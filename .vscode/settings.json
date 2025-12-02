@@ -32,7 +32,7 @@
 	"editor.tabSize": 2,
 	"editor.formatOnSave": true,
 	"editor.codeActionsOnSave": {
-		"source.organizeImports.biome": "explicit",
-		"source.removeUnusedImports.biome": "explicit"
+		"source.fixAll.eslint": "explicit",
+		"source.organizeImports": "explicit"
 	}
 }
