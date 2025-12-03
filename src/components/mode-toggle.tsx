@@ -1,30 +1,44 @@
+import { ClientOnly } from "@tanstack/react-router";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/providers/theme";
 
-export function ModeToggle() {
-	const { setTheme } = useTheme();
+function ModeToggleComponent() {
+	const { theme, setTheme } = useTheme();
+
+	const handleToggle = () => {
+		const isDark =
+			theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+		setTheme(isDark ? "light" : "dark");
+	};
+
+	const handleKeyDown = (event: React.KeyboardEvent) => {
+		if (event.key === "Enter" || event.key === " ") {
+			event.preventDefault();
+			handleToggle();
+		}
+	};
+
+	const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
 	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Button variant="outline" size="icon">
-					<Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-					<Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-					<span className="sr-only">Toggle theme</span>
-				</Button>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent align="end">
-				<DropdownMenuItem onClick={() => setTheme("light")}>Light</DropdownMenuItem>
-				<DropdownMenuItem onClick={() => setTheme("dark")}>Dark</DropdownMenuItem>
-				<DropdownMenuItem onClick={() => setTheme("system")}>System</DropdownMenuItem>
-			</DropdownMenuContent>
-		</DropdownMenu>
+		<Button
+			variant="outline"
+			size="icon"
+			aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+			onClick={handleToggle}
+			onKeyDown={handleKeyDown}
+			tabIndex={0}
+		>
+			{isDark ? <Sun className="h-[1.2rem] w-[1.2rem]" /> : <Moon className="h-[1.2rem] w-[1.2rem]" />}
+		</Button>
+	);
+}
+
+export function ModeToggle() {
+	return (
+		<ClientOnly>
+			<ModeToggleComponent />
+		</ClientOnly>
 	);
 }
