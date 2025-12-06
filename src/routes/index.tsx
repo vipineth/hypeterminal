@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { TradeTerminalPage } from "@/components/trade/TradeTerminalPage";
+import { TradeTerminalPage } from "@/components/trade";
 
 export const Route = createFileRoute("/")({
 	component: App,
