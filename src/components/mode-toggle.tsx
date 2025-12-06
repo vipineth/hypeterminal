@@ -24,7 +24,7 @@ function ModeToggleComponent() {
 	return (
 		<Button
 			variant="outline"
-			size="icon"
+			size="sm"
 			aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
 			onClick={handleToggle}
 			onKeyDown={handleKeyDown}

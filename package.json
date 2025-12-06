@@ -79,6 +79,7 @@
 		"@vitejs/plugin-react": "^5.0.4",
 		"babel-plugin-react-compiler": "^1.0.0",
 		"nitro": "latest",
+		"shadcn": "^3.5.1",
 		"typescript": "^5.7.2",
 		"vite": "^7.1.7",
 		"vite-tsconfig-paths": "^5.1.4"
