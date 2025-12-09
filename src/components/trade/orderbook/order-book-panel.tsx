@@ -19,7 +19,7 @@ export function OrderBookPanel() {
 
 	return (
 		<div className="h-full min-h-0 flex flex-col overflow-hidden border-l border-border/40">
-			<div className="flex items-center justify-between px-2 py-1.5 border-b border-border/40 bg-card/30">
+			<div className="flex items-center justify-between px-2 py-1.5 border-b border-border/40 bg-surface/30">
 				<div className="flex items-center gap-0.5">
 					<button
 						type="button"
@@ -90,7 +90,7 @@ export function OrderBookPanel() {
 							</div>
 						</ScrollArea>
 
-						<div className="shrink-0 py-1.5 px-2 flex items-center justify-center gap-2 border-y border-border/40 bg-card/30">
+						<div className="shrink-0 py-1.5 px-2 flex items-center justify-center gap-2 border-y border-border/40 bg-surface/30">
 							<span className="text-sm font-semibold tabular-nums text-terminal-amber terminal-glow-amber">102.45</span>
 							<TrendingUp className="size-3 text-terminal-green" />
 							<span className="text-4xs text-muted-foreground">≈ $102.45</span>

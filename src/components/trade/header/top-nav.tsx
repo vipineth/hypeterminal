@@ -11,7 +11,7 @@ import { ThemeToggle } from "./theme-toggle";
 
 export function TopNav() {
 	return (
-		<header className="h-11 border-b border-border/60 px-2 flex items-center justify-between bg-card/40">
+		<header className="h-11 border-b border-border/60 px-2 flex items-center justify-between bg-surface/40">
 			<div className="flex items-center gap-2 min-w-0">
 				<div className="flex items-center gap-1.5">
 					<div className="size-5 rounded bg-terminal-green/20 border border-terminal-green/40 flex items-center justify-center">

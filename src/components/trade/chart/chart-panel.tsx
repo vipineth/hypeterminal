@@ -20,7 +20,7 @@ export function ChartPanel() {
 
 	return (
 		<div className="h-full flex flex-col overflow-hidden">
-			<div className="px-2 py-1.5 border-b border-border/60 bg-card/30">
+			<div className="px-2 py-1.5 border-b border-border/60 bg-surface/30">
 				<div className="flex items-center justify-between gap-2">
 					<div className="flex items-center gap-2 min-w-0">
 						<DropdownMenu>

@@ -4,7 +4,7 @@ import { type Market, markets } from "../lib";
 
 export function TickerStrip() {
 	return (
-		<div className="h-8 border-b border-border/60 bg-card/20">
+		<div className="h-8 border-b border-border/60 bg-surface/20">
 			<ScrollArea className="w-full h-full">
 				<div className="h-8 flex items-center gap-0.5 px-2 min-w-full">
 					{markets.map((m) => (

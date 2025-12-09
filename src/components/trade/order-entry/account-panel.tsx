@@ -11,7 +11,7 @@ export function AccountPanel() {
 		<Collapsible
 			open={isExpanded}
 			onOpenChange={setIsExpanded}
-			className="shrink-0 flex flex-col bg-card/30 border-t border-border/40"
+			className="shrink-0 flex flex-col bg-surface/30 border-t border-border/40"
 		>
 			<CollapsibleTrigger asChild>
 				<button

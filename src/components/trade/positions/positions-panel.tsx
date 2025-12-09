@@ -7,7 +7,7 @@ import { positions } from "../lib";
 
 export function PositionsPanel() {
 	return (
-		<div className="h-full flex flex-col overflow-hidden bg-card/20">
+		<div className="h-full flex flex-col overflow-hidden bg-surface/20">
 			<Tabs defaultValue="positions" className="flex-1 min-h-0 flex flex-col">
 				<div className="px-2 pt-1.5 border-b border-border/40">
 					<div className="flex items-center gap-0.5 overflow-x-auto pb-1.5">

@@ -18,7 +18,7 @@ export function OrderEntryPanel() {
 	const tpSlId = useId();
 
 	return (
-		<div className="h-full flex flex-col overflow-hidden bg-card/20">
+		<div className="h-full flex flex-col overflow-hidden bg-surface/20">
 			<div className="px-2 py-1.5 border-b border-border/40 flex items-center justify-between">
 				<div className="flex items-center gap-1">
 					{["Cross", "Isolated"].map((m) => (
