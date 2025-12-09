@@ -1,7 +1,7 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { usePersistentLayout } from "../lib";
-import { PriceRow } from "./price-row";
 import { PositionsPanel } from "../positions/positions-panel";
+import { PriceRow } from "./price-row";
 
 export function AnalysisSection() {
 	const { layout: vertLayout, onLayout: onVertLayout } = usePersistentLayout("terminal:layout:vert", [70, 30]);
@@ -23,4 +23,3 @@ export function AnalysisSection() {
 		</div>
 	);
 }
-

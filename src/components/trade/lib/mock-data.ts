@@ -1,4 +1,13 @@
-import type { Market, OrderBookRow, PositionRow } from "./types";
+import type {
+	BalanceRow,
+	FundingRow,
+	HistoryRow,
+	Market,
+	OrderBookRow,
+	OrderRow,
+	PositionRow,
+	TwapOrder,
+} from "./types";
 
 export const markets: Market[] = [
 	{ symbol: "AAVE-USDC", base: "AAVE", changePct: 2.34, price: 102.45, volume: "42.3M" },
@@ -50,3 +59,148 @@ export const positions: PositionRow[] = [
 	},
 ];
 
+export const balances: BalanceRow[] = [
+	{ asset: "USDC", available: 12543.21, inOrder: 2500.0, total: 15043.21, usdValue: 15043.21 },
+	{ asset: "ETH", available: 2.4521, inOrder: 0.5, total: 2.9521, usdValue: 6912.42 },
+	{ asset: "BTC", available: 0.1234, inOrder: 0.0, total: 0.1234, usdValue: 5370.53 },
+	{ asset: "AAVE", available: 45.32, inOrder: 12.3, total: 57.62, usdValue: 5903.12 },
+	{ asset: "SOL", available: 124.5, inOrder: 0.0, total: 124.5, usdValue: 12298.74 },
+];
+
+export const orders: OrderRow[] = [
+	{
+		id: "ord-001",
+		coin: "AAVE",
+		side: "buy",
+		type: "limit",
+		price: 95.5,
+		size: 10.0,
+		filled: 0,
+		status: "open",
+		createdAt: "2024-01-15T10:23:45Z",
+	},
+	{
+		id: "ord-002",
+		coin: "ETH",
+		side: "sell",
+		type: "stop-limit",
+		price: 3200.0,
+		size: 0.5,
+		filled: 0,
+		status: "open",
+		createdAt: "2024-01-15T09:15:30Z",
+	},
+	{
+		id: "ord-003",
+		coin: "BTC",
+		side: "buy",
+		type: "limit",
+		price: 42000.0,
+		size: 0.05,
+		filled: 0.02,
+		status: "partial",
+		createdAt: "2024-01-15T08:45:12Z",
+	},
+	{
+		id: "ord-004",
+		coin: "SOL",
+		side: "sell",
+		type: "limit",
+		price: 105.0,
+		size: 25.0,
+		filled: 0,
+		status: "open",
+		createdAt: "2024-01-15T07:30:00Z",
+	},
+];
+
+export const twapOrders: TwapOrder[] = [
+	{
+		id: "twap-001",
+		coin: "BTC",
+		side: "buy",
+		totalSize: 0.5,
+		executedSize: 0.32,
+		avgPrice: 43102.45,
+		startTime: "2024-01-15T08:00:00Z",
+		endTime: "2024-01-15T12:00:00Z",
+		status: "active",
+	},
+	{
+		id: "twap-002",
+		coin: "ETH",
+		side: "sell",
+		totalSize: 5.0,
+		executedSize: 5.0,
+		avgPrice: 2356.78,
+		startTime: "2024-01-14T10:00:00Z",
+		endTime: "2024-01-14T18:00:00Z",
+		status: "completed",
+	},
+];
+
+export const history: HistoryRow[] = [
+	{
+		id: "hist-001",
+		coin: "AAVE",
+		side: "buy",
+		type: "market",
+		price: 98.32,
+		size: 12.3,
+		fee: 1.21,
+		pnl: 0,
+		executedAt: "2024-01-15T06:23:45Z",
+	},
+	{
+		id: "hist-002",
+		coin: "ETH",
+		side: "sell",
+		type: "limit",
+		price: 3102.12,
+		size: 0.84,
+		fee: 2.61,
+		pnl: 0,
+		executedAt: "2024-01-14T22:15:30Z",
+	},
+	{
+		id: "hist-003",
+		coin: "BTC",
+		side: "buy",
+		type: "market",
+		price: 43250.0,
+		size: 0.1,
+		fee: 4.33,
+		pnl: 0,
+		executedAt: "2024-01-14T18:45:12Z",
+	},
+	{
+		id: "hist-004",
+		coin: "SOL",
+		side: "sell",
+		type: "limit",
+		price: 102.5,
+		size: 50.0,
+		fee: 5.13,
+		pnl: 245.5,
+		executedAt: "2024-01-14T14:30:00Z",
+	},
+	{
+		id: "hist-005",
+		coin: "LINK",
+		side: "buy",
+		type: "market",
+		price: 14.12,
+		size: 100.0,
+		fee: 1.41,
+		pnl: 0,
+		executedAt: "2024-01-14T10:00:00Z",
+	},
+];
+
+export const fundingPayments: FundingRow[] = [
+	{ coin: "AAVE", rate: 0.0001, payment: -0.42, positionSize: 12.3, timestamp: "2024-01-15T08:00:00Z" },
+	{ coin: "ETH", rate: -0.00015, payment: 0.12, positionSize: -0.84, timestamp: "2024-01-15T08:00:00Z" },
+	{ coin: "AAVE", rate: 0.00008, payment: -0.34, positionSize: 12.3, timestamp: "2024-01-15T00:00:00Z" },
+	{ coin: "ETH", rate: -0.0001, payment: 0.08, positionSize: -0.84, timestamp: "2024-01-15T00:00:00Z" },
+	{ coin: "AAVE", rate: 0.00012, payment: -0.51, positionSize: 12.3, timestamp: "2024-01-14T16:00:00Z" },
+];

@@ -8,6 +8,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 export function OrderEntryPanel() {
@@ -20,25 +21,12 @@ export function OrderEntryPanel() {
 	return (
 		<div className="h-full flex flex-col overflow-hidden bg-surface/20">
 			<div className="px-2 py-1.5 border-b border-border/40 flex items-center justify-between">
-				<div className="flex items-center gap-1">
-					{["Cross", "Isolated"].map((m) => (
-						<button
-							key={m}
-							type="button"
-							onClick={() => setMode(m.toLowerCase())}
-							className={cn(
-								"px-2 py-0.5 text-3xs uppercase tracking-wider transition-colors",
-								mode === m.toLowerCase()
-									? "text-terminal-cyan bg-terminal-cyan/10"
-									: "text-muted-foreground hover:text-foreground",
-							)}
-							tabIndex={0}
-							aria-label={`${m} margin`}
-						>
-							{m}
-						</button>
-					))}
-				</div>
+				<Tabs value={mode} onValueChange={setMode}>
+					<TabsList>
+						<TabsTrigger value="cross">Cross</TabsTrigger>
+						<TabsTrigger value="isolated">Isolated</TabsTrigger>
+					</TabsList>
+				</Tabs>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<button
