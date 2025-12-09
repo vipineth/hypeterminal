@@ -1,46 +1,21 @@
 import { useEffect, useRef } from "react";
+import type {
+	ChartingLibraryFeatureset,
+	ChartingLibraryWidgetConstructor,
+	IBasicDataFeed,
+	IChartingLibraryWidget,
+	ResolutionString,
+	TimeFrameItem,
+} from "@/types/charting_library";
 import { createDatafeed } from "./datafeed";
 
 declare global {
 	interface Window {
 		TradingView: {
-			widget: new (config: TradingViewWidgetConfig) => TradingViewWidget;
+			widget: ChartingLibraryWidgetConstructor;
 		};
 	}
 }
-
-type TradingViewWidget = {
-	remove: () => void;
-	onChartReady: (callback: () => void) => void;
-	activeChart: () => {
-		setChartType: (type: number) => void;
-	};
-	applyOverrides: (overrides: Record<string, string | number | boolean>) => void;
-	changeTheme: (theme: "light" | "dark") => void;
-};
-
-type TradingViewWidgetConfig = {
-	container: HTMLElement;
-	library_path: string;
-	datafeed: ReturnType<typeof createDatafeed>;
-	symbol: string;
-	interval: string;
-	locale: string;
-	fullscreen: boolean;
-	autosize: boolean;
-	theme: "light" | "dark";
-	timezone: string;
-	debug: boolean;
-	enabled_features: string[];
-	disabled_features: string[];
-	overrides: Record<string, string | number | boolean>;
-	loading_screen: { backgroundColor: string; foregroundColor: string };
-	custom_css_url: string;
-	toolbar_bg: string;
-	studies_overrides: Record<string, string | number>;
-	custom_font_family?: string;
-	time_frames?: Array<{ text: string; resolution: string; description: string }>;
-};
 
 type TradingViewChartProps = {
 	symbol?: string;
@@ -51,10 +26,10 @@ type TradingViewChartProps = {
 const LIBRARY_PATH = "https://cdn.asgard.finance/charting_library-28.3.0/";
 
 const darkOverrides: Record<string, string | number | boolean> = {
-	"paneProperties.background": "#0a0a0a",
+	"paneProperties.background": "#0d0d0d",
 	"paneProperties.backgroundType": "solid",
-	"paneProperties.vertGridProperties.color": "rgba(255, 255, 255, 0.03)",
-	"paneProperties.horzGridProperties.color": "rgba(255, 255, 255, 0.03)",
+	"paneProperties.vertGridProperties.color": "rgba(255, 255, 255, 0.04)",
+	"paneProperties.horzGridProperties.color": "rgba(255, 255, 255, 0.04)",
 	"paneProperties.crossHairProperties.color": "#5eead4",
 	"paneProperties.crossHairProperties.style": 2,
 	"paneProperties.crossHairProperties.width": 1,
@@ -66,9 +41,9 @@ const darkOverrides: Record<string, string | number | boolean> = {
 	"paneProperties.legendProperties.showLegend": true,
 	"paneProperties.legendProperties.showBarChange": true,
 	"paneProperties.legendProperties.showVolume": false,
-	"scalesProperties.backgroundColor": "#0a0a0a",
-	"scalesProperties.lineColor": "rgba(255, 255, 255, 0.06)",
-	"scalesProperties.textColor": "rgba(255, 255, 255, 0.45)",
+	"scalesProperties.backgroundColor": "#0d0d0d",
+	"scalesProperties.lineColor": "rgba(255, 255, 255, 0.08)",
+	"scalesProperties.textColor": "rgba(255, 255, 255, 0.55)",
 	"scalesProperties.fontSize": 10,
 	"scalesProperties.scaleSeriesOnly": false,
 	"mainSeriesProperties.candleStyle.upColor": "#22c55e",
@@ -115,14 +90,14 @@ const darkOverrides: Record<string, string | number | boolean> = {
 	"mainSeriesProperties.statusViewStyle.symbolTextSource": "description",
 	"symbolWatermarkProperties.transparency": 96,
 	"symbolWatermarkProperties.color": "rgba(255, 255, 255, 0.03)",
-	"volumePaneSize": "small",
+	volumePaneSize: "small",
 };
 
 const lightOverrides: Record<string, string | number | boolean> = {
-	"paneProperties.background": "#fafafa",
+	"paneProperties.background": "#f5f7f9",
 	"paneProperties.backgroundType": "solid",
-	"paneProperties.vertGridProperties.color": "rgba(0, 0, 50, 0.04)",
-	"paneProperties.horzGridProperties.color": "rgba(0, 0, 50, 0.04)",
+	"paneProperties.vertGridProperties.color": "rgba(0, 0, 50, 0.05)",
+	"paneProperties.horzGridProperties.color": "rgba(0, 0, 50, 0.05)",
 	"paneProperties.crossHairProperties.color": "#0ea5e9",
 	"paneProperties.crossHairProperties.style": 2,
 	"paneProperties.crossHairProperties.width": 1,
@@ -134,9 +109,9 @@ const lightOverrides: Record<string, string | number | boolean> = {
 	"paneProperties.legendProperties.showLegend": true,
 	"paneProperties.legendProperties.showBarChange": true,
 	"paneProperties.legendProperties.showVolume": false,
-	"scalesProperties.backgroundColor": "#fafafa",
-	"scalesProperties.lineColor": "rgba(0, 0, 50, 0.08)",
-	"scalesProperties.textColor": "rgba(0, 0, 50, 0.55)",
+	"scalesProperties.backgroundColor": "#f5f7f9",
+	"scalesProperties.lineColor": "rgba(0, 0, 50, 0.1)",
+	"scalesProperties.textColor": "rgba(0, 0, 50, 0.6)",
 	"scalesProperties.fontSize": 10,
 	"scalesProperties.scaleSeriesOnly": false,
 	"mainSeriesProperties.candleStyle.upColor": "#16a34a",
@@ -183,21 +158,21 @@ const lightOverrides: Record<string, string | number | boolean> = {
 	"mainSeriesProperties.statusViewStyle.symbolTextSource": "description",
 	"symbolWatermarkProperties.transparency": 96,
 	"symbolWatermarkProperties.color": "rgba(0, 0, 50, 0.03)",
-	"volumePaneSize": "small",
+	volumePaneSize: "small",
 };
 
-const timeFrames = [
-	{ text: "5y", resolution: "1W", description: "5 Years" },
-	{ text: "1y", resolution: "1D", description: "1 Year" },
-	{ text: "3m", resolution: "240", description: "3 Months" },
-	{ text: "1m", resolution: "60", description: "1 Month" },
-	{ text: "5d", resolution: "15", description: "5 Days" },
-	{ text: "1d", resolution: "5", description: "1 Day" },
+const timeFrames: TimeFrameItem[] = [
+	{ text: "5y", resolution: "1W" as ResolutionString, description: "5 Years" },
+	{ text: "1y", resolution: "1D" as ResolutionString, description: "1 Year" },
+	{ text: "3m", resolution: "240" as ResolutionString, description: "3 Months" },
+	{ text: "1m", resolution: "60" as ResolutionString, description: "1 Month" },
+	{ text: "5d", resolution: "15" as ResolutionString, description: "5 Days" },
+	{ text: "1d", resolution: "5" as ResolutionString, description: "1 Day" },
 ];
 
 export function TradingViewChart({ symbol = "AAVE/USDC", interval = "60", theme = "dark" }: TradingViewChartProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
-	const widgetRef = useRef<TradingViewWidget | null>(null);
+	const widgetRef = useRef<IChartingLibraryWidget | null>(null);
 	const scriptLoadedRef = useRef(false);
 
 	useEffect(() => {
@@ -241,34 +216,33 @@ export function TradingViewChart({ symbol = "AAVE/USDC", interval = "60", theme 
 				}
 
 				const overrides = theme === "dark" ? darkOverrides : lightOverrides;
-				const bgColor = theme === "dark" ? "#0a0a0a" : "#fafafa";
+				const bgColor = theme === "dark" ? "#0d0d0d" : "#f5f7f9";
 				const accentColor = theme === "dark" ? "#5eead4" : "#0ea5e9";
 
 				widgetRef.current = new window.TradingView.widget({
 					container: containerRef.current,
 					library_path: LIBRARY_PATH,
-					datafeed: createDatafeed(),
+					datafeed: createDatafeed() as unknown as IBasicDataFeed,
 					symbol: symbol,
-					interval: interval,
+					interval: interval as ResolutionString,
 					locale: "en",
 					fullscreen: false,
 					autosize: true,
 					theme: theme,
 					timezone: "Etc/UTC",
 					debug: false,
-					custom_font_family: "'JetBrains Mono', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace",
+					custom_font_family: "'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, monospace",
 					time_frames: timeFrames,
 					enabled_features: [
 						"side_toolbar_in_fullscreen_mode",
 						"header_in_fullscreen_mode",
 						"hide_last_na_study_output",
 						"constraint_dialogs_to_chart",
-						"hide_left_toolbar_by_default",
 						"dont_show_boolean_study_arguments",
 						"hide_resolution_in_legend",
 						"items_favoriting",
 						"save_shortcut",
-					],
+					] as ChartingLibraryFeatureset[],
 					disabled_features: [
 						"header_symbol_search",
 						"header_compare",
@@ -292,7 +266,7 @@ export function TradingViewChart({ symbol = "AAVE/USDC", interval = "60", theme 
 						"countdown",
 						"timeframes_toolbar",
 						"main_series_scale_menu",
-					],
+					] as ChartingLibraryFeatureset[],
 					overrides: overrides,
 					loading_screen: {
 						backgroundColor: bgColor,
@@ -300,17 +274,9 @@ export function TradingViewChart({ symbol = "AAVE/USDC", interval = "60", theme 
 					},
 					custom_css_url: "/tradingview-theme.css",
 					toolbar_bg: bgColor,
-					studies_overrides: {
-						"volume.volume.color.0": theme === "dark" ? "rgba(239, 68, 68, 0.5)" : "rgba(220, 38, 38, 0.5)",
-						"volume.volume.color.1": theme === "dark" ? "rgba(34, 197, 94, 0.5)" : "rgba(22, 163, 74, 0.5)",
-						"volume.volume.transparency": 50,
-						"MACD.histogram.color": theme === "dark" ? "#5eead4" : "#0ea5e9",
-						"RSI.plot.color": theme === "dark" ? "#5eead4" : "#0ea5e9",
-						"Bollinger Bands.median.color": theme === "dark" ? "#5eead4" : "#0ea5e9",
-						"Bollinger Bands.upper.color": theme === "dark" ? "rgba(94, 234, 212, 0.5)" : "rgba(14, 165, 233, 0.5)",
-						"Bollinger Bands.lower.color": theme === "dark" ? "rgba(94, 234, 212, 0.5)" : "rgba(14, 165, 233, 0.5)",
-						"Moving Average.plot.color": theme === "dark" ? "#f59e0b" : "#d97706",
-						"Moving Average Exponential.plot.color": theme === "dark" ? "#a78bfa" : "#8b5cf6",
+					studies_overrides: {},
+					favorites: {
+						intervals: ["1", "5", "60", "240", "1D"] as ResolutionString[],
 					},
 				});
 

@@ -140,12 +140,7 @@ function getResolutionMs(resolution: string): number {
 
 const lastBarCache: Map<string, Bar> = new Map();
 
-function generateHistoricalBars(
-	symbol: string,
-	resolution: string,
-	from: number,
-	to: number,
-): Bar[] {
+function generateHistoricalBars(symbol: string, resolution: string, from: number, to: number): Bar[] {
 	const bars: Bar[] = [];
 	const basePrice = basePrices[symbol] || 100;
 	const resolutionMs = getResolutionMs(resolution);
@@ -154,7 +149,7 @@ function generateHistoricalBars(
 	const now = Date.now();
 	const currentBarTime = Math.floor(now / resolutionMs) * resolutionMs;
 	const toMs = Math.min(to * 1000, currentBarTime);
-	
+
 	let currentTime = Math.floor(fromMs / resolutionMs) * resolutionMs;
 	let lastClose = basePrice * (0.7 + Math.random() * 0.2);
 
@@ -178,7 +173,7 @@ function generateHistoricalBars(
 			close: Number(close.toFixed(2)),
 			volume: Number(volume.toFixed(2)),
 		};
-		
+
 		bars.push(bar);
 		lastClose = close;
 		currentTime += resolutionMs;
@@ -257,12 +252,7 @@ export function createDatafeed() {
 			onError: (error: string) => void,
 		) => {
 			try {
-				const bars = generateHistoricalBars(
-					symbolInfo.name,
-					resolution,
-					periodParams.from,
-					periodParams.to,
-				);
+				const bars = generateHistoricalBars(symbolInfo.name, resolution, periodParams.from, periodParams.to);
 				onResult(bars, { noData: bars.length === 0 });
 			} catch (error) {
 				onError(String(error));
@@ -278,20 +268,21 @@ export function createDatafeed() {
 			const resolutionMs = getResolutionMs(resolution);
 			const cacheKey = `${symbolInfo.name}_${resolution}`;
 			const cachedBar = lastBarCache.get(cacheKey);
-			
+
 			const now = Date.now();
 			const currentBarTime = Math.floor(now / resolutionMs) * resolutionMs;
-			
-			let lastBar: Bar = cachedBar && cachedBar.time === currentBarTime
-				? { ...cachedBar }
-				: {
-					time: currentBarTime,
-					open: cachedBar?.close ?? basePrices[symbolInfo.name] ?? 100,
-					high: cachedBar?.close ?? basePrices[symbolInfo.name] ?? 100,
-					low: cachedBar?.close ?? basePrices[symbolInfo.name] ?? 100,
-					close: cachedBar?.close ?? basePrices[symbolInfo.name] ?? 100,
-					volume: Math.random() * 50000,
-				};
+
+			let lastBar: Bar =
+				cachedBar && cachedBar.time === currentBarTime
+					? { ...cachedBar }
+					: {
+							time: currentBarTime,
+							open: cachedBar?.close ?? basePrices[symbolInfo.name] ?? 100,
+							high: cachedBar?.close ?? basePrices[symbolInfo.name] ?? 100,
+							low: cachedBar?.close ?? basePrices[symbolInfo.name] ?? 100,
+							close: cachedBar?.close ?? basePrices[symbolInfo.name] ?? 100,
+							volume: Math.random() * 50000,
+						};
 
 			const interval = setInterval(() => {
 				const currentTime = Date.now();
@@ -342,4 +333,3 @@ export function createDatafeed() {
 		},
 	};
 }
-
