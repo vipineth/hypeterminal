@@ -23,7 +23,7 @@ function MarketChip({ market }: { market: Market }) {
 		<button
 			type="button"
 			className={cn(
-				"shrink-0 inline-flex items-center gap-2 px-2.5 py-1 text-[10px] transition-colors",
+				"shrink-0 inline-flex items-center gap-2 px-2.5 py-1 text-3xs transition-colors",
 				"hover:bg-accent/50 border-r border-border/40",
 			)}
 			tabIndex={0}

@@ -1,0 +1,25 @@
+{
+  "version": 1.1,
+  "atDirectives": [
+    {
+      "name": "@theme",
+      "description": "Tailwind CSS v4: Define theme variables that generate utility classes"
+    },
+    {
+      "name": "@custom-variant",
+      "description": "Tailwind CSS v4: Define custom variants"
+    },
+    {
+      "name": "@source",
+      "description": "Tailwind CSS v4: Define source files to scan"
+    },
+    {
+      "name": "@plugin",
+      "description": "Tailwind CSS v4: Load a plugin"
+    },
+    {
+      "name": "@config",
+      "description": "Tailwind CSS v4: Load a configuration file"
+    }
+  ]
+}

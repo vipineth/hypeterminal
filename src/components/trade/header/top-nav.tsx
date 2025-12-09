@@ -22,7 +22,7 @@ export function TopNav() {
 					</span>
 				</div>
 				<div className="h-4 w-px bg-border/60 mx-1 hidden md:block" />
-				<nav className="hidden lg:flex items-center text-[10px] uppercase tracking-wider">
+				<nav className="hidden lg:flex items-center text-3xs uppercase tracking-wider">
 					{["Trade", "Vaults", "Portfolio", "Staking", "Leaderboard"].map((item, idx) => (
 						<button
 							key={item}
@@ -61,14 +61,14 @@ export function TopNav() {
 				<Button
 					size="sm"
 					variant="outline"
-					className="h-7 text-[10px] uppercase tracking-wider border-terminal-green/40 text-terminal-green hover:bg-terminal-green/10 hover:text-terminal-green"
+					className="h-7 text-3xs uppercase tracking-wider border-terminal-green/40 text-terminal-green hover:bg-terminal-green/10 hover:text-terminal-green"
 				>
 					<Zap className="size-3 mr-1" />
 					Deposit
 				</Button>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" size="sm" className="h-7 gap-1.5 text-[10px] uppercase tracking-wider">
+						<Button variant="ghost" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider">
 							<div className="size-1.5 rounded-full bg-terminal-green animate-pulse" />
 							0x8f2...4a1b
 							<ChevronDown className="size-2.5" />

@@ -16,7 +16,7 @@ export function PositionsPanel() {
 								key={k}
 								type="button"
 								className={cn(
-									"px-2 py-1 text-[10px] uppercase tracking-wider whitespace-nowrap transition-colors",
+									"px-2 py-1 text-3xs uppercase tracking-wider whitespace-nowrap transition-colors",
 									idx === 1
 										? "text-terminal-cyan border-b border-terminal-cyan"
 										: "text-muted-foreground hover:text-foreground",
@@ -30,7 +30,7 @@ export function PositionsPanel() {
 					</div>
 				</div>
 				<TabsContent value="positions" className="flex-1 min-h-0 flex flex-col p-2">
-					<div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-2">
+					<div className="text-3xs uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-2">
 						<Circle className="size-1.5 fill-terminal-green text-terminal-green" />
 						Active Positions
 						<span className="text-terminal-cyan ml-auto tabular-nums">2</span>
@@ -40,28 +40,28 @@ export function PositionsPanel() {
 							<Table>
 								<TableHeader>
 									<TableRow className="border-border/40 hover:bg-transparent">
-										<TableHead className="text-[9px] uppercase tracking-wider text-muted-foreground/70 h-7">
+										<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
 											Asset
 										</TableHead>
-										<TableHead className="text-[9px] uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+										<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
 											Size
 										</TableHead>
-										<TableHead className="text-[9px] uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+										<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
 											Value
 										</TableHead>
-										<TableHead className="text-[9px] uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+										<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
 											Entry
 										</TableHead>
-										<TableHead className="text-[9px] uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+										<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
 											Mark
 										</TableHead>
-										<TableHead className="text-[9px] uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+										<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
 											PNL
 										</TableHead>
-										<TableHead className="text-[9px] uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+										<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
 											Liq
 										</TableHead>
-										<TableHead className="text-[9px] uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+										<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
 											Actions
 										</TableHead>
 									</TableRow>
@@ -71,11 +71,11 @@ export function PositionsPanel() {
 										const isLong = p.size > 0;
 										return (
 											<TableRow key={`${p.coin}-${p.entryPrice}`} className="border-border/40 hover:bg-accent/30">
-												<TableCell className="text-[11px] font-medium py-1.5">
+												<TableCell className="text-2xs font-medium py-1.5">
 													<div className="flex items-center gap-1.5">
 														<span
 															className={cn(
-																"text-[9px] px-1 py-0.5 rounded-sm uppercase",
+																"text-4xs px-1 py-0.5 rounded-sm uppercase",
 																isLong
 																	? "bg-terminal-green/20 text-terminal-green"
 																	: "bg-terminal-red/20 text-terminal-red",
@@ -86,22 +86,22 @@ export function PositionsPanel() {
 														<span>{p.coin}</span>
 													</div>
 												</TableCell>
-												<TableCell className="text-[11px] text-right tabular-nums py-1.5">
+												<TableCell className="text-2xs text-right tabular-nums py-1.5">
 													{Math.abs(p.size).toFixed(2)}
 												</TableCell>
-												<TableCell className="text-[11px] text-right tabular-nums py-1.5">
+												<TableCell className="text-2xs text-right tabular-nums py-1.5">
 													${p.positionValue.toFixed(2)}
 												</TableCell>
-												<TableCell className="text-[11px] text-right tabular-nums py-1.5">
+												<TableCell className="text-2xs text-right tabular-nums py-1.5">
 													${p.entryPrice.toFixed(2)}
 												</TableCell>
-												<TableCell className="text-[11px] text-right tabular-nums text-terminal-amber py-1.5">
+												<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
 													${p.markPrice.toFixed(2)}
 												</TableCell>
 												<TableCell className="text-right py-1.5">
 													<div
 														className={cn(
-															"text-[11px] tabular-nums",
+															"text-2xs tabular-nums",
 															p.pnl >= 0 ? "text-terminal-green" : "text-terminal-red",
 														)}
 													>
@@ -109,14 +109,14 @@ export function PositionsPanel() {
 														<span className="text-muted-foreground ml-1">({p.roePct.toFixed(1)}%)</span>
 													</div>
 												</TableCell>
-												<TableCell className="text-[11px] text-right tabular-nums text-terminal-red/70 py-1.5">
+												<TableCell className="text-2xs text-right tabular-nums text-terminal-red/70 py-1.5">
 													${p.liqPrice.toFixed(2)}
 												</TableCell>
 												<TableCell className="text-right py-1.5">
 													<div className="flex justify-end gap-1">
 														<button
 															type="button"
-															className="px-1.5 py-0.5 text-[9px] uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors"
+															className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors"
 															tabIndex={0}
 															aria-label="Close position"
 														>
@@ -124,7 +124,7 @@ export function PositionsPanel() {
 														</button>
 														<button
 															type="button"
-															className="px-1.5 py-0.5 text-[9px] uppercase tracking-wider border border-border/60 hover:border-terminal-cyan/60 hover:text-terminal-cyan transition-colors"
+															className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-cyan/60 hover:text-terminal-cyan transition-colors"
 															tabIndex={0}
 															aria-label="Set TP/SL"
 														>
@@ -145,4 +145,3 @@ export function PositionsPanel() {
 		</div>
 	);
 }
-

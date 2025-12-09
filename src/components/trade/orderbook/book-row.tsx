@@ -12,7 +12,7 @@ export function BookRow({ row, type, maxTotal }: BookRowProps) {
 	const isAsk = type === "ask";
 
 	return (
-		<div className="grid grid-cols-3 gap-2 text-[11px] tabular-nums py-0.5 relative hover:bg-accent/30 cursor-pointer group">
+		<div className="grid grid-cols-3 gap-2 text-2xs tabular-nums py-0.5 relative hover:bg-accent/30 cursor-pointer group">
 			<div
 				className={cn("absolute inset-0 pointer-events-none", isAsk ? "depth-bar-ask" : "depth-bar-bid")}
 				style={{ width: `${depthPct}%`, [isAsk ? "right" : "left"]: 0, [isAsk ? "left" : "right"]: "auto" }}
@@ -29,4 +29,3 @@ export function BookRow({ row, type, maxTotal }: BookRowProps) {
 		</div>
 	);
 }
-

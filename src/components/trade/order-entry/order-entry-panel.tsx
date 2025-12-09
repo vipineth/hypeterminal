@@ -1,7 +1,12 @@
 import { ChevronDown, TrendingDown, TrendingUp } from "lucide-react";
 import { useId, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
@@ -22,7 +27,7 @@ export function OrderEntryPanel() {
 							type="button"
 							onClick={() => setMode(m.toLowerCase())}
 							className={cn(
-								"px-2 py-0.5 text-[10px] uppercase tracking-wider transition-colors",
+								"px-2 py-0.5 text-3xs uppercase tracking-wider transition-colors",
 								mode === m.toLowerCase()
 									? "text-terminal-cyan bg-terminal-cyan/10"
 									: "text-muted-foreground hover:text-foreground",
@@ -38,7 +43,7 @@ export function OrderEntryPanel() {
 					<DropdownMenuTrigger asChild>
 						<button
 							type="button"
-							className="px-2 py-0.5 text-[10px] border border-terminal-cyan/40 text-terminal-cyan inline-flex items-center gap-1"
+							className="px-2 py-0.5 text-3xs border border-terminal-cyan/40 text-terminal-cyan inline-flex items-center gap-1"
 							tabIndex={0}
 							aria-label="Select leverage"
 						>
@@ -61,7 +66,7 @@ export function OrderEntryPanel() {
 							type="button"
 							onClick={() => setType(t.toLowerCase())}
 							className={cn(
-								"flex-1 py-1 text-[10px] uppercase tracking-wider transition-colors rounded-sm",
+								"flex-1 py-1 text-3xs uppercase tracking-wider transition-colors rounded-sm",
 								type === t.toLowerCase()
 									? "bg-background text-foreground"
 									: "text-muted-foreground hover:text-foreground",
@@ -79,7 +84,7 @@ export function OrderEntryPanel() {
 						type="button"
 						onClick={() => setSide("buy")}
 						className={cn(
-							"py-2 text-[11px] font-semibold uppercase tracking-wider transition-all border",
+							"py-2 text-2xs font-semibold uppercase tracking-wider transition-all border",
 							side === "buy"
 								? "bg-terminal-green/20 border-terminal-green text-terminal-green terminal-glow-green"
 								: "border-border/60 text-muted-foreground hover:border-terminal-green/40 hover:text-terminal-green",
@@ -94,7 +99,7 @@ export function OrderEntryPanel() {
 						type="button"
 						onClick={() => setSide("sell")}
 						className={cn(
-							"py-2 text-[11px] font-semibold uppercase tracking-wider transition-all border",
+							"py-2 text-2xs font-semibold uppercase tracking-wider transition-all border",
 							side === "sell"
 								? "bg-terminal-red/20 border-terminal-red text-terminal-red terminal-glow-red"
 								: "border-border/60 text-muted-foreground hover:border-terminal-red/40 hover:text-terminal-red",
@@ -107,7 +112,7 @@ export function OrderEntryPanel() {
 					</button>
 				</div>
 
-				<div className="space-y-0.5 text-[10px]">
+				<div className="space-y-0.5 text-3xs">
 					<div className="flex items-center justify-between text-muted-foreground">
 						<span>Available</span>
 						<span className="tabular-nums text-terminal-green">$1,245.12</span>
@@ -119,11 +124,11 @@ export function OrderEntryPanel() {
 				</div>
 
 				<div className="space-y-1.5">
-					<div className="text-[9px] uppercase tracking-wider text-muted-foreground">Size</div>
+					<div className="text-4xs uppercase tracking-wider text-muted-foreground">Size</div>
 					<div className="flex items-center gap-1">
 						<button
 							type="button"
-							className="px-2 py-1.5 text-[10px] border border-border/60 hover:border-foreground/30 inline-flex items-center gap-1"
+							className="px-2 py-1.5 text-3xs border border-border/60 hover:border-foreground/30 inline-flex items-center gap-1"
 							tabIndex={0}
 							aria-label="Select asset"
 						>
@@ -139,7 +144,7 @@ export function OrderEntryPanel() {
 							<button
 								key={p}
 								type="button"
-								className="py-1 text-[9px] uppercase tracking-wider border border-border/60 hover:border-terminal-cyan/40 hover:text-terminal-cyan transition-colors"
+								className="py-1 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-cyan/40 hover:text-terminal-cyan transition-colors"
 								tabIndex={0}
 								aria-label={`Set ${p}`}
 							>
@@ -151,7 +156,7 @@ export function OrderEntryPanel() {
 
 				{type === "limit" && (
 					<div className="space-y-1.5">
-						<div className="text-[9px] uppercase tracking-wider text-muted-foreground">Limit Price</div>
+						<div className="text-4xs uppercase tracking-wider text-muted-foreground">Limit Price</div>
 						<Input
 							placeholder="0.00"
 							className="h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums"
@@ -159,7 +164,7 @@ export function OrderEntryPanel() {
 					</div>
 				)}
 
-				<div className="flex items-center gap-3 text-[10px]">
+				<div className="flex items-center gap-3 text-3xs">
 					<div className="inline-flex items-center gap-1.5 cursor-pointer">
 						<Checkbox id={reduceOnlyId} className="size-3.5" aria-label="Reduce Only" />
 						<label htmlFor={reduceOnlyId} className="text-muted-foreground cursor-pointer">
@@ -178,7 +183,7 @@ export function OrderEntryPanel() {
 				<button
 					type="button"
 					className={cn(
-						"w-full py-2.5 text-[11px] font-semibold uppercase tracking-wider transition-all border",
+						"w-full py-2.5 text-2xs font-semibold uppercase tracking-wider transition-all border",
 						side === "buy"
 							? "bg-terminal-green/20 border-terminal-green text-terminal-green hover:bg-terminal-green/30"
 							: "bg-terminal-red/20 border-terminal-red text-terminal-red hover:bg-terminal-red/30",
@@ -189,7 +194,7 @@ export function OrderEntryPanel() {
 					{side === "buy" ? "Buy / Long" : "Sell / Short"} AAVE
 				</button>
 
-				<div className="border border-border/40 divide-y divide-border/40 text-[10px]">
+				<div className="border border-border/40 divide-y divide-border/40 text-3xs">
 					{[
 						["Liq. Price", "$72.12", "text-terminal-red/70"],
 						["Order Value", "$1,245.30", ""],
@@ -207,4 +212,3 @@ export function OrderEntryPanel() {
 		</div>
 	);
 }
-

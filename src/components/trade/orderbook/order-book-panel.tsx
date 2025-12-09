@@ -1,6 +1,11 @@
 import { ChevronDown, TrendingUp } from "lucide-react";
 import { useState } from "react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { asks, bids } from "../lib";
@@ -20,7 +25,7 @@ export function OrderBookPanel() {
 						type="button"
 						onClick={() => setView("book")}
 						className={cn(
-							"px-2 py-1 text-[10px] uppercase tracking-wider transition-colors",
+							"px-2 py-1 text-3xs uppercase tracking-wider transition-colors",
 							view === "book" ? "text-terminal-cyan" : "text-muted-foreground hover:text-foreground",
 						)}
 						tabIndex={0}
@@ -32,7 +37,7 @@ export function OrderBookPanel() {
 						type="button"
 						onClick={() => setView("trades")}
 						className={cn(
-							"px-2 py-1 text-[10px] uppercase tracking-wider transition-colors",
+							"px-2 py-1 text-3xs uppercase tracking-wider transition-colors",
 							view === "trades" ? "text-terminal-cyan" : "text-muted-foreground hover:text-foreground",
 						)}
 						tabIndex={0}
@@ -45,7 +50,7 @@ export function OrderBookPanel() {
 					<DropdownMenuTrigger asChild>
 						<button
 							type="button"
-							className="px-1.5 py-0.5 text-[9px] border border-border/60 hover:border-foreground/30 inline-flex items-center gap-1"
+							className="px-1.5 py-0.5 text-4xs border border-border/60 hover:border-foreground/30 inline-flex items-center gap-1"
 							tabIndex={0}
 							aria-label="Select tick size"
 						>
@@ -65,7 +70,7 @@ export function OrderBookPanel() {
 
 			{view === "book" ? (
 				<div className="flex-1 min-h-0 flex flex-col">
-					<div className="grid grid-cols-3 gap-2 px-2 py-1 text-[9px] uppercase tracking-wider text-muted-foreground/70 border-b border-border/40 shrink-0">
+					<div className="grid grid-cols-3 gap-2 px-2 py-1 text-4xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40 shrink-0">
 						<div>Price</div>
 						<div className="text-right">Size</div>
 						<div className="text-right">Total</div>
@@ -88,7 +93,7 @@ export function OrderBookPanel() {
 						<div className="shrink-0 py-1.5 px-2 flex items-center justify-center gap-2 border-y border-border/40 bg-card/30">
 							<span className="text-sm font-semibold tabular-nums text-terminal-amber terminal-glow-amber">102.45</span>
 							<TrendingUp className="size-3 text-terminal-green" />
-							<span className="text-[9px] text-muted-foreground">≈ $102.45</span>
+							<span className="text-4xs text-muted-foreground">≈ $102.45</span>
 						</div>
 
 						<ScrollArea className="flex-1 min-h-0">
@@ -102,7 +107,7 @@ export function OrderBookPanel() {
 						</ScrollArea>
 					</div>
 
-					<div className="shrink-0 px-2 py-1.5 border-t border-border/40 flex items-center justify-between text-[9px] text-muted-foreground">
+					<div className="shrink-0 px-2 py-1.5 border-t border-border/40 flex items-center justify-between text-4xs text-muted-foreground">
 						<span>Spread</span>
 						<span className="tabular-nums text-terminal-amber">0.05 (0.05%)</span>
 					</div>
@@ -113,4 +118,3 @@ export function OrderBookPanel() {
 		</div>
 	);
 }
-

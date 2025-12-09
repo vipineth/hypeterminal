@@ -15,7 +15,7 @@ export function TradesView() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col">
-			<div className="grid grid-cols-3 gap-2 px-2 py-1 text-[9px] uppercase tracking-wider text-muted-foreground/70 border-b border-border/40">
+			<div className="grid grid-cols-3 gap-2 px-2 py-1 text-4xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40">
 				<div>Time</div>
 				<div className="text-right">Price</div>
 				<div className="text-right">Size</div>
@@ -23,7 +23,7 @@ export function TradesView() {
 			<ScrollArea className="flex-1">
 				<div className="px-2 py-1 space-y-px">
 					{trades.map((t) => (
-						<div key={t.id} className="grid grid-cols-3 gap-2 text-[11px] tabular-nums py-0.5 hover:bg-accent/30">
+						<div key={t.id} className="grid grid-cols-3 gap-2 text-2xs tabular-nums py-0.5 hover:bg-accent/30">
 							<div className="text-muted-foreground/70">{t.time}</div>
 							<div className={cn("text-right", t.side === "buy" ? "text-terminal-green" : "text-terminal-red")}>
 								{t.price}
@@ -36,4 +36,3 @@ export function TradesView() {
 		</div>
 	);
 }
-

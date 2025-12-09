@@ -40,7 +40,7 @@ export function ChartPanel() {
 							</DropdownMenuContent>
 						</DropdownMenu>
 						<Separator orientation="vertical" className="mx-1 h-4" />
-						<div className="hidden md:flex items-center gap-4 text-[10px]">
+						<div className="hidden md:flex items-center gap-4 text-3xs">
 							<StatBlock label="MARK" value="102.45" valueClass="text-terminal-amber terminal-glow-amber" />
 							<StatBlock label="ORACLE" value="102.42" />
 							<StatBlock label="24H" value="+2.31%" valueClass="text-terminal-green" />
