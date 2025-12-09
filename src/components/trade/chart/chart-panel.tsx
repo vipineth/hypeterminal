@@ -1,55 +1,71 @@
 import { ClientOnly } from "@tanstack/react-router";
-import { ChevronDown, EllipsisVertical, Flame, LayoutGrid, Search } from "lucide-react";
+import { EllipsisVertical, Flame, LayoutGrid, Search } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
+import { useMarket } from "@/hooks/hyperliquid";
+import { cn } from "@/lib/utils";
 import { useTheme } from "@/providers/theme";
-import { markets } from "../lib";
 import { StatBlock } from "./stat-block";
+import { TokenSelector } from "./token-selector";
 import { TradingViewChart } from "./trading-view-chart";
+
+function formatPrice(price: string | undefined): string {
+	if (!price) return "-";
+	const num = Number.parseFloat(price);
+	if (num >= 1000) return num.toLocaleString(undefined, { maximumFractionDigits: 2 });
+	if (num >= 1) return num.toFixed(2);
+	return num.toFixed(4);
+}
+
+function formatVolume(vol: string | undefined): string {
+	if (!vol) return "-";
+	const num = Number.parseFloat(vol);
+	if (num >= 1_000_000_000) return `$${(num / 1_000_000_000).toFixed(2)}B`;
+	if (num >= 1_000_000) return `$${(num / 1_000_000).toFixed(2)}M`;
+	if (num >= 1_000) return `$${(num / 1_000).toFixed(2)}K`;
+	return `$${num.toFixed(2)}`;
+}
+
+function formatFundingRate(rate: string | undefined): string {
+	if (!rate) return "-";
+	const num = Number.parseFloat(rate) * 100;
+	return `${num >= 0 ? "+" : ""}${num.toFixed(4)}%`;
+}
 
 export function ChartPanel() {
 	const { theme } = useTheme();
-	const [symbol, setSymbol] = useState("AAVE/USDC");
+	const [selectedCoin, setSelectedCoin] = useState("BTC");
+	const { data: market } = useMarket(selectedCoin);
+
+	const fundingNum = market?.fundingRate ? Number.parseFloat(market.fundingRate) : 0;
+	const isFundingPositive = fundingNum >= 0;
 
 	return (
 		<div className="h-full flex flex-col overflow-hidden">
 			<div className="px-2 py-1.5 border-b border-border/60 bg-surface/30">
 				<div className="flex items-center justify-between gap-2">
 					<div className="flex items-center gap-2 min-w-0">
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button variant="ghost" size="sm" className="h-6 gap-1.5 text-xs font-semibold px-2">
-									<span className="text-terminal-amber">{symbol.split("/")[0]}</span>
-									<span className="text-muted-foreground">/{symbol.split("/")[1]}</span>
-									<ChevronDown className="size-3" />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent className="w-40 font-mono text-xs">
-								{markets.slice(0, 6).map((m) => (
-									<DropdownMenuItem key={m.symbol} onSelect={() => setSymbol(m.symbol)}>
-										{m.symbol}
-									</DropdownMenuItem>
-								))}
-							</DropdownMenuContent>
-						</DropdownMenu>
+						<TokenSelector value={selectedCoin} onValueChange={setSelectedCoin} />
 						<Separator orientation="vertical" className="mx-1 h-4" />
 						<div className="hidden md:flex items-center gap-4 text-3xs">
-							<StatBlock label="MARK" value="102.45" valueClass="text-terminal-amber terminal-glow-amber" />
-							<StatBlock label="ORACLE" value="102.42" />
-							<StatBlock label="24H" value="+2.31%" valueClass="text-terminal-green" />
-							<StatBlock label="VOL" value="$42.3M" />
-							<StatBlock label="OI" value="$120.1M" />
+							<StatBlock
+								label="MARK"
+								value={formatPrice(market?.markPrice)}
+								valueClass="text-terminal-amber terminal-glow-amber"
+							/>
+							<StatBlock label="ORACLE" value={formatPrice(market?.indexPrice)} />
+							<StatBlock label="VOL" value={formatVolume(market?.volume24h)} />
+							<StatBlock label="OI" value={formatVolume(market?.openInterest)} />
 							<div className="flex items-center gap-1">
-								<Flame className="size-3 text-terminal-red" />
-								<span className="text-muted-foreground">0.01%</span>
-								<span className="text-muted-foreground/60">/ 02:34</span>
+								<Flame className={cn("size-3", isFundingPositive ? "text-terminal-green" : "text-terminal-red")} />
+								<span
+									className={cn(
+										"text-muted-foreground tabular-nums",
+										isFundingPositive ? "text-terminal-green" : "text-terminal-red",
+									)}
+								>
+									{formatFundingRate(market?.fundingRate)}
+								</span>
 							</div>
 						</div>
 					</div>
@@ -84,7 +100,7 @@ export function ChartPanel() {
 
 			<div className="flex-1 min-h-0">
 				<ClientOnly>
-					<TradingViewChart symbol={symbol} theme={theme === "dark" ? "dark" : "light"} />
+					<TradingViewChart symbol={`${selectedCoin}/USDC`} theme={theme === "dark" ? "dark" : "light"} />
 				</ClientOnly>
 			</div>
 		</div>
