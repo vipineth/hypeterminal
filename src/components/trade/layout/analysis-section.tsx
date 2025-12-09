@@ -1,16 +1,16 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { usePersistentLayout } from "../lib";
-import { ChartOrderbookRow } from "./chart-orderbook-row";
+import { PriceRow } from "./price-row";
 import { PositionsPanel } from "../positions/positions-panel";
 
-export function LeftSection() {
+export function AnalysisSection() {
 	const { layout: vertLayout, onLayout: onVertLayout } = usePersistentLayout("terminal:layout:vert", [70, 30]);
 
 	return (
 		<div className="h-full min-h-0">
 			<ResizablePanelGroup direction="vertical" className="h-full min-h-0" onLayout={onVertLayout}>
 				<ResizablePanel defaultSize={vertLayout[0] ?? 65} minSize={30}>
-					<ChartOrderbookRow />
+					<PriceRow />
 				</ResizablePanel>
 				<ResizableHandle
 					withHandle

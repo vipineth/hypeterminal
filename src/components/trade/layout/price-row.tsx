@@ -3,7 +3,7 @@ import { usePersistentLayout } from "../lib";
 import { ChartPanel } from "../chart/chart-panel";
 import { OrderBookPanel } from "../orderbook/order-book-panel";
 
-export function ChartOrderbookRow() {
+export function PriceRow() {
 	const { layout: horizLayout, onLayout: onHorizLayout } = usePersistentLayout("terminal:layout:chart-book", [75, 25]);
 
 	return (

@@ -1,4 +1,4 @@
-export { ChartOrderbookRow } from "./chart-orderbook-row";
-export { LeftSection } from "./left-section";
+export { PriceRow } from "./price-row";
+export { AnalysisSection } from "./analysis-section";
 export { MainWorkspace } from "./main-workspace";
-export { RightColumn } from "./right-column";
+export { OrderSidebar } from "./order-sidebar";
