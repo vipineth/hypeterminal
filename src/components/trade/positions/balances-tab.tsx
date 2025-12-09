@@ -1,6 +1,7 @@
 import { Wallet } from "lucide-react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { formatToken, formatUSD } from "@/lib/format";
 import { balances } from "../lib";
 
 export function BalancesTab() {
@@ -40,14 +41,14 @@ export function BalancesTab() {
 										<span className="text-terminal-cyan">{b.asset}</span>
 									</TableCell>
 									<TableCell className="text-2xs text-right tabular-nums py-1.5">
-										{b.available.toLocaleString()}
+										{formatToken(b.available)}
 									</TableCell>
 									<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
-										{b.inOrder.toLocaleString()}
+										{formatToken(b.inOrder)}
 									</TableCell>
-									<TableCell className="text-2xs text-right tabular-nums py-1.5">{b.total.toLocaleString()}</TableCell>
+									<TableCell className="text-2xs text-right tabular-nums py-1.5">{formatToken(b.total)}</TableCell>
 									<TableCell className="text-2xs text-right tabular-nums text-terminal-green py-1.5">
-										${b.usdValue.toLocaleString()}
+										{formatUSD(b.usdValue)}
 									</TableCell>
 								</TableRow>
 							))}

@@ -51,21 +51,24 @@ export function useMarkets(options?: MarketsOptions) {
 
 		const [meta, ctxs] = data;
 
-		return meta.universe.map((assetMeta, index) => {
-			const assetCtx = ctxs[index];
+		return meta.universe
+			.map((assetMeta, index) => {
+				const assetCtx = ctxs[index];
 
-			return {
-				coin: assetMeta.name,
-				name: assetMeta.name,
-				markPrice: assetCtx?.markPx,
-				indexPrice: assetCtx?.oraclePx,
-				fundingRate: assetCtx?.funding,
-				openInterest: assetCtx?.openInterest,
-				volume24h: assetCtx?.dayNtlVlm,
-				maxLeverage: assetMeta.maxLeverage,
-				szDecimals: assetMeta.szDecimals,
-			};
-		});
+				return {
+					coin: assetMeta.name,
+					name: assetMeta.name,
+					markPrice: assetCtx?.markPx,
+					indexPrice: assetCtx?.oraclePx,
+					fundingRate: assetCtx?.funding,
+					openInterest: assetCtx?.openInterest,
+					volume24h: assetCtx?.dayNtlVlm,
+					maxLeverage: assetMeta.maxLeverage,
+					szDecimals: assetMeta.szDecimals,
+					isDelisted: assetMeta.isDelisted,
+				};
+			})
+			.filter((market) => !market.isDelisted);
 	}, [data]);
 
 	return { data: markets, isLoading, error, refetch };

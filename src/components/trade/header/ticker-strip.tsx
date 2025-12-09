@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useMetaAndAssetCtxs } from "@/hooks/hyperliquid";
 import { cn } from "@/lib/utils";
+import { formatPercent, formatUSD } from "@/lib/format";
 import { type Market, markets } from "../lib";
 
 export function TickerStrip() {
@@ -63,10 +64,17 @@ function MarketChip({ market, isActive, onSelect }: MarketChipProps) {
 			onKeyDown={handleKeyDown}
 		>
 			<span className={cn("font-medium", isActive ? "text-terminal-cyan" : "text-foreground")}>{market.base}</span>
-			<span className="text-muted-foreground tabular-nums">${market.price.toLocaleString()}</span>
-			<span className={cn("tabular-nums font-medium", isPositive ? "text-terminal-green" : "text-terminal-red")}>
-				{isPositive ? "+" : ""}
-				{market.changePct.toFixed(2)}%
+			<span className="text-muted-foreground tabular-nums">{formatUSD(market.price)}</span>
+			<span
+				className={cn(
+					"tabular-nums font-medium",
+					isPositive ? "text-terminal-green" : "text-terminal-red",
+				)}
+			>
+				{formatPercent(market.changePct / 100, {
+					minimumFractionDigits: 2,
+					signDisplay: "exceptZero",
+				})}
 			</span>
 		</button>
 	);

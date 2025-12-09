@@ -1,4 +1,4 @@
-import { Check, ChevronDown, Flame, Search, Star, TrendingUp, Zap } from "lucide-react";
+import { ChevronDown, Flame, Search, Star } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -7,85 +7,25 @@ import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+	getTokenIconUrl,
+	isFavoriteToken,
+	isTokenInCategory,
+	type MarketCategory,
+	marketCategories,
+} from "@/config/token";
 import { useMarkets } from "@/hooks/hyperliquid";
+import { formatPercent, formatUSD } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-type Category = "all" | "favorites" | "trending" | "new" | "defi" | "layer1" | "layer2" | "meme";
-
-const categories: { value: Category; label: string; icon: React.ReactNode }[] = [
-	{ value: "all", label: "All", icon: null },
-	{ value: "favorites", label: "Favorites", icon: <Star className="size-2.5" /> },
-	{ value: "trending", label: "Hot", icon: <TrendingUp className="size-2.5" /> },
-	{ value: "new", label: "New", icon: <Zap className="size-2.5" /> },
-	{ value: "defi", label: "DeFi", icon: null },
-	{ value: "layer1", label: "L1", icon: null },
-	{ value: "layer2", label: "L2", icon: null },
-	{ value: "meme", label: "Meme", icon: null },
-];
-
-const categoryMapping: Record<string, Category[]> = {
-	BTC: ["layer1", "trending"],
-	ETH: ["layer1", "defi", "trending"],
-	SOL: ["layer1", "trending"],
-	AVAX: ["layer1"],
-	NEAR: ["layer1"],
-	ATOM: ["layer1"],
-	DOT: ["layer1"],
-	ADA: ["layer1"],
-	APT: ["layer1", "new"],
-	SUI: ["layer1", "new"],
-	SEI: ["layer1", "new"],
-	ARB: ["layer2", "defi"],
-	OP: ["layer2", "defi"],
-	MATIC: ["layer2"],
-	BASE: ["layer2", "new"],
-	AAVE: ["defi"],
-	UNI: ["defi"],
-	LINK: ["defi"],
-	MKR: ["defi"],
-	SNX: ["defi"],
-	CRV: ["defi"],
-	DOGE: ["meme", "trending"],
-	SHIB: ["meme"],
-	PEPE: ["meme", "trending"],
-	BONK: ["meme"],
-	WIF: ["meme", "new"],
-	FLOKI: ["meme"],
-};
-
-const favoriteCoins = ["BTC", "ETH", "SOL", "ARB"];
-
-type TokenSelectorProps = {
+export type TokenSelectorProps = {
 	value: string;
 	onValueChange: (value: string) => void;
 };
 
-function formatPrice(price: string | undefined): string {
-	if (!price) return "-";
-	const num = Number.parseFloat(price);
-	if (num >= 1000) return `$${num.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
-	if (num >= 1) return `$${num.toFixed(2)}`;
-	return `$${num.toFixed(4)}`;
-}
-
-function formatOpenInterest(oi: string | undefined): string {
-	if (!oi) return "-";
-	const num = Number.parseFloat(oi);
-	if (num >= 1_000_000_000) return `$${(num / 1_000_000_000).toFixed(1)}B`;
-	if (num >= 1_000_000) return `$${(num / 1_000_000).toFixed(1)}M`;
-	if (num >= 1_000) return `$${(num / 1_000).toFixed(1)}K`;
-	return `$${num.toFixed(0)}`;
-}
-
-function formatFundingRate(rate: string | undefined): string {
-	if (!rate) return "-";
-	const num = Number.parseFloat(rate) * 100;
-	return `${num >= 0 ? "+" : ""}${num.toFixed(4)}%`;
-}
-
 export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 	const [open, setOpen] = useState(false);
-	const [category, setCategory] = useState<Category>("all");
+	const [category, setCategory] = useState<MarketCategory>("all");
 	const [search, setSearch] = useState("");
 	const { data: markets, isLoading } = useMarkets();
 
@@ -96,15 +36,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 			if (search && !market.coin.toLowerCase().includes(search.toLowerCase())) {
 				return false;
 			}
-			if (category === "all") return true;
-			if (category === "favorites") return favoriteCoins.includes(market.coin);
-			if (category === "trending") {
-				return categoryMapping[market.coin]?.includes("trending") ?? false;
-			}
-			if (category === "new") {
-				return categoryMapping[market.coin]?.includes("new") ?? false;
-			}
-			return categoryMapping[market.coin]?.includes(category) ?? false;
+			return isTokenInCategory(market.coin, category);
 		});
 	}, [markets, category, search]);
 
@@ -114,7 +46,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 		setSearch("");
 	}
 
-	function handleCategorySelect(cat: Category) {
+	function handleCategorySelect(cat: MarketCategory) {
 		setCategory(cat);
 	}
 
@@ -130,7 +62,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 					className="h-6 gap-1.5 text-xs font-semibold px-2"
 				>
 					<Avatar className="size-4">
-						<AvatarImage src={`https://app.hyperliquid.xyz/coins/${value.toLowerCase()}.svg`} alt={value} />
+						<AvatarImage src={getTokenIconUrl(value)} alt={value} />
 						<AvatarFallback className="text-3xs bg-terminal-amber/20 text-terminal-amber">
 							{value.slice(0, 2)}
 						</AvatarFallback>
@@ -140,7 +72,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 					<ChevronDown className="size-3 text-muted-foreground" />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-lg p-0 border-border/60 bg-surface" align="start" sideOffset={8}>
+			<PopoverContent className="w-xl p-0 border-border/60 bg-surface" align="start" sideOffset={8}>
 				<div className="flex flex-col">
 					<div className="px-2 py-2 border-b border-border/40">
 						<div className="relative">
@@ -156,7 +88,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 
 					<div className="px-2 py-1.5 border-b border-border/40 bg-surface/50">
 						<div className="flex items-center gap-0.5 flex-wrap">
-							{categories.map((cat) => (
+							{marketCategories.map((cat) => (
 								<button
 									key={cat.value}
 									type="button"
@@ -178,16 +110,17 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 						</div>
 					</div>
 
-					<div className="grid grid-cols-[1fr_80px_80px_20px] gap-2 px-3 py-1.5 text-4xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40 bg-surface/30">
-						<div>Market</div>
-						<div className="text-right">Price</div>
-						<div className="text-right">Funding</div>
-						<div />
+					<div className="flex items-center px-3 py-1.5 text-4xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40 bg-surface/30">
+						<div className="flex-1 min-w-0">Market</div>
+						<div className="w-20 text-right">Price</div>
+						<div className="w-20 text-right">OI</div>
+						<div className="w-20 text-right">Volume</div>
+						<div className="w-20 text-right">Funding</div>
 					</div>
 
 					<Command className="bg-transparent" filter={() => 1}>
 						<CommandList>
-							<ScrollArea className="h-[280px]">
+							<ScrollArea className="h-72">
 								<CommandEmpty className="py-8 text-center text-3xs text-muted-foreground">
 									No markets found.
 								</CommandEmpty>
@@ -208,26 +141,23 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 													value={market.coin}
 													onSelect={() => handleSelect(market.coin)}
 													className={cn(
-														"grid grid-cols-[1fr_80px_80px_20px] gap-2 items-center px-3 py-1.5 rounded-none cursor-pointer border-b border-border/20",
+														"flex items-center px-3 py-1.5 rounded-none cursor-pointer border-b border-border/20",
 														"data-[selected=true]:bg-accent/30",
 														isSelected && "bg-terminal-cyan/5",
 													)}
 												>
-													<div className="flex items-center gap-2 min-w-0">
+													<div className="flex-1 min-w-0 flex items-center gap-2">
 														<Avatar className="size-5 shrink-0">
-															<AvatarImage
-																src={`https://assets.hyperliquid.xyz/icons/${market.coin.toLowerCase()}.svg`}
-																alt={market.coin}
-															/>
+															<AvatarImage src={getTokenIconUrl(market.coin)} alt={market.coin} />
 															<AvatarFallback className="text-4xs bg-muted">{market.coin.slice(0, 2)}</AvatarFallback>
 														</Avatar>
 														<div className="min-w-0">
 															<div className="flex items-center gap-1">
 																<span className="font-semibold text-2xs">{market.coin}</span>
-																{favoriteCoins.includes(market.coin) && (
+																{isFavoriteToken(market.coin) && (
 																	<Star className="size-2.5 fill-terminal-amber text-terminal-amber" />
 																)}
-																{categoryMapping[market.coin]?.includes("new") && (
+																{isTokenInCategory(market.coin, "new") && (
 																	<Badge variant="neutral" size="xs" className="px-1 py-0 text-4xs">
 																		NEW
 																	</Badge>
@@ -235,15 +165,25 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 															</div>
 															<div className="flex items-center gap-1.5 text-4xs text-muted-foreground">
 																<span>{market.maxLeverage}x</span>
-																<span className="text-muted-foreground/50">•</span>
-																<span>OI {formatOpenInterest(market.openInterest)}</span>
 															</div>
 														</div>
 													</div>
-													<div className="text-right">
-														<span className="text-2xs font-medium tabular-nums">{formatPrice(market.markPrice)}</span>
+													<div className="w-20 text-right">
+														<span className="text-2xs font-medium tabular-nums">
+															{market.markPrice ? formatUSD(Number(market.markPrice)) : "-"}
+														</span>
 													</div>
-													<div className="text-right">
+													<div className="w-20 text-right">
+														<span className="text-2xs font-medium tabular-nums">
+															{market.openInterest ? formatUSD(Number(market.openInterest)) : "-"}
+														</span>
+													</div>
+													<div className="w-20 text-right">
+														<span className="text-2xs font-medium tabular-nums">
+															{market.volume24h ? formatUSD(Number(market.volume24h)) : "-"}
+														</span>
+													</div>
+													<div className="w-20 text-right">
 														<div className="flex items-center justify-end gap-1">
 															<Flame
 																className={cn(
@@ -257,12 +197,14 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 																	isFundingPositive ? "text-terminal-green" : "text-terminal-red",
 																)}
 															>
-																{formatFundingRate(market.fundingRate)}
+																{fundingNum
+																	? formatPercent(fundingNum, {
+																			minimumFractionDigits: 4,
+																			signDisplay: "exceptZero",
+																		})
+																	: "-"}
 															</span>
 														</div>
-													</div>
-													<div className="flex justify-center">
-														{isSelected && <Check className="size-3.5 text-terminal-cyan" />}
 													</div>
 												</CommandItem>
 											);

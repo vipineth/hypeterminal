@@ -4,33 +4,11 @@ import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { useMarket } from "@/hooks/hyperliquid";
 import { cn } from "@/lib/utils";
+import { formatPercent, formatUSD } from "@/lib/format";
 import { useTheme } from "@/providers/theme";
 import { StatBlock } from "./stat-block";
 import { TokenSelector } from "./token-selector";
 import { TradingViewChart } from "./trading-view-chart";
-
-function formatPrice(price: string | undefined): string {
-	if (!price) return "-";
-	const num = Number.parseFloat(price);
-	if (num >= 1000) return num.toLocaleString(undefined, { maximumFractionDigits: 2 });
-	if (num >= 1) return num.toFixed(2);
-	return num.toFixed(4);
-}
-
-function formatVolume(vol: string | undefined): string {
-	if (!vol) return "-";
-	const num = Number.parseFloat(vol);
-	if (num >= 1_000_000_000) return `$${(num / 1_000_000_000).toFixed(2)}B`;
-	if (num >= 1_000_000) return `$${(num / 1_000_000).toFixed(2)}M`;
-	if (num >= 1_000) return `$${(num / 1_000).toFixed(2)}K`;
-	return `$${num.toFixed(2)}`;
-}
-
-function formatFundingRate(rate: string | undefined): string {
-	if (!rate) return "-";
-	const num = Number.parseFloat(rate) * 100;
-	return `${num >= 0 ? "+" : ""}${num.toFixed(4)}%`;
-}
 
 export function ChartPanel() {
 	const { theme } = useTheme();
@@ -50,21 +28,46 @@ export function ChartPanel() {
 						<div className="hidden md:flex items-center gap-4 text-3xs">
 							<StatBlock
 								label="MARK"
-								value={formatPrice(market?.markPrice)}
+								value={market?.markPrice ? formatUSD(Number(market.markPrice)) : "-"}
 								valueClass="text-terminal-amber terminal-glow-amber"
 							/>
-							<StatBlock label="ORACLE" value={formatPrice(market?.indexPrice)} />
-							<StatBlock label="VOL" value={formatVolume(market?.volume24h)} />
-							<StatBlock label="OI" value={formatVolume(market?.openInterest)} />
+							<StatBlock
+								label="ORACLE"
+								value={market?.indexPrice ? formatUSD(Number(market.indexPrice)) : "-"}
+							/>
+							<StatBlock
+								label="VOL"
+								value={
+									market?.volume24h
+										? formatUSD(Number(market.volume24h), { notation: "compact", compactDisplay: "short" })
+										: "-"
+								}
+							/>
+							<StatBlock
+								label="OI"
+								value={
+									market?.openInterest
+										? formatUSD(Number(market.openInterest), { notation: "compact", compactDisplay: "short" })
+										: "-"
+								}
+							/>
 							<div className="flex items-center gap-1">
-								<Flame className={cn("size-3", isFundingPositive ? "text-terminal-green" : "text-terminal-red")} />
+								<Flame
+									className={cn(
+										"size-3",
+										isFundingPositive ? "text-terminal-green" : "text-terminal-red",
+									)}
+								/>
 								<span
 									className={cn(
 										"text-muted-foreground tabular-nums",
 										isFundingPositive ? "text-terminal-green" : "text-terminal-red",
 									)}
 								>
-									{formatFundingRate(market?.fundingRate)}
+									{formatPercent(fundingNum, {
+										minimumFractionDigits: 4,
+										signDisplay: "exceptZero",
+									})}
 								</span>
 							</div>
 						</div>

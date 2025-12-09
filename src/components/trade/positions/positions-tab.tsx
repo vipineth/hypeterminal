@@ -2,6 +2,7 @@ import { Circle } from "lucide-react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { formatPercent, formatToken, formatUSD } from "@/lib/format";
 import { positions } from "../lib";
 
 export function PositionsTab() {
@@ -62,16 +63,16 @@ export function PositionsTab() {
 											</div>
 										</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">
-											{Math.abs(p.size).toFixed(2)}
+											{formatToken(Math.abs(p.size), 2)}
 										</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">
-											${p.positionValue.toFixed(2)}
+											{formatUSD(p.positionValue)}
 										</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">
-											${p.entryPrice.toFixed(2)}
+											{formatUSD(p.entryPrice)}
 										</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
-											${p.markPrice.toFixed(2)}
+											{formatUSD(p.markPrice)}
 										</TableCell>
 										<TableCell className="text-right py-1.5">
 											<div
@@ -80,12 +81,14 @@ export function PositionsTab() {
 													p.pnl >= 0 ? "text-terminal-green" : "text-terminal-red",
 												)}
 											>
-												{p.pnl >= 0 ? "+" : ""}${p.pnl.toFixed(2)}
-												<span className="text-muted-foreground ml-1">({p.roePct.toFixed(1)}%)</span>
+												{formatUSD(p.pnl, { signDisplay: "exceptZero" })}
+												<span className="text-muted-foreground ml-1">
+													({formatPercent(p.roePct / 100, 1)})
+												</span>
 											</div>
 										</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums text-terminal-red/70 py-1.5">
-											${p.liqPrice.toFixed(2)}
+											{formatUSD(p.liqPrice)}
 										</TableCell>
 										<TableCell className="text-right py-1.5">
 											<div className="flex justify-end gap-1">
