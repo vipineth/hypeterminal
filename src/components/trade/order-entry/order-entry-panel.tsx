@@ -47,25 +47,13 @@ export function OrderEntryPanel() {
 			</div>
 
 			<div className="p-2 space-y-2 overflow-y-auto flex-1">
-				<div className="flex items-center gap-0.5 p-0.5 bg-muted/30 rounded-sm">
-					{["Market", "Limit", "Stop"].map((t) => (
-						<button
-							key={t}
-							type="button"
-							onClick={() => setType(t.toLowerCase())}
-							className={cn(
-								"flex-1 py-1 text-3xs uppercase tracking-wider transition-colors rounded-sm",
-								type === t.toLowerCase()
-									? "bg-background text-foreground"
-									: "text-muted-foreground hover:text-foreground",
-							)}
-							tabIndex={0}
-							aria-label={`${t} order`}
-						>
-							{t}
-						</button>
-					))}
-				</div>
+				<Tabs value={type} onValueChange={setType}>
+					<TabsList>
+						<TabsTrigger value="market" variant="underline">Market</TabsTrigger>
+						<TabsTrigger value="limit" variant="underline">Limit</TabsTrigger>
+						<TabsTrigger value="stop" variant="underline">Stop</TabsTrigger>
+					</TabsList>
+				</Tabs>
 
 				<div className="grid grid-cols-2 gap-1">
 					<button
