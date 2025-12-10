@@ -200,6 +200,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 															type="button"
 															onClick={(e) => {
 																e.stopPropagation();
+																console.log("hello", market.coin);
 																toggleFavorite(market.coin);
 															}}
 															className="hover:scale-110 transition-transform"
@@ -214,7 +215,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 																)}
 															/>
 														</button>
-														{isTokenInCategory(market.coin, "new", favorites) && (
+														{isTokenInCategory(market.coin, "new") && (
 															<Badge variant="neutral" size="xs" className="px-1 py-0 text-4xs">
 																NEW
 															</Badge>

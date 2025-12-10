@@ -1,11 +1,4 @@
-import {
-	createColumnHelper,
-	getCoreRowModel,
-	getSortedRowModel,
-	type Row,
-	type SortingState,
-	useReactTable,
-} from "@tanstack/react-table";
+import { createColumnHelper, getCoreRowModel, type Row, type SortingState, useReactTable } from "@tanstack/react-table";
 import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { isTokenInCategory, type MarketCategory } from "@/config/token";
@@ -98,18 +91,51 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 			if (search && !market.coin.toLowerCase().includes(search.toLowerCase())) {
 				return false;
 			}
-			return isTokenInCategory(market.coin, category, favorites);
+			return isTokenInCategory(market.coin, category);
 		});
-	}, [markets, category, search, favorites]);
+	}, [markets, category, search]);
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [sorting, setSorting] = useState<SortingState>([]);
 
+	const sortedMarkets = useMemo(() => {
+		const favoriteMarkets = filteredMarkets.filter((m) => favorites.includes(m.coin));
+		const nonFavoriteMarkets = filteredMarkets.filter((m) => !favorites.includes(m.coin));
+
+		function getSortValue(market: Market, columnId: string): number {
+			switch (columnId) {
+				case "price":
+					return market.markPrice ? Number(market.markPrice) : 0;
+				case "oi":
+					return market.openInterest ? Number(market.openInterest) : 0;
+				case "volume":
+					return market.volume24h ? Number(market.volume24h) : 0;
+				case "funding":
+					return market.fundingRate ? Number.parseFloat(market.fundingRate) : 0;
+				default:
+					return 0;
+			}
+		}
+
+		function sortSection(section: Market[]): Market[] {
+			if (sorting.length === 0) return section;
+
+			const { id, desc } = sorting[0];
+			return [...section].sort((a, b) => {
+				const aVal = getSortValue(a, id);
+				const bVal = getSortValue(b, id);
+				return desc ? bVal - aVal : aVal - bVal;
+			});
+		}
+
+		return [...sortSection(favoriteMarkets), ...sortSection(nonFavoriteMarkets)];
+	}, [filteredMarkets, favorites, sorting]);
+
 	const table = useReactTable({
-		data: filteredMarkets,
+		data: sortedMarkets,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
-		getSortedRowModel: getSortedRowModel(),
+		manualSorting: true,
 		state: { sorting },
 		onSortingChange: setSorting,
 		enableSorting: true,

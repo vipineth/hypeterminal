@@ -1,6 +1,6 @@
-import { create } from "zustand";
-import { persist, createJSONStorage, type StateStorage } from "zustand/middleware";
 import { z } from "zod";
+import { create } from "zustand";
+import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
 
 const validatedStorage: StateStorage = {
 	getItem: (name: string): string | null => {
@@ -47,38 +47,42 @@ interface FavoritesStore {
 	};
 }
 
-// ⬇️ not exported - prevents subscribing to entire store
 const useFavoritesStore = create<FavoritesStore>()(
 	persist(
 		(set) => ({
 			favorites: [],
 			actions: {
-				toggleFavorite: (coin) =>
-					set((state) => ({
+				toggleFavorite: (coin) => {
+					return set((state) => ({
 						favorites: state.favorites.includes(coin)
 							? state.favorites.filter((f) => f !== coin)
 							: [...state.favorites, coin],
-					})),
-				addFavorite: (coin) =>
-					set((state) => ({
-						favorites: state.favorites.includes(coin)
-							? state.favorites
-							: [...state.favorites, coin],
-					})),
-				removeFavorite: (coin) =>
-					set((state) => ({
+					}));
+				},
+				addFavorite: (coin) => {
+					return set((state) => ({
+						favorites: state.favorites.includes(coin) ? state.favorites : [...state.favorites, coin],
+					}));
+				},
+				removeFavorite: (coin) => {
+					return set((state) => ({
 						favorites: state.favorites.filter((f) => f !== coin),
-					})),
+					}));
+				},
 			},
 		}),
 		{
-			name: "favorites-storage",
+			name: "favorites-storage-v0.1",
 			storage: createJSONStorage(() => validatedStorage),
+			partialize: (state) => ({ favorites: state.favorites }),
+			merge: (persisted, current) => ({
+				...current,
+				...(persisted as Partial<FavoritesStore>),
+			}),
 		},
 	),
 );
 
-// 💡 exported - atomic selectors using function declarations
 export function useFavorites() {
 	return useFavoritesStore((state) => state.favorites);
 }

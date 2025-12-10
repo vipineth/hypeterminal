@@ -1,14 +1,13 @@
-import { Star, TrendingUp, Zap } from "lucide-react";
+import { TrendingUp, Zap } from "lucide-react";
 
 export function getTokenIconUrl(token: string) {
 	return `https://app.hyperliquid.xyz/coins/${token}.svg`;
 }
 
-export type MarketCategory = "all" | "favorites" | "trending" | "new" | "defi" | "layer1" | "layer2" | "meme";
+export type MarketCategory = "all" | "trending" | "new" | "defi" | "layer1" | "layer2" | "meme";
 
 export const marketCategories: { value: MarketCategory; label: string; icon: React.ReactNode }[] = [
 	{ value: "all", label: "All", icon: null },
-	{ value: "favorites", label: "Favorites", icon: <Star className="size-2.5" /> },
 	{ value: "trending", label: "Hot", icon: <TrendingUp className="size-2.5" /> },
 	{ value: "new", label: "New", icon: <Zap className="size-2.5" /> },
 	{ value: "defi", label: "DeFi", icon: null },
@@ -47,8 +46,7 @@ export const categoryMapping: Record<string, MarketCategory[]> = {
 	FLOKI: ["meme"],
 };
 
-export function isTokenInCategory(token: string, category: MarketCategory, favorites: string[] = []) {
+export function isTokenInCategory(token: string, category: MarketCategory) {
 	if (category === "all") return true;
-	if (category === "favorites") return favorites.includes(token);
 	return categoryMapping[token]?.includes(category) ?? false;
 }
