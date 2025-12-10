@@ -3,8 +3,8 @@ import { EllipsisVertical, Flame, LayoutGrid, Search } from "lucide-react";
 import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { useMarket } from "@/hooks/hyperliquid";
-import { cn } from "@/lib/utils";
 import { formatPercent, formatUSD } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { useTheme } from "@/providers/theme";
 import { StatBlock } from "./stat-block";
 import { TokenSelector } from "./token-selector";
@@ -31,10 +31,7 @@ export function ChartPanel() {
 								value={market?.markPrice ? formatUSD(Number(market.markPrice)) : "-"}
 								valueClass="text-terminal-amber terminal-glow-amber"
 							/>
-							<StatBlock
-								label="ORACLE"
-								value={market?.indexPrice ? formatUSD(Number(market.indexPrice)) : "-"}
-							/>
+							<StatBlock label="ORACLE" value={market?.indexPrice ? formatUSD(Number(market.indexPrice)) : "-"} />
 							<StatBlock
 								label="VOL"
 								value={
@@ -52,12 +49,7 @@ export function ChartPanel() {
 								}
 							/>
 							<div className="flex items-center gap-1">
-								<Flame
-									className={cn(
-										"size-3",
-										isFundingPositive ? "text-terminal-green" : "text-terminal-red",
-									)}
-								/>
+								<Flame className={cn("size-3", isFundingPositive ? "text-terminal-green" : "text-terminal-red")} />
 								<span
 									className={cn(
 										"text-muted-foreground tabular-nums",

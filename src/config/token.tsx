@@ -47,14 +47,8 @@ export const categoryMapping: Record<string, MarketCategory[]> = {
 	FLOKI: ["meme"],
 };
 
-export const favoriteCoins = ["BTC", "ETH", "SOL", "ARB"];
-
-export function isFavoriteToken(token: string) {
-	return favoriteCoins.includes(token);
-}
-
-export function isTokenInCategory(token: string, category: MarketCategory) {
+export function isTokenInCategory(token: string, category: MarketCategory, favorites: string[] = []) {
 	if (category === "all") return true;
-	if (category === "favorites") return isFavoriteToken(token);
+	if (category === "favorites") return favorites.includes(token);
 	return categoryMapping[token]?.includes(category) ?? false;
 }

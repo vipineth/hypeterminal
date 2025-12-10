@@ -1,22 +1,14 @@
-import { ChevronDown, Flame, Search, Star } from "lucide-react";
-import { useMemo, useState } from "react";
+import { flexRender } from "@tanstack/react-table";
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown, Flame, Search, Star } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-	getTokenIconUrl,
-	isFavoriteToken,
-	isTokenInCategory,
-	type MarketCategory,
-	marketCategories,
-} from "@/config/token";
-import { useMarkets } from "@/hooks/hyperliquid";
+import { getTokenIconUrl, isTokenInCategory, marketCategories } from "@/config/token";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { useTokenSelector } from "./use-token-selector";
 
 export type TokenSelectorProps = {
 	value: string;
@@ -24,31 +16,26 @@ export type TokenSelectorProps = {
 };
 
 export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
-	const [open, setOpen] = useState(false);
-	const [category, setCategory] = useState<MarketCategory>("all");
-	const [search, setSearch] = useState("");
-	const { data: markets, isLoading } = useMarkets();
+	const {
+		open,
+		setOpen,
+		category,
+		search,
+		setSearch,
+		isLoading,
+		favorites,
+		sorting,
+		handleSelect,
+		handleCategorySelect,
+		toggleFavorite,
+		table,
+		rows,
+		virtualizer,
+		containerRef,
+		filteredMarkets,
+	} = useTokenSelector({ value, onValueChange });
 
-	const filteredMarkets = useMemo(() => {
-		if (!markets) return [];
-
-		return markets.filter((market) => {
-			if (search && !market.coin.toLowerCase().includes(search.toLowerCase())) {
-				return false;
-			}
-			return isTokenInCategory(market.coin, category);
-		});
-	}, [markets, category, search]);
-
-	function handleSelect(coin: string) {
-		onValueChange(coin);
-		setOpen(false);
-		setSearch("");
-	}
-
-	function handleCategorySelect(cat: MarketCategory) {
-		setCategory(cat);
-	}
+	const virtualItems = virtualizer.getVirtualItems();
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -109,115 +96,180 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 							))}
 						</div>
 					</div>
-
 					<div className="flex items-center px-3 py-1.5 text-4xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40 bg-surface/30">
-						<div className="flex-1 min-w-0">Market</div>
-						<div className="w-20 text-right">Price</div>
-						<div className="w-20 text-right">OI</div>
-						<div className="w-20 text-right">Volume</div>
-						<div className="w-20 text-right">Funding</div>
+						{table.getHeaderGroups().map((headerGroup) =>
+							headerGroup.headers.map((header) => {
+								const canSort = header.column.getCanSort();
+								const sorted = header.column.getIsSorted();
+								const isMarketColumn = header.id === "coin";
+
+								if (isMarketColumn) {
+									return (
+										<div key={header.id} className="flex-1 min-w-0">
+											{flexRender(header.column.columnDef.header, header.getContext())}
+										</div>
+									);
+								}
+
+								return (
+									<button
+										key={header.id}
+										type="button"
+										onClick={header.column.getToggleSortingHandler()}
+										disabled={!canSort}
+										className={cn(
+											"w-20 flex items-center justify-end gap-1 transition-colors",
+											canSort && "hover:text-foreground cursor-pointer",
+										)}
+										aria-label={`Sort by ${header.column.columnDef.header?.toString()}`}
+									>
+										<span>{flexRender(header.column.columnDef.header, header.getContext())}</span>
+										{canSort && (
+											<span className="shrink-0">
+												{sorted === "asc" ? (
+													<ArrowUp className="size-2.5 text-terminal-cyan" />
+												) : sorted === "desc" ? (
+													<ArrowDown className="size-2.5 text-terminal-cyan" />
+												) : (
+													<ArrowUpDown className="size-2.5 opacity-40" />
+												)}
+											</span>
+										)}
+									</button>
+								);
+							}),
+						)}
 					</div>
 
-					<Command className="bg-transparent" filter={() => 1}>
-						<CommandList>
-							<ScrollArea className="h-72">
-								<CommandEmpty className="py-8 text-center text-3xs text-muted-foreground">
-									No markets found.
-								</CommandEmpty>
-								<CommandGroup className="p-0">
-									{isLoading ? (
-										<div className="flex items-center justify-center py-8">
-											<span className="text-3xs text-muted-foreground">Loading markets...</span>
-										</div>
-									) : (
-										filteredMarkets.map((market) => {
-											const fundingNum = market.fundingRate ? Number.parseFloat(market.fundingRate) : 0;
-											const isFundingPositive = fundingNum >= 0;
-											const isSelected = value === market.coin;
+					<div ref={containerRef} className="h-72 overflow-auto">
+						{isLoading ? (
+							<div className="flex items-center justify-center py-8">
+								<span className="text-3xs text-muted-foreground">Loading markets...</span>
+							</div>
+						) : rows.length === 0 ? (
+							<div className="py-8 text-center text-3xs text-muted-foreground">No markets found.</div>
+						) : (
+							<div
+								style={{
+									height: `${virtualizer.getTotalSize()}px`,
+									width: "100%",
+									position: "relative",
+								}}
+							>
+								{virtualItems.map((virtualItem) => {
+									const row = rows[virtualItem.index];
+									const market = row.original;
+									const fundingNum = market.fundingRate ? Number.parseFloat(market.fundingRate) : 0;
+									const isFundingPositive = fundingNum >= 0;
+									const isSelected = value === market.coin;
+									const isFavorite = favorites.includes(market.coin);
 
-											return (
-												<CommandItem
-													key={market.coin}
-													value={market.coin}
-													onSelect={() => handleSelect(market.coin)}
-													className={cn(
-														"flex items-center px-3 py-1.5 rounded-none cursor-pointer border-b border-border/20",
-														"data-[selected=true]:bg-accent/30",
-														isSelected && "bg-terminal-cyan/5",
-													)}
-												>
-													<div className="flex-1 min-w-0 flex items-center gap-2">
-														<Avatar className="size-5 shrink-0">
-															<AvatarImage src={getTokenIconUrl(market.coin)} alt={market.coin} />
-															<AvatarFallback className="text-4xs bg-muted">{market.coin.slice(0, 2)}</AvatarFallback>
-														</Avatar>
-														<div className="min-w-0">
-															<div className="flex items-center gap-1">
-																<span className="font-semibold text-2xs">{market.coin}</span>
-																{isFavoriteToken(market.coin) && (
-																	<Star className="size-2.5 fill-terminal-amber text-terminal-amber" />
-																)}
-																{isTokenInCategory(market.coin, "new") && (
-																	<Badge variant="neutral" size="xs" className="px-1 py-0 text-4xs">
-																		NEW
-																	</Badge>
-																)}
-															</div>
-															<div className="flex items-center gap-1.5 text-4xs text-muted-foreground">
-																<span>{market.maxLeverage}x</span>
-															</div>
-														</div>
-													</div>
-													<div className="w-20 text-right">
-														<span className="text-2xs font-medium tabular-nums">
-															{market.markPrice ? formatUSD(Number(market.markPrice)) : "-"}
-														</span>
-													</div>
-													<div className="w-20 text-right">
-														<span className="text-2xs font-medium tabular-nums">
-															{market.openInterest ? formatUSD(Number(market.openInterest)) : "-"}
-														</span>
-													</div>
-													<div className="w-20 text-right">
-														<span className="text-2xs font-medium tabular-nums">
-															{market.volume24h ? formatUSD(Number(market.volume24h)) : "-"}
-														</span>
-													</div>
-													<div className="w-20 text-right">
-														<div className="flex items-center justify-end gap-1">
-															<Flame
+									return (
+										<div
+											key={row.id}
+											data-index={virtualItem.index}
+											onClick={() => handleSelect(market.coin)}
+											onKeyDown={(e) => {
+												if (e.key === "Enter" || e.key === " ") {
+													handleSelect(market.coin);
+												}
+											}}
+											role="option"
+											aria-selected={isSelected}
+											tabIndex={0}
+											className={cn(
+												"flex items-center px-3 py-1.5 cursor-pointer border-b border-border/20",
+												"hover:bg-accent/30 transition-colors",
+												"absolute top-0 left-0 w-full",
+												isSelected && "bg-terminal-cyan/5",
+											)}
+											style={{
+												height: `${virtualItem.size}px`,
+												transform: `translateY(${virtualItem.start}px)`,
+											}}
+										>
+											<div className="flex-1 min-w-0 flex items-center gap-2">
+												<Avatar className="size-5 shrink-0">
+													<AvatarImage src={getTokenIconUrl(market.coin)} alt={market.coin} />
+													<AvatarFallback className="text-4xs bg-muted">{market.coin.slice(0, 2)}</AvatarFallback>
+												</Avatar>
+												<div className="min-w-0">
+													<div className="flex items-center gap-1">
+														<span className="font-semibold text-2xs">{market.coin}</span>
+														<button
+															type="button"
+															onClick={(e) => {
+																e.stopPropagation();
+																toggleFavorite(market.coin);
+															}}
+															className="hover:scale-110 transition-transform"
+															aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+														>
+															<Star
 																className={cn(
-																	"size-2.5",
-																	isFundingPositive ? "text-terminal-green" : "text-terminal-red",
+																	"size-2.5 transition-colors",
+																	isFavorite
+																		? "fill-terminal-amber text-terminal-amber"
+																		: "text-muted-foreground hover:text-terminal-amber",
 																)}
 															/>
-															<span
-																className={cn(
-																	"text-2xs tabular-nums font-medium",
-																	isFundingPositive ? "text-terminal-green" : "text-terminal-red",
-																)}
-															>
-																{fundingNum
-																	? formatPercent(fundingNum, {
-																			minimumFractionDigits: 4,
-																			signDisplay: "exceptZero",
-																		})
-																	: "-"}
-															</span>
-														</div>
+														</button>
+														{isTokenInCategory(market.coin, "new", favorites) && (
+															<Badge variant="neutral" size="xs" className="px-1 py-0 text-4xs">
+																NEW
+															</Badge>
+														)}
 													</div>
-												</CommandItem>
-											);
-										})
-									)}
-								</CommandGroup>
-							</ScrollArea>
-						</CommandList>
-					</Command>
+													<div className="flex items-center gap-1.5 text-4xs text-muted-foreground">
+														<span>{market.maxLeverage}x</span>
+													</div>
+												</div>
+											</div>
+											<div className="w-20 text-right">
+												<span className="text-2xs font-medium tabular-nums">
+													{market.markPrice ? formatUSD(Number(market.markPrice)) : "-"}
+												</span>
+											</div>
+											<div className="w-20 text-right">
+												<span className="text-2xs font-medium tabular-nums">
+													{market.openInterest ? formatUSD(Number(market.openInterest)) : "-"}
+												</span>
+											</div>
+											<div className="w-20 text-right">
+												<span className="text-2xs font-medium tabular-nums">
+													{market.volume24h ? formatUSD(Number(market.volume24h)) : "-"}
+												</span>
+											</div>
+											<div className="w-20 text-right">
+												<div className="flex items-center justify-end gap-1">
+													<Flame
+														className={cn("size-2.5", isFundingPositive ? "text-terminal-green" : "text-terminal-red")}
+													/>
+													<span
+														className={cn(
+															"text-2xs tabular-nums font-medium",
+															isFundingPositive ? "text-terminal-green" : "text-terminal-red",
+														)}
+													>
+														{fundingNum
+															? formatPercent(fundingNum, {
+																	minimumFractionDigits: 4,
+																	signDisplay: "exceptZero",
+																})
+															: "-"}
+													</span>
+												</div>
+											</div>
+										</div>
+									);
+								})}
+							</div>
+						)}
+					</div>
 
-					<div className="px-3 py-1.5 border-t border-border/40 bg-surface/30 flex items-center justify-between text-4xs text-muted-foreground">
+					<div className="px-3 py-1.5 bg-surface/30 flex items-center justify-between text-4xs text-muted-foreground">
 						<span>{filteredMarkets.length} markets</span>
-						<span className="tabular-nums">Updated live</span>
+						<span className="tabular-nums">{sorting.length > 0 ? `Sorted by ${sorting[0].id}` : "Updated live"}</span>
 					</div>
 				</div>
 			</PopoverContent>

@@ -1,0 +1,1285 @@
+================================================================================
+HYPERLIQUID API DOCUMENTATION
+Complete Reference for All Endpoints, Parameters, and Return Types
+================================================================================
+
+API BASE URLs
+================================================================================
+
+Mainnet:
+  API: https://api.hyperliquid.xyz
+  RPC: https://rpc.hyperliquid.xyz
+
+Testnet:
+  API: https://api.hyperliquid-testnet.xyz
+  RPC: https://rpc.hyperliquid-testnet.xyz
+
+
+DATA TYPES
+================================================================================
+
+Address: Ethereum address (0x followed by 40 hex characters, 42 total)
+  Example: "0x563C175E6f11582f65D6d9E360A618699DEe14a9"
+
+Decimal: Signed decimal number (string or number)
+  Example: "-123.45" or "123.45"
+
+UnsignedDecimal: Non-negative decimal number (string or number)
+  Example: "123.45" or "0"
+
+Integer: Signed integer (number)
+  Example: -123 or 123
+
+UnsignedInteger: Non-negative integer (number, >= 0)
+  Example: 0, 123, 456
+
+Hex: Hexadecimal string (0x followed by hex characters, lowercase)
+  Example: "0x1a2b3c4d"
+
+TokenId: Token identifier (format: "name:0x...")
+  Example: "USDC:0x1234..."
+
+Percent: Percentage string (format: "123.45%")
+  Example: "5.25%"
+
+ISO8601WithoutTimezone: ISO 8601 datetime without timezone
+  Example: "2024-01-01T12:00:00"
+
+
+================================================================================
+INFO ENDPOINT METHODS (68 Total)
+================================================================================
+
+MARKET DATA ENDPOINTS
+================================================================================
+
+1. allMids - Request mid coin prices
+   Parameters:
+     - dex (optional, string): DEX name (empty string for main dex)
+   
+   Returns: Record<string, UnsignedDecimal>
+   Example Response:
+     {
+       "ETH": "3000.5",
+       "BTC": "45000.25",
+       "SOL": "100.75"
+     }
+
+
+2. l2Book - Request L2 order book
+   Parameters:
+     - coin (required, string): Asset symbol (e.g., "ETH", "BTC")
+     - nSigFigs (optional, 2|3|4|5): Number of significant figures
+     - mantissa (optional, 2|5): Mantissa for aggregation (if nSigFigs is 5)
+   
+   Returns: Object or null
+   Response Structure:
+     {
+       "coin": "ETH",
+       "time": 1700000000000,
+       "levels": [
+         [  // Bids (index 0)
+           {"px": "3000", "sz": "1.5", "n": 3},
+           {"px": "2999", "sz": "2.0", "n": 2}
+         ],
+         [  // Asks (index 1)
+           {"px": "3001", "sz": "1.2", "n": 1},
+           {"px": "3002", "sz": "2.5", "n": 2}
+         ]
+       ]
+     }
+   Note: Returns null if market does not exist
+
+
+3. candleSnapshot - Request candlestick snapshots
+   Parameters:
+     - coin (required, string): Asset symbol (e.g., "BTC")
+     - interval (required): "1m" | "3m" | "5m" | "15m" | "30m" | "1h" | "2h" | "4h" | "8h" | "12h" | "1d" | "3d" | "1w" | "1M"
+     - startTime (required, UnsignedInteger): Start time in ms since epoch
+     - endTime (optional, UnsignedInteger): End time in ms since epoch
+   
+   Returns: Array of candlestick objects
+   Response Structure:
+     [
+       {
+         "t": 1700000000000,      // Opening timestamp (ms)
+         "T": 1700003600000,      // Closing timestamp (ms)
+         "s": "ETH",              // Asset symbol
+         "i": "1h",               // Time interval
+         "o": "3000",             // Opening price
+         "c": "3010",             // Closing price
+         "h": "3020",             // Highest price
+         "l": "2995",             // Lowest price
+         "v": "100.5",            // Total volume (base currency)
+         "n": 150                 // Number of trades
+       }
+     ]
+
+
+4. recentTrades - Request recent trades
+   Parameters:
+     - coin (required, string): Asset symbol (e.g., "BTC")
+   
+   Returns: Array of trade objects
+   Response Structure:
+     [
+       {
+         "coin": "ETH",
+         "side": "B",             // "B" = Bid/Buy, "A" = Ask/Sell
+         "px": "3000.5",          // Trade price
+         "sz": "1.2",             // Trade size
+         "time": 1700000000000,   // Trade timestamp (ms)
+         "hash": "0x...",         // Transaction hash (66 chars)
+         "tid": 12345,            // Trade ID
+         "users": ["0x...", "0x..."]  // [Maker, Taker] addresses
+       }
+     ]
+
+
+5. meta - Request trading metadata
+   Parameters:
+     - dex (optional, string): DEX name (empty string for main dex)
+   
+   Returns: Object with universe and marginTables
+   Response Structure:
+     {
+       "universe": [
+         {
+           "name": "ETH",
+           "szDecimals": 3,
+           "maxLeverage": 20,
+           "marginTableId": 0,
+           "onlyIsolated": true,    // optional
+           "isDelisted": false,     // optional
+           "marginMode": "strictIsolated"  // optional
+         }
+       ],
+       "marginTables": [...]
+     }
+
+
+6. allPerpMetas - Get all perpetual metadata
+   Parameters: None
+   
+   Returns: Array of perpetual metadata objects
+
+
+7. fundingHistory - Request funding history
+   Parameters:
+     - coin (required, string): Asset symbol
+     - startTime (required, UnsignedInteger): Start time in ms
+     - endTime (optional, UnsignedInteger): End time in ms
+   
+   Returns: Array of funding rate history entries
+
+
+8. predictedFundings - Get predicted funding rates
+   Parameters: None
+   
+   Returns: Array of predicted funding rates
+
+
+9. liquidatable - Get liquidatable positions
+   Parameters: None
+   
+   Returns: Array of liquidatable position data
+
+
+10. maxMarketOrderNtls - Get max market order notional
+    Parameters: None
+    
+    Returns: Object with maximum market order notional values
+
+
+11. perpsAtOpenInterestCap - Get perps at open interest cap
+    Parameters:
+      - dex (optional, string): DEX name
+    
+    Returns: Array of perpetuals at open interest cap
+
+
+12. alignedQuoteTokenInfo - Get aligned quote token info
+    Parameters:
+      - token (required, UnsignedInteger): Token ID
+    
+    Returns: Aligned quote token information
+
+
+13. marginTable - Get margin table
+    Parameters:
+      - id (required, UnsignedInteger): Margin table ID
+    
+    Returns: Margin table details
+
+
+14. spotMeta - Get spot trading metadata
+    Parameters: None
+    
+    Returns: Spot trading metadata
+
+
+15. spotMetaAndAssetCtxs - Get spot meta and asset contexts
+    Parameters: None
+    
+    Returns: Combined spot metadata and asset contexts
+
+
+16. metaAndAssetCtxs - Get meta and asset contexts
+    Parameters:
+      - dex (optional, string): DEX name
+    
+    Returns: Combined metadata and asset contexts
+
+
+USER ACCOUNT ENDPOINTS
+================================================================================
+
+17. portfolio - Request user portfolio
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Tuple of portfolio metrics for different time periods
+    Response Structure:
+      [
+        ["day", {
+          "accountValueHistory": [[timestamp, value], ...],
+          "pnlHistory": [[timestamp, pnl], ...],
+          "vlm": "1000"
+        }],
+        ["week", {...}],
+        ["month", {...}],
+        ["allTime", {...}],
+        ["perpDay", {...}],
+        ["perpWeek", {...}],
+        ["perpMonth", {...}],
+        ["perpAllTime", {...}]
+      ]
+
+
+18. clearinghouseState - Request clearinghouse state
+    Parameters:
+      - user (required, Address): User address
+      - dex (optional, string): DEX name
+    
+    Returns: Object with account summary
+    Response Structure:
+      {
+        "marginSummary": {
+          "accountValue": "10000",
+          "totalNtlPos": "5000",
+          "totalRawUsd": "15000",
+          "totalMarginUsed": "500"
+        },
+        "crossMarginSummary": {...},
+        "crossMaintenanceMarginUsed": "200",
+        "assetPositions": [
+          {
+            "position": {...},
+            "marginUsed": "100",
+            ...
+          }
+        ]
+      }
+
+
+19. openOrders - Request open orders
+    Parameters:
+      - user (required, Address): User address
+      - dex (optional, string): DEX name
+    
+    Returns: Array of open order objects
+    Response Structure:
+      [
+        {
+          "coin": "ETH",
+          "side": "B",                    // "B" = Bid/Buy, "A" = Ask/Sell
+          "limitPx": "3000",              // Limit price
+          "sz": "1.5",                    // Size
+          "oid": 12345,                   // Order ID
+          "timestamp": 1700000000000,     // Order timestamp (ms)
+          "origSz": "1.5",                // Original size
+          "cloid": "0x...",               // Client Order ID (optional, 34 chars)
+          "reduceOnly": true              // Reduce-only flag (optional)
+        }
+      ]
+
+
+20. userFills - Request array of user fills
+    Parameters:
+      - user (required, Address): User address
+      - aggregateByTime (optional, boolean): Aggregate partial fills when crossing order fills multiple resting orders
+    
+    Returns: Array of fill objects
+    Response Structure:
+      [
+        {
+          "coin": "ETH",
+          "px": "3000",                   // Price
+          "sz": "1.5",                    // Size
+          "side": "B",                    // "B" = Bid/Buy, "A" = Ask/Sell
+          "time": 1700000000000,          // Trade timestamp (ms)
+          "startPosition": "10.5",       // Start position size
+          "dir": "Open Long",             // Direction indicator
+          "closedPnl": "50.25",           // Realized PnL
+          "hash": "0x...",                // L1 transaction hash (66 chars)
+          "oid": 12345,                   // Order ID
+          "crossed": true,                // Was taker order
+          "fee": "-0.5",                  // Fee (negative = rebate)
+          "tid": 67890,                   // Transaction ID
+          "cloid": "0x...",               // Client Order ID (optional, 34 chars)
+          "liquidation": {               // Liquidation details (optional)
+            "liquidatedUser": "0x...",
+            "markPx": "2995",
+            "method": "market"             // "market" | "backstop"
+          },
+          "feeToken": "USDC",             // Fee token
+          "twapId": null                  // TWAP ID (nullable)
+        }
+      ]
+
+
+21. userFillsByTime - Request user fills by time range
+    Parameters:
+      - user (required, Address): User address
+      - startTime (required, UnsignedInteger): Start time in ms
+      - endTime (optional, UnsignedInteger): End time in ms
+      - aggregateByTime (optional, boolean): Aggregate partial fills
+    
+    Returns: Array of fill objects (same structure as userFills)
+
+
+22. userFunding - Request array of user funding ledger updates
+    Parameters:
+      - user (required, Address): User address
+      - startTime (required, UnsignedInteger): Start time in ms
+      - endTime (optional, UnsignedInteger): End time in ms
+    
+    Returns: Array of funding ledger updates
+    Response Structure:
+      [
+        {
+          "time": 1700000000000,          // Timestamp (ms)
+          "hash": "0x...",                // L1 transaction hash (66 chars)
+          "delta": {
+            "type": "funding",
+            "coin": "ETH",
+            "usdc": "5.25",               // Amount in USDC
+            "szi": "10.5",                // Signed position size
+            "fundingRate": "0.0001",      // Applied funding rate
+            "nSamples": 8                 // Number of samples (nullable)
+          }
+        }
+      ]
+
+
+23. userNonFundingLedgerUpdates - Request non-funding ledger updates
+    Parameters:
+      - user (required, Address): User address
+      - startTime (required, UnsignedInteger): Start time in ms
+      - endTime (optional, UnsignedInteger): End time in ms
+    
+    Returns: Array of non-funding ledger updates
+
+
+24. historicalOrders - Request historical orders
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Array of historical order data
+
+
+25. orderStatus - Request order status
+    Parameters:
+      - user (required, Address): User address
+      - oid (required, UnsignedInteger | Hex): Order ID or Client Order ID
+    
+    Returns: Order status information
+
+
+26. twapHistory - Request TWAP history
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Array of TWAP order history
+
+
+27. userTwapSliceFills - Request user TWAP slice fills
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Array of TWAP slice fill data
+
+
+28. userTwapSliceFillsByTime - Request user TWAP slice fills by time
+    Parameters:
+      - user (required, Address): User address
+      - startTime (required, UnsignedInteger): Start time in ms
+      - endTime (optional, UnsignedInteger): End time in ms
+      - aggregateByTime (optional, boolean): Aggregate fills
+    
+    Returns: Array of TWAP slice fill data
+
+
+29. frontendOpenOrders - Request frontend open orders
+    Parameters:
+      - user (required, Address): User address
+      - dex (optional, string): DEX name
+    
+    Returns: Array of frontend-formatted open orders
+
+
+30. activeAssetData - Request active asset data
+    Parameters:
+      - user (required, Address): User address
+      - coin (required, string): Asset symbol
+    
+    Returns: Active asset data for the user
+
+
+31. extraAgents - Request extra agents
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Array of extra agent information
+
+
+32. isVip - Check if user is VIP
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Boolean indicating VIP status
+
+
+33. legalCheck - Legal check
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Legal check result
+
+
+34. maxBuilderFee - Request max builder fee
+    Parameters:
+      - user (required, Address): User address
+      - builder (required, Address): Builder address
+    
+    Returns: Maximum builder fee information
+
+
+35. preTransferCheck - Pre-transfer check
+    Parameters:
+      - user (required, Address): User address
+      - source (required, Address): Source address
+    
+    Returns: Pre-transfer check result
+
+
+36. referral - Request referral info
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Referral information
+
+
+37. spotClearinghouseState - Request spot clearinghouse state
+    Parameters:
+      - user (required, Address): User address
+      - dex (optional, string): DEX name
+    
+    Returns: Spot clearinghouse state
+
+
+38. subAccounts - Request sub-accounts
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Array of sub-account information
+
+
+39. subAccounts2 - Request sub-accounts (v2)
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Array of sub-account information (v2 format)
+
+
+40. userDexAbstraction - Request user DEX abstraction
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: User DEX abstraction settings
+
+
+41. userFees - Request user fees
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: User fee information
+
+
+42. userRateLimit - Request user rate limit
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: User rate limit information
+
+
+43. userRole - Request user role
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: User role information
+
+
+44. userToMultiSigSigners - Request multi-sig signers
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Multi-signature signer information
+
+
+45. webData2 - Request web data (v2)
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Web-formatted user data
+
+
+DELEGATION & VALIDATORS ENDPOINTS
+================================================================================
+
+46. delegations - Request delegations
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Array of delegation information
+
+
+47. delegatorHistory - Request delegator history
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Delegator history data
+
+
+48. delegatorRewards - Request delegator rewards
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Delegator rewards information
+
+
+49. delegatorSummary - Request delegator summary
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Delegator summary data
+
+
+50. gossipRootIps - Request gossip root IPs
+    Parameters: None
+    
+    Returns: Array of gossip root IP addresses
+
+
+51. validatorL1Votes - Request validator L1 votes
+    Parameters: None
+    
+    Returns: Array of validator L1 vote data
+
+
+52. validatorSummaries - Request validator summaries
+    Parameters: None
+    
+    Returns: Array of validator summary data
+
+
+VAULT ENDPOINTS
+================================================================================
+
+53. leadingVaults - Request leading vaults
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Array of leading vault information
+
+
+54. userVaultEquities - Request user vault equities
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Array of user vault equity data
+
+
+55. vaultDetails - Request vault details
+    Parameters:
+      - vaultAddress (required, Address): Vault address
+      - user (optional, Address): User address
+    
+    Returns: Detailed vault information
+
+
+56. vaultSummaries - Request vault summaries
+    Parameters: None
+    
+    Returns: Array of vault summary data
+
+
+DEX ENDPOINTS
+================================================================================
+
+57. perpDexLimits - Request perp DEX limits
+    Parameters:
+      - dex (required, string): DEX name
+    
+    Returns: Perpetual DEX limit information
+
+
+58. perpDexs - Request perp DEXs
+    Parameters: None
+    
+    Returns: Array of perpetual DEX information
+
+
+59. perpDexStatus - Request perp DEX status
+    Parameters:
+      - dex (required, string): DEX name
+    
+    Returns: Perpetual DEX status
+
+
+DEPLOY MARKET ENDPOINTS
+================================================================================
+
+60. perpDeployAuctionStatus - Request perp deploy auction status
+    Parameters: None
+    
+    Returns: Perpetual deploy auction status
+
+
+61. spotDeployState - Request spot deploy state
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: Spot deploy state information
+
+
+62. spotPairDeployAuctionStatus - Request spot pair deploy auction status
+    Parameters: None
+    
+    Returns: Spot pair deploy auction status
+
+
+OTHER ENDPOINTS
+================================================================================
+
+63. exchangeStatus - Request exchange status
+    Parameters: None
+    
+    Returns: Exchange status information
+
+
+64. blockDetails - Request block details
+    Parameters:
+      - height (required, UnsignedInteger): Block height
+    
+    Returns: Block details (requires HTTP transport)
+
+
+65. tokenDetails - Request token details
+    Parameters:
+      - tokenId (required, Hex): Token ID
+    
+    Returns: Token details (requires HTTP transport)
+
+
+66. txDetails - Request transaction details
+    Parameters:
+      - hash (required, Hex): Transaction hash
+    
+    Returns: Transaction details (requires HTTP transport)
+
+
+67. userDetails - Request user details
+    Parameters:
+      - user (required, Address): User address
+    
+    Returns: User details (requires HTTP transport)
+
+
+================================================================================
+EXCHANGE ENDPOINT METHODS (45 Total)
+================================================================================
+
+NOTE: All Exchange endpoints require authentication (wallet signature) and use
+ECDSA signing with nonces to prevent replay attacks. Some actions use EIP-712
+signing (e.g., withdraw3).
+
+All Exchange responses return either:
+  - SuccessResponse: { status: "ok", response: {...} }
+  - ErrorResponse: { status: "err", response: { error: "error message" } }
+
+
+ORDER & POSITION MANAGEMENT
+================================================================================
+
+1. order - Place order(s)
+   Parameters:
+     - orders (required, array): Array of order objects
+       Each order object:
+         - a (UnsignedInteger): Asset ID
+         - b (boolean): Position side (true = long, false = short)
+         - p (UnsignedDecimal): Price
+         - s (UnsignedDecimal): Size (in base currency units)
+         - r (boolean): Is reduce-only?
+         - t (object): Order type
+           Limit order:
+             { limit: { tif: "Gtc" | "Ioc" | "Alo" | "FrontendMarket" | "LiquidationMarket" } }
+           Trigger order:
+             { trigger: { isMarket: boolean, triggerPx: UnsignedDecimal, tpsl: "tp" | "sl" } }
+         - c (optional, Hex, 34 chars): Client Order ID
+     - grouping (optional): "na" | "normalTpsl" | "positionTpsl"
+     - builder (optional): { b: Address, f: UnsignedInteger } (builder fee in 0.1bps)
+   
+   Returns: Success or error response
+   Response Structure:
+     {
+       "status": "ok",
+       "response": {
+         "type": "order",
+         "data": {
+           "statuses": ["success", ...],
+           "resting": {...}
+         }
+       }
+     }
+
+
+2. modify - Modify an order
+   Parameters:
+     - oid (required, UnsignedInteger | Hex): Order ID or Client Order ID
+     - order (required, object): New order parameters
+       Same structure as order object (a, b, p, s, r, t, c)
+   
+   Returns: Success or error response
+
+
+3. batchModify - Batch modify orders
+   Parameters:
+     - modifies (required, array): Array of modify objects
+       Each modify object:
+         - oid (UnsignedInteger | Hex): Order ID or Client Order ID
+         - order (object): New order parameters
+   
+   Returns: Success or error response
+
+
+4. cancel - Cancel order(s)
+   Parameters:
+     - cancels (required, array): Array of cancel objects
+       Each cancel object:
+         - a (UnsignedInteger): Asset ID
+         - o (UnsignedInteger): Order ID
+   
+   Returns: Success or error response
+   Response Structure:
+     {
+       "status": "ok",
+       "response": {
+         "type": "cancel",
+         "data": {
+           "statuses": ["success", ...]
+         }
+       }
+     }
+
+
+5. cancelByCloid - Cancel by Client Order ID
+   Parameters:
+     - cancels (required, array): Array of cancel objects
+       Each cancel object:
+         - a (UnsignedInteger): Asset ID
+         - c (Hex, 34 chars): Client Order ID
+   
+   Returns: Success or error response
+
+
+6. scheduleCancel - Schedule cancel
+   Parameters:
+     - time (optional, UnsignedInteger): Cancel time in ms
+   
+   Returns: Success or error response
+
+
+7. twapOrder - Place TWAP order
+   Parameters:
+     - a (UnsignedInteger): Asset ID
+     - b (boolean): Position side (true = long, false = short)
+     - s (UnsignedDecimal): Size
+     - r (boolean): Is reduce-only?
+     - m (UnsignedInteger): Number of slices
+     - t (boolean): Is market order?
+     - twapTime (UnsignedInteger): TWAP duration in ms
+   
+   Returns: Success or error response
+
+
+8. twapCancel - Cancel TWAP order
+   Parameters:
+     - a (UnsignedInteger): Asset ID
+     - t (UnsignedInteger): TWAP ID
+   
+   Returns: Success or error response
+
+
+9. updateLeverage - Update cross or isolated leverage
+   Parameters:
+     - asset (required, UnsignedInteger): Asset ID
+     - isCross (required, boolean): true for cross leverage, false for isolated
+     - leverage (required, UnsignedInteger, min 1): New leverage value
+   
+   Returns: Success or error response
+
+
+10. updateIsolatedMargin - Update isolated margin
+    Parameters:
+      - asset (required, UnsignedInteger): Asset ID
+      - isBuy (required, boolean): Direction
+      - ntli (required, UnsignedDecimal): Notional to add/remove
+    
+    Returns: Success or error response
+
+
+ACCOUNT MANAGEMENT
+================================================================================
+
+11. approveAgent - Approve agent
+    Parameters:
+      - agentAddress (required, Address): Agent address
+      - agentName (optional, string): Agent name
+    
+    Returns: Success or error response
+
+
+12. approveBuilderFee - Approve builder fee
+    Parameters:
+      - maxFeeRate (required, UnsignedInteger): Max fee rate in 0.1bps (1 = 0.0001%)
+      - builder (required, Address): Builder address
+    
+    Returns: Success or error response
+
+
+13. setDisplayName - Set display name
+    Parameters:
+      - displayName (required, string): Display name
+    
+    Returns: Success or error response
+
+
+14. spotUser - Spot user settings
+    Parameters:
+      - optOut (required, boolean): Opt out of spot trading
+    
+    Returns: Success or error response
+
+
+15. userDexAbstraction - User DEX abstraction
+    Parameters:
+      - user (required, Address): User address
+      - enabled (required, boolean): Enable/disable
+    
+    Returns: Success or error response
+
+
+16. evmUserModify - EVM user modify
+    Parameters:
+      - usingBigBlocks (required, boolean): Use big blocks
+    
+    Returns: Success or error response
+
+
+17. noop - No operation
+    Parameters: None
+    
+    Returns: Success response
+
+
+18. reserveRequestWeight - Reserve request weight
+    Parameters:
+      - weight (required, UnsignedInteger): Request weight to reserve
+    
+    Returns: Success or error response
+
+
+19. agentEnableDexAbstraction - Agent enable DEX abstraction
+    Parameters: None
+    
+    Returns: Success or error response
+
+
+20. convertToMultiSigUser - Convert to multi-sig user
+    Parameters:
+      - authorizedUsers (required, array): Array of authorized user addresses
+      - threshold (required, UnsignedInteger): Signature threshold
+    
+    Returns: Success or error response
+
+
+FUND TRANSFERS
+================================================================================
+
+21. withdraw3 - Initiate withdrawal request
+    Parameters:
+      - destination (required, Address): Destination address
+      - amount (required, UnsignedDecimal): Amount to withdraw (1 = $1)
+    
+    Returns: Success or error response
+    Note: Uses EIP-712 signing
+
+
+22. usdSend - Send USD
+    Parameters:
+      - destination (required, Address): Destination address
+      - amount (required, UnsignedDecimal): Amount to send
+    
+    Returns: Success or error response
+
+
+23. usdClassTransfer - USD class transfer
+    Parameters:
+      - amount (required, UnsignedDecimal): Amount
+      - toPerp (required, boolean): Transfer to perp (true) or from perp (false)
+    
+    Returns: Success or error response
+
+
+24. sendAsset - Send asset
+    Parameters:
+      - destination (required, Address): Destination address
+      - token (required, TokenId): Token identifier (format: "name:0x...")
+      - amount (required, UnsignedDecimal): Amount
+      - sourceDex (required, string): Source DEX name
+      - destinationDex (required, string): Destination DEX name
+      - fromSubAccount (optional, Address): From sub-account
+    
+    Returns: Success or error response
+
+
+25. spotSend - Spot send
+    Parameters:
+      - destination (required, Address): Destination address
+      - token (required, TokenId): Token identifier
+      - amount (required, UnsignedDecimal): Amount
+    
+    Returns: Success or error response
+
+
+SUB-ACCOUNT MANAGEMENT
+================================================================================
+
+26. createSubAccount - Create sub-account
+    Parameters:
+      - name (required, string): Sub-account name
+    
+    Returns: Success or error response
+
+
+27. subAccountModify - Modify sub-account
+    Parameters:
+      - subAccountUser (required, Address): Sub-account user address
+      - name (required, string): New name
+    
+    Returns: Success or error response
+
+
+28. subAccountTransfer - Sub-account transfer
+    Parameters:
+      - subAccountUser (required, Address): Sub-account user address
+      - isDeposit (required, boolean): true for deposit, false for withdrawal
+      - usd (required, UnsignedDecimal): USD amount
+    
+    Returns: Success or error response
+
+
+29. subAccountSpotTransfer - Sub-account spot transfer
+    Parameters:
+      - subAccountUser (required, Address): Sub-account user address
+      - isDeposit (required, boolean): true for deposit, false for withdrawal
+      - token (required, TokenId): Token identifier
+      - amount (required, UnsignedDecimal): Amount
+    
+    Returns: Success or error response
+
+
+REFERRER MANAGEMENT
+================================================================================
+
+30. registerReferrer - Register referrer
+    Parameters:
+      - code (required, string): Referrer code
+    
+    Returns: Success or error response
+
+
+31. setReferrer - Set referrer
+    Parameters:
+      - code (required, string): Referrer code
+    
+    Returns: Success or error response
+
+
+32. claimRewards - Claim rewards
+    Parameters: None
+    
+    Returns: Success or error response
+
+
+STAKING & DELEGATION
+================================================================================
+
+33. cDeposit - Deposit to staking
+    Parameters:
+      - wei (required, UnsignedDecimal): Amount in wei
+    
+    Returns: Success or error response
+
+
+34. cWithdraw - Withdraw from staking
+    Parameters:
+      - wei (required, UnsignedDecimal): Amount in wei
+    
+    Returns: Success or error response
+
+
+35. tokenDelegate - Token delegate
+    Parameters:
+      - validator (required, Address): Validator address
+      - wei (required, UnsignedDecimal): Amount in wei
+      - isUndelegate (required, boolean): true to undelegate
+    
+    Returns: Success or error response
+
+
+36. linkStakingUser - Link staking user
+    Parameters:
+      - user (required, Address): User address
+      - isFinalize (required, boolean): Finalize the link
+    
+    Returns: Success or error response
+
+
+VAULT MANAGEMENT
+================================================================================
+
+37. createVault - Create vault
+    Parameters:
+      - name (required, string): Vault name
+      - description (required, string): Vault description
+      - initialUsd (required, UnsignedDecimal): Initial USD amount
+    
+    Returns: Success or error response
+
+
+38. vaultTransfer - Vault transfer
+    Parameters:
+      - vaultAddress (required, Address): Vault address
+      - isDeposit (required, boolean): true for deposit, false for withdrawal
+      - usd (required, UnsignedDecimal): USD amount
+    
+    Returns: Success or error response
+
+
+39. vaultModify - Modify vault
+    Parameters:
+      - vaultAddress (required, Address): Vault address
+      - allowDeposits (optional, boolean): Allow deposits
+      - alwaysCloseOnWithdraw (optional, boolean): Always close on withdraw
+    
+    Returns: Success or error response
+
+
+40. vaultDistribute - Vault distribute
+    Parameters:
+      - vaultAddress (required, Address): Vault address
+      - usd (required, UnsignedDecimal): USD amount to distribute
+    
+    Returns: Success or error response
+
+
+DEPLOY MARKET
+================================================================================
+
+41. perpDeploy - Deploy perpetual market
+    Parameters:
+      - Action object with deployment parameters (varies by action type)
+    
+    Returns: Success or error response
+
+
+42. spotDeploy - Deploy spot market
+    Parameters:
+      - Action object with deployment parameters (varies by action type)
+    
+    Returns: Success or error response
+
+
+VALIDATOR ACTIONS
+================================================================================
+
+43. cSignerAction - Signer action
+    Parameters:
+      - jailSelf (null) or unjailSelf (null)
+    
+    Returns: Success or error response
+
+
+44. cValidatorAction - Validator action
+    Parameters:
+      - Action object (varies by action type)
+    
+    Returns: Success or error response
+
+
+45. validatorL1Stream - Validator L1 stream
+    Parameters:
+      - riskFreeRate (required, UnsignedDecimal): Risk-free rate
+    
+    Returns: Success or error response
+
+
+================================================================================
+AUTHENTICATION & SIGNING
+================================================================================
+
+All Exchange endpoints require:
+  1. Wallet signature (ECDSA)
+  2. Nonce (timestamp in ms) to prevent replay attacks
+  3. EIP-712 signing for certain actions (withdraw3, etc.)
+
+Request Structure for Exchange Endpoints:
+  {
+    "action": {
+      "type": "actionName",
+      ...actionParameters
+    },
+    "nonce": 1700000000000,  // Timestamp in ms
+    "signature": {
+      "r": "0x...",
+      "s": "0x...",
+      "v": 27 or 28
+    },
+    "vaultAddress": "0x...",  // Optional, for vault trading
+    "expiresAfter": 1700000000000  // Optional, expiration time
+  }
+
+Response Structure:
+  Success:
+    {
+      "status": "ok",
+      "response": {
+        "type": "actionName",
+        "data": {...}
+      }
+    }
+  
+  Error:
+    {
+      "status": "err",
+      "response": {
+        "error": "error message"
+      }
+    }
+
+
+================================================================================
+ORDER TYPES & TIME-IN-FORCE
+================================================================================
+
+Limit Orders:
+  - Gtc: Good till canceled (remains active until filled or canceled)
+  - Ioc: Immediate or cancel (fills immediately or cancels unfilled portion)
+  - Alo: Add liquidity only
+  - FrontendMarket: Similar to Ioc, used in Hyperliquid UI
+  - LiquidationMarket: Similar to Ioc, used in Hyperliquid UI
+
+Trigger Orders:
+  - isMarket: Boolean indicating if it's a market order
+  - triggerPx: Trigger price (UnsignedDecimal)
+  - tpsl: "tp" (take profit) or "sl" (stop loss)
+
+Order Grouping:
+  - na: Standard order without grouping (default)
+  - normalTpsl: TP/SL order with fixed size that doesn't adjust with position changes
+  - positionTpsl: TP/SL order that adjusts proportionally with position size
+
+
+================================================================================
+EXAMPLES
+================================================================================
+
+Example: Get all mid prices
+  Request: { type: "allMids" }
+  Response: { "ETH": "3000.5", "BTC": "45000.25" }
+
+Example: Get L2 order book
+  Request: { type: "l2Book", coin: "ETH", nSigFigs: 3 }
+  Response: { coin: "ETH", time: 1700000000000, levels: [[bids], [asks]] }
+
+Example: Get user portfolio
+  Request: { type: "portfolio", user: "0x563C175E6f11582f65D6d9E360A618699DEe14a9" }
+  Response: [["day", {...}], ["week", {...}], ...]
+
+Example: Place a limit order
+  Request: {
+    action: {
+      type: "order",
+      orders: [{
+        a: 0,                    // Asset ID (0 = ETH)
+        b: true,                 // Long position
+        p: "30000",              // Price
+        s: "0.1",                // Size
+        r: false,                // Not reduce-only
+        t: { limit: { tif: "Gtc" } }
+      }],
+      grouping: "na"
+    },
+    nonce: 1700000000000,
+    signature: {...}
+  }
+
+Example: Cancel orders
+  Request: {
+    action: {
+      type: "cancel",
+      cancels: [{ a: 0, o: 12345 }]
+    },
+    nonce: 1700000000000,
+    signature: {...}
+  }
+
+Example: Update leverage
+  Request: {
+    action: {
+      type: "updateLeverage",
+      asset: 0,
+      isCross: true,
+      leverage: 5
+    },
+    nonce: 1700000000000,
+    signature: {...}
+  }
+
+Example: Withdraw funds
+  Request: {
+    action: {
+      type: "withdraw3",
+      destination: "0x...",
+      amount: "100.5"
+    },
+    nonce: 1700000000000,
+    signature: {...}  // EIP-712 signature
+  }
+
+
+================================================================================
+END OF DOCUMENTATION
+================================================================================
