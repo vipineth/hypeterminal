@@ -1,14 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 import { Check, Copy, Moon, Sun, Terminal } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "@/providers/theme";
 
 export const Route = createFileRoute("/components")({
@@ -35,11 +34,7 @@ function CodeBlock({ code, className = "" }: { code: string; className?: string 
 				className="absolute top-1.5 right-1.5 size-6 flex items-center justify-center rounded-sm bg-background/80 border border-border/40 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-accent"
 				aria-label="Copy code"
 			>
-				{copied ? (
-					<Check className="size-3 text-terminal-green" />
-				) : (
-					<Copy className="size-3 text-muted-foreground" />
-				)}
+				{copied ? <Check className="size-3 text-terminal-green" /> : <Copy className="size-3 text-muted-foreground" />}
 			</button>
 		</div>
 	);
@@ -56,15 +51,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 	);
 }
 
-function ComponentRow({ 
-	label, 
-	code, 
-	children 
-}: { 
-	label: string; 
-	code: string;
-	children: React.ReactNode;
-}) {
+function ComponentRow({ label, code, children }: { label: string; code: string; children: React.ReactNode }) {
 	return (
 		<div className="space-y-2">
 			<div className="flex items-center gap-4">
@@ -78,9 +65,10 @@ function ComponentRow({
 
 function ComponentShowcase() {
 	const { theme, setTheme } = useTheme();
-	const [inputValue, setInputValue] = useState("");
 
-	const isDark = theme === "dark" || (theme === "system" && typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+	const isDark =
+		theme === "dark" ||
+		(theme === "system" && typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
 	return (
 		<div className="min-h-screen bg-background text-foreground p-6">
@@ -91,11 +79,7 @@ function ComponentShowcase() {
 						<h1 className="text-xl font-bold">Component Showcase</h1>
 						<p className="text-sm text-muted-foreground">Hover over code blocks to copy</p>
 					</div>
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => setTheme(isDark ? "light" : "dark")}
-					>
+					<Button variant="outline" size="sm" onClick={() => setTheme(isDark ? "light" : "dark")}>
 						{isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
 						<span>{isDark ? "Light" : "Dark"}</span>
 					</Button>
@@ -103,34 +87,50 @@ function ComponentShowcase() {
 
 				{/* Button */}
 				<Section title="Button">
-					<ComponentRow 
-						label="Variants" 
+					<ComponentRow
+						label="Variants"
 						code={`<Button variant="default">Default</Button>
 <Button variant="secondary">Secondary</Button>
 <Button variant="outline">Outline</Button>
 <Button variant="ghost">Ghost</Button>
 <Button variant="destructive">Destructive</Button>`}
 					>
-						<Button variant="default" size="sm">Default</Button>
-						<Button variant="secondary" size="sm">Secondary</Button>
-						<Button variant="outline" size="sm">Outline</Button>
-						<Button variant="ghost" size="sm">Ghost</Button>
-						<Button variant="destructive" size="sm">Destructive</Button>
+						<Button variant="default" size="sm">
+							Default
+						</Button>
+						<Button variant="secondary" size="sm">
+							Secondary
+						</Button>
+						<Button variant="outline" size="sm">
+							Outline
+						</Button>
+						<Button variant="ghost" size="sm">
+							Ghost
+						</Button>
+						<Button variant="destructive" size="sm">
+							Destructive
+						</Button>
 					</ComponentRow>
 
-					<ComponentRow 
-						label="Trading" 
+					<ComponentRow
+						label="Trading"
 						code={`<Button variant="long">Long</Button>
 <Button variant="short">Short</Button>
 <Button variant="terminal">Terminal</Button>`}
 					>
-						<Button variant="long" size="sm">Long</Button>
-						<Button variant="short" size="sm">Short</Button>
-						<Button variant="terminal" size="sm">Terminal</Button>
+						<Button variant="long" size="sm">
+							Long
+						</Button>
+						<Button variant="short" size="sm">
+							Short
+						</Button>
+						<Button variant="terminal" size="sm">
+							Terminal
+						</Button>
 					</ComponentRow>
 
-					<ComponentRow 
-						label="Sizes" 
+					<ComponentRow
+						label="Sizes"
 						code={`<Button size="lg">Large</Button>
 <Button size="default">Default</Button>
 <Button size="sm">Small</Button>
@@ -144,26 +144,36 @@ function ComponentShowcase() {
 						<Button size="2xs">2XS</Button>
 					</ComponentRow>
 
-					<ComponentRow 
-						label="Icon Sizes" 
+					<ComponentRow
+						label="Icon Sizes"
 						code={`<Button size="icon-lg" variant="outline"><Terminal /></Button>
 <Button size="icon" variant="outline"><Terminal /></Button>
 <Button size="icon-sm" variant="outline"><Terminal /></Button>
 <Button size="icon-xs" variant="outline"><Terminal /></Button>
 <Button size="icon-2xs" variant="outline"><Terminal /></Button>`}
 					>
-						<Button size="icon-lg" variant="outline"><Terminal /></Button>
-						<Button size="icon" variant="outline"><Terminal /></Button>
-						<Button size="icon-sm" variant="outline"><Terminal /></Button>
-						<Button size="icon-xs" variant="outline"><Terminal /></Button>
-						<Button size="icon-2xs" variant="outline"><Terminal /></Button>
+						<Button size="icon-lg" variant="outline">
+							<Terminal />
+						</Button>
+						<Button size="icon" variant="outline">
+							<Terminal />
+						</Button>
+						<Button size="icon-sm" variant="outline">
+							<Terminal />
+						</Button>
+						<Button size="icon-xs" variant="outline">
+							<Terminal />
+						</Button>
+						<Button size="icon-2xs" variant="outline">
+							<Terminal />
+						</Button>
 					</ComponentRow>
 				</Section>
 
 				{/* Input */}
 				<Section title="Input">
-					<ComponentRow 
-						label="Sizes" 
+					<ComponentRow
+						label="Sizes"
 						code={`<Input inputSize="lg" placeholder="Large" />
 <Input inputSize="default" placeholder="Default" />
 <Input inputSize="sm" placeholder="Small" />`}
@@ -176,8 +186,8 @@ function ComponentShowcase() {
 
 				{/* Badge */}
 				<Section title="Badge">
-					<ComponentRow 
-						label="Variants" 
+					<ComponentRow
+						label="Variants"
 						code={`<Badge variant="default">Default</Badge>
 <Badge variant="secondary">Secondary</Badge>
 <Badge variant="outline">Outline</Badge>
@@ -189,8 +199,8 @@ function ComponentShowcase() {
 						<Badge variant="destructive">Destructive</Badge>
 					</ComponentRow>
 
-					<ComponentRow 
-						label="Trading" 
+					<ComponentRow
+						label="Trading"
 						code={`<Badge variant="long">+5.24%</Badge>
 <Badge variant="short">-2.15%</Badge>
 <Badge variant="neutral">0.00%</Badge>`}
@@ -200,8 +210,8 @@ function ComponentShowcase() {
 						<Badge variant="neutral">0.00%</Badge>
 					</ComponentRow>
 
-					<ComponentRow 
-						label="Sizes" 
+					<ComponentRow
+						label="Sizes"
 						code={`<Badge size="default">Default</Badge>
 <Badge size="sm">Small</Badge>
 <Badge size="xs">XS</Badge>`}
@@ -211,23 +221,35 @@ function ComponentShowcase() {
 						<Badge size="xs">XS</Badge>
 					</ComponentRow>
 
-					<ComponentRow 
-						label="Trading + Sizes" 
+					<ComponentRow
+						label="Trading + Sizes"
 						code={`<Badge variant="long" size="sm">LONG</Badge>
 <Badge variant="short" size="xs">S</Badge>`}
 					>
-						<Badge variant="long" size="default">LONG</Badge>
-						<Badge variant="long" size="sm">LONG</Badge>
-						<Badge variant="long" size="xs">L</Badge>
-						<Badge variant="short" size="default">SHORT</Badge>
-						<Badge variant="short" size="sm">SHORT</Badge>
-						<Badge variant="short" size="xs">S</Badge>
+						<Badge variant="long" size="default">
+							LONG
+						</Badge>
+						<Badge variant="long" size="sm">
+							LONG
+						</Badge>
+						<Badge variant="long" size="xs">
+							L
+						</Badge>
+						<Badge variant="short" size="default">
+							SHORT
+						</Badge>
+						<Badge variant="short" size="sm">
+							SHORT
+						</Badge>
+						<Badge variant="short" size="xs">
+							S
+						</Badge>
 					</ComponentRow>
 				</Section>
 
 				{/* Card */}
 				<Section title="Card">
-					<CodeBlock 
+					<CodeBlock
 						code={`<Card>
   <CardHeader>
     <CardTitle>Card Title</CardTitle>
@@ -236,7 +258,7 @@ function ComponentShowcase() {
   <CardContent>
     <p>Card content here</p>
   </CardContent>
-</Card>`} 
+</Card>`}
 						className="mb-4"
 					/>
 					<div className="grid grid-cols-2 gap-4">
@@ -266,7 +288,7 @@ function ComponentShowcase() {
 
 				{/* Tabs */}
 				<Section title="Tabs">
-					<CodeBlock 
+					<CodeBlock
 						code={`<Tabs defaultValue="positions">
   <TabsList>
     <TabsTrigger value="positions">Positions</TabsTrigger>
@@ -274,7 +296,7 @@ function ComponentShowcase() {
     <TabsTrigger value="history">History</TabsTrigger>
   </TabsList>
   <TabsContent value="positions">Content here</TabsContent>
-</Tabs>`} 
+</Tabs>`}
 						className="mb-4"
 					/>
 					<Tabs defaultValue="positions">
@@ -297,8 +319,8 @@ function ComponentShowcase() {
 
 				{/* Select */}
 				<Section title="Select">
-					<ComponentRow 
-						label="Sizes" 
+					<ComponentRow
+						label="Sizes"
 						code={`<Select defaultValue="eth">
   <SelectTrigger size="default">
     <SelectValue />
@@ -346,7 +368,7 @@ function ComponentShowcase() {
 
 				{/* Table */}
 				<Section title="Table">
-					<CodeBlock 
+					<CodeBlock
 						code={`<Table>
   <TableHeader>
     <TableRow>
@@ -362,7 +384,7 @@ function ComponentShowcase() {
       <TableCell className="text-right text-terminal-green">+$125.50</TableCell>
     </TableRow>
   </TableBody>
-</Table>`} 
+</Table>`}
 						className="mb-4"
 					/>
 					<Table>
@@ -378,14 +400,22 @@ function ComponentShowcase() {
 						<TableBody>
 							<TableRow>
 								<TableCell className="font-medium">ETH-PERP</TableCell>
-								<TableCell><Badge variant="long" size="xs">LONG</Badge></TableCell>
+								<TableCell>
+									<Badge variant="long" size="xs">
+										LONG
+									</Badge>
+								</TableCell>
 								<TableCell className="text-right tabular-nums">2.5</TableCell>
 								<TableCell className="text-right tabular-nums">$2,450.00</TableCell>
 								<TableCell className="text-right tabular-nums text-terminal-green">+$125.50</TableCell>
 							</TableRow>
 							<TableRow>
 								<TableCell className="font-medium">BTC-PERP</TableCell>
-								<TableCell><Badge variant="short" size="xs">SHORT</Badge></TableCell>
+								<TableCell>
+									<Badge variant="short" size="xs">
+										SHORT
+									</Badge>
+								</TableCell>
 								<TableCell className="text-right tabular-nums">0.15</TableCell>
 								<TableCell className="text-right tabular-nums">$42,100.00</TableCell>
 								<TableCell className="text-right tabular-nums text-terminal-red">-$85.20</TableCell>
@@ -396,7 +426,7 @@ function ComponentShowcase() {
 
 				{/* Typography Reference */}
 				<Section title="Typography">
-					<CodeBlock 
+					<CodeBlock
 						code={`<p className="text-sm">Default body (14px)</p>
 <p className="text-xs">Small text (12px)</p>
 <p className="text-2xs">Dense UI (11px)</p>
@@ -407,7 +437,7 @@ function ComponentShowcase() {
 <span className="text-terminal-red">Red</span>
 <span className="text-terminal-cyan">Cyan</span>
 <span className="text-terminal-amber">Amber</span>
-<span className="text-terminal-purple">Purple</span>`} 
+<span className="text-terminal-purple">Purple</span>`}
 						className="mb-4"
 					/>
 					<div className="space-y-1">

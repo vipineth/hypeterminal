@@ -123,6 +123,35 @@ await subscription.unsubscribe();
 
 ---
 
+## App WebSocket Hooks (Zustand)
+
+This app uses a small React + Zustand layer on top of `SubscriptionClient` to:
+
+- Keep a single underlying WebSocket subscription per channel/params (ref-counted across components)
+- Write incoming events into a generic Zustand store (keyed by `method + params`)
+- Read data anywhere via channel hooks or the generic hook
+
+### Subscribe + Read (recommended)
+
+```ts
+import { useAllMidsSubscription, useL2BookSubscription, useTradesSubscription } from "@/hooks/hyperliquid";
+
+const { data: allMids } = useAllMidsSubscription();
+const { data: book } = useL2BookSubscription({ params: { coin: "ETH", nSigFigs: 5 } });
+const { data: trades } = useTradesSubscription({ params: { coin: "ETH" } });
+```
+
+### Generic Hook (no custom hook needed)
+
+```ts
+import { useHyperliquidWs } from "@/hooks/hyperliquid";
+
+const { data: assetCtxs } = useHyperliquidWs("allDexsAssetCtxs");
+const { data: trades } = useHyperliquidWs("trades", { params: { coin: "ETH" } });
+```
+
+---
+
 ## ExchangeClient Methods
 
 Trading operations - requires wallet for signing.
