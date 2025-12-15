@@ -1,18 +1,19 @@
 import { ClientOnly } from "@tanstack/react-router";
 import { EllipsisVertical, Flame, LayoutGrid, Search } from "lucide-react";
-import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { useMarket } from "@/hooks/hyperliquid";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/providers/theme";
+import { useSelectedMarket, useSelectedMarketActions } from "@/stores";
 import { StatBlock } from "./stat-block";
 import { TokenSelector } from "./token-selector";
 import { TradingViewChart } from "./trading-view-chart";
 
 export function ChartPanel() {
 	const { theme } = useTheme();
-	const [selectedCoin, setSelectedCoin] = useState("BTC");
+	const selectedCoin = useSelectedMarket();
+	const { setCoin } = useSelectedMarketActions();
 	const { data: market } = useMarket(selectedCoin);
 
 	const fundingNum = market?.fundingRate ? Number.parseFloat(market.fundingRate) : 0;
@@ -23,7 +24,7 @@ export function ChartPanel() {
 			<div className="px-2 py-1.5 border-b border-border/60 bg-surface/30">
 				<div className="flex items-center justify-between gap-2">
 					<div className="flex items-center gap-2 min-w-0">
-						<TokenSelector value={selectedCoin} onValueChange={setSelectedCoin} />
+						<TokenSelector value={selectedCoin} onValueChange={setCoin} />
 						<Separator orientation="vertical" className="mx-1 h-4" />
 						<div className="hidden md:flex items-center gap-4 text-3xs">
 							<StatBlock

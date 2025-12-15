@@ -11,6 +11,12 @@ export type HyperliquidWsMethodName = {
 	[K in keyof SubscriptionClient]: SubscriptionClient[K] extends (...args: infer _Args) => Promise<unknown> ? K : never;
 }[keyof SubscriptionClient];
 
+/**
+ * Extracts overloaded method signatures from SubscriptionClient.
+ * This is gnarly, but it gives us correct parameter/return types
+ * for methods like l2Book(coin, listener) vs allMids(listener).
+ */
+
 type OverloadToUnion<T> = T extends {
 	(...args: infer A1): infer R1;
 	(...args: infer A2): infer R2;
@@ -25,27 +31,25 @@ type OverloadToUnion<T> = T extends {
 
 type MethodUnion<K extends HyperliquidWsMethodName> = OverloadToUnion<SubscriptionClient[K]>;
 
-type ListenerOnlySignature = (listener: (data: unknown) => void) => Promise<WebSocketSubscription>;
-type ParamsListenerSignature = (params: unknown, listener: (data: unknown) => void) => Promise<WebSocketSubscription>;
-
-type ListenerOf<F> = F extends (listener: infer L) => Promise<unknown>
-	? L
-	: F extends (params: unknown, listener: infer L) => Promise<unknown>
-		? L
-		: never;
 type EventFromListener<L> = L extends (data: infer E) => unknown ? E : never;
 
-type HasListenerOnly<K extends HyperliquidWsMethodName> = Extract<MethodUnion<K>, ListenerOnlySignature> extends never
-	? false
-	: true;
+type ParamTuples<K extends HyperliquidWsMethodName> = Parameters<MethodUnion<K>>;
+type ListenerOnlyTuple<K extends HyperliquidWsMethodName> = Extract<ParamTuples<K>, [unknown]>;
+type ParamsListenerTuple<K extends HyperliquidWsMethodName> = Extract<ParamTuples<K>, [unknown, unknown]>;
 
-type ParamsSignatureOf<K extends HyperliquidWsMethodName> = Extract<MethodUnion<K>, ParamsListenerSignature>;
+type ListenerArg<K extends HyperliquidWsMethodName> = ParamTuples<K> extends [infer L]
+	? L
+	: ParamTuples<K> extends [unknown, infer L]
+		? L
+		: never;
 
-export type HyperliquidWsParams<K extends HyperliquidWsMethodName> = ParamsSignatureOf<K> extends never
-	? never
-	: Parameters<ParamsSignatureOf<K>>[0];
+type HasListenerOnly<K extends HyperliquidWsMethodName> = ListenerOnlyTuple<K> extends never ? false : true;
 
-export type HyperliquidWsEvent<K extends HyperliquidWsMethodName> = EventFromListener<ListenerOf<MethodUnion<K>>>;
+type ParamsArg<K extends HyperliquidWsMethodName> = ParamsListenerTuple<K> extends [infer P, unknown] ? P : never;
+
+export type HyperliquidWsParams<K extends HyperliquidWsMethodName> = ParamsArg<K>;
+
+export type HyperliquidWsEvent<K extends HyperliquidWsMethodName> = EventFromListener<ListenerArg<K>>;
 
 type RequiredParamMethods = {
 	[K in HyperliquidWsMethodName]: HyperliquidWsParams<K> extends never
