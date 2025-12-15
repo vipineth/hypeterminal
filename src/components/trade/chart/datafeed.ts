@@ -1,334 +1,524 @@
-type Bar = {
-	time: number;
-	open: number;
-	high: number;
-	low: number;
-	close: number;
-	volume: number;
-};
+import type {
+	AllMidsResponse,
+	CandleSnapshotParameters,
+	CandleSnapshotResponse,
+	CandleWsEvent,
+	MetaResponse,
+	WebSocketSubscription,
+} from "@nktkas/hyperliquid";
+import { getInfoClient, getSubscriptionClient } from "@/lib/hyperliquid";
+import type {
+	Bar,
+	DatafeedConfiguration,
+	DatafeedErrorCallback,
+	HistoryCallback,
+	IBasicDataFeed,
+	LibrarySymbolInfo,
+	OnReadyCallback,
+	PeriodParams,
+	ResolutionString,
+	ResolveCallback,
+	SearchSymbolResultItem,
+	SearchSymbolsCallback,
+	ServerTimeCallback,
+	SubscribeBarsCallback,
+} from "@/types/charting_library";
 
-type SymbolInfo = {
-	name: string;
-	ticker: string;
-	description: string;
-	type: string;
-	session: string;
-	timezone: string;
-	exchange: string;
-	minmov: number;
-	pricescale: number;
-	has_intraday: boolean;
-	has_daily: boolean;
-	has_weekly_and_monthly: boolean;
-	supported_resolutions: string[];
-	volume_precision: number;
-	data_status: string;
-};
+const EXCHANGE = "Hyperliquid";
+const QUOTE_ASSET = "USDC";
+const SESSION_24X7 = "24x7";
+const TIMEZONE = "Etc/UTC";
+const DEFAULT_PRICESCALE = 100;
 
-type LibrarySymbolInfo = SymbolInfo & {
-	full_name: string;
-	listed_exchange: string;
-	format: string;
-};
+const supportedResolutions = [
+	"1",
+	"3",
+	"5",
+	"15",
+	"30",
+	"60",
+	"120",
+	"240",
+	"480",
+	"720",
+	"1D",
+	"1W",
+	"1M",
+] as unknown as ResolutionString[];
 
-type SubscriberCallback = (bar: Bar) => void;
+type CandleInterval = CandleSnapshotParameters["interval"];
 
-const supportedResolutions = ["1", "5", "15", "30", "60", "240", "1D", "1W", "1M"];
+const META_TTL_MS = 60_000;
+let metaCache: { value: MetaResponse; fetchedAt: number } | undefined;
+let metaPromise: Promise<MetaResponse> | undefined;
 
-const symbolsData: Record<string, SymbolInfo> = {
-	"AAVE/USDC": {
-		name: "AAVE/USDC",
-		ticker: "AAVE/USDC",
-		description: "Aave / USD Coin",
-		type: "crypto",
-		session: "24x7",
-		timezone: "Etc/UTC",
-		exchange: "HyperTerminal",
-		minmov: 1,
-		pricescale: 100,
-		has_intraday: true,
-		has_daily: true,
-		has_weekly_and_monthly: true,
-		supported_resolutions: supportedResolutions,
-		volume_precision: 2,
-		data_status: "streaming",
-	},
-	"BTC/USDC": {
-		name: "BTC/USDC",
-		ticker: "BTC/USDC",
-		description: "Bitcoin / USD Coin",
-		type: "crypto",
-		session: "24x7",
-		timezone: "Etc/UTC",
-		exchange: "HyperTerminal",
-		minmov: 1,
-		pricescale: 100,
-		has_intraday: true,
-		has_daily: true,
-		has_weekly_and_monthly: true,
-		supported_resolutions: supportedResolutions,
-		volume_precision: 2,
-		data_status: "streaming",
-	},
-	"ETH/USDC": {
-		name: "ETH/USDC",
-		ticker: "ETH/USDC",
-		description: "Ethereum / USD Coin",
-		type: "crypto",
-		session: "24x7",
-		timezone: "Etc/UTC",
-		exchange: "HyperTerminal",
-		minmov: 1,
-		pricescale: 100,
-		has_intraday: true,
-		has_daily: true,
-		has_weekly_and_monthly: true,
-		supported_resolutions: supportedResolutions,
-		volume_precision: 2,
-		data_status: "streaming",
-	},
-	"SOL/USDC": {
-		name: "SOL/USDC",
-		ticker: "SOL/USDC",
-		description: "Solana / USD Coin",
-		type: "crypto",
-		session: "24x7",
-		timezone: "Etc/UTC",
-		exchange: "HyperTerminal",
-		minmov: 1,
-		pricescale: 100,
-		has_intraday: true,
-		has_daily: true,
-		has_weekly_and_monthly: true,
-		supported_resolutions: supportedResolutions,
-		volume_precision: 2,
-		data_status: "streaming",
-	},
-};
+async function getMeta(): Promise<MetaResponse> {
+	const now = Date.now();
+	if (metaCache && now - metaCache.fetchedAt < META_TTL_MS) return metaCache.value;
+	if (metaPromise) return metaPromise;
 
-const basePrices: Record<string, number> = {
-	"AAVE/USDC": 102.45,
-	"BTC/USDC": 43521.3,
-	"ETH/USDC": 2341.8,
-	"SOL/USDC": 98.72,
-};
+	metaPromise = getInfoClient()
+		.meta()
+		.then((meta) => {
+			metaCache = { value: meta, fetchedAt: Date.now() };
+			return meta;
+		})
+		.finally(() => {
+			metaPromise = undefined;
+		});
 
-function getResolutionMs(resolution: string): number {
-	switch (resolution) {
+	return metaPromise;
+}
+
+const ALL_MIDS_TTL_MS = 10_000;
+let allMidsCache: { value: AllMidsResponse; fetchedAt: number } | undefined;
+let allMidsPromise: Promise<AllMidsResponse> | undefined;
+
+async function getAllMids(): Promise<AllMidsResponse> {
+	const now = Date.now();
+	if (allMidsCache && now - allMidsCache.fetchedAt < ALL_MIDS_TTL_MS) return allMidsCache.value;
+	if (allMidsPromise) return allMidsPromise;
+
+	allMidsPromise = getInfoClient()
+		.allMids()
+		.then((mids) => {
+			allMidsCache = { value: mids, fetchedAt: Date.now() };
+			return mids;
+		})
+		.finally(() => {
+			allMidsPromise = undefined;
+		});
+
+	return allMidsPromise;
+}
+
+function normalizeSymbolName(symbolName: string): string {
+	const trimmed = symbolName.trim();
+	const withoutExchange = trimmed.includes(":") ? (trimmed.split(":").pop() ?? trimmed) : trimmed;
+	return withoutExchange.trim();
+}
+
+function coinFromSymbolName(symbolName: string): string {
+	const normalized = normalizeSymbolName(symbolName);
+	return normalized.split(/[/-]/)[0] ?? normalized;
+}
+
+function symbolFromCoin(coin: string): string {
+	return `${coin}/${QUOTE_ASSET}`;
+}
+
+function resolutionToInterval(resolution: ResolutionString): CandleInterval | undefined {
+	const r = resolution as unknown as string;
+
+	switch (r) {
 		case "1":
-			return 60 * 1000;
+			return "1m";
+		case "3":
+			return "3m";
 		case "5":
-			return 5 * 60 * 1000;
+			return "5m";
 		case "15":
-			return 15 * 60 * 1000;
+			return "15m";
 		case "30":
-			return 30 * 60 * 1000;
+			return "30m";
 		case "60":
-			return 60 * 60 * 1000;
+			return "1h";
+		case "120":
+			return "2h";
 		case "240":
-			return 4 * 60 * 60 * 1000;
+			return "4h";
+		case "480":
+			return "8h";
+		case "720":
+			return "12h";
+		case "D":
 		case "1D":
-			return 24 * 60 * 60 * 1000;
+			return "1d";
+		case "3D":
+			return "3d";
+		case "W":
 		case "1W":
-			return 7 * 24 * 60 * 60 * 1000;
+			return "1w";
+		case "M":
 		case "1M":
-			return 30 * 24 * 60 * 60 * 1000;
+			return "1M";
 		default:
-			return 60 * 1000;
+			return undefined;
 	}
 }
 
-const lastBarCache: Map<string, Bar> = new Map();
+function parseDecimal(value: unknown): number {
+	if (typeof value === "number") return value;
+	if (typeof value === "string") {
+		const parsed = Number.parseFloat(value);
+		return Number.isFinite(parsed) ? parsed : Number.NaN;
+	}
+	return Number.NaN;
+}
 
-function generateHistoricalBars(symbol: string, resolution: string, from: number, to: number): Bar[] {
-	const bars: Bar[] = [];
-	const basePrice = basePrices[symbol] || 100;
-	const resolutionMs = getResolutionMs(resolution);
+function candleSnapshotToBar(candle: CandleSnapshotResponse[number]): Bar | null {
+	const open = parseDecimal(candle.o);
+	const high = parseDecimal(candle.h);
+	const low = parseDecimal(candle.l);
+	const close = parseDecimal(candle.c);
+	const volume = parseDecimal(candle.v);
 
-	const fromMs = from * 1000;
-	const now = Date.now();
-	const currentBarTime = Math.floor(now / resolutionMs) * resolutionMs;
-	const toMs = Math.min(to * 1000, currentBarTime);
+	if (!Number.isFinite(open) || !Number.isFinite(high) || !Number.isFinite(low) || !Number.isFinite(close)) {
+		return null;
+	}
 
-	let currentTime = Math.floor(fromMs / resolutionMs) * resolutionMs;
-	let lastClose = basePrice * (0.7 + Math.random() * 0.2);
+	return {
+		time: candle.t,
+		open,
+		high,
+		low,
+		close,
+		volume: Number.isFinite(volume) ? volume : undefined,
+	};
+}
 
-	while (currentTime <= toMs) {
-		const volatility = 0.015;
-		const longTrend = Math.sin(currentTime / (7 * 24 * 60 * 60 * 1000)) * 0.005;
-		const shortTrend = Math.sin(currentTime / (4 * 60 * 60 * 1000)) * 0.003;
-		const change = (Math.random() - 0.5) * 2 * volatility + longTrend + shortTrend;
+function candleEventToBar(event: CandleWsEvent): Bar | null {
+	const open = parseDecimal(event.o);
+	const high = parseDecimal(event.h);
+	const low = parseDecimal(event.l);
+	const close = parseDecimal(event.c);
+	const volume = parseDecimal(event.v);
 
-		const open = lastClose;
-		const close = open * (1 + change);
-		const high = Math.max(open, close) * (1 + Math.random() * volatility * 0.5);
-		const low = Math.min(open, close) * (1 - Math.random() * volatility * 0.5);
-		const volume = Math.random() * 800000 + 200000;
+	if (!Number.isFinite(open) || !Number.isFinite(high) || !Number.isFinite(low) || !Number.isFinite(close)) {
+		return null;
+	}
 
-		const bar: Bar = {
-			time: currentTime,
-			open: Number(open.toFixed(2)),
-			high: Number(high.toFixed(2)),
-			low: Number(low.toFixed(2)),
-			close: Number(close.toFixed(2)),
-			volume: Number(volume.toFixed(2)),
+	return {
+		time: event.t,
+		open,
+		high,
+		low,
+		close,
+		volume: Number.isFinite(volume) ? volume : undefined,
+	};
+}
+
+function inferDecimalPlaces(value: string): number {
+	const match = value.match(/\.(\d+)/);
+	if (!match) return 0;
+	return match[1]?.replace(/0+$/, "").length ?? 0;
+}
+
+function priceScaleFromMid(mid: string): number {
+	const decimals = inferDecimalPlaces(mid);
+	const digits = Math.min(Math.max(decimals, 2), 8);
+	return 10 ** digits;
+}
+
+async function inferPriceScale(coin: string): Promise<number> {
+	try {
+		const mids = await getAllMids();
+		const mid = mids[coin];
+		if (typeof mid === "string" && mid.length > 0) {
+			return priceScaleFromMid(mid);
+		}
+	} catch (error) {
+		console.warn("Failed to infer pricescale from allMids:", error);
+	}
+
+	return DEFAULT_PRICESCALE;
+}
+
+async function isKnownCoin(coin: string): Promise<boolean> {
+	try {
+		const meta = await getMeta();
+		return meta.universe.some((asset) => asset.name === coin && !(asset.isDelisted ?? false));
+	} catch {
+		return true;
+	}
+}
+
+async function searchCoins(query: string): Promise<string[]> {
+	const meta = await getMeta();
+	const q = query.trim().toLowerCase();
+	return meta.universe
+		.filter((asset) => !(asset.isDelisted ?? false))
+		.map((asset) => asset.name)
+		.filter((coin) => (q.length === 0 ? true : coin.toLowerCase().includes(q)));
+}
+
+function cacheKey(symbol: LibrarySymbolInfo, resolution: ResolutionString): string {
+	return `${symbol.ticker ?? symbol.name}:${resolution as unknown as string}`;
+}
+
+export function createDatafeed(): IBasicDataFeed {
+	const lastBarCache = new Map<string, Bar>();
+	const listenerToStreamKey = new Map<string, string>();
+
+	type CandleListener = {
+		onTick: SubscribeBarsCallback;
+		onResetCacheNeededCallback: () => void;
+		symbolCacheKey: string;
+	};
+
+	type CandleStream = {
+		subscriptionPromise: Promise<WebSocketSubscription>;
+		listeners: Map<string, CandleListener>;
+		lastBar?: Bar;
+	};
+
+	const candleStreams = new Map<string, CandleStream>();
+
+	function streamKeyFor(coin: string, interval: CandleInterval): string {
+		return `${coin}:${interval}`;
+	}
+
+	function removeListener(listenerGuid: string): void {
+		const streamKey = listenerToStreamKey.get(listenerGuid);
+		if (!streamKey) return;
+
+		const stream = candleStreams.get(streamKey);
+		listenerToStreamKey.delete(listenerGuid);
+
+		if (!stream) return;
+
+		stream.listeners.delete(listenerGuid);
+
+		if (stream.listeners.size === 0) {
+			candleStreams.delete(streamKey);
+			stream.subscriptionPromise.then((sub) => sub.unsubscribe()).catch(() => {});
+		}
+	}
+
+	function getOrCreateStream(coin: string, interval: CandleInterval): CandleStream {
+		const streamKey = streamKeyFor(coin, interval);
+		const existing = candleStreams.get(streamKey);
+		if (existing) return existing;
+
+		const stream: CandleStream = {
+			subscriptionPromise: Promise.resolve({
+				unsubscribe: async () => {},
+				failureSignal: new AbortController().signal,
+			}),
+			listeners: new Map<string, CandleListener>(),
+			lastBar: undefined,
 		};
 
-		bars.push(bar);
-		lastClose = close;
-		currentTime += resolutionMs;
-	}
+		const subscriptionPromise = getSubscriptionClient().candle({ coin, interval }, (event) => {
+			const bar = candleEventToBar(event);
+			if (!bar) return;
 
-	if (bars.length > 0) {
-		const cacheKey = `${symbol}_${resolution}`;
-		lastBarCache.set(cacheKey, bars[bars.length - 1]);
-	}
+			const current = candleStreams.get(streamKey);
+			if (!current) return;
 
-	return bars;
-}
+			current.lastBar = bar;
 
-const subscribers: Map<string, { callback: SubscriberCallback; interval: ReturnType<typeof setInterval> }> = new Map();
-
-export function createDatafeed() {
-	return {
-		onReady: (callback: (config: object) => void) => {
-			setTimeout(() => {
-				callback({
-					supports_search: true,
-					supports_group_request: false,
-					supports_marks: false,
-					supports_timescale_marks: false,
-					supports_time: true,
-					exchanges: [{ value: "HyperTerminal", name: "HyperTerminal", desc: "HyperTerminal Exchange" }],
-					symbols_types: [{ name: "crypto", value: "crypto" }],
-					supported_resolutions: supportedResolutions,
-				});
-			}, 0);
-		},
-
-		searchSymbols: (
-			userInput: string,
-			_exchange: string,
-			_symbolType: string,
-			onResult: (symbols: object[]) => void,
-		) => {
-			const results = Object.keys(symbolsData)
-				.filter((symbol) => symbol.toLowerCase().includes(userInput.toLowerCase()))
-				.map((symbol) => ({
-					symbol: symbol,
-					full_name: symbol,
-					description: symbolsData[symbol].description,
-					exchange: "HyperTerminal",
-					type: "crypto",
-				}));
-			onResult(results);
-		},
-
-		resolveSymbol: (
-			symbolName: string,
-			onResolve: (symbolInfo: LibrarySymbolInfo) => void,
-			onError: (error: string) => void,
-		) => {
-			const symbolInfo = symbolsData[symbolName];
-			if (symbolInfo) {
-				setTimeout(() => {
-					onResolve({
-						...symbolInfo,
-						full_name: symbolName,
-						listed_exchange: "HyperTerminal",
-						format: "price",
-					});
-				}, 0);
-			} else {
-				onError("Symbol not found");
+			for (const listener of current.listeners.values()) {
+				lastBarCache.set(listener.symbolCacheKey, bar);
+				listener.onTick(bar);
 			}
+		});
+
+		stream.subscriptionPromise = subscriptionPromise;
+		candleStreams.set(streamKey, stream);
+
+		subscriptionPromise
+			.then((sub) => {
+				sub.failureSignal.addEventListener(
+					"abort",
+					() => {
+						const current = candleStreams.get(streamKey);
+						if (!current) return;
+						console.warn("Candle subscription aborted:", sub.failureSignal.reason);
+						for (const listener of current.listeners.values()) {
+							listener.onResetCacheNeededCallback();
+						}
+					},
+					{ once: true },
+				);
+			})
+			.catch((error) => {
+				const current = candleStreams.get(streamKey);
+				if (!current) return;
+
+				console.error("Candle subscription failed:", error);
+
+				for (const [listenerGuid, listener] of current.listeners.entries()) {
+					listenerToStreamKey.delete(listenerGuid);
+					listener.onResetCacheNeededCallback();
+				}
+
+				candleStreams.delete(streamKey);
+			});
+
+		return stream;
+	}
+
+	const configuration: DatafeedConfiguration = {
+		exchanges: [{ value: EXCHANGE, name: EXCHANGE, desc: EXCHANGE }],
+		supported_resolutions: supportedResolutions,
+		supports_marks: false,
+		supports_time: true,
+		supports_timescale_marks: false,
+		symbols_types: [{ name: "crypto", value: "crypto" }],
+	};
+
+	return {
+		onReady: (callback: OnReadyCallback) => {
+			setTimeout(() => callback(configuration), 0);
+		},
+
+		searchSymbols: (userInput: string, exchange: string, symbolType: string, onResult: SearchSymbolsCallback) => {
+			void (async () => {
+				if (exchange && exchange !== EXCHANGE) {
+					onResult([]);
+					return;
+				}
+
+				if (symbolType && symbolType !== "crypto") {
+					onResult([]);
+					return;
+				}
+
+				let coins: string[] = [];
+				try {
+					coins = await searchCoins(userInput);
+				} catch (error) {
+					console.warn("searchSymbols failed:", error);
+				}
+
+				const items: SearchSymbolResultItem[] = coins.slice(0, 50).map((coin) => {
+					const symbol = symbolFromCoin(coin);
+					return {
+						symbol,
+						ticker: symbol,
+						description: `${coin} / ${QUOTE_ASSET}`,
+						exchange: EXCHANGE,
+						type: "crypto",
+					};
+				});
+
+				onResult(items);
+			})();
+		},
+
+		resolveSymbol: (symbolName: string, onResolve: ResolveCallback, onError: DatafeedErrorCallback, extension) => {
+			void extension;
+
+			void (async () => {
+				const normalized = normalizeSymbolName(symbolName);
+				const coin = coinFromSymbolName(normalized);
+				const symbol = symbolFromCoin(coin);
+
+				if (!(await isKnownCoin(coin))) {
+					onError(`Unknown symbol: ${symbolName}`);
+					return;
+				}
+
+				const pricescale = await inferPriceScale(coin);
+
+				const symbolInfo: LibrarySymbolInfo = {
+					name: symbol,
+					ticker: symbol,
+					description: `${coin} / ${QUOTE_ASSET}`,
+					type: "crypto",
+					session: SESSION_24X7,
+					timezone: TIMEZONE,
+					exchange: EXCHANGE,
+					listed_exchange: EXCHANGE,
+					format: "price",
+					pricescale,
+					minmov: 1,
+					has_intraday: true,
+					supported_resolutions: supportedResolutions,
+					volume_precision: 2,
+					data_status: "streaming",
+				};
+
+				onResolve(symbolInfo);
+			})().catch((error) => {
+				onError(error instanceof Error ? error.message : String(error));
+			});
 		},
 
 		getBars: (
 			symbolInfo: LibrarySymbolInfo,
-			resolution: string,
-			periodParams: { from: number; to: number; firstDataRequest: boolean },
-			onResult: (bars: Bar[], meta: { noData: boolean }) => void,
-			onError: (error: string) => void,
+			resolution: ResolutionString,
+			periodParams: PeriodParams,
+			onResult: HistoryCallback,
+			onError: DatafeedErrorCallback,
 		) => {
-			try {
-				const bars = generateHistoricalBars(symbolInfo.name, resolution, periodParams.from, periodParams.to);
-				onResult(bars, { noData: bars.length === 0 });
-			} catch (error) {
-				onError(String(error));
-			}
+			void (async () => {
+				const interval = resolutionToInterval(resolution);
+				if (!interval) {
+					onError(`Unsupported resolution: ${resolution as unknown as string}`);
+					return;
+				}
+
+				const coin = coinFromSymbolName(symbolInfo.ticker ?? symbolInfo.name);
+				const fromMs = Math.max(0, Math.floor(periodParams.from * 1000));
+				const toMs = Math.max(0, Math.floor(periodParams.to * 1000));
+
+				if (toMs <= fromMs) {
+					onResult([], { noData: true });
+					return;
+				}
+
+				const candles = await getInfoClient().candleSnapshot({
+					coin,
+					interval,
+					startTime: fromMs,
+					endTime: toMs,
+				});
+
+				const bars = candles
+					.map(candleSnapshotToBar)
+					.filter((bar): bar is Bar => !!bar)
+					.filter((bar) => bar.time >= fromMs && bar.time < toMs)
+					.sort((a, b) => a.time - b.time);
+
+				if (bars.length === 0) {
+					onResult([], { noData: true });
+					return;
+				}
+
+				const key = cacheKey(symbolInfo, resolution);
+				lastBarCache.set(key, bars[bars.length - 1]);
+
+				onResult(bars, { noData: false });
+			})().catch((error) => {
+				onError(error instanceof Error ? error.message : String(error));
+			});
 		},
 
 		subscribeBars: (
 			symbolInfo: LibrarySymbolInfo,
-			resolution: string,
-			onTick: SubscriberCallback,
+			resolution: ResolutionString,
+			onTick: SubscribeBarsCallback,
 			listenerGuid: string,
+			onResetCacheNeededCallback: () => void,
 		) => {
-			const resolutionMs = getResolutionMs(resolution);
-			const cacheKey = `${symbolInfo.name}_${resolution}`;
-			const cachedBar = lastBarCache.get(cacheKey);
+			const interval = resolutionToInterval(resolution);
+			if (!interval) {
+				console.warn("subscribeBars unsupported resolution:", resolution);
+				return;
+			}
 
-			const now = Date.now();
-			const currentBarTime = Math.floor(now / resolutionMs) * resolutionMs;
+			removeListener(listenerGuid);
 
-			let lastBar: Bar =
-				cachedBar && cachedBar.time === currentBarTime
-					? { ...cachedBar }
-					: {
-							time: currentBarTime,
-							open: cachedBar?.close ?? basePrices[symbolInfo.name] ?? 100,
-							high: cachedBar?.close ?? basePrices[symbolInfo.name] ?? 100,
-							low: cachedBar?.close ?? basePrices[symbolInfo.name] ?? 100,
-							close: cachedBar?.close ?? basePrices[symbolInfo.name] ?? 100,
-							volume: Math.random() * 50000,
-						};
+			const coin = coinFromSymbolName(symbolInfo.ticker ?? symbolInfo.name);
+			const symbolCacheKey = cacheKey(symbolInfo, resolution);
 
-			const interval = setInterval(() => {
-				const currentTime = Date.now();
-				const newBarTime = Math.floor(currentTime / resolutionMs) * resolutionMs;
+			const streamKey = streamKeyFor(coin, interval);
+			const stream = getOrCreateStream(coin, interval);
 
-				if (newBarTime > lastBar.time) {
-					lastBar = {
-						time: newBarTime,
-						open: lastBar.close,
-						high: lastBar.close,
-						low: lastBar.close,
-						close: lastBar.close,
-						volume: 0,
-					};
-				}
+			stream.listeners.set(listenerGuid, { onTick, onResetCacheNeededCallback, symbolCacheKey });
+			listenerToStreamKey.set(listenerGuid, streamKey);
 
-				const volatility = 0.0006;
-				const trend = Math.sin(currentTime / 20000) * 0.0001;
-				const change = (Math.random() - 0.5) * 2 * volatility + trend;
-				const newClose = lastBar.close * (1 + change);
-				const tradeVolume = Math.random() * 3000 + 200;
-
-				lastBar = {
-					...lastBar,
-					high: Math.max(lastBar.high, newClose),
-					low: Math.min(lastBar.low, newClose),
-					close: Number(newClose.toFixed(2)),
-					volume: Number((lastBar.volume + tradeVolume).toFixed(2)),
-				};
-
-				lastBarCache.set(cacheKey, lastBar);
-				onTick(lastBar);
-			}, 500);
-
-			subscribers.set(listenerGuid, { callback: onTick, interval });
+			const cached = lastBarCache.get(symbolCacheKey) ?? stream.lastBar;
+			if (cached) onTick(cached);
 		},
 
 		unsubscribeBars: (listenerGuid: string) => {
-			const subscriber = subscribers.get(listenerGuid);
-			if (subscriber) {
-				clearInterval(subscriber.interval);
-				subscribers.delete(listenerGuid);
-			}
+			removeListener(listenerGuid);
 		},
 
-		getServerTime: (callback: (time: number) => void) => {
+		getServerTime: (callback: ServerTimeCallback) => {
 			callback(Math.floor(Date.now() / 1000));
 		},
 	};

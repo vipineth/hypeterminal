@@ -1,4 +1,3 @@
-export { useHyperliquid } from "@/providers/hyperliquid-provider";
 export { useCancelOrder, usePlaceOrder } from "./mutations";
 export {
 	createHyperliquidWsHook,

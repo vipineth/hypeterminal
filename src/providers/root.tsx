@@ -1,5 +1,4 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { HyperliquidProvider } from "./hyperliquid-provider";
 import { ThemeProvider } from "./theme";
 
 export function getRootProviderContext() {
@@ -12,9 +11,7 @@ export function getRootProviderContext() {
 export function RootProvider({ children, queryClient }: { children: React.ReactNode; queryClient: QueryClient }) {
 	return (
 		<QueryClientProvider client={queryClient}>
-			<HyperliquidProvider>
-				<ThemeProvider>{children}</ThemeProvider>
-			</HyperliquidProvider>
+			<ThemeProvider>{children}</ThemeProvider>
 		</QueryClientProvider>
 	);
 }

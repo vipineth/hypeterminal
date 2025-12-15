@@ -1,6 +1,6 @@
 import type { SubscriptionClient, WebSocketSubscription } from "@nktkas/hyperliquid";
 import { useCallback, useMemo } from "react";
-import { useHyperliquid } from "@/providers/hyperliquid-provider";
+import { getSubscriptionClient } from "@/lib/hyperliquid";
 import type { HyperliquidWsEntry, HyperliquidWsStatus } from "@/stores/use-hyperliquid-ws-store";
 import { useHyperliquidWsStore } from "@/stores/use-hyperliquid-ws-store";
 import { useSharedSubscription } from "./use-subscription";
@@ -130,8 +130,6 @@ export function useHyperliquidWs<K extends HyperliquidWsMethodName, TSelected = 
 	method: K,
 	args?: UseHyperliquidWsArgs<K, TSelected>,
 ): HyperliquidWsResult<TSelected> {
-	const { subscriptionClient } = useHyperliquid();
-
 	const params = (args as UseHyperliquidWsArgs<K> | undefined)?.params;
 	const enabled = args?.enabled ?? true;
 	const clearOnUnsubscribe = args?.clearOnUnsubscribe ?? false;
@@ -140,6 +138,7 @@ export function useHyperliquidWs<K extends HyperliquidWsMethodName, TSelected = 
 	const key = useMemo(() => hyperliquidWsKey(String(method), params), [method, params]);
 
 	const subscribeFn = useCallback(() => {
+		const subscriptionClient = getSubscriptionClient();
 		const storeActions = useHyperliquidWsStore.getState().actions;
 		storeActions.setEntry(key, { status: "subscribing", error: undefined, failureSignal: undefined });
 
@@ -178,7 +177,7 @@ export function useHyperliquidWs<K extends HyperliquidWsMethodName, TSelected = 
 			});
 
 		return subscriptionPromise;
-	}, [subscriptionClient, method, params, key]);
+	}, [method, params, key]);
 
 	useSharedSubscription(key, subscribeFn, {
 		enabled,

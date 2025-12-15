@@ -200,7 +200,6 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 															type="button"
 															onClick={(e) => {
 																e.stopPropagation();
-																console.log("hello", market.coin);
 																toggleFavorite(market.coin);
 															}}
 															className="hover:scale-110 transition-transform"
