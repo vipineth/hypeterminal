@@ -8,9 +8,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useL2BookSubscription } from "@/hooks/hyperliquid";
+import { useSelectedResolvedMarket } from "@/hooks/hyperliquid";
 import { formatNumber, formatUSD } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { useSelectedMarket } from "@/stores";
 import type { OrderBookRow } from "../lib";
 import { BookRow } from "./book-row";
 import { TradesView } from "./trades-view";
@@ -49,7 +49,8 @@ export function OrderBookPanel() {
 	const [view, setView] = useState<"book" | "trades">("book");
 	const [nSigFigs, setNSigFigs] = useState<2 | 3 | 4 | 5 | undefined>(5);
 
-	const coin = useSelectedMarket();
+	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
+	const coin = selectedMarket?.coin ?? "BTC";
 	const {
 		data: book,
 		status: bookStatus,

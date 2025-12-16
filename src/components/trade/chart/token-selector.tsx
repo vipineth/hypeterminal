@@ -23,7 +23,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 		search,
 		setSearch,
 		isLoading,
-		favorites,
+		isFavorite,
 		sorting,
 		handleSelect,
 		handleCategorySelect,
@@ -162,7 +162,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 									const fundingNum = market.fundingRate ? Number.parseFloat(market.fundingRate) : 0;
 									const isFundingPositive = fundingNum >= 0;
 									const isSelected = value === market.coin;
-									const isFavorite = favorites.includes(market.coin);
+									const isFav = isFavorite(market.coin);
 
 									return (
 										<div
@@ -203,12 +203,12 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 																toggleFavorite(market.coin);
 															}}
 															className="hover:scale-110 transition-transform"
-															aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+															aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
 														>
 															<Star
 																className={cn(
 																	"size-2.5 transition-colors",
-																	isFavorite
+																	isFav
 																		? "fill-terminal-amber text-terminal-amber"
 																		: "text-muted-foreground hover:text-terminal-amber",
 																)}

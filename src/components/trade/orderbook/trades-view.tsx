@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useTradesSubscription } from "@/hooks/hyperliquid";
+import { useSelectedResolvedMarket, useTradesSubscription } from "@/hooks/hyperliquid";
 import type { HyperliquidWsEvent } from "@/hooks/hyperliquid/socket";
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { useSelectedMarket } from "@/stores";
 
 type Trade = HyperliquidWsEvent<"trades">[number];
 
@@ -22,7 +21,8 @@ function tradeKey(trade: Trade): string {
 }
 
 export function TradesView() {
-	const coin = useSelectedMarket();
+	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
+	const coin = selectedMarket?.coin ?? "BTC";
 	const { data: tradesBatch, status, error } = useTradesSubscription({ params: { coin } });
 
 	const [tradeState, setTradeState] = useState<{ coin: string; trades: Trade[] }>({ coin, trades: [] });

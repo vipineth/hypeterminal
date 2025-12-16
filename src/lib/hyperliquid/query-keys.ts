@@ -6,8 +6,6 @@ export const hyperliquidKeys = {
 	all: ["hyperliquid"] as const,
 
 	meta: () => [...hyperliquidKeys.all, "meta"] as const,
-	allMids: () => [...hyperliquidKeys.all, "allMids"] as const,
-	metaAndAssetCtxs: () => [...hyperliquidKeys.all, "metaAndAssetCtxs"] as const,
 	orderBook: (coin: string) => [...hyperliquidKeys.all, "orderBook", coin] as const,
 	candles: (coin: string, interval: string) => [...hyperliquidKeys.all, "candles", coin, interval] as const,
 	user: (address: string) => [...hyperliquidKeys.all, "user", address] as const,

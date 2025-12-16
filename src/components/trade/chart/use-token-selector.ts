@@ -1,11 +1,13 @@
 import { createColumnHelper, getCoreRowModel, type Row, type SortingState, useReactTable } from "@tanstack/react-table";
 import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { isTokenInCategory, type MarketCategory } from "@/config/token";
 import { useMarkets } from "@/hooks/hyperliquid";
-import { useFavorites, useFavoritesActions } from "@/stores/use-favorites-store";
+import { makePerpMarketKey } from "@/lib/hyperliquid";
+import { useFavoriteMarketKeys, useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 
 export type Market = {
+	marketKey: string;
 	coin: string;
 	name: string;
 	markPrice: string | undefined;
@@ -64,7 +66,7 @@ export interface UseTokenSelectorReturn {
 	search: string;
 	setSearch: (search: string) => void;
 	isLoading: boolean;
-	favorites: string[];
+	isFavorite: (coin: string) => boolean;
 	sorting: SortingState;
 	handleSelect: (coin: string) => void;
 	handleCategorySelect: (cat: MarketCategory) => void;
@@ -80,9 +82,33 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 	const [open, setOpen] = useState(false);
 	const [category, setCategory] = useState<MarketCategory>("all");
 	const [search, setSearch] = useState("");
-	const { data: markets, isLoading } = useMarkets();
-	const favorites = useFavorites();
-	const { toggleFavorite } = useFavoritesActions();
+	const { data: rawMarkets, isLoading } = useMarkets({ enabled: open });
+	const favorites = useFavoriteMarketKeys();
+	const { toggleFavoriteMarketKey } = useMarketPrefsActions();
+
+	const markets = useMemo((): Market[] => {
+		if (!rawMarkets) return [];
+		return rawMarkets.map((m) => ({
+			...m,
+			marketKey: m.marketKey ?? makePerpMarketKey(m.coin),
+		}));
+	}, [rawMarkets]);
+
+	const favoriteSet = useMemo(() => new Set(favorites), [favorites]);
+
+	const isFavorite = useCallback(
+		(coin: string): boolean => {
+			return favoriteSet.has(makePerpMarketKey(coin));
+		},
+		[favoriteSet],
+	);
+
+	const toggleFavorite = useCallback(
+		(coin: string) => {
+			toggleFavoriteMarketKey(makePerpMarketKey(coin));
+		},
+		[toggleFavoriteMarketKey],
+	);
 
 	const filteredMarkets = useMemo(() => {
 		if (!markets) return [];
@@ -99,8 +125,8 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 	const [sorting, setSorting] = useState<SortingState>([]);
 
 	const sortedMarkets = useMemo(() => {
-		const favoriteMarkets = filteredMarkets.filter((m) => favorites.includes(m.coin));
-		const nonFavoriteMarkets = filteredMarkets.filter((m) => !favorites.includes(m.coin));
+		const favoriteMarkets = filteredMarkets.filter((m) => isFavorite(m.coin));
+		const nonFavoriteMarkets = filteredMarkets.filter((m) => !isFavorite(m.coin));
 
 		function getSortValue(market: Market, columnId: string): number {
 			switch (columnId) {
@@ -129,7 +155,7 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 		}
 
 		return [...sortSection(favoriteMarkets), ...sortSection(nonFavoriteMarkets)];
-	}, [filteredMarkets, favorites, sorting]);
+	}, [filteredMarkets, isFavorite, sorting]);
 
 	const table = useReactTable({
 		data: sortedMarkets,
@@ -175,8 +201,8 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 		category,
 		search,
 		setSearch,
-		isLoading,
-		favorites,
+		isLoading: open && (isLoading || (rawMarkets?.length ?? 0) === 0),
+		isFavorite,
 		sorting,
 		handleSelect,
 		handleCategorySelect,

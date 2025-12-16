@@ -1,61 +1,26 @@
 import { useMemo } from "react";
-import { useMetaAndAssetCtxs } from "./use-meta-and-asset-ctxs";
-
-interface UseMarketOptions {
-	enabled?: boolean;
-}
-
-export function useMarket(coin: string, options?: UseMarketOptions) {
-	const { data, isLoading, error, refetch } = useMetaAndAssetCtxs({
-		enabled: options?.enabled ?? !!coin,
-	});
-
-	const market = useMemo(() => {
-		if (!data || !coin) return null;
-
-		const [meta, ctxs] = data;
-		const assetIndex = meta.universe.findIndex((a) => a.name === coin);
-
-		if (assetIndex === -1) return null;
-
-		const assetMeta = meta.universe[assetIndex];
-		const assetCtx = ctxs[assetIndex];
-
-		return {
-			coin,
-			name: assetMeta.name,
-			markPrice: assetCtx?.markPx,
-			indexPrice: assetCtx?.oraclePx,
-			fundingRate: assetCtx?.funding,
-			openInterest: assetCtx?.openInterest,
-			volume24h: assetCtx?.dayNtlVlm,
-			maxLeverage: assetMeta.maxLeverage,
-			szDecimals: assetMeta.szDecimals,
-		};
-	}, [data, coin]);
-
-	return { data: market, isLoading, error, refetch };
-}
+import { makePerpMarketKey } from "@/lib/hyperliquid";
+import { useMeta } from "./use-meta";
+import { usePerpAssetCtxsSnapshot } from "./use-perp-asset-ctxs-snapshot";
 
 interface MarketsOptions {
 	enabled?: boolean;
 }
 
 export function useMarkets(options?: MarketsOptions) {
-	const { data, isLoading, error, refetch } = useMetaAndAssetCtxs({
-		enabled: options?.enabled,
-	});
+	const enabled = options?.enabled ?? true;
+	const { data: meta, isLoading, error, refetch } = useMeta();
+	const ctxs = usePerpAssetCtxsSnapshot({ enabled, intervalMs: 10_000 });
 
 	const markets = useMemo(() => {
-		if (!data) return [];
-
-		const [meta, ctxs] = data;
+		if (!meta || !ctxs) return [];
 
 		return meta.universe
 			.map((assetMeta, index) => {
 				const assetCtx = ctxs[index];
 
 				return {
+					marketKey: makePerpMarketKey(assetMeta.name),
 					coin: assetMeta.name,
 					name: assetMeta.name,
 					markPrice: assetCtx?.markPx,
@@ -69,7 +34,7 @@ export function useMarkets(options?: MarketsOptions) {
 				};
 			})
 			.filter((market) => !market.isDelisted);
-	}, [data]);
+	}, [meta, ctxs]);
 
 	return { data: markets, isLoading, error, refetch };
 }

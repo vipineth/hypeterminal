@@ -1,22 +1,31 @@
 import { ClientOnly } from "@tanstack/react-router";
 import { EllipsisVertical, Flame, LayoutGrid, Search } from "lucide-react";
+import { useCallback } from "react";
 import { Separator } from "@/components/ui/separator";
-import { useMarket } from "@/hooks/hyperliquid";
+import { useSelectedResolvedMarket } from "@/hooks/hyperliquid";
+import { makePerpMarketKey } from "@/lib/hyperliquid";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/providers/theme";
-import { useSelectedMarket, useSelectedMarketActions } from "@/stores";
+import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import { StatBlock } from "./stat-block";
 import { TokenSelector } from "./token-selector";
 import { TradingViewChart } from "./trading-view-chart";
 
 export function ChartPanel() {
 	const { theme } = useTheme();
-	const selectedCoin = useSelectedMarket();
-	const { setCoin } = useSelectedMarketActions();
-	const { data: market } = useMarket(selectedCoin);
+	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "realtime" });
+	const selectedCoin = selectedMarket?.coin ?? "BTC";
+	const { setSelectedMarketKey } = useMarketPrefsActions();
 
-	const fundingNum = market?.fundingRate ? Number.parseFloat(market.fundingRate) : 0;
+	const handleCoinChange = useCallback(
+		(coin: string) => {
+			setSelectedMarketKey(makePerpMarketKey(coin));
+		},
+		[setSelectedMarketKey],
+	);
+
+	const fundingNum = selectedMarket?.ctx?.funding ? Number.parseFloat(selectedMarket.ctx.funding) : 0;
 	const isFundingPositive = fundingNum >= 0;
 
 	return (
@@ -24,28 +33,32 @@ export function ChartPanel() {
 			<div className="px-2 py-1.5 border-b border-border/60 bg-surface/30">
 				<div className="flex items-center justify-between gap-2">
 					<div className="flex items-center gap-2 min-w-0">
-						<TokenSelector value={selectedCoin} onValueChange={setCoin} />
+						<TokenSelector value={selectedCoin} onValueChange={handleCoinChange} />
+
 						<Separator orientation="vertical" className="mx-1 h-4" />
 						<div className="hidden md:flex items-center gap-4 text-3xs">
 							<StatBlock
 								label="MARK"
-								value={market?.markPrice ? formatUSD(Number(market.markPrice)) : "-"}
+								value={selectedMarket?.ctx?.markPx ? formatUSD(Number(selectedMarket.ctx.markPx)) : "-"}
 								valueClass="text-terminal-amber terminal-glow-amber"
 							/>
-							<StatBlock label="ORACLE" value={market?.indexPrice ? formatUSD(Number(market.indexPrice)) : "-"} />
+							<StatBlock
+								label="ORACLE"
+								value={selectedMarket?.ctx?.oraclePx ? formatUSD(Number(selectedMarket.ctx.oraclePx)) : "-"}
+							/>
 							<StatBlock
 								label="VOL"
 								value={
-									market?.volume24h
-										? formatUSD(Number(market.volume24h), { notation: "compact", compactDisplay: "short" })
+									selectedMarket?.ctx?.dayNtlVlm
+										? formatUSD(Number(selectedMarket.ctx.dayNtlVlm), { notation: "compact", compactDisplay: "short" })
 										: "-"
 								}
 							/>
 							<StatBlock
 								label="OI"
 								value={
-									market?.openInterest
-										? formatUSD(Number(market.openInterest), { notation: "compact", compactDisplay: "short" })
+									selectedMarket?.ctx?.openInterest
+										? formatUSD(Number(selectedMarket.ctx.openInterest), { notation: "compact", compactDisplay: "short" })
 										: "-"
 								}
 							/>

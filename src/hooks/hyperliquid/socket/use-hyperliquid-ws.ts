@@ -37,15 +37,15 @@ type ParamTuples<K extends HyperliquidWsMethodName> = Parameters<MethodUnion<K>>
 type ListenerOnlyTuple<K extends HyperliquidWsMethodName> = Extract<ParamTuples<K>, [unknown]>;
 type ParamsListenerTuple<K extends HyperliquidWsMethodName> = Extract<ParamTuples<K>, [unknown, unknown]>;
 
-type ListenerArg<K extends HyperliquidWsMethodName> = ParamTuples<K> extends [infer L]
-	? L
-	: ParamTuples<K> extends [unknown, infer L]
-		? L
-		: never;
+type ListenerArgFromTuple<TTuple> = TTuple extends [infer L] ? L : TTuple extends [unknown, infer L] ? L : never;
+
+type ListenerArg<K extends HyperliquidWsMethodName> = ListenerArgFromTuple<ParamTuples<K>>;
 
 type HasListenerOnly<K extends HyperliquidWsMethodName> = ListenerOnlyTuple<K> extends never ? false : true;
 
-type ParamsArg<K extends HyperliquidWsMethodName> = ParamsListenerTuple<K> extends [infer P, unknown] ? P : never;
+type ParamsArgFromTuple<TTuple> = TTuple extends [infer P, unknown] ? P : never;
+
+type ParamsArg<K extends HyperliquidWsMethodName> = ParamsArgFromTuple<ParamsListenerTuple<K>>;
 
 export type HyperliquidWsParams<K extends HyperliquidWsMethodName> = ParamsArg<K>;
 

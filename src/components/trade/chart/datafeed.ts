@@ -7,6 +7,7 @@ import type {
 	WebSocketSubscription,
 } from "@nktkas/hyperliquid";
 import { getInfoClient, getSubscriptionClient } from "@/lib/hyperliquid";
+import { META_CACHE_TTL_MS, readCachedMeta, writeCachedMeta } from "@/lib/hyperliquid/meta-cache";
 import type {
 	Bar,
 	DatafeedConfiguration,
@@ -48,19 +49,24 @@ const supportedResolutions = [
 
 type CandleInterval = CandleSnapshotParameters["interval"];
 
-const META_TTL_MS = 60_000;
 let metaCache: { value: MetaResponse; fetchedAt: number } | undefined;
 let metaPromise: Promise<MetaResponse> | undefined;
 
 async function getMeta(): Promise<MetaResponse> {
 	const now = Date.now();
-	if (metaCache && now - metaCache.fetchedAt < META_TTL_MS) return metaCache.value;
+	if (!metaCache) {
+		const cached = readCachedMeta();
+		if (cached) metaCache = { value: cached.value, fetchedAt: cached.updatedAt };
+	}
+
+	if (metaCache && now - metaCache.fetchedAt < META_CACHE_TTL_MS) return metaCache.value;
 	if (metaPromise) return metaPromise;
 
 	metaPromise = getInfoClient()
 		.meta()
 		.then((meta) => {
 			metaCache = { value: meta, fetchedAt: Date.now() };
+			writeCachedMeta(meta);
 			return meta;
 		})
 		.finally(() => {
