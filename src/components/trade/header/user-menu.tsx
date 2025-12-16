@@ -1,6 +1,6 @@
-import { ChevronDown, Loader2, Zap } from "lucide-react";
+import { ChevronDown, Copy, CopyCheck, Loader2, LogOut, PlusCircle, Zap } from "lucide-react";
 import { useState } from "react";
-import { useAccount, useDisconnect, useEnsName } from "wagmi";
+import { useConnection, useDisconnect, useEnsName } from "wagmi";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -8,11 +8,29 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
+import { shortenAddress } from "@/lib/format";
 import { WalletDialog } from "./wallet-dialog";
 
-export function WalletConnection() {
-	const { address, isConnected, isConnecting } = useAccount();
-	const { disconnect } = useDisconnect();
+function CopyAddressMenuItem({ address }: { address: string }) {
+	const { copied, copy } = useCopyToClipboard();
+
+	function handleClick(e: React.MouseEvent) {
+		e.preventDefault();
+		copy(address);
+	}
+
+	return (
+		<DropdownMenuItem className="flex items-center gap-2" onClick={handleClick}>
+			{copied ? <CopyCheck className="size-3.5" /> : <Copy className="size-3.5" />}
+			<span>Copy Address</span>
+		</DropdownMenuItem>
+	);
+}
+
+export function UserMenu() {
+	const { address, isConnected, isConnecting } = useConnection();
+	const disconnect = useDisconnect();
 	const { data: ensName } = useEnsName({ address });
 	const [isOpen, setIsOpen] = useState(false);
 
@@ -44,29 +62,26 @@ export function WalletConnection() {
 
 	return (
 		<div className="flex items-center gap-1.5">
-			{/* Deposit button - keeping it separate as in original design, or integrate? 
-                 The original design had "Deposit" AND "Connect/Address". 
-                 I'll assume "Deposit" is a separate action available to all or just connected?
-                 In original logic, it was just there. I will leave it out of *this* component 
-                 if it's handled in TopNav, OR include it. 
-                 The prompt said "Connect Wallet using wagmi", implying replacing the auth part.
-                 I'll stick to just the Wallet part here to be safe and let TopNav compose them.
-             */}
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Button variant="ghost" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider">
 						<div className="size-1.5 rounded-full bg-terminal-green animate-pulse" />
-						{ensName ?? (address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "")}
+						{ensName ?? (address ? shortenAddress(address) : "")}
 						<ChevronDown className="size-2.5" />
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end" className="w-44 text-xs font-mono">
-					{/* Placeholder menu items from original */}
-					<DropdownMenuItem>Account</DropdownMenuItem>
-					<DropdownMenuItem>Add funds</DropdownMenuItem>
-					<DropdownMenuItem>Change network</DropdownMenuItem>
-					<DropdownMenuItem className="text-terminal-red focus:text-terminal-red" onClick={() => disconnect()}>
-						Disconnect
+					{address && <CopyAddressMenuItem address={address} />}
+					<DropdownMenuItem className="flex items-center gap-2">
+						<PlusCircle className="size-3.5 text-muted-foreground" />
+						<span>Add funds</span>
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						className="flex items-center gap-2 text-terminal-red focus:text-terminal-red"
+						onClick={() => disconnect.mutate()}
+					>
+						<LogOut className="size-3.5" />
+						<span>Disconnect</span>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>

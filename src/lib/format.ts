@@ -123,3 +123,19 @@ export function formatNumber(value: number, opts?: number | FormatOptions) {
 	};
 	return getFormatter("en-US", mergeOptions(defaults, rest)).format(value);
 }
+
+/**
+ * Shorten an Ethereum address for display
+ * @example shortenAddress("0x1234567890123456789012345678901234567890") -> "0x1234...7890"
+ * @example shortenAddress("0x1234567890123456789012345678901234567890", 4, 4) -> "0x12...7890"
+ * @example shortenAddress("0x1234567890123456789012345678901234567890", 6, 4) -> "0x1234...7890"
+ */
+export function shortenAddress(address: string, startLength = 4, endLength = 4): string {
+	if (!address || address.length < startLength + endLength) {
+		return address;
+	}
+	if (address.startsWith("0x")) {
+		return `${address.slice(0, startLength + 2)}...${address.slice(-endLength)}`;
+	}
+	return `${address.slice(0, startLength)}...${address.slice(-endLength)}`;
+}

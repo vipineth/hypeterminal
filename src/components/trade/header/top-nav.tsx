@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
-import { WalletConnection } from "./wallet-connection";
+import { UserMenu } from "./user-menu";
 
 export function TopNav() {
 	return (
@@ -67,7 +67,7 @@ export function TopNav() {
 					<Zap className="size-3 mr-1" />
 					Deposit
 				</Button>
-				<WalletConnection />
+				<UserMenu />
 				<button
 					type="button"
 					className="size-7 flex items-center justify-center text-muted-foreground hover:text-foreground"
