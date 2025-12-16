@@ -2,8 +2,6 @@ export {
 	getHttpTransport,
 	getInfoClient,
 	getSubscriptionClient,
-	getSymbolConverter,
-	getSymbolConverterSync,
 	getWebSocketTransport,
 } from "./clients";
 export { hyperliquidKeys } from "./query-keys";

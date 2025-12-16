@@ -1,7 +1,6 @@
 export { useHyperliquidWsStore } from "@/stores/use-hyperliquid-ws-store";
 
 export { useActiveAssetCtxSubscription } from "./use-active-asset-ctx-subscription";
-export { useAllDexsAssetCtxs } from "./use-all-dexs-asset-ctxs";
 export { useAllMidsSubscription } from "./use-all-mids-subscription";
 export { useAssetCtxsSubscription } from "./use-asset-ctxs-subscription";
 export type {

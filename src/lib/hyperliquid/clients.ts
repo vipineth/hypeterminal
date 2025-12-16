@@ -1,5 +1,4 @@
 import { HttpTransport, InfoClient, SubscriptionClient, WebSocketTransport } from "@nktkas/hyperliquid";
-import { SymbolConverter } from "@nktkas/hyperliquid/utils";
 
 const IS_TESTNET = typeof import.meta !== "undefined" && import.meta.env?.VITE_HYPERLIQUID_TESTNET === "true";
 
@@ -45,28 +44,4 @@ export function getSubscriptionClient(): SubscriptionClient {
 		});
 	}
 	return subscriptionClient;
-}
-
-/**
- * Singleton SymbolConverter instance for cached symbol↔ID conversions
- * Use getSymbolConverter() for async initialization, getSymbolConverterSync() after init
- */
-let symbolConverter: SymbolConverter | null = null;
-let symbolConverterPromise: Promise<SymbolConverter> | null = null;
-
-export async function getSymbolConverter(): Promise<SymbolConverter> {
-	if (symbolConverter) return symbolConverter;
-	if (symbolConverterPromise) return symbolConverterPromise;
-
-	symbolConverterPromise = SymbolConverter.create({ transport: getHttpTransport() });
-	symbolConverter = await symbolConverterPromise;
-	return symbolConverter;
-}
-
-/**
- * Sync access to SymbolConverter after initialization
- * Returns null if not yet initialized - call getSymbolConverter() first
- */
-export function getSymbolConverterSync(): SymbolConverter | null {
-	return symbolConverter;
 }
