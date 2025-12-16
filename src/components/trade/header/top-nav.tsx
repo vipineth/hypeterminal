@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
+import { WalletConnection } from "./wallet-connection";
 
 export function TopNav() {
 	return (
@@ -66,21 +67,7 @@ export function TopNav() {
 					<Zap className="size-3 mr-1" />
 					Deposit
 				</Button>
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider">
-							<div className="size-1.5 rounded-full bg-terminal-green animate-pulse" />
-							0x8f2...4a1b
-							<ChevronDown className="size-2.5" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end" className="w-44 text-xs font-mono">
-						<DropdownMenuItem>Account</DropdownMenuItem>
-						<DropdownMenuItem>Add funds</DropdownMenuItem>
-						<DropdownMenuItem>Change network</DropdownMenuItem>
-						<DropdownMenuItem className="text-terminal-red">Disconnect</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
+				<WalletConnection />
 				<button
 					type="button"
 					className="size-7 flex items-center justify-center text-muted-foreground hover:text-foreground"
