@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
 import type { AssetCtxsEvent } from "@nktkas/hyperliquid/api/subscription";
+import { useEffect, useRef, useState } from "react";
 import { useAssetCtxsSubscription } from "./socket";
 
 export type PerpAssetCtx = AssetCtxsEvent["ctxs"][number];

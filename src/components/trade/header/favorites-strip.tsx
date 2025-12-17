@@ -1,10 +1,11 @@
-import { useMemo } from "react";
 import type { ActiveAssetCtxEvent } from "@nktkas/hyperliquid/api/subscription";
+import { Star } from "lucide-react";
+import { useMemo } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useActiveAssetCtxSubscription, useAllMidsSubscription } from "@/hooks/hyperliquid";
 import { formatPercent, formatUSD } from "@/lib/format";
+import { isPerpMarketKey, type PerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid";
 import { cn } from "@/lib/utils";
-import { isPerpMarketKey, perpCoinFromMarketKey, type PerpMarketKey } from "@/lib/hyperliquid";
 import { useFavoriteMarketKeys, useMarketPrefsActions, useSelectedMarketKey } from "@/stores/use-market-prefs-store";
 
 type AssetCtx = ActiveAssetCtxEvent["ctx"];
@@ -38,9 +39,9 @@ export function FavoritesStrip() {
 	}, [favorites, mids]);
 
 	return (
-		<div className="h-8 border-b border-border/60 bg-surface/20">
-			<ScrollArea className="w-full h-full">
-				<div className="h-8 flex items-center gap-0.5 px-2 min-w-full">
+		<div className="py-1.5 border-b border-border/60 bg-surface/20">
+			<ScrollArea className="w-full whitespace-nowrap">
+				<div className="flex items-center gap-0.5 px-2 min-w-full divide-x">
 					{favorites.length === 0 ? (
 						<EmptyState />
 					) : (
@@ -49,7 +50,7 @@ export function FavoritesStrip() {
 						))
 					)}
 				</div>
-				<ScrollBar orientation="horizontal" />
+				<ScrollBar orientation="horizontal" className="hidden" />
 			</ScrollArea>
 		</div>
 	);
@@ -58,6 +59,7 @@ export function FavoritesStrip() {
 function EmptyState() {
 	return (
 		<div className="flex items-center gap-2 text-3xs text-muted-foreground">
+			<Star className="size-3" />
 			<span>Select favorite markets</span>
 		</div>
 	);
@@ -96,8 +98,8 @@ function FavoriteChip({ marketKey, coin, price, isActive }: FavoriteChipProps) {
 			aria-label={`Select ${coin} market`}
 			aria-pressed={isActive}
 			className={cn(
-				"shrink-0 inline-flex items-center gap-2 px-2.5 py-1 text-3xs transition-colors cursor-pointer",
-				"hover:bg-accent/50 border-r border-border/40",
+				"shrink-0 inline-flex items-center gap-2 px-2.5 py-0.5 text-3xs transition-colors cursor-pointer",
+				"hover:bg-accent/50",
 				isActive && "bg-terminal-cyan/10",
 			)}
 		>

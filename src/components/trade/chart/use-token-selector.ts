@@ -34,6 +34,12 @@ const columns = [
 		size: 80,
 		enableSorting: true,
 	}),
+	columnHelper.accessor((row) => (row.markPrice ? Number(row.markPrice) : 0), {
+		id: "24h-change",
+		header: "Price Change 24h",
+		size: 80,
+		enableSorting: true,
+	}),
 	columnHelper.accessor((row) => (row.openInterest ? Number(row.openInterest) : 0), {
 		id: "oi",
 		header: "Open Interest",

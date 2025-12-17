@@ -1,4 +1,5 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { FavoritesStrip } from "../header";
 import { usePersistentLayout } from "../lib";
 import { AnalysisSection } from "./analysis-section";
 import { OrderSidebar } from "./order-sidebar";
@@ -10,6 +11,7 @@ export function MainWorkspace() {
 		<div className="flex-1 min-h-0">
 			<ResizablePanelGroup direction="horizontal" className="h-full min-h-0" onLayout={onMainLayout}>
 				<ResizablePanel defaultSize={78}>
+					<FavoritesStrip />
 					<AnalysisSection />
 				</ResizablePanel>
 				<ResizableHandle
