@@ -67,9 +67,11 @@ const info = new InfoClient({ transport: new HttpTransport() });
 | Method                                       | Parameters          | Returns                      | Description                     |
 | -------------------------------------------- | ------------------- | ---------------------------- | ------------------------------- |
 | `clearinghouseState({ user })`               | `{ user: Address }` | `ClearinghouseStateResponse` | Positions, margin, withdrawable |
+| `spotClearinghouseState({ user })`           | `{ user: Address }` | `SpotClearinghouseStateResponse` | Spot token balances + holds |
 | `openOrders({ user })`                       | `{ user: Address }` | `OpenOrdersResponse`         | Current open orders             |
 | `userFills({ user })`                        | `{ user: Address }` | `UserFillsResponse`          | Trade history                   |
 | `userFunding({ user, startTime, endTime? })` | see type            | `UserFundingResponse`        | Funding payments                |
+| `twapHistory({ user })`                      | `{ user: Address }` | `TwapHistoryResponse`        | TWAP history                    |
 
 ### Example Usage
 
@@ -266,6 +268,33 @@ import type {
   }>;
   withdrawable: string;
 }
+```
+
+### SpotClearinghouseStateResponse
+
+```typescript
+{
+  balances: Array<{
+    coin: string;
+    total: string;
+    hold: string;
+    entryNtl: string;
+  }>;
+}
+```
+
+### OpenOrdersResponse
+
+```typescript
+Array<{
+  coin: string;
+  side: "B" | "A";
+  limitPx: string;
+  sz: string;
+  oid: number;
+  origSz: string;
+  reduceOnly?: true;
+}>
 ```
 
 ### MetaResponse

@@ -1,5 +1,5 @@
-import { OrderEntryPanel } from "../order-entry/order-entry-panel";
 import { AccountPanel } from "../order-entry/account-panel";
+import { OrderEntryPanel } from "../order-entry/order-entry-panel";
 
 export function OrderSidebar() {
 	return (
@@ -11,4 +11,3 @@ export function OrderSidebar() {
 		</div>
 	);
 }
-

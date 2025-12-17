@@ -23,4 +23,3 @@ export function MainWorkspace() {
 		</div>
 	);
 }
-

@@ -10,9 +10,11 @@ export const hyperliquidKeys = {
 	candles: (coin: string, interval: string) => [...hyperliquidKeys.all, "candles", coin, interval] as const,
 	user: (address: string) => [...hyperliquidKeys.all, "user", address] as const,
 	clearinghouseState: (address: string) => [...hyperliquidKeys.user(address), "clearinghouseState"] as const,
+	spotClearinghouseState: (address: string) => [...hyperliquidKeys.user(address), "spotClearinghouseState"] as const,
 	openOrders: (address: string) => [...hyperliquidKeys.user(address), "openOrders"] as const,
 	userFills: (address: string) => [...hyperliquidKeys.user(address), "fills"] as const,
 	userFunding: (address: string) => [...hyperliquidKeys.user(address), "funding"] as const,
+	twapHistory: (address: string) => [...hyperliquidKeys.user(address), "twapHistory"] as const,
 
 	trades: (coin: string) => [...hyperliquidKeys.all, "trades", coin] as const,
 } as const;
