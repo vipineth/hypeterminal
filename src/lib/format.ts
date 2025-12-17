@@ -1,3 +1,5 @@
+import { FALLBACK_VALUE_PLACEHOLDER, FORMAT_COMPACT_DEFAULT, FORMAT_COMPACT_THRESHOLD } from "@/config/interface";
+
 const formatterCache = new Map<string, Intl.NumberFormat>();
 
 export interface FormatOptions extends Intl.NumberFormatOptions {
@@ -7,6 +9,10 @@ export interface FormatOptions extends Intl.NumberFormatOptions {
 
 export interface FormatTokenOptions extends FormatOptions {
 	symbol?: string;
+}
+
+function isValidNumber(value: number | null | undefined): value is number {
+	return typeof value === "number" && !Number.isNaN(value) && Number.isFinite(value);
 }
 
 function getFormatter(locale: string | undefined, opts: Intl.NumberFormatOptions): Intl.NumberFormat {
@@ -54,9 +60,11 @@ function mergeOptions(defaults: Intl.NumberFormatOptions, opts: FormatOptions): 
  * @example formatUSD(150000) -> "$150K"
  * @example formatUSD(150000, { compact: false }) -> "$150,000.00"
  */
-export function formatUSD(value: number, opts?: number | FormatOptions) {
+export function formatUSD(value: number | null | undefined, opts?: number | FormatOptions) {
+	if (!isValidNumber(value)) return FALLBACK_VALUE_PLACEHOLDER;
+
 	const { digits, compact, ...rest } = resolveOptions(opts);
-	const shouldCompact = compact !== false && Math.abs(value) >= 100000;
+	const shouldCompact = (compact ?? FORMAT_COMPACT_DEFAULT) && Math.abs(value) >= FORMAT_COMPACT_THRESHOLD;
 
 	const defaults: Intl.NumberFormatOptions = {
 		style: "currency",
@@ -75,7 +83,9 @@ export function formatUSD(value: number, opts?: number | FormatOptions) {
  * @example formatToken(1.234567, "ETH") -> "1.23457 ETH"
  * @example formatToken(1.234567, { digits: 2, symbol: "ETH" }) -> "1.23 ETH"
  */
-export function formatToken(value: number, opts?: number | string | FormatTokenOptions) {
+export function formatToken(value: number | null | undefined, opts?: number | string | FormatTokenOptions) {
+	if (!isValidNumber(value)) return FALLBACK_VALUE_PLACEHOLDER;
+
 	let options: FormatTokenOptions = {};
 
 	if (typeof opts === "number") {
@@ -104,17 +114,22 @@ export function formatToken(value: number, opts?: number | string | FormatTokenO
  * @example formatPercent(0.153) -> "15.30%"
  * @example formatPercent(0.153, 1) -> "15.3%"
  */
-export function formatPercent(value: number, opts?: number | FormatOptions) {
+export function formatPercent(value: number | null | undefined, opts?: number | FormatOptions) {
+	if (!isValidNumber(value)) return FALLBACK_VALUE_PLACEHOLDER;
+
 	const { digits, ...rest } = resolveOptions(opts);
 	const defaults: Intl.NumberFormatOptions = {
 		style: "percent",
 		minimumFractionDigits: digits ?? 2,
 		maximumFractionDigits: digits ?? 2,
+		signDisplay: "exceptZero",
 	};
 	return getFormatter("en-US", mergeOptions(defaults, rest)).format(value);
 }
 
-export function formatNumber(value: number, opts?: number | FormatOptions) {
+export function formatNumber(value: number | null | undefined, opts?: number | FormatOptions) {
+	if (!isValidNumber(value)) return FALLBACK_VALUE_PLACEHOLDER;
+
 	const { digits, ...rest } = resolveOptions(opts);
 	const defaults: Intl.NumberFormatOptions = {
 		style: "decimal",

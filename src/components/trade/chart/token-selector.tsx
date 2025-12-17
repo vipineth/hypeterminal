@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { getTokenIconUrl, isTokenInCategory, marketCategories } from "@/config/token";
 import { formatPercent, formatUSD } from "@/lib/format";
+import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
 import { cn } from "@/lib/utils";
 import { useTokenSelector } from "./use-token-selector";
 
@@ -36,6 +37,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 	} = useTokenSelector({ value, onValueChange });
 
 	const virtualItems = virtualizer.getVirtualItems();
+	const headerGroup = table.getHeaderGroups()[0];
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -97,48 +99,40 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 						</div>
 					</div>
 					<div className="flex items-center px-3 py-1.5 text-4xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40 bg-surface/30">
-						{table.getHeaderGroups().map((headerGroup) =>
-							headerGroup.headers.map((header) => {
-								const canSort = header.column.getCanSort();
-								const sorted = header.column.getIsSorted();
-								const isMarketColumn = header.id === "coin";
-
-								if (isMarketColumn) {
-									return (
-										<div key={header.id} className="flex-1 min-w-0">
-											{flexRender(header.column.columnDef.header, header.getContext())}
-										</div>
-									);
-								}
-
+						{headerGroup?.headers.map((header) => {
+							if (header.id === "coin") {
 								return (
-									<button
-										key={header.id}
-										type="button"
-										onClick={header.column.getToggleSortingHandler()}
-										disabled={!canSort}
-										className={cn(
-											"w-20 flex items-center justify-end gap-1 transition-colors",
-											canSort && "hover:text-foreground cursor-pointer",
-										)}
-										aria-label={`Sort by ${header.column.columnDef.header?.toString()}`}
-									>
-										<span>{flexRender(header.column.columnDef.header, header.getContext())}</span>
-										{canSort && (
-											<span className="shrink-0">
-												{sorted === "asc" ? (
-													<ArrowUp className="size-2.5 text-terminal-cyan" />
-												) : sorted === "desc" ? (
-													<ArrowDown className="size-2.5 text-terminal-cyan" />
-												) : (
-													<ArrowUpDown className="size-2.5 opacity-40" />
-												)}
-											</span>
-										)}
-									</button>
+									<div key={header.id} className="flex-1 min-w-0">
+										{flexRender(header.column.columnDef.header, header.getContext())}
+									</div>
 								);
-							}),
-						)}
+							}
+
+							const sortState = header.column.getIsSorted();
+
+							return (
+								<button
+									key={header.id}
+									type="button"
+									onClick={header.column.getToggleSortingHandler()}
+									className={cn(
+										"w-20 flex items-center justify-end gap-1 transition-colors hover:text-foreground cursor-pointer",
+									)}
+									aria-label={`Sort by ${header.column.columnDef.header?.toString()}`}
+								>
+									<span className="truncate">{flexRender(header.column.columnDef.header, header.getContext())}</span>
+									<span className="shrink-0">
+										{sortState === "asc" ? (
+											<ArrowUp className="size-2.5" />
+										) : sortState === "desc" ? (
+											<ArrowDown className="size-2.5" />
+										) : (
+											<ArrowUpDown className="size-2.5 opacity-40" />
+										)}
+									</span>
+								</button>
+							);
+						})}
 					</div>
 
 					<div ref={containerRef} className="h-72 overflow-auto">
@@ -159,7 +153,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 								{virtualItems.map((virtualItem) => {
 									const row = rows[virtualItem.index];
 									const market = row.original;
-									const fundingNum = market.fundingRate ? Number.parseFloat(market.fundingRate) : 0;
+									const fundingNum = market.ctx?.funding ? Number.parseFloat(market.ctx.funding) : 0;
 									const isFundingPositive = fundingNum >= 0;
 									const isSelected = value === market.coin;
 									const isFav = isFavorite(market.coin);
@@ -227,17 +221,34 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 											</div>
 											<div className="w-20 text-right">
 												<span className="text-2xs font-medium tabular-nums">
-													{market.markPrice ? formatUSD(Number(market.markPrice)) : "-"}
+													{formatUSD(market.ctx?.markPx ? Number(market.ctx.markPx) : null)}
+												</span>
+											</div>
+											<div className="w-20 text-right">
+												{(() => {
+													const changePct = calculate24hPriceChange(market.ctx);
+													if (changePct === null) return <span className="text-2xs">-</span>;
+													const isPositive = changePct >= 0;
+													return (
+														<span
+															className={cn(
+																"text-2xs font-medium tabular-nums",
+																isPositive ? "text-terminal-green" : "text-terminal-red",
+															)}
+														>
+															{formatPercent(changePct / 100)}
+														</span>
+													);
+												})()}
+											</div>
+											<div className="w-20 text-right">
+												<span className="text-2xs font-medium tabular-nums">
+													{formatUSD(calculateOpenInterestUSD(market.ctx))}
 												</span>
 											</div>
 											<div className="w-20 text-right">
 												<span className="text-2xs font-medium tabular-nums">
-													{market.openInterest ? formatUSD(Number(market.openInterest)) : "-"}
-												</span>
-											</div>
-											<div className="w-20 text-right">
-												<span className="text-2xs font-medium tabular-nums">
-													{market.volume24h ? formatUSD(Number(market.volume24h)) : "-"}
+													{formatUSD(market.ctx?.dayNtlVlm ? Number(market.ctx.dayNtlVlm) : null)}
 												</span>
 											</div>
 											<div className="w-20 text-right">
@@ -251,12 +262,10 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 															isFundingPositive ? "text-terminal-green" : "text-terminal-red",
 														)}
 													>
-														{fundingNum
-															? formatPercent(fundingNum, {
-																	minimumFractionDigits: 4,
-																	signDisplay: "exceptZero",
-																})
-															: "-"}
+														{formatPercent(fundingNum, {
+															minimumFractionDigits: 4,
+															signDisplay: "exceptZero",
+														})}
 													</span>
 												</div>
 											</div>

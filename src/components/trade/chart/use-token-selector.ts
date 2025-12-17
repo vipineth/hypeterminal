@@ -2,25 +2,17 @@ import { createColumnHelper, getCoreRowModel, type Row, type SortingState, useRe
 import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { isTokenInCategory, type MarketCategory } from "@/config/token";
-import { useMarkets } from "@/hooks/hyperliquid";
-import { makePerpMarketKey } from "@/lib/hyperliquid";
+import { usePerpMarketRegistry } from "@/hooks/hyperliquid";
+import { type PerpAssetCtx, usePerpAssetCtxsSnapshot } from "@/hooks/hyperliquid/use-perp-asset-ctxs-snapshot";
+import { makePerpMarketKey, type PerpMarketInfo } from "@/lib/hyperliquid";
+import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
 import { useFavoriteMarketKeys, useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 
-export type Market = {
-	marketKey: string;
-	coin: string;
-	name: string;
-	markPrice: string | undefined;
-	indexPrice: string | undefined;
-	fundingRate: string | undefined;
-	openInterest: string | undefined;
-	volume24h: string | undefined;
-	maxLeverage: number;
-	szDecimals: number;
-	isDelisted?: boolean;
+type MarketRow = PerpMarketInfo & {
+	ctx: PerpAssetCtx | undefined;
 };
 
-const columnHelper = createColumnHelper<Market>();
+const columnHelper = createColumnHelper<MarketRow>();
 
 const columns = [
 	columnHelper.accessor("coin", {
@@ -28,31 +20,31 @@ const columns = [
 		size: 160,
 		enableSorting: false,
 	}),
-	columnHelper.accessor((row) => (row.markPrice ? Number(row.markPrice) : 0), {
+	columnHelper.accessor((row) => (row.ctx?.markPx ? Number(row.ctx.markPx) : 0), {
 		id: "price",
 		header: "Price",
 		size: 80,
 		enableSorting: true,
 	}),
-	columnHelper.accessor((row) => (row.markPrice ? Number(row.markPrice) : 0), {
+	columnHelper.accessor((row) => calculate24hPriceChange(row.ctx) ?? 0, {
 		id: "24h-change",
-		header: "Price Change 24h",
+		header: "24h Price",
 		size: 80,
 		enableSorting: true,
 	}),
-	columnHelper.accessor((row) => (row.openInterest ? Number(row.openInterest) : 0), {
+	columnHelper.accessor((row) => calculateOpenInterestUSD(row.ctx) ?? 0, {
 		id: "oi",
 		header: "Open Interest",
 		size: 80,
 		enableSorting: true,
 	}),
-	columnHelper.accessor((row) => (row.volume24h ? Number(row.volume24h) : 0), {
+	columnHelper.accessor((row) => (row.ctx?.dayNtlVlm ? Number(row.ctx.dayNtlVlm) : 0), {
 		id: "volume",
 		header: "Volume",
 		size: 80,
 		enableSorting: true,
 	}),
-	columnHelper.accessor((row) => (row.fundingRate ? Number.parseFloat(row.fundingRate) : 0), {
+	columnHelper.accessor((row) => (row.ctx?.funding ? Number.parseFloat(row.ctx.funding) : 0), {
 		id: "funding",
 		header: "Funding",
 		size: 80,
@@ -77,28 +69,29 @@ export interface UseTokenSelectorReturn {
 	handleSelect: (coin: string) => void;
 	handleCategorySelect: (cat: MarketCategory) => void;
 	toggleFavorite: (coin: string) => void;
-	table: ReturnType<typeof useReactTable<Market>>;
-	rows: Row<Market>[];
+	table: ReturnType<typeof useReactTable<MarketRow>>;
+	rows: Row<MarketRow>[];
 	virtualizer: Virtualizer<HTMLDivElement, Element>;
 	containerRef: React.RefObject<HTMLDivElement | null>;
-	filteredMarkets: Market[];
+	filteredMarkets: MarketRow[];
 }
 
 export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): UseTokenSelectorReturn {
 	const [open, setOpen] = useState(false);
 	const [category, setCategory] = useState<MarketCategory>("all");
 	const [search, setSearch] = useState("");
-	const { data: rawMarkets, isLoading } = useMarkets({ enabled: open });
+	const { registry, isLoading } = usePerpMarketRegistry();
+	const ctxs = usePerpAssetCtxsSnapshot({ enabled: open, intervalMs: 10_000 });
 	const favorites = useFavoriteMarketKeys();
 	const { toggleFavoriteMarketKey } = useMarketPrefsActions();
 
-	const markets = useMemo((): Market[] => {
-		if (!rawMarkets) return [];
-		return rawMarkets.map((m) => ({
-			...m,
-			marketKey: m.marketKey ?? makePerpMarketKey(m.coin),
+	const markets = useMemo((): MarketRow[] => {
+		if (!registry) return [];
+		return Array.from(registry.marketKeyToInfo.values()).map((marketInfo) => ({
+			...marketInfo,
+			ctx: ctxs?.[marketInfo.assetIndex],
 		}));
-	}, [rawMarkets]);
+	}, [registry, ctxs]);
 
 	const favoriteSet = useMemo(() => new Set(favorites), [favorites]);
 
@@ -130,26 +123,32 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [sorting, setSorting] = useState<SortingState>([]);
 
+	const handleSortingChange = useCallback((updaterOrValue: SortingState | ((old: SortingState) => SortingState)) => {
+		setSorting(updaterOrValue);
+	}, []);
+
 	const sortedMarkets = useMemo(() => {
 		const favoriteMarkets = filteredMarkets.filter((m) => isFavorite(m.coin));
 		const nonFavoriteMarkets = filteredMarkets.filter((m) => !isFavorite(m.coin));
 
-		function getSortValue(market: Market, columnId: string): number {
+		function getSortValue(market: MarketRow, columnId: string): number {
 			switch (columnId) {
 				case "price":
-					return market.markPrice ? Number(market.markPrice) : 0;
+					return market.ctx?.markPx ? Number(market.ctx.markPx) : 0;
+				case "24h-change":
+					return calculate24hPriceChange(market.ctx) ?? 0;
 				case "oi":
-					return market.openInterest ? Number(market.openInterest) : 0;
+					return calculateOpenInterestUSD(market.ctx) ?? 0;
 				case "volume":
-					return market.volume24h ? Number(market.volume24h) : 0;
+					return market.ctx?.dayNtlVlm ? Number(market.ctx.dayNtlVlm) : 0;
 				case "funding":
-					return market.fundingRate ? Number.parseFloat(market.fundingRate) : 0;
+					return market.ctx?.funding ? Number.parseFloat(market.ctx.funding) : 0;
 				default:
 					return 0;
 			}
 		}
 
-		function sortSection(section: Market[]): Market[] {
+		function sortSection(section: MarketRow[]): MarketRow[] {
 			if (sorting.length === 0) return section;
 
 			const { id, desc } = sorting[0];
@@ -169,7 +168,7 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 		getCoreRowModel: getCoreRowModel(),
 		manualSorting: true,
 		state: { sorting },
-		onSortingChange: setSorting,
+		onSortingChange: handleSortingChange,
 		enableSorting: true,
 	});
 
@@ -207,7 +206,7 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 		category,
 		search,
 		setSearch,
-		isLoading: open && (isLoading || (rawMarkets?.length ?? 0) === 0),
+		isLoading: open && (isLoading || !registry),
 		isFavorite,
 		sorting,
 		handleSelect,

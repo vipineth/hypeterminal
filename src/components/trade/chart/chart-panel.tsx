@@ -1,10 +1,11 @@
 import { ClientOnly } from "@tanstack/react-router";
-import { EllipsisVertical, Flame, LayoutGrid, Search } from "lucide-react";
+import { Flame } from "lucide-react";
 import { useCallback } from "react";
 import { Separator } from "@/components/ui/separator";
 import { useSelectedResolvedMarket } from "@/hooks/hyperliquid";
-import { makePerpMarketKey } from "@/lib/hyperliquid";
 import { formatPercent, formatUSD } from "@/lib/format";
+import { makePerpMarketKey } from "@/lib/hyperliquid";
+import { calculateOpenInterestUSD } from "@/lib/market";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/providers/theme";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
@@ -39,28 +40,26 @@ export function ChartPanel() {
 						<div className="hidden md:flex items-center gap-4 text-3xs">
 							<StatBlock
 								label="MARK"
-								value={selectedMarket?.ctx?.markPx ? formatUSD(Number(selectedMarket.ctx.markPx)) : "-"}
+								value={formatUSD(selectedMarket?.ctx?.markPx ? Number(selectedMarket.ctx.markPx) : null)}
 								valueClass="text-terminal-amber terminal-glow-amber"
 							/>
 							<StatBlock
 								label="ORACLE"
-								value={selectedMarket?.ctx?.oraclePx ? formatUSD(Number(selectedMarket.ctx.oraclePx)) : "-"}
+								value={formatUSD(selectedMarket?.ctx?.oraclePx ? Number(selectedMarket.ctx.oraclePx) : null)}
 							/>
 							<StatBlock
 								label="VOL"
-								value={
-									selectedMarket?.ctx?.dayNtlVlm
-										? formatUSD(Number(selectedMarket.ctx.dayNtlVlm), { notation: "compact", compactDisplay: "short" })
-										: "-"
-								}
+								value={formatUSD(selectedMarket?.ctx?.dayNtlVlm ? Number(selectedMarket.ctx.dayNtlVlm) : null, {
+									notation: "compact",
+									compactDisplay: "short",
+								})}
 							/>
 							<StatBlock
 								label="OI"
-								value={
-									selectedMarket?.ctx?.openInterest
-										? formatUSD(Number(selectedMarket.ctx.openInterest), { notation: "compact", compactDisplay: "short" })
-										: "-"
-								}
+								value={formatUSD(calculateOpenInterestUSD(selectedMarket?.ctx), {
+									notation: "compact",
+									compactDisplay: "short",
+								})}
 							/>
 							<div className="flex items-center gap-1">
 								<Flame className={cn("size-3", isFundingPositive ? "text-terminal-green" : "text-terminal-red")} />
@@ -77,32 +76,6 @@ export function ChartPanel() {
 								</span>
 							</div>
 						</div>
-					</div>
-					<div className="hidden md:flex items-center gap-0.5">
-						<button
-							type="button"
-							className="size-6 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-							tabIndex={0}
-							aria-label="Search"
-						>
-							<Search className="size-3.5" />
-						</button>
-						<button
-							type="button"
-							className="size-6 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-							tabIndex={0}
-							aria-label="Layout"
-						>
-							<LayoutGrid className="size-3.5" />
-						</button>
-						<button
-							type="button"
-							className="size-6 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-							tabIndex={0}
-							aria-label="More"
-						>
-							<EllipsisVertical className="size-3.5" />
-						</button>
 					</div>
 				</div>
 			</div>

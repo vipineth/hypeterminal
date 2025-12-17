@@ -8,7 +8,6 @@ export {
 	useL2BookSubscription,
 	useTradesSubscription,
 } from "./socket";
-export { useMarkets } from "./use-market";
 export { usePerpMarketRegistry } from "./use-market-registry";
 export { useMeta } from "./use-meta";
 export { useClearinghouseState } from "./use-clearinghouse-state";
