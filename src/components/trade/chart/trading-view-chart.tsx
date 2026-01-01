@@ -8,7 +8,13 @@ import type {
 	TimeFrameItem,
 } from "@/types/charting_library";
 import { createDatafeed } from "./datafeed";
-import { buildChartOverrides, getLoadingScreenColors, getToolbarBgColor } from "./theme-colors";
+import {
+	buildChartOverrides,
+	generateChartCssUrl,
+	getCustomThemeColors,
+	getLoadingScreenColors,
+	getToolbarBgColor,
+} from "./theme-colors";
 
 declare global {
 	interface Window {
@@ -39,6 +45,7 @@ export function TradingViewChart({ symbol = "AAVE/USDC", interval = "60", theme 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const widgetRef = useRef<IChartingLibraryWidget | null>(null);
 	const scriptLoadedRef = useRef(false);
+	const cssUrlRef = useRef<string | null>(null);
 
 	useEffect(() => {
 		if (!containerRef.current) return;
@@ -80,10 +87,18 @@ export function TradingViewChart({ symbol = "AAVE/USDC", interval = "60", theme 
 					widgetRef.current.remove();
 				}
 
-				// Build colors dynamically from CSS variables
+				// Clean up previous CSS blob URL
+				if (cssUrlRef.current) {
+					URL.revokeObjectURL(cssUrlRef.current);
+				}
+
+				// Build colors and CSS dynamically from CSS variables
 				const overrides = buildChartOverrides();
 				const loadingColors = getLoadingScreenColors();
 				const toolbarBg = getToolbarBgColor();
+				const customCssUrl = generateChartCssUrl();
+				const themeColors = getCustomThemeColors();
+				cssUrlRef.current = customCssUrl;
 
 				widgetRef.current = new window.TradingView.widget({
 					container: containerRef.current,
@@ -136,6 +151,11 @@ export function TradingViewChart({ symbol = "AAVE/USDC", interval = "60", theme 
 					overrides: overrides,
 					loading_screen: loadingColors,
 					toolbar_bg: toolbarBg,
+					custom_css_url: customCssUrl,
+					custom_themes: {
+						dark: themeColors,
+						light: themeColors,
+					},
 					studies_overrides: {},
 					favorites: {
 						intervals: ["1", "5", "60", "240", "1D"] as ResolutionString[],
@@ -156,6 +176,10 @@ export function TradingViewChart({ symbol = "AAVE/USDC", interval = "60", theme 
 			if (widgetRef.current) {
 				widgetRef.current.remove();
 				widgetRef.current = null;
+			}
+			if (cssUrlRef.current) {
+				URL.revokeObjectURL(cssUrlRef.current);
+				cssUrlRef.current = null;
 			}
 		};
 	}, [symbol, interval, theme]);

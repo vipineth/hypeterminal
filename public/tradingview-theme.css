@@ -1,0 +1,249 @@
+/* ============================================
+   TradingView Custom Theme - Static Styles
+   Colors are injected via CSS variables
+   ============================================ */
+
+/* CSS Variables - will be overridden by injected styles */
+:root {
+	--tv-bg: #0d0d0d;
+	--tv-fg: #d9d9d9;
+	--tv-muted-fg: #8c8c8c;
+	--tv-border: #333333;
+	--tv-hover: rgba(255, 255, 255, 0.06);
+	--tv-accent: #5eead4;
+}
+
+/* ========== TYPOGRAPHY ========== */
+html, body,
+.layout__area--top,
+.layout__area--top *,
+.chart-controls-bar,
+.chart-controls-bar *,
+[class*="button-"],
+[class*="Button-"],
+[class*="item-"],
+[class*="menu-"],
+[class*="legend-"],
+[class*="value-"],
+.apply-common-tooltip {
+	font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, monospace !important;
+	font-size: 10px !important;
+	font-weight: 400 !important;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* Symbol title slightly larger */
+[class*="symbolTitle-"],
+[class*="mainTitle-"] {
+	font-size: 11px !important;
+	font-weight: 500 !important;
+}
+
+/* ========== SCROLLBARS ========== */
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+::-webkit-scrollbar-track {
+	background: var(--tv-bg);
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--tv-border);
+	border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: var(--tv-muted-fg);
+}
+
+/* ========== ICONS ========== */
+[class*="icon-"] svg,
+[class*="button-"] svg {
+	opacity: 0.7;
+}
+
+[class*="icon-"]:hover svg,
+[class*="button-"]:hover svg {
+	opacity: 1;
+}
+
+/* ========== BACKGROUNDS ========== */
+html,
+body,
+.chart-page,
+.chart-container,
+.layout__area--center,
+.chart-controls-bar,
+.layout__area--top {
+	background: var(--tv-bg) !important;
+	background-color: var(--tv-bg) !important;
+}
+
+/* ========== TOP TOOLBAR ========== */
+.layout__area--top {
+	border-bottom: 1px solid var(--tv-border) !important;
+}
+
+/* Toolbar buttons */
+[class*="button-"],
+[class*="Button-"],
+.apply-common-tooltip {
+	background: transparent !important;
+	color: var(--tv-muted-fg) !important;
+	border: none !important;
+	transition: color 0.15s ease, background 0.15s ease !important;
+}
+
+[class*="button-"]:hover,
+[class*="Button-"]:hover,
+.apply-common-tooltip:hover {
+	background: var(--tv-hover) !important;
+	color: var(--tv-fg) !important;
+}
+
+/* Active/selected button states */
+[class*="isActive-"],
+[class*="isOpened-"],
+[class*="button-"][class*="isActive-"],
+[class*="button-"][class*="isOpened-"] {
+	background: var(--tv-hover) !important;
+	color: var(--tv-accent) !important;
+}
+
+/* ========== MENU CONTAINERS ========== */
+[class*="container-"]:not([class*="legend"]),
+[class*="wrapper-"]:not([class*="legend"]),
+[class*="menuWrap-"],
+[class*="dropdown-"],
+[class*="menu-"] {
+	background: var(--tv-bg) !important;
+	border: 1px solid var(--tv-border) !important;
+	border-radius: 4px !important;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Menu items */
+[class*="item-"],
+[class*="menuItem-"],
+[class*="option-"] {
+	background: transparent !important;
+	color: var(--tv-muted-fg) !important;
+	transition: background 0.15s ease, color 0.15s ease !important;
+}
+
+[class*="item-"]:hover,
+[class*="menuItem-"]:hover,
+[class*="option-"]:hover {
+	background: var(--tv-hover) !important;
+	color: var(--tv-fg) !important;
+}
+
+/* Selected menu items */
+[class*="item-"][class*="isActive-"],
+[class*="item-"][class*="selected-"],
+[class*="menuItem-"][class*="isActive-"] {
+	color: var(--tv-accent) !important;
+}
+
+/* ========== LEGEND / SYMBOL INFO ========== */
+/* Legend text styling - transparent background */
+[class*="legend-"],
+[class*="value-"],
+[class*="valuesWrapper-"],
+[class*="mainTitle-"],
+[class*="symbolTitle-"],
+[class*="priceWrapper-"],
+[class*="valueItem-"],
+[class*="valueValue-"],
+[class*="valueTitle-"] {
+	color: var(--tv-muted-fg) !important;
+	background: transparent !important;
+}
+
+/* Legend containers - explicitly transparent */
+[class*="legendWrapper-"],
+[class*="legend-"][class*="wrap-"],
+[class*="sourcesWrapper-"],
+[class*="sources-"] {
+	background: transparent !important;
+	background-color: transparent !important;
+}
+
+/* Symbol title accent */
+[class*="symbolTitle-"],
+[class*="mainTitle-"] {
+	color: var(--tv-fg) !important;
+}
+
+/* ========== SEPARATORS & DIVIDERS ========== */
+[class*="separator-"],
+[class*="divider-"] {
+	background: var(--tv-border) !important;
+	opacity: 0.5;
+}
+
+/* ========== INPUTS & CONTROLS ========== */
+input,
+select,
+[class*="input-"],
+[class*="select-"] {
+	background: var(--tv-bg) !important;
+	border: 1px solid var(--tv-border) !important;
+	color: var(--tv-fg) !important;
+}
+
+input:focus,
+select:focus,
+[class*="input-"]:focus,
+[class*="select-"]:focus {
+	border-color: var(--tv-accent) !important;
+	outline: none !important;
+}
+
+/* ========== TOOLTIPS ========== */
+[class*="tooltip-"],
+[class*="Tooltip-"] {
+	background: var(--tv-bg) !important;
+	border: 1px solid var(--tv-border) !important;
+	color: var(--tv-fg) !important;
+}
+
+/* ========== DIALOGS & MODALS ========== */
+[class*="dialog-"],
+[class*="modal-"],
+[class*="popup-"] {
+	background: var(--tv-bg) !important;
+	border: 1px solid var(--tv-border) !important;
+}
+
+/* ========== TABS ========== */
+[class*="tab-"] {
+	background: transparent !important;
+	color: var(--tv-muted-fg) !important;
+	border-bottom: 2px solid transparent !important;
+}
+
+[class*="tab-"]:hover {
+	color: var(--tv-fg) !important;
+}
+
+[class*="tab-"][class*="active-"],
+[class*="tab-"][class*="isActive-"] {
+	color: var(--tv-accent) !important;
+	border-bottom-color: var(--tv-accent) !important;
+}
+
+/* ========== CHECKBOXES & TOGGLES ========== */
+[class*="checkbox-"],
+[class*="switcher-"] {
+	border-color: var(--tv-border) !important;
+}
+
+[class*="checkbox-"][class*="checked-"],
+[class*="switcher-"][class*="on-"] {
+	background: var(--tv-accent) !important;
+	border-color: var(--tv-accent) !important;
+}
