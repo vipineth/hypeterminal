@@ -7,8 +7,46 @@ import { asks, bids } from "../lib";
 import { BookRow } from "./book-row";
 import { TradesView } from "./trades-view";
 
+/**
+ * Generate appropriate tick sizes based on the asset price
+ * For low prices (< $1): use smaller increments like 0.0001, 0.001, 0.01
+ * For medium prices ($1-$100): use 0.01, 0.1, 1
+ * For high prices ($100-$1000): use 0.1, 1, 10
+ * For very high prices (> $1000): use 1, 10, 100
+ */
+function getTickSizes(price: number): string[] {
+	if (price < 0.01) {
+		return ["0.00001", "0.0001", "0.001"];
+	}
+	if (price < 0.1) {
+		return ["0.0001", "0.001", "0.01"];
+	}
+	if (price < 1) {
+		return ["0.001", "0.01", "0.1"];
+	}
+	if (price < 10) {
+		return ["0.01", "0.1", "1"];
+	}
+	if (price < 100) {
+		return ["0.1", "1", "10"];
+	}
+	if (price < 1000) {
+		return ["1", "10", "100"];
+	}
+	if (price < 10000) {
+		return ["10", "100", "1000"];
+	}
+	return ["100", "1000", "10000"];
+}
+
 export function OrderBookPanel() {
-	const [tick, setTick] = useState("0.01");
+	// Get current price from the order book (using the mid-price)
+	const currentPrice = asks.length > 0 && bids.length > 0
+		? (asks[0].price + bids[0].price) / 2
+		: 100; // fallback
+
+	const tickSizes = getTickSizes(currentPrice);
+	const [tick, setTick] = useState(tickSizes[0]);
 	const [view, setView] = useState<"book" | "trades">("book");
 	const maxTotal = Math.max(...[...asks, ...bids].map((r) => r.total));
 
@@ -54,7 +92,7 @@ export function OrderBookPanel() {
 						</button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end" className="w-20 font-mono text-xs">
-						{["0.01", "0.05", "0.1"].map((t) => (
+						{tickSizes.map((t) => (
 							<DropdownMenuItem key={t} onClick={() => setTick(t)}>
 								{t}
 							</DropdownMenuItem>
