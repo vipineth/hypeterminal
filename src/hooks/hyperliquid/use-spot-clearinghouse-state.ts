@@ -1,0 +1,25 @@
+import { useQuery } from "@tanstack/react-query";
+import { getInfoClient, hyperliquidKeys } from "@/lib/hyperliquid";
+
+const infoClient = getInfoClient();
+
+interface UseSpotClearinghouseStateParams {
+	user: `0x${string}` | undefined;
+	enabled?: boolean;
+	refetchIntervalMs?: number;
+}
+
+export function useSpotClearinghouseState(params: UseSpotClearinghouseStateParams) {
+	const enabled = params.enabled ?? true;
+
+	return useQuery({
+		queryKey: hyperliquidKeys.spotClearinghouseState(params.user ?? "0x0"),
+		queryFn: () => infoClient.spotClearinghouseState({ user: params.user as `0x${string}` }),
+		enabled: enabled && !!params.user,
+		staleTime: 5_000,
+		refetchInterval: params.refetchIntervalMs ?? 15_000,
+		refetchOnWindowFocus: false,
+		refetchOnReconnect: false,
+	});
+}
+

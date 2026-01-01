@@ -3,13 +3,86 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  /* Typography - Font Families */
+  --font-sans: Geist, sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "SF Mono", Menlo, monospace;
+
+  /* Typography - Custom smaller text sizes for dense UI */
+  --text-2xs: 0.6875rem; /* 11px */
+  --text-2xs--line-height: 1.45;
+  --text-3xs: 0.625rem; /* 10px */
+  --text-3xs--line-height: 1.5;
+  --text-4xs: 0.5625rem; /* 9px */
+  --text-4xs--line-height: 1.55;
+
+  /* Border Radius */
+  --radius-sm: calc(0.125rem - 4px);
+  --radius-md: calc(0.125rem - 2px);
+  --radius-lg: 0.125rem;
+  --radius-xl: calc(0.125rem + 4px);
+
+  /* Shadows - Light Mode */
+  --shadow-2xs: 0px 1px 2px 0px hsl(220 20% 20% / 0.06);
+  --shadow-xs: 0px 1px 2px 0px hsl(220 20% 20% / 0.08);
+  --shadow-sm: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 1px 2px -1px hsl(220 20% 20% / 0.1);
+  --shadow: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 1px 2px -1px hsl(220 20% 20% / 0.1);
+  --shadow-md: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 2px 4px -1px hsl(220 20% 20% / 0.1);
+  --shadow-lg: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 4px 6px -1px hsl(220 20% 20% / 0.1);
+  --shadow-xl: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 8px 10px -1px hsl(220 20% 20% / 0.1);
+  --shadow-2xl: 0px 1px 2px 0px hsl(220 20% 20% / 0.25);
+
+  /* Custom Animations */
+  --animate-pulse-slow: pulse-slow 2s ease-in-out infinite;
+  --animate-blink: blink 1s step-end infinite;
+  --animate-collapse-down: collapse-down 0.2s ease-out;
+  --animate-collapse-up: collapse-up 0.2s ease-out;
+
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  @keyframes collapse-down {
+    from {
+      height: 0;
+      opacity: 0;
+    }
+    to {
+      height: var(--radix-collapsible-content-height);
+      opacity: 1;
+    }
+  }
+
+  @keyframes collapse-up {
+    from {
+      height: var(--radix-collapsible-content-height);
+      opacity: 1;
+    }
+    to {
+      height: 0;
+      opacity: 0;
+    }
+  }
+}
+
+/* =============================================================================
+   LIGHT/DARK MODE CSS VARIABLES
+   Using :root and .dark for values that change between modes
+   ============================================================================= */
+
 :root {
+  /* Semantic Colors - Light Mode */
   --background: oklch(0.97 0.005 240);
   --foreground: oklch(0.2 0.02 250);
-  --card: oklch(0.99 0.003 240);
-  --card-foreground: oklch(0.2 0.02 250);
-  --popover: oklch(0.99 0.003 240);
-  --popover-foreground: oklch(0.2 0.02 250);
+  --surface: oklch(0.99 0.003 240);
+  --surface-foreground: oklch(0.2 0.02 250);
   --primary: oklch(0.45 0.15 250);
   --primary-foreground: oklch(0.98 0 0);
   --secondary: oklch(0.94 0.01 240);
@@ -23,11 +96,8 @@
   --border: oklch(0.88 0.015 240);
   --input: oklch(0.94 0.01 240);
   --ring: oklch(0.45 0.15 250);
-  --chart-1: oklch(0.8100 0.1700 75.3500);
-  --chart-2: oklch(0.5500 0.2200 264.5300);
-  --chart-3: oklch(0.7200 0 0);
-  --chart-4: oklch(0.9200 0 0);
-  --chart-5: oklch(0.5600 0 0);
+
+  /* Sidebar - Light Mode */
   --sidebar: oklch(0.97 0.005 240);
   --sidebar-foreground: oklch(0.2 0.02 250);
   --sidebar-primary: oklch(0.45 0.15 250);
@@ -36,27 +106,8 @@
   --sidebar-accent-foreground: oklch(0.2 0.02 250);
   --sidebar-border: oklch(0.88 0.015 240);
   --sidebar-ring: oklch(0.45 0.15 250);
-  --font-sans: Geist, sans-serif;
-  --font-serif: Georgia, serif;
-  --font-mono: "JetBrains Mono", "Fira Code", "SF Mono", Menlo, monospace;
-  --radius: 0.125rem;
-  --shadow-x: 0px;
-  --shadow-y: 1px;
-  --shadow-blur: 2px;
-  --shadow-spread: 0px;
-  --shadow-opacity: 0.18;
-  --shadow-color: hsl(0 0% 0%);
-  --shadow-2xs: 0px 1px 2px 0px hsl(220 20% 20% / 0.06);
-  --shadow-xs: 0px 1px 2px 0px hsl(220 20% 20% / 0.08);
-  --shadow-sm: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 1px 2px -1px hsl(220 20% 20% / 0.1);
-  --shadow: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 1px 2px -1px hsl(220 20% 20% / 0.1);
-  --shadow-md: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 2px 4px -1px hsl(220 20% 20% / 0.1);
-  --shadow-lg: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 4px 6px -1px hsl(220 20% 20% / 0.1);
-  --shadow-xl: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 8px 10px -1px hsl(220 20% 20% / 0.1);
-  --shadow-2xl: 0px 1px 2px 0px hsl(220 20% 20% / 0.25);
-  --tracking-normal: 0em;
-  --spacing: 0.25rem;
-  
+
+  /* Terminal Colors - Light Mode */
   --terminal-green: oklch(0.45 0.18 145);
   --terminal-red: oklch(0.5 0.2 25);
   --terminal-cyan: oklch(0.45 0.12 230);
@@ -65,12 +116,11 @@
 }
 
 .dark {
+  /* Semantic Colors - Dark Mode */
   --background: oklch(0.05 0 0);
   --foreground: oklch(0.85 0 0);
-  --card: oklch(0.08 0 0);
-  --card-foreground: oklch(0.85 0 0);
-  --popover: oklch(0.1 0 0);
-  --popover-foreground: oklch(0.85 0 0);
+  --surface: oklch(0.08 0 0);
+  --surface-foreground: oklch(0.85 0 0);
   --primary: oklch(0.75 0.18 160);
   --primary-foreground: oklch(0.05 0 0);
   --secondary: oklch(0.15 0 0);
@@ -84,11 +134,8 @@
   --border: oklch(0.2 0 0);
   --input: oklch(0.12 0 0);
   --ring: oklch(0.75 0.18 160);
-  --chart-1: oklch(0.8100 0.1700 75.3500);
-  --chart-2: oklch(0.5800 0.2100 260.8400);
-  --chart-3: oklch(0.5600 0 0);
-  --chart-4: oklch(0.4400 0 0);
-  --chart-5: oklch(0.9200 0 0);
+
+  /* Sidebar - Dark Mode */
   --sidebar: oklch(0.08 0 0);
   --sidebar-foreground: oklch(0.85 0 0);
   --sidebar-primary: oklch(0.75 0.18 160);
@@ -97,16 +144,15 @@
   --sidebar-accent-foreground: oklch(0.85 0 0);
   --sidebar-border: oklch(0.2 0 0);
   --sidebar-ring: oklch(0.75 0.18 160);
-  --font-sans: Geist, sans-serif;
-  --font-serif: Georgia, serif;
-  --font-mono: "JetBrains Mono", "Fira Code", "SF Mono", Menlo, monospace;
-  --radius: 0.125rem;
-  --shadow-x: 0px;
-  --shadow-y: 1px;
-  --shadow-blur: 2px;
-  --shadow-spread: 0px;
-  --shadow-opacity: 0.18;
-  --shadow-color: hsl(0 0% 0%);
+
+  /* Terminal Colors - Dark Mode */
+  --terminal-green: oklch(0.75 0.18 145);
+  --terminal-red: oklch(0.65 0.22 25);
+  --terminal-cyan: oklch(0.78 0.12 195);
+  --terminal-amber: oklch(0.8 0.16 85);
+  --terminal-purple: oklch(0.7 0.15 300);
+
+  /* Override shadows for dark mode */
   --shadow-2xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.09);
   --shadow-xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.09);
   --shadow-sm: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 1px 2px -1px hsl(0 0% 0% / 0.18);
@@ -115,21 +161,19 @@
   --shadow-lg: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 4px 6px -1px hsl(0 0% 0% / 0.18);
   --shadow-xl: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 8px 10px -1px hsl(0 0% 0% / 0.18);
   --shadow-2xl: 0px 1px 2px 0px hsl(0 0% 0% / 0.45);
-  
-  --terminal-green: oklch(0.75 0.18 145);
-  --terminal-red: oklch(0.65 0.22 25);
-  --terminal-cyan: oklch(0.78 0.12 195);
-  --terminal-amber: oklch(0.8 0.16 85);
-  --terminal-purple: oklch(0.7 0.15 300);
 }
 
+/* =============================================================================
+   THEME INLINE - Map CSS variables to Tailwind utilities
+   Use @theme inline for variables that reference other CSS variables
+   ============================================================================= */
+
 @theme inline {
+  /* Semantic Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
+  --color-surface: var(--surface);
+  --color-surface-foreground: var(--surface-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
@@ -143,11 +187,8 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
+
+  /* Sidebar */
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -157,15 +198,14 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
-  --font-serif: var(--font-serif);
+  /* Terminal Colors */
+  --color-terminal-green: var(--terminal-green);
+  --color-terminal-red: var(--terminal-red);
+  --color-terminal-cyan: var(--terminal-cyan);
+  --color-terminal-amber: var(--terminal-amber);
+  --color-terminal-purple: var(--terminal-purple);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-
+  /* Shadows (for dark mode override support) */
   --shadow-2xs: var(--shadow-2xs);
   --shadow-xs: var(--shadow-xs);
   --shadow-sm: var(--shadow-sm);
@@ -176,6 +216,10 @@
   --shadow-2xl: var(--shadow-2xl);
 }
 
+/* =============================================================================
+   BASE STYLES
+   ============================================================================= */
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -185,15 +229,12 @@
   }
 }
 
-@theme inline {
-  --color-terminal-green: var(--terminal-green);
-  --color-terminal-red: var(--terminal-red);
-  --color-terminal-cyan: var(--terminal-cyan);
-  --color-terminal-amber: var(--terminal-amber);
-  --color-terminal-purple: var(--terminal-purple);
-}
+/* =============================================================================
+   COMPONENT STYLES
+   ============================================================================= */
 
 @layer components {
+  /* Terminal Glow Effects */
   .terminal-glow-green {
     text-shadow: none;
   }
@@ -206,6 +247,7 @@
   .terminal-glow-amber {
     text-shadow: none;
   }
+
   .dark .terminal-glow-green {
     text-shadow: 0 0 8px oklch(0.75 0.18 145 / 0.6);
   }
@@ -218,6 +260,8 @@
   .dark .terminal-glow-amber {
     text-shadow: 0 0 8px oklch(0.8 0.16 85 / 0.6);
   }
+
+  /* Terminal Scanlines */
   .terminal-scanlines {
     background-image: repeating-linear-gradient(
       0deg,
@@ -232,10 +276,12 @@
       0deg,
       transparent,
       transparent 1px,
-      oklch(0 0 0 / 0.03) 1px,
-      oklch(0 0 0 / 0.03) 2px
+      oklch(1 0 0 / 0.02) 1px,
+      oklch(1 0 0 / 0.02) 2px
     );
   }
+
+  /* Terminal Grid */
   .terminal-grid {
     background-image: 
       linear-gradient(oklch(0.5 0.02 240 / 0.15) 1px, transparent 1px),
@@ -248,6 +294,8 @@
       linear-gradient(90deg, oklch(0.2 0 0 / 0.3) 1px, transparent 1px);
     background-size: 20px 20px;
   }
+
+  /* Depth Bars */
   .depth-bar-ask {
     background: linear-gradient(90deg, transparent 0%, oklch(0.5 0.2 25 / 0.12) 100%);
   }
@@ -259,45 +307,5 @@
   }
   .dark .depth-bar-bid {
     background: linear-gradient(90deg, oklch(0.75 0.18 145 / 0.15) 0%, transparent 100%);
-  }
-  @keyframes pulse-slow {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-  }
-  .animate-pulse-slow {
-    animation: pulse-slow 2s ease-in-out infinite;
-  }
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-  }
-  .animate-blink {
-    animation: blink 1s step-end infinite;
-  }
-  @keyframes collapse-down {
-    from {
-      height: 0;
-      opacity: 0;
-    }
-    to {
-      height: var(--radix-collapsible-content-height);
-      opacity: 1;
-    }
-  }
-  @keyframes collapse-up {
-    from {
-      height: var(--radix-collapsible-content-height);
-      opacity: 1;
-    }
-    to {
-      height: 0;
-      opacity: 0;
-    }
-  }
-  .animate-collapse-down {
-    animation: collapse-down 0.2s ease-out;
-  }
-  .animate-collapse-up {
-    animation: collapse-up 0.2s ease-out;
   }
 }

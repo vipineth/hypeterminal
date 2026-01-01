@@ -11,7 +11,7 @@ export function AccountPanel() {
 		<Collapsible
 			open={isExpanded}
 			onOpenChange={setIsExpanded}
-			className="shrink-0 flex flex-col bg-card/30 border-t border-border/40"
+			className="shrink-0 flex flex-col bg-surface/30 border-t border-border/40"
 		>
 			<CollapsibleTrigger asChild>
 				<button
@@ -21,7 +21,7 @@ export function AccountPanel() {
 					aria-label={isExpanded ? "Collapse account panel" : "Expand account panel"}
 				>
 					<div className="flex items-center gap-2">
-						<span className="text-[10px] uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
+						<span className="text-3xs uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
 							Account
 						</span>
 						<ChevronUp
@@ -33,14 +33,14 @@ export function AccountPanel() {
 					</div>
 					<div className="flex items-center gap-3">
 						<div className="flex items-center gap-1.5">
-							<span className="text-[9px] text-muted-foreground uppercase">Equity</span>
+							<span className="text-4xs text-muted-foreground uppercase">Equity</span>
 							<span className="text-sm font-semibold tabular-nums text-terminal-green terminal-glow-green">
 								$12,450.23
 							</span>
 						</div>
 						<div className="flex items-center gap-1.5">
-							<span className="text-[9px] text-muted-foreground uppercase">PNL</span>
-							<span className="text-[11px] font-medium tabular-nums text-terminal-green">+$241.12</span>
+							<span className="text-4xs text-muted-foreground uppercase">PNL</span>
+							<span className="text-2xs font-medium tabular-nums text-terminal-green">+$241.12</span>
 						</div>
 					</div>
 				</button>
@@ -60,7 +60,7 @@ export function AccountPanel() {
 								setActiveTab(tab.key as "perps" | "spot");
 							}}
 							className={cn(
-								"px-2 py-1 text-[9px] uppercase tracking-wider transition-colors",
+								"px-2 py-1 text-4xs uppercase tracking-wider transition-colors",
 								activeTab === tab.key
 									? "text-terminal-cyan border-b border-terminal-cyan"
 									: "text-muted-foreground hover:text-foreground",
@@ -74,7 +74,7 @@ export function AccountPanel() {
 				</div>
 
 				<div className="p-2 space-y-2 max-h-48 overflow-y-auto">
-					<div className="border border-border/40 divide-y divide-border/40 text-[10px]">
+					<div className="border border-border/40 divide-y divide-border/40 text-3xs">
 						{[
 							["Balance", "$11,203.12"],
 							["Unrealized PNL", "+$241.12", "text-terminal-green"],
@@ -92,7 +92,7 @@ export function AccountPanel() {
 					<div className="grid grid-cols-2 gap-1">
 						<button
 							type="button"
-							className="py-1.5 text-[10px] uppercase tracking-wider border border-terminal-green/40 text-terminal-green hover:bg-terminal-green/10 transition-colors"
+							className="py-1.5 text-3xs uppercase tracking-wider border border-terminal-green/40 text-terminal-green hover:bg-terminal-green/10 transition-colors"
 							tabIndex={0}
 							aria-label="Deposit"
 						>
@@ -100,7 +100,7 @@ export function AccountPanel() {
 						</button>
 						<button
 							type="button"
-							className="py-1.5 text-[10px] uppercase tracking-wider border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+							className="py-1.5 text-3xs uppercase tracking-wider border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
 							tabIndex={0}
 							aria-label="Withdraw"
 						>
@@ -112,4 +112,3 @@ export function AccountPanel() {
 		</Collapsible>
 	);
 }
-

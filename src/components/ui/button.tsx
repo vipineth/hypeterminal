@@ -16,13 +16,22 @@ const buttonVariants = cva(
 				secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
 				ghost: "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
 				link: "text-primary underline-offset-4 hover:underline",
+				// Trading variants
+				long: "bg-terminal-green text-primary-foreground hover:bg-terminal-green/90",
+				short: "bg-terminal-red text-white hover:bg-terminal-red/90",
+				terminal:
+					"border border-border/60 bg-transparent hover:border-terminal-cyan/40 hover:text-terminal-cyan transition-colors",
 			},
 			size: {
 				default: "h-9 px-4 py-2 has-[>svg]:px-3",
 				sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5 text-xs",
+				xs: "h-6 rounded-sm gap-1 px-2 has-[>svg]:px-1.5 text-2xs",
+				"2xs": "h-5 rounded-sm gap-0.5 px-1.5 has-[>svg]:px-1 text-3xs",
 				lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
 				icon: "size-9",
 				"icon-sm": "size-8",
+				"icon-xs": "size-6",
+				"icon-2xs": "size-5",
 				"icon-lg": "size-10",
 			},
 		},

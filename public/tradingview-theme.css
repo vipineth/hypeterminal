@@ -1,0 +1,73 @@
+/* /* ============================================
+   TradingView Custom Theme - Static Styles
+   Colors are injected via CSS variables
+   ============================================ */
+
+/* CSS Variables - will be overridden by injected styles */
+:root {
+	--tv-bg: #0d0d0d;
+	--tv-fg: #d9d9d9;
+	--tv-muted-fg: #8c8c8c;
+	--tv-border: #333333;
+	--tv-hover: rgba(255, 255, 255, 0.06);
+	--tv-accent: #5eead4;
+}
+
+/* ========== TYPOGRAPHY ========== */
+html, body,
+.layout__area--top,
+.layout__area--top *,
+.chart-controls-bar,
+.chart-controls-bar *,
+[class*="item-"],
+[class*="menu-"],
+[class*="legend-"],
+[class*="value-"],
+.apply-common-tooltip {
+	font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, monospace !important;
+	font-size: 10px !important;
+	font-weight: 400 !important;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* ========== SCROLLBARS ========== */
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+::-webkit-scrollbar-track {
+	background: var(--tv-bg);
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--tv-border);
+	border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: var(--tv-muted-fg);
+}
+
+
+/* ========== BACKGROUNDS ========== */
+html,
+body,
+.chart-page,
+.chart-container,
+.layout__area--center,
+.chart-controls-bar,
+.layout__area--top {
+	background: var(--tv-bg) !important;
+	background-color: var(--tv-bg) !important;
+}
+
+/* ========== TOP TOOLBAR ========== */
+.layout__area--top {
+	border-bottom: 1px solid var(--tv-border) !important;
+}
+
+/* button [class*="icon-"] > svg {
+	width: 24px !important;
+} */
