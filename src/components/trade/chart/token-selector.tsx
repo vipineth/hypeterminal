@@ -9,6 +9,7 @@ import { getTokenIconUrl, isTokenInCategory, marketCategories } from "@/config/t
 import { formatPercent, formatUSD } from "@/lib/format";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
 import { cn } from "@/lib/utils";
+import { QUOTE_ASSET } from "./constants";
 import { useTokenSelector } from "./use-token-selector";
 
 export type TokenSelectorProps = {
@@ -57,7 +58,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 						</AvatarFallback>
 					</Avatar>
 					<span className="text-terminal-amber">{value}</span>
-					<span className="text-muted-foreground">/USDC</span>
+					<span className="text-muted-foreground">/{QUOTE_ASSET}</span>
 					<ChevronDown className="size-3 text-muted-foreground" />
 				</Button>
 			</PopoverTrigger>

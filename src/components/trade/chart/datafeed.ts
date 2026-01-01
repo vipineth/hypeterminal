@@ -24,28 +24,15 @@ import type {
 	ServerTimeCallback,
 	SubscribeBarsCallback,
 } from "@/types/charting_library";
-
-const EXCHANGE = "Hyperliquid";
-const QUOTE_ASSET = "USDC";
-const SESSION_24X7 = "24x7";
-const TIMEZONE = "Etc/UTC";
-const DEFAULT_PRICESCALE = 100;
-
-const supportedResolutions = [
-	"1",
-	"3",
-	"5",
-	"15",
-	"30",
-	"60",
-	"120",
-	"240",
-	"480",
-	"720",
-	"1D",
-	"1W",
-	"1M",
-] as unknown as ResolutionString[];
+import {
+	ALL_MIDS_TTL_MS,
+	DEFAULT_PRICESCALE,
+	EXCHANGE,
+	QUOTE_ASSET,
+	SESSION_24X7,
+	SUPPORTED_RESOLUTIONS,
+	TIMEZONE,
+} from "./constants";
 
 type CandleInterval = CandleSnapshotParameters["interval"];
 
@@ -76,7 +63,6 @@ async function getMeta(): Promise<MetaResponse> {
 	return metaPromise;
 }
 
-const ALL_MIDS_TTL_MS = 10_000;
 let allMidsCache: { value: AllMidsResponse; fetchedAt: number } | undefined;
 let allMidsPromise: Promise<AllMidsResponse> | undefined;
 
@@ -357,7 +343,7 @@ export function createDatafeed(): IBasicDataFeed {
 
 	const configuration: DatafeedConfiguration = {
 		exchanges: [{ value: EXCHANGE, name: EXCHANGE, desc: EXCHANGE }],
-		supported_resolutions: supportedResolutions,
+		supported_resolutions: SUPPORTED_RESOLUTIONS,
 		supports_marks: false,
 		supports_time: true,
 		supports_timescale_marks: false,
@@ -431,7 +417,7 @@ export function createDatafeed(): IBasicDataFeed {
 					pricescale,
 					minmov: 1,
 					has_intraday: true,
-					supported_resolutions: supportedResolutions,
+					supported_resolutions: SUPPORTED_RESOLUTIONS,
 					volume_precision: 2,
 					data_status: "streaming",
 				};

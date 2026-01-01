@@ -5,9 +5,16 @@ import type {
 	IBasicDataFeed,
 	IChartingLibraryWidget,
 	ResolutionString,
-	TimeFrameItem,
 } from "@/types/charting_library";
 import { createDatafeed } from "./datafeed";
+import {
+	CHART_LIBRARY_PATH,
+	CHART_TIME_FRAMES,
+	DEFAULT_CHART_INTERVAL,
+	DEFAULT_CHART_SYMBOL,
+	DEFAULT_CHART_THEME,
+	TIMEZONE,
+} from "./constants";
 import {
 	buildChartOverrides,
 	generateChartCssUrl,
@@ -30,18 +37,11 @@ type TradingViewChartProps = {
 	theme?: "light" | "dark";
 };
 
-const LIBRARY_PATH = "https://cdn.asgard.finance/charting_library-28.3.0/";
-
-const timeFrames: TimeFrameItem[] = [
-	{ text: "5y", resolution: "1W" as ResolutionString, description: "5 Years" },
-	{ text: "1y", resolution: "1D" as ResolutionString, description: "1 Year" },
-	{ text: "3m", resolution: "240" as ResolutionString, description: "3 Months" },
-	{ text: "1m", resolution: "60" as ResolutionString, description: "1 Month" },
-	{ text: "5d", resolution: "15" as ResolutionString, description: "5 Days" },
-	{ text: "1d", resolution: "5" as ResolutionString, description: "1 Day" },
-];
-
-export function TradingViewChart({ symbol = "AAVE/USDC", interval = "60", theme = "dark" }: TradingViewChartProps) {
+export function TradingViewChart({
+	symbol = DEFAULT_CHART_SYMBOL,
+	interval = DEFAULT_CHART_INTERVAL,
+	theme = DEFAULT_CHART_THEME,
+}: TradingViewChartProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const widgetRef = useRef<IChartingLibraryWidget | null>(null);
 	const scriptLoadedRef = useRef(false);
@@ -69,7 +69,7 @@ export function TradingViewChart({ symbol = "AAVE/USDC", interval = "60", theme 
 
 				scriptLoadedRef.current = true;
 				const script = document.createElement("script");
-				script.src = `${LIBRARY_PATH}charting_library.js`;
+				script.src = `${CHART_LIBRARY_PATH}charting_library.js`;
 				script.async = true;
 				script.onload = () => resolve();
 				script.onerror = () => reject(new Error("Failed to load TradingView library"));
@@ -102,7 +102,7 @@ export function TradingViewChart({ symbol = "AAVE/USDC", interval = "60", theme 
 
 				widgetRef.current = new window.TradingView.widget({
 					container: containerRef.current,
-					library_path: LIBRARY_PATH,
+					library_path: CHART_LIBRARY_PATH,
 					datafeed: createDatafeed() as unknown as IBasicDataFeed,
 					symbol: symbol,
 					interval: interval as ResolutionString,
@@ -110,10 +110,10 @@ export function TradingViewChart({ symbol = "AAVE/USDC", interval = "60", theme 
 					fullscreen: false,
 					autosize: true,
 					theme: theme,
-					timezone: "Etc/UTC",
+					timezone: TIMEZONE,
 					debug: false,
 					custom_font_family: "'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, monospace",
-					time_frames: timeFrames,
+					time_frames: CHART_TIME_FRAMES,
 					enabled_features: [
 						"side_toolbar_in_fullscreen_mode",
 						"header_in_fullscreen_mode",

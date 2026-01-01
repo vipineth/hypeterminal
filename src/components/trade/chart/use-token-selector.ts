@@ -1,56 +1,13 @@
-import { createColumnHelper, getCoreRowModel, type Row, type SortingState, useReactTable } from "@tanstack/react-table";
+import { getCoreRowModel, type Row, type SortingState, useReactTable } from "@tanstack/react-table";
 import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { isTokenInCategory, type MarketCategory } from "@/config/token";
 import { usePerpMarketRegistry } from "@/hooks/hyperliquid";
-import { type PerpAssetCtx, usePerpAssetCtxsSnapshot } from "@/hooks/hyperliquid/use-perp-asset-ctxs-snapshot";
-import { makePerpMarketKey, type PerpMarketInfo } from "@/lib/hyperliquid";
+import { usePerpAssetCtxsSnapshot } from "@/hooks/hyperliquid/use-perp-asset-ctxs-snapshot";
+import { makePerpMarketKey } from "@/lib/hyperliquid";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
 import { useFavoriteMarketKeys, useMarketPrefsActions } from "@/stores/use-market-prefs-store";
-
-type MarketRow = PerpMarketInfo & {
-	ctx: PerpAssetCtx | undefined;
-};
-
-const columnHelper = createColumnHelper<MarketRow>();
-
-const columns = [
-	columnHelper.accessor("coin", {
-		header: "Market",
-		size: 160,
-		enableSorting: false,
-	}),
-	columnHelper.accessor((row) => (row.ctx?.markPx ? Number(row.ctx.markPx) : 0), {
-		id: "price",
-		header: "Price",
-		size: 80,
-		enableSorting: true,
-	}),
-	columnHelper.accessor((row) => calculate24hPriceChange(row.ctx) ?? 0, {
-		id: "24h-change",
-		header: "24h Price",
-		size: 80,
-		enableSorting: true,
-	}),
-	columnHelper.accessor((row) => calculateOpenInterestUSD(row.ctx) ?? 0, {
-		id: "oi",
-		header: "Open Interest",
-		size: 80,
-		enableSorting: true,
-	}),
-	columnHelper.accessor((row) => (row.ctx?.dayNtlVlm ? Number(row.ctx.dayNtlVlm) : 0), {
-		id: "volume",
-		header: "Volume",
-		size: 80,
-		enableSorting: true,
-	}),
-	columnHelper.accessor((row) => (row.ctx?.funding ? Number.parseFloat(row.ctx.funding) : 0), {
-		id: "funding",
-		header: "Funding",
-		size: 80,
-		enableSorting: true,
-	}),
-];
+import { type MarketRow, TOKEN_SELECTOR_COLUMNS } from "./constants";
 
 export interface UseTokenSelectorOptions {
 	value: string;
@@ -164,7 +121,7 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 
 	const table = useReactTable({
 		data: sortedMarkets,
-		columns,
+		columns: TOKEN_SELECTOR_COLUMNS,
 		getCoreRowModel: getCoreRowModel(),
 		manualSorting: true,
 		state: { sorting },

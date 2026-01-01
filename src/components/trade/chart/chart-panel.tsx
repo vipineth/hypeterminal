@@ -9,6 +9,7 @@ import { calculateOpenInterestUSD } from "@/lib/market";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/providers/theme";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
+import { QUOTE_ASSET } from "./constants";
 import { StatBlock } from "./stat-block";
 import { TokenSelector } from "./token-selector";
 import { TradingViewChart } from "./trading-view-chart";
@@ -82,7 +83,7 @@ export function ChartPanel() {
 
 			<div className="flex-1 min-h-0">
 				<ClientOnly>
-					<TradingViewChart symbol={`${selectedCoin}/USDC`} theme={theme === "dark" ? "dark" : "light"} />
+					<TradingViewChart symbol={`${selectedCoin}/${QUOTE_ASSET}`} theme={theme === "dark" ? "dark" : "light"} />
 				</ClientOnly>
 			</div>
 		</div>
