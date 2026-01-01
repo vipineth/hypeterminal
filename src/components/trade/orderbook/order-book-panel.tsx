@@ -23,6 +23,48 @@ function parseNumber(value: unknown): number {
 	return Number.NaN;
 }
 
+/**
+ * Generates price grouping options based on the current market price.
+ * Returns an array of tick sizes and their corresponding significant figures.
+ *
+ * For example:
+ * - Price ~$100,000 (BTC) → [100, 10, 1, 0.1]
+ * - Price ~$3,000 (ETH) → [10, 1, 0.1, 0.01]
+ * - Price ~$1 → [0.1, 0.01, 0.001, 0.0001]
+ * - Price ~$0.0001 → [0.00001, 0.000001, 0.0000001, 0.00000001]
+ */
+function generatePriceGroupingOptions(midPrice: number | undefined): Array<{ tickSize: number; nSigFigs: number }> {
+	if (!midPrice || !Number.isFinite(midPrice) || midPrice <= 0) {
+		// Fallback to default sig figs when no price available
+		return [
+			{ tickSize: 0, nSigFigs: 5 },
+			{ tickSize: 0, nSigFigs: 4 },
+			{ tickSize: 0, nSigFigs: 3 },
+			{ tickSize: 0, nSigFigs: 2 },
+		];
+	}
+
+	// Find the order of magnitude of the price
+	const orderOfMagnitude = Math.floor(Math.log10(midPrice));
+
+	// Generate 4 tick size options based on the price
+	const options: Array<{ tickSize: number; nSigFigs: number }> = [];
+
+	// Start from the order of magnitude and go down
+	for (let i = 0; i < 4; i++) {
+		const exponent = orderOfMagnitude - i - 1;
+		const tickSize = Math.pow(10, exponent);
+
+		// Calculate corresponding sig figs
+		// More precision (smaller tick) = more sig figs
+		const nSigFigs = Math.max(2, Math.min(5, 5 - i));
+
+		options.push({ tickSize, nSigFigs: nSigFigs as 2 | 3 | 4 | 5 });
+	}
+
+	return options;
+}
+
 function buildOrderBookRows(
 	levels: Array<{ px: unknown; sz: unknown }> | undefined,
 	side: "bid" | "ask",
@@ -106,6 +148,8 @@ export function OrderBookPanel() {
 		return (spread / mid) * 100;
 	}, [spread, mid]);
 
+	const priceGroupingOptions = useMemo(() => generatePriceGroupingOptions(mid), [mid]);
+
 	return (
 		<div className="h-full min-h-0 flex flex-col overflow-hidden border-l border-border/40">
 			<div className="flex items-center justify-between px-2 py-1.5 border-b border-border/40 bg-surface/30">
@@ -143,15 +187,23 @@ export function OrderBookPanel() {
 							tabIndex={0}
 							aria-label="Select order book aggregation"
 						>
-							{nSigFigs ? `${nSigFigs} sig figs` : "Auto"}
+							{nSigFigs ? (
+								priceGroupingOptions.find((opt) => opt.nSigFigs === nSigFigs)?.tickSize ? (
+									formatNumber(priceGroupingOptions.find((opt) => opt.nSigFigs === nSigFigs)!.tickSize, 8)
+								) : (
+									`${nSigFigs} sig figs`
+								)
+							) : (
+								"Auto"
+							)}
 							<ChevronDown className="size-2.5" />
 						</button>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end" className="w-20 font-mono text-xs">
+					<DropdownMenuContent align="end" className="w-24 font-mono text-xs">
 						<DropdownMenuItem onClick={() => setNSigFigs(undefined)}>Auto</DropdownMenuItem>
-						{[5, 4, 3, 2].map((n) => (
-							<DropdownMenuItem key={n} onClick={() => setNSigFigs(n as 2 | 3 | 4 | 5)}>
-								{n} sig figs
+						{priceGroupingOptions.map((option) => (
+							<DropdownMenuItem key={option.nSigFigs} onClick={() => setNSigFigs(option.nSigFigs as 2 | 3 | 4 | 5)}>
+								{option.tickSize > 0 ? formatNumber(option.tickSize, 8) : `${option.nSigFigs} sig figs`}
 							</DropdownMenuItem>
 						))}
 					</DropdownMenuContent>
