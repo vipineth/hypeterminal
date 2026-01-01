@@ -1,11 +1,74 @@
 import { ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useConnection } from "wagmi";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
+import { formatPercent, formatUSD } from "@/lib/format";
 import { cn } from "@/lib/utils";
+
+function parseNumber(value: unknown): number {
+	if (typeof value === "number") return value;
+	if (typeof value === "string") {
+		const parsed = Number.parseFloat(value);
+		return Number.isFinite(parsed) ? parsed : 0;
+	}
+	return 0;
+}
 
 export function AccountPanel() {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [activeTab, setActiveTab] = useState<"perps" | "spot">("perps");
+
+	const { address, isConnected } = useConnection();
+	const { data: clearinghouse } = useClearinghouseState({
+		user: address,
+		enabled: isConnected,
+	});
+
+	// Calculate account metrics from clearinghouse data
+	const accountMetrics = useMemo(() => {
+		if (!clearinghouse?.crossMarginSummary) {
+			return null;
+		}
+
+		const summary = clearinghouse.crossMarginSummary;
+
+		const accountValue = parseNumber(summary.accountValue);
+		const totalNtlPos = parseNumber(summary.totalNtlPos);
+		const totalMarginUsed = parseNumber(summary.totalMarginUsed);
+		const totalRawUsd = parseNumber(summary.totalRawUsd);
+
+		// Calculate unrealized PNL from positions
+		let unrealizedPnl = 0;
+		for (const pos of clearinghouse.assetPositions ?? []) {
+			unrealizedPnl += parseNumber(pos.position.unrealizedPnl);
+		}
+
+		// Margin ratio = totalMarginUsed / accountValue (as percentage)
+		const marginRatio = accountValue > 0 ? totalMarginUsed / accountValue : 0;
+
+		// Maintenance margin (approximate - usually ~50% of initial margin for cross)
+		const maintMargin = totalMarginUsed * 0.5;
+
+		// Cross leverage = totalNtlPos / accountValue
+		const crossLeverage = accountValue > 0 ? Math.abs(totalNtlPos) / accountValue : 0;
+
+		// Available balance for trading
+		const availableBalance = Math.max(0, accountValue - totalMarginUsed);
+
+		return {
+			accountValue,
+			totalRawUsd,
+			unrealizedPnl,
+			marginRatio,
+			maintMargin,
+			crossLeverage,
+			availableBalance,
+			totalMarginUsed,
+		};
+	}, [clearinghouse]);
+
+	const hasData = isConnected && accountMetrics !== null;
 
 	return (
 		<Collapsible
@@ -34,13 +97,29 @@ export function AccountPanel() {
 					<div className="flex items-center gap-3">
 						<div className="flex items-center gap-1.5">
 							<span className="text-4xs text-muted-foreground uppercase">Equity</span>
-							<span className="text-sm font-semibold tabular-nums text-terminal-green terminal-glow-green">
-								$12,450.23
+							<span
+								className={cn(
+									"text-sm font-semibold tabular-nums",
+									hasData ? "text-terminal-green terminal-glow-green" : "text-muted-foreground",
+								)}
+							>
+								{hasData ? formatUSD(accountMetrics.accountValue) : "-"}
 							</span>
 						</div>
 						<div className="flex items-center gap-1.5">
 							<span className="text-4xs text-muted-foreground uppercase">PNL</span>
-							<span className="text-2xs font-medium tabular-nums text-terminal-green">+$241.12</span>
+							<span
+								className={cn(
+									"text-2xs font-medium tabular-nums",
+									hasData
+										? accountMetrics.unrealizedPnl >= 0
+											? "text-terminal-green"
+											: "text-terminal-red"
+										: "text-muted-foreground",
+								)}
+							>
+								{hasData ? formatUSD(accountMetrics.unrealizedPnl, { signDisplay: "exceptZero" }) : "-"}
+							</span>
 						</div>
 					</div>
 				</button>
@@ -74,39 +153,72 @@ export function AccountPanel() {
 				</div>
 
 				<div className="p-2 space-y-2 max-h-48 overflow-y-auto">
-					<div className="border border-border/40 divide-y divide-border/40 text-3xs">
-						{[
-							["Balance", "$11,203.12"],
-							["Unrealized PNL", "+$241.12", "text-terminal-green"],
-							["Margin Ratio", "12.3%"],
-							["Maint. Margin", "$642.20"],
-							["Leverage", "3.2x", "text-terminal-cyan"],
-						].map(([k, v, cls]) => (
-							<div key={k} className="flex items-center justify-between px-2 py-1.5">
-								<span className="text-muted-foreground">{k}</span>
-								<span className={cn("tabular-nums", cls)}>{v}</span>
+					{!isConnected ? (
+						<div className="text-3xs text-muted-foreground text-center py-4">
+							Connect wallet to view account
+						</div>
+					) : !hasData ? (
+						<div className="text-3xs text-muted-foreground text-center py-4">Loading...</div>
+					) : (
+						<>
+							<div className="border border-border/40 divide-y divide-border/40 text-3xs">
+								<div className="flex items-center justify-between px-2 py-1.5">
+									<span className="text-muted-foreground">Balance</span>
+									<span className="tabular-nums">{formatUSD(accountMetrics.totalRawUsd)}</span>
+								</div>
+								<div className="flex items-center justify-between px-2 py-1.5">
+									<span className="text-muted-foreground">Unrealized PNL</span>
+									<span
+										className={cn(
+											"tabular-nums",
+											accountMetrics.unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red",
+										)}
+									>
+										{formatUSD(accountMetrics.unrealizedPnl, { signDisplay: "exceptZero" })}
+									</span>
+								</div>
+								<div className="flex items-center justify-between px-2 py-1.5">
+									<span className="text-muted-foreground">Available</span>
+									<span className="tabular-nums">{formatUSD(accountMetrics.availableBalance)}</span>
+								</div>
+								<div className="flex items-center justify-between px-2 py-1.5">
+									<span className="text-muted-foreground">Margin Used</span>
+									<span className="tabular-nums">{formatUSD(accountMetrics.totalMarginUsed)}</span>
+								</div>
+								<div className="flex items-center justify-between px-2 py-1.5">
+									<span className="text-muted-foreground">Margin Ratio</span>
+									<span className="tabular-nums">
+										{formatPercent(accountMetrics.marginRatio, { maximumFractionDigits: 1 })}
+									</span>
+								</div>
+								<div className="flex items-center justify-between px-2 py-1.5">
+									<span className="text-muted-foreground">Cross Leverage</span>
+									<span className="tabular-nums text-terminal-cyan">
+										{accountMetrics.crossLeverage.toFixed(2)}x
+									</span>
+								</div>
 							</div>
-						))}
-					</div>
 
-					<div className="grid grid-cols-2 gap-1">
-						<button
-							type="button"
-							className="py-1.5 text-3xs uppercase tracking-wider border border-terminal-green/40 text-terminal-green hover:bg-terminal-green/10 transition-colors"
-							tabIndex={0}
-							aria-label="Deposit"
-						>
-							Deposit
-						</button>
-						<button
-							type="button"
-							className="py-1.5 text-3xs uppercase tracking-wider border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
-							tabIndex={0}
-							aria-label="Withdraw"
-						>
-							Withdraw
-						</button>
-					</div>
+							<div className="grid grid-cols-2 gap-1">
+								<button
+									type="button"
+									className="py-1.5 text-3xs uppercase tracking-wider border border-terminal-green/40 text-terminal-green hover:bg-terminal-green/10 transition-colors"
+									tabIndex={0}
+									aria-label="Deposit"
+								>
+									Deposit
+								</button>
+								<button
+									type="button"
+									className="py-1.5 text-3xs uppercase tracking-wider border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+									tabIndex={0}
+									aria-label="Withdraw"
+								>
+									Withdraw
+								</button>
+							</div>
+						</>
+					)}
 				</div>
 			</CollapsibleContent>
 		</Collapsible>
