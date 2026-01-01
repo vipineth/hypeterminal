@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { getTokenIconUrl, isTokenInCategory, marketCategories } from "@/config/token";
-import { formatPercent, formatUSD } from "@/lib/format";
+import { formatPercent, formatPrice, formatUSD } from "@/lib/format";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
 import { cn } from "@/lib/utils";
 import { QUOTE_ASSET } from "./constants";
@@ -222,7 +222,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 											</div>
 											<div className="w-20 text-right">
 												<span className="text-2xs font-medium tabular-nums">
-													{formatUSD(market.ctx?.markPx ? Number(market.ctx.markPx) : null)}
+													{formatPrice(market.ctx?.markPx ? Number(market.ctx.markPx) : null, { szDecimals: market.szDecimals })}
 												</span>
 											</div>
 											<div className="w-20 text-right">

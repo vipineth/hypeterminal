@@ -15,7 +15,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
 import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
 import { useTradingAgent } from "@/hooks/use-trading-agent";
-import { formatUSD } from "@/lib/format";
+import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import {
 	ensureLeverage,
 	getHttpTransport,
@@ -361,10 +361,11 @@ export function OrderEntryPanel() {
 
 	const handleMarkPriceClick = useCallback(() => {
 		if (markPx > 0) {
-			const formatted = formatPriceForOrder(markPx);
-			setLimitPriceInput(formatted);
+			// Use szDecimals to derive price decimals for input
+			const decimals = szDecimalsToPriceDecimals(market?.szDecimals ?? 4);
+			setLimitPriceInput(markPx.toFixed(decimals));
 		}
-	}, [markPx]);
+	}, [markPx, market?.szDecimals]);
 
 	// Handle chain switch
 	const handleSwitchChain = useCallback(() => {
@@ -751,7 +752,7 @@ export function OrderEntryPanel() {
 									onClick={handleMarkPriceClick}
 									className="text-4xs text-muted-foreground hover:text-terminal-cyan tabular-nums"
 								>
-									Mark: {formatUSD(markPx, { compact: false })}
+									Mark: {formatPrice(markPx, { szDecimals: market?.szDecimals })}
 								</button>
 							)}
 						</div>
@@ -835,7 +836,7 @@ export function OrderEntryPanel() {
 					<div className="flex items-center justify-between px-2 py-1.5">
 						<span className="text-muted-foreground">Liq. Price</span>
 						<span className={cn("tabular-nums", liqWarning ? "text-terminal-red" : "text-terminal-red/70")}>
-							{liqPrice ? formatUSD(liqPrice) : "-"}
+							{liqPrice ? formatPrice(liqPrice, { szDecimals: market?.szDecimals }) : "-"}
 						</span>
 					</div>
 					<div className="flex items-center justify-between px-2 py-1.5">

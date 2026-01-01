@@ -2,8 +2,8 @@ import { Timer } from "lucide-react";
 import { useMemo } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useTwapHistory } from "@/hooks/hyperliquid";
-import { formatNumber, formatUSD } from "@/lib/format";
+import { usePerpMarketRegistry, useTwapHistory } from "@/hooks/hyperliquid";
+import { formatNumber, formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useConnection } from "wagmi";
 
@@ -19,6 +19,7 @@ function parseNumber(value: unknown): number {
 export function TwapTab() {
 	const { address, isConnected } = useConnection();
 	const { data, status, error } = useTwapHistory({ user: isConnected ? address : undefined });
+	const { registry } = usePerpMarketRegistry();
 
 	const orders = useMemo(() => {
 		const raw = data ?? [];
@@ -87,6 +88,8 @@ export function TwapTab() {
 									const totalSize = parseNumber(t.state.sz);
 									const executedSize = parseNumber(t.state.executedSz);
 									const executedNtl = parseNumber(t.state.executedNtl);
+									const marketInfo = registry?.coinToInfo.get(t.state.coin);
+									const szDecimals = marketInfo?.szDecimals ?? 4;
 
 									const avgPrice =
 										Number.isFinite(executedNtl) && Number.isFinite(executedSize) && executedSize !== 0
@@ -136,7 +139,7 @@ export function TwapTab() {
 												{Number.isFinite(executedSize) ? formatNumber(executedSize, 4) : String(t.state.executedSz)}
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
-												{Number.isFinite(avgPrice) ? formatUSD(avgPrice) : "-"}
+												{Number.isFinite(avgPrice) ? formatPrice(avgPrice, { szDecimals }) : "-"}
 											</TableCell>
 											<TableCell className="py-1.5">
 												<div className="flex items-center gap-2">

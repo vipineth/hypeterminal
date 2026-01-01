@@ -2,8 +2,8 @@ import type { ActiveAssetCtxEvent } from "@nktkas/hyperliquid/api/subscription";
 import { Star } from "lucide-react";
 import { useMemo } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { useActiveAssetCtxSubscription, useAllMidsSubscription } from "@/hooks/hyperliquid";
-import { formatPercent, formatUSD } from "@/lib/format";
+import { useActiveAssetCtxSubscription, useAllMidsSubscription, usePerpMarketRegistry } from "@/hooks/hyperliquid";
+import { formatPercent, formatPrice } from "@/lib/format";
 import { isPerpMarketKey, type PerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid";
 import { cn } from "@/lib/utils";
 import { useFavoriteMarketKeys, useMarketPrefsActions, useSelectedMarketKey } from "@/stores/use-market-prefs-store";
@@ -14,11 +14,13 @@ type FavoriteData = {
 	marketKey: PerpMarketKey;
 	coin: string;
 	price: string | undefined;
+	szDecimals: number;
 };
 
 export function FavoritesStrip() {
 	const favorites = useFavoriteMarketKeys();
 	const selectedMarketKey = useSelectedMarketKey();
+	const { registry } = usePerpMarketRegistry();
 	const { data: mids } = useAllMidsSubscription<Record<string, string> | undefined>({
 		select: (event) => event?.mids,
 	});
@@ -28,15 +30,17 @@ export function FavoritesStrip() {
 			.map((marketKey) => {
 				if (!isPerpMarketKey(marketKey)) return null;
 				const coin = perpCoinFromMarketKey(marketKey);
+				const marketInfo = registry?.coinToInfo.get(coin);
 
 				return {
 					marketKey,
 					coin,
 					price: mids?.[coin],
+					szDecimals: marketInfo?.szDecimals ?? 4,
 				};
 			})
 			.filter((x): x is FavoriteData => x !== null);
-	}, [favorites, mids]);
+	}, [favorites, mids, registry]);
 
 	return (
 		<div className="py-1.5 border-b border-border/60 bg-surface/20">
@@ -69,7 +73,7 @@ type FavoriteChipProps = FavoriteData & {
 	isActive: boolean;
 };
 
-function FavoriteChip({ marketKey, coin, price, isActive }: FavoriteChipProps) {
+function FavoriteChip({ marketKey, coin, price, szDecimals, isActive }: FavoriteChipProps) {
 	const { setSelectedMarketKey } = useMarketPrefsActions();
 	const { data: assetCtx } = useActiveAssetCtxSubscription({
 		params: { coin },
@@ -104,7 +108,7 @@ function FavoriteChip({ marketKey, coin, price, isActive }: FavoriteChipProps) {
 			)}
 		>
 			<span className={cn("font-medium", isActive ? "text-terminal-cyan" : "text-foreground")}>{coin}</span>
-			{price && <span className="text-muted-foreground tabular-nums">{formatUSD(parseFloat(price))}</span>}
+			{price && <span className="text-muted-foreground tabular-nums">{formatPrice(parseFloat(price), { szDecimals })}</span>}
 			{assetCtx && (
 				<span className={cn("tabular-nums font-medium", isPositive ? "text-terminal-green" : "text-terminal-red")}>
 					{formatPercent(changePct / 100, {

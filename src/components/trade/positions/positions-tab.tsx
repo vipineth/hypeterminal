@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { formatPercent, formatToken, formatUSD } from "@/lib/format";
+import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
 import { useClearinghouseState, usePerpAssetCtxsSnapshot, usePerpMarketRegistry } from "@/hooks/hyperliquid";
 import { useConnection } from "wagmi";
 
@@ -101,7 +101,9 @@ export function PositionsTab() {
 									const roe = parseNumber(p.returnOnEquity);
 									const liquidationPx = p.liquidationPx ? parseNumber(p.liquidationPx) : Number.NaN;
 
-									const assetIndex = registry?.coinToAssetIndex.get(p.coin);
+									const marketInfo = registry?.coinToInfo.get(p.coin);
+									const szDecimals = marketInfo?.szDecimals ?? 4;
+									const assetIndex = marketInfo?.assetIndex;
 									const markPxRaw = typeof assetIndex === "number" ? snapshotCtxs?.[assetIndex]?.markPx : undefined;
 									const markPx = markPxRaw ? parseNumber(markPxRaw) : Number.NaN;
 
@@ -123,16 +125,16 @@ export function PositionsTab() {
 												</div>
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
-												{Number.isFinite(size) ? formatToken(Math.abs(size), 2) : "-"}
+												{Number.isFinite(size) ? formatToken(Math.abs(size), szDecimals) : "-"}
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
 												{Number.isFinite(positionValue) ? formatUSD(Math.abs(positionValue), { compact: true }) : "-"}
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
-												{Number.isFinite(entryPx) ? formatUSD(entryPx) : "-"}
+												{Number.isFinite(entryPx) ? formatPrice(entryPx, { szDecimals }) : "-"}
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
-												{Number.isFinite(markPx) ? formatUSD(markPx) : "-"}
+												{Number.isFinite(markPx) ? formatPrice(markPx, { szDecimals }) : "-"}
 											</TableCell>
 											<TableCell className="text-right py-1.5">
 												<div
@@ -148,7 +150,7 @@ export function PositionsTab() {
 												</div>
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums text-terminal-red/70 py-1.5">
-												{Number.isFinite(liquidationPx) ? formatUSD(liquidationPx) : "-"}
+												{Number.isFinite(liquidationPx) ? formatPrice(liquidationPx, { szDecimals }) : "-"}
 											</TableCell>
 											<TableCell className="text-right py-1.5">
 												<div className="flex justify-end gap-1">
