@@ -15,6 +15,7 @@ export const hyperliquidKeys = {
 	userFills: (address: string) => [...hyperliquidKeys.user(address), "fills"] as const,
 	userFunding: (address: string) => [...hyperliquidKeys.user(address), "funding"] as const,
 	twapHistory: (address: string) => [...hyperliquidKeys.user(address), "twapHistory"] as const,
+	extraAgents: (address: string) => [...hyperliquidKeys.user(address), "extraAgents"] as const,
 
 	trades: (coin: string) => [...hyperliquidKeys.all, "trades", coin] as const,
 } as const;

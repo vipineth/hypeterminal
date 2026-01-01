@@ -62,7 +62,7 @@ const DEFAULT_DEFAULT_LEVERAGE_BY_MODE: Record<MarginMode, number> = {
 	isolated: 10,
 };
 
-const DEFAULT_MARKET_ORDER_SLIPPAGE_BPS = 30;
+const DEFAULT_MARKET_ORDER_SLIPPAGE_BPS = 25;
 
 interface TradeSettingsStore {
 	defaultLeverageByMode: Record<MarginMode, number>;
@@ -126,7 +126,7 @@ const useTradeSettingsStore = create<TradeSettingsStore>()(
 					});
 				},
 				setMarketOrderSlippageBps: (bps) => {
-					set({ marketOrderSlippageBps: clampInt(bps, 20, 50) });
+					set({ marketOrderSlippageBps: clampInt(bps, 10, 500) });
 				},
 			},
 		}),
@@ -147,8 +147,8 @@ const useTradeSettingsStore = create<TradeSettingsStore>()(
 				},
 				marketOrderSlippageBps: clampInt(
 					(persisted as Partial<TradeSettingsStore>)?.marketOrderSlippageBps ?? DEFAULT_MARKET_ORDER_SLIPPAGE_BPS,
-					20,
-					50,
+					10,
+					500,
 				),
 			}),
 		},
