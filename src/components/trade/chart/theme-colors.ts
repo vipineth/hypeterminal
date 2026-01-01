@@ -3,6 +3,8 @@
  * This ensures the chart colors stay in sync with the app theme
  */
 
+import type { ColorGradient, CustomThemeColors } from "@/types/charting_library";
+
 type ChartColors = {
 	background: string;
 	foreground: string;
@@ -212,13 +214,13 @@ export function getToolbarBgColor(): string {
  * Generates a gradient array of 19 shades from a base color
  * TradingView custom_themes requires 19 shades from lightest to darkest
  */
-function generateColorGradient(baseHex: string): string[] {
+function generateColorGradient(baseHex: string): ColorGradient {
 	// Parse hex to RGB
 	const r = Number.parseInt(baseHex.slice(1, 3), 16);
 	const g = Number.parseInt(baseHex.slice(3, 5), 16);
 	const b = Number.parseInt(baseHex.slice(5, 7), 16);
 
-	const shades: string[] = [];
+	const shades = new Array<string>(19);
 
 	// Generate 19 shades from light (index 0) to dark (index 18)
 	// The base color is typically around index 9-10
@@ -249,27 +251,17 @@ function generateColorGradient(baseHex: string): string[] {
 		}
 
 		const hex = `#${newR.toString(16).padStart(2, "0")}${newG.toString(16).padStart(2, "0")}${newB.toString(16).padStart(2, "0")}`;
-		shades.push(hex);
+		shades[i] = hex;
 	}
 
-	return shades;
+	return shades as ColorGradient;
 }
 
 /**
  * Generates custom theme colors for TradingView widget
  * This provides a complete color palette that matches the app theme
  */
-export function getCustomThemeColors(): {
-	color1: string[];
-	color2: string[];
-	color3: string[];
-	color4: string[];
-	color5: string[];
-	color6: string[];
-	color7: string[];
-	white: string;
-	black: string;
-} {
+export function getCustomThemeColors(): CustomThemeColors {
 	const colors = getChartColors();
 
 	const accent = colorToHex(colors.accent);
@@ -294,11 +286,31 @@ export function getCustomThemeColors(): {
 	};
 }
 
+// Cache for the fetched static CSS
+let staticCssCache: string | null = null;
+
 /**
- * Generates a blob URL containing CSS variable overrides for colors
- * Imports static styles from /tradingview-theme.css
+ * Fetches the static TradingView theme CSS file
  */
-export function generateChartCssUrl(): string {
+async function fetchStaticCss(): Promise<string> {
+	if (staticCssCache) return staticCssCache;
+
+	try {
+		const response = await fetch("/tradingview-theme.css");
+		if (!response.ok) throw new Error("Failed to fetch CSS");
+		staticCssCache = await response.text();
+		return staticCssCache;
+	} catch (error) {
+		console.error("Failed to load tradingview-theme.css:", error);
+		return "";
+	}
+}
+
+/**
+ * Generates a blob URL containing the complete CSS (static + dynamic variables)
+ * This inlines the static CSS to avoid @import issues in blob URLs
+ */
+export async function generateChartCssUrl(): Promise<string> {
 	const colors = getChartColors();
 
 	const bg = colorToHex(colors.background);
@@ -307,11 +319,18 @@ export function generateChartCssUrl(): string {
 	const border = colorToHex(colors.border);
 	const accent = colorToHex(colors.accent);
 	const hoverBg = colorToRgba(colors.foreground, 0.06);
+	const borderSoft = colorToRgba(colors.border, 0.6);
+	const accentSoft = colorToRgba(colors.accent, 0.18);
 
-	// Import static styles and override CSS variables with current theme colors
+	// Fetch and inline the static CSS
+	const staticCss = await fetchStaticCss();
+
+	// Combine static styles with dynamic CSS variable overrides
 	const css = `
-@import url("/tradingview-theme.css");
+/* Static theme styles */
+${staticCss}
 
+/* Dynamic color overrides */
 :root {
 	--tv-bg: ${bg};
 	--tv-fg: ${fg};
@@ -319,6 +338,8 @@ export function generateChartCssUrl(): string {
 	--tv-border: ${border};
 	--tv-hover: ${hoverBg};
 	--tv-accent: ${accent};
+	--tv-color-toolbar-button-background-hover: ${borderSoft};
+	--tv-color-toolbar-divider-background: ${accentSoft};
 }
 `;
 

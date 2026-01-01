@@ -96,7 +96,7 @@ export function TradingViewChart({ symbol = "AAVE/USDC", interval = "60", theme 
 				const overrides = buildChartOverrides();
 				const loadingColors = getLoadingScreenColors();
 				const toolbarBg = getToolbarBgColor();
-				const customCssUrl = generateChartCssUrl();
+				const customCssUrl = await generateChartCssUrl();
 				const themeColors = getCustomThemeColors();
 				cssUrlRef.current = customCssUrl;
 
