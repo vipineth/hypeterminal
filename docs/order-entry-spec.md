@@ -2,7 +2,7 @@
 
 **Goal**
 - Make `src/components/trade/order-entry/order-entry-panel.tsx` fully functional for perp trading in cross mode: show withdrawable balance and current position, compute max size and drive a size slider, and place market/limit orders via `@nktkas/hyperliquid` with correct signing and rounding.
-- Follow `UI-UX-GUIDELINES.md` for all UI decisions (no new colors, keep density, use shadcn components).
+- Follow `docs/ui-ux-guidelines.md` for all UI decisions (no new colors, keep density, use shadcn components).
 
 **Relevant Code**
 - `src/components/trade/order-entry/order-entry-panel.tsx`

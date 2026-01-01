@@ -1,11 +1,11 @@
 import { Wallet } from "lucide-react";
 import { useMemo } from "react";
+import { useConnection } from "wagmi";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { formatToken, formatUSD } from "@/lib/format";
 import { useClearinghouseState, useSpotClearinghouseState } from "@/hooks/hyperliquid";
+import { formatToken, formatUSD } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { useConnection } from "wagmi";
 
 type BalanceRow = {
 	asset: string;
@@ -127,7 +127,9 @@ export function BalancesTab() {
 						<Table>
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">Asset</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
+										Asset
+									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
 										Available
 									</TableHead>
