@@ -86,6 +86,42 @@ src/components/<feature>/
 - Use loaders for data fetching when it matches the route boundary.
 - Never edit `src/routeTree.gen.ts` (auto-generated).
 
+## SEO
+Every route should define SEO metadata using the `buildPageHead` helper from `src/lib/seo.ts`.
+
+### Required for each route
+- **`title`**: concise page title (suffixed with site name automatically).
+- **`description`**: 120–155 characters summarizing the page content.
+- **`path`**: canonical URL path (e.g., `"/trade"`).
+
+Note: Site name is "HypeTerminal" (Hype = Hyperliquid ticker).
+
+### Optional
+- **`keywords`**: page-specific keywords (base keywords are included by default).
+- **`noIndex`**: set `true` for internal/dev pages (e.g., `/components`).
+- **`ogImage`**: custom Open Graph image URL.
+
+### Example
+```ts
+export const Route = createFileRoute("/trade")({
+  head: () =>
+    buildPageHead({
+      title: "Trade",
+      description: "Trade perpetuals on Hyperliquid with real-time charts.",
+      path: "/trade",
+      keywords: ["perpetuals", "orderbook"],
+    }),
+  component: TradePage,
+});
+```
+
+### SEO checklist
+- Descriptions should be unique per page and avoid keyword stuffing.
+- Use `noIndex: true` for pages that shouldn't appear in search results.
+- Keep titles under 60 characters (before site name suffix).
+- Ensure canonical URLs match the deployed route structure.
+- Update `SEO_DEFAULTS` in `src/lib/seo.ts` when site-wide values change.
+
 ## Config, constants, providers
 - `src/config/` for external integrations (wagmi, API clients, env wiring).
 - `src/constants/` for static values used across features.

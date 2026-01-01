@@ -5,12 +5,21 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { buildPageHead } from "@/lib/seo";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "@/providers/theme";
 
 export const Route = createFileRoute("/components")({
+	head: () =>
+		buildPageHead({
+			title: "Components",
+			description: "UI component showcase for HypeTerminal design system. Explore buttons, badges, cards, and trading-specific components.",
+			path: "/components",
+			keywords: ["components", "design system", "ui"],
+			noIndex: true,
+		}),
 	component: ComponentShowcase,
 });
 
