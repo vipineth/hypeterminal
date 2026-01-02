@@ -33,11 +33,7 @@ export function PositionsTab() {
 	const [closingKey, setClosingKey] = useState<string | null>(null);
 	const [actionError, setActionError] = useState<string | null>(null);
 
-	const signer = useMemo(() => {
-		if (apiWalletSigner) return apiWalletSigner;
-		if (!walletClient) return null;
-		return toHyperliquidWallet(walletClient);
-	}, [apiWalletSigner, walletClient]);
+	const signer = apiWalletSigner ?? (walletClient ? toHyperliquidWallet(walletClient) : null);
 
 	const positions = useMemo(() => {
 		const raw = state?.assetPositions ?? [];

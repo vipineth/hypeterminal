@@ -32,13 +32,8 @@ export function OrdersTab() {
 	const [actionError, setActionError] = useState<string | null>(null);
 	const [isCancelling, setIsCancelling] = useState(false);
 
-	const signer = useMemo(() => {
-		if (apiWalletSigner) return apiWalletSigner;
-		if (!walletClient) return null;
-		return toHyperliquidWallet(walletClient);
-	}, [apiWalletSigner, walletClient]);
-
-	const openOrders = useMemo(() => data ?? [], [data]);
+	const signer = apiWalletSigner ?? (walletClient ? toHyperliquidWallet(walletClient) : null);
+	const openOrders = data ?? [];
 	const headerCount = isConnected ? openOrders.length : FALLBACK_VALUE_PLACEHOLDER;
 
 	useEffect(() => {

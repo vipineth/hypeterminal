@@ -1,5 +1,4 @@
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { type Connector, useConnect } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -14,11 +13,7 @@ interface WalletDialogProps {
 
 export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
 	const { connectors, connect, isPending, error } = useConnect();
-	const [hasConnector, setHasConnector] = useState(false);
-
-	useEffect(() => {
-		setHasConnector(connectors.length > 0);
-	}, [connectors]);
+	const hasConnector = connectors.length > 0;
 
 	const handleConnect = (connector: Connector) => {
 		connect({ connector });

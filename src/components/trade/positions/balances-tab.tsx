@@ -80,7 +80,7 @@ export function BalancesTab() {
 		return rows;
 	}, [perpData, spotData]);
 
-	const totalValue = useMemo(() => balances.reduce((acc, b) => acc + b.usdValue, 0), [balances]);
+	const totalValue = balances.reduce((acc, b) => acc + b.usdValue, 0);
 	const displayRows = useMemo(() => {
 		return balances.map((balance) => {
 			const decimals = balance.asset === "USDC" ? 2 : 5;

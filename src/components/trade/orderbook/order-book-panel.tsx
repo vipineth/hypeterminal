@@ -161,19 +161,11 @@ export function OrderBookPanel() {
 
 	const priceGroupingOptions = useMemo(() => generatePriceGroupingOptions(mid), [mid]);
 
-	const prevCoinRef = useRef(coin);
 	useEffect(() => {
-		if (prevCoinRef.current !== coin) {
-			prevCoinRef.current = coin;
-			if (priceGroupingOptions.length > 0) {
-				setSelectedOption(priceGroupingOptions[0]);
-			}
-		}
-
 		if (selectedOption === null && priceGroupingOptions.length > 0) {
 			setSelectedOption(priceGroupingOptions[0]);
 		}
-	}, [coin, priceGroupingOptions, selectedOption]);
+	}, [priceGroupingOptions, selectedOption]);
 
 	return (
 		<div className="h-full min-h-0 flex flex-col overflow-hidden border-l border-border/40">
@@ -335,7 +327,7 @@ export function OrderBookPanel() {
 					) : null}
 				</div>
 			) : (
-				<TradesView />
+				<TradesView key={coin} />
 			)}
 		</div>
 	);

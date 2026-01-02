@@ -6,7 +6,29 @@ import { type OrderQueueItem, useOrderQueue, useOrderQueueActions } from "@/stor
 
 const ORDER_TOAST_TEXT = UI_TEXT.ORDER_TOAST;
 
+function useAutoRemove(order: OrderQueueItem, onRemove: () => void) {
+	useEffect(() => {
+		if (order.status !== "success" || !order.completedAt) return;
+
+		const elapsed = Date.now() - order.completedAt;
+		const remaining = ORDER_TOAST_SUCCESS_DURATION_MS - elapsed;
+
+		// Already expired, remove immediately
+		if (remaining <= 0) {
+			onRemove();
+			return;
+		}
+
+		// Schedule removal
+		const timer = setTimeout(onRemove, remaining);
+		return () => clearTimeout(timer);
+	}, [order.status, order.completedAt, onRemove]);
+}
+
 function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () => void }) {
+	// Auto-remove successful orders after duration
+	useAutoRemove(order, onRemove);
+
 	const sideColor = order.side === "buy" ? "text-terminal-green" : "text-terminal-red";
 	const sideBg = order.side === "buy" ? "bg-terminal-green/10" : "bg-terminal-red/10";
 	const sideGlow = order.side === "buy" ? "terminal-glow-green" : "terminal-glow-red";
@@ -112,32 +134,6 @@ function CountdownBar({ order }: { order: OrderQueueItem }) {
 export function OrderToast() {
 	const orders = useOrderQueue();
 	const { removeOrder } = useOrderQueueActions();
-
-	useEffect(() => {
-		const timers: NodeJS.Timeout[] = [];
-
-		for (const order of orders) {
-			if (order.status === "success" && order.completedAt) {
-				const elapsed = Date.now() - order.completedAt;
-				const remaining = ORDER_TOAST_SUCCESS_DURATION_MS - elapsed;
-
-				if (remaining > 0) {
-					const timer = setTimeout(() => {
-						removeOrder(order.id);
-					}, remaining);
-					timers.push(timer);
-				} else {
-					removeOrder(order.id);
-				}
-			}
-		}
-
-		return () => {
-			for (const timer of timers) {
-				clearTimeout(timer);
-			}
-		};
-	}, [orders, removeOrder]);
 
 	if (orders.length === 0) return null;
 

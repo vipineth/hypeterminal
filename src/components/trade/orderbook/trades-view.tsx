@@ -20,20 +20,13 @@ export function TradesView() {
 	const coin = selectedMarket?.coin ?? "BTC";
 	const szDecimals = selectedMarket?.szDecimals ?? 4;
 	const { data: tradesBatch, status, error } = useTradesSubscription({ params: { coin } });
-
-	const [tradeState, setTradeState] = useState<{ coin: string; trades: Trade[] }>({ coin, trades: [] });
-	const trades = tradeState.coin === coin ? tradeState.trades : [];
-
-	useEffect(() => {
-		setTradeState((prev) => (prev.coin === coin ? prev : { coin, trades: [] }));
-	}, [coin]);
+	const [trades, setTrades] = useState<Trade[]>([]);
 
 	useEffect(() => {
 		if (!tradesBatch || tradesBatch.length === 0) return;
 
-		setTradeState((prev) => {
-			const base = prev.coin === coin ? prev.trades : [];
-			const merged = [...tradesBatch, ...base];
+		setTrades((prev) => {
+			const merged = [...tradesBatch, ...prev];
 			const seen = new Set<string>();
 			const deduped: Trade[] = [];
 			for (const t of merged) {
@@ -43,9 +36,9 @@ export function TradesView() {
 				deduped.push(t);
 			}
 			deduped.sort((a, b) => b.time - a.time);
-			return { coin, trades: deduped.slice(0, 30) };
+			return deduped.slice(0, 30);
 		});
-	}, [coin, tradesBatch]);
+	}, [tradesBatch]);
 
 	const tradeRows = useMemo(() => {
 		return trades.map((trade) => {

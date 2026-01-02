@@ -1,6 +1,7 @@
 import { ChevronDown, Loader2, TrendingDown, TrendingUp } from "lucide-react";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
+// Note: useEffect still used for selectedPrice sync (store-driven, will fix in Phase 2)
 import { Checkbox } from "@/components/ui/checkbox";
 import {
 	DropdownMenu,
@@ -96,16 +97,10 @@ export function OrderEntryPanel() {
 	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
 	const [depositModalOpen, setDepositModalOpen] = useState(false);
 
-	const [prevMarketKey, setPrevMarketKey] = useState<string | undefined>(undefined);
+	// React 19: Form reset handled by key prop from OrderSidebar
 
-	useEffect(() => {
-		if (market?.marketKey && market.marketKey !== prevMarketKey) {
-			setSizeInput("");
-			setLimitPriceInput("");
-			setPrevMarketKey(market.marketKey);
-		}
-	}, [market?.marketKey, prevMarketKey]);
-
+	// Valid useEffect: Cross-component event from orderbook price click
+	// This responds to user action in another component (similar to external event)
 	useEffect(() => {
 		if (selectedPrice !== null) {
 			setType("limit");
@@ -114,20 +109,18 @@ export function OrderEntryPanel() {
 		}
 	}, [selectedPrice]);
 
-	const availableBalance = useMemo(() => {
-		const accountValue = parseNumber(clearinghouse?.crossMarginSummary?.accountValue) || 0;
-		const marginUsed = parseNumber(clearinghouse?.crossMarginSummary?.totalMarginUsed) || 0;
-		return Math.max(0, accountValue - marginUsed);
-	}, [clearinghouse?.crossMarginSummary?.accountValue, clearinghouse?.crossMarginSummary?.totalMarginUsed]);
+	// React 19: Simple arithmetic - no useMemo needed
+	const accountValue = parseNumber(clearinghouse?.crossMarginSummary?.accountValue) || 0;
+	const marginUsed = parseNumber(clearinghouse?.crossMarginSummary?.totalMarginUsed) || 0;
+	const availableBalance = Math.max(0, accountValue - marginUsed);
 
 	const position = useMemo(() => {
 		if (!clearinghouse?.assetPositions || !market?.coin) return null;
 		return clearinghouse.assetPositions.find((p) => p.position.coin === market.coin);
 	}, [clearinghouse?.assetPositions, market?.coin]);
 
-	const positionSize = useMemo(() => {
-		return parseNumber(position?.position?.szi) || 0;
-	}, [position?.position?.szi]);
+	// React 19: Simple parsing - no useMemo needed
+	const positionSize = parseNumber(position?.position?.szi) || 0;
 
 	const maxLeverage = market?.maxLeverage || DEFAULT_MAX_LEVERAGE;
 
@@ -165,39 +158,24 @@ export function OrderEntryPanel() {
 		return floorToDecimals(maxSizeRaw, market?.szDecimals ?? 0);
 	}, [availableBalance, leverage, price, side, positionSize, market?.szDecimals]);
 
-	const sizeValue = useMemo(() => {
-		const inputValue = parseNumber(sizeInput) || 0;
-		if (sizeMode === "usd" && price > 0) {
-			return inputValue / price;
-		}
-		return inputValue;
-	}, [sizeInput, sizeMode, price]);
+	// React 19: Simple calculations - no useMemo needed
+	const sizeInputValue = parseNumber(sizeInput) || 0;
+	const sizeValue = sizeMode === "usd" && price > 0 ? sizeInputValue / price : sizeInputValue;
 
-	const orderValue = useMemo(() => {
-		return sizeValue * price;
-	}, [sizeValue, price]);
+	const orderValue = sizeValue * price;
 
-	const marginRequired = useMemo(() => {
-		if (!leverage) return 0;
-		return orderValue / leverage;
-	}, [orderValue, leverage]);
+	const marginRequired = leverage ? orderValue / leverage : 0;
 
-	const estimatedFee = useMemo(() => {
-		const feeRate = type === "market" ? ORDER_FEE_RATE_TAKER : ORDER_FEE_RATE_MAKER;
-		return orderValue * feeRate;
-	}, [orderValue, type]);
+	const feeRate = type === "market" ? ORDER_FEE_RATE_TAKER : ORDER_FEE_RATE_MAKER;
+	const estimatedFee = orderValue * feeRate;
 
-	const liqPrice = useMemo(() => {
+	const liqPrice = (() => {
 		if (!price || !sizeValue || !leverage) return null;
-
 		const buffer = price * (1 / leverage) * 0.9;
 		return side === "buy" ? price - buffer : price + buffer;
-	}, [price, sizeValue, leverage, side]);
+	})();
 
-	const liqWarning = useMemo(() => {
-		if (!liqPrice || !price) return false;
-		return Math.abs(liqPrice - price) / price < 0.05;
-	}, [liqPrice, price]);
+	const liqWarning = liqPrice && price ? Math.abs(liqPrice - price) / price < 0.05 : false;
 
 	const canSign = isAgentApproved ? !!apiWalletSigner : !!walletClient;
 
@@ -443,12 +421,11 @@ export function OrderEntryPanel() {
 	// 	[validation.canSubmit, isSubmitting, handleSubmit],
 	// );
 
-	const sliderValue = useMemo(() => {
-		if (!maxSize || maxSize <= 0) return 0;
-		return Math.min(100, (sizeValue / maxSize) * 100);
-	}, [sizeValue, maxSize]);
+	// React 19: Simple calculations - no useMemo needed
+	const sliderValue = !maxSize || maxSize <= 0 ? 0 : Math.min(100, (sizeValue / maxSize) * 100);
 
-	const buttonContent = useMemo(() => {
+	// React 19: Object literal with conditionals - compiler handles this
+	const buttonContent = (() => {
 		if (!isConnected) {
 			return {
 				text: ORDER_TEXT.BUTTON_CONNECT,
@@ -457,7 +434,6 @@ export function OrderEntryPanel() {
 				variant: "cyan" as const,
 			};
 		}
-
 		if (needsChainSwitch) {
 			return {
 				text: isSwitchingChain ? ORDER_TEXT.BUTTON_SWITCHING : ORDER_TEXT.BUTTON_SWITCH_CHAIN,
@@ -492,21 +468,7 @@ export function OrderEntryPanel() {
 			disabled: !validation.canSubmit || isSubmitting,
 			variant: side as "buy" | "sell",
 		};
-	}, [
-		isConnected,
-		needsChainSwitch,
-		isSwitchingChain,
-		handleSwitchChain,
-		availableBalance,
-		side,
-		validation.canSubmit,
-		validation.needsApproval,
-		isSubmitting,
-		isApproving,
-		canApprove,
-		handleSubmit,
-		handleApprove,
-	]);
+	})();
 
 	const isFormDisabled = !isConnected || availableBalance <= 0;
 
