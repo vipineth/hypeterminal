@@ -5,7 +5,6 @@ import type {
 	IChartingLibraryWidget,
 	ResolutionString,
 } from "@/types/charting_library";
-import { createDatafeed } from "./datafeed";
 import {
 	CHART_CUSTOM_FONT_FAMILY,
 	CHART_DISABLED_FEATURES,
@@ -20,6 +19,7 @@ import {
 	DEFAULT_CHART_THEME,
 	TIMEZONE,
 } from "./constants";
+import { createDatafeed } from "./datafeed";
 import {
 	buildChartOverrides,
 	generateChartCssUrl,
@@ -92,12 +92,10 @@ export function TradingViewChart({
 					widgetRef.current.remove();
 				}
 
-				// Clean up previous CSS blob URL
 				if (cssUrlRef.current) {
 					URL.revokeObjectURL(cssUrlRef.current);
 				}
 
-				// Build colors and CSS dynamically from CSS variables
 				const overrides = buildChartOverrides();
 				const loadingColors = getLoadingScreenColors();
 				const toolbarBg = getToolbarBgColor();

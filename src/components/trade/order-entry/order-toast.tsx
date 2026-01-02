@@ -58,9 +58,7 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 				<div className="text-2xs text-muted-foreground">
 					{ORDER_TOAST_TEXT.SIZE_LABEL}: <span className="text-foreground/80 font-medium">{order.size}</span>
 				</div>
-				{order.error && (
-					<div className="text-2xs text-terminal-red terminal-glow-red truncate">{order.error}</div>
-				)}
+				{order.error && <div className="text-2xs text-terminal-red terminal-glow-red truncate">{order.error}</div>}
 			</div>
 
 			{/* Dismiss Button for Failed Orders */}
@@ -115,7 +113,6 @@ export function OrderToast() {
 	const orders = useOrderQueue();
 	const { removeOrder } = useOrderQueueActions();
 
-	// Auto-remove successful orders after delay
 	useEffect(() => {
 		const timers: NodeJS.Timeout[] = [];
 
@@ -156,7 +153,7 @@ export function OrderToast() {
 				"border border-border/60 rounded-lg overflow-hidden",
 				"shadow-2xl shadow-black/20 dark:shadow-black/50",
 				"font-mono",
-				// Glow effect based on status
+
 				pendingCount > 0 && "ring-1 ring-terminal-cyan/30 dark:shadow-[0_0_30px_-5px_oklch(0.78_0.12_195_/_0.2)]",
 				failedCount > 0 &&
 					pendingCount === 0 &&
@@ -171,7 +168,9 @@ export function OrderToast() {
 			<div className="px-3 py-2 border-b border-border/40 bg-muted/30 flex items-center justify-between">
 				<div className="flex items-center gap-2">
 					<Zap className="size-4 text-terminal-cyan terminal-glow-cyan" />
-					<span className="text-xs font-semibold uppercase tracking-wider text-foreground">{ORDER_TOAST_TEXT.TITLE}</span>
+					<span className="text-xs font-semibold uppercase tracking-wider text-foreground">
+						{ORDER_TOAST_TEXT.TITLE}
+					</span>
 				</div>
 				<div className="flex items-center gap-1.5">
 					{pendingCount > 0 && (

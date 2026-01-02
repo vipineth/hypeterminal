@@ -56,32 +56,24 @@ function generatePriceGroupingOptions(midPrice: number | undefined): PriceGroupO
 		];
 	}
 
-	// Number of integer digits in midPrice (e.g., $2 = 1, $95000 = 5)
 	const integerDigits = Math.floor(Math.log10(midPrice)) + 1;
 	const options: PriceGroupOption[] = [];
 
-	// nSigFigs 5 with mantissa options (finest granularity)
-	// tickSize = 10^(integerDigits - 5)
 	const base5 = 10 ** (integerDigits - 5);
 
-	// Base tick (omit mantissa)
 	options.push({ tickSize: base5, nSigFigs: 5, label: formatTickLabel(base5) });
-	// mantissa=2: 2x base tick
+
 	options.push({ tickSize: base5 * 2, nSigFigs: 5, mantissa: 2, label: formatTickLabel(base5 * 2) });
-	// mantissa=5: 5x base tick
+
 	options.push({ tickSize: base5 * 5, nSigFigs: 5, mantissa: 5, label: formatTickLabel(base5 * 5) });
 
-	// nSigFigs 4, 3, 2 (no mantissa allowed)
 	for (let nSigFigs = 4; nSigFigs >= 2; nSigFigs--) {
 		const tickSize = 10 ** (integerDigits - nSigFigs);
 		options.push({ tickSize, nSigFigs: nSigFigs as 2 | 3 | 4, label: formatTickLabel(tickSize) });
 	}
 
-	// Sort by tick size (smallest first)
 	options.sort((a, b) => a.tickSize - b.tickSize);
 
-	// Filter: tick size must be positive and not larger than ~10% of price
-	// No minimum filter - let the API determine valid precision
 	const filtered = options.filter((opt) => opt.tickSize > 0 && opt.tickSize <= midPrice / 10);
 	return filtered.slice(0, 6);
 }
@@ -90,11 +82,9 @@ function formatTickLabel(tickSize: number): string {
 	if (tickSize >= 1) {
 		return tickSize >= 1000 ? `${tickSize / 1000}K` : String(tickSize);
 	}
-	// For small decimals, use enough precision to show significant digits
-	// e.g., 0.0001 -> "0.0001", 0.0002 -> "0.0002", 0.0005 -> "0.0005"
-	// Round to avoid floating point artifacts (e.g., 0.00019999999 -> 0.0002)
+
 	const rounded = Number(tickSize.toPrecision(4));
-	// Convert to string and remove trailing zeros after decimal
+
 	return String(rounded);
 }
 
@@ -106,11 +96,6 @@ export function OrderBookPanel() {
 	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
 	const coin = selectedMarket?.coin ?? "BTC";
 	const szDecimals = selectedMarket?.szDecimals ?? 4;
-
-	// Reset price grouping to auto when market changes
-	useEffect(() => {
-		setSelectedOption(null);
-	}, [coin]);
 
 	const {
 		data: book,
@@ -174,6 +159,20 @@ export function OrderBookPanel() {
 
 	const priceGroupingOptions = useMemo(() => generatePriceGroupingOptions(mid), [mid]);
 
+	const prevCoinRef = useRef(coin);
+	useEffect(() => {
+		if (prevCoinRef.current !== coin) {
+			prevCoinRef.current = coin;
+			if (priceGroupingOptions.length > 0) {
+				setSelectedOption(priceGroupingOptions[0]);
+			}
+		}
+
+		if (selectedOption === null && priceGroupingOptions.length > 0) {
+			setSelectedOption(priceGroupingOptions[0]);
+		}
+	}, [coin, priceGroupingOptions, selectedOption]);
+
 	return (
 		<div className="h-full min-h-0 flex flex-col overflow-hidden border-l border-border/40">
 			<div className="flex items-center justify-between px-2 py-1.5 border-b border-border/40 bg-surface/30">
@@ -203,30 +202,36 @@ export function OrderBookPanel() {
 						{ORDERBOOK_TEXT.TRADES_LABEL}
 					</button>
 				</div>
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<button
-							type="button"
-							className="px-1.5 py-0.5 text-4xs border border-border/60 hover:border-foreground/30 inline-flex items-center gap-1"
-							tabIndex={0}
-							aria-label={ORDERBOOK_TEXT.SELECT_AGGREGATION_ARIA}
-						>
-							{selectedOption?.label ?? ORDERBOOK_TEXT.AUTO_LABEL}
-							<ChevronDown className="size-2.5" />
-						</button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end" className="w-24 font-mono text-xs">
-						<DropdownMenuItem onClick={() => setSelectedOption(null)}>{ORDERBOOK_TEXT.AUTO_LABEL}</DropdownMenuItem>
-						{priceGroupingOptions.map((option) => (
-							<DropdownMenuItem
-								key={`${option.nSigFigs}-${option.mantissa ?? 0}`}
-								onClick={() => setSelectedOption(option)}
+				{view === "book" && (
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<button
+								type="button"
+								className="px-1.5 py-0.5 text-4xs border border-border/60 hover:border-foreground/30 inline-flex items-center gap-1"
+								tabIndex={0}
+								aria-label={ORDERBOOK_TEXT.SELECT_AGGREGATION_ARIA}
 							>
-								{option.label}
-							</DropdownMenuItem>
-						))}
-					</DropdownMenuContent>
-				</DropdownMenu>
+								{selectedOption?.label ?? priceGroupingOptions[0]?.label ?? "—"}
+								<ChevronDown className="size-2.5" />
+							</button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end" className="min-w-20 font-mono text-xs">
+							{priceGroupingOptions.map((option) => {
+								const isSelected =
+									selectedOption?.nSigFigs === option.nSigFigs && selectedOption?.mantissa === option.mantissa;
+								return (
+									<DropdownMenuItem
+										key={`${option.nSigFigs}-${option.mantissa ?? 0}`}
+										onClick={() => setSelectedOption(option)}
+										selected={isSelected}
+									>
+										{option.label}
+									</DropdownMenuItem>
+								);
+							})}
+						</DropdownMenuContent>
+					</DropdownMenu>
+				)}
 			</div>
 
 			{view === "book" ? (

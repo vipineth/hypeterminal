@@ -24,13 +24,11 @@ const BALANCES_TEXT = UI_TEXT.BALANCES_TAB;
 export function BalancesTab() {
 	const { address, isConnected } = useConnection();
 
-	// Get perp clearinghouse for USDC balance
 	const { data: perpData, status: perpStatus } = useClearinghouseState({
 		user: address,
 		enabled: isConnected,
 	});
 
-	// Get spot clearinghouse for token balances
 	const { data: spotData, status: spotStatus } = useSpotClearinghouseState({
 		user: isConnected ? address : undefined,
 	});
@@ -38,13 +36,11 @@ export function BalancesTab() {
 	const balances = useMemo((): BalanceRow[] => {
 		const rows: BalanceRow[] = [];
 
-		// Add perp USDC balance (from cross margin)
 		if (perpData?.crossMarginSummary) {
 			const summary = perpData.crossMarginSummary;
 			const accountValue = parseNumberOrZero(summary.accountValue);
 			const totalMarginUsed = parseNumberOrZero(summary.totalMarginUsed);
 
-			// Only show if there's actual balance
 			if (accountValue > 0) {
 				rows.push({
 					asset: "USDC",
@@ -57,7 +53,6 @@ export function BalancesTab() {
 			}
 		}
 
-		// Add spot token balances
 		if (spotData?.balances) {
 			for (const b of spotData.balances) {
 				const total = parseNumberOrZero(b.total);
@@ -66,8 +61,6 @@ export function BalancesTab() {
 
 				if (total === 0) continue;
 
-				// Skip USDC if we already added it from perp (avoid duplicate)
-				// Spot USDC is separate from perp USDC
 				const available = Math.max(0, total - hold);
 				const usdValue = b.coin === "USDC" ? total : entryNtl;
 
@@ -82,7 +75,6 @@ export function BalancesTab() {
 			}
 		}
 
-		// Sort by USD value descending
 		rows.sort((a, b) => b.usdValue - a.usdValue);
 		return rows;
 	}, [perpData, spotData]);
@@ -171,15 +163,11 @@ export function BalancesTab() {
 												</span>
 											</div>
 										</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums py-1.5">
-											{row.availableText}
-										</TableCell>
+										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.availableText}</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
 											{row.inOrderText}
 										</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums py-1.5">
-											{row.totalText}
-										</TableCell>
+										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.totalText}</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums text-terminal-green py-1.5">
 											{row.usdValueText}
 										</TableCell>

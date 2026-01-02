@@ -4,7 +4,7 @@ export const APP_NAME = "HypeTerminal";
 export const APP_VERSION = "v0.1.0";
 
 export const FALLBACK_VALUE_PLACEHOLDER = "-";
-export const FORMAT_COMPACT_THRESHOLD = 100_000;
+export const FORMAT_COMPACT_THRESHOLD = 10_000;
 export const FORMAT_COMPACT_DEFAULT = true;
 
 export const ORDER_TOAST_SUCCESS_DURATION_MS = 5_000;
