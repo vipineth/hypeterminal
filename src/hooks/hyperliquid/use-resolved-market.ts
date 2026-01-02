@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import type { PerpMarketKey } from "@/lib/hyperliquid/market-key";
 import type { PerpMarketRegistry } from "@/lib/hyperliquid/market-registry";
 import { isPerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
+import { getMarketCtxNumbers, type MarketCtxNumbers } from "@/lib/market";
+import { toFiniteNumber } from "@/lib/trade/numbers";
 import { useSelectedMarketKey } from "@/stores/use-market-prefs-store";
 import type { PerpAssetCtx } from "@/types/hyperliquid";
 import { useActiveAssetCtxSubscription } from "./socket/use-active-asset-ctx-subscription";
@@ -19,7 +21,9 @@ export type ResolvedPerpMarket = {
 	maxLeverage?: number;
 	isDelisted?: boolean;
 	ctx?: PerpAssetCtx;
+	ctxNumbers?: MarketCtxNumbers | null;
 	midPx?: string;
+	midPxNumber?: number | null;
 };
 
 export type ResolvedMarket = ResolvedPerpMarket;
@@ -76,6 +80,10 @@ export function useResolvedMarket(marketKey: string | undefined, options?: UseRe
 	const resolved = useMemo<ResolvedMarket | undefined>(() => {
 		if (!perpMarketKey || !coin) return undefined;
 
+		const ctxNumbers = getMarketCtxNumbers(ctx);
+		const midPx = coin ? mids?.[coin] : undefined;
+		const midPxNumber = toFiniteNumber(midPx);
+
 		return {
 			kind: "perp",
 			marketKey: perpMarketKey,
@@ -86,7 +94,9 @@ export function useResolvedMarket(marketKey: string | undefined, options?: UseRe
 			maxLeverage: info?.maxLeverage,
 			isDelisted: info?.isDelisted,
 			ctx,
-			midPx: coin ? mids?.[coin] : undefined,
+			ctxNumbers,
+			midPx,
+			midPxNumber,
 		};
 	}, [perpMarketKey, coin, info, ctx, mids]);
 

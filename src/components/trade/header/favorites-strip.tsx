@@ -9,6 +9,7 @@ import { useAllMidsSubscription } from "@/hooks/hyperliquid/socket/use-all-mids-
 import { formatPercent, formatPrice } from "@/lib/format";
 import { calculate24hPriceChange } from "@/lib/market";
 import { isPerpMarketKey, type PerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
+import { toFiniteNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
 import { useFavoriteMarketKeys, useMarketPrefsActions, useSelectedMarketKey } from "@/stores/use-market-prefs-store";
 
@@ -17,7 +18,7 @@ type AssetCtx = ActiveAssetCtxEvent["ctx"];
 type FavoriteData = {
 	marketKey: PerpMarketKey;
 	coin: string;
-	price: string | undefined;
+	priceNumber: number | null;
 	szDecimals: number;
 };
 
@@ -41,7 +42,7 @@ export function FavoritesStrip() {
 				return {
 					marketKey,
 					coin,
-					price: mids?.[coin],
+					priceNumber: toFiniteNumber(mids?.[coin]),
 					szDecimals: marketInfo?.szDecimals ?? 4,
 				};
 			})
@@ -79,7 +80,7 @@ type FavoriteChipProps = FavoriteData & {
 	isActive: boolean;
 };
 
-function FavoriteChip({ marketKey, coin, price, szDecimals, isActive }: FavoriteChipProps) {
+function FavoriteChip({ marketKey, coin, priceNumber, szDecimals, isActive }: FavoriteChipProps) {
 	const { setSelectedMarketKey } = useMarketPrefsActions();
 	const { data: assetCtx } = useActiveAssetCtxSubscription({
 		params: { coin },
@@ -114,7 +115,9 @@ function FavoriteChip({ marketKey, coin, price, szDecimals, isActive }: Favorite
 			)}
 		>
 			<span className={cn("font-medium", isActive ? "text-terminal-cyan" : "text-foreground")}>{coin}</span>
-			{price && <span className="text-muted-foreground tabular-nums">{formatPrice(parseFloat(price), { szDecimals })}</span>}
+			{typeof priceNumber === "number" && (
+				<span className="text-muted-foreground tabular-nums">{formatPrice(priceNumber, { szDecimals })}</span>
+			)}
 			{assetCtx && (
 				<span className={cn("tabular-nums font-medium", isPositive ? "text-terminal-green" : "text-terminal-red")}>
 					{formatPercent(changePct / 100, {

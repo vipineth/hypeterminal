@@ -25,7 +25,7 @@ export function MarketOverview() {
 		[setSelectedMarketKey],
 	);
 
-	const fundingNum = selectedMarket?.ctx?.funding ? Number.parseFloat(selectedMarket.ctx.funding) : 0;
+	const fundingNum = selectedMarket?.ctxNumbers?.funding ?? 0;
 	const isFundingPositive = fundingNum >= 0;
 
 	return (
@@ -38,23 +38,23 @@ export function MarketOverview() {
 					<div className="hidden md:flex items-center gap-4 text-3xs">
 						<StatBlock
 							label={MARKET_OVERVIEW_TEXT.LABEL_MARK}
-							value={formatUSD(selectedMarket?.ctx?.markPx ? Number(selectedMarket.ctx.markPx) : null)}
+							value={formatUSD(selectedMarket?.ctxNumbers?.markPx ?? null)}
 							valueClass="text-terminal-amber terminal-glow-amber"
 						/>
 						<StatBlock
 							label={MARKET_OVERVIEW_TEXT.LABEL_ORACLE}
-							value={formatUSD(selectedMarket?.ctx?.oraclePx ? Number(selectedMarket.ctx.oraclePx) : null)}
+							value={formatUSD(selectedMarket?.ctxNumbers?.oraclePx ?? null)}
 						/>
 						<StatBlock
 							label={MARKET_OVERVIEW_TEXT.LABEL_VOLUME}
-							value={formatUSD(selectedMarket?.ctx?.dayNtlVlm ? Number(selectedMarket.ctx.dayNtlVlm) : null, {
+							value={formatUSD(selectedMarket?.ctxNumbers?.dayNtlVlm ?? null, {
 								notation: "compact",
 								compactDisplay: "short",
 							})}
 						/>
 						<StatBlock
 							label={MARKET_OVERVIEW_TEXT.LABEL_OPEN_INTEREST}
-							value={formatUSD(calculateOpenInterestUSD(selectedMarket?.ctx), {
+							value={formatUSD(calculateOpenInterestUSD(selectedMarket?.ctxNumbers), {
 								notation: "compact",
 								compactDisplay: "short",
 							})}

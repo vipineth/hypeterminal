@@ -1,15 +1,22 @@
-export function parseNumber(value: unknown): number {
-	if (typeof value === "number") return value;
+export function toFiniteNumber(value: unknown): number | null {
+	if (typeof value === "number") return Number.isFinite(value) ? value : null;
 	if (typeof value === "string") {
-		const parsed = Number.parseFloat(value);
-		return Number.isFinite(parsed) ? parsed : Number.NaN;
+		const trimmed = value.trim();
+		if (!trimmed) return null;
+		const parsed = Number(trimmed);
+		return Number.isFinite(parsed) ? parsed : null;
 	}
-	return Number.NaN;
+	return null;
+}
+
+export function parseNumber(value: unknown): number {
+	const parsed = toFiniteNumber(value);
+	return parsed ?? Number.NaN;
 }
 
 export function parseNumberOr(value: unknown, fallback: number): number {
-	const parsed = parseNumber(value);
-	return Number.isFinite(parsed) ? parsed : fallback;
+	const parsed = toFiniteNumber(value);
+	return parsed ?? fallback;
 }
 
 export function parseNumberOrZero(value: unknown): number {
@@ -44,7 +51,7 @@ export function parsePositiveDecimalInput(input: string): number | null {
 	const trimmed = input.trim();
 	if (!trimmed) return null;
 	if (!/^\d+(?:\.\d*)?$/.test(trimmed)) return null;
-	const num = Number.parseFloat(trimmed);
+	const num = Number(trimmed);
 	if (!Number.isFinite(num) || num <= 0) return null;
 	return num;
 }

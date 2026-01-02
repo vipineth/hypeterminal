@@ -272,7 +272,7 @@ export const UI_TEXT = {
 		SELECT_MARKET_ARIA: (coin: string) => `Select ${coin} market`,
 	},
 	ORDERBOOK: {
-		BOOK_LABEL: "Book",
+		BOOK_LABEL: "Order Book",
 		TRADES_LABEL: "Trades",
 		ORDER_BOOK_ARIA: "Order Book",
 		RECENT_TRADES_ARIA: "Recent Trades",
