@@ -9,6 +9,7 @@ import { useSpotClearinghouseState } from "@/hooks/hyperliquid/use-spot-clearing
 import { formatToken, formatUSD } from "@/lib/format";
 import { parseNumberOrZero } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
+import { TokenAvatar } from "../components/token-avatar";
 
 type BalanceRow = {
 	asset: string;
@@ -150,6 +151,7 @@ export function BalancesTab() {
 									<TableRow key={`${row.type}-${row.asset}`} className="border-border/40 hover:bg-accent/30">
 										<TableCell className="text-2xs font-medium py-1.5">
 											<div className="flex items-center gap-1.5">
+												<TokenAvatar symbol={row.asset} />
 												<span className="text-terminal-cyan">{row.asset}</span>
 												<span
 													className={cn(

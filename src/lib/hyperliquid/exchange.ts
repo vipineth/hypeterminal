@@ -1,6 +1,8 @@
 import type { HttpTransport } from "@nktkas/hyperliquid";
 import {
 	approveAgent,
+	cancel,
+	type CancelParameters,
 	type ExchangeSingleWalletConfig,
 	type OrderParameters,
 	order,
@@ -39,6 +41,13 @@ export async function placeSingleOrder(
 	params: { order: OrderParameters["orders"][number]; grouping?: OrderParameters["grouping"] },
 ) {
 	return await order(config, { orders: [params.order], grouping: params.grouping ?? "na" });
+}
+
+export async function cancelOrders(
+	config: ExchangeSingleWalletConfig,
+	params: { cancels: CancelParameters["cancels"] },
+) {
+	return await cancel(config, { cancels: params.cancels });
 }
 
 export async function approveApiWallet(

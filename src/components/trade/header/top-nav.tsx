@@ -1,4 +1,5 @@
 import { Bell, ChevronDown, Cog, Terminal, Zap } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -8,12 +9,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { UI_TEXT } from "@/constants/app";
 import { cn } from "@/lib/utils";
+import { DepositModal } from "../order-entry/deposit-modal";
 import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
 
 const TOP_NAV_TEXT = UI_TEXT.TOP_NAV;
 
 export function TopNav() {
+	const [depositModalOpen, setDepositModalOpen] = useState(false);
+
 	return (
 		<header className="h-11 border-b border-border/60 px-2 flex items-center justify-between bg-surface/40">
 			<div className="flex items-center gap-2 min-w-0">
@@ -67,6 +71,7 @@ export function TopNav() {
 					size="sm"
 					variant="outline"
 					className="h-7 text-3xs uppercase tracking-wider border-terminal-green/40 text-terminal-green hover:bg-terminal-green/10 hover:text-terminal-green"
+					onClick={() => setDepositModalOpen(true)}
 				>
 					<Zap className="size-3 mr-1" />
 					{TOP_NAV_TEXT.DEPOSIT_LABEL}
@@ -90,6 +95,7 @@ export function TopNav() {
 					<Cog className="size-3.5" />
 				</button>
 			</div>
+			<DepositModal open={depositModalOpen} onOpenChange={setDepositModalOpen} />
 		</header>
 	);
 }

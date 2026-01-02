@@ -1,24 +1,152 @@
 import { ListOrdered } from "lucide-react";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
 import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
 import { useOpenOrders } from "@/hooks/hyperliquid/use-open-orders";
 import { formatNumber, formatUSD } from "@/lib/format";
+import { getHttpTransport } from "@/lib/hyperliquid/clients";
+import { cancelOrders, makeExchangeConfig } from "@/lib/hyperliquid/exchange";
+import { toHyperliquidWallet } from "@/lib/hyperliquid/wallet";
 import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
-import { useConnection } from "wagmi";
+import { useTradingAgent } from "@/hooks/hyperliquid/use-trading-agent";
+import { useConnection, useWalletClient } from "wagmi";
+import { TokenAvatar } from "../components/token-avatar";
 
 const ORDERS_TEXT = UI_TEXT.ORDERS_TAB;
 
 export function OrdersTab() {
 	const { address, isConnected } = useConnection();
-	const { data, status, error } = useOpenOrders({ user: isConnected ? address : undefined });
+	const { data: walletClient } = useWalletClient();
+	const { data, status, error, refetch } = useOpenOrders({ user: isConnected ? address : undefined });
 	const { registry } = usePerpMarketRegistry();
+	const { apiWalletSigner } = useTradingAgent({
+		user: isConnected ? address : undefined,
+		walletClient,
+		enabled: isConnected,
+	});
+	const [selectedOrderIds, setSelectedOrderIds] = useState<Set<number>>(() => new Set());
+	const [actionError, setActionError] = useState<string | null>(null);
+	const [isCancelling, setIsCancelling] = useState(false);
+
+	const signer = useMemo(() => {
+		if (apiWalletSigner) return apiWalletSigner;
+		if (!walletClient) return null;
+		return toHyperliquidWallet(walletClient);
+	}, [apiWalletSigner, walletClient]);
 
 	const openOrders = useMemo(() => data ?? [], [data]);
 	const headerCount = isConnected ? openOrders.length : FALLBACK_VALUE_PLACEHOLDER;
+
+	useEffect(() => {
+		setSelectedOrderIds((prev) => {
+			if (prev.size === 0) return prev;
+			const next = new Set<number>();
+			const openIds = new Set(openOrders.map((order) => order.oid));
+			let changed = false;
+			for (const id of prev) {
+				if (openIds.has(id)) {
+					next.add(id);
+				} else {
+					changed = true;
+				}
+			}
+			return changed ? next : prev;
+		});
+	}, [openOrders]);
+
+	const selectedCount = selectedOrderIds.size;
+	const allSelected = selectedCount > 0 && selectedCount === openOrders.length;
+	const someSelected = selectedCount > 0 && selectedCount < openOrders.length;
+
+	const handleToggleAll = useCallback(
+		(value: boolean | "indeterminate") => {
+			if (value === true) {
+				setSelectedOrderIds(new Set(openOrders.map((order) => order.oid)));
+			} else {
+				setSelectedOrderIds(new Set());
+			}
+		},
+		[openOrders],
+	);
+
+	const handleToggleOrder = useCallback((orderId: number, value: boolean | "indeterminate") => {
+		setSelectedOrderIds((prev) => {
+			const next = new Set(prev);
+			if (value === true) {
+				next.add(orderId);
+			} else {
+				next.delete(orderId);
+			}
+			return next;
+		});
+	}, []);
+
+	const handleCancelOrders = useCallback(
+		async (ordersToCancel: typeof openOrders) => {
+			if (isCancelling) return;
+			if (!signer) {
+				setActionError(ORDERS_TEXT.ERROR_SIGNER);
+				return;
+			}
+			if (ordersToCancel.length === 0) return;
+
+			const cancels = ordersToCancel.reduce<{ a: number; o: number }[]>((acc, order) => {
+				const assetIndex = registry?.coinToInfo.get(order.coin)?.assetIndex;
+				if (typeof assetIndex !== "number") return acc;
+				acc.push({ a: assetIndex, o: order.oid });
+				return acc;
+			}, []);
+
+			if (cancels.length !== ordersToCancel.length) {
+				setActionError(ORDERS_TEXT.ERROR_MARKET_UNAVAILABLE);
+				return;
+			}
+
+			setIsCancelling(true);
+			setActionError(null);
+
+			try {
+				const transport = getHttpTransport();
+				const config = makeExchangeConfig(transport, signer);
+				const result = await cancelOrders(config, { cancels });
+				const statuses = result.response?.data?.statuses ?? [];
+				const errorStatus = statuses.find(
+					(status) => typeof status === "object" && status !== null && "error" in status,
+				);
+				if (errorStatus && typeof errorStatus === "object" && "error" in errorStatus) {
+					throw new Error(errorStatus.error);
+				}
+
+				await refetch();
+				setSelectedOrderIds((prev) => {
+					const next = new Set(prev);
+					for (const order of ordersToCancel) {
+						next.delete(order.oid);
+					}
+					return next;
+				});
+			} catch (error) {
+				const message = error instanceof Error ? error.message : ORDERS_TEXT.ERROR_CANCEL_FALLBACK;
+				setActionError(message);
+			} finally {
+				setIsCancelling(false);
+			}
+		},
+		[isCancelling, signer, registry, refetch],
+	);
+
+	const handleCancelSelected = useCallback(() => {
+		const ordersToCancel = openOrders.filter((order) => selectedOrderIds.has(order.oid));
+		void handleCancelOrders(ordersToCancel);
+	}, [handleCancelOrders, openOrders, selectedOrderIds]);
+
+	const handleCancelAll = useCallback(() => {
+		void handleCancelOrders(openOrders);
+	}, [handleCancelOrders, openOrders]);
 
 	const orderRows = useMemo(() => {
 		return openOrders.map((order) => {
@@ -34,6 +162,7 @@ export function OrdersTab() {
 
 			return {
 				key: order.oid,
+				order,
 				coin: order.coin,
 				sideLabel: isBuy ? ORDERS_TEXT.SIDE_BUY : ORDERS_TEXT.SIDE_SELL,
 				sideClass: isBuy ? "bg-terminal-green/20 text-terminal-green" : "bg-terminal-red/20 text-terminal-red",
@@ -48,13 +177,40 @@ export function OrdersTab() {
 		});
 	}, [openOrders, registry]);
 
+	const canCancel = !isCancelling;
+	const disableCancelSelected = !canCancel || selectedCount === 0;
+	const disableCancelAll = !canCancel || openOrders.length === 0;
+
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-2">
 				<ListOrdered className="size-3" />
 				{ORDERS_TEXT.TITLE}
-				<span className="text-terminal-cyan ml-auto tabular-nums">{headerCount}</span>
+				<div className="ml-auto flex items-center gap-2">
+					<span className="text-terminal-cyan tabular-nums">{headerCount}</span>
+					<button
+						type="button"
+						className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+						tabIndex={0}
+						aria-label={ORDERS_TEXT.ARIA_CANCEL_SELECTED}
+						onClick={handleCancelSelected}
+						disabled={disableCancelSelected}
+					>
+						{isCancelling ? ORDERS_TEXT.ACTION_CANCELING : ORDERS_TEXT.ACTION_CANCEL_SELECTED}
+					</button>
+					<button
+						type="button"
+						className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+						tabIndex={0}
+						aria-label={ORDERS_TEXT.ARIA_CANCEL_ALL}
+						onClick={handleCancelAll}
+						disabled={disableCancelAll}
+					>
+						{isCancelling ? ORDERS_TEXT.ACTION_CANCELING : ORDERS_TEXT.ACTION_CANCEL_ALL}
+					</button>
+				</div>
 			</div>
+			{actionError ? <div className="mb-1 text-4xs text-terminal-red/80">{actionError}</div> : null}
 			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
 				{!isConnected ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
@@ -78,6 +234,15 @@ export function OrdersTab() {
 						<Table>
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
+									<TableHead className="w-7">
+										<Checkbox
+											checked={allSelected ? true : someSelected ? "indeterminate" : false}
+											onCheckedChange={handleToggleAll}
+											aria-label={ORDERS_TEXT.ARIA_SELECT_ALL}
+											disabled={openOrders.length === 0 || isCancelling}
+											className="size-3.5 border-border/70 bg-background/60 data-[state=checked]:bg-terminal-cyan data-[state=checked]:border-terminal-cyan data-[state=checked]:text-background"
+										/>
+									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
 										{ORDERS_TEXT.HEADER_ASSET}
 									</TableHead>
@@ -104,11 +269,21 @@ export function OrdersTab() {
 							<TableBody>
 								{orderRows.map((row) => (
 									<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
+										<TableCell className="py-1.5">
+											<Checkbox
+												checked={selectedOrderIds.has(row.order.oid)}
+												onCheckedChange={(value) => handleToggleOrder(row.order.oid, value)}
+												aria-label={`${ORDERS_TEXT.ARIA_SELECT_ORDER} ${row.coin}`}
+												disabled={isCancelling}
+												className="size-3.5 border-border/70 bg-background/60 data-[state=checked]:bg-terminal-cyan data-[state=checked]:border-terminal-cyan data-[state=checked]:text-background"
+											/>
+										</TableCell>
 										<TableCell className="text-2xs font-medium py-1.5">
 											<div className="flex items-center gap-1.5">
 												<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
 													{row.sideLabel}
 												</span>
+												<TokenAvatar symbol={row.coin} />
 												<span>{row.coin}</span>
 											</div>
 										</TableCell>
@@ -130,11 +305,13 @@ export function OrdersTab() {
 										<TableCell className="text-right py-1.5">
 											<button
 												type="button"
-												className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors"
+												className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 												tabIndex={0}
 												aria-label={ORDERS_TEXT.ARIA_CANCEL}
+												onClick={() => void handleCancelOrders([row.order])}
+												disabled={!canCancel}
 											>
-												{ORDERS_TEXT.ACTION_CANCEL}
+												{isCancelling ? ORDERS_TEXT.ACTION_CANCELING : ORDERS_TEXT.ACTION_CANCEL}
 											</button>
 										</TableCell>
 									</TableRow>

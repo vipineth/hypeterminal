@@ -613,6 +613,73 @@ const result = await client.order({
 });
 ```
 
+### Close a position (reduce-only)
+
+To close an existing position, submit a reduce-only order in the opposite direction for the current position size. Use a market-style order (`FrontendMarket`) to exit quickly. Use a smaller size to close partially.
+
+```ts
+import { ExchangeClient, HttpTransport, InfoClient } from "@nktkas/hyperliquid";
+import { privateKeyToAccount } from "viem/accounts";
+
+const transport = new HttpTransport();
+const wallet = privateKeyToAccount("0x...");
+const info = new InfoClient({ transport });
+const exchange = new ExchangeClient({ transport, wallet });
+
+const state = await info.clearinghouseState({ user: wallet.address });
+const position = state.assetPositions.find((p) => p.position.coin === "ETH")?.position;
+
+if (position) {
+  const size = Number(position.szi);
+  if (size !== 0) {
+    const isLong = size > 0;
+    const closeSize = Math.abs(size);
+
+    await exchange.order({
+      orders: [
+        {
+          a: 4, // asset index (ETH)
+          b: !isLong, // opposite side
+          p: "3000", // current mark price with slippage
+          s: closeSize.toString(),
+          r: true, // reduce-only
+          t: { limit: { tif: "FrontendMarket" } },
+        },
+      ],
+      grouping: "na",
+    });
+  }
+}
+```
+
+### Cancel orders (one, many, or all)
+
+Use the `cancel` action with an array of `{ a, o }` pairs (asset index and order id).
+
+```ts
+import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
+import { privateKeyToAccount } from "viem/accounts";
+
+const transport = new HttpTransport();
+const wallet = privateKeyToAccount("0x...");
+const exchange = new ExchangeClient({ transport, wallet });
+
+// Cancel a single order
+await exchange.cancel({
+  cancels: [{ a: 4, o: 123 }], // asset index + order id
+});
+
+// Cancel multiple orders at once
+await exchange.cancel({
+  cancels: [
+    { a: 4, o: 123 },
+    { a: 4, o: 456 },
+  ],
+});
+```
+
+To cancel all open orders, fetch open orders and map each one to `{ a, o }` using the correct asset index for its coin.
+
 ### Usage with ethers
 
 ```ts
