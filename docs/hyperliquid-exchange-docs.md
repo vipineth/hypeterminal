@@ -125,6 +125,93 @@ The SDK supports multi-sig accounts by passing an array of `signers` and the `mu
 
 ---
 
+## 5. L2 Orderbook Subscription & Price Grouping
+
+The L2 orderbook WebSocket subscription supports price aggregation via `nSigFigs` and `mantissa` parameters.
+
+### Parameters
+
+| Parameter | Type | Description |
+| :--- | :--- | :--- |
+| `coin` | string | Asset symbol (e.g., "BTC", "ETH") |
+| `nSigFigs` | 2, 3, 4, 5, or null | Number of significant figures. `null` = full precision |
+| `mantissa` | 1, 2, or 5 | **Only valid when nSigFigs is 5**. Controls sub-tick granularity |
+
+### How nSigFigs Works
+
+`nSigFigs` controls the number of significant figures in prices, which determines the tick size:
+
+```
+tickSize = 10^(integerDigits - nSigFigs)
+```
+
+**BTC at $95,000 (5 integer digits):**
+| nSigFigs | Tick Size | Example Prices |
+| :--- | :--- | :--- |
+| 5 | 1 | 95001, 95002, 95003 |
+| 4 | 10 | 95010, 95020, 95030 |
+| 3 | 100 | 95100, 95200, 95300 |
+| 2 | 1000 | 95000, 96000, 97000 |
+
+**ETH at $3,500 (4 integer digits):**
+| nSigFigs | Tick Size | Example Prices |
+| :--- | :--- | :--- |
+| 5 | 0.1 | 3500.1, 3500.2, 3500.3 |
+| 4 | 1 | 3500, 3501, 3502 |
+| 3 | 10 | 3500, 3510, 3520 |
+| 2 | 100 | 3500, 3600, 3700 |
+
+### Using Mantissa for Finer Control
+
+The `mantissa` parameter is **only valid when nSigFigs is 5**. It allows for finer granularity:
+
+| mantissa | Effect | Example (ETH ~$3500) |
+| :--- | :--- | :--- |
+| 1 (or omitted) | Base tick | 0.1 increments |
+| 2 | 2x base tick | 0.2 increments |
+| 5 | 5x base tick | 0.5 increments |
+
+```typescript
+// 0.1 increments (mantissa=1 or omitted)
+{ type: "l2Book", coin: "ETH", nSigFigs: 5 }
+
+// 0.2 increments
+{ type: "l2Book", coin: "ETH", nSigFigs: 5, mantissa: 2 }
+
+// 0.5 increments
+{ type: "l2Book", coin: "ETH", nSigFigs: 5, mantissa: 5 }
+```
+
+**Note:** Using `mantissa` with `nSigFigs` other than 5 is invalid and will be rejected by the API.
+
+### Subscription Examples
+
+```typescript
+// Subscribe to ETH orderbook with 1 tick size
+client.l2Book({ coin: "ETH", nSigFigs: 4 }, (data) => { ... });
+
+// Subscribe to BTC orderbook with 10 tick size
+client.l2Book({ coin: "BTC", nSigFigs: 4 }, (data) => { ... });
+
+// Subscribe with 0.2 increments
+client.l2Book({ coin: "ETH", nSigFigs: 5, mantissa: 2 }, (data) => { ... });
+```
+
+### WebSocket Message Format
+
+```json
+// Subscribe
+{"method":"subscribe","subscription":{"type":"l2Book","coin":"ETH","nSigFigs":4}}
+
+// Subscribe with mantissa
+{"method":"subscribe","subscription":{"type":"l2Book","coin":"ETH","nSigFigs":5,"mantissa":2}}
+
+// Unsubscribe
+{"method":"unsubscribe","subscription":{"type":"l2Book","coin":"ETH","nSigFigs":4}}
+```
+
+---
+
 ## Guiding Principles for Agents
 1. **Verify Asset ID**: Never assume an asset ID. Check metadata first.
 2. **Respect Decimals**: Always check `szDecimals` for the asset before sending size.

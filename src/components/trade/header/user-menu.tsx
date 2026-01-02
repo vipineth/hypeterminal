@@ -1,5 +1,5 @@
 import { ChevronDown, Copy, CopyCheck, Loader2, LogOut, PlusCircle, Zap } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useConnection, useDisconnect, useEnsName } from "wagmi";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,8 +36,14 @@ export function UserMenu() {
 	const disconnect = useDisconnect();
 	const { data: ensName } = useEnsName({ address });
 	const [isOpen, setIsOpen] = useState(false);
+	const [mounted, setMounted] = useState(false);
 
-	if (isConnecting) {
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	// Show loading state during SSR and initial hydration to prevent mismatch
+	if (!mounted || isConnecting) {
 		return (
 			<Button variant="ghost" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider" disabled>
 				<Loader2 className="size-3 animate-spin" />

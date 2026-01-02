@@ -156,10 +156,11 @@ export function OrderEntryPanel() {
 	}, [market?.marketKey, marketLeverageByMode, defaultLeverageByMode.cross, maxLeverage]);
 
 	const markPx = useMemo(() => {
-		const ctxMarkPx = market?.ctx?.markPx;
-		const midPx = market?.midPx;
-		return parseNumber(ctxMarkPx || midPx) || 0;
-	}, [market?.ctx?.markPx, market?.midPx]);
+		const ctxMarkPx = market?.ctxNumbers?.markPx;
+		if (typeof ctxMarkPx === "number") return ctxMarkPx;
+		const midPx = market?.midPxNumber;
+		return typeof midPx === "number" ? midPx : 0;
+	}, [market?.ctxNumbers?.markPx, market?.midPxNumber]);
 
 	const price = useMemo(() => {
 		if (type === "market") return markPx;

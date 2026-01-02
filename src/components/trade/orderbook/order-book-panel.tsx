@@ -1,4 +1,4 @@
-import { ChevronDown, TrendingDown, TrendingUp } from "lucide-react";
+import { ArrowRightLeft, ChevronDown, TrendingDown, TrendingUp } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
 	DropdownMenu,
@@ -17,32 +17,78 @@ import { TradesView } from "./trades-view";
 
 const ORDERBOOK_TEXT = UI_TEXT.ORDERBOOK;
 
-function generatePriceGroupingOptions(midPrice: number | undefined): Array<{ tickSize: number; nSigFigs: number }> {
+interface PriceGroupOption {
+	tickSize: number;
+	/** Valid values: 2, 3, 4, 5. null/undefined = full precision */
+	nSigFigs: 2 | 3 | 4 | 5;
+	/** Only valid when nSigFigs is 5. Valid values: 1, 2, 5 */
+	mantissa?: 1 | 2 | 5;
+	label: string;
+}
+
+/**
+ * Generate price grouping options based on mid price.
+ *
+ * API constraints:
+ * - nSigFigs: 2, 3, 4, 5, or null (full precision)
+ * - mantissa: 1, 2, or 5 (only valid when nSigFigs is 5)
+ *
+ * With nSigFigs=5:
+ * - mantissa=1 (or omitted): base tick (0.1, 1, 10...)
+ * - mantissa=2: 2x tick (0.2, 2, 20...)
+ * - mantissa=5: 5x tick (0.5, 5, 50...)
+ */
+function generatePriceGroupingOptions(midPrice: number | undefined): PriceGroupOption[] {
 	if (!midPrice || !Number.isFinite(midPrice) || midPrice <= 0) {
 		return [
-			{ tickSize: 0, nSigFigs: 5 },
-			{ tickSize: 0, nSigFigs: 4 },
-			{ tickSize: 0, nSigFigs: 3 },
-			{ tickSize: 0, nSigFigs: 2 },
+			{ tickSize: 1, nSigFigs: 5, label: "1" },
+			{ tickSize: 2, nSigFigs: 5, mantissa: 2, label: "2" },
+			{ tickSize: 5, nSigFigs: 5, mantissa: 5, label: "5" },
+			{ tickSize: 10, nSigFigs: 4, label: "10" },
 		];
 	}
 
-	const orderOfMagnitude = Math.floor(Math.log10(midPrice));
-	const options: Array<{ tickSize: number; nSigFigs: number }> = [];
+	// Number of integer digits in midPrice
+	const integerDigits = Math.floor(Math.log10(midPrice)) + 1;
+	const options: PriceGroupOption[] = [];
 
-	for (let i = 0; i < 4; i++) {
-		const exponent = orderOfMagnitude - i - 1;
+	// nSigFigs 5 with mantissa options (finest granularity)
+	const exp5 = integerDigits - 5;
+	const base5 = 10 ** exp5;
+
+	// mantissa=1 or omitted (base tick)
+	options.push({ tickSize: base5, nSigFigs: 5, label: formatTickLabel(base5) });
+	// mantissa=2 (2x tick)
+	options.push({ tickSize: base5 * 2, nSigFigs: 5, mantissa: 2, label: formatTickLabel(base5 * 2) });
+	// mantissa=5 (5x tick)
+	options.push({ tickSize: base5 * 5, nSigFigs: 5, mantissa: 5, label: formatTickLabel(base5 * 5) });
+
+	// nSigFigs 4, 3, 2 (no mantissa allowed)
+	for (let nSigFigs = 4; nSigFigs >= 2; nSigFigs--) {
+		const exponent = integerDigits - nSigFigs;
 		const tickSize = 10 ** exponent;
-		const nSigFigs = Math.max(2, Math.min(5, 5 - i));
-		options.push({ tickSize, nSigFigs: nSigFigs as 2 | 3 | 4 | 5 });
+		options.push({ tickSize, nSigFigs: nSigFigs as 2 | 3 | 4, label: formatTickLabel(tickSize) });
 	}
 
-	return options;
+	// Sort by tick size
+	options.sort((a, b) => a.tickSize - b.tickSize);
+
+	// Filter to reasonable range and return first 6
+	const filtered = options.filter((opt) => opt.tickSize >= 0.01 && opt.tickSize <= midPrice / 10);
+	return filtered.slice(0, 6);
+}
+
+function formatTickLabel(tickSize: number): string {
+	if (tickSize >= 1) {
+		return tickSize >= 1000 ? `${tickSize / 1000}K` : String(tickSize);
+	}
+	const decimals = Math.max(0, Math.ceil(-Math.log10(tickSize)));
+	return tickSize.toFixed(decimals);
 }
 
 export function OrderBookPanel() {
 	const [view, setView] = useState<"book" | "trades">("book");
-	const [nSigFigs, setNSigFigs] = useState<2 | 3 | 4 | 5 | undefined>(5);
+	const [selectedOption, setSelectedOption] = useState<PriceGroupOption | null>(null);
 	const [showInUsdc, setShowInUsdc] = useState(false);
 
 	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
@@ -52,7 +98,11 @@ export function OrderBookPanel() {
 		status: bookStatus,
 		error: bookError,
 	} = useL2BookSubscription({
-		params: { coin, nSigFigs },
+		params: {
+			coin,
+			nSigFigs: selectedOption?.nSigFigs,
+			mantissa: selectedOption?.mantissa,
+		},
 		enabled: view === "book",
 	});
 
@@ -142,19 +192,18 @@ export function OrderBookPanel() {
 							tabIndex={0}
 							aria-label={ORDERBOOK_TEXT.SELECT_AGGREGATION_ARIA}
 						>
-							{nSigFigs
-								? priceGroupingOptions.find((opt) => opt.nSigFigs === nSigFigs)?.tickSize
-									? String(priceGroupingOptions.find((opt) => opt.nSigFigs === nSigFigs)?.tickSize)
-									: `${nSigFigs ?? 0} ${ORDERBOOK_TEXT.SIG_FIGS_SUFFIX}`
-								: ORDERBOOK_TEXT.AUTO_LABEL}
+							{selectedOption?.label ?? ORDERBOOK_TEXT.AUTO_LABEL}
 							<ChevronDown className="size-2.5" />
 						</button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end" className="w-24 font-mono text-xs">
-						<DropdownMenuItem onClick={() => setNSigFigs(undefined)}>{ORDERBOOK_TEXT.AUTO_LABEL}</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => setSelectedOption(null)}>{ORDERBOOK_TEXT.AUTO_LABEL}</DropdownMenuItem>
 						{priceGroupingOptions.map((option) => (
-							<DropdownMenuItem key={option.nSigFigs} onClick={() => setNSigFigs(option.nSigFigs as 2 | 3 | 4 | 5)}>
-								{option.tickSize > 0 ? String(option.tickSize) : `${option.nSigFigs} ${ORDERBOOK_TEXT.SIG_FIGS_SUFFIX}`}
+							<DropdownMenuItem
+								key={`${option.nSigFigs}-${option.mantissa ?? 0}`}
+								onClick={() => setSelectedOption(option)}
+							>
+								{option.label}
 							</DropdownMenuItem>
 						))}
 					</DropdownMenuContent>
@@ -168,16 +217,20 @@ export function OrderBookPanel() {
 						<button
 							type="button"
 							onClick={() => setShowInUsdc((v) => !v)}
-							className="text-right hover:text-foreground transition-colors"
+							className="text-right hover:text-foreground transition-colors inline-flex items-center justify-end gap-0.5"
 						>
-							{showInUsdc ? "USDC" : coin}
+							{ORDERBOOK_TEXT.HEADER_SIZE}
+							<span className="opacity-60">({showInUsdc ? "$" : coin})</span>
+							<ArrowRightLeft className="size-2 opacity-40" />
 						</button>
 						<button
 							type="button"
 							onClick={() => setShowInUsdc((v) => !v)}
-							className="text-right hover:text-foreground transition-colors"
+							className="text-right hover:text-foreground transition-colors inline-flex items-center justify-end gap-0.5"
 						>
-							{showInUsdc ? "USDC" : coin}
+							{ORDERBOOK_TEXT.HEADER_TOTAL}
+							<span className="opacity-60">({showInUsdc ? "$" : coin})</span>
+							<ArrowRightLeft className="size-2 opacity-40" />
 						</button>
 					</div>
 

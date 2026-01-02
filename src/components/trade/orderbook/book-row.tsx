@@ -1,5 +1,5 @@
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
-import { formatNumber } from "@/lib/format";
+import { formatNumber, formatUSD } from "@/lib/format";
 import type { OrderBookRow } from "@/lib/trade/orderbook";
 import { cn } from "@/lib/utils";
 import { useSetSelectedPrice } from "@/stores/use-orderbook-actions-store";
@@ -23,8 +23,16 @@ export function BookRow({ row, type, maxTotal, showInUsdc = false }: BookRowProp
 	const sizeValue = showInUsdc ? row.size * row.price : row.size;
 	const totalValue = showInUsdc ? row.total * row.price : row.total;
 
-	const sizeText = Number.isFinite(sizeValue) ? formatNumber(sizeValue, showInUsdc ? 2 : 3) : FALLBACK_VALUE_PLACEHOLDER;
-	const totalText = Number.isFinite(totalValue) ? formatNumber(totalValue, showInUsdc ? 2 : 3) : FALLBACK_VALUE_PLACEHOLDER;
+	const sizeText = Number.isFinite(sizeValue)
+		? showInUsdc
+			? formatUSD(sizeValue, { digits: 2, compact: true })
+			: formatNumber(sizeValue, 3)
+		: FALLBACK_VALUE_PLACEHOLDER;
+	const totalText = Number.isFinite(totalValue)
+		? showInUsdc
+			? formatUSD(totalValue, { digits: 2, compact: true })
+			: formatNumber(totalValue, 3)
+		: FALLBACK_VALUE_PLACEHOLDER;
 
 	const handlePriceClick = () => {
 		if (Number.isFinite(row.price)) {
