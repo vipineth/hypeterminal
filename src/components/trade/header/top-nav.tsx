@@ -6,9 +6,12 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { UI_TEXT } from "@/constants/app";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
+
+const TOP_NAV_TEXT = UI_TEXT.TOP_NAV;
 
 export function TopNav() {
 	return (
@@ -19,12 +22,13 @@ export function TopNav() {
 						<Terminal className="size-3 text-terminal-green" />
 					</div>
 					<span className="text-xs font-semibold tracking-tight text-terminal-cyan">
-						HYPE<span className="text-foreground">TERMINAL</span>
+						{TOP_NAV_TEXT.BRAND_PREFIX}
+						<span className="text-foreground">{TOP_NAV_TEXT.BRAND_SUFFIX}</span>
 					</span>
 				</div>
 				<div className="h-4 w-px bg-border/60 mx-1 hidden md:block" />
 				<nav className="hidden lg:flex items-center text-3xs uppercase tracking-wider">
-					{["Trade", "Vaults", "Portfolio", "Staking", "Leaderboard"].map((item, idx) => (
+					{TOP_NAV_TEXT.NAV_ITEMS.map((item, idx) => (
 						<button
 							key={item}
 							type="button"
@@ -44,15 +48,15 @@ export function TopNav() {
 								type="button"
 								className="px-2.5 py-1.5 text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
 								tabIndex={0}
-								aria-label="More options"
+								aria-label={TOP_NAV_TEXT.MORE_ARIA}
 							>
-								More <ChevronDown className="size-2.5" />
+								{TOP_NAV_TEXT.MORE_LABEL} <ChevronDown className="size-2.5" />
 							</button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="start" className="w-32 text-xs font-mono">
-							<DropdownMenuItem>API</DropdownMenuItem>
-							<DropdownMenuItem>Docs</DropdownMenuItem>
-							<DropdownMenuItem>Support</DropdownMenuItem>
+							{TOP_NAV_TEXT.MORE_MENU_ITEMS.map((item) => (
+								<DropdownMenuItem key={item}>{item}</DropdownMenuItem>
+							))}
 						</DropdownMenuContent>
 					</DropdownMenu>
 				</nav>
@@ -65,14 +69,14 @@ export function TopNav() {
 					className="h-7 text-3xs uppercase tracking-wider border-terminal-green/40 text-terminal-green hover:bg-terminal-green/10 hover:text-terminal-green"
 				>
 					<Zap className="size-3 mr-1" />
-					Deposit
+					{TOP_NAV_TEXT.DEPOSIT_LABEL}
 				</Button>
 				<UserMenu />
 				<button
 					type="button"
 					className="size-7 flex items-center justify-center text-muted-foreground hover:text-foreground"
 					tabIndex={0}
-					aria-label="Notifications"
+					aria-label={TOP_NAV_TEXT.NOTIFICATIONS_ARIA}
 				>
 					<Bell className="size-3.5" />
 				</button>
@@ -81,7 +85,7 @@ export function TopNav() {
 					type="button"
 					className="size-7 flex items-center justify-center text-muted-foreground hover:text-foreground"
 					tabIndex={0}
-					aria-label="Settings"
+					aria-label={TOP_NAV_TEXT.SETTINGS_ARIA}
 				>
 					<Cog className="size-3.5" />
 				</button>

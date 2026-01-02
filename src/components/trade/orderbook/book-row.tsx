@@ -1,6 +1,7 @@
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
 import { formatNumber } from "@/lib/format";
+import type { OrderBookRow } from "@/lib/trade/orderbook";
 import { cn } from "@/lib/utils";
-import type { OrderBookRow } from "../lib";
 
 type BookRowProps = {
 	row: OrderBookRow;
@@ -9,12 +10,12 @@ type BookRowProps = {
 };
 
 export function BookRow({ row, type, maxTotal }: BookRowProps) {
-	const depthPct = (row.total / maxTotal) * 100;
+	const depthPct = maxTotal > 0 ? (row.total / maxTotal) * 100 : 0;
 	const isAsk = type === "ask";
 
-	const priceText = Number.isFinite(row.price) ? formatNumber(row.price, 2) : "-";
-	const sizeText = Number.isFinite(row.size) ? formatNumber(row.size, 3) : "-";
-	const totalText = Number.isFinite(row.total) ? formatNumber(row.total, 3) : "-";
+	const priceText = Number.isFinite(row.price) ? formatNumber(row.price, 2) : FALLBACK_VALUE_PLACEHOLDER;
+	const sizeText = Number.isFinite(row.size) ? formatNumber(row.size, 3) : FALLBACK_VALUE_PLACEHOLDER;
+	const totalText = Number.isFinite(row.total) ? formatNumber(row.total, 3) : FALLBACK_VALUE_PLACEHOLDER;
 
 	return (
 		<div className="grid grid-cols-3 gap-2 text-2xs tabular-nums py-0.5 relative hover:bg-accent/30 cursor-pointer group">

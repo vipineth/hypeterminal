@@ -1,7 +1,10 @@
 import { flexRender, type Header, type RowData } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import type { UseVirtualTableReturn } from "@/hooks/use-virtual-table";
+import type { UseVirtualTableReturn } from "@/hooks/ui/use-virtual-table";
+import { UI_TEXT } from "@/constants/app";
 import { cn } from "@/lib/utils";
+
+const VIRTUAL_TABLE_TEXT = UI_TEXT.VIRTUAL_TABLE;
 
 export interface VirtualTableProps<TData extends RowData> extends UseVirtualTableReturn<TData> {
 	className?: string;
@@ -78,6 +81,7 @@ export function VirtualTable<TData extends RowData>({
 							const headerStyle = { width: header.getSize() };
 
 							if (canSort) {
+								const headerLabel = header.column.columnDef.header?.toString() ?? "";
 								return (
 									<button
 										key={header.id}
@@ -85,7 +89,7 @@ export function VirtualTable<TData extends RowData>({
 										className={headerClassName}
 										style={headerStyle}
 										onClick={header.column.getToggleSortingHandler()}
-										aria-label={`Sort by ${header.column.columnDef.header?.toString()}`}
+										aria-label={VIRTUAL_TABLE_TEXT.SORT_ARIA(headerLabel)}
 									>
 										{headerContent}
 										{showSortingIndicators && <SortingIndicator header={header} />}

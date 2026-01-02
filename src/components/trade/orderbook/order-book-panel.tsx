@@ -7,35 +7,19 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useL2BookSubscription, useSelectedResolvedMarket } from "@/hooks/hyperliquid";
+import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
+import { useL2BookSubscription } from "@/hooks/hyperliquid/socket/use-l2-book-subscription";
+import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
 import { formatNumber, formatUSD } from "@/lib/format";
+import { buildOrderBookRows } from "@/lib/trade/orderbook";
 import { cn } from "@/lib/utils";
-import type { OrderBookRow } from "../lib";
 import { BookRow } from "./book-row";
 import { TradesView } from "./trades-view";
 
-function parseNumber(value: unknown): number {
-	if (typeof value === "number") return value;
-	if (typeof value === "string") {
-		const parsed = Number.parseFloat(value);
-		return Number.isFinite(parsed) ? parsed : Number.NaN;
-	}
-	return Number.NaN;
-}
+const ORDERBOOK_TEXT = UI_TEXT.ORDERBOOK;
 
-/**
- * Generates price grouping options based on the current market price.
- * Returns an array of tick sizes and their corresponding significant figures.
- *
- * For example:
- * - Price ~$100,000 (BTC) → [100, 10, 1, 0.1]
- * - Price ~$3,000 (ETH) → [10, 1, 0.1, 0.01]
- * - Price ~$1 → [0.1, 0.01, 0.001, 0.0001]
- * - Price ~$0.0001 → [0.00001, 0.000001, 0.0000001, 0.00000001]
- */
 function generatePriceGroupingOptions(midPrice: number | undefined): Array<{ tickSize: number; nSigFigs: number }> {
 	if (!midPrice || !Number.isFinite(midPrice) || midPrice <= 0) {
-		// Fallback to default sig figs when no price available
 		return [
 			{ tickSize: 0, nSigFigs: 5 },
 			{ tickSize: 0, nSigFigs: 4 },
@@ -44,46 +28,17 @@ function generatePriceGroupingOptions(midPrice: number | undefined): Array<{ tic
 		];
 	}
 
-	// Find the order of magnitude of the price
 	const orderOfMagnitude = Math.floor(Math.log10(midPrice));
-
-	// Generate 4 tick size options based on the price
 	const options: Array<{ tickSize: number; nSigFigs: number }> = [];
 
-	// Start from the order of magnitude and go down
 	for (let i = 0; i < 4; i++) {
 		const exponent = orderOfMagnitude - i - 1;
-		const tickSize = Math.pow(10, exponent);
-
-		// Calculate corresponding sig figs
-		// More precision (smaller tick) = more sig figs
+		const tickSize = 10 ** exponent;
 		const nSigFigs = Math.max(2, Math.min(5, 5 - i));
-
 		options.push({ tickSize, nSigFigs: nSigFigs as 2 | 3 | 4 | 5 });
 	}
 
 	return options;
-}
-
-function buildOrderBookRows(
-	levels: Array<{ px: unknown; sz: unknown }> | undefined,
-	side: "bid" | "ask",
-): OrderBookRow[] {
-	if (!levels || levels.length === 0) return [];
-
-	const sorted = [...levels].sort((a, b) => {
-		const aPx = parseNumber(a.px);
-		const bPx = parseNumber(b.px);
-		return side === "bid" ? bPx - aPx : aPx - bPx;
-	});
-
-	let cumulative = 0;
-	return sorted.map((level) => {
-		const price = parseNumber(level.px);
-		const size = parseNumber(level.sz);
-		cumulative += Number.isFinite(size) ? size : 0;
-		return { price, size, total: cumulative };
-	});
 }
 
 export function OrderBookPanel() {
@@ -162,9 +117,9 @@ export function OrderBookPanel() {
 							view === "book" ? "text-terminal-cyan" : "text-muted-foreground hover:text-foreground",
 						)}
 						tabIndex={0}
-						aria-label="Order Book"
+						aria-label={ORDERBOOK_TEXT.ORDER_BOOK_ARIA}
 					>
-						Book
+						{ORDERBOOK_TEXT.BOOK_LABEL}
 					</button>
 					<button
 						type="button"
@@ -174,9 +129,9 @@ export function OrderBookPanel() {
 							view === "trades" ? "text-terminal-cyan" : "text-muted-foreground hover:text-foreground",
 						)}
 						tabIndex={0}
-						aria-label="Recent Trades"
+						aria-label={ORDERBOOK_TEXT.RECENT_TRADES_ARIA}
 					>
-						Trades
+						{ORDERBOOK_TEXT.TRADES_LABEL}
 					</button>
 				</div>
 				<DropdownMenu>
@@ -185,25 +140,23 @@ export function OrderBookPanel() {
 							type="button"
 							className="px-1.5 py-0.5 text-4xs border border-border/60 hover:border-foreground/30 inline-flex items-center gap-1"
 							tabIndex={0}
-							aria-label="Select order book aggregation"
+							aria-label={ORDERBOOK_TEXT.SELECT_AGGREGATION_ARIA}
 						>
-							{nSigFigs ? (
-								priceGroupingOptions.find((opt) => opt.nSigFigs === nSigFigs)?.tickSize ? (
-									formatNumber(priceGroupingOptions.find((opt) => opt.nSigFigs === nSigFigs)!.tickSize, 8)
-								) : (
-									`${nSigFigs} sig figs`
-								)
-							) : (
-								"Auto"
-							)}
+							{nSigFigs
+								? priceGroupingOptions.find((opt) => opt.nSigFigs === nSigFigs)?.tickSize
+									? formatNumber(priceGroupingOptions.find((opt) => opt.nSigFigs === nSigFigs)?.tickSize, 8)
+									: `${nSigFigs ?? 0} ${ORDERBOOK_TEXT.SIG_FIGS_SUFFIX}`
+								: ORDERBOOK_TEXT.AUTO_LABEL}
 							<ChevronDown className="size-2.5" />
 						</button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end" className="w-24 font-mono text-xs">
-						<DropdownMenuItem onClick={() => setNSigFigs(undefined)}>Auto</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => setNSigFigs(undefined)}>{ORDERBOOK_TEXT.AUTO_LABEL}</DropdownMenuItem>
 						{priceGroupingOptions.map((option) => (
 							<DropdownMenuItem key={option.nSigFigs} onClick={() => setNSigFigs(option.nSigFigs as 2 | 3 | 4 | 5)}>
-								{option.tickSize > 0 ? formatNumber(option.tickSize, 8) : `${option.nSigFigs} sig figs`}
+								{option.tickSize > 0
+									? formatNumber(option.tickSize, 8)
+									: `${option.nSigFigs} ${ORDERBOOK_TEXT.SIG_FIGS_SUFFIX}`}
 							</DropdownMenuItem>
 						))}
 					</DropdownMenuContent>
@@ -213,9 +166,9 @@ export function OrderBookPanel() {
 			{view === "book" ? (
 				<div className="flex-1 min-h-0 flex flex-col">
 					<div className="grid grid-cols-3 gap-2 px-2 py-1 text-4xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40 shrink-0">
-						<div>Price</div>
-						<div className="text-right">Size</div>
-						<div className="text-right">Total</div>
+						<div>{ORDERBOOK_TEXT.HEADER_PRICE}</div>
+						<div className="text-right">{ORDERBOOK_TEXT.HEADER_SIZE}</div>
+						<div className="text-right">{ORDERBOOK_TEXT.HEADER_TOTAL}</div>
 					</div>
 
 					<div className="flex-1 min-h-0 flex flex-col">
@@ -234,13 +187,13 @@ export function OrderBookPanel() {
 							</ScrollArea>
 						) : (
 							<div className="flex-1 min-h-0 flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-								{bookStatus === "error" ? "Failed to load order book." : "Waiting for order book..."}
+								{bookStatus === "error" ? ORDERBOOK_TEXT.FAILED : ORDERBOOK_TEXT.WAITING}
 							</div>
 						)}
 
 						<div className="shrink-0 py-1.5 px-2 flex items-center justify-center gap-2 border-y border-border/40 bg-surface/30">
 							<span className="text-sm font-semibold tabular-nums text-terminal-amber terminal-glow-amber">
-								{typeof mid === "number" && Number.isFinite(mid) ? formatNumber(mid, 2) : "-"}
+								{typeof mid === "number" && Number.isFinite(mid) ? formatNumber(mid, 2) : FALLBACK_VALUE_PLACEHOLDER}
 							</span>
 							{midDirection === "up" ? (
 								<TrendingUp className="size-3 text-terminal-green" />
@@ -251,7 +204,7 @@ export function OrderBookPanel() {
 							)}
 							<span className="text-4xs text-muted-foreground">
 								{typeof mid === "number" && Number.isFinite(mid)
-									? `≈ ${formatUSD(mid, { digits: 2, compact: false })}`
+									? `${ORDERBOOK_TEXT.APPROX_PREFIX}${formatUSD(mid, { digits: 2, compact: false })}`
 									: ""}
 							</span>
 						</div>
@@ -270,19 +223,19 @@ export function OrderBookPanel() {
 					</div>
 
 					<div className="shrink-0 px-2 py-1.5 border-t border-border/40 flex items-center justify-between text-4xs text-muted-foreground">
-						<span>Spread</span>
+						<span>{ORDERBOOK_TEXT.SPREAD_LABEL}</span>
 						<span className="tabular-nums text-terminal-amber">
 							{typeof spread === "number" &&
 							Number.isFinite(spread) &&
 							typeof spreadPct === "number" &&
 							Number.isFinite(spreadPct)
 								? `${formatNumber(spread, 2)} (${formatNumber(spreadPct, 3)}%)`
-								: "-"}
+								: FALLBACK_VALUE_PLACEHOLDER}
 						</span>
 					</div>
 					{bookStatus === "error" ? (
 						<div className="shrink-0 px-2 pb-1.5 text-4xs text-terminal-red/80">
-							{bookError instanceof Error ? bookError.message : "WebSocket error"}
+							{bookError instanceof Error ? bookError.message : ORDERBOOK_TEXT.WEBSOCKET_ERROR}
 						</div>
 					) : null}
 				</div>

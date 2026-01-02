@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { buildPerpMarketRegistry } from "@/lib/hyperliquid";
+import { buildPerpMarketRegistry } from "@/lib/hyperliquid/market-registry";
 import { useMeta } from "./use-meta";
 
 export function usePerpMarketRegistry() {
@@ -11,4 +11,3 @@ export function usePerpMarketRegistry() {
 
 	return { ...metaQuery, registry };
 }
-

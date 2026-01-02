@@ -1,4 +1,9 @@
-export function formatErrorForDisplay(error: unknown, fallbackMessage = "Something went wrong."): string {
+import { UI_TEXT } from "@/constants/app";
+
+export function formatErrorForDisplay(
+	error: unknown,
+	fallbackMessage = UI_TEXT.ERRORS.GENERIC_FALLBACK,
+): string {
 	const parts: string[] = [];
 
 	function collect(err: unknown, depth: number) {
@@ -32,4 +37,3 @@ export function formatErrorForDisplay(error: unknown, fallbackMessage = "Somethi
 	const unique = Array.from(new Set(parts.map((x) => x.trim()).filter(Boolean)));
 	return unique.join(" — ") || fallbackMessage;
 }
-

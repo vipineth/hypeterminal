@@ -1,17 +1,3 @@
-/* /* ============================================
-   TradingView Custom Theme - Static Styles
-   Colors are injected via CSS variables
-   ============================================ */
-
-/* CSS Variables - will be overridden by injected styles */
-:root {
-	--tv-bg: #0d0d0d;
-	--tv-fg: #d9d9d9;
-	--tv-muted-fg: #8c8c8c;
-	--tv-border: #333333;
-	--tv-hover: rgba(255, 255, 255, 0.06);
-	--tv-accent: #5eead4;
-}
 
 /* ========== TYPOGRAPHY ========== */
 html, body,
@@ -25,7 +11,7 @@ html, body,
 [class*="value-"],
 .apply-common-tooltip {
 	font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, monospace !important;
-	font-size: 10px !important;
+	font-size: 12px !important;
 	font-weight: 400 !important;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;

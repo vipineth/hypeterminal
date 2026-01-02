@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { create } from "zustand";
-import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { STORAGE_KEYS } from "@/constants/app";
+import { createValidatedStorage } from "@/stores/validated-storage";
 
 export type HyperliquidEnv = "mainnet" | "testnet";
 
@@ -16,38 +18,7 @@ const apiWalletSchema = z.object({
 	}),
 });
 
-const canUseLocalStorage = typeof window !== "undefined" && typeof window.localStorage !== "undefined";
-
-const validatedStorage: StateStorage = {
-	getItem: (name: string): string | null => {
-		if (!canUseLocalStorage) return null;
-		const item = localStorage.getItem(name);
-		if (!item) return null;
-
-		try {
-			const parsed = JSON.parse(item);
-			const validationResult = apiWalletSchema.safeParse(parsed);
-			if (!validationResult.success) {
-				console.warn("Invalid api wallet data in localStorage, resetting:", validationResult.error);
-				localStorage.removeItem(name);
-				return null;
-			}
-			return item;
-		} catch (error) {
-			console.warn("Failed to parse api wallet from localStorage:", error);
-			localStorage.removeItem(name);
-			return null;
-		}
-	},
-	setItem: (name: string, value: string): void => {
-		if (!canUseLocalStorage) return;
-		localStorage.setItem(name, value);
-	},
-	removeItem: (name: string): void => {
-		if (!canUseLocalStorage) return;
-		localStorage.removeItem(name);
-	},
-};
+const validatedStorage = createValidatedStorage(apiWalletSchema, "api wallet");
 
 interface ApiWalletStore {
 	privateKeyByEnv: Partial<Record<HyperliquidEnv, `0x${string}`>>;
@@ -84,7 +55,7 @@ const useApiWalletStore = create<ApiWalletStore>()(
 			},
 		}),
 		{
-			name: "hyperliquid-api-wallet-v1",
+			name: STORAGE_KEYS.API_WALLET,
 			storage: createJSONStorage(() => validatedStorage),
 			partialize: (state) => ({ privateKeyByEnv: state.privateKeyByEnv, nameByEnv: state.nameByEnv }),
 			merge: (persisted, current) => ({
@@ -106,4 +77,3 @@ export function useApiWalletNameByEnv() {
 export function useApiWalletActions() {
 	return useApiWalletStore((state) => state.actions);
 }
-

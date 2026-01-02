@@ -1,12 +1,15 @@
 import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from "lucide-react";
 import type * as React from "react";
 import { type Button, buttonVariants } from "@/components/ui/button";
+import { UI_TEXT } from "@/constants/app";
 import { cn } from "@/lib/utils";
+
+const PAGINATION_TEXT = UI_TEXT.PAGINATION;
 
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
 	return (
 		<nav
-			aria-label="pagination"
+			aria-label={PAGINATION_TEXT.ARIA_LABEL}
 			data-slot="pagination"
 			className={cn("mx-auto flex w-full justify-center", className)}
 			{...props}
@@ -48,13 +51,13 @@ function PaginationLink({ className, isActive, size = "icon", ...props }: Pagina
 function PaginationPrevious({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
 	return (
 		<PaginationLink
-			aria-label="Go to previous page"
+			aria-label={PAGINATION_TEXT.PREVIOUS_ARIA}
 			size="default"
 			className={cn("gap-1 px-2.5 sm:pl-2.5", className)}
 			{...props}
 		>
 			<ChevronLeftIcon />
-			<span className="hidden sm:block">Previous</span>
+			<span className="hidden sm:block">{PAGINATION_TEXT.PREVIOUS_LABEL}</span>
 		</PaginationLink>
 	);
 }
@@ -62,12 +65,12 @@ function PaginationPrevious({ className, ...props }: React.ComponentProps<typeof
 function PaginationNext({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
 	return (
 		<PaginationLink
-			aria-label="Go to next page"
+			aria-label={PAGINATION_TEXT.NEXT_ARIA}
 			size="default"
 			className={cn("gap-1 px-2.5 sm:pr-2.5", className)}
 			{...props}
 		>
-			<span className="hidden sm:block">Next</span>
+			<span className="hidden sm:block">{PAGINATION_TEXT.NEXT_LABEL}</span>
 			<ChevronRightIcon />
 		</PaginationLink>
 	);
@@ -82,7 +85,7 @@ function PaginationEllipsis({ className, ...props }: React.ComponentProps<"span"
 			{...props}
 		>
 			<MoreHorizontalIcon className="size-4" />
-			<span className="sr-only">More pages</span>
+			<span className="sr-only">{PAGINATION_TEXT.ELLIPSIS_LABEL}</span>
 		</span>
 	);
 }

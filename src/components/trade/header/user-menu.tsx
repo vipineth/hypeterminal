@@ -8,9 +8,12 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
+import { UI_TEXT } from "@/constants/app";
+import { useCopyToClipboard } from "@/hooks/ui/use-copy-to-clipboard";
 import { shortenAddress } from "@/lib/format";
-import { WalletDialog } from "./wallet-dialog";
+import { WalletDialog } from "../components/wallet-dialog";
+
+const USER_MENU_TEXT = UI_TEXT.USER_MENU;
 
 function CopyAddressMenuItem({ address }: { address: string }) {
 	const { copied, copy } = useCopyToClipboard();
@@ -23,7 +26,7 @@ function CopyAddressMenuItem({ address }: { address: string }) {
 	return (
 		<DropdownMenuItem className="flex items-center gap-2" onClick={handleClick}>
 			{copied ? <CopyCheck className="size-3.5" /> : <Copy className="size-3.5" />}
-			<span>Copy Address</span>
+			<span>{USER_MENU_TEXT.COPY_ADDRESS}</span>
 		</DropdownMenuItem>
 	);
 }
@@ -38,7 +41,7 @@ export function UserMenu() {
 		return (
 			<Button variant="ghost" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider" disabled>
 				<Loader2 className="size-3 animate-spin" />
-				Connecting...
+				{USER_MENU_TEXT.CONNECTING}
 			</Button>
 		);
 	}
@@ -53,7 +56,7 @@ export function UserMenu() {
 					onClick={() => setIsOpen(true)}
 				>
 					<Zap className="size-3 mr-1" />
-					Connect Wallet
+					{USER_MENU_TEXT.CONNECT_WALLET}
 				</Button>
 				<WalletDialog open={isOpen} onOpenChange={setIsOpen} />
 			</>
@@ -74,14 +77,14 @@ export function UserMenu() {
 					{address && <CopyAddressMenuItem address={address} />}
 					<DropdownMenuItem className="flex items-center gap-2">
 						<PlusCircle className="size-3.5 text-muted-foreground" />
-						<span>Add funds</span>
+						<span>{USER_MENU_TEXT.ADD_FUNDS}</span>
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						className="flex items-center gap-2 text-terminal-red focus:text-terminal-red"
 						onClick={() => disconnect.mutate()}
 					>
 						<LogOut className="size-3.5" />
-						<span>Disconnect</span>
+						<span>{USER_MENU_TEXT.DISCONNECT}</span>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>

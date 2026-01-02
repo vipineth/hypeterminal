@@ -1,7 +1,7 @@
 import { useMarketPrefsMigrations } from "@/hooks/markets/use-market-prefs-migrations";
-import { FooterBar } from "./footer";
-import { TopNav } from "./header";
-import { MainWorkspace } from "./layout";
+import { FooterBar } from "./footer/footer-bar";
+import { TopNav } from "./header/top-nav";
+import { MainWorkspace } from "./layout/main-workspace";
 
 export function TradeTerminalPage() {
 	useMarketPrefsMigrations();

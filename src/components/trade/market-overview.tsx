@@ -1,18 +1,21 @@
 import { Flame } from "lucide-react";
 import { useCallback } from "react";
 import { Separator } from "@/components/ui/separator";
-import { useSelectedResolvedMarket } from "@/hooks/hyperliquid";
+import { DEFAULT_MARKET_KEY, UI_TEXT } from "@/constants/app";
+import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
 import { formatPercent, formatUSD } from "@/lib/format";
-import { makePerpMarketKey } from "@/lib/hyperliquid";
+import { makePerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
 import { calculateOpenInterestUSD } from "@/lib/market";
 import { cn } from "@/lib/utils";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import { StatBlock } from "./chart/stat-block";
 import { TokenSelector } from "./chart/token-selector";
 
+const MARKET_OVERVIEW_TEXT = UI_TEXT.MARKET_OVERVIEW;
+
 export function MarketOverview() {
 	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "realtime" });
-	const selectedCoin = selectedMarket?.coin ?? "BTC";
+	const selectedCoin = selectedMarket?.coin ?? perpCoinFromMarketKey(DEFAULT_MARKET_KEY);
 	const { setSelectedMarketKey } = useMarketPrefsActions();
 
 	const handleCoinChange = useCallback(
@@ -34,23 +37,23 @@ export function MarketOverview() {
 					<Separator orientation="vertical" className="mx-1 h-4" />
 					<div className="hidden md:flex items-center gap-4 text-3xs">
 						<StatBlock
-							label="MARK"
+							label={MARKET_OVERVIEW_TEXT.LABEL_MARK}
 							value={formatUSD(selectedMarket?.ctx?.markPx ? Number(selectedMarket.ctx.markPx) : null)}
 							valueClass="text-terminal-amber terminal-glow-amber"
 						/>
 						<StatBlock
-							label="ORACLE"
+							label={MARKET_OVERVIEW_TEXT.LABEL_ORACLE}
 							value={formatUSD(selectedMarket?.ctx?.oraclePx ? Number(selectedMarket.ctx.oraclePx) : null)}
 						/>
 						<StatBlock
-							label="VOL"
+							label={MARKET_OVERVIEW_TEXT.LABEL_VOLUME}
 							value={formatUSD(selectedMarket?.ctx?.dayNtlVlm ? Number(selectedMarket.ctx.dayNtlVlm) : null, {
 								notation: "compact",
 								compactDisplay: "short",
 							})}
 						/>
 						<StatBlock
-							label="OI"
+							label={MARKET_OVERVIEW_TEXT.LABEL_OPEN_INTEREST}
 							value={formatUSD(calculateOpenInterestUSD(selectedMarket?.ctx), {
 								notation: "compact",
 								compactDisplay: "short",

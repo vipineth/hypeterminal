@@ -1,4 +1,4 @@
-import { FALLBACK_VALUE_PLACEHOLDER, FORMAT_COMPACT_DEFAULT, FORMAT_COMPACT_THRESHOLD } from "@/config/interface";
+import { FALLBACK_VALUE_PLACEHOLDER, FORMAT_COMPACT_DEFAULT, FORMAT_COMPACT_THRESHOLD } from "@/constants/app";
 
 const formatterCache = new Map<string, Intl.NumberFormat>();
 
@@ -74,6 +74,71 @@ export function formatUSD(value: number | null | undefined, opts?: number | Form
 		...(shouldCompact && { notation: "compact", compactDisplay: "short" }),
 	};
 	return getFormatter("en-US", mergeOptions(defaults, rest)).format(value);
+}
+
+/**
+ * Calculate price decimals from szDecimals using Hyperliquid's rule.
+ * Price decimals = max(0, 6 - szDecimals)
+ *
+ * @example szDecimalsToPriceDecimals(4) -> 2 (BTC: szDecimals=4, shows $88,140.12)
+ * @example szDecimalsToPriceDecimals(3) -> 3 (ETH: szDecimals=3, shows $3,456.789)
+ * @example szDecimalsToPriceDecimals(0) -> 6 (low-priced assets)
+ */
+export function szDecimalsToPriceDecimals(szDecimals: number): number {
+	return Math.max(0, 6 - szDecimals);
+}
+
+export interface FormatPriceOptions extends FormatOptions {
+	/** Size decimals from market metadata - used to derive price decimals */
+	szDecimals?: number;
+}
+
+/**
+ * Format a price with decimal places derived from szDecimals.
+ * Uses Hyperliquid's rule: priceDecimals = max(0, 6 - szDecimals)
+ *
+ * @example formatPrice(88140.123, { szDecimals: 4 }) -> "$88,140.12" (BTC)
+ * @example formatPrice(3456.789, { szDecimals: 3 }) -> "$3,456.789" (ETH)
+ * @example formatPrice(0.00001234, { szDecimals: 0 }) -> "$0.000012" (low-priced)
+ */
+export function formatPrice(value: number | null | undefined, opts?: FormatPriceOptions): string {
+	if (!isValidNumber(value)) return FALLBACK_VALUE_PLACEHOLDER;
+
+	// Derive decimals from szDecimals if provided, otherwise use explicit digits or default to 2
+	const decimals = opts?.digits ?? (opts?.szDecimals !== undefined ? szDecimalsToPriceDecimals(opts.szDecimals) : 2);
+	const { compact, szDecimals: _, ...rest } = opts ?? {};
+	const shouldCompact = (compact ?? false) && Math.abs(value) >= FORMAT_COMPACT_THRESHOLD;
+
+	const defaults: Intl.NumberFormatOptions = {
+		style: "currency",
+		currency: "USD",
+		minimumFractionDigits: decimals,
+		maximumFractionDigits: decimals,
+		...(shouldCompact && { notation: "compact", compactDisplay: "short" }),
+	};
+
+	return getFormatter("en-US", mergeOptions(defaults, rest)).format(value);
+}
+
+/**
+ * Format a price without currency symbol.
+ * Useful for input fields and raw price display.
+ *
+ * @example formatPriceRaw(88140.123, 4) -> "88,140.12" (szDecimals=4 -> 2 price decimals)
+ * @example formatPriceRaw(3456.789, 3) -> "3,456.789" (szDecimals=3 -> 3 price decimals)
+ */
+export function formatPriceRaw(value: number | null | undefined, szDecimals?: number): string {
+	if (!isValidNumber(value)) return FALLBACK_VALUE_PLACEHOLDER;
+
+	const decimals = szDecimals !== undefined ? szDecimalsToPriceDecimals(szDecimals) : 2;
+
+	const defaults: Intl.NumberFormatOptions = {
+		style: "decimal",
+		minimumFractionDigits: decimals,
+		maximumFractionDigits: decimals,
+	};
+
+	return getFormatter("en-US", defaults).format(value);
 }
 
 /**

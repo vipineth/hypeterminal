@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { getTokenIconUrl, isTokenInCategory, marketCategories } from "@/config/token";
-import { formatPercent, formatUSD } from "@/lib/format";
+import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
+import { formatPercent, formatPrice, formatUSD } from "@/lib/format";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
 import { cn } from "@/lib/utils";
 import { QUOTE_ASSET } from "./constants";
@@ -16,6 +17,8 @@ export type TokenSelectorProps = {
 	value: string;
 	onValueChange: (value: string) => void;
 };
+
+const TOKEN_SELECTOR_TEXT = UI_TEXT.TOKEN_SELECTOR;
 
 export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 	const {
@@ -48,7 +51,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 					size="sm"
 					role="combobox"
 					aria-expanded={open}
-					aria-label="Select token"
+					aria-label={TOKEN_SELECTOR_TEXT.ARIA_SELECT}
 					className="h-6 gap-1.5 text-xs font-semibold px-2"
 				>
 					<Avatar className="size-4">
@@ -68,7 +71,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 						<div className="relative">
 							<Search className="absolute left-2 top-1/2 -translate-y-1/2 size-3 text-muted-foreground" />
 							<Input
-								placeholder="Search markets..."
+								placeholder={TOKEN_SELECTOR_TEXT.SEARCH_PLACEHOLDER}
 								value={search}
 								onChange={(e) => setSearch(e.target.value)}
 								className="pl-7 h-7 text-xs bg-background/50 border-border/60 focus:border-terminal-cyan/60"
@@ -90,7 +93,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 											: "text-muted-foreground hover:text-foreground",
 									)}
 									tabIndex={0}
-									aria-label={`Filter by ${cat.label}`}
+									aria-label={TOKEN_SELECTOR_TEXT.FILTER_ARIA(cat.label)}
 									aria-pressed={category === cat.value}
 								>
 									{cat.icon}
@@ -119,7 +122,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 									className={cn(
 										"w-20 flex items-center justify-end gap-1 transition-colors hover:text-foreground cursor-pointer",
 									)}
-									aria-label={`Sort by ${header.column.columnDef.header?.toString()}`}
+									aria-label={TOKEN_SELECTOR_TEXT.SORT_ARIA(String(header.column.columnDef.header ?? ""))}
 								>
 									<span className="truncate">{flexRender(header.column.columnDef.header, header.getContext())}</span>
 									<span className="shrink-0">
@@ -139,10 +142,10 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 					<div ref={containerRef} className="h-72 overflow-auto">
 						{isLoading ? (
 							<div className="flex items-center justify-center py-8">
-								<span className="text-3xs text-muted-foreground">Loading markets...</span>
+								<span className="text-3xs text-muted-foreground">{TOKEN_SELECTOR_TEXT.LOADING}</span>
 							</div>
 						) : rows.length === 0 ? (
-							<div className="py-8 text-center text-3xs text-muted-foreground">No markets found.</div>
+							<div className="py-8 text-center text-3xs text-muted-foreground">{TOKEN_SELECTOR_TEXT.EMPTY}</div>
 						) : (
 							<div
 								style={{
@@ -158,6 +161,18 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 									const isFundingPositive = fundingNum >= 0;
 									const isSelected = value === market.coin;
 									const isFav = isFavorite(market.coin);
+									const changePct = calculate24hPriceChange(market.ctx);
+									const changeIsPositive = (changePct ?? 0) >= 0;
+									const changeClass = cn(
+										"text-2xs font-medium tabular-nums",
+										changePct === null
+											? "text-muted-foreground"
+											: changeIsPositive
+												? "text-terminal-green"
+												: "text-terminal-red",
+									);
+									const changeText =
+										changePct === null ? FALLBACK_VALUE_PLACEHOLDER : formatPercent(changePct / 100);
 
 									return (
 										<div
@@ -198,7 +213,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 																toggleFavorite(market.coin);
 															}}
 															className="hover:scale-110 transition-transform"
-															aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
+															aria-label={isFav ? TOKEN_SELECTOR_TEXT.FAVORITE_REMOVE : TOKEN_SELECTOR_TEXT.FAVORITE_ADD}
 														>
 															<Star
 																className={cn(
@@ -211,7 +226,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 														</button>
 														{isTokenInCategory(market.coin, "new") && (
 															<Badge variant="neutral" size="xs" className="px-1 py-0 text-4xs">
-																NEW
+																{TOKEN_SELECTOR_TEXT.NEW_BADGE}
 															</Badge>
 														)}
 													</div>
@@ -222,25 +237,13 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 											</div>
 											<div className="w-20 text-right">
 												<span className="text-2xs font-medium tabular-nums">
-													{formatUSD(market.ctx?.markPx ? Number(market.ctx.markPx) : null)}
+													{formatPrice(market.ctx?.markPx ? Number(market.ctx.markPx) : null, { szDecimals: market.szDecimals })}
 												</span>
 											</div>
 											<div className="w-20 text-right">
-												{(() => {
-													const changePct = calculate24hPriceChange(market.ctx);
-													if (changePct === null) return <span className="text-2xs">-</span>;
-													const isPositive = changePct >= 0;
-													return (
-														<span
-															className={cn(
-																"text-2xs font-medium tabular-nums",
-																isPositive ? "text-terminal-green" : "text-terminal-red",
-															)}
-														>
-															{formatPercent(changePct / 100)}
-														</span>
-													);
-												})()}
+												<span className={changeClass}>
+													{changeText}
+												</span>
 											</div>
 											<div className="w-20 text-right">
 												<span className="text-2xs font-medium tabular-nums">
@@ -278,8 +281,12 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 					</div>
 
 					<div className="px-3 py-1.5 bg-surface/30 flex items-center justify-between text-4xs text-muted-foreground">
-						<span>{filteredMarkets.length} markets</span>
-						<span className="tabular-nums">{sorting.length > 0 ? `Sorted by ${sorting[0].id}` : "Updated live"}</span>
+						<span>
+							{filteredMarkets.length} {TOKEN_SELECTOR_TEXT.MARKETS_SUFFIX}
+						</span>
+						<span className="tabular-nums">
+							{sorting.length > 0 ? TOKEN_SELECTOR_TEXT.SORTED_BY(sorting[0].id) : TOKEN_SELECTOR_TEXT.UPDATED_LIVE}
+						</span>
 					</div>
 				</div>
 			</PopoverContent>

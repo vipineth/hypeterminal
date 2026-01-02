@@ -8,7 +8,8 @@
 		"serve": "vite preview",
 		"format": "biome format",
 		"lint": "biome lint",
-		"check": "biome check"
+		"check": "biome check",
+		"test": "vitest run"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^5.2.2",
@@ -88,11 +89,12 @@
 		"shadcn": "^3.5.1",
 		"typescript": "^5.7.2",
 		"vite": "^7.1.7",
-		"vite-tsconfig-paths": "^5.1.4"
+		"vite-tsconfig-paths": "^5.1.4",
+		"vitest": "^4.0.16"
 	},
 	"pnpm": {
-    "overrides": {
-      "@noble/hashes": "1.8.0"
-    }
-  }
+		"overrides": {
+			"@noble/hashes": "1.8.0"
+		}
+	}
 }

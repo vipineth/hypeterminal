@@ -2,9 +2,9 @@ import { getCoreRowModel, type Row, type SortingState, useReactTable } from "@ta
 import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { isTokenInCategory, type MarketCategory } from "@/config/token";
-import { usePerpMarketRegistry } from "@/hooks/hyperliquid";
+import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
 import { usePerpAssetCtxsSnapshot } from "@/hooks/hyperliquid/use-perp-asset-ctxs-snapshot";
-import { makePerpMarketKey } from "@/lib/hyperliquid";
+import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
 import { useFavoriteMarketKeys, useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import { type MarketRow, TOKEN_SELECTOR_COLUMNS } from "./constants";

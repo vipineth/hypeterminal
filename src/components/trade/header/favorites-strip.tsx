@@ -2,9 +2,13 @@ import type { ActiveAssetCtxEvent } from "@nktkas/hyperliquid/api/subscription";
 import { Star } from "lucide-react";
 import { useMemo } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { useActiveAssetCtxSubscription, useAllMidsSubscription } from "@/hooks/hyperliquid";
-import { formatPercent, formatUSD } from "@/lib/format";
-import { isPerpMarketKey, type PerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid";
+import { UI_TEXT } from "@/constants/app";
+import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
+import { useActiveAssetCtxSubscription } from "@/hooks/hyperliquid/socket/use-active-asset-ctx-subscription";
+import { useAllMidsSubscription } from "@/hooks/hyperliquid/socket/use-all-mids-subscription";
+import { formatPercent, formatPrice } from "@/lib/format";
+import { calculate24hPriceChange } from "@/lib/market";
+import { isPerpMarketKey, type PerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
 import { cn } from "@/lib/utils";
 import { useFavoriteMarketKeys, useMarketPrefsActions, useSelectedMarketKey } from "@/stores/use-market-prefs-store";
 
@@ -14,11 +18,15 @@ type FavoriteData = {
 	marketKey: PerpMarketKey;
 	coin: string;
 	price: string | undefined;
+	szDecimals: number;
 };
+
+const FAVORITES_TEXT = UI_TEXT.FAVORITES;
 
 export function FavoritesStrip() {
 	const favorites = useFavoriteMarketKeys();
 	const selectedMarketKey = useSelectedMarketKey();
+	const { registry } = usePerpMarketRegistry();
 	const { data: mids } = useAllMidsSubscription<Record<string, string> | undefined>({
 		select: (event) => event?.mids,
 	});
@@ -28,15 +36,17 @@ export function FavoritesStrip() {
 			.map((marketKey) => {
 				if (!isPerpMarketKey(marketKey)) return null;
 				const coin = perpCoinFromMarketKey(marketKey);
+				const marketInfo = registry?.coinToInfo.get(coin);
 
 				return {
 					marketKey,
 					coin,
 					price: mids?.[coin],
+					szDecimals: marketInfo?.szDecimals ?? 4,
 				};
 			})
 			.filter((x): x is FavoriteData => x !== null);
-	}, [favorites, mids]);
+	}, [favorites, mids, registry]);
 
 	return (
 		<div className="py-1.5 border-b border-border/60 bg-surface/20">
@@ -60,7 +70,7 @@ function EmptyState() {
 	return (
 		<div className="flex items-center gap-2 text-3xs text-muted-foreground">
 			<Star className="size-3" />
-			<span>Select favorite markets</span>
+			<span>{FAVORITES_TEXT.EMPTY}</span>
 		</div>
 	);
 }
@@ -69,13 +79,13 @@ type FavoriteChipProps = FavoriteData & {
 	isActive: boolean;
 };
 
-function FavoriteChip({ marketKey, coin, price, isActive }: FavoriteChipProps) {
+function FavoriteChip({ marketKey, coin, price, szDecimals, isActive }: FavoriteChipProps) {
 	const { setSelectedMarketKey } = useMarketPrefsActions();
 	const { data: assetCtx } = useActiveAssetCtxSubscription({
 		params: { coin },
 		select: (event) => event?.ctx,
 	});
-	const changePct = calculateChangePct(assetCtx);
+	const changePct = calculate24hPriceChange(assetCtx) ?? 0;
 	const isPositive = changePct >= 0;
 
 	function handleClick() {
@@ -95,7 +105,7 @@ function FavoriteChip({ marketKey, coin, price, isActive }: FavoriteChipProps) {
 			onClick={handleClick}
 			onKeyDown={handleKeyDown}
 			tabIndex={0}
-			aria-label={`Select ${coin} market`}
+			aria-label={FAVORITES_TEXT.SELECT_MARKET_ARIA(coin)}
 			aria-pressed={isActive}
 			className={cn(
 				"shrink-0 inline-flex items-center gap-2 px-2.5 py-0.5 text-3xs transition-colors cursor-pointer",
@@ -104,7 +114,7 @@ function FavoriteChip({ marketKey, coin, price, isActive }: FavoriteChipProps) {
 			)}
 		>
 			<span className={cn("font-medium", isActive ? "text-terminal-cyan" : "text-foreground")}>{coin}</span>
-			{price && <span className="text-muted-foreground tabular-nums">{formatUSD(parseFloat(price))}</span>}
+			{price && <span className="text-muted-foreground tabular-nums">{formatPrice(parseFloat(price), { szDecimals })}</span>}
 			{assetCtx && (
 				<span className={cn("tabular-nums font-medium", isPositive ? "text-terminal-green" : "text-terminal-red")}>
 					{formatPercent(changePct / 100, {
@@ -115,15 +125,4 @@ function FavoriteChip({ marketKey, coin, price, isActive }: FavoriteChipProps) {
 			)}
 		</button>
 	);
-}
-
-function calculateChangePct(assetCtx: AssetCtx | undefined): number {
-	if (!assetCtx) return 0;
-
-	const markPx = parseFloat(assetCtx.markPx);
-	const prevDayPx = parseFloat(assetCtx.prevDayPx);
-
-	if (prevDayPx === 0) return 0;
-
-	return ((markPx - prevDayPx) / prevDayPx) * 100;
 }

@@ -1,11 +1,14 @@
 import { Wifi } from "lucide-react";
 import { useEffect, useState } from "react";
+import { FOOTER_TIME_TICK_MS, UI_TEXT } from "@/constants/app";
+
+const FOOTER_TEXT = UI_TEXT.FOOTER;
 
 export function FooterBar() {
 	const [time, setTime] = useState(new Date());
 
 	useEffect(() => {
-		const interval = setInterval(() => setTime(new Date()), 1000);
+		const interval = setInterval(() => setTime(new Date()), FOOTER_TIME_TICK_MS);
 		return () => clearInterval(interval);
 	}, []);
 
@@ -14,27 +17,27 @@ export function FooterBar() {
 			<div className="flex items-center gap-3">
 				<div className="flex items-center gap-1.5">
 					<Wifi className="size-3 text-terminal-green" />
-					<span className="text-terminal-green">Connected</span>
+					<span className="text-terminal-green">{FOOTER_TEXT.STATUS_CONNECTED}</span>
 				</div>
 				<div className="h-3 w-px bg-border/60" />
 				<div className="flex items-center gap-1.5 text-muted-foreground">
-					<span>Block:</span>
-					<span className="tabular-nums text-terminal-cyan">18,942,103</span>
+					<span>{FOOTER_TEXT.BLOCK_LABEL}</span>
+					<span className="tabular-nums text-terminal-cyan">{FOOTER_TEXT.BLOCK_VALUE}</span>
 				</div>
 				<div className="h-3 w-px bg-border/60" />
 				<div className="flex items-center gap-1.5 text-muted-foreground">
-					<span>Gas:</span>
-					<span className="tabular-nums text-terminal-amber">24 gwei</span>
+					<span>{FOOTER_TEXT.GAS_LABEL}</span>
+					<span className="tabular-nums text-terminal-amber">{FOOTER_TEXT.GAS_VALUE}</span>
 				</div>
 			</div>
 			<div className="flex items-center gap-3">
 				<span className="text-muted-foreground">
-					Latency: <span className="tabular-nums text-terminal-green">12ms</span>
+					{FOOTER_TEXT.LATENCY_LABEL} <span className="tabular-nums text-terminal-green">{FOOTER_TEXT.LATENCY_VALUE}</span>
 				</span>
 				<div className="h-3 w-px bg-border/60" />
 				<span className="text-muted-foreground tabular-nums">{time.toLocaleTimeString()}</span>
 				<div className="h-3 w-px bg-border/60" />
-				<span className="text-muted-foreground">v0.1.0</span>
+				<span className="text-muted-foreground">{FOOTER_TEXT.VERSION}</span>
 			</div>
 		</footer>
 	);
