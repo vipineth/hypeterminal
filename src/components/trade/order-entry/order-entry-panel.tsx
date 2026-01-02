@@ -32,6 +32,7 @@ import { ensureLeverage, makeExchangeConfig, placeSingleOrder } from "@/lib/hype
 import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder, getDefaultLeverage } from "@/lib/trade/orders";
 import { cn } from "@/lib/utils";
+import { useOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import {
 	useDefaultLeverageByMode,
@@ -88,6 +89,9 @@ export function OrderEntryPanel() {
 	// Order queue
 	const { addOrder, updateOrder } = useOrderQueueActions();
 
+	// Orderbook price selection
+	const selectedPrice = useSelectedPrice();
+
 	// Local form state
 	const [type, setType] = useState<OrderType>("market");
 	const [side, setSide] = useState<Side>("buy");
@@ -113,6 +117,15 @@ export function OrderEntryPanel() {
 			setPrevMarketKey(market.marketKey);
 		}
 	}, [market?.marketKey, prevMarketKey]);
+
+	// Handle orderbook price selection
+	useEffect(() => {
+		if (selectedPrice !== null) {
+			setType("limit");
+			setLimitPriceInput(String(selectedPrice));
+			useOrderbookActionsStore.getState().clearSelectedPrice();
+		}
+	}, [selectedPrice]);
 
 	// Derived values
 	// Available balance for trading = accountValue - totalMarginUsed

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-export function usePersistentLayout(key: string, fallback: number[]) {
-	const [layout, setLayout] = useState<number[]>(fallback);
+export function usePersistentLayout(key: string, fallback: readonly number[]) {
+	const [layout, setLayout] = useState<number[]>([...fallback]);
 
 	useEffect(() => {
 		try {

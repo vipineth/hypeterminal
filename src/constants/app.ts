@@ -46,17 +46,17 @@ export const TOKEN_ICON_BASE_URL = "https://app.hyperliquid.xyz/coins";
 export const LAYOUT_PERSISTENCE = {
 	MAIN: {
 		KEY: "terminal:layout:main",
-		FALLBACK: [82, 18],
+		FALLBACK: [82, 18] as const,
 		PANEL_DEFAULTS: [78, 22],
 	},
 	VERTICAL: {
 		KEY: "terminal:layout:vert",
-		FALLBACK: [70, 30],
+		FALLBACK: [65, 35] as const,
 		PANEL_DEFAULTS: [65, 35],
 	},
 	CHART_BOOK: {
 		KEY: "terminal:layout:chart-book",
-		FALLBACK: [75, 25],
+		FALLBACK: [75, 25] as const,
 		PANEL_DEFAULTS: [70, 30],
 	},
 } as const;

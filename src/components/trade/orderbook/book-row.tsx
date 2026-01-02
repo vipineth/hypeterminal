@@ -2,31 +2,55 @@ import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
 import { formatNumber } from "@/lib/format";
 import type { OrderBookRow } from "@/lib/trade/orderbook";
 import { cn } from "@/lib/utils";
+import { useSetSelectedPrice } from "@/stores/use-orderbook-actions-store";
 
 type BookRowProps = {
 	row: OrderBookRow;
 	type: "ask" | "bid";
 	maxTotal: number;
+	/** Show size/total in USDC instead of asset */
+	showInUsdc?: boolean;
 };
 
-export function BookRow({ row, type, maxTotal }: BookRowProps) {
+export function BookRow({ row, type, maxTotal, showInUsdc = false }: BookRowProps) {
+	const setSelectedPrice = useSetSelectedPrice();
 	const depthPct = maxTotal > 0 ? (row.total / maxTotal) * 100 : 0;
 	const isAsk = type === "ask";
 
 	const priceText = Number.isFinite(row.price) ? formatNumber(row.price, 2) : FALLBACK_VALUE_PLACEHOLDER;
-	const sizeText = Number.isFinite(row.size) ? formatNumber(row.size, 3) : FALLBACK_VALUE_PLACEHOLDER;
-	const totalText = Number.isFinite(row.total) ? formatNumber(row.total, 3) : FALLBACK_VALUE_PLACEHOLDER;
+
+	// Size and total can be shown in USDC (multiply by price) or in asset
+	const sizeValue = showInUsdc ? row.size * row.price : row.size;
+	const totalValue = showInUsdc ? row.total * row.price : row.total;
+
+	const sizeText = Number.isFinite(sizeValue) ? formatNumber(sizeValue, showInUsdc ? 2 : 3) : FALLBACK_VALUE_PLACEHOLDER;
+	const totalText = Number.isFinite(totalValue) ? formatNumber(totalValue, showInUsdc ? 2 : 3) : FALLBACK_VALUE_PLACEHOLDER;
+
+	const handlePriceClick = () => {
+		if (Number.isFinite(row.price)) {
+			setSelectedPrice(row.price);
+		}
+	};
 
 	return (
-		<div className="grid grid-cols-3 gap-2 text-2xs tabular-nums py-0.5 relative hover:bg-accent/30 cursor-pointer group">
+		<div className="relative hover:bg-accent/30 cursor-pointer group">
 			<div
-				className={cn("absolute inset-0 pointer-events-none", isAsk ? "depth-bar-ask" : "depth-bar-bid")}
+				className={cn("absolute inset-y-0 pointer-events-none", isAsk ? "depth-bar-ask" : "depth-bar-bid")}
 				style={{ width: `${depthPct}%`, [isAsk ? "right" : "left"]: 0, [isAsk ? "left" : "right"]: "auto" }}
 			/>
-			<div className={cn("relative z-10", isAsk ? "text-terminal-red" : "text-terminal-green")}>{priceText}</div>
-			<div className="text-right relative z-10 text-muted-foreground group-hover:text-foreground">{sizeText}</div>
-			<div className="text-right relative z-10 text-muted-foreground/70 group-hover:text-muted-foreground">
-				{totalText}
+			<div className="grid grid-cols-3 gap-2 text-2xs tabular-nums py-0.5 px-2 relative z-10">
+				<button
+					type="button"
+					onClick={handlePriceClick}
+					className={cn(
+						"text-left hover:underline",
+						isAsk ? "text-terminal-red" : "text-terminal-green",
+					)}
+				>
+					{priceText}
+				</button>
+				<div className="text-right text-muted-foreground group-hover:text-foreground">{sizeText}</div>
+				<div className="text-right text-muted-foreground/70 group-hover:text-muted-foreground">{totalText}</div>
 			</div>
 		</div>
 	);

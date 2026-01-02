@@ -6,7 +6,6 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
 import { useL2BookSubscription } from "@/hooks/hyperliquid/socket/use-l2-book-subscription";
 import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
@@ -44,6 +43,7 @@ function generatePriceGroupingOptions(midPrice: number | undefined): Array<{ tic
 export function OrderBookPanel() {
 	const [view, setView] = useState<"book" | "trades">("book");
 	const [nSigFigs, setNSigFigs] = useState<2 | 3 | 4 | 5 | undefined>(5);
+	const [showInUsdc, setShowInUsdc] = useState(false);
 
 	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
 	const coin = selectedMarket?.coin ?? "BTC";
@@ -144,7 +144,7 @@ export function OrderBookPanel() {
 						>
 							{nSigFigs
 								? priceGroupingOptions.find((opt) => opt.nSigFigs === nSigFigs)?.tickSize
-									? formatNumber(priceGroupingOptions.find((opt) => opt.nSigFigs === nSigFigs)?.tickSize, 8)
+									? String(priceGroupingOptions.find((opt) => opt.nSigFigs === nSigFigs)?.tickSize)
 									: `${nSigFigs ?? 0} ${ORDERBOOK_TEXT.SIG_FIGS_SUFFIX}`
 								: ORDERBOOK_TEXT.AUTO_LABEL}
 							<ChevronDown className="size-2.5" />
@@ -154,9 +154,7 @@ export function OrderBookPanel() {
 						<DropdownMenuItem onClick={() => setNSigFigs(undefined)}>{ORDERBOOK_TEXT.AUTO_LABEL}</DropdownMenuItem>
 						{priceGroupingOptions.map((option) => (
 							<DropdownMenuItem key={option.nSigFigs} onClick={() => setNSigFigs(option.nSigFigs as 2 | 3 | 4 | 5)}>
-								{option.tickSize > 0
-									? formatNumber(option.tickSize, 8)
-									: `${option.nSigFigs} ${ORDERBOOK_TEXT.SIG_FIGS_SUFFIX}`}
+								{option.tickSize > 0 ? String(option.tickSize) : `${option.nSigFigs} ${ORDERBOOK_TEXT.SIG_FIGS_SUFFIX}`}
 							</DropdownMenuItem>
 						))}
 					</DropdownMenuContent>
@@ -167,26 +165,34 @@ export function OrderBookPanel() {
 				<div className="flex-1 min-h-0 flex flex-col">
 					<div className="grid grid-cols-3 gap-2 px-2 py-1 text-4xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40 shrink-0">
 						<div>{ORDERBOOK_TEXT.HEADER_PRICE}</div>
-						<div className="text-right">{ORDERBOOK_TEXT.HEADER_SIZE}</div>
-						<div className="text-right">{ORDERBOOK_TEXT.HEADER_TOTAL}</div>
+						<button
+							type="button"
+							onClick={() => setShowInUsdc((v) => !v)}
+							className="text-right hover:text-foreground transition-colors"
+						>
+							{showInUsdc ? "USDC" : coin}
+						</button>
+						<button
+							type="button"
+							onClick={() => setShowInUsdc((v) => !v)}
+							className="text-right hover:text-foreground transition-colors"
+						>
+							{showInUsdc ? "USDC" : coin}
+						</button>
 					</div>
 
-					<div className="flex-1 min-h-0 flex flex-col">
+					<div className="flex-1 min-h-0 flex flex-col overflow-hidden">
 						{bookStatus !== "error" && asks.length > 0 ? (
-							<ScrollArea className="flex-1 min-h-0">
-								<div className="px-2 py-1 flex flex-col justify-end min-h-full">
-									<div className="space-y-px">
-										{asks
-											.slice(0, 12)
-											.reverse()
-											.map((r) => (
-												<BookRow key={`ask-${r.price}`} row={r} type="ask" maxTotal={maxTotal} />
-											))}
-									</div>
-								</div>
-							</ScrollArea>
+							<div className="flex-1 flex flex-col justify-end gap-px py-0.5">
+								{asks
+									.slice(0, 9)
+									.reverse()
+									.map((r) => (
+										<BookRow key={`ask-${r.price}`} row={r} type="ask" maxTotal={maxTotal} showInUsdc={showInUsdc} />
+									))}
+							</div>
 						) : (
-							<div className="flex-1 min-h-0 flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
+							<div className="flex-1 flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
 								{bookStatus === "error" ? ORDERBOOK_TEXT.FAILED : ORDERBOOK_TEXT.WAITING}
 							</div>
 						)}
@@ -210,19 +216,15 @@ export function OrderBookPanel() {
 						</div>
 
 						{bookStatus !== "error" && bids.length > 0 ? (
-							<ScrollArea className="flex-1 min-h-0">
-								<div className="px-2 py-1">
-									<div className="space-y-px">
-										{bids.slice(0, 12).map((r) => (
-											<BookRow key={`bid-${r.price}`} row={r} type="bid" maxTotal={maxTotal} />
-										))}
-									</div>
-								</div>
-							</ScrollArea>
+							<div className="flex-1 flex flex-col gap-px py-0.5">
+								{bids.slice(0, 11).map((r) => (
+									<BookRow key={`bid-${r.price}`} row={r} type="bid" maxTotal={maxTotal} showInUsdc={showInUsdc} />
+								))}
+							</div>
 						) : null}
 					</div>
 
-					<div className="shrink-0 px-2 py-1.5 border-t border-border/40 flex items-center justify-between text-4xs text-muted-foreground">
+					<div className="mt-auto shrink-0 px-2 py-1.5 border-t border-border/40 flex items-center justify-between text-4xs text-muted-foreground">
 						<span>{ORDERBOOK_TEXT.SPREAD_LABEL}</span>
 						<span className="tabular-nums text-terminal-amber">
 							{typeof spread === "number" &&
