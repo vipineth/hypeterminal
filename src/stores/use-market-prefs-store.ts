@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { create } from "zustand";
-import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { DEFAULT_MARKET_KEY, DEFAULT_MARKET_SCOPE, STORAGE_KEYS } from "@/constants/app";
+import { createValidatedStorage } from "@/stores/validated-storage";
 
 export type MarketScope = "all" | "perp" | "spot" | "builderPerp";
 
@@ -15,42 +17,7 @@ const marketPrefsSchema = z.object({
 	}),
 });
 
-const canUseLocalStorage = typeof window !== "undefined" && typeof window.localStorage !== "undefined";
-
-const validatedStorage: StateStorage = {
-	getItem: (name: string): string | null => {
-		if (!canUseLocalStorage) return null;
-		const item = localStorage.getItem(name);
-		if (!item) return null;
-
-		try {
-			const parsed = JSON.parse(item);
-			const validationResult = marketPrefsSchema.safeParse(parsed);
-
-			if (!validationResult.success) {
-				console.warn("Invalid market prefs data in localStorage, resetting:", validationResult.error);
-				localStorage.removeItem(name);
-				return null;
-			}
-
-			return item;
-		} catch (error) {
-			console.warn("Failed to parse market prefs from localStorage:", error);
-			localStorage.removeItem(name);
-			return null;
-		}
-	},
-	setItem: (name: string, value: string): void => {
-		if (!canUseLocalStorage) return;
-		localStorage.setItem(name, value);
-	},
-	removeItem: (name: string): void => {
-		if (!canUseLocalStorage) return;
-		localStorage.removeItem(name);
-	},
-};
-
-const DEFAULT_MARKET_KEY = "perp:BTC";
+const validatedStorage = createValidatedStorage(marketPrefsSchema, "market prefs");
 
 function defaultLastSelectedByScope(): Record<MarketScope, string> {
 	return {
@@ -79,7 +46,7 @@ interface MarketPrefsStore {
 const useMarketPrefsStore = create<MarketPrefsStore>()(
 	persist(
 		(set, get) => ({
-			marketScope: "perp",
+			marketScope: DEFAULT_MARKET_SCOPE,
 			selectedMarketKey: DEFAULT_MARKET_KEY,
 			lastSelectedByScope: defaultLastSelectedByScope(),
 			favoriteMarketKeys: [],
@@ -122,7 +89,7 @@ const useMarketPrefsStore = create<MarketPrefsStore>()(
 			},
 		}),
 		{
-			name: "market-prefs-v1",
+			name: STORAGE_KEYS.MARKET_PREFS,
 			storage: createJSONStorage(() => validatedStorage),
 			partialize: (state) => ({
 				marketScope: state.marketScope,

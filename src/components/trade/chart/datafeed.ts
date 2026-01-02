@@ -6,8 +6,8 @@ import type {
 	MetaResponse,
 	WebSocketSubscription,
 } from "@nktkas/hyperliquid";
-import { getInfoClient, getSubscriptionClient } from "@/lib/hyperliquid";
-import { META_CACHE_TTL_MS, readCachedMeta, writeCachedMeta } from "@/lib/hyperliquid/meta-cache";
+import { getInfoClient, getSubscriptionClient } from "@/lib/hyperliquid/clients";
+import { readCachedMeta, writeCachedMeta } from "@/lib/hyperliquid/meta-cache";
 import type {
 	Bar,
 	DatafeedConfiguration,
@@ -24,8 +24,10 @@ import type {
 	ServerTimeCallback,
 	SubscribeBarsCallback,
 } from "@/types/charting_library";
+import { META_CACHE_TTL_MS, UI_TEXT } from "@/constants/app";
 import {
 	ALL_MIDS_TTL_MS,
+	CHART_DATAFEED_CONFIG,
 	DEFAULT_PRICESCALE,
 	EXCHANGE,
 	QUOTE_ASSET,
@@ -33,6 +35,8 @@ import {
 	SUPPORTED_RESOLUTIONS,
 	TIMEZONE,
 } from "./constants";
+
+const DATAFEED_TEXT = UI_TEXT.CHART_DATAFEED;
 
 type CandleInterval = CandleSnapshotParameters["interval"];
 
@@ -347,7 +351,7 @@ export function createDatafeed(): IBasicDataFeed {
 		supports_marks: false,
 		supports_time: true,
 		supports_timescale_marks: false,
-		symbols_types: [{ name: "crypto", value: "crypto" }],
+		symbols_types: CHART_DATAFEED_CONFIG.SYMBOL_TYPES,
 	};
 
 	return {
@@ -374,14 +378,14 @@ export function createDatafeed(): IBasicDataFeed {
 					console.warn("searchSymbols failed:", error);
 				}
 
-				const items: SearchSymbolResultItem[] = coins.slice(0, 50).map((coin) => {
+				const items: SearchSymbolResultItem[] = coins.slice(0, CHART_DATAFEED_CONFIG.SEARCH_LIMIT).map((coin) => {
 					const symbol = symbolFromCoin(coin);
 					return {
 						symbol,
 						ticker: symbol,
 						description: `${coin} / ${QUOTE_ASSET}`,
 						exchange: EXCHANGE,
-						type: "crypto",
+						type: CHART_DATAFEED_CONFIG.SYMBOL_TYPE,
 					};
 				});
 
@@ -398,7 +402,7 @@ export function createDatafeed(): IBasicDataFeed {
 				const symbol = symbolFromCoin(coin);
 
 				if (!(await isKnownCoin(coin))) {
-					onError(`Unknown symbol: ${symbolName}`);
+					onError(DATAFEED_TEXT.ERROR_UNKNOWN_SYMBOL(symbolName));
 					return;
 				}
 
@@ -408,18 +412,18 @@ export function createDatafeed(): IBasicDataFeed {
 					name: symbol,
 					ticker: symbol,
 					description: `${coin} / ${QUOTE_ASSET}`,
-					type: "crypto",
+					type: CHART_DATAFEED_CONFIG.SYMBOL_TYPE,
 					session: SESSION_24X7,
 					timezone: TIMEZONE,
 					exchange: EXCHANGE,
 					listed_exchange: EXCHANGE,
-					format: "price",
+					format: CHART_DATAFEED_CONFIG.FORMAT,
 					pricescale,
-					minmov: 1,
+					minmov: CHART_DATAFEED_CONFIG.MIN_MOVEMENT,
 					has_intraday: true,
 					supported_resolutions: SUPPORTED_RESOLUTIONS,
-					volume_precision: 2,
-					data_status: "streaming",
+					volume_precision: CHART_DATAFEED_CONFIG.VOLUME_PRECISION,
+					data_status: CHART_DATAFEED_CONFIG.DATA_STATUS,
 				};
 
 				onResolve(symbolInfo);
@@ -438,7 +442,7 @@ export function createDatafeed(): IBasicDataFeed {
 			void (async () => {
 				const interval = resolutionToInterval(resolution);
 				if (!interval) {
-					onError(`Unsupported resolution: ${resolution as unknown as string}`);
+					onError(DATAFEED_TEXT.ERROR_UNSUPPORTED_RESOLUTION(String(resolution)));
 					return;
 				}
 

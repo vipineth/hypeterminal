@@ -3,8 +3,11 @@ import { useMemo } from "react";
 import { useConnection } from "wagmi";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useClearinghouseState, useSpotClearinghouseState } from "@/hooks/hyperliquid";
+import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
+import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
+import { useSpotClearinghouseState } from "@/hooks/hyperliquid/use-spot-clearinghouse-state";
 import { formatToken, formatUSD } from "@/lib/format";
+import { parseNumberOrZero } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
 
 type BalanceRow = {
@@ -16,14 +19,7 @@ type BalanceRow = {
 	usdValue: number;
 };
 
-function parseNumber(value: unknown): number {
-	if (typeof value === "number") return value;
-	if (typeof value === "string") {
-		const parsed = Number.parseFloat(value);
-		return Number.isFinite(parsed) ? parsed : 0;
-	}
-	return 0;
-}
+const BALANCES_TEXT = UI_TEXT.BALANCES_TAB;
 
 export function BalancesTab() {
 	const { address, isConnected } = useConnection();
@@ -45,8 +41,8 @@ export function BalancesTab() {
 		// Add perp USDC balance (from cross margin)
 		if (perpData?.crossMarginSummary) {
 			const summary = perpData.crossMarginSummary;
-			const accountValue = parseNumber(summary.accountValue);
-			const totalMarginUsed = parseNumber(summary.totalMarginUsed);
+			const accountValue = parseNumberOrZero(summary.accountValue);
+			const totalMarginUsed = parseNumberOrZero(summary.totalMarginUsed);
 
 			// Only show if there's actual balance
 			if (accountValue > 0) {
@@ -64,9 +60,9 @@ export function BalancesTab() {
 		// Add spot token balances
 		if (spotData?.balances) {
 			for (const b of spotData.balances) {
-				const total = parseNumber(b.total);
-				const hold = parseNumber(b.hold);
-				const entryNtl = parseNumber(b.entryNtl);
+				const total = parseNumberOrZero(b.total);
+				const hold = parseNumberOrZero(b.hold);
+				const entryNtl = parseNumberOrZero(b.entryNtl);
 
 				if (total === 0) continue;
 
@@ -92,6 +88,19 @@ export function BalancesTab() {
 	}, [perpData, spotData]);
 
 	const totalValue = useMemo(() => balances.reduce((acc, b) => acc + b.usdValue, 0), [balances]);
+	const displayRows = useMemo(() => {
+		return balances.map((balance) => {
+			const decimals = balance.asset === "USDC" ? 2 : 5;
+			return {
+				...balance,
+				decimals,
+				availableText: formatToken(balance.available, decimals),
+				inOrderText: formatToken(balance.inOrder, decimals),
+				totalText: formatToken(balance.total, decimals),
+				usdValueText: formatUSD(balance.usdValue, { compact: true }),
+			};
+		});
+	}, [balances]);
 
 	const isLoading = perpStatus === "pending" || spotStatus === "pending";
 	const hasError = perpStatus === "error" || spotStatus === "error";
@@ -100,27 +109,27 @@ export function BalancesTab() {
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-2">
 				<Wallet className="size-3" />
-				Account Balances
+				{BALANCES_TEXT.TITLE}
 				<span className="text-terminal-cyan ml-auto tabular-nums">
-					{isConnected && !isLoading ? formatUSD(totalValue, { compact: true }) : "-"}
+					{isConnected && !isLoading ? formatUSD(totalValue, { compact: true }) : FALLBACK_VALUE_PLACEHOLDER}
 				</span>
 			</div>
 			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
 				{!isConnected ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						Connect your wallet to view balances.
+						{BALANCES_TEXT.CONNECT}
 					</div>
 				) : isLoading ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						Loading balances...
+						{BALANCES_TEXT.LOADING}
 					</div>
 				) : hasError ? (
 					<div className="h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs text-terminal-red/80">
-						<span>Failed to load balances.</span>
+						<span>{BALANCES_TEXT.FAILED}</span>
 					</div>
 				) : balances.length === 0 ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						No balances found. Deposit funds to start trading.
+						{BALANCES_TEXT.EMPTY}
 					</div>
 				) : (
 					<ScrollArea className="h-full w-full">
@@ -128,51 +137,51 @@ export function BalancesTab() {
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
-										Asset
+										{BALANCES_TEXT.HEADER_ASSET}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										Available
+										{BALANCES_TEXT.HEADER_AVAILABLE}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										In Use
+										{BALANCES_TEXT.HEADER_IN_USE}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										Total
+										{BALANCES_TEXT.HEADER_TOTAL}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										USD Value
+										{BALANCES_TEXT.HEADER_USD_VALUE}
 									</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{balances.map((b) => (
-									<TableRow key={`${b.type}-${b.asset}`} className="border-border/40 hover:bg-accent/30">
+								{displayRows.map((row) => (
+									<TableRow key={`${row.type}-${row.asset}`} className="border-border/40 hover:bg-accent/30">
 										<TableCell className="text-2xs font-medium py-1.5">
 											<div className="flex items-center gap-1.5">
-												<span className="text-terminal-cyan">{b.asset}</span>
+												<span className="text-terminal-cyan">{row.asset}</span>
 												<span
 													className={cn(
 														"text-4xs px-1 py-0.5 rounded-sm uppercase",
-														b.type === "perp"
+														row.type === "perp"
 															? "bg-terminal-purple/20 text-terminal-purple"
 															: "bg-terminal-amber/20 text-terminal-amber",
 													)}
 												>
-													{b.type}
+													{row.type === "perp" ? BALANCES_TEXT.TYPE_PERP : BALANCES_TEXT.TYPE_SPOT}
 												</span>
 											</div>
 										</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">
-											{formatToken(b.available, b.asset === "USDC" ? 2 : 5)}
+											{row.availableText}
 										</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
-											{formatToken(b.inOrder, b.asset === "USDC" ? 2 : 5)}
+											{row.inOrderText}
 										</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">
-											{formatToken(b.total, b.asset === "USDC" ? 2 : 5)}
+											{row.totalText}
 										</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums text-terminal-green py-1.5">
-											{formatUSD(b.usdValue, { compact: true })}
+											{row.usdValueText}
 										</TableCell>
 									</TableRow>
 								))}

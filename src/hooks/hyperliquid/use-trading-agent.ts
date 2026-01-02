@@ -1,15 +1,12 @@
-import { useCallback, useMemo } from "react";
-import { privateKeyToAccount } from "viem/accounts";
 import type { WalletClient } from "viem";
-import { useExtraAgents } from "@/hooks/hyperliquid/use-extra-agents";
+import { privateKeyToAccount } from "viem/accounts";
+import { useCallback, useMemo } from "react";
+import { useExtraAgents } from "./use-extra-agents";
+import { UI_TEXT } from "@/constants/app";
 import { createApiWalletSigner, generateApiWalletPrivateKey } from "@/lib/hyperliquid/api-wallet";
-import {
-	approveApiWallet,
-	getHttpTransport,
-	isAgentApproved,
-	makeExchangeConfig,
-	toHyperliquidWallet,
-} from "@/lib/hyperliquid";
+import { getHttpTransport } from "@/lib/hyperliquid/clients";
+import { approveApiWallet, isAgentApproved, makeExchangeConfig } from "@/lib/hyperliquid/exchange";
+import { toHyperliquidWallet } from "@/lib/hyperliquid/wallet";
 import {
 	useApiWalletActions,
 	useApiWalletPrivateKeyByEnv,
@@ -17,6 +14,7 @@ import {
 } from "@/stores/use-api-wallet-store";
 
 const HYPERLIQUID_ENV: HyperliquidEnv = import.meta.env.VITE_HYPERLIQUID_TESTNET === "true" ? "testnet" : "mainnet";
+const TRADING_AGENT_TEXT = UI_TEXT.TRADING_AGENT;
 
 interface UseTradingAgentParams {
 	user: `0x${string}` | undefined;
@@ -77,10 +75,10 @@ export function useTradingAgent(params: UseTradingAgentParams) {
 	// Approve the agent
 	const approveAgent = useCallback(async () => {
 		if (!walletClient) {
-			throw new Error("Wallet client not ready. Please wait and try again.");
+			throw new Error(TRADING_AGENT_TEXT.ERROR_WALLET_CLIENT_NOT_READY);
 		}
 		if (!user) {
-			throw new Error("Wallet not connected");
+			throw new Error(TRADING_AGENT_TEXT.ERROR_WALLET_NOT_CONNECTED);
 		}
 
 		// Ensure we have an API wallet
@@ -91,7 +89,7 @@ export function useTradingAgent(params: UseTradingAgentParams) {
 		// Create config with the connected wallet (not the agent)
 		const wallet = toHyperliquidWallet(walletClient);
 		if (!wallet) {
-			throw new Error("Failed to create wallet");
+			throw new Error(TRADING_AGENT_TEXT.ERROR_CREATE_WALLET);
 		}
 
 		const transport = getHttpTransport();
@@ -100,7 +98,7 @@ export function useTradingAgent(params: UseTradingAgentParams) {
 		// Approve the agent
 		await approveApiWallet(config, {
 			agentAddress: agentAddr,
-			agentName: "HyperTerminal",
+			agentName: TRADING_AGENT_TEXT.AGENT_NAME,
 		});
 
 		// Refetch agents to update approval status

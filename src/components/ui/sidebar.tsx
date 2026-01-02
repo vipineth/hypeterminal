@@ -8,14 +8,11 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { SIDEBAR_LAYOUT, STORAGE_KEYS, UI_TEXT } from "@/constants/app";
+import { useIsMobile } from "@/hooks/ui/use-is-mobile";
 import { cn } from "@/lib/utils";
 
-const SIDEBAR_COOKIE_NAME = "sidebar_state";
-const SIDEBAR_WIDTH = "16rem";
-const SIDEBAR_WIDTH_MOBILE = "18rem";
-const SIDEBAR_WIDTH_ICON = "3rem";
-const SIDEBAR_KEYBOARD_SHORTCUT = "b";
+const SIDEBAR_TEXT = UI_TEXT.SIDEBAR;
 
 type SidebarContextProps = {
 	state: "expanded" | "collapsed";
@@ -68,7 +65,7 @@ function SidebarProvider({
 			}
 
 			if (typeof window !== "undefined") {
-				window.localStorage.setItem(SIDEBAR_COOKIE_NAME, openState ? "1" : "0");
+				window.localStorage.setItem(STORAGE_KEYS.SIDEBAR_STATE, openState ? "1" : "0");
 			}
 		},
 		[setOpenProp, open],
@@ -82,7 +79,7 @@ function SidebarProvider({
 	// Adds a keyboard shortcut to toggle the sidebar.
 	React.useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
-			if (event.key === SIDEBAR_KEYBOARD_SHORTCUT && (event.metaKey || event.ctrlKey)) {
+			if (event.key === SIDEBAR_LAYOUT.KEYBOARD_SHORTCUT && (event.metaKey || event.ctrlKey)) {
 				event.preventDefault();
 				toggleSidebar();
 			}
@@ -116,8 +113,8 @@ function SidebarProvider({
 					data-slot="sidebar-wrapper"
 					style={
 						{
-							"--sidebar-width": SIDEBAR_WIDTH,
-							"--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
+							"--sidebar-width": SIDEBAR_LAYOUT.WIDTH,
+							"--sidebar-width-icon": SIDEBAR_LAYOUT.WIDTH_ICON,
 							...style,
 						} as React.CSSProperties
 					}
@@ -167,14 +164,14 @@ function Sidebar({
 					className="bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
 					style={
 						{
-							"--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+							"--sidebar-width": SIDEBAR_LAYOUT.WIDTH_MOBILE,
 						} as React.CSSProperties
 					}
 					side={side}
 				>
 					<SheetHeader className="sr-only">
-						<SheetTitle>Sidebar</SheetTitle>
-						<SheetDescription>Displays the mobile sidebar.</SheetDescription>
+						<SheetTitle>{SIDEBAR_TEXT.TITLE}</SheetTitle>
+						<SheetDescription>{SIDEBAR_TEXT.DESCRIPTION}</SheetDescription>
 					</SheetHeader>
 					<div className="flex h-full w-full flex-col">{children}</div>
 				</SheetContent>
@@ -247,7 +244,7 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
 			{...props}
 		>
 			<PanelLeftIcon />
-			<span className="sr-only">Toggle Sidebar</span>
+			<span className="sr-only">{SIDEBAR_TEXT.TOGGLE_LABEL}</span>
 		</Button>
 	);
 }
@@ -259,10 +256,10 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
 		<button
 			data-sidebar="rail"
 			data-slot="sidebar-rail"
-			aria-label="Toggle Sidebar"
+			aria-label={SIDEBAR_TEXT.TOGGLE_LABEL}
 			tabIndex={-1}
 			onClick={toggleSidebar}
-			title="Toggle Sidebar"
+			title={SIDEBAR_TEXT.TOGGLE_LABEL}
 			className={cn(
 				"hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] sm:flex",
 				"in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize",

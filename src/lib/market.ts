@@ -1,6 +1,10 @@
-import type { PerpAssetCtx } from "@/hooks/hyperliquid/use-perp-asset-ctxs-snapshot";
+type MarketCtxLike = {
+	markPx?: string | number;
+	prevDayPx?: string | number;
+	openInterest?: string | number;
+};
 
-export function calculate24hPriceChange(ctx: PerpAssetCtx | undefined): number | null {
+export function calculate24hPriceChange(ctx: MarketCtxLike | undefined): number | null {
 	if (!ctx?.markPx || !ctx?.prevDayPx) return null;
 
 	const markPx = Number(ctx.markPx);
@@ -11,7 +15,7 @@ export function calculate24hPriceChange(ctx: PerpAssetCtx | undefined): number |
 	return ((markPx - prevDayPx) / prevDayPx) * 100;
 }
 
-export function calculateOpenInterestUSD(ctx: PerpAssetCtx | undefined): number | null {
+export function calculateOpenInterestUSD(ctx: MarketCtxLike | undefined): number | null {
 	if (!ctx?.openInterest || !ctx?.markPx) return null;
 
 	const openInterest = Number(ctx.openInterest);

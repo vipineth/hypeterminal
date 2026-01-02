@@ -2,19 +2,15 @@ import { Timer } from "lucide-react";
 import { useMemo } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { usePerpMarketRegistry, useTwapHistory } from "@/hooks/hyperliquid";
+import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
+import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
+import { useTwapHistory } from "@/hooks/hyperliquid/use-twap-history";
 import { formatNumber, formatPrice } from "@/lib/format";
+import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
 import { useConnection } from "wagmi";
 
-function parseNumber(value: unknown): number {
-	if (typeof value === "number") return value;
-	if (typeof value === "string") {
-		const parsed = Number.parseFloat(value);
-		return Number.isFinite(parsed) ? parsed : Number.NaN;
-	}
-	return Number.NaN;
-}
+const TWAP_TEXT = UI_TEXT.TWAP_TAB;
 
 export function TwapTab() {
 	const { address, isConnected } = useConnection();
@@ -31,157 +27,165 @@ export function TwapTab() {
 		return orders.filter((o) => o.status.status === "activated");
 	}, [orders]);
 
+	const headerCount = isConnected ? `${activeOrders.length} ${TWAP_TEXT.COUNT_LABEL}` : FALLBACK_VALUE_PLACEHOLDER;
+
+	const tableRows = useMemo(() => {
+		return orders.map((order) => {
+			const isBuy = order.state.side === "B";
+			const totalSize = parseNumber(order.state.sz);
+			const executedSize = parseNumber(order.state.executedSz);
+			const executedNtl = parseNumber(order.state.executedNtl);
+			const marketInfo = registry?.coinToInfo.get(order.state.coin);
+			const szDecimals = marketInfo?.szDecimals ?? 4;
+
+			const avgPrice =
+				Number.isFinite(executedNtl) && Number.isFinite(executedSize) && executedSize !== 0
+					? executedNtl / executedSize
+					: Number.NaN;
+
+			const rawProgressPct =
+				Number.isFinite(totalSize) && totalSize !== 0 && Number.isFinite(executedSize)
+					? (executedSize / totalSize) * 100
+					: 0;
+			const progressPct = Math.max(0, Math.min(100, rawProgressPct));
+
+			const rawStatus = order.status.status;
+			const statusLabel =
+				rawStatus === "activated"
+					? TWAP_TEXT.STATUS_ACTIVE
+					: rawStatus === "finished"
+						? TWAP_TEXT.STATUS_COMPLETED
+						: rawStatus === "terminated"
+							? TWAP_TEXT.STATUS_CANCELLED
+							: rawStatus;
+
+			return {
+				key: typeof order.twapId === "number" ? order.twapId : `${order.state.coin}-${order.state.timestamp}-${order.time}`,
+				coin: order.state.coin,
+				sideLabel: isBuy ? TWAP_TEXT.SIDE_BUY : TWAP_TEXT.SIDE_SELL,
+				sideClass: isBuy ? "bg-terminal-green/20 text-terminal-green" : "bg-terminal-red/20 text-terminal-red",
+				totalSizeText: Number.isFinite(totalSize) ? formatNumber(totalSize, 4) : String(order.state.sz),
+				executedSizeText: Number.isFinite(executedSize) ? formatNumber(executedSize, 4) : String(order.state.executedSz),
+				avgPriceText: Number.isFinite(avgPrice) ? formatPrice(avgPrice, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER,
+				progressPct,
+				rawStatus,
+				statusLabel,
+				showCancel: rawStatus === "activated",
+			};
+		});
+	}, [orders, registry]);
+
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-2">
 				<Timer className="size-3" />
-				TWAP Orders
-				<span className="text-terminal-cyan ml-auto tabular-nums">
-					{isConnected ? `${activeOrders.length} Active` : "-"}
-				</span>
+				{TWAP_TEXT.TITLE}
+				<span className="text-terminal-cyan ml-auto tabular-nums">{headerCount}</span>
 			</div>
 			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
 				{!isConnected ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						Connect your wallet to view TWAP orders.
+						{TWAP_TEXT.CONNECT}
 					</div>
 				) : status === "pending" ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						Loading TWAP orders...
+						{TWAP_TEXT.LOADING}
 					</div>
 				) : status === "error" ? (
 					<div className="h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs text-terminal-red/80">
-						<span>Failed to load TWAP history.</span>
+						<span>{TWAP_TEXT.FAILED}</span>
 						{error instanceof Error ? <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span> : null}
 					</div>
 				) : orders.length === 0 ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						No TWAP orders found.
+						{TWAP_TEXT.EMPTY}
 					</div>
 				) : (
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">Asset</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										Total Size
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
+										{TWAP_TEXT.HEADER_ASSET}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										Executed
+										{TWAP_TEXT.HEADER_TOTAL_SIZE}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										Avg Price
+										{TWAP_TEXT.HEADER_EXECUTED}
+									</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+										{TWAP_TEXT.HEADER_AVG_PRICE}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
-										Progress
+										{TWAP_TEXT.HEADER_PROGRESS}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">Status</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
+										{TWAP_TEXT.HEADER_STATUS}
+									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										Actions
+										{TWAP_TEXT.HEADER_ACTIONS}
 									</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{orders.map((t) => {
-									const isBuy = t.state.side === "B";
-									const totalSize = parseNumber(t.state.sz);
-									const executedSize = parseNumber(t.state.executedSz);
-									const executedNtl = parseNumber(t.state.executedNtl);
-									const marketInfo = registry?.coinToInfo.get(t.state.coin);
-									const szDecimals = marketInfo?.szDecimals ?? 4;
-
-									const avgPrice =
-										Number.isFinite(executedNtl) && Number.isFinite(executedSize) && executedSize !== 0
-											? executedNtl / executedSize
-											: Number.NaN;
-
-									const rawProgressPct =
-										Number.isFinite(totalSize) && totalSize !== 0 && Number.isFinite(executedSize)
-											? (executedSize / totalSize) * 100
-											: 0;
-									const progressPct = Math.max(0, Math.min(100, rawProgressPct));
-
-									const rawStatus = t.status.status;
-									const statusLabel =
-										rawStatus === "activated"
-											? "active"
-											: rawStatus === "finished"
-												? "completed"
-												: rawStatus === "terminated"
-													? "cancelled"
-													: rawStatus;
-
-									return (
-										<TableRow
-											key={typeof t.twapId === "number" ? t.twapId : `${t.state.coin}-${t.state.timestamp}-${t.time}`}
-											className="border-border/40 hover:bg-accent/30"
-										>
-											<TableCell className="text-2xs font-medium py-1.5">
-												<div className="flex items-center gap-1.5">
-													<span
-														className={cn(
-															"text-4xs px-1 py-0.5 rounded-sm uppercase",
-															isBuy
-																? "bg-terminal-green/20 text-terminal-green"
-																: "bg-terminal-red/20 text-terminal-red",
-														)}
-													>
-														{isBuy ? "buy" : "sell"}
-													</span>
-													<span>{t.state.coin}</span>
-												</div>
-											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums py-1.5">
-												{Number.isFinite(totalSize) ? formatNumber(totalSize, 4) : String(t.state.sz)}
-											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
-												{Number.isFinite(executedSize) ? formatNumber(executedSize, 4) : String(t.state.executedSz)}
-											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums py-1.5">
-												{Number.isFinite(avgPrice) ? formatPrice(avgPrice, { szDecimals }) : "-"}
-											</TableCell>
-											<TableCell className="py-1.5">
-												<div className="flex items-center gap-2">
-													<div className="flex-1 h-1.5 bg-accent/30 rounded-full overflow-hidden">
-														<div
-															className={cn(
-																"h-full rounded-full",
-																rawStatus === "finished" ? "bg-terminal-green" : "bg-terminal-cyan",
-															)}
-															style={{ width: `${progressPct}%` }}
-														/>
-													</div>
-													<span className="text-4xs tabular-nums text-muted-foreground">{progressPct.toFixed(0)}%</span>
-												</div>
-											</TableCell>
-											<TableCell className="text-2xs py-1.5">
-												<span
-													className={cn(
-														"text-4xs px-1 py-0.5 rounded-sm uppercase",
-														rawStatus === "activated" && "bg-terminal-cyan/20 text-terminal-cyan",
-														rawStatus === "finished" && "bg-terminal-green/20 text-terminal-green",
-														(rawStatus === "terminated" || rawStatus === "error") && "bg-terminal-red/20 text-terminal-red",
-													)}
-												>
-													{statusLabel}
+								{tableRows.map((row) => (
+									<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
+										<TableCell className="text-2xs font-medium py-1.5">
+											<div className="flex items-center gap-1.5">
+												<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
+													{row.sideLabel}
 												</span>
-											</TableCell>
-											<TableCell className="text-right py-1.5">
-												{rawStatus === "activated" && (
-													<button
-														type="button"
-														className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors"
-														tabIndex={0}
-														aria-label="Cancel TWAP order"
-													>
-														Cancel
-													</button>
+												<span>{row.coin}</span>
+											</div>
+										</TableCell>
+										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.totalSizeText}</TableCell>
+										<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
+											{row.executedSizeText}
+										</TableCell>
+										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.avgPriceText}</TableCell>
+										<TableCell className="py-1.5">
+											<div className="flex items-center gap-2">
+												<div className="flex-1 h-1.5 bg-accent/30 rounded-full overflow-hidden">
+													<div
+														className={cn(
+															"h-full rounded-full",
+															row.rawStatus === "finished" ? "bg-terminal-green" : "bg-terminal-cyan",
+														)}
+														style={{ width: `${row.progressPct}%` }}
+													/>
+												</div>
+												<span className="text-4xs tabular-nums text-muted-foreground">
+													{row.progressPct.toFixed(0)}%
+												</span>
+											</div>
+										</TableCell>
+										<TableCell className="text-2xs py-1.5">
+											<span
+												className={cn(
+													"text-4xs px-1 py-0.5 rounded-sm uppercase",
+													row.rawStatus === "activated" && "bg-terminal-cyan/20 text-terminal-cyan",
+													row.rawStatus === "finished" && "bg-terminal-green/20 text-terminal-green",
+													(row.rawStatus === "terminated" || row.rawStatus === "error") && "bg-terminal-red/20 text-terminal-red",
 												)}
-											</TableCell>
-										</TableRow>
-									);
-								})}
+											>
+												{row.statusLabel}
+											</span>
+										</TableCell>
+										<TableCell className="text-right py-1.5">
+											{row.showCancel && (
+												<button
+													type="button"
+													className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors"
+													tabIndex={0}
+													aria-label={TWAP_TEXT.ARIA_CANCEL}
+												>
+													{TWAP_TEXT.ACTION_CANCEL}
+												</button>
+											)}
+										</TableCell>
+									</TableRow>
+								))}
 							</TableBody>
 						</Table>
 						<ScrollBar orientation="horizontal" />

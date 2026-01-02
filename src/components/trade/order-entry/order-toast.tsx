@@ -1,8 +1,10 @@
 import { Check, Loader2, X, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
-import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/constants/ui-timing";
+import { ORDER_TOAST_SUCCESS_DURATION_MS, UI_TEXT } from "@/constants/app";
 import { cn } from "@/lib/utils";
 import { type OrderQueueItem, useOrderQueue, useOrderQueueActions } from "@/stores/use-order-queue-store";
+
+const ORDER_TOAST_TEXT = UI_TEXT.ORDER_TOAST;
 
 function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () => void }) {
 	const sideColor = order.side === "buy" ? "text-terminal-green" : "text-terminal-red";
@@ -48,12 +50,13 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 					<span className="text-xs font-medium text-foreground">{order.market}</span>
 					{order.status === "success" && order.fillPercent !== undefined && (
 						<span className="text-2xs text-terminal-green terminal-glow-green font-medium">
-							{order.fillPercent}% filled
+							{order.fillPercent}
+							{ORDER_TOAST_TEXT.FILLED_SUFFIX}
 						</span>
 					)}
 				</div>
 				<div className="text-2xs text-muted-foreground">
-					Size: <span className="text-foreground/80 font-medium">{order.size}</span>
+					{ORDER_TOAST_TEXT.SIZE_LABEL}: <span className="text-foreground/80 font-medium">{order.size}</span>
 				</div>
 				{order.error && (
 					<div className="text-2xs text-terminal-red terminal-glow-red truncate">{order.error}</div>
@@ -66,7 +69,7 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 					type="button"
 					onClick={onRemove}
 					className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors shrink-0"
-					aria-label="Dismiss"
+					aria-label={ORDER_TOAST_TEXT.DISMISS_ARIA}
 				>
 					<X className="size-4" />
 				</button>
@@ -168,17 +171,17 @@ export function OrderToast() {
 			<div className="px-3 py-2 border-b border-border/40 bg-muted/30 flex items-center justify-between">
 				<div className="flex items-center gap-2">
 					<Zap className="size-4 text-terminal-cyan terminal-glow-cyan" />
-					<span className="text-xs font-semibold uppercase tracking-wider text-foreground">Order Queue</span>
+					<span className="text-xs font-semibold uppercase tracking-wider text-foreground">{ORDER_TOAST_TEXT.TITLE}</span>
 				</div>
 				<div className="flex items-center gap-1.5">
 					{pendingCount > 0 && (
 						<span className="px-1.5 py-0.5 rounded text-3xs font-medium bg-terminal-cyan/15 text-terminal-cyan border border-terminal-cyan/30">
-							{pendingCount} pending
+							{pendingCount} {ORDER_TOAST_TEXT.PENDING_LABEL}
 						</span>
 					)}
 					{failedCount > 0 && (
 						<span className="px-1.5 py-0.5 rounded text-3xs font-medium bg-terminal-red/15 text-terminal-red border border-terminal-red/30">
-							{failedCount} failed
+							{failedCount} {ORDER_TOAST_TEXT.FAILED_LABEL}
 						</span>
 					)}
 				</div>

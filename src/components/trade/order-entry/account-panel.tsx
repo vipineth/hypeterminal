@@ -2,18 +2,17 @@ import { ChevronUp } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
 import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
 import { formatPercent, formatUSD } from "@/lib/format";
+import { parseNumberOrZero } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
 
-function parseNumber(value: unknown): number {
-	if (typeof value === "number") return value;
-	if (typeof value === "string") {
-		const parsed = Number.parseFloat(value);
-		return Number.isFinite(parsed) ? parsed : 0;
-	}
-	return 0;
-}
+const ACCOUNT_TEXT = UI_TEXT.ACCOUNT_PANEL;
+const ACCOUNT_TABS = [
+	{ key: "perps", label: ACCOUNT_TEXT.TAB_PERPS },
+	{ key: "spot", label: ACCOUNT_TEXT.TAB_SPOT },
+] as const;
 
 export function AccountPanel() {
 	const [isExpanded, setIsExpanded] = useState(false);
@@ -33,15 +32,15 @@ export function AccountPanel() {
 
 		const summary = clearinghouse.crossMarginSummary;
 
-		const accountValue = parseNumber(summary.accountValue);
-		const totalNtlPos = parseNumber(summary.totalNtlPos);
-		const totalMarginUsed = parseNumber(summary.totalMarginUsed);
-		const totalRawUsd = parseNumber(summary.totalRawUsd);
+		const accountValue = parseNumberOrZero(summary.accountValue);
+		const totalNtlPos = parseNumberOrZero(summary.totalNtlPos);
+		const totalMarginUsed = parseNumberOrZero(summary.totalMarginUsed);
+		const totalRawUsd = parseNumberOrZero(summary.totalRawUsd);
 
 		// Calculate unrealized PNL from positions
 		let unrealizedPnl = 0;
 		for (const pos of clearinghouse.assetPositions ?? []) {
-			unrealizedPnl += parseNumber(pos.position.unrealizedPnl);
+			unrealizedPnl += parseNumberOrZero(pos.position.unrealizedPnl);
 		}
 
 		// Margin ratio = totalMarginUsed / accountValue (as percentage)
@@ -69,6 +68,52 @@ export function AccountPanel() {
 	}, [clearinghouse]);
 
 	const hasData = isConnected && accountMetrics !== null;
+	const headerEquity = hasData ? formatUSD(accountMetrics.accountValue) : FALLBACK_VALUE_PLACEHOLDER;
+	const headerPnl = hasData ? formatUSD(accountMetrics.unrealizedPnl, { signDisplay: "exceptZero" }) : FALLBACK_VALUE_PLACEHOLDER;
+	const headerPnlClass = hasData
+		? accountMetrics.unrealizedPnl >= 0
+			? "text-terminal-green"
+			: "text-terminal-red"
+		: "text-muted-foreground";
+
+	const summaryRows = useMemo(() => {
+		if (!accountMetrics) return [];
+		return [
+			{
+				label: ACCOUNT_TEXT.BALANCE_LABEL,
+				value: formatUSD(accountMetrics.totalRawUsd),
+				valueClass: "tabular-nums",
+			},
+			{
+				label: ACCOUNT_TEXT.UNREALIZED_LABEL,
+				value: formatUSD(accountMetrics.unrealizedPnl, { signDisplay: "exceptZero" }),
+				valueClass: cn(
+					"tabular-nums",
+					accountMetrics.unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red",
+				),
+			},
+			{
+				label: ACCOUNT_TEXT.AVAILABLE_LABEL,
+				value: formatUSD(accountMetrics.availableBalance),
+				valueClass: "tabular-nums",
+			},
+			{
+				label: ACCOUNT_TEXT.MARGIN_USED_LABEL,
+				value: formatUSD(accountMetrics.totalMarginUsed),
+				valueClass: "tabular-nums",
+			},
+			{
+				label: ACCOUNT_TEXT.MARGIN_RATIO_LABEL,
+				value: formatPercent(accountMetrics.marginRatio, { maximumFractionDigits: 1 }),
+				valueClass: "tabular-nums",
+			},
+			{
+				label: ACCOUNT_TEXT.CROSS_LEVERAGE_LABEL,
+				value: `${accountMetrics.crossLeverage.toFixed(2)}x`,
+				valueClass: "tabular-nums text-terminal-cyan",
+			},
+		];
+	}, [accountMetrics]);
 
 	return (
 		<Collapsible
@@ -81,11 +126,11 @@ export function AccountPanel() {
 					type="button"
 					className="w-full px-2 py-2 flex items-center justify-between hover:bg-accent/30 transition-colors cursor-pointer group border-b border-border/40"
 					tabIndex={0}
-					aria-label={isExpanded ? "Collapse account panel" : "Expand account panel"}
+					aria-label={isExpanded ? ACCOUNT_TEXT.ARIA_COLLAPSE : ACCOUNT_TEXT.ARIA_EXPAND}
 				>
 					<div className="flex items-center gap-2">
 						<span className="text-3xs uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
-							Account
+							{ACCOUNT_TEXT.TITLE}
 						</span>
 						<ChevronUp
 							className={cn(
@@ -96,29 +141,22 @@ export function AccountPanel() {
 					</div>
 					<div className="flex items-center gap-3">
 						<div className="flex items-center gap-1.5">
-							<span className="text-4xs text-muted-foreground uppercase">Equity</span>
+							<span className="text-4xs text-muted-foreground uppercase">{ACCOUNT_TEXT.EQUITY_LABEL}</span>
 							<span
 								className={cn(
 									"text-sm font-semibold tabular-nums",
 									hasData ? "text-terminal-green terminal-glow-green" : "text-muted-foreground",
 								)}
 							>
-								{hasData ? formatUSD(accountMetrics.accountValue) : "-"}
+								{headerEquity}
 							</span>
 						</div>
 						<div className="flex items-center gap-1.5">
-							<span className="text-4xs text-muted-foreground uppercase">PNL</span>
+							<span className="text-4xs text-muted-foreground uppercase">{ACCOUNT_TEXT.PNL_LABEL}</span>
 							<span
-								className={cn(
-									"text-2xs font-medium tabular-nums",
-									hasData
-										? accountMetrics.unrealizedPnl >= 0
-											? "text-terminal-green"
-											: "text-terminal-red"
-										: "text-muted-foreground",
-								)}
+								className={cn("text-2xs font-medium tabular-nums", headerPnlClass)}
 							>
-								{hasData ? formatUSD(accountMetrics.unrealizedPnl, { signDisplay: "exceptZero" }) : "-"}
+								{headerPnl}
 							</span>
 						</div>
 					</div>
@@ -127,10 +165,7 @@ export function AccountPanel() {
 
 			<CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapse-up data-[state=open]:animate-collapse-down">
 				<div className="px-2 py-1 flex items-center gap-0.5 border-b border-border/40">
-					{[
-						{ key: "perps", label: "Perps" },
-						{ key: "spot", label: "Spot" },
-					].map((tab) => (
+					{ACCOUNT_TABS.map((tab) => (
 						<button
 							key={tab.key}
 							type="button"
@@ -155,48 +190,19 @@ export function AccountPanel() {
 				<div className="p-2 space-y-2 max-h-48 overflow-y-auto">
 					{!isConnected ? (
 						<div className="text-3xs text-muted-foreground text-center py-4">
-							Connect wallet to view account
+							{ACCOUNT_TEXT.CONNECT}
 						</div>
 					) : !hasData ? (
-						<div className="text-3xs text-muted-foreground text-center py-4">Loading...</div>
+						<div className="text-3xs text-muted-foreground text-center py-4">{ACCOUNT_TEXT.LOADING}</div>
 					) : (
 						<>
 							<div className="border border-border/40 divide-y divide-border/40 text-3xs">
-								<div className="flex items-center justify-between px-2 py-1.5">
-									<span className="text-muted-foreground">Balance</span>
-									<span className="tabular-nums">{formatUSD(accountMetrics.totalRawUsd)}</span>
-								</div>
-								<div className="flex items-center justify-between px-2 py-1.5">
-									<span className="text-muted-foreground">Unrealized PNL</span>
-									<span
-										className={cn(
-											"tabular-nums",
-											accountMetrics.unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red",
-										)}
-									>
-										{formatUSD(accountMetrics.unrealizedPnl, { signDisplay: "exceptZero" })}
-									</span>
-								</div>
-								<div className="flex items-center justify-between px-2 py-1.5">
-									<span className="text-muted-foreground">Available</span>
-									<span className="tabular-nums">{formatUSD(accountMetrics.availableBalance)}</span>
-								</div>
-								<div className="flex items-center justify-between px-2 py-1.5">
-									<span className="text-muted-foreground">Margin Used</span>
-									<span className="tabular-nums">{formatUSD(accountMetrics.totalMarginUsed)}</span>
-								</div>
-								<div className="flex items-center justify-between px-2 py-1.5">
-									<span className="text-muted-foreground">Margin Ratio</span>
-									<span className="tabular-nums">
-										{formatPercent(accountMetrics.marginRatio, { maximumFractionDigits: 1 })}
-									</span>
-								</div>
-								<div className="flex items-center justify-between px-2 py-1.5">
-									<span className="text-muted-foreground">Cross Leverage</span>
-									<span className="tabular-nums text-terminal-cyan">
-										{accountMetrics.crossLeverage.toFixed(2)}x
-									</span>
-								</div>
+								{summaryRows.map((row) => (
+									<div key={row.label} className="flex items-center justify-between px-2 py-1.5">
+										<span className="text-muted-foreground">{row.label}</span>
+										<span className={row.valueClass}>{row.value}</span>
+									</div>
+								))}
 							</div>
 
 							<div className="grid grid-cols-2 gap-1">
@@ -204,17 +210,17 @@ export function AccountPanel() {
 									type="button"
 									className="py-1.5 text-3xs uppercase tracking-wider border border-terminal-green/40 text-terminal-green hover:bg-terminal-green/10 transition-colors"
 									tabIndex={0}
-									aria-label="Deposit"
+									aria-label={ACCOUNT_TEXT.DEPOSIT_LABEL}
 								>
-									Deposit
+									{ACCOUNT_TEXT.DEPOSIT_LABEL}
 								</button>
 								<button
 									type="button"
 									className="py-1.5 text-3xs uppercase tracking-wider border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
 									tabIndex={0}
-									aria-label="Withdraw"
+									aria-label={ACCOUNT_TEXT.WITHDRAW_LABEL}
 								>
-									Withdraw
+									{ACCOUNT_TEXT.WITHDRAW_LABEL}
 								</button>
 							</div>
 						</>

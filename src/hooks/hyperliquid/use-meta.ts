@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { getInfoClient, hyperliquidKeys } from "@/lib/hyperliquid";
-import { META_CACHE_TTL_MS, readCachedMeta, writeCachedMeta } from "@/lib/hyperliquid/meta-cache";
+import { META_CACHE_TTL_MS } from "@/constants/app";
+import { getInfoClient } from "@/lib/hyperliquid/clients";
+import { hyperliquidKeys } from "@/lib/hyperliquid/query-keys";
+import { readCachedMeta, writeCachedMeta } from "@/lib/hyperliquid/meta-cache";
 
 const infoClient = getInfoClient();
 

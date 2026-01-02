@@ -1,4 +1,0 @@
-export const FALLBACK_VALUE_PLACEHOLDER = "-";
-
-export const FORMAT_COMPACT_THRESHOLD = 100_000;
-export const FORMAT_COMPACT_DEFAULT = true;

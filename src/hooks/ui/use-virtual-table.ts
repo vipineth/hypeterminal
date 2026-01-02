@@ -10,7 +10,7 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import { useVirtualizer, type VirtualItem, type Virtualizer } from "@tanstack/react-virtual";
-import { useRef, useState } from "react";
+import { useRef, useState, type Dispatch, type RefObject, type SetStateAction } from "react";
 
 export interface UseVirtualTableOptions<TData extends RowData> {
 	data: TData[];
@@ -29,11 +29,11 @@ export interface VirtualRow<TData extends RowData> {
 export interface UseVirtualTableReturn<TData extends RowData> {
 	table: Table<TData>;
 	virtualizer: Virtualizer<HTMLDivElement, Element>;
-	containerRef: React.RefObject<HTMLDivElement | null>;
+	containerRef: RefObject<HTMLDivElement | null>;
 	virtualRows: VirtualRow<TData>[];
 	totalSize: number;
 	sorting: SortingState;
-	setSorting: React.Dispatch<React.SetStateAction<SortingState>>;
+	setSorting: Dispatch<SetStateAction<SortingState>>;
 }
 
 export function useVirtualTable<TData extends RowData>(

@@ -1,6 +1,16 @@
 import { z } from "zod";
 import { create } from "zustand";
-import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
+import {
+	DEFAULT_LEVERAGE_BY_MODE,
+	DEFAULT_MARKET_ORDER_SLIPPAGE_BPS,
+	MARKET_LEVERAGE_HARD_MAX,
+	MARKET_ORDER_SLIPPAGE_MAX_BPS,
+	MARKET_ORDER_SLIPPAGE_MIN_BPS,
+	STORAGE_KEYS,
+} from "@/constants/app";
+import { clampInt } from "@/lib/trade/numbers";
+import { createValidatedStorage } from "@/stores/validated-storage";
 
 export type MarginMode = "cross" | "isolated";
 
@@ -17,52 +27,7 @@ const tradeSettingsSchema = z.object({
 	}),
 });
 
-const canUseLocalStorage = typeof window !== "undefined" && typeof window.localStorage !== "undefined";
-
-const validatedStorage: StateStorage = {
-	getItem: (name: string): string | null => {
-		if (!canUseLocalStorage) return null;
-		const item = localStorage.getItem(name);
-		if (!item) return null;
-
-		try {
-			const parsed = JSON.parse(item);
-			const validationResult = tradeSettingsSchema.safeParse(parsed);
-
-			if (!validationResult.success) {
-				console.warn("Invalid trade settings data in localStorage, resetting:", validationResult.error);
-				localStorage.removeItem(name);
-				return null;
-			}
-
-			return item;
-		} catch (error) {
-			console.warn("Failed to parse trade settings from localStorage:", error);
-			localStorage.removeItem(name);
-			return null;
-		}
-	},
-	setItem: (name: string, value: string): void => {
-		if (!canUseLocalStorage) return;
-		localStorage.setItem(name, value);
-	},
-	removeItem: (name: string): void => {
-		if (!canUseLocalStorage) return;
-		localStorage.removeItem(name);
-	},
-};
-
-function clampInt(value: number, min: number, max: number) {
-	if (!Number.isFinite(value)) return min;
-	return Math.min(max, Math.max(min, Math.round(value)));
-}
-
-const DEFAULT_DEFAULT_LEVERAGE_BY_MODE: Record<MarginMode, number> = {
-	cross: 10,
-	isolated: 10,
-};
-
-const DEFAULT_MARKET_ORDER_SLIPPAGE_BPS = 25;
+const validatedStorage = createValidatedStorage(tradeSettingsSchema, "trade settings");
 
 interface TradeSettingsStore {
 	defaultLeverageByMode: Record<MarginMode, number>;
@@ -79,18 +44,21 @@ interface TradeSettingsStore {
 const useTradeSettingsStore = create<TradeSettingsStore>()(
 	persist(
 		(set, get) => ({
-			defaultLeverageByMode: DEFAULT_DEFAULT_LEVERAGE_BY_MODE,
+			defaultLeverageByMode: DEFAULT_LEVERAGE_BY_MODE,
 			marketLeverageByMode: {},
 			marketOrderSlippageBps: DEFAULT_MARKET_ORDER_SLIPPAGE_BPS,
 			actions: {
 				setDefaultLeverage: (mode, leverage) => {
-					const next = clampInt(leverage, 1, 100);
+					const next = clampInt(leverage, 1, MARKET_LEVERAGE_HARD_MAX);
 					set((state) => ({
 						defaultLeverageByMode: { ...state.defaultLeverageByMode, [mode]: next },
 					}));
 				},
 				setMarketLeverage: (marketKey, mode, leverage, maxLeverage) => {
-					const max = typeof maxLeverage === "number" && Number.isFinite(maxLeverage) ? Math.max(1, maxLeverage) : 100;
+					const max =
+						typeof maxLeverage === "number" && Number.isFinite(maxLeverage)
+							? Math.max(1, maxLeverage)
+							: MARKET_LEVERAGE_HARD_MAX;
 					const next = clampInt(leverage, 1, max);
 					set((state) => ({
 						marketLeverageByMode: {
@@ -126,12 +94,12 @@ const useTradeSettingsStore = create<TradeSettingsStore>()(
 					});
 				},
 				setMarketOrderSlippageBps: (bps) => {
-					set({ marketOrderSlippageBps: clampInt(bps, 10, 500) });
+					set({ marketOrderSlippageBps: clampInt(bps, MARKET_ORDER_SLIPPAGE_MIN_BPS, MARKET_ORDER_SLIPPAGE_MAX_BPS) });
 				},
 			},
 		}),
 		{
-			name: "trade-settings-v1",
+			name: STORAGE_KEYS.TRADE_SETTINGS,
 			storage: createJSONStorage(() => validatedStorage),
 			partialize: (state) => ({
 				defaultLeverageByMode: state.defaultLeverageByMode,
@@ -142,13 +110,13 @@ const useTradeSettingsStore = create<TradeSettingsStore>()(
 				...current,
 				...(persisted as Partial<TradeSettingsStore>),
 				defaultLeverageByMode: {
-					...DEFAULT_DEFAULT_LEVERAGE_BY_MODE,
+					...DEFAULT_LEVERAGE_BY_MODE,
 					...((persisted as Partial<TradeSettingsStore>)?.defaultLeverageByMode ?? {}),
 				},
 				marketOrderSlippageBps: clampInt(
 					(persisted as Partial<TradeSettingsStore>)?.marketOrderSlippageBps ?? DEFAULT_MARKET_ORDER_SLIPPAGE_BPS,
-					10,
-					500,
+					MARKET_ORDER_SLIPPAGE_MIN_BPS,
+					MARKET_ORDER_SLIPPAGE_MAX_BPS,
 				),
 			}),
 		},
@@ -170,4 +138,3 @@ export function useMarketOrderSlippageBps() {
 export function useTradeSettingsActions() {
 	return useTradeSettingsStore((state) => state.actions);
 }
-

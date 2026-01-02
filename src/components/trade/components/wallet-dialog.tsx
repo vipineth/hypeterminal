@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { type Connector, useConnect } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { UI_TEXT } from "@/constants/app";
+
+const WALLET_TEXT = UI_TEXT.WALLET_DIALOG;
 
 interface WalletDialogProps {
 	open: boolean;
@@ -29,7 +32,7 @@ export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle>Connect Wallet</DialogTitle>
+					<DialogTitle>{WALLET_TEXT.TITLE}</DialogTitle>
 				</DialogHeader>
 				<div className="grid gap-4 py-4">
 					{connectors.map((connector) => (
@@ -49,7 +52,7 @@ export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
 							{isPending && <Loader2 className="size-4 animate-spin" />}
 						</Button>
 					))}
-					{!hasConnector && <p className="text-sm text-center text-muted-foreground">No wallets found</p>}
+					{!hasConnector && <p className="text-sm text-center text-muted-foreground">{WALLET_TEXT.EMPTY}</p>}
 					{error && <p className="text-sm text-center text-destructive">{error.message}</p>}
 				</div>
 			</DialogContent>

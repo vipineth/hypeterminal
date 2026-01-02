@@ -1,6 +1,6 @@
 import type { SubscriptionClient, WebSocketSubscription } from "@nktkas/hyperliquid";
 import { useCallback, useMemo } from "react";
-import { getSubscriptionClient } from "@/lib/hyperliquid";
+import { getSubscriptionClient } from "@/lib/hyperliquid/clients";
 import type { HyperliquidWsEntry, HyperliquidWsStatus } from "@/stores/use-hyperliquid-ws-store";
 import { useHyperliquidWsStore } from "@/stores/use-hyperliquid-ws-store";
 import { useSharedSubscription } from "./use-subscription";

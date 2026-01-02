@@ -1,7 +1,5 @@
 import type { MetaResponse } from "@nktkas/hyperliquid";
-
-export const META_CACHE_KEY = "hyperliquid-meta-cache-v1";
-export const META_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+import { META_CACHE_TTL_MS, STORAGE_KEYS } from "@/constants/app";
 
 export type CachedMeta = {
 	updatedAt: number;
@@ -12,7 +10,7 @@ export function readCachedMeta(): CachedMeta | null {
 	if (typeof window === "undefined") return null;
 
 	try {
-		const raw = window.localStorage.getItem(META_CACHE_KEY);
+		const raw = window.localStorage.getItem(STORAGE_KEYS.META_CACHE);
 		if (!raw) return null;
 		const parsed = JSON.parse(raw) as unknown;
 
@@ -33,7 +31,6 @@ export function writeCachedMeta(meta: MetaResponse) {
 	if (typeof window === "undefined") return;
 	try {
 		const payload: CachedMeta = { updatedAt: Date.now(), value: meta };
-		window.localStorage.setItem(META_CACHE_KEY, JSON.stringify(payload));
+		window.localStorage.setItem(STORAGE_KEYS.META_CACHE, JSON.stringify(payload));
 	} catch {}
 }
-

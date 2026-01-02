@@ -1,24 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useSelectedResolvedMarket, useTradesSubscription } from "@/hooks/hyperliquid";
-import type { HyperliquidWsEvent } from "@/hooks/hyperliquid/socket";
+import { UI_TEXT } from "@/constants/app";
+import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
+import { useTradesSubscription } from "@/hooks/hyperliquid/socket/use-trades-subscription";
+import type { HyperliquidWsEvent } from "@/hooks/hyperliquid/socket/use-hyperliquid-ws";
 import { formatNumber } from "@/lib/format";
+import { parseNumber } from "@/lib/trade/numbers";
+import { getTradeKey } from "@/lib/trade/trades";
 import { cn } from "@/lib/utils";
 
 type Trade = HyperliquidWsEvent<"trades">[number];
 
-function parseNumber(value: unknown): number {
-	if (typeof value === "number") return value;
-	if (typeof value === "string") {
-		const parsed = Number.parseFloat(value);
-		return Number.isFinite(parsed) ? parsed : Number.NaN;
-	}
-	return Number.NaN;
-}
-
-function tradeKey(trade: Trade): string {
-	return `${trade.hash}:${trade.tid}`;
-}
+const TRADES_TEXT = UI_TEXT.TRADES;
 
 export function TradesView() {
 	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
@@ -41,7 +34,7 @@ export function TradesView() {
 			const seen = new Set<string>();
 			const deduped: Trade[] = [];
 			for (const t of merged) {
-				const key = tradeKey(t);
+				const key = getTradeKey(t.hash, t.tid);
 				if (seen.has(key)) continue;
 				seen.add(key);
 				deduped.push(t);
@@ -63,7 +56,7 @@ export function TradesView() {
 			const size = parseNumber(trade.sz);
 
 			return {
-				id: tradeKey(trade),
+				id: getTradeKey(trade.hash, trade.tid),
 				time,
 				price: Number.isFinite(price) ? formatNumber(price, 2) : String(trade.px),
 				size: Number.isFinite(size) ? formatNumber(size, 3) : String(trade.sz),
@@ -75,13 +68,13 @@ export function TradesView() {
 	return (
 		<div className="flex-1 min-h-0 flex flex-col">
 			<div className="grid grid-cols-3 gap-2 px-2 py-1 text-4xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40">
-				<div>Time</div>
-				<div className="text-right">Price</div>
-				<div className="text-right">Size</div>
+				<div>{TRADES_TEXT.HEADER_TIME}</div>
+				<div className="text-right">{TRADES_TEXT.HEADER_PRICE}</div>
+				<div className="text-right">{TRADES_TEXT.HEADER_SIZE}</div>
 			</div>
 			{tradeRows.length === 0 ? (
 				<div className="flex-1 flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-					{status === "error" ? "Failed to load trades." : "Waiting for trades..."}
+					{status === "error" ? TRADES_TEXT.FAILED : TRADES_TEXT.WAITING}
 				</div>
 			) : (
 				<ScrollArea className="flex-1">
@@ -100,7 +93,7 @@ export function TradesView() {
 			)}
 			{status === "error" ? (
 				<div className="shrink-0 px-2 pb-1.5 text-4xs text-terminal-red/80">
-					{error instanceof Error ? error.message : "WebSocket error"}
+					{error instanceof Error ? error.message : TRADES_TEXT.WEBSOCKET_ERROR}
 				</div>
 			) : null}
 		</div>

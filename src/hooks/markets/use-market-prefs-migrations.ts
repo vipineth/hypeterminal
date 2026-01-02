@@ -1,12 +1,11 @@
 import { useEffect } from "react";
-import { isPerpMarketKey, makePerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid";
+import { DEFAULT_MARKET_KEY, STORAGE_KEYS } from "@/constants/app";
+import { isPerpMarketKey, makePerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
 import { useMeta } from "@/hooks/hyperliquid/use-meta";
 import { useFavoriteMarketKeys, useMarketPrefsActions, useSelectedMarketKey } from "@/stores/use-market-prefs-store";
 
-const LEGACY_FAVORITES_STORAGE_KEY = "favorites-storage-v0.2";
-
 function readLegacyFavoriteAssetIds(): number[] | null {
-	const raw = localStorage.getItem(LEGACY_FAVORITES_STORAGE_KEY);
+	const raw = localStorage.getItem(STORAGE_KEYS.LEGACY_FAVORITES);
 	if (!raw) return null;
 
 	try {
@@ -41,13 +40,13 @@ export function useMarketPrefsMigrations() {
 			.map((coin) => makePerpMarketKey(coin));
 
 		if (migrated.length === 0) {
-			localStorage.removeItem(LEGACY_FAVORITES_STORAGE_KEY);
+			localStorage.removeItem(STORAGE_KEYS.LEGACY_FAVORITES);
 			return;
 		}
 
 		const merged = Array.from(new Set([...favoriteMarketKeys, ...migrated]));
 		setFavoriteMarketKeys(merged);
-		localStorage.removeItem(LEGACY_FAVORITES_STORAGE_KEY);
+		localStorage.removeItem(STORAGE_KEYS.LEGACY_FAVORITES);
 	}, [meta, favoriteMarketKeys, setFavoriteMarketKeys]);
 
 	useEffect(() => {
@@ -61,7 +60,7 @@ export function useMarketPrefsMigrations() {
 		}
 
 		if (!isValidMarketKey(selectedMarketKey)) {
-			setSelectedMarketKey(makePerpMarketKey("BTC"));
+			setSelectedMarketKey(DEFAULT_MARKET_KEY);
 		}
 
 		const filteredFavorites = favoriteMarketKeys.filter(isValidMarketKey);

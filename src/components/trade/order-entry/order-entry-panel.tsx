@@ -12,17 +12,25 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+	ARBITRUM_CHAIN_ID,
+	DEFAULT_MAX_LEVERAGE,
+	FALLBACK_VALUE_PLACEHOLDER,
+	ORDER_FEE_RATE_MAKER,
+	ORDER_FEE_RATE_TAKER,
+	ORDER_LEVERAGE_STEPS,
+	ORDER_MIN_NOTIONAL_USD,
+	ORDER_SIZE_PERCENT_STEPS,
+	UI_TEXT,
+} from "@/constants/app";
 import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
 import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
-import { useTradingAgent } from "@/hooks/use-trading-agent";
+import { useTradingAgent } from "@/hooks/hyperliquid/use-trading-agent";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
-import {
-	ensureLeverage,
-	getHttpTransport,
-	makeExchangeConfig,
-	placeSingleOrder,
-} from "@/lib/hyperliquid";
+import { getHttpTransport } from "@/lib/hyperliquid/clients";
+import { ensureLeverage, makeExchangeConfig, placeSingleOrder } from "@/lib/hyperliquid/exchange";
 import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
+import { formatPriceForOrder, formatSizeForOrder, getDefaultLeverage } from "@/lib/trade/orders";
 import { cn } from "@/lib/utils";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import {
@@ -33,62 +41,13 @@ import {
 } from "@/stores/use-trade-settings-store";
 import { DepositModal } from "./deposit-modal";
 import { OrderToast } from "./order-toast";
-import { WalletDialog } from "../header/wallet-dialog";
+import { WalletDialog } from "../components/wallet-dialog";
 
 type OrderType = "market" | "limit";
 type Side = "buy" | "sell";
 type SizeMode = "asset" | "usd";
 
-function getDefaultLeverage(maxLeverage: number): number {
-	if (maxLeverage <= 5) return maxLeverage;
-	return Math.floor(maxLeverage / 2);
-}
-
-/**
- * Format price according to Hyperliquid's tick size rules.
- * Prices must have at most 5 significant figures.
- * The number of decimal places depends on the price magnitude.
- */
-function formatPriceForOrder(price: number): string {
-	if (!Number.isFinite(price) || price <= 0) return "0";
-
-	// Hyperliquid uses 5 significant figures for prices
-	const MAX_SIGNIFICANT_FIGURES = 5;
-
-	// Calculate the number of decimal places based on price magnitude
-	// For price >= 1: decimals = max(0, 5 - floor(log10(price)) - 1)
-	// For price < 1: we need more decimals
-	const log10Price = Math.log10(price);
-	const integerDigits = Math.floor(log10Price) + 1;
-
-	let decimals: number;
-	if (price >= 1) {
-		decimals = Math.max(0, MAX_SIGNIFICANT_FIGURES - integerDigits);
-	} else {
-		// For prices < 1, count leading zeros after decimal
-		// e.g., 0.001234 has 2 leading zeros, so we allow more decimals
-		decimals = MAX_SIGNIFICANT_FIGURES - integerDigits;
-	}
-
-	// Cap at reasonable maximum
-	decimals = Math.min(decimals, 8);
-
-	// Round to tick size (floor for sells would be safer, but round is standard)
-	const multiplier = Math.pow(10, decimals);
-	const rounded = Math.round(price * multiplier) / multiplier;
-
-	// Format with the correct number of decimals
-	// Only strip trailing zeros after decimal point, not from integers
-	if (decimals === 0) {
-		return rounded.toFixed(0);
-	}
-	// Strip trailing zeros after decimal, and the decimal point if no decimals remain
-	return rounded.toFixed(decimals).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
-}
-
-function formatSizeForOrder(size: number, szDecimals: number): string {
-	return formatDecimalFloor(size, szDecimals);
-}
+const ORDER_TEXT = UI_TEXT.ORDER_ENTRY;
 
 export function OrderEntryPanel() {
 	// IDs for accessibility
@@ -173,7 +132,7 @@ export function OrderEntryPanel() {
 		return parseNumber(position?.position?.szi) || 0;
 	}, [position?.position?.szi]);
 
-	const maxLeverage = market?.maxLeverage || 50;
+	const maxLeverage = market?.maxLeverage || DEFAULT_MAX_LEVERAGE;
 
 	const leverage = useMemo(() => {
 		if (!market?.marketKey) return getDefaultLeverage(maxLeverage);
@@ -186,9 +145,7 @@ export function OrderEntryPanel() {
 	const markPx = useMemo(() => {
 		const ctxMarkPx = market?.ctx?.markPx;
 		const midPx = market?.midPx;
-		const result = parseNumber(ctxMarkPx || midPx) || 0;
-		console.log("[OrderEntry] markPx calculation:", { ctxMarkPx, midPx, result });
-		return result;
+		return parseNumber(ctxMarkPx || midPx) || 0;
 	}, [market?.ctx?.markPx, market?.midPx]);
 
 	const price = useMemo(() => {
@@ -229,7 +186,7 @@ export function OrderEntryPanel() {
 	}, [orderValue, leverage]);
 
 	const estimatedFee = useMemo(() => {
-		const feeRate = type === "market" ? 0.00045 : 0.00015;
+		const feeRate = type === "market" ? ORDER_FEE_RATE_TAKER : ORDER_FEE_RATE_MAKER;
 		return orderValue * feeRate;
 	}, [orderValue, type]);
 
@@ -254,43 +211,56 @@ export function OrderEntryPanel() {
 	const validation = useMemo(() => {
 		const errors: string[] = [];
 
-		if (!isConnected) return { valid: false, errors: ["Not connected"], canSubmit: false, needsApproval: false };
-		if (isWalletLoading) return { valid: false, errors: ["Loading wallet..."], canSubmit: false, needsApproval: false };
-		if (availableBalance <= 0) return { valid: false, errors: ["No balance"], canSubmit: false, needsApproval: false };
-		if (!market) return { valid: false, errors: ["No market"], canSubmit: false, needsApproval: false };
-		if (typeof market.assetIndex !== "number") return { valid: false, errors: ["Market not ready"], canSubmit: false, needsApproval: false };
+		if (!isConnected) {
+			return { valid: false, errors: [ORDER_TEXT.ERROR_NOT_CONNECTED], canSubmit: false, needsApproval: false };
+		}
+		if (isWalletLoading) {
+			return { valid: false, errors: [ORDER_TEXT.ERROR_LOADING_WALLET], canSubmit: false, needsApproval: false };
+		}
+		if (availableBalance <= 0) {
+			return { valid: false, errors: [ORDER_TEXT.ERROR_NO_BALANCE], canSubmit: false, needsApproval: false };
+		}
+		if (!market) {
+			return { valid: false, errors: [ORDER_TEXT.ERROR_NO_MARKET], canSubmit: false, needsApproval: false };
+		}
+		if (typeof market.assetIndex !== "number") {
+			return { valid: false, errors: [ORDER_TEXT.ERROR_MARKET_NOT_READY], canSubmit: false, needsApproval: false };
+		}
 
 		// Check if agent approval is needed
 		if (!isAgentApproved) {
 			return { valid: false, errors: [], canSubmit: false, needsApproval: true };
 		}
 
-		if (!canSign) return { valid: false, errors: ["Signer not ready"], canSubmit: false, needsApproval: false };
-		if (type === "market" && !markPx) return { valid: false, errors: ["No mark price"], canSubmit: false, needsApproval: false };
+		if (!canSign) {
+			return { valid: false, errors: [ORDER_TEXT.ERROR_SIGNER_NOT_READY], canSubmit: false, needsApproval: false };
+		}
+		if (type === "market" && !markPx) {
+			return { valid: false, errors: [ORDER_TEXT.ERROR_NO_MARK_PRICE], canSubmit: false, needsApproval: false };
+		}
 		if (type === "limit" && !price) {
-			errors.push("Enter limit price");
+			errors.push(ORDER_TEXT.ERROR_LIMIT_PRICE);
 		}
 		if (!sizeValue || sizeValue <= 0) {
-			errors.push("Enter size");
+			errors.push(ORDER_TEXT.ERROR_SIZE);
 		}
-		if (orderValue > 0 && orderValue < 10) {
-			errors.push("Min order $10");
+		if (orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD) {
+			errors.push(ORDER_TEXT.ERROR_MIN_NOTIONAL);
 		}
 		if (sizeValue > maxSize && maxSize > 0) {
-			errors.push("Exceeds max size");
+			errors.push(ORDER_TEXT.ERROR_EXCEEDS_MAX);
 		}
 
 		return { valid: errors.length === 0, errors, canSubmit: errors.length === 0, needsApproval: false };
 	}, [isConnected, isWalletLoading, availableBalance, market, type, markPx, price, sizeValue, orderValue, maxSize, isAgentApproved, canSign]);
 
 	const sizeHasError = sizeValue > maxSize && maxSize > 0;
-	const orderValueTooLow = orderValue > 0 && orderValue < 10;
+	const orderValueTooLow = orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD;
 
 	// Leverage options
 	const leverageOptions = useMemo(() => {
 		const options: number[] = [];
-		const steps = [1, 2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 125, 150, 200];
-		for (const step of steps) {
+		for (const step of ORDER_LEVERAGE_STEPS) {
 			if (step <= maxLeverage) {
 				options.push(step);
 			}
@@ -310,37 +280,33 @@ export function OrderEntryPanel() {
 		[market?.marketKey, maxLeverage, setMarketLeverage],
 	);
 
-	const handleSliderChange = useCallback(
-		(values: number[]) => {
-			const pct = values[0];
-			if (maxSize > 0) {
-				const newSize = maxSize * (pct / 100);
-				const formatted = formatDecimalFloor(newSize, market?.szDecimals ?? 0);
-				if (sizeMode === "usd" && price > 0) {
-					const usdValue = newSize * price;
-					setSizeInput(usdValue > 0 ? usdValue.toFixed(2) : "");
-				} else {
-					setSizeInput(formatted || "");
-				}
+	const applySizeFromPercent = useCallback(
+		(pct: number) => {
+			if (maxSize <= 0) return;
+			const newSize = maxSize * (pct / 100);
+			const formatted = formatDecimalFloor(newSize, market?.szDecimals ?? 0);
+			if (sizeMode === "usd" && price > 0) {
+				const usdValue = newSize * price;
+				setSizeInput(usdValue > 0 ? usdValue.toFixed(2) : "");
+				return;
 			}
+			setSizeInput(formatted || "");
 		},
 		[maxSize, market?.szDecimals, sizeMode, price],
 	);
 
+	const handleSliderChange = useCallback(
+		(values: number[]) => {
+			applySizeFromPercent(values[0]);
+		},
+		[applySizeFromPercent],
+	);
+
 	const handlePercentClick = useCallback(
 		(pct: number) => {
-			if (maxSize > 0) {
-				const newSize = maxSize * (pct / 100);
-				const formatted = formatDecimalFloor(newSize, market?.szDecimals ?? 0);
-				if (sizeMode === "usd" && price > 0) {
-					const usdValue = newSize * price;
-					setSizeInput(usdValue > 0 ? usdValue.toFixed(2) : "");
-				} else {
-					setSizeInput(formatted || "");
-				}
-			}
+			applySizeFromPercent(pct);
 		},
-		[maxSize, market?.szDecimals, sizeMode, price],
+		[applySizeFromPercent],
 	);
 
 	const handleSizeModeToggle = useCallback(() => {
@@ -369,17 +335,11 @@ export function OrderEntryPanel() {
 
 	// Handle chain switch
 	const handleSwitchChain = useCallback(() => {
-		switchChain({ chainId: 42161 }); // Arbitrum One
+		switchChain({ chainId: ARBITRUM_CHAIN_ID });
 	}, [switchChain]);
 
 	// Handle agent approval
 	const handleApprove = useCallback(async () => {
-		console.log("[OrderEntry] handleApprove called", {
-			isApproving,
-			hasWalletClient: !!walletClient,
-			isWalletLoading,
-		});
-
 		if (isApproving) return;
 
 		setIsApproving(true);
@@ -389,25 +349,14 @@ export function OrderEntryPanel() {
 			await approveAgent();
 		} catch (error) {
 			console.error("[OrderEntry] Approval failed:", error);
-			const message = error instanceof Error ? error.message : "Failed to enable trading";
+			const message = error instanceof Error ? error.message : ORDER_TEXT.APPROVAL_ERROR_FALLBACK;
 			setApprovalError(message);
 		} finally {
 			setIsApproving(false);
 		}
-	}, [isApproving, approveAgent, walletClient, isWalletLoading]);
+	}, [isApproving, approveAgent]);
 
 	const handleSubmit = useCallback(async () => {
-		console.log("[OrderEntry] handleSubmit called", {
-			canSubmit: validation.canSubmit,
-			isSubmitting,
-			isAgentApproved,
-			hasApiWalletSigner: !!apiWalletSigner,
-			assetIndex: market?.assetIndex,
-			sizeValue,
-			orderValue,
-			errors: validation.errors,
-		});
-
 		if (!validation.canSubmit || isSubmitting) return;
 		if (!apiWalletSigner || typeof market?.assetIndex !== "number") return;
 
@@ -426,15 +375,6 @@ export function OrderEntryPanel() {
 		const szDecimals = market.szDecimals ?? 0;
 		const formattedPrice = formatPriceForOrder(orderPrice);
 		const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
-
-		console.log("[OrderEntry] Order params:", {
-			markPx,
-			orderPrice,
-			formattedPrice,
-			slippageBps,
-			sizeValue,
-			formattedSize,
-		});
 
 		// Add to order queue
 		const orderId = addOrder({
@@ -480,7 +420,7 @@ export function OrderEntryPanel() {
 			setSizeInput("");
 			setLimitPriceInput("");
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : "Order failed";
+			const errorMessage = error instanceof Error ? error.message : ORDER_TEXT.ORDER_ERROR_FALLBACK;
 			updateOrder(orderId, { status: "failed", error: errorMessage });
 		} finally {
 			setIsSubmitting(false);
@@ -521,30 +461,40 @@ export function OrderEntryPanel() {
 	// Button text and action
 	const buttonContent = useMemo(() => {
 		if (!isConnected) {
-			return { text: "Connect Wallet", action: () => setWalletDialogOpen(true), disabled: false, variant: "cyan" as const };
+			return {
+				text: ORDER_TEXT.BUTTON_CONNECT,
+				action: () => setWalletDialogOpen(true),
+				disabled: false,
+				variant: "cyan" as const,
+			};
 		}
 		// Handle chain mismatch - prompt user to switch to Arbitrum
 		if (needsChainSwitch) {
 			return {
-				text: isSwitchingChain ? "Switching..." : "Switch to Arbitrum",
+				text: isSwitchingChain ? ORDER_TEXT.BUTTON_SWITCHING : ORDER_TEXT.BUTTON_SWITCH_CHAIN,
 				action: handleSwitchChain,
 				disabled: isSwitchingChain,
 				variant: "cyan" as const,
 			};
 		}
 		if (availableBalance <= 0) {
-			return { text: "Deposit", action: () => setDepositModalOpen(true), disabled: false, variant: "cyan" as const };
+			return {
+				text: ORDER_TEXT.BUTTON_DEPOSIT,
+				action: () => setDepositModalOpen(true),
+				disabled: false,
+				variant: "cyan" as const,
+			};
 		}
 		if (validation.needsApproval) {
 			return {
-				text: isApproving ? "Signing..." : !canApprove ? "Loading..." : "Enable Trading",
+				text: isApproving ? ORDER_TEXT.BUTTON_SIGNING : !canApprove ? ORDER_TEXT.BUTTON_LOADING : ORDER_TEXT.BUTTON_ENABLE_TRADING,
 				action: handleApprove,
 				disabled: isApproving || !canApprove,
 				variant: "cyan" as const,
 			};
 		}
 		return {
-			text: side === "buy" ? "Buy" : "Sell",
+			text: side === "buy" ? ORDER_TEXT.BUTTON_BUY : ORDER_TEXT.BUTTON_SELL,
 			action: handleSubmit,
 			disabled: !validation.canSubmit || isSubmitting,
 			variant: side as "buy" | "sell",
@@ -559,16 +509,16 @@ export function OrderEntryPanel() {
 			<div className="px-2 py-1.5 border-b border-border/40 flex items-center justify-between">
 				<Tabs value="cross">
 					<TabsList>
-						<TabsTrigger value="cross">Cross</TabsTrigger>
+						<TabsTrigger value="cross">{ORDER_TEXT.MODE_CROSS}</TabsTrigger>
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<span>
 									<TabsTrigger value="isolated" disabled className="opacity-50 cursor-not-allowed">
-										Isolated
+										{ORDER_TEXT.MODE_ISOLATED}
 									</TabsTrigger>
 								</span>
 							</TooltipTrigger>
-							<TooltipContent>Coming soon</TooltipContent>
+							<TooltipContent>{ORDER_TEXT.MODE_COMING_SOON}</TooltipContent>
 						</Tooltip>
 					</TabsList>
 				</Tabs>
@@ -578,7 +528,7 @@ export function OrderEntryPanel() {
 							type="button"
 							className="px-2 py-0.5 text-3xs border border-terminal-cyan/40 text-terminal-cyan inline-flex items-center gap-1"
 							tabIndex={0}
-							aria-label="Select leverage"
+							aria-label={ORDER_TEXT.LEVERAGE_ARIA}
 						>
 							{leverage}x <ChevronDown className="size-2.5" />
 						</button>
@@ -602,20 +552,20 @@ export function OrderEntryPanel() {
 				<Tabs value={type} onValueChange={(v) => setType(v as OrderType)}>
 					<TabsList>
 						<TabsTrigger value="market" variant="underline">
-							Market
+							{ORDER_TEXT.ORDER_TYPE_MARKET}
 						</TabsTrigger>
 						<TabsTrigger value="limit" variant="underline">
-							Limit
+							{ORDER_TEXT.ORDER_TYPE_LIMIT}
 						</TabsTrigger>
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<span>
 									<TabsTrigger value="stop" variant="underline" disabled className="opacity-50 cursor-not-allowed">
-										Stop
+										{ORDER_TEXT.ORDER_TYPE_STOP}
 									</TabsTrigger>
 								</span>
 							</TooltipTrigger>
-							<TooltipContent>Coming soon</TooltipContent>
+							<TooltipContent>{ORDER_TEXT.MODE_COMING_SOON}</TooltipContent>
 						</Tooltip>
 					</TabsList>
 				</Tabs>
@@ -632,10 +582,10 @@ export function OrderEntryPanel() {
 								: "border-border/60 text-muted-foreground hover:border-terminal-green/40 hover:text-terminal-green",
 						)}
 						tabIndex={0}
-						aria-label="Buy Long"
+						aria-label={ORDER_TEXT.BUY_ARIA}
 					>
 						<TrendingUp className="size-3 inline mr-1" />
-						Long
+						{ORDER_TEXT.BUY_LABEL}
 					</button>
 					<button
 						type="button"
@@ -647,20 +597,20 @@ export function OrderEntryPanel() {
 								: "border-border/60 text-muted-foreground hover:border-terminal-red/40 hover:text-terminal-red",
 						)}
 						tabIndex={0}
-						aria-label="Sell Short"
+						aria-label={ORDER_TEXT.SELL_ARIA}
 					>
 						<TrendingDown className="size-3 inline mr-1" />
-						Short
+						{ORDER_TEXT.SELL_LABEL}
 					</button>
 				</div>
 
 				{/* Balance + Deposit */}
 				<div className="space-y-0.5 text-3xs">
 					<div className="flex items-center justify-between text-muted-foreground">
-						<span>Available</span>
+						<span>{ORDER_TEXT.AVAILABLE_LABEL}</span>
 						<div className="flex items-center gap-2">
 							<span className={cn("tabular-nums", availableBalance > 0 ? "text-terminal-green" : "text-muted-foreground")}>
-								{isConnected ? formatUSD(availableBalance) : "-"}
+								{isConnected ? formatUSD(availableBalance) : FALLBACK_VALUE_PLACEHOLDER}
 							</span>
 							{isConnected && (
 								<button
@@ -668,7 +618,7 @@ export function OrderEntryPanel() {
 									onClick={() => setDepositModalOpen(true)}
 									className="text-terminal-cyan hover:underline text-4xs uppercase"
 								>
-									Deposit
+									{ORDER_TEXT.DEPOSIT_LABEL}
 								</button>
 							)}
 						</div>
@@ -676,7 +626,7 @@ export function OrderEntryPanel() {
 					{/* Position (if exists) */}
 					{positionSize !== 0 && (
 						<div className="flex items-center justify-between text-muted-foreground">
-							<span>Position</span>
+							<span>{ORDER_TEXT.POSITION_LABEL}</span>
 							<span
 								className={cn("tabular-nums", positionSize > 0 ? "text-terminal-green" : "text-terminal-red")}
 							>
@@ -689,20 +639,21 @@ export function OrderEntryPanel() {
 
 				{/* Size input */}
 				<div className="space-y-1.5">
-					<div className="text-4xs uppercase tracking-wider text-muted-foreground">Size</div>
+					<div className="text-4xs uppercase tracking-wider text-muted-foreground">{ORDER_TEXT.SIZE_LABEL}</div>
 					<div className="flex items-center gap-1">
 						<button
 							type="button"
 							onClick={handleSizeModeToggle}
 							className="px-2 py-1.5 text-3xs border border-border/60 hover:border-foreground/30 inline-flex items-center gap-1"
 							tabIndex={0}
-							aria-label="Toggle size mode"
+							aria-label={ORDER_TEXT.SIZE_MODE_TOGGLE_ARIA}
 							disabled={isFormDisabled}
 						>
-							{sizeMode === "asset" ? market?.coin || "---" : "USD"} <ChevronDown className="size-2.5" />
+							{sizeMode === "asset" ? market?.coin || ORDER_TEXT.SIZE_MODE_FALLBACK : ORDER_TEXT.SIZE_MODE_USD}{" "}
+							<ChevronDown className="size-2.5" />
 						</button>
 						<Input
-							placeholder="0.00"
+							placeholder={ORDER_TEXT.INPUT_PLACEHOLDER}
 							value={sizeInput}
 							onChange={(e) => setSizeInput(e.target.value)}
 							className={cn(
@@ -725,17 +676,17 @@ export function OrderEntryPanel() {
 
 					{/* Percent buttons */}
 					<div className="grid grid-cols-4 gap-1">
-						{[25, 50, 75, 100].map((p) => (
+						{ORDER_SIZE_PERCENT_STEPS.map((p) => (
 							<button
 								key={p}
 								type="button"
 								onClick={() => handlePercentClick(p)}
 								className="py-1 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-cyan/40 hover:text-terminal-cyan transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 								tabIndex={0}
-								aria-label={`Set ${p}%`}
+								aria-label={ORDER_TEXT.PERCENT_ARIA(p)}
 								disabled={isFormDisabled || maxSize <= 0}
 							>
-								{p === 100 ? "Max" : `${p}%`}
+								{p === 100 ? ORDER_TEXT.SIZE_MAX_LABEL : `${p}%`}
 							</button>
 						))}
 					</div>
@@ -745,19 +696,19 @@ export function OrderEntryPanel() {
 				{type === "limit" && (
 					<div className="space-y-1.5">
 						<div className="flex items-center justify-between">
-							<div className="text-4xs uppercase tracking-wider text-muted-foreground">Limit Price</div>
+							<div className="text-4xs uppercase tracking-wider text-muted-foreground">{ORDER_TEXT.LIMIT_PRICE_LABEL}</div>
 							{markPx > 0 && (
 								<button
 									type="button"
 									onClick={handleMarkPriceClick}
 									className="text-4xs text-muted-foreground hover:text-terminal-cyan tabular-nums"
 								>
-									Mark: {formatPrice(markPx, { szDecimals: market?.szDecimals })}
+									{ORDER_TEXT.MARK_PRICE_LABEL}: {formatPrice(markPx, { szDecimals: market?.szDecimals })}
 								</button>
 							)}
 						</div>
 						<Input
-							placeholder="0.00"
+							placeholder={ORDER_TEXT.INPUT_PLACEHOLDER}
 							value={limitPriceInput}
 							onChange={(e) => setLimitPriceInput(e.target.value)}
 							className={cn(
@@ -774,24 +725,24 @@ export function OrderEntryPanel() {
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<div className="inline-flex items-center gap-1.5 cursor-not-allowed opacity-50">
-								<Checkbox id={reduceOnlyId} className="size-3.5" aria-label="Reduce Only" disabled />
+								<Checkbox id={reduceOnlyId} className="size-3.5" aria-label={ORDER_TEXT.REDUCE_ONLY_LABEL} disabled />
 								<label htmlFor={reduceOnlyId} className="text-muted-foreground cursor-not-allowed">
-									Reduce Only
+									{ORDER_TEXT.REDUCE_ONLY_LABEL}
 								</label>
 							</div>
 						</TooltipTrigger>
-						<TooltipContent>Coming soon</TooltipContent>
+						<TooltipContent>{ORDER_TEXT.MODE_COMING_SOON}</TooltipContent>
 					</Tooltip>
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<div className="inline-flex items-center gap-1.5 cursor-not-allowed opacity-50">
-								<Checkbox id={tpSlId} className="size-3.5" aria-label="Take Profit / Stop Loss" disabled />
+								<Checkbox id={tpSlId} className="size-3.5" aria-label={ORDER_TEXT.TPSL_ARIA} disabled />
 								<label htmlFor={tpSlId} className="text-muted-foreground cursor-not-allowed">
-									TP/SL
+									{ORDER_TEXT.TPSL_LABEL}
 								</label>
 							</div>
 						</TooltipTrigger>
-						<TooltipContent>Coming soon</TooltipContent>
+						<TooltipContent>{ORDER_TEXT.MODE_COMING_SOON}</TooltipContent>
 					</Tooltip>
 				</div>
 
@@ -834,27 +785,29 @@ export function OrderEntryPanel() {
 				{/* Order summary */}
 				<div className="border border-border/40 divide-y divide-border/40 text-3xs">
 					<div className="flex items-center justify-between px-2 py-1.5">
-						<span className="text-muted-foreground">Liq. Price</span>
+						<span className="text-muted-foreground">{ORDER_TEXT.SUMMARY_LIQ}</span>
 						<span className={cn("tabular-nums", liqWarning ? "text-terminal-red" : "text-terminal-red/70")}>
-							{liqPrice ? formatPrice(liqPrice, { szDecimals: market?.szDecimals }) : "-"}
+							{liqPrice ? formatPrice(liqPrice, { szDecimals: market?.szDecimals }) : FALLBACK_VALUE_PLACEHOLDER}
 						</span>
 					</div>
 					<div className="flex items-center justify-between px-2 py-1.5">
-						<span className="text-muted-foreground">Order Value</span>
-						<span className="tabular-nums">{orderValue > 0 ? formatUSD(orderValue) : "-"}</span>
+						<span className="text-muted-foreground">{ORDER_TEXT.SUMMARY_ORDER_VALUE}</span>
+						<span className="tabular-nums">{orderValue > 0 ? formatUSD(orderValue) : FALLBACK_VALUE_PLACEHOLDER}</span>
 					</div>
 					<div className="flex items-center justify-between px-2 py-1.5">
-						<span className="text-muted-foreground">Margin Req.</span>
-						<span className="tabular-nums">{marginRequired > 0 ? formatUSD(marginRequired) : "-"}</span>
+						<span className="text-muted-foreground">{ORDER_TEXT.SUMMARY_MARGIN_REQ}</span>
+						<span className="tabular-nums">
+							{marginRequired > 0 ? formatUSD(marginRequired) : FALLBACK_VALUE_PLACEHOLDER}
+						</span>
 					</div>
 					<div className="flex items-center justify-between px-2 py-1.5">
-						<span className="text-muted-foreground">Slippage</span>
+						<span className="text-muted-foreground">{ORDER_TEXT.SUMMARY_SLIPPAGE}</span>
 						<span className="tabular-nums text-terminal-amber">{(slippageBps / 100).toFixed(2)}%</span>
 					</div>
 					<div className="flex items-center justify-between px-2 py-1.5">
-						<span className="text-muted-foreground">Est. Fee</span>
+						<span className="text-muted-foreground">{ORDER_TEXT.SUMMARY_FEE}</span>
 						<span className="tabular-nums text-muted-foreground">
-							{estimatedFee > 0 ? formatUSD(estimatedFee) : "-"}
+							{estimatedFee > 0 ? formatUSD(estimatedFee) : FALLBACK_VALUE_PLACEHOLDER}
 						</span>
 					</div>
 				</div>

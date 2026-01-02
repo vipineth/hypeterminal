@@ -1,19 +1,20 @@
 import { TrendingUp, Zap } from "lucide-react";
+import { MARKET_CATEGORY_LABELS, TOKEN_ICON_BASE_URL } from "@/constants/app";
 
 export function getTokenIconUrl(token: string) {
-	return `https://app.hyperliquid.xyz/coins/${token}.svg`;
+	return `${TOKEN_ICON_BASE_URL}/${token}.svg`;
 }
 
 export type MarketCategory = "all" | "trending" | "new" | "defi" | "layer1" | "layer2" | "meme";
 
 export const marketCategories: { value: MarketCategory; label: string; icon: React.ReactNode }[] = [
-	{ value: "all", label: "All", icon: null },
-	{ value: "trending", label: "Hot", icon: <TrendingUp className="size-2.5" /> },
-	{ value: "new", label: "New", icon: <Zap className="size-2.5" /> },
-	{ value: "defi", label: "DeFi", icon: null },
-	{ value: "layer1", label: "L1", icon: null },
-	{ value: "layer2", label: "L2", icon: null },
-	{ value: "meme", label: "Meme", icon: null },
+	{ value: "all", label: MARKET_CATEGORY_LABELS.all, icon: null },
+	{ value: "trending", label: MARKET_CATEGORY_LABELS.trending, icon: <TrendingUp className="size-2.5" /> },
+	{ value: "new", label: MARKET_CATEGORY_LABELS.new, icon: <Zap className="size-2.5" /> },
+	{ value: "defi", label: MARKET_CATEGORY_LABELS.defi, icon: null },
+	{ value: "layer1", label: MARKET_CATEGORY_LABELS.layer1, icon: null },
+	{ value: "layer2", label: MARKET_CATEGORY_LABELS.layer2, icon: null },
+	{ value: "meme", label: MARKET_CATEGORY_LABELS.meme, icon: null },
 ];
 
 export const categoryMapping: Record<string, MarketCategory[]> = {

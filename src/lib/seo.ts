@@ -13,16 +13,9 @@
  * ```
  */
 
-export const SEO_DEFAULTS = {
-	siteName: "HypeTerminal",
-	siteUrl: "https://hypeterminal.xyz",
-	defaultTitle: "HypeTerminal - Hyperliquid Trading Terminal",
-	defaultDescription:
-		"A professional trading terminal for Hyperliquid DEX. Trade perpetuals and spot markets with real-time data, advanced charting, and seamless wallet connectivity.",
-	twitterHandle: "@hypeterminal",
-	locale: "en_US",
-	themeColor: "#0a0a0a",
-} as const;
+import { SEO_BASE_KEYWORDS, SEO_DEFAULTS } from "@/constants/app";
+
+export { SEO_DEFAULTS };
 
 export interface PageSeoOptions {
 	/** Page title (will be suffixed with site name unless `fullTitle` is true) */
@@ -87,8 +80,7 @@ export function buildPageHead(options: PageSeoOptions = {}): HeadOutput {
 
 	const canonicalUrl = `${SEO_DEFAULTS.siteUrl}${path}`;
 
-	const baseKeywords = ["hyperliquid", "trading", "dex", "perpetuals", "crypto", "defi"];
-	const allKeywords = Array.from(new Set([...baseKeywords, ...keywords]));
+	const allKeywords = Array.from(new Set([...SEO_BASE_KEYWORDS, ...keywords]));
 
 	const meta: MetaTag[] = [
 		{ charSet: "utf-8" },

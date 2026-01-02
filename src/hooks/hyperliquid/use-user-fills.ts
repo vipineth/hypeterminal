@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getInfoClient, hyperliquidKeys } from "@/lib/hyperliquid";
+import { getInfoClient } from "@/lib/hyperliquid/clients";
+import { hyperliquidKeys } from "@/lib/hyperliquid/query-keys";
 
 const infoClient = getInfoClient();
 
@@ -30,4 +31,3 @@ export function useUserFills(params: UseUserFillsParams) {
 		refetchOnReconnect: false,
 	});
 }
-

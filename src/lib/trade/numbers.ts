@@ -7,6 +7,15 @@ export function parseNumber(value: unknown): number {
 	return Number.NaN;
 }
 
+export function parseNumberOr(value: unknown, fallback: number): number {
+	const parsed = parseNumber(value);
+	return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+export function parseNumberOrZero(value: unknown): number {
+	return parseNumberOr(value, 0);
+}
+
 export function clampInt(value: number, min: number, max: number) {
 	if (!Number.isFinite(value)) return min;
 	return Math.min(max, Math.max(min, Math.round(value)));

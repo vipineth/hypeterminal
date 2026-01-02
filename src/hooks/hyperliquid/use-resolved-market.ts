@@ -1,9 +1,12 @@
 import { useMemo } from "react";
-import type { PerpMarketKey, PerpMarketRegistry } from "@/lib/hyperliquid";
-import { isPerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid";
+import type { PerpMarketKey } from "@/lib/hyperliquid/market-key";
+import type { PerpMarketRegistry } from "@/lib/hyperliquid/market-registry";
+import { isPerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
 import { useSelectedMarketKey } from "@/stores/use-market-prefs-store";
-import { useActiveAssetCtxSubscription, useAllMidsSubscription } from "./socket";
-import { type PerpAssetCtx, usePerpAssetCtxsSnapshot } from "./use-perp-asset-ctxs-snapshot";
+import type { PerpAssetCtx } from "@/types/hyperliquid";
+import { useActiveAssetCtxSubscription } from "./socket/use-active-asset-ctx-subscription";
+import { useAllMidsSubscription } from "./socket/use-all-mids-subscription";
+import { usePerpAssetCtxsSnapshot } from "./use-perp-asset-ctxs-snapshot";
 import { usePerpMarketRegistry } from "./use-market-registry";
 
 export type ResolvedPerpMarket = {
