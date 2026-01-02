@@ -16,6 +16,7 @@ const TRADES_TEXT = UI_TEXT.TRADES;
 export function TradesView() {
 	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
 	const coin = selectedMarket?.coin ?? "BTC";
+	const szDecimals = selectedMarket?.szDecimals ?? 4;
 	const { data: tradesBatch, status, error } = useTradesSubscription({ params: { coin } });
 
 	const [tradeState, setTradeState] = useState<{ coin: string; trades: Trade[] }>({ coin, trades: [] });
@@ -59,11 +60,11 @@ export function TradesView() {
 				id: getTradeKey(trade.hash, trade.tid),
 				time,
 				price: Number.isFinite(price) ? formatNumber(price, 2) : String(trade.px),
-				size: Number.isFinite(size) ? formatNumber(size, 3) : String(trade.sz),
+				size: Number.isFinite(size) ? formatNumber(size, szDecimals) : String(trade.sz),
 				side: trade.side === "B" ? ("buy" as const) : ("sell" as const),
 			};
 		});
-	}, [trades]);
+	}, [trades, szDecimals]);
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col">

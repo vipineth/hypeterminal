@@ -93,6 +93,7 @@ export function OrderBookPanel() {
 
 	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
 	const coin = selectedMarket?.coin ?? "BTC";
+	const szDecimals = selectedMarket?.szDecimals ?? 4;
 	const {
 		data: book,
 		status: bookStatus,
@@ -241,7 +242,7 @@ export function OrderBookPanel() {
 									.slice(0, 9)
 									.reverse()
 									.map((r) => (
-										<BookRow key={`ask-${r.price}`} row={r} type="ask" maxTotal={maxTotal} showInUsdc={showInUsdc} />
+										<BookRow key={`ask-${r.price}`} row={r} type="ask" maxTotal={maxTotal} showInUsdc={showInUsdc} szDecimals={szDecimals} />
 									))}
 							</div>
 						) : (
@@ -271,7 +272,7 @@ export function OrderBookPanel() {
 						{bookStatus !== "error" && bids.length > 0 ? (
 							<div className="flex-1 flex flex-col gap-px py-0.5">
 								{bids.slice(0, 11).map((r) => (
-									<BookRow key={`bid-${r.price}`} row={r} type="bid" maxTotal={maxTotal} showInUsdc={showInUsdc} />
+									<BookRow key={`bid-${r.price}`} row={r} type="bid" maxTotal={maxTotal} showInUsdc={showInUsdc} szDecimals={szDecimals} />
 								))}
 							</div>
 						) : null}

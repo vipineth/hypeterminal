@@ -3,10 +3,11 @@ import { useMemo } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
-import { cn } from "@/lib/utils";
-import { formatNumber, formatUSD } from "@/lib/format";
+import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
 import { useOpenOrders } from "@/hooks/hyperliquid/use-open-orders";
+import { formatNumber, formatUSD } from "@/lib/format";
 import { parseNumber } from "@/lib/trade/numbers";
+import { cn } from "@/lib/utils";
 import { useConnection } from "wagmi";
 
 const ORDERS_TEXT = UI_TEXT.ORDERS_TAB;
@@ -14,6 +15,7 @@ const ORDERS_TEXT = UI_TEXT.ORDERS_TAB;
 export function OrdersTab() {
 	const { address, isConnected } = useConnection();
 	const { data, status, error } = useOpenOrders({ user: isConnected ? address : undefined });
+	const { registry } = usePerpMarketRegistry();
 
 	const openOrders = useMemo(() => data ?? [], [data]);
 	const headerCount = isConnected ? openOrders.length : FALLBACK_VALUE_PLACEHOLDER;
@@ -27,6 +29,8 @@ export function OrdersTab() {
 				Number.isFinite(origSz) && Number.isFinite(remaining) ? Math.max(0, origSz - remaining) : Number.NaN;
 			const fillPct = Number.isFinite(origSz) && origSz !== 0 && Number.isFinite(filled) ? (filled / origSz) * 100 : 0;
 			const limitPx = parseNumber(order.limitPx);
+			const marketInfo = registry?.coinToInfo.get(order.coin);
+			const szDecimals = marketInfo?.szDecimals ?? 4;
 
 			return {
 				key: order.oid,
@@ -35,14 +39,14 @@ export function OrdersTab() {
 				sideClass: isBuy ? "bg-terminal-green/20 text-terminal-green" : "bg-terminal-red/20 text-terminal-red",
 				typeLabel: order.reduceOnly ? ORDERS_TEXT.TYPE_LIMIT_RO : ORDERS_TEXT.TYPE_LIMIT,
 				priceText: Number.isFinite(limitPx) ? formatUSD(limitPx, { compact: false }) : String(order.limitPx),
-				sizeText: Number.isFinite(origSz) ? formatNumber(origSz, 4) : String(order.origSz),
-				filledText: Number.isFinite(filled) ? formatNumber(filled, 4) : FALLBACK_VALUE_PLACEHOLDER,
+				sizeText: Number.isFinite(origSz) ? formatNumber(origSz, szDecimals) : String(order.origSz),
+				filledText: Number.isFinite(filled) ? formatNumber(filled, szDecimals) : FALLBACK_VALUE_PLACEHOLDER,
 				hasFilled: Number.isFinite(filled) && filled > 0,
 				fillPctText: `${fillPct.toFixed(0)}%`,
 				statusLabel: ORDERS_TEXT.STATUS_OPEN,
 			};
 		});
-	}, [openOrders]);
+	}, [openOrders, registry]);
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">

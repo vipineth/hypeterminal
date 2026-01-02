@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
+import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
 import { useUserFunding } from "@/hooks/hyperliquid/use-user-funding";
 import { formatNumber, formatPercent, formatUSD } from "@/lib/format";
 import { parseNumber } from "@/lib/trade/numbers";
@@ -14,6 +15,7 @@ const FUNDING_TEXT = UI_TEXT.FUNDING_TAB;
 export function FundingTab() {
 	const { address, isConnected } = useConnection();
 	const { data, status, error } = useUserFunding({ user: isConnected ? address : undefined });
+	const { registry } = usePerpMarketRegistry();
 
 	const updates = useMemo(() => {
 		const raw = data ?? [];
@@ -38,6 +40,8 @@ export function FundingTab() {
 			const szi = parseNumber(update.delta.szi);
 			const isLong = Number.isFinite(szi) ? szi > 0 : true;
 			const positionSize = Number.isFinite(szi) ? Math.abs(szi) : Number.NaN;
+			const marketInfo = registry?.coinToInfo.get(update.delta.coin);
+			const szDecimals = marketInfo?.szDecimals ?? 4;
 
 			const rate = parseNumber(update.delta.fundingRate);
 			const usdc = parseNumber(update.delta.usdc);
@@ -58,7 +62,7 @@ export function FundingTab() {
 				coin: update.delta.coin,
 				sideLabel: isLong ? FUNDING_TEXT.SIDE_LONG : FUNDING_TEXT.SIDE_SHORT,
 				sideClass: isLong ? "bg-terminal-green/20 text-terminal-green" : "bg-terminal-red/20 text-terminal-red",
-				positionText: Number.isFinite(positionSize) ? formatNumber(positionSize, 4) : FALLBACK_VALUE_PLACEHOLDER,
+				positionText: Number.isFinite(positionSize) ? formatNumber(positionSize, szDecimals) : FALLBACK_VALUE_PLACEHOLDER,
 				rateText: Number.isFinite(rate)
 					? formatPercent(rate, { minimumFractionDigits: 4, maximumFractionDigits: 4 })
 					: FALLBACK_VALUE_PLACEHOLDER,
@@ -69,7 +73,7 @@ export function FundingTab() {
 				dateStr,
 			};
 		});
-	}, [updates]);
+	}, [updates, registry]);
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">

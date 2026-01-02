@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
+import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
 import { useUserFills } from "@/hooks/hyperliquid/use-user-fills";
 import { formatNumber, formatUSD } from "@/lib/format";
 import { parseNumber } from "@/lib/trade/numbers";
@@ -14,6 +15,7 @@ const HISTORY_TEXT = UI_TEXT.HISTORY_TAB;
 export function HistoryTab() {
 	const { address, isConnected } = useConnection();
 	const { data, status, error } = useUserFills({ user: isConnected ? address : undefined, aggregateByTime: true });
+	const { registry } = usePerpMarketRegistry();
 
 	const fills = useMemo(() => {
 		const raw = data ?? [];
@@ -41,6 +43,8 @@ export function HistoryTab() {
 			const sz = parseNumber(fill.sz);
 			const fee = parseNumber(fill.fee);
 			const closedPnl = parseNumber(fill.closedPnl);
+			const marketInfo = registry?.coinToInfo.get(fill.coin);
+			const szDecimals = marketInfo?.szDecimals ?? 4;
 
 			return {
 				key: `${fill.hash}-${fill.tid}`,
@@ -49,7 +53,7 @@ export function HistoryTab() {
 				sideClass: isBuy ? "bg-terminal-green/20 text-terminal-green" : "bg-terminal-red/20 text-terminal-red",
 				typeLabel: fill.dir,
 				priceText: Number.isFinite(px) ? formatUSD(px) : String(fill.px),
-				sizeText: Number.isFinite(sz) ? formatNumber(sz, 4) : String(fill.sz),
+				sizeText: Number.isFinite(sz) ? formatNumber(sz, szDecimals) : String(fill.sz),
 				feeText: Number.isFinite(fee) ? formatUSD(fee, { signDisplay: "exceptZero" }) : FALLBACK_VALUE_PLACEHOLDER,
 				feeClass: Number.isFinite(fee) && fee < 0 ? "text-terminal-green" : "text-muted-foreground",
 				pnlText: Number.isFinite(closedPnl) && closedPnl !== 0 ? formatUSD(closedPnl, { signDisplay: "exceptZero" }) : FALLBACK_VALUE_PLACEHOLDER,
@@ -59,7 +63,7 @@ export function HistoryTab() {
 				dateStr,
 			};
 		});
-	}, [fills]);
+	}, [fills, registry]);
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">

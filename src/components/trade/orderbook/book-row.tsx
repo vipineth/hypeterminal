@@ -10,9 +10,11 @@ type BookRowProps = {
 	maxTotal: number;
 	/** Show size/total in USDC instead of asset */
 	showInUsdc?: boolean;
+	/** Decimal precision for token amounts (from market metadata) */
+	szDecimals: number;
 };
 
-export function BookRow({ row, type, maxTotal, showInUsdc = false }: BookRowProps) {
+export function BookRow({ row, type, maxTotal, showInUsdc = false, szDecimals }: BookRowProps) {
 	const setSelectedPrice = useSetSelectedPrice();
 	const depthPct = maxTotal > 0 ? (row.total / maxTotal) * 100 : 0;
 	const isAsk = type === "ask";
@@ -26,12 +28,12 @@ export function BookRow({ row, type, maxTotal, showInUsdc = false }: BookRowProp
 	const sizeText = Number.isFinite(sizeValue)
 		? showInUsdc
 			? formatUSD(sizeValue, { digits: 2, compact: true })
-			: formatNumber(sizeValue, 3)
+			: formatNumber(sizeValue, szDecimals)
 		: FALLBACK_VALUE_PLACEHOLDER;
 	const totalText = Number.isFinite(totalValue)
 		? showInUsdc
 			? formatUSD(totalValue, { digits: 2, compact: true })
-			: formatNumber(totalValue, 3)
+			: formatNumber(totalValue, szDecimals)
 		: FALLBACK_VALUE_PLACEHOLDER;
 
 	const handlePriceClick = () => {
