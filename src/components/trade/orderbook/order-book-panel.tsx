@@ -18,13 +18,40 @@ import { TradesView } from "./trades-view";
 
 const ORDERBOOK_TEXT = UI_TEXT.ORDERBOOK;
 
+function generatePriceGroupingOptions(midPrice: number | undefined): Array<{ tickSize: number; nSigFigs: number }> {
+	if (!midPrice || !Number.isFinite(midPrice) || midPrice <= 0) {
+		return [
+			{ tickSize: 0, nSigFigs: 5 },
+			{ tickSize: 0, nSigFigs: 4 },
+			{ tickSize: 0, nSigFigs: 3 },
+			{ tickSize: 0, nSigFigs: 2 },
+		];
+	}
+
+	const orderOfMagnitude = Math.floor(Math.log10(midPrice));
+	const options: Array<{ tickSize: number; nSigFigs: number }> = [];
+
+	for (let i = 0; i < 4; i++) {
+		const exponent = orderOfMagnitude - i - 1;
+		const tickSize = 10 ** exponent;
+		const nSigFigs = Math.max(2, Math.min(5, 5 - i));
+		options.push({ tickSize, nSigFigs: nSigFigs as 2 | 3 | 4 | 5 });
+	}
+
+	return options;
+}
+
 export function OrderBookPanel() {
 	const [view, setView] = useState<"book" | "trades">("book");
 	const [nSigFigs, setNSigFigs] = useState<2 | 3 | 4 | 5 | undefined>(5);
 
 	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
 	const coin = selectedMarket?.coin ?? "BTC";
-	const { data: book, status: bookStatus, error: bookError } = useL2BookSubscription({
+	const {
+		data: book,
+		status: bookStatus,
+		error: bookError,
+	} = useL2BookSubscription({
 		params: { coin, nSigFigs },
 		enabled: view === "book",
 	});
@@ -76,6 +103,8 @@ export function OrderBookPanel() {
 		return (spread / mid) * 100;
 	}, [spread, mid]);
 
+	const priceGroupingOptions = useMemo(() => generatePriceGroupingOptions(mid), [mid]);
+
 	return (
 		<div className="h-full min-h-0 flex flex-col overflow-hidden border-l border-border/40">
 			<div className="flex items-center justify-between px-2 py-1.5 border-b border-border/40 bg-surface/30">
@@ -113,15 +142,21 @@ export function OrderBookPanel() {
 							tabIndex={0}
 							aria-label={ORDERBOOK_TEXT.SELECT_AGGREGATION_ARIA}
 						>
-							{nSigFigs ? `${nSigFigs} ${ORDERBOOK_TEXT.SIG_FIGS_SUFFIX}` : ORDERBOOK_TEXT.AUTO_LABEL}
+							{nSigFigs
+								? priceGroupingOptions.find((opt) => opt.nSigFigs === nSigFigs)?.tickSize
+									? formatNumber(priceGroupingOptions.find((opt) => opt.nSigFigs === nSigFigs)?.tickSize, 8)
+									: `${nSigFigs ?? 0} ${ORDERBOOK_TEXT.SIG_FIGS_SUFFIX}`
+								: ORDERBOOK_TEXT.AUTO_LABEL}
 							<ChevronDown className="size-2.5" />
 						</button>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end" className="w-20 font-mono text-xs">
+					<DropdownMenuContent align="end" className="w-24 font-mono text-xs">
 						<DropdownMenuItem onClick={() => setNSigFigs(undefined)}>{ORDERBOOK_TEXT.AUTO_LABEL}</DropdownMenuItem>
-						{[5, 4, 3, 2].map((n) => (
-							<DropdownMenuItem key={n} onClick={() => setNSigFigs(n as 2 | 3 | 4 | 5)}>
-								{n} {ORDERBOOK_TEXT.SIG_FIGS_SUFFIX}
+						{priceGroupingOptions.map((option) => (
+							<DropdownMenuItem key={option.nSigFigs} onClick={() => setNSigFigs(option.nSigFigs as 2 | 3 | 4 | 5)}>
+								{option.tickSize > 0
+									? formatNumber(option.tickSize, 8)
+									: `${option.nSigFigs} ${ORDERBOOK_TEXT.SIG_FIGS_SUFFIX}`}
 							</DropdownMenuItem>
 						))}
 					</DropdownMenuContent>
