@@ -94,7 +94,9 @@ const useTradeSettingsStore = create<TradeSettingsStore>()(
 					});
 				},
 				setMarketOrderSlippageBps: (bps) => {
-					set({ marketOrderSlippageBps: clampInt(bps, MARKET_ORDER_SLIPPAGE_MIN_BPS, MARKET_ORDER_SLIPPAGE_MAX_BPS) });
+					const next = clampInt(bps, MARKET_ORDER_SLIPPAGE_MIN_BPS, MARKET_ORDER_SLIPPAGE_MAX_BPS);
+					if (get().marketOrderSlippageBps === next) return;
+					set({ marketOrderSlippageBps: next });
 				},
 			},
 		}),

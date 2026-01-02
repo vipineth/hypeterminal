@@ -12,6 +12,7 @@ import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-mark
 import { formatNumber, formatUSD } from "@/lib/format";
 import { buildOrderBookRows } from "@/lib/trade/orderbook";
 import { cn } from "@/lib/utils";
+import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
 import { BookRow } from "./book-row";
 import { TradesView } from "./trades-view";
 
@@ -91,7 +92,8 @@ function formatTickLabel(tickSize: number): string {
 export function OrderBookPanel() {
 	const [view, setView] = useState<"book" | "trades">("book");
 	const [selectedOption, setSelectedOption] = useState<PriceGroupOption | null>(null);
-	const [showInUsdc, setShowInUsdc] = useState(false);
+	const { showOrderbookInUsd } = useGlobalSettings();
+	const { setShowOrderbookInUsd } = useGlobalSettingsActions();
 
 	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
 	const coin = selectedMarket?.coin ?? "BTC";
@@ -240,20 +242,20 @@ export function OrderBookPanel() {
 						<div>{ORDERBOOK_TEXT.HEADER_PRICE}</div>
 						<button
 							type="button"
-							onClick={() => setShowInUsdc((v) => !v)}
+							onClick={() => setShowOrderbookInUsd(!showOrderbookInUsd)}
 							className="text-right hover:text-foreground transition-colors inline-flex items-center justify-end gap-0.5"
 						>
 							{ORDERBOOK_TEXT.HEADER_SIZE}
-							<span className="opacity-60">({showInUsdc ? "$" : coin})</span>
+							<span className="opacity-60">({showOrderbookInUsd ? "$" : coin})</span>
 							<ArrowRightLeft className="size-2 opacity-40" />
 						</button>
 						<button
 							type="button"
-							onClick={() => setShowInUsdc((v) => !v)}
+							onClick={() => setShowOrderbookInUsd(!showOrderbookInUsd)}
 							className="text-right hover:text-foreground transition-colors inline-flex items-center justify-end gap-0.5"
 						>
 							{ORDERBOOK_TEXT.HEADER_TOTAL}
-							<span className="opacity-60">({showInUsdc ? "$" : coin})</span>
+							<span className="opacity-60">({showOrderbookInUsd ? "$" : coin})</span>
 							<ArrowRightLeft className="size-2 opacity-40" />
 						</button>
 					</div>
@@ -270,7 +272,7 @@ export function OrderBookPanel() {
 											row={r}
 											type="ask"
 											maxTotal={maxTotal}
-											showInUsdc={showInUsdc}
+											showInUsdc={showOrderbookInUsd}
 											szDecimals={szDecimals}
 										/>
 									))}
@@ -302,15 +304,15 @@ export function OrderBookPanel() {
 						{bookStatus !== "error" && bids.length > 0 ? (
 							<div className="flex-1 flex flex-col gap-px py-0.5">
 								{bids.slice(0, 11).map((r) => (
-									<BookRow
-										key={`bid-${r.price}`}
-										row={r}
-										type="bid"
-										maxTotal={maxTotal}
-										showInUsdc={showInUsdc}
-										szDecimals={szDecimals}
-									/>
-								))}
+										<BookRow
+											key={`bid-${r.price}`}
+											row={r}
+											type="bid"
+											maxTotal={maxTotal}
+											showInUsdc={showOrderbookInUsd}
+											szDecimals={szDecimals}
+										/>
+									))}
 							</div>
 						) : null}
 					</div>

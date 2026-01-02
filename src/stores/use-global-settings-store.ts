@@ -1,0 +1,88 @@
+import { z } from "zod";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { useShallow } from "zustand/react/shallow";
+import { STORAGE_KEYS } from "@/constants/app";
+import { createValidatedStorage } from "@/stores/validated-storage";
+
+const globalSettingsSchema = z.object({
+	state: z.object({
+		showOrdersOnChart: z.boolean().optional(),
+		showPositionsOnChart: z.boolean().optional(),
+		showExecutionsOnChart: z.boolean().optional(),
+		showOrderbookInUsd: z.boolean().optional(),
+		showChartScanlines: z.boolean().optional(),
+	}),
+});
+
+const validatedStorage = createValidatedStorage(globalSettingsSchema, "global settings");
+
+const DEFAULT_GLOBAL_SETTINGS = {
+	showOrdersOnChart: true,
+	showPositionsOnChart: true,
+	showExecutionsOnChart: false,
+	showOrderbookInUsd: false,
+	showChartScanlines: true,
+} as const;
+
+interface GlobalSettingsStore {
+	showOrdersOnChart: boolean;
+	showPositionsOnChart: boolean;
+	showExecutionsOnChart: boolean;
+	showOrderbookInUsd: boolean;
+	showChartScanlines: boolean;
+	actions: {
+		setShowOrdersOnChart: (next: boolean) => void;
+		setShowPositionsOnChart: (next: boolean) => void;
+		setShowExecutionsOnChart: (next: boolean) => void;
+		setShowOrderbookInUsd: (next: boolean) => void;
+		setShowChartScanlines: (next: boolean) => void;
+	};
+}
+
+const useGlobalSettingsStore = create<GlobalSettingsStore>()(
+	persist(
+		(set) => ({
+			...DEFAULT_GLOBAL_SETTINGS,
+			actions: {
+				setShowOrdersOnChart: (next) => set({ showOrdersOnChart: next }),
+				setShowPositionsOnChart: (next) => set({ showPositionsOnChart: next }),
+				setShowExecutionsOnChart: (next) => set({ showExecutionsOnChart: next }),
+				setShowOrderbookInUsd: (next) => set({ showOrderbookInUsd: next }),
+				setShowChartScanlines: (next) => set({ showChartScanlines: next }),
+			},
+		}),
+		{
+			name: STORAGE_KEYS.GLOBAL_SETTINGS,
+			storage: createJSONStorage(() => validatedStorage),
+			partialize: (state) => ({
+				showOrdersOnChart: state.showOrdersOnChart,
+				showPositionsOnChart: state.showPositionsOnChart,
+				showExecutionsOnChart: state.showExecutionsOnChart,
+				showOrderbookInUsd: state.showOrderbookInUsd,
+				showChartScanlines: state.showChartScanlines,
+			}),
+			merge: (persisted, current) => ({
+				...current,
+				...DEFAULT_GLOBAL_SETTINGS,
+				...(persisted as Partial<GlobalSettingsStore>),
+			}),
+		},
+	),
+);
+
+export function useGlobalSettings() {
+	return useGlobalSettingsStore(
+		useShallow((state) => ({
+			showOrdersOnChart: state.showOrdersOnChart,
+			showPositionsOnChart: state.showPositionsOnChart,
+			showExecutionsOnChart: state.showExecutionsOnChart,
+			showOrderbookInUsd: state.showOrderbookInUsd,
+			showChartScanlines: state.showChartScanlines,
+		})),
+	);
+}
+
+export function useGlobalSettingsActions() {
+	return useGlobalSettingsStore((state) => state.actions);
+}
