@@ -21,8 +21,8 @@ interface PriceGroupOption {
 	tickSize: number;
 	/** Valid values: 2, 3, 4, 5. null/undefined = full precision */
 	nSigFigs: 2 | 3 | 4 | 5;
-	/** Only valid when nSigFigs is 5. Valid values: 1, 2, 5 */
-	mantissa?: 1 | 2 | 5;
+	/** Only valid when nSigFigs is 5. Valid values: 2 or 5 (omit for base tick) */
+	mantissa?: 2 | 5;
 	label: string;
 }
 
@@ -31,12 +31,20 @@ interface PriceGroupOption {
  *
  * API constraints:
  * - nSigFigs: 2, 3, 4, 5, or null (full precision)
- * - mantissa: 1, 2, or 5 (only valid when nSigFigs is 5)
+ * - mantissa: 2 or 5 (only valid when nSigFigs is 5, omit for base tick)
  *
- * With nSigFigs=5:
- * - mantissa=1 (or omitted): base tick (0.1, 1, 10...)
- * - mantissa=2: 2x tick (0.2, 2, 20...)
- * - mantissa=5: 5x tick (0.5, 5, 50...)
+ * Formula: tickSize = 10^(integerDigits - nSigFigs)
+ *
+ * Example for ATOM at $2 (integerDigits = 1):
+ * - nSigFigs=5: tickSize = 10^(1-5) = 0.0001
+ * - nSigFigs=4: tickSize = 10^(1-4) = 0.001
+ * - nSigFigs=3: tickSize = 10^(1-3) = 0.01
+ * - nSigFigs=2: tickSize = 10^(1-2) = 0.1
+ *
+ * With nSigFigs=5 and mantissa:
+ * - omitted: base tick (0.0001)
+ * - mantissa=2: 2x base tick (0.0002)
+ * - mantissa=5: 5x base tick (0.0005)
  */
 function generatePriceGroupingOptions(midPrice: number | undefined): PriceGroupOption[] {
 	if (!midPrice || !Number.isFinite(midPrice) || midPrice <= 0) {
@@ -48,33 +56,33 @@ function generatePriceGroupingOptions(midPrice: number | undefined): PriceGroupO
 		];
 	}
 
-	// Number of integer digits in midPrice
+	// Number of integer digits in midPrice (e.g., $2 = 1, $95000 = 5)
 	const integerDigits = Math.floor(Math.log10(midPrice)) + 1;
 	const options: PriceGroupOption[] = [];
 
 	// nSigFigs 5 with mantissa options (finest granularity)
-	const exp5 = integerDigits - 5;
-	const base5 = 10 ** exp5;
+	// tickSize = 10^(integerDigits - 5)
+	const base5 = 10 ** (integerDigits - 5);
 
-	// mantissa=1 or omitted (base tick)
+	// Base tick (omit mantissa)
 	options.push({ tickSize: base5, nSigFigs: 5, label: formatTickLabel(base5) });
-	// mantissa=2 (2x tick)
+	// mantissa=2: 2x base tick
 	options.push({ tickSize: base5 * 2, nSigFigs: 5, mantissa: 2, label: formatTickLabel(base5 * 2) });
-	// mantissa=5 (5x tick)
+	// mantissa=5: 5x base tick
 	options.push({ tickSize: base5 * 5, nSigFigs: 5, mantissa: 5, label: formatTickLabel(base5 * 5) });
 
 	// nSigFigs 4, 3, 2 (no mantissa allowed)
 	for (let nSigFigs = 4; nSigFigs >= 2; nSigFigs--) {
-		const exponent = integerDigits - nSigFigs;
-		const tickSize = 10 ** exponent;
+		const tickSize = 10 ** (integerDigits - nSigFigs);
 		options.push({ tickSize, nSigFigs: nSigFigs as 2 | 3 | 4, label: formatTickLabel(tickSize) });
 	}
 
-	// Sort by tick size
+	// Sort by tick size (smallest first)
 	options.sort((a, b) => a.tickSize - b.tickSize);
 
-	// Filter to reasonable range and return first 6
-	const filtered = options.filter((opt) => opt.tickSize >= 0.01 && opt.tickSize <= midPrice / 10);
+	// Filter: tick size must be positive and not larger than ~10% of price
+	// No minimum filter - let the API determine valid precision
+	const filtered = options.filter((opt) => opt.tickSize > 0 && opt.tickSize <= midPrice / 10);
 	return filtered.slice(0, 6);
 }
 
@@ -82,8 +90,12 @@ function formatTickLabel(tickSize: number): string {
 	if (tickSize >= 1) {
 		return tickSize >= 1000 ? `${tickSize / 1000}K` : String(tickSize);
 	}
-	const decimals = Math.max(0, Math.ceil(-Math.log10(tickSize)));
-	return tickSize.toFixed(decimals);
+	// For small decimals, use enough precision to show significant digits
+	// e.g., 0.0001 -> "0.0001", 0.0002 -> "0.0002", 0.0005 -> "0.0005"
+	// Round to avoid floating point artifacts (e.g., 0.00019999999 -> 0.0002)
+	const rounded = Number(tickSize.toPrecision(4));
+	// Convert to string and remove trailing zeros after decimal
+	return String(rounded);
 }
 
 export function OrderBookPanel() {
@@ -94,6 +106,12 @@ export function OrderBookPanel() {
 	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
 	const coin = selectedMarket?.coin ?? "BTC";
 	const szDecimals = selectedMarket?.szDecimals ?? 4;
+
+	// Reset price grouping to auto when market changes
+	useEffect(() => {
+		setSelectedOption(null);
+	}, [coin]);
+
 	const {
 		data: book,
 		status: bookStatus,
@@ -107,8 +125,8 @@ export function OrderBookPanel() {
 		enabled: view === "book",
 	});
 
-	const bids = useMemo(() => buildOrderBookRows(book?.levels[0], "bid"), [book?.levels]);
-	const asks = useMemo(() => buildOrderBookRows(book?.levels[1], "ask"), [book?.levels]);
+	const bids = useMemo(() => buildOrderBookRows(book?.levels[0]), [book?.levels]);
+	const asks = useMemo(() => buildOrderBookRows(book?.levels[1]), [book?.levels]);
 
 	const maxTotal = useMemo(() => {
 		const totals = [...asks, ...bids].map((r) => r.total);
@@ -242,7 +260,14 @@ export function OrderBookPanel() {
 									.slice(0, 9)
 									.reverse()
 									.map((r) => (
-										<BookRow key={`ask-${r.price}`} row={r} type="ask" maxTotal={maxTotal} showInUsdc={showInUsdc} szDecimals={szDecimals} />
+										<BookRow
+											key={`ask-${r.price}`}
+											row={r}
+											type="ask"
+											maxTotal={maxTotal}
+											showInUsdc={showInUsdc}
+											szDecimals={szDecimals}
+										/>
 									))}
 							</div>
 						) : (
@@ -272,7 +297,14 @@ export function OrderBookPanel() {
 						{bookStatus !== "error" && bids.length > 0 ? (
 							<div className="flex-1 flex flex-col gap-px py-0.5">
 								{bids.slice(0, 11).map((r) => (
-									<BookRow key={`bid-${r.price}`} row={r} type="bid" maxTotal={maxTotal} showInUsdc={showInUsdc} szDecimals={szDecimals} />
+									<BookRow
+										key={`bid-${r.price}`}
+										row={r}
+										type="bid"
+										maxTotal={maxTotal}
+										showInUsdc={showInUsdc}
+										szDecimals={szDecimals}
+									/>
 								))}
 							</div>
 						) : null}

@@ -192,7 +192,37 @@ export function formatPercent(value: number | null | undefined, opts?: number | 
 	return getFormatter("en-US", mergeOptions(defaults, rest)).format(value);
 }
 
-export function formatNumber(value: number | null | undefined, opts?: number | FormatOptions) {
+/**
+ * Format a number with commas and decimal precision.
+ *
+ * - If value is a string, preserves its original decimal precision (for API values)
+ * - If value is a number with digits specified, uses those
+ * - If value is a number without digits, uses 0-3 decimals
+ *
+ * @example formatNumber("95001.5") -> "95,001.5" (string: preserves precision)
+ * @example formatNumber("2.0001") -> "2.0001" (string: preserves precision)
+ * @example formatNumber(1234.5678, 2) -> "1,234.57" (number with digits)
+ * @example formatNumber(1234.5) -> "1,234.5" (number, default 0-3 decimals)
+ */
+export function formatNumber(value: string | number | null | undefined, opts?: number | FormatOptions): string {
+	// Handle string input - preserve original decimal precision
+	if (typeof value === "string") {
+		if (!value) return FALLBACK_VALUE_PLACEHOLDER;
+		const num = Number(value);
+		if (!Number.isFinite(num)) return value;
+
+		// Find how many decimal places the original string has
+		const decimalIndex = value.indexOf(".");
+		const decimals = decimalIndex === -1 ? 0 : value.length - decimalIndex - 1;
+
+		return getFormatter("en-US", {
+			style: "decimal",
+			minimumFractionDigits: decimals,
+			maximumFractionDigits: decimals,
+		}).format(num);
+	}
+
+	// Handle number input
 	if (!isValidNumber(value)) return FALLBACK_VALUE_PLACEHOLDER;
 
 	const { digits, ...rest } = resolveOptions(opts);

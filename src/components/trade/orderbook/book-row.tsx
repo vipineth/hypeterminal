@@ -19,7 +19,8 @@ export function BookRow({ row, type, maxTotal, showInUsdc = false, szDecimals }:
 	const depthPct = maxTotal > 0 ? (row.total / maxTotal) * 100 : 0;
 	const isAsk = type === "ask";
 
-	const priceText = Number.isFinite(row.price) ? formatNumber(row.price, 2) : FALLBACK_VALUE_PLACEHOLDER;
+	// Use priceRaw string to preserve exact decimal precision from API
+	const priceText = formatNumber(row.priceRaw);
 
 	// Size and total can be shown in USDC (multiply by price) or in asset
 	const sizeValue = showInUsdc ? row.size * row.price : row.size;
@@ -52,10 +53,7 @@ export function BookRow({ row, type, maxTotal, showInUsdc = false, szDecimals }:
 				<button
 					type="button"
 					onClick={handlePriceClick}
-					className={cn(
-						"text-left hover:underline",
-						isAsk ? "text-terminal-red" : "text-terminal-green",
-					)}
+					className={cn("text-left hover:underline", isAsk ? "text-terminal-red" : "text-terminal-green")}
 				>
 					{priceText}
 				</button>
