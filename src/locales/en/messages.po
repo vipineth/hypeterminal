@@ -41,7 +41,7 @@ msgstr "Deposit"
 msgid "Disconnect"
 msgstr "Disconnect"
 
-#: src/components/trade/components/global-settings-dialog.tsx:102
+#: src/components/trade/components/global-settings-dialog.tsx:103
 msgid "Display Language"
 msgstr "Display Language"
 
@@ -49,7 +49,7 @@ msgstr "Display Language"
 msgid "Docs"
 msgstr "Docs"
 
-#: src/components/trade/components/global-settings-dialog.tsx:97
+#: src/components/trade/components/global-settings-dialog.tsx:98
 msgid "Language"
 msgstr "Language"
 

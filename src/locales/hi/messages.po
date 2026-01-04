@@ -15,80 +15,80 @@ msgstr ""
 
 #: src/components/trade/header/user-menu.tsx:87
 msgid "Add funds"
-msgstr ""
+msgstr "धन जोड़ें"
 
 #: src/components/trade/header/top-nav.tsx:27
 msgid "API"
-msgstr ""
+msgstr "API"
 
 #: src/components/trade/header/user-menu.tsx:65
 msgid "Connect Wallet"
-msgstr ""
+msgstr "वॉलेट कनेक्ट करें"
 
 #: src/components/trade/header/user-menu.tsx:50
 msgid "Connecting..."
-msgstr ""
+msgstr "कनेक्ट हो रहा है..."
 
 #: src/components/trade/header/user-menu.tsx:29
 msgid "Copy Address"
-msgstr ""
+msgstr "पता कॉपी करें"
 
 #: src/components/trade/header/top-nav.tsx:91
 msgid "Deposit"
-msgstr ""
+msgstr "जमा करें"
 
 #: src/components/trade/header/user-menu.tsx:98
 msgid "Disconnect"
-msgstr ""
+msgstr "डिस्कनेक्ट करें"
 
-#: src/components/trade/components/global-settings-dialog.tsx:102
+#: src/components/trade/components/global-settings-dialog.tsx:103
 msgid "Display Language"
-msgstr ""
+msgstr "प्रदर्शन भाषा"
 
 #: src/components/trade/header/top-nav.tsx:28
 msgid "Docs"
-msgstr ""
+msgstr "दस्तावेज़"
 
-#: src/components/trade/components/global-settings-dialog.tsx:97
+#: src/components/trade/components/global-settings-dialog.tsx:98
 msgid "Language"
-msgstr ""
+msgstr "भाषा"
 
 #: src/components/trade/header/top-nav.tsx:23
 msgid "Leaderboard"
-msgstr ""
+msgstr "लीडरबोर्ड"
 
 #: src/components/trade/header/top-nav.tsx:71
 msgid "More"
-msgstr ""
+msgstr "और"
 
 #: src/components/trade/header/top-nav.tsx:69
 msgid "More options"
-msgstr ""
+msgstr "और विकल्प"
 
 #: src/components/trade/header/top-nav.tsx:98
 msgid "Notifications"
-msgstr ""
+msgstr "सूचनाएं"
 
 #: src/components/trade/header/top-nav.tsx:21
 msgid "Portfolio"
-msgstr ""
+msgstr "पोर्टफोलियो"
 
 #: src/components/trade/header/top-nav.tsx:107
 msgid "Settings"
-msgstr ""
+msgstr "सेटिंग्स"
 
 #: src/components/trade/header/top-nav.tsx:22
 msgid "Staking"
-msgstr ""
+msgstr "स्टेकिंग"
 
 #: src/components/trade/header/top-nav.tsx:29
 msgid "Support"
-msgstr ""
+msgstr "सहायता"
 
 #: src/components/trade/header/top-nav.tsx:19
 msgid "Trade"
-msgstr ""
+msgstr "ट्रेड"
 
 #: src/components/trade/header/top-nav.tsx:20
 msgid "Vaults"
-msgstr ""
+msgstr "वॉल्ट"

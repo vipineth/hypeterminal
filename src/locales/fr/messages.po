@@ -15,80 +15,80 @@ msgstr ""
 
 #: src/components/trade/header/user-menu.tsx:87
 msgid "Add funds"
-msgstr ""
+msgstr "Ajouter des fonds"
 
 #: src/components/trade/header/top-nav.tsx:27
 msgid "API"
-msgstr ""
+msgstr "API"
 
 #: src/components/trade/header/user-menu.tsx:65
 msgid "Connect Wallet"
-msgstr ""
+msgstr "Connecter le portefeuille"
 
 #: src/components/trade/header/user-menu.tsx:50
 msgid "Connecting..."
-msgstr ""
+msgstr "Connexion..."
 
 #: src/components/trade/header/user-menu.tsx:29
 msgid "Copy Address"
-msgstr ""
+msgstr "Copier l'adresse"
 
 #: src/components/trade/header/top-nav.tsx:91
 msgid "Deposit"
-msgstr ""
+msgstr "Déposer"
 
 #: src/components/trade/header/user-menu.tsx:98
 msgid "Disconnect"
-msgstr ""
+msgstr "Déconnecter"
 
-#: src/components/trade/components/global-settings-dialog.tsx:102
+#: src/components/trade/components/global-settings-dialog.tsx:103
 msgid "Display Language"
-msgstr ""
+msgstr "Langue d'affichage"
 
 #: src/components/trade/header/top-nav.tsx:28
 msgid "Docs"
-msgstr ""
+msgstr "Documentation"
 
-#: src/components/trade/components/global-settings-dialog.tsx:97
+#: src/components/trade/components/global-settings-dialog.tsx:98
 msgid "Language"
-msgstr ""
+msgstr "Langue"
 
 #: src/components/trade/header/top-nav.tsx:23
 msgid "Leaderboard"
-msgstr ""
+msgstr "Classement"
 
 #: src/components/trade/header/top-nav.tsx:71
 msgid "More"
-msgstr ""
+msgstr "Plus"
 
 #: src/components/trade/header/top-nav.tsx:69
 msgid "More options"
-msgstr ""
+msgstr "Plus d'options"
 
 #: src/components/trade/header/top-nav.tsx:98
 msgid "Notifications"
-msgstr ""
+msgstr "Notifications"
 
 #: src/components/trade/header/top-nav.tsx:21
 msgid "Portfolio"
-msgstr ""
+msgstr "Portefeuille"
 
 #: src/components/trade/header/top-nav.tsx:107
 msgid "Settings"
-msgstr ""
+msgstr "Paramètres"
 
 #: src/components/trade/header/top-nav.tsx:22
 msgid "Staking"
-msgstr ""
+msgstr "Staking"
 
 #: src/components/trade/header/top-nav.tsx:29
 msgid "Support"
-msgstr ""
+msgstr "Support"
 
 #: src/components/trade/header/top-nav.tsx:19
 msgid "Trade"
-msgstr ""
+msgstr "Trader"
 
 #: src/components/trade/header/top-nav.tsx:20
 msgid "Vaults"
-msgstr ""
+msgstr "Coffres"

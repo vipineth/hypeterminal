@@ -15,80 +15,80 @@ msgstr ""
 
 #: src/components/trade/header/user-menu.tsx:87
 msgid "Add funds"
-msgstr ""
+msgstr "添加资金"
 
 #: src/components/trade/header/top-nav.tsx:27
 msgid "API"
-msgstr ""
+msgstr "API"
 
 #: src/components/trade/header/user-menu.tsx:65
 msgid "Connect Wallet"
-msgstr ""
+msgstr "连接钱包"
 
 #: src/components/trade/header/user-menu.tsx:50
 msgid "Connecting..."
-msgstr ""
+msgstr "连接中..."
 
 #: src/components/trade/header/user-menu.tsx:29
 msgid "Copy Address"
-msgstr ""
+msgstr "复制地址"
 
 #: src/components/trade/header/top-nav.tsx:91
 msgid "Deposit"
-msgstr ""
+msgstr "存款"
 
 #: src/components/trade/header/user-menu.tsx:98
 msgid "Disconnect"
-msgstr ""
+msgstr "断开连接"
 
-#: src/components/trade/components/global-settings-dialog.tsx:102
+#: src/components/trade/components/global-settings-dialog.tsx:103
 msgid "Display Language"
-msgstr ""
+msgstr "显示语言"
 
 #: src/components/trade/header/top-nav.tsx:28
 msgid "Docs"
-msgstr ""
+msgstr "文档"
 
-#: src/components/trade/components/global-settings-dialog.tsx:97
+#: src/components/trade/components/global-settings-dialog.tsx:98
 msgid "Language"
-msgstr ""
+msgstr "语言"
 
 #: src/components/trade/header/top-nav.tsx:23
 msgid "Leaderboard"
-msgstr ""
+msgstr "排行榜"
 
 #: src/components/trade/header/top-nav.tsx:71
 msgid "More"
-msgstr ""
+msgstr "更多"
 
 #: src/components/trade/header/top-nav.tsx:69
 msgid "More options"
-msgstr ""
+msgstr "更多选项"
 
 #: src/components/trade/header/top-nav.tsx:98
 msgid "Notifications"
-msgstr ""
+msgstr "通知"
 
 #: src/components/trade/header/top-nav.tsx:21
 msgid "Portfolio"
-msgstr ""
+msgstr "投资组合"
 
 #: src/components/trade/header/top-nav.tsx:107
 msgid "Settings"
-msgstr ""
+msgstr "设置"
 
 #: src/components/trade/header/top-nav.tsx:22
 msgid "Staking"
-msgstr ""
+msgstr "质押"
 
 #: src/components/trade/header/top-nav.tsx:29
 msgid "Support"
-msgstr ""
+msgstr "支持"
 
 #: src/components/trade/header/top-nav.tsx:19
 msgid "Trade"
-msgstr ""
+msgstr "交易"
 
 #: src/components/trade/header/top-nav.tsx:20
 msgid "Vaults"
-msgstr ""
+msgstr "金库"
