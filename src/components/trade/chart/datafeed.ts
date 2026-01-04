@@ -6,8 +6,10 @@ import type {
 	MetaResponse,
 	WebSocketSubscription,
 } from "@nktkas/hyperliquid";
+import { META_CACHE_TTL_MS, UI_TEXT } from "@/constants/app";
 import { getInfoClient, getSubscriptionClient } from "@/lib/hyperliquid/clients";
 import { readCachedMeta, writeCachedMeta } from "@/lib/hyperliquid/meta-cache";
+import { toFiniteNumber } from "@/lib/trade/numbers";
 import type {
 	Bar,
 	DatafeedConfiguration,
@@ -24,8 +26,6 @@ import type {
 	ServerTimeCallback,
 	SubscribeBarsCallback,
 } from "@/types/charting_library";
-import { META_CACHE_TTL_MS, UI_TEXT } from "@/constants/app";
-import { toFiniteNumber } from "@/lib/trade/numbers";
 import {
 	ALL_MIDS_TTL_MS,
 	CHART_DATAFEED_CONFIG,

@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TapTradeRouteImport } from './routes/tap-trade'
 import { Route as ComponentsRouteImport } from './routes/components'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
 
+const TapTradeRoute = TapTradeRouteImport.update({
+  id: '/tap-trade',
+  path: '/tap-trade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsRoute = ComponentsRouteImport.update({
   id: '/components',
   path: '/components',
@@ -33,34 +39,45 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/components': typeof ComponentsRoute
+  '/tap-trade': typeof TapTradeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/components': typeof ComponentsRoute
+  '/tap-trade': typeof TapTradeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/components': typeof ComponentsRoute
+  '/tap-trade': typeof TapTradeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$' | '/components'
+  fullPaths: '/' | '/$' | '/components' | '/tap-trade'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$' | '/components'
-  id: '__root__' | '/' | '/$' | '/components'
+  to: '/' | '/$' | '/components' | '/tap-trade'
+  id: '__root__' | '/' | '/$' | '/components' | '/tap-trade'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
   ComponentsRoute: typeof ComponentsRoute
+  TapTradeRoute: typeof TapTradeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tap-trade': {
+      id: '/tap-trade'
+      path: '/tap-trade'
+      fullPath: '/tap-trade'
+      preLoaderRoute: typeof TapTradeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components': {
       id: '/components'
       path: '/components'
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
   ComponentsRoute: ComponentsRoute,
+  TapTradeRoute: TapTradeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
