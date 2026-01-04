@@ -1,14 +1,27 @@
 import { i18n, type Messages } from "@lingui/core";
 import { messages as enMessages } from "@/locales/en/messages.po";
 
+// Top 6 most spoken languages globally with native names
 export const locales = {
 	en: "English",
-	fr: "French",
-};
+	zh: "中文",
+	hi: "हिन्दी",
+	es: "Español",
+	fr: "Français",
+	ar: "العربية",
+} as const;
 
-export const isLocaleValid = (locale: string) => Object.keys(locales).includes(locale);
+export type LocaleCode = keyof typeof locales;
 
-export const defaultLocale = "en";
+export const localeList = Object.entries(locales).map(([code, name]) => ({
+	code: code as LocaleCode,
+	name,
+}));
+
+export const isLocaleValid = (locale: string): locale is LocaleCode =>
+	Object.keys(locales).includes(locale);
+
+export const defaultLocale: LocaleCode = "en";
 
 // Initialize with default locale synchronously (required for SSR)
 i18n.loadAndActivate({ locale: defaultLocale, messages: enMessages });

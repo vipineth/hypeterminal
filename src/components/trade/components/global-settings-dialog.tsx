@@ -1,7 +1,10 @@
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
 import type { ChangeEvent } from "react";
 import { useEffect, useId, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -9,6 +12,7 @@ import {
 	MARKET_ORDER_SLIPPAGE_MIN_BPS,
 	UI_TEXT,
 } from "@/constants/app";
+import { dynamicActivate, type LocaleCode, localeList } from "@/lib/i18n";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
 import { useMarketOrderSlippageBps, useTradeSettingsActions } from "@/stores/use-trade-settings-store";
 
@@ -20,6 +24,7 @@ interface GlobalSettingsDialogProps {
 const SETTINGS_TEXT = UI_TEXT.GLOBAL_SETTINGS;
 
 export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialogProps) {
+	const { i18n } = useLingui();
 	const slippageBps = useMarketOrderSlippageBps();
 	const { setMarketOrderSlippageBps } = useTradeSettingsActions();
 	const {
@@ -75,6 +80,10 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 	const showScanlinesId = useId();
 	const showOrderbookUsdId = useId();
 
+	const handleLanguageChange = (locale: LocaleCode) => {
+		dynamicActivate(locale);
+	};
+
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-xl">
@@ -84,6 +93,34 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 				</DialogHeader>
 
 				<div className="space-y-4 text-xs">
+					<section className="space-y-2">
+						<div className="text-4xs uppercase tracking-wider text-muted-foreground">
+							<Trans>Language</Trans>
+						</div>
+						<div className="rounded-md border border-border/40">
+							<div className="flex items-center justify-between gap-4 px-3 py-2">
+								<div className="text-xs">
+									<Trans>Display Language</Trans>
+								</div>
+								<Select
+									value={i18n.locale}
+									onValueChange={(value) => handleLanguageChange(value as LocaleCode)}
+								>
+									<SelectTrigger className="w-32">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										{localeList.map(({ code, name }) => (
+											<SelectItem key={code} value={code}>
+												{name}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+						</div>
+					</section>
+
 					<section className="space-y-2">
 						<div className="text-4xs uppercase tracking-wider text-muted-foreground">
 							{SETTINGS_TEXT.SECTION_TRADING}

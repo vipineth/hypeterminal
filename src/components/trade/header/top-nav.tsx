@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { Bell, ChevronDown, Cog, Terminal, Zap } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -7,14 +9,25 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UI_TEXT } from "@/constants/app";
 import { cn } from "@/lib/utils";
 import { DepositModal } from "../order-entry/deposit-modal";
 import { GlobalSettingsDialog } from "../components/global-settings-dialog";
 import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
 
-const TOP_NAV_TEXT = UI_TEXT.TOP_NAV;
+const NAV_ITEMS = [
+	{ key: "trade", label: <Trans>Trade</Trans> },
+	{ key: "vaults", label: <Trans>Vaults</Trans> },
+	{ key: "portfolio", label: <Trans>Portfolio</Trans> },
+	{ key: "staking", label: <Trans>Staking</Trans> },
+	{ key: "leaderboard", label: <Trans>Leaderboard</Trans> },
+] as const;
+
+const MORE_MENU_ITEMS = [
+	{ key: "api", label: <Trans>API</Trans> },
+	{ key: "docs", label: <Trans>Docs</Trans> },
+	{ key: "support", label: <Trans>Support</Trans> },
+] as const;
 
 export function TopNav() {
 	const [depositModalOpen, setDepositModalOpen] = useState(false);
@@ -28,24 +41,23 @@ export function TopNav() {
 						<Terminal className="size-3 text-terminal-green" />
 					</div>
 					<span className="text-xs font-semibold tracking-tight text-terminal-cyan">
-						{TOP_NAV_TEXT.BRAND_PREFIX}
-						<span className="text-foreground">{TOP_NAV_TEXT.BRAND_SUFFIX}</span>
+						HYPE
+						<span className="text-foreground">TERMINAL</span>
 					</span>
 				</div>
 				<div className="h-4 w-px bg-border/60 mx-1 hidden md:block" />
 				<nav className="hidden lg:flex items-center text-3xs uppercase tracking-wider">
-					{TOP_NAV_TEXT.NAV_ITEMS.map((item, idx) => (
+					{NAV_ITEMS.map((item, idx) => (
 						<button
-							key={item}
+							key={item.key}
 							type="button"
 							className={cn(
 								"px-2.5 py-1.5 transition-colors",
 								idx === 0 ? "text-terminal-cyan" : "text-muted-foreground hover:text-foreground",
 							)}
 							tabIndex={0}
-							aria-label={item}
 						>
-							{item}
+							{item.label}
 						</button>
 					))}
 					<DropdownMenu>
@@ -54,14 +66,14 @@ export function TopNav() {
 								type="button"
 								className="px-2.5 py-1.5 text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
 								tabIndex={0}
-								aria-label={TOP_NAV_TEXT.MORE_ARIA}
+								aria-label={t`More options`}
 							>
-								{TOP_NAV_TEXT.MORE_LABEL} <ChevronDown className="size-2.5" />
+								<Trans>More</Trans> <ChevronDown className="size-2.5" />
 							</button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="start" className="w-32 text-xs font-mono">
-							{TOP_NAV_TEXT.MORE_MENU_ITEMS.map((item) => (
-								<DropdownMenuItem key={item}>{item}</DropdownMenuItem>
+							{MORE_MENU_ITEMS.map((item) => (
+								<DropdownMenuItem key={item.key}>{item.label}</DropdownMenuItem>
 							))}
 						</DropdownMenuContent>
 					</DropdownMenu>
@@ -76,14 +88,14 @@ export function TopNav() {
 					onClick={() => setDepositModalOpen(true)}
 				>
 					<Zap className="size-3 mr-1" />
-					{TOP_NAV_TEXT.DEPOSIT_LABEL}
+					<Trans>Deposit</Trans>
 				</Button>
 				<UserMenu />
 				<button
 					type="button"
 					className="size-7 flex items-center justify-center text-muted-foreground hover:text-foreground"
 					tabIndex={0}
-					aria-label={TOP_NAV_TEXT.NOTIFICATIONS_ARIA}
+					aria-label={t`Notifications`}
 				>
 					<Bell className="size-3.5" />
 				</button>
@@ -92,7 +104,7 @@ export function TopNav() {
 					type="button"
 					className="size-7 flex items-center justify-center text-muted-foreground hover:text-foreground"
 					tabIndex={0}
-					aria-label={TOP_NAV_TEXT.SETTINGS_ARIA}
+					aria-label={t`Settings`}
 					onClick={() => setSettingsOpen(true)}
 				>
 					<Cog className="size-3.5" />

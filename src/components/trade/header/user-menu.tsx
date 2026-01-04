@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { ChevronDown, Copy, CopyCheck, Loader2, LogOut, PlusCircle, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useConnection, useDisconnect, useEnsName } from "wagmi";
@@ -9,12 +10,9 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UI_TEXT } from "@/constants/app";
 import { useCopyToClipboard } from "@/hooks/ui/use-copy-to-clipboard";
 import { shortenAddress } from "@/lib/format";
 import { WalletDialog } from "../components/wallet-dialog";
-
-const USER_MENU_TEXT = UI_TEXT.USER_MENU;
 
 function CopyAddressMenuItem({ address }: { address: string }) {
 	const { copied, copy } = useCopyToClipboard();
@@ -27,7 +25,9 @@ function CopyAddressMenuItem({ address }: { address: string }) {
 	return (
 		<DropdownMenuItem className="flex items-center gap-2" onClick={handleClick}>
 			{copied ? <CopyCheck className="size-3.5" /> : <Copy className="size-3.5" />}
-			<span>{USER_MENU_TEXT.COPY_ADDRESS}</span>
+			<span>
+				<Trans>Copy Address</Trans>
+			</span>
 		</DropdownMenuItem>
 	);
 }
@@ -47,7 +47,7 @@ export function UserMenu() {
 		return (
 			<Button variant="ghost" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider" disabled>
 				<Loader2 className="size-3 animate-spin" />
-				{USER_MENU_TEXT.CONNECTING}
+				<Trans>Connecting...</Trans>
 			</Button>
 		);
 	}
@@ -62,7 +62,7 @@ export function UserMenu() {
 					onClick={() => setIsOpen(true)}
 				>
 					<Zap className="size-3 mr-1" />
-					{USER_MENU_TEXT.CONNECT_WALLET}
+					<Trans>Connect Wallet</Trans>
 				</Button>
 				<WalletDialog open={isOpen} onOpenChange={setIsOpen} />
 			</>
@@ -83,7 +83,9 @@ export function UserMenu() {
 					{address && <CopyAddressMenuItem address={address} />}
 					<DropdownMenuItem className="flex items-center gap-2">
 						<PlusCircle className="size-3.5 text-muted-foreground" />
-						<span>{USER_MENU_TEXT.ADD_FUNDS}</span>
+						<span>
+							<Trans>Add funds</Trans>
+						</span>
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem
@@ -92,7 +94,9 @@ export function UserMenu() {
 						onClick={() => disconnect.mutate()}
 					>
 						<LogOut className="size-3.5" />
-						<span>{USER_MENU_TEXT.DISCONNECT}</span>
+						<span>
+							<Trans>Disconnect</Trans>
+						</span>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
