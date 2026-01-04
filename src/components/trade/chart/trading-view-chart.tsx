@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import type {
 	ChartingLibraryWidgetConstructor,
 	IBasicDataFeed,
@@ -56,21 +56,16 @@ export function TradingViewChart({
 
 	const { showOrdersOnChart, showPositionsOnChart, showExecutionsOnChart, showChartScanlines } = useGlobalSettings();
 
-	const tradingOverrides = useMemo(
-		() => ({
-			"tradingProperties.showOrders": showOrdersOnChart,
-			"tradingProperties.showPositions": showPositionsOnChart,
-			"tradingProperties.showExecutions": showExecutionsOnChart,
-			"tradingProperties.showExecutionsLabels": showExecutionsOnChart,
-		}),
-		[showOrdersOnChart, showPositionsOnChart, showExecutionsOnChart],
-	);
+	// React 19: Simple object creation - no useMemo needed
+	const tradingOverrides = {
+		"tradingProperties.showOrders": showOrdersOnChart,
+		"tradingProperties.showPositions": showPositionsOnChart,
+		"tradingProperties.showExecutions": showExecutionsOnChart,
+		"tradingProperties.showExecutionsLabels": showExecutionsOnChart,
+	};
 
 	const tradingOverridesRef = useRef(tradingOverrides);
-
-	useEffect(() => {
-		tradingOverridesRef.current = tradingOverrides;
-	}, [tradingOverrides]);
+	tradingOverridesRef.current = tradingOverrides;
 
 	useEffect(() => {
 		if (!containerRef.current) return;
@@ -87,9 +82,15 @@ export function TradingViewChart({
 					const checkInterval = setInterval(() => {
 						if (window.TradingView) {
 							clearInterval(checkInterval);
+							clearTimeout(timeout);
 							resolve();
 						}
 					}, 100);
+
+					const timeout = setTimeout(() => {
+						clearInterval(checkInterval);
+						reject(new Error("TradingView library load timeout"));
+					}, 10000);
 					return;
 				}
 
@@ -97,8 +98,22 @@ export function TradingViewChart({
 				const script = document.createElement("script");
 				script.src = `${CHART_LIBRARY_PATH}charting_library.js`;
 				script.async = true;
-				script.onload = () => resolve();
-				script.onerror = () => reject(new Error("Failed to load TradingView library"));
+
+				const timeout = setTimeout(() => {
+					script.remove();
+					reject(new Error("Script load timeout"));
+				}, 30000);
+
+				script.onload = () => {
+					clearTimeout(timeout);
+					resolve();
+				};
+
+				script.onerror = () => {
+					clearTimeout(timeout);
+					reject(new Error("Failed to load TradingView library"));
+				};
+
 				document.head.appendChild(script);
 			});
 		};
@@ -127,6 +142,8 @@ export function TradingViewChart({
 				widgetRef.current = new window.TradingView.widget({
 					container: containerRef.current,
 					library_path: CHART_LIBRARY_PATH,
+					// Type assertion needed due to TradingView library type definitions mismatch
+					// createDatafeed() correctly implements IBasicDataFeed interface
 					datafeed: createDatafeed() as unknown as IBasicDataFeed,
 					symbol: symbol,
 					interval: interval as ResolutionString,
@@ -157,7 +174,6 @@ export function TradingViewChart({
 				widgetRef.current.onChartReady(() => {
 					chartReadyRef.current = true;
 					widgetRef.current?.applyOverrides(tradingOverridesRef.current);
-					console.log("Chart is ready");
 				});
 			} catch (error) {
 				console.error("Error initializing TradingView widget:", error);

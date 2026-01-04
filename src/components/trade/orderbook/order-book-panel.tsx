@@ -258,9 +258,9 @@ export function OrderBookPanel() {
 								{asks
 									.slice(0, 9)
 									.reverse()
-									.map((r) => (
+									.map((r, index) => (
 										<BookRow
-											key={`ask-${r.price}`}
+											key={`ask-${r.price}-${index}`}
 											row={r}
 											type="ask"
 											maxTotal={maxTotal}
@@ -295,9 +295,9 @@ export function OrderBookPanel() {
 
 						{bookStatus !== "error" && bids.length > 0 ? (
 							<div className="flex-1 flex flex-col gap-px py-0.5">
-								{bids.slice(0, 11).map((r) => (
+								{bids.slice(0, 11).map((r, index) => (
 										<BookRow
-											key={`bid-${r.price}`}
+											key={`bid-${r.price}-${index}`}
 											row={r}
 											type="bid"
 											maxTotal={maxTotal}

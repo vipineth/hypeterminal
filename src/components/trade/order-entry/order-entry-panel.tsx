@@ -1,7 +1,7 @@
 import { ChevronDown, Loader2, TrendingDown, TrendingUp } from "lucide-react";
-import { useCallback, useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
-// Note: useEffect still used for selectedPrice sync (store-driven, will fix in Phase 2)
+// Note: useEffect still used for selectedPrice sync (cross-component event, similar to external event)
 import { Checkbox } from "@/components/ui/checkbox";
 import {
 	DropdownMenu,
@@ -114,37 +114,34 @@ export function OrderEntryPanel() {
 	const marginUsed = parseNumber(clearinghouse?.crossMarginSummary?.totalMarginUsed) || 0;
 	const availableBalance = Math.max(0, accountValue - marginUsed);
 
-	const position = useMemo(() => {
-		if (!clearinghouse?.assetPositions || !market?.coin) return null;
-		return clearinghouse.assetPositions.find((p) => p.position.coin === market.coin);
-	}, [clearinghouse?.assetPositions, market?.coin]);
+	// React 19: Simple array.find - no useMemo needed
+	const position = !clearinghouse?.assetPositions || !market?.coin
+		? null
+		: clearinghouse.assetPositions.find((p) => p.position.coin === market.coin) ?? null;
 
 	// React 19: Simple parsing - no useMemo needed
 	const positionSize = parseNumber(position?.position?.szi) || 0;
 
 	const maxLeverage = market?.maxLeverage || DEFAULT_MAX_LEVERAGE;
 
-	const leverage = useMemo(() => {
+	// React 19: Simple calculation - no useMemo needed
+	const leverage = (() => {
 		if (!market?.marketKey) return getDefaultLeverage(maxLeverage);
 		const marketSpecific = marketLeverageByMode[market.marketKey]?.cross;
 		if (marketSpecific) return Math.min(marketSpecific, maxLeverage);
 		const defaultLev = defaultLeverageByMode.cross ?? getDefaultLeverage(maxLeverage);
 		return Math.min(defaultLev, maxLeverage);
-	}, [market?.marketKey, marketLeverageByMode, defaultLeverageByMode.cross, maxLeverage]);
+	})();
 
-	const markPx = useMemo(() => {
-		const ctxMarkPx = market?.ctxNumbers?.markPx;
-		if (typeof ctxMarkPx === "number") return ctxMarkPx;
-		const midPx = market?.midPxNumber;
-		return typeof midPx === "number" ? midPx : 0;
-	}, [market?.ctxNumbers?.markPx, market?.midPxNumber]);
+	// React 19: Simple conditional - no useMemo needed
+	const ctxMarkPx = market?.ctxNumbers?.markPx;
+	const markPx = typeof ctxMarkPx === "number" ? ctxMarkPx : (typeof market?.midPxNumber === "number" ? market.midPxNumber : 0);
 
-	const price = useMemo(() => {
-		if (type === "market") return markPx;
-		return parseNumber(limitPriceInput) || 0;
-	}, [type, markPx, limitPriceInput]);
+	// React 19: Simple conditional - no useMemo needed
+	const price = type === "market" ? markPx : (parseNumber(limitPriceInput) || 0);
 
-	const maxSize = useMemo(() => {
+	// React 19: Simple calculation - no useMemo needed
+	const maxSize = (() => {
 		if (!price || price <= 0 || !leverage) return 0;
 		const maxNotional = availableBalance * leverage;
 		let maxSizeRaw = maxNotional / price;
@@ -156,7 +153,7 @@ export function OrderEntryPanel() {
 		}
 
 		return floorToDecimals(maxSizeRaw, market?.szDecimals ?? 0);
-	}, [availableBalance, leverage, price, side, positionSize, market?.szDecimals]);
+	})();
 
 	// React 19: Simple calculations - no useMemo needed
 	const sizeInputValue = parseNumber(sizeInput) || 0;
@@ -253,45 +250,34 @@ export function OrderEntryPanel() {
 		return options.sort((a, b) => a - b);
 	}, [maxLeverage]);
 
-	const handleLeverageChange = useCallback(
-		(newLeverage: number) => {
-			if (market?.marketKey) {
-				setMarketLeverage(market.marketKey, "cross", newLeverage, maxLeverage);
-			}
-		},
-		[market?.marketKey, maxLeverage, setMarketLeverage],
-	);
+	// React 19: Simple event handlers - no useCallback needed
+	const handleLeverageChange = (newLeverage: number) => {
+		if (market?.marketKey) {
+			setMarketLeverage(market.marketKey, "cross", newLeverage, maxLeverage);
+		}
+	};
 
-	const applySizeFromPercent = useCallback(
-		(pct: number) => {
-			if (maxSize <= 0) return;
-			const newSize = maxSize * (pct / 100);
-			const formatted = formatDecimalFloor(newSize, market?.szDecimals ?? 0);
-			if (sizeMode === "usd" && price > 0) {
-				const usdValue = newSize * price;
-				setSizeInput(usdValue > 0 ? usdValue.toFixed(2) : "");
-				return;
-			}
-			setSizeInput(formatted || "");
-		},
-		[maxSize, market?.szDecimals, sizeMode, price],
-	);
+	const applySizeFromPercent = (pct: number) => {
+		if (maxSize <= 0) return;
+		const newSize = maxSize * (pct / 100);
+		const formatted = formatDecimalFloor(newSize, market?.szDecimals ?? 0);
+		if (sizeMode === "usd" && price > 0) {
+			const usdValue = newSize * price;
+			setSizeInput(usdValue > 0 ? usdValue.toFixed(2) : "");
+			return;
+		}
+		setSizeInput(formatted || "");
+	};
 
-	const handleSliderChange = useCallback(
-		(values: number[]) => {
-			applySizeFromPercent(values[0]);
-		},
-		[applySizeFromPercent],
-	);
+	const handleSliderChange = (values: number[]) => {
+		applySizeFromPercent(values[0]);
+	};
 
-	const handlePercentClick = useCallback(
-		(pct: number) => {
-			applySizeFromPercent(pct);
-		},
-		[applySizeFromPercent],
-	);
+	const handlePercentClick = (pct: number) => {
+		applySizeFromPercent(pct);
+	};
 
-	const handleSizeModeToggle = useCallback(() => {
+	const handleSizeModeToggle = () => {
 		if (sizeMode === "asset" && price > 0 && sizeValue > 0) {
 			const usdValue = sizeValue * price;
 			setSizeInput(usdValue.toFixed(2));
@@ -303,20 +289,20 @@ export function OrderEntryPanel() {
 		} else {
 			setSizeMode(sizeMode === "asset" ? "usd" : "asset");
 		}
-	}, [sizeMode, price, sizeValue, market?.szDecimals]);
+	};
 
-	const handleMarkPriceClick = useCallback(() => {
+	const handleMarkPriceClick = () => {
 		if (markPx > 0) {
 			const decimals = szDecimalsToPriceDecimals(market?.szDecimals ?? 4);
 			setLimitPriceInput(markPx.toFixed(decimals));
 		}
-	}, [markPx, market?.szDecimals]);
+	};
 
-	const handleSwitchChain = useCallback(() => {
+	const handleSwitchChain = () => {
 		switchChain({ chainId: ARBITRUM_CHAIN_ID });
-	}, [switchChain]);
+	};
 
-	const handleApprove = useCallback(async () => {
+	const handleApprove = async () => {
 		if (isApproving) return;
 
 		setIsApproving(true);
@@ -331,9 +317,10 @@ export function OrderEntryPanel() {
 		} finally {
 			setIsApproving(false);
 		}
-	}, [isApproving, approveAgent]);
+	};
 
-	const handleSubmit = useCallback(async () => {
+	// React 19: Simple event handler - no useCallback needed
+	const handleSubmit = async () => {
 		if (!validation.canSubmit || isSubmitting) return;
 		if (!apiWalletSigner || typeof market?.assetIndex !== "number") return;
 
@@ -363,6 +350,8 @@ export function OrderEntryPanel() {
 			const transport = getHttpTransport();
 			const config = makeExchangeConfig(transport, apiWalletSigner);
 
+			// Set leverage first - this is a persistent account setting independent of order success
+			// If the order fails after leverage is set, that's acceptable as leverage is user-configured
 			await ensureLeverage(config, {
 				asset: market.assetIndex,
 				isCross: true,
@@ -395,22 +384,7 @@ export function OrderEntryPanel() {
 		} finally {
 			setIsSubmitting(false);
 		}
-	}, [
-		validation.canSubmit,
-		isSubmitting,
-		apiWalletSigner,
-		isAgentApproved,
-		market,
-		type,
-		side,
-		price,
-		markPx,
-		slippageBps,
-		sizeValue,
-		leverage,
-		addOrder,
-		updateOrder,
-	]);
+	};
 
 	// const handleKeyDown = useCallback(
 	// 	(e: React.KeyboardEvent) => {
