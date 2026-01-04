@@ -4,7 +4,7 @@ export const APP_NAME = "HypeTerminal";
 export const APP_VERSION = "v0.1.0";
 
 export const FALLBACK_VALUE_PLACEHOLDER = "-";
-export const FORMAT_COMPACT_THRESHOLD = 100_000;
+export const FORMAT_COMPACT_THRESHOLD = 10_000;
 export const FORMAT_COMPACT_DEFAULT = true;
 
 export const ORDER_TOAST_SUCCESS_DURATION_MS = 5_000;
@@ -33,6 +33,7 @@ export const DEFAULT_LEVERAGE_BY_MODE = { cross: 10, isolated: 10 } as const;
 export const STORAGE_KEYS = {
 	MARKET_PREFS: "market-prefs-v1",
 	TRADE_SETTINGS: "trade-settings-v1",
+	GLOBAL_SETTINGS: "global-settings-v1",
 	API_WALLET: "hyperliquid-api-wallet-v1",
 	LEGACY_FAVORITES: "favorites-storage-v0.2",
 	META_CACHE: "hyperliquid-meta-cache-v1",
@@ -46,17 +47,17 @@ export const TOKEN_ICON_BASE_URL = "https://app.hyperliquid.xyz/coins";
 export const LAYOUT_PERSISTENCE = {
 	MAIN: {
 		KEY: "terminal:layout:main",
-		FALLBACK: [82, 18],
+		FALLBACK: [82, 18] as const,
 		PANEL_DEFAULTS: [78, 22],
 	},
 	VERTICAL: {
 		KEY: "terminal:layout:vert",
-		FALLBACK: [70, 30],
+		FALLBACK: [65, 35] as const,
 		PANEL_DEFAULTS: [65, 35],
 	},
 	CHART_BOOK: {
 		KEY: "terminal:layout:chart-book",
-		FALLBACK: [75, 25],
+		FALLBACK: [75, 25] as const,
 		PANEL_DEFAULTS: [70, 30],
 	},
 } as const;
@@ -234,6 +235,21 @@ export const UI_TEXT = {
 		NOTIFICATIONS_ARIA: "Notifications",
 		SETTINGS_ARIA: "Settings",
 	},
+	GLOBAL_SETTINGS: {
+		TITLE: "Settings",
+		DESCRIPTION: "Global preferences for trading, chart, and orderbook.",
+		SECTION_TRADING: "Trading",
+		SECTION_CHART: "Chart",
+		SECTION_ORDERBOOK: "Orderbook",
+		SLIPPAGE_LABEL: "Max slippage",
+		SLIPPAGE_HELP: "Used for market orders and position closes.",
+		SLIPPAGE_UNIT: "bps",
+		SHOW_ORDERS: "Show orders on chart",
+		SHOW_POSITIONS: "Show positions on chart",
+		SHOW_EXECUTIONS: "Show executions on chart",
+		SHOW_SCANLINES: "Show chart scanlines",
+		SHOW_ORDERBOOK_USD: "Show orderbook size in USD",
+	},
 	USER_MENU: {
 		COPY_ADDRESS: "Copy Address",
 		CONNECTING: "Connecting...",
@@ -272,7 +288,7 @@ export const UI_TEXT = {
 		SELECT_MARKET_ARIA: (coin: string) => `Select ${coin} market`,
 	},
 	ORDERBOOK: {
-		BOOK_LABEL: "Book",
+		BOOK_LABEL: "Order Book",
 		TRADES_LABEL: "Trades",
 		ORDER_BOOK_ARIA: "Order Book",
 		RECENT_TRADES_ARIA: "Recent Trades",
@@ -364,9 +380,12 @@ export const UI_TEXT = {
 		SIDE_LONG: "Long",
 		SIDE_SHORT: "Short",
 		ACTION_CLOSE: "Close",
+		ACTION_CLOSING: "Closing...",
 		ACTION_TPSL: "TP/SL",
 		ARIA_CLOSE: "Close position",
 		ARIA_TPSL: "Set TP/SL",
+		ERROR_SIGNER: "Connect a wallet to manage positions.",
+		ERROR_CLOSE_FALLBACK: "Unable to close position.",
 	},
 	ORDERS_TAB: {
 		TITLE: "Open Orders",
@@ -387,7 +406,17 @@ export const UI_TEXT = {
 		TYPE_LIMIT_RO: "limit ro",
 		STATUS_OPEN: "open",
 		ACTION_CANCEL: "Cancel",
+		ACTION_CANCELING: "Canceling...",
+		ACTION_CANCEL_SELECTED: "Cancel selected",
+		ACTION_CANCEL_ALL: "Cancel all",
 		ARIA_CANCEL: "Cancel order",
+		ARIA_CANCEL_SELECTED: "Cancel selected orders",
+		ARIA_CANCEL_ALL: "Cancel all orders",
+		ARIA_SELECT_ALL: "Select all orders",
+		ARIA_SELECT_ORDER: "Select order",
+		ERROR_SIGNER: "Connect a wallet to manage orders.",
+		ERROR_MARKET_UNAVAILABLE: "Market metadata unavailable.",
+		ERROR_CANCEL_FALLBACK: "Unable to cancel orders.",
 	},
 	FUNDING_TAB: {
 		TITLE: "Funding Payments",

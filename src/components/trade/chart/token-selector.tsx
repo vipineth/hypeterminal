@@ -157,11 +157,11 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 								{virtualItems.map((virtualItem) => {
 									const row = rows[virtualItem.index];
 									const market = row.original;
-									const fundingNum = market.ctx?.funding ? Number.parseFloat(market.ctx.funding) : 0;
+									const fundingNum = market.ctxNumbers?.funding ?? 0;
 									const isFundingPositive = fundingNum >= 0;
 									const isSelected = value === market.coin;
 									const isFav = isFavorite(market.coin);
-									const changePct = calculate24hPriceChange(market.ctx);
+									const changePct = calculate24hPriceChange(market.ctxNumbers);
 									const changeIsPositive = (changePct ?? 0) >= 0;
 									const changeClass = cn(
 										"text-2xs font-medium tabular-nums",
@@ -237,7 +237,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 											</div>
 											<div className="w-20 text-right">
 												<span className="text-2xs font-medium tabular-nums">
-													{formatPrice(market.ctx?.markPx ? Number(market.ctx.markPx) : null, { szDecimals: market.szDecimals })}
+													{formatPrice(market.ctxNumbers?.markPx ?? null, { szDecimals: market.szDecimals })}
 												</span>
 											</div>
 											<div className="w-20 text-right">
@@ -247,12 +247,12 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 											</div>
 											<div className="w-20 text-right">
 												<span className="text-2xs font-medium tabular-nums">
-													{formatUSD(calculateOpenInterestUSD(market.ctx))}
+													{formatUSD(calculateOpenInterestUSD(market.ctxNumbers))}
 												</span>
 											</div>
 											<div className="w-20 text-right">
 												<span className="text-2xs font-medium tabular-nums">
-													{formatUSD(market.ctx?.dayNtlVlm ? Number(market.ctx.dayNtlVlm) : null)}
+													{formatUSD(market.ctxNumbers?.dayNtlVlm ?? null)}
 												</span>
 											</div>
 											<div className="w-20 text-right">

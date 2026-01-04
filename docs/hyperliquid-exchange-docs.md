@@ -125,6 +125,103 @@ The SDK supports multi-sig accounts by passing an array of `signers` and the `mu
 
 ---
 
+## 5. L2 Orderbook Subscription & Price Grouping
+
+The L2 orderbook WebSocket subscription supports price aggregation via `nSigFigs` and `mantissa` parameters.
+
+### Parameters
+
+| Parameter | Type | Description |
+| :--- | :--- | :--- |
+| `coin` | string | Asset symbol (e.g., "BTC", "ETH") |
+| `nSigFigs` | 2, 3, 4, 5, or null | Number of significant figures. `null` = full precision |
+| `mantissa` | 2 or 5 | **Only valid when nSigFigs is 5**. Multiplier for base tick (omit for 1x) |
+
+### How nSigFigs Works
+
+`nSigFigs` controls how many significant figures are preserved in prices. The formula for tick size is:
+
+```
+tickSize = 10^(integerDigits - nSigFigs)
+```
+
+Where `integerDigits` = number of digits before the decimal point in the price.
+
+**BTC at $95,000 (5 integer digits):**
+| nSigFigs | Tick Size | Example Prices |
+| :--- | :--- | :--- |
+| 5 | 1 | 95001, 95002, 95003 |
+| 4 | 10 | 95010, 95020, 95030 |
+| 3 | 100 | 95100, 95200, 95300 |
+| 2 | 1000 | 95000, 96000, 97000 |
+
+**ETH at $3,500 (4 integer digits):**
+| nSigFigs | Tick Size | Example Prices |
+| :--- | :--- | :--- |
+| 5 | 0.1 | 3500.1, 3500.2, 3500.3 |
+| 4 | 1 | 3500, 3501, 3502 |
+| 3 | 10 | 3500, 3510, 3520 |
+| 2 | 100 | 3500, 3600, 3700 |
+
+**ATOM at $2 (1 integer digit):**
+| nSigFigs | Tick Size | Example Prices |
+| :--- | :--- | :--- |
+| 5 | 0.0001 | 2.0001, 2.0002, 2.0003 |
+| 4 | 0.001 | 2.001, 2.002, 2.003 |
+| 3 | 0.01 | 2.01, 2.02, 2.03 |
+| 2 | 0.1 | 2.1, 2.2, 2.3 |
+
+### Using Mantissa for Finer Control
+
+The `mantissa` parameter is **only valid when nSigFigs is 5**. It multiplies the base tick size:
+
+| mantissa | Effect | Example (ATOM ~$2) |
+| :--- | :--- | :--- |
+| omitted | Base tick | 0.0001 increments |
+| 2 | 2x base tick | 0.0002 increments |
+| 5 | 5x base tick | 0.0005 increments |
+
+```typescript
+// 0.0001 increments (omit mantissa for base tick)
+{ type: "l2Book", coin: "ATOM", nSigFigs: 5 }
+
+// 0.0002 increments
+{ type: "l2Book", coin: "ATOM", nSigFigs: 5, mantissa: 2 }
+
+// 0.0005 increments
+{ type: "l2Book", coin: "ATOM", nSigFigs: 5, mantissa: 5 }
+```
+
+**Note:** Using `mantissa` with `nSigFigs` other than 5 is invalid and will be rejected by the API.
+
+### Subscription Examples
+
+```typescript
+// Subscribe to ETH orderbook with 1 tick size (nSigFigs=4)
+client.l2Book({ coin: "ETH", nSigFigs: 4 }, (data) => { ... });
+
+// Subscribe to BTC orderbook with 10 tick size (nSigFigs=4)
+client.l2Book({ coin: "BTC", nSigFigs: 4 }, (data) => { ... });
+
+// Subscribe to ATOM with 0.0002 increments
+client.l2Book({ coin: "ATOM", nSigFigs: 5, mantissa: 2 }, (data) => { ... });
+```
+
+### WebSocket Message Format
+
+```json
+// Subscribe
+{"method":"subscribe","subscription":{"type":"l2Book","coin":"ETH","nSigFigs":4}}
+
+// Subscribe with mantissa (only valid when nSigFigs is 5)
+{"method":"subscribe","subscription":{"type":"l2Book","coin":"ATOM","nSigFigs":5,"mantissa":2}}
+
+// Unsubscribe
+{"method":"unsubscribe","subscription":{"type":"l2Book","coin":"ETH","nSigFigs":4}}
+```
+
+---
+
 ## Guiding Principles for Agents
 1. **Verify Asset ID**: Never assume an asset ID. Check metadata first.
 2. **Respect Decimals**: Always check `szDecimals` for the asset before sending size.

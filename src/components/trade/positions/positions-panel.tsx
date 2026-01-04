@@ -1,5 +1,10 @@
+import { useMemo } from "react";
+import { useConnection } from "wagmi";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { POSITIONS_TABS } from "@/constants/app";
+import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
+import { useOpenOrders } from "@/hooks/hyperliquid/use-open-orders";
+import { parseNumber } from "@/lib/trade/numbers";
 import { BalancesTab } from "./balances-tab";
 import { FundingTab } from "./funding-tab";
 import { HistoryTab } from "./history-tab";
@@ -8,20 +13,47 @@ import { PositionsTab } from "./positions-tab";
 import { TwapTab } from "./twap-tab";
 
 export function PositionsPanel() {
+	const { address, isConnected } = useConnection();
+	const { data: state } = useClearinghouseState({ user: isConnected ? address : undefined });
+	const { data: openOrders } = useOpenOrders({ user: isConnected ? address : undefined });
+
+	const positionsCount = useMemo(() => {
+		if (!isConnected) return 0;
+		const raw = state?.assetPositions ?? [];
+		return raw.reduce((count, entry) => {
+			const size = parseNumber(entry.position.szi);
+			if (!Number.isFinite(size) || size === 0) return count;
+			return count + 1;
+		}, 0);
+	}, [isConnected, state?.assetPositions]);
+
+	const ordersCount = isConnected ? (openOrders?.length ?? 0) : 0;
+
 	return (
 		<div className="h-full flex flex-col overflow-hidden bg-surface/20">
 			<Tabs defaultValue="positions" className="flex-1 min-h-0 flex flex-col">
 				<div className="px-2 pt-1.5 border-b border-border/40">
 					<TabsList className="pb-1.5">
-						{POSITIONS_TABS.map((tab) => (
-							<TabsTrigger
-								key={tab.value}
-								value={tab.value}
-								variant="underline"
-							>
-								{tab.label}
-							</TabsTrigger>
-						))}
+						{POSITIONS_TABS.map((tab) => {
+							const count =
+								tab.value === "positions" ? positionsCount : tab.value === "orders" ? ordersCount : null;
+
+							return (
+								<TabsTrigger
+									key={tab.value}
+									value={tab.value}
+									variant="underline"
+									className="inline-flex items-center gap-1"
+								>
+									<span>{tab.label}</span>
+									{typeof count === "number" ? (
+										<span className="min-w-4 h-4 px-1 inline-flex items-center justify-center rounded-full border border-terminal-cyan/30 bg-terminal-cyan/15 text-terminal-cyan text-4xs tabular-nums">
+											{count}
+										</span>
+									) : null}
+								</TabsTrigger>
+							);
+						})}
 					</TabsList>
 				</div>
 				<TabsContent value="balances" className="flex-1 min-h-0 flex flex-col mt-0">

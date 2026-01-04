@@ -1,19 +1,24 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-export function usePersistentLayout(key: string, fallback: number[]) {
-	const [layout, setLayout] = useState<number[]>(fallback);
-
-	useEffect(() => {
-		try {
-			const stored = localStorage.getItem(key);
-			if (stored) {
-				const arr = JSON.parse(stored) as number[];
-				if (Array.isArray(arr) && arr.every((n) => typeof n === "number")) {
-					setLayout(arr);
-				}
+// Helper to safely read from localStorage (handles SSR)
+function getStoredLayout(key: string, fallback: readonly number[]): number[] {
+	if (typeof window === "undefined") return [...fallback];
+	try {
+		const stored = localStorage.getItem(key);
+		if (stored) {
+			const arr = JSON.parse(stored) as number[];
+			if (Array.isArray(arr) && arr.every((n) => typeof n === "number")) {
+				return arr;
 			}
-		} catch {}
-	}, [key]);
+		}
+	} catch {
+		// Ignore localStorage errors
+	}
+	return [...fallback];
+}
+
+export function usePersistentLayout(key: string, fallback: readonly number[]) {
+	const [layout, setLayout] = useState<number[]>(() => getStoredLayout(key, fallback));
 
 	const onLayout = (sizes: number[]) => {
 		setLayout(sizes);

@@ -1,11 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type {
 	ChartingLibraryWidgetConstructor,
 	IBasicDataFeed,
 	IChartingLibraryWidget,
 	ResolutionString,
 } from "@/types/charting_library";
-import { createDatafeed } from "./datafeed";
 import {
 	CHART_CUSTOM_FONT_FAMILY,
 	CHART_DISABLED_FEATURES,
@@ -20,6 +19,7 @@ import {
 	DEFAULT_CHART_THEME,
 	TIMEZONE,
 } from "./constants";
+import { createDatafeed } from "./datafeed";
 import {
 	buildChartOverrides,
 	generateChartCssUrl,
@@ -27,6 +27,7 @@ import {
 	getLoadingScreenColors,
 	getToolbarBgColor,
 } from "./theme-colors";
+import { useGlobalSettings } from "@/stores/use-global-settings-store";
 
 declare global {
 	interface Window {
@@ -51,9 +52,29 @@ export function TradingViewChart({
 	const widgetRef = useRef<IChartingLibraryWidget | null>(null);
 	const scriptLoadedRef = useRef(false);
 	const cssUrlRef = useRef<string | null>(null);
+	const chartReadyRef = useRef(false);
+
+	const { showOrdersOnChart, showPositionsOnChart, showExecutionsOnChart, showChartScanlines } = useGlobalSettings();
+
+	const tradingOverrides = useMemo(
+		() => ({
+			"tradingProperties.showOrders": showOrdersOnChart,
+			"tradingProperties.showPositions": showPositionsOnChart,
+			"tradingProperties.showExecutions": showExecutionsOnChart,
+			"tradingProperties.showExecutionsLabels": showExecutionsOnChart,
+		}),
+		[showOrdersOnChart, showPositionsOnChart, showExecutionsOnChart],
+	);
+
+	const tradingOverridesRef = useRef(tradingOverrides);
+
+	useEffect(() => {
+		tradingOverridesRef.current = tradingOverrides;
+	}, [tradingOverrides]);
 
 	useEffect(() => {
 		if (!containerRef.current) return;
+		chartReadyRef.current = false;
 
 		const loadScript = (): Promise<void> => {
 			return new Promise((resolve, reject) => {
@@ -92,12 +113,10 @@ export function TradingViewChart({
 					widgetRef.current.remove();
 				}
 
-				// Clean up previous CSS blob URL
 				if (cssUrlRef.current) {
 					URL.revokeObjectURL(cssUrlRef.current);
 				}
 
-				// Build colors and CSS dynamically from CSS variables
 				const overrides = buildChartOverrides();
 				const loadingColors = getLoadingScreenColors();
 				const toolbarBg = getToolbarBgColor();
@@ -136,6 +155,8 @@ export function TradingViewChart({
 				});
 
 				widgetRef.current.onChartReady(() => {
+					chartReadyRef.current = true;
+					widgetRef.current?.applyOverrides(tradingOverridesRef.current);
 					console.log("Chart is ready");
 				});
 			} catch (error) {
@@ -150,6 +171,7 @@ export function TradingViewChart({
 				widgetRef.current.remove();
 				widgetRef.current = null;
 			}
+			chartReadyRef.current = false;
 			if (cssUrlRef.current) {
 				URL.revokeObjectURL(cssUrlRef.current);
 				cssUrlRef.current = null;
@@ -157,11 +179,16 @@ export function TradingViewChart({
 		};
 	}, [symbol, interval, theme]);
 
+	useEffect(() => {
+		if (!widgetRef.current || !chartReadyRef.current) return;
+		widgetRef.current.applyOverrides(tradingOverrides);
+	}, [tradingOverrides]);
+
 	return (
 		<div className="relative w-full h-full" style={{ minHeight: "300px" }}>
 			<div ref={containerRef} className="w-full h-full" />
 			{/* Scanlines overlay to match terminal aesthetic */}
-			<div className="pointer-events-none absolute inset-0 terminal-scanlines" />
+			{showChartScanlines ? <div className="pointer-events-none absolute inset-0 terminal-scanlines" /> : null}
 		</div>
 	);
 }

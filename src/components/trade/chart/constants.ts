@@ -21,6 +21,7 @@ import {
 	CHART_TIMEZONE,
 	UI_TEXT,
 } from "@/constants/app";
+import type { MarketCtxNumbers } from "@/lib/market";
 import type { PerpAssetCtx } from "@/types/hyperliquid";
 import type { PerpMarketInfo } from "@/lib/hyperliquid/market-registry";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
@@ -49,6 +50,7 @@ export {
 
 export type MarketRow = PerpMarketInfo & {
 	ctx: PerpAssetCtx | undefined;
+	ctxNumbers: MarketCtxNumbers | null;
 };
 
 const columnHelper = createColumnHelper<MarketRow>();
@@ -61,31 +63,31 @@ export const TOKEN_SELECTOR_COLUMNS = [
 		size: 160,
 		enableSorting: false,
 	}),
-	columnHelper.accessor((row) => (row.ctx?.markPx ? Number(row.ctx.markPx) : 0), {
+columnHelper.accessor((row) => row.ctxNumbers?.markPx ?? 0, {
 		id: "price",
 		header: TOKEN_SELECTOR_TEXT.HEADER_PRICE,
 		size: 80,
 		enableSorting: true,
 	}),
-	columnHelper.accessor((row) => calculate24hPriceChange(row.ctx) ?? 0, {
+columnHelper.accessor((row) => calculate24hPriceChange(row.ctxNumbers) ?? 0, {
 		id: "24h-change",
 		header: TOKEN_SELECTOR_TEXT.HEADER_CHANGE_24H,
 		size: 80,
 		enableSorting: true,
 	}),
-	columnHelper.accessor((row) => calculateOpenInterestUSD(row.ctx) ?? 0, {
+columnHelper.accessor((row) => calculateOpenInterestUSD(row.ctxNumbers) ?? 0, {
 		id: "oi",
 		header: TOKEN_SELECTOR_TEXT.HEADER_OPEN_INTEREST,
 		size: 80,
 		enableSorting: true,
 	}),
-	columnHelper.accessor((row) => (row.ctx?.dayNtlVlm ? Number(row.ctx.dayNtlVlm) : 0), {
+	columnHelper.accessor((row) => row.ctxNumbers?.dayNtlVlm ?? 0, {
 		id: "volume",
 		header: TOKEN_SELECTOR_TEXT.HEADER_VOLUME,
 		size: 80,
 		enableSorting: true,
 	}),
-	columnHelper.accessor((row) => (row.ctx?.funding ? Number.parseFloat(row.ctx.funding) : 0), {
+	columnHelper.accessor((row) => row.ctxNumbers?.funding ?? 0, {
 		id: "funding",
 		header: TOKEN_SELECTOR_TEXT.HEADER_FUNDING,
 		size: 80,

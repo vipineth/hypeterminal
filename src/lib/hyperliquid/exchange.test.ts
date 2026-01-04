@@ -4,10 +4,11 @@ vi.mock("@nktkas/hyperliquid/api/exchange", () => ({
 	order: vi.fn(async () => ({ statuses: [] })),
 	updateLeverage: vi.fn(async () => {}),
 	approveAgent: vi.fn(async () => {}),
+	cancel: vi.fn(async () => ({ response: { data: { statuses: [] } } })),
 }));
 
-import { approveAgent, order, updateLeverage } from "@nktkas/hyperliquid/api/exchange";
-import { approveApiWallet, ensureLeverage, isAgentApproved, placeSingleOrder } from "./exchange";
+import { approveAgent, cancel, order, updateLeverage } from "@nktkas/hyperliquid/api/exchange";
+import { approveApiWallet, cancelOrders, ensureLeverage, isAgentApproved, placeSingleOrder } from "./exchange";
 
 describe("exchange", () => {
 	beforeEach(() => {
@@ -36,6 +37,13 @@ describe("exchange", () => {
 		const config = {} as never;
 		await approveApiWallet(config, { agentAddress: "0xabc" });
 		expect(approveAgent).toHaveBeenCalledWith(config, { agentAddress: "0xabc", agentName: undefined });
+	});
+
+	it("cancels orders via exchange client", async () => {
+		const config = {} as never;
+		const cancels = [{ a: 1, o: 123 }];
+		await cancelOrders(config, { cancels });
+		expect(cancel).toHaveBeenCalledWith(config, { cancels });
 	});
 
 	it("checks agent approval status", () => {

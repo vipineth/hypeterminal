@@ -1,6 +1,7 @@
 import { ChevronDown, Loader2, TrendingDown, TrendingUp } from "lucide-react";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
+// Note: useEffect still used for selectedPrice sync (store-driven, will fix in Phase 2)
 import { Checkbox } from "@/components/ui/checkbox";
 import {
 	DropdownMenu,
@@ -33,15 +34,16 @@ import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/nu
 import { formatPriceForOrder, formatSizeForOrder, getDefaultLeverage } from "@/lib/trade/orders";
 import { cn } from "@/lib/utils";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
+import { useOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
 import {
 	useDefaultLeverageByMode,
 	useMarketLeverageByMode,
 	useMarketOrderSlippageBps,
 	useTradeSettingsActions,
 } from "@/stores/use-trade-settings-store";
+import { WalletDialog } from "../components/wallet-dialog";
 import { DepositModal } from "./deposit-modal";
 import { OrderToast } from "./order-toast";
-import { WalletDialog } from "../components/wallet-dialog";
 
 type OrderType = "market" | "limit";
 type Side = "buy" | "sell";
@@ -50,24 +52,19 @@ type SizeMode = "asset" | "usd";
 const ORDER_TEXT = UI_TEXT.ORDER_ENTRY;
 
 export function OrderEntryPanel() {
-	// IDs for accessibility
 	const reduceOnlyId = useId();
 	const tpSlId = useId();
 
-	// Connection state
 	const { address, isConnected } = useConnection();
-	// Don't pass account - let wagmi use the connected account automatically
+
 	const { data: walletClient, isLoading: isWalletLoading, error: walletClientError } = useWalletClient();
 	const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
 
-	// Check if we need to switch chains (error indicates chain mismatch)
 	const needsChainSwitch = !!walletClientError && walletClientError.message.includes("does not match");
 
-	// Market data
 	const { data: market } = useSelectedResolvedMarket({ ctxMode: "realtime" });
 	const { data: clearinghouse } = useClearinghouseState({ user: address });
 
-	// Trading agent (API wallet for signing)
 	const {
 		isApproved: isAgentApproved,
 		apiWalletSigner,
@@ -79,16 +76,15 @@ export function OrderEntryPanel() {
 		enabled: isConnected,
 	});
 
-	// Trade settings
 	const defaultLeverageByMode = useDefaultLeverageByMode();
 	const marketLeverageByMode = useMarketLeverageByMode();
 	const slippageBps = useMarketOrderSlippageBps();
 	const { setMarketLeverage } = useTradeSettingsActions();
 
-	// Order queue
 	const { addOrder, updateOrder } = useOrderQueueActions();
 
-	// Local form state
+	const selectedPrice = useSelectedPrice();
+
 	const [type, setType] = useState<OrderType>("market");
 	const [side, setSide] = useState<Side>("buy");
 	const [sizeInput, setSizeInput] = useState("");
@@ -98,39 +94,33 @@ export function OrderEntryPanel() {
 	const [isApproving, setIsApproving] = useState(false);
 	const [approvalError, setApprovalError] = useState<string | null>(null);
 
-	// Modal state
 	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
 	const [depositModalOpen, setDepositModalOpen] = useState(false);
 
-	// Track previous market to clear form on market change
-	const [prevMarketKey, setPrevMarketKey] = useState<string | undefined>(undefined);
+	// React 19: Form reset handled by key prop from OrderSidebar
 
-	// Clear size when market changes
+	// Valid useEffect: Cross-component event from orderbook price click
+	// This responds to user action in another component (similar to external event)
 	useEffect(() => {
-		if (market?.marketKey && market.marketKey !== prevMarketKey) {
-			setSizeInput("");
-			setLimitPriceInput("");
-			setPrevMarketKey(market.marketKey);
+		if (selectedPrice !== null) {
+			setType("limit");
+			setLimitPriceInput(String(selectedPrice));
+			useOrderbookActionsStore.getState().clearSelectedPrice();
 		}
-	}, [market?.marketKey, prevMarketKey]);
+	}, [selectedPrice]);
 
-	// Derived values
-	// Available balance for trading = accountValue - totalMarginUsed
-	// (withdrawable is only for actual withdrawals from the exchange)
-	const availableBalance = useMemo(() => {
-		const accountValue = parseNumber(clearinghouse?.crossMarginSummary?.accountValue) || 0;
-		const marginUsed = parseNumber(clearinghouse?.crossMarginSummary?.totalMarginUsed) || 0;
-		return Math.max(0, accountValue - marginUsed);
-	}, [clearinghouse?.crossMarginSummary?.accountValue, clearinghouse?.crossMarginSummary?.totalMarginUsed]);
+	// React 19: Simple arithmetic - no useMemo needed
+	const accountValue = parseNumber(clearinghouse?.crossMarginSummary?.accountValue) || 0;
+	const marginUsed = parseNumber(clearinghouse?.crossMarginSummary?.totalMarginUsed) || 0;
+	const availableBalance = Math.max(0, accountValue - marginUsed);
 
 	const position = useMemo(() => {
 		if (!clearinghouse?.assetPositions || !market?.coin) return null;
 		return clearinghouse.assetPositions.find((p) => p.position.coin === market.coin);
 	}, [clearinghouse?.assetPositions, market?.coin]);
 
-	const positionSize = useMemo(() => {
-		return parseNumber(position?.position?.szi) || 0;
-	}, [position?.position?.szi]);
+	// React 19: Simple parsing - no useMemo needed
+	const positionSize = parseNumber(position?.position?.szi) || 0;
 
 	const maxLeverage = market?.maxLeverage || DEFAULT_MAX_LEVERAGE;
 
@@ -143,10 +133,11 @@ export function OrderEntryPanel() {
 	}, [market?.marketKey, marketLeverageByMode, defaultLeverageByMode.cross, maxLeverage]);
 
 	const markPx = useMemo(() => {
-		const ctxMarkPx = market?.ctx?.markPx;
-		const midPx = market?.midPx;
-		return parseNumber(ctxMarkPx || midPx) || 0;
-	}, [market?.ctx?.markPx, market?.midPx]);
+		const ctxMarkPx = market?.ctxNumbers?.markPx;
+		if (typeof ctxMarkPx === "number") return ctxMarkPx;
+		const midPx = market?.midPxNumber;
+		return typeof midPx === "number" ? midPx : 0;
+	}, [market?.ctxNumbers?.markPx, market?.midPxNumber]);
 
 	const price = useMemo(() => {
 		if (type === "market") return markPx;
@@ -158,7 +149,6 @@ export function OrderEntryPanel() {
 		const maxNotional = availableBalance * leverage;
 		let maxSizeRaw = maxNotional / price;
 
-		// Position-aware: can close existing position + open opposite
 		if (side === "sell" && positionSize > 0) {
 			maxSizeRaw += positionSize;
 		} else if (side === "buy" && positionSize < 0) {
@@ -168,46 +158,27 @@ export function OrderEntryPanel() {
 		return floorToDecimals(maxSizeRaw, market?.szDecimals ?? 0);
 	}, [availableBalance, leverage, price, side, positionSize, market?.szDecimals]);
 
-	const sizeValue = useMemo(() => {
-		const inputValue = parseNumber(sizeInput) || 0;
-		if (sizeMode === "usd" && price > 0) {
-			return inputValue / price;
-		}
-		return inputValue;
-	}, [sizeInput, sizeMode, price]);
+	// React 19: Simple calculations - no useMemo needed
+	const sizeInputValue = parseNumber(sizeInput) || 0;
+	const sizeValue = sizeMode === "usd" && price > 0 ? sizeInputValue / price : sizeInputValue;
 
-	const orderValue = useMemo(() => {
-		return sizeValue * price;
-	}, [sizeValue, price]);
+	const orderValue = sizeValue * price;
 
-	const marginRequired = useMemo(() => {
-		if (!leverage) return 0;
-		return orderValue / leverage;
-	}, [orderValue, leverage]);
+	const marginRequired = leverage ? orderValue / leverage : 0;
 
-	const estimatedFee = useMemo(() => {
-		const feeRate = type === "market" ? ORDER_FEE_RATE_TAKER : ORDER_FEE_RATE_MAKER;
-		return orderValue * feeRate;
-	}, [orderValue, type]);
+	const feeRate = type === "market" ? ORDER_FEE_RATE_TAKER : ORDER_FEE_RATE_MAKER;
+	const estimatedFee = orderValue * feeRate;
 
-	// Liquidation price calculation (simplified)
-	const liqPrice = useMemo(() => {
+	const liqPrice = (() => {
 		if (!price || !sizeValue || !leverage) return null;
-		// Simplified estimate: entry price +/- (entry * (1/leverage) * 0.9)
-		// Real calculation requires maintenance margin tiers
 		const buffer = price * (1 / leverage) * 0.9;
 		return side === "buy" ? price - buffer : price + buffer;
-	}, [price, sizeValue, leverage, side]);
+	})();
 
-	const liqWarning = useMemo(() => {
-		if (!liqPrice || !price) return false;
-		return Math.abs(liqPrice - price) / price < 0.05;
-	}, [liqPrice, price]);
+	const liqWarning = liqPrice && price ? Math.abs(liqPrice - price) / price < 0.05 : false;
 
-	// Check if we can sign (either agent approved or wallet client available)
 	const canSign = isAgentApproved ? !!apiWalletSigner : !!walletClient;
 
-	// Validation
 	const validation = useMemo(() => {
 		const errors: string[] = [];
 
@@ -227,7 +198,6 @@ export function OrderEntryPanel() {
 			return { valid: false, errors: [ORDER_TEXT.ERROR_MARKET_NOT_READY], canSubmit: false, needsApproval: false };
 		}
 
-		// Check if agent approval is needed
 		if (!isAgentApproved) {
 			return { valid: false, errors: [], canSubmit: false, needsApproval: true };
 		}
@@ -252,12 +222,24 @@ export function OrderEntryPanel() {
 		}
 
 		return { valid: errors.length === 0, errors, canSubmit: errors.length === 0, needsApproval: false };
-	}, [isConnected, isWalletLoading, availableBalance, market, type, markPx, price, sizeValue, orderValue, maxSize, isAgentApproved, canSign]);
+	}, [
+		isConnected,
+		isWalletLoading,
+		availableBalance,
+		market,
+		type,
+		markPx,
+		price,
+		sizeValue,
+		orderValue,
+		maxSize,
+		isAgentApproved,
+		canSign,
+	]);
 
 	const sizeHasError = sizeValue > maxSize && maxSize > 0;
 	const orderValueTooLow = orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD;
 
-	// Leverage options
 	const leverageOptions = useMemo(() => {
 		const options: number[] = [];
 		for (const step of ORDER_LEVERAGE_STEPS) {
@@ -311,12 +293,10 @@ export function OrderEntryPanel() {
 
 	const handleSizeModeToggle = useCallback(() => {
 		if (sizeMode === "asset" && price > 0 && sizeValue > 0) {
-			// Convert to USD
 			const usdValue = sizeValue * price;
 			setSizeInput(usdValue.toFixed(2));
 			setSizeMode("usd");
 		} else if (sizeMode === "usd" && price > 0 && sizeValue > 0) {
-			// Convert to asset
 			const formatted = formatDecimalFloor(sizeValue, market?.szDecimals ?? 0);
 			setSizeInput(formatted || "");
 			setSizeMode("asset");
@@ -327,18 +307,15 @@ export function OrderEntryPanel() {
 
 	const handleMarkPriceClick = useCallback(() => {
 		if (markPx > 0) {
-			// Use szDecimals to derive price decimals for input
 			const decimals = szDecimalsToPriceDecimals(market?.szDecimals ?? 4);
 			setLimitPriceInput(markPx.toFixed(decimals));
 		}
 	}, [markPx, market?.szDecimals]);
 
-	// Handle chain switch
 	const handleSwitchChain = useCallback(() => {
 		switchChain({ chainId: ARBITRUM_CHAIN_ID });
 	}, [switchChain]);
 
-	// Handle agent approval
 	const handleApprove = useCallback(async () => {
 		if (isApproving) return;
 
@@ -362,7 +339,6 @@ export function OrderEntryPanel() {
 
 		setIsSubmitting(true);
 
-		// Calculate order price with slippage for market orders
 		let orderPrice = price;
 		if (type === "market") {
 			if (side === "buy") {
@@ -376,7 +352,6 @@ export function OrderEntryPanel() {
 		const formattedPrice = formatPriceForOrder(orderPrice);
 		const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
 
-		// Add to order queue
 		const orderId = addOrder({
 			market: market.coin,
 			side,
@@ -388,14 +363,12 @@ export function OrderEntryPanel() {
 			const transport = getHttpTransport();
 			const config = makeExchangeConfig(transport, apiWalletSigner);
 
-			// Ensure leverage is set correctly
 			await ensureLeverage(config, {
 				asset: market.assetIndex,
 				isCross: true,
 				leverage,
 			});
 
-			// Build order
 			const order = {
 				a: market.assetIndex,
 				b: side === "buy",
@@ -407,16 +380,13 @@ export function OrderEntryPanel() {
 
 			const result = await placeSingleOrder(config, { order });
 
-			// Check for errors in response
 			const status = result.response?.data?.statuses?.[0];
 			if (status && "error" in status && typeof status.error === "string") {
 				throw new Error(status.error);
 			}
 
-			// Success
 			updateOrder(orderId, { status: "success", fillPercent: 100 });
 
-			// Reset form
 			setSizeInput("");
 			setLimitPriceInput("");
 		} catch (error) {
@@ -442,24 +412,20 @@ export function OrderEntryPanel() {
 		updateOrder,
 	]);
 
-	// Handle Enter key
-	const handleKeyDown = useCallback(
-		(e: React.KeyboardEvent) => {
-			if (e.key === "Enter" && validation.canSubmit && !isSubmitting) {
-				handleSubmit();
-			}
-		},
-		[validation.canSubmit, isSubmitting, handleSubmit],
-	);
+	// const handleKeyDown = useCallback(
+	// 	(e: React.KeyboardEvent) => {
+	// 		if (e.key === "Enter" && validation.canSubmit && !isSubmitting) {
+	// 			handleSubmit();
+	// 		}
+	// 	},
+	// 	[validation.canSubmit, isSubmitting, handleSubmit],
+	// );
 
-	// Slider value (0-100)
-	const sliderValue = useMemo(() => {
-		if (!maxSize || maxSize <= 0) return 0;
-		return Math.min(100, (sizeValue / maxSize) * 100);
-	}, [sizeValue, maxSize]);
+	// React 19: Simple calculations - no useMemo needed
+	const sliderValue = !maxSize || maxSize <= 0 ? 0 : Math.min(100, (sizeValue / maxSize) * 100);
 
-	// Button text and action
-	const buttonContent = useMemo(() => {
+	// React 19: Object literal with conditionals - compiler handles this
+	const buttonContent = (() => {
 		if (!isConnected) {
 			return {
 				text: ORDER_TEXT.BUTTON_CONNECT,
@@ -468,7 +434,6 @@ export function OrderEntryPanel() {
 				variant: "cyan" as const,
 			};
 		}
-		// Handle chain mismatch - prompt user to switch to Arbitrum
 		if (needsChainSwitch) {
 			return {
 				text: isSwitchingChain ? ORDER_TEXT.BUTTON_SWITCHING : ORDER_TEXT.BUTTON_SWITCH_CHAIN,
@@ -487,7 +452,11 @@ export function OrderEntryPanel() {
 		}
 		if (validation.needsApproval) {
 			return {
-				text: isApproving ? ORDER_TEXT.BUTTON_SIGNING : !canApprove ? ORDER_TEXT.BUTTON_LOADING : ORDER_TEXT.BUTTON_ENABLE_TRADING,
+				text: isApproving
+					? ORDER_TEXT.BUTTON_SIGNING
+					: !canApprove
+						? ORDER_TEXT.BUTTON_LOADING
+						: ORDER_TEXT.BUTTON_ENABLE_TRADING,
 				action: handleApprove,
 				disabled: isApproving || !canApprove,
 				variant: "cyan" as const,
@@ -499,13 +468,15 @@ export function OrderEntryPanel() {
 			disabled: !validation.canSubmit || isSubmitting,
 			variant: side as "buy" | "sell",
 		};
-	}, [isConnected, needsChainSwitch, isSwitchingChain, handleSwitchChain, availableBalance, side, validation.canSubmit, validation.needsApproval, isSubmitting, isApproving, canApprove, handleSubmit, handleApprove]);
+	})();
 
 	const isFormDisabled = !isConnected || availableBalance <= 0;
 
 	return (
-		<div className="h-full flex flex-col overflow-hidden bg-surface/20" onKeyDown={handleKeyDown}>
-			{/* Header: Mode tabs + Leverage dropdown */}
+		<div
+			className="h-full flex flex-col overflow-hidden bg-surface/20"
+			// onKeyDown={handleKeyDown}
+		>
 			<div className="px-2 py-1.5 border-b border-border/40 flex items-center justify-between">
 				<Tabs value="cross">
 					<TabsList>
@@ -533,13 +504,9 @@ export function OrderEntryPanel() {
 							{leverage}x <ChevronDown className="size-2.5" />
 						</button>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end" className="w-20 font-mono text-xs max-h-48 overflow-y-auto">
+					<DropdownMenuContent align="end" className="min-w-16 font-mono text-xs max-h-48 overflow-y-auto">
 						{leverageOptions.map((lv) => (
-							<DropdownMenuItem
-								key={lv}
-								onClick={() => handleLeverageChange(lv)}
-								className={cn(lv === leverage && "bg-terminal-cyan/20")}
-							>
+							<DropdownMenuItem key={lv} onClick={() => handleLeverageChange(lv)} selected={lv === leverage}>
 								{lv}x
 							</DropdownMenuItem>
 						))}
@@ -609,7 +576,9 @@ export function OrderEntryPanel() {
 					<div className="flex items-center justify-between text-muted-foreground">
 						<span>{ORDER_TEXT.AVAILABLE_LABEL}</span>
 						<div className="flex items-center gap-2">
-							<span className={cn("tabular-nums", availableBalance > 0 ? "text-terminal-green" : "text-muted-foreground")}>
+							<span
+								className={cn("tabular-nums", availableBalance > 0 ? "text-terminal-green" : "text-muted-foreground")}
+							>
 								{isConnected ? formatUSD(availableBalance) : FALLBACK_VALUE_PLACEHOLDER}
 							</span>
 							{isConnected && (
@@ -627,9 +596,7 @@ export function OrderEntryPanel() {
 					{positionSize !== 0 && (
 						<div className="flex items-center justify-between text-muted-foreground">
 							<span>{ORDER_TEXT.POSITION_LABEL}</span>
-							<span
-								className={cn("tabular-nums", positionSize > 0 ? "text-terminal-green" : "text-terminal-red")}
-							>
+							<span className={cn("tabular-nums", positionSize > 0 ? "text-terminal-green" : "text-terminal-red")}>
 								{positionSize > 0 ? "+" : ""}
 								{formatDecimalFloor(positionSize, market?.szDecimals ?? 2)} {market?.coin}
 							</span>
@@ -696,7 +663,9 @@ export function OrderEntryPanel() {
 				{type === "limit" && (
 					<div className="space-y-1.5">
 						<div className="flex items-center justify-between">
-							<div className="text-4xs uppercase tracking-wider text-muted-foreground">{ORDER_TEXT.LIMIT_PRICE_LABEL}</div>
+							<div className="text-4xs uppercase tracking-wider text-muted-foreground">
+								{ORDER_TEXT.LIMIT_PRICE_LABEL}
+							</div>
 							{markPx > 0 && (
 								<button
 									type="button"
@@ -750,17 +719,11 @@ export function OrderEntryPanel() {
 
 				{/* Validation errors */}
 				{validation.errors.length > 0 && isConnected && availableBalance > 0 && !validation.needsApproval && (
-					<div className="text-4xs text-terminal-red">
-						{validation.errors.join(" • ")}
-					</div>
+					<div className="text-4xs text-terminal-red">{validation.errors.join(" • ")}</div>
 				)}
 
 				{/* Approval error */}
-				{approvalError && (
-					<div className="text-4xs text-terminal-red">
-						{approvalError}
-					</div>
-				)}
+				{approvalError && <div className="text-4xs text-terminal-red">{approvalError}</div>}
 
 				{/* Submit button */}
 				<button

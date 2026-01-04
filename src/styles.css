@@ -227,6 +227,14 @@
   body {
     @apply bg-background text-foreground;
   }
+  ::selection {
+    background: oklch(0.85 0.01 240 / 0.3);
+    color: inherit;
+  }
+  .dark ::selection {
+    background: oklch(0.7 0.01 240 / 0.3);
+    color: inherit;
+  }
 }
 
 /* =============================================================================

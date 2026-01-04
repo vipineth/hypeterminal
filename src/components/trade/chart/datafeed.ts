@@ -25,6 +25,7 @@ import type {
 	SubscribeBarsCallback,
 } from "@/types/charting_library";
 import { META_CACHE_TTL_MS, UI_TEXT } from "@/constants/app";
+import { toFiniteNumber } from "@/lib/trade/numbers";
 import {
 	ALL_MIDS_TTL_MS,
 	CHART_DATAFEED_CONFIG,
@@ -144,12 +145,8 @@ function resolutionToInterval(resolution: ResolutionString): CandleInterval | un
 }
 
 function parseDecimal(value: unknown): number {
-	if (typeof value === "number") return value;
-	if (typeof value === "string") {
-		const parsed = Number.parseFloat(value);
-		return Number.isFinite(parsed) ? parsed : Number.NaN;
-	}
-	return Number.NaN;
+	const parsed = toFiniteNumber(value);
+	return parsed ?? Number.NaN;
 }
 
 function candleSnapshotToBar(candle: CandleSnapshotResponse[number]): Bar | null {

@@ -24,7 +24,6 @@ export function AccountPanel() {
 		enabled: isConnected,
 	});
 
-	// Calculate account metrics from clearinghouse data
 	const accountMetrics = useMemo(() => {
 		if (!clearinghouse?.crossMarginSummary) {
 			return null;
@@ -37,22 +36,17 @@ export function AccountPanel() {
 		const totalMarginUsed = parseNumberOrZero(summary.totalMarginUsed);
 		const totalRawUsd = parseNumberOrZero(summary.totalRawUsd);
 
-		// Calculate unrealized PNL from positions
 		let unrealizedPnl = 0;
 		for (const pos of clearinghouse.assetPositions ?? []) {
 			unrealizedPnl += parseNumberOrZero(pos.position.unrealizedPnl);
 		}
 
-		// Margin ratio = totalMarginUsed / accountValue (as percentage)
 		const marginRatio = accountValue > 0 ? totalMarginUsed / accountValue : 0;
 
-		// Maintenance margin (approximate - usually ~50% of initial margin for cross)
 		const maintMargin = totalMarginUsed * 0.5;
 
-		// Cross leverage = totalNtlPos / accountValue
 		const crossLeverage = accountValue > 0 ? Math.abs(totalNtlPos) / accountValue : 0;
 
-		// Available balance for trading
 		const availableBalance = Math.max(0, accountValue - totalMarginUsed);
 
 		return {
@@ -69,7 +63,9 @@ export function AccountPanel() {
 
 	const hasData = isConnected && accountMetrics !== null;
 	const headerEquity = hasData ? formatUSD(accountMetrics.accountValue) : FALLBACK_VALUE_PLACEHOLDER;
-	const headerPnl = hasData ? formatUSD(accountMetrics.unrealizedPnl, { signDisplay: "exceptZero" }) : FALLBACK_VALUE_PLACEHOLDER;
+	const headerPnl = hasData
+		? formatUSD(accountMetrics.unrealizedPnl, { signDisplay: "exceptZero" })
+		: FALLBACK_VALUE_PLACEHOLDER;
 	const headerPnlClass = hasData
 		? accountMetrics.unrealizedPnl >= 0
 			? "text-terminal-green"
@@ -87,10 +83,7 @@ export function AccountPanel() {
 			{
 				label: ACCOUNT_TEXT.UNREALIZED_LABEL,
 				value: formatUSD(accountMetrics.unrealizedPnl, { signDisplay: "exceptZero" }),
-				valueClass: cn(
-					"tabular-nums",
-					accountMetrics.unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red",
-				),
+				valueClass: cn("tabular-nums", accountMetrics.unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red"),
 			},
 			{
 				label: ACCOUNT_TEXT.AVAILABLE_LABEL,
@@ -153,11 +146,7 @@ export function AccountPanel() {
 						</div>
 						<div className="flex items-center gap-1.5">
 							<span className="text-4xs text-muted-foreground uppercase">{ACCOUNT_TEXT.PNL_LABEL}</span>
-							<span
-								className={cn("text-2xs font-medium tabular-nums", headerPnlClass)}
-							>
-								{headerPnl}
-							</span>
+							<span className={cn("text-2xs font-medium tabular-nums", headerPnlClass)}>{headerPnl}</span>
 						</div>
 					</div>
 				</button>
@@ -189,9 +178,7 @@ export function AccountPanel() {
 
 				<div className="p-2 space-y-2 max-h-48 overflow-y-auto">
 					{!isConnected ? (
-						<div className="text-3xs text-muted-foreground text-center py-4">
-							{ACCOUNT_TEXT.CONNECT}
-						</div>
+						<div className="text-3xs text-muted-foreground text-center py-4">{ACCOUNT_TEXT.CONNECT}</div>
 					) : !hasData ? (
 						<div className="text-3xs text-muted-foreground text-center py-4">{ACCOUNT_TEXT.LOADING}</div>
 					) : (

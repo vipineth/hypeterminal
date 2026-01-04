@@ -5,7 +5,7 @@ import { isTokenInCategory, type MarketCategory } from "@/config/token";
 import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
 import { usePerpAssetCtxsSnapshot } from "@/hooks/hyperliquid/use-perp-asset-ctxs-snapshot";
 import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
-import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
+import { calculate24hPriceChange, calculateOpenInterestUSD, getMarketCtxNumbers } from "@/lib/market";
 import { useFavoriteMarketKeys, useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import { type MarketRow, TOKEN_SELECTOR_COLUMNS } from "./constants";
 
@@ -47,6 +47,7 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 		return Array.from(registry.marketKeyToInfo.values()).map((marketInfo) => ({
 			...marketInfo,
 			ctx: ctxs?.[marketInfo.assetIndex],
+			ctxNumbers: getMarketCtxNumbers(ctxs?.[marketInfo.assetIndex]),
 		}));
 	}, [registry, ctxs]);
 
@@ -91,15 +92,15 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 		function getSortValue(market: MarketRow, columnId: string): number {
 			switch (columnId) {
 				case "price":
-					return market.ctx?.markPx ? Number(market.ctx.markPx) : 0;
+					return market.ctxNumbers?.markPx ?? 0;
 				case "24h-change":
-					return calculate24hPriceChange(market.ctx) ?? 0;
+					return calculate24hPriceChange(market.ctxNumbers) ?? 0;
 				case "oi":
-					return calculateOpenInterestUSD(market.ctx) ?? 0;
+					return calculateOpenInterestUSD(market.ctxNumbers) ?? 0;
 				case "volume":
-					return market.ctx?.dayNtlVlm ? Number(market.ctx.dayNtlVlm) : 0;
+					return market.ctxNumbers?.dayNtlVlm ?? 0;
 				case "funding":
-					return market.ctx?.funding ? Number.parseFloat(market.ctx.funding) : 0;
+					return market.ctxNumbers?.funding ?? 0;
 				default:
 					return 0;
 			}

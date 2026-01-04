@@ -8,6 +8,7 @@ import {
 	parseNumberOr,
 	parseNumberOrZero,
 	parsePositiveDecimalInput,
+	toFiniteNumber,
 } from "./numbers";
 
 describe("trade numbers", () => {
@@ -16,12 +17,21 @@ describe("trade numbers", () => {
 		expect(parseNumber("2.5")).toBe(2.5);
 		expect(Number.isNaN(parseNumber("nope"))).toBe(true);
 		expect(Number.isNaN(parseNumber(null))).toBe(true);
+		expect(Number.isNaN(parseNumber(Number.POSITIVE_INFINITY))).toBe(true);
+		expect(Number.isNaN(parseNumber(Number.NaN))).toBe(true);
 	});
 
 	it("parses numbers with fallbacks", () => {
 		expect(parseNumberOr("2.5", 0)).toBe(2.5);
 		expect(parseNumberOr("nope", 7)).toBe(7);
 		expect(parseNumberOrZero("nope")).toBe(0);
+	});
+
+	it("normalizes to finite numbers", () => {
+		expect(toFiniteNumber("  ")).toBeNull();
+		expect(toFiniteNumber("12.5")).toBe(12.5);
+		expect(toFiniteNumber(Number.NEGATIVE_INFINITY)).toBeNull();
+		expect(toFiniteNumber(Number.NaN)).toBeNull();
 	});
 
 	it("clamps integers to bounds", () => {

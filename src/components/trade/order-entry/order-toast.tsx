@@ -6,7 +6,29 @@ import { type OrderQueueItem, useOrderQueue, useOrderQueueActions } from "@/stor
 
 const ORDER_TOAST_TEXT = UI_TEXT.ORDER_TOAST;
 
+function useAutoRemove(order: OrderQueueItem, onRemove: () => void) {
+	useEffect(() => {
+		if (order.status !== "success" || !order.completedAt) return;
+
+		const elapsed = Date.now() - order.completedAt;
+		const remaining = ORDER_TOAST_SUCCESS_DURATION_MS - elapsed;
+
+		// Already expired, remove immediately
+		if (remaining <= 0) {
+			onRemove();
+			return;
+		}
+
+		// Schedule removal
+		const timer = setTimeout(onRemove, remaining);
+		return () => clearTimeout(timer);
+	}, [order.status, order.completedAt, onRemove]);
+}
+
 function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () => void }) {
+	// Auto-remove successful orders after duration
+	useAutoRemove(order, onRemove);
+
 	const sideColor = order.side === "buy" ? "text-terminal-green" : "text-terminal-red";
 	const sideBg = order.side === "buy" ? "bg-terminal-green/10" : "bg-terminal-red/10";
 	const sideGlow = order.side === "buy" ? "terminal-glow-green" : "terminal-glow-red";
@@ -58,9 +80,7 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 				<div className="text-2xs text-muted-foreground">
 					{ORDER_TOAST_TEXT.SIZE_LABEL}: <span className="text-foreground/80 font-medium">{order.size}</span>
 				</div>
-				{order.error && (
-					<div className="text-2xs text-terminal-red terminal-glow-red truncate">{order.error}</div>
-				)}
+				{order.error && <div className="text-2xs text-terminal-red terminal-glow-red truncate">{order.error}</div>}
 			</div>
 
 			{/* Dismiss Button for Failed Orders */}
@@ -115,33 +135,6 @@ export function OrderToast() {
 	const orders = useOrderQueue();
 	const { removeOrder } = useOrderQueueActions();
 
-	// Auto-remove successful orders after delay
-	useEffect(() => {
-		const timers: NodeJS.Timeout[] = [];
-
-		for (const order of orders) {
-			if (order.status === "success" && order.completedAt) {
-				const elapsed = Date.now() - order.completedAt;
-				const remaining = ORDER_TOAST_SUCCESS_DURATION_MS - elapsed;
-
-				if (remaining > 0) {
-					const timer = setTimeout(() => {
-						removeOrder(order.id);
-					}, remaining);
-					timers.push(timer);
-				} else {
-					removeOrder(order.id);
-				}
-			}
-		}
-
-		return () => {
-			for (const timer of timers) {
-				clearTimeout(timer);
-			}
-		};
-	}, [orders, removeOrder]);
-
 	if (orders.length === 0) return null;
 
 	const pendingCount = orders.filter((o) => o.status === "pending").length;
@@ -156,7 +149,7 @@ export function OrderToast() {
 				"border border-border/60 rounded-lg overflow-hidden",
 				"shadow-2xl shadow-black/20 dark:shadow-black/50",
 				"font-mono",
-				// Glow effect based on status
+
 				pendingCount > 0 && "ring-1 ring-terminal-cyan/30 dark:shadow-[0_0_30px_-5px_oklch(0.78_0.12_195_/_0.2)]",
 				failedCount > 0 &&
 					pendingCount === 0 &&
@@ -171,7 +164,9 @@ export function OrderToast() {
 			<div className="px-3 py-2 border-b border-border/40 bg-muted/30 flex items-center justify-between">
 				<div className="flex items-center gap-2">
 					<Zap className="size-4 text-terminal-cyan terminal-glow-cyan" />
-					<span className="text-xs font-semibold uppercase tracking-wider text-foreground">{ORDER_TOAST_TEXT.TITLE}</span>
+					<span className="text-xs font-semibold uppercase tracking-wider text-foreground">
+						{ORDER_TOAST_TEXT.TITLE}
+					</span>
 				</div>
 				<div className="flex items-center gap-1.5">
 					{pendingCount > 0 && (

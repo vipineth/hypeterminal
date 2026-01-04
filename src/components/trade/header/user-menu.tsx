@@ -1,11 +1,12 @@
 import { ChevronDown, Copy, CopyCheck, Loader2, LogOut, PlusCircle, Zap } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useConnection, useDisconnect, useEnsName } from "wagmi";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UI_TEXT } from "@/constants/app";
@@ -36,8 +37,13 @@ export function UserMenu() {
 	const disconnect = useDisconnect();
 	const { data: ensName } = useEnsName({ address });
 	const [isOpen, setIsOpen] = useState(false);
+	const [mounted, setMounted] = useState(false);
 
-	if (isConnecting) {
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	if (!mounted || isConnecting) {
 		return (
 			<Button variant="ghost" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider" disabled>
 				<Loader2 className="size-3 animate-spin" />
@@ -73,14 +79,16 @@ export function UserMenu() {
 						<ChevronDown className="size-2.5" />
 					</Button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent align="end" className="w-44 text-xs font-mono">
+				<DropdownMenuContent align="end" className="min-w-40 text-xs font-mono">
 					{address && <CopyAddressMenuItem address={address} />}
 					<DropdownMenuItem className="flex items-center gap-2">
 						<PlusCircle className="size-3.5 text-muted-foreground" />
 						<span>{USER_MENU_TEXT.ADD_FUNDS}</span>
 					</DropdownMenuItem>
+					<DropdownMenuSeparator />
 					<DropdownMenuItem
-						className="flex items-center gap-2 text-terminal-red focus:text-terminal-red"
+						variant="destructive"
+						className="flex items-center gap-2"
 						onClick={() => disconnect.mutate()}
 					>
 						<LogOut className="size-3.5" />

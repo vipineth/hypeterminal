@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { PerpAssetCtx, PerpAssetCtxs } from "@/types/hyperliquid";
+import type { PerpAssetCtxs } from "@/types/hyperliquid";
 import { useAssetCtxsSubscription } from "./socket/use-asset-ctxs-subscription";
 
 interface UsePerpAssetCtxsSnapshotOptions {
@@ -7,6 +7,10 @@ interface UsePerpAssetCtxsSnapshotOptions {
 	intervalMs?: number;
 }
 
+/**
+ * Provides a throttled snapshot of perp asset contexts.
+ * Updates at most every `intervalMs` (default 10s) instead of on every WebSocket tick.
+ */
 export function usePerpAssetCtxsSnapshot(options?: UsePerpAssetCtxsSnapshotOptions) {
 	const enabled = options?.enabled ?? true;
 	const intervalMs = options?.intervalMs ?? 10_000;
@@ -20,22 +24,28 @@ export function usePerpAssetCtxsSnapshot(options?: UsePerpAssetCtxsSnapshotOptio
 	const [snapshot, setSnapshot] = useState<PerpAssetCtxs | undefined>(undefined);
 
 	const latestRef = useRef<PerpAssetCtxs | undefined>(undefined);
-	useEffect(() => {
-		latestRef.current = liveCtxs;
-		setSnapshot((prev) => (prev === undefined && liveCtxs !== undefined ? liveCtxs : prev));
-	}, [liveCtxs]);
 
 	useEffect(() => {
+		// Always track latest value in ref
+		latestRef.current = liveCtxs;
+
+		// Set initial snapshot when first data arrives
+		if (snapshot === undefined && liveCtxs !== undefined) {
+			setSnapshot(liveCtxs);
+		}
+
+		// Only set up interval when enabled
 		if (!enabled) return;
 
-		setSnapshot(latestRef.current);
-
+		// Set up periodic snapshot updates
 		const id = window.setInterval(() => {
-			setSnapshot(latestRef.current);
+			if (latestRef.current !== undefined) {
+				setSnapshot(latestRef.current);
+			}
 		}, intervalMs);
 
 		return () => window.clearInterval(id);
-	}, [enabled, intervalMs]);
+	}, [enabled, intervalMs, liveCtxs, snapshot]);
 
 	return snapshot;
 }
