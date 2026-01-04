@@ -9,10 +9,14 @@
 		"format": "biome format",
 		"lint": "biome lint",
 		"check": "biome check",
-		"test": "vitest run"
+		"test": "vitest run",
+		"i18n:extract": "lingui extract",
+		"i18n:compile": "lingui compile"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^5.2.2",
+		"@lingui/core": "^5.7.0",
+		"@lingui/react": "^5.7.0",
 		"@nktkas/hyperliquid": "^0.29.1",
 		"@phosphor-icons/react": "^2.1.10",
 		"@radix-ui/react-accordion": "^1.2.12",
@@ -77,6 +81,9 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.4",
+		"@lingui/babel-plugin-lingui-macro": "^5.7.0",
+		"@lingui/cli": "^5.7.0",
+		"@lingui/vite-plugin": "^5.7.0",
 		"@tailwindcss/vite": "^4.0.6",
 		"@tanstack/devtools-vite": "^0.3.11",
 		"@tanstack/router-plugin": "^1.132.0",
