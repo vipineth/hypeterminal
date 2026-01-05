@@ -1,16 +1,15 @@
+import { t } from "@lingui/core/macro";
 import { History } from "lucide-react";
 import { useMemo } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
 import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
 import { useUserFills } from "@/hooks/hyperliquid/use-user-fills";
 import { formatNumber, formatUSD } from "@/lib/format";
 import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
 import { useConnection } from "wagmi";
-
-const HISTORY_TEXT = UI_TEXT.HISTORY_TAB;
 
 export function HistoryTab() {
 	const { address, isConnected } = useConnection();
@@ -23,7 +22,7 @@ export function HistoryTab() {
 		return sorted.slice(0, 200);
 	}, [data]);
 
-	const headerCount = isConnected ? `${fills.length} ${HISTORY_TEXT.COUNT_LABEL}` : FALLBACK_VALUE_PLACEHOLDER;
+	const headerCount = isConnected ? `${fills.length} ${t`Trades`}` : FALLBACK_VALUE_PLACEHOLDER;
 
 	const tableRows = useMemo(() => {
 		return fills.map((fill) => {
@@ -49,7 +48,7 @@ export function HistoryTab() {
 			return {
 				key: `${fill.hash}-${fill.tid}`,
 				coin: fill.coin,
-				sideLabel: isBuy ? HISTORY_TEXT.SIDE_BUY : HISTORY_TEXT.SIDE_SELL,
+				sideLabel: isBuy ? t`buy` : t`sell`,
 				sideClass: isBuy ? "bg-terminal-green/20 text-terminal-green" : "bg-terminal-red/20 text-terminal-red",
 				typeLabel: fill.dir,
 				priceText: Number.isFinite(px) ? formatUSD(px) : String(fill.px),
@@ -69,26 +68,26 @@ export function HistoryTab() {
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-2">
 				<History className="size-3" />
-				{HISTORY_TEXT.TITLE}
+				{t`Trade History`}
 				<span className="text-terminal-cyan ml-auto tabular-nums">{headerCount}</span>
 			</div>
 			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
 				{!isConnected ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{HISTORY_TEXT.CONNECT}
+						{t`Connect your wallet to view trade history.`}
 					</div>
 				) : status === "pending" ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{HISTORY_TEXT.LOADING}
+						{t`Loading trade history...`}
 					</div>
 				) : status === "error" ? (
 					<div className="h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs text-terminal-red/80">
-						<span>{HISTORY_TEXT.FAILED}</span>
+						<span>{t`Failed to load trade history.`}</span>
 						{error instanceof Error ? <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span> : null}
 					</div>
 				) : fills.length === 0 ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{HISTORY_TEXT.EMPTY}
+						{t`No fills found.`}
 					</div>
 				) : (
 					<ScrollArea className="h-full w-full">
@@ -96,25 +95,25 @@ export function HistoryTab() {
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
-										{HISTORY_TEXT.HEADER_ASSET}
+										{t`Asset`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
-										{HISTORY_TEXT.HEADER_TYPE}
+										{t`Type`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{HISTORY_TEXT.HEADER_PRICE}
+										{t`Price`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{HISTORY_TEXT.HEADER_SIZE}
+										{t`Size`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{HISTORY_TEXT.HEADER_FEE}
+										{t`Fee`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{HISTORY_TEXT.HEADER_PNL}
+										{t`PNL`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{HISTORY_TEXT.HEADER_TIME}
+										{t`Time`}
 									</TableHead>
 								</TableRow>
 							</TableHeader>

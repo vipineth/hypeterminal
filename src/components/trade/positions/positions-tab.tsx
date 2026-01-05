@@ -1,24 +1,23 @@
+import { t } from "@lingui/core/macro";
 import { Circle } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
+import { useConnection, useWalletClient } from "wagmi";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
-import { cn } from "@/lib/utils";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
+import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
+import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
+import { usePerpAssetCtxsSnapshot } from "@/hooks/hyperliquid/use-perp-asset-ctxs-snapshot";
+import { useTradingAgent } from "@/hooks/hyperliquid/use-trading-agent";
 import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
 import { getHttpTransport } from "@/lib/hyperliquid/clients";
-import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
-import { usePerpAssetCtxsSnapshot } from "@/hooks/hyperliquid/use-perp-asset-ctxs-snapshot";
-import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
-import { useTradingAgent } from "@/hooks/hyperliquid/use-trading-agent";
 import { makeExchangeConfig, placeSingleOrder } from "@/lib/hyperliquid/exchange";
+import { toHyperliquidWallet } from "@/lib/hyperliquid/wallet";
 import { parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
-import { toHyperliquidWallet } from "@/lib/hyperliquid/wallet";
+import { cn } from "@/lib/utils";
 import { useMarketOrderSlippageBps } from "@/stores/use-trade-settings-store";
-import { useConnection, useWalletClient } from "wagmi";
 import { TokenAvatar } from "../components/token-avatar";
-
-const POSITIONS_TEXT = UI_TEXT.POSITIONS_TAB;
 
 export function PositionsTab() {
 	const { address, isConnected } = useConnection();
@@ -85,7 +84,7 @@ export function PositionsTab() {
 				markPx,
 				szDecimals,
 				canClose,
-				sideLabel: isLong ? POSITIONS_TEXT.SIDE_LONG : POSITIONS_TEXT.SIDE_SHORT,
+				sideLabel: isLong ? t`Long` : t`Short`,
 				sideClass: isLong ? "bg-terminal-green/20 text-terminal-green" : "bg-terminal-red/20 text-terminal-red",
 				sizeText: Number.isFinite(size) ? formatToken(Math.abs(size), szDecimals) : FALLBACK_VALUE_PLACEHOLDER,
 				valueText: Number.isFinite(positionValue)
@@ -93,7 +92,9 @@ export function PositionsTab() {
 					: FALLBACK_VALUE_PLACEHOLDER,
 				entryText: Number.isFinite(entryPx) ? formatPrice(entryPx, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER,
 				markText: Number.isFinite(markPx) ? formatPrice(markPx, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER,
-				liqText: Number.isFinite(liquidationPx) ? formatPrice(liquidationPx, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER,
+				liqText: Number.isFinite(liquidationPx)
+					? formatPrice(liquidationPx, { szDecimals })
+					: FALLBACK_VALUE_PLACEHOLDER,
 				pnlText: Number.isFinite(unrealizedPnl)
 					? formatUSD(unrealizedPnl, { signDisplay: "exceptZero" })
 					: FALLBACK_VALUE_PLACEHOLDER,
@@ -108,7 +109,7 @@ export function PositionsTab() {
 	const handleClosePosition = useCallback(
 		async (row: (typeof tableRows)[number]) => {
 			if (!signer) {
-				setActionError(POSITIONS_TEXT.ERROR_SIGNER);
+				setActionError(t`Connect a wallet to manage positions.`);
 				return;
 			}
 			if (closingKey) return;
@@ -120,7 +121,7 @@ export function PositionsTab() {
 			try {
 				const assetIndex = row.assetIndex;
 				if (typeof assetIndex !== "number" || !Number.isFinite(row.markPx)) {
-					throw new Error(POSITIONS_TEXT.ERROR_CLOSE_FALLBACK);
+					throw new Error(t`Unable to close position.`);
 				}
 
 				const transport = getHttpTransport();
@@ -141,12 +142,12 @@ export function PositionsTab() {
 				const result = await placeSingleOrder(config, { order });
 				const status = result.response?.data?.statuses?.[0];
 				if (status && typeof status === "object" && "error" in status) {
-					throw new Error(status.error);
+					throw new Error(status.error as string);
 				}
 
 				await refetch();
 			} catch (error) {
-				const message = error instanceof Error ? error.message : POSITIONS_TEXT.ERROR_CLOSE_FALLBACK;
+				const message = error instanceof Error ? error.message : t`Unable to close position.`;
 				setActionError(message);
 			} finally {
 				setClosingKey(null);
@@ -159,27 +160,29 @@ export function PositionsTab() {
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-2">
 				<Circle className="size-1.5 fill-terminal-green text-terminal-green" />
-				{POSITIONS_TEXT.TITLE}
+				{t`Active Positions`}
 				<span className="text-terminal-cyan ml-auto tabular-nums">{headerCount}</span>
 			</div>
 			{actionError ? <div className="mb-1 text-4xs text-terminal-red/80">{actionError}</div> : null}
 			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
 				{!isConnected ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{POSITIONS_TEXT.CONNECT}
+						{t`Connect your wallet to view positions.`}
 					</div>
 				) : status === "pending" ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{POSITIONS_TEXT.LOADING}
+						{t`Loading positions...`}
 					</div>
 				) : status === "error" ? (
 					<div className="h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs text-terminal-red/80">
-						<span>{POSITIONS_TEXT.FAILED}</span>
-						{error instanceof Error ? <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span> : null}
+						<span>{t`Failed to load positions.`}</span>
+						{error instanceof Error ? (
+							<span className="mt-1 text-4xs text-muted-foreground">{error.message}</span>
+						) : null}
 					</div>
 				) : positions.length === 0 ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{POSITIONS_TEXT.EMPTY}
+						{t`No active positions.`}
 					</div>
 				) : (
 					<ScrollArea className="h-full w-full">
@@ -187,28 +190,28 @@ export function PositionsTab() {
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
-										{POSITIONS_TEXT.HEADER_ASSET}
+										{t`Asset`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{POSITIONS_TEXT.HEADER_SIZE}
+										{t`Size`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{POSITIONS_TEXT.HEADER_VALUE}
+										{t`Value`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{POSITIONS_TEXT.HEADER_ENTRY}
+										{t`Entry`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{POSITIONS_TEXT.HEADER_MARK}
+										{t`Mark`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{POSITIONS_TEXT.HEADER_PNL}
+										{t`PNL`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{POSITIONS_TEXT.HEADER_LIQ}
+										{t`Liq`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{POSITIONS_TEXT.HEADER_ACTIONS}
+										{t`Actions`}
 									</TableHead>
 								</TableRow>
 							</TableHeader>
@@ -245,19 +248,19 @@ export function PositionsTab() {
 													type="button"
 													className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 													tabIndex={0}
-													aria-label={POSITIONS_TEXT.ARIA_CLOSE}
+													aria-label={t`Close position`}
 													onClick={() => handleClosePosition(row)}
 													disabled={!row.canClose || closingKey !== null}
 												>
-													{closingKey === row.key ? POSITIONS_TEXT.ACTION_CLOSING : POSITIONS_TEXT.ACTION_CLOSE}
+													{closingKey === row.key ? t`Closing...` : t`Close`}
 												</button>
 												<button
 													type="button"
 													className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-cyan/60 hover:text-terminal-cyan transition-colors"
 													tabIndex={0}
-													aria-label={POSITIONS_TEXT.ARIA_TPSL}
+													aria-label={t`Set TP/SL`}
 												>
-													{POSITIONS_TEXT.ACTION_TPSL}
+													{t`TP/SL`}
 												</button>
 											</div>
 										</TableCell>

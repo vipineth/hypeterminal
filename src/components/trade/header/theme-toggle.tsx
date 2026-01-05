@@ -1,6 +1,6 @@
+import { t } from "@lingui/core/macro";
 import { ClientOnly } from "@tanstack/react-router";
 import { Moon, Sun } from "lucide-react";
-import { UI_TEXT } from "@/constants/app";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/providers/theme";
 
@@ -16,7 +16,6 @@ function ThemeToggleButton() {
 	const { theme, setTheme } = useTheme();
 
 	const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-	const themeText = UI_TEXT.THEME_TOGGLE;
 
 	const handleToggle = () => {
 		setTheme(isDark ? "light" : "dark");
@@ -41,7 +40,7 @@ function ThemeToggleButton() {
 			onClick={handleToggle}
 			onKeyDown={handleKeyDown}
 			tabIndex={0}
-			aria-label={isDark ? themeText.SWITCH_LIGHT : themeText.SWITCH_DARK}
+			aria-label={isDark ? t`Switch to light mode` : t`Switch to dark mode`}
 		>
 			{isDark ? <Sun className="size-3.5" /> : <Moon className="size-3.5" />}
 		</button>

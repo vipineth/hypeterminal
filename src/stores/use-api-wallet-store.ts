@@ -32,7 +32,7 @@ interface ApiWalletStore {
 
 const useApiWalletStore = create<ApiWalletStore>()(
 	persist(
-		(set, get) => ({
+		(set) => ({
 			privateKeyByEnv: {},
 			nameByEnv: {},
 			actions: {

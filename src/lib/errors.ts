@@ -1,8 +1,8 @@
-import { UI_TEXT } from "@/constants/app";
+import { t } from "@lingui/core/macro";
 
 export function formatErrorForDisplay(
 	error: unknown,
-	fallbackMessage = UI_TEXT.ERRORS.GENERIC_FALLBACK,
+	fallbackMessage = t`Something went wrong`,
 ): string {
 	const parts: string[] = [];
 

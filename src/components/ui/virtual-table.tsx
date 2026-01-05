@@ -1,10 +1,8 @@
+import { t } from "@lingui/core/macro";
 import { flexRender, type Header, type RowData } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import type { UseVirtualTableReturn } from "@/hooks/ui/use-virtual-table";
-import { UI_TEXT } from "@/constants/app";
 import { cn } from "@/lib/utils";
-
-const VIRTUAL_TABLE_TEXT = UI_TEXT.VIRTUAL_TABLE;
 
 export interface VirtualTableProps<TData extends RowData> extends UseVirtualTableReturn<TData> {
 	className?: string;
@@ -89,7 +87,7 @@ export function VirtualTable<TData extends RowData>({
 										className={headerClassName}
 										style={headerStyle}
 										onClick={header.column.getToggleSortingHandler()}
-										aria-label={VIRTUAL_TABLE_TEXT.SORT_ARIA(headerLabel)}
+										aria-label={t`Sort by ${headerLabel}`}
 									>
 										{headerContent}
 										{showSortingIndicators && <SortingIndicator header={header} />}

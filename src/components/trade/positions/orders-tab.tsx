@@ -1,9 +1,10 @@
+import { t } from "@lingui/core/macro";
 import { ListOrdered } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
 import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
 import { useOpenOrders } from "@/hooks/hyperliquid/use-open-orders";
 import { formatNumber, formatUSD } from "@/lib/format";
@@ -15,8 +16,6 @@ import { cn } from "@/lib/utils";
 import { useTradingAgent } from "@/hooks/hyperliquid/use-trading-agent";
 import { useConnection, useWalletClient } from "wagmi";
 import { TokenAvatar } from "../components/token-avatar";
-
-const ORDERS_TEXT = UI_TEXT.ORDERS_TAB;
 
 export function OrdersTab() {
 	const { address, isConnected } = useConnection();
@@ -84,7 +83,7 @@ export function OrdersTab() {
 		async (ordersToCancel: typeof openOrders) => {
 			if (isCancelling) return;
 			if (!signer) {
-				setActionError(ORDERS_TEXT.ERROR_SIGNER);
+				setActionError(t`Connect a wallet to manage orders.`);
 				return;
 			}
 			if (ordersToCancel.length === 0) return;
@@ -97,7 +96,7 @@ export function OrdersTab() {
 			}, []);
 
 			if (cancels.length !== ordersToCancel.length) {
-				setActionError(ORDERS_TEXT.ERROR_MARKET_UNAVAILABLE);
+				setActionError(t`Market metadata unavailable.`);
 				return;
 			}
 
@@ -125,7 +124,7 @@ export function OrdersTab() {
 					return next;
 				});
 			} catch (error) {
-				const message = error instanceof Error ? error.message : ORDERS_TEXT.ERROR_CANCEL_FALLBACK;
+				const message = error instanceof Error ? error.message : t`Unable to cancel orders.`;
 				setActionError(message);
 			} finally {
 				setIsCancelling(false);
@@ -159,15 +158,15 @@ export function OrdersTab() {
 				key: order.oid,
 				order,
 				coin: order.coin,
-				sideLabel: isBuy ? ORDERS_TEXT.SIDE_BUY : ORDERS_TEXT.SIDE_SELL,
+				sideLabel: isBuy ? t`buy` : t`sell`,
 				sideClass: isBuy ? "bg-terminal-green/20 text-terminal-green" : "bg-terminal-red/20 text-terminal-red",
-				typeLabel: order.reduceOnly ? ORDERS_TEXT.TYPE_LIMIT_RO : ORDERS_TEXT.TYPE_LIMIT,
+				typeLabel: order.reduceOnly ? t`limit ro` : t`limit`,
 				priceText: Number.isFinite(limitPx) ? formatUSD(limitPx, { compact: false }) : String(order.limitPx),
 				sizeText: Number.isFinite(origSz) ? formatNumber(origSz, szDecimals) : String(order.origSz),
 				filledText: Number.isFinite(filled) ? formatNumber(filled, szDecimals) : FALLBACK_VALUE_PLACEHOLDER,
 				hasFilled: Number.isFinite(filled) && filled > 0,
 				fillPctText: `${fillPct.toFixed(0)}%`,
-				statusLabel: ORDERS_TEXT.STATUS_OPEN,
+				statusLabel: t`open`,
 			};
 		});
 	}, [openOrders, registry]);
@@ -180,28 +179,28 @@ export function OrdersTab() {
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-2">
 				<ListOrdered className="size-3" />
-				{ORDERS_TEXT.TITLE}
+				{t`Open Orders`}
 				<div className="ml-auto flex items-center gap-2">
 					<span className="text-terminal-cyan tabular-nums">{headerCount}</span>
 					<button
 						type="button"
 						className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 						tabIndex={0}
-						aria-label={ORDERS_TEXT.ARIA_CANCEL_SELECTED}
+						aria-label={t`Cancel selected orders`}
 						onClick={handleCancelSelected}
 						disabled={disableCancelSelected}
 					>
-						{isCancelling ? ORDERS_TEXT.ACTION_CANCELING : ORDERS_TEXT.ACTION_CANCEL_SELECTED}
+						{isCancelling ? t`Canceling...` : t`Cancel selected`}
 					</button>
 					<button
 						type="button"
 						className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 						tabIndex={0}
-						aria-label={ORDERS_TEXT.ARIA_CANCEL_ALL}
+						aria-label={t`Cancel all orders`}
 						onClick={handleCancelAll}
 						disabled={disableCancelAll}
 					>
-						{isCancelling ? ORDERS_TEXT.ACTION_CANCELING : ORDERS_TEXT.ACTION_CANCEL_ALL}
+						{isCancelling ? t`Canceling...` : t`Cancel all`}
 					</button>
 				</div>
 			</div>
@@ -209,20 +208,20 @@ export function OrdersTab() {
 			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
 				{!isConnected ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{ORDERS_TEXT.CONNECT}
+						{t`Connect your wallet to view open orders.`}
 					</div>
 				) : status === "pending" ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{ORDERS_TEXT.LOADING}
+						{t`Loading open orders...`}
 					</div>
 				) : status === "error" ? (
 					<div className="h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs text-terminal-red/80">
-						<span>{ORDERS_TEXT.FAILED}</span>
+						<span>{t`Failed to load open orders.`}</span>
 						{error instanceof Error ? <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span> : null}
 					</div>
 				) : openOrders.length === 0 ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{ORDERS_TEXT.EMPTY}
+						{t`No open orders.`}
 					</div>
 				) : (
 					<ScrollArea className="h-full w-full">
@@ -233,31 +232,31 @@ export function OrdersTab() {
 										<Checkbox
 											checked={allSelected ? true : someSelected ? "indeterminate" : false}
 											onCheckedChange={handleToggleAll}
-											aria-label={ORDERS_TEXT.ARIA_SELECT_ALL}
+											aria-label={t`Select all orders`}
 											disabled={openOrders.length === 0 || isCancelling}
 											className="size-3.5 border-border/70 bg-background/60 data-[state=checked]:bg-terminal-cyan data-[state=checked]:border-terminal-cyan data-[state=checked]:text-background"
 										/>
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
-										{ORDERS_TEXT.HEADER_ASSET}
+										{t`Asset`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
-										{ORDERS_TEXT.HEADER_TYPE}
+										{t`Type`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{ORDERS_TEXT.HEADER_PRICE}
+										{t`Price`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{ORDERS_TEXT.HEADER_SIZE}
+										{t`Size`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{ORDERS_TEXT.HEADER_FILLED}
+										{t`Filled`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
-										{ORDERS_TEXT.HEADER_STATUS}
+										{t`Status`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{ORDERS_TEXT.HEADER_ACTIONS}
+										{t`Actions`}
 									</TableHead>
 								</TableRow>
 							</TableHeader>
@@ -268,7 +267,7 @@ export function OrdersTab() {
 											<Checkbox
 												checked={selectedOrderIds.has(row.order.oid)}
 												onCheckedChange={(value) => handleToggleOrder(row.order.oid, value)}
-												aria-label={`${ORDERS_TEXT.ARIA_SELECT_ORDER} ${row.coin}`}
+												aria-label={`${t`Select order`} ${row.coin}`}
 												disabled={isCancelling}
 												className="size-3.5 border-border/70 bg-background/60 data-[state=checked]:bg-terminal-cyan data-[state=checked]:border-terminal-cyan data-[state=checked]:text-background"
 											/>
@@ -302,11 +301,11 @@ export function OrdersTab() {
 												type="button"
 												className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 												tabIndex={0}
-												aria-label={ORDERS_TEXT.ARIA_CANCEL}
+												aria-label={t`Cancel order`}
 												onClick={() => void handleCancelOrders([row.order])}
 												disabled={!canCancel}
 											>
-												{isCancelling ? ORDERS_TEXT.ACTION_CANCELING : ORDERS_TEXT.ACTION_CANCEL}
+												{isCancelling ? t`Canceling...` : t`Cancel`}
 											</button>
 										</TableCell>
 									</TableRow>

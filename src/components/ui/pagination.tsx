@@ -1,15 +1,13 @@
+import { t } from "@lingui/core/macro";
 import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from "lucide-react";
 import type * as React from "react";
 import { type Button, buttonVariants } from "@/components/ui/button";
-import { UI_TEXT } from "@/constants/app";
 import { cn } from "@/lib/utils";
-
-const PAGINATION_TEXT = UI_TEXT.PAGINATION;
 
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
 	return (
 		<nav
-			aria-label={PAGINATION_TEXT.ARIA_LABEL}
+			aria-label={t`pagination`}
 			data-slot="pagination"
 			className={cn("mx-auto flex w-full justify-center", className)}
 			{...props}
@@ -51,13 +49,13 @@ function PaginationLink({ className, isActive, size = "icon", ...props }: Pagina
 function PaginationPrevious({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
 	return (
 		<PaginationLink
-			aria-label={PAGINATION_TEXT.PREVIOUS_ARIA}
+			aria-label={t`Go to previous page`}
 			size="default"
 			className={cn("gap-1 px-2.5 sm:pl-2.5", className)}
 			{...props}
 		>
 			<ChevronLeftIcon />
-			<span className="hidden sm:block">{PAGINATION_TEXT.PREVIOUS_LABEL}</span>
+			<span className="hidden sm:block">{t`Previous`}</span>
 		</PaginationLink>
 	);
 }
@@ -65,12 +63,12 @@ function PaginationPrevious({ className, ...props }: React.ComponentProps<typeof
 function PaginationNext({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
 	return (
 		<PaginationLink
-			aria-label={PAGINATION_TEXT.NEXT_ARIA}
+			aria-label={t`Go to next page`}
 			size="default"
 			className={cn("gap-1 px-2.5 sm:pr-2.5", className)}
 			{...props}
 		>
-			<span className="hidden sm:block">{PAGINATION_TEXT.NEXT_LABEL}</span>
+			<span className="hidden sm:block">{t`Next`}</span>
 			<ChevronRightIcon />
 		</PaginationLink>
 	);
@@ -85,7 +83,7 @@ function PaginationEllipsis({ className, ...props }: React.ComponentProps<"span"
 			{...props}
 		>
 			<MoreHorizontalIcon className="size-4" />
-			<span className="sr-only">{PAGINATION_TEXT.ELLIPSIS_LABEL}</span>
+			<span className="sr-only">{t`More pages`}</span>
 		</span>
 	);
 }

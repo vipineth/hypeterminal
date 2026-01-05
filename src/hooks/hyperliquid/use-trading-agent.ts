@@ -1,7 +1,7 @@
+import { t } from "@lingui/core/macro";
 import { useCallback, useMemo } from "react";
 import type { WalletClient } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { UI_TEXT } from "@/constants/app";
 import { createApiWalletSigner, generateApiWalletPrivateKey } from "@/lib/hyperliquid/api-wallet";
 import { getHttpTransport } from "@/lib/hyperliquid/clients";
 import { approveApiWallet, isAgentApproved, makeExchangeConfig } from "@/lib/hyperliquid/exchange";
@@ -10,7 +10,6 @@ import { type HyperliquidEnv, useApiWalletActions, useApiWalletPrivateKeyByEnv }
 import { useExtraAgents } from "./use-extra-agents";
 
 const HYPERLIQUID_ENV: HyperliquidEnv = import.meta.env.VITE_HYPERLIQUID_TESTNET === "true" ? "testnet" : "mainnet";
-const TRADING_AGENT_TEXT = UI_TEXT.TRADING_AGENT;
 
 interface UseTradingAgentParams {
 	user: `0x${string}` | undefined;
@@ -63,10 +62,10 @@ export function useTradingAgent(params: UseTradingAgentParams) {
 
 	const approveAgent = useCallback(async () => {
 		if (!walletClient) {
-			throw new Error(TRADING_AGENT_TEXT.ERROR_WALLET_CLIENT_NOT_READY);
+			throw new Error(t`Wallet client not ready`);
 		}
 		if (!user) {
-			throw new Error(TRADING_AGENT_TEXT.ERROR_WALLET_NOT_CONNECTED);
+			throw new Error(t`Wallet not connected`);
 		}
 
 		const privateKey = ensureApiWallet();
@@ -75,7 +74,7 @@ export function useTradingAgent(params: UseTradingAgentParams) {
 
 		const wallet = toHyperliquidWallet(walletClient);
 		if (!wallet) {
-			throw new Error(TRADING_AGENT_TEXT.ERROR_CREATE_WALLET);
+			throw new Error(t`Could not create wallet`);
 		}
 
 		const transport = getHttpTransport();
@@ -83,7 +82,7 @@ export function useTradingAgent(params: UseTradingAgentParams) {
 
 		await approveApiWallet(config, {
 			agentAddress: agentAddr,
-			agentName: TRADING_AGENT_TEXT.AGENT_NAME,
+			agentName: "HyperTerminal",
 		});
 
 		await refetchAgents();
