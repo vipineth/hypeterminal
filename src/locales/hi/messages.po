@@ -86,7 +86,7 @@ msgstr "शेष"
 msgid "Block:"
 msgstr "ब्लॉक:"
 
-#: src/components/trade/components/global-settings-dialog.tsx:136
+#: src/components/trade/components/global-settings-dialog.tsx:169
 msgid "bps"
 msgstr "बीपीएस"
 
@@ -151,7 +151,7 @@ msgstr "रद्द हो रहा है..."
 msgid "cancelled"
 msgstr "रद्द"
 
-#: src/components/trade/components/global-settings-dialog.tsx:160
+#: src/components/trade/components/global-settings-dialog.tsx:193
 msgid "Chart"
 msgstr "चार्ट"
 
@@ -250,7 +250,7 @@ msgstr "क्रॉस"
 msgid "Cross Leverage"
 msgstr "क्रॉस लीवरेज"
 
-#: src/components/trade/components/global-settings-dialog.tsx:90
+#: src/components/trade/components/global-settings-dialog.tsx:96
 msgid "Customize your trading experience."
 msgstr "अपने ट्रेडिंग अनुभव को अनुकूलित करें।"
 
@@ -278,7 +278,7 @@ msgstr "डिस्कनेक्ट करें"
 msgid "Dismiss"
 msgstr "खारिज करें"
 
-#: src/components/trade/components/global-settings-dialog.tsx:97
+#: src/components/trade/components/global-settings-dialog.tsx:103
 msgid "Display Language"
 msgstr "प्रदर्शन भाषा"
 
@@ -378,6 +378,10 @@ msgstr "पूर्ण"
 #: src/components/trade/chart/token-selector.tsx:95
 msgid "Filter by {0}"
 msgstr "{0} से फ़िल्टर करें"
+
+#: src/components/trade/components/global-settings-dialog.tsx:129
+msgid "Format for numbers and dates"
+msgstr ""
 
 #: src/components/trade/chart/constants.ts:90
 msgid "Funding"
@@ -526,7 +530,7 @@ msgstr "बाज़ार मेटाडेटा उपलब्ध नही
 msgid "Market not ready"
 msgstr "मार्केट तैयार नहीं"
 
-#: src/components/trade/components/global-settings-dialog.tsx:122
+#: src/components/trade/components/global-settings-dialog.tsx:155
 msgid "Market Order Slippage"
 msgstr "मार्केट ऑर्डर स्लिपेज"
 
@@ -538,7 +542,7 @@ msgstr "बाज़ार"
 msgid "Max"
 msgstr "अधिकतम"
 
-#: src/components/trade/components/global-settings-dialog.tsx:123
+#: src/components/trade/components/global-settings-dialog.tsx:156
 msgid "Max slippage allowed for market orders."
 msgstr "मार्केट ऑर्डर के लिए अधिकतम स्लिपेज।"
 
@@ -619,6 +623,10 @@ msgstr "कनेक्टेड नहीं"
 msgid "Notifications"
 msgstr "सूचनाएं"
 
+#: src/components/trade/components/global-settings-dialog.tsx:126
+msgid "Number Format"
+msgstr ""
+
 #: src/components/trade/chart/chart-panel.tsx:61
 #: src/components/trade/market-overview.tsx:55
 msgid "OI"
@@ -641,7 +649,7 @@ msgstr "खुले ऑर्डर"
 msgid "ORACLE"
 msgstr "ऑरेकल"
 
-#: src/components/trade/components/global-settings-dialog.tsx:206
+#: src/components/trade/components/global-settings-dialog.tsx:239
 #: src/components/trade/orderbook/order-book-panel.tsx:181
 #: src/components/trade/orderbook/order-book-panel.tsx:183
 msgid "Order Book"
@@ -786,7 +794,7 @@ msgstr "{p}% सेट करें"
 msgid "Set TP/SL"
 msgstr "TP/SL सेट करें"
 
-#: src/components/trade/components/global-settings-dialog.tsx:89
+#: src/components/trade/components/global-settings-dialog.tsx:95
 #: src/components/trade/header/top-nav.tsx:107
 msgid "Settings"
 msgstr "सेटिंग्स"
@@ -797,23 +805,23 @@ msgstr "सेटिंग्स"
 msgid "Short"
 msgstr "शॉर्ट"
 
-#: src/components/trade/components/global-settings-dialog.tsx:181
+#: src/components/trade/components/global-settings-dialog.tsx:214
 msgid "Show Executions on Chart"
 msgstr "चार्ट पर निष्पादन दिखाएं"
 
-#: src/components/trade/components/global-settings-dialog.tsx:165
+#: src/components/trade/components/global-settings-dialog.tsx:198
 msgid "Show Orders on Chart"
 msgstr "चार्ट पर ऑर्डर दिखाएं"
 
-#: src/components/trade/components/global-settings-dialog.tsx:171
+#: src/components/trade/components/global-settings-dialog.tsx:204
 msgid "Show Positions on Chart"
 msgstr "चार्ट पर पोजीशन दिखाएं"
 
-#: src/components/trade/components/global-settings-dialog.tsx:191
+#: src/components/trade/components/global-settings-dialog.tsx:224
 msgid "Show Scanlines"
 msgstr "स्कैनलाइन दिखाएं"
 
-#: src/components/trade/components/global-settings-dialog.tsx:210
+#: src/components/trade/components/global-settings-dialog.tsx:243
 msgid "Show Values in USD"
 msgstr "USD में मान दिखाएं"
 

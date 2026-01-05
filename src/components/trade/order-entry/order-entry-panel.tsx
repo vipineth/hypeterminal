@@ -596,7 +596,7 @@ export function OrderEntryPanel() {
 						onValueChange={handleSliderChange}
 						max={100}
 						step={0.1}
-						className="py-4"
+						className="py-5"
 						disabled={isFormDisabled || maxSize <= 0}
 					/>
 

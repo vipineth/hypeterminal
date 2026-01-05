@@ -86,7 +86,7 @@ msgstr "الرصيد"
 msgid "Block:"
 msgstr "الكتلة:"
 
-#: src/components/trade/components/global-settings-dialog.tsx:136
+#: src/components/trade/components/global-settings-dialog.tsx:169
 msgid "bps"
 msgstr "نقطة أساس"
 
@@ -151,7 +151,7 @@ msgstr "جارٍ الإلغاء..."
 msgid "cancelled"
 msgstr "ملغى"
 
-#: src/components/trade/components/global-settings-dialog.tsx:160
+#: src/components/trade/components/global-settings-dialog.tsx:193
 msgid "Chart"
 msgstr "الرسم البياني"
 
@@ -250,7 +250,7 @@ msgstr "متقاطع"
 msgid "Cross Leverage"
 msgstr "الرافعة المتقاطعة"
 
-#: src/components/trade/components/global-settings-dialog.tsx:90
+#: src/components/trade/components/global-settings-dialog.tsx:96
 msgid "Customize your trading experience."
 msgstr "خصص تجربة التداول الخاصة بك."
 
@@ -278,7 +278,7 @@ msgstr "قطع الاتصال"
 msgid "Dismiss"
 msgstr "تجاهل"
 
-#: src/components/trade/components/global-settings-dialog.tsx:97
+#: src/components/trade/components/global-settings-dialog.tsx:103
 msgid "Display Language"
 msgstr "لغة العرض"
 
@@ -378,6 +378,10 @@ msgstr "منفذ"
 #: src/components/trade/chart/token-selector.tsx:95
 msgid "Filter by {0}"
 msgstr "تصفية حسب {0}"
+
+#: src/components/trade/components/global-settings-dialog.tsx:129
+msgid "Format for numbers and dates"
+msgstr ""
 
 #: src/components/trade/chart/constants.ts:90
 msgid "Funding"
@@ -526,7 +530,7 @@ msgstr "بيانات السوق غير متوفرة."
 msgid "Market not ready"
 msgstr "السوق غير جاهز"
 
-#: src/components/trade/components/global-settings-dialog.tsx:122
+#: src/components/trade/components/global-settings-dialog.tsx:155
 msgid "Market Order Slippage"
 msgstr "انزلاق أمر السوق"
 
@@ -538,7 +542,7 @@ msgstr "أسواق"
 msgid "Max"
 msgstr "الأقصى"
 
-#: src/components/trade/components/global-settings-dialog.tsx:123
+#: src/components/trade/components/global-settings-dialog.tsx:156
 msgid "Max slippage allowed for market orders."
 msgstr "الحد الأقصى للانزلاق المسموح به لأوامر السوق."
 
@@ -619,6 +623,10 @@ msgstr "غير متصل"
 msgid "Notifications"
 msgstr "الإشعارات"
 
+#: src/components/trade/components/global-settings-dialog.tsx:126
+msgid "Number Format"
+msgstr ""
+
 #: src/components/trade/chart/chart-panel.tsx:61
 #: src/components/trade/market-overview.tsx:55
 msgid "OI"
@@ -641,7 +649,7 @@ msgstr "الأوامر المفتوحة"
 msgid "ORACLE"
 msgstr "أوراكل"
 
-#: src/components/trade/components/global-settings-dialog.tsx:206
+#: src/components/trade/components/global-settings-dialog.tsx:239
 #: src/components/trade/orderbook/order-book-panel.tsx:181
 #: src/components/trade/orderbook/order-book-panel.tsx:183
 msgid "Order Book"
@@ -786,7 +794,7 @@ msgstr "تعيين {p}%"
 msgid "Set TP/SL"
 msgstr "تعيين TP/SL"
 
-#: src/components/trade/components/global-settings-dialog.tsx:89
+#: src/components/trade/components/global-settings-dialog.tsx:95
 #: src/components/trade/header/top-nav.tsx:107
 msgid "Settings"
 msgstr "الإعدادات"
@@ -797,23 +805,23 @@ msgstr "الإعدادات"
 msgid "Short"
 msgstr "بيع"
 
-#: src/components/trade/components/global-settings-dialog.tsx:181
+#: src/components/trade/components/global-settings-dialog.tsx:214
 msgid "Show Executions on Chart"
 msgstr "إظهار التنفيذات على الرسم البياني"
 
-#: src/components/trade/components/global-settings-dialog.tsx:165
+#: src/components/trade/components/global-settings-dialog.tsx:198
 msgid "Show Orders on Chart"
 msgstr "إظهار الأوامر على الرسم البياني"
 
-#: src/components/trade/components/global-settings-dialog.tsx:171
+#: src/components/trade/components/global-settings-dialog.tsx:204
 msgid "Show Positions on Chart"
 msgstr "إظهار المراكز على الرسم البياني"
 
-#: src/components/trade/components/global-settings-dialog.tsx:191
+#: src/components/trade/components/global-settings-dialog.tsx:224
 msgid "Show Scanlines"
 msgstr "إظهار خطوط المسح"
 
-#: src/components/trade/components/global-settings-dialog.tsx:210
+#: src/components/trade/components/global-settings-dialog.tsx:243
 msgid "Show Values in USD"
 msgstr "إظهار القيم بالدولار"
 

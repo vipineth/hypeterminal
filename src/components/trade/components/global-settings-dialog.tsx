@@ -12,7 +12,7 @@ import {
 	MARKET_ORDER_SLIPPAGE_MAX_BPS,
 	MARKET_ORDER_SLIPPAGE_MIN_BPS,
 } from "@/constants/app";
-import { dynamicActivate, type LocaleCode, localeList } from "@/lib/i18n";
+import { dynamicActivate, type LocaleCode, localeList, type NumberFormatLocale, numberFormatLocaleList } from "@/lib/i18n";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
 import { useMarketOrderSlippageBps, useTradeSettingsActions } from "@/stores/use-trade-settings-store";
 
@@ -31,6 +31,7 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 		showExecutionsOnChart,
 		showOrderbookInUsd,
 		showChartScanlines,
+		numberFormatLocale,
 	} = useGlobalSettings();
 	const {
 		setShowOrdersOnChart,
@@ -38,6 +39,7 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 		setShowExecutionsOnChart,
 		setShowOrderbookInUsd,
 		setShowChartScanlines,
+		setNumberFormatLocale,
 	} = useGlobalSettingsActions();
 
 	const [slippageInput, setSlippageInput] = useState(String(slippageBps));
@@ -82,6 +84,10 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 		dynamicActivate(locale);
 	};
 
+	const handleNumberFormatChange = (locale: NumberFormatLocale) => {
+		setNumberFormatLocale(locale);
+	};
+
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-md">
@@ -105,6 +111,33 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 							</SelectTrigger>
 							<SelectContent>
 								{localeList.map(({ code, name }) => (
+									<SelectItem key={code} value={code}>
+										{name}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
+
+					{/* Number Format */}
+					<div className="flex items-center justify-between gap-4">
+						<div className="space-y-0.5">
+							<div className="text-xs text-muted-foreground">
+								<Trans>Number Format</Trans>
+							</div>
+							<div className="text-4xs text-muted-foreground/70">
+								<Trans>Format for numbers and dates</Trans>
+							</div>
+						</div>
+						<Select
+							value={numberFormatLocale}
+							onValueChange={(value) => handleNumberFormatChange(value as NumberFormatLocale)}
+						>
+							<SelectTrigger className="w-48">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{numberFormatLocaleList.map(({ code, name }) => (
 									<SelectItem key={code} value={code}>
 										{name}
 									</SelectItem>

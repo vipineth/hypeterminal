@@ -1,4 +1,5 @@
 import { FALLBACK_VALUE_PLACEHOLDER, FORMAT_COMPACT_DEFAULT, FORMAT_COMPACT_THRESHOLD } from "@/constants/app";
+import { getResolvedFormatLocale } from "@/stores/use-global-settings-store";
 
 type Formatter = Intl.NumberFormat | Intl.DateTimeFormat | Intl.RelativeTimeFormat;
 type DateInput = Date | number | string | null | undefined;
@@ -105,7 +106,7 @@ export function formatUSD(value: number | null | undefined, opts?: number | Form
 		maximumFractionDigits: digits ?? 2,
 		...(shouldCompact && { notation: "compact", compactDisplay: "short" }),
 	};
-	return getFormatter("number", "en-US", mergeOptions(defaults, rest)).format(value);
+	return getFormatter("number", getResolvedFormatLocale(), mergeOptions(defaults, rest)).format(value);
 }
 
 /**
@@ -149,7 +150,7 @@ export function formatPrice(value: number | null | undefined, opts?: FormatPrice
 		...(shouldCompact && { notation: "compact", compactDisplay: "short" }),
 	};
 
-	return getFormatter("number", "en-US", mergeOptions(defaults, rest)).format(value);
+	return getFormatter("number", getResolvedFormatLocale(), mergeOptions(defaults, rest)).format(value);
 }
 
 /**
@@ -170,7 +171,7 @@ export function formatPriceRaw(value: number | null | undefined, szDecimals?: nu
 		maximumFractionDigits: decimals,
 	};
 
-	return getFormatter("number", "en-US", defaults).format(value);
+	return getFormatter("number", getResolvedFormatLocale(), defaults).format(value);
 }
 
 /**
@@ -201,7 +202,7 @@ export function formatToken(value: number | null | undefined, opts?: number | st
 		maximumFractionDigits: digits ?? 5,
 	};
 
-	const number = getFormatter("number", "en-US", mergeOptions(defaults, rest)).format(value);
+	const number = getFormatter("number", getResolvedFormatLocale(), mergeOptions(defaults, rest)).format(value);
 	return symbol ? `${number} ${symbol}` : number;
 }
 
@@ -221,7 +222,7 @@ export function formatPercent(value: number | null | undefined, opts?: number | 
 		maximumFractionDigits: digits ?? 2,
 		signDisplay: "exceptZero",
 	};
-	return getFormatter("number", "en-US", mergeOptions(defaults, rest)).format(value);
+	return getFormatter("number", getResolvedFormatLocale(), mergeOptions(defaults, rest)).format(value);
 }
 
 /**
@@ -247,7 +248,7 @@ export function formatNumber(value: string | number | null | undefined, opts?: n
 		const decimalIndex = value.indexOf(".");
 		const decimals = decimalIndex === -1 ? 0 : value.length - decimalIndex - 1;
 
-		return getFormatter("number", "en-US", {
+		return getFormatter("number", getResolvedFormatLocale(), {
 			style: "decimal",
 			minimumFractionDigits: decimals,
 			maximumFractionDigits: decimals,
@@ -263,7 +264,7 @@ export function formatNumber(value: string | number | null | undefined, opts?: n
 		minimumFractionDigits: digits ?? 0,
 		maximumFractionDigits: digits ?? 3,
 	};
-	return getFormatter("number", "en-US", mergeOptions(defaults, rest)).format(value);
+	return getFormatter("number", getResolvedFormatLocale(), mergeOptions(defaults, rest)).format(value);
 }
 
 /**
@@ -302,7 +303,7 @@ export function formatDate(value: DateInput, opts?: FormatDateOptions): string {
 		...rest,
 	};
 
-	return getFormatter("date", locale, defaults).format(toDate(value));
+	return getFormatter("date", locale ?? getResolvedFormatLocale(), defaults).format(toDate(value));
 }
 
 /**
@@ -320,7 +321,7 @@ export function formatTime(value: DateInput, opts?: FormatDateOptions): string {
 		...rest,
 	};
 
-	return getFormatter("date", locale, defaults).format(toDate(value));
+	return getFormatter("date", locale ?? getResolvedFormatLocale(), defaults).format(toDate(value));
 }
 
 /**
@@ -338,7 +339,7 @@ export function formatDateTime(value: DateInput, opts?: FormatDateOptions): stri
 		...rest,
 	};
 
-	return getFormatter("date", locale, defaults).format(toDate(value));
+	return getFormatter("date", locale ?? getResolvedFormatLocale(), defaults).format(toDate(value));
 }
 
 const RELATIVE_TIME_UNITS: Array<{ unit: Intl.RelativeTimeFormatUnit; ms: number }> = [
@@ -365,6 +366,7 @@ export function formatRelativeTime(value: DateInput, opts?: FormatRelativeTimeOp
 	if (!isValidDate(value)) return FALLBACK_VALUE_PLACEHOLDER;
 
 	const { locale, ...rest } = opts ?? {};
+	const resolvedLocale = locale ?? getResolvedFormatLocale();
 	const defaults: Intl.RelativeTimeFormatOptions = {
 		numeric: "auto",
 		style: "long",
@@ -378,9 +380,9 @@ export function formatRelativeTime(value: DateInput, opts?: FormatRelativeTimeOp
 	for (const { unit, ms } of RELATIVE_TIME_UNITS) {
 		if (absDiff >= ms || unit === "second") {
 			const amount = Math.round(diff / ms);
-			return getFormatter("relative", locale, defaults).format(amount, unit);
+			return getFormatter("relative", resolvedLocale, defaults).format(amount, unit);
 		}
 	}
 
-	return getFormatter("relative", locale, defaults).format(0, "second");
+	return getFormatter("relative", resolvedLocale, defaults).format(0, "second");
 }

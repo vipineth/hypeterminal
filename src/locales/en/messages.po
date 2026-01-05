@@ -86,7 +86,7 @@ msgstr "Balance"
 msgid "Block:"
 msgstr "Block:"
 
-#: src/components/trade/components/global-settings-dialog.tsx:136
+#: src/components/trade/components/global-settings-dialog.tsx:169
 msgid "bps"
 msgstr "bps"
 
@@ -151,7 +151,7 @@ msgstr "Canceling..."
 msgid "cancelled"
 msgstr "cancelled"
 
-#: src/components/trade/components/global-settings-dialog.tsx:160
+#: src/components/trade/components/global-settings-dialog.tsx:193
 msgid "Chart"
 msgstr "Chart"
 
@@ -250,7 +250,7 @@ msgstr "Cross"
 msgid "Cross Leverage"
 msgstr "Cross Leverage"
 
-#: src/components/trade/components/global-settings-dialog.tsx:90
+#: src/components/trade/components/global-settings-dialog.tsx:96
 msgid "Customize your trading experience."
 msgstr "Customize your trading experience."
 
@@ -278,7 +278,7 @@ msgstr "Disconnect"
 msgid "Dismiss"
 msgstr "Dismiss"
 
-#: src/components/trade/components/global-settings-dialog.tsx:97
+#: src/components/trade/components/global-settings-dialog.tsx:103
 msgid "Display Language"
 msgstr "Display Language"
 
@@ -378,6 +378,10 @@ msgstr "Filled"
 #: src/components/trade/chart/token-selector.tsx:95
 msgid "Filter by {0}"
 msgstr "Filter by {0}"
+
+#: src/components/trade/components/global-settings-dialog.tsx:129
+msgid "Format for numbers and dates"
+msgstr "Format for numbers and dates"
 
 #: src/components/trade/chart/constants.ts:90
 msgid "Funding"
@@ -530,7 +534,7 @@ msgstr "Market metadata unavailable."
 msgid "Market not ready"
 msgstr "Market not ready"
 
-#: src/components/trade/components/global-settings-dialog.tsx:122
+#: src/components/trade/components/global-settings-dialog.tsx:155
 msgid "Market Order Slippage"
 msgstr "Market Order Slippage"
 
@@ -542,7 +546,7 @@ msgstr "markets"
 msgid "Max"
 msgstr "Max"
 
-#: src/components/trade/components/global-settings-dialog.tsx:123
+#: src/components/trade/components/global-settings-dialog.tsx:156
 msgid "Max slippage allowed for market orders."
 msgstr "Max slippage allowed for market orders."
 
@@ -623,6 +627,10 @@ msgstr "Not connected"
 msgid "Notifications"
 msgstr "Notifications"
 
+#: src/components/trade/components/global-settings-dialog.tsx:126
+msgid "Number Format"
+msgstr "Number Format"
+
 #: src/components/trade/chart/chart-panel.tsx:61
 #: src/components/trade/market-overview.tsx:55
 msgid "OI"
@@ -645,7 +653,7 @@ msgstr "Open Orders"
 msgid "ORACLE"
 msgstr "ORACLE"
 
-#: src/components/trade/components/global-settings-dialog.tsx:206
+#: src/components/trade/components/global-settings-dialog.tsx:239
 #: src/components/trade/orderbook/order-book-panel.tsx:181
 #: src/components/trade/orderbook/order-book-panel.tsx:183
 msgid "Order Book"
@@ -790,7 +798,7 @@ msgstr "Set {p}%"
 msgid "Set TP/SL"
 msgstr "Set TP/SL"
 
-#: src/components/trade/components/global-settings-dialog.tsx:89
+#: src/components/trade/components/global-settings-dialog.tsx:95
 #: src/components/trade/header/top-nav.tsx:107
 msgid "Settings"
 msgstr "Settings"
@@ -801,23 +809,23 @@ msgstr "Settings"
 msgid "Short"
 msgstr "Short"
 
-#: src/components/trade/components/global-settings-dialog.tsx:181
+#: src/components/trade/components/global-settings-dialog.tsx:214
 msgid "Show Executions on Chart"
 msgstr "Show Executions on Chart"
 
-#: src/components/trade/components/global-settings-dialog.tsx:165
+#: src/components/trade/components/global-settings-dialog.tsx:198
 msgid "Show Orders on Chart"
 msgstr "Show Orders on Chart"
 
-#: src/components/trade/components/global-settings-dialog.tsx:171
+#: src/components/trade/components/global-settings-dialog.tsx:204
 msgid "Show Positions on Chart"
 msgstr "Show Positions on Chart"
 
-#: src/components/trade/components/global-settings-dialog.tsx:191
+#: src/components/trade/components/global-settings-dialog.tsx:224
 msgid "Show Scanlines"
 msgstr "Show Scanlines"
 
-#: src/components/trade/components/global-settings-dialog.tsx:210
+#: src/components/trade/components/global-settings-dialog.tsx:243
 msgid "Show Values in USD"
 msgstr "Show Values in USD"
 

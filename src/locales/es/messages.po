@@ -86,7 +86,7 @@ msgstr "Saldo"
 msgid "Block:"
 msgstr "Bloque:"
 
-#: src/components/trade/components/global-settings-dialog.tsx:136
+#: src/components/trade/components/global-settings-dialog.tsx:169
 msgid "bps"
 msgstr "pbs"
 
@@ -151,7 +151,7 @@ msgstr "Cancelando..."
 msgid "cancelled"
 msgstr "cancelado"
 
-#: src/components/trade/components/global-settings-dialog.tsx:160
+#: src/components/trade/components/global-settings-dialog.tsx:193
 msgid "Chart"
 msgstr "Gráfico"
 
@@ -250,7 +250,7 @@ msgstr "Cruzado"
 msgid "Cross Leverage"
 msgstr "Apalancamiento cruzado"
 
-#: src/components/trade/components/global-settings-dialog.tsx:90
+#: src/components/trade/components/global-settings-dialog.tsx:96
 msgid "Customize your trading experience."
 msgstr "Personaliza tu experiencia de trading."
 
@@ -278,7 +278,7 @@ msgstr "Desconectar"
 msgid "Dismiss"
 msgstr "Descartar"
 
-#: src/components/trade/components/global-settings-dialog.tsx:97
+#: src/components/trade/components/global-settings-dialog.tsx:103
 msgid "Display Language"
 msgstr "Idioma de visualización"
 
@@ -378,6 +378,10 @@ msgstr "Ejecutado"
 #: src/components/trade/chart/token-selector.tsx:95
 msgid "Filter by {0}"
 msgstr "Filtrar por {0}"
+
+#: src/components/trade/components/global-settings-dialog.tsx:129
+msgid "Format for numbers and dates"
+msgstr ""
 
 #: src/components/trade/chart/constants.ts:90
 msgid "Funding"
@@ -526,7 +530,7 @@ msgstr "Metadatos del mercado no disponibles."
 msgid "Market not ready"
 msgstr "Mercado no listo"
 
-#: src/components/trade/components/global-settings-dialog.tsx:122
+#: src/components/trade/components/global-settings-dialog.tsx:155
 msgid "Market Order Slippage"
 msgstr "Deslizamiento de orden de mercado"
 
@@ -538,7 +542,7 @@ msgstr "mercados"
 msgid "Max"
 msgstr "Máx"
 
-#: src/components/trade/components/global-settings-dialog.tsx:123
+#: src/components/trade/components/global-settings-dialog.tsx:156
 msgid "Max slippage allowed for market orders."
 msgstr "Deslizamiento máximo permitido para órdenes de mercado."
 
@@ -619,6 +623,10 @@ msgstr "No conectado"
 msgid "Notifications"
 msgstr "Notificaciones"
 
+#: src/components/trade/components/global-settings-dialog.tsx:126
+msgid "Number Format"
+msgstr ""
+
 #: src/components/trade/chart/chart-panel.tsx:61
 #: src/components/trade/market-overview.tsx:55
 msgid "OI"
@@ -641,7 +649,7 @@ msgstr "Órdenes abiertas"
 msgid "ORACLE"
 msgstr "ORÁCULO"
 
-#: src/components/trade/components/global-settings-dialog.tsx:206
+#: src/components/trade/components/global-settings-dialog.tsx:239
 #: src/components/trade/orderbook/order-book-panel.tsx:181
 #: src/components/trade/orderbook/order-book-panel.tsx:183
 msgid "Order Book"
@@ -786,7 +794,7 @@ msgstr "Establecer {p}%"
 msgid "Set TP/SL"
 msgstr "Establecer TP/SL"
 
-#: src/components/trade/components/global-settings-dialog.tsx:89
+#: src/components/trade/components/global-settings-dialog.tsx:95
 #: src/components/trade/header/top-nav.tsx:107
 msgid "Settings"
 msgstr "Configuración"
@@ -797,23 +805,23 @@ msgstr "Configuración"
 msgid "Short"
 msgstr "Corto"
 
-#: src/components/trade/components/global-settings-dialog.tsx:181
+#: src/components/trade/components/global-settings-dialog.tsx:214
 msgid "Show Executions on Chart"
 msgstr "Mostrar ejecuciones en gráfico"
 
-#: src/components/trade/components/global-settings-dialog.tsx:165
+#: src/components/trade/components/global-settings-dialog.tsx:198
 msgid "Show Orders on Chart"
 msgstr "Mostrar órdenes en gráfico"
 
-#: src/components/trade/components/global-settings-dialog.tsx:171
+#: src/components/trade/components/global-settings-dialog.tsx:204
 msgid "Show Positions on Chart"
 msgstr "Mostrar posiciones en gráfico"
 
-#: src/components/trade/components/global-settings-dialog.tsx:191
+#: src/components/trade/components/global-settings-dialog.tsx:224
 msgid "Show Scanlines"
 msgstr "Mostrar líneas de escaneo"
 
-#: src/components/trade/components/global-settings-dialog.tsx:210
+#: src/components/trade/components/global-settings-dialog.tsx:243
 msgid "Show Values in USD"
 msgstr "Mostrar valores en USD"
 
