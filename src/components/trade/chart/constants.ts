@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { createColumnHelper } from "@tanstack/react-table";
 import {
 	CHART_ALL_MIDS_TTL_MS,
@@ -19,7 +20,6 @@ import {
 	CHART_SUPPORTED_RESOLUTIONS,
 	CHART_TIME_FRAMES,
 	CHART_TIMEZONE,
-	UI_TEXT,
 } from "@/constants/app";
 import type { MarketCtxNumbers } from "@/lib/market";
 import type { PerpAssetCtx } from "@/types/hyperliquid";
@@ -55,41 +55,39 @@ export type MarketRow = PerpMarketInfo & {
 
 const columnHelper = createColumnHelper<MarketRow>();
 
-const TOKEN_SELECTOR_TEXT = UI_TEXT.TOKEN_SELECTOR;
-
 export const TOKEN_SELECTOR_COLUMNS = [
 	columnHelper.accessor("coin", {
-		header: TOKEN_SELECTOR_TEXT.HEADER_MARKET,
+		header: t`Market`,
 		size: 160,
 		enableSorting: false,
 	}),
-columnHelper.accessor((row) => row.ctxNumbers?.markPx ?? 0, {
+	columnHelper.accessor((row) => row.ctxNumbers?.markPx ?? 0, {
 		id: "price",
-		header: TOKEN_SELECTOR_TEXT.HEADER_PRICE,
+		header: t`Price`,
 		size: 80,
 		enableSorting: true,
 	}),
-columnHelper.accessor((row) => calculate24hPriceChange(row.ctxNumbers) ?? 0, {
+	columnHelper.accessor((row) => calculate24hPriceChange(row.ctxNumbers) ?? 0, {
 		id: "24h-change",
-		header: TOKEN_SELECTOR_TEXT.HEADER_CHANGE_24H,
+		header: t`24h Price`,
 		size: 80,
 		enableSorting: true,
 	}),
-columnHelper.accessor((row) => calculateOpenInterestUSD(row.ctxNumbers) ?? 0, {
+	columnHelper.accessor((row) => calculateOpenInterestUSD(row.ctxNumbers) ?? 0, {
 		id: "oi",
-		header: TOKEN_SELECTOR_TEXT.HEADER_OPEN_INTEREST,
+		header: t`Open Interest`,
 		size: 80,
 		enableSorting: true,
 	}),
 	columnHelper.accessor((row) => row.ctxNumbers?.dayNtlVlm ?? 0, {
 		id: "volume",
-		header: TOKEN_SELECTOR_TEXT.HEADER_VOLUME,
+		header: t`Volume`,
 		size: 80,
 		enableSorting: true,
 	}),
 	columnHelper.accessor((row) => row.ctxNumbers?.funding ?? 0, {
 		id: "funding",
-		header: TOKEN_SELECTOR_TEXT.HEADER_FUNDING,
+		header: t`Funding`,
 		size: 80,
 		enableSorting: true,
 	}),

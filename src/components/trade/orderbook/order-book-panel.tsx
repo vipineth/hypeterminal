@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { ArrowRightLeft, ChevronDown, TrendingDown, TrendingUp } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -6,7 +7,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
 import { useL2BookSubscription } from "@/hooks/hyperliquid/socket/use-l2-book-subscription";
 import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
 import { formatNumber, formatUSD } from "@/lib/format";
@@ -15,8 +16,6 @@ import { cn } from "@/lib/utils";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
 import { BookRow } from "./book-row";
 import { TradesView } from "./trades-view";
-
-const ORDERBOOK_TEXT = UI_TEXT.ORDERBOOK;
 
 interface PriceGroupOption {
 	tickSize: number;
@@ -179,9 +178,9 @@ export function OrderBookPanel() {
 							view === "book" ? "text-terminal-cyan" : "text-muted-foreground hover:text-foreground",
 						)}
 						tabIndex={0}
-						aria-label={ORDERBOOK_TEXT.ORDER_BOOK_ARIA}
+						aria-label={t`Order Book`}
 					>
-						{ORDERBOOK_TEXT.BOOK_LABEL}
+						{t`Order Book`}
 					</button>
 					<button
 						type="button"
@@ -191,9 +190,9 @@ export function OrderBookPanel() {
 							view === "trades" ? "text-terminal-cyan" : "text-muted-foreground hover:text-foreground",
 						)}
 						tabIndex={0}
-						aria-label={ORDERBOOK_TEXT.RECENT_TRADES_ARIA}
+						aria-label={t`Recent Trades`}
 					>
-						{ORDERBOOK_TEXT.TRADES_LABEL}
+						{t`Trades`}
 					</button>
 				</div>
 				{view === "book" && (
@@ -203,7 +202,7 @@ export function OrderBookPanel() {
 								type="button"
 								className="px-1.5 py-0.5 text-4xs border border-border/60 hover:border-foreground/30 inline-flex items-center gap-1"
 								tabIndex={0}
-								aria-label={ORDERBOOK_TEXT.SELECT_AGGREGATION_ARIA}
+								aria-label={t`Select order book aggregation`}
 							>
 								{selectedOption?.label ?? priceGroupingOptions[0]?.label ?? "—"}
 								<ChevronDown className="size-2.5" />
@@ -231,13 +230,13 @@ export function OrderBookPanel() {
 			{view === "book" ? (
 				<div className="flex-1 min-h-0 flex flex-col">
 					<div className="grid grid-cols-3 gap-2 px-2 py-1 text-4xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40 shrink-0">
-						<div>{ORDERBOOK_TEXT.HEADER_PRICE}</div>
+						<div>{t`Price`}</div>
 						<button
 							type="button"
 							onClick={() => setShowOrderbookInUsd(!showOrderbookInUsd)}
 							className="text-right hover:text-foreground transition-colors inline-flex items-center justify-end gap-0.5"
 						>
-							{ORDERBOOK_TEXT.HEADER_SIZE}
+							{t`Size`}
 							<span className="opacity-60">({showOrderbookInUsd ? "$" : coin})</span>
 							<ArrowRightLeft className="size-2 opacity-40" />
 						</button>
@@ -246,7 +245,7 @@ export function OrderBookPanel() {
 							onClick={() => setShowOrderbookInUsd(!showOrderbookInUsd)}
 							className="text-right hover:text-foreground transition-colors inline-flex items-center justify-end gap-0.5"
 						>
-							{ORDERBOOK_TEXT.HEADER_TOTAL}
+							{t`Total`}
 							<span className="opacity-60">({showOrderbookInUsd ? "$" : coin})</span>
 							<ArrowRightLeft className="size-2 opacity-40" />
 						</button>
@@ -271,7 +270,7 @@ export function OrderBookPanel() {
 							</div>
 						) : (
 							<div className="flex-1 flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-								{bookStatus === "error" ? ORDERBOOK_TEXT.FAILED : ORDERBOOK_TEXT.WAITING}
+								{bookStatus === "error" ? t`Failed to load order book.` : t`Waiting for order book...`}
 							</div>
 						)}
 
@@ -288,7 +287,7 @@ export function OrderBookPanel() {
 							)}
 							<span className="text-4xs text-muted-foreground">
 								{typeof mid === "number" && Number.isFinite(mid)
-									? `${ORDERBOOK_TEXT.APPROX_PREFIX}${formatUSD(mid, { digits: 2, compact: false })}`
+									? `≈ ${formatUSD(mid, { digits: 2, compact: false })}`
 									: ""}
 							</span>
 						</div>
@@ -310,7 +309,7 @@ export function OrderBookPanel() {
 					</div>
 
 					<div className="mt-auto shrink-0 px-2 py-1.5 border-t border-border/40 flex items-center justify-between text-4xs text-muted-foreground">
-						<span>{ORDERBOOK_TEXT.SPREAD_LABEL}</span>
+						<span>{t`Spread`}</span>
 						<span className="tabular-nums text-terminal-amber">
 							{typeof spread === "number" &&
 							Number.isFinite(spread) &&
@@ -322,7 +321,7 @@ export function OrderBookPanel() {
 					</div>
 					{bookStatus === "error" ? (
 						<div className="shrink-0 px-2 pb-1.5 text-4xs text-terminal-red/80">
-							{bookError instanceof Error ? bookError.message : ORDERBOOK_TEXT.WEBSOCKET_ERROR}
+							{bookError instanceof Error ? bookError.message : t`WebSocket error`}
 						</div>
 					) : null}
 				</div>

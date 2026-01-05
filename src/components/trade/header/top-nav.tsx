@@ -10,8 +10,8 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { DepositModal } from "../order-entry/deposit-modal";
 import { GlobalSettingsDialog } from "../components/global-settings-dialog";
+import { DepositModal } from "../order-entry/deposit-modal";
 import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
 

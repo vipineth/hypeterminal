@@ -1,9 +1,10 @@
+import { t } from "@lingui/core/macro";
 import { Wallet } from "lucide-react";
 import { useMemo } from "react";
 import { useConnection } from "wagmi";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
 import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
 import { useSpotClearinghouseState } from "@/hooks/hyperliquid/use-spot-clearinghouse-state";
 import { formatToken, formatUSD } from "@/lib/format";
@@ -19,8 +20,6 @@ type BalanceRow = {
 	total: number;
 	usdValue: number;
 };
-
-const BALANCES_TEXT = UI_TEXT.BALANCES_TAB;
 
 export function BalancesTab() {
 	const { address, isConnected } = useConnection();
@@ -102,7 +101,7 @@ export function BalancesTab() {
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-2">
 				<Wallet className="size-3" />
-				{BALANCES_TEXT.TITLE}
+				{t`Account Balances`}
 				<span className="text-terminal-cyan ml-auto tabular-nums">
 					{isConnected && !isLoading ? formatUSD(totalValue, { compact: true }) : FALLBACK_VALUE_PLACEHOLDER}
 				</span>
@@ -110,19 +109,19 @@ export function BalancesTab() {
 			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
 				{!isConnected ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{BALANCES_TEXT.CONNECT}
+						{t`Connect your wallet to view balances.`}
 					</div>
 				) : isLoading ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{BALANCES_TEXT.LOADING}
+						{t`Loading balances...`}
 					</div>
 				) : hasError ? (
 					<div className="h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs text-terminal-red/80">
-						<span>{BALANCES_TEXT.FAILED}</span>
+						<span>{t`Failed to load balances.`}</span>
 					</div>
 				) : balances.length === 0 ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{BALANCES_TEXT.EMPTY}
+						{t`No balances found. Deposit funds to start trading.`}
 					</div>
 				) : (
 					<ScrollArea className="h-full w-full">
@@ -130,19 +129,19 @@ export function BalancesTab() {
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
-										{BALANCES_TEXT.HEADER_ASSET}
+										{t`Asset`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{BALANCES_TEXT.HEADER_AVAILABLE}
+										{t`Available`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{BALANCES_TEXT.HEADER_IN_USE}
+										{t`In Use`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{BALANCES_TEXT.HEADER_TOTAL}
+										{t`Total`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{BALANCES_TEXT.HEADER_USD_VALUE}
+										{t`USD Value`}
 									</TableHead>
 								</TableRow>
 							</TableHeader>
@@ -161,7 +160,7 @@ export function BalancesTab() {
 															: "bg-terminal-amber/20 text-terminal-amber",
 													)}
 												>
-													{row.type === "perp" ? BALANCES_TEXT.TYPE_PERP : BALANCES_TEXT.TYPE_SPOT}
+													{row.type === "perp" ? t`perp` : t`spot`}
 												</span>
 											</div>
 										</TableCell>

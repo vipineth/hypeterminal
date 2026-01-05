@@ -1,21 +1,21 @@
 import { Circle } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
+import { useConnection, useWalletClient } from "wagmi";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
-import { cn } from "@/lib/utils";
+import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
+import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
+import { usePerpAssetCtxsSnapshot } from "@/hooks/hyperliquid/use-perp-asset-ctxs-snapshot";
+import { useTradingAgent } from "@/hooks/hyperliquid/use-trading-agent";
 import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
 import { getHttpTransport } from "@/lib/hyperliquid/clients";
-import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
-import { usePerpAssetCtxsSnapshot } from "@/hooks/hyperliquid/use-perp-asset-ctxs-snapshot";
-import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
-import { useTradingAgent } from "@/hooks/hyperliquid/use-trading-agent";
 import { makeExchangeConfig, placeSingleOrder } from "@/lib/hyperliquid/exchange";
+import { toHyperliquidWallet } from "@/lib/hyperliquid/wallet";
 import { parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
-import { toHyperliquidWallet } from "@/lib/hyperliquid/wallet";
+import { cn } from "@/lib/utils";
 import { useMarketOrderSlippageBps } from "@/stores/use-trade-settings-store";
-import { useConnection, useWalletClient } from "wagmi";
 import { TokenAvatar } from "../components/token-avatar";
 
 const POSITIONS_TEXT = UI_TEXT.POSITIONS_TAB;
@@ -93,7 +93,9 @@ export function PositionsTab() {
 					: FALLBACK_VALUE_PLACEHOLDER,
 				entryText: Number.isFinite(entryPx) ? formatPrice(entryPx, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER,
 				markText: Number.isFinite(markPx) ? formatPrice(markPx, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER,
-				liqText: Number.isFinite(liquidationPx) ? formatPrice(liquidationPx, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER,
+				liqText: Number.isFinite(liquidationPx)
+					? formatPrice(liquidationPx, { szDecimals })
+					: FALLBACK_VALUE_PLACEHOLDER,
 				pnlText: Number.isFinite(unrealizedPnl)
 					? formatUSD(unrealizedPnl, { signDisplay: "exceptZero" })
 					: FALLBACK_VALUE_PLACEHOLDER,
@@ -141,7 +143,7 @@ export function PositionsTab() {
 				const result = await placeSingleOrder(config, { order });
 				const status = result.response?.data?.statuses?.[0];
 				if (status && typeof status === "object" && "error" in status) {
-					throw new Error(status.error);
+					throw new Error(status.error as string);
 				}
 
 				await refetch();
@@ -175,7 +177,9 @@ export function PositionsTab() {
 				) : status === "error" ? (
 					<div className="h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs text-terminal-red/80">
 						<span>{POSITIONS_TEXT.FAILED}</span>
-						{error instanceof Error ? <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span> : null}
+						{error instanceof Error ? (
+							<span className="mt-1 text-4xs text-muted-foreground">{error.message}</span>
+						) : null}
 					</div>
 				) : positions.length === 0 ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">

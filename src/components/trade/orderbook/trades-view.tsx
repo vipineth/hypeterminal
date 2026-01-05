@@ -1,7 +1,7 @@
+import { t } from "@lingui/core/macro";
 import { ExternalLink } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { UI_TEXT } from "@/constants/app";
 import type { HyperliquidWsEvent } from "@/hooks/hyperliquid/socket/use-hyperliquid-ws";
 import { useTradesSubscription } from "@/hooks/hyperliquid/socket/use-trades-subscription";
 import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
@@ -12,8 +12,6 @@ import { getTradeKey } from "@/lib/trade/trades";
 import { cn } from "@/lib/utils";
 
 type Trade = HyperliquidWsEvent<"trades">[number];
-
-const TRADES_TEXT = UI_TEXT.TRADES;
 
 export function TradesView() {
 	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
@@ -65,13 +63,13 @@ export function TradesView() {
 	return (
 		<div className="flex-1 min-h-0 flex flex-col">
 			<div className="grid grid-cols-3 gap-2 px-2 py-1 text-4xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40">
-				<div>{TRADES_TEXT.HEADER_TIME}</div>
-				<div className="text-right">{TRADES_TEXT.HEADER_PRICE}</div>
-				<div className="text-right">{TRADES_TEXT.HEADER_SIZE}</div>
+				<div>{t`Time`}</div>
+				<div className="text-right">{t`Price`}</div>
+				<div className="text-right">{t`Size`}</div>
 			</div>
 			{tradeRows.length === 0 ? (
 				<div className="flex-1 flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-					{status === "error" ? TRADES_TEXT.FAILED : TRADES_TEXT.WAITING}
+					{status === "error" ? t`Failed to load trades.` : t`Waiting for trades...`}
 				</div>
 			) : (
 				<ScrollArea className="flex-1 min-h-0">
@@ -99,7 +97,7 @@ export function TradesView() {
 			)}
 			{status === "error" ? (
 				<div className="shrink-0 px-2 pb-1.5 text-4xs text-terminal-red/80">
-					{error instanceof Error ? error.message : TRADES_TEXT.WEBSOCKET_ERROR}
+					{error instanceof Error ? error.message : t`WebSocket error`}
 				</div>
 			) : null}
 		</div>

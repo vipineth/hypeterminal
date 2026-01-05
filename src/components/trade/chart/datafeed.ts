@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import type {
 	AllMidsResponse,
 	CandleSnapshotParameters,
@@ -24,7 +25,7 @@ import type {
 	ServerTimeCallback,
 	SubscribeBarsCallback,
 } from "@/types/charting_library";
-import { META_CACHE_TTL_MS, UI_TEXT } from "@/constants/app";
+import { META_CACHE_TTL_MS } from "@/constants/app";
 import { toFiniteNumber } from "@/lib/trade/numbers";
 import {
 	ALL_MIDS_TTL_MS,
@@ -36,8 +37,6 @@ import {
 	SUPPORTED_RESOLUTIONS,
 	TIMEZONE,
 } from "./constants";
-
-const DATAFEED_TEXT = UI_TEXT.CHART_DATAFEED;
 
 type CandleInterval = CandleSnapshotParameters["interval"];
 
@@ -399,7 +398,7 @@ export function createDatafeed(): IBasicDataFeed {
 				const symbol = symbolFromCoin(coin);
 
 				if (!(await isKnownCoin(coin))) {
-					onError(DATAFEED_TEXT.ERROR_UNKNOWN_SYMBOL(symbolName));
+					onError(t`Unknown symbol: ${symbolName}`);
 					return;
 				}
 
@@ -439,7 +438,7 @@ export function createDatafeed(): IBasicDataFeed {
 			void (async () => {
 				const interval = resolutionToInterval(resolution);
 				if (!interval) {
-					onError(DATAFEED_TEXT.ERROR_UNSUPPORTED_RESOLUTION(String(resolution)));
+					onError(t`Unsupported resolution: ${String(resolution)}`);
 					return;
 				}
 

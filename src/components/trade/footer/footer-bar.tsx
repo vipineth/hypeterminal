@@ -1,6 +1,8 @@
+import { ClientOnly } from "@tanstack/react-router";
 import { Wifi } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FOOTER_TIME_TICK_MS, UI_TEXT } from "@/constants/app";
+import { formatTime } from "@/lib/format";
 
 const FOOTER_TEXT = UI_TEXT.FOOTER;
 
@@ -32,10 +34,13 @@ export function FooterBar() {
 			</div>
 			<div className="flex items-center gap-3">
 				<span className="text-muted-foreground">
-					{FOOTER_TEXT.LATENCY_LABEL} <span className="tabular-nums text-terminal-green">{FOOTER_TEXT.LATENCY_VALUE}</span>
+					{FOOTER_TEXT.LATENCY_LABEL}{" "}
+					<span className="tabular-nums text-terminal-green">{FOOTER_TEXT.LATENCY_VALUE}</span>
 				</span>
 				<div className="h-3 w-px bg-border/60" />
-				<span className="text-muted-foreground tabular-nums">{time.toLocaleTimeString()}</span>
+				<ClientOnly>
+					<span className="text-muted-foreground tabular-nums">{formatTime(time)}</span>
+				</ClientOnly>
 				<div className="h-3 w-px bg-border/60" />
 				<span className="text-muted-foreground">{FOOTER_TEXT.VERSION}</span>
 			</div>

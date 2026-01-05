@@ -1,6 +1,9 @@
 import { FALLBACK_VALUE_PLACEHOLDER, FORMAT_COMPACT_DEFAULT, FORMAT_COMPACT_THRESHOLD } from "@/constants/app";
 
-const formatterCache = new Map<string, Intl.NumberFormat>();
+type Formatter = Intl.NumberFormat | Intl.DateTimeFormat | Intl.RelativeTimeFormat;
+type DateInput = Date | number | string | null | undefined;
+
+const formatterCache = new Map<string, Formatter>();
 
 export interface FormatOptions extends Intl.NumberFormatOptions {
 	digits?: number;
@@ -15,13 +18,42 @@ function isValidNumber(value: number | null | undefined): value is number {
 	return typeof value === "number" && !Number.isNaN(value) && Number.isFinite(value);
 }
 
-function getFormatter(locale: string | undefined, opts: Intl.NumberFormatOptions): Intl.NumberFormat {
-	// Create a unique key for the cache based on locale and options
-	// JSON.stringify is fast enough for small option objects
-	const key = `${locale || "default"}-${JSON.stringify(opts)}`;
+function isValidDate(value: DateInput): value is Date | number | string {
+	if (value === null || value === undefined) return false;
+	if (value instanceof Date) return !Number.isNaN(value.getTime());
+	if (typeof value === "number") return Number.isFinite(value);
+	if (typeof value === "string") return !Number.isNaN(Date.parse(value));
+	return false;
+}
+
+function toDate(value: Date | number | string): Date {
+	if (value instanceof Date) return value;
+	return new Date(value);
+}
+
+function getFormatter(type: "number", locale: string | undefined, opts: Intl.NumberFormatOptions): Intl.NumberFormat;
+function getFormatter(type: "date", locale: string | undefined, opts: Intl.DateTimeFormatOptions): Intl.DateTimeFormat;
+function getFormatter(
+	type: "relative",
+	locale: string | undefined,
+	opts: Intl.RelativeTimeFormatOptions,
+): Intl.RelativeTimeFormat;
+function getFormatter(
+	type: "number" | "date" | "relative",
+	locale: string | undefined,
+	opts: Intl.NumberFormatOptions | Intl.DateTimeFormatOptions | Intl.RelativeTimeFormatOptions,
+): Formatter {
+	const key = `${type}-${locale || "default"}-${JSON.stringify(opts)}`;
+	const resolvedLocale = locale || "en-US";
 
 	if (!formatterCache.has(key)) {
-		formatterCache.set(key, new Intl.NumberFormat(locale || "en-US", opts));
+		if (type === "number") {
+			formatterCache.set(key, new Intl.NumberFormat(resolvedLocale, opts as Intl.NumberFormatOptions));
+		} else if (type === "date") {
+			formatterCache.set(key, new Intl.DateTimeFormat(resolvedLocale, opts as Intl.DateTimeFormatOptions));
+		} else {
+			formatterCache.set(key, new Intl.RelativeTimeFormat(resolvedLocale, opts as Intl.RelativeTimeFormatOptions));
+		}
 	}
 
 	const formatter = formatterCache.get(key);
@@ -73,7 +105,7 @@ export function formatUSD(value: number | null | undefined, opts?: number | Form
 		maximumFractionDigits: digits ?? 2,
 		...(shouldCompact && { notation: "compact", compactDisplay: "short" }),
 	};
-	return getFormatter("en-US", mergeOptions(defaults, rest)).format(value);
+	return getFormatter("number", "en-US", mergeOptions(defaults, rest)).format(value);
 }
 
 /**
@@ -117,7 +149,7 @@ export function formatPrice(value: number | null | undefined, opts?: FormatPrice
 		...(shouldCompact && { notation: "compact", compactDisplay: "short" }),
 	};
 
-	return getFormatter("en-US", mergeOptions(defaults, rest)).format(value);
+	return getFormatter("number", "en-US", mergeOptions(defaults, rest)).format(value);
 }
 
 /**
@@ -138,7 +170,7 @@ export function formatPriceRaw(value: number | null | undefined, szDecimals?: nu
 		maximumFractionDigits: decimals,
 	};
 
-	return getFormatter("en-US", defaults).format(value);
+	return getFormatter("number", "en-US", defaults).format(value);
 }
 
 /**
@@ -169,7 +201,7 @@ export function formatToken(value: number | null | undefined, opts?: number | st
 		maximumFractionDigits: digits ?? 5,
 	};
 
-	const number = getFormatter("en-US", mergeOptions(defaults, rest)).format(value);
+	const number = getFormatter("number", "en-US", mergeOptions(defaults, rest)).format(value);
 	return symbol ? `${number} ${symbol}` : number;
 }
 
@@ -189,7 +221,7 @@ export function formatPercent(value: number | null | undefined, opts?: number | 
 		maximumFractionDigits: digits ?? 2,
 		signDisplay: "exceptZero",
 	};
-	return getFormatter("en-US", mergeOptions(defaults, rest)).format(value);
+	return getFormatter("number", "en-US", mergeOptions(defaults, rest)).format(value);
 }
 
 /**
@@ -215,7 +247,7 @@ export function formatNumber(value: string | number | null | undefined, opts?: n
 		const decimalIndex = value.indexOf(".");
 		const decimals = decimalIndex === -1 ? 0 : value.length - decimalIndex - 1;
 
-		return getFormatter("en-US", {
+		return getFormatter("number", "en-US", {
 			style: "decimal",
 			minimumFractionDigits: decimals,
 			maximumFractionDigits: decimals,
@@ -231,7 +263,7 @@ export function formatNumber(value: string | number | null | undefined, opts?: n
 		minimumFractionDigits: digits ?? 0,
 		maximumFractionDigits: digits ?? 3,
 	};
-	return getFormatter("en-US", mergeOptions(defaults, rest)).format(value);
+	return getFormatter("number", "en-US", mergeOptions(defaults, rest)).format(value);
 }
 
 /**
@@ -248,4 +280,107 @@ export function shortenAddress(address: string, startLength = 4, endLength = 4):
 		return `${address.slice(0, startLength + 2)}...${address.slice(-endLength)}`;
 	}
 	return `${address.slice(0, startLength)}...${address.slice(-endLength)}`;
+}
+
+export interface FormatDateOptions extends Intl.DateTimeFormatOptions {
+	locale?: string;
+}
+
+/**
+ * Format a date
+ * @example formatDate(new Date()) -> "Jan 5, 2026"
+ * @example formatDate(1704067200000) -> "Jan 1, 2024"
+ * @example formatDate("2024-01-01") -> "Jan 1, 2024"
+ * @example formatDate(new Date(), { dateStyle: "full" }) -> "Monday, January 5, 2026"
+ */
+export function formatDate(value: DateInput, opts?: FormatDateOptions): string {
+	if (!isValidDate(value)) return FALLBACK_VALUE_PLACEHOLDER;
+
+	const { locale, ...rest } = opts ?? {};
+	const defaults: Intl.DateTimeFormatOptions = {
+		dateStyle: "medium",
+		...rest,
+	};
+
+	return getFormatter("date", locale, defaults).format(toDate(value));
+}
+
+/**
+ * Format time only
+ * @example formatTime(new Date()) -> "2:30 PM"
+ * @example formatTime(new Date(), { timeStyle: "medium" }) -> "2:30:45 PM"
+ * @example formatTime(new Date(), { hour12: false }) -> "14:30"
+ */
+export function formatTime(value: DateInput, opts?: FormatDateOptions): string {
+	if (!isValidDate(value)) return FALLBACK_VALUE_PLACEHOLDER;
+
+	const { locale, ...rest } = opts ?? {};
+	const defaults: Intl.DateTimeFormatOptions = {
+		timeStyle: "short",
+		...rest,
+	};
+
+	return getFormatter("date", locale, defaults).format(toDate(value));
+}
+
+/**
+ * Format date and time together
+ * @example formatDateTime(new Date()) -> "Jan 5, 2026, 2:30 PM"
+ * @example formatDateTime(new Date(), { dateStyle: "short", timeStyle: "short" }) -> "1/5/26, 2:30 PM"
+ */
+export function formatDateTime(value: DateInput, opts?: FormatDateOptions): string {
+	if (!isValidDate(value)) return FALLBACK_VALUE_PLACEHOLDER;
+
+	const { locale, ...rest } = opts ?? {};
+	const defaults: Intl.DateTimeFormatOptions = {
+		dateStyle: "medium",
+		timeStyle: "short",
+		...rest,
+	};
+
+	return getFormatter("date", locale, defaults).format(toDate(value));
+}
+
+const RELATIVE_TIME_UNITS: Array<{ unit: Intl.RelativeTimeFormatUnit; ms: number }> = [
+	{ unit: "year", ms: 365 * 24 * 60 * 60 * 1000 },
+	{ unit: "month", ms: 30 * 24 * 60 * 60 * 1000 },
+	{ unit: "week", ms: 7 * 24 * 60 * 60 * 1000 },
+	{ unit: "day", ms: 24 * 60 * 60 * 1000 },
+	{ unit: "hour", ms: 60 * 60 * 1000 },
+	{ unit: "minute", ms: 60 * 1000 },
+	{ unit: "second", ms: 1000 },
+];
+
+export interface FormatRelativeTimeOptions extends Intl.RelativeTimeFormatOptions {
+	locale?: string;
+}
+
+/**
+ * Format relative time (e.g., "2 hours ago", "in 3 days")
+ * @example formatRelativeTime(Date.now() - 3600000) -> "1 hour ago"
+ * @example formatRelativeTime(Date.now() + 86400000) -> "in 1 day"
+ * @example formatRelativeTime(Date.now() - 120000) -> "2 minutes ago"
+ */
+export function formatRelativeTime(value: DateInput, opts?: FormatRelativeTimeOptions): string {
+	if (!isValidDate(value)) return FALLBACK_VALUE_PLACEHOLDER;
+
+	const { locale, ...rest } = opts ?? {};
+	const defaults: Intl.RelativeTimeFormatOptions = {
+		numeric: "auto",
+		style: "long",
+		...rest,
+	};
+
+	const date = toDate(value);
+	const diff = date.getTime() - Date.now();
+	const absDiff = Math.abs(diff);
+
+	for (const { unit, ms } of RELATIVE_TIME_UNITS) {
+		if (absDiff >= ms || unit === "second") {
+			const amount = Math.round(diff / ms);
+			return getFormatter("relative", locale, defaults).format(amount, unit);
+		}
+	}
+
+	return getFormatter("relative", locale, defaults).format(0, "second");
 }

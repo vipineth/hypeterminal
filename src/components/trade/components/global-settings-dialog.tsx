@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import type { ChangeEvent } from "react";
@@ -10,7 +11,6 @@ import { Switch } from "@/components/ui/switch";
 import {
 	MARKET_ORDER_SLIPPAGE_MAX_BPS,
 	MARKET_ORDER_SLIPPAGE_MIN_BPS,
-	UI_TEXT,
 } from "@/constants/app";
 import { dynamicActivate, type LocaleCode, localeList } from "@/lib/i18n";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
@@ -20,8 +20,6 @@ interface GlobalSettingsDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 }
-
-const SETTINGS_TEXT = UI_TEXT.GLOBAL_SETTINGS;
 
 export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialogProps) {
 	const { i18n } = useLingui();
@@ -86,101 +84,91 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-xl">
+			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle>{SETTINGS_TEXT.TITLE}</DialogTitle>
-					<DialogDescription>{SETTINGS_TEXT.DESCRIPTION}</DialogDescription>
+					<DialogTitle>{t`Settings`}</DialogTitle>
+					<DialogDescription>{t`Customize your trading experience.`}</DialogDescription>
 				</DialogHeader>
 
-				<div className="space-y-4 text-xs">
-					<section className="space-y-2">
-						<div className="text-4xs uppercase tracking-wider text-muted-foreground">
-							<Trans>Language</Trans>
+				<div className="space-y-6 text-xs">
+					{/* Language */}
+					<div className="flex items-center justify-between gap-4">
+						<div className="text-xs text-muted-foreground">
+							<Trans>Display Language</Trans>
 						</div>
-						<div className="rounded-md border border-border/40">
-							<div className="flex items-center justify-between gap-4 px-3 py-2">
-								<div className="text-xs">
-									<Trans>Display Language</Trans>
-								</div>
-								<Select
-									value={i18n.locale}
-									onValueChange={(value) => handleLanguageChange(value as LocaleCode)}
-								>
-									<SelectTrigger className="w-32">
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent>
-										{localeList.map(({ code, name }) => (
-											<SelectItem key={code} value={code}>
-												{name}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</div>
-						</div>
-					</section>
+						<Select
+							value={i18n.locale}
+							onValueChange={(value) => handleLanguageChange(value as LocaleCode)}
+						>
+							<SelectTrigger className="w-32">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{localeList.map(({ code, name }) => (
+									<SelectItem key={code} value={code}>
+										{name}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
 
-					<section className="space-y-2">
-						<div className="text-4xs uppercase tracking-wider text-muted-foreground">
-							{SETTINGS_TEXT.SECTION_TRADING}
-						</div>
-						<div className="rounded-md border border-border/40">
-							<div className="px-3 py-2 space-y-2">
-								<div className="flex items-start justify-between gap-4">
-									<div className="space-y-1">
-										<div className="text-xs font-medium">{SETTINGS_TEXT.SLIPPAGE_LABEL}</div>
-										<div className="text-4xs text-muted-foreground">{SETTINGS_TEXT.SLIPPAGE_HELP}</div>
-									</div>
-									<div className="flex items-center gap-2">
-										<Input
-											type="number"
-											value={slippageInput}
-											onChange={handleSlippageInputChange}
-											onBlur={handleSlippageInputBlur}
-											min={MARKET_ORDER_SLIPPAGE_MIN_BPS}
-											max={MARKET_ORDER_SLIPPAGE_MAX_BPS}
-											inputSize="sm"
-											className="w-20 text-right tabular-nums"
-										/>
-										<span className="text-4xs text-muted-foreground">{SETTINGS_TEXT.SLIPPAGE_UNIT}</span>
-									</div>
-								</div>
-								<Slider
-									value={[slippageBps]}
-									onValueChange={handleSlippageSliderChange}
+					<div className="h-px bg-border/40" />
+
+					{/* Slippage */}
+					<div className="space-y-3">
+						<div className="flex items-center justify-between gap-4">
+							<div className="space-y-0.5">
+								<div className="text-xs">{t`Market Order Slippage`}</div>
+								<div className="text-4xs text-muted-foreground">{t`Max slippage allowed for market orders.`}</div>
+							</div>
+							<div className="flex items-center gap-1.5">
+								<Input
+									type="number"
+									value={slippageInput}
+									onChange={handleSlippageInputChange}
+									onBlur={handleSlippageInputBlur}
 									min={MARKET_ORDER_SLIPPAGE_MIN_BPS}
 									max={MARKET_ORDER_SLIPPAGE_MAX_BPS}
-									step={5}
-									className="py-1"
+									inputSize="sm"
+									className="w-16 text-right tabular-nums"
 								/>
-								<div className="flex items-center justify-between text-4xs text-muted-foreground">
-									<span>
-										{MARKET_ORDER_SLIPPAGE_MIN_BPS} {SETTINGS_TEXT.SLIPPAGE_UNIT}
-									</span>
-									<span>{slippagePercent}%</span>
-									<span>
-										{MARKET_ORDER_SLIPPAGE_MAX_BPS} {SETTINGS_TEXT.SLIPPAGE_UNIT}
-									</span>
-								</div>
+								<span className="text-4xs text-muted-foreground w-6">{t`bps`}</span>
 							</div>
 						</div>
-					</section>
-
-					<section className="space-y-2">
-						<div className="text-4xs uppercase tracking-wider text-muted-foreground">
-							{SETTINGS_TEXT.SECTION_CHART}
+						<div className="space-y-1">
+							<Slider
+								value={[slippageBps]}
+								onValueChange={handleSlippageSliderChange}
+								min={MARKET_ORDER_SLIPPAGE_MIN_BPS}
+								max={MARKET_ORDER_SLIPPAGE_MAX_BPS}
+								step={5}
+							/>
+							<div className="flex items-center justify-between text-4xs text-muted-foreground">
+								<span>{MARKET_ORDER_SLIPPAGE_MIN_BPS}</span>
+								<span className="font-medium text-foreground">{slippagePercent}%</span>
+								<span>{MARKET_ORDER_SLIPPAGE_MAX_BPS}</span>
+							</div>
 						</div>
-						<div className="rounded-md border border-border/40 divide-y divide-border/40">
-							<div className="flex items-center justify-between gap-4 px-3 py-2">
-								<label htmlFor={showOrdersId} className="text-xs">
-									{SETTINGS_TEXT.SHOW_ORDERS}
+					</div>
+
+					<div className="h-px bg-border/40" />
+
+					{/* Toggles */}
+					<div className="space-y-3">
+						<div className="text-4xs uppercase tracking-wider text-muted-foreground">
+							{t`Chart`}
+						</div>
+						<div className="space-y-2">
+							<div className="flex items-center justify-between gap-4">
+								<label htmlFor={showOrdersId} className="text-xs text-muted-foreground">
+									{t`Show Orders on Chart`}
 								</label>
 								<Switch id={showOrdersId} checked={showOrdersOnChart} onCheckedChange={setShowOrdersOnChart} />
 							</div>
-							<div className="flex items-center justify-between gap-4 px-3 py-2">
-								<label htmlFor={showPositionsId} className="text-xs">
-									{SETTINGS_TEXT.SHOW_POSITIONS}
+							<div className="flex items-center justify-between gap-4">
+								<label htmlFor={showPositionsId} className="text-xs text-muted-foreground">
+									{t`Show Positions on Chart`}
 								</label>
 								<Switch
 									id={showPositionsId}
@@ -188,9 +176,9 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 									onCheckedChange={setShowPositionsOnChart}
 								/>
 							</div>
-							<div className="flex items-center justify-between gap-4 px-3 py-2">
-								<label htmlFor={showExecutionsId} className="text-xs">
-									{SETTINGS_TEXT.SHOW_EXECUTIONS}
+							<div className="flex items-center justify-between gap-4">
+								<label htmlFor={showExecutionsId} className="text-xs text-muted-foreground">
+									{t`Show Executions on Chart`}
 								</label>
 								<Switch
 									id={showExecutionsId}
@@ -198,9 +186,9 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 									onCheckedChange={setShowExecutionsOnChart}
 								/>
 							</div>
-							<div className="flex items-center justify-between gap-4 px-3 py-2">
-								<label htmlFor={showScanlinesId} className="text-xs">
-									{SETTINGS_TEXT.SHOW_SCANLINES}
+							<div className="flex items-center justify-between gap-4">
+								<label htmlFor={showScanlinesId} className="text-xs text-muted-foreground">
+									{t`Show Scanlines`}
 								</label>
 								<Switch
 									id={showScanlinesId}
@@ -209,25 +197,25 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 								/>
 							</div>
 						</div>
-					</section>
+					</div>
 
-					<section className="space-y-2">
+					<div className="h-px bg-border/40" />
+
+					<div className="space-y-3">
 						<div className="text-4xs uppercase tracking-wider text-muted-foreground">
-							{SETTINGS_TEXT.SECTION_ORDERBOOK}
+							{t`Order Book`}
 						</div>
-						<div className="rounded-md border border-border/40">
-							<div className="flex items-center justify-between gap-4 px-3 py-2">
-								<label htmlFor={showOrderbookUsdId} className="text-xs">
-									{SETTINGS_TEXT.SHOW_ORDERBOOK_USD}
-								</label>
-								<Switch
-									id={showOrderbookUsdId}
-									checked={showOrderbookInUsd}
-									onCheckedChange={setShowOrderbookInUsd}
-								/>
-							</div>
+						<div className="flex items-center justify-between gap-4">
+							<label htmlFor={showOrderbookUsdId} className="text-xs text-muted-foreground">
+								{t`Show Values in USD`}
+							</label>
+							<Switch
+								id={showOrderbookUsdId}
+								checked={showOrderbookInUsd}
+								onCheckedChange={setShowOrderbookInUsd}
+							/>
 						</div>
-					</section>
+					</div>
 				</div>
 			</DialogContent>
 		</Dialog>
