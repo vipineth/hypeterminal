@@ -1,9 +1,9 @@
+import type { ZodType } from "zod";
 import type { StateStorage } from "zustand/middleware";
-import type { ZodSchema } from "zod";
 
 const canUseLocalStorage = typeof window !== "undefined" && typeof window.localStorage !== "undefined";
 
-export function createValidatedStorage<T>(schema: ZodSchema<T>, label: string): StateStorage {
+export function createValidatedStorage<T>(schema: ZodType<T>, label: string): StateStorage {
 	return {
 		getItem: (name: string): string | null => {
 			if (!canUseLocalStorage) return null;
