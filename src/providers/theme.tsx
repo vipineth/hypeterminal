@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "dark" | "light" | "system";
-const defaultTheme = "system";
+const defaultTheme = "light";
 
 type ThemeProviderProps = {
 	children: React.ReactNode;
@@ -15,7 +15,7 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-	theme: "system",
+	theme: defaultTheme,
 	setTheme: () => null,
 };
 

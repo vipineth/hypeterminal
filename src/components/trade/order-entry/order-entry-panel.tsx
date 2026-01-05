@@ -2,7 +2,6 @@ import { t } from "@lingui/core/macro";
 import { ChevronDown, Loader2, TrendingDown, TrendingUp } from "lucide-react";
 import { useEffect, useId, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
-// Note: useEffect still used for selectedPrice sync (cross-component event, similar to external event)
 import { Checkbox } from "@/components/ui/checkbox";
 import {
 	DropdownMenu,
@@ -66,7 +65,12 @@ export function OrderEntryPanel() {
 	const { data: clearinghouse } = useClearinghouseState({ user: address });
 
 	const signingMode = useSigningMode();
-	const { status: agentStatus, registerStatus, signer: agentSigner, registerAgent } = useTradingAgent({
+	const {
+		status: agentStatus,
+		registerStatus,
+		signer: agentSigner,
+		registerAgent,
+	} = useTradingAgent({
 		user: address,
 		walletClient,
 	});
@@ -507,10 +511,10 @@ export function OrderEntryPanel() {
 						</Tooltip>
 						<DropdownMenuContent align="end" className="min-w-24 font-mono text-xs">
 							<DropdownMenuItem onClick={() => setSigningMode("agent")} selected={signingMode === "agent"}>
-								{t`Agent`}
+								Agent
 							</DropdownMenuItem>
 							<DropdownMenuItem onClick={() => setSigningMode("direct")} selected={signingMode === "direct"}>
-								{t`Direct`}
+								Direct
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
@@ -654,7 +658,6 @@ export function OrderEntryPanel() {
 						disabled={isFormDisabled || maxSize <= 0}
 					/>
 
-					{/* Percent buttons */}
 					<div className="grid grid-cols-4 gap-1">
 						{ORDER_SIZE_PERCENT_STEPS.map((p) => (
 							<button
@@ -672,7 +675,6 @@ export function OrderEntryPanel() {
 					</div>
 				</div>
 
-				{/* Limit price (conditional) */}
 				{type === "limit" && (
 					<div className="space-y-1.5">
 						<div className="flex items-center justify-between">
@@ -700,7 +702,6 @@ export function OrderEntryPanel() {
 					</div>
 				)}
 
-				{/* Reduce Only + TP/SL (disabled) */}
 				<div className="flex items-center gap-3 text-3xs">
 					<Tooltip>
 						<TooltipTrigger asChild>
@@ -728,15 +729,12 @@ export function OrderEntryPanel() {
 
 				<div className="h-4" />
 
-				{/* Validation errors */}
 				{validation.errors.length > 0 && isConnected && availableBalance > 0 && !validation.needsApproval && (
 					<div className="text-4xs text-terminal-red">{validation.errors.join(" • ")}</div>
 				)}
 
-				{/* Approval error */}
 				{approvalError && <div className="text-4xs text-terminal-red">{approvalError}</div>}
 
-				{/* Submit button */}
 				<button
 					type="button"
 					onClick={buttonContent.action}
@@ -756,7 +754,6 @@ export function OrderEntryPanel() {
 					{buttonContent.text}
 				</button>
 
-				{/* Order summary */}
 				<div className="border border-border/40 divide-y divide-border/40 text-3xs">
 					<div className="flex items-center justify-between px-2 py-1.5">
 						<span className="text-muted-foreground">{t`Liq. Price`}</span>
@@ -787,11 +784,9 @@ export function OrderEntryPanel() {
 				</div>
 			</div>
 
-			{/* Modals */}
 			<WalletDialog open={walletDialogOpen} onOpenChange={setWalletDialogOpen} />
 			<DepositModal open={depositModalOpen} onOpenChange={setDepositModalOpen} />
 
-			{/* Order toast */}
 			<OrderToast />
 		</div>
 	);
