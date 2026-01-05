@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { ChevronDown, Loader2, TrendingDown, TrendingUp } from "lucide-react";
 import { useEffect, useId, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
@@ -22,7 +23,6 @@ import {
 	ORDER_LEVERAGE_STEPS,
 	ORDER_MIN_NOTIONAL_USD,
 	ORDER_SIZE_PERCENT_STEPS,
-	UI_TEXT,
 } from "@/constants/app";
 import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
 import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
@@ -48,8 +48,6 @@ import { OrderToast } from "./order-toast";
 type OrderType = "market" | "limit";
 type Side = "buy" | "sell";
 type SizeMode = "asset" | "usd";
-
-const ORDER_TEXT = UI_TEXT.ORDER_ENTRY;
 
 export function OrderEntryPanel() {
 	const reduceOnlyId = useId();
@@ -115,9 +113,10 @@ export function OrderEntryPanel() {
 	const availableBalance = Math.max(0, accountValue - marginUsed);
 
 	// React 19: Simple array.find - no useMemo needed
-	const position = !clearinghouse?.assetPositions || !market?.coin
-		? null
-		: clearinghouse.assetPositions.find((p) => p.position.coin === market.coin) ?? null;
+	const position =
+		!clearinghouse?.assetPositions || !market?.coin
+			? null
+			: (clearinghouse.assetPositions.find((p) => p.position.coin === market.coin) ?? null);
 
 	// React 19: Simple parsing - no useMemo needed
 	const positionSize = parseNumber(position?.position?.szi) || 0;
@@ -135,10 +134,11 @@ export function OrderEntryPanel() {
 
 	// React 19: Simple conditional - no useMemo needed
 	const ctxMarkPx = market?.ctxNumbers?.markPx;
-	const markPx = typeof ctxMarkPx === "number" ? ctxMarkPx : (typeof market?.midPxNumber === "number" ? market.midPxNumber : 0);
+	const markPx =
+		typeof ctxMarkPx === "number" ? ctxMarkPx : typeof market?.midPxNumber === "number" ? market.midPxNumber : 0;
 
 	// React 19: Simple conditional - no useMemo needed
-	const price = type === "market" ? markPx : (parseNumber(limitPriceInput) || 0);
+	const price = type === "market" ? markPx : parseNumber(limitPriceInput) || 0;
 
 	// React 19: Simple calculation - no useMemo needed
 	const maxSize = (() => {
@@ -180,19 +180,19 @@ export function OrderEntryPanel() {
 		const errors: string[] = [];
 
 		if (!isConnected) {
-			return { valid: false, errors: [ORDER_TEXT.ERROR_NOT_CONNECTED], canSubmit: false, needsApproval: false };
+			return { valid: false, errors: [t`Not connected`], canSubmit: false, needsApproval: false };
 		}
 		if (isWalletLoading) {
-			return { valid: false, errors: [ORDER_TEXT.ERROR_LOADING_WALLET], canSubmit: false, needsApproval: false };
+			return { valid: false, errors: [t`Loading wallet...`], canSubmit: false, needsApproval: false };
 		}
 		if (availableBalance <= 0) {
-			return { valid: false, errors: [ORDER_TEXT.ERROR_NO_BALANCE], canSubmit: false, needsApproval: false };
+			return { valid: false, errors: [t`No balance`], canSubmit: false, needsApproval: false };
 		}
 		if (!market) {
-			return { valid: false, errors: [ORDER_TEXT.ERROR_NO_MARKET], canSubmit: false, needsApproval: false };
+			return { valid: false, errors: [t`No market`], canSubmit: false, needsApproval: false };
 		}
 		if (typeof market.assetIndex !== "number") {
-			return { valid: false, errors: [ORDER_TEXT.ERROR_MARKET_NOT_READY], canSubmit: false, needsApproval: false };
+			return { valid: false, errors: [t`Market not ready`], canSubmit: false, needsApproval: false };
 		}
 
 		if (!isAgentApproved) {
@@ -200,22 +200,22 @@ export function OrderEntryPanel() {
 		}
 
 		if (!canSign) {
-			return { valid: false, errors: [ORDER_TEXT.ERROR_SIGNER_NOT_READY], canSubmit: false, needsApproval: false };
+			return { valid: false, errors: [t`Signer not ready`], canSubmit: false, needsApproval: false };
 		}
 		if (type === "market" && !markPx) {
-			return { valid: false, errors: [ORDER_TEXT.ERROR_NO_MARK_PRICE], canSubmit: false, needsApproval: false };
+			return { valid: false, errors: [t`No mark price`], canSubmit: false, needsApproval: false };
 		}
 		if (type === "limit" && !price) {
-			errors.push(ORDER_TEXT.ERROR_LIMIT_PRICE);
+			errors.push(t`Enter limit price`);
 		}
 		if (!sizeValue || sizeValue <= 0) {
-			errors.push(ORDER_TEXT.ERROR_SIZE);
+			errors.push(t`Enter size`);
 		}
 		if (orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD) {
-			errors.push(ORDER_TEXT.ERROR_MIN_NOTIONAL);
+			errors.push(t`Min order $10`);
 		}
 		if (sizeValue > maxSize && maxSize > 0) {
-			errors.push(ORDER_TEXT.ERROR_EXCEEDS_MAX);
+			errors.push(t`Exceeds max size`);
 		}
 
 		return { valid: errors.length === 0, errors, canSubmit: errors.length === 0, needsApproval: false };
@@ -312,7 +312,7 @@ export function OrderEntryPanel() {
 			await approveAgent();
 		} catch (error) {
 			console.error("[OrderEntry] Approval failed:", error);
-			const message = error instanceof Error ? error.message : ORDER_TEXT.APPROVAL_ERROR_FALLBACK;
+			const message = error instanceof Error ? error.message : t`Failed to enable trading`;
 			setApprovalError(message);
 		} finally {
 			setIsApproving(false);
@@ -379,7 +379,7 @@ export function OrderEntryPanel() {
 			setSizeInput("");
 			setLimitPriceInput("");
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : ORDER_TEXT.ORDER_ERROR_FALLBACK;
+			const errorMessage = error instanceof Error ? error.message : t`Order failed`;
 			updateOrder(orderId, { status: "failed", error: errorMessage });
 		} finally {
 			setIsSubmitting(false);
@@ -395,14 +395,12 @@ export function OrderEntryPanel() {
 	// 	[validation.canSubmit, isSubmitting, handleSubmit],
 	// );
 
-	// React 19: Simple calculations - no useMemo needed
-	const sliderValue = !maxSize || maxSize <= 0 ? 0 : Math.min(100, (sizeValue / maxSize) * 100);
+	const sliderValue = !maxSize || maxSize <= 0 ? 25 : Math.min(100, (sizeValue / maxSize) * 100);
 
-	// React 19: Object literal with conditionals - compiler handles this
 	const buttonContent = (() => {
 		if (!isConnected) {
 			return {
-				text: ORDER_TEXT.BUTTON_CONNECT,
+				text: t`Connect Wallet`,
 				action: () => setWalletDialogOpen(true),
 				disabled: false,
 				variant: "cyan" as const,
@@ -410,7 +408,7 @@ export function OrderEntryPanel() {
 		}
 		if (needsChainSwitch) {
 			return {
-				text: isSwitchingChain ? ORDER_TEXT.BUTTON_SWITCHING : ORDER_TEXT.BUTTON_SWITCH_CHAIN,
+				text: isSwitchingChain ? t`Switching...` : t`Switch to Arbitrum`,
 				action: handleSwitchChain,
 				disabled: isSwitchingChain,
 				variant: "cyan" as const,
@@ -418,7 +416,7 @@ export function OrderEntryPanel() {
 		}
 		if (availableBalance <= 0) {
 			return {
-				text: ORDER_TEXT.BUTTON_DEPOSIT,
+				text: t`Deposit`,
 				action: () => setDepositModalOpen(true),
 				disabled: false,
 				variant: "cyan" as const,
@@ -426,18 +424,14 @@ export function OrderEntryPanel() {
 		}
 		if (validation.needsApproval) {
 			return {
-				text: isApproving
-					? ORDER_TEXT.BUTTON_SIGNING
-					: !canApprove
-						? ORDER_TEXT.BUTTON_LOADING
-						: ORDER_TEXT.BUTTON_ENABLE_TRADING,
+				text: isApproving ? t`Signing...` : !canApprove ? t`Loading...` : t`Enable Trading`,
 				action: handleApprove,
 				disabled: isApproving || !canApprove,
 				variant: "cyan" as const,
 			};
 		}
 		return {
-			text: side === "buy" ? ORDER_TEXT.BUTTON_BUY : ORDER_TEXT.BUTTON_SELL,
+			text: side === "buy" ? t`Buy` : t`Sell`,
 			action: handleSubmit,
 			disabled: !validation.canSubmit || isSubmitting,
 			variant: side as "buy" | "sell",
@@ -454,16 +448,16 @@ export function OrderEntryPanel() {
 			<div className="px-2 py-1.5 border-b border-border/40 flex items-center justify-between">
 				<Tabs value="cross">
 					<TabsList>
-						<TabsTrigger value="cross">{ORDER_TEXT.MODE_CROSS}</TabsTrigger>
+						<TabsTrigger value="cross">{t`Cross`}</TabsTrigger>
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<span>
 									<TabsTrigger value="isolated" disabled className="opacity-50 cursor-not-allowed">
-										{ORDER_TEXT.MODE_ISOLATED}
+										{t`Isolated`}
 									</TabsTrigger>
 								</span>
 							</TooltipTrigger>
-							<TooltipContent>{ORDER_TEXT.MODE_COMING_SOON}</TooltipContent>
+							<TooltipContent>{t`Coming soon`}</TooltipContent>
 						</Tooltip>
 					</TabsList>
 				</Tabs>
@@ -473,7 +467,7 @@ export function OrderEntryPanel() {
 							type="button"
 							className="px-2 py-0.5 text-3xs border border-terminal-cyan/40 text-terminal-cyan inline-flex items-center gap-1"
 							tabIndex={0}
-							aria-label={ORDER_TEXT.LEVERAGE_ARIA}
+							aria-label={t`Select leverage`}
 						>
 							{leverage}x <ChevronDown className="size-2.5" />
 						</button>
@@ -489,29 +483,27 @@ export function OrderEntryPanel() {
 			</div>
 
 			<div className="p-2 space-y-2 overflow-y-auto flex-1">
-				{/* Order type tabs */}
 				<Tabs value={type} onValueChange={(v) => setType(v as OrderType)}>
 					<TabsList>
 						<TabsTrigger value="market" variant="underline">
-							{ORDER_TEXT.ORDER_TYPE_MARKET}
+							{t`Market`}
 						</TabsTrigger>
 						<TabsTrigger value="limit" variant="underline">
-							{ORDER_TEXT.ORDER_TYPE_LIMIT}
+							{t`Limit`}
 						</TabsTrigger>
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<span>
 									<TabsTrigger value="stop" variant="underline" disabled className="opacity-50 cursor-not-allowed">
-										{ORDER_TEXT.ORDER_TYPE_STOP}
+										{t`Stop`}
 									</TabsTrigger>
 								</span>
 							</TooltipTrigger>
-							<TooltipContent>{ORDER_TEXT.MODE_COMING_SOON}</TooltipContent>
+							<TooltipContent>{t`Coming soon`}</TooltipContent>
 						</Tooltip>
 					</TabsList>
 				</Tabs>
 
-				{/* Buy/Sell buttons */}
 				<div className="grid grid-cols-2 gap-1">
 					<button
 						type="button"
@@ -523,10 +515,10 @@ export function OrderEntryPanel() {
 								: "border-border/60 text-muted-foreground hover:border-terminal-green/40 hover:text-terminal-green",
 						)}
 						tabIndex={0}
-						aria-label={ORDER_TEXT.BUY_ARIA}
+						aria-label={t`Buy Long`}
 					>
 						<TrendingUp className="size-3 inline mr-1" />
-						{ORDER_TEXT.BUY_LABEL}
+						{t`Long`}
 					</button>
 					<button
 						type="button"
@@ -538,17 +530,15 @@ export function OrderEntryPanel() {
 								: "border-border/60 text-muted-foreground hover:border-terminal-red/40 hover:text-terminal-red",
 						)}
 						tabIndex={0}
-						aria-label={ORDER_TEXT.SELL_ARIA}
+						aria-label={t`Sell Short`}
 					>
 						<TrendingDown className="size-3 inline mr-1" />
-						{ORDER_TEXT.SELL_LABEL}
+						{t`Short`}
 					</button>
 				</div>
-
-				{/* Balance + Deposit */}
 				<div className="space-y-0.5 text-3xs">
 					<div className="flex items-center justify-between text-muted-foreground">
-						<span>{ORDER_TEXT.AVAILABLE_LABEL}</span>
+						<span>{t`Available`}</span>
 						<div className="flex items-center gap-2">
 							<span
 								className={cn("tabular-nums", availableBalance > 0 ? "text-terminal-green" : "text-muted-foreground")}
@@ -561,15 +551,14 @@ export function OrderEntryPanel() {
 									onClick={() => setDepositModalOpen(true)}
 									className="text-terminal-cyan hover:underline text-4xs uppercase"
 								>
-									{ORDER_TEXT.DEPOSIT_LABEL}
+									{t`Deposit`}
 								</button>
 							)}
 						</div>
 					</div>
-					{/* Position (if exists) */}
 					{positionSize !== 0 && (
 						<div className="flex items-center justify-between text-muted-foreground">
-							<span>{ORDER_TEXT.POSITION_LABEL}</span>
+							<span>{t`Position`}</span>
 							<span className={cn("tabular-nums", positionSize > 0 ? "text-terminal-green" : "text-terminal-red")}>
 								{positionSize > 0 ? "+" : ""}
 								{formatDecimalFloor(positionSize, market?.szDecimals ?? 2)} {market?.coin}
@@ -577,24 +566,21 @@ export function OrderEntryPanel() {
 						</div>
 					)}
 				</div>
-
-				{/* Size input */}
 				<div className="space-y-1.5">
-					<div className="text-4xs uppercase tracking-wider text-muted-foreground">{ORDER_TEXT.SIZE_LABEL}</div>
+					<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Size`}</div>
 					<div className="flex items-center gap-1">
 						<button
 							type="button"
 							onClick={handleSizeModeToggle}
 							className="px-2 py-1.5 text-3xs border border-border/60 hover:border-foreground/30 inline-flex items-center gap-1"
 							tabIndex={0}
-							aria-label={ORDER_TEXT.SIZE_MODE_TOGGLE_ARIA}
+							aria-label={t`Toggle size mode`}
 							disabled={isFormDisabled}
 						>
-							{sizeMode === "asset" ? market?.coin || ORDER_TEXT.SIZE_MODE_FALLBACK : ORDER_TEXT.SIZE_MODE_USD}{" "}
-							<ChevronDown className="size-2.5" />
+							{sizeMode === "asset" ? market?.coin || "---" : "USD"} <ChevronDown className="size-2.5" />
 						</button>
 						<Input
-							placeholder={ORDER_TEXT.INPUT_PLACEHOLDER}
+							placeholder="0.00"
 							value={sizeInput}
 							onChange={(e) => setSizeInput(e.target.value)}
 							className={cn(
@@ -605,13 +591,12 @@ export function OrderEntryPanel() {
 						/>
 					</div>
 
-					{/* Slider */}
 					<Slider
 						value={[sliderValue]}
 						onValueChange={handleSliderChange}
 						max={100}
 						step={0.1}
-						className="py-1"
+						className="py-4"
 						disabled={isFormDisabled || maxSize <= 0}
 					/>
 
@@ -624,10 +609,10 @@ export function OrderEntryPanel() {
 								onClick={() => handlePercentClick(p)}
 								className="py-1 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-cyan/40 hover:text-terminal-cyan transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 								tabIndex={0}
-								aria-label={ORDER_TEXT.PERCENT_ARIA(p)}
+								aria-label={t`Set ${p}%`}
 								disabled={isFormDisabled || maxSize <= 0}
 							>
-								{p === 100 ? ORDER_TEXT.SIZE_MAX_LABEL : `${p}%`}
+								{p === 100 ? t`Max` : `${p}%`}
 							</button>
 						))}
 					</div>
@@ -637,21 +622,19 @@ export function OrderEntryPanel() {
 				{type === "limit" && (
 					<div className="space-y-1.5">
 						<div className="flex items-center justify-between">
-							<div className="text-4xs uppercase tracking-wider text-muted-foreground">
-								{ORDER_TEXT.LIMIT_PRICE_LABEL}
-							</div>
+							<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Limit Price`}</div>
 							{markPx > 0 && (
 								<button
 									type="button"
 									onClick={handleMarkPriceClick}
 									className="text-4xs text-muted-foreground hover:text-terminal-cyan tabular-nums"
 								>
-									{ORDER_TEXT.MARK_PRICE_LABEL}: {formatPrice(markPx, { szDecimals: market?.szDecimals })}
+									{t`Mark`}: {formatPrice(markPx, { szDecimals: market?.szDecimals })}
 								</button>
 							)}
 						</div>
 						<Input
-							placeholder={ORDER_TEXT.INPUT_PLACEHOLDER}
+							placeholder="0.00"
 							value={limitPriceInput}
 							onChange={(e) => setLimitPriceInput(e.target.value)}
 							className={cn(
@@ -668,24 +651,24 @@ export function OrderEntryPanel() {
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<div className="inline-flex items-center gap-1.5 cursor-not-allowed opacity-50">
-								<Checkbox id={reduceOnlyId} className="size-3.5" aria-label={ORDER_TEXT.REDUCE_ONLY_LABEL} disabled />
+								<Checkbox id={reduceOnlyId} className="size-3.5" aria-label={t`Reduce Only`} disabled />
 								<label htmlFor={reduceOnlyId} className="text-muted-foreground cursor-not-allowed">
-									{ORDER_TEXT.REDUCE_ONLY_LABEL}
+									{t`Reduce Only`}
 								</label>
 							</div>
 						</TooltipTrigger>
-						<TooltipContent>{ORDER_TEXT.MODE_COMING_SOON}</TooltipContent>
+						<TooltipContent>{t`Coming soon`}</TooltipContent>
 					</Tooltip>
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<div className="inline-flex items-center gap-1.5 cursor-not-allowed opacity-50">
-								<Checkbox id={tpSlId} className="size-3.5" aria-label={ORDER_TEXT.TPSL_ARIA} disabled />
+								<Checkbox id={tpSlId} className="size-3.5" aria-label={t`Take Profit / Stop Loss`} disabled />
 								<label htmlFor={tpSlId} className="text-muted-foreground cursor-not-allowed">
-									{ORDER_TEXT.TPSL_LABEL}
+									{t`TP/SL`}
 								</label>
 							</div>
 						</TooltipTrigger>
-						<TooltipContent>{ORDER_TEXT.MODE_COMING_SOON}</TooltipContent>
+						<TooltipContent>{t`Coming soon`}</TooltipContent>
 					</Tooltip>
 				</div>
 
@@ -722,27 +705,27 @@ export function OrderEntryPanel() {
 				{/* Order summary */}
 				<div className="border border-border/40 divide-y divide-border/40 text-3xs">
 					<div className="flex items-center justify-between px-2 py-1.5">
-						<span className="text-muted-foreground">{ORDER_TEXT.SUMMARY_LIQ}</span>
+						<span className="text-muted-foreground">{t`Liq. Price`}</span>
 						<span className={cn("tabular-nums", liqWarning ? "text-terminal-red" : "text-terminal-red/70")}>
 							{liqPrice ? formatPrice(liqPrice, { szDecimals: market?.szDecimals }) : FALLBACK_VALUE_PLACEHOLDER}
 						</span>
 					</div>
 					<div className="flex items-center justify-between px-2 py-1.5">
-						<span className="text-muted-foreground">{ORDER_TEXT.SUMMARY_ORDER_VALUE}</span>
+						<span className="text-muted-foreground">{t`Order Value`}</span>
 						<span className="tabular-nums">{orderValue > 0 ? formatUSD(orderValue) : FALLBACK_VALUE_PLACEHOLDER}</span>
 					</div>
 					<div className="flex items-center justify-between px-2 py-1.5">
-						<span className="text-muted-foreground">{ORDER_TEXT.SUMMARY_MARGIN_REQ}</span>
+						<span className="text-muted-foreground">{t`Margin Req.`}</span>
 						<span className="tabular-nums">
 							{marginRequired > 0 ? formatUSD(marginRequired) : FALLBACK_VALUE_PLACEHOLDER}
 						</span>
 					</div>
 					<div className="flex items-center justify-between px-2 py-1.5">
-						<span className="text-muted-foreground">{ORDER_TEXT.SUMMARY_SLIPPAGE}</span>
+						<span className="text-muted-foreground">{t`Slippage`}</span>
 						<span className="tabular-nums text-terminal-amber">{(slippageBps / 100).toFixed(2)}%</span>
 					</div>
 					<div className="flex items-center justify-between px-2 py-1.5">
-						<span className="text-muted-foreground">{ORDER_TEXT.SUMMARY_FEE}</span>
+						<span className="text-muted-foreground">{t`Est. Fee`}</span>
 						<span className="tabular-nums text-muted-foreground">
 							{estimatedFee > 0 ? formatUSD(estimatedFee) : FALLBACK_VALUE_PLACEHOLDER}
 						</span>
