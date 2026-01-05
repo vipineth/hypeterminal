@@ -52,20 +52,20 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 					role="combobox"
 					aria-expanded={open}
 					aria-label={TOKEN_SELECTOR_TEXT.ARIA_SELECT}
-					className="h-6 gap-1.5 text-xs font-semibold px-2"
+					className="h-8 gap-1.5 text-xs font-semibold px-2 min-w-0"
 				>
-					<Avatar className="size-4">
+					<Avatar className="size-5 shrink-0">
 						<AvatarImage src={getTokenIconUrl(value)} alt={value} />
 						<AvatarFallback className="text-3xs bg-terminal-amber/20 text-terminal-amber">
 							{value.slice(0, 2)}
 						</AvatarFallback>
 					</Avatar>
-					<span className="text-terminal-amber">{value}</span>
-					<span className="text-muted-foreground">/{QUOTE_ASSET}</span>
-					<ChevronDown className="size-3 text-muted-foreground" />
+					<span className="text-terminal-amber truncate">{value}</span>
+					<span className="text-muted-foreground hidden sm:inline">/{QUOTE_ASSET}</span>
+					<ChevronDown className="size-3 text-muted-foreground shrink-0" />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-xl p-0 border-border/60 bg-surface" align="start" sideOffset={8}>
+			<PopoverContent className="w-[calc(100vw-1rem)] sm:w-xl max-w-xl p-0 border-border/60 bg-surface" align="start" sideOffset={8}>
 				<div className="flex flex-col">
 					<div className="px-2 py-2 border-b border-border/40">
 						<div className="relative">
@@ -114,13 +114,17 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 
 							const sortState = header.column.getIsSorted();
 
+							// Hide some columns on mobile for better fit
+							const hiddenOnMobile = ["openInterest", "dayNtlVlm", "funding"].includes(header.id);
+
 							return (
 								<button
 									key={header.id}
 									type="button"
 									onClick={header.column.getToggleSortingHandler()}
 									className={cn(
-										"w-20 flex items-center justify-end gap-1 transition-colors hover:text-foreground cursor-pointer",
+										"w-16 sm:w-20 flex items-center justify-end gap-1 transition-colors hover:text-foreground cursor-pointer",
+										hiddenOnMobile && "hidden sm:flex",
 									)}
 									aria-label={TOKEN_SELECTOR_TEXT.SORT_ARIA(String(header.column.columnDef.header ?? ""))}
 								>
@@ -235,27 +239,32 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 													</div>
 												</div>
 											</div>
-											<div className="w-20 text-right">
+											{/* Price - always visible */}
+											<div className="w-16 sm:w-20 text-right">
 												<span className="text-2xs font-medium tabular-nums">
 													{formatPrice(market.ctxNumbers?.markPx ?? null, { szDecimals: market.szDecimals })}
 												</span>
 											</div>
-											<div className="w-20 text-right">
+											{/* 24h change - always visible */}
+											<div className="w-16 sm:w-20 text-right">
 												<span className={changeClass}>
 													{changeText}
 												</span>
 											</div>
-											<div className="w-20 text-right">
+											{/* Open Interest - hidden on mobile */}
+											<div className="w-20 text-right hidden sm:block">
 												<span className="text-2xs font-medium tabular-nums">
 													{formatUSD(calculateOpenInterestUSD(market.ctxNumbers))}
 												</span>
 											</div>
-											<div className="w-20 text-right">
+											{/* Volume - hidden on mobile */}
+											<div className="w-20 text-right hidden sm:block">
 												<span className="text-2xs font-medium tabular-nums">
 													{formatUSD(market.ctxNumbers?.dayNtlVlm ?? null)}
 												</span>
 											</div>
-											<div className="w-20 text-right">
+											{/* Funding - hidden on mobile */}
+											<div className="w-20 text-right hidden sm:block">
 												<div className="flex items-center justify-end gap-1">
 													<Flame
 														className={cn("size-2.5", isFundingPositive ? "text-terminal-green" : "text-terminal-red")}

@@ -241,7 +241,75 @@
    COMPONENT STYLES
    ============================================================================= */
 
+@layer base {
+  /* Safe area insets for notched devices */
+  :root {
+    --sat: env(safe-area-inset-top);
+    --sar: env(safe-area-inset-right);
+    --sab: env(safe-area-inset-bottom);
+    --sal: env(safe-area-inset-left);
+  }
+
+  /* Mobile viewport height fix - use 100dvh instead of 100vh */
+  html {
+    height: 100%;
+  }
+
+  /* Prevent pull-to-refresh on mobile when at top of page */
+  body {
+    overscroll-behavior-y: contain;
+  }
+
+  /* Touch action optimizations */
+  button, a, [role="button"] {
+    touch-action: manipulation;
+  }
+
+  /* Prevent text selection on interactive elements for better touch UX */
+  button, [role="button"], nav {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Smooth scrolling with reduced motion respect */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /* Disable animations for reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
 @layer components {
+  /* Active scale effect for touch feedback */
+  .active\:scale-98:active {
+    transform: scale(0.98);
+  }
+
+  .active\:scale-95:active {
+    transform: scale(0.95);
+  }
+
+  /* Mobile-specific touch targets - ensure minimum 44px */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .touch-target-lg {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
   /* Terminal Glow Effects */
   .terminal-glow-green {
     text-shadow: none;
