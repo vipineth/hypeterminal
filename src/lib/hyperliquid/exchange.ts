@@ -1,14 +1,15 @@
 import type { HttpTransport } from "@nktkas/hyperliquid";
 import {
 	approveAgent,
-	cancel,
 	type CancelParameters,
+	cancel,
 	type ExchangeSingleWalletConfig,
 	type OrderParameters,
 	order,
 	updateLeverage,
 } from "@nktkas/hyperliquid/api/exchange";
 import type { AbstractWallet } from "@nktkas/hyperliquid/signing";
+import { ARBITRUM_CHAIN_ID_HEX } from "@/constants/app";
 
 export type TimeInForce = "Gtc" | "Ioc" | "Alo" | "FrontendMarket" | "LiquidationMarket";
 
@@ -19,7 +20,7 @@ export type CurrentLeverageInfo =
 	| undefined;
 
 export function makeExchangeConfig(transport: HttpTransport, wallet: AbstractWallet): ExchangeSingleWalletConfig {
-	return { transport, wallet };
+	return { transport, wallet, signatureChainId: ARBITRUM_CHAIN_ID_HEX };
 }
 
 export async function ensureLeverage(

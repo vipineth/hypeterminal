@@ -13,17 +13,21 @@ import { clampInt } from "@/lib/trade/numbers";
 import { createValidatedStorage } from "@/stores/validated-storage";
 
 export type MarginMode = "cross" | "isolated";
+export type SigningMode = "agent" | "direct";
 
 const leverageByModeSchema = z.object({
 	cross: z.number().int().positive().optional(),
 	isolated: z.number().int().positive().optional(),
 });
 
+const signingModeSchema = z.enum(["agent", "direct"]);
+
 const tradeSettingsSchema = z.object({
 	state: z.object({
 		defaultLeverageByMode: leverageByModeSchema.optional(),
 		marketLeverageByMode: z.record(z.string(), leverageByModeSchema).optional(),
 		marketOrderSlippageBps: z.number().int().optional(),
+		signingMode: signingModeSchema.optional(),
 	}),
 });
 
@@ -33,13 +37,17 @@ interface TradeSettingsStore {
 	defaultLeverageByMode: Record<MarginMode, number>;
 	marketLeverageByMode: Record<string, Partial<Record<MarginMode, number>>>;
 	marketOrderSlippageBps: number;
+	signingMode: SigningMode;
 	actions: {
 		setDefaultLeverage: (mode: MarginMode, leverage: number) => void;
 		setMarketLeverage: (marketKey: string, mode: MarginMode, leverage: number, maxLeverage?: number) => void;
 		clearMarketLeverage: (marketKey: string, mode?: MarginMode) => void;
 		setMarketOrderSlippageBps: (bps: number) => void;
+		setSigningMode: (mode: SigningMode) => void;
 	};
 }
+
+const DEFAULT_SIGNING_MODE: SigningMode = "agent";
 
 const useTradeSettingsStore = create<TradeSettingsStore>()(
 	persist(
@@ -47,6 +55,7 @@ const useTradeSettingsStore = create<TradeSettingsStore>()(
 			defaultLeverageByMode: DEFAULT_LEVERAGE_BY_MODE,
 			marketLeverageByMode: {},
 			marketOrderSlippageBps: DEFAULT_MARKET_ORDER_SLIPPAGE_BPS,
+			signingMode: DEFAULT_SIGNING_MODE,
 			actions: {
 				setDefaultLeverage: (mode, leverage) => {
 					const next = clampInt(leverage, 1, MARKET_LEVERAGE_HARD_MAX);
@@ -98,6 +107,10 @@ const useTradeSettingsStore = create<TradeSettingsStore>()(
 					if (get().marketOrderSlippageBps === next) return;
 					set({ marketOrderSlippageBps: next });
 				},
+				setSigningMode: (mode) => {
+					if (get().signingMode === mode) return;
+					set({ signingMode: mode });
+				},
 			},
 		}),
 		{
@@ -107,6 +120,7 @@ const useTradeSettingsStore = create<TradeSettingsStore>()(
 				defaultLeverageByMode: state.defaultLeverageByMode,
 				marketLeverageByMode: state.marketLeverageByMode,
 				marketOrderSlippageBps: state.marketOrderSlippageBps,
+				signingMode: state.signingMode,
 			}),
 			merge: (persisted, current) => ({
 				...current,
@@ -120,6 +134,7 @@ const useTradeSettingsStore = create<TradeSettingsStore>()(
 					MARKET_ORDER_SLIPPAGE_MIN_BPS,
 					MARKET_ORDER_SLIPPAGE_MAX_BPS,
 				),
+				signingMode: (persisted as Partial<TradeSettingsStore>)?.signingMode ?? DEFAULT_SIGNING_MODE,
 			}),
 		},
 	),
@@ -139,4 +154,8 @@ export function useMarketOrderSlippageBps() {
 
 export function useTradeSettingsActions() {
 	return useTradeSettingsStore((state) => state.actions);
+}
+
+export function useSigningMode() {
+	return useTradeSettingsStore((state) => state.signingMode);
 }

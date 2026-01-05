@@ -12,7 +12,6 @@ import { useTradingAgent } from "@/hooks/hyperliquid/use-trading-agent";
 import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
 import { getHttpTransport } from "@/lib/hyperliquid/clients";
 import { makeExchangeConfig, placeSingleOrder } from "@/lib/hyperliquid/exchange";
-import { toHyperliquidWallet } from "@/lib/hyperliquid/wallet";
 import { parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
 import { cn } from "@/lib/utils";
@@ -23,16 +22,13 @@ export function PositionsTab() {
 	const { address, isConnected } = useConnection();
 	const { data: walletClient } = useWalletClient();
 	const { data: state, status, error, refetch } = useClearinghouseState({ user: isConnected ? address : undefined });
-	const { apiWalletSigner } = useTradingAgent({
+	const { signer: activeSigner } = useTradingAgent({
 		user: isConnected ? address : undefined,
 		walletClient,
-		enabled: isConnected,
 	});
 	const slippageBps = useMarketOrderSlippageBps();
 	const [closingKey, setClosingKey] = useState<string | null>(null);
 	const [actionError, setActionError] = useState<string | null>(null);
-
-	const signer = apiWalletSigner ?? (walletClient ? toHyperliquidWallet(walletClient) : null);
 
 	const positions = useMemo(() => {
 		const raw = state?.assetPositions ?? [];
@@ -108,7 +104,7 @@ export function PositionsTab() {
 
 	const handleClosePosition = useCallback(
 		async (row: (typeof tableRows)[number]) => {
-			if (!signer) {
+			if (!activeSigner) {
 				setActionError(t`Connect a wallet to manage positions.`);
 				return;
 			}
@@ -125,7 +121,7 @@ export function PositionsTab() {
 				}
 
 				const transport = getHttpTransport();
-				const config = makeExchangeConfig(transport, signer);
+				const config = makeExchangeConfig(transport, activeSigner);
 				const isBuy = !row.isLong;
 				const slippage = slippageBps / 10000;
 				const orderPrice = isBuy ? row.markPx * (1 + slippage) : row.markPx * (1 - slippage);
@@ -153,7 +149,7 @@ export function PositionsTab() {
 				setClosingKey(null);
 			}
 		},
-		[closingKey, signer, slippageBps, refetch],
+		[closingKey, activeSigner, slippageBps, refetch],
 	);
 
 	return (

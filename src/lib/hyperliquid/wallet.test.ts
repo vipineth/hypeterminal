@@ -1,14 +1,10 @@
+import type { AbstractViemLocalAccount } from "@nktkas/hyperliquid/signing";
 import { describe, expect, it, vi } from "vitest";
 import { toHyperliquidWallet } from "./wallet";
 
 const typedData = {
 	domain: { name: "Test", version: "1", chainId: 1 },
 	types: {
-		EIP712Domain: [
-			{ name: "name", type: "string" },
-			{ name: "version", type: "string" },
-			{ name: "chainId", type: "uint256" },
-		],
 		Mail: [{ name: "contents", type: "string" }],
 	},
 	primaryType: "Mail",
@@ -18,45 +14,59 @@ const typedData = {
 describe("wallet", () => {
 	it("returns null for invalid wallet client", () => {
 		expect(toHyperliquidWallet(null)).toBeNull();
+		expect(toHyperliquidWallet({})).toBeNull();
+		expect(toHyperliquidWallet({ signTypedData: "not a function" })).toBeNull();
 	});
 
-	it("uses account address and request for signing", async () => {
-		const accountAddress = "0x1111111111111111111111111111111111111111";
-		const request = vi.fn().mockResolvedValue("0xsignature");
+	it("returns null if no account address and no override", () => {
 		const walletClient = {
-			account: { address: accountAddress },
-			getAddresses: vi.fn().mockResolvedValue([accountAddress]),
-			getChainId: vi.fn().mockResolvedValue(1),
-			request,
+			signTypedData: vi.fn(),
+		};
+		expect(toHyperliquidWallet(walletClient)).toBeNull();
+	});
+
+	it("creates wallet adapter with accountOverride when client.account is missing", async () => {
+		const accountAddress = "0x1111111111111111111111111111111111111111" as const;
+		const signTypedData = vi.fn().mockResolvedValue("0xsignature");
+		const walletClient = {
+			signTypedData,
 		};
 
-		const wallet = toHyperliquidWallet(walletClient);
+		const wallet = toHyperliquidWallet(walletClient, accountAddress) as AbstractViemLocalAccount | null;
 		expect(wallet).not.toBeNull();
-
-		const addresses = await wallet?.getAddresses();
-		expect(addresses).toEqual([accountAddress]);
-
-		const chainId = await wallet?.getChainId();
-		expect(chainId).toBe(1);
+		expect(wallet?.address).toBe(accountAddress);
 
 		const signature = await wallet?.signTypedData(typedData);
 		expect(signature).toBe("0xsignature");
-		expect(request).toHaveBeenCalledWith({
-			method: "eth_signTypedData_v4",
-			params: [accountAddress, expect.any(String)],
+		expect(signTypedData).toHaveBeenCalledWith({
+			account: accountAddress,
+			domain: typedData.domain,
+			types: typedData.types,
+			primaryType: typedData.primaryType,
+			message: typedData.message,
 		});
 	});
 
-	it("falls back to request for chain id", async () => {
-		const request = vi.fn().mockResolvedValue("0x1");
+	it("creates wallet adapter from valid wallet client", async () => {
+		const accountAddress = "0x1111111111111111111111111111111111111111" as const;
+		const signTypedData = vi.fn().mockResolvedValue("0xsignature");
 		const walletClient = {
-			getAddresses: vi.fn().mockResolvedValue(["0x1111111111111111111111111111111111111111"]),
-			request,
+			account: { address: accountAddress },
+			signTypedData,
 		};
 
-		const wallet = toHyperliquidWallet(walletClient);
-		const chainId = await wallet?.getChainId();
-		expect(chainId).toBe(1);
-		expect(request).toHaveBeenCalledWith({ method: "eth_chainId" });
+		const wallet = toHyperliquidWallet(walletClient) as AbstractViemLocalAccount | null;
+		expect(wallet).not.toBeNull();
+		expect(wallet?.address).toBe(accountAddress);
+
+		const signature = await wallet?.signTypedData(typedData);
+		expect(signature).toBe("0xsignature");
+		expect(signTypedData).toHaveBeenCalledWith({
+			account: walletClient.account,
+			domain: typedData.domain,
+			types: typedData.types,
+			primaryType: typedData.primaryType,
+			message: typedData.message,
+		});
 	});
 });

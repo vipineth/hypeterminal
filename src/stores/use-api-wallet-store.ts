@@ -1,79 +1,103 @@
+import { useCallback, useSyncExternalStore } from "react";
 import { z } from "zod";
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
-import { STORAGE_KEYS } from "@/constants/app";
-import { createValidatedStorage } from "@/stores/validated-storage";
 
 export type HyperliquidEnv = "mainnet" | "testnet";
 
 const privateKeySchema = z
 	.string()
 	.regex(/^0x[0-9a-fA-F]{64}$/)
-	.transform((v) => v.toLowerCase());
+	.transform((v) => v.toLowerCase() as `0x${string}`);
 
-const apiWalletSchema = z.object({
-	state: z.object({
-		privateKeyByEnv: z.record(z.string(), privateKeySchema).optional(),
-		nameByEnv: z.record(z.string(), z.string().min(1)).optional(),
-	}),
+const publicKeySchema = z
+	.string()
+	.regex(/^0x[0-9a-fA-F]{40}$/)
+	.transform((v) => v.toLowerCase() as `0x${string}`);
+
+const agentWalletSchema = z.object({
+	privateKey: privateKeySchema,
+	publicKey: publicKeySchema,
 });
 
-const validatedStorage = createValidatedStorage(apiWalletSchema, "api wallet");
+export type AgentWallet = z.infer<typeof agentWalletSchema>;
 
-interface ApiWalletStore {
-	privateKeyByEnv: Partial<Record<HyperliquidEnv, `0x${string}`>>;
-	nameByEnv: Partial<Record<HyperliquidEnv, string>>;
-	actions: {
-		setPrivateKey: (env: HyperliquidEnv, privateKey: string) => void;
-		clearPrivateKey: (env: HyperliquidEnv) => void;
-		setName: (env: HyperliquidEnv, name: string) => void;
-	};
+function getStorageKey(env: HyperliquidEnv, userAddress: string): string {
+	return `hyperliquid_agent_${env}_${userAddress.toLowerCase()}`;
 }
 
-const useApiWalletStore = create<ApiWalletStore>()(
-	persist(
-		(set) => ({
-			privateKeyByEnv: {},
-			nameByEnv: {},
-			actions: {
-				setPrivateKey: (env, privateKey) => {
-					const parsed = privateKeySchema.parse(privateKey) as `0x${string}`;
-					set((state) => ({ privateKeyByEnv: { ...state.privateKeyByEnv, [env]: parsed } }));
-				},
-				clearPrivateKey: (env) => {
-					set((state) => {
-						const next = { ...state.privateKeyByEnv };
-						delete next[env];
-						return { privateKeyByEnv: next };
-					});
-				},
-				setName: (env, name) => {
-					const trimmed = name.trim();
-					if (!trimmed) return;
-					set((state) => ({ nameByEnv: { ...state.nameByEnv, [env]: trimmed } }));
-				},
-			},
-		}),
-		{
-			name: STORAGE_KEYS.API_WALLET,
-			storage: createJSONStorage(() => validatedStorage),
-			partialize: (state) => ({ privateKeyByEnv: state.privateKeyByEnv, nameByEnv: state.nameByEnv }),
-			merge: (persisted, current) => ({
-				...current,
-				...(persisted as Partial<ApiWalletStore>),
-			}),
+function readAgent(env: HyperliquidEnv, userAddress: string): AgentWallet | null {
+	if (typeof window === "undefined") return null;
+
+	try {
+		const key = getStorageKey(env, userAddress);
+		const raw = localStorage.getItem(key);
+		if (!raw) return null;
+
+		const parsed = JSON.parse(raw);
+		return agentWalletSchema.parse(parsed);
+	} catch {
+		return null;
+	}
+}
+
+function writeAgent(env: HyperliquidEnv, userAddress: string, privateKey: string, publicKey: string): void {
+	if (typeof window === "undefined") return;
+
+	try {
+		const key = getStorageKey(env, userAddress);
+		const data: AgentWallet = {
+			privateKey: privateKeySchema.parse(privateKey),
+			publicKey: publicKeySchema.parse(publicKey),
+		};
+		localStorage.setItem(key, JSON.stringify(data));
+		window.dispatchEvent(new StorageEvent("storage", { key }));
+	} catch (error) {
+		console.error("[AgentStore] Failed to write:", error);
+	}
+}
+
+function removeAgent(env: HyperliquidEnv, userAddress: string): void {
+	if (typeof window === "undefined") return;
+
+	const key = getStorageKey(env, userAddress);
+	localStorage.removeItem(key);
+	window.dispatchEvent(new StorageEvent("storage", { key }));
+}
+
+function subscribeToStorage(callback: () => void): () => void {
+	const handleStorage = () => callback();
+	window.addEventListener("storage", handleStorage);
+	return () => window.removeEventListener("storage", handleStorage);
+}
+
+export function useAgentWallet(env: HyperliquidEnv, userAddress: string | undefined): AgentWallet | null {
+	const getSnapshot = useCallback(() => {
+		if (!userAddress) return null;
+		return readAgent(env, userAddress);
+	}, [env, userAddress]);
+
+	const agent = useSyncExternalStore(
+		subscribeToStorage,
+		() => {
+			const data = getSnapshot();
+			return data ? JSON.stringify(data) : null;
 		},
-	),
-);
+		() => null,
+	);
 
-export function useApiWalletPrivateKeyByEnv() {
-	return useApiWalletStore((state) => state.privateKeyByEnv);
+	return agent ? (JSON.parse(agent) as AgentWallet) : null;
 }
 
-export function useApiWalletNameByEnv() {
-	return useApiWalletStore((state) => state.nameByEnv);
-}
+export function useAgentWalletActions() {
+	const setAgent = useCallback(
+		(env: HyperliquidEnv, userAddress: string, privateKey: string, publicKey: string) => {
+			writeAgent(env, userAddress, privateKey, publicKey);
+		},
+		[],
+	);
 
-export function useApiWalletActions() {
-	return useApiWalletStore((state) => state.actions);
+	const clearAgent = useCallback((env: HyperliquidEnv, userAddress: string) => {
+		removeAgent(env, userAddress);
+	}, []);
+
+	return { setAgent, clearAgent };
 }

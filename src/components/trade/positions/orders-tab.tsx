@@ -1,20 +1,19 @@
 import { t } from "@lingui/core/macro";
 import { ListOrdered } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useConnection, useWalletClient } from "wagmi";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
 import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
 import { useOpenOrders } from "@/hooks/hyperliquid/use-open-orders";
+import { useTradingAgent } from "@/hooks/hyperliquid/use-trading-agent";
 import { formatNumber, formatUSD } from "@/lib/format";
 import { getHttpTransport } from "@/lib/hyperliquid/clients";
 import { cancelOrders, makeExchangeConfig } from "@/lib/hyperliquid/exchange";
-import { toHyperliquidWallet } from "@/lib/hyperliquid/wallet";
 import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
-import { useTradingAgent } from "@/hooks/hyperliquid/use-trading-agent";
-import { useConnection, useWalletClient } from "wagmi";
 import { TokenAvatar } from "../components/token-avatar";
 
 export function OrdersTab() {
@@ -22,16 +21,13 @@ export function OrdersTab() {
 	const { data: walletClient } = useWalletClient();
 	const { data, status, error, refetch } = useOpenOrders({ user: isConnected ? address : undefined });
 	const { registry } = usePerpMarketRegistry();
-	const { apiWalletSigner } = useTradingAgent({
+	const { signer: activeSigner } = useTradingAgent({
 		user: isConnected ? address : undefined,
 		walletClient,
-		enabled: isConnected,
 	});
 	const [selectedOrderIds, setSelectedOrderIds] = useState<Set<number>>(() => new Set());
 	const [actionError, setActionError] = useState<string | null>(null);
 	const [isCancelling, setIsCancelling] = useState(false);
-
-	const signer = apiWalletSigner ?? (walletClient ? toHyperliquidWallet(walletClient) : null);
 	const openOrders = data ?? [];
 	const headerCount = isConnected ? openOrders.length : FALLBACK_VALUE_PLACEHOLDER;
 
@@ -82,7 +78,7 @@ export function OrdersTab() {
 	const handleCancelOrders = useCallback(
 		async (ordersToCancel: typeof openOrders) => {
 			if (isCancelling) return;
-			if (!signer) {
+			if (!activeSigner) {
 				setActionError(t`Connect a wallet to manage orders.`);
 				return;
 			}
@@ -105,7 +101,7 @@ export function OrdersTab() {
 
 			try {
 				const transport = getHttpTransport();
-				const config = makeExchangeConfig(transport, signer);
+				const config = makeExchangeConfig(transport, activeSigner);
 				const result = await cancelOrders(config, { cancels });
 				const statuses = result.response?.data?.statuses ?? [];
 				const errorStatus = statuses.find(
@@ -130,7 +126,7 @@ export function OrdersTab() {
 				setIsCancelling(false);
 			}
 		},
-		[isCancelling, signer, registry, refetch],
+		[isCancelling, activeSigner, registry, refetch],
 	);
 
 	const handleCancelSelected = useCallback(() => {
