@@ -1,16 +1,15 @@
+import { t } from "@lingui/core/macro";
 import { Timer } from "lucide-react";
 import { useMemo } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
 import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
 import { useTwapHistory } from "@/hooks/hyperliquid/use-twap-history";
 import { formatNumber, formatPrice } from "@/lib/format";
 import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
 import { useConnection } from "wagmi";
-
-const TWAP_TEXT = UI_TEXT.TWAP_TAB;
 
 export function TwapTab() {
 	const { address, isConnected } = useConnection();
@@ -27,7 +26,7 @@ export function TwapTab() {
 		return orders.filter((o) => o.status.status === "activated");
 	}, [orders]);
 
-	const headerCount = isConnected ? `${activeOrders.length} ${TWAP_TEXT.COUNT_LABEL}` : FALLBACK_VALUE_PLACEHOLDER;
+	const headerCount = isConnected ? `${activeOrders.length} ${t`Active`}` : FALLBACK_VALUE_PLACEHOLDER;
 
 	const tableRows = useMemo(() => {
 		return orders.map((order) => {
@@ -52,17 +51,17 @@ export function TwapTab() {
 			const rawStatus = order.status.status;
 			const statusLabel =
 				rawStatus === "activated"
-					? TWAP_TEXT.STATUS_ACTIVE
+					? t`active`
 					: rawStatus === "finished"
-						? TWAP_TEXT.STATUS_COMPLETED
+						? t`completed`
 						: rawStatus === "terminated"
-							? TWAP_TEXT.STATUS_CANCELLED
+							? t`cancelled`
 							: rawStatus;
 
 			return {
 				key: typeof order.twapId === "number" ? order.twapId : `${order.state.coin}-${order.state.timestamp}-${order.time}`,
 				coin: order.state.coin,
-				sideLabel: isBuy ? TWAP_TEXT.SIDE_BUY : TWAP_TEXT.SIDE_SELL,
+				sideLabel: isBuy ? t`buy` : t`sell`,
 				sideClass: isBuy ? "bg-terminal-green/20 text-terminal-green" : "bg-terminal-red/20 text-terminal-red",
 				totalSizeText: Number.isFinite(totalSize) ? formatNumber(totalSize, szDecimals) : String(order.state.sz),
 				executedSizeText: Number.isFinite(executedSize) ? formatNumber(executedSize, szDecimals) : String(order.state.executedSz),
@@ -79,26 +78,26 @@ export function TwapTab() {
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-2">
 				<Timer className="size-3" />
-				{TWAP_TEXT.TITLE}
+				{t`TWAP Orders`}
 				<span className="text-terminal-cyan ml-auto tabular-nums">{headerCount}</span>
 			</div>
 			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
 				{!isConnected ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{TWAP_TEXT.CONNECT}
+						{t`Connect your wallet to view TWAP orders.`}
 					</div>
 				) : status === "pending" ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{TWAP_TEXT.LOADING}
+						{t`Loading TWAP orders...`}
 					</div>
 				) : status === "error" ? (
 					<div className="h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs text-terminal-red/80">
-						<span>{TWAP_TEXT.FAILED}</span>
+						<span>{t`Failed to load TWAP history.`}</span>
 						{error instanceof Error ? <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span> : null}
 					</div>
 				) : orders.length === 0 ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{TWAP_TEXT.EMPTY}
+						{t`No TWAP orders found.`}
 					</div>
 				) : (
 					<ScrollArea className="h-full w-full">
@@ -106,25 +105,25 @@ export function TwapTab() {
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
-										{TWAP_TEXT.HEADER_ASSET}
+										{t`Asset`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{TWAP_TEXT.HEADER_TOTAL_SIZE}
+										{t`Total Size`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{TWAP_TEXT.HEADER_EXECUTED}
+										{t`Executed`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{TWAP_TEXT.HEADER_AVG_PRICE}
+										{t`Avg Price`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
-										{TWAP_TEXT.HEADER_PROGRESS}
+										{t`Progress`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
-										{TWAP_TEXT.HEADER_STATUS}
+										{t`Status`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{TWAP_TEXT.HEADER_ACTIONS}
+										{t`Actions`}
 									</TableHead>
 								</TableRow>
 							</TableHeader>
@@ -178,9 +177,9 @@ export function TwapTab() {
 													type="button"
 													className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors"
 													tabIndex={0}
-													aria-label={TWAP_TEXT.ARIA_CANCEL}
+													aria-label={t`Cancel TWAP order`}
 												>
-													{TWAP_TEXT.ACTION_CANCEL}
+													{t`Cancel`}
 												</button>
 											)}
 										</TableCell>

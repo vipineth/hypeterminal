@@ -1,0 +1,1053 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-01-04 20:57+0530\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: fr\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/components/trade/order-entry/order-toast.tsx:75
+msgid "% filled"
+msgstr "% exécuté"
+
+#: src/components/trade/chart/constants.ts:72
+msgid "24h Price"
+msgstr "Prix 24h"
+
+#: src/components/trade/order-entry/account-panel.tsx:121
+msgid "Account"
+msgstr "Compte"
+
+#: src/components/trade/positions/balances-tab.tsx:104
+msgid "Account Balances"
+msgstr "Soldes du compte"
+
+#: src/components/trade/positions/orders-tab.tsx:259
+#: src/components/trade/positions/positions-tab.tsx:214
+#: src/components/trade/positions/twap-tab.tsx:126
+msgid "Actions"
+msgstr "Actions"
+
+#: src/components/trade/positions/twap-tab.tsx:54
+msgid "active"
+msgstr "actif"
+
+#: src/components/trade/positions/twap-tab.tsx:29
+msgid "Active"
+msgstr "Actif"
+
+#: src/components/trade/positions/positions-tab.tsx:163
+msgid "Active Positions"
+msgstr "Positions actives"
+
+#: src/components/trade/header/user-menu.tsx:87
+msgid "Add funds"
+msgstr "Ajouter des fonds"
+
+#: src/components/trade/chart/token-selector.tsx:215
+msgid "Add to favorites"
+msgstr "Ajouter aux favoris"
+
+#: src/components/trade/header/top-nav.tsx:27
+msgid "API"
+msgstr "API"
+
+#: src/components/trade/positions/balances-tab.tsx:132
+#: src/components/trade/positions/funding-tab.tsx:110
+#: src/components/trade/positions/history-tab.tsx:98
+#: src/components/trade/positions/orders-tab.tsx:241
+#: src/components/trade/positions/positions-tab.tsx:193
+#: src/components/trade/positions/twap-tab.tsx:108
+msgid "Asset"
+msgstr "Actif"
+
+#: src/components/trade/order-entry/account-panel.tsx:84
+#: src/components/trade/order-entry/order-entry-panel.tsx:541
+#: src/components/trade/positions/balances-tab.tsx:135
+msgid "Available"
+msgstr "Disponible"
+
+#: src/components/trade/positions/twap-tab.tsx:117
+msgid "Avg Price"
+msgstr "Prix moy."
+
+#: src/components/trade/order-entry/account-panel.tsx:74
+msgid "Balance"
+msgstr "Solde"
+
+#: src/components/trade/footer/footer-bar.tsx:25
+msgid "Block:"
+msgstr "Bloc :"
+
+#: src/components/trade/components/global-settings-dialog.tsx:169
+msgid "bps"
+msgstr "pbs"
+
+#: src/components/ui/breadcrumb.tsx:9
+msgid "Breadcrumb"
+msgstr "Fil d'Ariane"
+
+#: src/components/trade/order-entry/deposit-modal.tsx:31
+msgid "Bridge USDC from Arbitrum or other chains to your Hyperliquid account."
+msgstr "Transférez des USDC depuis Arbitrum ou d'autres chaînes vers votre compte Hyperliquid."
+
+#: src/components/trade/positions/history-tab.tsx:51
+#: src/components/trade/positions/orders-tab.tsx:161
+#: src/components/trade/positions/twap-tab.tsx:64
+msgid "buy"
+msgstr "achat"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:434
+msgid "Buy"
+msgstr "Acheter"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:518
+msgid "Buy Long"
+msgstr "Acheter long"
+
+#: src/components/trade/positions/orders-tab.tsx:308
+#: src/components/trade/positions/twap-tab.tsx:182
+msgid "Cancel"
+msgstr "Annuler"
+
+#: src/components/trade/positions/orders-tab.tsx:203
+msgid "Cancel all"
+msgstr "Tout annuler"
+
+#: src/components/trade/positions/orders-tab.tsx:199
+msgid "Cancel all orders"
+msgstr "Annuler tous les ordres"
+
+#: src/components/trade/positions/orders-tab.tsx:304
+msgid "Cancel order"
+msgstr "Annuler l'ordre"
+
+#: src/components/trade/positions/orders-tab.tsx:193
+msgid "Cancel selected"
+msgstr "Annuler la sélection"
+
+#: src/components/trade/positions/orders-tab.tsx:189
+msgid "Cancel selected orders"
+msgstr "Annuler les ordres sélectionnés"
+
+#: src/components/trade/positions/twap-tab.tsx:180
+msgid "Cancel TWAP order"
+msgstr "Annuler l'ordre TWAP"
+
+#: src/components/trade/positions/orders-tab.tsx:193
+#: src/components/trade/positions/orders-tab.tsx:203
+#: src/components/trade/positions/orders-tab.tsx:308
+msgid "Canceling..."
+msgstr "Annulation..."
+
+#: src/components/trade/positions/twap-tab.tsx:58
+msgid "cancelled"
+msgstr "annulé"
+
+#: src/components/trade/components/global-settings-dialog.tsx:193
+msgid "Chart"
+msgstr "Graphique"
+
+#: src/components/trade/positions/positions-tab.tsx:255
+#: src/components/ui/dialog.tsx:63
+#: src/components/ui/sheet.tsx:67
+msgid "Close"
+msgstr "Fermer"
+
+#: src/components/trade/positions/positions-tab.tsx:251
+msgid "Close position"
+msgstr "Fermer la position"
+
+#: src/components/trade/positions/positions-tab.tsx:255
+msgid "Closing..."
+msgstr "Fermeture..."
+
+#: src/components/trade/order-entry/account-panel.tsx:117
+msgid "Collapse account panel"
+msgstr "Réduire le panneau du compte"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:460
+#: src/components/trade/order-entry/order-entry-panel.tsx:502
+#: src/components/trade/order-entry/order-entry-panel.tsx:660
+#: src/components/trade/order-entry/order-entry-panel.tsx:671
+msgid "Coming soon"
+msgstr "Bientôt disponible"
+
+#: src/components/trade/positions/twap-tab.tsx:56
+msgid "completed"
+msgstr "terminé"
+
+#: src/components/trade/positions/orders-tab.tsx:86
+msgid "Connect a wallet to manage orders."
+msgstr "Connectez un portefeuille pour gérer les ordres."
+
+#: src/components/trade/positions/positions-tab.tsx:112
+msgid "Connect a wallet to manage positions."
+msgstr "Connectez un portefeuille pour gérer les positions."
+
+#: src/components/trade/components/wallet-dialog.tsx:28
+#: src/components/trade/header/user-menu.tsx:65
+#: src/components/trade/order-entry/order-entry-panel.tsx:403
+msgid "Connect Wallet"
+msgstr "Connecter le portefeuille"
+
+#: src/components/trade/order-entry/account-panel.tsx:190
+msgid "Connect wallet to view account"
+msgstr "Connectez le portefeuille pour voir le compte"
+
+#: src/components/trade/positions/balances-tab.tsx:112
+msgid "Connect your wallet to view balances."
+msgstr "Connectez votre portefeuille pour voir les soldes."
+
+#: src/components/trade/positions/funding-tab.tsx:89
+msgid "Connect your wallet to view funding payments."
+msgstr "Connectez votre portefeuille pour voir les paiements de financement."
+
+#: src/components/trade/positions/orders-tab.tsx:211
+msgid "Connect your wallet to view open orders."
+msgstr "Connectez votre portefeuille pour voir les ordres ouverts."
+
+#: src/components/trade/positions/positions-tab.tsx:170
+msgid "Connect your wallet to view positions."
+msgstr "Connectez votre portefeuille pour voir les positions."
+
+#: src/components/trade/positions/history-tab.tsx:77
+msgid "Connect your wallet to view trade history."
+msgstr "Connectez votre portefeuille pour voir l'historique des transactions."
+
+#: src/components/trade/positions/twap-tab.tsx:87
+msgid "Connect your wallet to view TWAP orders."
+msgstr "Connectez votre portefeuille pour voir les ordres TWAP."
+
+#: src/components/trade/footer/footer-bar.tsx:21
+msgid "Connected"
+msgstr "Connecté"
+
+#: src/components/trade/header/user-menu.tsx:50
+msgid "Connecting..."
+msgstr "Connexion..."
+
+#: src/components/trade/header/user-menu.tsx:29
+msgid "Copy Address"
+msgstr "Copier l'adresse"
+
+#: src/hooks/hyperliquid/use-trading-agent.ts:77
+msgid "Could not create wallet"
+msgstr "Impossible de créer le portefeuille"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:451
+msgid "Cross"
+msgstr "Croisé"
+
+#: src/components/trade/order-entry/account-panel.tsx:99
+msgid "Cross Leverage"
+msgstr "Effet de levier croisé"
+
+#: src/components/trade/components/global-settings-dialog.tsx:96
+msgid "Customize your trading experience."
+msgstr "Personnalisez votre expérience de trading."
+
+#: src/components/trade/header/top-nav.tsx:91
+#: src/components/trade/order-entry/account-panel.tsx:209
+#: src/components/trade/order-entry/account-panel.tsx:211
+#: src/components/trade/order-entry/order-entry-panel.tsx:419
+#: src/components/trade/order-entry/order-entry-panel.tsx:554
+msgid "Deposit"
+msgstr "Déposer"
+
+#: src/components/trade/order-entry/deposit-modal.tsx:17
+msgid "Deposit Funds"
+msgstr "Déposer des fonds"
+
+#: src/components/trade/order-entry/deposit-modal.tsx:26
+msgid "Deposit on Hyperliquid"
+msgstr "Déposer sur Hyperliquid"
+
+#: src/components/trade/header/user-menu.tsx:98
+msgid "Disconnect"
+msgstr "Déconnecter"
+
+#: src/components/trade/order-entry/order-toast.tsx:91
+msgid "Dismiss"
+msgstr "Fermer"
+
+#: src/components/trade/components/global-settings-dialog.tsx:103
+msgid "Display Language"
+msgstr "Langue d'affichage"
+
+#: src/components/ui/sidebar.tsx:173
+msgid "Displays the mobile sidebar."
+msgstr "Affiche la barre latérale mobile."
+
+#: src/components/trade/header/top-nav.tsx:28
+msgid "Docs"
+msgstr "Documentation"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:427
+msgid "Enable Trading"
+msgstr "Activer le trading"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:209
+msgid "Enter limit price"
+msgstr "Entrez le prix limite"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:212
+msgid "Enter size"
+msgstr "Entrez la taille"
+
+#: src/components/trade/positions/positions-tab.tsx:202
+msgid "Entry"
+msgstr "Entrée"
+
+#: src/components/trade/order-entry/account-panel.tsx:132
+msgid "Equity"
+msgstr "Capitaux propres"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:728
+msgid "Est. Fee"
+msgstr "Frais est."
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:218
+msgid "Exceeds max size"
+msgstr "Dépasse la taille max"
+
+#: src/components/trade/positions/twap-tab.tsx:114
+msgid "Executed"
+msgstr "Exécuté"
+
+#: src/components/trade/order-entry/account-panel.tsx:117
+msgid "Expand account panel"
+msgstr "Développer le panneau du compte"
+
+#: src/components/trade/order-entry/order-toast.tsx:178
+msgid "failed"
+msgstr "échoué"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:315
+msgid "Failed to enable trading"
+msgstr "Échec de l'activation du trading"
+
+#: src/components/trade/positions/balances-tab.tsx:120
+msgid "Failed to load balances."
+msgstr "Échec du chargement des soldes."
+
+#: src/components/trade/positions/funding-tab.tsx:97
+msgid "Failed to load funding history."
+msgstr "Échec du chargement de l'historique de financement."
+
+#: src/components/trade/positions/orders-tab.tsx:219
+msgid "Failed to load open orders."
+msgstr "Échec du chargement des ordres ouverts."
+
+#: src/components/trade/orderbook/order-book-panel.tsx:273
+msgid "Failed to load order book."
+msgstr "Échec du chargement du carnet d'ordres."
+
+#: src/components/trade/positions/positions-tab.tsx:178
+msgid "Failed to load positions."
+msgstr "Échec du chargement des positions."
+
+#: src/components/trade/positions/history-tab.tsx:85
+msgid "Failed to load trade history."
+msgstr "Échec du chargement de l'historique des transactions."
+
+#: src/components/trade/orderbook/trades-view.tsx:72
+msgid "Failed to load trades."
+msgstr "Échec du chargement des transactions."
+
+#: src/components/trade/positions/twap-tab.tsx:95
+msgid "Failed to load TWAP history."
+msgstr "Échec du chargement de l'historique TWAP."
+
+#: src/components/trade/positions/history-tab.tsx:110
+msgid "Fee"
+msgstr "Frais"
+
+#: src/components/trade/positions/orders-tab.tsx:253
+msgid "Filled"
+msgstr "Exécuté"
+
+#. placeholder {0}: cat.label
+#: src/components/trade/chart/token-selector.tsx:95
+msgid "Filter by {0}"
+msgstr "Filtrer par {0}"
+
+#: src/components/trade/components/global-settings-dialog.tsx:129
+msgid "Format for numbers and dates"
+msgstr ""
+
+#: src/components/trade/chart/constants.ts:90
+msgid "Funding"
+msgstr "Financement"
+
+#: src/components/trade/positions/funding-tab.tsx:81
+msgid "Funding Payments"
+msgstr "Paiements de financement"
+
+#: src/components/trade/footer/footer-bar.tsx:30
+msgid "Gas:"
+msgstr "Gas :"
+
+#: src/components/ui/pagination.tsx:66
+msgid "Go to next page"
+msgstr "Aller à la page suivante"
+
+#: src/components/ui/pagination.tsx:52
+msgid "Go to previous page"
+msgstr "Aller à la page précédente"
+
+#: src/components/pages/not-found-page.tsx:20
+#: src/components/pages/not-found-page.tsx:21
+msgid "Go to trading terminal"
+msgstr "Aller au terminal de trading"
+
+#: src/components/trade/positions/balances-tab.tsx:138
+msgid "In Use"
+msgstr "En cours d'utilisation"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:456
+msgid "Isolated"
+msgstr "Isolé"
+
+#: src/components/trade/footer/footer-bar.tsx:36
+msgid "Latency:"
+msgstr "Latence :"
+
+#: src/components/trade/header/top-nav.tsx:23
+msgid "Leaderboard"
+msgstr "Classement"
+
+#: src/components/trade/positions/orders-tab.tsx:163
+msgid "limit"
+msgstr "limite"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:492
+msgid "Limit"
+msgstr "Limite"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:625
+msgid "Limit Price"
+msgstr "Prix limite"
+
+#: src/components/trade/positions/orders-tab.tsx:163
+msgid "limit ro"
+msgstr "limite réd. seul."
+
+#: src/components/trade/positions/positions-tab.tsx:211
+msgid "Liq"
+msgstr "Liq."
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:708
+msgid "Liq. Price"
+msgstr "Prix liq."
+
+#: src/components/ui/spinner.tsx:10
+msgid "Loading"
+msgstr "Chargement"
+
+#: src/components/trade/positions/balances-tab.tsx:116
+msgid "Loading balances..."
+msgstr "Chargement des soldes..."
+
+#: src/components/trade/positions/funding-tab.tsx:93
+msgid "Loading funding history..."
+msgstr "Chargement de l'historique de financement..."
+
+#: src/components/trade/chart/token-selector.tsx:144
+msgid "Loading markets..."
+msgstr "Chargement des marchés..."
+
+#: src/components/trade/positions/orders-tab.tsx:215
+msgid "Loading open orders..."
+msgstr "Chargement des ordres ouverts..."
+
+#: src/components/trade/positions/positions-tab.tsx:174
+msgid "Loading positions..."
+msgstr "Chargement des positions..."
+
+#: src/components/trade/positions/history-tab.tsx:81
+msgid "Loading trade history..."
+msgstr "Chargement de l'historique des transactions..."
+
+#: src/components/trade/positions/twap-tab.tsx:91
+msgid "Loading TWAP orders..."
+msgstr "Chargement des ordres TWAP..."
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:186
+msgid "Loading wallet..."
+msgstr "Chargement du portefeuille..."
+
+#: src/components/trade/order-entry/account-panel.tsx:192
+#: src/components/trade/order-entry/order-entry-panel.tsx:427
+msgid "Loading..."
+msgstr "Chargement..."
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:521
+#: src/components/trade/positions/funding-tab.tsx:62
+#: src/components/trade/positions/positions-tab.tsx:87
+msgid "Long"
+msgstr "Achat"
+
+#: src/components/trade/order-entry/account-panel.tsx:94
+msgid "Margin Ratio"
+msgstr "Ratio de marge"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:718
+msgid "Margin Req."
+msgstr "Marge req."
+
+#: src/components/trade/order-entry/account-panel.tsx:89
+msgid "Margin Used"
+msgstr "Marge utilisée"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:632
+#: src/components/trade/positions/positions-tab.tsx:205
+msgid "Mark"
+msgstr "Mark"
+
+#: src/components/trade/chart/chart-panel.tsx:45
+#: src/components/trade/market-overview.tsx:39
+msgid "MARK"
+msgstr "MARQUE"
+
+#: src/components/trade/chart/constants.ts:60
+#: src/components/trade/order-entry/order-entry-panel.tsx:489
+msgid "Market"
+msgstr "Marché"
+
+#: src/components/trade/positions/orders-tab.tsx:99
+msgid "Market metadata unavailable."
+msgstr "Métadonnées du marché indisponibles."
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:195
+msgid "Market not ready"
+msgstr "Marché non prêt"
+
+#: src/components/trade/components/global-settings-dialog.tsx:155
+msgid "Market Order Slippage"
+msgstr "Glissement des ordres au marché"
+
+#: src/components/trade/chart/token-selector.tsx:284
+msgid "markets"
+msgstr "marchés"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:615
+msgid "Max"
+msgstr "Max"
+
+#: src/components/trade/components/global-settings-dialog.tsx:156
+msgid "Max slippage allowed for market orders."
+msgstr "Glissement maximum autorisé pour les ordres au marché."
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:215
+msgid "Min order $10"
+msgstr "Ordre min. 10 $"
+
+#: src/components/trade/header/top-nav.tsx:71
+#: src/components/ui/breadcrumb.tsx:78
+msgid "More"
+msgstr "Plus"
+
+#: src/components/trade/header/top-nav.tsx:69
+msgid "More options"
+msgstr "Plus d'options"
+
+#: src/components/ui/pagination.tsx:86
+msgid "More pages"
+msgstr "Plus de pages"
+
+#: src/components/trade/chart/token-selector.tsx:228
+msgid "NEW"
+msgstr "NOUVEAU"
+
+#: src/components/ui/pagination.tsx:71
+msgid "Next"
+msgstr "Suivant"
+
+#: src/components/trade/positions/positions-tab.tsx:185
+msgid "No active positions."
+msgstr "Aucune position active."
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:189
+msgid "No balance"
+msgstr "Pas de solde"
+
+#: src/components/trade/positions/balances-tab.tsx:124
+msgid "No balances found. Deposit funds to start trading."
+msgstr "Aucun solde trouvé. Déposez des fonds pour commencer à trader."
+
+#: src/components/trade/positions/history-tab.tsx:90
+msgid "No fills found."
+msgstr "Aucune exécution trouvée."
+
+#: src/components/trade/positions/funding-tab.tsx:102
+msgid "No funding payments found."
+msgstr "Aucun paiement de financement trouvé."
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:206
+msgid "No mark price"
+msgstr "Pas de prix mark"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:192
+msgid "No market"
+msgstr "Pas de marché"
+
+#: src/components/trade/chart/token-selector.tsx:147
+msgid "No markets found."
+msgstr "Aucun marché trouvé."
+
+#: src/components/trade/positions/orders-tab.tsx:224
+msgid "No open orders."
+msgstr "Aucun ordre ouvert."
+
+#: src/components/trade/positions/twap-tab.tsx:100
+msgid "No TWAP orders found."
+msgstr "Aucun ordre TWAP trouvé."
+
+#: src/components/trade/components/wallet-dialog.tsx:48
+msgid "No wallets found"
+msgstr "Aucun portefeuille trouvé"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:183
+msgid "Not connected"
+msgstr "Non connecté"
+
+#: src/components/trade/header/top-nav.tsx:98
+msgid "Notifications"
+msgstr "Notifications"
+
+#: src/components/trade/components/global-settings-dialog.tsx:126
+msgid "Number Format"
+msgstr ""
+
+#: src/components/trade/chart/chart-panel.tsx:61
+#: src/components/trade/market-overview.tsx:55
+msgid "OI"
+msgstr "OI"
+
+#: src/components/trade/positions/orders-tab.tsx:169
+msgid "open"
+msgstr "ouvert"
+
+#: src/components/trade/chart/constants.ts:78
+msgid "Open Interest"
+msgstr "Intérêt ouvert"
+
+#: src/components/trade/positions/orders-tab.tsx:182
+msgid "Open Orders"
+msgstr "Ordres ouverts"
+
+#: src/components/trade/chart/chart-panel.tsx:50
+#: src/components/trade/market-overview.tsx:44
+msgid "ORACLE"
+msgstr "ORACLE"
+
+#: src/components/trade/components/global-settings-dialog.tsx:239
+#: src/components/trade/orderbook/order-book-panel.tsx:181
+#: src/components/trade/orderbook/order-book-panel.tsx:183
+msgid "Order Book"
+msgstr "Carnet d'ordres"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:382
+msgid "Order failed"
+msgstr "Ordre échoué"
+
+#: src/components/trade/order-entry/order-toast.tsx:167
+msgid "Order Queue"
+msgstr "File d'ordres"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:714
+msgid "Order Value"
+msgstr "Valeur de l'ordre"
+
+#: src/components/pages/not-found-page.tsx:13
+msgid "Page not found"
+msgstr "Page non trouvée"
+
+#: src/components/ui/pagination.tsx:10
+msgid "pagination"
+msgstr "pagination"
+
+#: src/components/trade/positions/funding-tab.tsx:119
+msgid "Payment"
+msgstr "Paiement"
+
+#: src/components/trade/order-entry/order-toast.tsx:173
+msgid "pending"
+msgstr "en attente"
+
+#: src/components/trade/positions/balances-tab.tsx:163
+msgid "perp"
+msgstr "perp"
+
+#: src/components/trade/order-entry/account-panel.tsx:165
+#: src/components/trade/order-entry/account-panel.tsx:167
+msgid "Perps"
+msgstr "Perpétuels"
+
+#: src/components/trade/order-entry/account-panel.tsx:143
+#: src/components/trade/positions/history-tab.tsx:113
+#: src/components/trade/positions/positions-tab.tsx:208
+msgid "PNL"
+msgstr "PNL"
+
+#: src/components/trade/header/top-nav.tsx:21
+msgid "Portfolio"
+msgstr "Portefeuille"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:561
+#: src/components/trade/positions/funding-tab.tsx:113
+msgid "Position"
+msgstr "Position"
+
+#: src/components/ui/pagination.tsx:58
+msgid "Previous"
+msgstr "Précédent"
+
+#: src/components/trade/chart/constants.ts:66
+#: src/components/trade/orderbook/order-book-panel.tsx:233
+#: src/components/trade/orderbook/trades-view.tsx:67
+#: src/components/trade/positions/history-tab.tsx:104
+#: src/components/trade/positions/orders-tab.tsx:247
+msgid "Price"
+msgstr "Prix"
+
+#: src/components/trade/positions/twap-tab.tsx:120
+msgid "Progress"
+msgstr "Progression"
+
+#: src/components/trade/positions/funding-tab.tsx:116
+msgid "Rate"
+msgstr "Taux"
+
+#: src/components/trade/orderbook/order-book-panel.tsx:193
+msgid "Recent Trades"
+msgstr "Transactions récentes"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:654
+#: src/components/trade/order-entry/order-entry-panel.tsx:656
+msgid "Reduce Only"
+msgstr "Réduction uniquement"
+
+#: src/components/trade/chart/token-selector.tsx:215
+msgid "Remove from favorites"
+msgstr "Retirer des favoris"
+
+#: src/components/trade/chart/token-selector.tsx:73
+msgid "Search markets..."
+msgstr "Rechercher des marchés..."
+
+#: src/components/trade/header/favorites-strip.tsx:104
+msgid "Select {coin} market"
+msgstr "Sélectionner le marché {coin}"
+
+#: src/components/trade/positions/orders-tab.tsx:235
+msgid "Select all orders"
+msgstr "Sélectionner tous les ordres"
+
+#: src/components/trade/header/favorites-strip.tsx:69
+msgid "Select favorite markets"
+msgstr "Sélectionner les marchés favoris"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:470
+msgid "Select leverage"
+msgstr "Sélectionner le levier"
+
+#: src/components/trade/positions/orders-tab.tsx:270
+msgid "Select order"
+msgstr "Sélectionner l'ordre"
+
+#: src/components/trade/orderbook/order-book-panel.tsx:205
+msgid "Select order book aggregation"
+msgstr "Sélectionner l'agrégation du carnet d'ordres"
+
+#: src/components/trade/chart/token-selector.tsx:53
+msgid "Select token"
+msgstr "Sélectionner le jeton"
+
+#: src/components/trade/positions/history-tab.tsx:51
+#: src/components/trade/positions/orders-tab.tsx:161
+#: src/components/trade/positions/twap-tab.tsx:64
+msgid "sell"
+msgstr "vente"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:434
+msgid "Sell"
+msgstr "Vendre"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:533
+msgid "Sell Short"
+msgstr "Vendre short"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:612
+msgid "Set {p}%"
+msgstr "Définir {p}%"
+
+#: src/components/trade/positions/positions-tab.tsx:261
+msgid "Set TP/SL"
+msgstr "Définir TP/SL"
+
+#: src/components/trade/components/global-settings-dialog.tsx:95
+#: src/components/trade/header/top-nav.tsx:107
+msgid "Settings"
+msgstr "Paramètres"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:536
+#: src/components/trade/positions/funding-tab.tsx:62
+#: src/components/trade/positions/positions-tab.tsx:87
+msgid "Short"
+msgstr "Vente"
+
+#: src/components/trade/components/global-settings-dialog.tsx:214
+msgid "Show Executions on Chart"
+msgstr "Afficher les exécutions sur le graphique"
+
+#: src/components/trade/components/global-settings-dialog.tsx:198
+msgid "Show Orders on Chart"
+msgstr "Afficher les ordres sur le graphique"
+
+#: src/components/trade/components/global-settings-dialog.tsx:204
+msgid "Show Positions on Chart"
+msgstr "Afficher les positions sur le graphique"
+
+#: src/components/trade/components/global-settings-dialog.tsx:224
+msgid "Show Scanlines"
+msgstr "Afficher les lignes de balayage"
+
+#: src/components/trade/components/global-settings-dialog.tsx:243
+msgid "Show Values in USD"
+msgstr "Afficher les valeurs en USD"
+
+#: src/components/ui/sidebar.tsx:172
+msgid "Sidebar"
+msgstr "Barre latérale"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:203
+msgid "Signer not ready"
+msgstr "Signataire non prêt"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:427
+msgid "Signing..."
+msgstr "Signature..."
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:570
+#: src/components/trade/order-entry/order-toast.tsx:80
+#: src/components/trade/orderbook/order-book-panel.tsx:239
+#: src/components/trade/orderbook/trades-view.tsx:68
+#: src/components/trade/positions/history-tab.tsx:107
+#: src/components/trade/positions/orders-tab.tsx:250
+#: src/components/trade/positions/positions-tab.tsx:196
+msgid "Size"
+msgstr "Taille"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:724
+msgid "Slippage"
+msgstr "Glissement"
+
+#: src/lib/errors.ts:5
+msgid "Something went wrong"
+msgstr "Une erreur s'est produite"
+
+#. placeholder {0}: String(header.column.columnDef.header ?? "")
+#: src/components/trade/chart/token-selector.tsx:124
+msgid "Sort by {0}"
+msgstr "Trier par {0}"
+
+#: src/components/ui/virtual-table.tsx:90
+msgid "Sort by {headerLabel}"
+msgstr "Trier par {headerLabel}"
+
+#. placeholder {0}: sorting[0].id
+#: src/components/trade/chart/token-selector.tsx:287
+msgid "Sorted by {0}"
+msgstr "Trié par {0}"
+
+#: src/components/trade/positions/balances-tab.tsx:163
+msgid "spot"
+msgstr "spot"
+
+#: src/components/trade/order-entry/account-panel.tsx:182
+#: src/components/trade/order-entry/account-panel.tsx:184
+msgid "Spot"
+msgstr "Spot"
+
+#: src/components/trade/orderbook/order-book-panel.tsx:312
+msgid "Spread"
+msgstr "Écart"
+
+#: src/components/trade/header/top-nav.tsx:22
+msgid "Staking"
+msgstr "Staking"
+
+#: src/components/trade/positions/orders-tab.tsx:256
+#: src/components/trade/positions/twap-tab.tsx:123
+msgid "Status"
+msgstr "Statut"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:498
+msgid "Stop"
+msgstr "Stop"
+
+#: src/components/trade/header/top-nav.tsx:29
+msgid "Support"
+msgstr "Support"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:411
+msgid "Switch to Arbitrum"
+msgstr "Passer à Arbitrum"
+
+#: src/components/trade/header/theme-toggle.tsx:43
+msgid "Switch to dark mode"
+msgstr "Passer en mode sombre"
+
+#: src/components/trade/header/theme-toggle.tsx:43
+msgid "Switch to light mode"
+msgstr "Passer en mode clair"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:411
+msgid "Switching..."
+msgstr "Changement..."
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:665
+msgid "Take Profit / Stop Loss"
+msgstr "Prise de profit / Stop Loss"
+
+#: src/components/pages/not-found-page.tsx:16
+msgid "The page you are looking for does not exist."
+msgstr "La page que vous recherchez n'existe pas."
+
+#: src/components/trade/orderbook/trades-view.tsx:66
+#: src/components/trade/positions/funding-tab.tsx:122
+#: src/components/trade/positions/history-tab.tsx:116
+msgid "Time"
+msgstr "Heure"
+
+#: src/components/ui/sidebar.tsx:246
+#: src/components/ui/sidebar.tsx:258
+#: src/components/ui/sidebar.tsx:261
+msgid "Toggle Sidebar"
+msgstr "Basculer la barre latérale"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:577
+msgid "Toggle size mode"
+msgstr "Basculer le mode de taille"
+
+#: src/components/trade/orderbook/order-book-panel.tsx:248
+#: src/components/trade/positions/balances-tab.tsx:141
+msgid "Total"
+msgstr "Total"
+
+#: src/components/trade/positions/twap-tab.tsx:111
+msgid "Total Size"
+msgstr "Taille totale"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:667
+#: src/components/trade/positions/positions-tab.tsx:263
+msgid "TP/SL"
+msgstr "TP/SL"
+
+#: src/components/trade/header/top-nav.tsx:19
+msgid "Trade"
+msgstr "Trader"
+
+#: src/components/trade/positions/history-tab.tsx:71
+msgid "Trade History"
+msgstr "Historique des transactions"
+
+#: src/components/trade/orderbook/order-book-panel.tsx:195
+#: src/components/trade/positions/history-tab.tsx:25
+msgid "Trades"
+msgstr "Transactions"
+
+#: src/components/trade/order-entry/deposit-modal.tsx:18
+msgid "Transfer USDC to your Hyperliquid account to start trading."
+msgstr "Transférez des USDC vers votre compte Hyperliquid pour commencer à trader."
+
+#: src/components/trade/positions/twap-tab.tsx:81
+msgid "TWAP Orders"
+msgstr "Ordres TWAP"
+
+#: src/components/trade/positions/history-tab.tsx:101
+#: src/components/trade/positions/orders-tab.tsx:244
+msgid "Type"
+msgstr "Type"
+
+#: src/components/trade/positions/orders-tab.tsx:127
+msgid "Unable to cancel orders."
+msgstr "Impossible d'annuler les ordres."
+
+#: src/components/trade/positions/positions-tab.tsx:124
+#: src/components/trade/positions/positions-tab.tsx:150
+msgid "Unable to close position."
+msgstr "Impossible de fermer la position."
+
+#: src/components/trade/chart/datafeed.ts:401
+msgid "Unknown symbol: {symbolName}"
+msgstr "Symbole inconnu : {symbolName}"
+
+#: src/components/trade/order-entry/account-panel.tsx:79
+msgid "Unrealized PNL"
+msgstr "PNL non réalisé"
+
+#. placeholder {0}: String(resolution)
+#: src/components/trade/chart/datafeed.ts:441
+msgid "Unsupported resolution: {0}"
+msgstr "Résolution non prise en charge : {0}"
+
+#: src/components/trade/chart/token-selector.tsx:287
+msgid "Updated live"
+msgstr "Mise à jour en direct"
+
+#: src/components/trade/positions/balances-tab.tsx:144
+msgid "USD Value"
+msgstr "Valeur en USD"
+
+#: src/components/trade/positions/positions-tab.tsx:199
+msgid "Value"
+msgstr "Valeur"
+
+#: src/components/trade/header/top-nav.tsx:20
+msgid "Vaults"
+msgstr "Coffres"
+
+#: src/components/trade/chart/chart-panel.tsx:54
+#: src/components/trade/market-overview.tsx:48
+msgid "VOL"
+msgstr "VOL"
+
+#: src/components/trade/chart/constants.ts:84
+msgid "Volume"
+msgstr "Volume"
+
+#: src/components/trade/orderbook/order-book-panel.tsx:273
+msgid "Waiting for order book..."
+msgstr "En attente du carnet d'ordres..."
+
+#: src/components/trade/orderbook/trades-view.tsx:72
+msgid "Waiting for trades..."
+msgstr "En attente des transactions..."
+
+#: src/hooks/hyperliquid/use-trading-agent.ts:65
+msgid "Wallet client not ready"
+msgstr "Client du portefeuille non prêt"
+
+#: src/hooks/hyperliquid/use-trading-agent.ts:68
+msgid "Wallet not connected"
+msgstr "Portefeuille non connecté"
+
+#: src/components/trade/orderbook/order-book-panel.tsx:324
+#: src/components/trade/orderbook/trades-view.tsx:100
+msgid "WebSocket error"
+msgstr "Erreur WebSocket"
+
+#: src/components/trade/order-entry/account-panel.tsx:217
+#: src/components/trade/order-entry/account-panel.tsx:219
+msgid "Withdraw"
+msgstr "Retirer"

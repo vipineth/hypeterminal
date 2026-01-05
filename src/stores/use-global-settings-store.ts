@@ -3,6 +3,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useShallow } from "zustand/react/shallow";
 import { STORAGE_KEYS } from "@/constants/app";
+import { type NumberFormatLocale, resolveNumberFormatLocale } from "@/lib/i18n";
 import { createValidatedStorage } from "@/stores/validated-storage";
 
 const globalSettingsSchema = z.object({
@@ -12,6 +13,7 @@ const globalSettingsSchema = z.object({
 		showExecutionsOnChart: z.boolean().optional(),
 		showOrderbookInUsd: z.boolean().optional(),
 		showChartScanlines: z.boolean().optional(),
+		numberFormatLocale: z.string().optional(),
 	}),
 });
 
@@ -23,6 +25,7 @@ const DEFAULT_GLOBAL_SETTINGS = {
 	showExecutionsOnChart: false,
 	showOrderbookInUsd: false,
 	showChartScanlines: true,
+	numberFormatLocale: "auto" as NumberFormatLocale,
 } as const;
 
 interface GlobalSettingsStore {
@@ -31,12 +34,14 @@ interface GlobalSettingsStore {
 	showExecutionsOnChart: boolean;
 	showOrderbookInUsd: boolean;
 	showChartScanlines: boolean;
+	numberFormatLocale: NumberFormatLocale;
 	actions: {
 		setShowOrdersOnChart: (next: boolean) => void;
 		setShowPositionsOnChart: (next: boolean) => void;
 		setShowExecutionsOnChart: (next: boolean) => void;
 		setShowOrderbookInUsd: (next: boolean) => void;
 		setShowChartScanlines: (next: boolean) => void;
+		setNumberFormatLocale: (next: NumberFormatLocale) => void;
 	};
 }
 
@@ -50,6 +55,7 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 				setShowExecutionsOnChart: (next) => set({ showExecutionsOnChart: next }),
 				setShowOrderbookInUsd: (next) => set({ showOrderbookInUsd: next }),
 				setShowChartScanlines: (next) => set({ showChartScanlines: next }),
+				setNumberFormatLocale: (next) => set({ numberFormatLocale: next }),
 			},
 		}),
 		{
@@ -61,6 +67,7 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 				showExecutionsOnChart: state.showExecutionsOnChart,
 				showOrderbookInUsd: state.showOrderbookInUsd,
 				showChartScanlines: state.showChartScanlines,
+				numberFormatLocale: state.numberFormatLocale,
 			}),
 			merge: (persisted, current) => ({
 				...current,
@@ -79,10 +86,28 @@ export function useGlobalSettings() {
 			showExecutionsOnChart: state.showExecutionsOnChart,
 			showOrderbookInUsd: state.showOrderbookInUsd,
 			showChartScanlines: state.showChartScanlines,
+			numberFormatLocale: state.numberFormatLocale,
 		})),
 	);
 }
 
 export function useGlobalSettingsActions() {
 	return useGlobalSettingsStore((state) => state.actions);
+}
+
+/**
+ * Returns the resolved Intl locale string for number/date formatting.
+ * Use this when you need the actual locale code (e.g., "en-US", "de-DE").
+ */
+export function useResolvedFormatLocale(): string {
+	const numberFormatLocale = useGlobalSettingsStore((state) => state.numberFormatLocale);
+	return resolveNumberFormatLocale(numberFormatLocale);
+}
+
+/**
+ * Get the resolved format locale synchronously (for non-React contexts).
+ * Prefer useResolvedFormatLocale() in React components for reactivity.
+ */
+export function getResolvedFormatLocale(): string {
+	return resolveNumberFormatLocale(useGlobalSettingsStore.getState().numberFormatLocale);
 }

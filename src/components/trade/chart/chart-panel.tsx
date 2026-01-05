@@ -1,8 +1,9 @@
+import { t } from "@lingui/core/macro";
 import { ClientOnly } from "@tanstack/react-router";
 import { Flame } from "lucide-react";
 import { useCallback } from "react";
 import { Separator } from "@/components/ui/separator";
-import { DEFAULT_MARKET_KEY, UI_TEXT } from "@/constants/app";
+import { DEFAULT_MARKET_KEY } from "@/constants/app";
 import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { makePerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
@@ -20,7 +21,6 @@ export function ChartPanel() {
 	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "realtime" });
 	const selectedCoin = selectedMarket?.coin ?? perpCoinFromMarketKey(DEFAULT_MARKET_KEY);
 	const { setSelectedMarketKey } = useMarketPrefsActions();
-	const overviewText = UI_TEXT.MARKET_OVERVIEW;
 
 	const handleCoinChange = useCallback(
 		(coin: string) => {
@@ -42,23 +42,23 @@ export function ChartPanel() {
 						<Separator orientation="vertical" className="mx-1 h-4" />
 						<div className="hidden md:flex items-center gap-4 text-3xs">
 							<StatBlock
-								label={overviewText.LABEL_MARK}
+								label={t`MARK`}
 								value={formatUSD(selectedMarket?.ctxNumbers?.markPx ?? null)}
 								valueClass="text-terminal-amber terminal-glow-amber"
 							/>
 							<StatBlock
-								label={overviewText.LABEL_ORACLE}
+								label={t`ORACLE`}
 								value={formatUSD(selectedMarket?.ctxNumbers?.oraclePx ?? null)}
 							/>
 							<StatBlock
-								label={overviewText.LABEL_VOLUME}
+								label={t`VOL`}
 								value={formatUSD(selectedMarket?.ctxNumbers?.dayNtlVlm ?? null, {
 									notation: "compact",
 									compactDisplay: "short",
 								})}
 							/>
 							<StatBlock
-								label={overviewText.LABEL_OPEN_INTEREST}
+								label={t`OI`}
 								value={formatUSD(calculateOpenInterestUSD(selectedMarket?.ctxNumbers), {
 									notation: "compact",
 									compactDisplay: "short",

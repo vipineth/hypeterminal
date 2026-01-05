@@ -1,16 +1,15 @@
+import { t } from "@lingui/core/macro";
 import { Percent } from "lucide-react";
 import { useMemo } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
 import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
 import { useUserFunding } from "@/hooks/hyperliquid/use-user-funding";
 import { formatNumber, formatPercent, formatUSD } from "@/lib/format";
 import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
 import { useConnection } from "wagmi";
-
-const FUNDING_TEXT = UI_TEXT.FUNDING_TAB;
 
 export function FundingTab() {
 	const { address, isConnected } = useConnection();
@@ -60,7 +59,7 @@ export function FundingTab() {
 			return {
 				key: `${update.hash}-${update.time}`,
 				coin: update.delta.coin,
-				sideLabel: isLong ? FUNDING_TEXT.SIDE_LONG : FUNDING_TEXT.SIDE_SHORT,
+				sideLabel: isLong ? t`Long` : t`Short`,
 				sideClass: isLong ? "bg-terminal-green/20 text-terminal-green" : "bg-terminal-red/20 text-terminal-red",
 				positionText: Number.isFinite(positionSize) ? formatNumber(positionSize, szDecimals) : FALLBACK_VALUE_PLACEHOLDER,
 				rateText: Number.isFinite(rate)
@@ -79,7 +78,7 @@ export function FundingTab() {
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-2">
 				<Percent className="size-3" />
-				{FUNDING_TEXT.TITLE}
+				{t`Funding Payments`}
 				<span className={cn("ml-auto tabular-nums", headerClass)}>
 					{headerTotal}
 				</span>
@@ -87,20 +86,20 @@ export function FundingTab() {
 			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
 				{!isConnected ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{FUNDING_TEXT.CONNECT}
+						{t`Connect your wallet to view funding payments.`}
 					</div>
 				) : status === "pending" ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{FUNDING_TEXT.LOADING}
+						{t`Loading funding history...`}
 					</div>
 				) : status === "error" ? (
 					<div className="h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs text-terminal-red/80">
-						<span>{FUNDING_TEXT.FAILED}</span>
+						<span>{t`Failed to load funding history.`}</span>
 						{error instanceof Error ? <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span> : null}
 					</div>
 				) : updates.length === 0 ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{FUNDING_TEXT.EMPTY}
+						{t`No funding payments found.`}
 					</div>
 				) : (
 					<ScrollArea className="h-full w-full">
@@ -108,19 +107,19 @@ export function FundingTab() {
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
-										{FUNDING_TEXT.HEADER_ASSET}
+										{t`Asset`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{FUNDING_TEXT.HEADER_POSITION}
+										{t`Position`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{FUNDING_TEXT.HEADER_RATE}
+										{t`Rate`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{FUNDING_TEXT.HEADER_PAYMENT}
+										{t`Payment`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{FUNDING_TEXT.HEADER_TIME}
+										{t`Time`}
 									</TableHead>
 								</TableRow>
 							</TableHeader>

@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { flexRender } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown, Flame, Search, Star } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -6,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { getTokenIconUrl, isTokenInCategory, marketCategories } from "@/config/token";
-import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
 import { formatPercent, formatPrice, formatUSD } from "@/lib/format";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
 import { cn } from "@/lib/utils";
@@ -17,8 +18,6 @@ export type TokenSelectorProps = {
 	value: string;
 	onValueChange: (value: string) => void;
 };
-
-const TOKEN_SELECTOR_TEXT = UI_TEXT.TOKEN_SELECTOR;
 
 export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 	const {
@@ -51,8 +50,8 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 					size="sm"
 					role="combobox"
 					aria-expanded={open}
-					aria-label={TOKEN_SELECTOR_TEXT.ARIA_SELECT}
-					className="h-8 gap-1.5 text-xs font-semibold px-2 min-w-0"
+					aria-label={t`Select token`}
+					className="h-6 gap-1.5 text-xs font-semibold px-2"
 				>
 					<Avatar className="size-5 shrink-0">
 						<AvatarImage src={getTokenIconUrl(value)} alt={value} />
@@ -71,7 +70,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 						<div className="relative">
 							<Search className="absolute left-2 top-1/2 -translate-y-1/2 size-3 text-muted-foreground" />
 							<Input
-								placeholder={TOKEN_SELECTOR_TEXT.SEARCH_PLACEHOLDER}
+								placeholder={t`Search markets...`}
 								value={search}
 								onChange={(e) => setSearch(e.target.value)}
 								className="pl-7 h-7 text-xs bg-background/50 border-border/60 focus:border-terminal-cyan/60"
@@ -93,7 +92,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 											: "text-muted-foreground hover:text-foreground",
 									)}
 									tabIndex={0}
-									aria-label={TOKEN_SELECTOR_TEXT.FILTER_ARIA(cat.label)}
+									aria-label={t`Filter by ${cat.label}`}
 									aria-pressed={category === cat.value}
 								>
 									{cat.icon}
@@ -126,7 +125,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 										"w-16 sm:w-20 flex items-center justify-end gap-1 transition-colors hover:text-foreground cursor-pointer",
 										hiddenOnMobile && "hidden sm:flex",
 									)}
-									aria-label={TOKEN_SELECTOR_TEXT.SORT_ARIA(String(header.column.columnDef.header ?? ""))}
+									aria-label={t`Sort by ${String(header.column.columnDef.header ?? "")}`}
 								>
 									<span className="truncate">{flexRender(header.column.columnDef.header, header.getContext())}</span>
 									<span className="shrink-0">
@@ -146,10 +145,10 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 					<div ref={containerRef} className="h-72 overflow-auto">
 						{isLoading ? (
 							<div className="flex items-center justify-center py-8">
-								<span className="text-3xs text-muted-foreground">{TOKEN_SELECTOR_TEXT.LOADING}</span>
+								<span className="text-3xs text-muted-foreground">{t`Loading markets...`}</span>
 							</div>
 						) : rows.length === 0 ? (
-							<div className="py-8 text-center text-3xs text-muted-foreground">{TOKEN_SELECTOR_TEXT.EMPTY}</div>
+							<div className="py-8 text-center text-3xs text-muted-foreground">{t`No markets found.`}</div>
 						) : (
 							<div
 								style={{
@@ -217,7 +216,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 																toggleFavorite(market.coin);
 															}}
 															className="hover:scale-110 transition-transform"
-															aria-label={isFav ? TOKEN_SELECTOR_TEXT.FAVORITE_REMOVE : TOKEN_SELECTOR_TEXT.FAVORITE_ADD}
+															aria-label={isFav ? t`Remove from favorites` : t`Add to favorites`}
 														>
 															<Star
 																className={cn(
@@ -230,7 +229,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 														</button>
 														{isTokenInCategory(market.coin, "new") && (
 															<Badge variant="neutral" size="xs" className="px-1 py-0 text-4xs">
-																{TOKEN_SELECTOR_TEXT.NEW_BADGE}
+																{t`NEW`}
 															</Badge>
 														)}
 													</div>
@@ -291,10 +290,10 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 
 					<div className="px-3 py-1.5 bg-surface/30 flex items-center justify-between text-4xs text-muted-foreground">
 						<span>
-							{filteredMarkets.length} {TOKEN_SELECTOR_TEXT.MARKETS_SUFFIX}
+							{filteredMarkets.length} {t`markets`}
 						</span>
 						<span className="tabular-nums">
-							{sorting.length > 0 ? TOKEN_SELECTOR_TEXT.SORTED_BY(sorting[0].id) : TOKEN_SELECTOR_TEXT.UPDATED_LIVE}
+							{sorting.length > 0 ? t`Sorted by ${sorting[0].id}` : t`Updated live`}
 						</span>
 					</div>
 				</div>

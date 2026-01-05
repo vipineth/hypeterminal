@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { PanelLeftIcon } from "lucide-react";
@@ -8,11 +9,9 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { SIDEBAR_LAYOUT, STORAGE_KEYS, UI_TEXT } from "@/constants/app";
+import { SIDEBAR_LAYOUT, STORAGE_KEYS } from "@/constants/app";
 import { useIsMobile } from "@/hooks/ui/use-is-mobile";
 import { cn } from "@/lib/utils";
-
-const SIDEBAR_TEXT = UI_TEXT.SIDEBAR;
 
 type SidebarContextProps = {
 	state: "expanded" | "collapsed";
@@ -170,8 +169,8 @@ function Sidebar({
 					side={side}
 				>
 					<SheetHeader className="sr-only">
-						<SheetTitle>{SIDEBAR_TEXT.TITLE}</SheetTitle>
-						<SheetDescription>{SIDEBAR_TEXT.DESCRIPTION}</SheetDescription>
+						<SheetTitle>{t`Sidebar`}</SheetTitle>
+						<SheetDescription>{t`Displays the mobile sidebar.`}</SheetDescription>
 					</SheetHeader>
 					<div className="flex h-full w-full flex-col">{children}</div>
 				</SheetContent>
@@ -244,7 +243,7 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
 			{...props}
 		>
 			<PanelLeftIcon />
-			<span className="sr-only">{SIDEBAR_TEXT.TOGGLE_LABEL}</span>
+			<span className="sr-only">{t`Toggle Sidebar`}</span>
 		</Button>
 	);
 }
@@ -256,10 +255,10 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
 		<button
 			data-sidebar="rail"
 			data-slot="sidebar-rail"
-			aria-label={SIDEBAR_TEXT.TOGGLE_LABEL}
+			aria-label={t`Toggle Sidebar`}
 			tabIndex={-1}
 			onClick={toggleSidebar}
-			title={SIDEBAR_TEXT.TOGGLE_LABEL}
+			title={t`Toggle Sidebar`}
 			className={cn(
 				"hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] sm:flex",
 				"in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize",
