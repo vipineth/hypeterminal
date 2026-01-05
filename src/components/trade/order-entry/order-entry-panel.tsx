@@ -30,6 +30,7 @@ import { useTradingAgent } from "@/hooks/hyperliquid/use-trading-agent";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { getHttpTransport } from "@/lib/hyperliquid/clients";
 import { ensureLeverage, makeExchangeConfig, placeSingleOrder } from "@/lib/hyperliquid/exchange";
+import { toHyperliquidWallet } from "@/lib/hyperliquid/wallet";
 import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder, getDefaultLeverage } from "@/lib/trade/orders";
 import { cn } from "@/lib/utils";
@@ -39,6 +40,7 @@ import {
 	useDefaultLeverageByMode,
 	useMarketLeverageByMode,
 	useMarketOrderSlippageBps,
+	useSigningMode,
 	useTradeSettingsActions,
 } from "@/stores/use-trade-settings-store";
 import { WalletDialog } from "../components/wallet-dialog";
@@ -63,21 +65,25 @@ export function OrderEntryPanel() {
 	const { data: market } = useSelectedResolvedMarket({ ctxMode: "realtime" });
 	const { data: clearinghouse } = useClearinghouseState({ user: address });
 
-	const {
-		isApproved: isAgentApproved,
-		apiWalletSigner,
-		approveAgent,
-		canApprove,
-	} = useTradingAgent({
+	const signingMode = useSigningMode();
+	const { status: agentStatus, registerStatus, signer: agentSigner, registerAgent } = useTradingAgent({
 		user: address,
 		walletClient,
-		enabled: isConnected,
 	});
+
+	// Direct wallet signer for "direct" mode
+	const directSigner = useMemo(() => {
+		if (!walletClient || !address) return null;
+		return toHyperliquidWallet(walletClient, address);
+	}, [walletClient, address]);
+
+	// Active signer based on mode
+	const activeSigner = signingMode === "direct" ? directSigner : agentSigner;
 
 	const defaultLeverageByMode = useDefaultLeverageByMode();
 	const marketLeverageByMode = useMarketLeverageByMode();
 	const slippageBps = useMarketOrderSlippageBps();
-	const { setMarketLeverage } = useTradeSettingsActions();
+	const { setMarketLeverage, setSigningMode } = useTradeSettingsActions();
 
 	const { addOrder, updateOrder } = useOrderQueueActions();
 
@@ -89,7 +95,6 @@ export function OrderEntryPanel() {
 	const [sizeMode, setSizeMode] = useState<SizeMode>("asset");
 	const [limitPriceInput, setLimitPriceInput] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const [isApproving, setIsApproving] = useState(false);
 	const [approvalError, setApprovalError] = useState<string | null>(null);
 
 	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
@@ -174,7 +179,10 @@ export function OrderEntryPanel() {
 
 	const liqWarning = liqPrice && price ? Math.abs(liqPrice - price) / price < 0.05 : false;
 
-	const canSign = isAgentApproved ? !!apiWalletSigner : !!walletClient;
+	const needsAgentApproval = signingMode === "agent" && agentStatus !== "valid";
+	const isReadyToTrade = signingMode === "direct" ? !!directSigner : agentStatus === "valid" && !!agentSigner;
+	const isLoadingAgents = agentStatus === "loading";
+	const canApprove = !!walletClient && !!address;
 
 	const validation = useMemo(() => {
 		const errors: string[] = [];
@@ -195,11 +203,11 @@ export function OrderEntryPanel() {
 			return { valid: false, errors: [t`Market not ready`], canSubmit: false, needsApproval: false };
 		}
 
-		if (!isAgentApproved) {
+		if (needsAgentApproval) {
 			return { valid: false, errors: [], canSubmit: false, needsApproval: true };
 		}
 
-		if (!canSign) {
+		if (!isReadyToTrade) {
 			return { valid: false, errors: [t`Signer not ready`], canSubmit: false, needsApproval: false };
 		}
 		if (type === "market" && !markPx) {
@@ -230,8 +238,8 @@ export function OrderEntryPanel() {
 		sizeValue,
 		orderValue,
 		maxSize,
-		isAgentApproved,
-		canSign,
+		needsAgentApproval,
+		isReadyToTrade,
 	]);
 
 	const sizeHasError = sizeValue > maxSize && maxSize > 0;
@@ -302,27 +310,24 @@ export function OrderEntryPanel() {
 		switchChain({ chainId: ARBITRUM_CHAIN_ID });
 	};
 
-	const handleApprove = async () => {
-		if (isApproving) return;
+	const isRegistering = registerStatus === "signing" || registerStatus === "verifying";
 
-		setIsApproving(true);
+	const handleRegister = async () => {
+		if (isRegistering) return;
 		setApprovalError(null);
 
 		try {
-			await approveAgent();
+			await registerAgent();
 		} catch (error) {
-			console.error("[OrderEntry] Approval failed:", error);
+			console.error("[OrderEntry] Registration failed:", error);
 			const message = error instanceof Error ? error.message : t`Failed to enable trading`;
 			setApprovalError(message);
-		} finally {
-			setIsApproving(false);
 		}
 	};
 
-	// React 19: Simple event handler - no useCallback needed
 	const handleSubmit = async () => {
 		if (!validation.canSubmit || isSubmitting) return;
-		if (!apiWalletSigner || typeof market?.assetIndex !== "number") return;
+		if (!activeSigner || typeof market?.assetIndex !== "number") return;
 
 		setIsSubmitting(true);
 
@@ -348,7 +353,7 @@ export function OrderEntryPanel() {
 
 		try {
 			const transport = getHttpTransport();
-			const config = makeExchangeConfig(transport, apiWalletSigner);
+			const config = makeExchangeConfig(transport, activeSigner);
 
 			// Set leverage first - this is a persistent account setting independent of order success
 			// If the order fails after leverage is set, that's acceptable as leverage is user-configured
@@ -423,10 +428,22 @@ export function OrderEntryPanel() {
 			};
 		}
 		if (validation.needsApproval) {
+			const getRegisterText = () => {
+				if (isLoadingAgents) return t`Loading...`;
+				if (!canApprove) return t`Loading...`;
+				switch (registerStatus) {
+					case "signing":
+						return t`Sign in wallet...`;
+					case "verifying":
+						return t`Verifying...`;
+					default:
+						return t`Enable Trading`;
+				}
+			};
 			return {
-				text: isApproving ? t`Signing...` : !canApprove ? t`Loading...` : t`Enable Trading`,
-				action: handleApprove,
-				disabled: isApproving || !canApprove,
+				text: getRegisterText(),
+				action: handleRegister,
+				disabled: isRegistering || !canApprove || isLoadingAgents,
 				variant: "cyan" as const,
 			};
 		}
@@ -461,25 +478,62 @@ export function OrderEntryPanel() {
 						</Tooltip>
 					</TabsList>
 				</Tabs>
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<button
-							type="button"
-							className="px-2 py-0.5 text-3xs border border-terminal-cyan/40 text-terminal-cyan inline-flex items-center gap-1"
-							tabIndex={0}
-							aria-label={t`Select leverage`}
-						>
-							{leverage}x <ChevronDown className="size-2.5" />
-						</button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end" className="min-w-16 font-mono text-xs max-h-48 overflow-y-auto">
-						{leverageOptions.map((lv) => (
-							<DropdownMenuItem key={lv} onClick={() => handleLeverageChange(lv)} selected={lv === leverage}>
-								{lv}x
+				<div className="flex items-center gap-2">
+					<DropdownMenu>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<DropdownMenuTrigger asChild>
+									<button
+										type="button"
+										className={cn(
+											"px-2 py-0.5 text-3xs border inline-flex items-center gap-1",
+											signingMode === "agent"
+												? "border-terminal-green/40 text-terminal-green"
+												: "border-terminal-amber/40 text-terminal-amber",
+										)}
+										tabIndex={0}
+										aria-label={t`Select signing mode`}
+									>
+										{signingMode === "agent" ? t`Agent` : t`Direct`}
+										<ChevronDown className="size-2.5" />
+									</button>
+								</DropdownMenuTrigger>
+							</TooltipTrigger>
+							<TooltipContent side="bottom">
+								{signingMode === "agent"
+									? t`Agent mode: Orders signed automatically (fast)`
+									: t`Direct mode: Sign each order with wallet`}
+							</TooltipContent>
+						</Tooltip>
+						<DropdownMenuContent align="end" className="min-w-24 font-mono text-xs">
+							<DropdownMenuItem onClick={() => setSigningMode("agent")} selected={signingMode === "agent"}>
+								{t`Agent`}
 							</DropdownMenuItem>
-						))}
-					</DropdownMenuContent>
-				</DropdownMenu>
+							<DropdownMenuItem onClick={() => setSigningMode("direct")} selected={signingMode === "direct"}>
+								{t`Direct`}
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<button
+								type="button"
+								className="px-2 py-0.5 text-3xs border border-terminal-cyan/40 text-terminal-cyan inline-flex items-center gap-1"
+								tabIndex={0}
+								aria-label={t`Select leverage`}
+							>
+								{leverage}x <ChevronDown className="size-2.5" />
+							</button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end" className="min-w-16 font-mono text-xs max-h-48 overflow-y-auto">
+							{leverageOptions.map((lv) => (
+								<DropdownMenuItem key={lv} onClick={() => handleLeverageChange(lv)} selected={lv === leverage}>
+									{lv}x
+								</DropdownMenuItem>
+							))}
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
 			</div>
 
 			<div className="p-2 space-y-2 overflow-y-auto flex-1">
@@ -698,7 +752,7 @@ export function OrderEntryPanel() {
 					tabIndex={0}
 					aria-label={buttonContent.text}
 				>
-					{(isSubmitting || isApproving) && <Loader2 className="size-3 animate-spin" />}
+					{(isSubmitting || isRegistering) && <Loader2 className="size-3 animate-spin" />}
 					{buttonContent.text}
 				</button>
 

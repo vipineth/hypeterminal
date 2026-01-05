@@ -1,25 +1,30 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 import { getInfoClient } from "@/lib/hyperliquid/clients";
 import { hyperliquidKeys } from "@/lib/hyperliquid/query-keys";
 
 const infoClient = getInfoClient();
 
-interface UseExtraAgentsParams {
-	user: `0x${string}` | undefined;
-	enabled?: boolean;
-	refetchIntervalMs?: number;
-}
+export function useExtraAgents(user: `0x${string}` | undefined) {
+	const queryClient = useQueryClient();
 
-export function useExtraAgents(params: UseExtraAgentsParams) {
-	const enabled = params.enabled ?? true;
-
-	return useQuery({
-		queryKey: hyperliquidKeys.extraAgents(params.user ?? "0x0"),
-		queryFn: () => infoClient.extraAgents({ user: params.user as `0x${string}` }),
-		enabled: enabled && !!params.user,
-		staleTime: 10_000,
-		refetchInterval: params.refetchIntervalMs ?? 30_000,
-		refetchOnWindowFocus: false,
-		refetchOnReconnect: false,
+	const query = useQuery({
+		queryKey: hyperliquidKeys.extraAgents(user ?? "0x0"),
+		queryFn: () => infoClient.extraAgents({ user: user as `0x${string}` }),
+		enabled: !!user,
+		staleTime: 5_000,
+		refetchInterval: 30_000,
 	});
+
+	const refetch = useCallback(async () => {
+		if (!user) return { data: undefined };
+		await queryClient.invalidateQueries({ queryKey: hyperliquidKeys.extraAgents(user) });
+		return query.refetch();
+	}, [queryClient, user, query]);
+
+	return {
+		agents: query.data,
+		isLoading: query.isPending,
+		refetch,
+	};
 }
