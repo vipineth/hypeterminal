@@ -21,6 +21,10 @@ msgstr "% exécuté"
 msgid "24h Price"
 msgstr "Prix 24h"
 
+#: src/components/trade/components/wallet-dialog.tsx:485
+msgid "A crypto wallet lets you store and manage your digital assets securely."
+msgstr ""
+
 #: src/components/pages/builder-page.tsx:237
 #~ msgid "About Builder Codes"
 #~ msgstr ""
@@ -232,7 +236,7 @@ msgstr "Connectez un portefeuille pour gérer les ordres."
 msgid "Connect a wallet to manage positions."
 msgstr "Connectez un portefeuille pour gérer les positions."
 
-#: src/components/trade/components/wallet-dialog.tsx:28
+#: src/components/trade/components/wallet-dialog.tsx:312
 #: src/components/trade/header/user-menu.tsx:65
 #: src/components/trade/order-entry/order-entry-panel.tsx:412
 msgid "Connect Wallet"
@@ -245,6 +249,10 @@ msgstr "Connectez le portefeuille pour voir le compte"
 #: src/components/pages/builder-page.tsx:115
 #~ msgid "Connect your wallet to register a builder code"
 #~ msgstr ""
+
+#: src/components/trade/components/wallet-dialog.tsx:315
+msgid "Connect your wallet to start trading on Hyperliquid"
+msgstr ""
 
 #: src/components/trade/positions/balances-tab.tsx:112
 msgid "Connect your wallet to view balances."
@@ -480,6 +488,10 @@ msgstr "Aller au terminal de trading"
 msgid "In Use"
 msgstr "En cours d'utilisation"
 
+#: src/components/trade/components/wallet-dialog.tsx:427
+msgid "Install a wallet extension to continue"
+msgstr ""
+
 #: src/components/pages/builder-page.tsx:160
 #~ msgid "Invalid Ethereum address"
 #~ msgstr ""
@@ -495,6 +507,10 @@ msgstr "Isolé"
 #: src/components/trade/header/top-nav.tsx:23
 msgid "Leaderboard"
 msgstr "Classement"
+
+#: src/components/trade/components/wallet-dialog.tsx:502
+msgid "Learn more"
+msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx:159
 msgid "limit"
@@ -652,6 +668,10 @@ msgstr "Plus de pages"
 msgid "NEW"
 msgstr "NOUVEAU"
 
+#: src/components/trade/components/wallet-dialog.tsx:450
+msgid "New to wallets?"
+msgstr ""
+
 #: src/components/ui/pagination.tsx:71
 msgid "Next"
 msgstr "Suivant"
@@ -700,7 +720,7 @@ msgstr "Aucun ordre TWAP trouvé."
 msgid "No user address"
 msgstr ""
 
-#: src/components/trade/components/wallet-dialog.tsx:48
+#: src/components/trade/components/wallet-dialog.tsx:424
 msgid "No wallets found"
 msgstr "Aucun portefeuille trouvé"
 
@@ -720,6 +740,10 @@ msgstr ""
 #: src/components/trade/market-overview.tsx:55
 msgid "OI"
 msgstr "OI"
+
+#: src/components/trade/components/wallet-dialog.tsx:474
+msgid "Only you control your funds. No email or password required."
+msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx:165
 msgid "open"
@@ -756,6 +780,10 @@ msgstr "File d'ordres"
 msgid "Order Value"
 msgstr "Valeur de l'ordre"
 
+#: src/components/trade/components/wallet-dialog.tsx:373
+msgid "Other Options"
+msgstr ""
+
 #: src/components/pages/not-found-page.tsx:13
 msgid "Page not found"
 msgstr "Page non trouvée"
@@ -790,6 +818,10 @@ msgstr "Perpétuels"
 #: src/components/trade/positions/positions-tab.tsx:204
 msgid "PNL"
 msgstr "PNL"
+
+#: src/components/trade/components/wallet-dialog.tsx:326
+msgid "Popular"
+msgstr ""
 
 #: src/components/trade/header/top-nav.tsx:21
 msgid "Portfolio"
@@ -849,6 +881,10 @@ msgstr "Retirer des favoris"
 #: src/components/trade/chart/token-selector.tsx:73
 msgid "Search markets..."
 msgstr "Rechercher des marchés..."
+
+#: src/components/trade/components/wallet-dialog.tsx:471
+msgid "Secure & Private"
+msgstr ""
 
 #: src/components/trade/header/favorites-strip.tsx:104
 msgid "Select {coin} market"
@@ -1180,6 +1216,10 @@ msgstr "Portefeuille non connecté"
 #: src/components/trade/orderbook/trades-view.tsx:100
 msgid "WebSocket error"
 msgstr "Erreur WebSocket"
+
+#: src/components/trade/components/wallet-dialog.tsx:482
+msgid "What is a wallet?"
+msgstr ""
 
 #: src/components/trade/order-entry/account-panel.tsx:217
 #: src/components/trade/order-entry/account-panel.tsx:219

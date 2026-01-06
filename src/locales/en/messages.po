@@ -21,6 +21,10 @@ msgstr "% filled"
 msgid "24h Price"
 msgstr "24h Price"
 
+#: src/components/trade/components/wallet-dialog.tsx:485
+msgid "A crypto wallet lets you store and manage your digital assets securely."
+msgstr "A crypto wallet lets you store and manage your digital assets securely."
+
 #: src/components/pages/builder-page.tsx:237
 #~ msgid "About Builder Codes"
 #~ msgstr "About Builder Codes"
@@ -232,7 +236,7 @@ msgstr "Connect a wallet to manage orders."
 msgid "Connect a wallet to manage positions."
 msgstr "Connect a wallet to manage positions."
 
-#: src/components/trade/components/wallet-dialog.tsx:28
+#: src/components/trade/components/wallet-dialog.tsx:312
 #: src/components/trade/header/user-menu.tsx:65
 #: src/components/trade/order-entry/order-entry-panel.tsx:412
 msgid "Connect Wallet"
@@ -245,6 +249,10 @@ msgstr "Connect wallet to view account"
 #: src/components/pages/builder-page.tsx:115
 #~ msgid "Connect your wallet to register a builder code"
 #~ msgstr "Connect your wallet to register a builder code"
+
+#: src/components/trade/components/wallet-dialog.tsx:315
+msgid "Connect your wallet to start trading on Hyperliquid"
+msgstr "Connect your wallet to start trading on Hyperliquid"
 
 #: src/components/trade/positions/balances-tab.tsx:112
 msgid "Connect your wallet to view balances."
@@ -480,6 +488,10 @@ msgstr "Go to trading terminal"
 msgid "In Use"
 msgstr "In Use"
 
+#: src/components/trade/components/wallet-dialog.tsx:427
+msgid "Install a wallet extension to continue"
+msgstr "Install a wallet extension to continue"
+
 #: src/components/pages/builder-page.tsx:160
 #~ msgid "Invalid Ethereum address"
 #~ msgstr "Invalid Ethereum address"
@@ -499,6 +511,10 @@ msgstr "Isolated"
 #: src/components/trade/header/top-nav.tsx:23
 msgid "Leaderboard"
 msgstr "Leaderboard"
+
+#: src/components/trade/components/wallet-dialog.tsx:502
+msgid "Learn more"
+msgstr "Learn more"
 
 #: src/components/trade/positions/orders-tab.tsx:159
 msgid "limit"
@@ -656,6 +672,10 @@ msgstr "More pages"
 msgid "NEW"
 msgstr "NEW"
 
+#: src/components/trade/components/wallet-dialog.tsx:450
+msgid "New to wallets?"
+msgstr "New to wallets?"
+
 #: src/components/ui/pagination.tsx:71
 msgid "Next"
 msgstr "Next"
@@ -704,7 +724,7 @@ msgstr "No TWAP orders found."
 msgid "No user address"
 msgstr "No user address"
 
-#: src/components/trade/components/wallet-dialog.tsx:48
+#: src/components/trade/components/wallet-dialog.tsx:424
 msgid "No wallets found"
 msgstr "No wallets found"
 
@@ -724,6 +744,10 @@ msgstr "Number Format"
 #: src/components/trade/market-overview.tsx:55
 msgid "OI"
 msgstr "OI"
+
+#: src/components/trade/components/wallet-dialog.tsx:474
+msgid "Only you control your funds. No email or password required."
+msgstr "Only you control your funds. No email or password required."
 
 #: src/components/trade/positions/orders-tab.tsx:165
 msgid "open"
@@ -760,6 +784,10 @@ msgstr "Order Queue"
 msgid "Order Value"
 msgstr "Order Value"
 
+#: src/components/trade/components/wallet-dialog.tsx:373
+msgid "Other Options"
+msgstr "Other Options"
+
 #: src/components/pages/not-found-page.tsx:13
 msgid "Page not found"
 msgstr "Page not found"
@@ -794,6 +822,10 @@ msgstr "Perps"
 #: src/components/trade/positions/positions-tab.tsx:204
 msgid "PNL"
 msgstr "PNL"
+
+#: src/components/trade/components/wallet-dialog.tsx:326
+msgid "Popular"
+msgstr "Popular"
 
 #: src/components/trade/header/top-nav.tsx:21
 msgid "Portfolio"
@@ -853,6 +885,10 @@ msgstr "Remove from favorites"
 #: src/components/trade/chart/token-selector.tsx:73
 msgid "Search markets..."
 msgstr "Search markets..."
+
+#: src/components/trade/components/wallet-dialog.tsx:471
+msgid "Secure & Private"
+msgstr "Secure & Private"
 
 #: src/components/trade/header/favorites-strip.tsx:104
 msgid "Select {coin} market"
@@ -1188,6 +1224,10 @@ msgstr "Wallet not connected"
 #: src/components/trade/orderbook/trades-view.tsx:100
 msgid "WebSocket error"
 msgstr "WebSocket error"
+
+#: src/components/trade/components/wallet-dialog.tsx:482
+msgid "What is a wallet?"
+msgstr "What is a wallet?"
 
 #: src/components/trade/order-entry/account-panel.tsx:217
 #: src/components/trade/order-entry/account-panel.tsx:219
