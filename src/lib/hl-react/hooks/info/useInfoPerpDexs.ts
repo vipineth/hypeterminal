@@ -1,0 +1,23 @@
+import type { PerpDexsResponse } from "@nktkas/hyperliquid";
+import { type UseQueryResult, useQuery } from "@tanstack/react-query";
+import { infoKeys } from "../../query/keys";
+import type { HyperliquidQueryError, QueryParameter } from "../../types";
+import { useHyperliquidClients } from "../useClients";
+
+type PerpDexsData = PerpDexsResponse;
+
+export type UseInfoPerpDexsOptions<TData = PerpDexsData> = QueryParameter<PerpDexsData, TData>;
+export type UseInfoPerpDexsReturnType<TData = PerpDexsData> = UseQueryResult<TData, HyperliquidQueryError>;
+
+export function useInfoPerpDexs<TData = PerpDexsData>(
+	options: UseInfoPerpDexsOptions<TData> = {},
+): UseInfoPerpDexsReturnType<TData> {
+	const { info } = useHyperliquidClients();
+	const queryKey = infoKeys.method("perpDexs");
+
+	return useQuery({
+		...options,
+		queryKey,
+		queryFn: ({ signal }) => info.perpDexs(signal),
+	});
+}

@@ -21,7 +21,7 @@ msgstr "% पूर्ण"
 msgid "24h Price"
 msgstr "24घंटे मूल्य"
 
-#: src/components/trade/components/wallet-dialog.tsx:485
+#: src/components/trade/components/wallet-dialog.tsx:235
 msgid "A crypto wallet lets you store and manage your digital assets securely."
 msgstr ""
 
@@ -236,7 +236,7 @@ msgstr "ऑर्डर प्रबंधित करने के लिए �
 msgid "Connect a wallet to manage positions."
 msgstr "पोजीशन प्रबंधित करने के लिए वॉलेट कनेक्ट करें।"
 
-#: src/components/trade/components/wallet-dialog.tsx:312
+#: src/components/trade/components/wallet-dialog.tsx:68
 #: src/components/trade/header/user-menu.tsx:65
 #: src/components/trade/order-entry/order-entry-panel.tsx:412
 msgid "Connect Wallet"
@@ -250,7 +250,7 @@ msgstr "खाता देखने के लिए वॉलेट कने�
 #~ msgid "Connect your wallet to register a builder code"
 #~ msgstr ""
 
-#: src/components/trade/components/wallet-dialog.tsx:315
+#: src/components/trade/components/wallet-dialog.tsx:71
 msgid "Connect your wallet to start trading on Hyperliquid"
 msgstr ""
 
@@ -488,7 +488,7 @@ msgstr "ट्रेडिंग टर्मिनल पर जाएं"
 msgid "In Use"
 msgstr "उपयोग में"
 
-#: src/components/trade/components/wallet-dialog.tsx:427
+#: src/components/trade/components/wallet-dialog.tsx:179
 msgid "Install a wallet extension to continue"
 msgstr ""
 
@@ -508,7 +508,7 @@ msgstr "आइसोलेटेड"
 msgid "Leaderboard"
 msgstr "लीडरबोर्ड"
 
-#: src/components/trade/components/wallet-dialog.tsx:502
+#: src/components/trade/components/wallet-dialog.tsx:243
 msgid "Learn more"
 msgstr ""
 
@@ -668,7 +668,7 @@ msgstr "और पृष्ठ"
 msgid "NEW"
 msgstr "नया"
 
-#: src/components/trade/components/wallet-dialog.tsx:450
+#: src/components/trade/components/wallet-dialog.tsx:200
 msgid "New to wallets?"
 msgstr ""
 
@@ -720,7 +720,7 @@ msgstr "कोई TWAP ऑर्डर नहीं मिला।"
 msgid "No user address"
 msgstr ""
 
-#: src/components/trade/components/wallet-dialog.tsx:424
+#: src/components/trade/components/wallet-dialog.tsx:176
 msgid "No wallets found"
 msgstr "कोई वॉलेट नहीं मिला"
 
@@ -741,7 +741,7 @@ msgstr ""
 msgid "OI"
 msgstr "OI"
 
-#: src/components/trade/components/wallet-dialog.tsx:474
+#: src/components/trade/components/wallet-dialog.tsx:224
 msgid "Only you control your funds. No email or password required."
 msgstr ""
 
@@ -780,7 +780,7 @@ msgstr "ऑर्डर कतार"
 msgid "Order Value"
 msgstr "ऑर्डर वैल्यू"
 
-#: src/components/trade/components/wallet-dialog.tsx:373
+#: src/components/trade/components/wallet-dialog.tsx:126
 msgid "Other Options"
 msgstr ""
 
@@ -819,7 +819,7 @@ msgstr "परप्स"
 msgid "PNL"
 msgstr "PNL"
 
-#: src/components/trade/components/wallet-dialog.tsx:326
+#: src/components/trade/components/wallet-dialog.tsx:80
 msgid "Popular"
 msgstr ""
 
@@ -882,7 +882,7 @@ msgstr "पसंदीदा से हटाएं"
 msgid "Search markets..."
 msgstr "बाज़ार खोजें..."
 
-#: src/components/trade/components/wallet-dialog.tsx:471
+#: src/components/trade/components/wallet-dialog.tsx:221
 msgid "Secure & Private"
 msgstr ""
 
@@ -1217,7 +1217,7 @@ msgstr "वॉलेट कनेक्ट नहीं है"
 msgid "WebSocket error"
 msgstr "WebSocket त्रुटि"
 
-#: src/components/trade/components/wallet-dialog.tsx:482
+#: src/components/trade/components/wallet-dialog.tsx:232
 msgid "What is a wallet?"
 msgstr ""
 
