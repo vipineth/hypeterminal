@@ -22,8 +22,8 @@ msgid "24h Price"
 msgstr "24h Price"
 
 #: src/components/pages/builder-page.tsx:237
-msgid "About Builder Codes"
-msgstr "About Builder Codes"
+#~ msgid "About Builder Codes"
+#~ msgstr "About Builder Codes"
 
 #: src/components/trade/order-entry/account-panel.tsx:121
 msgid "Account"
@@ -76,8 +76,8 @@ msgid "API"
 msgstr "API"
 
 #: src/components/pages/builder-page.tsx:92
-msgid "Approve a builder to charge fees on orders placed on your behalf. Builder codes allow DeFi applications to receive a portion of trading fees."
-msgstr "Approve a builder to charge fees on orders placed on your behalf. Builder codes allow DeFi applications to receive a portion of trading fees."
+#~ msgid "Approve a builder to charge fees on orders placed on your behalf. Builder codes allow DeFi applications to receive a portion of trading fees."
+#~ msgstr "Approve a builder to charge fees on orders placed on your behalf. Builder codes allow DeFi applications to receive a portion of trading fees."
 
 #: src/components/trade/positions/balances-tab.tsx:132
 #: src/components/trade/positions/funding-tab.tsx:110
@@ -119,24 +119,24 @@ msgid "Bridge USDC from Arbitrum or other chains to your Hyperliquid account."
 msgstr "Bridge USDC from Arbitrum or other chains to your Hyperliquid account."
 
 #: src/components/pages/builder-page.tsx:145
-msgid "Builder Address"
-msgstr "Builder Address"
+#~ msgid "Builder Address"
+#~ msgstr "Builder Address"
 
 #: src/components/pages/builder-page.tsx:127
-msgid "Builder code registered successfully!"
-msgstr "Builder code registered successfully!"
+#~ msgid "Builder code registered successfully!"
+#~ msgstr "Builder code registered successfully!"
 
 #: src/components/pages/builder-page.tsx:242
-msgid "Builder codes allow DeFi builders to receive a fee on fills they send on behalf of users. They are set per-order for maximal flexibility."
-msgstr "Builder codes allow DeFi builders to receive a fee on fills they send on behalf of users. They are set per-order for maximal flexibility."
+#~ msgid "Builder codes allow DeFi builders to receive a fee on fills they send on behalf of users. They are set per-order for maximal flexibility."
+#~ msgstr "Builder codes allow DeFi builders to receive a fee on fills they send on behalf of users. They are set per-order for maximal flexibility."
 
 #: src/components/pages/builder-page.tsx:102
-msgid "Builder Fee Approval"
-msgstr "Builder Fee Approval"
+#~ msgid "Builder Fee Approval"
+#~ msgstr "Builder Fee Approval"
 
 #: src/components/pages/builder-page.tsx:272
-msgid "Builder must have at least 100 USDC in perps account value"
-msgstr "Builder must have at least 100 USDC in perps account value"
+#~ msgid "Builder must have at least 100 USDC in perps account value"
+#~ msgstr "Builder must have at least 100 USDC in perps account value"
 
 #: src/components/trade/positions/history-tab.tsx:51
 #: src/components/trade/positions/orders-tab.tsx:157
@@ -232,7 +232,6 @@ msgstr "Connect a wallet to manage orders."
 msgid "Connect a wallet to manage positions."
 msgstr "Connect a wallet to manage positions."
 
-#: src/components/pages/builder-page.tsx:118
 #: src/components/trade/components/wallet-dialog.tsx:28
 #: src/components/trade/header/user-menu.tsx:65
 #: src/components/trade/order-entry/order-entry-panel.tsx:412
@@ -244,8 +243,8 @@ msgid "Connect wallet to view account"
 msgstr "Connect wallet to view account"
 
 #: src/components/pages/builder-page.tsx:115
-msgid "Connect your wallet to register a builder code"
-msgstr "Connect your wallet to register a builder code"
+#~ msgid "Connect your wallet to register a builder code"
+#~ msgstr "Connect your wallet to register a builder code"
 
 #: src/components/trade/positions/balances-tab.tsx:112
 msgid "Connect your wallet to view balances."
@@ -275,11 +274,9 @@ msgstr "Connect your wallet to view TWAP orders."
 msgid "Connected"
 msgstr "Connected"
 
-#. placeholder {0}: address?.slice(0, 6)
-#. placeholder {1}: address?.slice(-4)
 #: src/components/pages/builder-page.tsx:224
-msgid "Connected: {0}...{1}"
-msgstr "Connected: {0}...{1}"
+#~ msgid "Connected: {0}...{1}"
+#~ msgstr "Connected: {0}...{1}"
 
 #: src/components/trade/header/user-menu.tsx:50
 msgid "Connecting..."
@@ -289,7 +286,6 @@ msgstr "Connecting..."
 msgid "Copy Address"
 msgstr "Copy Address"
 
-#: src/components/pages/builder-page.tsx:52
 #: src/hooks/hyperliquid/use-trading-agent.ts:69
 msgid "Could not create wallet"
 msgstr "Could not create wallet"
@@ -427,20 +423,20 @@ msgid "Failed to load TWAP history."
 msgstr "Failed to load TWAP history."
 
 #: src/components/pages/builder-page.tsx:69
-msgid "Failed to register builder code"
-msgstr "Failed to register builder code"
+#~ msgid "Failed to register builder code"
+#~ msgstr "Failed to register builder code"
 
 #: src/components/trade/positions/history-tab.tsx:110
 msgid "Fee"
 msgstr "Fee"
 
 #: src/components/pages/builder-page.tsx:255
-msgid "Fee Limits:"
-msgstr "Fee Limits:"
+#~ msgid "Fee Limits:"
+#~ msgstr "Fee Limits:"
 
 #: src/components/pages/builder-page.tsx:192
-msgid "Fee rate must be between 0.001% and 1%"
-msgstr "Fee rate must be between 0.001% and 1%"
+#~ msgid "Fee rate must be between 0.001% and 1%"
+#~ msgstr "Fee rate must be between 0.001% and 1%"
 
 #: src/components/trade/positions/orders-tab.tsx:249
 msgid "Filled"
@@ -485,8 +481,8 @@ msgid "In Use"
 msgstr "In Use"
 
 #: src/components/pages/builder-page.tsx:160
-msgid "Invalid Ethereum address"
-msgstr "Invalid Ethereum address"
+#~ msgid "Invalid Ethereum address"
+#~ msgstr "Invalid Ethereum address"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx:477
 msgid "Isolated"
@@ -624,12 +620,12 @@ msgid "Max"
 msgstr "Max"
 
 #: src/components/pages/builder-page.tsx:185
-msgid "Max 0.1% (10 bps) for perps, 1% (100 bps) for spot. Enter as decimal (e.g., 0.01 for 1 basis point)."
-msgstr "Max 0.1% (10 bps) for perps, 1% (100 bps) for spot. Enter as decimal (e.g., 0.01 for 1 basis point)."
+#~ msgid "Max 0.1% (10 bps) for perps, 1% (100 bps) for spot. Enter as decimal (e.g., 0.01 for 1 basis point)."
+#~ msgstr "Max 0.1% (10 bps) for perps, 1% (100 bps) for spot. Enter as decimal (e.g., 0.01 for 1 basis point)."
 
 #: src/components/pages/builder-page.tsx:167
-msgid "Max Fee Rate (%)"
-msgstr "Max Fee Rate (%)"
+#~ msgid "Max Fee Rate (%)"
+#~ msgstr "Max Fee Rate (%)"
 
 #: src/components/trade/components/global-settings-dialog.tsx:156
 msgid "Max slippage allowed for market orders."
@@ -653,8 +649,8 @@ msgid "More pages"
 msgstr "More pages"
 
 #: src/components/pages/builder-page.tsx:275
-msgid "Must be signed by main wallet (not agent/API wallet)"
-msgstr "Must be signed by main wallet (not agent/API wallet)"
+#~ msgid "Must be signed by main wallet (not agent/API wallet)"
+#~ msgstr "Must be signed by main wallet (not agent/API wallet)"
 
 #: src/components/trade/chart/token-selector.tsx:232
 msgid "NEW"
@@ -790,8 +786,8 @@ msgid "Perps"
 msgstr "Perps"
 
 #: src/components/pages/builder-page.tsx:259
-msgid "Perps: Max 0.1% (10 basis points)"
-msgstr "Perps: Max 0.1% (10 basis points)"
+#~ msgid "Perps: Max 0.1% (10 basis points)"
+#~ msgstr "Perps: Max 0.1% (10 basis points)"
 
 #: src/components/trade/order-entry/account-panel.tsx:143
 #: src/components/trade/positions/history-tab.tsx:113
@@ -838,21 +834,21 @@ msgid "Reduce Only"
 msgstr "Reduce Only"
 
 #: src/components/pages/builder-page.tsx:138
-msgid "Register Another"
-msgstr "Register Another"
+#~ msgid "Register Another"
+#~ msgstr "Register Another"
 
 #: src/components/pages/builder-page.tsx:89
 #: src/components/pages/builder-page.tsx:217
-msgid "Register Builder Code"
-msgstr "Register Builder Code"
+#~ msgid "Register Builder Code"
+#~ msgstr "Register Builder Code"
 
 #: src/components/trade/chart/token-selector.tsx:219
 msgid "Remove from favorites"
 msgstr "Remove from favorites"
 
 #: src/components/pages/builder-page.tsx:268
-msgid "Requirements:"
-msgstr "Requirements:"
+#~ msgid "Requirements:"
+#~ msgstr "Requirements:"
 
 #: src/components/trade/chart/token-selector.tsx:73
 msgid "Search markets..."
@@ -947,7 +943,6 @@ msgstr "Show Values in USD"
 msgid "Sidebar"
 msgstr "Sidebar"
 
-#: src/components/pages/builder-page.tsx:213
 #: src/components/trade/order-entry/order-entry-panel.tsx:440
 msgid "Sign in wallet..."
 msgstr "Sign in wallet..."
@@ -1002,8 +997,8 @@ msgid "Spot"
 msgstr "Spot"
 
 #: src/components/pages/builder-page.tsx:262
-msgid "Spot: Max 1% (100 basis points)"
-msgstr "Spot: Max 1% (100 basis points)"
+#~ msgid "Spot: Max 1% (100 basis points)"
+#~ msgstr "Spot: Max 1% (100 basis points)"
 
 #: src/components/trade/orderbook/order-book-panel.tsx:312
 msgid "Spread"
@@ -1023,8 +1018,8 @@ msgid "Stop"
 msgstr "Stop"
 
 #: src/components/pages/builder-page.tsx:215
-msgid "Submitting..."
-msgstr "Submitting..."
+#~ msgid "Submitting..."
+#~ msgstr "Submitting..."
 
 #: src/components/trade/header/top-nav.tsx:29
 msgid "Support"
@@ -1050,19 +1045,17 @@ msgstr "Switching..."
 msgid "Take Profit / Stop Loss"
 msgstr "Take Profit / Stop Loss"
 
-#. placeholder {0}: builderAddress.slice(0, 6)
-#. placeholder {1}: builderAddress.slice(-4)
 #: src/components/pages/builder-page.tsx:130
-msgid "The builder at {0}...{1} can now charge up to {maxFeeRate}% fee on orders placed on your behalf."
-msgstr "The builder at {0}...{1} can now charge up to {maxFeeRate}% fee on orders placed on your behalf."
+#~ msgid "The builder at {0}...{1} can now charge up to {maxFeeRate}% fee on orders placed on your behalf."
+#~ msgstr "The builder at {0}...{1} can now charge up to {maxFeeRate}% fee on orders placed on your behalf."
 
 #: src/components/pages/not-found-page.tsx:16
 msgid "The page you are looking for does not exist."
 msgstr "The page you are looking for does not exist."
 
 #: src/components/pages/builder-page.tsx:105
-msgid "This action must be signed by your main wallet (not an agent/API wallet). The builder must have at least 100 USDC in perps account value."
-msgstr "This action must be signed by your main wallet (not an agent/API wallet). The builder must have at least 100 USDC in perps account value."
+#~ msgid "This action must be signed by your main wallet (not an agent/API wallet). The builder must have at least 100 USDC in perps account value."
+#~ msgstr "This action must be signed by your main wallet (not an agent/API wallet). The builder must have at least 100 USDC in perps account value."
 
 #: src/components/trade/orderbook/trades-view.tsx:66
 #: src/components/trade/positions/funding-tab.tsx:122
@@ -1202,5 +1195,5 @@ msgid "Withdraw"
 msgstr "Withdraw"
 
 #: src/components/pages/builder-page.tsx:248
-msgid "You can revoke permissions at any time by registering a new approval with 0% fee rate. Builder codes are processed entirely onchain as part of the fee logic."
-msgstr "You can revoke permissions at any time by registering a new approval with 0% fee rate. Builder codes are processed entirely onchain as part of the fee logic."
+#~ msgid "You can revoke permissions at any time by registering a new approval with 0% fee rate. Builder codes are processed entirely onchain as part of the fee logic."
+#~ msgstr "You can revoke permissions at any time by registering a new approval with 0% fee rate. Builder codes are processed entirely onchain as part of the fee logic."

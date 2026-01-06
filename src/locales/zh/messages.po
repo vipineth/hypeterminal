@@ -22,8 +22,8 @@ msgid "24h Price"
 msgstr "24小时价格"
 
 #: src/components/pages/builder-page.tsx:237
-msgid "About Builder Codes"
-msgstr ""
+#~ msgid "About Builder Codes"
+#~ msgstr ""
 
 #: src/components/trade/order-entry/account-panel.tsx:121
 msgid "Account"
@@ -76,8 +76,8 @@ msgid "API"
 msgstr "API"
 
 #: src/components/pages/builder-page.tsx:92
-msgid "Approve a builder to charge fees on orders placed on your behalf. Builder codes allow DeFi applications to receive a portion of trading fees."
-msgstr ""
+#~ msgid "Approve a builder to charge fees on orders placed on your behalf. Builder codes allow DeFi applications to receive a portion of trading fees."
+#~ msgstr ""
 
 #: src/components/trade/positions/balances-tab.tsx:132
 #: src/components/trade/positions/funding-tab.tsx:110
@@ -119,24 +119,24 @@ msgid "Bridge USDC from Arbitrum or other chains to your Hyperliquid account."
 msgstr "从 Arbitrum 或其他链桥接 USDC 到您的 Hyperliquid 账户。"
 
 #: src/components/pages/builder-page.tsx:145
-msgid "Builder Address"
-msgstr ""
+#~ msgid "Builder Address"
+#~ msgstr ""
 
 #: src/components/pages/builder-page.tsx:127
-msgid "Builder code registered successfully!"
-msgstr ""
+#~ msgid "Builder code registered successfully!"
+#~ msgstr ""
 
 #: src/components/pages/builder-page.tsx:242
-msgid "Builder codes allow DeFi builders to receive a fee on fills they send on behalf of users. They are set per-order for maximal flexibility."
-msgstr ""
+#~ msgid "Builder codes allow DeFi builders to receive a fee on fills they send on behalf of users. They are set per-order for maximal flexibility."
+#~ msgstr ""
 
 #: src/components/pages/builder-page.tsx:102
-msgid "Builder Fee Approval"
-msgstr ""
+#~ msgid "Builder Fee Approval"
+#~ msgstr ""
 
 #: src/components/pages/builder-page.tsx:272
-msgid "Builder must have at least 100 USDC in perps account value"
-msgstr ""
+#~ msgid "Builder must have at least 100 USDC in perps account value"
+#~ msgstr ""
 
 #: src/components/trade/positions/history-tab.tsx:51
 #: src/components/trade/positions/orders-tab.tsx:157
@@ -232,7 +232,6 @@ msgstr "连接钱包以管理订单。"
 msgid "Connect a wallet to manage positions."
 msgstr "连接钱包以管理仓位。"
 
-#: src/components/pages/builder-page.tsx:118
 #: src/components/trade/components/wallet-dialog.tsx:28
 #: src/components/trade/header/user-menu.tsx:65
 #: src/components/trade/order-entry/order-entry-panel.tsx:412
@@ -244,8 +243,8 @@ msgid "Connect wallet to view account"
 msgstr "连接钱包查看账户"
 
 #: src/components/pages/builder-page.tsx:115
-msgid "Connect your wallet to register a builder code"
-msgstr ""
+#~ msgid "Connect your wallet to register a builder code"
+#~ msgstr ""
 
 #: src/components/trade/positions/balances-tab.tsx:112
 msgid "Connect your wallet to view balances."
@@ -275,11 +274,9 @@ msgstr "连接钱包查看 TWAP 订单。"
 msgid "Connected"
 msgstr "已连接"
 
-#. placeholder {0}: address?.slice(0, 6)
-#. placeholder {1}: address?.slice(-4)
 #: src/components/pages/builder-page.tsx:224
-msgid "Connected: {0}...{1}"
-msgstr ""
+#~ msgid "Connected: {0}...{1}"
+#~ msgstr ""
 
 #: src/components/trade/header/user-menu.tsx:50
 msgid "Connecting..."
@@ -289,7 +286,6 @@ msgstr "连接中..."
 msgid "Copy Address"
 msgstr "复制地址"
 
-#: src/components/pages/builder-page.tsx:52
 #: src/hooks/hyperliquid/use-trading-agent.ts:69
 msgid "Could not create wallet"
 msgstr "无法创建钱包"
@@ -427,20 +423,20 @@ msgid "Failed to load TWAP history."
 msgstr "加载 TWAP 历史失败。"
 
 #: src/components/pages/builder-page.tsx:69
-msgid "Failed to register builder code"
-msgstr ""
+#~ msgid "Failed to register builder code"
+#~ msgstr ""
 
 #: src/components/trade/positions/history-tab.tsx:110
 msgid "Fee"
 msgstr "手续费"
 
 #: src/components/pages/builder-page.tsx:255
-msgid "Fee Limits:"
-msgstr ""
+#~ msgid "Fee Limits:"
+#~ msgstr ""
 
 #: src/components/pages/builder-page.tsx:192
-msgid "Fee rate must be between 0.001% and 1%"
-msgstr ""
+#~ msgid "Fee rate must be between 0.001% and 1%"
+#~ msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx:249
 msgid "Filled"
@@ -485,8 +481,8 @@ msgid "In Use"
 msgstr "使用中"
 
 #: src/components/pages/builder-page.tsx:160
-msgid "Invalid Ethereum address"
-msgstr ""
+#~ msgid "Invalid Ethereum address"
+#~ msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx:477
 msgid "Isolated"
@@ -620,12 +616,12 @@ msgid "Max"
 msgstr "最大"
 
 #: src/components/pages/builder-page.tsx:185
-msgid "Max 0.1% (10 bps) for perps, 1% (100 bps) for spot. Enter as decimal (e.g., 0.01 for 1 basis point)."
-msgstr ""
+#~ msgid "Max 0.1% (10 bps) for perps, 1% (100 bps) for spot. Enter as decimal (e.g., 0.01 for 1 basis point)."
+#~ msgstr ""
 
 #: src/components/pages/builder-page.tsx:167
-msgid "Max Fee Rate (%)"
-msgstr ""
+#~ msgid "Max Fee Rate (%)"
+#~ msgstr ""
 
 #: src/components/trade/components/global-settings-dialog.tsx:156
 msgid "Max slippage allowed for market orders."
@@ -649,8 +645,8 @@ msgid "More pages"
 msgstr "更多页面"
 
 #: src/components/pages/builder-page.tsx:275
-msgid "Must be signed by main wallet (not agent/API wallet)"
-msgstr ""
+#~ msgid "Must be signed by main wallet (not agent/API wallet)"
+#~ msgstr ""
 
 #: src/components/trade/chart/token-selector.tsx:232
 msgid "NEW"
@@ -786,8 +782,8 @@ msgid "Perps"
 msgstr "永续合约"
 
 #: src/components/pages/builder-page.tsx:259
-msgid "Perps: Max 0.1% (10 basis points)"
-msgstr ""
+#~ msgid "Perps: Max 0.1% (10 basis points)"
+#~ msgstr ""
 
 #: src/components/trade/order-entry/account-panel.tsx:143
 #: src/components/trade/positions/history-tab.tsx:113
@@ -834,21 +830,21 @@ msgid "Reduce Only"
 msgstr "只减仓"
 
 #: src/components/pages/builder-page.tsx:138
-msgid "Register Another"
-msgstr ""
+#~ msgid "Register Another"
+#~ msgstr ""
 
 #: src/components/pages/builder-page.tsx:89
 #: src/components/pages/builder-page.tsx:217
-msgid "Register Builder Code"
-msgstr ""
+#~ msgid "Register Builder Code"
+#~ msgstr ""
 
 #: src/components/trade/chart/token-selector.tsx:219
 msgid "Remove from favorites"
 msgstr "从收藏中移除"
 
 #: src/components/pages/builder-page.tsx:268
-msgid "Requirements:"
-msgstr ""
+#~ msgid "Requirements:"
+#~ msgstr ""
 
 #: src/components/trade/chart/token-selector.tsx:73
 msgid "Search markets..."
@@ -943,7 +939,6 @@ msgstr "以美元显示数值"
 msgid "Sidebar"
 msgstr "侧边栏"
 
-#: src/components/pages/builder-page.tsx:213
 #: src/components/trade/order-entry/order-entry-panel.tsx:440
 msgid "Sign in wallet..."
 msgstr ""
@@ -998,8 +993,8 @@ msgid "Spot"
 msgstr "现货"
 
 #: src/components/pages/builder-page.tsx:262
-msgid "Spot: Max 1% (100 basis points)"
-msgstr ""
+#~ msgid "Spot: Max 1% (100 basis points)"
+#~ msgstr ""
 
 #: src/components/trade/orderbook/order-book-panel.tsx:312
 msgid "Spread"
@@ -1019,8 +1014,8 @@ msgid "Stop"
 msgstr "止损"
 
 #: src/components/pages/builder-page.tsx:215
-msgid "Submitting..."
-msgstr ""
+#~ msgid "Submitting..."
+#~ msgstr ""
 
 #: src/components/trade/header/top-nav.tsx:29
 msgid "Support"
@@ -1046,19 +1041,17 @@ msgstr "切换中..."
 msgid "Take Profit / Stop Loss"
 msgstr "止盈 / 止损"
 
-#. placeholder {0}: builderAddress.slice(0, 6)
-#. placeholder {1}: builderAddress.slice(-4)
 #: src/components/pages/builder-page.tsx:130
-msgid "The builder at {0}...{1} can now charge up to {maxFeeRate}% fee on orders placed on your behalf."
-msgstr ""
+#~ msgid "The builder at {0}...{1} can now charge up to {maxFeeRate}% fee on orders placed on your behalf."
+#~ msgstr ""
 
 #: src/components/pages/not-found-page.tsx:16
 msgid "The page you are looking for does not exist."
 msgstr "您查找的页面不存在。"
 
 #: src/components/pages/builder-page.tsx:105
-msgid "This action must be signed by your main wallet (not an agent/API wallet). The builder must have at least 100 USDC in perps account value."
-msgstr ""
+#~ msgid "This action must be signed by your main wallet (not an agent/API wallet). The builder must have at least 100 USDC in perps account value."
+#~ msgstr ""
 
 #: src/components/trade/orderbook/trades-view.tsx:66
 #: src/components/trade/positions/funding-tab.tsx:122
@@ -1194,5 +1187,5 @@ msgid "Withdraw"
 msgstr "提款"
 
 #: src/components/pages/builder-page.tsx:248
-msgid "You can revoke permissions at any time by registering a new approval with 0% fee rate. Builder codes are processed entirely onchain as part of the fee logic."
-msgstr ""
+#~ msgid "You can revoke permissions at any time by registering a new approval with 0% fee rate. Builder codes are processed entirely onchain as part of the fee logic."
+#~ msgstr ""
