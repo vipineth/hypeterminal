@@ -21,6 +21,10 @@ msgstr "% مكتمل"
 msgid "24h Price"
 msgstr "سعر 24 ساعة"
 
+#: src/components/pages/builder-page.tsx:237
+msgid "About Builder Codes"
+msgstr ""
+
 #: src/components/trade/order-entry/account-panel.tsx:121
 msgid "Account"
 msgstr "الحساب"
@@ -29,8 +33,8 @@ msgstr "الحساب"
 msgid "Account Balances"
 msgstr "أرصدة الحساب"
 
-#: src/components/trade/positions/orders-tab.tsx:259
-#: src/components/trade/positions/positions-tab.tsx:214
+#: src/components/trade/positions/orders-tab.tsx:255
+#: src/components/trade/positions/positions-tab.tsx:210
 #: src/components/trade/positions/twap-tab.tsx:126
 msgid "Actions"
 msgstr "إجراءات"
@@ -43,7 +47,7 @@ msgstr "نشط"
 msgid "Active"
 msgstr "نشط"
 
-#: src/components/trade/positions/positions-tab.tsx:163
+#: src/components/trade/positions/positions-tab.tsx:159
 msgid "Active Positions"
 msgstr "المراكز النشطة"
 
@@ -51,25 +55,41 @@ msgstr "المراكز النشطة"
 msgid "Add funds"
 msgstr "إضافة أموال"
 
-#: src/components/trade/chart/token-selector.tsx:215
+#: src/components/trade/chart/token-selector.tsx:219
 msgid "Add to favorites"
 msgstr "إضافة إلى المفضلة"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:501
+msgid "Agent"
+msgstr ""
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:508
+msgid "Agent mode: Orders signed automatically (fast)"
+msgstr ""
+
+#: src/hooks/hyperliquid/use-trading-agent.ts:79
+msgid "Agent verification failed"
+msgstr ""
 
 #: src/components/trade/header/top-nav.tsx:27
 msgid "API"
 msgstr "API"
 
+#: src/components/pages/builder-page.tsx:92
+msgid "Approve a builder to charge fees on orders placed on your behalf. Builder codes allow DeFi applications to receive a portion of trading fees."
+msgstr ""
+
 #: src/components/trade/positions/balances-tab.tsx:132
 #: src/components/trade/positions/funding-tab.tsx:110
 #: src/components/trade/positions/history-tab.tsx:98
-#: src/components/trade/positions/orders-tab.tsx:241
-#: src/components/trade/positions/positions-tab.tsx:193
+#: src/components/trade/positions/orders-tab.tsx:237
+#: src/components/trade/positions/positions-tab.tsx:189
 #: src/components/trade/positions/twap-tab.tsx:108
 msgid "Asset"
 msgstr "الأصل"
 
 #: src/components/trade/order-entry/account-panel.tsx:84
-#: src/components/trade/order-entry/order-entry-panel.tsx:541
+#: src/components/trade/order-entry/order-entry-panel.tsx:599
 #: src/components/trade/positions/balances-tab.tsx:135
 msgid "Available"
 msgstr "متاح"
@@ -83,8 +103,8 @@ msgid "Balance"
 msgstr "الرصيد"
 
 #: src/components/trade/footer/footer-bar.tsx:25
-msgid "Block:"
-msgstr "الكتلة:"
+#~ msgid "Block:"
+#~ msgstr "الكتلة:"
 
 #: src/components/trade/components/global-settings-dialog.tsx:169
 msgid "bps"
@@ -98,42 +118,62 @@ msgstr "مسار التنقل"
 msgid "Bridge USDC from Arbitrum or other chains to your Hyperliquid account."
 msgstr "قم بتحويل USDC من Arbitrum أو سلاسل أخرى إلى حساب Hyperliquid الخاص بك."
 
+#: src/components/pages/builder-page.tsx:145
+msgid "Builder Address"
+msgstr ""
+
+#: src/components/pages/builder-page.tsx:127
+msgid "Builder code registered successfully!"
+msgstr ""
+
+#: src/components/pages/builder-page.tsx:242
+msgid "Builder codes allow DeFi builders to receive a fee on fills they send on behalf of users. They are set per-order for maximal flexibility."
+msgstr ""
+
+#: src/components/pages/builder-page.tsx:102
+msgid "Builder Fee Approval"
+msgstr ""
+
+#: src/components/pages/builder-page.tsx:272
+msgid "Builder must have at least 100 USDC in perps account value"
+msgstr ""
+
 #: src/components/trade/positions/history-tab.tsx:51
-#: src/components/trade/positions/orders-tab.tsx:161
+#: src/components/trade/positions/orders-tab.tsx:157
 #: src/components/trade/positions/twap-tab.tsx:64
 msgid "buy"
 msgstr "شراء"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:434
+#: src/components/trade/order-entry/order-entry-panel.tsx:455
 msgid "Buy"
 msgstr "شراء"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:518
+#: src/components/trade/order-entry/order-entry-panel.tsx:576
 msgid "Buy Long"
 msgstr "شراء طويل"
 
-#: src/components/trade/positions/orders-tab.tsx:308
+#: src/components/trade/positions/orders-tab.tsx:304
 #: src/components/trade/positions/twap-tab.tsx:182
 msgid "Cancel"
 msgstr "إلغاء"
 
-#: src/components/trade/positions/orders-tab.tsx:203
+#: src/components/trade/positions/orders-tab.tsx:199
 msgid "Cancel all"
 msgstr "إلغاء الكل"
 
-#: src/components/trade/positions/orders-tab.tsx:199
+#: src/components/trade/positions/orders-tab.tsx:195
 msgid "Cancel all orders"
 msgstr "إلغاء جميع الأوامر"
 
-#: src/components/trade/positions/orders-tab.tsx:304
+#: src/components/trade/positions/orders-tab.tsx:300
 msgid "Cancel order"
 msgstr "إلغاء الأمر"
 
-#: src/components/trade/positions/orders-tab.tsx:193
+#: src/components/trade/positions/orders-tab.tsx:189
 msgid "Cancel selected"
 msgstr "إلغاء المحدد"
 
-#: src/components/trade/positions/orders-tab.tsx:189
+#: src/components/trade/positions/orders-tab.tsx:185
 msgid "Cancel selected orders"
 msgstr "إلغاء الأوامر المحددة"
 
@@ -141,9 +181,9 @@ msgstr "إلغاء الأوامر المحددة"
 msgid "Cancel TWAP order"
 msgstr "إلغاء أمر TWAP"
 
-#: src/components/trade/positions/orders-tab.tsx:193
-#: src/components/trade/positions/orders-tab.tsx:203
-#: src/components/trade/positions/orders-tab.tsx:308
+#: src/components/trade/positions/orders-tab.tsx:189
+#: src/components/trade/positions/orders-tab.tsx:199
+#: src/components/trade/positions/orders-tab.tsx:304
 msgid "Canceling..."
 msgstr "جارٍ الإلغاء..."
 
@@ -155,17 +195,17 @@ msgstr "ملغى"
 msgid "Chart"
 msgstr "الرسم البياني"
 
-#: src/components/trade/positions/positions-tab.tsx:255
+#: src/components/trade/positions/positions-tab.tsx:251
 #: src/components/ui/dialog.tsx:63
 #: src/components/ui/sheet.tsx:67
 msgid "Close"
 msgstr "إغلاق"
 
-#: src/components/trade/positions/positions-tab.tsx:251
+#: src/components/trade/positions/positions-tab.tsx:247
 msgid "Close position"
 msgstr "إغلاق المركز"
 
-#: src/components/trade/positions/positions-tab.tsx:255
+#: src/components/trade/positions/positions-tab.tsx:251
 msgid "Closing..."
 msgstr "جاري الإغلاق..."
 
@@ -173,10 +213,10 @@ msgstr "جاري الإغلاق..."
 msgid "Collapse account panel"
 msgstr "طي لوحة الحساب"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:460
-#: src/components/trade/order-entry/order-entry-panel.tsx:502
-#: src/components/trade/order-entry/order-entry-panel.tsx:660
-#: src/components/trade/order-entry/order-entry-panel.tsx:671
+#: src/components/trade/order-entry/order-entry-panel.tsx:481
+#: src/components/trade/order-entry/order-entry-panel.tsx:560
+#: src/components/trade/order-entry/order-entry-panel.tsx:715
+#: src/components/trade/order-entry/order-entry-panel.tsx:726
 msgid "Coming soon"
 msgstr "قريباً"
 
@@ -184,23 +224,28 @@ msgstr "قريباً"
 msgid "completed"
 msgstr "مكتمل"
 
-#: src/components/trade/positions/orders-tab.tsx:86
+#: src/components/trade/positions/orders-tab.tsx:82
 msgid "Connect a wallet to manage orders."
 msgstr "قم بربط المحفظة لإدارة الأوامر."
 
-#: src/components/trade/positions/positions-tab.tsx:112
+#: src/components/trade/positions/positions-tab.tsx:108
 msgid "Connect a wallet to manage positions."
 msgstr "قم بتوصيل المحفظة لإدارة المراكز."
 
+#: src/components/pages/builder-page.tsx:118
 #: src/components/trade/components/wallet-dialog.tsx:28
 #: src/components/trade/header/user-menu.tsx:65
-#: src/components/trade/order-entry/order-entry-panel.tsx:403
+#: src/components/trade/order-entry/order-entry-panel.tsx:412
 msgid "Connect Wallet"
 msgstr "ربط المحفظة"
 
 #: src/components/trade/order-entry/account-panel.tsx:190
 msgid "Connect wallet to view account"
 msgstr "اربط المحفظة لعرض الحساب"
+
+#: src/components/pages/builder-page.tsx:115
+msgid "Connect your wallet to register a builder code"
+msgstr ""
 
 #: src/components/trade/positions/balances-tab.tsx:112
 msgid "Connect your wallet to view balances."
@@ -210,11 +255,11 @@ msgstr "اربط محفظتك لعرض الأرصدة."
 msgid "Connect your wallet to view funding payments."
 msgstr "اربط محفظتك لعرض مدفوعات التمويل."
 
-#: src/components/trade/positions/orders-tab.tsx:211
+#: src/components/trade/positions/orders-tab.tsx:207
 msgid "Connect your wallet to view open orders."
 msgstr "اربط محفظتك لعرض الأوامر المفتوحة."
 
-#: src/components/trade/positions/positions-tab.tsx:170
+#: src/components/trade/positions/positions-tab.tsx:166
 msgid "Connect your wallet to view positions."
 msgstr "قم بتوصيل محفظتك لعرض المراكز."
 
@@ -226,9 +271,15 @@ msgstr "اربط محفظتك لعرض سجل التداول."
 msgid "Connect your wallet to view TWAP orders."
 msgstr "اربط محفظتك لعرض أوامر TWAP."
 
-#: src/components/trade/footer/footer-bar.tsx:21
+#: src/components/trade/footer/footer-bar.tsx:13
 msgid "Connected"
 msgstr "متصل"
+
+#. placeholder {0}: address?.slice(0, 6)
+#. placeholder {1}: address?.slice(-4)
+#: src/components/pages/builder-page.tsx:224
+msgid "Connected: {0}...{1}"
+msgstr ""
 
 #: src/components/trade/header/user-menu.tsx:50
 msgid "Connecting..."
@@ -238,11 +289,12 @@ msgstr "جارٍ الاتصال..."
 msgid "Copy Address"
 msgstr "نسخ العنوان"
 
-#: src/hooks/hyperliquid/use-trading-agent.ts:77
+#: src/components/pages/builder-page.tsx:52
+#: src/hooks/hyperliquid/use-trading-agent.ts:69
 msgid "Could not create wallet"
 msgstr "تعذر إنشاء المحفظة"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:451
+#: src/components/trade/order-entry/order-entry-panel.tsx:472
 msgid "Cross"
 msgstr "متقاطع"
 
@@ -257,8 +309,8 @@ msgstr "خصص تجربة التداول الخاصة بك."
 #: src/components/trade/header/top-nav.tsx:91
 #: src/components/trade/order-entry/account-panel.tsx:209
 #: src/components/trade/order-entry/account-panel.tsx:211
-#: src/components/trade/order-entry/order-entry-panel.tsx:419
-#: src/components/trade/order-entry/order-entry-panel.tsx:554
+#: src/components/trade/order-entry/order-entry-panel.tsx:428
+#: src/components/trade/order-entry/order-entry-panel.tsx:612
 msgid "Deposit"
 msgstr "إيداع"
 
@@ -269,6 +321,14 @@ msgstr "إيداع الأموال"
 #: src/components/trade/order-entry/deposit-modal.tsx:26
 msgid "Deposit on Hyperliquid"
 msgstr "إيداع في Hyperliquid"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:501
+msgid "Direct"
+msgstr ""
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:509
+msgid "Direct mode: Sign each order with wallet"
+msgstr ""
 
 #: src/components/trade/header/user-menu.tsx:98
 msgid "Disconnect"
@@ -290,19 +350,19 @@ msgstr "يعرض الشريط الجانبي للجوال."
 msgid "Docs"
 msgstr "المستندات"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:427
+#: src/components/trade/order-entry/order-entry-panel.tsx:444
 msgid "Enable Trading"
 msgstr "تفعيل التداول"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:209
+#: src/components/trade/order-entry/order-entry-panel.tsx:221
 msgid "Enter limit price"
 msgstr "أدخل السعر المحدد"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:212
+#: src/components/trade/order-entry/order-entry-panel.tsx:224
 msgid "Enter size"
 msgstr "أدخل الحجم"
 
-#: src/components/trade/positions/positions-tab.tsx:202
+#: src/components/trade/positions/positions-tab.tsx:198
 msgid "Entry"
 msgstr "الدخول"
 
@@ -310,11 +370,11 @@ msgstr "الدخول"
 msgid "Equity"
 msgstr "حقوق الملكية"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:728
+#: src/components/trade/order-entry/order-entry-panel.tsx:779
 msgid "Est. Fee"
 msgstr "الرسوم المقدرة"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:218
+#: src/components/trade/order-entry/order-entry-panel.tsx:230
 msgid "Exceeds max size"
 msgstr "يتجاوز الحد الأقصى"
 
@@ -330,7 +390,7 @@ msgstr "توسيع لوحة الحساب"
 msgid "failed"
 msgstr "فشل"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:315
+#: src/components/trade/order-entry/order-entry-panel.tsx:327
 msgid "Failed to enable trading"
 msgstr "فشل تفعيل التداول"
 
@@ -342,7 +402,7 @@ msgstr "فشل في تحميل الأرصدة."
 msgid "Failed to load funding history."
 msgstr "فشل في تحميل سجل التمويل."
 
-#: src/components/trade/positions/orders-tab.tsx:219
+#: src/components/trade/positions/orders-tab.tsx:215
 msgid "Failed to load open orders."
 msgstr "فشل في تحميل الأوامر المفتوحة."
 
@@ -350,7 +410,7 @@ msgstr "فشل في تحميل الأوامر المفتوحة."
 msgid "Failed to load order book."
 msgstr "فشل في تحميل دفتر الأوامر."
 
-#: src/components/trade/positions/positions-tab.tsx:178
+#: src/components/trade/positions/positions-tab.tsx:174
 msgid "Failed to load positions."
 msgstr "فشل تحميل المراكز."
 
@@ -366,11 +426,23 @@ msgstr "فشل في تحميل الصفقات."
 msgid "Failed to load TWAP history."
 msgstr "فشل في تحميل سجل TWAP."
 
+#: src/components/pages/builder-page.tsx:69
+msgid "Failed to register builder code"
+msgstr ""
+
 #: src/components/trade/positions/history-tab.tsx:110
 msgid "Fee"
 msgstr "الرسوم"
 
-#: src/components/trade/positions/orders-tab.tsx:253
+#: src/components/pages/builder-page.tsx:255
+msgid "Fee Limits:"
+msgstr ""
+
+#: src/components/pages/builder-page.tsx:192
+msgid "Fee rate must be between 0.001% and 1%"
+msgstr ""
+
+#: src/components/trade/positions/orders-tab.tsx:249
 msgid "Filled"
 msgstr "منفذ"
 
@@ -392,8 +464,8 @@ msgid "Funding Payments"
 msgstr "مدفوعات التمويل"
 
 #: src/components/trade/footer/footer-bar.tsx:30
-msgid "Gas:"
-msgstr "الغاز:"
+#~ msgid "Gas:"
+#~ msgstr "الغاز:"
 
 #: src/components/ui/pagination.tsx:66
 msgid "Go to next page"
@@ -412,39 +484,43 @@ msgstr "الذهاب إلى منصة التداول"
 msgid "In Use"
 msgstr "قيد الاستخدام"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:456
+#: src/components/pages/builder-page.tsx:160
+msgid "Invalid Ethereum address"
+msgstr ""
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:477
 msgid "Isolated"
 msgstr "معزول"
 
 #: src/components/trade/footer/footer-bar.tsx:36
-msgid "Latency:"
-msgstr "التأخير:"
+#~ msgid "Latency:"
+#~ msgstr "التأخير:"
 
 #: src/components/trade/header/top-nav.tsx:23
 msgid "Leaderboard"
 msgstr "لوحة المتصدرين"
 
-#: src/components/trade/positions/orders-tab.tsx:163
+#: src/components/trade/positions/orders-tab.tsx:159
 msgid "limit"
 msgstr "محدد"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:492
+#: src/components/trade/order-entry/order-entry-panel.tsx:550
 msgid "Limit"
 msgstr "محدد"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:625
+#: src/components/trade/order-entry/order-entry-panel.tsx:681
 msgid "Limit Price"
 msgstr "السعر المحدد"
 
-#: src/components/trade/positions/orders-tab.tsx:163
+#: src/components/trade/positions/orders-tab.tsx:159
 msgid "limit ro"
 msgstr "محدد تقليل فقط"
 
-#: src/components/trade/positions/positions-tab.tsx:211
+#: src/components/trade/positions/positions-tab.tsx:207
 msgid "Liq"
 msgstr "التصفية"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:708
+#: src/components/trade/order-entry/order-entry-panel.tsx:759
 msgid "Liq. Price"
 msgstr "سعر التصفية"
 
@@ -460,15 +536,15 @@ msgstr "جارٍ تحميل الأرصدة..."
 msgid "Loading funding history..."
 msgstr "جارٍ تحميل سجل التمويل..."
 
-#: src/components/trade/chart/token-selector.tsx:144
+#: src/components/trade/chart/token-selector.tsx:148
 msgid "Loading markets..."
 msgstr "جارٍ تحميل الأسواق..."
 
-#: src/components/trade/positions/orders-tab.tsx:215
+#: src/components/trade/positions/orders-tab.tsx:211
 msgid "Loading open orders..."
 msgstr "جارٍ تحميل الأوامر المفتوحة..."
 
-#: src/components/trade/positions/positions-tab.tsx:174
+#: src/components/trade/positions/positions-tab.tsx:170
 msgid "Loading positions..."
 msgstr "جاري تحميل المراكز..."
 
@@ -480,18 +556,19 @@ msgstr "جارٍ تحميل سجل التداول..."
 msgid "Loading TWAP orders..."
 msgstr "جارٍ تحميل أوامر TWAP..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:186
+#: src/components/trade/order-entry/order-entry-panel.tsx:198
 msgid "Loading wallet..."
 msgstr "جاري تحميل المحفظة..."
 
 #: src/components/trade/order-entry/account-panel.tsx:192
-#: src/components/trade/order-entry/order-entry-panel.tsx:427
+#: src/components/trade/order-entry/order-entry-panel.tsx:436
+#: src/components/trade/order-entry/order-entry-panel.tsx:437
 msgid "Loading..."
 msgstr "جارٍ التحميل..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:521
+#: src/components/trade/order-entry/order-entry-panel.tsx:579
 #: src/components/trade/positions/funding-tab.tsx:62
-#: src/components/trade/positions/positions-tab.tsx:87
+#: src/components/trade/positions/positions-tab.tsx:83
 msgid "Long"
 msgstr "شراء"
 
@@ -499,7 +576,7 @@ msgstr "شراء"
 msgid "Margin Ratio"
 msgstr "نسبة الهامش"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:718
+#: src/components/trade/order-entry/order-entry-panel.tsx:769
 msgid "Margin Req."
 msgstr "الهامش المطلوب"
 
@@ -507,8 +584,8 @@ msgstr "الهامش المطلوب"
 msgid "Margin Used"
 msgstr "الهامش المستخدم"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:632
-#: src/components/trade/positions/positions-tab.tsx:205
+#: src/components/trade/order-entry/order-entry-panel.tsx:688
+#: src/components/trade/positions/positions-tab.tsx:201
 msgid "Mark"
 msgstr "السعر المرجعي"
 
@@ -518,15 +595,15 @@ msgid "MARK"
 msgstr "السعر المرجعي"
 
 #: src/components/trade/chart/constants.ts:60
-#: src/components/trade/order-entry/order-entry-panel.tsx:489
+#: src/components/trade/order-entry/order-entry-panel.tsx:547
 msgid "Market"
 msgstr "السوق"
 
-#: src/components/trade/positions/orders-tab.tsx:99
+#: src/components/trade/positions/orders-tab.tsx:95
 msgid "Market metadata unavailable."
 msgstr "بيانات السوق غير متوفرة."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:195
+#: src/components/trade/order-entry/order-entry-panel.tsx:207
 msgid "Market not ready"
 msgstr "السوق غير جاهز"
 
@@ -534,19 +611,27 @@ msgstr "السوق غير جاهز"
 msgid "Market Order Slippage"
 msgstr "انزلاق أمر السوق"
 
-#: src/components/trade/chart/token-selector.tsx:284
+#: src/components/trade/chart/token-selector.tsx:293
 msgid "markets"
 msgstr "أسواق"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:615
+#: src/components/trade/order-entry/order-entry-panel.tsx:672
 msgid "Max"
 msgstr "الأقصى"
+
+#: src/components/pages/builder-page.tsx:185
+msgid "Max 0.1% (10 bps) for perps, 1% (100 bps) for spot. Enter as decimal (e.g., 0.01 for 1 basis point)."
+msgstr ""
+
+#: src/components/pages/builder-page.tsx:167
+msgid "Max Fee Rate (%)"
+msgstr ""
 
 #: src/components/trade/components/global-settings-dialog.tsx:156
 msgid "Max slippage allowed for market orders."
 msgstr "الحد الأقصى للانزلاق المسموح به لأوامر السوق."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:215
+#: src/components/trade/order-entry/order-entry-panel.tsx:227
 msgid "Min order $10"
 msgstr "الحد الأدنى $10"
 
@@ -563,7 +648,11 @@ msgstr "المزيد من الخيارات"
 msgid "More pages"
 msgstr "صفحات أخرى"
 
-#: src/components/trade/chart/token-selector.tsx:228
+#: src/components/pages/builder-page.tsx:275
+msgid "Must be signed by main wallet (not agent/API wallet)"
+msgstr ""
+
+#: src/components/trade/chart/token-selector.tsx:232
 msgid "NEW"
 msgstr "جديد"
 
@@ -571,11 +660,11 @@ msgstr "جديد"
 msgid "Next"
 msgstr "التالي"
 
-#: src/components/trade/positions/positions-tab.tsx:185
+#: src/components/trade/positions/positions-tab.tsx:181
 msgid "No active positions."
 msgstr "لا توجد مراكز نشطة."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:189
+#: src/components/trade/order-entry/order-entry-panel.tsx:201
 msgid "No balance"
 msgstr "لا يوجد رصيد"
 
@@ -591,19 +680,19 @@ msgstr "لم يتم العثور على تنفيذات."
 msgid "No funding payments found."
 msgstr "لم يتم العثور على مدفوعات تمويل."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:206
+#: src/components/trade/order-entry/order-entry-panel.tsx:218
 msgid "No mark price"
 msgstr "لا يوجد سعر مرجعي"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:192
+#: src/components/trade/order-entry/order-entry-panel.tsx:204
 msgid "No market"
 msgstr "لا يوجد سوق"
 
-#: src/components/trade/chart/token-selector.tsx:147
+#: src/components/trade/chart/token-selector.tsx:151
 msgid "No markets found."
 msgstr "لم يتم العثور على أسواق."
 
-#: src/components/trade/positions/orders-tab.tsx:224
+#: src/components/trade/positions/orders-tab.tsx:220
 msgid "No open orders."
 msgstr "لا توجد أوامر مفتوحة."
 
@@ -611,11 +700,15 @@ msgstr "لا توجد أوامر مفتوحة."
 msgid "No TWAP orders found."
 msgstr "لم يتم العثور على أوامر TWAP."
 
+#: src/hooks/hyperliquid/use-trading-agent.ts:53
+msgid "No user address"
+msgstr ""
+
 #: src/components/trade/components/wallet-dialog.tsx:48
 msgid "No wallets found"
 msgstr "لم يتم العثور على محافظ"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:183
+#: src/components/trade/order-entry/order-entry-panel.tsx:195
 msgid "Not connected"
 msgstr "غير متصل"
 
@@ -632,7 +725,7 @@ msgstr ""
 msgid "OI"
 msgstr "العقود المفتوحة"
 
-#: src/components/trade/positions/orders-tab.tsx:169
+#: src/components/trade/positions/orders-tab.tsx:165
 msgid "open"
 msgstr "مفتوح"
 
@@ -640,7 +733,7 @@ msgstr "مفتوح"
 msgid "Open Interest"
 msgstr "العقود المفتوحة"
 
-#: src/components/trade/positions/orders-tab.tsx:182
+#: src/components/trade/positions/orders-tab.tsx:178
 msgid "Open Orders"
 msgstr "الأوامر المفتوحة"
 
@@ -655,7 +748,7 @@ msgstr "أوراكل"
 msgid "Order Book"
 msgstr "دفتر الأوامر"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:382
+#: src/components/trade/order-entry/order-entry-panel.tsx:391
 msgid "Order failed"
 msgstr "فشل الطلب"
 
@@ -663,7 +756,7 @@ msgstr "فشل الطلب"
 msgid "Order Queue"
 msgstr "قائمة الأوامر"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:714
+#: src/components/trade/order-entry/order-entry-panel.tsx:765
 msgid "Order Value"
 msgstr "قيمة الطلب"
 
@@ -692,9 +785,13 @@ msgstr "دائم"
 msgid "Perps"
 msgstr "العقود الدائمة"
 
+#: src/components/pages/builder-page.tsx:259
+msgid "Perps: Max 0.1% (10 basis points)"
+msgstr ""
+
 #: src/components/trade/order-entry/account-panel.tsx:143
 #: src/components/trade/positions/history-tab.tsx:113
-#: src/components/trade/positions/positions-tab.tsx:208
+#: src/components/trade/positions/positions-tab.tsx:204
 msgid "PNL"
 msgstr "الربح والخسارة"
 
@@ -702,7 +799,7 @@ msgstr "الربح والخسارة"
 msgid "Portfolio"
 msgstr "المحفظة"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:561
+#: src/components/trade/order-entry/order-entry-panel.tsx:619
 #: src/components/trade/positions/funding-tab.tsx:113
 msgid "Position"
 msgstr "المركز"
@@ -715,7 +812,7 @@ msgstr "السابق"
 #: src/components/trade/orderbook/order-book-panel.tsx:233
 #: src/components/trade/orderbook/trades-view.tsx:67
 #: src/components/trade/positions/history-tab.tsx:104
-#: src/components/trade/positions/orders-tab.tsx:247
+#: src/components/trade/positions/orders-tab.tsx:243
 msgid "Price"
 msgstr "السعر"
 
@@ -731,14 +828,27 @@ msgstr "المعدل"
 msgid "Recent Trades"
 msgstr "الصفقات الأخيرة"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:654
-#: src/components/trade/order-entry/order-entry-panel.tsx:656
+#: src/components/trade/order-entry/order-entry-panel.tsx:709
+#: src/components/trade/order-entry/order-entry-panel.tsx:711
 msgid "Reduce Only"
 msgstr "تقليل فقط"
 
-#: src/components/trade/chart/token-selector.tsx:215
+#: src/components/pages/builder-page.tsx:138
+msgid "Register Another"
+msgstr ""
+
+#: src/components/pages/builder-page.tsx:89
+#: src/components/pages/builder-page.tsx:217
+msgid "Register Builder Code"
+msgstr ""
+
+#: src/components/trade/chart/token-selector.tsx:219
 msgid "Remove from favorites"
 msgstr "إزالة من المفضلة"
+
+#: src/components/pages/builder-page.tsx:268
+msgid "Requirements:"
+msgstr ""
 
 #: src/components/trade/chart/token-selector.tsx:73
 msgid "Search markets..."
@@ -748,7 +858,7 @@ msgstr "البحث في الأسواق..."
 msgid "Select {coin} market"
 msgstr "اختر سوق {coin}"
 
-#: src/components/trade/positions/orders-tab.tsx:235
+#: src/components/trade/positions/orders-tab.tsx:231
 msgid "Select all orders"
 msgstr "تحديد جميع الأوامر"
 
@@ -756,11 +866,11 @@ msgstr "تحديد جميع الأوامر"
 msgid "Select favorite markets"
 msgstr "اختر الأسواق المفضلة"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:470
+#: src/components/trade/order-entry/order-entry-panel.tsx:527
 msgid "Select leverage"
 msgstr "اختر الرافعة المالية"
 
-#: src/components/trade/positions/orders-tab.tsx:270
+#: src/components/trade/positions/orders-tab.tsx:266
 msgid "Select order"
 msgstr "اختر الأمر"
 
@@ -768,29 +878,33 @@ msgstr "اختر الأمر"
 msgid "Select order book aggregation"
 msgstr "اختر تجميع دفتر الأوامر"
 
+#: src/components/trade/order-entry/order-entry-panel.tsx:499
+msgid "Select signing mode"
+msgstr ""
+
 #: src/components/trade/chart/token-selector.tsx:53
 msgid "Select token"
 msgstr "اختر الرمز"
 
 #: src/components/trade/positions/history-tab.tsx:51
-#: src/components/trade/positions/orders-tab.tsx:161
+#: src/components/trade/positions/orders-tab.tsx:157
 #: src/components/trade/positions/twap-tab.tsx:64
 msgid "sell"
 msgstr "بيع"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:434
+#: src/components/trade/order-entry/order-entry-panel.tsx:455
 msgid "Sell"
 msgstr "بيع"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:533
+#: src/components/trade/order-entry/order-entry-panel.tsx:591
 msgid "Sell Short"
 msgstr "بيع قصير"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:612
+#: src/components/trade/order-entry/order-entry-panel.tsx:669
 msgid "Set {p}%"
 msgstr "تعيين {p}%"
 
-#: src/components/trade/positions/positions-tab.tsx:261
+#: src/components/trade/positions/positions-tab.tsx:257
 msgid "Set TP/SL"
 msgstr "تعيين TP/SL"
 
@@ -799,9 +913,9 @@ msgstr "تعيين TP/SL"
 msgid "Settings"
 msgstr "الإعدادات"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:536
+#: src/components/trade/order-entry/order-entry-panel.tsx:594
 #: src/components/trade/positions/funding-tab.tsx:62
-#: src/components/trade/positions/positions-tab.tsx:87
+#: src/components/trade/positions/positions-tab.tsx:83
 msgid "Short"
 msgstr "بيع"
 
@@ -829,25 +943,30 @@ msgstr "إظهار القيم بالدولار"
 msgid "Sidebar"
 msgstr "الشريط الجانبي"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:203
+#: src/components/pages/builder-page.tsx:213
+#: src/components/trade/order-entry/order-entry-panel.tsx:440
+msgid "Sign in wallet..."
+msgstr ""
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:215
 msgid "Signer not ready"
 msgstr "المُوقِّع غير جاهز"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx:427
-msgid "Signing..."
-msgstr "جاري التوقيع..."
+#~ msgid "Signing..."
+#~ msgstr "جاري التوقيع..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:570
+#: src/components/trade/order-entry/order-entry-panel.tsx:628
 #: src/components/trade/order-entry/order-toast.tsx:80
 #: src/components/trade/orderbook/order-book-panel.tsx:239
 #: src/components/trade/orderbook/trades-view.tsx:68
 #: src/components/trade/positions/history-tab.tsx:107
-#: src/components/trade/positions/orders-tab.tsx:250
-#: src/components/trade/positions/positions-tab.tsx:196
+#: src/components/trade/positions/orders-tab.tsx:246
+#: src/components/trade/positions/positions-tab.tsx:192
 msgid "Size"
 msgstr "الحجم"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:724
+#: src/components/trade/order-entry/order-entry-panel.tsx:775
 msgid "Slippage"
 msgstr "الانزلاق"
 
@@ -856,7 +975,7 @@ msgid "Something went wrong"
 msgstr "حدث خطأ ما"
 
 #. placeholder {0}: String(header.column.columnDef.header ?? "")
-#: src/components/trade/chart/token-selector.tsx:124
+#: src/components/trade/chart/token-selector.tsx:128
 msgid "Sort by {0}"
 msgstr "ترتيب حسب {0}"
 
@@ -865,7 +984,7 @@ msgid "Sort by {headerLabel}"
 msgstr "ترتيب حسب {headerLabel}"
 
 #. placeholder {0}: sorting[0].id
-#: src/components/trade/chart/token-selector.tsx:287
+#: src/components/trade/chart/token-selector.tsx:296
 msgid "Sorted by {0}"
 msgstr "مرتب حسب {0}"
 
@@ -878,6 +997,10 @@ msgstr "فوري"
 msgid "Spot"
 msgstr "فوري"
 
+#: src/components/pages/builder-page.tsx:262
+msgid "Spot: Max 1% (100 basis points)"
+msgstr ""
+
 #: src/components/trade/orderbook/order-book-panel.tsx:312
 msgid "Spread"
 msgstr "الفارق"
@@ -886,20 +1009,24 @@ msgstr "الفارق"
 msgid "Staking"
 msgstr "التخزين"
 
-#: src/components/trade/positions/orders-tab.tsx:256
+#: src/components/trade/positions/orders-tab.tsx:252
 #: src/components/trade/positions/twap-tab.tsx:123
 msgid "Status"
 msgstr "الحالة"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:498
+#: src/components/trade/order-entry/order-entry-panel.tsx:556
 msgid "Stop"
 msgstr "إيقاف"
+
+#: src/components/pages/builder-page.tsx:215
+msgid "Submitting..."
+msgstr ""
 
 #: src/components/trade/header/top-nav.tsx:29
 msgid "Support"
 msgstr "الدعم"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:411
+#: src/components/trade/order-entry/order-entry-panel.tsx:420
 msgid "Switch to Arbitrum"
 msgstr "التبديل إلى Arbitrum"
 
@@ -911,17 +1038,27 @@ msgstr "التبديل إلى الوضع الداكن"
 msgid "Switch to light mode"
 msgstr "التبديل إلى الوضع الفاتح"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:411
+#: src/components/trade/order-entry/order-entry-panel.tsx:420
 msgid "Switching..."
 msgstr "جاري التبديل..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:665
+#: src/components/trade/order-entry/order-entry-panel.tsx:720
 msgid "Take Profit / Stop Loss"
 msgstr "جني الأرباح / وقف الخسارة"
+
+#. placeholder {0}: builderAddress.slice(0, 6)
+#. placeholder {1}: builderAddress.slice(-4)
+#: src/components/pages/builder-page.tsx:130
+msgid "The builder at {0}...{1} can now charge up to {maxFeeRate}% fee on orders placed on your behalf."
+msgstr ""
 
 #: src/components/pages/not-found-page.tsx:16
 msgid "The page you are looking for does not exist."
 msgstr "الصفحة التي تبحث عنها غير موجودة."
+
+#: src/components/pages/builder-page.tsx:105
+msgid "This action must be signed by your main wallet (not an agent/API wallet). The builder must have at least 100 USDC in perps account value."
+msgstr ""
 
 #: src/components/trade/orderbook/trades-view.tsx:66
 #: src/components/trade/positions/funding-tab.tsx:122
@@ -935,7 +1072,7 @@ msgstr "الوقت"
 msgid "Toggle Sidebar"
 msgstr "تبديل الشريط الجانبي"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:577
+#: src/components/trade/order-entry/order-entry-panel.tsx:635
 msgid "Toggle size mode"
 msgstr "تبديل وضع الحجم"
 
@@ -948,8 +1085,8 @@ msgstr "الإجمالي"
 msgid "Total Size"
 msgstr "الحجم الإجمالي"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:667
-#: src/components/trade/positions/positions-tab.tsx:263
+#: src/components/trade/order-entry/order-entry-panel.tsx:722
+#: src/components/trade/positions/positions-tab.tsx:259
 msgid "TP/SL"
 msgstr "TP/SL"
 
@@ -975,16 +1112,16 @@ msgid "TWAP Orders"
 msgstr "أوامر TWAP"
 
 #: src/components/trade/positions/history-tab.tsx:101
-#: src/components/trade/positions/orders-tab.tsx:244
+#: src/components/trade/positions/orders-tab.tsx:240
 msgid "Type"
 msgstr "النوع"
 
-#: src/components/trade/positions/orders-tab.tsx:127
+#: src/components/trade/positions/orders-tab.tsx:123
 msgid "Unable to cancel orders."
 msgstr "تعذر إلغاء الأوامر."
 
-#: src/components/trade/positions/positions-tab.tsx:124
-#: src/components/trade/positions/positions-tab.tsx:150
+#: src/components/trade/positions/positions-tab.tsx:120
+#: src/components/trade/positions/positions-tab.tsx:146
 msgid "Unable to close position."
 msgstr "تعذر إغلاق المركز."
 
@@ -1001,7 +1138,7 @@ msgstr "الربح والخسارة غير المحققة"
 msgid "Unsupported resolution: {0}"
 msgstr "دقة غير مدعومة: {0}"
 
-#: src/components/trade/chart/token-selector.tsx:287
+#: src/components/trade/chart/token-selector.tsx:296
 msgid "Updated live"
 msgstr "تحديث مباشر"
 
@@ -1009,13 +1146,17 @@ msgstr "تحديث مباشر"
 msgid "USD Value"
 msgstr "القيمة بالدولار"
 
-#: src/components/trade/positions/positions-tab.tsx:199
+#: src/components/trade/positions/positions-tab.tsx:195
 msgid "Value"
 msgstr "القيمة"
 
 #: src/components/trade/header/top-nav.tsx:20
 msgid "Vaults"
 msgstr "الخزائن"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:442
+msgid "Verifying..."
+msgstr ""
 
 #: src/components/trade/chart/chart-panel.tsx:54
 #: src/components/trade/market-overview.tsx:48
@@ -1035,10 +1176,10 @@ msgid "Waiting for trades..."
 msgstr "في انتظار الصفقات..."
 
 #: src/hooks/hyperliquid/use-trading-agent.ts:65
-msgid "Wallet client not ready"
-msgstr "عميل المحفظة غير جاهز"
+#~ msgid "Wallet client not ready"
+#~ msgstr "عميل المحفظة غير جاهز"
 
-#: src/hooks/hyperliquid/use-trading-agent.ts:68
+#: src/hooks/hyperliquid/use-trading-agent.ts:52
 msgid "Wallet not connected"
 msgstr "المحفظة غير متصلة"
 
@@ -1051,3 +1192,7 @@ msgstr "خطأ WebSocket"
 #: src/components/trade/order-entry/account-panel.tsx:219
 msgid "Withdraw"
 msgstr "سحب"
+
+#: src/components/pages/builder-page.tsx:248
+msgid "You can revoke permissions at any time by registering a new approval with 0% fee rate. Builder codes are processed entirely onchain as part of the fee logic."
+msgstr ""
