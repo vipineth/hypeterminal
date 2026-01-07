@@ -9,6 +9,7 @@ export {
 export { HyperliquidProvider } from "./context";
 export { createHyperliquidConfig } from "./createConfig";
 export * from "./errors";
+export * from "./hooks/agent";
 export * from "./hooks/exchange";
 export * from "./hooks/info";
 export * from "./hooks/subscription";

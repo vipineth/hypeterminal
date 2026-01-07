@@ -1,15 +1,16 @@
 import { useMemo } from "react";
+import { DEFAULT_MARKET_KEY } from "@/constants/app";
 import type { PerpMarketKey } from "@/lib/hyperliquid/market-key";
-import type { PerpMarketRegistry } from "@/lib/hyperliquid/market-registry";
 import { isPerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
+import type { PerpMarketRegistry } from "@/lib/hyperliquid/market-registry";
 import { getMarketCtxNumbers, type MarketCtxNumbers } from "@/lib/market";
 import { toFiniteNumber } from "@/lib/trade/numbers";
 import { useSelectedMarketKey } from "@/stores/use-market-prefs-store";
 import type { PerpAssetCtx } from "@/types/hyperliquid";
 import { useActiveAssetCtxSubscription } from "./socket/use-active-asset-ctx-subscription";
 import { useAllMidsSubscription } from "./socket/use-all-mids-subscription";
-import { usePerpAssetCtxsSnapshot } from "./use-perp-asset-ctxs-snapshot";
 import { usePerpMarketRegistry } from "./use-market-registry";
+import { usePerpAssetCtxsSnapshot } from "./use-perp-asset-ctxs-snapshot";
 
 export type ResolvedPerpMarket = {
 	kind: "perp";
@@ -17,7 +18,7 @@ export type ResolvedPerpMarket = {
 	coin: string;
 	assetIndex?: number;
 	assetId?: number;
-	szDecimals?: number;
+	szDecimals: number;
 	maxLeverage?: number;
 	isDelisted?: boolean;
 	ctx?: PerpAssetCtx;
@@ -27,6 +28,14 @@ export type ResolvedPerpMarket = {
 };
 
 export type ResolvedMarket = ResolvedPerpMarket;
+
+const DEFAULT_RESOLVED_MARKET: ResolvedPerpMarket = {
+	kind: "perp",
+	marketKey: DEFAULT_MARKET_KEY as PerpMarketKey,
+	coin: perpCoinFromMarketKey(DEFAULT_MARKET_KEY as PerpMarketKey),
+	szDecimals: 5,
+	maxLeverage: 40,
+};
 
 type CtxMode = "realtime" | "snapshot" | "none";
 
@@ -90,7 +99,7 @@ export function useResolvedMarket(marketKey: string | undefined, options?: UseRe
 			coin,
 			assetIndex: info?.assetIndex,
 			assetId: info?.assetIndex,
-			szDecimals: info?.szDecimals,
+			szDecimals: info?.szDecimals ?? DEFAULT_RESOLVED_MARKET.szDecimals,
 			maxLeverage: info?.maxLeverage,
 			isDelisted: info?.isDelisted,
 			ctx,
@@ -100,10 +109,28 @@ export function useResolvedMarket(marketKey: string | undefined, options?: UseRe
 		};
 	}, [perpMarketKey, coin, info, ctx, mids]);
 
-	return { data: resolved, isLoading: metaQuery.isLoading, error: metaQuery.error, refetch: metaQuery.refetch, registry };
+	return {
+		data: resolved,
+		isLoading: metaQuery.isLoading,
+		error: metaQuery.error,
+		refetch: metaQuery.refetch,
+		registry,
+	};
 }
 
 export function useSelectedResolvedMarket(options?: Omit<UseResolvedMarketOptions, "enabled">) {
 	const selectedMarketKey = useSelectedMarketKey();
-	return useResolvedMarket(selectedMarketKey, { ...options, ctxMode: options?.ctxMode ?? "realtime" });
+	const result = useResolvedMarket(selectedMarketKey, { ...options, ctxMode: options?.ctxMode ?? "realtime" });
+
+	const dataWithDefaults = useMemo<ResolvedPerpMarket>(() => {
+		if (result.data) return result.data;
+		if (!selectedMarketKey || !isPerpMarketKey(selectedMarketKey)) return DEFAULT_RESOLVED_MARKET;
+		return {
+			...DEFAULT_RESOLVED_MARKET,
+			marketKey: selectedMarketKey,
+			coin: perpCoinFromMarketKey(selectedMarketKey),
+		};
+	}, [result.data, selectedMarketKey]);
+
+	return { ...result, data: dataWithDefaults };
 }

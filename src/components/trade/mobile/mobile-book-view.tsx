@@ -10,7 +10,7 @@ import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
 import { useL2BookSubscription } from "@/hooks/hyperliquid/socket/use-l2-book-subscription";
 import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
 import { formatNumber } from "@/lib/format";
-import { buildOrderBookRows } from "@/lib/trade/orderbook";
+import { processLevels } from "@/lib/trade/orderbook";
 import { cn } from "@/lib/utils";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
 import { BookRow } from "../orderbook/book-row";
@@ -73,8 +73,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 	const { setShowOrderbookInUsd } = useGlobalSettingsActions();
 
 	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
-	const coin = selectedMarket?.coin ?? "BTC";
-	const szDecimals = selectedMarket?.szDecimals ?? 4;
+	const { coin, szDecimals } = selectedMarket;
 
 	const { data: book, status: bookStatus } = useL2BookSubscription({
 		params: {
@@ -85,8 +84,8 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 		enabled: view === "book",
 	});
 
-	const bids = useMemo(() => buildOrderBookRows(book?.levels[0]), [book?.levels]);
-	const asks = useMemo(() => buildOrderBookRows(book?.levels[1]), [book?.levels]);
+	const bids = useMemo(() => processLevels(book?.levels[0]), [book?.levels]);
+	const asks = useMemo(() => processLevels(book?.levels[1]), [book?.levels]);
 
 	const maxTotal = useMemo(() => {
 		const totals = [...asks, ...bids].map((r) => r.total);
@@ -243,13 +242,13 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 								{asks
 									.slice(0, 12)
 									.reverse()
-									.map((r, index) => (
+									.map((level, index) => (
 										<BookRow
-											key={`ask-${r.price}-${index}`}
-											row={r}
-											type="ask"
+											key={`ask-${level.price}-${index}`}
+											level={level}
+											side="ask"
 											maxTotal={maxTotal}
-											showInUsdc={showOrderbookInUsd}
+											showInUsd={showOrderbookInUsd}
 											szDecimals={szDecimals}
 										/>
 									))}
@@ -282,13 +281,13 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 						{/* Bids - show more rows to fill mobile screen */}
 						{bookStatus !== "error" && bids.length > 0 ? (
 							<div className="flex-1 flex flex-col gap-px py-1 overflow-hidden">
-								{bids.slice(0, 12).map((r, index) => (
+								{bids.slice(0, 12).map((level, index) => (
 									<BookRow
-										key={`bid-${r.price}-${index}`}
-										row={r}
-										type="bid"
+										key={`bid-${level.price}-${index}`}
+										level={level}
+										side="bid"
 										maxTotal={maxTotal}
-										showInUsdc={showOrderbookInUsd}
+										showInUsd={showOrderbookInUsd}
 										szDecimals={szDecimals}
 									/>
 								))}

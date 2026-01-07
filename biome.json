@@ -30,6 +30,7 @@
 		"rules": {
 			"recommended": true,
 			"correctness": {
+				"noUnusedImports": "error",
 				"useExhaustiveDependencies": "warn",
 				"useHookAtTopLevel": "error"
 			},

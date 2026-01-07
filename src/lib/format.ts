@@ -242,7 +242,7 @@ export function formatNumber(value: string | number | null | undefined, opts?: n
 	if (typeof value === "string") {
 		if (!value) return FALLBACK_VALUE_PLACEHOLDER;
 		const num = Number(value);
-		if (!Number.isFinite(num)) return value;
+		if (!Number.isFinite(num)) return FALLBACK_VALUE_PLACEHOLDER;
 
 		// Find how many decimal places the original string has
 		const decimalIndex = value.indexOf(".");

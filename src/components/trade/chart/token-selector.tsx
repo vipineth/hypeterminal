@@ -64,7 +64,11 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 					<ChevronDown className="size-3 text-muted-foreground shrink-0" />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-[calc(100vw-1rem)] sm:w-xl max-w-xl p-0 border-border/60 bg-surface" align="start" sideOffset={8}>
+			<PopoverContent
+				className="w-[calc(100vw-1rem)] sm:w-xl max-w-xl p-0 border-border/60 bg-surface"
+				align="start"
+				sideOffset={8}
+			>
 				<div className="flex flex-col">
 					<div className="px-2 py-2 border-b border-border/40">
 						<div className="relative">
@@ -174,8 +178,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 												? "text-terminal-green"
 												: "text-terminal-red",
 									);
-									const changeText =
-										changePct === null ? FALLBACK_VALUE_PLACEHOLDER : formatPercent(changePct / 100);
+									const changeText = changePct === null ? FALLBACK_VALUE_PLACEHOLDER : formatPercent(changePct / 100);
 
 									return (
 										<div
@@ -246,9 +249,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 											</div>
 											{/* 24h change - always visible */}
 											<div className="w-16 sm:w-20 text-right">
-												<span className={changeClass}>
-													{changeText}
-												</span>
+												<span className={changeClass}>{changeText}</span>
 											</div>
 											{/* Open Interest - hidden on mobile */}
 											<div className="w-20 text-right hidden sm:block">
@@ -292,9 +293,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 						<span>
 							{filteredMarkets.length} {t`markets`}
 						</span>
-						<span className="tabular-nums">
-							{sorting.length > 0 ? t`Sorted by ${sorting[0].id}` : t`Updated live`}
-						</span>
+						<span className="tabular-nums">{sorting.length > 0 ? t`Sorted by ${sorting[0].id}` : t`Updated live`}</span>
 					</div>
 				</div>
 			</PopoverContent>

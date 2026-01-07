@@ -213,7 +213,9 @@ export function OrdersTab() {
 				) : status === "error" ? (
 					<div className="h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs text-terminal-red/80">
 						<span>{t`Failed to load open orders.`}</span>
-						{error instanceof Error ? <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span> : null}
+						{error instanceof Error ? (
+							<span className="mt-1 text-4xs text-muted-foreground">{error.message}</span>
+						) : null}
 					</div>
 				) : openOrders.length === 0 ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
