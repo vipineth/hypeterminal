@@ -1,13 +1,13 @@
+import type { ExtraAgentsResponse } from "@nktkas/hyperliquid";
 import { useCallback, useMemo, useState } from "react";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
-import type { ExtraAgentsResponse } from "@nktkas/hyperliquid";
 import { useExchangeApproveAgent } from "../exchange/useExchangeApproveAgent";
 import { useInfoExtraAgents } from "../info/useInfoExtraAgents";
+import type { AgentRegisterStatus, AgentStatus, HyperliquidEnv } from "./types";
 import { type AgentWallet, useAgentWallet, useAgentWalletActions } from "./useAgentStore";
-import type { AgentStatus, AgentRegisterStatus, HyperliquidEnv } from "./types";
 
 // Re-export types for convenience
-export type { AgentStatus, AgentRegisterStatus as RegisterStatus } from "./types";
+export type { AgentRegisterStatus as RegisterStatus, AgentStatus } from "./types";
 
 export interface UseTradingAgentParams {
 	/** User's wallet address */
@@ -46,10 +46,7 @@ export interface UseTradingAgentResult {
 /**
  * Check if an agent is in the extraAgents list and not expired.
  */
-export function isAgentApproved(
-	extraAgents: ExtraAgentsResponse | undefined,
-	publicKey: string | undefined,
-): boolean {
+export function isAgentApproved(extraAgents: ExtraAgentsResponse | undefined, publicKey: string | undefined): boolean {
 	if (!extraAgents || !publicKey) return false;
 
 	const normalizedKey = publicKey.toLowerCase();

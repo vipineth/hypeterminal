@@ -1,4 +1,5 @@
-import type { ExchangeClient, HyperliquidError, IRequestTransport, ISubscriptionTransport } from "@nktkas/hyperliquid";
+import type { HyperliquidError, IRequestTransport, ISubscriptionTransport } from "@nktkas/hyperliquid";
+import type { AbstractWallet } from "@nktkas/hyperliquid/signing";
 import type { QueryKey, UseMutationOptions, UseQueryOptions } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import type { BaseIssue, BaseSchema, BaseSchemaAsync, ValiError } from "valibot";
@@ -61,7 +62,7 @@ export type SubscriptionResult<TData> = {
 export type HyperliquidConfig = {
 	httpTransport?: IRequestTransport;
 	wsTransport?: ISubscriptionTransport;
-	wallet?: Extract<ConstructorParameters<typeof ExchangeClient>[0], { wallet: unknown }>["wallet"];
+	wallet?: AbstractWallet;
 	ssr?: boolean;
 };
 

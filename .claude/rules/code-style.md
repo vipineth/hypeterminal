@@ -89,12 +89,115 @@ const doubled = useMemo(() => value * 2, [value]);
 - Only use when passing callbacks to memoized children
 - Don't wrap every function - only when preventing unnecessary re-renders
 
-## hl-react Hooks
+## hl-react Subscription Components
 
+### Hook Usage
 - Use subscription hooks (`useSubL2Book`, `useSubTrades`, etc.) for real-time data
 - Use info hooks (`useInfoClearinghouseState`, etc.) for one-time fetches
 - Use action hooks (`useActionOrder`, `useActionCancel`, etc.) for mutations
-- Always destructure only what you need from hook returns
+- Destructure only what you need: `{ data, status, error }`
+
+### Data Processing
+- **Process in lib/, not components** - Create utilities in `lib/` for data transformation
+- **Limit what you process** - If showing 10 rows, only process 10 rows
+- **Only memoize array transformations** - Not trivial math like `getMaxTotal(bids, asks)`
+- **Use simple patterns** - `map` with closure for accumulation, not `reduce`
+
+```tsx
+// Good - process only what's needed, memoize array transformation
+const VISIBLE_ROWS = 10;
+const bids = useMemo(() => processLevels(orderbook?.levels[0], VISIBLE_ROWS), [orderbook?.levels]);
+const asks = useMemo(() => processLevels(orderbook?.levels[1], VISIBLE_ROWS), [orderbook?.levels]);
+
+// Good - trivial calculations don't need memoization
+const maxTotal = getMaxTotal(bids, asks);
+const spreadInfo = getSpreadInfo(bids, asks);
+
+// Bad - over-memoizing simple operations
+const maxTotal = useMemo(() => getMaxTotal(bids, asks), [bids, asks]);
+```
+
+### Types
+- **Use literal types for constrained values** - Not `number`, use `2 | 3 | 4 | 5`
+- **Type raw API data** - Create types like `RawBookLevel` for SDK responses
+- **Export types from lib/** - Keep type definitions with their utilities
+
+```tsx
+// Good - literal types for API constraints
+type PriceGroupOption = {
+  nSigFigs: 2 | 3 | 4 | 5;
+  mantissa?: 2 | 5;
+  label: string;
+};
+
+// Bad - loose typing
+type PriceGroupOption = {
+  nSigFigs: number;
+  mantissa?: number;
+  label: string;
+};
+```
+
+### Status Handling
+- **Keep conditionals explicit** - Don't over-abstract error/loading states
+- **Simple ternary chain** - `status === "error" ? <Error /> : isEmpty ? <Empty /> : <Content />`
+- **Show meaningful messages** - Use `error?.message` when available
+
+```tsx
+// Good - explicit and readable
+{status === "error" ? (
+  <Placeholder>{error?.message ?? t`Failed to load`}</Placeholder>
+) : data.length === 0 ? (
+  <Placeholder>{t`Waiting for data...`}</Placeholder>
+) : (
+  <Content data={data} />
+)}
+
+// Bad - hiding logic in abstractions
+<SubscriptionWrapper status={status} error={error} data={data}>
+  {(d) => <Content data={d} />}
+</SubscriptionWrapper>
+```
+
+### Component Structure Pattern
+
+```tsx
+export function SubscriptionComponent() {
+  // 1. Local UI state only
+  const [selectedOption, setSelectedOption] = useState<Option | null>(null);
+
+  // 2. External state/context
+  const { data: market } = useSelectedResolvedMarket();
+
+  // 3. Subscription hook
+  const { data, status, error } = useSubSomething({
+    coin: market?.coin,
+    // other params
+  });
+
+  // 4. Data transformation (memoize only array transforms)
+  const processed = useMemo(() => processData(data, LIMIT), [data]);
+
+  // 5. Derived values (no memoization needed)
+  const derivedValue = calculateSomething(processed);
+
+  // 6. Simple handlers
+  const handleClick = () => setSomething(value);
+
+  // 7. Render with explicit status handling
+  return (
+    <Container>
+      {status === "error" ? (
+        <Placeholder>{error?.message}</Placeholder>
+      ) : processed.length === 0 ? (
+        <Placeholder>{t`Loading...`}</Placeholder>
+      ) : (
+        <DataView data={processed} />
+      )}
+    </Container>
+  );
+}
+```
 
 ## Examples
 

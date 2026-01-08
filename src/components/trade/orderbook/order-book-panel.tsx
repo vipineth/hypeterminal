@@ -23,7 +23,7 @@ import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global
 import { BookRow } from "./book-row";
 import { TradesView } from "./trades-view";
 
-const VISIBLE_ROWS = 10;
+const VISIBLE_ROWS = 9;
 
 export function OrderBookPanel() {
 	const [selectedOption, setSelectedOption] = useState<L2BookPriceGroupOption | null>(null);
@@ -37,7 +37,7 @@ export function OrderBookPanel() {
 		status: orderbookStatus,
 		error: orderbookError,
 	} = useSubL2Book({
-		coin: selectedMarket?.coin,
+		coin: selectedMarket.coin,
 		nSigFigs: selectedOption?.nSigFigs,
 		mantissa: selectedOption?.mantissa,
 	});
@@ -48,7 +48,7 @@ export function OrderBookPanel() {
 	const spreadInfo = getSpreadInfo(bids, asks);
 	const priceGroupingOptions = getPriceGroupingOptions(spreadInfo.mid);
 
-	const szDecimals = selectedMarket?.szDecimals;
+	const szDecimals = selectedMarket.szDecimals;
 	const toggleUsdDisplay = () => setShowOrderbookInUsd(!showOrderbookInUsd);
 
 	return (
@@ -100,7 +100,7 @@ export function OrderBookPanel() {
 						className="text-right hover:text-foreground transition-colors inline-flex items-center justify-end gap-0.5"
 					>
 						{t`Size`}
-						<span className="opacity-60">({showOrderbookInUsd ? "$" : selectedMarket?.coin})</span>
+						<span className="opacity-60">({showOrderbookInUsd ? "$" : selectedMarket.coin})</span>
 						<ArrowRightLeft className="size-2 opacity-40" />
 					</button>
 					<button
@@ -109,7 +109,7 @@ export function OrderBookPanel() {
 						className="text-right hover:text-foreground transition-colors inline-flex items-center justify-end gap-0.5"
 					>
 						{t`Total`}
-						<span className="opacity-60">({showOrderbookInUsd ? "$" : selectedMarket?.coin})</span>
+						<span className="opacity-60">({showOrderbookInUsd ? "$" : selectedMarket.coin})</span>
 						<ArrowRightLeft className="size-2 opacity-40" />
 					</button>
 				</div>
@@ -136,7 +136,7 @@ export function OrderBookPanel() {
 
 					<div className="shrink-0 py-1.5 px-2 flex items-center justify-center gap-2 border-y border-border/40 bg-surface/30">
 						<span className="text-sm font-semibold tabular-nums text-terminal-amber terminal-glow-amber">
-							{formatNumber(spreadInfo.mid, selectedMarket?.szDecimals)}
+							{formatNumber(spreadInfo.mid, selectedMarket.szDecimals)}
 						</span>
 					</div>
 
@@ -171,8 +171,8 @@ export function OrderBookPanel() {
 				)}
 			</TabsContent>
 
-			<TabsContent value="trades" className="flex-1 min-h-0">
-				<TradesView key={selectedMarket?.coin} />
+			<TabsContent value="trades" className="flex-1 min-h-0 flex flex-col">
+				<TradesView key={selectedMarket.coin} />
 			</TabsContent>
 		</Tabs>
 	);

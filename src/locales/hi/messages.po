@@ -37,7 +37,7 @@ msgstr "खाता"
 msgid "Account Balances"
 msgstr "खाता शेष"
 
-#: src/components/trade/positions/orders-tab.tsx:255
+#: src/components/trade/positions/orders-tab.tsx:257
 #: src/components/trade/positions/positions-tab.tsx:210
 #: src/components/trade/positions/twap-tab.tsx:126
 msgid "Actions"
@@ -59,7 +59,7 @@ msgstr "सक्रिय पोजीशन"
 msgid "Add funds"
 msgstr "धन जोड़ें"
 
-#: src/components/trade/chart/token-selector.tsx:219
+#: src/components/trade/chart/token-selector.tsx:222
 msgid "Add to favorites"
 msgstr "पसंदीदा में जोड़ें"
 
@@ -86,7 +86,7 @@ msgstr "API"
 #: src/components/trade/positions/balances-tab.tsx:132
 #: src/components/trade/positions/funding-tab.tsx:110
 #: src/components/trade/positions/history-tab.tsx:98
-#: src/components/trade/positions/orders-tab.tsx:237
+#: src/components/trade/positions/orders-tab.tsx:239
 #: src/components/trade/positions/positions-tab.tsx:189
 #: src/components/trade/positions/twap-tab.tsx:108
 msgid "Asset"
@@ -156,7 +156,7 @@ msgstr "खरीदें"
 msgid "Buy Long"
 msgstr "लॉन्ग खरीदें"
 
-#: src/components/trade/positions/orders-tab.tsx:304
+#: src/components/trade/positions/orders-tab.tsx:306
 #: src/components/trade/positions/twap-tab.tsx:182
 msgid "Cancel"
 msgstr "रद्द करें"
@@ -169,7 +169,7 @@ msgstr "सभी रद्द करें"
 msgid "Cancel all orders"
 msgstr "सभी ऑर्डर रद्द करें"
 
-#: src/components/trade/positions/orders-tab.tsx:300
+#: src/components/trade/positions/orders-tab.tsx:302
 msgid "Cancel order"
 msgstr "ऑर्डर रद्द करें"
 
@@ -187,7 +187,7 @@ msgstr "TWAP ऑर्डर रद्द करें"
 
 #: src/components/trade/positions/orders-tab.tsx:189
 #: src/components/trade/positions/orders-tab.tsx:199
-#: src/components/trade/positions/orders-tab.tsx:304
+#: src/components/trade/positions/orders-tab.tsx:306
 msgid "Canceling..."
 msgstr "रद्द हो रहा है..."
 
@@ -410,7 +410,7 @@ msgstr "फंडिंग इतिहास लोड करने में �
 msgid "Failed to load open orders."
 msgstr "खुले ऑर्डर लोड करने में विफल।"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:273
+#: src/components/trade/orderbook/order-book-panel.tsx:133
 msgid "Failed to load order book."
 msgstr "ऑर्डर बुक लोड करने में विफल।"
 
@@ -422,7 +422,7 @@ msgstr "पोजीशन लोड करने में विफल।"
 msgid "Failed to load trade history."
 msgstr "ट्रेड इतिहास लोड करने में विफल।"
 
-#: src/components/trade/orderbook/trades-view.tsx:72
+#: src/components/trade/orderbook/trades-view.tsx:77
 msgid "Failed to load trades."
 msgstr "ट्रेड लोड करने में विफल।"
 
@@ -446,12 +446,12 @@ msgstr "शुल्क"
 #~ msgid "Fee rate must be between 0.001% and 1%"
 #~ msgstr ""
 
-#: src/components/trade/positions/orders-tab.tsx:249
+#: src/components/trade/positions/orders-tab.tsx:251
 msgid "Filled"
 msgstr "पूर्ण"
 
 #. placeholder {0}: cat.label
-#: src/components/trade/chart/token-selector.tsx:95
+#: src/components/trade/chart/token-selector.tsx:99
 msgid "Filter by {0}"
 msgstr "{0} से फ़िल्टर करें"
 
@@ -548,7 +548,7 @@ msgstr "शेष लोड हो रहा है..."
 msgid "Loading funding history..."
 msgstr "फंडिंग इतिहास लोड हो रहा है..."
 
-#: src/components/trade/chart/token-selector.tsx:148
+#: src/components/trade/chart/token-selector.tsx:152
 msgid "Loading markets..."
 msgstr "बाज़ार लोड हो रहे हैं..."
 
@@ -623,7 +623,7 @@ msgstr "मार्केट तैयार नहीं"
 msgid "Market Order Slippage"
 msgstr "मार्केट ऑर्डर स्लिपेज"
 
-#: src/components/trade/chart/token-selector.tsx:293
+#: src/components/trade/chart/token-selector.tsx:294
 msgid "markets"
 msgstr "बाज़ार"
 
@@ -664,7 +664,7 @@ msgstr "और पृष्ठ"
 #~ msgid "Must be signed by main wallet (not agent/API wallet)"
 #~ msgstr ""
 
-#: src/components/trade/chart/token-selector.tsx:232
+#: src/components/trade/chart/token-selector.tsx:235
 msgid "NEW"
 msgstr "नया"
 
@@ -704,11 +704,11 @@ msgstr "कोई मार्क प्राइस नहीं"
 msgid "No market"
 msgstr "कोई मार्केट नहीं"
 
-#: src/components/trade/chart/token-selector.tsx:151
+#: src/components/trade/chart/token-selector.tsx:155
 msgid "No markets found."
 msgstr "कोई बाज़ार नहीं मिला।"
 
-#: src/components/trade/positions/orders-tab.tsx:220
+#: src/components/trade/positions/orders-tab.tsx:222
 msgid "No open orders."
 msgstr "कोई खुला ऑर्डर नहीं।"
 
@@ -763,8 +763,8 @@ msgid "ORACLE"
 msgstr "ऑरेकल"
 
 #: src/components/trade/components/global-settings-dialog.tsx:239
-#: src/components/trade/orderbook/order-book-panel.tsx:181
-#: src/components/trade/orderbook/order-book-panel.tsx:183
+#: src/components/trade/orderbook/order-book-panel.tsx:58
+#: src/components/trade/orderbook/order-book-panel.tsx:59
 msgid "Order Book"
 msgstr "ऑर्डर बुक"
 
@@ -837,10 +837,10 @@ msgid "Previous"
 msgstr "पिछला"
 
 #: src/components/trade/chart/constants.ts:66
-#: src/components/trade/orderbook/order-book-panel.tsx:233
-#: src/components/trade/orderbook/trades-view.tsx:67
+#: src/components/trade/orderbook/order-book-panel.tsx:70
+#: src/components/trade/orderbook/trades-view.tsx:71
 #: src/components/trade/positions/history-tab.tsx:104
-#: src/components/trade/positions/orders-tab.tsx:243
+#: src/components/trade/positions/orders-tab.tsx:245
 msgid "Price"
 msgstr "मूल्य"
 
@@ -852,7 +852,7 @@ msgstr "प्रगति"
 msgid "Rate"
 msgstr "दर"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:193
+#: src/components/trade/orderbook/order-book-panel.tsx:61
 msgid "Recent Trades"
 msgstr "हाल के ट्रेड"
 
@@ -870,7 +870,7 @@ msgstr "केवल कम करें"
 #~ msgid "Register Builder Code"
 #~ msgstr ""
 
-#: src/components/trade/chart/token-selector.tsx:219
+#: src/components/trade/chart/token-selector.tsx:222
 msgid "Remove from favorites"
 msgstr "पसंदीदा से हटाएं"
 
@@ -878,7 +878,7 @@ msgstr "पसंदीदा से हटाएं"
 #~ msgid "Requirements:"
 #~ msgstr ""
 
-#: src/components/trade/chart/token-selector.tsx:73
+#: src/components/trade/chart/token-selector.tsx:77
 msgid "Search markets..."
 msgstr "बाज़ार खोजें..."
 
@@ -890,7 +890,7 @@ msgstr ""
 msgid "Select {coin} market"
 msgstr "{coin} बाज़ार चुनें"
 
-#: src/components/trade/positions/orders-tab.tsx:231
+#: src/components/trade/positions/orders-tab.tsx:233
 msgid "Select all orders"
 msgstr "सभी ऑर्डर चुनें"
 
@@ -902,11 +902,11 @@ msgstr "पसंदीदा बाज़ार चुनें"
 msgid "Select leverage"
 msgstr "लीवरेज चुनें"
 
-#: src/components/trade/positions/orders-tab.tsx:266
+#: src/components/trade/positions/orders-tab.tsx:268
 msgid "Select order"
 msgstr "ऑर्डर चुनें"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:205
+#: src/components/trade/orderbook/order-book-panel.tsx:76
 msgid "Select order book aggregation"
 msgstr "ऑर्डर बुक एग्रीगेशन चुनें"
 
@@ -989,10 +989,10 @@ msgstr "साइनर तैयार नहीं"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx:628
 #: src/components/trade/order-entry/order-toast.tsx:80
-#: src/components/trade/orderbook/order-book-panel.tsx:239
-#: src/components/trade/orderbook/trades-view.tsx:68
+#: src/components/trade/orderbook/order-book-panel.tsx:102
+#: src/components/trade/orderbook/trades-view.tsx:72
 #: src/components/trade/positions/history-tab.tsx:107
-#: src/components/trade/positions/orders-tab.tsx:246
+#: src/components/trade/positions/orders-tab.tsx:248
 #: src/components/trade/positions/positions-tab.tsx:192
 msgid "Size"
 msgstr "आकार"
@@ -1006,7 +1006,7 @@ msgid "Something went wrong"
 msgstr "कुछ गलत हो गया"
 
 #. placeholder {0}: String(header.column.columnDef.header ?? "")
-#: src/components/trade/chart/token-selector.tsx:128
+#: src/components/trade/chart/token-selector.tsx:132
 msgid "Sort by {0}"
 msgstr "{0} से क्रमबद्ध करें"
 
@@ -1032,7 +1032,7 @@ msgstr "स्पॉट"
 #~ msgid "Spot: Max 1% (100 basis points)"
 #~ msgstr ""
 
-#: src/components/trade/orderbook/order-book-panel.tsx:312
+#: src/components/trade/orderbook/order-book-panel.tsx:160
 msgid "Spread"
 msgstr "स्प्रेड"
 
@@ -1040,7 +1040,7 @@ msgstr "स्प्रेड"
 msgid "Staking"
 msgstr "स्टेकिंग"
 
-#: src/components/trade/positions/orders-tab.tsx:252
+#: src/components/trade/positions/orders-tab.tsx:254
 #: src/components/trade/positions/twap-tab.tsx:123
 msgid "Status"
 msgstr "स्थिति"
@@ -1089,7 +1089,7 @@ msgstr "आप जो पृष्ठ ढूंढ रहे हैं वह �
 #~ msgid "This action must be signed by your main wallet (not an agent/API wallet). The builder must have at least 100 USDC in perps account value."
 #~ msgstr ""
 
-#: src/components/trade/orderbook/trades-view.tsx:66
+#: src/components/trade/orderbook/trades-view.tsx:70
 #: src/components/trade/positions/funding-tab.tsx:122
 #: src/components/trade/positions/history-tab.tsx:116
 msgid "Time"
@@ -1105,7 +1105,7 @@ msgstr "साइडबार टॉगल करें"
 msgid "Toggle size mode"
 msgstr "साइज मोड टॉगल करें"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:248
+#: src/components/trade/orderbook/order-book-panel.tsx:111
 #: src/components/trade/positions/balances-tab.tsx:141
 msgid "Total"
 msgstr "कुल"
@@ -1127,7 +1127,7 @@ msgstr "ट्रेड"
 msgid "Trade History"
 msgstr "ट्रेड इतिहास"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:195
+#: src/components/trade/orderbook/order-book-panel.tsx:62
 #: src/components/trade/positions/history-tab.tsx:25
 msgid "Trades"
 msgstr "ट्रेड्स"
@@ -1141,7 +1141,7 @@ msgid "TWAP Orders"
 msgstr "TWAP ऑर्डर"
 
 #: src/components/trade/positions/history-tab.tsx:101
-#: src/components/trade/positions/orders-tab.tsx:240
+#: src/components/trade/positions/orders-tab.tsx:242
 msgid "Type"
 msgstr "प्रकार"
 
@@ -1196,11 +1196,11 @@ msgstr "वॉल्यूम"
 msgid "Volume"
 msgstr "वॉल्यूम"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:273
+#: src/components/trade/orderbook/order-book-panel.tsx:133
 msgid "Waiting for order book..."
 msgstr "ऑर्डर बुक की प्रतीक्षा..."
 
-#: src/components/trade/orderbook/trades-view.tsx:72
+#: src/components/trade/orderbook/trades-view.tsx:81
 msgid "Waiting for trades..."
 msgstr "ट्रेड की प्रतीक्षा..."
 
@@ -1212,8 +1212,7 @@ msgstr "ट्रेड की प्रतीक्षा..."
 msgid "Wallet not connected"
 msgstr "वॉलेट कनेक्ट नहीं है"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:324
-#: src/components/trade/orderbook/trades-view.tsx:100
+#: src/components/trade/orderbook/order-book-panel.tsx:169
 msgid "WebSocket error"
 msgstr "WebSocket त्रुटि"
 

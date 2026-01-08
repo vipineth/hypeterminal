@@ -17,5 +17,4 @@ export { useHyperliquidClients } from "./hooks/useClients";
 export { useConfig } from "./hooks/useConfig";
 export { useHyperliquidApiStatus } from "./hooks/useHyperliquidApiStatus";
 export { useHttpTransport, useSubscriptionTransport } from "./hooks/useTransport";
-export { useWallet } from "./hooks/useWallet";
 export * from "./types";
