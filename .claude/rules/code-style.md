@@ -2,11 +2,41 @@
 
 ## Component Structure
 
+- **One component per file** - Each file should export one main component; small internal helpers are OK
+- **No index.ts barrel files** - Import directly from the file, not through index.ts re-exports
+- **Name props interface `Props`** - The main component's props interface should always be named `Props`
+- **Prefer `interface` over `type`** - Use `interface Props` not `type Props` for component props
+- **Use `clsx` for class combining** - Always use `clsx()` to combine conditional classes, not `cn()` or template literals
 - **Keep components clean** - Move calculations and business logic to `lib/` utilities
 - **Organize utils by domain** - Use folders like `lib/trade/`, `lib/chart/`, etc.
 - **Minimize useEffect** - Only use when truly needed for side effects, not for derived state
 - **No comments in components** - Logic should be self-explanatory; add comments only in lib utilities when needed
 - Components should primarily handle: state, hooks, and JSX rendering
+
+```tsx
+// Good - interface Props and clsx usage
+import clsx from "clsx";
+
+interface Props {
+  value: number;
+  isActive: boolean;
+  className?: string;
+}
+
+export function PriceDisplay({ value, isActive, className }: Props) {
+  return (
+    <span className={clsx("text-sm tabular-nums", isActive && "text-terminal-green", className)}>
+      {value}
+    </span>
+  );
+}
+
+// Bad - type instead of interface, custom name, cn() usage
+type PriceDisplayProps = { ... };
+export function PriceDisplay({ ... }: PriceDisplayProps) {
+  return <span className={cn("text-sm", isActive && "text-green")}>{value}</span>;
+}
+```
 
 ```tsx
 // Bad - calculations in component
@@ -162,7 +192,14 @@ type PriceGroupOption = {
 ### Component Structure Pattern
 
 ```tsx
-export function SubscriptionComponent() {
+import clsx from "clsx";
+
+interface Props {
+  coin: string;
+  className?: string;
+}
+
+export function SubscriptionComponent({ coin, className }: Props) {
   // 1. Local UI state only
   const [selectedOption, setSelectedOption] = useState<Option | null>(null);
 
@@ -170,10 +207,7 @@ export function SubscriptionComponent() {
   const { data: market } = useSelectedResolvedMarket();
 
   // 3. Subscription hook
-  const { data, status, error } = useSubSomething({
-    coin: market?.coin,
-    // other params
-  });
+  const { data, status, error } = useSubSomething({ coin });
 
   // 4. Data transformation (memoize only array transforms)
   const processed = useMemo(() => processData(data, LIMIT), [data]);
@@ -186,7 +220,7 @@ export function SubscriptionComponent() {
 
   // 7. Render with explicit status handling
   return (
-    <Container>
+    <div className={clsx("flex flex-col", className)}>
       {status === "error" ? (
         <Placeholder>{error?.message}</Placeholder>
       ) : processed.length === 0 ? (
@@ -194,7 +228,7 @@ export function SubscriptionComponent() {
       ) : (
         <DataView data={processed} />
       )}
-    </Container>
+    </div>
   );
 }
 ```

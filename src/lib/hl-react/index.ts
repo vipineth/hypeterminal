@@ -6,7 +6,13 @@ export {
 	WebSocketTransport,
 	type WebSocketTransportOptions,
 } from "@nktkas/hyperliquid";
-export { HyperliquidProvider } from "./context";
+export {
+	HyperliquidProvider,
+	useHyperliquidContext,
+	useHyperliquidContextOptional,
+	useTradingAgent,
+	isAgentApproved,
+} from "./context";
 export { createHyperliquidConfig } from "./createConfig";
 export * from "./errors";
 export * from "./hooks/agent";

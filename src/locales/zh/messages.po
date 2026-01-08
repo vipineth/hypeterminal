@@ -410,7 +410,7 @@ msgstr "加载资金费用历史失败。"
 msgid "Failed to load open orders."
 msgstr "加载未成交订单失败。"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:133
+#: src/components/trade/orderbook/orderbook-panel.tsx:133
 msgid "Failed to load order book."
 msgstr "加载订单簿失败。"
 
@@ -422,7 +422,7 @@ msgstr "加载仓位失败。"
 msgid "Failed to load trade history."
 msgstr "加载交易历史失败。"
 
-#: src/components/trade/orderbook/trades-view.tsx:77
+#: src/components/trade/orderbook/trades-panel.tsx:92
 msgid "Failed to load trades."
 msgstr "加载成交记录失败。"
 
@@ -763,8 +763,8 @@ msgid "ORACLE"
 msgstr "预言机"
 
 #: src/components/trade/components/global-settings-dialog.tsx:239
-#: src/components/trade/orderbook/order-book-panel.tsx:58
-#: src/components/trade/orderbook/order-book-panel.tsx:59
+#: src/components/trade/orderbook/orderbook-panel.tsx:58
+#: src/components/trade/orderbook/orderbook-panel.tsx:59
 msgid "Order Book"
 msgstr "订单簿"
 
@@ -837,8 +837,8 @@ msgid "Previous"
 msgstr "上一页"
 
 #: src/components/trade/chart/constants.ts:66
-#: src/components/trade/orderbook/order-book-panel.tsx:70
-#: src/components/trade/orderbook/trades-view.tsx:71
+#: src/components/trade/orderbook/orderbook-panel.tsx:70
+#: src/components/trade/orderbook/trades-panel.tsx:78
 #: src/components/trade/positions/history-tab.tsx:104
 #: src/components/trade/positions/orders-tab.tsx:245
 msgid "Price"
@@ -852,7 +852,7 @@ msgstr "进度"
 msgid "Rate"
 msgstr "费率"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:61
+#: src/components/trade/orderbook/orderbook-panel.tsx:61
 msgid "Recent Trades"
 msgstr "最近成交"
 
@@ -906,7 +906,7 @@ msgstr "选择杠杆"
 msgid "Select order"
 msgstr "选择订单"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:76
+#: src/components/trade/orderbook/orderbook-panel.tsx:76
 msgid "Select order book aggregation"
 msgstr "选择订单簿聚合"
 
@@ -989,8 +989,8 @@ msgstr "签名器未就绪"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx:628
 #: src/components/trade/order-entry/order-toast.tsx:80
-#: src/components/trade/orderbook/order-book-panel.tsx:102
-#: src/components/trade/orderbook/trades-view.tsx:72
+#: src/components/trade/orderbook/orderbook-panel.tsx:102
+#: src/components/trade/orderbook/trades-panel.tsx:84
 #: src/components/trade/positions/history-tab.tsx:107
 #: src/components/trade/positions/orders-tab.tsx:248
 #: src/components/trade/positions/positions-tab.tsx:192
@@ -1032,7 +1032,7 @@ msgstr "现货"
 #~ msgid "Spot: Max 1% (100 basis points)"
 #~ msgstr ""
 
-#: src/components/trade/orderbook/order-book-panel.tsx:160
+#: src/components/trade/orderbook/orderbook-panel.tsx:160
 msgid "Spread"
 msgstr "价差"
 
@@ -1089,7 +1089,7 @@ msgstr "您查找的页面不存在。"
 #~ msgid "This action must be signed by your main wallet (not an agent/API wallet). The builder must have at least 100 USDC in perps account value."
 #~ msgstr ""
 
-#: src/components/trade/orderbook/trades-view.tsx:70
+#: src/components/trade/orderbook/trades-panel.tsx:77
 #: src/components/trade/positions/funding-tab.tsx:122
 #: src/components/trade/positions/history-tab.tsx:116
 msgid "Time"
@@ -1105,7 +1105,7 @@ msgstr "切换侧边栏"
 msgid "Toggle size mode"
 msgstr "切换数量模式"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:111
+#: src/components/trade/orderbook/orderbook-panel.tsx:111
 #: src/components/trade/positions/balances-tab.tsx:141
 msgid "Total"
 msgstr "合计"
@@ -1127,7 +1127,7 @@ msgstr "交易"
 msgid "Trade History"
 msgstr "交易历史"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:62
+#: src/components/trade/orderbook/orderbook-panel.tsx:62
 #: src/components/trade/positions/history-tab.tsx:25
 msgid "Trades"
 msgstr "成交"
@@ -1196,11 +1196,11 @@ msgstr "成交量"
 msgid "Volume"
 msgstr "成交量"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:133
+#: src/components/trade/orderbook/orderbook-panel.tsx:133
 msgid "Waiting for order book..."
 msgstr "等待订单簿..."
 
-#: src/components/trade/orderbook/trades-view.tsx:81
+#: src/components/trade/orderbook/trades-panel.tsx:96
 msgid "Waiting for trades..."
 msgstr "等待成交记录..."
 
@@ -1212,7 +1212,7 @@ msgstr "等待成交记录..."
 msgid "Wallet not connected"
 msgstr "钱包未连接"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:169
+#: src/components/trade/orderbook/orderbook-panel.tsx:169
 msgid "WebSocket error"
 msgstr "WebSocket 错误"
 

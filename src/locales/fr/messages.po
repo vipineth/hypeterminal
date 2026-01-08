@@ -410,7 +410,7 @@ msgstr "Échec du chargement de l'historique de financement."
 msgid "Failed to load open orders."
 msgstr "Échec du chargement des ordres ouverts."
 
-#: src/components/trade/orderbook/order-book-panel.tsx:133
+#: src/components/trade/orderbook/orderbook-panel.tsx:133
 msgid "Failed to load order book."
 msgstr "Échec du chargement du carnet d'ordres."
 
@@ -422,7 +422,7 @@ msgstr "Échec du chargement des positions."
 msgid "Failed to load trade history."
 msgstr "Échec du chargement de l'historique des transactions."
 
-#: src/components/trade/orderbook/trades-view.tsx:77
+#: src/components/trade/orderbook/trades-panel.tsx:92
 msgid "Failed to load trades."
 msgstr "Échec du chargement des transactions."
 
@@ -763,8 +763,8 @@ msgid "ORACLE"
 msgstr "ORACLE"
 
 #: src/components/trade/components/global-settings-dialog.tsx:239
-#: src/components/trade/orderbook/order-book-panel.tsx:58
-#: src/components/trade/orderbook/order-book-panel.tsx:59
+#: src/components/trade/orderbook/orderbook-panel.tsx:58
+#: src/components/trade/orderbook/orderbook-panel.tsx:59
 msgid "Order Book"
 msgstr "Carnet d'ordres"
 
@@ -837,8 +837,8 @@ msgid "Previous"
 msgstr "Précédent"
 
 #: src/components/trade/chart/constants.ts:66
-#: src/components/trade/orderbook/order-book-panel.tsx:70
-#: src/components/trade/orderbook/trades-view.tsx:71
+#: src/components/trade/orderbook/orderbook-panel.tsx:70
+#: src/components/trade/orderbook/trades-panel.tsx:78
 #: src/components/trade/positions/history-tab.tsx:104
 #: src/components/trade/positions/orders-tab.tsx:245
 msgid "Price"
@@ -852,7 +852,7 @@ msgstr "Progression"
 msgid "Rate"
 msgstr "Taux"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:61
+#: src/components/trade/orderbook/orderbook-panel.tsx:61
 msgid "Recent Trades"
 msgstr "Transactions récentes"
 
@@ -906,7 +906,7 @@ msgstr "Sélectionner le levier"
 msgid "Select order"
 msgstr "Sélectionner l'ordre"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:76
+#: src/components/trade/orderbook/orderbook-panel.tsx:76
 msgid "Select order book aggregation"
 msgstr "Sélectionner l'agrégation du carnet d'ordres"
 
@@ -989,8 +989,8 @@ msgstr "Signataire non prêt"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx:628
 #: src/components/trade/order-entry/order-toast.tsx:80
-#: src/components/trade/orderbook/order-book-panel.tsx:102
-#: src/components/trade/orderbook/trades-view.tsx:72
+#: src/components/trade/orderbook/orderbook-panel.tsx:102
+#: src/components/trade/orderbook/trades-panel.tsx:84
 #: src/components/trade/positions/history-tab.tsx:107
 #: src/components/trade/positions/orders-tab.tsx:248
 #: src/components/trade/positions/positions-tab.tsx:192
@@ -1032,7 +1032,7 @@ msgstr "Spot"
 #~ msgid "Spot: Max 1% (100 basis points)"
 #~ msgstr ""
 
-#: src/components/trade/orderbook/order-book-panel.tsx:160
+#: src/components/trade/orderbook/orderbook-panel.tsx:160
 msgid "Spread"
 msgstr "Écart"
 
@@ -1089,7 +1089,7 @@ msgstr "La page que vous recherchez n'existe pas."
 #~ msgid "This action must be signed by your main wallet (not an agent/API wallet). The builder must have at least 100 USDC in perps account value."
 #~ msgstr ""
 
-#: src/components/trade/orderbook/trades-view.tsx:70
+#: src/components/trade/orderbook/trades-panel.tsx:77
 #: src/components/trade/positions/funding-tab.tsx:122
 #: src/components/trade/positions/history-tab.tsx:116
 msgid "Time"
@@ -1105,7 +1105,7 @@ msgstr "Basculer la barre latérale"
 msgid "Toggle size mode"
 msgstr "Basculer le mode de taille"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:111
+#: src/components/trade/orderbook/orderbook-panel.tsx:111
 #: src/components/trade/positions/balances-tab.tsx:141
 msgid "Total"
 msgstr "Total"
@@ -1127,7 +1127,7 @@ msgstr "Trader"
 msgid "Trade History"
 msgstr "Historique des transactions"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:62
+#: src/components/trade/orderbook/orderbook-panel.tsx:62
 #: src/components/trade/positions/history-tab.tsx:25
 msgid "Trades"
 msgstr "Transactions"
@@ -1196,11 +1196,11 @@ msgstr "VOL"
 msgid "Volume"
 msgstr "Volume"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:133
+#: src/components/trade/orderbook/orderbook-panel.tsx:133
 msgid "Waiting for order book..."
 msgstr "En attente du carnet d'ordres..."
 
-#: src/components/trade/orderbook/trades-view.tsx:81
+#: src/components/trade/orderbook/trades-panel.tsx:96
 msgid "Waiting for trades..."
 msgstr "En attente des transactions..."
 
@@ -1212,7 +1212,7 @@ msgstr "En attente des transactions..."
 msgid "Wallet not connected"
 msgstr "Portefeuille non connecté"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:169
+#: src/components/trade/orderbook/orderbook-panel.tsx:169
 msgid "WebSocket error"
 msgstr "Erreur WebSocket"
 

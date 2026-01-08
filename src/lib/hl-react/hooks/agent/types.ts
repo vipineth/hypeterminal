@@ -2,6 +2,8 @@
 // Trading Status (Single Source of Truth)
 // ============================================================================
 
+import type { OrderParameters } from "@nktkas/hyperliquid";
+
 /**
  * Trading readiness status.
  *
@@ -38,15 +40,10 @@ export type AgentStatus = "loading" | "no_agent" | "valid" | "invalid";
  * Builder fee configuration for order placement.
  * Only applies to `order` operations.
  */
-export type BuilderConfig = {
-	/** Builder address */
-	address: `0x${string}`;
-	/** Fee rate in 0.1bps units (1 = 0.0001%). Max 100 for perps (0.1%), 1000 for spot (1%) */
-	feeRate: number;
-};
+export type BuilderConfig = OrderParameters["builder"];
 
 // ============================================================================
 // Environment
 // ============================================================================
 
-export type HyperliquidEnv = "mainnet" | "testnet";
+export type HyperliquidEnv = "Mainnet" | "Testnet";

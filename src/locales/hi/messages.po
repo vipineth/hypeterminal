@@ -410,7 +410,7 @@ msgstr "फंडिंग इतिहास लोड करने में �
 msgid "Failed to load open orders."
 msgstr "खुले ऑर्डर लोड करने में विफल।"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:133
+#: src/components/trade/orderbook/orderbook-panel.tsx:133
 msgid "Failed to load order book."
 msgstr "ऑर्डर बुक लोड करने में विफल।"
 
@@ -422,7 +422,7 @@ msgstr "पोजीशन लोड करने में विफल।"
 msgid "Failed to load trade history."
 msgstr "ट्रेड इतिहास लोड करने में विफल।"
 
-#: src/components/trade/orderbook/trades-view.tsx:77
+#: src/components/trade/orderbook/trades-panel.tsx:92
 msgid "Failed to load trades."
 msgstr "ट्रेड लोड करने में विफल।"
 
@@ -763,8 +763,8 @@ msgid "ORACLE"
 msgstr "ऑरेकल"
 
 #: src/components/trade/components/global-settings-dialog.tsx:239
-#: src/components/trade/orderbook/order-book-panel.tsx:58
-#: src/components/trade/orderbook/order-book-panel.tsx:59
+#: src/components/trade/orderbook/orderbook-panel.tsx:58
+#: src/components/trade/orderbook/orderbook-panel.tsx:59
 msgid "Order Book"
 msgstr "ऑर्डर बुक"
 
@@ -837,8 +837,8 @@ msgid "Previous"
 msgstr "पिछला"
 
 #: src/components/trade/chart/constants.ts:66
-#: src/components/trade/orderbook/order-book-panel.tsx:70
-#: src/components/trade/orderbook/trades-view.tsx:71
+#: src/components/trade/orderbook/orderbook-panel.tsx:70
+#: src/components/trade/orderbook/trades-panel.tsx:78
 #: src/components/trade/positions/history-tab.tsx:104
 #: src/components/trade/positions/orders-tab.tsx:245
 msgid "Price"
@@ -852,7 +852,7 @@ msgstr "प्रगति"
 msgid "Rate"
 msgstr "दर"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:61
+#: src/components/trade/orderbook/orderbook-panel.tsx:61
 msgid "Recent Trades"
 msgstr "हाल के ट्रेड"
 
@@ -906,7 +906,7 @@ msgstr "लीवरेज चुनें"
 msgid "Select order"
 msgstr "ऑर्डर चुनें"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:76
+#: src/components/trade/orderbook/orderbook-panel.tsx:76
 msgid "Select order book aggregation"
 msgstr "ऑर्डर बुक एग्रीगेशन चुनें"
 
@@ -989,8 +989,8 @@ msgstr "साइनर तैयार नहीं"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx:628
 #: src/components/trade/order-entry/order-toast.tsx:80
-#: src/components/trade/orderbook/order-book-panel.tsx:102
-#: src/components/trade/orderbook/trades-view.tsx:72
+#: src/components/trade/orderbook/orderbook-panel.tsx:102
+#: src/components/trade/orderbook/trades-panel.tsx:84
 #: src/components/trade/positions/history-tab.tsx:107
 #: src/components/trade/positions/orders-tab.tsx:248
 #: src/components/trade/positions/positions-tab.tsx:192
@@ -1032,7 +1032,7 @@ msgstr "स्पॉट"
 #~ msgid "Spot: Max 1% (100 basis points)"
 #~ msgstr ""
 
-#: src/components/trade/orderbook/order-book-panel.tsx:160
+#: src/components/trade/orderbook/orderbook-panel.tsx:160
 msgid "Spread"
 msgstr "स्प्रेड"
 
@@ -1089,7 +1089,7 @@ msgstr "आप जो पृष्ठ ढूंढ रहे हैं वह �
 #~ msgid "This action must be signed by your main wallet (not an agent/API wallet). The builder must have at least 100 USDC in perps account value."
 #~ msgstr ""
 
-#: src/components/trade/orderbook/trades-view.tsx:70
+#: src/components/trade/orderbook/trades-panel.tsx:77
 #: src/components/trade/positions/funding-tab.tsx:122
 #: src/components/trade/positions/history-tab.tsx:116
 msgid "Time"
@@ -1105,7 +1105,7 @@ msgstr "साइडबार टॉगल करें"
 msgid "Toggle size mode"
 msgstr "साइज मोड टॉगल करें"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:111
+#: src/components/trade/orderbook/orderbook-panel.tsx:111
 #: src/components/trade/positions/balances-tab.tsx:141
 msgid "Total"
 msgstr "कुल"
@@ -1127,7 +1127,7 @@ msgstr "ट्रेड"
 msgid "Trade History"
 msgstr "ट्रेड इतिहास"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:62
+#: src/components/trade/orderbook/orderbook-panel.tsx:62
 #: src/components/trade/positions/history-tab.tsx:25
 msgid "Trades"
 msgstr "ट्रेड्स"
@@ -1196,11 +1196,11 @@ msgstr "वॉल्यूम"
 msgid "Volume"
 msgstr "वॉल्यूम"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:133
+#: src/components/trade/orderbook/orderbook-panel.tsx:133
 msgid "Waiting for order book..."
 msgstr "ऑर्डर बुक की प्रतीक्षा..."
 
-#: src/components/trade/orderbook/trades-view.tsx:81
+#: src/components/trade/orderbook/trades-panel.tsx:96
 msgid "Waiting for trades..."
 msgstr "ट्रेड की प्रतीक्षा..."
 
@@ -1212,7 +1212,7 @@ msgstr "ट्रेड की प्रतीक्षा..."
 msgid "Wallet not connected"
 msgstr "वॉलेट कनेक्ट नहीं है"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:169
+#: src/components/trade/orderbook/orderbook-panel.tsx:169
 msgid "WebSocket error"
 msgstr "WebSocket त्रुटि"
 

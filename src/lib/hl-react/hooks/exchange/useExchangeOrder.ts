@@ -3,6 +3,7 @@ import { type UseMutationResult, useMutation } from "@tanstack/react-query";
 import { MissingWalletError } from "../../errors";
 import { exchangeKeys } from "../../query/keys";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
+import { useHyperliquidContext } from "../agent";
 import { useHyperliquidClients } from "../useClients";
 
 type OrderData = OrderSuccessResponse;
@@ -13,13 +14,14 @@ export type UseExchangeOrderReturnType = UseMutationResult<OrderData, Hyperliqui
 
 export function useExchangeOrder(options: UseExchangeOrderOptions = {}): UseExchangeOrderReturnType {
 	const { exchange } = useHyperliquidClients();
+	const { builderConfig } = useHyperliquidContext();
 
 	return useMutation({
 		...options,
 		mutationKey: exchangeKeys.method("order"),
 		mutationFn: (params) => {
 			if (!exchange) throw new MissingWalletError();
-			return exchange.order(params);
+			return exchange.order({ ...params, builder: builderConfig });
 		},
 	});
 }

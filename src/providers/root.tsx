@@ -2,14 +2,12 @@ import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import type { WalletClient } from "viem";
 import { useConnection, useWalletClient, WagmiProvider } from "wagmi";
 import { config } from "@/config/wagmi";
 import { createHyperliquidConfig, HyperliquidProvider } from "@/lib/hl-react";
-import { SigningModeProvider } from "@/lib/hl-react/hooks/agent";
-import { toHyperliquidWallet } from "@/lib/hyperliquid/wallet";
 import { ThemeProvider } from "./theme";
 import "@/lib/i18n";
+import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/interface";
 
 export function getRootProviderContext() {
 	const queryClient = new QueryClient();
@@ -38,16 +36,14 @@ function HyperliquidProviderWrapper({ children }: { children: React.ReactNode })
 	}
 
 	return (
-		<HyperliquidProvider config={hyperliquidConfig}>
-			<SigningModeProvider
-				userAddress={address}
-				walletClient={walletClient}
-				env="mainnet"
-				toHyperliquidWallet={toHyperliquidWallet as (wc: WalletClient, addr: string) => unknown}
-				agentName="HypeTerminal"
-			>
-				{children}
-			</SigningModeProvider>
+		<HyperliquidProvider
+			env="Mainnet"
+			userAddress={address}
+			wallet={walletClient}
+			builderConfig={DEFAULT_BUILDER_CONFIG}
+			agentName={PROJECT_NAME}
+		>
+			{children}
 		</HyperliquidProvider>
 	);
 }

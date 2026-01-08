@@ -8,23 +8,23 @@ import {
 	CHART_DEFAULT_PRICESCALE,
 	CHART_DEFAULT_SYMBOL,
 	CHART_DEFAULT_THEME,
-	CHART_EXCHANGE,
-	CHART_FAVORITE_INTERVALS,
-	CHART_LOCALE,
 	CHART_DISABLED_FEATURES,
 	CHART_ENABLED_FEATURES,
-	CHART_WIDGET_DEFAULTS,
+	CHART_EXCHANGE,
+	CHART_FAVORITE_INTERVALS,
 	CHART_LIBRARY_PATH,
+	CHART_LOCALE,
 	CHART_QUOTE_ASSET,
 	CHART_SESSION,
 	CHART_SUPPORTED_RESOLUTIONS,
 	CHART_TIME_FRAMES,
 	CHART_TIMEZONE,
+	CHART_WIDGET_DEFAULTS,
 } from "@/constants/app";
-import type { MarketCtxNumbers } from "@/lib/market";
-import type { PerpAssetCtx } from "@/types/hyperliquid";
 import type { PerpMarketInfo } from "@/lib/hyperliquid/market-registry";
+import type { MarketCtxNumbers } from "@/lib/market";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
+import type { PerpAssetCtx } from "@/types/hyperliquid";
 
 export {
 	CHART_LIBRARY_PATH,

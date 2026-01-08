@@ -410,7 +410,7 @@ msgstr "فشل في تحميل سجل التمويل."
 msgid "Failed to load open orders."
 msgstr "فشل في تحميل الأوامر المفتوحة."
 
-#: src/components/trade/orderbook/order-book-panel.tsx:133
+#: src/components/trade/orderbook/orderbook-panel.tsx:133
 msgid "Failed to load order book."
 msgstr "فشل في تحميل دفتر الأوامر."
 
@@ -422,7 +422,7 @@ msgstr "فشل تحميل المراكز."
 msgid "Failed to load trade history."
 msgstr "فشل في تحميل سجل التداول."
 
-#: src/components/trade/orderbook/trades-view.tsx:77
+#: src/components/trade/orderbook/trades-panel.tsx:92
 msgid "Failed to load trades."
 msgstr "فشل في تحميل الصفقات."
 
@@ -763,8 +763,8 @@ msgid "ORACLE"
 msgstr "أوراكل"
 
 #: src/components/trade/components/global-settings-dialog.tsx:239
-#: src/components/trade/orderbook/order-book-panel.tsx:58
-#: src/components/trade/orderbook/order-book-panel.tsx:59
+#: src/components/trade/orderbook/orderbook-panel.tsx:58
+#: src/components/trade/orderbook/orderbook-panel.tsx:59
 msgid "Order Book"
 msgstr "دفتر الأوامر"
 
@@ -837,8 +837,8 @@ msgid "Previous"
 msgstr "السابق"
 
 #: src/components/trade/chart/constants.ts:66
-#: src/components/trade/orderbook/order-book-panel.tsx:70
-#: src/components/trade/orderbook/trades-view.tsx:71
+#: src/components/trade/orderbook/orderbook-panel.tsx:70
+#: src/components/trade/orderbook/trades-panel.tsx:78
 #: src/components/trade/positions/history-tab.tsx:104
 #: src/components/trade/positions/orders-tab.tsx:245
 msgid "Price"
@@ -852,7 +852,7 @@ msgstr "التقدم"
 msgid "Rate"
 msgstr "المعدل"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:61
+#: src/components/trade/orderbook/orderbook-panel.tsx:61
 msgid "Recent Trades"
 msgstr "الصفقات الأخيرة"
 
@@ -906,7 +906,7 @@ msgstr "اختر الرافعة المالية"
 msgid "Select order"
 msgstr "اختر الأمر"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:76
+#: src/components/trade/orderbook/orderbook-panel.tsx:76
 msgid "Select order book aggregation"
 msgstr "اختر تجميع دفتر الأوامر"
 
@@ -989,8 +989,8 @@ msgstr "المُوقِّع غير جاهز"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx:628
 #: src/components/trade/order-entry/order-toast.tsx:80
-#: src/components/trade/orderbook/order-book-panel.tsx:102
-#: src/components/trade/orderbook/trades-view.tsx:72
+#: src/components/trade/orderbook/orderbook-panel.tsx:102
+#: src/components/trade/orderbook/trades-panel.tsx:84
 #: src/components/trade/positions/history-tab.tsx:107
 #: src/components/trade/positions/orders-tab.tsx:248
 #: src/components/trade/positions/positions-tab.tsx:192
@@ -1032,7 +1032,7 @@ msgstr "فوري"
 #~ msgid "Spot: Max 1% (100 basis points)"
 #~ msgstr ""
 
-#: src/components/trade/orderbook/order-book-panel.tsx:160
+#: src/components/trade/orderbook/orderbook-panel.tsx:160
 msgid "Spread"
 msgstr "الفارق"
 
@@ -1089,7 +1089,7 @@ msgstr "الصفحة التي تبحث عنها غير موجودة."
 #~ msgid "This action must be signed by your main wallet (not an agent/API wallet). The builder must have at least 100 USDC in perps account value."
 #~ msgstr ""
 
-#: src/components/trade/orderbook/trades-view.tsx:70
+#: src/components/trade/orderbook/trades-panel.tsx:77
 #: src/components/trade/positions/funding-tab.tsx:122
 #: src/components/trade/positions/history-tab.tsx:116
 msgid "Time"
@@ -1105,7 +1105,7 @@ msgstr "تبديل الشريط الجانبي"
 msgid "Toggle size mode"
 msgstr "تبديل وضع الحجم"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:111
+#: src/components/trade/orderbook/orderbook-panel.tsx:111
 #: src/components/trade/positions/balances-tab.tsx:141
 msgid "Total"
 msgstr "الإجمالي"
@@ -1127,7 +1127,7 @@ msgstr "تداول"
 msgid "Trade History"
 msgstr "سجل التداول"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:62
+#: src/components/trade/orderbook/orderbook-panel.tsx:62
 #: src/components/trade/positions/history-tab.tsx:25
 msgid "Trades"
 msgstr "الصفقات"
@@ -1196,11 +1196,11 @@ msgstr "الحجم"
 msgid "Volume"
 msgstr "الحجم"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:133
+#: src/components/trade/orderbook/orderbook-panel.tsx:133
 msgid "Waiting for order book..."
 msgstr "في انتظار دفتر الأوامر..."
 
-#: src/components/trade/orderbook/trades-view.tsx:81
+#: src/components/trade/orderbook/trades-panel.tsx:96
 msgid "Waiting for trades..."
 msgstr "في انتظار الصفقات..."
 
@@ -1212,7 +1212,7 @@ msgstr "في انتظار الصفقات..."
 msgid "Wallet not connected"
 msgstr "المحفظة غير متصلة"
 
-#: src/components/trade/orderbook/order-book-panel.tsx:169
+#: src/components/trade/orderbook/orderbook-panel.tsx:169
 msgid "WebSocket error"
 msgstr "خطأ WebSocket"
 
