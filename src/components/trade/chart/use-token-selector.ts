@@ -2,11 +2,12 @@ import { getCoreRowModel, type Row, type SortingState, useReactTable } from "@ta
 import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { isTokenInCategory, type MarketCategory } from "@/config/token";
-import { usePerpAssetCtxsSnapshot } from "@/hooks/hyperliquid/use-perp-asset-ctxs-snapshot";
-import { usePerpMarkets } from "@/lib/hl-react";
+import { usePerpMarkets } from "@/lib/hyperliquid";
+import { useSubAssetCtxs } from "@/lib/hyperliquid/hooks/subscription";
 import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { calculate24hPriceChange, calculateOpenInterestUSD, getMarketCtxNumbers } from "@/lib/market";
 import { useFavoriteMarketKeys, useMarketPrefsActions } from "@/stores/use-market-prefs-store";
+import type { PerpAssetCtxs } from "@/types/hyperliquid";
 import { type MarketRow, TOKEN_SELECTOR_COLUMNS } from "./constants";
 
 export interface UseTokenSelectorOptions {
@@ -38,7 +39,26 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 	const [category, setCategory] = useState<MarketCategory>("all");
 	const [search, setSearch] = useState("");
 	const { data: marketsData, isLoading } = usePerpMarkets();
-	const ctxs = usePerpAssetCtxsSnapshot({ enabled: open, intervalMs: 10_000 });
+	const { data: assetCtxsEvent } = useSubAssetCtxs({ dex: "" }, { enabled: open });
+	const liveCtxs = assetCtxsEvent?.ctxs as PerpAssetCtxs | undefined;
+
+	const [ctxs, setCtxs] = useState<PerpAssetCtxs | undefined>(undefined);
+	const latestRef = useRef<PerpAssetCtxs | undefined>(undefined);
+
+	useEffect(() => {
+		latestRef.current = liveCtxs;
+		if (ctxs === undefined && liveCtxs !== undefined) {
+			setCtxs(liveCtxs);
+		}
+		if (!open) return;
+		const id = window.setInterval(() => {
+			if (latestRef.current !== undefined) {
+				setCtxs(latestRef.current);
+			}
+		}, 10_000);
+		return () => window.clearInterval(id);
+	}, [open, liveCtxs, ctxs]);
+
 	const favorites = useFavoriteMarketKeys();
 	const { toggleFavoriteMarketKey } = useMarketPrefsActions();
 

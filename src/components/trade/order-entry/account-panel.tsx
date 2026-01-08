@@ -4,8 +4,8 @@ import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
-import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
 import { formatPercent, formatUSD } from "@/lib/format";
+import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumberOrZero } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
 
@@ -14,10 +14,11 @@ export function AccountPanel() {
 	const [activeTab, setActiveTab] = useState<"perps" | "spot">("perps");
 
 	const { address, isConnected } = useConnection();
-	const { data: clearinghouse } = useClearinghouseState({
-		user: address,
-		enabled: isConnected,
-	});
+	const { data: stateEvent } = useSubClearinghouseState(
+		{ user: address ?? "0x0" },
+		{ enabled: isConnected && !!address },
+	);
+	const clearinghouse = stateEvent?.clearinghouseState;
 
 	const accountMetrics = useMemo(() => {
 		if (!clearinghouse?.crossMarginSummary) {

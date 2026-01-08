@@ -1,11 +1,9 @@
 import { t } from "@lingui/core/macro";
 import { ArrowRightLeft, ExternalLink } from "lucide-react";
 import { memo, useEffect, useMemo, useRef } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
 import { useRingBuffer } from "@/lib/circular-buffer";
 import { formatNumber } from "@/lib/format";
-import { useSubTrades } from "@/lib/hl-react";
+import { useSelectedResolvedMarket, useSubTrades } from "@/lib/hyperliquid";
 import { getExplorerTxUrl } from "@/lib/hyperliquid/explorer";
 import { getTradeKey, type ProcessedTrade, processTrades, type RawTrade } from "@/lib/trade/trades";
 import { cn } from "@/lib/utils";
@@ -46,26 +44,40 @@ const TradeRow = memo(function TradeRow({ trade, szDecimals, showInUsd }: Props)
 	);
 });
 
+const RESOLVED_MARKET_OPTIONS = { ctxMode: "none" } as const;
+
 export function TradesPanel() {
-	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
-	const { data: tradesBatch, status, error } = useSubTrades({ coin: selectedMarket.coin });
+	const { data: selectedMarket } = useSelectedResolvedMarket(RESOLVED_MARKET_OPTIONS);
+	const coin = selectedMarket.coin;
+	const params = useMemo(() => ({ coin }), [coin]);
+	const { data: tradesBatch, status, error } = useSubTrades(params);
 	const { showOrderbookInUsd } = useGlobalSettings();
 	const { setShowOrderbookInUsd } = useGlobalSettingsActions();
 
-	const { items: trades, add } = useRingBuffer<RawTrade>({
+	const {
+		items: trades,
+		add,
+		clear,
+	} = useRingBuffer<RawTrade>({
 		maxSize: MAX_TRADES,
 		getKey,
 		compare,
 	});
 
 	const lastBatchRef = useRef<RawTrade[] | undefined>(undefined);
+	const lastCoinRef = useRef<string | undefined>(undefined);
 
 	useEffect(() => {
+		if (coin !== lastCoinRef.current) {
+			lastCoinRef.current = coin;
+			lastBatchRef.current = undefined;
+			clear();
+		}
 		if (tradesBatch?.length && tradesBatch !== lastBatchRef.current) {
 			lastBatchRef.current = tradesBatch;
 			add(tradesBatch);
 		}
-	}, [tradesBatch, add]);
+	}, [coin, tradesBatch, add, clear]);
 
 	const szDecimals = selectedMarket.szDecimals;
 	const processed = useMemo(() => processTrades(trades), [trades]);
@@ -96,13 +108,13 @@ export function TradesPanel() {
 					{t`Waiting for trades...`}
 				</div>
 			) : (
-				<ScrollArea className="flex-1 min-h-0">
+				<div className="flex-1 min-h-0 overflow-y-auto">
 					<div className="px-2 py-1 space-y-px">
 						{processed.map((trade) => (
 							<TradeRow key={trade.id} trade={trade} szDecimals={szDecimals} showInUsd={showOrderbookInUsd} />
 						))}
 					</div>
-				</ScrollArea>
+				</div>
 			)}
 		</div>
 	);

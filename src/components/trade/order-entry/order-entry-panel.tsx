@@ -23,13 +23,11 @@ import {
 	ORDER_MIN_NOTIONAL_USD,
 	ORDER_SIZE_PERCENT_STEPS,
 } from "@/constants/app";
-import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
-import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
-import { useTradingAgent } from "@/hooks/hyperliquid/use-trading-agent";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
-import { getHttpTransport } from "@/lib/hyperliquid/clients";
-import { ensureLeverage, makeExchangeConfig, placeSingleOrder } from "@/lib/hyperliquid/exchange";
-import { toHyperliquidWallet } from "@/lib/hyperliquid/wallet";
+import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
+import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
+import { useExchangeUpdateLeverage } from "@/lib/hyperliquid/hooks/exchange/useExchangeUpdateLeverage";
+import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder, getDefaultLeverage } from "@/lib/trade/orders";
 import { cn } from "@/lib/utils";
@@ -62,27 +60,17 @@ export function OrderEntryPanel() {
 	const needsChainSwitch = !!walletClientError && walletClientError.message.includes("does not match");
 
 	const { data: market } = useSelectedResolvedMarket({ ctxMode: "realtime" });
-	const { data: clearinghouse } = useClearinghouseState({ user: address });
+	const { data: clearinghouseEvent } = useSubClearinghouseState(
+		{ user: address ?? "0x0" },
+		{ enabled: isConnected && !!address },
+	);
+	const clearinghouse = clearinghouseEvent?.clearinghouseState;
 
 	const signingMode = useSigningMode();
-	const {
-		status: agentStatus,
-		registerStatus,
-		signer: agentSigner,
-		registerAgent,
-	} = useTradingAgent({
-		user: address,
-		walletClient,
-	});
+	const { status: agentStatus, registerStatus, registerAgent } = useTradingAgent();
 
-	// Direct wallet signer for "direct" mode
-	const directSigner = useMemo(() => {
-		if (!walletClient || !address) return null;
-		return toHyperliquidWallet(walletClient, address);
-	}, [walletClient, address]);
-
-	// Active signer based on mode
-	const activeSigner = signingMode === "direct" ? directSigner : agentSigner;
+	const { mutateAsync: placeOrder, isPending: isSubmitting } = useExchangeOrder();
+	const { mutateAsync: updateLeverage } = useExchangeUpdateLeverage();
 
 	const defaultLeverageByMode = useDefaultLeverageByMode();
 	const marketLeverageByMode = useMarketLeverageByMode();
@@ -98,8 +86,8 @@ export function OrderEntryPanel() {
 	const [sizeInput, setSizeInput] = useState("");
 	const [sizeMode, setSizeMode] = useState<SizeMode>("asset");
 	const [limitPriceInput, setLimitPriceInput] = useState("");
-	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [approvalError, setApprovalError] = useState<string | null>(null);
+	const [reduceOnly, setReduceOnly] = useState(false);
 
 	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
 	const [depositModalOpen, setDepositModalOpen] = useState(false);
@@ -184,7 +172,7 @@ export function OrderEntryPanel() {
 	const liqWarning = liqPrice && price ? Math.abs(liqPrice - price) / price < 0.05 : false;
 
 	const needsAgentApproval = signingMode === "agent" && agentStatus !== "valid";
-	const isReadyToTrade = signingMode === "direct" ? !!directSigner : agentStatus === "valid" && !!agentSigner;
+	const isReadyToTrade = signingMode === "direct" ? !!walletClient : agentStatus === "valid";
 	const isLoadingAgents = agentStatus === "loading";
 	const canApprove = !!walletClient && !!address;
 
@@ -331,17 +319,11 @@ export function OrderEntryPanel() {
 
 	const handleSubmit = async () => {
 		if (!validation.canSubmit || isSubmitting) return;
-		if (!activeSigner || typeof market?.assetIndex !== "number") return;
-
-		setIsSubmitting(true);
+		if (typeof market?.assetIndex !== "number") return;
 
 		let orderPrice = price;
 		if (type === "market") {
-			if (side === "buy") {
-				orderPrice = markPx * (1 + slippageBps / 10000);
-			} else {
-				orderPrice = markPx * (1 - slippageBps / 10000);
-			}
+			orderPrice = side === "buy" ? markPx * (1 + slippageBps / 10000) : markPx * (1 - slippageBps / 10000);
 		}
 
 		const szDecimals = market.szDecimals ?? 0;
@@ -356,30 +338,24 @@ export function OrderEntryPanel() {
 		});
 
 		try {
-			const transport = getHttpTransport();
-			const config = makeExchangeConfig(transport, activeSigner);
+			await updateLeverage({ asset: market.assetIndex, isCross: true, leverage });
 
-			// Set leverage first - this is a persistent account setting independent of order success
-			// If the order fails after leverage is set, that's acceptable as leverage is user-configured
-			await ensureLeverage(config, {
-				asset: market.assetIndex,
-				isCross: true,
-				leverage,
+			const result = await placeOrder({
+				orders: [
+					{
+						a: market.assetIndex,
+						b: side === "buy",
+						p: formattedPrice,
+						s: formattedSize,
+						r: reduceOnly,
+						t: type === "market" ? { limit: { tif: "FrontendMarket" as const } } : { limit: { tif: "Gtc" as const } },
+					},
+				],
+				grouping: "na",
 			});
 
-			const order = {
-				a: market.assetIndex,
-				b: side === "buy",
-				p: formattedPrice,
-				s: formattedSize,
-				r: false,
-				t: type === "market" ? { limit: { tif: "FrontendMarket" as const } } : { limit: { tif: "Gtc" as const } },
-			};
-
-			const result = await placeSingleOrder(config, { order });
-
 			const status = result.response?.data?.statuses?.[0];
-			if (status && "error" in status && typeof status.error === "string") {
+			if (status && typeof status === "object" && "error" in status && typeof status.error === "string") {
 				throw new Error(status.error);
 			}
 
@@ -390,8 +366,6 @@ export function OrderEntryPanel() {
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : t`Order failed`;
 			updateOrder(orderId, { status: "failed", error: errorMessage });
-		} finally {
-			setIsSubmitting(false);
 		}
 	};
 
@@ -703,17 +677,22 @@ export function OrderEntryPanel() {
 				)}
 
 				<div className="flex items-center gap-3 text-3xs">
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<div className="inline-flex items-center gap-1.5 cursor-not-allowed opacity-50">
-								<Checkbox id={reduceOnlyId} className="size-3.5" aria-label={t`Reduce Only`} disabled />
-								<label htmlFor={reduceOnlyId} className="text-muted-foreground cursor-not-allowed">
-									{t`Reduce Only`}
-								</label>
-							</div>
-						</TooltipTrigger>
-						<TooltipContent>{t`Coming soon`}</TooltipContent>
-					</Tooltip>
+					<div className="inline-flex items-center gap-1.5">
+						<Checkbox
+							id={reduceOnlyId}
+							className="size-3.5"
+							aria-label={t`Reduce Only`}
+							checked={reduceOnly}
+							onCheckedChange={(checked) => setReduceOnly(checked === true)}
+							disabled={isFormDisabled}
+						/>
+						<label
+							htmlFor={reduceOnlyId}
+							className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-foreground")}
+						>
+							{t`Reduce Only`}
+						</label>
+					</div>
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<div className="inline-flex items-center gap-1.5 cursor-not-allowed opacity-50">

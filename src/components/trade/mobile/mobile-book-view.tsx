@@ -7,9 +7,9 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
-import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
-import { useSubL2Book } from "@/lib/hl-react/hooks/subscription";
 import { formatNumber } from "@/lib/format";
+import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
+import { useSubL2Book } from "@/lib/hyperliquid/hooks/subscription";
 import { processLevels } from "@/lib/trade/orderbook";
 import { cn } from "@/lib/utils";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";

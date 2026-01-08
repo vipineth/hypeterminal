@@ -4,7 +4,7 @@
 
 This document compares two approaches for integrating `@nktkas/hyperliquid` in the Hyperminal codebase:
 
-| Aspect | Old Implementation (`src/lib/hyperliquid/`) | New React SDK (`src/lib/hl-react/`) |
+| Aspect | Old Implementation (`src/lib/hyperliquid/`) | New React SDK (`src/lib/hyperliquid/`) |
 |--------|---------------------------------------------|-------------------------------------|
 | Pattern | Singleton + Direct Function Calls | Provider + Hooks + Store |
 | React Integration | Manual | Native |
@@ -51,7 +51,7 @@ const result = await placeSingleOrder(
 );
 ```
 
-### New React SDK (`src/lib/hl-react/`)
+### New React SDK (`src/lib/hyperliquid/`)
 
 ```
 <HyperliquidProvider config={config}>
@@ -317,7 +317,7 @@ type InferSubEvent<TMethod> = /* listener data type */;
 
 ```typescript
 // src/providers/hyperliquid-provider.tsx
-import { createHyperliquidConfig, HyperliquidProvider } from "@/lib/hl-react";
+import { createHyperliquidConfig, HyperliquidProvider } from "@/lib/hyperliquid";
 
 export function HyperliquidSetup({ children }) {
   const wallet = useWalletFromPripy(); // Your wallet integration
@@ -524,7 +524,7 @@ hl-react/hooks/agent/
 Manages the full agent lifecycle: creation, approval, and validation.
 
 ```typescript
-import { useTradingAgent } from "@/lib/hl-react";
+import { useTradingAgent } from "@/lib/hyperliquid";
 
 const {
   status,           // "loading" | "no_agent" | "valid" | "invalid"
@@ -546,7 +546,7 @@ const {
 Abstracts switching between direct wallet and agent signing.
 
 ```typescript
-import { useSigningMode } from "@/lib/hl-react";
+import { useSigningMode } from "@/lib/hyperliquid";
 
 const {
   signingMode,        // "direct" | "agent"
@@ -571,7 +571,7 @@ Provider-based global state for the entire app. All components share the same si
 import {
   SigningModeProvider,
   useSigningModeContext,
-} from "@/lib/hl-react";
+} from "@/lib/hyperliquid";
 
 // 1. Wrap your app
 function App() {
@@ -644,7 +644,7 @@ function AgentApprovalModal() {
 Low-level localStorage management (used internally by above hooks).
 
 ```typescript
-import { useAgentWallet, useAgentWalletActions } from "@/lib/hl-react";
+import { useAgentWallet, useAgentWalletActions } from "@/lib/hyperliquid";
 
 // Read agent wallet
 const agentWallet = useAgentWallet("mainnet", userAddress);
@@ -665,7 +665,7 @@ import {
   createHyperliquidConfig,
   HyperliquidProvider,
   SigningModeProvider,
-} from "@/lib/hl-react";
+} from "@/lib/hyperliquid";
 import { useAccount, useWalletClient } from "wagmi";
 import { toHyperliquidWallet } from "@/lib/hyperliquid/wallet";
 
@@ -707,7 +707,7 @@ import {
   useSigningModeContext,
   useExchangeOrder,
   useInfoClearinghouseState,
-} from "@/lib/hl-react";
+} from "@/lib/hyperliquid";
 
 export function OrderPanel() {
   // Get signing state from context (shared across app)
@@ -799,7 +799,7 @@ import {
   useSigningModeContext,
   useExchangeCancel,
   useInfoOpenOrders,
-} from "@/lib/hl-react";
+} from "@/lib/hyperliquid";
 
 export function PositionsTab() {
   // Same context - shared with OrderPanel
@@ -839,7 +839,7 @@ export function PositionsTab() {
 
 ```typescript
 // src/components/agent-approval-modal.tsx
-import { useSigningModeContext } from "@/lib/hl-react";
+import { useSigningModeContext } from "@/lib/hyperliquid";
 import { Dialog } from "@/components/ui/dialog";
 
 export function AgentApprovalModal() {
@@ -961,7 +961,7 @@ await placeSingleOrder(config, params);
 
 **After:**
 ```typescript
-import { useTradingAgent, useExchangeOrder } from "@/lib/hl-react";
+import { useTradingAgent, useExchangeOrder } from "@/lib/hyperliquid";
 
 const { status, signer, registerAgent, isReady } = useTradingAgent({
   user,
@@ -990,7 +990,7 @@ import {
   useTradingTwapOrder,    // TWAP order
   useTradingTwapCancel,   // TWAP cancel
   useTradingUpdateLeverage,
-} from "@/lib/hl-react";
+} from "@/lib/hyperliquid";
 
 function OrderPanel() {
   // Single source of truth for UI state

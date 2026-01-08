@@ -1,4 +1,4 @@
-import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
+import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { AccountPanel } from "../order-entry/account-panel";
 import { OrderEntryPanel } from "../order-entry/order-entry-panel";
 

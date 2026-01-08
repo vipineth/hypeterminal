@@ -1,8 +1,9 @@
-import type { ExtraAgentsResponse } from "@nktkas/hyperliquid";
+import type { ExchangeClient, ExtraAgentsResponse, InfoClient, SubscriptionClient } from "@nktkas/hyperliquid";
 import type { AbstractWallet } from "@nktkas/hyperliquid/signing";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/interface";
+import { getClients, initializeClients, setExchangeClient } from "./client-registry";
 import { createHyperliquidConfig } from "./createConfig";
 import type {
 	AgentRegisterStatus,
@@ -18,6 +19,12 @@ import { useExchangeApproveAgent } from "./hooks/exchange/useExchangeApproveAgen
 import { useInfoExtraAgents } from "./hooks/info/useInfoExtraAgents";
 import { createHyperliquidStore, type HyperliquidStore } from "./store";
 import type { HyperliquidConfig, HyperliquidProviderProps } from "./types";
+
+export type HyperliquidClients = {
+	info: InfoClient;
+	subscription: SubscriptionClient;
+	exchange: ExchangeClient | null;
+};
 
 export interface HyperliquidContextValue {
 	status: TradingStatus;
@@ -51,6 +58,7 @@ type AgentLifecycleResult = {
 };
 
 export const HyperliquidStoreContext = createContext<HyperliquidStore | null>(null);
+export const HyperliquidClientsContext = createContext<HyperliquidClients | null>(null);
 const HyperliquidContext = createContext<HyperliquidContextValue | null>(null);
 
 export function isAgentApproved(extraAgents: ExtraAgentsResponse | undefined, publicKey: string | undefined): boolean {
@@ -150,7 +158,7 @@ function useAgentLifecycle(
 	};
 }
 
-function HyperliquidTradingProvider({
+export function HyperliquidTradingProvider({
 	children,
 	env,
 	userAddress,
@@ -170,6 +178,16 @@ function HyperliquidTradingProvider({
 	const activeSigner = useMemo(() => {
 		if (signingMode === "direct") return directSigner;
 		return agentLifecycle.signer;
+	}, [signingMode, directSigner, agentLifecycle.signer]);
+
+	useEffect(() => {
+		if (signingMode === "agent" && agentLifecycle.signer) {
+			setExchangeClient(agentLifecycle.signer as AbstractWallet);
+		} else if (signingMode === "direct" && directSigner) {
+			setExchangeClient(directSigner);
+		} else {
+			setExchangeClient(null);
+		}
 	}, [signingMode, directSigner, agentLifecycle.signer]);
 
 	const status: TradingStatus = useMemo(() => {
@@ -237,10 +255,9 @@ export function HyperliquidProvider({
 			createHyperliquidConfig({
 				httpTransport,
 				wsTransport,
-				wallet,
 				ssr: false,
 			}),
-		[httpTransport, wsTransport, wallet],
+		[httpTransport, wsTransport],
 	);
 
 	const storeRef = useRef<HyperliquidStore | null>(null);
@@ -249,22 +266,30 @@ export function HyperliquidProvider({
 		storeRef.current = createHyperliquidStore(config);
 	}
 
-	useEffect(() => {
-		storeRef.current?.getState().setConfig(config);
-	}, [config]);
+	initializeClients({
+		httpTransport: config.httpTransport,
+		wsTransport: config.wsTransport,
+	});
+
+	const clients = useMemo<HyperliquidClients>(() => {
+		const { info, subscription, exchange } = getClients();
+		return { info, subscription, exchange };
+	}, []);
 
 	return (
 		<HyperliquidStoreContext.Provider value={storeRef.current}>
-			<HyperliquidTradingProvider
-				env={env}
-				userAddress={userAddress}
-				wallet={wallet}
-				signingMode={signingMode}
-				agentName={agentName}
-				builderConfig={builderConfig}
-			>
-				{children}
-			</HyperliquidTradingProvider>
+			<HyperliquidClientsContext.Provider value={clients}>
+				<HyperliquidTradingProvider
+					env={env}
+					userAddress={userAddress}
+					wallet={wallet}
+					signingMode={signingMode}
+					agentName={agentName}
+					builderConfig={builderConfig}
+				>
+					{children}
+				</HyperliquidTradingProvider>
+			</HyperliquidClientsContext.Provider>
 		</HyperliquidStoreContext.Provider>
 	);
 }

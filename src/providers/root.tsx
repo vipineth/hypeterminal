@@ -1,13 +1,15 @@
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useConnection, useWalletClient, WagmiProvider } from "wagmi";
+import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/interface";
 import { config } from "@/config/wagmi";
-import { createHyperliquidConfig, HyperliquidProvider } from "@/lib/hl-react";
+import { HyperliquidProvider } from "@/lib/hyperliquid";
+import { toHyperliquidWallet } from "@/lib/hyperliquid/wallet";
 import { ThemeProvider } from "./theme";
 import "@/lib/i18n";
-import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/interface";
+import { getHttpTransport, getWsTransport } from "@/lib/hyperliquid/client-registry";
 
 export function getRootProviderContext() {
 	const queryClient = new QueryClient();
@@ -19,27 +21,20 @@ export function getRootProviderContext() {
 function HyperliquidProviderWrapper({ children }: { children: React.ReactNode }) {
 	const { address } = useConnection();
 	const { data: walletClient } = useWalletClient();
-	const [isClient, setIsClient] = useState(false);
-
-	useEffect(() => {
-		setIsClient(true);
+	const wallet = useMemo(() => toHyperliquidWallet(walletClient, address) ?? undefined, [walletClient, address]);
+	const env = import.meta.env.VITE_HYPERLIQUID_TESTNET === "true" ? "Testnet" : "Mainnet";
+	const httpTransport = useMemo(() => getHttpTransport(), []);
+	const wsTransport = useMemo(() => {
+		if (typeof window === "undefined") return undefined;
+		return getWsTransport();
 	}, []);
-
-	const hyperliquidConfig = createHyperliquidConfig({
-		wallet: walletClient,
-		ssr: false,
-	});
-
-	// During SSR, render children without Hyperliquid providers
-	if (!isClient || !hyperliquidConfig) {
-		return <>{children}</>;
-	}
-
 	return (
 		<HyperliquidProvider
-			env="Mainnet"
+			env={env}
 			userAddress={address}
-			wallet={walletClient}
+			wallet={wallet}
+			httpTransport={httpTransport}
+			wsTransport={wsTransport}
 			builderConfig={DEFAULT_BUILDER_CONFIG}
 			agentName={PROJECT_NAME}
 		>

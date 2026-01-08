@@ -21,12 +21,11 @@ import {
 	ORDER_SIZE_PERCENT_STEPS,
 	UI_TEXT,
 } from "@/constants/app";
-import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
-import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
-import { useTradingAgent } from "@/hooks/hyperliquid/use-trading-agent";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
-import { getHttpTransport } from "@/lib/hyperliquid/clients";
-import { ensureLeverage, makeExchangeConfig, placeSingleOrder } from "@/lib/hyperliquid/exchange";
+import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
+import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
+import { useExchangeUpdateLeverage } from "@/lib/hyperliquid/hooks/exchange/useExchangeUpdateLeverage";
+import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder, getDefaultLeverage } from "@/lib/trade/orders";
 import { cn } from "@/lib/utils";
@@ -63,18 +62,18 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const needsChainSwitch = !!walletClientError && walletClientError.message.includes("does not match");
 
 	const { data: market, isLoading: isMarketLoading } = useSelectedResolvedMarket({ ctxMode: "realtime" });
-	const { data: clearinghouse } = useClearinghouseState({ user: address });
+	const { data: clearinghouseEvent } = useSubClearinghouseState(
+		{ user: address ?? "0x0" },
+		{ enabled: isConnected && !!address },
+	);
+	const clearinghouse = clearinghouseEvent?.clearinghouseState;
 
-	const {
-		isApproved: isAgentApproved,
-		apiWalletSigner,
-		approveAgent,
-		canApprove,
-	} = useTradingAgent({
-		user: address,
-		walletClient,
-		enabled: isConnected,
-	});
+	const { status: agentStatus, registerStatus, signer: agentSigner, registerAgent } = useTradingAgent();
+
+	const isAgentApproved = agentStatus === "valid";
+	const apiWalletSigner = agentSigner;
+	const canApprove = !!walletClient && !!address;
+	const isRegistering = registerStatus === "signing" || registerStatus === "verifying";
 
 	const defaultLeverageByMode = useDefaultLeverageByMode();
 	const marketLeverageByMode = useMarketLeverageByMode();
@@ -89,12 +88,13 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const [sizeInput, setSizeInput] = useState("");
 	const [sizeMode, setSizeMode] = useState<SizeMode>("usd");
 	const [limitPriceInput, setLimitPriceInput] = useState("");
-	const [isSubmitting, setIsSubmitting] = useState(false);
-	const [isApproving, setIsApproving] = useState(false);
 	const [approvalError, setApprovalError] = useState<string | null>(null);
 
 	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
 	const [depositModalOpen, setDepositModalOpen] = useState(false);
+
+	const { mutateAsync: placeOrder, isPending: isSubmitting } = useExchangeOrder();
+	const { mutateAsync: updateLeverage } = useExchangeUpdateLeverage();
 
 	// Sync orderbook price clicks
 	useEffect(() => {
@@ -239,23 +239,19 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const handleSwitchChain = () => switchChain({ chainId: ARBITRUM_CHAIN_ID });
 
 	const handleApprove = async () => {
-		if (isApproving) return;
-		setIsApproving(true);
+		if (isRegistering) return;
 		setApprovalError(null);
 		try {
-			await approveAgent();
+			await registerAgent();
 		} catch (error) {
 			setApprovalError(error instanceof Error ? error.message : ORDER_TEXT.APPROVAL_ERROR_FALLBACK);
-		} finally {
-			setIsApproving(false);
 		}
 	};
 
 	const handleSubmit = async () => {
 		if (!validation.canSubmit || isSubmitting) return;
-		if (!apiWalletSigner || typeof market?.assetIndex !== "number") return;
+		if (typeof market?.assetIndex !== "number") return;
 
-		setIsSubmitting(true);
 		let orderPrice = price;
 		if (type === "market") {
 			orderPrice = side === "buy" ? markPx * (1 + slippageBps / 10000) : markPx * (1 - slippageBps / 10000);
@@ -268,22 +264,25 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 		const orderId = addOrder({ market: market.coin, side, size: formattedSize, status: "pending" });
 
 		try {
-			const transport = getHttpTransport();
-			const config = makeExchangeConfig(transport, apiWalletSigner);
-			await ensureLeverage(config, { asset: market.assetIndex, isCross: true, leverage });
+			await updateLeverage({ asset: market.assetIndex, isCross: true, leverage });
 
-			const order = {
-				a: market.assetIndex,
-				b: side === "buy",
-				p: formattedPrice,
-				s: formattedSize,
-				r: false,
-				t: type === "market" ? { limit: { tif: "FrontendMarket" as const } } : { limit: { tif: "Gtc" as const } },
-			};
+			const result = await placeOrder({
+				orders: [
+					{
+						a: market.assetIndex,
+						b: side === "buy",
+						p: formattedPrice,
+						s: formattedSize,
+						r: false,
+						t: type === "market" ? { limit: { tif: "FrontendMarket" as const } } : { limit: { tif: "Gtc" as const } },
+					},
+				],
+				grouping: "na",
+			});
 
-			const result = await placeSingleOrder(config, { order });
 			const status = result.response?.data?.statuses?.[0];
-			if (status && "error" in status && typeof status.error === "string") throw new Error(status.error);
+			if (status && typeof status === "object" && "error" in status && typeof status.error === "string")
+				throw new Error(status.error);
 
 			updateOrder(orderId, { status: "success", fillPercent: 100 });
 			setSizeInput("");
@@ -293,8 +292,6 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 				status: "failed",
 				error: error instanceof Error ? error.message : ORDER_TEXT.ORDER_ERROR_FALLBACK,
 			});
-		} finally {
-			setIsSubmitting(false);
 		}
 	};
 
@@ -324,13 +321,13 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 			};
 		if (validation.needsApproval)
 			return {
-				text: isApproving
+				text: isRegistering
 					? ORDER_TEXT.BUTTON_SIGNING
 					: !canApprove
 						? ORDER_TEXT.BUTTON_LOADING
 						: ORDER_TEXT.BUTTON_ENABLE_TRADING,
 				action: handleApprove,
-				disabled: isApproving || !canApprove,
+				disabled: isRegistering || !canApprove,
 				variant: "cyan" as const,
 			};
 		return {
@@ -607,7 +604,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 								: "bg-terminal-red/20 border-terminal-red text-terminal-red hover:bg-terminal-red/30",
 					)}
 				>
-					{(isSubmitting || isApproving) && <Loader2 className="size-5 animate-spin" />}
+					{(isSubmitting || isRegistering) && <Loader2 className="size-5 animate-spin" />}
 					{buttonContent.text}
 				</button>
 			</div>

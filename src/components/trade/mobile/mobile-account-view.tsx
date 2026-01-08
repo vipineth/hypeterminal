@@ -4,8 +4,8 @@ import { useConnection, useDisconnect } from "wagmi";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UI_TEXT } from "@/constants/app";
-import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
 import { formatPercent, formatUSD } from "@/lib/format";
+import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
 import { WalletDialog } from "../components/wallet-dialog";
@@ -22,9 +22,12 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 	const { address, isConnected } = useConnection();
 	const { disconnect } = useDisconnect();
 
-	const { data: state, isLoading } = useClearinghouseState({
-		user: isConnected ? address : undefined,
-	});
+	const { data: stateEvent, status } = useSubClearinghouseState(
+		{ user: address ?? "0x0" },
+		{ enabled: isConnected && !!address },
+	);
+	const state = stateEvent?.clearinghouseState;
+	const isLoading = status === "subscribing" || status === "idle";
 
 	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
 	const [depositModalOpen, setDepositModalOpen] = useState(false);

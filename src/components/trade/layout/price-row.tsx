@@ -1,6 +1,6 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { LAYOUT_PERSISTENCE } from "@/constants/app";
-import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
+import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { ChartPanel } from "../chart/chart-panel";
 import { usePersistentLayout } from "../hooks/use-persistent-layout";
 import { OrderbookPanel } from "../orderbook/orderbook-panel";

@@ -1,4 +1,4 @@
-import type { BuilderConfig } from "@/lib/hl-react";
+import type { BuilderConfig } from "@/lib/hyperliquid";
 
 export const PROJECT_NAME = "HypeTerminal";
 export const DEFAULT_BUILDER_CONFIG: BuilderConfig = {

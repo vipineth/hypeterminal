@@ -9,9 +9,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
-import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
 import { formatNumber } from "@/lib/format";
-import { useSubL2Book } from "@/lib/hl-react";
+import { useSelectedResolvedMarket, useSubL2Book } from "@/lib/hyperliquid";
 import {
 	getMaxTotal,
 	getPriceGroupingOptions,

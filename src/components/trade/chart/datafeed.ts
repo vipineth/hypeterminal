@@ -4,11 +4,11 @@ import type {
 	CandleSnapshotParameters,
 	CandleSnapshotResponse,
 	CandleWsEvent,
+	ISubscription,
 	MetaResponse,
-	WebSocketSubscription,
 } from "@nktkas/hyperliquid";
-import { getInfoClient, getSubscriptionClient } from "@/lib/hyperliquid/clients";
-import { readCachedMeta, writeCachedMeta } from "@/lib/hyperliquid/meta-cache";
+import { getInfoClient, getSubscriptionClient } from "@/lib/hyperliquid/client-registry";
+import { toFiniteNumber } from "@/lib/trade/numbers";
 import type {
 	Bar,
 	DatafeedConfiguration,
@@ -25,8 +25,6 @@ import type {
 	ServerTimeCallback,
 	SubscribeBarsCallback,
 } from "@/types/charting_library";
-import { META_CACHE_TTL_MS } from "@/constants/app";
-import { toFiniteNumber } from "@/lib/trade/numbers";
 import {
 	ALL_MIDS_TTL_MS,
 	CHART_DATAFEED_CONFIG,
@@ -44,20 +42,13 @@ let metaCache: { value: MetaResponse; fetchedAt: number } | undefined;
 let metaPromise: Promise<MetaResponse> | undefined;
 
 async function getMeta(): Promise<MetaResponse> {
-	const now = Date.now();
-	if (!metaCache) {
-		const cached = readCachedMeta();
-		if (cached) metaCache = { value: cached.value, fetchedAt: cached.updatedAt };
-	}
-
-	if (metaCache && now - metaCache.fetchedAt < META_CACHE_TTL_MS) return metaCache.value;
+	if (metaCache) return metaCache.value;
 	if (metaPromise) return metaPromise;
 
 	metaPromise = getInfoClient()
 		.meta()
 		.then((meta) => {
 			metaCache = { value: meta, fetchedAt: Date.now() };
-			writeCachedMeta(meta);
 			return meta;
 		})
 		.finally(() => {
@@ -249,7 +240,7 @@ export function createDatafeed(): IBasicDataFeed {
 	};
 
 	type CandleStream = {
-		subscriptionPromise: Promise<WebSocketSubscription>;
+		subscriptionPromise: Promise<ISubscription>;
 		listeners: Map<string, CandleListener>;
 		lastBar?: Bar;
 	};
@@ -347,7 +338,7 @@ export function createDatafeed(): IBasicDataFeed {
 		supports_marks: false,
 		supports_time: true,
 		supports_timescale_marks: false,
-		symbols_types: CHART_DATAFEED_CONFIG.SYMBOL_TYPES,
+		// symbols_types: CHART_DATAFEED_CONFIG.SYMBOL_TYPES,
 	};
 
 	return {

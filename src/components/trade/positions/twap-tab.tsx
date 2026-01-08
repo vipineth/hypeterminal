@@ -1,19 +1,24 @@
 import { t } from "@lingui/core/macro";
 import { Timer } from "lucide-react";
 import { useMemo } from "react";
+import { useConnection } from "wagmi";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
-import { useTwapHistory } from "@/hooks/hyperliquid/use-twap-history";
 import { formatNumber, formatPrice } from "@/lib/format";
-import { usePerpMarkets } from "@/lib/hl-react";
+import { usePerpMarkets } from "@/lib/hyperliquid";
+import { useSubUserTwapHistory } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
-import { useConnection } from "wagmi";
 
 export function TwapTab() {
 	const { address, isConnected } = useConnection();
-	const { data, status, error } = useTwapHistory({ user: isConnected ? address : undefined });
+	const {
+		data: twapEvent,
+		status,
+		error,
+	} = useSubUserTwapHistory({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
+	const data = twapEvent?.history;
 	const { getSzDecimals } = usePerpMarkets();
 
 	const orders = useMemo(() => {
@@ -58,12 +63,17 @@ export function TwapTab() {
 							: rawStatus;
 
 			return {
-				key: typeof order.twapId === "number" ? order.twapId : `${order.state.coin}-${order.state.timestamp}-${order.time}`,
+				key:
+					typeof order.twapId === "number"
+						? order.twapId
+						: `${order.state.coin}-${order.state.timestamp}-${order.time}`,
 				coin: order.state.coin,
 				sideLabel: isBuy ? t`buy` : t`sell`,
 				sideClass: isBuy ? "bg-terminal-green/20 text-terminal-green" : "bg-terminal-red/20 text-terminal-red",
 				totalSizeText: Number.isFinite(totalSize) ? formatNumber(totalSize, szDecimals) : String(order.state.sz),
-				executedSizeText: Number.isFinite(executedSize) ? formatNumber(executedSize, szDecimals) : String(order.state.executedSz),
+				executedSizeText: Number.isFinite(executedSize)
+					? formatNumber(executedSize, szDecimals)
+					: String(order.state.executedSz),
 				avgPriceText: Number.isFinite(avgPrice) ? formatPrice(avgPrice, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER,
 				progressPct,
 				rawStatus,
@@ -85,14 +95,16 @@ export function TwapTab() {
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
 						{t`Connect your wallet to view TWAP orders.`}
 					</div>
-				) : status === "pending" ? (
+				) : status === "subscribing" || status === "idle" ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
 						{t`Loading TWAP orders...`}
 					</div>
 				) : status === "error" ? (
 					<div className="h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs text-terminal-red/80">
 						<span>{t`Failed to load TWAP history.`}</span>
-						{error instanceof Error ? <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span> : null}
+						{error instanceof Error ? (
+							<span className="mt-1 text-4xs text-muted-foreground">{error.message}</span>
+						) : null}
 					</div>
 				) : orders.length === 0 ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
@@ -164,7 +176,8 @@ export function TwapTab() {
 													"text-4xs px-1 py-0.5 rounded-sm uppercase",
 													row.rawStatus === "activated" && "bg-terminal-cyan/20 text-terminal-cyan",
 													row.rawStatus === "finished" && "bg-terminal-green/20 text-terminal-green",
-													(row.rawStatus === "terminated" || row.rawStatus === "error") && "bg-terminal-red/20 text-terminal-red",
+													(row.rawStatus === "terminated" || row.rawStatus === "error") &&
+														"bg-terminal-red/20 text-terminal-red",
 												)}
 											>
 												{row.statusLabel}

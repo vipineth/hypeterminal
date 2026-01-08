@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
-import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
-import { useOpenOrders } from "@/hooks/hyperliquid/use-open-orders";
+import { useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
 import { MobileAccountView } from "./mobile-account-view";
@@ -21,8 +20,13 @@ export function MobileTerminal({ className }: MobileTerminalProps) {
 	const [activeTab, setActiveTab] = useState<MobileTab>("chart");
 
 	const { address, isConnected } = useConnection();
-	const { data: state } = useClearinghouseState({ user: isConnected ? address : undefined });
-	const { data: openOrders } = useOpenOrders({ user: isConnected ? address : undefined });
+	const { data: stateEvent } = useSubClearinghouseState(
+		{ user: address ?? "0x0" },
+		{ enabled: isConnected && !!address },
+	);
+	const state = stateEvent?.clearinghouseState;
+	const { data: ordersEvent } = useSubOpenOrders({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
+	const openOrders = ordersEvent?.orders;
 
 	// Badge counts for bottom nav
 	const positionsCount = useMemo(() => {

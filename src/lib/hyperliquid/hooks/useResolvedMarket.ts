@@ -1,14 +1,13 @@
 import { useMemo } from "react";
 import { DEFAULT_MARKET_KEY } from "@/constants/app";
-import { usePerpMarkets } from "@/lib/hl-react";
-import { useSubActiveAssetCtx, useSubAllMids } from "@/lib/hl-react/hooks/subscription";
-import type { PerpMarketKey } from "@/lib/hyperliquid/market-key";
-import { isPerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
+import type { PerpMarketKey } from "../market-key";
+import { isPerpMarketKey, perpCoinFromMarketKey } from "../market-key";
 import { getMarketCtxNumbers, type MarketCtxNumbers } from "@/lib/market";
 import { toFiniteNumber } from "@/lib/trade/numbers";
 import { useSelectedMarketKey } from "@/stores/use-market-prefs-store";
 import type { PerpAssetCtx } from "@/types/hyperliquid";
-import { usePerpAssetCtxsSnapshot } from "./use-perp-asset-ctxs-snapshot";
+import { useSubActiveAssetCtx, useSubAllMids } from "./subscription";
+import { usePerpMarkets } from "./usePerpMarkets";
 
 export type ResolvedPerpMarket = {
 	kind: "perp";
@@ -29,8 +28,7 @@ export type ResolvedMarket = ResolvedPerpMarket;
 
 export type UseResolvedMarketOptions = {
 	enabled?: boolean;
-	ctxMode?: "realtime" | "snapshot" | "none";
-	snapshotIntervalMs?: number;
+	ctxMode?: "realtime" | "none";
 };
 
 const DEFAULT_RESOLVED_MARKET: ResolvedPerpMarket = {
@@ -42,7 +40,7 @@ const DEFAULT_RESOLVED_MARKET: ResolvedPerpMarket = {
 };
 
 export function useResolvedMarket(marketKey: string | undefined, options: UseResolvedMarketOptions = {}) {
-	const { enabled = true, ctxMode = "realtime", snapshotIntervalMs } = options;
+	const { enabled = true, ctxMode = "realtime" } = options;
 
 	const perpMarkets = usePerpMarkets();
 	const { getAssetId, getSzDecimals, getMaxLeverage, isDelisted, data: marketsData } = perpMarkets;
@@ -69,19 +67,7 @@ export function useResolvedMarket(marketKey: string | undefined, options: UseRes
 			enabled: enabled && ctxMode === "realtime" && !!coin,
 		},
 	);
-	const activeCtx = activeCtxEvent?.ctx as PerpAssetCtx | undefined;
-
-	const snapshotCtxs = usePerpAssetCtxsSnapshot({
-		enabled: enabled && ctxMode === "snapshot",
-		intervalMs: snapshotIntervalMs,
-	});
-
-	const ctx =
-		ctxMode === "realtime"
-			? activeCtx
-			: ctxMode === "snapshot" && typeof assetIndex === "number"
-				? snapshotCtxs?.[assetIndex]
-				: undefined;
+	const ctx = activeCtxEvent?.ctx as PerpAssetCtx | undefined;
 
 	const resolved = useMemo<ResolvedMarket | undefined>(() => {
 		if (!perpMarketKey || !coin) return undefined;

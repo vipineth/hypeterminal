@@ -2,8 +2,7 @@ import { useMemo } from "react";
 import { useConnection } from "wagmi";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { POSITIONS_TABS } from "@/constants/app";
-import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
-import { useOpenOrders } from "@/hooks/hyperliquid/use-open-orders";
+import { useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
 import { BalancesTab } from "./balances-tab";
 import { FundingTab } from "./funding-tab";
@@ -14,8 +13,13 @@ import { TwapTab } from "./twap-tab";
 
 export function PositionsPanel() {
 	const { address, isConnected } = useConnection();
-	const { data: state } = useClearinghouseState({ user: isConnected ? address : undefined });
-	const { data: openOrders } = useOpenOrders({ user: isConnected ? address : undefined });
+	const { data: stateEvent } = useSubClearinghouseState(
+		{ user: address ?? "0x0" },
+		{ enabled: isConnected && !!address },
+	);
+	const state = stateEvent?.clearinghouseState;
+	const { data: ordersEvent } = useSubOpenOrders({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
+	const openOrders = ordersEvent?.orders;
 
 	const positionsCount = useMemo(() => {
 		if (!isConnected) return 0;
@@ -35,8 +39,7 @@ export function PositionsPanel() {
 				<div className="px-2 pt-1.5 border-b border-border/40">
 					<TabsList className="pb-1.5">
 						{POSITIONS_TABS.map((tab) => {
-							const count =
-								tab.value === "positions" ? positionsCount : tab.value === "orders" ? ordersCount : null;
+							const count = tab.value === "positions" ? positionsCount : tab.value === "orders" ? ordersCount : null;
 
 							return (
 								<TabsTrigger

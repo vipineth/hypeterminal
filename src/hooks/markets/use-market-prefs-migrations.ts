@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 import { DEFAULT_MARKET_KEY, STORAGE_KEYS } from "@/constants/app";
+import { useHyperliquidContextOptional } from "@/lib/hyperliquid";
+import { useInfoMeta } from "@/lib/hyperliquid/hooks/info";
 import { isPerpMarketKey, makePerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
-import { useMeta } from "@/hooks/hyperliquid/use-meta";
 import { useFavoriteMarketKeys, useMarketPrefsActions, useSelectedMarketKey } from "@/stores/use-market-prefs-store";
 
 function readLegacyFavoriteAssetIds(): number[] | null {
+	if (typeof window === "undefined") return null;
 	const raw = localStorage.getItem(STORAGE_KEYS.LEGACY_FAVORITES);
 	if (!raw) return null;
 
@@ -23,7 +25,8 @@ function readLegacyFavoriteAssetIds(): number[] | null {
 }
 
 export function useMarketPrefsMigrations() {
-	const { data: meta } = useMeta();
+	const hlContext = useHyperliquidContextOptional();
+	const { data: meta } = useInfoMeta({}, { enabled: !!hlContext });
 	const favoriteMarketKeys = useFavoriteMarketKeys();
 	const selectedMarketKey = useSelectedMarketKey();
 	const { setFavoriteMarketKeys, setSelectedMarketKey } = useMarketPrefsActions();

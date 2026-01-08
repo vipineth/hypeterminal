@@ -1,10 +1,9 @@
 import { t } from "@lingui/core/macro";
 import { Star } from "lucide-react";
 import { useMemo } from "react";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { formatPercent, formatPrice } from "@/lib/format";
-import { usePerpMarkets } from "@/lib/hl-react";
-import { useSubActiveAssetCtx, useSubAllMids } from "@/lib/hl-react/hooks/subscription";
+import { usePerpMarkets } from "@/lib/hyperliquid";
+import { useSubActiveAssetCtx, useSubAllMids } from "@/lib/hyperliquid/hooks/subscription";
 import { isPerpMarketKey, type PerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
 import { calculate24hPriceChange } from "@/lib/market";
 import { toFiniteNumber } from "@/lib/trade/numbers";
@@ -44,7 +43,7 @@ export function FavoritesStrip() {
 
 	return (
 		<div className="py-1.5 border-b border-border/60 bg-surface/20">
-			<ScrollArea className="w-full whitespace-nowrap">
+			<div className="w-full whitespace-nowrap overflow-x-auto scrollbar-none">
 				<div className="flex items-center gap-0.5 px-2 min-w-full divide-x">
 					{favorites.length === 0 ? (
 						<EmptyState />
@@ -54,8 +53,7 @@ export function FavoritesStrip() {
 						))
 					)}
 				</div>
-				<ScrollBar orientation="horizontal" className="hidden" />
-			</ScrollArea>
+			</div>
 		</div>
 	);
 }

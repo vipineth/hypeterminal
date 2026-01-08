@@ -1,4 +1,4 @@
-import { useMarketPrefsMigrations } from "@/hooks/markets/use-market-prefs-migrations";
+// import { useMarketPrefsMigrations } from "@/hooks/markets/use-market-prefs-migrations";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FooterBar } from "./footer/footer-bar";
 import { TopNav } from "./header/top-nav";
@@ -6,7 +6,7 @@ import { MainWorkspace } from "./layout/main-workspace";
 import { MobileTerminal } from "./mobile";
 
 export function TradeTerminalPage() {
-	useMarketPrefsMigrations();
+	// useMarketPrefsMigrations();
 	const isMobile = useIsMobile();
 
 	// Render mobile-optimized PWA layout

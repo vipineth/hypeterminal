@@ -3,8 +3,8 @@ import { Flame } from "lucide-react";
 import { useCallback } from "react";
 import { Separator } from "@/components/ui/separator";
 import { DEFAULT_MARKET_KEY } from "@/constants/app";
-import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
 import { formatPercent, formatUSD } from "@/lib/format";
+import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { makePerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
 import { calculateOpenInterestUSD } from "@/lib/market";
 import { cn } from "@/lib/utils";
@@ -40,10 +40,7 @@ export function MarketOverview() {
 							value={formatUSD(selectedMarket?.ctxNumbers?.markPx ?? null)}
 							valueClass="text-terminal-amber terminal-glow-amber"
 						/>
-						<StatBlock
-							label={t`ORACLE`}
-							value={formatUSD(selectedMarket?.ctxNumbers?.oraclePx ?? null)}
-						/>
+						<StatBlock label={t`ORACLE`} value={formatUSD(selectedMarket?.ctxNumbers?.oraclePx ?? null)} />
 						<StatBlock
 							label={t`VOL`}
 							value={formatUSD(selectedMarket?.ctxNumbers?.dayNtlVlm ?? null, {

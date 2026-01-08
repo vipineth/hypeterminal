@@ -1,52 +1,61 @@
 import { t } from "@lingui/core/macro";
 import { ListOrdered } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useConnection, useWalletClient } from "wagmi";
+import { useConnection } from "wagmi";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
-import { useOpenOrders } from "@/hooks/hyperliquid/use-open-orders";
-import { useTradingAgent } from "@/hooks/hyperliquid/use-trading-agent";
 import { formatNumber, formatUSD } from "@/lib/format";
-import { usePerpMarkets } from "@/lib/hl-react";
-import { getHttpTransport } from "@/lib/hyperliquid/clients";
-import { cancelOrders, makeExchangeConfig } from "@/lib/hyperliquid/exchange";
+import { usePerpMarkets } from "@/lib/hyperliquid";
+import { useExchangeCancel } from "@/lib/hyperliquid/hooks/exchange/useExchangeCancel";
+import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
 import { TokenAvatar } from "../components/token-avatar";
 
 export function OrdersTab() {
 	const { address, isConnected } = useConnection();
-	const { data: walletClient } = useWalletClient();
-	const { data, status, error, refetch } = useOpenOrders({ user: isConnected ? address : undefined });
+	const {
+		data: openOrdersEvent,
+		status,
+		error,
+	} = useSubOpenOrders({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
 	const { getSzDecimals, getAssetId } = usePerpMarkets();
-	const { signer: activeSigner } = useTradingAgent({
-		user: isConnected ? address : undefined,
-		walletClient,
-	});
 	const [selectedOrderIds, setSelectedOrderIds] = useState<Set<number>>(() => new Set());
-	const [actionError, setActionError] = useState<string | null>(null);
-	const [isCancelling, setIsCancelling] = useState(false);
-	const openOrders = data ?? [];
+
+	const {
+		mutate: cancelOrders,
+		isPending: isCancelling,
+		error: cancelError,
+		reset: resetCancelError,
+	} = useExchangeCancel();
+
+	const openOrders = useMemo(() => openOrdersEvent?.orders ?? [], [openOrdersEvent?.orders]);
 	const headerCount = isConnected ? openOrders.length : FALLBACK_VALUE_PLACEHOLDER;
 
 	useEffect(() => {
+		if (selectedOrderIds.size === 0) return;
+		const openIds = new Set(openOrders.map((order) => order.oid));
+		let changed = false;
+		for (const id of selectedOrderIds) {
+			if (!openIds.has(id)) {
+				changed = true;
+				break;
+			}
+		}
+		if (!changed) return;
+
 		setSelectedOrderIds((prev) => {
-			if (prev.size === 0) return prev;
 			const next = new Set<number>();
-			const openIds = new Set(openOrders.map((order) => order.oid));
-			let changed = false;
 			for (const id of prev) {
 				if (openIds.has(id)) {
 					next.add(id);
-				} else {
-					changed = true;
 				}
 			}
-			return changed ? next : prev;
+			return next;
 		});
-	}, [openOrders]);
+	}, [openOrders, selectedOrderIds]);
 
 	const selectedCount = selectedOrderIds.size;
 	const allSelected = selectedCount > 0 && selectedCount === openOrders.length;
@@ -76,13 +85,8 @@ export function OrdersTab() {
 	}, []);
 
 	const handleCancelOrders = useCallback(
-		async (ordersToCancel: typeof openOrders) => {
-			if (isCancelling) return;
-			if (!activeSigner) {
-				setActionError(t`Connect a wallet to manage orders.`);
-				return;
-			}
-			if (ordersToCancel.length === 0) return;
+		(ordersToCancel: typeof openOrders) => {
+			if (isCancelling || ordersToCancel.length === 0) return;
 
 			const cancels = ordersToCancel.reduce<{ a: number; o: number }[]>((acc, order) => {
 				const assetIndex = getAssetId(order.coin);
@@ -91,51 +95,34 @@ export function OrdersTab() {
 				return acc;
 			}, []);
 
-			if (cancels.length !== ordersToCancel.length) {
-				setActionError(t`Market metadata unavailable.`);
-				return;
-			}
+			if (cancels.length === 0) return;
 
-			setIsCancelling(true);
-			setActionError(null);
-
-			try {
-				const transport = getHttpTransport();
-				const config = makeExchangeConfig(transport, activeSigner);
-				const result = await cancelOrders(config, { cancels });
-				const statuses = result.response?.data?.statuses ?? [];
-				const errorStatus = statuses.find(
-					(status) => typeof status === "object" && status !== null && "error" in status,
-				);
-				if (errorStatus && typeof errorStatus === "object" && "error" in errorStatus) {
-					throw new Error(errorStatus.error);
-				}
-
-				await refetch();
-				setSelectedOrderIds((prev) => {
-					const next = new Set(prev);
-					for (const order of ordersToCancel) {
-						next.delete(order.oid);
-					}
-					return next;
-				});
-			} catch (error) {
-				const message = error instanceof Error ? error.message : t`Unable to cancel orders.`;
-				setActionError(message);
-			} finally {
-				setIsCancelling(false);
-			}
+			resetCancelError();
+			cancelOrders(
+				{ cancels },
+				{
+					onSuccess: () => {
+						setSelectedOrderIds((prev) => {
+							const next = new Set(prev);
+							for (const order of ordersToCancel) {
+								next.delete(order.oid);
+							}
+							return next;
+						});
+					},
+				},
+			);
 		},
-		[isCancelling, activeSigner, getAssetId, refetch],
+		[isCancelling, getAssetId, cancelOrders, resetCancelError],
 	);
 
 	const handleCancelSelected = useCallback(() => {
 		const ordersToCancel = openOrders.filter((order) => selectedOrderIds.has(order.oid));
-		void handleCancelOrders(ordersToCancel);
+		handleCancelOrders(ordersToCancel);
 	}, [handleCancelOrders, openOrders, selectedOrderIds]);
 
 	const handleCancelAll = useCallback(() => {
-		void handleCancelOrders(openOrders);
+		handleCancelOrders(openOrders);
 	}, [handleCancelOrders, openOrders]);
 
 	const orderRows = useMemo(() => {
@@ -169,6 +156,7 @@ export function OrdersTab() {
 	const canCancel = !isCancelling;
 	const disableCancelSelected = !canCancel || selectedCount === 0;
 	const disableCancelAll = !canCancel || openOrders.length === 0;
+	const actionError = cancelError?.message;
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
@@ -205,7 +193,7 @@ export function OrdersTab() {
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
 						{t`Connect your wallet to view open orders.`}
 					</div>
-				) : status === "pending" ? (
+				) : status === "subscribing" || status === "idle" ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
 						{t`Loading open orders...`}
 					</div>
@@ -299,7 +287,7 @@ export function OrdersTab() {
 												className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 												tabIndex={0}
 												aria-label={t`Cancel order`}
-												onClick={() => void handleCancelOrders([row.order])}
+												onClick={() => handleCancelOrders([row.order])}
 												disabled={!canCancel}
 											>
 												{isCancelling ? t`Canceling...` : t`Cancel`}

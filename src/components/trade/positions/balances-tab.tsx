@@ -5,9 +5,8 @@ import { useConnection } from "wagmi";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
-import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
-import { useSpotClearinghouseState } from "@/hooks/hyperliquid/use-spot-clearinghouse-state";
 import { formatToken, formatUSD } from "@/lib/format";
+import { useSubClearinghouseState, useSubSpotState } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumberOrZero } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
 import { TokenAvatar } from "../components/token-avatar";
@@ -24,14 +23,17 @@ type BalanceRow = {
 export function BalancesTab() {
 	const { address, isConnected } = useConnection();
 
-	const { data: perpData, status: perpStatus } = useClearinghouseState({
-		user: address,
-		enabled: isConnected,
-	});
+	const { data: perpEvent, status: perpStatus } = useSubClearinghouseState(
+		{ user: address ?? "0x0" },
+		{ enabled: isConnected && !!address },
+	);
+	const perpData = perpEvent?.clearinghouseState;
 
-	const { data: spotData, status: spotStatus } = useSpotClearinghouseState({
-		user: isConnected ? address : undefined,
-	});
+	const { data: spotEvent, status: spotStatus } = useSubSpotState(
+		{ user: address ?? "0x0" },
+		{ enabled: isConnected && !!address },
+	);
+	const spotData = spotEvent?.spotState;
 
 	const balances = useMemo((): BalanceRow[] => {
 		const rows: BalanceRow[] = [];
@@ -94,7 +96,8 @@ export function BalancesTab() {
 		});
 	}, [balances]);
 
-	const isLoading = perpStatus === "pending" || spotStatus === "pending";
+	const isLoading =
+		perpStatus === "subscribing" || spotStatus === "subscribing" || perpStatus === "idle" || spotStatus === "idle";
 	const hasError = perpStatus === "error" || spotStatus === "error";
 
 	return (

@@ -4,8 +4,7 @@ import { useConnection } from "wagmi";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { POSITIONS_TABS, UI_TEXT } from "@/constants/app";
-import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
-import { useOpenOrders } from "@/hooks/hyperliquid/use-open-orders";
+import { useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
 import { BalancesTab } from "../positions/balances-tab";
@@ -28,8 +27,19 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 	const [activeTab, setActiveTab] = useState<TabValue>("positions");
 
 	const { address, isConnected } = useConnection();
-	const { data: state, isLoading: isLoadingState } = useClearinghouseState({ user: isConnected ? address : undefined });
-	const { data: openOrders, isLoading: isLoadingOrders } = useOpenOrders({ user: isConnected ? address : undefined });
+	const { data: stateEvent, status: stateStatus } = useSubClearinghouseState(
+		{ user: address ?? "0x0" },
+		{ enabled: isConnected && !!address },
+	);
+	const state = stateEvent?.clearinghouseState;
+	const isLoadingState = stateStatus === "subscribing" || stateStatus === "idle";
+
+	const { data: ordersEvent, status: ordersStatus } = useSubOpenOrders(
+		{ user: address ?? "0x0" },
+		{ enabled: isConnected && !!address },
+	);
+	const openOrders = ordersEvent?.orders;
+	const isLoadingOrders = ordersStatus === "subscribing" || ordersStatus === "idle";
 
 	const positionsCount = useMemo(() => {
 		if (!isConnected) return 0;

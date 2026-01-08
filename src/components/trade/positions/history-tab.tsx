@@ -5,15 +5,20 @@ import { useConnection } from "wagmi";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
-import { useUserFills } from "@/hooks/hyperliquid/use-user-fills";
 import { formatNumber, formatUSD } from "@/lib/format";
-import { usePerpMarkets } from "@/lib/hl-react";
+import { usePerpMarkets } from "@/lib/hyperliquid";
+import { useSubUserFills } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
 
 export function HistoryTab() {
 	const { address, isConnected } = useConnection();
-	const { data, status, error } = useUserFills({ user: isConnected ? address : undefined, aggregateByTime: true });
+	const {
+		data: fillsEvent,
+		status,
+		error,
+	} = useSubUserFills({ user: address ?? "0x0", aggregateByTime: true }, { enabled: isConnected && !!address });
+	const data = fillsEvent?.fills;
 	const { getSzDecimals } = usePerpMarkets();
 
 	const fills = useMemo(() => {
@@ -78,7 +83,7 @@ export function HistoryTab() {
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
 						{t`Connect your wallet to view trade history.`}
 					</div>
-				) : status === "pending" ? (
+				) : status === "subscribing" || status === "idle" ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
 						{t`Loading trade history...`}
 					</div>

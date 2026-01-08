@@ -21,7 +21,7 @@ export function MainWorkspace() {
 					className="bg-border/40 data-[resize-handle-state=hover]:bg-terminal-cyan/30 data-[resize-handle-state=drag]:bg-terminal-cyan/50"
 				/>
 				<ResizablePanel defaultSize={layout.PANEL_DEFAULTS[1]}>
-					<OrderSidebar />
+					<OrderSidebar />{" "}
 				</ResizablePanel>
 			</ResizablePanelGroup>
 		</div>
