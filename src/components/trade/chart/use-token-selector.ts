@@ -2,8 +2,8 @@ import { getCoreRowModel, type Row, type SortingState, useReactTable } from "@ta
 import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { isTokenInCategory, type MarketCategory } from "@/config/token";
-import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
 import { usePerpAssetCtxsSnapshot } from "@/hooks/hyperliquid/use-perp-asset-ctxs-snapshot";
+import { usePerpMarkets } from "@/lib/hl-react";
 import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { calculate24hPriceChange, calculateOpenInterestUSD, getMarketCtxNumbers } from "@/lib/market";
 import { useFavoriteMarketKeys, useMarketPrefsActions } from "@/stores/use-market-prefs-store";
@@ -37,19 +37,25 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 	const [open, setOpen] = useState(false);
 	const [category, setCategory] = useState<MarketCategory>("all");
 	const [search, setSearch] = useState("");
-	const { registry, isLoading } = usePerpMarketRegistry();
+	const { data: marketsData, isLoading } = usePerpMarkets();
 	const ctxs = usePerpAssetCtxsSnapshot({ enabled: open, intervalMs: 10_000 });
 	const favorites = useFavoriteMarketKeys();
 	const { toggleFavoriteMarketKey } = useMarketPrefsActions();
 
 	const markets = useMemo((): MarketRow[] => {
-		if (!registry) return [];
-		return Array.from(registry.marketKeyToInfo.values()).map((marketInfo) => ({
-			...marketInfo,
+		if (!marketsData) return [];
+		return marketsData.markets.map((marketInfo) => ({
+			kind: "perp" as const,
+			marketKey: makePerpMarketKey(marketInfo.coin),
+			coin: marketInfo.coin,
+			assetIndex: marketInfo.assetIndex,
+			szDecimals: marketInfo.szDecimals,
+			maxLeverage: marketInfo.maxLeverage,
+			isDelisted: marketInfo.isDelisted,
 			ctx: ctxs?.[marketInfo.assetIndex],
 			ctxNumbers: getMarketCtxNumbers(ctxs?.[marketInfo.assetIndex]),
 		}));
-	}, [registry, ctxs]);
+	}, [marketsData, ctxs]);
 
 	const favoriteSet = useMemo(() => new Set(favorites), [favorites]);
 
@@ -164,7 +170,7 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 		category,
 		search,
 		setSearch,
-		isLoading: open && (isLoading || !registry),
+		isLoading: open && (isLoading || !marketsData),
 		isFavorite,
 		sorting,
 		handleSelect,

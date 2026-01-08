@@ -4,9 +4,9 @@ import { useMemo } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
-import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
 import { useUserFunding } from "@/hooks/hyperliquid/use-user-funding";
 import { formatNumber, formatPercent, formatUSD } from "@/lib/format";
+import { usePerpMarkets } from "@/lib/hl-react";
 import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
 import { useConnection } from "wagmi";
@@ -14,7 +14,7 @@ import { useConnection } from "wagmi";
 export function FundingTab() {
 	const { address, isConnected } = useConnection();
 	const { data, status, error } = useUserFunding({ user: isConnected ? address : undefined });
-	const { registry } = usePerpMarketRegistry();
+	const { getSzDecimals } = usePerpMarkets();
 
 	const updates = useMemo(() => {
 		const raw = data ?? [];
@@ -39,8 +39,7 @@ export function FundingTab() {
 			const szi = parseNumber(update.delta.szi);
 			const isLong = Number.isFinite(szi) ? szi > 0 : true;
 			const positionSize = Number.isFinite(szi) ? Math.abs(szi) : Number.NaN;
-			const marketInfo = registry?.coinToInfo.get(update.delta.coin);
-			const szDecimals = marketInfo?.szDecimals ?? 4;
+			const szDecimals = getSzDecimals(update.delta.coin) ?? 4;
 
 			const rate = parseNumber(update.delta.fundingRate);
 			const usdc = parseNumber(update.delta.usdc);
@@ -72,7 +71,7 @@ export function FundingTab() {
 				dateStr,
 			};
 		});
-	}, [updates, registry]);
+	}, [updates, getSzDecimals]);
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">

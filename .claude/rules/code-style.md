@@ -1,4 +1,8 @@
-# Code Style Rules
+---
+globs: ["*.ts", "*.tsx", "*.js", "*.jsx"]
+alwaysApply: true
+description: Code style rules
+---
 
 ## Component Structure
 

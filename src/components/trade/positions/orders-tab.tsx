@@ -6,10 +6,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
-import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
 import { useOpenOrders } from "@/hooks/hyperliquid/use-open-orders";
 import { useTradingAgent } from "@/hooks/hyperliquid/use-trading-agent";
 import { formatNumber, formatUSD } from "@/lib/format";
+import { usePerpMarkets } from "@/lib/hl-react";
 import { getHttpTransport } from "@/lib/hyperliquid/clients";
 import { cancelOrders, makeExchangeConfig } from "@/lib/hyperliquid/exchange";
 import { parseNumber } from "@/lib/trade/numbers";
@@ -20,7 +20,7 @@ export function OrdersTab() {
 	const { address, isConnected } = useConnection();
 	const { data: walletClient } = useWalletClient();
 	const { data, status, error, refetch } = useOpenOrders({ user: isConnected ? address : undefined });
-	const { registry } = usePerpMarketRegistry();
+	const { getSzDecimals, getAssetId } = usePerpMarkets();
 	const { signer: activeSigner } = useTradingAgent({
 		user: isConnected ? address : undefined,
 		walletClient,
@@ -85,7 +85,7 @@ export function OrdersTab() {
 			if (ordersToCancel.length === 0) return;
 
 			const cancels = ordersToCancel.reduce<{ a: number; o: number }[]>((acc, order) => {
-				const assetIndex = registry?.coinToInfo.get(order.coin)?.assetIndex;
+				const assetIndex = getAssetId(order.coin);
 				if (typeof assetIndex !== "number") return acc;
 				acc.push({ a: assetIndex, o: order.oid });
 				return acc;
@@ -126,7 +126,7 @@ export function OrdersTab() {
 				setIsCancelling(false);
 			}
 		},
-		[isCancelling, activeSigner, registry, refetch],
+		[isCancelling, activeSigner, getAssetId, refetch],
 	);
 
 	const handleCancelSelected = useCallback(() => {
@@ -147,8 +147,7 @@ export function OrdersTab() {
 				Number.isFinite(origSz) && Number.isFinite(remaining) ? Math.max(0, origSz - remaining) : Number.NaN;
 			const fillPct = Number.isFinite(origSz) && origSz !== 0 && Number.isFinite(filled) ? (filled / origSz) * 100 : 0;
 			const limitPx = parseNumber(order.limitPx);
-			const marketInfo = registry?.coinToInfo.get(order.coin);
-			const szDecimals = marketInfo?.szDecimals ?? 4;
+			const szDecimals = getSzDecimals(order.coin) ?? 4;
 
 			return {
 				key: order.oid,
@@ -165,7 +164,7 @@ export function OrdersTab() {
 				statusLabel: t`open`,
 			};
 		});
-	}, [openOrders, registry]);
+	}, [openOrders, getSzDecimals]);
 
 	const canCancel = !isCancelling;
 	const disableCancelSelected = !canCancel || selectedCount === 0;

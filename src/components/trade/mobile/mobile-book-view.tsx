@@ -7,8 +7,8 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
-import { useL2BookSubscription } from "@/hooks/hyperliquid/socket/use-l2-book-subscription";
 import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
+import { useSubL2Book } from "@/lib/hl-react/hooks/subscription";
 import { formatNumber } from "@/lib/format";
 import { processLevels } from "@/lib/trade/orderbook";
 import { cn } from "@/lib/utils";
@@ -75,14 +75,16 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
 	const { coin, szDecimals } = selectedMarket;
 
-	const { data: book, status: bookStatus } = useL2BookSubscription({
-		params: {
+	const { data: book, status: bookStatus } = useSubL2Book(
+		{
 			coin,
 			nSigFigs: selectedOption?.nSigFigs,
 			mantissa: selectedOption?.mantissa,
 		},
-		enabled: view === "book",
-	});
+		{
+			enabled: view === "book",
+		},
+	);
 
 	const bids = useMemo(() => processLevels(book?.levels[0]), [book?.levels]);
 	const asks = useMemo(() => processLevels(book?.levels[1]), [book?.levels]);

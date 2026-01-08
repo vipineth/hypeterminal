@@ -1,15 +1,13 @@
 import { useMemo } from "react";
 import { DEFAULT_MARKET_KEY } from "@/constants/app";
+import { usePerpMarkets } from "@/lib/hl-react";
+import { useSubActiveAssetCtx, useSubAllMids } from "@/lib/hl-react/hooks/subscription";
 import type { PerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { isPerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
-import type { PerpMarketRegistry } from "@/lib/hyperliquid/market-registry";
 import { getMarketCtxNumbers, type MarketCtxNumbers } from "@/lib/market";
 import { toFiniteNumber } from "@/lib/trade/numbers";
 import { useSelectedMarketKey } from "@/stores/use-market-prefs-store";
 import type { PerpAssetCtx } from "@/types/hyperliquid";
-import { useActiveAssetCtxSubscription } from "./socket/use-active-asset-ctx-subscription";
-import { useAllMidsSubscription } from "./socket/use-all-mids-subscription";
-import { usePerpMarketRegistry } from "./use-market-registry";
 import { usePerpAssetCtxsSnapshot } from "./use-perp-asset-ctxs-snapshot";
 
 export type ResolvedPerpMarket = {
@@ -29,6 +27,12 @@ export type ResolvedPerpMarket = {
 
 export type ResolvedMarket = ResolvedPerpMarket;
 
+export type UseResolvedMarketOptions = {
+	enabled?: boolean;
+	ctxMode?: "realtime" | "snapshot" | "none";
+	snapshotIntervalMs?: number;
+};
+
 const DEFAULT_RESOLVED_MARKET: ResolvedPerpMarket = {
 	kind: "perp",
 	marketKey: DEFAULT_MARKET_KEY as PerpMarketKey,
@@ -37,46 +41,39 @@ const DEFAULT_RESOLVED_MARKET: ResolvedPerpMarket = {
 	maxLeverage: 40,
 };
 
-type CtxMode = "realtime" | "snapshot" | "none";
+export function useResolvedMarket(marketKey: string | undefined, options: UseResolvedMarketOptions = {}) {
+	const { enabled = true, ctxMode = "realtime", snapshotIntervalMs } = options;
 
-interface UseResolvedMarketOptions {
-	enabled?: boolean;
-	ctxMode?: CtxMode;
-	snapshotIntervalMs?: number;
-}
-
-function resolvePerpMarket(registry: PerpMarketRegistry | undefined, marketKey: string | undefined) {
-	if (!registry || !marketKey || !isPerpMarketKey(marketKey)) return undefined;
-	return registry.marketKeyToInfo.get(marketKey);
-}
-
-export function useResolvedMarket(marketKey: string | undefined, options?: UseResolvedMarketOptions) {
-	const enabled = options?.enabled ?? true;
-	const ctxMode = options?.ctxMode ?? "snapshot";
-
-	const metaQuery = usePerpMarketRegistry();
-	const registry = metaQuery.registry;
+	const perpMarkets = usePerpMarkets();
+	const { getAssetId, getSzDecimals, getMaxLeverage, isDelisted, data: marketsData } = perpMarkets;
 
 	const perpMarketKey = marketKey && isPerpMarketKey(marketKey) ? marketKey : undefined;
 	const coin = perpMarketKey ? perpCoinFromMarketKey(perpMarketKey) : undefined;
 
-	const info = useMemo(() => resolvePerpMarket(registry, perpMarketKey), [registry, perpMarketKey]);
-	const assetIndex = info?.assetIndex;
+	const assetIndex = coin ? getAssetId(coin) : undefined;
+	const szDecimals = coin ? getSzDecimals(coin) : undefined;
+	const maxLeverage = coin ? getMaxLeverage(coin) : undefined;
+	const coinIsDelisted = coin ? isDelisted(coin) : undefined;
 
-	const { data: mids } = useAllMidsSubscription<Record<string, string> | undefined>({
-		enabled,
-		select: (event) => event?.mids,
-	});
+	const { data: midsEvent } = useSubAllMids(
+		{},
+		{
+			enabled: enabled && ctxMode !== "none",
+		},
+	);
+	const mids = midsEvent?.mids;
 
-	const { data: activeCtx } = useActiveAssetCtxSubscription({
-		enabled: enabled && ctxMode === "realtime" && !!coin,
-		params: coin ? { coin } : (undefined as never),
-		select: (event) => event?.ctx,
-	});
+	const { data: activeCtxEvent } = useSubActiveAssetCtx(
+		{ coin: coin ?? "" },
+		{
+			enabled: enabled && ctxMode === "realtime" && !!coin,
+		},
+	);
+	const activeCtx = activeCtxEvent?.ctx as PerpAssetCtx | undefined;
 
 	const snapshotCtxs = usePerpAssetCtxsSnapshot({
 		enabled: enabled && ctxMode === "snapshot",
-		intervalMs: options?.snapshotIntervalMs,
+		intervalMs: snapshotIntervalMs,
 	});
 
 	const ctx =
@@ -97,24 +94,24 @@ export function useResolvedMarket(marketKey: string | undefined, options?: UseRe
 			kind: "perp",
 			marketKey: perpMarketKey,
 			coin,
-			assetIndex: info?.assetIndex,
-			assetId: info?.assetIndex,
-			szDecimals: info?.szDecimals ?? DEFAULT_RESOLVED_MARKET.szDecimals,
-			maxLeverage: info?.maxLeverage,
-			isDelisted: info?.isDelisted,
+			assetIndex,
+			assetId: assetIndex,
+			szDecimals: szDecimals ?? DEFAULT_RESOLVED_MARKET.szDecimals,
+			maxLeverage,
+			isDelisted: coinIsDelisted,
 			ctx,
 			ctxNumbers,
 			midPx,
 			midPxNumber,
 		};
-	}, [perpMarketKey, coin, info, ctx, mids]);
+	}, [perpMarketKey, coin, assetIndex, szDecimals, maxLeverage, coinIsDelisted, ctx, mids]);
 
 	return {
 		data: resolved,
-		isLoading: metaQuery.isLoading,
-		error: metaQuery.error,
-		refetch: metaQuery.refetch,
-		registry,
+		isLoading: perpMarkets.isLoading,
+		error: perpMarkets.error,
+		refetch: perpMarkets.refetch,
+		markets: marketsData,
 	};
 }
 

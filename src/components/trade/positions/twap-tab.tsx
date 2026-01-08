@@ -4,9 +4,9 @@ import { useMemo } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
-import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
 import { useTwapHistory } from "@/hooks/hyperliquid/use-twap-history";
 import { formatNumber, formatPrice } from "@/lib/format";
+import { usePerpMarkets } from "@/lib/hl-react";
 import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
 import { useConnection } from "wagmi";
@@ -14,7 +14,7 @@ import { useConnection } from "wagmi";
 export function TwapTab() {
 	const { address, isConnected } = useConnection();
 	const { data, status, error } = useTwapHistory({ user: isConnected ? address : undefined });
-	const { registry } = usePerpMarketRegistry();
+	const { getSzDecimals } = usePerpMarkets();
 
 	const orders = useMemo(() => {
 		const raw = data ?? [];
@@ -34,8 +34,7 @@ export function TwapTab() {
 			const totalSize = parseNumber(order.state.sz);
 			const executedSize = parseNumber(order.state.executedSz);
 			const executedNtl = parseNumber(order.state.executedNtl);
-			const marketInfo = registry?.coinToInfo.get(order.state.coin);
-			const szDecimals = marketInfo?.szDecimals ?? 4;
+			const szDecimals = getSzDecimals(order.state.coin) ?? 4;
 
 			const avgPrice =
 				Number.isFinite(executedNtl) && Number.isFinite(executedSize) && executedSize !== 0
@@ -72,7 +71,7 @@ export function TwapTab() {
 				showCancel: rawStatus === "activated",
 			};
 		});
-	}, [orders, registry]);
+	}, [orders, getSzDecimals]);
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">

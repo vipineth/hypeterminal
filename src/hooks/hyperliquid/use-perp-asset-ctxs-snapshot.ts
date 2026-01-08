@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { useSubAssetCtxs } from "@/lib/hl-react/hooks/subscription";
 import type { PerpAssetCtxs } from "@/types/hyperliquid";
-import { useAssetCtxsSubscription } from "./socket/use-asset-ctxs-subscription";
 
 interface UsePerpAssetCtxsSnapshotOptions {
 	enabled?: boolean;
@@ -15,11 +15,13 @@ export function usePerpAssetCtxsSnapshot(options?: UsePerpAssetCtxsSnapshotOptio
 	const enabled = options?.enabled ?? true;
 	const intervalMs = options?.intervalMs ?? 10_000;
 
-	const { data: liveCtxs } = useAssetCtxsSubscription<PerpAssetCtxs | undefined>({
-		enabled,
-		params: { dex: "" },
-		select: (event) => event?.ctxs,
-	});
+	const { data: assetCtxsEvent } = useSubAssetCtxs(
+		{ dex: "" },
+		{
+			enabled,
+		},
+	);
+	const liveCtxs = assetCtxsEvent?.ctxs as PerpAssetCtxs | undefined;
 
 	const [snapshot, setSnapshot] = useState<PerpAssetCtxs | undefined>(undefined);
 

@@ -1,20 +1,20 @@
 import { t } from "@lingui/core/macro";
 import { History } from "lucide-react";
 import { useMemo } from "react";
+import { useConnection } from "wagmi";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
-import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
 import { useUserFills } from "@/hooks/hyperliquid/use-user-fills";
 import { formatNumber, formatUSD } from "@/lib/format";
+import { usePerpMarkets } from "@/lib/hl-react";
 import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
-import { useConnection } from "wagmi";
 
 export function HistoryTab() {
 	const { address, isConnected } = useConnection();
 	const { data, status, error } = useUserFills({ user: isConnected ? address : undefined, aggregateByTime: true });
-	const { registry } = usePerpMarketRegistry();
+	const { getSzDecimals } = usePerpMarkets();
 
 	const fills = useMemo(() => {
 		const raw = data ?? [];
@@ -42,8 +42,7 @@ export function HistoryTab() {
 			const sz = parseNumber(fill.sz);
 			const fee = parseNumber(fill.fee);
 			const closedPnl = parseNumber(fill.closedPnl);
-			const marketInfo = registry?.coinToInfo.get(fill.coin);
-			const szDecimals = marketInfo?.szDecimals ?? 4;
+			const szDecimals = getSzDecimals(fill.coin) ?? 4;
 
 			return {
 				key: `${fill.hash}-${fill.tid}`,
@@ -55,14 +54,17 @@ export function HistoryTab() {
 				sizeText: Number.isFinite(sz) ? formatNumber(sz, szDecimals) : String(fill.sz),
 				feeText: Number.isFinite(fee) ? formatUSD(fee, { signDisplay: "exceptZero" }) : FALLBACK_VALUE_PLACEHOLDER,
 				feeClass: Number.isFinite(fee) && fee < 0 ? "text-terminal-green" : "text-muted-foreground",
-				pnlText: Number.isFinite(closedPnl) && closedPnl !== 0 ? formatUSD(closedPnl, { signDisplay: "exceptZero" }) : FALLBACK_VALUE_PLACEHOLDER,
+				pnlText:
+					Number.isFinite(closedPnl) && closedPnl !== 0
+						? formatUSD(closedPnl, { signDisplay: "exceptZero" })
+						: FALLBACK_VALUE_PLACEHOLDER,
 				pnlClass: closedPnl >= 0 ? "text-terminal-green" : "text-terminal-red",
 				showPnl: Number.isFinite(closedPnl) && closedPnl !== 0,
 				timeStr,
 				dateStr,
 			};
 		});
-	}, [fills, registry]);
+	}, [fills, getSzDecimals]);
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
@@ -83,7 +85,9 @@ export function HistoryTab() {
 				) : status === "error" ? (
 					<div className="h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs text-terminal-red/80">
 						<span>{t`Failed to load trade history.`}</span>
-						{error instanceof Error ? <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span> : null}
+						{error instanceof Error ? (
+							<span className="mt-1 text-4xs text-muted-foreground">{error.message}</span>
+						) : null}
 					</div>
 				) : fills.length === 0 ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">

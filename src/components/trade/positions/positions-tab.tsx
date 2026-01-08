@@ -6,10 +6,10 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
 import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
-import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
 import { usePerpAssetCtxsSnapshot } from "@/hooks/hyperliquid/use-perp-asset-ctxs-snapshot";
 import { useTradingAgent } from "@/hooks/hyperliquid/use-trading-agent";
 import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
+import { usePerpMarkets } from "@/lib/hl-react";
 import { getHttpTransport } from "@/lib/hyperliquid/clients";
 import { makeExchangeConfig, placeSingleOrder } from "@/lib/hyperliquid/exchange";
 import { parseNumber } from "@/lib/trade/numbers";
@@ -40,7 +40,7 @@ export function PositionsTab() {
 			});
 	}, [state]);
 
-	const { registry } = usePerpMarketRegistry();
+	const { getSzDecimals, getAssetId } = usePerpMarkets();
 	const snapshotCtxs = usePerpAssetCtxsSnapshot({
 		enabled: isConnected && positions.length > 0,
 		intervalMs: 10_000,
@@ -58,9 +58,8 @@ export function PositionsTab() {
 			const roe = parseNumber(p.returnOnEquity);
 			const liquidationPx = p.liquidationPx ? parseNumber(p.liquidationPx) : Number.NaN;
 
-			const marketInfo = registry?.coinToInfo.get(p.coin);
-			const szDecimals = marketInfo?.szDecimals ?? 4;
-			const assetIndex = marketInfo?.assetIndex;
+			const szDecimals = getSzDecimals(p.coin) ?? 4;
+			const assetIndex = getAssetId(p.coin);
 			const markPxRaw = typeof assetIndex === "number" ? snapshotCtxs?.[assetIndex]?.markPx : undefined;
 			const markPx = markPxRaw ? parseNumber(markPxRaw) : Number.NaN;
 
@@ -98,7 +97,7 @@ export function PositionsTab() {
 				pnlClass: unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red",
 			};
 		});
-	}, [positions, registry, snapshotCtxs]);
+	}, [positions, getSzDecimals, getAssetId, snapshotCtxs]);
 
 	const headerCount = isConnected ? positions.length : FALLBACK_VALUE_PLACEHOLDER;
 

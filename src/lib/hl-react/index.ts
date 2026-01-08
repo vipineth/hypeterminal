@@ -23,4 +23,5 @@ export { useHyperliquidClients } from "./hooks/useClients";
 export { useConfig } from "./hooks/useConfig";
 export { useHyperliquidApiStatus } from "./hooks/useHyperliquidApiStatus";
 export { useHttpTransport, useSubscriptionTransport } from "./hooks/useTransport";
+export { usePerpMarkets, type PerpMarketInfo, type PerpMarketsData } from "./hooks/usePerpMarkets";
 export * from "./types";
