@@ -9,9 +9,11 @@ import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format
 import { usePerpMarkets } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useSubAssetCtxs, useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
+import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
 import { cn } from "@/lib/utils";
+import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-trade-settings-store";
 import type { PerpAssetCtxs } from "@/types/hyperliquid";
 import { TokenAvatar } from "../components/token-avatar";
@@ -20,6 +22,7 @@ export function PositionsTab() {
 	const { address, isConnected } = useConnection();
 	const slippageBps = useMarketOrderSlippageBps();
 	const closingKeyRef = useRef<string | null>(null);
+	const { setSelectedMarketKey } = useMarketPrefsActions();
 
 	const { mutate: placeOrder, isPending: isClosing, error: closeError, reset: resetCloseError } = useExchangeOrder();
 
@@ -209,8 +212,15 @@ export function PositionsTab() {
 													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
 														{row.sideLabel}
 													</span>
-													<TokenAvatar symbol={row.coin} />
-													<span>{row.coin}</span>
+													<button
+														type="button"
+														onClick={() => setSelectedMarketKey(makePerpMarketKey(row.coin))}
+														className="flex items-center gap-1.5 hover:underline hover:text-terminal-cyan transition-colors"
+														aria-label={t`Switch to ${row.coin} market`}
+													>
+														<TokenAvatar symbol={row.coin} />
+														<span>{row.coin}</span>
+													</button>
 												</div>
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.sizeText}</TableCell>

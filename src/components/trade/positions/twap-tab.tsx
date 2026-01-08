@@ -8,11 +8,14 @@ import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
 import { formatNumber, formatPrice } from "@/lib/format";
 import { usePerpMarkets } from "@/lib/hyperliquid";
 import { useSubUserTwapHistory } from "@/lib/hyperliquid/hooks/subscription";
+import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
+import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 
 export function TwapTab() {
 	const { address, isConnected } = useConnection();
+	const { setSelectedMarketKey } = useMarketPrefsActions();
 	const {
 		data: twapEvent,
 		status,
@@ -146,7 +149,14 @@ export function TwapTab() {
 												<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
 													{row.sideLabel}
 												</span>
-												<span>{row.coin}</span>
+												<button
+													type="button"
+													onClick={() => setSelectedMarketKey(makePerpMarketKey(row.coin))}
+													className="hover:underline hover:text-terminal-cyan transition-colors"
+													aria-label={t`Switch to ${row.coin} market`}
+												>
+													{row.coin}
+												</button>
 											</div>
 										</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.totalSizeText}</TableCell>

@@ -10,12 +10,15 @@ import { formatNumber, formatUSD } from "@/lib/format";
 import { usePerpMarkets } from "@/lib/hyperliquid";
 import { useExchangeCancel } from "@/lib/hyperliquid/hooks/exchange/useExchangeCancel";
 import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
+import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
+import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import { TokenAvatar } from "../components/token-avatar";
 
 export function OrdersTab() {
 	const { address, isConnected } = useConnection();
+	const { setSelectedMarketKey } = useMarketPrefsActions();
 	const {
 		data: openOrdersEvent,
 		status,
@@ -262,8 +265,15 @@ export function OrdersTab() {
 												<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
 													{row.sideLabel}
 												</span>
-												<TokenAvatar symbol={row.coin} />
-												<span>{row.coin}</span>
+												<button
+													type="button"
+													onClick={() => setSelectedMarketKey(makePerpMarketKey(row.coin))}
+													className="flex items-center gap-1.5 hover:underline hover:text-terminal-cyan transition-colors"
+													aria-label={t`Switch to ${row.coin} market`}
+												>
+													<TokenAvatar symbol={row.coin} />
+													<span>{row.coin}</span>
+												</button>
 											</div>
 										</TableCell>
 										<TableCell className="text-2xs py-1.5">

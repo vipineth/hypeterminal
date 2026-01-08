@@ -8,11 +8,14 @@ import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
 import { formatNumber, formatUSD } from "@/lib/format";
 import { usePerpMarkets } from "@/lib/hyperliquid";
 import { useSubUserFills } from "@/lib/hyperliquid/hooks/subscription";
+import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";
+import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 
 export function HistoryTab() {
 	const { address, isConnected } = useConnection();
+	const { setSelectedMarketKey } = useMarketPrefsActions();
 	const {
 		data: fillsEvent,
 		status,
@@ -134,7 +137,14 @@ export function HistoryTab() {
 												<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
 													{row.sideLabel}
 												</span>
-												<span>{row.coin}</span>
+												<button
+													type="button"
+													onClick={() => setSelectedMarketKey(makePerpMarketKey(row.coin))}
+													className="hover:underline hover:text-terminal-cyan transition-colors"
+													aria-label={t`Switch to ${row.coin} market`}
+												>
+													{row.coin}
+												</button>
 											</div>
 										</TableCell>
 										<TableCell className="text-2xs py-1.5">
