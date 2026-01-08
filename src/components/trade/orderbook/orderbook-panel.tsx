@@ -20,12 +20,12 @@ import {
 	processLevels,
 } from "@/lib/trade/orderbook";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
-import { BookRow } from "./book-row";
-import { TradesView } from "./trades-view";
+import { OrderbookRow } from "./orderbook-row";
+import { TradesPanel } from "./trades-panel";
 
 const VISIBLE_ROWS = 9;
 
-export function OrderBookPanel() {
+export function OrderbookPanel() {
 	const [selectedOption, setSelectedOption] = useState<L2BookPriceGroupOption | null>(null);
 	const { showOrderbookInUsd } = useGlobalSettings();
 	const { setShowOrderbookInUsd } = useGlobalSettingsActions();
@@ -118,7 +118,7 @@ export function OrderBookPanel() {
 					{orderbookStatus !== "error" && asks.length > 0 ? (
 						<div className="flex-1 flex flex-col justify-end gap-px py-0.5">
 							{[...asks].reverse().map((level, i) => (
-								<BookRow
+								<OrderbookRow
 									key={`ask-${level.price}-${i}`}
 									level={level}
 									side="ask"
@@ -143,7 +143,7 @@ export function OrderBookPanel() {
 					{orderbookStatus !== "error" && bids.length > 0 && (
 						<div className="flex-1 flex flex-col gap-px py-0.5">
 							{bids.map((level, i) => (
-								<BookRow
+								<OrderbookRow
 									key={`bid-${level.price}-${i}`}
 									level={level}
 									side="bid"
@@ -172,7 +172,7 @@ export function OrderBookPanel() {
 			</TabsContent>
 
 			<TabsContent value="trades" className="flex-1 min-h-0 flex flex-col">
-				<TradesView key={selectedMarket.coin} />
+				<TradesPanel key={selectedMarket.coin} />
 			</TabsContent>
 		</Tabs>
 	);

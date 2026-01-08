@@ -13,8 +13,8 @@ import { formatNumber } from "@/lib/format";
 import { processLevels } from "@/lib/trade/orderbook";
 import { cn } from "@/lib/utils";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
-import { BookRow } from "../orderbook/book-row";
-import { TradesView } from "../orderbook/trades-view";
+import { OrderbookRow } from "../orderbook/orderbook-row";
+import { TradesPanel } from "../orderbook/trades-panel";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
 
 const ORDERBOOK_TEXT = UI_TEXT.ORDERBOOK;
@@ -119,7 +119,13 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 	}, [bestAsk, bestBid]);
 
 	const spreadPct = useMemo(() => {
-		if (typeof spread !== "number" || typeof mid !== "number" || !Number.isFinite(spread) || !Number.isFinite(mid) || mid === 0) {
+		if (
+			typeof spread !== "number" ||
+			typeof mid !== "number" ||
+			!Number.isFinite(spread) ||
+			!Number.isFinite(mid) ||
+			mid === 0
+		) {
 			return undefined;
 		}
 		return (spread / mid) * 100;
@@ -243,7 +249,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 									.slice(0, 12)
 									.reverse()
 									.map((level, index) => (
-										<BookRow
+										<OrderbookRow
 											key={`ask-${level.price}-${index}`}
 											level={level}
 											side="ask"
@@ -282,7 +288,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 						{bookStatus !== "error" && bids.length > 0 ? (
 							<div className="flex-1 flex flex-col gap-px py-1 overflow-hidden">
 								{bids.slice(0, 12).map((level, index) => (
-									<BookRow
+									<OrderbookRow
 										key={`bid-${level.price}-${index}`}
 										level={level}
 										side="bid"
@@ -299,7 +305,10 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 					<div className="shrink-0 px-3 py-2 border-t border-border/40 flex items-center justify-between text-xs text-muted-foreground">
 						<span>{ORDERBOOK_TEXT.SPREAD_LABEL}</span>
 						<span className="tabular-nums text-terminal-amber">
-							{typeof spread === "number" && Number.isFinite(spread) && typeof spreadPct === "number" && Number.isFinite(spreadPct)
+							{typeof spread === "number" &&
+							Number.isFinite(spread) &&
+							typeof spreadPct === "number" &&
+							Number.isFinite(spreadPct)
 								? `${formatNumber(spread, 2)} (${formatNumber(spreadPct, 3)}%)`
 								: FALLBACK_VALUE_PLACEHOLDER}
 						</span>
@@ -307,7 +316,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 				</div>
 			) : (
 				<div className="flex-1 min-h-0">
-					<TradesView key={coin} />
+					<TradesPanel key={coin} />
 				</div>
 			)}
 

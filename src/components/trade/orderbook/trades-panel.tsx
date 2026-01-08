@@ -46,7 +46,7 @@ const TradeRow = memo(function TradeRow({ trade, szDecimals, showInUsd }: Props)
 	);
 });
 
-export function TradesView() {
+export function TradesPanel() {
 	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
 	const { data: tradesBatch, status, error } = useSubTrades({ coin: selectedMarket.coin });
 	const { showOrderbookInUsd } = useGlobalSettings();

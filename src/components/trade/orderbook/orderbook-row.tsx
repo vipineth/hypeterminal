@@ -4,15 +4,15 @@ import type { BookLevel } from "@/lib/trade/orderbook";
 import { cn } from "@/lib/utils";
 import { useSetSelectedPrice } from "@/stores/use-orderbook-actions-store";
 
-type BookRowProps = {
+interface Props {
 	level: BookLevel;
 	side: "ask" | "bid";
 	maxTotal: number;
 	showInUsd?: boolean;
 	szDecimals: number;
-};
+}
 
-export function BookRow({ level, side, maxTotal, showInUsd = false, szDecimals }: BookRowProps) {
+export function OrderbookRow({ level, side, maxTotal, showInUsd = false, szDecimals }: Props) {
 	const setSelectedPrice = useSetSelectedPrice();
 	const depthPct = maxTotal > 0 ? (level.total / maxTotal) * 100 : 0;
 	const isAsk = side === "ask";
