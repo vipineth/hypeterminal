@@ -29,8 +29,14 @@ export type AgentRegisterStatus = "idle" | "signing" | "verifying" | "error";
 
 /**
  * Agent validation status.
+ *
+ * - `loading`: Checking approval status
+ * - `needs_builder_fee`: Builder config exists but fee not approved
+ * - `no_agent`: Builder fee approved (or no config), agent not registered
+ * - `valid`: All approvals complete
+ * - `invalid`: Agent key exists but not valid on-chain
  */
-export type AgentStatus = "loading" | "no_agent" | "valid" | "invalid";
+export type AgentStatus = "loading" | "needs_builder_fee" | "no_agent" | "valid" | "invalid";
 
 // ============================================================================
 // Builder Fee Config

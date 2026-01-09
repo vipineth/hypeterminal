@@ -1,3 +1,4 @@
+import type { ExtraAgentsResponse } from "@nktkas/hyperliquid";
 import { useCallback, useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
@@ -6,8 +7,9 @@ import { useHyperliquid } from "../context";
 import type { AgentRegisterStatus, AgentStatus } from "./agent/types";
 import { useAgentWallet, useAgentWalletActions, type AgentWallet } from "../state/agentWallet";
 import { useInfoExtraAgents } from "./info/useInfoExtraAgents";
+import { useInfoMaxBuilderFee } from "./info/useInfoMaxBuilderFee";
 import { infoKeys } from "../query/keys";
-import { isAgentApproved } from "../utils/agent";
+import { convertFeeToPercentageString, isAgentApproved, isBuilderFeeApproved } from "../utils/agent";
 
 export interface UseAgentRegistrationResult {
 	status: AgentStatus;
@@ -21,7 +23,7 @@ export interface UseAgentRegistrationResult {
 }
 
 export function useAgentRegistration(): UseAgentRegistrationResult {
-	const { exchangeClient, env, agentName } = useHyperliquid();
+	const { exchangeClient, env, agentName, builderConfig } = useHyperliquid();
 	const { address } = useConnection();
 	const queryClient = useQueryClient();
 
@@ -31,22 +33,34 @@ export function useAgentRegistration(): UseAgentRegistrationResult {
 	const agentWallet = useAgentWallet(env, address);
 	const { setAgent, clearAgent } = useAgentWalletActions();
 
-	const { data: extraAgents, isLoading } = useInfoExtraAgents(
+	const hasBuilderConfig = !!builderConfig?.b;
+
+	const { data: maxBuilderFee, isLoading: isLoadingBuilderFee } = useInfoMaxBuilderFee(
+		{ user: address ?? "0x0000000000000000000000000000000000000000", builder: builderConfig?.b ?? "0x0" },
+		{ enabled: !!address && hasBuilderConfig, staleTime: 5_000 },
+	);
+
+	const { data: extraAgents, isLoading: isLoadingAgents } = useInfoExtraAgents(
 		{ user: address ?? "0x0000000000000000000000000000000000000000" },
 		{ enabled: !!address, staleTime: 5_000, refetchInterval: 30_000 },
 	);
 
-	const isValid = isAgentApproved(extraAgents, agentWallet?.publicKey);
+	const builderFeeApproved = !hasBuilderConfig || isBuilderFeeApproved(maxBuilderFee, builderConfig?.f);
+	const agentApproved = isAgentApproved(extraAgents, agentWallet?.publicKey);
+
+	const isLoading = (hasBuilderConfig && isLoadingBuilderFee) || isLoadingAgents;
 
 	const status: AgentStatus = !address
 		? "no_agent"
 		: isLoading
 			? "loading"
-			: !agentWallet
-				? "no_agent"
-				: isValid
-					? "valid"
-					: "invalid";
+			: !builderFeeApproved
+				? "needs_builder_fee"
+				: !agentWallet
+					? "no_agent"
+					: agentApproved
+						? "valid"
+						: "invalid";
 
 	const signer = useMemo(() => {
 		if (status !== "valid" || !agentWallet?.privateKey) return null;
@@ -65,31 +79,57 @@ export function useAgentRegistration(): UseAgentRegistrationResult {
 		setRegisterStatus("signing");
 
 		try {
-			clearAgent(env, address);
+			const currentMaxBuilderFee = queryClient.getQueryData<number>(
+				infoKeys.method("maxBuilderFee", { user: address, builder: builderConfig?.b ?? "0x0" }),
+			);
+			const needsBuilderFee = hasBuilderConfig && !isBuilderFeeApproved(currentMaxBuilderFee, builderConfig?.f);
 
-			const privateKey = generatePrivateKey();
-			const account = privateKeyToAccount(privateKey);
-			const publicKey = account.address;
+			if (needsBuilderFee && builderConfig?.b && builderConfig?.f !== undefined) {
+				await exchangeClient.approveBuilderFee({
+					builder: builderConfig.b,
+					maxFeeRate: convertFeeToPercentageString(builderConfig.f),
+				});
 
-			setAgent(env, address, privateKey, publicKey);
+				setRegisterStatus("verifying");
+				await queryClient.invalidateQueries({
+					queryKey: infoKeys.method("maxBuilderFee", { user: address, builder: builderConfig.b }),
+				});
+				setRegisterStatus("signing");
+			}
 
-			await exchangeClient.approveAgent({ agentAddress: publicKey, agentName });
+			const currentExtraAgents = queryClient.getQueryData<ExtraAgentsResponse>(
+				infoKeys.method("extraAgents", { user: address }),
+			);
+			const existingWallet = agentWallet;
+			const needsAgentApproval = !isAgentApproved(currentExtraAgents, existingWallet?.publicKey);
 
-			setRegisterStatus("verifying");
+			if (needsAgentApproval) {
+				clearAgent(env, address);
 
-			await queryClient.invalidateQueries({
-				queryKey: infoKeys.method("extraAgents", { user: address }),
-			});
+				const privateKey = generatePrivateKey();
+				const account = privateKeyToAccount(privateKey);
+				const publicKey = account.address;
+
+				setAgent(env, address, privateKey, publicKey);
+
+				await exchangeClient.approveAgent({ agentAddress: publicKey, agentName });
+
+				setRegisterStatus("verifying");
+				await queryClient.invalidateQueries({
+					queryKey: infoKeys.method("extraAgents", { user: address }),
+				});
+			}
 
 			setRegisterStatus("idle");
-			return publicKey;
+			const wallet = queryClient.getQueryData<AgentWallet>(["agentWallet", env, address]) ?? agentWallet;
+			return wallet?.publicKey ?? "0x0";
 		} catch (err) {
 			setRegisterStatus("error");
 			const nextError = err instanceof Error ? err : new Error(String(err));
 			setError(nextError);
 			throw nextError;
 		}
-	}, [address, exchangeClient, env, agentName, clearAgent, setAgent, queryClient]);
+	}, [address, exchangeClient, env, agentName, builderConfig, hasBuilderConfig, clearAgent, setAgent, queryClient, agentWallet]);
 
 	const reset = useCallback(() => {
 		if (address) clearAgent(env, address);

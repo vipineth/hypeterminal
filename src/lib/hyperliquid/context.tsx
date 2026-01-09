@@ -49,7 +49,7 @@ export function HyperliquidProvider({
 		storeRef.current = createHyperliquidStore(createHyperliquidConfig({ ssr: false }));
 	}
 
-	const wallet = toHyperliquidWallet(walletClient, address) ?? null;
+	const wallet = useMemo(() => toHyperliquidWallet(walletClient, address), [walletClient, address]);
 
 	const exchangeClient = useMemo(() => {
 		if (!wallet) return null;

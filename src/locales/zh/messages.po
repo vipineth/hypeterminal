@@ -37,21 +37,21 @@ msgstr "账户"
 msgid "Account Balances"
 msgstr "账户余额"
 
-#: src/components/trade/positions/orders-tab.tsx:244
-#: src/components/trade/positions/positions-tab.tsx:198
-#: src/components/trade/positions/twap-tab.tsx:137
+#: src/components/trade/positions/orders-tab.tsx:247
+#: src/components/trade/positions/positions-tab.tsx:201
+#: src/components/trade/positions/twap-tab.tsx:140
 msgid "Actions"
 msgstr "操作"
 
-#: src/components/trade/positions/twap-tab.tsx:58
+#: src/components/trade/positions/twap-tab.tsx:61
 msgid "active"
 msgstr "活跃"
 
-#: src/components/trade/positions/twap-tab.tsx:34
+#: src/components/trade/positions/twap-tab.tsx:37
 msgid "Active"
 msgstr "活跃"
 
-#: src/components/trade/positions/positions-tab.tsx:147
+#: src/components/trade/positions/positions-tab.tsx:150
 msgid "Active Positions"
 msgstr "活跃仓位"
 
@@ -63,11 +63,11 @@ msgstr "添加资金"
 msgid "Add to favorites"
 msgstr "添加到收藏"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:475
+#: src/components/trade/order-entry/order-entry-panel.tsx:466
 msgid "Agent"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:482
+#: src/components/trade/order-entry/order-entry-panel.tsx:473
 msgid "Agent mode: Orders signed automatically (fast)"
 msgstr ""
 
@@ -85,20 +85,20 @@ msgstr "API"
 
 #: src/components/trade/positions/balances-tab.tsx:135
 #: src/components/trade/positions/funding-tab.tsx:119
-#: src/components/trade/positions/history-tab.tsx:107
-#: src/components/trade/positions/orders-tab.tsx:226
-#: src/components/trade/positions/positions-tab.tsx:177
-#: src/components/trade/positions/twap-tab.tsx:119
+#: src/components/trade/positions/history-tab.tsx:110
+#: src/components/trade/positions/orders-tab.tsx:229
+#: src/components/trade/positions/positions-tab.tsx:180
+#: src/components/trade/positions/twap-tab.tsx:122
 msgid "Asset"
 msgstr "资产"
 
 #: src/components/trade/order-entry/account-panel.tsx:85
-#: src/components/trade/order-entry/order-entry-panel.tsx:573
+#: src/components/trade/order-entry/order-entry-panel.tsx:564
 #: src/components/trade/positions/balances-tab.tsx:138
 msgid "Available"
 msgstr "可用"
 
-#: src/components/trade/positions/twap-tab.tsx:128
+#: src/components/trade/positions/twap-tab.tsx:131
 msgid "Avg Price"
 msgstr "均价"
 
@@ -142,56 +142,56 @@ msgstr "从 Arbitrum 或其他链桥接 USDC 到您的 Hyperliquid 账户。"
 #~ msgid "Builder must have at least 100 USDC in perps account value"
 #~ msgstr ""
 
-#: src/components/trade/positions/history-tab.tsx:55
-#: src/components/trade/positions/orders-tab.tsx:143
-#: src/components/trade/positions/twap-tab.tsx:71
+#: src/components/trade/positions/history-tab.tsx:58
+#: src/components/trade/positions/orders-tab.tsx:146
+#: src/components/trade/positions/twap-tab.tsx:74
 msgid "buy"
 msgstr "买入"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:429
+#: src/components/trade/order-entry/order-entry-panel.tsx:420
 msgid "Buy"
 msgstr "买入"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:550
+#: src/components/trade/order-entry/order-entry-panel.tsx:541
 msgid "Buy Long"
 msgstr "买入做多"
 
-#: src/components/trade/positions/orders-tab.tsx:293
-#: src/components/trade/positions/twap-tab.tsx:194
+#: src/components/trade/positions/orders-tab.tsx:303
+#: src/components/trade/positions/twap-tab.tsx:204
 msgid "Cancel"
 msgstr "取消"
 
-#: src/components/trade/positions/orders-tab.tsx:186
+#: src/components/trade/positions/orders-tab.tsx:189
 msgid "Cancel all"
 msgstr "全部取消"
 
-#: src/components/trade/positions/orders-tab.tsx:182
+#: src/components/trade/positions/orders-tab.tsx:185
 msgid "Cancel all orders"
 msgstr "取消所有订单"
 
-#: src/components/trade/positions/orders-tab.tsx:289
+#: src/components/trade/positions/orders-tab.tsx:299
 msgid "Cancel order"
 msgstr "取消订单"
 
-#: src/components/trade/positions/orders-tab.tsx:176
+#: src/components/trade/positions/orders-tab.tsx:179
 msgid "Cancel selected"
 msgstr "取消选中"
 
-#: src/components/trade/positions/orders-tab.tsx:172
+#: src/components/trade/positions/orders-tab.tsx:175
 msgid "Cancel selected orders"
 msgstr "取消选中的订单"
 
-#: src/components/trade/positions/twap-tab.tsx:192
+#: src/components/trade/positions/twap-tab.tsx:202
 msgid "Cancel TWAP order"
 msgstr "取消 TWAP 订单"
 
-#: src/components/trade/positions/orders-tab.tsx:176
-#: src/components/trade/positions/orders-tab.tsx:186
-#: src/components/trade/positions/orders-tab.tsx:293
+#: src/components/trade/positions/orders-tab.tsx:179
+#: src/components/trade/positions/orders-tab.tsx:189
+#: src/components/trade/positions/orders-tab.tsx:303
 msgid "Canceling..."
 msgstr "取消中..."
 
-#: src/components/trade/positions/twap-tab.tsx:62
+#: src/components/trade/positions/twap-tab.tsx:65
 msgid "cancelled"
 msgstr "已取消"
 
@@ -199,17 +199,17 @@ msgstr "已取消"
 msgid "Chart"
 msgstr "图表"
 
-#: src/components/trade/positions/positions-tab.tsx:241
+#: src/components/trade/positions/positions-tab.tsx:251
 #: src/components/ui/dialog.tsx:63
 #: src/components/ui/sheet.tsx:67
 msgid "Close"
 msgstr "关闭"
 
-#: src/components/trade/positions/positions-tab.tsx:237
+#: src/components/trade/positions/positions-tab.tsx:247
 msgid "Close position"
 msgstr "平仓"
 
-#: src/components/trade/positions/positions-tab.tsx:241
+#: src/components/trade/positions/positions-tab.tsx:251
 msgid "Closing..."
 msgstr "平仓中..."
 
@@ -217,13 +217,13 @@ msgstr "平仓中..."
 msgid "Collapse account panel"
 msgstr "收起账户面板"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:455
-#: src/components/trade/order-entry/order-entry-panel.tsx:534
-#: src/components/trade/order-entry/order-entry-panel.tsx:705
+#: src/components/trade/order-entry/order-entry-panel.tsx:446
+#: src/components/trade/order-entry/order-entry-panel.tsx:525
+#: src/components/trade/order-entry/order-entry-panel.tsx:696
 msgid "Coming soon"
 msgstr "即将推出"
 
-#: src/components/trade/positions/twap-tab.tsx:60
+#: src/components/trade/positions/twap-tab.tsx:63
 msgid "completed"
 msgstr "已完成"
 
@@ -237,7 +237,7 @@ msgstr "已完成"
 
 #: src/components/trade/components/wallet-dialog.tsx:68
 #: src/components/trade/header/user-menu.tsx:65
-#: src/components/trade/order-entry/order-entry-panel.tsx:386
+#: src/components/trade/order-entry/order-entry-panel.tsx:377
 msgid "Connect Wallet"
 msgstr "连接钱包"
 
@@ -261,19 +261,19 @@ msgstr "连接钱包查看余额。"
 msgid "Connect your wallet to view funding payments."
 msgstr "连接钱包查看资金费用。"
 
-#: src/components/trade/positions/orders-tab.tsx:194
+#: src/components/trade/positions/orders-tab.tsx:197
 msgid "Connect your wallet to view open orders."
 msgstr "连接钱包查看未成交订单。"
 
-#: src/components/trade/positions/positions-tab.tsx:154
+#: src/components/trade/positions/positions-tab.tsx:157
 msgid "Connect your wallet to view positions."
 msgstr "连接钱包查看仓位。"
 
-#: src/components/trade/positions/history-tab.tsx:84
+#: src/components/trade/positions/history-tab.tsx:87
 msgid "Connect your wallet to view trade history."
 msgstr "连接钱包查看交易历史。"
 
-#: src/components/trade/positions/twap-tab.tsx:96
+#: src/components/trade/positions/twap-tab.tsx:99
 msgid "Connect your wallet to view TWAP orders."
 msgstr "连接钱包查看 TWAP 订单。"
 
@@ -297,7 +297,7 @@ msgstr "复制地址"
 #~ msgid "Could not create wallet"
 #~ msgstr "无法创建钱包"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:446
+#: src/components/trade/order-entry/order-entry-panel.tsx:437
 msgid "Cross"
 msgstr "全仓"
 
@@ -312,8 +312,8 @@ msgstr "自定义您的交易体验。"
 #: src/components/trade/header/top-nav.tsx:91
 #: src/components/trade/order-entry/account-panel.tsx:210
 #: src/components/trade/order-entry/account-panel.tsx:212
-#: src/components/trade/order-entry/order-entry-panel.tsx:402
-#: src/components/trade/order-entry/order-entry-panel.tsx:586
+#: src/components/trade/order-entry/order-entry-panel.tsx:393
+#: src/components/trade/order-entry/order-entry-panel.tsx:577
 msgid "Deposit"
 msgstr "存款"
 
@@ -325,11 +325,11 @@ msgstr "存入资金"
 msgid "Deposit on Hyperliquid"
 msgstr "在 Hyperliquid 存款"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:475
+#: src/components/trade/order-entry/order-entry-panel.tsx:466
 msgid "Direct"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:483
+#: src/components/trade/order-entry/order-entry-panel.tsx:474
 msgid "Direct mode: Sign each order with wallet"
 msgstr ""
 
@@ -353,19 +353,19 @@ msgstr "显示移动端侧边栏。"
 msgid "Docs"
 msgstr "文档"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:418
+#: src/components/trade/order-entry/order-entry-panel.tsx:409
 msgid "Enable Trading"
 msgstr "启用交易"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:209
+#: src/components/trade/order-entry/order-entry-panel.tsx:197
 msgid "Enter limit price"
 msgstr "输入限价"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:212
+#: src/components/trade/order-entry/order-entry-panel.tsx:200
 msgid "Enter size"
 msgstr "输入数量"
 
-#: src/components/trade/positions/positions-tab.tsx:186
+#: src/components/trade/positions/positions-tab.tsx:189
 msgid "Entry"
 msgstr "开仓价"
 
@@ -373,15 +373,15 @@ msgstr "开仓价"
 msgid "Equity"
 msgstr "净值"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:758
+#: src/components/trade/order-entry/order-entry-panel.tsx:749
 msgid "Est. Fee"
 msgstr "预估费用"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:218
+#: src/components/trade/order-entry/order-entry-panel.tsx:206
 msgid "Exceeds max size"
 msgstr "超过最大数量"
 
-#: src/components/trade/positions/twap-tab.tsx:125
+#: src/components/trade/positions/twap-tab.tsx:128
 msgid "Executed"
 msgstr "已执行"
 
@@ -393,7 +393,7 @@ msgstr "展开账户面板"
 msgid "failed"
 msgstr "失败"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:315
+#: src/components/trade/order-entry/order-entry-panel.tsx:302
 msgid "Failed to enable trading"
 msgstr "启用交易失败"
 
@@ -405,7 +405,7 @@ msgstr "加载余额失败。"
 msgid "Failed to load funding history."
 msgstr "加载资金费用历史失败。"
 
-#: src/components/trade/positions/orders-tab.tsx:202
+#: src/components/trade/positions/orders-tab.tsx:205
 msgid "Failed to load open orders."
 msgstr "加载未成交订单失败。"
 
@@ -413,11 +413,11 @@ msgstr "加载未成交订单失败。"
 msgid "Failed to load order book."
 msgstr "加载订单簿失败。"
 
-#: src/components/trade/positions/positions-tab.tsx:162
+#: src/components/trade/positions/positions-tab.tsx:165
 msgid "Failed to load positions."
 msgstr "加载仓位失败。"
 
-#: src/components/trade/positions/history-tab.tsx:92
+#: src/components/trade/positions/history-tab.tsx:95
 msgid "Failed to load trade history."
 msgstr "加载交易历史失败。"
 
@@ -425,7 +425,7 @@ msgstr "加载交易历史失败。"
 msgid "Failed to load trades."
 msgstr "加载成交记录失败。"
 
-#: src/components/trade/positions/twap-tab.tsx:104
+#: src/components/trade/positions/twap-tab.tsx:107
 msgid "Failed to load TWAP history."
 msgstr "加载 TWAP 历史失败。"
 
@@ -433,7 +433,7 @@ msgstr "加载 TWAP 历史失败。"
 #~ msgid "Failed to register builder code"
 #~ msgstr ""
 
-#: src/components/trade/positions/history-tab.tsx:119
+#: src/components/trade/positions/history-tab.tsx:122
 msgid "Fee"
 msgstr "手续费"
 
@@ -445,7 +445,7 @@ msgstr "手续费"
 #~ msgid "Fee rate must be between 0.001% and 1%"
 #~ msgstr ""
 
-#: src/components/trade/positions/orders-tab.tsx:238
+#: src/components/trade/positions/orders-tab.tsx:241
 msgid "Filled"
 msgstr "已成交"
 
@@ -495,7 +495,7 @@ msgstr ""
 #~ msgid "Invalid Ethereum address"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:451
+#: src/components/trade/order-entry/order-entry-panel.tsx:442
 msgid "Isolated"
 msgstr "逐仓"
 
@@ -511,27 +511,27 @@ msgstr "排行榜"
 msgid "Learn more"
 msgstr ""
 
-#: src/components/trade/positions/orders-tab.tsx:145
+#: src/components/trade/positions/orders-tab.tsx:148
 msgid "limit"
 msgstr "限价"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:524
+#: src/components/trade/order-entry/order-entry-panel.tsx:515
 msgid "Limit"
 msgstr "限价"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:655
+#: src/components/trade/order-entry/order-entry-panel.tsx:646
 msgid "Limit Price"
 msgstr "限价"
 
-#: src/components/trade/positions/orders-tab.tsx:145
+#: src/components/trade/positions/orders-tab.tsx:148
 msgid "limit ro"
 msgstr "限价只减仓"
 
-#: src/components/trade/positions/positions-tab.tsx:195
+#: src/components/trade/positions/positions-tab.tsx:198
 msgid "Liq"
 msgstr "清算"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:738
+#: src/components/trade/order-entry/order-entry-panel.tsx:729
 msgid "Liq. Price"
 msgstr "清算价"
 
@@ -551,35 +551,35 @@ msgstr "加载资金费用历史中..."
 msgid "Loading markets..."
 msgstr "加载市场中..."
 
-#: src/components/trade/positions/orders-tab.tsx:198
+#: src/components/trade/positions/orders-tab.tsx:201
 msgid "Loading open orders..."
 msgstr "加载未成交订单中..."
 
-#: src/components/trade/positions/positions-tab.tsx:158
+#: src/components/trade/positions/positions-tab.tsx:161
 msgid "Loading positions..."
 msgstr "加载仓位中..."
 
-#: src/components/trade/positions/history-tab.tsx:88
+#: src/components/trade/positions/history-tab.tsx:91
 msgid "Loading trade history..."
 msgstr "加载交易历史中..."
 
-#: src/components/trade/positions/twap-tab.tsx:100
+#: src/components/trade/positions/twap-tab.tsx:103
 msgid "Loading TWAP orders..."
 msgstr "加载 TWAP 订单中..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:186
+#: src/components/trade/order-entry/order-entry-panel.tsx:174
 msgid "Loading wallet..."
 msgstr "加载钱包中..."
 
 #: src/components/trade/order-entry/account-panel.tsx:193
-#: src/components/trade/order-entry/order-entry-panel.tsx:410
-#: src/components/trade/order-entry/order-entry-panel.tsx:411
+#: src/components/trade/order-entry/order-entry-panel.tsx:401
+#: src/components/trade/order-entry/order-entry-panel.tsx:402
 msgid "Loading..."
 msgstr "加载中..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:553
+#: src/components/trade/order-entry/order-entry-panel.tsx:544
 #: src/components/trade/positions/funding-tab.tsx:67
-#: src/components/trade/positions/positions-tab.tsx:84
+#: src/components/trade/positions/positions-tab.tsx:87
 msgid "Long"
 msgstr "多"
 
@@ -587,7 +587,7 @@ msgstr "多"
 msgid "Margin Ratio"
 msgstr "保证金率"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:748
+#: src/components/trade/order-entry/order-entry-panel.tsx:739
 msgid "Margin Req."
 msgstr "保证金要求"
 
@@ -595,8 +595,8 @@ msgstr "保证金要求"
 msgid "Margin Used"
 msgstr "已用保证金"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:662
-#: src/components/trade/positions/positions-tab.tsx:189
+#: src/components/trade/order-entry/order-entry-panel.tsx:653
+#: src/components/trade/positions/positions-tab.tsx:192
 msgid "Mark"
 msgstr "标记价"
 
@@ -606,7 +606,7 @@ msgid "MARK"
 msgstr "标记"
 
 #: src/components/trade/chart/constants.ts:60
-#: src/components/trade/order-entry/order-entry-panel.tsx:521
+#: src/components/trade/order-entry/order-entry-panel.tsx:512
 msgid "Market"
 msgstr "市场"
 
@@ -614,7 +614,7 @@ msgstr "市场"
 #~ msgid "Market metadata unavailable."
 #~ msgstr "市场元数据不可用。"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:195
+#: src/components/trade/order-entry/order-entry-panel.tsx:183
 msgid "Market not ready"
 msgstr "市场未就绪"
 
@@ -626,7 +626,7 @@ msgstr "市价单滑点"
 msgid "markets"
 msgstr "个市场"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:646
+#: src/components/trade/order-entry/order-entry-panel.tsx:637
 msgid "Max"
 msgstr "最大"
 
@@ -642,7 +642,7 @@ msgstr "最大"
 msgid "Max slippage allowed for market orders."
 msgstr "市价单允许的最大滑点。"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:215
+#: src/components/trade/order-entry/order-entry-panel.tsx:203
 msgid "Min order $10"
 msgstr "最小订单 $10"
 
@@ -675,11 +675,11 @@ msgstr ""
 msgid "Next"
 msgstr "下一页"
 
-#: src/components/trade/positions/positions-tab.tsx:169
+#: src/components/trade/positions/positions-tab.tsx:172
 msgid "No active positions."
 msgstr "无活跃仓位。"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:189
+#: src/components/trade/order-entry/order-entry-panel.tsx:177
 msgid "No balance"
 msgstr "无余额"
 
@@ -687,7 +687,7 @@ msgstr "无余额"
 msgid "No balances found. Deposit funds to start trading."
 msgstr "未找到余额。存入资金开始交易。"
 
-#: src/components/trade/positions/history-tab.tsx:99
+#: src/components/trade/positions/history-tab.tsx:102
 msgid "No fills found."
 msgstr "未找到成交记录。"
 
@@ -695,11 +695,11 @@ msgstr "未找到成交记录。"
 msgid "No funding payments found."
 msgstr "未找到资金费用记录。"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:206
+#: src/components/trade/order-entry/order-entry-panel.tsx:194
 msgid "No mark price"
 msgstr "无标记价格"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:192
+#: src/components/trade/order-entry/order-entry-panel.tsx:180
 msgid "No market"
 msgstr "无市场"
 
@@ -707,11 +707,11 @@ msgstr "无市场"
 msgid "No markets found."
 msgstr "未找到市场。"
 
-#: src/components/trade/positions/orders-tab.tsx:209
+#: src/components/trade/positions/orders-tab.tsx:212
 msgid "No open orders."
 msgstr "无未成交订单。"
 
-#: src/components/trade/positions/twap-tab.tsx:111
+#: src/components/trade/positions/twap-tab.tsx:114
 msgid "No TWAP orders found."
 msgstr "未找到 TWAP 订单。"
 
@@ -723,7 +723,7 @@ msgstr "未找到 TWAP 订单。"
 msgid "No wallets found"
 msgstr "未找到钱包"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:183
+#: src/components/trade/order-entry/order-entry-panel.tsx:171
 msgid "Not connected"
 msgstr "未连接"
 
@@ -744,7 +744,7 @@ msgstr "持仓量"
 msgid "Only you control your funds. No email or password required."
 msgstr ""
 
-#: src/components/trade/positions/orders-tab.tsx:151
+#: src/components/trade/positions/orders-tab.tsx:154
 msgid "open"
 msgstr "未成交"
 
@@ -752,7 +752,7 @@ msgstr "未成交"
 msgid "Open Interest"
 msgstr "未平仓量"
 
-#: src/components/trade/positions/orders-tab.tsx:165
+#: src/components/trade/positions/orders-tab.tsx:168
 msgid "Open Orders"
 msgstr "未成交订单"
 
@@ -767,7 +767,7 @@ msgstr "预言机"
 msgid "Order Book"
 msgstr "订单簿"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:367
+#: src/components/trade/order-entry/order-entry-panel.tsx:358
 msgid "Order failed"
 msgstr "下单失败"
 
@@ -775,7 +775,7 @@ msgstr "下单失败"
 msgid "Order Queue"
 msgstr "订单队列"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:744
+#: src/components/trade/order-entry/order-entry-panel.tsx:735
 msgid "Order Value"
 msgstr "订单价值"
 
@@ -813,8 +813,8 @@ msgstr "永续合约"
 #~ msgstr ""
 
 #: src/components/trade/order-entry/account-panel.tsx:144
-#: src/components/trade/positions/history-tab.tsx:122
-#: src/components/trade/positions/positions-tab.tsx:192
+#: src/components/trade/positions/history-tab.tsx:125
+#: src/components/trade/positions/positions-tab.tsx:195
 msgid "PNL"
 msgstr "盈亏"
 
@@ -826,7 +826,7 @@ msgstr ""
 msgid "Portfolio"
 msgstr "投资组合"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:593
+#: src/components/trade/order-entry/order-entry-panel.tsx:584
 #: src/components/trade/positions/funding-tab.tsx:122
 msgid "Position"
 msgstr "仓位"
@@ -838,12 +838,12 @@ msgstr "上一页"
 #: src/components/trade/chart/constants.ts:66
 #: src/components/trade/orderbook/orderbook-panel.tsx:69
 #: src/components/trade/orderbook/trades-panel.tsx:90
-#: src/components/trade/positions/history-tab.tsx:113
-#: src/components/trade/positions/orders-tab.tsx:232
+#: src/components/trade/positions/history-tab.tsx:116
+#: src/components/trade/positions/orders-tab.tsx:235
 msgid "Price"
 msgstr "价格"
 
-#: src/components/trade/positions/twap-tab.tsx:131
+#: src/components/trade/positions/twap-tab.tsx:134
 msgid "Progress"
 msgstr "进度"
 
@@ -855,8 +855,8 @@ msgstr "费率"
 msgid "Recent Trades"
 msgstr "最近成交"
 
+#: src/components/trade/order-entry/order-entry-panel.tsx:675
 #: src/components/trade/order-entry/order-entry-panel.tsx:684
-#: src/components/trade/order-entry/order-entry-panel.tsx:693
 msgid "Reduce Only"
 msgstr "只减仓"
 
@@ -889,7 +889,7 @@ msgstr ""
 msgid "Select {coin} market"
 msgstr "选择 {coin} 市场"
 
-#: src/components/trade/positions/orders-tab.tsx:220
+#: src/components/trade/positions/orders-tab.tsx:223
 msgid "Select all orders"
 msgstr "选择所有订单"
 
@@ -897,11 +897,11 @@ msgstr "选择所有订单"
 msgid "Select favorite markets"
 msgstr "选择收藏市场"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:501
+#: src/components/trade/order-entry/order-entry-panel.tsx:492
 msgid "Select leverage"
 msgstr "选择杠杆"
 
-#: src/components/trade/positions/orders-tab.tsx:255
+#: src/components/trade/positions/orders-tab.tsx:258
 msgid "Select order"
 msgstr "选择订单"
 
@@ -909,7 +909,7 @@ msgstr "选择订单"
 msgid "Select order book aggregation"
 msgstr "选择订单簿聚合"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:473
+#: src/components/trade/order-entry/order-entry-panel.tsx:464
 msgid "Select signing mode"
 msgstr ""
 
@@ -917,25 +917,25 @@ msgstr ""
 msgid "Select token"
 msgstr "选择代币"
 
-#: src/components/trade/positions/history-tab.tsx:55
-#: src/components/trade/positions/orders-tab.tsx:143
-#: src/components/trade/positions/twap-tab.tsx:71
+#: src/components/trade/positions/history-tab.tsx:58
+#: src/components/trade/positions/orders-tab.tsx:146
+#: src/components/trade/positions/twap-tab.tsx:74
 msgid "sell"
 msgstr "卖出"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:429
+#: src/components/trade/order-entry/order-entry-panel.tsx:420
 msgid "Sell"
 msgstr "卖出"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:565
+#: src/components/trade/order-entry/order-entry-panel.tsx:556
 msgid "Sell Short"
 msgstr "卖出做空"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:643
+#: src/components/trade/order-entry/order-entry-panel.tsx:634
 msgid "Set {p}%"
 msgstr "设置 {p}%"
 
-#: src/components/trade/positions/positions-tab.tsx:247
+#: src/components/trade/positions/positions-tab.tsx:257
 msgid "Set TP/SL"
 msgstr "设置止盈止损"
 
@@ -944,9 +944,9 @@ msgstr "设置止盈止损"
 msgid "Settings"
 msgstr "设置"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:568
+#: src/components/trade/order-entry/order-entry-panel.tsx:559
 #: src/components/trade/positions/funding-tab.tsx:67
-#: src/components/trade/positions/positions-tab.tsx:84
+#: src/components/trade/positions/positions-tab.tsx:87
 msgid "Short"
 msgstr "空"
 
@@ -974,11 +974,11 @@ msgstr "以美元显示数值"
 msgid "Sidebar"
 msgstr "侧边栏"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:414
+#: src/components/trade/order-entry/order-entry-panel.tsx:405
 msgid "Sign in wallet..."
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:203
+#: src/components/trade/order-entry/order-entry-panel.tsx:191
 msgid "Signer not ready"
 msgstr "签名器未就绪"
 
@@ -986,17 +986,17 @@ msgstr "签名器未就绪"
 #~ msgid "Signing..."
 #~ msgstr "签名中..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:602
+#: src/components/trade/order-entry/order-entry-panel.tsx:593
 #: src/components/trade/order-entry/order-toast.tsx:80
 #: src/components/trade/orderbook/orderbook-panel.tsx:101
 #: src/components/trade/orderbook/trades-panel.tsx:96
-#: src/components/trade/positions/history-tab.tsx:116
-#: src/components/trade/positions/orders-tab.tsx:235
-#: src/components/trade/positions/positions-tab.tsx:180
+#: src/components/trade/positions/history-tab.tsx:119
+#: src/components/trade/positions/orders-tab.tsx:238
+#: src/components/trade/positions/positions-tab.tsx:183
 msgid "Size"
 msgstr "数量"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:754
+#: src/components/trade/order-entry/order-entry-panel.tsx:745
 msgid "Slippage"
 msgstr "滑点"
 
@@ -1039,12 +1039,12 @@ msgstr "价差"
 msgid "Staking"
 msgstr "质押"
 
-#: src/components/trade/positions/orders-tab.tsx:241
-#: src/components/trade/positions/twap-tab.tsx:134
+#: src/components/trade/positions/orders-tab.tsx:244
+#: src/components/trade/positions/twap-tab.tsx:137
 msgid "Status"
 msgstr "状态"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:530
+#: src/components/trade/order-entry/order-entry-panel.tsx:521
 msgid "Stop"
 msgstr "止损"
 
@@ -1056,7 +1056,15 @@ msgstr "止损"
 msgid "Support"
 msgstr "支持"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:394
+#. placeholder {0}: row.coin
+#: src/components/trade/positions/history-tab.tsx:144
+#: src/components/trade/positions/orders-tab.tsx:272
+#: src/components/trade/positions/positions-tab.tsx:219
+#: src/components/trade/positions/twap-tab.tsx:156
+msgid "Switch to {0} market"
+msgstr ""
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:385
 msgid "Switch to Arbitrum"
 msgstr "切换到 Arbitrum"
 
@@ -1068,11 +1076,11 @@ msgstr "切换到深色模式"
 msgid "Switch to light mode"
 msgstr "切换到浅色模式"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:394
+#: src/components/trade/order-entry/order-entry-panel.tsx:385
 msgid "Switching..."
 msgstr "切换中..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:699
+#: src/components/trade/order-entry/order-entry-panel.tsx:690
 msgid "Take Profit / Stop Loss"
 msgstr "止盈 / 止损"
 
@@ -1090,7 +1098,7 @@ msgstr "您查找的页面不存在。"
 
 #: src/components/trade/orderbook/trades-panel.tsx:89
 #: src/components/trade/positions/funding-tab.tsx:131
-#: src/components/trade/positions/history-tab.tsx:125
+#: src/components/trade/positions/history-tab.tsx:128
 msgid "Time"
 msgstr "时间"
 
@@ -1100,7 +1108,7 @@ msgstr "时间"
 msgid "Toggle Sidebar"
 msgstr "切换侧边栏"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:609
+#: src/components/trade/order-entry/order-entry-panel.tsx:600
 msgid "Toggle size mode"
 msgstr "切换数量模式"
 
@@ -1109,12 +1117,12 @@ msgstr "切换数量模式"
 msgid "Total"
 msgstr "合计"
 
-#: src/components/trade/positions/twap-tab.tsx:122
+#: src/components/trade/positions/twap-tab.tsx:125
 msgid "Total Size"
 msgstr "总数量"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:701
-#: src/components/trade/positions/positions-tab.tsx:249
+#: src/components/trade/order-entry/order-entry-panel.tsx:692
+#: src/components/trade/positions/positions-tab.tsx:259
 msgid "TP/SL"
 msgstr "止盈止损"
 
@@ -1122,12 +1130,12 @@ msgstr "止盈止损"
 msgid "Trade"
 msgstr "交易"
 
-#: src/components/trade/positions/history-tab.tsx:78
+#: src/components/trade/positions/history-tab.tsx:81
 msgid "Trade History"
 msgstr "交易历史"
 
 #: src/components/trade/orderbook/orderbook-panel.tsx:61
-#: src/components/trade/positions/history-tab.tsx:30
+#: src/components/trade/positions/history-tab.tsx:33
 msgid "Trades"
 msgstr "成交"
 
@@ -1135,12 +1143,12 @@ msgstr "成交"
 msgid "Transfer USDC to your Hyperliquid account to start trading."
 msgstr "将 USDC 转入您的 Hyperliquid 账户以开始交易。"
 
-#: src/components/trade/positions/twap-tab.tsx:90
+#: src/components/trade/positions/twap-tab.tsx:93
 msgid "TWAP Orders"
 msgstr "TWAP 订单"
 
-#: src/components/trade/positions/history-tab.tsx:110
-#: src/components/trade/positions/orders-tab.tsx:229
+#: src/components/trade/positions/history-tab.tsx:113
+#: src/components/trade/positions/orders-tab.tsx:232
 msgid "Type"
 msgstr "类型"
 
@@ -1174,7 +1182,7 @@ msgstr "实时更新"
 msgid "USD Value"
 msgstr "美元价值"
 
-#: src/components/trade/positions/positions-tab.tsx:183
+#: src/components/trade/positions/positions-tab.tsx:186
 msgid "Value"
 msgstr "价值"
 
@@ -1182,7 +1190,7 @@ msgstr "价值"
 msgid "Vaults"
 msgstr "金库"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:416
+#: src/components/trade/order-entry/order-entry-panel.tsx:407
 msgid "Verifying..."
 msgstr ""
 

@@ -1,7 +1,8 @@
 import { t } from "@lingui/core/macro";
+import { ExchangeClient } from "@nktkas/hyperliquid";
 import { ChevronDown, Loader2, TrendingDown, TrendingUp } from "lucide-react";
 import { useEffect, useId, useMemo, useState } from "react";
-import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
+import { useChainId, useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
 	DropdownMenu,
@@ -25,9 +26,11 @@ import {
 } from "@/constants/app";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
+import { getHttpTransport } from "@/lib/hyperliquid/clients";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useExchangeUpdateLeverage } from "@/lib/hyperliquid/hooks/exchange/useExchangeUpdateLeverage";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
+import { toHyperliquidWallet } from "@/lib/hyperliquid/wallet";
 import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder, getDefaultLeverage } from "@/lib/trade/orders";
 import { cn } from "@/lib/utils";
@@ -51,6 +54,7 @@ type SizeMode = "asset" | "usd";
 export function OrderEntryPanel() {
 	const reduceOnlyId = useId();
 	const tpSlId = useId();
+	const chainId = useChainId();
 
 	const { address, isConnected } = useConnection();
 
@@ -305,16 +309,14 @@ export function OrderEntryPanel() {
 	};
 
 	const handleSubmit = async () => {
-		console.log("handleSubmit");
 		if (!validation.canSubmit || isSubmitting) return;
-		console.log("validation.canSubmit", validation.canSubmit);
 		if (typeof market?.assetIndex !== "number") return;
-		console.log("market?.assetIndex", market?.assetIndex);
+
 		let orderPrice = price;
 		if (type === "market") {
 			orderPrice = side === "buy" ? markPx * (1 + slippageBps / 10000) : markPx * (1 - slippageBps / 10000);
 		}
-		console.log("orderPrice", orderPrice);
+
 		const szDecimals = market.szDecimals ?? 0;
 		const formattedPrice = formatPriceForOrder(orderPrice);
 		const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
@@ -328,8 +330,25 @@ export function OrderEntryPanel() {
 		console.log("orderId", orderId);
 		try {
 			// await updateLeverage({ asset: market.assetIndex, isCross: true, leverage });
-
-			console.log("placeOrder");
+			// const wall = toHyperliquidWallet(walletClient, address);
+			// if (!wall) return;
+			// console.log("formattedPrice", formattedPrice);
+			// const result = await new ExchangeClient({
+			// 	transport: getHttpTransport(),
+			// 	wallet: wall,
+			// }).order({
+			// 	orders: [
+			// 		{
+			// 			a: market.assetIndex,
+			// 			b: side === "buy",
+			// 			p: formattedPrice,
+			// 			s: formattedSize,
+			// 			r: reduceOnly,
+			// 			t: { limit: { tif: "Gtc" } }, // Time in force: Good-til-canceled
+			// 		},
+			// 	],
+			// 	grouping: "na", // Order grouping (usually "na")
+			// });
 
 			const result = await placeOrder({
 				orders: [
@@ -355,6 +374,7 @@ export function OrderEntryPanel() {
 			setSizeInput("");
 			setLimitPriceInput("");
 		} catch (error) {
+			console.error("[OrderEntry] Order failed:", error, chainId);
 			const errorMessage = error instanceof Error ? error.message : t`Order failed`;
 			updateOrder(orderId, { status: "failed", error: errorMessage });
 		}

@@ -39,24 +39,13 @@ export function toHyperliquidWallet(
 		if (!account) return null;
 		return {
 			signTypedData: async (params: SignTypedDataParams) => {
-				try {
-					return await client.signTypedData({
-						account,
-						domain: params.domain as Parameters<WalletClient["signTypedData"]>[0]["domain"],
-						types: params.types as Parameters<WalletClient["signTypedData"]>[0]["types"],
-						primaryType: params.primaryType,
-						message: params.message,
-					});
-				} catch (error) {
-					console.error("[toHyperliquidWallet] signTypedData failed:", {
-						error,
-						account,
-						domain: params.domain,
-						types: params.types,
-						primaryType: params.primaryType,
-					});
-					throw error;
-				}
+				return client.signTypedData({
+					account,
+					domain: params.domain as Parameters<WalletClient["signTypedData"]>[0]["domain"],
+					types: params.types as Parameters<WalletClient["signTypedData"]>[0]["types"],
+					primaryType: params.primaryType,
+					message: params.message,
+				});
 			},
 			getAddresses: () => client.getAddresses(),
 			getChainId: () => client.getChainId(),
@@ -73,24 +62,13 @@ export function toHyperliquidWallet(
 	return {
 		address: accountAddress,
 		signTypedData: async (params: SignTypedDataParams) => {
-			try {
-				return await client.signTypedData({
-					account: client.account ?? accountAddress,
-					domain: params.domain as Parameters<WalletClient["signTypedData"]>[0]["domain"],
-					types: params.types as Parameters<WalletClient["signTypedData"]>[0]["types"],
-					primaryType: params.primaryType,
-					message: params.message,
-				});
-			} catch (error) {
-				console.error("[toHyperliquidWallet] signTypedData failed:", {
-					error,
-					account: client.account ?? accountAddress,
-					domain: params.domain,
-					types: params.types,
-					primaryType: params.primaryType,
-				});
-				throw error;
-			}
+			return client.signTypedData({
+				account: client.account ?? accountAddress,
+				domain: params.domain as Parameters<WalletClient["signTypedData"]>[0]["domain"],
+				types: params.types as Parameters<WalletClient["signTypedData"]>[0]["types"],
+				primaryType: params.primaryType,
+				message: params.message,
+			});
 		},
 	};
 }

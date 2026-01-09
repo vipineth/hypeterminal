@@ -37,21 +37,21 @@ msgstr "Compte"
 msgid "Account Balances"
 msgstr "Soldes du compte"
 
-#: src/components/trade/positions/orders-tab.tsx:244
-#: src/components/trade/positions/positions-tab.tsx:198
-#: src/components/trade/positions/twap-tab.tsx:137
+#: src/components/trade/positions/orders-tab.tsx:247
+#: src/components/trade/positions/positions-tab.tsx:201
+#: src/components/trade/positions/twap-tab.tsx:140
 msgid "Actions"
 msgstr "Actions"
 
-#: src/components/trade/positions/twap-tab.tsx:58
+#: src/components/trade/positions/twap-tab.tsx:61
 msgid "active"
 msgstr "actif"
 
-#: src/components/trade/positions/twap-tab.tsx:34
+#: src/components/trade/positions/twap-tab.tsx:37
 msgid "Active"
 msgstr "Actif"
 
-#: src/components/trade/positions/positions-tab.tsx:147
+#: src/components/trade/positions/positions-tab.tsx:150
 msgid "Active Positions"
 msgstr "Positions actives"
 
@@ -63,11 +63,11 @@ msgstr "Ajouter des fonds"
 msgid "Add to favorites"
 msgstr "Ajouter aux favoris"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:475
+#: src/components/trade/order-entry/order-entry-panel.tsx:466
 msgid "Agent"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:482
+#: src/components/trade/order-entry/order-entry-panel.tsx:473
 msgid "Agent mode: Orders signed automatically (fast)"
 msgstr ""
 
@@ -85,20 +85,20 @@ msgstr "API"
 
 #: src/components/trade/positions/balances-tab.tsx:135
 #: src/components/trade/positions/funding-tab.tsx:119
-#: src/components/trade/positions/history-tab.tsx:107
-#: src/components/trade/positions/orders-tab.tsx:226
-#: src/components/trade/positions/positions-tab.tsx:177
-#: src/components/trade/positions/twap-tab.tsx:119
+#: src/components/trade/positions/history-tab.tsx:110
+#: src/components/trade/positions/orders-tab.tsx:229
+#: src/components/trade/positions/positions-tab.tsx:180
+#: src/components/trade/positions/twap-tab.tsx:122
 msgid "Asset"
 msgstr "Actif"
 
 #: src/components/trade/order-entry/account-panel.tsx:85
-#: src/components/trade/order-entry/order-entry-panel.tsx:573
+#: src/components/trade/order-entry/order-entry-panel.tsx:564
 #: src/components/trade/positions/balances-tab.tsx:138
 msgid "Available"
 msgstr "Disponible"
 
-#: src/components/trade/positions/twap-tab.tsx:128
+#: src/components/trade/positions/twap-tab.tsx:131
 msgid "Avg Price"
 msgstr "Prix moy."
 
@@ -142,56 +142,56 @@ msgstr "Transférez des USDC depuis Arbitrum ou d'autres chaînes vers votre com
 #~ msgid "Builder must have at least 100 USDC in perps account value"
 #~ msgstr ""
 
-#: src/components/trade/positions/history-tab.tsx:55
-#: src/components/trade/positions/orders-tab.tsx:143
-#: src/components/trade/positions/twap-tab.tsx:71
+#: src/components/trade/positions/history-tab.tsx:58
+#: src/components/trade/positions/orders-tab.tsx:146
+#: src/components/trade/positions/twap-tab.tsx:74
 msgid "buy"
 msgstr "achat"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:429
+#: src/components/trade/order-entry/order-entry-panel.tsx:420
 msgid "Buy"
 msgstr "Acheter"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:550
+#: src/components/trade/order-entry/order-entry-panel.tsx:541
 msgid "Buy Long"
 msgstr "Acheter long"
 
-#: src/components/trade/positions/orders-tab.tsx:293
-#: src/components/trade/positions/twap-tab.tsx:194
+#: src/components/trade/positions/orders-tab.tsx:303
+#: src/components/trade/positions/twap-tab.tsx:204
 msgid "Cancel"
 msgstr "Annuler"
 
-#: src/components/trade/positions/orders-tab.tsx:186
+#: src/components/trade/positions/orders-tab.tsx:189
 msgid "Cancel all"
 msgstr "Tout annuler"
 
-#: src/components/trade/positions/orders-tab.tsx:182
+#: src/components/trade/positions/orders-tab.tsx:185
 msgid "Cancel all orders"
 msgstr "Annuler tous les ordres"
 
-#: src/components/trade/positions/orders-tab.tsx:289
+#: src/components/trade/positions/orders-tab.tsx:299
 msgid "Cancel order"
 msgstr "Annuler l'ordre"
 
-#: src/components/trade/positions/orders-tab.tsx:176
+#: src/components/trade/positions/orders-tab.tsx:179
 msgid "Cancel selected"
 msgstr "Annuler la sélection"
 
-#: src/components/trade/positions/orders-tab.tsx:172
+#: src/components/trade/positions/orders-tab.tsx:175
 msgid "Cancel selected orders"
 msgstr "Annuler les ordres sélectionnés"
 
-#: src/components/trade/positions/twap-tab.tsx:192
+#: src/components/trade/positions/twap-tab.tsx:202
 msgid "Cancel TWAP order"
 msgstr "Annuler l'ordre TWAP"
 
-#: src/components/trade/positions/orders-tab.tsx:176
-#: src/components/trade/positions/orders-tab.tsx:186
-#: src/components/trade/positions/orders-tab.tsx:293
+#: src/components/trade/positions/orders-tab.tsx:179
+#: src/components/trade/positions/orders-tab.tsx:189
+#: src/components/trade/positions/orders-tab.tsx:303
 msgid "Canceling..."
 msgstr "Annulation..."
 
-#: src/components/trade/positions/twap-tab.tsx:62
+#: src/components/trade/positions/twap-tab.tsx:65
 msgid "cancelled"
 msgstr "annulé"
 
@@ -199,17 +199,17 @@ msgstr "annulé"
 msgid "Chart"
 msgstr "Graphique"
 
-#: src/components/trade/positions/positions-tab.tsx:241
+#: src/components/trade/positions/positions-tab.tsx:251
 #: src/components/ui/dialog.tsx:63
 #: src/components/ui/sheet.tsx:67
 msgid "Close"
 msgstr "Fermer"
 
-#: src/components/trade/positions/positions-tab.tsx:237
+#: src/components/trade/positions/positions-tab.tsx:247
 msgid "Close position"
 msgstr "Fermer la position"
 
-#: src/components/trade/positions/positions-tab.tsx:241
+#: src/components/trade/positions/positions-tab.tsx:251
 msgid "Closing..."
 msgstr "Fermeture..."
 
@@ -217,13 +217,13 @@ msgstr "Fermeture..."
 msgid "Collapse account panel"
 msgstr "Réduire le panneau du compte"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:455
-#: src/components/trade/order-entry/order-entry-panel.tsx:534
-#: src/components/trade/order-entry/order-entry-panel.tsx:705
+#: src/components/trade/order-entry/order-entry-panel.tsx:446
+#: src/components/trade/order-entry/order-entry-panel.tsx:525
+#: src/components/trade/order-entry/order-entry-panel.tsx:696
 msgid "Coming soon"
 msgstr "Bientôt disponible"
 
-#: src/components/trade/positions/twap-tab.tsx:60
+#: src/components/trade/positions/twap-tab.tsx:63
 msgid "completed"
 msgstr "terminé"
 
@@ -237,7 +237,7 @@ msgstr "terminé"
 
 #: src/components/trade/components/wallet-dialog.tsx:68
 #: src/components/trade/header/user-menu.tsx:65
-#: src/components/trade/order-entry/order-entry-panel.tsx:386
+#: src/components/trade/order-entry/order-entry-panel.tsx:377
 msgid "Connect Wallet"
 msgstr "Connecter le portefeuille"
 
@@ -261,19 +261,19 @@ msgstr "Connectez votre portefeuille pour voir les soldes."
 msgid "Connect your wallet to view funding payments."
 msgstr "Connectez votre portefeuille pour voir les paiements de financement."
 
-#: src/components/trade/positions/orders-tab.tsx:194
+#: src/components/trade/positions/orders-tab.tsx:197
 msgid "Connect your wallet to view open orders."
 msgstr "Connectez votre portefeuille pour voir les ordres ouverts."
 
-#: src/components/trade/positions/positions-tab.tsx:154
+#: src/components/trade/positions/positions-tab.tsx:157
 msgid "Connect your wallet to view positions."
 msgstr "Connectez votre portefeuille pour voir les positions."
 
-#: src/components/trade/positions/history-tab.tsx:84
+#: src/components/trade/positions/history-tab.tsx:87
 msgid "Connect your wallet to view trade history."
 msgstr "Connectez votre portefeuille pour voir l'historique des transactions."
 
-#: src/components/trade/positions/twap-tab.tsx:96
+#: src/components/trade/positions/twap-tab.tsx:99
 msgid "Connect your wallet to view TWAP orders."
 msgstr "Connectez votre portefeuille pour voir les ordres TWAP."
 
@@ -297,7 +297,7 @@ msgstr "Copier l'adresse"
 #~ msgid "Could not create wallet"
 #~ msgstr "Impossible de créer le portefeuille"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:446
+#: src/components/trade/order-entry/order-entry-panel.tsx:437
 msgid "Cross"
 msgstr "Croisé"
 
@@ -312,8 +312,8 @@ msgstr "Personnalisez votre expérience de trading."
 #: src/components/trade/header/top-nav.tsx:91
 #: src/components/trade/order-entry/account-panel.tsx:210
 #: src/components/trade/order-entry/account-panel.tsx:212
-#: src/components/trade/order-entry/order-entry-panel.tsx:402
-#: src/components/trade/order-entry/order-entry-panel.tsx:586
+#: src/components/trade/order-entry/order-entry-panel.tsx:393
+#: src/components/trade/order-entry/order-entry-panel.tsx:577
 msgid "Deposit"
 msgstr "Déposer"
 
@@ -325,11 +325,11 @@ msgstr "Déposer des fonds"
 msgid "Deposit on Hyperliquid"
 msgstr "Déposer sur Hyperliquid"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:475
+#: src/components/trade/order-entry/order-entry-panel.tsx:466
 msgid "Direct"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:483
+#: src/components/trade/order-entry/order-entry-panel.tsx:474
 msgid "Direct mode: Sign each order with wallet"
 msgstr ""
 
@@ -353,19 +353,19 @@ msgstr "Affiche la barre latérale mobile."
 msgid "Docs"
 msgstr "Documentation"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:418
+#: src/components/trade/order-entry/order-entry-panel.tsx:409
 msgid "Enable Trading"
 msgstr "Activer le trading"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:209
+#: src/components/trade/order-entry/order-entry-panel.tsx:197
 msgid "Enter limit price"
 msgstr "Entrez le prix limite"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:212
+#: src/components/trade/order-entry/order-entry-panel.tsx:200
 msgid "Enter size"
 msgstr "Entrez la taille"
 
-#: src/components/trade/positions/positions-tab.tsx:186
+#: src/components/trade/positions/positions-tab.tsx:189
 msgid "Entry"
 msgstr "Entrée"
 
@@ -373,15 +373,15 @@ msgstr "Entrée"
 msgid "Equity"
 msgstr "Capitaux propres"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:758
+#: src/components/trade/order-entry/order-entry-panel.tsx:749
 msgid "Est. Fee"
 msgstr "Frais est."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:218
+#: src/components/trade/order-entry/order-entry-panel.tsx:206
 msgid "Exceeds max size"
 msgstr "Dépasse la taille max"
 
-#: src/components/trade/positions/twap-tab.tsx:125
+#: src/components/trade/positions/twap-tab.tsx:128
 msgid "Executed"
 msgstr "Exécuté"
 
@@ -393,7 +393,7 @@ msgstr "Développer le panneau du compte"
 msgid "failed"
 msgstr "échoué"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:315
+#: src/components/trade/order-entry/order-entry-panel.tsx:302
 msgid "Failed to enable trading"
 msgstr "Échec de l'activation du trading"
 
@@ -405,7 +405,7 @@ msgstr "Échec du chargement des soldes."
 msgid "Failed to load funding history."
 msgstr "Échec du chargement de l'historique de financement."
 
-#: src/components/trade/positions/orders-tab.tsx:202
+#: src/components/trade/positions/orders-tab.tsx:205
 msgid "Failed to load open orders."
 msgstr "Échec du chargement des ordres ouverts."
 
@@ -413,11 +413,11 @@ msgstr "Échec du chargement des ordres ouverts."
 msgid "Failed to load order book."
 msgstr "Échec du chargement du carnet d'ordres."
 
-#: src/components/trade/positions/positions-tab.tsx:162
+#: src/components/trade/positions/positions-tab.tsx:165
 msgid "Failed to load positions."
 msgstr "Échec du chargement des positions."
 
-#: src/components/trade/positions/history-tab.tsx:92
+#: src/components/trade/positions/history-tab.tsx:95
 msgid "Failed to load trade history."
 msgstr "Échec du chargement de l'historique des transactions."
 
@@ -425,7 +425,7 @@ msgstr "Échec du chargement de l'historique des transactions."
 msgid "Failed to load trades."
 msgstr "Échec du chargement des transactions."
 
-#: src/components/trade/positions/twap-tab.tsx:104
+#: src/components/trade/positions/twap-tab.tsx:107
 msgid "Failed to load TWAP history."
 msgstr "Échec du chargement de l'historique TWAP."
 
@@ -433,7 +433,7 @@ msgstr "Échec du chargement de l'historique TWAP."
 #~ msgid "Failed to register builder code"
 #~ msgstr ""
 
-#: src/components/trade/positions/history-tab.tsx:119
+#: src/components/trade/positions/history-tab.tsx:122
 msgid "Fee"
 msgstr "Frais"
 
@@ -445,7 +445,7 @@ msgstr "Frais"
 #~ msgid "Fee rate must be between 0.001% and 1%"
 #~ msgstr ""
 
-#: src/components/trade/positions/orders-tab.tsx:238
+#: src/components/trade/positions/orders-tab.tsx:241
 msgid "Filled"
 msgstr "Exécuté"
 
@@ -495,7 +495,7 @@ msgstr ""
 #~ msgid "Invalid Ethereum address"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:451
+#: src/components/trade/order-entry/order-entry-panel.tsx:442
 msgid "Isolated"
 msgstr "Isolé"
 
@@ -511,27 +511,27 @@ msgstr "Classement"
 msgid "Learn more"
 msgstr ""
 
-#: src/components/trade/positions/orders-tab.tsx:145
+#: src/components/trade/positions/orders-tab.tsx:148
 msgid "limit"
 msgstr "limite"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:524
+#: src/components/trade/order-entry/order-entry-panel.tsx:515
 msgid "Limit"
 msgstr "Limite"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:655
+#: src/components/trade/order-entry/order-entry-panel.tsx:646
 msgid "Limit Price"
 msgstr "Prix limite"
 
-#: src/components/trade/positions/orders-tab.tsx:145
+#: src/components/trade/positions/orders-tab.tsx:148
 msgid "limit ro"
 msgstr "limite réd. seul."
 
-#: src/components/trade/positions/positions-tab.tsx:195
+#: src/components/trade/positions/positions-tab.tsx:198
 msgid "Liq"
 msgstr "Liq."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:738
+#: src/components/trade/order-entry/order-entry-panel.tsx:729
 msgid "Liq. Price"
 msgstr "Prix liq."
 
@@ -551,35 +551,35 @@ msgstr "Chargement de l'historique de financement..."
 msgid "Loading markets..."
 msgstr "Chargement des marchés..."
 
-#: src/components/trade/positions/orders-tab.tsx:198
+#: src/components/trade/positions/orders-tab.tsx:201
 msgid "Loading open orders..."
 msgstr "Chargement des ordres ouverts..."
 
-#: src/components/trade/positions/positions-tab.tsx:158
+#: src/components/trade/positions/positions-tab.tsx:161
 msgid "Loading positions..."
 msgstr "Chargement des positions..."
 
-#: src/components/trade/positions/history-tab.tsx:88
+#: src/components/trade/positions/history-tab.tsx:91
 msgid "Loading trade history..."
 msgstr "Chargement de l'historique des transactions..."
 
-#: src/components/trade/positions/twap-tab.tsx:100
+#: src/components/trade/positions/twap-tab.tsx:103
 msgid "Loading TWAP orders..."
 msgstr "Chargement des ordres TWAP..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:186
+#: src/components/trade/order-entry/order-entry-panel.tsx:174
 msgid "Loading wallet..."
 msgstr "Chargement du portefeuille..."
 
 #: src/components/trade/order-entry/account-panel.tsx:193
-#: src/components/trade/order-entry/order-entry-panel.tsx:410
-#: src/components/trade/order-entry/order-entry-panel.tsx:411
+#: src/components/trade/order-entry/order-entry-panel.tsx:401
+#: src/components/trade/order-entry/order-entry-panel.tsx:402
 msgid "Loading..."
 msgstr "Chargement..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:553
+#: src/components/trade/order-entry/order-entry-panel.tsx:544
 #: src/components/trade/positions/funding-tab.tsx:67
-#: src/components/trade/positions/positions-tab.tsx:84
+#: src/components/trade/positions/positions-tab.tsx:87
 msgid "Long"
 msgstr "Achat"
 
@@ -587,7 +587,7 @@ msgstr "Achat"
 msgid "Margin Ratio"
 msgstr "Ratio de marge"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:748
+#: src/components/trade/order-entry/order-entry-panel.tsx:739
 msgid "Margin Req."
 msgstr "Marge req."
 
@@ -595,8 +595,8 @@ msgstr "Marge req."
 msgid "Margin Used"
 msgstr "Marge utilisée"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:662
-#: src/components/trade/positions/positions-tab.tsx:189
+#: src/components/trade/order-entry/order-entry-panel.tsx:653
+#: src/components/trade/positions/positions-tab.tsx:192
 msgid "Mark"
 msgstr "Mark"
 
@@ -606,7 +606,7 @@ msgid "MARK"
 msgstr "MARQUE"
 
 #: src/components/trade/chart/constants.ts:60
-#: src/components/trade/order-entry/order-entry-panel.tsx:521
+#: src/components/trade/order-entry/order-entry-panel.tsx:512
 msgid "Market"
 msgstr "Marché"
 
@@ -614,7 +614,7 @@ msgstr "Marché"
 #~ msgid "Market metadata unavailable."
 #~ msgstr "Métadonnées du marché indisponibles."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:195
+#: src/components/trade/order-entry/order-entry-panel.tsx:183
 msgid "Market not ready"
 msgstr "Marché non prêt"
 
@@ -626,7 +626,7 @@ msgstr "Glissement des ordres au marché"
 msgid "markets"
 msgstr "marchés"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:646
+#: src/components/trade/order-entry/order-entry-panel.tsx:637
 msgid "Max"
 msgstr "Max"
 
@@ -642,7 +642,7 @@ msgstr "Max"
 msgid "Max slippage allowed for market orders."
 msgstr "Glissement maximum autorisé pour les ordres au marché."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:215
+#: src/components/trade/order-entry/order-entry-panel.tsx:203
 msgid "Min order $10"
 msgstr "Ordre min. 10 $"
 
@@ -675,11 +675,11 @@ msgstr ""
 msgid "Next"
 msgstr "Suivant"
 
-#: src/components/trade/positions/positions-tab.tsx:169
+#: src/components/trade/positions/positions-tab.tsx:172
 msgid "No active positions."
 msgstr "Aucune position active."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:189
+#: src/components/trade/order-entry/order-entry-panel.tsx:177
 msgid "No balance"
 msgstr "Pas de solde"
 
@@ -687,7 +687,7 @@ msgstr "Pas de solde"
 msgid "No balances found. Deposit funds to start trading."
 msgstr "Aucun solde trouvé. Déposez des fonds pour commencer à trader."
 
-#: src/components/trade/positions/history-tab.tsx:99
+#: src/components/trade/positions/history-tab.tsx:102
 msgid "No fills found."
 msgstr "Aucune exécution trouvée."
 
@@ -695,11 +695,11 @@ msgstr "Aucune exécution trouvée."
 msgid "No funding payments found."
 msgstr "Aucun paiement de financement trouvé."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:206
+#: src/components/trade/order-entry/order-entry-panel.tsx:194
 msgid "No mark price"
 msgstr "Pas de prix mark"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:192
+#: src/components/trade/order-entry/order-entry-panel.tsx:180
 msgid "No market"
 msgstr "Pas de marché"
 
@@ -707,11 +707,11 @@ msgstr "Pas de marché"
 msgid "No markets found."
 msgstr "Aucun marché trouvé."
 
-#: src/components/trade/positions/orders-tab.tsx:209
+#: src/components/trade/positions/orders-tab.tsx:212
 msgid "No open orders."
 msgstr "Aucun ordre ouvert."
 
-#: src/components/trade/positions/twap-tab.tsx:111
+#: src/components/trade/positions/twap-tab.tsx:114
 msgid "No TWAP orders found."
 msgstr "Aucun ordre TWAP trouvé."
 
@@ -723,7 +723,7 @@ msgstr "Aucun ordre TWAP trouvé."
 msgid "No wallets found"
 msgstr "Aucun portefeuille trouvé"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:183
+#: src/components/trade/order-entry/order-entry-panel.tsx:171
 msgid "Not connected"
 msgstr "Non connecté"
 
@@ -744,7 +744,7 @@ msgstr "OI"
 msgid "Only you control your funds. No email or password required."
 msgstr ""
 
-#: src/components/trade/positions/orders-tab.tsx:151
+#: src/components/trade/positions/orders-tab.tsx:154
 msgid "open"
 msgstr "ouvert"
 
@@ -752,7 +752,7 @@ msgstr "ouvert"
 msgid "Open Interest"
 msgstr "Intérêt ouvert"
 
-#: src/components/trade/positions/orders-tab.tsx:165
+#: src/components/trade/positions/orders-tab.tsx:168
 msgid "Open Orders"
 msgstr "Ordres ouverts"
 
@@ -767,7 +767,7 @@ msgstr "ORACLE"
 msgid "Order Book"
 msgstr "Carnet d'ordres"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:367
+#: src/components/trade/order-entry/order-entry-panel.tsx:358
 msgid "Order failed"
 msgstr "Ordre échoué"
 
@@ -775,7 +775,7 @@ msgstr "Ordre échoué"
 msgid "Order Queue"
 msgstr "File d'ordres"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:744
+#: src/components/trade/order-entry/order-entry-panel.tsx:735
 msgid "Order Value"
 msgstr "Valeur de l'ordre"
 
@@ -813,8 +813,8 @@ msgstr "Perpétuels"
 #~ msgstr ""
 
 #: src/components/trade/order-entry/account-panel.tsx:144
-#: src/components/trade/positions/history-tab.tsx:122
-#: src/components/trade/positions/positions-tab.tsx:192
+#: src/components/trade/positions/history-tab.tsx:125
+#: src/components/trade/positions/positions-tab.tsx:195
 msgid "PNL"
 msgstr "PNL"
 
@@ -826,7 +826,7 @@ msgstr ""
 msgid "Portfolio"
 msgstr "Portefeuille"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:593
+#: src/components/trade/order-entry/order-entry-panel.tsx:584
 #: src/components/trade/positions/funding-tab.tsx:122
 msgid "Position"
 msgstr "Position"
@@ -838,12 +838,12 @@ msgstr "Précédent"
 #: src/components/trade/chart/constants.ts:66
 #: src/components/trade/orderbook/orderbook-panel.tsx:69
 #: src/components/trade/orderbook/trades-panel.tsx:90
-#: src/components/trade/positions/history-tab.tsx:113
-#: src/components/trade/positions/orders-tab.tsx:232
+#: src/components/trade/positions/history-tab.tsx:116
+#: src/components/trade/positions/orders-tab.tsx:235
 msgid "Price"
 msgstr "Prix"
 
-#: src/components/trade/positions/twap-tab.tsx:131
+#: src/components/trade/positions/twap-tab.tsx:134
 msgid "Progress"
 msgstr "Progression"
 
@@ -855,8 +855,8 @@ msgstr "Taux"
 msgid "Recent Trades"
 msgstr "Transactions récentes"
 
+#: src/components/trade/order-entry/order-entry-panel.tsx:675
 #: src/components/trade/order-entry/order-entry-panel.tsx:684
-#: src/components/trade/order-entry/order-entry-panel.tsx:693
 msgid "Reduce Only"
 msgstr "Réduction uniquement"
 
@@ -889,7 +889,7 @@ msgstr ""
 msgid "Select {coin} market"
 msgstr "Sélectionner le marché {coin}"
 
-#: src/components/trade/positions/orders-tab.tsx:220
+#: src/components/trade/positions/orders-tab.tsx:223
 msgid "Select all orders"
 msgstr "Sélectionner tous les ordres"
 
@@ -897,11 +897,11 @@ msgstr "Sélectionner tous les ordres"
 msgid "Select favorite markets"
 msgstr "Sélectionner les marchés favoris"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:501
+#: src/components/trade/order-entry/order-entry-panel.tsx:492
 msgid "Select leverage"
 msgstr "Sélectionner le levier"
 
-#: src/components/trade/positions/orders-tab.tsx:255
+#: src/components/trade/positions/orders-tab.tsx:258
 msgid "Select order"
 msgstr "Sélectionner l'ordre"
 
@@ -909,7 +909,7 @@ msgstr "Sélectionner l'ordre"
 msgid "Select order book aggregation"
 msgstr "Sélectionner l'agrégation du carnet d'ordres"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:473
+#: src/components/trade/order-entry/order-entry-panel.tsx:464
 msgid "Select signing mode"
 msgstr ""
 
@@ -917,25 +917,25 @@ msgstr ""
 msgid "Select token"
 msgstr "Sélectionner le jeton"
 
-#: src/components/trade/positions/history-tab.tsx:55
-#: src/components/trade/positions/orders-tab.tsx:143
-#: src/components/trade/positions/twap-tab.tsx:71
+#: src/components/trade/positions/history-tab.tsx:58
+#: src/components/trade/positions/orders-tab.tsx:146
+#: src/components/trade/positions/twap-tab.tsx:74
 msgid "sell"
 msgstr "vente"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:429
+#: src/components/trade/order-entry/order-entry-panel.tsx:420
 msgid "Sell"
 msgstr "Vendre"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:565
+#: src/components/trade/order-entry/order-entry-panel.tsx:556
 msgid "Sell Short"
 msgstr "Vendre short"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:643
+#: src/components/trade/order-entry/order-entry-panel.tsx:634
 msgid "Set {p}%"
 msgstr "Définir {p}%"
 
-#: src/components/trade/positions/positions-tab.tsx:247
+#: src/components/trade/positions/positions-tab.tsx:257
 msgid "Set TP/SL"
 msgstr "Définir TP/SL"
 
@@ -944,9 +944,9 @@ msgstr "Définir TP/SL"
 msgid "Settings"
 msgstr "Paramètres"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:568
+#: src/components/trade/order-entry/order-entry-panel.tsx:559
 #: src/components/trade/positions/funding-tab.tsx:67
-#: src/components/trade/positions/positions-tab.tsx:84
+#: src/components/trade/positions/positions-tab.tsx:87
 msgid "Short"
 msgstr "Vente"
 
@@ -974,11 +974,11 @@ msgstr "Afficher les valeurs en USD"
 msgid "Sidebar"
 msgstr "Barre latérale"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:414
+#: src/components/trade/order-entry/order-entry-panel.tsx:405
 msgid "Sign in wallet..."
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:203
+#: src/components/trade/order-entry/order-entry-panel.tsx:191
 msgid "Signer not ready"
 msgstr "Signataire non prêt"
 
@@ -986,17 +986,17 @@ msgstr "Signataire non prêt"
 #~ msgid "Signing..."
 #~ msgstr "Signature..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:602
+#: src/components/trade/order-entry/order-entry-panel.tsx:593
 #: src/components/trade/order-entry/order-toast.tsx:80
 #: src/components/trade/orderbook/orderbook-panel.tsx:101
 #: src/components/trade/orderbook/trades-panel.tsx:96
-#: src/components/trade/positions/history-tab.tsx:116
-#: src/components/trade/positions/orders-tab.tsx:235
-#: src/components/trade/positions/positions-tab.tsx:180
+#: src/components/trade/positions/history-tab.tsx:119
+#: src/components/trade/positions/orders-tab.tsx:238
+#: src/components/trade/positions/positions-tab.tsx:183
 msgid "Size"
 msgstr "Taille"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:754
+#: src/components/trade/order-entry/order-entry-panel.tsx:745
 msgid "Slippage"
 msgstr "Glissement"
 
@@ -1039,12 +1039,12 @@ msgstr "Écart"
 msgid "Staking"
 msgstr "Staking"
 
-#: src/components/trade/positions/orders-tab.tsx:241
-#: src/components/trade/positions/twap-tab.tsx:134
+#: src/components/trade/positions/orders-tab.tsx:244
+#: src/components/trade/positions/twap-tab.tsx:137
 msgid "Status"
 msgstr "Statut"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:530
+#: src/components/trade/order-entry/order-entry-panel.tsx:521
 msgid "Stop"
 msgstr "Stop"
 
@@ -1056,7 +1056,15 @@ msgstr "Stop"
 msgid "Support"
 msgstr "Support"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:394
+#. placeholder {0}: row.coin
+#: src/components/trade/positions/history-tab.tsx:144
+#: src/components/trade/positions/orders-tab.tsx:272
+#: src/components/trade/positions/positions-tab.tsx:219
+#: src/components/trade/positions/twap-tab.tsx:156
+msgid "Switch to {0} market"
+msgstr ""
+
+#: src/components/trade/order-entry/order-entry-panel.tsx:385
 msgid "Switch to Arbitrum"
 msgstr "Passer à Arbitrum"
 
@@ -1068,11 +1076,11 @@ msgstr "Passer en mode sombre"
 msgid "Switch to light mode"
 msgstr "Passer en mode clair"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:394
+#: src/components/trade/order-entry/order-entry-panel.tsx:385
 msgid "Switching..."
 msgstr "Changement..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:699
+#: src/components/trade/order-entry/order-entry-panel.tsx:690
 msgid "Take Profit / Stop Loss"
 msgstr "Prise de profit / Stop Loss"
 
@@ -1090,7 +1098,7 @@ msgstr "La page que vous recherchez n'existe pas."
 
 #: src/components/trade/orderbook/trades-panel.tsx:89
 #: src/components/trade/positions/funding-tab.tsx:131
-#: src/components/trade/positions/history-tab.tsx:125
+#: src/components/trade/positions/history-tab.tsx:128
 msgid "Time"
 msgstr "Heure"
 
@@ -1100,7 +1108,7 @@ msgstr "Heure"
 msgid "Toggle Sidebar"
 msgstr "Basculer la barre latérale"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:609
+#: src/components/trade/order-entry/order-entry-panel.tsx:600
 msgid "Toggle size mode"
 msgstr "Basculer le mode de taille"
 
@@ -1109,12 +1117,12 @@ msgstr "Basculer le mode de taille"
 msgid "Total"
 msgstr "Total"
 
-#: src/components/trade/positions/twap-tab.tsx:122
+#: src/components/trade/positions/twap-tab.tsx:125
 msgid "Total Size"
 msgstr "Taille totale"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:701
-#: src/components/trade/positions/positions-tab.tsx:249
+#: src/components/trade/order-entry/order-entry-panel.tsx:692
+#: src/components/trade/positions/positions-tab.tsx:259
 msgid "TP/SL"
 msgstr "TP/SL"
 
@@ -1122,12 +1130,12 @@ msgstr "TP/SL"
 msgid "Trade"
 msgstr "Trader"
 
-#: src/components/trade/positions/history-tab.tsx:78
+#: src/components/trade/positions/history-tab.tsx:81
 msgid "Trade History"
 msgstr "Historique des transactions"
 
 #: src/components/trade/orderbook/orderbook-panel.tsx:61
-#: src/components/trade/positions/history-tab.tsx:30
+#: src/components/trade/positions/history-tab.tsx:33
 msgid "Trades"
 msgstr "Transactions"
 
@@ -1135,12 +1143,12 @@ msgstr "Transactions"
 msgid "Transfer USDC to your Hyperliquid account to start trading."
 msgstr "Transférez des USDC vers votre compte Hyperliquid pour commencer à trader."
 
-#: src/components/trade/positions/twap-tab.tsx:90
+#: src/components/trade/positions/twap-tab.tsx:93
 msgid "TWAP Orders"
 msgstr "Ordres TWAP"
 
-#: src/components/trade/positions/history-tab.tsx:110
-#: src/components/trade/positions/orders-tab.tsx:229
+#: src/components/trade/positions/history-tab.tsx:113
+#: src/components/trade/positions/orders-tab.tsx:232
 msgid "Type"
 msgstr "Type"
 
@@ -1174,7 +1182,7 @@ msgstr "Mise à jour en direct"
 msgid "USD Value"
 msgstr "Valeur en USD"
 
-#: src/components/trade/positions/positions-tab.tsx:183
+#: src/components/trade/positions/positions-tab.tsx:186
 msgid "Value"
 msgstr "Valeur"
 
@@ -1182,7 +1190,7 @@ msgstr "Valeur"
 msgid "Vaults"
 msgstr "Coffres"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:416
+#: src/components/trade/order-entry/order-entry-panel.tsx:407
 msgid "Verifying..."
 msgstr ""
 
