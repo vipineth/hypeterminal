@@ -13,1225 +13,1225 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/components/trade/order-entry/order-toast.tsx:75
+#: src/components/trade/order-entry/order-toast.tsx
 msgid "% filled"
 msgstr "% पूर्ण"
 
-#: src/components/trade/chart/constants.ts:72
+#: src/components/trade/chart/constants.ts
 msgid "24h Price"
 msgstr "24घंटे मूल्य"
 
-#: src/components/trade/components/wallet-dialog.tsx:235
+#: src/components/trade/components/wallet-dialog.tsx
 msgid "A crypto wallet lets you store and manage your digital assets securely."
 msgstr ""
 
-#: src/components/pages/builder-page.tsx:237
+#: src/components/pages/builder-page.tsx
 #~ msgid "About Builder Codes"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx:122
+#: src/components/trade/order-entry/account-panel.tsx
 msgid "Account"
 msgstr "खाता"
 
-#: src/components/trade/positions/balances-tab.tsx:107
+#: src/components/trade/positions/balances-tab.tsx
 msgid "Account Balances"
 msgstr "खाता शेष"
 
-#: src/components/trade/positions/orders-tab.tsx:247
-#: src/components/trade/positions/positions-tab.tsx:201
-#: src/components/trade/positions/twap-tab.tsx:140
+#: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/positions/twap-tab.tsx
 msgid "Actions"
 msgstr "कार्रवाई"
 
-#: src/components/trade/positions/twap-tab.tsx:61
+#: src/components/trade/positions/twap-tab.tsx
 msgid "active"
 msgstr "सक्रिय"
 
-#: src/components/trade/positions/twap-tab.tsx:37
+#: src/components/trade/positions/twap-tab.tsx
 msgid "Active"
 msgstr "सक्रिय"
 
-#: src/components/trade/positions/positions-tab.tsx:150
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Active Positions"
 msgstr "सक्रिय पोजीशन"
 
-#: src/components/trade/header/user-menu.tsx:87
+#: src/components/trade/header/user-menu.tsx
 msgid "Add funds"
 msgstr "धन जोड़ें"
 
-#: src/components/trade/chart/token-selector.tsx:222
+#: src/components/trade/chart/token-selector.tsx
 msgid "Add to favorites"
 msgstr "पसंदीदा में जोड़ें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:486
+#: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Agent"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:493
+#: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Agent mode: Orders signed automatically (fast)"
 #~ msgstr ""
 
-#: src/hooks/hyperliquid/use-trading-agent.ts:79
+#: src/hooks/hyperliquid/use-trading-agent.ts
 #~ msgid "Agent verification failed"
 #~ msgstr ""
 
-#: src/components/trade/header/top-nav.tsx:27
+#: src/components/trade/header/top-nav.tsx
 msgid "API"
 msgstr "API"
 
-#: src/components/pages/builder-page.tsx:92
+#: src/components/pages/builder-page.tsx
 #~ msgid "Approve a builder to charge fees on orders placed on your behalf. Builder codes allow DeFi applications to receive a portion of trading fees."
 #~ msgstr ""
 
-#: src/components/trade/positions/balances-tab.tsx:135
-#: src/components/trade/positions/funding-tab.tsx:119
-#: src/components/trade/positions/history-tab.tsx:110
-#: src/components/trade/positions/orders-tab.tsx:229
-#: src/components/trade/positions/positions-tab.tsx:180
-#: src/components/trade/positions/twap-tab.tsx:122
+#: src/components/trade/positions/balances-tab.tsx
+#: src/components/trade/positions/funding-tab.tsx
+#: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/positions/twap-tab.tsx
 msgid "Asset"
 msgstr "संपत्ति"
 
-#: src/components/trade/order-entry/account-panel.tsx:85
-#: src/components/trade/order-entry/order-entry-panel.tsx:511
-#: src/components/trade/positions/balances-tab.tsx:138
+#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/balances-tab.tsx
 msgid "Available"
 msgstr "उपलब्ध"
 
-#: src/components/trade/positions/twap-tab.tsx:131
+#: src/components/trade/positions/twap-tab.tsx
 msgid "Avg Price"
 msgstr "औसत मूल्य"
 
-#: src/components/trade/order-entry/account-panel.tsx:75
+#: src/components/trade/order-entry/account-panel.tsx
 msgid "Balance"
 msgstr "शेष"
 
-#: src/components/trade/footer/footer-bar.tsx:25
+#: src/components/trade/footer/footer-bar.tsx
 #~ msgid "Block:"
 #~ msgstr "ब्लॉक:"
 
-#: src/components/trade/components/global-settings-dialog.tsx:169
+#: src/components/trade/components/global-settings-dialog.tsx
 msgid "bps"
 msgstr "बीपीएस"
 
-#: src/components/ui/breadcrumb.tsx:9
+#: src/components/ui/breadcrumb.tsx
 msgid "Breadcrumb"
 msgstr "ब्रेडक्रम्ब"
 
-#: src/components/trade/order-entry/deposit-modal.tsx:31
+#: src/components/trade/order-entry/deposit-modal.tsx
 msgid "Bridge USDC from Arbitrum or other chains to your Hyperliquid account."
 msgstr "Arbitrum या अन्य चेन से अपने Hyperliquid खाते में USDC ब्रिज करें।"
 
-#: src/components/pages/builder-page.tsx:145
+#: src/components/pages/builder-page.tsx
 #~ msgid "Builder Address"
 #~ msgstr ""
 
-#: src/components/pages/builder-page.tsx:127
+#: src/components/pages/builder-page.tsx
 #~ msgid "Builder code registered successfully!"
 #~ msgstr ""
 
-#: src/components/pages/builder-page.tsx:242
+#: src/components/pages/builder-page.tsx
 #~ msgid "Builder codes allow DeFi builders to receive a fee on fills they send on behalf of users. They are set per-order for maximal flexibility."
 #~ msgstr ""
 
-#: src/components/pages/builder-page.tsx:102
+#: src/components/pages/builder-page.tsx
 #~ msgid "Builder Fee Approval"
 #~ msgstr ""
 
-#: src/components/pages/builder-page.tsx:272
+#: src/components/pages/builder-page.tsx
 #~ msgid "Builder must have at least 100 USDC in perps account value"
 #~ msgstr ""
 
-#: src/components/trade/positions/history-tab.tsx:58
-#: src/components/trade/positions/orders-tab.tsx:146
-#: src/components/trade/positions/twap-tab.tsx:74
+#: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/twap-tab.tsx
 msgid "buy"
 msgstr "खरीदें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:402
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Buy"
 msgstr "खरीदें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:488
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Buy Long"
 msgstr "लॉन्ग खरीदें"
 
-#: src/components/trade/positions/orders-tab.tsx:303
-#: src/components/trade/positions/twap-tab.tsx:204
+#: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/twap-tab.tsx
 msgid "Cancel"
 msgstr "रद्द करें"
 
-#: src/components/trade/positions/orders-tab.tsx:189
+#: src/components/trade/positions/orders-tab.tsx
 msgid "Cancel all"
 msgstr "सभी रद्द करें"
 
-#: src/components/trade/positions/orders-tab.tsx:185
+#: src/components/trade/positions/orders-tab.tsx
 msgid "Cancel all orders"
 msgstr "सभी ऑर्डर रद्द करें"
 
-#: src/components/trade/positions/orders-tab.tsx:299
+#: src/components/trade/positions/orders-tab.tsx
 msgid "Cancel order"
 msgstr "ऑर्डर रद्द करें"
 
-#: src/components/trade/positions/orders-tab.tsx:179
+#: src/components/trade/positions/orders-tab.tsx
 msgid "Cancel selected"
 msgstr "चयनित रद्द करें"
 
-#: src/components/trade/positions/orders-tab.tsx:175
+#: src/components/trade/positions/orders-tab.tsx
 msgid "Cancel selected orders"
 msgstr "चयनित ऑर्डर रद्द करें"
 
-#: src/components/trade/positions/twap-tab.tsx:202
+#: src/components/trade/positions/twap-tab.tsx
 msgid "Cancel TWAP order"
 msgstr "TWAP ऑर्डर रद्द करें"
 
-#: src/components/trade/positions/orders-tab.tsx:179
-#: src/components/trade/positions/orders-tab.tsx:189
-#: src/components/trade/positions/orders-tab.tsx:303
+#: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/orders-tab.tsx
 msgid "Canceling..."
 msgstr "रद्द हो रहा है..."
 
-#: src/components/trade/positions/twap-tab.tsx:65
+#: src/components/trade/positions/twap-tab.tsx
 msgid "cancelled"
 msgstr "रद्द"
 
-#: src/components/trade/components/global-settings-dialog.tsx:193
+#: src/components/trade/components/global-settings-dialog.tsx
 msgid "Chart"
 msgstr "चार्ट"
 
-#: src/components/trade/positions/positions-tab.tsx:251
-#: src/components/ui/dialog.tsx:63
-#: src/components/ui/sheet.tsx:67
+#: src/components/trade/positions/positions-tab.tsx
+#: src/components/ui/dialog.tsx
+#: src/components/ui/sheet.tsx
 msgid "Close"
 msgstr "बंद करें"
 
-#: src/components/trade/positions/positions-tab.tsx:247
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Close position"
 msgstr "पोजीशन बंद करें"
 
-#: src/components/trade/positions/positions-tab.tsx:251
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Closing..."
 msgstr "बंद हो रहा है..."
 
-#: src/components/trade/order-entry/account-panel.tsx:118
+#: src/components/trade/order-entry/account-panel.tsx
 msgid "Collapse account panel"
 msgstr "खाता पैनल छोटा करें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:428
-#: src/components/trade/order-entry/order-entry-panel.tsx:472
-#: src/components/trade/order-entry/order-entry-panel.tsx:643
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Coming soon"
 msgstr "जल्द आ रहा है"
 
-#: src/components/trade/positions/twap-tab.tsx:63
+#: src/components/trade/positions/twap-tab.tsx
 msgid "completed"
 msgstr "पूर्ण"
 
-#: src/components/trade/positions/orders-tab.tsx:82
+#: src/components/trade/positions/orders-tab.tsx
 #~ msgid "Connect a wallet to manage orders."
 #~ msgstr "ऑर्डर प्रबंधित करने के लिए वॉलेट कनेक्ट करें।"
 
-#: src/components/trade/positions/positions-tab.tsx:107
+#: src/components/trade/positions/positions-tab.tsx
 #~ msgid "Connect a wallet to manage positions."
 #~ msgstr "पोजीशन प्रबंधित करने के लिए वॉलेट कनेक्ट करें।"
 
-#: src/components/trade/components/wallet-dialog.tsx:68
-#: src/components/trade/header/user-menu.tsx:65
-#: src/components/trade/order-entry/order-entry-panel.tsx:359
+#: src/components/trade/components/wallet-dialog.tsx
+#: src/components/trade/header/user-menu.tsx
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Connect Wallet"
 msgstr "वॉलेट कनेक्ट करें"
 
-#: src/components/trade/order-entry/account-panel.tsx:191
+#: src/components/trade/order-entry/account-panel.tsx
 msgid "Connect wallet to view account"
 msgstr "खाता देखने के लिए वॉलेट कनेक्ट करें"
 
-#: src/components/pages/builder-page.tsx:115
+#: src/components/pages/builder-page.tsx
 #~ msgid "Connect your wallet to register a builder code"
 #~ msgstr ""
 
-#: src/components/trade/components/wallet-dialog.tsx:71
+#: src/components/trade/components/wallet-dialog.tsx
 msgid "Connect your wallet to start trading on Hyperliquid"
 msgstr ""
 
-#: src/components/trade/positions/balances-tab.tsx:115
+#: src/components/trade/positions/balances-tab.tsx
 msgid "Connect your wallet to view balances."
 msgstr "शेष देखने के लिए अपना वॉलेट कनेक्ट करें।"
 
-#: src/components/trade/positions/funding-tab.tsx:96
+#: src/components/trade/positions/funding-tab.tsx
 msgid "Connect your wallet to view funding payments."
 msgstr "फंडिंग भुगतान देखने के लिए अपना वॉलेट कनेक्ट करें।"
 
-#: src/components/trade/positions/orders-tab.tsx:197
+#: src/components/trade/positions/orders-tab.tsx
 msgid "Connect your wallet to view open orders."
 msgstr "खुले ऑर्डर देखने के लिए अपना वॉलेट कनेक्ट करें।"
 
-#: src/components/trade/positions/positions-tab.tsx:157
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Connect your wallet to view positions."
 msgstr "पोजीशन देखने के लिए अपना वॉलेट कनेक्ट करें।"
 
-#: src/components/trade/positions/history-tab.tsx:87
+#: src/components/trade/positions/history-tab.tsx
 msgid "Connect your wallet to view trade history."
 msgstr "ट्रेड इतिहास देखने के लिए अपना वॉलेट कनेक्ट करें।"
 
-#: src/components/trade/positions/twap-tab.tsx:99
+#: src/components/trade/positions/twap-tab.tsx
 msgid "Connect your wallet to view TWAP orders."
 msgstr "TWAP ऑर्डर देखने के लिए अपना वॉलेट कनेक्ट करें।"
 
-#: src/components/trade/footer/footer-bar.tsx:13
+#: src/components/trade/footer/footer-bar.tsx
 msgid "Connected"
 msgstr "कनेक्टेड"
 
-#: src/components/pages/builder-page.tsx:224
+#: src/components/pages/builder-page.tsx
 #~ msgid "Connected: {0}...{1}"
 #~ msgstr ""
 
-#: src/components/trade/header/user-menu.tsx:50
+#: src/components/trade/header/user-menu.tsx
 msgid "Connecting..."
 msgstr "कनेक्ट हो रहा है..."
 
-#: src/components/trade/header/user-menu.tsx:29
+#: src/components/trade/header/user-menu.tsx
 msgid "Copy Address"
 msgstr "पता कॉपी करें"
 
-#: src/hooks/hyperliquid/use-trading-agent.ts:69
+#: src/hooks/hyperliquid/use-trading-agent.ts
 #~ msgid "Could not create wallet"
 #~ msgstr "वॉलेट नहीं बना सका"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:419
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Cross"
 msgstr "क्रॉस"
 
-#: src/components/trade/order-entry/account-panel.tsx:100
+#: src/components/trade/order-entry/account-panel.tsx
 msgid "Cross Leverage"
 msgstr "क्रॉस लीवरेज"
 
-#: src/components/trade/components/global-settings-dialog.tsx:96
+#: src/components/trade/components/global-settings-dialog.tsx
 msgid "Customize your trading experience."
 msgstr "अपने ट्रेडिंग अनुभव को अनुकूलित करें।"
 
-#: src/components/trade/header/top-nav.tsx:91
-#: src/components/trade/order-entry/account-panel.tsx:210
-#: src/components/trade/order-entry/account-panel.tsx:212
-#: src/components/trade/order-entry/order-entry-panel.tsx:375
-#: src/components/trade/order-entry/order-entry-panel.tsx:524
+#: src/components/trade/header/top-nav.tsx
+#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Deposit"
 msgstr "जमा करें"
 
-#: src/components/trade/order-entry/deposit-modal.tsx:17
+#: src/components/trade/order-entry/deposit-modal.tsx
 msgid "Deposit Funds"
 msgstr "धन जमा करें"
 
-#: src/components/trade/order-entry/deposit-modal.tsx:26
+#: src/components/trade/order-entry/deposit-modal.tsx
 msgid "Deposit on Hyperliquid"
 msgstr "Hyperliquid पर जमा करें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:486
+#: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Direct"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:494
+#: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Direct mode: Sign each order with wallet"
 #~ msgstr ""
 
-#: src/components/trade/header/user-menu.tsx:98
+#: src/components/trade/header/user-menu.tsx
 msgid "Disconnect"
 msgstr "डिस्कनेक्ट करें"
 
-#: src/components/trade/order-entry/order-toast.tsx:91
+#: src/components/trade/order-entry/order-toast.tsx
 msgid "Dismiss"
 msgstr "खारिज करें"
 
-#: src/components/trade/components/global-settings-dialog.tsx:103
+#: src/components/trade/components/global-settings-dialog.tsx
 msgid "Display Language"
 msgstr "प्रदर्शन भाषा"
 
-#: src/components/ui/sidebar.tsx:173
+#: src/components/ui/sidebar.tsx
 msgid "Displays the mobile sidebar."
 msgstr "मोबाइल साइडबार दिखाता है।"
 
-#: src/components/trade/header/top-nav.tsx:28
+#: src/components/trade/header/top-nav.tsx
 msgid "Docs"
 msgstr "दस्तावेज़"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:391
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enable Trading"
 msgstr "ट्रेडिंग सक्षम करें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:194
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enter limit price"
 msgstr "लिमिट प्राइस दर्ज करें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:197
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enter size"
 msgstr "साइज दर्ज करें"
 
-#: src/components/trade/positions/positions-tab.tsx:189
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Entry"
 msgstr "प्रवेश"
 
-#: src/components/trade/order-entry/account-panel.tsx:133
+#: src/components/trade/order-entry/account-panel.tsx
 msgid "Equity"
 msgstr "इक्विटी"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:696
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Est. Fee"
 msgstr "अनु. शुल्क"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:203
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Exceeds max size"
 msgstr "अधिकतम साइज से अधिक"
 
-#: src/components/trade/positions/twap-tab.tsx:128
+#: src/components/trade/positions/twap-tab.tsx
 msgid "Executed"
 msgstr "निष्पादित"
 
-#: src/components/trade/order-entry/account-panel.tsx:118
+#: src/components/trade/order-entry/account-panel.tsx
 msgid "Expand account panel"
 msgstr "खाता पैनल विस्तृत करें"
 
-#: src/components/trade/order-entry/order-toast.tsx:178
+#: src/components/trade/order-entry/order-toast.tsx
 msgid "failed"
 msgstr "विफल"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:299
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Failed to enable trading"
 msgstr "ट्रेडिंग सक्षम करने में विफल"
 
-#: src/components/trade/positions/balances-tab.tsx:123
+#: src/components/trade/positions/balances-tab.tsx
 msgid "Failed to load balances."
 msgstr "शेष लोड करने में विफल।"
 
-#: src/components/trade/positions/funding-tab.tsx:104
+#: src/components/trade/positions/funding-tab.tsx
 msgid "Failed to load funding history."
 msgstr "फंडिंग इतिहास लोड करने में विफल।"
 
-#: src/components/trade/positions/orders-tab.tsx:205
+#: src/components/trade/positions/orders-tab.tsx
 msgid "Failed to load open orders."
 msgstr "खुले ऑर्डर लोड करने में विफल।"
 
-#: src/components/trade/orderbook/orderbook-panel.tsx:132
+#: src/components/trade/orderbook/orderbook-panel.tsx
 msgid "Failed to load order book."
 msgstr "ऑर्डर बुक लोड करने में विफल।"
 
-#: src/components/trade/positions/positions-tab.tsx:165
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Failed to load positions."
 msgstr "पोजीशन लोड करने में विफल।"
 
-#: src/components/trade/positions/history-tab.tsx:95
+#: src/components/trade/positions/history-tab.tsx
 msgid "Failed to load trade history."
 msgstr "ट्रेड इतिहास लोड करने में विफल।"
 
-#: src/components/trade/orderbook/trades-panel.tsx:104
+#: src/components/trade/orderbook/trades-panel.tsx
 msgid "Failed to load trades."
 msgstr "ट्रेड लोड करने में विफल।"
 
-#: src/components/trade/positions/twap-tab.tsx:107
+#: src/components/trade/positions/twap-tab.tsx
 msgid "Failed to load TWAP history."
 msgstr "TWAP इतिहास लोड करने में विफल।"
 
-#: src/components/pages/builder-page.tsx:69
+#: src/components/pages/builder-page.tsx
 #~ msgid "Failed to register builder code"
 #~ msgstr ""
 
-#: src/components/trade/positions/history-tab.tsx:122
+#: src/components/trade/positions/history-tab.tsx
 msgid "Fee"
 msgstr "शुल्क"
 
-#: src/components/pages/builder-page.tsx:255
+#: src/components/pages/builder-page.tsx
 #~ msgid "Fee Limits:"
 #~ msgstr ""
 
-#: src/components/pages/builder-page.tsx:192
+#: src/components/pages/builder-page.tsx
 #~ msgid "Fee rate must be between 0.001% and 1%"
 #~ msgstr ""
 
-#: src/components/trade/positions/orders-tab.tsx:241
+#: src/components/trade/positions/orders-tab.tsx
 msgid "Filled"
 msgstr "पूर्ण"
 
 #. placeholder {0}: cat.label
-#: src/components/trade/chart/token-selector.tsx:99
+#: src/components/trade/chart/token-selector.tsx
 msgid "Filter by {0}"
 msgstr "{0} से फ़िल्टर करें"
 
-#: src/components/trade/components/global-settings-dialog.tsx:129
+#: src/components/trade/components/global-settings-dialog.tsx
 msgid "Format for numbers and dates"
 msgstr ""
 
-#: src/components/trade/chart/constants.ts:90
+#: src/components/trade/chart/constants.ts
 msgid "Funding"
 msgstr "फंडिंग"
 
-#: src/components/trade/positions/funding-tab.tsx:90
+#: src/components/trade/positions/funding-tab.tsx
 msgid "Funding Payments"
 msgstr "फंडिंग भुगतान"
 
-#: src/components/trade/footer/footer-bar.tsx:30
+#: src/components/trade/footer/footer-bar.tsx
 #~ msgid "Gas:"
 #~ msgstr "गैस:"
 
-#: src/components/ui/pagination.tsx:66
+#: src/components/ui/pagination.tsx
 msgid "Go to next page"
 msgstr "अगले पृष्ठ पर जाएं"
 
-#: src/components/ui/pagination.tsx:52
+#: src/components/ui/pagination.tsx
 msgid "Go to previous page"
 msgstr "पिछले पृष्ठ पर जाएं"
 
-#: src/components/pages/not-found-page.tsx:20
-#: src/components/pages/not-found-page.tsx:21
+#: src/components/pages/not-found-page.tsx
+#: src/components/pages/not-found-page.tsx
 msgid "Go to trading terminal"
 msgstr "ट्रेडिंग टर्मिनल पर जाएं"
 
-#: src/components/trade/positions/balances-tab.tsx:141
+#: src/components/trade/positions/balances-tab.tsx
 msgid "In Use"
 msgstr "उपयोग में"
 
-#: src/components/trade/components/wallet-dialog.tsx:179
+#: src/components/trade/components/wallet-dialog.tsx
 msgid "Install a wallet extension to continue"
 msgstr ""
 
-#: src/components/pages/builder-page.tsx:160
+#: src/components/pages/builder-page.tsx
 #~ msgid "Invalid Ethereum address"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:424
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Isolated"
 msgstr "आइसोलेटेड"
 
-#: src/components/trade/footer/footer-bar.tsx:36
+#: src/components/trade/footer/footer-bar.tsx
 #~ msgid "Latency:"
 #~ msgstr "लेटेंसी:"
 
-#: src/components/trade/header/top-nav.tsx:23
+#: src/components/trade/header/top-nav.tsx
 msgid "Leaderboard"
 msgstr "लीडरबोर्ड"
 
-#: src/components/trade/components/wallet-dialog.tsx:243
+#: src/components/trade/components/wallet-dialog.tsx
 msgid "Learn more"
 msgstr ""
 
-#: src/components/trade/positions/orders-tab.tsx:148
+#: src/components/trade/positions/orders-tab.tsx
 msgid "limit"
 msgstr "लिमिट"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:462
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Limit"
 msgstr "लिमिट"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:593
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Limit Price"
 msgstr "लिमिट प्राइस"
 
-#: src/components/trade/positions/orders-tab.tsx:148
+#: src/components/trade/positions/orders-tab.tsx
 msgid "limit ro"
 msgstr "लिमिट आरओ"
 
-#: src/components/trade/positions/positions-tab.tsx:198
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Liq"
 msgstr "लिक्विडेशन"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:676
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Liq. Price"
 msgstr "लिक्विडेशन प्राइस"
 
-#: src/components/ui/spinner.tsx:10
+#: src/components/ui/spinner.tsx
 msgid "Loading"
 msgstr "लोड हो रहा है"
 
-#: src/components/trade/positions/balances-tab.tsx:119
+#: src/components/trade/positions/balances-tab.tsx
 msgid "Loading balances..."
 msgstr "शेष लोड हो रहा है..."
 
-#: src/components/trade/positions/funding-tab.tsx:100
+#: src/components/trade/positions/funding-tab.tsx
 msgid "Loading funding history..."
 msgstr "फंडिंग इतिहास लोड हो रहा है..."
 
-#: src/components/trade/chart/token-selector.tsx:152
+#: src/components/trade/chart/token-selector.tsx
 msgid "Loading markets..."
 msgstr "बाज़ार लोड हो रहे हैं..."
 
-#: src/components/trade/positions/orders-tab.tsx:201
+#: src/components/trade/positions/orders-tab.tsx
 msgid "Loading open orders..."
 msgstr "खुले ऑर्डर लोड हो रहे हैं..."
 
-#: src/components/trade/positions/positions-tab.tsx:161
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Loading positions..."
 msgstr "पोजीशन लोड हो रहे हैं..."
 
-#: src/components/trade/positions/history-tab.tsx:91
+#: src/components/trade/positions/history-tab.tsx
 msgid "Loading trade history..."
 msgstr "ट्रेड इतिहास लोड हो रहा है..."
 
-#: src/components/trade/positions/twap-tab.tsx:103
+#: src/components/trade/positions/twap-tab.tsx
 msgid "Loading TWAP orders..."
 msgstr "TWAP ऑर्डर लोड हो रहे हैं..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:171
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Loading wallet..."
 msgstr "वॉलेट लोड हो रहा है..."
 
-#: src/components/trade/order-entry/account-panel.tsx:193
-#: src/components/trade/order-entry/order-entry-panel.tsx:383
-#: src/components/trade/order-entry/order-entry-panel.tsx:384
+#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Loading..."
 msgstr "लोड हो रहा है..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:491
-#: src/components/trade/positions/funding-tab.tsx:67
-#: src/components/trade/positions/positions-tab.tsx:87
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/funding-tab.tsx
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Long"
 msgstr "लॉन्ग"
 
-#: src/components/trade/order-entry/account-panel.tsx:95
+#: src/components/trade/order-entry/account-panel.tsx
 msgid "Margin Ratio"
 msgstr "मार्जिन अनुपात"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:686
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Margin Req."
 msgstr "मार्जिन आवश्यक"
 
-#: src/components/trade/order-entry/account-panel.tsx:90
+#: src/components/trade/order-entry/account-panel.tsx
 msgid "Margin Used"
 msgstr "उपयोग किया गया मार्जिन"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:600
-#: src/components/trade/positions/positions-tab.tsx:192
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Mark"
 msgstr "मार्क"
 
-#: src/components/trade/chart/chart-panel.tsx:45
-#: src/components/trade/market-overview.tsx:39
+#: src/components/trade/chart/chart-panel.tsx
+#: src/components/trade/market-overview.tsx
 msgid "MARK"
 msgstr "मार्क"
 
-#: src/components/trade/chart/constants.ts:60
-#: src/components/trade/order-entry/order-entry-panel.tsx:459
+#: src/components/trade/chart/constants.ts
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Market"
 msgstr "बाज़ार"
 
-#: src/components/trade/positions/orders-tab.tsx:95
+#: src/components/trade/positions/orders-tab.tsx
 #~ msgid "Market metadata unavailable."
 #~ msgstr "बाज़ार मेटाडेटा उपलब्ध नहीं है।"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:180
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Market not ready"
 msgstr "मार्केट तैयार नहीं"
 
-#: src/components/trade/components/global-settings-dialog.tsx:155
+#: src/components/trade/components/global-settings-dialog.tsx
 msgid "Market Order Slippage"
 msgstr "मार्केट ऑर्डर स्लिपेज"
 
-#: src/components/trade/chart/token-selector.tsx:294
+#: src/components/trade/chart/token-selector.tsx
 msgid "markets"
 msgstr "बाज़ार"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:584
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Max"
 msgstr "अधिकतम"
 
-#: src/components/pages/builder-page.tsx:185
+#: src/components/pages/builder-page.tsx
 #~ msgid "Max 0.1% (10 bps) for perps, 1% (100 bps) for spot. Enter as decimal (e.g., 0.01 for 1 basis point)."
 #~ msgstr ""
 
-#: src/components/pages/builder-page.tsx:167
+#: src/components/pages/builder-page.tsx
 #~ msgid "Max Fee Rate (%)"
 #~ msgstr ""
 
-#: src/components/trade/components/global-settings-dialog.tsx:156
+#: src/components/trade/components/global-settings-dialog.tsx
 msgid "Max slippage allowed for market orders."
 msgstr "मार्केट ऑर्डर के लिए अधिकतम स्लिपेज।"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:200
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Min order $10"
 msgstr "न्यूनतम ऑर्डर $10"
 
-#: src/components/trade/header/top-nav.tsx:71
-#: src/components/ui/breadcrumb.tsx:78
+#: src/components/trade/header/top-nav.tsx
+#: src/components/ui/breadcrumb.tsx
 msgid "More"
 msgstr "और"
 
-#: src/components/trade/header/top-nav.tsx:69
+#: src/components/trade/header/top-nav.tsx
 msgid "More options"
 msgstr "और विकल्प"
 
-#: src/components/ui/pagination.tsx:86
+#: src/components/ui/pagination.tsx
 msgid "More pages"
 msgstr "और पृष्ठ"
 
-#: src/components/pages/builder-page.tsx:275
+#: src/components/pages/builder-page.tsx
 #~ msgid "Must be signed by main wallet (not agent/API wallet)"
 #~ msgstr ""
 
-#: src/components/trade/chart/token-selector.tsx:235
+#: src/components/trade/chart/token-selector.tsx
 msgid "NEW"
 msgstr "नया"
 
-#: src/components/trade/components/wallet-dialog.tsx:200
+#: src/components/trade/components/wallet-dialog.tsx
 msgid "New to wallets?"
 msgstr ""
 
-#: src/components/ui/pagination.tsx:71
+#: src/components/ui/pagination.tsx
 msgid "Next"
 msgstr "अगला"
 
-#: src/components/trade/positions/positions-tab.tsx:172
+#: src/components/trade/positions/positions-tab.tsx
 msgid "No active positions."
 msgstr "कोई सक्रिय पोजीशन नहीं।"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:174
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "No balance"
 msgstr "कोई बैलेंस नहीं"
 
-#: src/components/trade/positions/balances-tab.tsx:127
+#: src/components/trade/positions/balances-tab.tsx
 msgid "No balances found. Deposit funds to start trading."
 msgstr "कोई शेष नहीं मिला। ट्रेडिंग शुरू करने के लिए धन जमा करें।"
 
-#: src/components/trade/positions/history-tab.tsx:102
+#: src/components/trade/positions/history-tab.tsx
 msgid "No fills found."
 msgstr "कोई निष्पादन नहीं मिला।"
 
-#: src/components/trade/positions/funding-tab.tsx:111
+#: src/components/trade/positions/funding-tab.tsx
 msgid "No funding payments found."
 msgstr "कोई फंडिंग भुगतान नहीं मिला।"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:191
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "No mark price"
 msgstr "कोई मार्क प्राइस नहीं"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:177
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "No market"
 msgstr "कोई मार्केट नहीं"
 
-#: src/components/trade/chart/token-selector.tsx:155
+#: src/components/trade/chart/token-selector.tsx
 msgid "No markets found."
 msgstr "कोई बाज़ार नहीं मिला।"
 
-#: src/components/trade/positions/orders-tab.tsx:212
+#: src/components/trade/positions/orders-tab.tsx
 msgid "No open orders."
 msgstr "कोई खुला ऑर्डर नहीं।"
 
-#: src/components/trade/positions/twap-tab.tsx:114
+#: src/components/trade/positions/twap-tab.tsx
 msgid "No TWAP orders found."
 msgstr "कोई TWAP ऑर्डर नहीं मिला।"
 
-#: src/hooks/hyperliquid/use-trading-agent.ts:53
+#: src/hooks/hyperliquid/use-trading-agent.ts
 #~ msgid "No user address"
 #~ msgstr ""
 
-#: src/components/trade/components/wallet-dialog.tsx:176
+#: src/components/trade/components/wallet-dialog.tsx
 msgid "No wallets found"
 msgstr "कोई वॉलेट नहीं मिला"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:168
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Not connected"
 msgstr "कनेक्टेड नहीं"
 
-#: src/components/trade/header/top-nav.tsx:98
+#: src/components/trade/header/top-nav.tsx
 msgid "Notifications"
 msgstr "सूचनाएं"
 
-#: src/components/trade/components/global-settings-dialog.tsx:126
+#: src/components/trade/components/global-settings-dialog.tsx
 msgid "Number Format"
 msgstr ""
 
-#: src/components/trade/chart/chart-panel.tsx:58
-#: src/components/trade/market-overview.tsx:52
+#: src/components/trade/chart/chart-panel.tsx
+#: src/components/trade/market-overview.tsx
 msgid "OI"
 msgstr "OI"
 
-#: src/components/trade/components/wallet-dialog.tsx:224
+#: src/components/trade/components/wallet-dialog.tsx
 msgid "Only you control your funds. No email or password required."
 msgstr ""
 
-#: src/components/trade/positions/orders-tab.tsx:154
+#: src/components/trade/positions/orders-tab.tsx
 msgid "open"
 msgstr "खुला"
 
-#: src/components/trade/chart/constants.ts:78
+#: src/components/trade/chart/constants.ts
 msgid "Open Interest"
 msgstr "ओपन इंटरेस्ट"
 
-#: src/components/trade/positions/orders-tab.tsx:168
+#: src/components/trade/positions/orders-tab.tsx
 msgid "Open Orders"
 msgstr "खुले ऑर्डर"
 
-#: src/components/trade/chart/chart-panel.tsx:49
-#: src/components/trade/market-overview.tsx:43
+#: src/components/trade/chart/chart-panel.tsx
+#: src/components/trade/market-overview.tsx
 msgid "ORACLE"
 msgstr "ऑरेकल"
 
-#: src/components/trade/components/global-settings-dialog.tsx:239
-#: src/components/trade/orderbook/orderbook-panel.tsx:57
-#: src/components/trade/orderbook/orderbook-panel.tsx:58
+#: src/components/trade/components/global-settings-dialog.tsx
+#: src/components/trade/orderbook/orderbook-panel.tsx
+#: src/components/trade/orderbook/orderbook-panel.tsx
 msgid "Order Book"
 msgstr "ऑर्डर बुक"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:349
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Order failed"
 msgstr "ऑर्डर विफल"
 
-#: src/components/trade/order-entry/order-toast.tsx:167
+#: src/components/trade/order-entry/order-toast.tsx
 msgid "Order Queue"
 msgstr "ऑर्डर कतार"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:682
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Order Value"
 msgstr "ऑर्डर वैल्यू"
 
-#: src/components/trade/components/wallet-dialog.tsx:126
+#: src/components/trade/components/wallet-dialog.tsx
 msgid "Other Options"
 msgstr ""
 
-#: src/components/pages/not-found-page.tsx:13
+#: src/components/pages/not-found-page.tsx
 msgid "Page not found"
 msgstr "पृष्ठ नहीं मिला"
 
-#: src/components/ui/pagination.tsx:10
+#: src/components/ui/pagination.tsx
 msgid "pagination"
 msgstr "पृष्ठांकन"
 
-#: src/components/trade/positions/funding-tab.tsx:128
+#: src/components/trade/positions/funding-tab.tsx
 msgid "Payment"
 msgstr "भुगतान"
 
-#: src/components/trade/order-entry/order-toast.tsx:173
+#: src/components/trade/order-entry/order-toast.tsx
 msgid "pending"
 msgstr "लंबित"
 
-#: src/components/trade/positions/balances-tab.tsx:166
+#: src/components/trade/positions/balances-tab.tsx
 msgid "perp"
 msgstr "परप"
 
-#: src/components/trade/order-entry/account-panel.tsx:166
-#: src/components/trade/order-entry/account-panel.tsx:168
+#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/order-entry/account-panel.tsx
 msgid "Perps"
 msgstr "परप्स"
 
-#: src/components/pages/builder-page.tsx:259
+#: src/components/pages/builder-page.tsx
 #~ msgid "Perps: Max 0.1% (10 basis points)"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx:144
-#: src/components/trade/positions/history-tab.tsx:125
-#: src/components/trade/positions/positions-tab.tsx:195
+#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/positions-tab.tsx
 msgid "PNL"
 msgstr "PNL"
 
-#: src/components/trade/components/wallet-dialog.tsx:80
+#: src/components/trade/components/wallet-dialog.tsx
 msgid "Popular"
 msgstr ""
 
-#: src/components/trade/header/top-nav.tsx:21
+#: src/components/trade/header/top-nav.tsx
 msgid "Portfolio"
 msgstr "पोर्टफोलियो"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:531
-#: src/components/trade/positions/funding-tab.tsx:122
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/funding-tab.tsx
 msgid "Position"
 msgstr "पोजीशन"
 
-#: src/components/ui/pagination.tsx:58
+#: src/components/ui/pagination.tsx
 msgid "Previous"
 msgstr "पिछला"
 
-#: src/components/trade/chart/constants.ts:66
-#: src/components/trade/orderbook/orderbook-panel.tsx:69
-#: src/components/trade/orderbook/trades-panel.tsx:90
-#: src/components/trade/positions/history-tab.tsx:116
-#: src/components/trade/positions/orders-tab.tsx:235
+#: src/components/trade/chart/constants.ts
+#: src/components/trade/orderbook/orderbook-panel.tsx
+#: src/components/trade/orderbook/trades-panel.tsx
+#: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-tab.tsx
 msgid "Price"
 msgstr "मूल्य"
 
-#: src/components/trade/positions/twap-tab.tsx:134
+#: src/components/trade/positions/twap-tab.tsx
 msgid "Progress"
 msgstr "प्रगति"
 
-#: src/components/trade/positions/funding-tab.tsx:125
+#: src/components/trade/positions/funding-tab.tsx
 msgid "Rate"
 msgstr "दर"
 
-#: src/components/trade/orderbook/orderbook-panel.tsx:60
+#: src/components/trade/orderbook/orderbook-panel.tsx
 msgid "Recent Trades"
 msgstr "हाल के ट्रेड"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:622
-#: src/components/trade/order-entry/order-entry-panel.tsx:631
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Reduce Only"
 msgstr "केवल कम करें"
 
-#: src/components/pages/builder-page.tsx:138
+#: src/components/pages/builder-page.tsx
 #~ msgid "Register Another"
 #~ msgstr ""
 
-#: src/components/pages/builder-page.tsx:89
-#: src/components/pages/builder-page.tsx:217
+#: src/components/pages/builder-page.tsx
+#: src/components/pages/builder-page.tsx
 #~ msgid "Register Builder Code"
 #~ msgstr ""
 
-#: src/components/trade/chart/token-selector.tsx:222
+#: src/components/trade/chart/token-selector.tsx
 msgid "Remove from favorites"
 msgstr "पसंदीदा से हटाएं"
 
-#: src/components/pages/builder-page.tsx:268
+#: src/components/pages/builder-page.tsx
 #~ msgid "Requirements:"
 #~ msgstr ""
 
-#: src/components/trade/chart/token-selector.tsx:77
+#: src/components/trade/chart/token-selector.tsx
 msgid "Search markets..."
 msgstr "बाज़ार खोजें..."
 
-#: src/components/trade/components/wallet-dialog.tsx:221
+#: src/components/trade/components/wallet-dialog.tsx
 msgid "Secure & Private"
 msgstr ""
 
-#: src/components/trade/header/favorites-strip.tsx:98
+#: src/components/trade/header/favorites-strip.tsx
 msgid "Select {coin} market"
 msgstr "{coin} बाज़ार चुनें"
 
-#: src/components/trade/positions/orders-tab.tsx:223
+#: src/components/trade/positions/orders-tab.tsx
 msgid "Select all orders"
 msgstr "सभी ऑर्डर चुनें"
 
-#: src/components/trade/header/favorites-strip.tsx:65
+#: src/components/trade/header/favorites-strip.tsx
 msgid "Select favorite markets"
 msgstr "पसंदीदा बाज़ार चुनें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:439
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Select leverage"
 msgstr "लीवरेज चुनें"
 
-#: src/components/trade/positions/orders-tab.tsx:258
+#: src/components/trade/positions/orders-tab.tsx
 msgid "Select order"
 msgstr "ऑर्डर चुनें"
 
-#: src/components/trade/orderbook/orderbook-panel.tsx:75
+#: src/components/trade/orderbook/orderbook-panel.tsx
 msgid "Select order book aggregation"
 msgstr "ऑर्डर बुक एग्रीगेशन चुनें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:484
+#: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Select signing mode"
 #~ msgstr ""
 
-#: src/components/trade/chart/token-selector.tsx:53
+#: src/components/trade/chart/token-selector.tsx
 msgid "Select token"
 msgstr "टोकन चुनें"
 
-#: src/components/trade/positions/history-tab.tsx:58
-#: src/components/trade/positions/orders-tab.tsx:146
-#: src/components/trade/positions/twap-tab.tsx:74
+#: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/twap-tab.tsx
 msgid "sell"
 msgstr "बेचें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:402
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Sell"
 msgstr "बेचें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:503
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Sell Short"
 msgstr "शॉर्ट बेचें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:581
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Set {p}%"
 msgstr "{p}% सेट करें"
 
-#: src/components/trade/positions/positions-tab.tsx:257
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Set TP/SL"
 msgstr "TP/SL सेट करें"
 
-#: src/components/trade/components/global-settings-dialog.tsx:95
-#: src/components/trade/header/top-nav.tsx:107
+#: src/components/trade/components/global-settings-dialog.tsx
+#: src/components/trade/header/top-nav.tsx
 msgid "Settings"
 msgstr "सेटिंग्स"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:506
-#: src/components/trade/positions/funding-tab.tsx:67
-#: src/components/trade/positions/positions-tab.tsx:87
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/funding-tab.tsx
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Short"
 msgstr "शॉर्ट"
 
-#: src/components/trade/components/global-settings-dialog.tsx:214
+#: src/components/trade/components/global-settings-dialog.tsx
 msgid "Show Executions on Chart"
 msgstr "चार्ट पर निष्पादन दिखाएं"
 
-#: src/components/trade/components/global-settings-dialog.tsx:198
+#: src/components/trade/components/global-settings-dialog.tsx
 msgid "Show Orders on Chart"
 msgstr "चार्ट पर ऑर्डर दिखाएं"
 
-#: src/components/trade/components/global-settings-dialog.tsx:204
+#: src/components/trade/components/global-settings-dialog.tsx
 msgid "Show Positions on Chart"
 msgstr "चार्ट पर पोजीशन दिखाएं"
 
-#: src/components/trade/components/global-settings-dialog.tsx:224
+#: src/components/trade/components/global-settings-dialog.tsx
 msgid "Show Scanlines"
 msgstr "स्कैनलाइन दिखाएं"
 
-#: src/components/trade/components/global-settings-dialog.tsx:243
+#: src/components/trade/components/global-settings-dialog.tsx
 msgid "Show Values in USD"
 msgstr "USD में मान दिखाएं"
 
-#: src/components/ui/sidebar.tsx:172
+#: src/components/ui/sidebar.tsx
 msgid "Sidebar"
 msgstr "साइडबार"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:387
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Sign in wallet..."
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:188
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Signer not ready"
 msgstr "साइनर तैयार नहीं"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:427
+#: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Signing..."
 #~ msgstr "साइन हो रहा है..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:540
-#: src/components/trade/order-entry/order-toast.tsx:80
-#: src/components/trade/orderbook/orderbook-panel.tsx:101
-#: src/components/trade/orderbook/trades-panel.tsx:96
-#: src/components/trade/positions/history-tab.tsx:119
-#: src/components/trade/positions/orders-tab.tsx:238
-#: src/components/trade/positions/positions-tab.tsx:183
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/order-entry/order-toast.tsx
+#: src/components/trade/orderbook/orderbook-panel.tsx
+#: src/components/trade/orderbook/trades-panel.tsx
+#: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Size"
 msgstr "आकार"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:692
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Slippage"
 msgstr "स्लिपेज"
 
-#: src/lib/errors.ts:5
+#: src/lib/errors.ts
 msgid "Something went wrong"
 msgstr "कुछ गलत हो गया"
 
 #. placeholder {0}: String(header.column.columnDef.header ?? "")
-#: src/components/trade/chart/token-selector.tsx:132
+#: src/components/trade/chart/token-selector.tsx
 msgid "Sort by {0}"
 msgstr "{0} से क्रमबद्ध करें"
 
-#: src/components/ui/virtual-table.tsx:90
+#: src/components/ui/virtual-table.tsx
 msgid "Sort by {headerLabel}"
 msgstr "{headerLabel} से क्रमबद्ध करें"
 
 #. placeholder {0}: sorting[0].id
-#: src/components/trade/chart/token-selector.tsx:296
+#: src/components/trade/chart/token-selector.tsx
 msgid "Sorted by {0}"
 msgstr "{0} से क्रमबद्ध"
 
-#: src/components/trade/positions/balances-tab.tsx:166
+#: src/components/trade/positions/balances-tab.tsx
 msgid "spot"
 msgstr "स्पॉट"
 
-#: src/components/trade/order-entry/account-panel.tsx:183
-#: src/components/trade/order-entry/account-panel.tsx:185
+#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/order-entry/account-panel.tsx
 msgid "Spot"
 msgstr "स्पॉट"
 
-#: src/components/pages/builder-page.tsx:262
+#: src/components/pages/builder-page.tsx
 #~ msgid "Spot: Max 1% (100 basis points)"
 #~ msgstr ""
 
-#: src/components/trade/orderbook/orderbook-panel.tsx:159
+#: src/components/trade/orderbook/orderbook-panel.tsx
 msgid "Spread"
 msgstr "स्प्रेड"
 
-#: src/components/trade/header/top-nav.tsx:22
+#: src/components/trade/header/top-nav.tsx
 msgid "Staking"
 msgstr "स्टेकिंग"
 
-#: src/components/trade/positions/orders-tab.tsx:244
-#: src/components/trade/positions/twap-tab.tsx:137
+#: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/twap-tab.tsx
 msgid "Status"
 msgstr "स्थिति"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:468
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Stop"
 msgstr "स्टॉप"
 
-#: src/components/pages/builder-page.tsx:215
+#: src/components/pages/builder-page.tsx
 #~ msgid "Submitting..."
 #~ msgstr ""
 
-#: src/components/trade/header/top-nav.tsx:29
+#: src/components/trade/header/top-nav.tsx
 msgid "Support"
 msgstr "सहायता"
 
 #. placeholder {0}: row.coin
-#: src/components/trade/positions/history-tab.tsx:144
-#: src/components/trade/positions/orders-tab.tsx:272
-#: src/components/trade/positions/positions-tab.tsx:219
-#: src/components/trade/positions/twap-tab.tsx:156
+#: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/positions/twap-tab.tsx
 msgid "Switch to {0} market"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:367
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Switch to Arbitrum"
 msgstr "Arbitrum पर स्विच करें"
 
-#: src/components/trade/header/theme-toggle.tsx:43
+#: src/components/trade/header/theme-toggle.tsx
 msgid "Switch to dark mode"
 msgstr "डार्क मोड में बदलें"
 
-#: src/components/trade/header/theme-toggle.tsx:43
+#: src/components/trade/header/theme-toggle.tsx
 msgid "Switch to light mode"
 msgstr "लाइट मोड में बदलें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:367
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Switching..."
 msgstr "स्विच हो रहा है..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:637
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Take Profit / Stop Loss"
 msgstr "प्रॉफिट लें / स्टॉप लॉस"
 
-#: src/components/pages/builder-page.tsx:130
+#: src/components/pages/builder-page.tsx
 #~ msgid "The builder at {0}...{1} can now charge up to {maxFeeRate}% fee on orders placed on your behalf."
 #~ msgstr ""
 
-#: src/components/pages/not-found-page.tsx:16
+#: src/components/pages/not-found-page.tsx
 msgid "The page you are looking for does not exist."
 msgstr "आप जो पृष्ठ ढूंढ रहे हैं वह मौजूद नहीं है।"
 
-#: src/components/pages/builder-page.tsx:105
+#: src/components/pages/builder-page.tsx
 #~ msgid "This action must be signed by your main wallet (not an agent/API wallet). The builder must have at least 100 USDC in perps account value."
 #~ msgstr ""
 
-#: src/components/trade/orderbook/trades-panel.tsx:89
-#: src/components/trade/positions/funding-tab.tsx:131
-#: src/components/trade/positions/history-tab.tsx:128
+#: src/components/trade/orderbook/trades-panel.tsx
+#: src/components/trade/positions/funding-tab.tsx
+#: src/components/trade/positions/history-tab.tsx
 msgid "Time"
 msgstr "समय"
 
-#: src/components/ui/sidebar.tsx:246
-#: src/components/ui/sidebar.tsx:258
-#: src/components/ui/sidebar.tsx:261
+#: src/components/ui/sidebar.tsx
+#: src/components/ui/sidebar.tsx
+#: src/components/ui/sidebar.tsx
 msgid "Toggle Sidebar"
 msgstr "साइडबार टॉगल करें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:547
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Toggle size mode"
 msgstr "साइज मोड टॉगल करें"
 
-#: src/components/trade/orderbook/orderbook-panel.tsx:110
-#: src/components/trade/positions/balances-tab.tsx:144
+#: src/components/trade/orderbook/orderbook-panel.tsx
+#: src/components/trade/positions/balances-tab.tsx
 msgid "Total"
 msgstr "कुल"
 
-#: src/components/trade/positions/twap-tab.tsx:125
+#: src/components/trade/positions/twap-tab.tsx
 msgid "Total Size"
 msgstr "कुल आकार"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:639
-#: src/components/trade/positions/positions-tab.tsx:259
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/positions-tab.tsx
 msgid "TP/SL"
 msgstr "TP/SL"
 
-#: src/components/trade/header/top-nav.tsx:19
+#: src/components/trade/header/top-nav.tsx
 msgid "Trade"
 msgstr "ट्रेड"
 
-#: src/components/trade/positions/history-tab.tsx:81
+#: src/components/trade/positions/history-tab.tsx
 msgid "Trade History"
 msgstr "ट्रेड इतिहास"
 
-#: src/components/trade/orderbook/orderbook-panel.tsx:61
-#: src/components/trade/positions/history-tab.tsx:33
+#: src/components/trade/orderbook/orderbook-panel.tsx
+#: src/components/trade/positions/history-tab.tsx
 msgid "Trades"
 msgstr "ट्रेड्स"
 
-#: src/components/trade/order-entry/deposit-modal.tsx:18
+#: src/components/trade/order-entry/deposit-modal.tsx
 msgid "Transfer USDC to your Hyperliquid account to start trading."
 msgstr "ट्रेडिंग शुरू करने के लिए अपने Hyperliquid खाते में USDC ट्रांसफर करें।"
 
-#: src/components/trade/positions/twap-tab.tsx:93
+#: src/components/trade/positions/twap-tab.tsx
 msgid "TWAP Orders"
 msgstr "TWAP ऑर्डर"
 
-#: src/components/trade/positions/history-tab.tsx:113
-#: src/components/trade/positions/orders-tab.tsx:232
+#: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-tab.tsx
 msgid "Type"
 msgstr "प्रकार"
 
-#: src/components/trade/positions/orders-tab.tsx:123
+#: src/components/trade/positions/orders-tab.tsx
 #~ msgid "Unable to cancel orders."
 #~ msgstr "ऑर्डर रद्द करने में असमर्थ।"
 
-#: src/components/trade/positions/positions-tab.tsx:119
-#: src/components/trade/positions/positions-tab.tsx:145
+#: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/positions/positions-tab.tsx
 #~ msgid "Unable to close position."
 #~ msgstr "पोजीशन बंद करने में असमर्थ।"
 
-#: src/components/trade/chart/datafeed.ts:392
+#: src/components/trade/chart/datafeed.ts
 msgid "Unknown symbol: {symbolName}"
 msgstr "अज्ञात प्रतीक: {symbolName}"
 
-#: src/components/trade/order-entry/account-panel.tsx:80
+#: src/components/trade/order-entry/account-panel.tsx
 msgid "Unrealized PNL"
 msgstr "अवास्तविक PNL"
 
 #. placeholder {0}: String(resolution)
-#: src/components/trade/chart/datafeed.ts:432
+#: src/components/trade/chart/datafeed.ts
 msgid "Unsupported resolution: {0}"
 msgstr "असमर्थित रेजोल्यूशन: {0}"
 
-#: src/components/trade/chart/token-selector.tsx:296
+#: src/components/trade/chart/token-selector.tsx
 msgid "Updated live"
 msgstr "लाइव अपडेट"
 
-#: src/components/trade/positions/balances-tab.tsx:147
+#: src/components/trade/positions/balances-tab.tsx
 msgid "USD Value"
 msgstr "USD मूल्य"
 
-#: src/components/trade/positions/positions-tab.tsx:186
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Value"
 msgstr "वैल्यू"
 
-#: src/components/trade/header/top-nav.tsx:20
+#: src/components/trade/header/top-nav.tsx
 msgid "Vaults"
 msgstr "वॉल्ट"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:389
+#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Verifying..."
 msgstr ""
 
-#: src/components/trade/chart/chart-panel.tsx:51
-#: src/components/trade/market-overview.tsx:45
+#: src/components/trade/chart/chart-panel.tsx
+#: src/components/trade/market-overview.tsx
 msgid "VOL"
 msgstr "वॉल्यूम"
 
-#: src/components/trade/chart/constants.ts:84
+#: src/components/trade/chart/constants.ts
 msgid "Volume"
 msgstr "वॉल्यूम"
 
-#: src/components/trade/orderbook/orderbook-panel.tsx:132
+#: src/components/trade/orderbook/orderbook-panel.tsx
 msgid "Waiting for order book..."
 msgstr "ऑर्डर बुक की प्रतीक्षा..."
 
-#: src/components/trade/orderbook/trades-panel.tsx:108
+#: src/components/trade/orderbook/trades-panel.tsx
 msgid "Waiting for trades..."
 msgstr "ट्रेड की प्रतीक्षा..."
 
-#: src/hooks/hyperliquid/use-trading-agent.ts:65
+#: src/hooks/hyperliquid/use-trading-agent.ts
 #~ msgid "Wallet client not ready"
 #~ msgstr "वॉलेट क्लाइंट तैयार नहीं है"
 
-#: src/hooks/hyperliquid/use-trading-agent.ts:52
+#: src/hooks/hyperliquid/use-trading-agent.ts
 #~ msgid "Wallet not connected"
 #~ msgstr "वॉलेट कनेक्ट नहीं है"
 
-#: src/components/trade/orderbook/orderbook-panel.tsx:168
+#: src/components/trade/orderbook/orderbook-panel.tsx
 msgid "WebSocket error"
 msgstr "WebSocket त्रुटि"
 
-#: src/components/trade/components/wallet-dialog.tsx:232
+#: src/components/trade/components/wallet-dialog.tsx
 msgid "What is a wallet?"
 msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx:218
-#: src/components/trade/order-entry/account-panel.tsx:220
+#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/order-entry/account-panel.tsx
 msgid "Withdraw"
 msgstr "निकासी"
 
-#: src/components/pages/builder-page.tsx:248
+#: src/components/pages/builder-page.tsx
 #~ msgid "You can revoke permissions at any time by registering a new approval with 0% fee rate. Builder codes are processed entirely onchain as part of the fee logic."
 #~ msgstr ""
