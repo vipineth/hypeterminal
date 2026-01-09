@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { useConnection } from "wagmi";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
 import { formatToken, formatUSD } from "@/lib/format";
 import { useSubClearinghouseState, useSubSpotState } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumberOrZero } from "@/lib/trade/numbers";

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { DEFAULT_MARKET_KEY, STORAGE_KEYS } from "@/constants/app";
+import { DEFAULT_MARKET_KEY, STORAGE_KEYS } from "@/config/interface";
 import { useHyperliquidOptional } from "@/lib/hyperliquid";
 import { useInfoMeta } from "@/lib/hyperliquid/hooks/info";
 import { isPerpMarketKey, makePerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";

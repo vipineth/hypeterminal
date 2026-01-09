@@ -8,7 +8,7 @@ import {
 	MARKET_ORDER_SLIPPAGE_MAX_BPS,
 	MARKET_ORDER_SLIPPAGE_MIN_BPS,
 	STORAGE_KEYS,
-} from "@/constants/app";
+} from "@/config/interface";
 import { clampInt } from "@/lib/trade/numbers";
 import { createValidatedStorage } from "@/stores/validated-storage";
 

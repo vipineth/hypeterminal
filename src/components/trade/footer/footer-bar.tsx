@@ -1,7 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { ClientOnly } from "@tanstack/react-router";
 import { Wifi } from "lucide-react";
-import { APP_VERSION } from "@/constants/app";
+import { APP_VERSION } from "@/config/interface";
 import { formatTime } from "@/lib/format";
 
 export function FooterBar() {

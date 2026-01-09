@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { POSITIONS_TABS, UI_TEXT } from "@/constants/app";
+import { POSITIONS_TABS, UI_TEXT } from "@/config/interface";
 import { useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
 import { cn } from "@/lib/utils";

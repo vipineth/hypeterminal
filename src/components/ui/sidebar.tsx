@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { SIDEBAR_LAYOUT, STORAGE_KEYS } from "@/constants/app";
+import { SIDEBAR_LAYOUT, STORAGE_KEYS } from "@/config/interface";
 import { useIsMobile } from "@/hooks/ui/use-is-mobile";
 import { cn } from "@/lib/utils";
 

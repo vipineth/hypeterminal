@@ -1,5 +1,5 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { LAYOUT_PERSISTENCE } from "@/constants/app";
+import { LAYOUT_PERSISTENCE } from "@/config/interface";
 import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { ChartPanel } from "../chart/chart-panel";
 import { usePersistentLayout } from "../hooks/use-persistent-layout";

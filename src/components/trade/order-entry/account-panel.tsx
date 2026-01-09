@@ -3,7 +3,7 @@ import { ChevronUp } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumberOrZero } from "@/lib/trade/numbers";

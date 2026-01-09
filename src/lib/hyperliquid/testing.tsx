@@ -1,7 +1,7 @@
 import type { InfoClient, SubscriptionClient } from "@nktkas/hyperliquid";
 import type { ReactNode } from "react";
 import { createContext, useContext } from "react";
-import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/interface";
+import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/hyperliquid";
 import type { HyperliquidContextValue } from "./context";
 import type { BuilderConfig, HyperliquidEnv } from "./hooks/agent/types";
 
@@ -15,7 +15,7 @@ export interface MockHyperliquidProviderProps {
 function createMockInfoClient(): InfoClient {
 	return {
 		allMids: async () => ({}),
-		clearinghouseState: async () => ({} as never),
+		clearinghouseState: async () => ({}) as never,
 		extraAgents: async () => [],
 	} as unknown as InfoClient;
 }

@@ -1,4 +1,4 @@
-import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
 import { formatNumber, formatUSD } from "@/lib/format";
 import type { BookLevel } from "@/lib/trade/orderbook";
 import { cn } from "@/lib/utils";

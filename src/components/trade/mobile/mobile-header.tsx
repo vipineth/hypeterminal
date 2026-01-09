@@ -1,6 +1,6 @@
 import { Bell, Cog, Terminal } from "lucide-react";
 import { useState } from "react";
-import { UI_TEXT } from "@/constants/app";
+import { UI_TEXT } from "@/config/interface";
 import { cn } from "@/lib/utils";
 import { GlobalSettingsDialog } from "../components/global-settings-dialog";
 import { ThemeToggle } from "../header/theme-toggle";

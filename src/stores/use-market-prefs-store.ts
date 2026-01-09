@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { DEFAULT_MARKET_KEY, DEFAULT_MARKET_SCOPE, STORAGE_KEYS } from "@/constants/app";
+import { DEFAULT_MARKET_KEY, DEFAULT_MARKET_SCOPE, STORAGE_KEYS } from "@/config/interface";
 import { createValidatedStorage } from "@/stores/validated-storage";
 
 export type MarketScope = "all" | "perp" | "spot" | "builderPerp";
@@ -10,9 +10,7 @@ const marketPrefsSchema = z.object({
 	state: z.object({
 		marketScope: z.enum(["all", "perp", "spot", "builderPerp"]).optional(),
 		selectedMarketKey: z.string().optional(),
-		lastSelectedByScope: z
-			.record(z.enum(["all", "perp", "spot", "builderPerp"]), z.string())
-			.optional(),
+		lastSelectedByScope: z.record(z.enum(["all", "perp", "spot", "builderPerp"]), z.string()).optional(),
 		favoriteMarketKeys: z.array(z.string()).optional(),
 	}),
 });

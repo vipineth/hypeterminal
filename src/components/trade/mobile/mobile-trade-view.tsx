@@ -20,7 +20,7 @@ import {
 	ORDER_MIN_NOTIONAL_USD,
 	ORDER_SIZE_PERCENT_STEPS,
 	UI_TEXT,
-} from "@/constants/app";
+} from "@/config/interface";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";

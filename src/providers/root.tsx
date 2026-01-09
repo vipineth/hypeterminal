@@ -2,7 +2,7 @@ import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
-import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/interface";
+import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/hyperliquid";
 import { config } from "@/config/wagmi";
 import { HyperliquidProvider } from "@/lib/hyperliquid";
 import { ThemeProvider } from "./theme";

@@ -2,7 +2,7 @@ import type { ExchangeClient, InfoClient, SubscriptionClient } from "@nktkas/hyp
 import type { ReactNode } from "react";
 import { createContext, useContext, useMemo, useRef } from "react";
 import { useConnection, useWalletClient } from "wagmi";
-import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/interface";
+import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/hyperliquid";
 import { createExchangeClient, getInfoClient, getSubscriptionClient, initializeClients } from "./clients";
 import { createHyperliquidConfig } from "./createConfig";
 import type { BuilderConfig, HyperliquidEnv } from "./hooks/agent/types";

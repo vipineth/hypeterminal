@@ -2,7 +2,7 @@ import { z } from "zod";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useShallow } from "zustand/react/shallow";
-import { STORAGE_KEYS } from "@/constants/app";
+import { STORAGE_KEYS } from "@/config/interface";
 import { type NumberFormatLocale, resolveNumberFormatLocale } from "@/lib/i18n";
 import { createValidatedStorage } from "@/stores/validated-storage";
 

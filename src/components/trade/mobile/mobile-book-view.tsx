@@ -6,7 +6,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
+import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/config/interface";
 import { formatNumber } from "@/lib/format";
 import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { useSubL2Book } from "@/lib/hyperliquid/hooks/subscription";

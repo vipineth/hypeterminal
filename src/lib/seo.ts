@@ -13,7 +13,7 @@
  * ```
  */
 
-import { SEO_BASE_KEYWORDS, SEO_DEFAULTS } from "@/constants/app";
+import { SEO_BASE_KEYWORDS, SEO_DEFAULTS } from "@/config/interface";
 
 export { SEO_DEFAULTS };
 
@@ -72,11 +72,7 @@ export function buildPageHead(options: PageSeoOptions = {}): HeadOutput {
 		noIndex = false,
 	} = options;
 
-	const pageTitle = title
-		? fullTitle
-			? title
-			: `${title} | ${SEO_DEFAULTS.siteName}`
-		: SEO_DEFAULTS.defaultTitle;
+	const pageTitle = title ? (fullTitle ? title : `${title} | ${SEO_DEFAULTS.siteName}`) : SEO_DEFAULTS.defaultTitle;
 
 	const canonicalUrl = `${SEO_DEFAULTS.siteUrl}${path}`;
 

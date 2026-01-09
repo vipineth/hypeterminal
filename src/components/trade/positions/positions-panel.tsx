@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useConnection } from "wagmi";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { POSITIONS_TABS } from "@/constants/app";
+import { POSITIONS_TABS } from "@/config/interface";
 import { useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
 import { BalancesTab } from "./balances-tab";

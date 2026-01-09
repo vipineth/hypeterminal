@@ -1,11 +1,11 @@
 import { useMemo } from "react";
-import { DEFAULT_MARKET_KEY } from "@/constants/app";
-import type { PerpMarketKey } from "../market-key";
-import { isPerpMarketKey, perpCoinFromMarketKey } from "../market-key";
+import { DEFAULT_MARKET_KEY } from "@/config/interface";
 import { getMarketCtxNumbers, type MarketCtxNumbers } from "@/lib/market";
 import { toFiniteNumber } from "@/lib/trade/numbers";
 import { useSelectedMarketKey } from "@/stores/use-market-prefs-store";
 import type { PerpAssetCtx } from "@/types/hyperliquid";
+import type { PerpMarketKey } from "../market-key";
+import { isPerpMarketKey, perpCoinFromMarketKey } from "../market-key";
 import { useSubActiveAssetCtx, useSubAllMids } from "./subscription";
 import { usePerpMarkets } from "./usePerpMarkets";
 

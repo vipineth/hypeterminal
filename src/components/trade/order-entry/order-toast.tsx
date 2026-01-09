@@ -1,7 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { Check, Loader2, X, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
-import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/constants/app";
+import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/interface";
 import { cn } from "@/lib/utils";
 import { type OrderQueueItem, useOrderQueue, useOrderQueueActions } from "@/stores/use-order-queue-store";
 
@@ -163,9 +163,7 @@ export function OrderToast() {
 			<div className="px-3 py-2 border-b border-border/40 bg-muted/30 flex items-center justify-between">
 				<div className="flex items-center gap-2">
 					<Zap className="size-4 text-terminal-cyan terminal-glow-cyan" />
-					<span className="text-xs font-semibold uppercase tracking-wider text-foreground">
-						{t`Order Queue`}
-					</span>
+					<span className="text-xs font-semibold uppercase tracking-wider text-foreground">{t`Order Queue`}</span>
 				</div>
 				<div className="flex items-center gap-1.5">
 					{pendingCount > 0 && (

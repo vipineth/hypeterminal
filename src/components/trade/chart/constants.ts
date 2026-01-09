@@ -20,7 +20,7 @@ import {
 	CHART_TIME_FRAMES,
 	CHART_TIMEZONE,
 	CHART_WIDGET_DEFAULTS,
-} from "@/constants/app";
+} from "@/config/interface";
 import type { PerpMarketInfo } from "@/lib/hyperliquid/market-registry";
 import type { MarketCtxNumbers } from "@/lib/market";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";

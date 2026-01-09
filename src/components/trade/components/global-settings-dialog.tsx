@@ -8,11 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import { MARKET_ORDER_SLIPPAGE_MAX_BPS, MARKET_ORDER_SLIPPAGE_MIN_BPS } from "@/config/interface";
 import {
-	MARKET_ORDER_SLIPPAGE_MAX_BPS,
-	MARKET_ORDER_SLIPPAGE_MIN_BPS,
-} from "@/constants/app";
-import { dynamicActivate, type LocaleCode, localeList, type NumberFormatLocale, numberFormatLocaleList } from "@/lib/i18n";
+	dynamicActivate,
+	type LocaleCode,
+	localeList,
+	type NumberFormatLocale,
+	numberFormatLocaleList,
+} from "@/lib/i18n";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
 import { useMarketOrderSlippageBps, useTradeSettingsActions } from "@/stores/use-trade-settings-store";
 
@@ -102,10 +105,7 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 						<div className="text-xs text-muted-foreground">
 							<Trans>Display Language</Trans>
 						</div>
-						<Select
-							value={i18n.locale}
-							onValueChange={(value) => handleLanguageChange(value as LocaleCode)}
-						>
+						<Select value={i18n.locale} onValueChange={(value) => handleLanguageChange(value as LocaleCode)}>
 							<SelectTrigger className="w-32">
 								<SelectValue />
 							</SelectTrigger>
@@ -189,9 +189,7 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 
 					{/* Toggles */}
 					<div className="space-y-3">
-						<div className="text-4xs uppercase tracking-wider text-muted-foreground">
-							{t`Chart`}
-						</div>
+						<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Chart`}</div>
 						<div className="space-y-2">
 							<div className="flex items-center justify-between gap-4">
 								<label htmlFor={showOrdersId} className="text-xs text-muted-foreground">
@@ -203,11 +201,7 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 								<label htmlFor={showPositionsId} className="text-xs text-muted-foreground">
 									{t`Show Positions on Chart`}
 								</label>
-								<Switch
-									id={showPositionsId}
-									checked={showPositionsOnChart}
-									onCheckedChange={setShowPositionsOnChart}
-								/>
+								<Switch id={showPositionsId} checked={showPositionsOnChart} onCheckedChange={setShowPositionsOnChart} />
 							</div>
 							<div className="flex items-center justify-between gap-4">
 								<label htmlFor={showExecutionsId} className="text-xs text-muted-foreground">
@@ -223,11 +217,7 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 								<label htmlFor={showScanlinesId} className="text-xs text-muted-foreground">
 									{t`Show Scanlines`}
 								</label>
-								<Switch
-									id={showScanlinesId}
-									checked={showChartScanlines}
-									onCheckedChange={setShowChartScanlines}
-								/>
+								<Switch id={showScanlinesId} checked={showChartScanlines} onCheckedChange={setShowChartScanlines} />
 							</div>
 						</div>
 					</div>
@@ -235,18 +225,12 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 					<div className="h-px bg-border/40" />
 
 					<div className="space-y-3">
-						<div className="text-4xs uppercase tracking-wider text-muted-foreground">
-							{t`Order Book`}
-						</div>
+						<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Order Book`}</div>
 						<div className="flex items-center justify-between gap-4">
 							<label htmlFor={showOrderbookUsdId} className="text-xs text-muted-foreground">
 								{t`Show Values in USD`}
 							</label>
-							<Switch
-								id={showOrderbookUsdId}
-								checked={showOrderbookInUsd}
-								onCheckedChange={setShowOrderbookInUsd}
-							/>
+							<Switch id={showOrderbookUsdId} checked={showOrderbookInUsd} onCheckedChange={setShowOrderbookInUsd} />
 						</div>
 					</div>
 				</div>
