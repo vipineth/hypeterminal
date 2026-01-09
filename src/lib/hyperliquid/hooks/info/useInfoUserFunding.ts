@@ -2,7 +2,7 @@ import type { UserFundingParameters, UserFundingResponse } from "@nktkas/hyperli
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type UserFundingData = UserFundingResponse;
 type UserFundingParams = UserFundingParameters;
@@ -15,7 +15,7 @@ export function useInfoUserFunding<TData = UserFundingData>(
 	params: UseInfoUserFundingParameters,
 	options: UseInfoUserFundingOptions<TData> = {},
 ): UseInfoUserFundingReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("userFunding", params);
 
 	return useQuery({

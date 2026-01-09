@@ -1,11 +1,15 @@
-import { useContext } from "react";
-import { HyperliquidClientsContext, type HyperliquidClients } from "../context";
-import { ProviderNotFoundError } from "../errors";
+import type { ExchangeClient, InfoClient, SubscriptionClient } from "@nktkas/hyperliquid";
+import { useHyperliquid } from "../context";
+import { useSignedExchange } from "./useSignedExchange";
+
+export interface HyperliquidClients {
+	info: InfoClient;
+	subscription: SubscriptionClient;
+	exchange: ExchangeClient | null;
+}
 
 export function useHyperliquidClients(): HyperliquidClients {
-	const clients = useContext(HyperliquidClientsContext);
-	if (!clients) {
-		throw new ProviderNotFoundError();
-	}
-	return clients;
+	const { info, subscription } = useHyperliquid();
+	const { exchange } = useSignedExchange();
+	return { info, subscription, exchange };
 }

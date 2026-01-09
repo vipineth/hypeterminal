@@ -2,7 +2,7 @@ import type { WebData3WsEvent, WebData3WsParameters } from "@nktkas/hyperliquid"
 import { useCallback, useMemo } from "react";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 import { useSub } from "../utils/useSub";
 
 type WebData3Event = WebData3WsEvent;
@@ -16,7 +16,7 @@ export function useSubWebData3(
 	params: UseSubWebData3Parameters,
 	options: UseSubWebData3Options = {},
 ): UseSubWebData3ReturnType {
-	const { subscription } = useHyperliquidClients();
+	const { subscription } = useHyperliquid();
 	const key = serializeKey(subscriptionKeys.method("webData3", params));
 	const stableParams = useMemo(() => params, [key]);
 

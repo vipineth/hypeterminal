@@ -2,7 +2,7 @@ import type { MetaParameters, MetaResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type MetaData = MetaResponse;
 type MetaParams = MetaParameters;
@@ -15,7 +15,7 @@ export function useInfoMeta<TData = MetaData>(
 	params: UseInfoMetaParameters,
 	options: UseInfoMetaOptions<TData> = {},
 ): UseInfoMetaReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("meta", params);
 
 	return useQuery({

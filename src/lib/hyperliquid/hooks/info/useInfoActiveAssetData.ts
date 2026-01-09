@@ -2,7 +2,7 @@ import type { ActiveAssetDataParameters, ActiveAssetDataResponse } from "@nktkas
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type ActiveAssetDataData = ActiveAssetDataResponse;
 type ActiveAssetDataParams = ActiveAssetDataParameters;
@@ -18,7 +18,7 @@ export function useInfoActiveAssetData<TData = ActiveAssetDataData>(
 	params: UseInfoActiveAssetDataParameters,
 	options: UseInfoActiveAssetDataOptions<TData> = {},
 ): UseInfoActiveAssetDataReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("activeAssetData", params);
 
 	return useQuery({

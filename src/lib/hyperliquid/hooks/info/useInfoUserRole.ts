@@ -2,7 +2,7 @@ import type { UserRoleParameters, UserRoleResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type UserRoleData = UserRoleResponse;
 type UserRoleParams = UserRoleParameters;
@@ -15,7 +15,7 @@ export function useInfoUserRole<TData = UserRoleData>(
 	params: UseInfoUserRoleParameters,
 	options: UseInfoUserRoleOptions<TData> = {},
 ): UseInfoUserRoleReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("userRole", params);
 
 	return useQuery({

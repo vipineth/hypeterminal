@@ -2,7 +2,7 @@ import type { GossipRootIpsResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type GossipRootIpsData = GossipRootIpsResponse;
 
@@ -12,7 +12,7 @@ export type UseInfoGossipRootIpsReturnType<TData = GossipRootIpsData> = UseQuery
 export function useInfoGossipRootIps<TData = GossipRootIpsData>(
 	options: UseInfoGossipRootIpsOptions<TData> = {},
 ): UseInfoGossipRootIpsReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("gossipRootIps");
 
 	return useQuery({

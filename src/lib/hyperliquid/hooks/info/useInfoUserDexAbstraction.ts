@@ -2,7 +2,7 @@ import type { UserDexAbstractionInfoResponse, UserDexAbstractionParameters } fro
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type UserDexAbstractionData = UserDexAbstractionInfoResponse;
 type UserDexAbstractionParams = UserDexAbstractionParameters;
@@ -21,7 +21,7 @@ export function useInfoUserDexAbstraction<TData = UserDexAbstractionData>(
 	params: UseInfoUserDexAbstractionParameters,
 	options: UseInfoUserDexAbstractionOptions<TData> = {},
 ): UseInfoUserDexAbstractionReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("userDexAbstraction", params);
 
 	return useQuery({

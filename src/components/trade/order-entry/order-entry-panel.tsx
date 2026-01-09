@@ -92,10 +92,6 @@ export function OrderEntryPanel() {
 	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
 	const [depositModalOpen, setDepositModalOpen] = useState(false);
 
-	// React 19: Form reset handled by key prop from OrderSidebar
-
-	// Valid useEffect: Cross-component event from orderbook price click
-	// This responds to user action in another component (similar to external event)
 	useEffect(() => {
 		if (selectedPrice !== null) {
 			setType("limit");
@@ -104,23 +100,19 @@ export function OrderEntryPanel() {
 		}
 	}, [selectedPrice]);
 
-	// React 19: Simple arithmetic - no useMemo needed
 	const accountValue = parseNumber(clearinghouse?.crossMarginSummary?.accountValue) || 0;
 	const marginUsed = parseNumber(clearinghouse?.crossMarginSummary?.totalMarginUsed) || 0;
 	const availableBalance = Math.max(0, accountValue - marginUsed);
 
-	// React 19: Simple array.find - no useMemo needed
 	const position =
 		!clearinghouse?.assetPositions || !market?.coin
 			? null
 			: (clearinghouse.assetPositions.find((p) => p.position.coin === market.coin) ?? null);
 
-	// React 19: Simple parsing - no useMemo needed
 	const positionSize = parseNumber(position?.position?.szi) || 0;
 
 	const maxLeverage = market?.maxLeverage || DEFAULT_MAX_LEVERAGE;
 
-	// React 19: Simple calculation - no useMemo needed
 	const leverage = (() => {
 		if (!market?.marketKey) return getDefaultLeverage(maxLeverage);
 		const marketSpecific = marketLeverageByMode[market.marketKey]?.cross;
@@ -129,15 +121,12 @@ export function OrderEntryPanel() {
 		return Math.min(defaultLev, maxLeverage);
 	})();
 
-	// React 19: Simple conditional - no useMemo needed
 	const ctxMarkPx = market?.ctxNumbers?.markPx;
 	const markPx =
 		typeof ctxMarkPx === "number" ? ctxMarkPx : typeof market?.midPxNumber === "number" ? market.midPxNumber : 0;
 
-	// React 19: Simple conditional - no useMemo needed
 	const price = type === "market" ? markPx : parseNumber(limitPriceInput) || 0;
 
-	// React 19: Simple calculation - no useMemo needed
 	const maxSize = (() => {
 		if (!price || price <= 0 || !leverage) return 0;
 		const maxNotional = availableBalance * leverage;
@@ -152,7 +141,6 @@ export function OrderEntryPanel() {
 		return floorToDecimals(maxSizeRaw, market?.szDecimals ?? 0);
 	})();
 
-	// React 19: Simple calculations - no useMemo needed
 	const sizeInputValue = parseNumber(sizeInput) || 0;
 	const sizeValue = sizeMode === "usd" && price > 0 ? sizeInputValue / price : sizeInputValue;
 
@@ -250,7 +238,6 @@ export function OrderEntryPanel() {
 		return options.sort((a, b) => a - b);
 	}, [maxLeverage]);
 
-	// React 19: Simple event handlers - no useCallback needed
 	const handleLeverageChange = (newLeverage: number) => {
 		if (market?.marketKey) {
 			setMarketLeverage(market.marketKey, "cross", newLeverage, maxLeverage);
@@ -318,14 +305,16 @@ export function OrderEntryPanel() {
 	};
 
 	const handleSubmit = async () => {
+		console.log("handleSubmit");
 		if (!validation.canSubmit || isSubmitting) return;
+		console.log("validation.canSubmit", validation.canSubmit);
 		if (typeof market?.assetIndex !== "number") return;
-
+		console.log("market?.assetIndex", market?.assetIndex);
 		let orderPrice = price;
 		if (type === "market") {
 			orderPrice = side === "buy" ? markPx * (1 + slippageBps / 10000) : markPx * (1 - slippageBps / 10000);
 		}
-
+		console.log("orderPrice", orderPrice);
 		const szDecimals = market.szDecimals ?? 0;
 		const formattedPrice = formatPriceForOrder(orderPrice);
 		const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
@@ -336,9 +325,11 @@ export function OrderEntryPanel() {
 			size: formattedSize,
 			status: "pending",
 		});
-
+		console.log("orderId", orderId);
 		try {
-			await updateLeverage({ asset: market.assetIndex, isCross: true, leverage });
+			// await updateLeverage({ asset: market.assetIndex, isCross: true, leverage });
+
+			console.log("placeOrder");
 
 			const result = await placeOrder({
 				orders: [

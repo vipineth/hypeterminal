@@ -2,7 +2,7 @@ import type { VaultDetailsParameters, VaultDetailsResponse } from "@nktkas/hyper
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type VaultDetailsData = VaultDetailsResponse;
 type VaultDetailsParams = VaultDetailsParameters;
@@ -15,7 +15,7 @@ export function useInfoVaultDetails<TData = VaultDetailsData>(
 	params: UseInfoVaultDetailsParameters,
 	options: UseInfoVaultDetailsOptions<TData> = {},
 ): UseInfoVaultDetailsReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("vaultDetails", params);
 
 	return useQuery({

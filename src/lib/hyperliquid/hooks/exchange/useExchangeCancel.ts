@@ -1,5 +1,6 @@
 import type { CancelParameters, CancelSuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
+import { useHyperliquid } from "../../context";
 import { MissingWalletError } from "../../errors";
 import { exchangeKeys } from "../../query/keys";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
@@ -13,10 +14,11 @@ export type UseExchangeCancelReturnType = UseMutationResult<CancelData, Hyperliq
 
 export function useExchangeCancel(options: UseExchangeCancelOptions = {}): UseExchangeCancelReturnType {
 	const { exchange } = useHyperliquidClients();
+	const { clientKey } = useHyperliquid();
 
 	return useMutation({
 		...options,
-		mutationKey: exchangeKeys.method("cancel"),
+		mutationKey: exchangeKeys.method("cancel", clientKey),
 		mutationFn: (params) => {
 			if (!exchange) throw new MissingWalletError();
 			return exchange.cancel(params);

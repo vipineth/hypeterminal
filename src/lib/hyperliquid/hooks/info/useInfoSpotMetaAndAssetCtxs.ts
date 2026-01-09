@@ -2,7 +2,7 @@ import type { SpotMetaAndAssetCtxsResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type SpotMetaAndAssetCtxsData = SpotMetaAndAssetCtxsResponse;
 
@@ -18,7 +18,7 @@ export type UseInfoSpotMetaAndAssetCtxsReturnType<TData = SpotMetaAndAssetCtxsDa
 export function useInfoSpotMetaAndAssetCtxs<TData = SpotMetaAndAssetCtxsData>(
 	options: UseInfoSpotMetaAndAssetCtxsOptions<TData> = {},
 ): UseInfoSpotMetaAndAssetCtxsReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("spotMetaAndAssetCtxs");
 
 	return useQuery({

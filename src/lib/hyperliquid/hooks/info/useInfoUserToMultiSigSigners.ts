@@ -2,7 +2,7 @@ import type { UserToMultiSigSignersParameters, UserToMultiSigSignersResponse } f
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type UserToMultiSigSignersData = UserToMultiSigSignersResponse;
 type UserToMultiSigSignersParams = UserToMultiSigSignersParameters;
@@ -21,7 +21,7 @@ export function useInfoUserToMultiSigSigners<TData = UserToMultiSigSignersData>(
 	params: UseInfoUserToMultiSigSignersParameters,
 	options: UseInfoUserToMultiSigSignersOptions<TData> = {},
 ): UseInfoUserToMultiSigSignersReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("userToMultiSigSigners", params);
 
 	return useQuery({

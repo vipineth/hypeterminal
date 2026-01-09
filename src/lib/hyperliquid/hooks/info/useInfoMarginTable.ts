@@ -2,7 +2,7 @@ import type { MarginTableParameters, MarginTableResponse } from "@nktkas/hyperli
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type MarginTableData = MarginTableResponse;
 type MarginTableParams = MarginTableParameters;
@@ -15,7 +15,7 @@ export function useInfoMarginTable<TData = MarginTableData>(
 	params: UseInfoMarginTableParameters,
 	options: UseInfoMarginTableOptions<TData> = {},
 ): UseInfoMarginTableReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("marginTable", params);
 
 	return useQuery({

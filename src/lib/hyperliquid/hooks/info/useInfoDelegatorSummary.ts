@@ -2,7 +2,7 @@ import type { DelegatorSummaryParameters, DelegatorSummaryResponse } from "@nktk
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type DelegatorSummaryData = DelegatorSummaryResponse;
 type DelegatorSummaryParams = DelegatorSummaryParameters;
@@ -18,7 +18,7 @@ export function useInfoDelegatorSummary<TData = DelegatorSummaryData>(
 	params: UseInfoDelegatorSummaryParameters,
 	options: UseInfoDelegatorSummaryOptions<TData> = {},
 ): UseInfoDelegatorSummaryReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("delegatorSummary", params);
 
 	return useQuery({

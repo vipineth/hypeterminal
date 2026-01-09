@@ -2,7 +2,7 @@ import type { UserTwapHistoryWsEvent, UserTwapHistoryWsParameters } from "@nktka
 import { useCallback, useMemo } from "react";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 import { useSub } from "../utils/useSub";
 
 type UserTwapHistoryEvent = UserTwapHistoryWsEvent;
@@ -16,7 +16,7 @@ export function useSubUserTwapHistory(
 	params: UseSubUserTwapHistoryParameters,
 	options: UseSubUserTwapHistoryOptions = {},
 ): UseSubUserTwapHistoryReturnType {
-	const { subscription } = useHyperliquidClients();
+	const { subscription } = useHyperliquid();
 	const key = serializeKey(subscriptionKeys.method("userTwapHistory", params));
 	const stableParams = useMemo(() => params, [key]);
 

@@ -2,7 +2,7 @@ import type { PredictedFundingsResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type PredictedFundingsData = PredictedFundingsResponse;
 
@@ -18,7 +18,7 @@ export type UseInfoPredictedFundingsReturnType<TData = PredictedFundingsData> = 
 export function useInfoPredictedFundings<TData = PredictedFundingsData>(
 	options: UseInfoPredictedFundingsOptions<TData> = {},
 ): UseInfoPredictedFundingsReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("predictedFundings");
 
 	return useQuery({

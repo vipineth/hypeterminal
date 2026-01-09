@@ -2,7 +2,7 @@ import type { PerpsAtOpenInterestCapParameters, PerpsAtOpenInterestCapResponse }
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type PerpsAtOpenInterestCapData = PerpsAtOpenInterestCapResponse;
 type PerpsAtOpenInterestCapParams = PerpsAtOpenInterestCapParameters;
@@ -21,7 +21,7 @@ export function useInfoPerpsAtOpenInterestCap<TData = PerpsAtOpenInterestCapData
 	params: UseInfoPerpsAtOpenInterestCapParameters,
 	options: UseInfoPerpsAtOpenInterestCapOptions<TData> = {},
 ): UseInfoPerpsAtOpenInterestCapReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("perpsAtOpenInterestCap", params);
 
 	return useQuery({

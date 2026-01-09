@@ -2,7 +2,7 @@ import type { FundingHistoryParameters, FundingHistoryResponse } from "@nktkas/h
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type FundingHistoryData = FundingHistoryResponse;
 type FundingHistoryParams = FundingHistoryParameters;
@@ -15,7 +15,7 @@ export function useInfoFundingHistory<TData = FundingHistoryData>(
 	params: UseInfoFundingHistoryParameters,
 	options: UseInfoFundingHistoryOptions<TData> = {},
 ): UseInfoFundingHistoryReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("fundingHistory", params);
 
 	return useQuery({

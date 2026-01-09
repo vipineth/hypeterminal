@@ -2,7 +2,7 @@ import type { L2BookWsEvent, L2BookWsParameters } from "@nktkas/hyperliquid";
 import { useCallback, useMemo } from "react";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 import { useSub } from "../utils/useSub";
 
 type L2BookEvent = L2BookWsEvent;
@@ -16,7 +16,7 @@ export function useSubL2Book(
 	params: UseSubL2BookParameters,
 	options: UseSubL2BookOptions = {},
 ): UseSubL2BookReturnType {
-	const { subscription } = useHyperliquidClients();
+	const { subscription } = useHyperliquid();
 	const key = serializeKey(subscriptionKeys.method("l2Book", params));
 	const stableParams = useMemo(() => params, [key]);
 

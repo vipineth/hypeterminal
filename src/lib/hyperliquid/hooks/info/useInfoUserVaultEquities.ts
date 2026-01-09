@@ -2,7 +2,7 @@ import type { UserVaultEquitiesParameters, UserVaultEquitiesResponse } from "@nk
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type UserVaultEquitiesData = UserVaultEquitiesResponse;
 type UserVaultEquitiesParams = UserVaultEquitiesParameters;
@@ -21,7 +21,7 @@ export function useInfoUserVaultEquities<TData = UserVaultEquitiesData>(
 	params: UseInfoUserVaultEquitiesParameters,
 	options: UseInfoUserVaultEquitiesOptions<TData> = {},
 ): UseInfoUserVaultEquitiesReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("userVaultEquities", params);
 
 	return useQuery({

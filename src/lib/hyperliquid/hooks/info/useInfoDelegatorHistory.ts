@@ -2,7 +2,7 @@ import type { DelegatorHistoryParameters, DelegatorHistoryResponse } from "@nktk
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type DelegatorHistoryData = DelegatorHistoryResponse;
 type DelegatorHistoryParams = DelegatorHistoryParameters;
@@ -18,7 +18,7 @@ export function useInfoDelegatorHistory<TData = DelegatorHistoryData>(
 	params: UseInfoDelegatorHistoryParameters,
 	options: UseInfoDelegatorHistoryOptions<TData> = {},
 ): UseInfoDelegatorHistoryReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("delegatorHistory", params);
 
 	return useQuery({

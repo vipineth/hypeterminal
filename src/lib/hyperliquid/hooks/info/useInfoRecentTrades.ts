@@ -2,7 +2,7 @@ import type { RecentTradesParameters, RecentTradesResponse } from "@nktkas/hyper
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type RecentTradesData = RecentTradesResponse;
 type RecentTradesParams = RecentTradesParameters;
@@ -15,7 +15,7 @@ export function useInfoRecentTrades<TData = RecentTradesData>(
 	params: UseInfoRecentTradesParameters,
 	options: UseInfoRecentTradesOptions<TData> = {},
 ): UseInfoRecentTradesReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("recentTrades", params);
 
 	return useQuery({

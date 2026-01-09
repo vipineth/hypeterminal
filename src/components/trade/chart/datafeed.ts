@@ -7,7 +7,7 @@ import type {
 	ISubscription,
 	MetaResponse,
 } from "@nktkas/hyperliquid";
-import { getInfoClient, getSubscriptionClient } from "@/lib/hyperliquid/client-registry";
+import { getInfoClient, getSubscriptionClient } from "@/lib/hyperliquid/clients";
 import { toFiniteNumber } from "@/lib/trade/numbers";
 import type {
 	Bar,

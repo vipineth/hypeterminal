@@ -2,7 +2,7 @@ import type { AllPerpMetasResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type AllPerpMetasData = AllPerpMetasResponse;
 
@@ -12,7 +12,7 @@ export type UseInfoAllPerpMetasReturnType<TData = AllPerpMetasData> = UseQueryRe
 export function useInfoAllPerpMetas<TData = AllPerpMetasData>(
 	options: UseInfoAllPerpMetasOptions<TData> = {},
 ): UseInfoAllPerpMetasReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("allPerpMetas");
 
 	return useQuery({

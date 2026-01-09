@@ -2,7 +2,7 @@ import type { CandleSnapshotParameters, CandleSnapshotResponse } from "@nktkas/h
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type CandleSnapshotData = CandleSnapshotResponse;
 type CandleSnapshotParams = CandleSnapshotParameters;
@@ -15,7 +15,7 @@ export function useInfoCandleSnapshot<TData = CandleSnapshotData>(
 	params: UseInfoCandleSnapshotParameters,
 	options: UseInfoCandleSnapshotOptions<TData> = {},
 ): UseInfoCandleSnapshotReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("candleSnapshot", params);
 
 	return useQuery({

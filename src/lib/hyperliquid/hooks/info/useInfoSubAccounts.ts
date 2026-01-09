@@ -2,7 +2,7 @@ import type { SubAccountsParameters, SubAccountsResponse } from "@nktkas/hyperli
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type SubAccountsData = SubAccountsResponse;
 type SubAccountsParams = SubAccountsParameters;
@@ -15,7 +15,7 @@ export function useInfoSubAccounts<TData = SubAccountsData>(
 	params: UseInfoSubAccountsParameters,
 	options: UseInfoSubAccountsOptions<TData> = {},
 ): UseInfoSubAccountsReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("subAccounts", params);
 
 	return useQuery({

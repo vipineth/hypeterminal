@@ -2,7 +2,7 @@ import type { VaultSummariesResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type VaultSummariesData = VaultSummariesResponse;
 
@@ -12,7 +12,7 @@ export type UseInfoVaultSummariesReturnType<TData = VaultSummariesData> = UseQue
 export function useInfoVaultSummaries<TData = VaultSummariesData>(
 	options: UseInfoVaultSummariesOptions<TData> = {},
 ): UseInfoVaultSummariesReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("vaultSummaries");
 
 	return useQuery({

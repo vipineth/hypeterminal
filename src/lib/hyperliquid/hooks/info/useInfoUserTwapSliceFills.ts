@@ -2,7 +2,7 @@ import type { UserTwapSliceFillsParameters, UserTwapSliceFillsResponse } from "@
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type UserTwapSliceFillsData = UserTwapSliceFillsResponse;
 type UserTwapSliceFillsParams = UserTwapSliceFillsParameters;
@@ -21,7 +21,7 @@ export function useInfoUserTwapSliceFills<TData = UserTwapSliceFillsData>(
 	params: UseInfoUserTwapSliceFillsParameters,
 	options: UseInfoUserTwapSliceFillsOptions<TData> = {},
 ): UseInfoUserTwapSliceFillsReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("userTwapSliceFills", params);
 
 	return useQuery({

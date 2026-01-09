@@ -2,7 +2,7 @@ import type { LeadingVaultsParameters, LeadingVaultsResponse } from "@nktkas/hyp
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type LeadingVaultsData = LeadingVaultsResponse;
 type LeadingVaultsParams = LeadingVaultsParameters;
@@ -15,7 +15,7 @@ export function useInfoLeadingVaults<TData = LeadingVaultsData>(
 	params: UseInfoLeadingVaultsParameters,
 	options: UseInfoLeadingVaultsOptions<TData> = {},
 ): UseInfoLeadingVaultsReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("leadingVaults", params);
 
 	return useQuery({

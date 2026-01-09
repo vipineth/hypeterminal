@@ -2,7 +2,7 @@ import type { UserRateLimitParameters, UserRateLimitResponse } from "@nktkas/hyp
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type UserRateLimitData = UserRateLimitResponse;
 type UserRateLimitParams = UserRateLimitParameters;
@@ -15,7 +15,7 @@ export function useInfoUserRateLimit<TData = UserRateLimitData>(
 	params: UseInfoUserRateLimitParameters,
 	options: UseInfoUserRateLimitOptions<TData> = {},
 ): UseInfoUserRateLimitReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("userRateLimit", params);
 
 	return useQuery({

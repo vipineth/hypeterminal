@@ -2,7 +2,7 @@ import type { OrderUpdatesWsEvent, OrderUpdatesWsParameters } from "@nktkas/hype
 import { useCallback, useMemo } from "react";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 import { useSub } from "../utils/useSub";
 
 type OrderUpdatesEvent = OrderUpdatesWsEvent;
@@ -16,7 +16,7 @@ export function useSubOrderUpdates(
 	params: UseSubOrderUpdatesParameters,
 	options: UseSubOrderUpdatesOptions = {},
 ): UseSubOrderUpdatesReturnType {
-	const { subscription } = useHyperliquidClients();
+	const { subscription } = useHyperliquid();
 	const key = serializeKey(subscriptionKeys.method("orderUpdates", params));
 	const stableParams = useMemo(() => params, [key]);
 

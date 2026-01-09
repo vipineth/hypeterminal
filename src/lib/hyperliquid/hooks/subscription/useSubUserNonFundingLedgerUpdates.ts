@@ -2,7 +2,7 @@ import type { UserNonFundingLedgerUpdatesWsEvent, UserNonFundingLedgerUpdatesWsP
 import { useCallback, useMemo } from "react";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 import { useSub } from "../utils/useSub";
 
 type UserNonFundingLedgerUpdatesEvent = UserNonFundingLedgerUpdatesWsEvent;
@@ -16,7 +16,7 @@ export function useSubUserNonFundingLedgerUpdates(
 	params: UseSubUserNonFundingLedgerUpdatesParameters,
 	options: UseSubUserNonFundingLedgerUpdatesOptions = {},
 ): UseSubUserNonFundingLedgerUpdatesReturnType {
-	const { subscription } = useHyperliquidClients();
+	const { subscription } = useHyperliquid();
 	const key = serializeKey(subscriptionKeys.method("userNonFundingLedgerUpdates", params));
 	const stableParams = useMemo(() => params, [key]);
 

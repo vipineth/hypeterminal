@@ -2,7 +2,7 @@ import type { UserNonFundingLedgerUpdatesParameters, UserNonFundingLedgerUpdates
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type UserNonFundingLedgerUpdatesData = UserNonFundingLedgerUpdatesResponse;
 type UserNonFundingLedgerUpdatesParams = UserNonFundingLedgerUpdatesParameters;
@@ -21,7 +21,7 @@ export function useInfoUserNonFundingLedgerUpdates<TData = UserNonFundingLedgerU
 	params: UseInfoUserNonFundingLedgerUpdatesParameters,
 	options: UseInfoUserNonFundingLedgerUpdatesOptions<TData> = {},
 ): UseInfoUserNonFundingLedgerUpdatesReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("userNonFundingLedgerUpdates", params);
 
 	return useQuery({

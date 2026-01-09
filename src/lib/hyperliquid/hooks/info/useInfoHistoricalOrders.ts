@@ -2,7 +2,7 @@ import type { HistoricalOrdersParameters, HistoricalOrdersResponse } from "@nktk
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type HistoricalOrdersData = HistoricalOrdersResponse;
 type HistoricalOrdersParams = HistoricalOrdersParameters;
@@ -18,7 +18,7 @@ export function useInfoHistoricalOrders<TData = HistoricalOrdersData>(
 	params: UseInfoHistoricalOrdersParameters,
 	options: UseInfoHistoricalOrdersOptions<TData> = {},
 ): UseInfoHistoricalOrdersReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("historicalOrders", params);
 
 	return useQuery({

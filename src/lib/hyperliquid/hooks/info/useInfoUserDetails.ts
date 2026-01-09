@@ -2,7 +2,7 @@ import type { UserDetailsParameters, UserDetailsResponse } from "@nktkas/hyperli
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type UserDetailsData = UserDetailsResponse;
 type UserDetailsParams = UserDetailsParameters;
@@ -15,7 +15,7 @@ export function useInfoUserDetails<TData = UserDetailsData>(
 	params: UseInfoUserDetailsParameters,
 	options: UseInfoUserDetailsOptions<TData> = {},
 ): UseInfoUserDetailsReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("userDetails", params);
 
 	return useQuery({

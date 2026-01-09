@@ -2,7 +2,7 @@ import type { SpotMetaResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type SpotMetaData = SpotMetaResponse;
 
@@ -12,7 +12,7 @@ export type UseInfoSpotMetaReturnType<TData = SpotMetaData> = UseQueryResult<TDa
 export function useInfoSpotMeta<TData = SpotMetaData>(
 	options: UseInfoSpotMetaOptions<TData> = {},
 ): UseInfoSpotMetaReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("spotMeta");
 
 	return useQuery({

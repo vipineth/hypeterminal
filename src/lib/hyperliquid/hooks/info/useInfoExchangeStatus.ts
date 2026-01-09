@@ -1,6 +1,6 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import type { ExchangeStatusResponse } from "@nktkas/hyperliquid";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
@@ -12,7 +12,7 @@ export type UseInfoExchangeStatusReturnType<TData = ExchangeStatusData> = UseQue
 export function useInfoExchangeStatus<TData = ExchangeStatusData>(
   options: UseInfoExchangeStatusOptions<TData> = {},
 ): UseInfoExchangeStatusReturnType<TData> {
-  const { info } = useHyperliquidClients();
+  const { info } = useHyperliquid();
   const queryKey = infoKeys.method("exchangeStatus");
 
   return useQuery({

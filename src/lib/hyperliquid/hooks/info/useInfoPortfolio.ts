@@ -2,7 +2,7 @@ import type { PortfolioParameters, PortfolioResponse } from "@nktkas/hyperliquid
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type PortfolioData = PortfolioResponse;
 type PortfolioParams = PortfolioParameters;
@@ -15,7 +15,7 @@ export function useInfoPortfolio<TData = PortfolioData>(
 	params: UseInfoPortfolioParameters,
 	options: UseInfoPortfolioOptions<TData> = {},
 ): UseInfoPortfolioReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("portfolio", params);
 
 	return useQuery({

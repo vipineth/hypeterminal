@@ -2,7 +2,7 @@ import type { WebData2Parameters, WebData2Response } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type WebData2Data = WebData2Response;
 type WebData2Params = WebData2Parameters;
@@ -15,7 +15,7 @@ export function useInfoWebData2<TData = WebData2Data>(
 	params: UseInfoWebData2Parameters,
 	options: UseInfoWebData2Options<TData> = {},
 ): UseInfoWebData2ReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("webData2", params);
 
 	return useQuery({

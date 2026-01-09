@@ -2,7 +2,7 @@ import type { TradesWsEvent, TradesWsParameters } from "@nktkas/hyperliquid";
 import { useCallback, useMemo } from "react";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 import { useSub } from "../utils/useSub";
 
 type TradesEvent = TradesWsEvent;
@@ -16,7 +16,7 @@ export function useSubTrades(
 	params: UseSubTradesParameters,
 	options: UseSubTradesOptions = {},
 ): UseSubTradesReturnType {
-	const { subscription } = useHyperliquidClients();
+	const { subscription } = useHyperliquid();
 	const key = serializeKey(subscriptionKeys.method("trades", params));
 	const stableParams = useMemo(() => params, [key]);
 

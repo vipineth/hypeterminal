@@ -2,7 +2,7 @@ import type { LegalCheckParameters, LegalCheckResponse } from "@nktkas/hyperliqu
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type LegalCheckData = LegalCheckResponse;
 type LegalCheckParams = LegalCheckParameters;
@@ -15,7 +15,7 @@ export function useInfoLegalCheck<TData = LegalCheckData>(
 	params: UseInfoLegalCheckParameters,
 	options: UseInfoLegalCheckOptions<TData> = {},
 ): UseInfoLegalCheckReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("legalCheck", params);
 
 	return useQuery({

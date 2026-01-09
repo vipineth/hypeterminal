@@ -2,7 +2,7 @@ import type { PreTransferCheckParameters, PreTransferCheckResponse } from "@nktk
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type PreTransferCheckData = PreTransferCheckResponse;
 type PreTransferCheckParams = PreTransferCheckParameters;
@@ -18,7 +18,7 @@ export function useInfoPreTransferCheck<TData = PreTransferCheckData>(
 	params: UseInfoPreTransferCheckParameters,
 	options: UseInfoPreTransferCheckOptions<TData> = {},
 ): UseInfoPreTransferCheckReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("preTransferCheck", params);
 
 	return useQuery({

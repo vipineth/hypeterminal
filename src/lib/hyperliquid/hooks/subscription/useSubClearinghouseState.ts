@@ -2,7 +2,7 @@ import type { ClearinghouseStateWsEvent, ClearinghouseStateWsParameters } from "
 import { useCallback, useMemo } from "react";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 import { useSub } from "../utils/useSub";
 
 type ClearinghouseStateEvent = ClearinghouseStateWsEvent;
@@ -16,7 +16,7 @@ export function useSubClearinghouseState(
 	params: UseSubClearinghouseStateParameters,
 	options: UseSubClearinghouseStateOptions = {},
 ): UseSubClearinghouseStateReturnType {
-	const { subscription } = useHyperliquidClients();
+	const { subscription } = useHyperliquid();
 	const key = serializeKey(subscriptionKeys.method("clearinghouseState", params));
 	const stableParams = useMemo(() => params, [key]);
 

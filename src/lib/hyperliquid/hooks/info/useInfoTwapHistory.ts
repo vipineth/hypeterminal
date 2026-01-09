@@ -2,7 +2,7 @@ import type { TwapHistoryParameters, TwapHistoryResponse } from "@nktkas/hyperli
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type TwapHistoryData = TwapHistoryResponse;
 type TwapHistoryParams = TwapHistoryParameters;
@@ -15,7 +15,7 @@ export function useInfoTwapHistory<TData = TwapHistoryData>(
 	params: UseInfoTwapHistoryParameters,
 	options: UseInfoTwapHistoryOptions<TData> = {},
 ): UseInfoTwapHistoryReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("twapHistory", params);
 
 	return useQuery({

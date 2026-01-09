@@ -2,7 +2,7 @@ import type { SpotDeployStateParameters, SpotDeployStateResponse } from "@nktkas
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type SpotDeployStateData = SpotDeployStateResponse;
 type SpotDeployStateParams = SpotDeployStateParameters;
@@ -18,7 +18,7 @@ export function useInfoSpotDeployState<TData = SpotDeployStateData>(
 	params: UseInfoSpotDeployStateParameters,
 	options: UseInfoSpotDeployStateOptions<TData> = {},
 ): UseInfoSpotDeployStateReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("spotDeployState", params);
 
 	return useQuery({

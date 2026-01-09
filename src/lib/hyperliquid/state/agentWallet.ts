@@ -1,9 +1,6 @@
 import { useCallback, useSyncExternalStore } from "react";
 import { z } from "zod";
-import type { HyperliquidEnv } from "./types";
-
-// Re-export for convenience
-export type { HyperliquidEnv } from "./types";
+import type { HyperliquidEnv } from "../hooks/agent/types";
 
 const privateKeySchema = z
 	.string()
@@ -21,10 +18,6 @@ const agentWalletSchema = z.object({
 });
 
 export type AgentWallet = z.infer<typeof agentWalletSchema>;
-
-// ============================================================================
-// Storage Helpers
-// ============================================================================
 
 function getStorageKey(env: HyperliquidEnv, userAddress: string): string {
 	return `hyperliquid_agent_${env}_${userAddress.toLowerCase()}`;
@@ -61,8 +54,8 @@ export function writeAgentToStorage(
 		};
 		localStorage.setItem(key, JSON.stringify(data));
 		window.dispatchEvent(new StorageEvent("storage", { key }));
-	} catch (error) {
-		console.error("[AgentStore] Failed to write:", error);
+	} catch {
+		// Silent fail for storage errors
 	}
 }
 
@@ -80,14 +73,6 @@ function subscribeToStorage(callback: () => void): () => void {
 	return () => window.removeEventListener("storage", handleStorage);
 }
 
-// ============================================================================
-// Hooks
-// ============================================================================
-
-/**
- * Hook to read agent wallet from localStorage with reactive updates.
- * Syncs across tabs/windows via storage events.
- */
 export function useAgentWallet(env: HyperliquidEnv, userAddress: string | undefined): AgentWallet | null {
 	const getSnapshot = useCallback(() => {
 		if (!userAddress) return null;
@@ -106,9 +91,6 @@ export function useAgentWallet(env: HyperliquidEnv, userAddress: string | undefi
 	return agent ? (JSON.parse(agent) as AgentWallet) : null;
 }
 
-/**
- * Hook that provides actions to manage agent wallet in storage.
- */
 export function useAgentWalletActions() {
 	const setAgent = useCallback(
 		(env: HyperliquidEnv, userAddress: string, privateKey: string, publicKey: string) => {

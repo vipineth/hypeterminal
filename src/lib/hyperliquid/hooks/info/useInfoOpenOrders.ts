@@ -2,7 +2,7 @@ import type { OpenOrdersParameters, OpenOrdersResponse } from "@nktkas/hyperliqu
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type OpenOrdersData = OpenOrdersResponse;
 type OpenOrdersParams = OpenOrdersParameters;
@@ -15,7 +15,7 @@ export function useInfoOpenOrders<TData = OpenOrdersData>(
 	params: UseInfoOpenOrdersParameters,
 	options: UseInfoOpenOrdersOptions<TData> = {},
 ): UseInfoOpenOrdersReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("openOrders", params);
 
 	return useQuery({

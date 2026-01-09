@@ -2,7 +2,7 @@ import type { UserEventsWsEvent, UserEventsWsParameters } from "@nktkas/hyperliq
 import { useCallback, useMemo } from "react";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 import { useSub } from "../utils/useSub";
 
 type UserEventsEvent = UserEventsWsEvent;
@@ -16,7 +16,7 @@ export function useSubUserEvents(
 	params: UseSubUserEventsParameters,
 	options: UseSubUserEventsOptions = {},
 ): UseSubUserEventsReturnType {
-	const { subscription } = useHyperliquidClients();
+	const { subscription } = useHyperliquid();
 	const key = serializeKey(subscriptionKeys.method("userEvents", params));
 	const stableParams = useMemo(() => params, [key]);
 

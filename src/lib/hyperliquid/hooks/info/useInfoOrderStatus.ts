@@ -2,7 +2,7 @@ import type { OrderStatusParameters, OrderStatusResponse } from "@nktkas/hyperli
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type OrderStatusData = OrderStatusResponse;
 type OrderStatusParams = OrderStatusParameters;
@@ -15,7 +15,7 @@ export function useInfoOrderStatus<TData = OrderStatusData>(
 	params: UseInfoOrderStatusParameters,
 	options: UseInfoOrderStatusOptions<TData> = {},
 ): UseInfoOrderStatusReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("orderStatus", params);
 
 	return useQuery({

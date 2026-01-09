@@ -2,7 +2,7 @@ import type { ValidatorSummariesResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type ValidatorSummariesData = ValidatorSummariesResponse;
 
@@ -18,7 +18,7 @@ export type UseInfoValidatorSummariesReturnType<TData = ValidatorSummariesData> 
 export function useInfoValidatorSummaries<TData = ValidatorSummariesData>(
 	options: UseInfoValidatorSummariesOptions<TData> = {},
 ): UseInfoValidatorSummariesReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("validatorSummaries");
 
 	return useQuery({

@@ -2,7 +2,7 @@ import type { UserHistoricalOrdersWsEvent, UserHistoricalOrdersWsParameters } fr
 import { useCallback, useMemo } from "react";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 import { useSub } from "../utils/useSub";
 
 type UserHistoricalOrdersEvent = UserHistoricalOrdersWsEvent;
@@ -16,7 +16,7 @@ export function useSubUserHistoricalOrders(
 	params: UseSubUserHistoricalOrdersParameters,
 	options: UseSubUserHistoricalOrdersOptions = {},
 ): UseSubUserHistoricalOrdersReturnType {
-	const { subscription } = useHyperliquidClients();
+	const { subscription } = useHyperliquid();
 	const key = serializeKey(subscriptionKeys.method("userHistoricalOrders", params));
 	const stableParams = useMemo(() => params, [key]);
 

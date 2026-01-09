@@ -2,7 +2,7 @@ import type { ExtraAgentsParameters, ExtraAgentsResponse } from "@nktkas/hyperli
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type ExtraAgentsData = ExtraAgentsResponse;
 type ExtraAgentsParams = ExtraAgentsParameters;
@@ -15,7 +15,7 @@ export function useInfoExtraAgents<TData = ExtraAgentsData>(
 	params: UseInfoExtraAgentsParameters,
 	options: UseInfoExtraAgentsOptions<TData> = {},
 ): UseInfoExtraAgentsReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("extraAgents", params);
 
 	return useQuery({

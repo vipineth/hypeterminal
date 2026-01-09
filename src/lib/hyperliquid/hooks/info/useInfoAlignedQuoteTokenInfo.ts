@@ -2,7 +2,7 @@ import type { AlignedQuoteTokenInfoParameters, AlignedQuoteTokenInfoResponse } f
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type AlignedQuoteTokenInfoData = AlignedQuoteTokenInfoResponse;
 type AlignedQuoteTokenInfoParams = AlignedQuoteTokenInfoParameters;
@@ -21,7 +21,7 @@ export function useInfoAlignedQuoteTokenInfo<TData = AlignedQuoteTokenInfoData>(
 	params: UseInfoAlignedQuoteTokenInfoParameters,
 	options: UseInfoAlignedQuoteTokenInfoOptions<TData> = {},
 ): UseInfoAlignedQuoteTokenInfoReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("alignedQuoteTokenInfo", params);
 
 	return useQuery({

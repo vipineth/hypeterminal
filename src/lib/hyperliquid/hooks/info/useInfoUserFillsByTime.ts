@@ -2,7 +2,7 @@ import type { UserFillsByTimeParameters, UserFillsByTimeResponse } from "@nktkas
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type UserFillsByTimeData = UserFillsByTimeResponse;
 type UserFillsByTimeParams = UserFillsByTimeParameters;
@@ -18,7 +18,7 @@ export function useInfoUserFillsByTime<TData = UserFillsByTimeData>(
 	params: UseInfoUserFillsByTimeParameters,
 	options: UseInfoUserFillsByTimeOptions<TData> = {},
 ): UseInfoUserFillsByTimeReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("userFillsByTime", params);
 
 	return useQuery({

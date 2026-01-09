@@ -2,7 +2,7 @@ import type { ActiveAssetCtxWsEvent, ActiveAssetCtxWsParameters } from "@nktkas/
 import { useCallback, useMemo } from "react";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 import { useSub } from "../utils/useSub";
 
 type ActiveAssetCtxEvent = ActiveAssetCtxWsEvent;
@@ -16,7 +16,7 @@ export function useSubActiveAssetCtx(
 	params: UseSubActiveAssetCtxParameters,
 	options: UseSubActiveAssetCtxOptions = {},
 ): UseSubActiveAssetCtxReturnType {
-	const { subscription } = useHyperliquidClients();
+	const { subscription } = useHyperliquid();
 	const key = serializeKey(subscriptionKeys.method("activeAssetCtx", params));
 	const stableParams = useMemo(() => params, [key]);
 

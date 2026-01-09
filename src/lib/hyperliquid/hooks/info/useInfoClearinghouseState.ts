@@ -2,7 +2,7 @@ import type { ClearinghouseStateParameters, ClearinghouseStateResponse } from "@
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type ClearinghouseStateData = ClearinghouseStateResponse;
 type ClearinghouseStateParams = ClearinghouseStateParameters;
@@ -21,7 +21,7 @@ export function useInfoClearinghouseState<TData = ClearinghouseStateData>(
 	params: UseInfoClearinghouseStateParameters,
 	options: UseInfoClearinghouseStateOptions<TData> = {},
 ): UseInfoClearinghouseStateReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("clearinghouseState", params);
 
 	return useQuery({

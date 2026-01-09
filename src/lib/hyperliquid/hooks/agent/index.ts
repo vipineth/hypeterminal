@@ -1,10 +1,4 @@
-export {
-	HyperliquidProvider,
-	isAgentApproved,
-	useHyperliquidContext,
-	useHyperliquidContextOptional,
-	useTradingAgent,
-} from "../../context";
+export { HyperliquidProvider, useHyperliquid, useHyperliquidOptional } from "../../context";
 export type {
 	AgentRegisterStatus,
 	AgentStatus,
@@ -20,4 +14,8 @@ export {
 	useAgentWallet,
 	useAgentWalletActions,
 	writeAgentToStorage,
-} from "./useAgentStore";
+} from "../../state/agentWallet";
+export { useAgentRegistration } from "../useAgentRegistration";
+export { useTradingStatus } from "../useTradingStatus";
+export { useSignedExchange } from "../useSignedExchange";
+export { useTradingAgent, type UseTradingAgentResult } from "../useTradingAgent";

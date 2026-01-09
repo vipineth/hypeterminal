@@ -2,7 +2,7 @@ import type { MetaAndAssetCtxsParameters, MetaAndAssetCtxsResponse } from "@nktk
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type MetaAndAssetCtxsData = MetaAndAssetCtxsResponse;
 type MetaAndAssetCtxsParams = MetaAndAssetCtxsParameters;
@@ -18,7 +18,7 @@ export function useInfoMetaAndAssetCtxs<TData = MetaAndAssetCtxsData>(
 	params: UseInfoMetaAndAssetCtxsParameters,
 	options: UseInfoMetaAndAssetCtxsOptions<TData> = {},
 ): UseInfoMetaAndAssetCtxsReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("metaAndAssetCtxs", params);
 
 	return useQuery({

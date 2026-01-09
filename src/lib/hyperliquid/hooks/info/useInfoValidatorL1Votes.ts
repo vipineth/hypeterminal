@@ -2,7 +2,7 @@ import type { ValidatorL1VotesResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type ValidatorL1VotesData = ValidatorL1VotesResponse;
 
@@ -15,7 +15,7 @@ export type UseInfoValidatorL1VotesReturnType<TData = ValidatorL1VotesData> = Us
 export function useInfoValidatorL1Votes<TData = ValidatorL1VotesData>(
 	options: UseInfoValidatorL1VotesOptions<TData> = {},
 ): UseInfoValidatorL1VotesReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("validatorL1Votes");
 
 	return useQuery({

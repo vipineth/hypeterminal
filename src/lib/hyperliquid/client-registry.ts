@@ -2,9 +2,9 @@ import {
 	ExchangeClient,
 	HttpTransport,
 	type HttpTransportOptions,
+	InfoClient,
 	type IRequestTransport,
 	type ISubscriptionTransport,
-	InfoClient,
 	SubscriptionClient,
 	WebSocketTransport,
 	type WebSocketTransportOptions,
@@ -29,14 +29,12 @@ type ClientRegistry = {
 let registry: ClientRegistry | null = null;
 
 function getDefaultHttpTransportOptions(): HttpTransportOptions {
-	const isTestnet =
-		typeof import.meta !== "undefined" && import.meta.env?.VITE_HYPERLIQUID_TESTNET === "true";
+	const isTestnet = typeof import.meta !== "undefined" && import.meta.env?.VITE_HYPERLIQUID_TESTNET === "true";
 	return { isTestnet };
 }
 
 function getDefaultWsTransportOptions(): WebSocketTransportOptions {
-	const isTestnet =
-		typeof import.meta !== "undefined" && import.meta.env?.VITE_HYPERLIQUID_TESTNET === "true";
+	const isTestnet = typeof import.meta !== "undefined" && import.meta.env?.VITE_HYPERLIQUID_TESTNET === "true";
 	return { isTestnet };
 }
 
@@ -44,8 +42,10 @@ function createTransports(config: ClientRegistryConfig = {}): {
 	httpTransport: IRequestTransport;
 	wsTransport: ISubscriptionTransport;
 } {
-	const httpTransport = config.httpTransport ?? new HttpTransport(config.httpTransportOptions ?? getDefaultHttpTransportOptions());
-	const wsTransport = config.wsTransport ?? new WebSocketTransport(config.wsTransportOptions ?? getDefaultWsTransportOptions());
+	const httpTransport =
+		config.httpTransport ?? new HttpTransport(config.httpTransportOptions ?? getDefaultHttpTransportOptions());
+	const wsTransport =
+		config.wsTransport ?? new WebSocketTransport(config.wsTransportOptions ?? getDefaultWsTransportOptions());
 	return { httpTransport, wsTransport };
 }
 
@@ -94,6 +94,11 @@ export function setExchangeClient(wallet: AbstractWallet | null): ExchangeClient
 	const reg = ensureRegistry();
 	reg.exchange = wallet ? new ExchangeClient({ transport: reg.httpTransport, wallet }) : null;
 	return reg.exchange;
+}
+
+export function createExchangeClient(wallet: AbstractWallet): ExchangeClient {
+	const reg = ensureRegistry();
+	return new ExchangeClient({ transport: reg.httpTransport, wallet });
 }
 
 export function getClients(): {

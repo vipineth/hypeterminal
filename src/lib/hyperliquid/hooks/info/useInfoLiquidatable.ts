@@ -2,7 +2,7 @@ import type { LiquidatableResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+import { useHyperliquid } from "../../context";
 
 type LiquidatableData = LiquidatableResponse;
 
@@ -12,7 +12,7 @@ export type UseInfoLiquidatableReturnType<TData = LiquidatableData> = UseQueryRe
 export function useInfoLiquidatable<TData = LiquidatableData>(
 	options: UseInfoLiquidatableOptions<TData> = {},
 ): UseInfoLiquidatableReturnType<TData> {
-	const { info } = useHyperliquidClients();
+	const { info } = useHyperliquid();
 	const queryKey = infoKeys.method("liquidatable");
 
 	return useQuery({
