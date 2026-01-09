@@ -320,29 +320,8 @@ export function OrderEntryPanel() {
 			size: formattedSize,
 			status: "pending",
 		});
-		console.log("orderId", orderId);
-		try {
-			// await updateLeverage({ asset: market.assetIndex, isCross: true, leverage });
-			// const wall = toHyperliquidWallet(walletClient, address);
-			// if (!wall) return;
-			// console.log("formattedPrice", formattedPrice);
-			// const result = await new ExchangeClient({
-			// 	transport: getHttpTransport(),
-			// 	wallet: wall,
-			// }).order({
-			// 	orders: [
-			// 		{
-			// 			a: market.assetIndex,
-			// 			b: side === "buy",
-			// 			p: formattedPrice,
-			// 			s: formattedSize,
-			// 			r: reduceOnly,
-			// 			t: { limit: { tif: "Gtc" } }, // Time in force: Good-til-canceled
-			// 		},
-			// 	],
-			// 	grouping: "na", // Order grouping (usually "na")
-			// });
 
+		try {
 			const result = await placeOrder({
 				orders: [
 					{
@@ -367,20 +346,10 @@ export function OrderEntryPanel() {
 			setSizeInput("");
 			setLimitPriceInput("");
 		} catch (error) {
-			console.error("[OrderEntry] Order failed:", error, chainId);
 			const errorMessage = error instanceof Error ? error.message : t`Order failed`;
 			updateOrder(orderId, { status: "failed", error: errorMessage });
 		}
 	};
-
-	// const handleKeyDown = useCallback(
-	// 	(e: React.KeyboardEvent) => {
-	// 		if (e.key === "Enter" && validation.canSubmit && !isSubmitting) {
-	// 			handleSubmit();
-	// 		}
-	// 	},
-	// 	[validation.canSubmit, isSubmitting, handleSubmit],
-	// );
 
 	const sliderValue = !maxSize || maxSize <= 0 ? 25 : Math.min(100, (sizeValue / maxSize) * 100);
 
