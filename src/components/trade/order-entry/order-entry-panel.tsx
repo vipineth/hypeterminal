@@ -1,5 +1,4 @@
 import { t } from "@lingui/core/macro";
-import { ExchangeClient } from "@nktkas/hyperliquid";
 import { ChevronDown, Loader2, TrendingDown, TrendingUp } from "lucide-react";
 import { useEffect, useId, useMemo, useState } from "react";
 import { useChainId, useConnection, useSwitchChain, useWalletClient } from "wagmi";
@@ -26,11 +25,8 @@ import {
 } from "@/constants/app";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
-import { getHttpTransport } from "@/lib/hyperliquid/clients";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
-import { useExchangeUpdateLeverage } from "@/lib/hyperliquid/hooks/exchange/useExchangeUpdateLeverage";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
-import { toHyperliquidWallet } from "@/lib/hyperliquid/wallet";
 import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder, getDefaultLeverage } from "@/lib/trade/orders";
 import { cn } from "@/lib/utils";
@@ -40,7 +36,6 @@ import {
 	useDefaultLeverageByMode,
 	useMarketLeverageByMode,
 	useMarketOrderSlippageBps,
-	useSigningMode,
 	useTradeSettingsActions,
 } from "@/stores/use-trade-settings-store";
 import { WalletDialog } from "../components/wallet-dialog";
@@ -59,7 +54,7 @@ export function OrderEntryPanel() {
 	const { address, isConnected } = useConnection();
 
 	const { data: walletClient, isLoading: isWalletLoading, error: walletClientError } = useWalletClient();
-	const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
+	const switchChain = useSwitchChain();
 
 	const needsChainSwitch = !!walletClientError && walletClientError.message.includes("does not match");
 
@@ -70,16 +65,14 @@ export function OrderEntryPanel() {
 	);
 	const clearinghouse = clearinghouseEvent?.clearinghouseState;
 
-	const signingMode = useSigningMode();
 	const { status: agentStatus, registerStatus, registerAgent } = useTradingAgent();
 
 	const { mutateAsync: placeOrder, isPending: isSubmitting } = useExchangeOrder();
-	const { mutateAsync: updateLeverage } = useExchangeUpdateLeverage();
 
 	const defaultLeverageByMode = useDefaultLeverageByMode();
 	const marketLeverageByMode = useMarketLeverageByMode();
 	const slippageBps = useMarketOrderSlippageBps();
-	const { setMarketLeverage, setSigningMode } = useTradeSettingsActions();
+	const { setMarketLeverage } = useTradeSettingsActions();
 
 	const { addOrder, updateOrder } = useOrderQueueActions();
 
@@ -163,8 +156,8 @@ export function OrderEntryPanel() {
 
 	const liqWarning = liqPrice && price ? Math.abs(liqPrice - price) / price < 0.05 : false;
 
-	const needsAgentApproval = signingMode === "agent" && agentStatus !== "valid";
-	const isReadyToTrade = signingMode === "direct" ? !!walletClient : agentStatus === "valid";
+	const needsAgentApproval = agentStatus !== "valid";
+	const isReadyToTrade = agentStatus === "valid";
 	const isLoadingAgents = agentStatus === "loading";
 	const canApprove = !!walletClient && !!address;
 
@@ -290,7 +283,7 @@ export function OrderEntryPanel() {
 	};
 
 	const handleSwitchChain = () => {
-		switchChain({ chainId: ARBITRUM_CHAIN_ID });
+		switchChain.mutate({ chainId: ARBITRUM_CHAIN_ID });
 	};
 
 	const isRegistering = registerStatus === "signing" || registerStatus === "verifying";
@@ -402,9 +395,9 @@ export function OrderEntryPanel() {
 		}
 		if (needsChainSwitch) {
 			return {
-				text: isSwitchingChain ? t`Switching...` : t`Switch to Arbitrum`,
+				text: switchChain.isPending ? t`Switching...` : t`Switch to Arbitrum`,
 				action: handleSwitchChain,
-				disabled: isSwitchingChain,
+				disabled: switchChain.isPending,
 				variant: "cyan" as const,
 			};
 		}
@@ -468,41 +461,6 @@ export function OrderEntryPanel() {
 					</TabsList>
 				</Tabs>
 				<div className="flex items-center gap-2">
-					<DropdownMenu>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<DropdownMenuTrigger asChild>
-									<button
-										type="button"
-										className={cn(
-											"px-2 py-0.5 text-3xs border inline-flex items-center gap-1",
-											signingMode === "agent"
-												? "border-terminal-green/40 text-terminal-green"
-												: "border-terminal-amber/40 text-terminal-amber",
-										)}
-										tabIndex={0}
-										aria-label={t`Select signing mode`}
-									>
-										{signingMode === "agent" ? t`Agent` : t`Direct`}
-										<ChevronDown className="size-2.5" />
-									</button>
-								</DropdownMenuTrigger>
-							</TooltipTrigger>
-							<TooltipContent side="bottom">
-								{signingMode === "agent"
-									? t`Agent mode: Orders signed automatically (fast)`
-									: t`Direct mode: Sign each order with wallet`}
-							</TooltipContent>
-						</Tooltip>
-						<DropdownMenuContent align="end" className="min-w-24 font-mono text-xs">
-							<DropdownMenuItem onClick={() => setSigningMode("agent")} selected={signingMode === "agent"}>
-								Agent
-							</DropdownMenuItem>
-							<DropdownMenuItem onClick={() => setSigningMode("direct")} selected={signingMode === "direct"}>
-								Direct
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<button

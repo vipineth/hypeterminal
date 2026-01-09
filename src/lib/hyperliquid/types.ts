@@ -3,7 +3,7 @@ import type { AbstractWallet } from "@nktkas/hyperliquid/signing";
 import type { QueryKey, UseMutationOptions, UseQueryOptions } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import type { BaseIssue, BaseSchema, BaseSchemaAsync, ValiError } from "valibot";
-import type { BuilderConfig, HyperliquidEnv, SigningMode } from "./hooks/agent/types";
+import type { BuilderConfig, HyperliquidEnv } from "./hooks/agent/types";
 
 type AnyValiErrorSchema =
 	| BaseSchema<unknown, unknown, BaseIssue<unknown>>
@@ -73,7 +73,6 @@ export type HyperliquidProviderProps = {
 	userAddress: `0x${string}` | undefined;
 	wallet: AbstractWallet | undefined;
 	agentName?: string;
-	signingMode?: SigningMode;
 	builderConfig?: BuilderConfig;
 	httpTransport?: IRequestTransport;
 	wsTransport?: ISubscriptionTransport;

@@ -9,18 +9,9 @@ import type { OrderParameters } from "@nktkas/hyperliquid";
  *
  * - `ready`: Can execute trades
  * - `no_wallet`: Wallet not connected
- * - `needs_approval`: Agent mode selected, needs one-time approval
- * - `no_signer`: Signer unavailable (shouldn't happen normally)
+ * - `needs_approval`: Agent needs one-time approval
  */
-export type TradingStatus = "ready" | "no_wallet" | "needs_approval" | "no_signer";
-
-/**
- * Signing mode for transactions.
- *
- * - `direct`: Every transaction requires wallet signature popup
- * - `agent`: Transactions signed instantly with locally-stored agent key
- */
-export type SigningMode = "direct" | "agent";
+export type TradingStatus = "ready" | "no_wallet" | "needs_approval";
 
 /**
  * Agent registration status during the approval flow.

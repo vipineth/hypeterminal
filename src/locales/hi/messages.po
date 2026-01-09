@@ -63,11 +63,11 @@ msgstr "धन जोड़ें"
 msgid "Add to favorites"
 msgstr "पसंदीदा में जोड़ें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:466
+#: src/components/trade/order-entry/order-entry-panel.tsx:486
 msgid "Agent"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:473
+#: src/components/trade/order-entry/order-entry-panel.tsx:493
 msgid "Agent mode: Orders signed automatically (fast)"
 msgstr ""
 
@@ -93,7 +93,7 @@ msgid "Asset"
 msgstr "संपत्ति"
 
 #: src/components/trade/order-entry/account-panel.tsx:85
-#: src/components/trade/order-entry/order-entry-panel.tsx:564
+#: src/components/trade/order-entry/order-entry-panel.tsx:584
 #: src/components/trade/positions/balances-tab.tsx:138
 msgid "Available"
 msgstr "उपलब्ध"
@@ -148,11 +148,11 @@ msgstr "Arbitrum या अन्य चेन से अपने Hyperliquid �
 msgid "buy"
 msgstr "खरीदें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:420
+#: src/components/trade/order-entry/order-entry-panel.tsx:440
 msgid "Buy"
 msgstr "खरीदें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:541
+#: src/components/trade/order-entry/order-entry-panel.tsx:561
 msgid "Buy Long"
 msgstr "लॉन्ग खरीदें"
 
@@ -217,9 +217,9 @@ msgstr "बंद हो रहा है..."
 msgid "Collapse account panel"
 msgstr "खाता पैनल छोटा करें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:446
-#: src/components/trade/order-entry/order-entry-panel.tsx:525
-#: src/components/trade/order-entry/order-entry-panel.tsx:696
+#: src/components/trade/order-entry/order-entry-panel.tsx:466
+#: src/components/trade/order-entry/order-entry-panel.tsx:545
+#: src/components/trade/order-entry/order-entry-panel.tsx:716
 msgid "Coming soon"
 msgstr "जल्द आ रहा है"
 
@@ -237,7 +237,7 @@ msgstr "पूर्ण"
 
 #: src/components/trade/components/wallet-dialog.tsx:68
 #: src/components/trade/header/user-menu.tsx:65
-#: src/components/trade/order-entry/order-entry-panel.tsx:377
+#: src/components/trade/order-entry/order-entry-panel.tsx:397
 msgid "Connect Wallet"
 msgstr "वॉलेट कनेक्ट करें"
 
@@ -297,7 +297,7 @@ msgstr "पता कॉपी करें"
 #~ msgid "Could not create wallet"
 #~ msgstr "वॉलेट नहीं बना सका"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:437
+#: src/components/trade/order-entry/order-entry-panel.tsx:457
 msgid "Cross"
 msgstr "क्रॉस"
 
@@ -312,8 +312,8 @@ msgstr "अपने ट्रेडिंग अनुभव को अनु�
 #: src/components/trade/header/top-nav.tsx:91
 #: src/components/trade/order-entry/account-panel.tsx:210
 #: src/components/trade/order-entry/account-panel.tsx:212
-#: src/components/trade/order-entry/order-entry-panel.tsx:393
-#: src/components/trade/order-entry/order-entry-panel.tsx:577
+#: src/components/trade/order-entry/order-entry-panel.tsx:413
+#: src/components/trade/order-entry/order-entry-panel.tsx:597
 msgid "Deposit"
 msgstr "जमा करें"
 
@@ -325,11 +325,11 @@ msgstr "धन जमा करें"
 msgid "Deposit on Hyperliquid"
 msgstr "Hyperliquid पर जमा करें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:466
+#: src/components/trade/order-entry/order-entry-panel.tsx:486
 msgid "Direct"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:474
+#: src/components/trade/order-entry/order-entry-panel.tsx:494
 msgid "Direct mode: Sign each order with wallet"
 msgstr ""
 
@@ -353,15 +353,15 @@ msgstr "मोबाइल साइडबार दिखाता है।"
 msgid "Docs"
 msgstr "दस्तावेज़"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:409
+#: src/components/trade/order-entry/order-entry-panel.tsx:429
 msgid "Enable Trading"
 msgstr "ट्रेडिंग सक्षम करें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:197
+#: src/components/trade/order-entry/order-entry-panel.tsx:201
 msgid "Enter limit price"
 msgstr "लिमिट प्राइस दर्ज करें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:200
+#: src/components/trade/order-entry/order-entry-panel.tsx:204
 msgid "Enter size"
 msgstr "साइज दर्ज करें"
 
@@ -373,11 +373,11 @@ msgstr "प्रवेश"
 msgid "Equity"
 msgstr "इक्विटी"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:749
+#: src/components/trade/order-entry/order-entry-panel.tsx:769
 msgid "Est. Fee"
 msgstr "अनु. शुल्क"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:206
+#: src/components/trade/order-entry/order-entry-panel.tsx:210
 msgid "Exceeds max size"
 msgstr "अधिकतम साइज से अधिक"
 
@@ -393,7 +393,7 @@ msgstr "खाता पैनल विस्तृत करें"
 msgid "failed"
 msgstr "विफल"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:302
+#: src/components/trade/order-entry/order-entry-panel.tsx:306
 msgid "Failed to enable trading"
 msgstr "ट्रेडिंग सक्षम करने में विफल"
 
@@ -495,7 +495,7 @@ msgstr ""
 #~ msgid "Invalid Ethereum address"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:442
+#: src/components/trade/order-entry/order-entry-panel.tsx:462
 msgid "Isolated"
 msgstr "आइसोलेटेड"
 
@@ -515,11 +515,11 @@ msgstr ""
 msgid "limit"
 msgstr "लिमिट"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:515
+#: src/components/trade/order-entry/order-entry-panel.tsx:535
 msgid "Limit"
 msgstr "लिमिट"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:646
+#: src/components/trade/order-entry/order-entry-panel.tsx:666
 msgid "Limit Price"
 msgstr "लिमिट प्राइस"
 
@@ -531,7 +531,7 @@ msgstr "लिमिट आरओ"
 msgid "Liq"
 msgstr "लिक्विडेशन"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:729
+#: src/components/trade/order-entry/order-entry-panel.tsx:749
 msgid "Liq. Price"
 msgstr "लिक्विडेशन प्राइस"
 
@@ -567,17 +567,17 @@ msgstr "ट्रेड इतिहास लोड हो रहा है..."
 msgid "Loading TWAP orders..."
 msgstr "TWAP ऑर्डर लोड हो रहे हैं..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:174
+#: src/components/trade/order-entry/order-entry-panel.tsx:178
 msgid "Loading wallet..."
 msgstr "वॉलेट लोड हो रहा है..."
 
 #: src/components/trade/order-entry/account-panel.tsx:193
-#: src/components/trade/order-entry/order-entry-panel.tsx:401
-#: src/components/trade/order-entry/order-entry-panel.tsx:402
+#: src/components/trade/order-entry/order-entry-panel.tsx:421
+#: src/components/trade/order-entry/order-entry-panel.tsx:422
 msgid "Loading..."
 msgstr "लोड हो रहा है..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:544
+#: src/components/trade/order-entry/order-entry-panel.tsx:564
 #: src/components/trade/positions/funding-tab.tsx:67
 #: src/components/trade/positions/positions-tab.tsx:87
 msgid "Long"
@@ -587,7 +587,7 @@ msgstr "लॉन्ग"
 msgid "Margin Ratio"
 msgstr "मार्जिन अनुपात"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:739
+#: src/components/trade/order-entry/order-entry-panel.tsx:759
 msgid "Margin Req."
 msgstr "मार्जिन आवश्यक"
 
@@ -595,7 +595,7 @@ msgstr "मार्जिन आवश्यक"
 msgid "Margin Used"
 msgstr "उपयोग किया गया मार्जिन"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:653
+#: src/components/trade/order-entry/order-entry-panel.tsx:673
 #: src/components/trade/positions/positions-tab.tsx:192
 msgid "Mark"
 msgstr "मार्क"
@@ -606,7 +606,7 @@ msgid "MARK"
 msgstr "मार्क"
 
 #: src/components/trade/chart/constants.ts:60
-#: src/components/trade/order-entry/order-entry-panel.tsx:512
+#: src/components/trade/order-entry/order-entry-panel.tsx:532
 msgid "Market"
 msgstr "बाज़ार"
 
@@ -614,7 +614,7 @@ msgstr "बाज़ार"
 #~ msgid "Market metadata unavailable."
 #~ msgstr "बाज़ार मेटाडेटा उपलब्ध नहीं है।"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:183
+#: src/components/trade/order-entry/order-entry-panel.tsx:187
 msgid "Market not ready"
 msgstr "मार्केट तैयार नहीं"
 
@@ -626,7 +626,7 @@ msgstr "मार्केट ऑर्डर स्लिपेज"
 msgid "markets"
 msgstr "बाज़ार"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:637
+#: src/components/trade/order-entry/order-entry-panel.tsx:657
 msgid "Max"
 msgstr "अधिकतम"
 
@@ -642,7 +642,7 @@ msgstr "अधिकतम"
 msgid "Max slippage allowed for market orders."
 msgstr "मार्केट ऑर्डर के लिए अधिकतम स्लिपेज।"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:203
+#: src/components/trade/order-entry/order-entry-panel.tsx:207
 msgid "Min order $10"
 msgstr "न्यूनतम ऑर्डर $10"
 
@@ -679,7 +679,7 @@ msgstr "अगला"
 msgid "No active positions."
 msgstr "कोई सक्रिय पोजीशन नहीं।"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:177
+#: src/components/trade/order-entry/order-entry-panel.tsx:181
 msgid "No balance"
 msgstr "कोई बैलेंस नहीं"
 
@@ -695,11 +695,11 @@ msgstr "कोई निष्पादन नहीं मिला।"
 msgid "No funding payments found."
 msgstr "कोई फंडिंग भुगतान नहीं मिला।"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:194
+#: src/components/trade/order-entry/order-entry-panel.tsx:198
 msgid "No mark price"
 msgstr "कोई मार्क प्राइस नहीं"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:180
+#: src/components/trade/order-entry/order-entry-panel.tsx:184
 msgid "No market"
 msgstr "कोई मार्केट नहीं"
 
@@ -723,7 +723,7 @@ msgstr "कोई TWAP ऑर्डर नहीं मिला।"
 msgid "No wallets found"
 msgstr "कोई वॉलेट नहीं मिला"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:171
+#: src/components/trade/order-entry/order-entry-panel.tsx:175
 msgid "Not connected"
 msgstr "कनेक्टेड नहीं"
 
@@ -767,7 +767,7 @@ msgstr "ऑरेकल"
 msgid "Order Book"
 msgstr "ऑर्डर बुक"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:358
+#: src/components/trade/order-entry/order-entry-panel.tsx:378
 msgid "Order failed"
 msgstr "ऑर्डर विफल"
 
@@ -775,7 +775,7 @@ msgstr "ऑर्डर विफल"
 msgid "Order Queue"
 msgstr "ऑर्डर कतार"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:735
+#: src/components/trade/order-entry/order-entry-panel.tsx:755
 msgid "Order Value"
 msgstr "ऑर्डर वैल्यू"
 
@@ -826,7 +826,7 @@ msgstr ""
 msgid "Portfolio"
 msgstr "पोर्टफोलियो"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:584
+#: src/components/trade/order-entry/order-entry-panel.tsx:604
 #: src/components/trade/positions/funding-tab.tsx:122
 msgid "Position"
 msgstr "पोजीशन"
@@ -855,8 +855,8 @@ msgstr "दर"
 msgid "Recent Trades"
 msgstr "हाल के ट्रेड"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:675
-#: src/components/trade/order-entry/order-entry-panel.tsx:684
+#: src/components/trade/order-entry/order-entry-panel.tsx:695
+#: src/components/trade/order-entry/order-entry-panel.tsx:704
 msgid "Reduce Only"
 msgstr "केवल कम करें"
 
@@ -897,7 +897,7 @@ msgstr "सभी ऑर्डर चुनें"
 msgid "Select favorite markets"
 msgstr "पसंदीदा बाज़ार चुनें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:492
+#: src/components/trade/order-entry/order-entry-panel.tsx:512
 msgid "Select leverage"
 msgstr "लीवरेज चुनें"
 
@@ -909,7 +909,7 @@ msgstr "ऑर्डर चुनें"
 msgid "Select order book aggregation"
 msgstr "ऑर्डर बुक एग्रीगेशन चुनें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:464
+#: src/components/trade/order-entry/order-entry-panel.tsx:484
 msgid "Select signing mode"
 msgstr ""
 
@@ -923,15 +923,15 @@ msgstr "टोकन चुनें"
 msgid "sell"
 msgstr "बेचें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:420
+#: src/components/trade/order-entry/order-entry-panel.tsx:440
 msgid "Sell"
 msgstr "बेचें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:556
+#: src/components/trade/order-entry/order-entry-panel.tsx:576
 msgid "Sell Short"
 msgstr "शॉर्ट बेचें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:634
+#: src/components/trade/order-entry/order-entry-panel.tsx:654
 msgid "Set {p}%"
 msgstr "{p}% सेट करें"
 
@@ -944,7 +944,7 @@ msgstr "TP/SL सेट करें"
 msgid "Settings"
 msgstr "सेटिंग्स"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:559
+#: src/components/trade/order-entry/order-entry-panel.tsx:579
 #: src/components/trade/positions/funding-tab.tsx:67
 #: src/components/trade/positions/positions-tab.tsx:87
 msgid "Short"
@@ -974,11 +974,11 @@ msgstr "USD में मान दिखाएं"
 msgid "Sidebar"
 msgstr "साइडबार"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:405
+#: src/components/trade/order-entry/order-entry-panel.tsx:425
 msgid "Sign in wallet..."
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:191
+#: src/components/trade/order-entry/order-entry-panel.tsx:195
 msgid "Signer not ready"
 msgstr "साइनर तैयार नहीं"
 
@@ -986,7 +986,7 @@ msgstr "साइनर तैयार नहीं"
 #~ msgid "Signing..."
 #~ msgstr "साइन हो रहा है..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:593
+#: src/components/trade/order-entry/order-entry-panel.tsx:613
 #: src/components/trade/order-entry/order-toast.tsx:80
 #: src/components/trade/orderbook/orderbook-panel.tsx:101
 #: src/components/trade/orderbook/trades-panel.tsx:96
@@ -996,7 +996,7 @@ msgstr "साइनर तैयार नहीं"
 msgid "Size"
 msgstr "आकार"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:745
+#: src/components/trade/order-entry/order-entry-panel.tsx:765
 msgid "Slippage"
 msgstr "स्लिपेज"
 
@@ -1044,7 +1044,7 @@ msgstr "स्टेकिंग"
 msgid "Status"
 msgstr "स्थिति"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:521
+#: src/components/trade/order-entry/order-entry-panel.tsx:541
 msgid "Stop"
 msgstr "स्टॉप"
 
@@ -1064,7 +1064,7 @@ msgstr "सहायता"
 msgid "Switch to {0} market"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:385
+#: src/components/trade/order-entry/order-entry-panel.tsx:405
 msgid "Switch to Arbitrum"
 msgstr "Arbitrum पर स्विच करें"
 
@@ -1076,11 +1076,11 @@ msgstr "डार्क मोड में बदलें"
 msgid "Switch to light mode"
 msgstr "लाइट मोड में बदलें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:385
+#: src/components/trade/order-entry/order-entry-panel.tsx:405
 msgid "Switching..."
 msgstr "स्विच हो रहा है..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:690
+#: src/components/trade/order-entry/order-entry-panel.tsx:710
 msgid "Take Profit / Stop Loss"
 msgstr "प्रॉफिट लें / स्टॉप लॉस"
 
@@ -1108,7 +1108,7 @@ msgstr "समय"
 msgid "Toggle Sidebar"
 msgstr "साइडबार टॉगल करें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:600
+#: src/components/trade/order-entry/order-entry-panel.tsx:620
 msgid "Toggle size mode"
 msgstr "साइज मोड टॉगल करें"
 
@@ -1121,7 +1121,7 @@ msgstr "कुल"
 msgid "Total Size"
 msgstr "कुल आकार"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:692
+#: src/components/trade/order-entry/order-entry-panel.tsx:712
 #: src/components/trade/positions/positions-tab.tsx:259
 msgid "TP/SL"
 msgstr "TP/SL"
@@ -1190,7 +1190,7 @@ msgstr "वैल्यू"
 msgid "Vaults"
 msgstr "वॉल्ट"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx:407
+#: src/components/trade/order-entry/order-entry-panel.tsx:427
 msgid "Verifying..."
 msgstr ""
 

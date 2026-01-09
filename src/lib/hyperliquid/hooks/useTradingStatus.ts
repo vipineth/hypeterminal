@@ -1,5 +1,4 @@
 import { useConnection } from "wagmi";
-import { useSigningMode } from "@/stores/use-trade-settings-store";
 import type { TradingStatus } from "./agent/types";
 import { useSignedExchange } from "./useSignedExchange";
 
@@ -10,16 +9,13 @@ export interface UseTradingStatusResult {
 
 export function useTradingStatus(): UseTradingStatusResult {
 	const { address } = useConnection();
-	const signingMode = useSigningMode();
-	const { exchange, signerType } = useSignedExchange();
+	const { exchange } = useSignedExchange();
 
 	const status: TradingStatus = !address
 		? "no_wallet"
-		: signingMode === "agent" && !signerType
+		: !exchange
 			? "needs_approval"
-			: !exchange
-				? "no_signer"
-				: "ready";
+			: "ready";
 
 	return { status, isReady: status === "ready" };
 }
