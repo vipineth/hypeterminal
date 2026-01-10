@@ -2,6 +2,7 @@ import { Copy, ExternalLink, LogOut, Wallet, Zap } from "lucide-react";
 import { useState } from "react";
 import { useConnection, useDisconnect } from "wagmi";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UI_TEXT } from "@/config/interface";
 import { formatPercent, formatUSD } from "@/lib/format";
@@ -70,8 +71,9 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 							Connect your wallet to view your account, positions, and start trading.
 						</p>
 					</div>
-					<button
-						type="button"
+					<Button
+						variant="ghost"
+						size="none"
 						onClick={() => setWalletDialogOpen(true)}
 						className={clsx(
 							"px-6 py-3 text-base font-semibold rounded-md",
@@ -81,7 +83,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						)}
 					>
 						Connect Wallet
-					</button>
+					</Button>
 				</div>
 				<MobileBottomNavSpacer />
 				<WalletDialog open={walletDialogOpen} onOpenChange={setWalletDialogOpen} />
@@ -103,32 +105,34 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 								<span className="font-mono text-sm">
 									{address?.slice(0, 6)}...{address?.slice(-4)}
 								</span>
-								<button
-									type="button"
+								<Button
+									variant="ghost"
+									size="none"
 									onClick={handleCopyAddress}
-									className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+									className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-transparent transition-colors"
 									aria-label="Copy address"
 								>
 									<Copy className={clsx("size-3.5", copied && "text-terminal-green")} />
-								</button>
+								</Button>
 							</div>
 							<Badge variant="outline" className="text-xs mt-0.5">
 								Cross Margin
 							</Badge>
 						</div>
 					</div>
-					<button
-						type="button"
+					<Button
+						variant="ghost"
+						size="none"
 						onClick={() => disconnect()}
 						className={clsx(
 							"p-2.5 text-muted-foreground hover:text-terminal-red",
-							"transition-colors rounded-md",
+							"transition-colors rounded-md hover:bg-transparent",
 							"min-h-[44px] min-w-[44px] flex items-center justify-center",
 						)}
 						aria-label="Disconnect wallet"
 					>
 						<LogOut className="size-5" />
-					</button>
+					</Button>
 				</div>
 			</div>
 
@@ -180,8 +184,9 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 
 					{/* Actions */}
 					<div className="grid grid-cols-2 gap-3 pt-2">
-						<button
-							type="button"
+						<Button
+							variant="ghost"
+							size="none"
 							onClick={() => setDepositModalOpen(true)}
 							className={clsx(
 								"py-4 text-base font-semibold rounded-md",
@@ -193,9 +198,10 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						>
 							<Zap className="size-5" />
 							{ACCOUNT_TEXT.DEPOSIT_LABEL}
-						</button>
-						<button
-							type="button"
+						</Button>
+						<Button
+							variant="ghost"
+							size="none"
 							className={clsx(
 								"py-4 text-base font-semibold rounded-md",
 								"bg-muted/50 border border-border/60 text-muted-foreground",
@@ -207,7 +213,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						>
 							<ExternalLink className="size-5" />
 							{ACCOUNT_TEXT.WITHDRAW_LABEL}
-						</button>
+						</Button>
 					</div>
 
 					{/* Additional info */}

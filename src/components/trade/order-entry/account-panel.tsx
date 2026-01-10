@@ -2,6 +2,7 @@ import { t } from "@lingui/core/macro";
 import { ChevronUp } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
+import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
 import { formatPercent, formatUSD } from "@/lib/format";
@@ -111,10 +112,10 @@ export function AccountPanel() {
 			className="shrink-0 flex flex-col bg-surface/30 border-t border-border/40"
 		>
 			<CollapsibleTrigger asChild>
-				<button
-					type="button"
-					className="w-full px-2 py-2 flex items-center justify-between hover:bg-accent/30 transition-colors cursor-pointer group border-b border-border/40"
-					tabIndex={0}
+				<Button
+					variant="ghost"
+					size="none"
+					className="w-full px-2 py-2 justify-between hover:bg-accent/30 group border-b border-border/40 rounded-none"
 					aria-label={isExpanded ? t`Collapse account panel` : t`Expand account panel`}
 				>
 					<div className="flex items-center gap-2">
@@ -145,45 +146,45 @@ export function AccountPanel() {
 							<span className={clsx("text-2xs font-medium tabular-nums", headerPnlClass)}>{headerPnl}</span>
 						</div>
 					</div>
-				</button>
+				</Button>
 			</CollapsibleTrigger>
 
 			<CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapse-up data-[state=open]:animate-collapse-down">
 				<div className="px-2 py-1 flex items-center gap-0.5 border-b border-border/40">
-					<button
-						type="button"
+					<Button
+						variant="ghost"
+						size="none"
 						onClick={(e) => {
 							e.stopPropagation();
 							setActiveTab("perps");
 						}}
 						className={clsx(
-							"px-2 py-1 text-4xs uppercase tracking-wider transition-colors",
+							"px-2 py-1 text-4xs uppercase tracking-wider hover:bg-transparent",
 							activeTab === "perps"
 								? "text-foreground border-b border-foreground"
 								: "text-muted-foreground hover:text-foreground",
 						)}
-						tabIndex={0}
 						aria-label={t`Perps`}
 					>
 						{t`Perps`}
-					</button>
-					<button
-						type="button"
+					</Button>
+					<Button
+						variant="ghost"
+						size="none"
 						onClick={(e) => {
 							e.stopPropagation();
 							setActiveTab("spot");
 						}}
 						className={clsx(
-							"px-2 py-1 text-4xs uppercase tracking-wider transition-colors",
+							"px-2 py-1 text-4xs uppercase tracking-wider hover:bg-transparent",
 							activeTab === "spot"
 								? "text-foreground border-b border-foreground"
 								: "text-muted-foreground hover:text-foreground",
 						)}
-						tabIndex={0}
 						aria-label={t`Spot`}
 					>
 						{t`Spot`}
-					</button>
+					</Button>
 				</div>
 
 				<div className="p-2 space-y-2 max-h-48 overflow-y-auto">
@@ -203,22 +204,22 @@ export function AccountPanel() {
 							</div>
 
 							<div className="grid grid-cols-2 gap-1">
-								<button
-									type="button"
-									className="py-1.5 text-3xs uppercase tracking-wider border border-terminal-green/40 text-terminal-green hover:bg-terminal-green/10 transition-colors"
-									tabIndex={0}
+								<Button
+									variant="ghost"
+									size="none"
+									className="py-1.5 text-3xs uppercase tracking-wider border border-terminal-green/40 text-terminal-green hover:bg-terminal-green/10"
 									aria-label={t`Deposit`}
 								>
 									{t`Deposit`}
-								</button>
-								<button
-									type="button"
-									className="py-1.5 text-3xs uppercase tracking-wider border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
-									tabIndex={0}
+								</Button>
+								<Button
+									variant="ghost"
+									size="none"
+									className="py-1.5 text-3xs uppercase tracking-wider border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:bg-transparent"
 									aria-label={t`Withdraw`}
 								>
 									{t`Withdraw`}
-								</button>
+								</Button>
 							</div>
 						</>
 					)}

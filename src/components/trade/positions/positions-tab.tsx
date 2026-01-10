@@ -213,15 +213,16 @@ export function PositionsTab() {
 													<span className={clsx("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
 														{row.sideLabel}
 													</span>
-													<button
-														type="button"
+													<Button
+														variant="link"
+														size="none"
 														onClick={() => setSelectedMarketKey(makePerpMarketKey(row.coin))}
-														className="flex items-center gap-1.5 hover:underline hover:text-terminal-cyan transition-colors"
+														className="gap-1.5"
 														aria-label={t`Switch to ${row.coin} market`}
 													>
 														<TokenAvatar symbol={row.coin} />
 														<span>{row.coin}</span>
-													</button>
+													</Button>
 												</div>
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.sizeText}</TableCell>

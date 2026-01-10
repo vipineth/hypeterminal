@@ -139,37 +139,37 @@ export function LeveragePopover({
 							<Button variant="outline" size="sm" className="flex-1" onClick={handleCancel}>
 								<Trans>Cancel</Trans>
 							</Button>
-							<button
-								type="button"
+							<Button
+								variant="ghost"
+								size="none"
 								onClick={handleConfirm}
 								disabled={isUpdating}
 								className={clsx(
-									"flex-1 py-2 text-2xs font-semibold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5",
+									"flex-1 py-2 text-2xs font-semibold uppercase tracking-wider gap-1.5 hover:bg-transparent",
 									"bg-terminal-cyan/20 border border-terminal-cyan text-terminal-cyan",
 									"hover:bg-terminal-cyan/30",
-									"disabled:opacity-50 disabled:cursor-not-allowed",
 								)}
 							>
 								{isUpdating && <Loader2 className="size-3 animate-spin" />}
 								<Trans>Retry</Trans>
-							</button>
+							</Button>
 						</div>
 					) : (
-						<button
-							type="button"
+						<Button
+							variant="ghost"
+							size="none"
 							onClick={handleConfirm}
 							disabled={!isDirty || isUpdating || showSuccess}
 							className={clsx(
-								"w-full py-2 text-2xs font-semibold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5",
-								"border",
+								"w-full py-2 text-2xs font-semibold uppercase tracking-wider gap-1.5 border hover:bg-transparent",
 								isDirty && !isUpdating && !showSuccess
 									? "bg-terminal-cyan/20 border-terminal-cyan text-terminal-cyan hover:bg-terminal-cyan/30"
-									: "bg-terminal-cyan/10 border-terminal-cyan/30 text-terminal-cyan/50 cursor-not-allowed",
+									: "bg-terminal-cyan/10 border-terminal-cyan/30 text-terminal-cyan/50",
 							)}
 						>
 							{isUpdating && <Loader2 className="size-3 animate-spin" />}
 							<Trans>Confirm</Trans>
-						</button>
+						</Button>
 					)}
 				</div>
 			</PopoverContent>

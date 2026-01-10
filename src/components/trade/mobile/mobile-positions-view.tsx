@@ -2,6 +2,7 @@ import { Inbox, Wallet } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { POSITIONS_TABS, UI_TEXT } from "@/config/interface";
 import { useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
@@ -90,14 +91,16 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 								(tab.value === "positions" && isLoadingState) || (tab.value === "orders" && isLoadingOrders);
 
 							return (
-								<button
+								<Button
 									key={tab.value}
-									type="button"
+									variant="ghost"
+									size="none"
 									onClick={() => setActiveTab(tab.value)}
 									className={clsx(
 										"px-3 py-2.5 text-sm font-medium rounded-md transition-colors",
 										"min-h-[44px] flex items-center gap-2",
 										"active:scale-98",
+										"hover:bg-transparent",
 										isActive
 											? "bg-background text-terminal-cyan shadow-sm"
 											: "text-muted-foreground hover:text-foreground",
@@ -117,7 +120,7 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 											{count}
 										</Badge>
 									) : null}
-								</button>
+								</Button>
 							);
 						})}
 					</div>

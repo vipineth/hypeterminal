@@ -1,5 +1,6 @@
 import { ArrowRightLeft, ChevronDown, RefreshCw, TrendingDown, TrendingUp } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -148,67 +149,73 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 				<div className="flex items-center justify-between">
 					{/* View toggle */}
 					<div className="flex items-center gap-1 bg-muted/50 rounded-md p-0.5">
-						<button
-							type="button"
+						<Button
+							variant="ghost"
+							size="none"
 							onClick={() => setView("book")}
 							className={clsx(
 								"px-3 py-1.5 text-xs font-medium rounded transition-colors",
-								"min-h-[36px]", // Touch target
+								"min-h-[36px]",
+								"hover:bg-transparent",
 								view === "book"
 									? "bg-background text-terminal-cyan shadow-sm"
 									: "text-muted-foreground hover:text-foreground",
 							)}
 						>
 							{ORDERBOOK_TEXT.BOOK_LABEL}
-						</button>
-						<button
-							type="button"
+						</Button>
+						<Button
+							variant="ghost"
+							size="none"
 							onClick={() => setView("trades")}
 							className={clsx(
 								"px-3 py-1.5 text-xs font-medium rounded transition-colors",
 								"min-h-[36px]",
+								"hover:bg-transparent",
 								view === "trades"
 									? "bg-background text-terminal-cyan shadow-sm"
 									: "text-muted-foreground hover:text-foreground",
 							)}
 						>
 							{ORDERBOOK_TEXT.TRADES_LABEL}
-						</button>
+						</Button>
 					</div>
 
 					{/* Controls */}
 					<div className="flex items-center gap-2">
 						{/* Unit toggle */}
-						<button
-							type="button"
+						<Button
+							variant="ghost"
+							size="none"
 							onClick={() => setShowOrderbookInUsd(!showOrderbookInUsd)}
 							className={clsx(
 								"px-2 py-1.5 text-xs border border-border/60 rounded",
 								"min-h-[36px] flex items-center gap-1",
 								"text-muted-foreground hover:text-foreground hover:border-foreground/30",
-								"transition-colors",
+								"hover:bg-transparent transition-colors",
 							)}
 							aria-label="Toggle display units"
 						>
 							{showOrderbookInUsd ? "USD" : coin}
 							<ArrowRightLeft className="size-3" />
-						</button>
+						</Button>
 
 						{/* Aggregation selector */}
 						{view === "book" && (
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
-									<button
-										type="button"
+									<Button
+										variant="ghost"
+										size="none"
 										className={clsx(
 											"px-2 py-1.5 text-xs border border-border/60 rounded",
 											"min-h-[36px] flex items-center gap-1",
-											"hover:border-foreground/30 transition-colors",
+											"hover:border-foreground/30 hover:bg-transparent transition-colors",
 										)}
 									>
 										{selectedOption?.label ?? "—"}
 										<ChevronDown className="size-3" />
-									</button>
+									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end" className="min-w-20 font-mono text-xs">
 									{priceGroupingOptions.map((option) => {

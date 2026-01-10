@@ -1,6 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { ArrowRightLeft, ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -69,14 +70,15 @@ export function OrderbookPanel() {
 						{t`Price`}
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
-								<button
-									type="button"
-									className="px-1.5 py-0.5 text-4xs border border-border/60 hover:border-foreground/30 inline-flex items-center gap-1"
+								<Button
+									variant="ghost"
+									size="none"
+									className="px-1.5 py-0.5 text-4xs border border-border/60 hover:border-foreground/30 hover:bg-transparent inline-flex items-center gap-1"
 									aria-label={t`Select order book aggregation`}
 								>
 									{selectedOption?.label ?? priceGroupingOptions[0]?.label ?? "—"}
 									<ChevronDown className="size-2.5" />
-								</button>
+								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end" className="min-w-20 font-mono text-xs">
 								{priceGroupingOptions.map((option) => (
@@ -93,24 +95,26 @@ export function OrderbookPanel() {
 							</DropdownMenuContent>
 						</DropdownMenu>
 					</div>
-					<button
-						type="button"
+					<Button
+						variant="ghost"
+						size="none"
 						onClick={toggleUsdDisplay}
-						className="text-right hover:text-foreground transition-colors inline-flex items-center justify-end gap-0.5"
+						className="text-right hover:text-foreground hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
 					>
 						{t`Size`}
 						<span className="opacity-60">({showOrderbookInUsd ? "$" : selectedMarket.coin})</span>
 						<ArrowRightLeft className="size-2 opacity-40" />
-					</button>
-					<button
-						type="button"
+					</Button>
+					<Button
+						variant="ghost"
+						size="none"
 						onClick={toggleUsdDisplay}
-						className="text-right hover:text-foreground transition-colors inline-flex items-center justify-end gap-0.5"
+						className="text-right hover:text-foreground hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
 					>
 						{t`Total`}
 						<span className="opacity-60">({showOrderbookInUsd ? "$" : selectedMarket.coin})</span>
 						<ArrowRightLeft className="size-2 opacity-40" />
-					</button>
+					</Button>
 				</div>
 
 				<div className="flex-1 min-h-0 flex flex-col overflow-hidden">

@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { useMemo } from "react";
+import { Button } from "@/components/ui/button";
 
 interface Props {
 	value: number;
@@ -92,22 +93,22 @@ export function LeverageSlider({ value, onChange, max, disabled, className }: Pr
 					const markPosition = ((mark - 1) / (max - 1)) * 100;
 					const isSelected = value === mark;
 					return (
-						<button
+						<Button
 							key={mark}
-							type="button"
+							variant="ghost"
+							size="none"
 							onClick={() => !disabled && onChange(mark)}
 							disabled={disabled}
 							className={clsx(
-								"absolute -translate-x-1/2 text-3xs tabular-nums transition-colors",
+								"absolute -translate-x-1/2 text-3xs tabular-nums hover:bg-transparent",
 								isSelected
 									? "text-terminal-cyan font-medium"
 									: "text-muted-foreground hover:text-foreground",
-								!disabled && "cursor-pointer",
 							)}
 							style={{ left: `${markPosition}%` }}
 						>
 							{mark}×
-						</button>
+						</Button>
 					);
 				})}
 			</div>

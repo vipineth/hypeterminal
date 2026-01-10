@@ -1,6 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { Star } from "lucide-react";
 import { useMemo } from "react";
+import { Button } from "@/components/ui/button";
 import { formatPercent, formatPrice } from "@/lib/format";
 import { usePerpMarkets } from "@/lib/hyperliquid";
 import { useSubActiveAssetCtx, useSubAllMids } from "@/lib/hyperliquid/hooks/subscription";
@@ -90,15 +91,16 @@ function FavoriteChip({ marketKey, coin, priceNumber, szDecimals, isActive }: Fa
 	}
 
 	return (
-		<button
-			type="button"
+		<Button
+			variant="ghost"
+			size="none"
 			onClick={handleClick}
 			onKeyDown={handleKeyDown}
 			tabIndex={0}
 			aria-label={t`Select ${coin} market`}
 			aria-pressed={isActive}
 			className={clsx(
-				"shrink-0 inline-flex items-center gap-2 px-2.5 py-0.5 text-3xs transition-colors cursor-pointer",
+				"shrink-0 inline-flex items-center gap-2 px-2.5 py-0.5 text-3xs transition-colors cursor-pointer rounded-none",
 				"hover:bg-accent/50",
 				isActive && "bg-terminal-cyan/10",
 			)}
@@ -115,6 +117,6 @@ function FavoriteChip({ marketKey, coin, priceNumber, szDecimals, isActive }: Fa
 					})}
 				</span>
 			)}
-		</button>
+		</Button>
 	);
 }

@@ -1,6 +1,7 @@
 import { ChevronDown, Loader2, TrendingDown, TrendingUp } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
@@ -336,13 +337,12 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 				<div className="p-4 space-y-4">
 					{/* Buy/Sell toggle */}
 					<div className="grid grid-cols-2 gap-2">
-						<button
-							type="button"
+						<Button
+							variant="ghost"
+							size="none"
 							onClick={() => setSide("buy")}
 							className={clsx(
-								// Large touch targets
-								"py-4 text-base font-semibold uppercase tracking-wider transition-all border rounded-md",
-								"flex items-center justify-center gap-2",
+								"py-4 text-base font-semibold uppercase tracking-wider border rounded-md gap-2 hover:bg-transparent",
 								"active:scale-98",
 								side === "buy"
 									? "bg-terminal-green/20 border-terminal-green text-terminal-green"
@@ -351,13 +351,13 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 						>
 							<TrendingUp className="size-5" />
 							{ORDER_TEXT.BUY_LABEL}
-						</button>
-						<button
-							type="button"
+						</Button>
+						<Button
+							variant="ghost"
+							size="none"
 							onClick={() => setSide("sell")}
 							className={clsx(
-								"py-4 text-base font-semibold uppercase tracking-wider transition-all border rounded-md",
-								"flex items-center justify-center gap-2",
+								"py-4 text-base font-semibold uppercase tracking-wider border rounded-md gap-2 hover:bg-transparent",
 								"active:scale-98",
 								side === "sell"
 									? "bg-terminal-red/20 border-terminal-red text-terminal-red"
@@ -366,31 +366,33 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 						>
 							<TrendingDown className="size-5" />
 							{ORDER_TEXT.SELL_LABEL}
-						</button>
+						</Button>
 					</div>
 
 					{/* Order type tabs */}
 					<div className="flex items-center gap-1 bg-muted/50 rounded-md p-1">
-						<button
-							type="button"
+						<Button
+							variant="ghost"
+							size="none"
 							onClick={() => setType("market")}
 							className={clsx(
-								"flex-1 py-2.5 text-sm font-medium rounded transition-colors",
+								"flex-1 py-2.5 text-sm font-medium rounded hover:bg-transparent",
 								type === "market" ? "bg-background text-terminal-cyan shadow-sm" : "text-muted-foreground",
 							)}
 						>
 							{ORDER_TEXT.ORDER_TYPE_MARKET}
-						</button>
-						<button
-							type="button"
+						</Button>
+						<Button
+							variant="ghost"
+							size="none"
 							onClick={() => setType("limit")}
 							className={clsx(
-								"flex-1 py-2.5 text-sm font-medium rounded transition-colors",
+								"flex-1 py-2.5 text-sm font-medium rounded hover:bg-transparent",
 								type === "limit" ? "bg-background text-terminal-cyan shadow-sm" : "text-muted-foreground",
 							)}
 						>
 							{ORDER_TEXT.ORDER_TYPE_LIMIT}
-						</button>
+						</Button>
 					</div>
 
 					{/* Leverage and balance */}
@@ -411,19 +413,19 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					<div className="space-y-2">
 						<p className="text-sm text-muted-foreground">{ORDER_TEXT.SIZE_LABEL}</p>
 						<div className="flex items-center gap-2">
-							<button
-								type="button"
+							<Button
+								variant="ghost"
+								size="none"
 								onClick={handleSizeModeToggle}
 								className={clsx(
-									"px-3 py-3 text-sm border border-border/60 rounded-md",
-									"flex items-center gap-1 min-h-[48px]",
-									"hover:border-foreground/30 transition-colors",
+									"px-3 py-3 text-sm border border-border/60 rounded-md gap-1 min-h-[48px] hover:bg-transparent",
+									"hover:border-foreground/30",
 								)}
 								disabled={isFormDisabled}
 							>
 								{sizeMode === "asset" ? market?.coin || "—" : "USD"}
 								<ChevronDown className="size-3" />
-							</button>
+							</Button>
 							<Input
 								type="text"
 								inputMode="decimal"
@@ -452,20 +454,16 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 						{/* Percent buttons */}
 						<div className="grid grid-cols-4 gap-2">
 							{ORDER_SIZE_PERCENT_STEPS.map((p) => (
-								<button
+								<Button
 									key={p}
-									type="button"
+									variant="terminal"
+									size="none"
 									onClick={() => handlePercentClick(p)}
-									className={clsx(
-										"py-2.5 text-sm font-medium border border-border/60 rounded-md",
-										"hover:border-terminal-cyan/40 hover:text-terminal-cyan",
-										"transition-colors disabled:opacity-50",
-										"min-h-[44px]",
-									)}
+									className="py-2.5 text-sm font-medium rounded-md min-h-[44px]"
 									disabled={isFormDisabled || maxSize <= 0}
 								>
 									{p === 100 ? ORDER_TEXT.SIZE_MAX_LABEL : `${p}%`}
-								</button>
+								</Button>
 							))}
 						</div>
 					</div>
@@ -476,13 +474,14 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							<div className="flex items-center justify-between">
 								<p className="text-sm text-muted-foreground">{ORDER_TEXT.LIMIT_PRICE_LABEL}</p>
 								{markPx > 0 && (
-									<button
-										type="button"
+									<Button
+										variant="link"
+										size="none"
 										onClick={handleMarkPriceClick}
-										className="text-xs text-terminal-cyan hover:underline"
+										className="text-xs text-terminal-cyan"
 									>
 										{ORDER_TEXT.MARK_PRICE_LABEL}: {formatPrice(markPx, { szDecimals: market?.szDecimals })}
-									</button>
+									</Button>
 								)}
 							</div>
 							<Input
@@ -529,15 +528,13 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 
 			{/* Sticky submit button */}
 			<div className="shrink-0 p-4 border-t border-border/60 bg-background/95 backdrop-blur-sm">
-				<button
-					type="button"
+				<Button
+					variant="ghost"
+					size="none"
 					onClick={buttonContent.action}
 					disabled={buttonContent.disabled}
 					className={clsx(
-						"w-full py-4 text-base font-semibold uppercase tracking-wider",
-						"transition-all border rounded-md",
-						"disabled:opacity-50 disabled:cursor-not-allowed",
-						"flex items-center justify-center gap-2",
+						"w-full py-4 text-base font-semibold uppercase tracking-wider border rounded-md gap-2 hover:bg-transparent",
 						"active:scale-98",
 						buttonContent.variant === "cyan"
 							? "bg-terminal-cyan/20 border-terminal-cyan text-terminal-cyan hover:bg-terminal-cyan/30"
@@ -548,7 +545,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 				>
 					{(isSubmitting || isRegistering) && <Loader2 className="size-5 animate-spin" />}
 					{buttonContent.text}
-				</button>
+				</Button>
 			</div>
 
 			<MobileBottomNavSpacer />

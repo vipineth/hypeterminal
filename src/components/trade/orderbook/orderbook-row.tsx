@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { Button } from "@/components/ui/button";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
 import { formatNumber, formatUSD } from "@/lib/format";
 import type { BookLevel } from "@/lib/trade/orderbook";
@@ -39,13 +40,14 @@ export function OrderbookRow({ level, side, maxTotal, showInUsd = false, szDecim
 				style={{ width: `${depthPct}%`, [isAsk ? "right" : "left"]: 0, [isAsk ? "left" : "right"]: "auto" }}
 			/>
 			<div className="grid grid-cols-3 gap-2 text-2xs tabular-nums py-0.5 px-2 relative z-10">
-				<button
-					type="button"
+				<Button
+					variant="link"
+					size="none"
 					onClick={() => setSelectedPrice(level.price)}
-					className={clsx("text-left hover:underline", isAsk ? "text-terminal-red" : "text-terminal-green")}
+					className={clsx("text-left justify-start", isAsk ? "text-terminal-red hover:text-terminal-red" : "text-terminal-green hover:text-terminal-green")}
 				>
 					{formatNumber(level.price)}
-				</button>
+				</Button>
 				<div className="text-right text-muted-foreground group-hover:text-foreground">{sizeText}</div>
 				<div className="text-right text-muted-foreground/70 group-hover:text-muted-foreground">{totalText}</div>
 			</div>

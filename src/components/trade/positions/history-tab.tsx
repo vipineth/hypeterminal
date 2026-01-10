@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { History } from "lucide-react";
 import { useMemo } from "react";
 import { useConnection } from "wagmi";
+import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
@@ -137,14 +138,14 @@ export function HistoryTab() {
 												<span className={clsx("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
 													{row.sideLabel}
 												</span>
-												<button
-													type="button"
+												<Button
+													variant="link"
+													size="none"
 													onClick={() => setSelectedMarketKey(makePerpMarketKey(row.coin))}
-													className="hover:underline hover:text-terminal-cyan transition-colors"
 													aria-label={t`Switch to ${row.coin} market`}
 												>
 													{row.coin}
-												</button>
+												</Button>
 											</div>
 										</TableCell>
 										<TableCell className="text-2xs py-1.5">

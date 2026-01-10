@@ -136,37 +136,37 @@ export function LeverageSheet({
 							<Button variant="outline" size="lg" className="flex-1" onClick={handleCancel}>
 								<Trans>Cancel</Trans>
 							</Button>
-							<button
-								type="button"
+							<Button
+								variant="ghost"
+								size="none"
 								onClick={handleConfirm}
 								disabled={isUpdating}
 								className={clsx(
-									"flex-1 py-3 text-xs font-semibold uppercase tracking-wider transition-colors flex items-center justify-center gap-2",
+									"flex-1 py-3 text-xs font-semibold uppercase tracking-wider gap-2 hover:bg-transparent",
 									"bg-terminal-cyan/20 border border-terminal-cyan text-terminal-cyan",
 									"hover:bg-terminal-cyan/30",
-									"disabled:opacity-50 disabled:cursor-not-allowed",
 								)}
 							>
 								{isUpdating && <Loader2 className="size-4 animate-spin" />}
 								<Trans>Retry</Trans>
-							</button>
+							</Button>
 						</div>
 					) : (
-						<button
-							type="button"
+						<Button
+							variant="ghost"
+							size="none"
 							onClick={handleConfirm}
 							disabled={!isDirty || isUpdating || showSuccess}
 							className={clsx(
-								"w-full py-3 text-xs font-semibold uppercase tracking-wider transition-colors flex items-center justify-center gap-2",
-								"border",
+								"w-full py-3 text-xs font-semibold uppercase tracking-wider gap-2 border hover:bg-transparent",
 								isDirty && !isUpdating && !showSuccess
 									? "bg-terminal-cyan/20 border-terminal-cyan text-terminal-cyan hover:bg-terminal-cyan/30"
-									: "bg-terminal-cyan/10 border-terminal-cyan/30 text-terminal-cyan/50 cursor-not-allowed",
+									: "bg-terminal-cyan/10 border-terminal-cyan/30 text-terminal-cyan/50",
 							)}
 						>
 							{isUpdating && <Loader2 className="size-4 animate-spin" />}
 							<Trans>Confirm</Trans>
-						</button>
+						</Button>
 					)}
 				</div>
 			</SheetContent>

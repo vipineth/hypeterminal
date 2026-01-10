@@ -1,5 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { flexRender } from "@tanstack/react-table";
+import clsx from "clsx";
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown, Flame, Search, Star } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +11,6 @@ import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
 import { getTokenIconUrl, isTokenInCategory, marketCategories } from "@/config/token";
 import { formatPercent, formatPrice, formatUSD } from "@/lib/format";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
-import clsx from "clsx";
 import { QUOTE_ASSET } from "./constants";
 import { useTokenSelector } from "./use-token-selector";
 
@@ -85,23 +85,23 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 					<div className="px-2 py-1.5 border-b border-border/40 bg-surface/50">
 						<div className="flex items-center gap-0.5 flex-wrap">
 							{marketCategories.map((cat) => (
-								<button
+								<Button
 									key={cat.value}
-									type="button"
+									variant="ghost"
+									size="none"
 									onClick={() => handleCategorySelect(cat.value)}
 									className={clsx(
-										"px-2 py-1 text-3xs uppercase tracking-wider transition-colors inline-flex items-center gap-1",
+										"px-2 py-1 text-3xs uppercase tracking-wider gap-1 hover:bg-transparent",
 										category === cat.value
 											? "text-terminal-cyan bg-terminal-cyan/10"
 											: "text-muted-foreground hover:text-foreground",
 									)}
-									tabIndex={0}
 									aria-label={t`Filter by ${cat.label}`}
 									aria-pressed={category === cat.value}
 								>
 									{cat.icon}
 									{cat.label}
-								</button>
+								</Button>
 							))}
 						</div>
 					</div>
@@ -121,12 +121,13 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 							const hiddenOnMobile = ["openInterest", "dayNtlVlm", "funding"].includes(header.id);
 
 							return (
-								<button
+								<Button
 									key={header.id}
-									type="button"
+									variant="ghost"
+									size="none"
 									onClick={header.column.getToggleSortingHandler()}
 									className={clsx(
-										"w-16 sm:w-20 flex items-center justify-end gap-1 transition-colors hover:text-foreground cursor-pointer",
+										"w-16 sm:w-20 justify-end gap-1 hover:text-foreground hover:bg-transparent",
 										hiddenOnMobile && "hidden sm:flex",
 									)}
 									aria-label={t`Sort by ${String(header.column.columnDef.header ?? "")}`}
@@ -141,7 +142,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 											<ArrowUpDown className="size-2.5 opacity-40" />
 										)}
 									</span>
-								</button>
+								</Button>
 							);
 						})}
 					</div>
@@ -212,13 +213,14 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 												<div className="min-w-0">
 													<div className="flex items-center gap-1">
 														<span className="font-semibold text-2xs">{market.coin}</span>
-														<button
-															type="button"
+														<Button
+															variant="ghost"
+															size="none"
 															onClick={(e) => {
 																e.stopPropagation();
 																toggleFavorite(market.coin);
 															}}
-															className="hover:scale-110 transition-transform"
+															className="hover:scale-110 hover:bg-transparent"
 															aria-label={isFav ? t`Remove from favorites` : t`Add to favorites`}
 														>
 															<Star
@@ -229,7 +231,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 																		: "text-muted-foreground hover:text-terminal-amber",
 																)}
 															/>
-														</button>
+														</Button>
 														{isTokenInCategory(market.coin, "new") && (
 															<Badge variant="neutral" size="xs" className="px-1 py-0 text-4xs">
 																{t`NEW`}
@@ -267,7 +269,10 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 											<div className="w-20 text-right hidden sm:block">
 												<div className="flex items-center justify-end gap-1">
 													<Flame
-														className={clsx("size-2.5", isFundingPositive ? "text-terminal-green" : "text-terminal-red")}
+														className={clsx(
+															"size-2.5",
+															isFundingPositive ? "text-terminal-green" : "text-terminal-red",
+														)}
 													/>
 													<span
 														className={clsx(

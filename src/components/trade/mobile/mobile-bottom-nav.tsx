@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { BarChart3, BookOpen, CircleDollarSign, LayoutList, TrendingUp } from "lucide-react";
 import type { ReactNode } from "react";
+import { Button } from "@/components/ui/button";
 
 export type MobileTab = "chart" | "book" | "trade" | "positions" | "account";
 
@@ -42,16 +43,17 @@ export function MobileBottomNav({ activeTab, onTabChange, badges, className }: P
 					const showBadge = typeof badgeCount === "number" && badgeCount > 0;
 
 					return (
-						<button
+						<Button
 							key={item.id}
-							type="button"
+							variant="ghost"
+							size="none"
 							onClick={() => onTabChange(item.id)}
 							className={clsx(
-								"flex-1 flex flex-col items-center justify-center gap-0.5",
+								"flex-1 flex flex-col items-center justify-center gap-0.5 rounded-none",
 								"min-h-[56px] py-2 px-1",
 								"transition-colors duration-150 ease-out",
 								"active:bg-accent/50 active:scale-95",
-								"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
+								"hover:bg-transparent",
 								isActive ? "text-terminal-cyan" : "text-muted-foreground hover:text-foreground",
 							)}
 							aria-current={isActive ? "page" : undefined}
@@ -74,7 +76,7 @@ export function MobileBottomNav({ activeTab, onTabChange, badges, className }: P
 								)}
 							</span>
 							<span className="text-[10px] font-medium tracking-wide">{item.label}</span>
-						</button>
+						</Button>
 					);
 				})}
 			</div>

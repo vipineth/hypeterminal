@@ -150,14 +150,14 @@ export function TwapTab() {
 												<span className={clsx("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
 													{row.sideLabel}
 												</span>
-												<button
-													type="button"
+												<Button
+													variant="link"
+													size="none"
 													onClick={() => setSelectedMarketKey(makePerpMarketKey(row.coin))}
-													className="hover:underline hover:text-terminal-cyan transition-colors"
 													aria-label={t`Switch to ${row.coin} market`}
 												>
 													{row.coin}
-												</button>
+												</Button>
 											</div>
 										</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.totalSizeText}</TableCell>

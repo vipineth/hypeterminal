@@ -1,6 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { Check, Loader2, X, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/interface";
 import clsx from "clsx";
 import { type OrderQueueItem, useOrderQueue, useOrderQueueActions } from "@/stores/use-order-queue-store";
@@ -84,14 +85,15 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 
 			{/* Dismiss Button for Failed Orders */}
 			{order.status === "failed" && (
-				<button
-					type="button"
+				<Button
+					variant="ghost"
+					size="none"
 					onClick={onRemove}
 					className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors shrink-0"
 					aria-label={t`Dismiss`}
 				>
 					<X className="size-4" />
-				</button>
+				</Button>
 			)}
 		</div>
 	);

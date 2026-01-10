@@ -417,36 +417,36 @@ export function OrderEntryPanel() {
 				</Tabs>
 
 				<div className="grid grid-cols-2 gap-1">
-					<button
-						type="button"
+					<Button
+						variant="ghost"
+						size="none"
 						onClick={() => setSide("buy")}
 						className={clsx(
-							"py-2 text-2xs font-semibold uppercase tracking-wider transition-all border",
+							"py-2 text-2xs font-semibold uppercase tracking-wider border hover:bg-transparent",
 							side === "buy"
 								? "bg-terminal-green/20 border-terminal-green text-terminal-green terminal-glow-green"
 								: "border-border/60 text-muted-foreground hover:border-terminal-green/40 hover:text-terminal-green",
 						)}
-						tabIndex={0}
 						aria-label={t`Buy Long`}
 					>
 						<TrendingUp className="size-3 inline mr-1" />
 						{t`Long`}
-					</button>
-					<button
-						type="button"
+					</Button>
+					<Button
+						variant="ghost"
+						size="none"
 						onClick={() => setSide("sell")}
 						className={clsx(
-							"py-2 text-2xs font-semibold uppercase tracking-wider transition-all border",
+							"py-2 text-2xs font-semibold uppercase tracking-wider border hover:bg-transparent",
 							side === "sell"
 								? "bg-terminal-red/20 border-terminal-red text-terminal-red terminal-glow-red"
 								: "border-border/60 text-muted-foreground hover:border-terminal-red/40 hover:text-terminal-red",
 						)}
-						tabIndex={0}
 						aria-label={t`Sell Short`}
 					>
 						<TrendingDown className="size-3 inline mr-1" />
 						{t`Short`}
-					</button>
+					</Button>
 				</div>
 				<div className="space-y-0.5 text-3xs">
 					<div className="flex items-center justify-between text-muted-foreground">
@@ -458,13 +458,14 @@ export function OrderEntryPanel() {
 								{isConnected ? formatUSD(availableBalance) : FALLBACK_VALUE_PLACEHOLDER}
 							</span>
 							{isConnected && (
-								<button
-									type="button"
+								<Button
+									variant="link"
+									size="none"
 									onClick={() => setDepositModalOpen(true)}
-									className="text-terminal-cyan hover:underline text-4xs uppercase"
+									className="text-terminal-cyan text-4xs uppercase"
 								>
 									{t`Deposit`}
-								</button>
+								</Button>
 							)}
 						</div>
 					</div>
@@ -481,16 +482,16 @@ export function OrderEntryPanel() {
 				<div className="space-y-1.5">
 					<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Size`}</div>
 					<div className="flex items-center gap-1">
-						<button
-							type="button"
+						<Button
+							variant="ghost"
+							size="none"
 							onClick={handleSizeModeToggle}
-							className="px-2 py-1.5 text-3xs border border-border/60 hover:border-foreground/30 inline-flex items-center gap-1"
-							tabIndex={0}
+							className="px-2 py-1.5 text-3xs border border-border/60 hover:border-foreground/30 hover:bg-transparent gap-1"
 							aria-label={t`Toggle size mode`}
 							disabled={isFormDisabled}
 						>
 							{sizeMode === "asset" ? market?.coin || "---" : "USD"} <ChevronDown className="size-2.5" />
-						</button>
+						</Button>
 						<Input
 							placeholder="0.00"
 							value={sizeInput}
@@ -532,13 +533,14 @@ export function OrderEntryPanel() {
 						<div className="flex items-center justify-between">
 							<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Limit Price`}</div>
 							{markPx > 0 && (
-								<button
-									type="button"
+								<Button
+									variant="ghost"
+									size="none"
 									onClick={handleMarkPriceClick}
-									className="text-4xs text-muted-foreground hover:text-terminal-cyan tabular-nums"
+									className="text-4xs text-muted-foreground hover:text-terminal-cyan hover:bg-transparent tabular-nums"
 								>
 									{t`Mark`}: {formatPrice(markPx, { szDecimals: market?.szDecimals })}
-								</button>
+								</Button>
 							)}
 						</div>
 						<Input
@@ -591,24 +593,24 @@ export function OrderEntryPanel() {
 
 				{approvalError && <div className="text-4xs text-terminal-red">{approvalError}</div>}
 
-				<button
-					type="button"
+				<Button
+					variant="ghost"
+					size="none"
 					onClick={buttonContent.action}
 					disabled={buttonContent.disabled}
 					className={clsx(
-						"w-full py-2.5 text-2xs font-semibold uppercase tracking-wider transition-all border disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2",
+						"w-full py-2.5 text-2xs font-semibold uppercase tracking-wider border gap-2 hover:bg-transparent",
 						buttonContent.variant === "cyan"
 							? "bg-terminal-cyan/20 border-terminal-cyan text-terminal-cyan hover:bg-terminal-cyan/30"
 							: buttonContent.variant === "buy"
 								? "bg-terminal-green/20 border-terminal-green text-terminal-green hover:bg-terminal-green/30"
 								: "bg-terminal-red/20 border-terminal-red text-terminal-red hover:bg-terminal-red/30",
 					)}
-					tabIndex={0}
 					aria-label={buttonContent.text}
 				>
 					{(isSubmitting || isRegistering) && <Loader2 className="size-3 animate-spin" />}
 					{buttonContent.text}
-				</button>
+				</Button>
 
 				<div className="border border-border/40 divide-y divide-border/40 text-3xs">
 					<div className="flex items-center justify-between px-2 py-1.5">

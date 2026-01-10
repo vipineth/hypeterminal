@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { WifiOff, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { useOnlineStatus } from "@/hooks/use-mobile";
 
 interface Props {
@@ -65,8 +66,9 @@ export function OfflineBanner({ className }: Props) {
 			</div>
 
 			{!isOnline && (
-				<button
-					type="button"
+				<Button
+					variant="ghost"
+					size="none"
 					onClick={() => setDismissed(true)}
 					className={clsx(
 						"size-8 flex items-center justify-center",
@@ -76,7 +78,7 @@ export function OfflineBanner({ className }: Props) {
 					aria-label="Dismiss offline notification"
 				>
 					<X className="size-4" />
-				</button>
+				</Button>
 			)}
 		</div>
 	);

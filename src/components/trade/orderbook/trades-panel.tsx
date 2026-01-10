@@ -1,6 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { ArrowRightLeft, ExternalLink } from "lucide-react";
 import { memo, useEffect, useMemo, useRef } from "react";
+import { Button } from "@/components/ui/button";
 import { useRingBuffer } from "@/lib/circular-buffer";
 import { formatNumber } from "@/lib/format";
 import { useSelectedResolvedMarket, useSubTrades } from "@/lib/hyperliquid";
@@ -88,15 +89,16 @@ export function TradesPanel() {
 			<div className="grid grid-cols-3 gap-2 px-2 py-1 text-4xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40">
 				<div>{t`Time`}</div>
 				<div className="text-right">{t`Price`}</div>
-				<button
-					type="button"
+				<Button
+					variant="ghost"
+					size="none"
 					onClick={toggleUsdDisplay}
-					className="text-right hover:text-foreground transition-colors inline-flex items-center justify-end gap-0.5"
+					className="text-right hover:text-foreground hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
 				>
 					{t`Size`}
 					<span className="opacity-60">({showOrderbookInUsd ? "$" : selectedMarket.coin})</span>
 					<ArrowRightLeft className="size-2 opacity-40" />
-				</button>
+				</Button>
 			</div>
 
 			{status === "error" ? (
