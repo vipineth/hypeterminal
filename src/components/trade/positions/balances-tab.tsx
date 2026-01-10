@@ -1,4 +1,5 @@
 import { t } from "@lingui/core/macro";
+import clsx from "clsx";
 import { Wallet } from "lucide-react";
 import { useMemo } from "react";
 import { useConnection } from "wagmi";
@@ -8,7 +9,6 @@ import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
 import { formatToken, formatUSD } from "@/lib/format";
 import { useSubClearinghouseState, useSubSpotState } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumberOrZero } from "@/lib/trade/numbers";
-import clsx from "clsx";
 import { TokenAvatar } from "../components/token-avatar";
 
 type BalanceRow = {

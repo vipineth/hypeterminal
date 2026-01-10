@@ -51,6 +51,17 @@ Enable Take Profit and Stop Loss orders for both new and existing positions with
 
 ## Technical Spec
 
+### Finding the Right API
+
+1. **Discover methods by intent** → `docs/hyperliquid-sdk-directory.md`
+   - Scan "Want to..." tables to find method names
+   - Note the type: (I)nfo, (E)xchange, or (S)ubscription
+
+2. **Get full parameter schema** → `docs/hyperliquid-sdk-1.md` or `docs/hyperliquid-sdk-2.md`
+   - Info methods: sdk-1 lines 1036-1775
+   - Exchange methods: sdk-1 lines 1776-2054 + sdk-2 lines 1-220
+   - Subscriptions: sdk-2 lines 221-540
+
 ### SDK/API Details
 
 ```typescript

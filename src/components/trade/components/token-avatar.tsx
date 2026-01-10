@@ -13,7 +13,7 @@ export function TokenAvatar({ symbol, className, fallbackClassName }: Props) {
 
 	return (
 		<Avatar className={clsx("size-4", className)}>
-			<AvatarImage src={getTokenIconUrl(symbol)} alt={symbol} />
+			<AvatarImage className="size-4" src={getTokenIconUrl(symbol)} alt={symbol} />
 			<AvatarFallback className={clsx("text-3xs bg-terminal-amber/20 text-terminal-amber", fallbackClassName)}>
 				{fallbackText}
 			</AvatarFallback>

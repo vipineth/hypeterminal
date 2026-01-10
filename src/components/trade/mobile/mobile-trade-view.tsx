@@ -1,22 +1,14 @@
 import { ChevronDown, Loader2, TrendingDown, TrendingUp } from "lucide-react";
-import { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
 import {
 	ARBITRUM_CHAIN_ID,
-	DEFAULT_MAX_LEVERAGE,
 	FALLBACK_VALUE_PLACEHOLDER,
 	ORDER_FEE_RATE_MAKER,
 	ORDER_FEE_RATE_TAKER,
-	ORDER_LEVERAGE_STEPS,
 	ORDER_MIN_NOTIONAL_USD,
 	ORDER_SIZE_PERCENT_STEPS,
 	UI_TEXT,
@@ -24,21 +16,17 @@ import {
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
-import { useExchangeUpdateLeverage } from "@/lib/hyperliquid/hooks/exchange/useExchangeUpdateLeverage";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
+import { useAssetLeverage } from "@/hooks/trade/use-asset-leverage";
 import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
-import { formatPriceForOrder, formatSizeForOrder, getDefaultLeverage } from "@/lib/trade/orders";
+import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
 import clsx from "clsx";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { useOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
-import {
-	useDefaultLeverageByMode,
-	useMarketLeverageByMode,
-	useMarketOrderSlippageBps,
-	useTradeSettingsActions,
-} from "@/stores/use-trade-settings-store";
+import { useMarketOrderSlippageBps } from "@/stores/use-trade-settings-store";
 import { WalletDialog } from "../components/wallet-dialog";
 import { DepositModal } from "../order-entry/deposit-modal";
+import { LeverageControl } from "../order-entry/leverage-control";
 import { OrderToast } from "../order-entry/order-toast";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
 
@@ -53,8 +41,6 @@ interface MobileTradeViewProps {
 }
 
 export function MobileTradeView({ className }: MobileTradeViewProps) {
-	const leverageId = useId();
-
 	const { address, isConnected } = useConnection();
 	const { data: walletClient, isLoading: isWalletLoading, error: walletClientError } = useWalletClient();
 	const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
@@ -75,10 +61,13 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const canApprove = !!walletClient && !!address;
 	const isRegistering = registerStatus === "signing" || registerStatus === "verifying";
 
-	const defaultLeverageByMode = useDefaultLeverageByMode();
-	const marketLeverageByMode = useMarketLeverageByMode();
 	const slippageBps = useMarketOrderSlippageBps();
-	const { setMarketLeverage } = useTradeSettingsActions();
+
+	const {
+		displayLeverage: leverage,
+		availableToSell,
+		availableToBuy,
+	} = useAssetLeverage();
 
 	const { addOrder, updateOrder } = useOrderQueueActions();
 	const selectedPrice = useSelectedPrice();
@@ -94,7 +83,6 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const [depositModalOpen, setDepositModalOpen] = useState(false);
 
 	const { mutateAsync: placeOrder, isPending: isSubmitting } = useExchangeOrder();
-	const { mutateAsync: updateLeverage } = useExchangeUpdateLeverage();
 
 	// Sync orderbook price clicks
 	useEffect(() => {
@@ -116,29 +104,26 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 			: (clearinghouse.assetPositions.find((p) => p.position.coin === market.coin) ?? null);
 	const positionSize = parseNumber(position?.position?.szi) || 0;
 
-	const maxLeverage = market?.maxLeverage || DEFAULT_MAX_LEVERAGE;
-
-	const leverage = (() => {
-		if (!market?.marketKey) return getDefaultLeverage(maxLeverage);
-		const marketSpecific = marketLeverageByMode[market.marketKey]?.cross;
-		if (marketSpecific) return Math.min(marketSpecific, maxLeverage);
-		const defaultLev = defaultLeverageByMode.cross ?? getDefaultLeverage(maxLeverage);
-		return Math.min(defaultLev, maxLeverage);
-	})();
-
 	const ctxMarkPx = market?.ctxNumbers?.markPx;
 	const markPx =
 		typeof ctxMarkPx === "number" ? ctxMarkPx : typeof market?.midPxNumber === "number" ? market.midPxNumber : 0;
 	const price = type === "market" ? markPx : parseNumber(limitPriceInput) || 0;
 
-	const maxSize = (() => {
-		if (!price || price <= 0 || !leverage) return 0;
+	const maxSize = useMemo(() => {
+		if (!price || price <= 0) return 0;
+
+		const availableFromSub = side === "buy" ? availableToBuy : availableToSell;
+		if (availableFromSub !== null && availableFromSub > 0) {
+			return floorToDecimals(availableFromSub, market?.szDecimals ?? 0);
+		}
+
+		if (!leverage || availableBalance <= 0) return 0;
 		const maxNotional = availableBalance * leverage;
 		let maxSizeRaw = maxNotional / price;
 		if (side === "sell" && positionSize > 0) maxSizeRaw += positionSize;
 		else if (side === "buy" && positionSize < 0) maxSizeRaw += Math.abs(positionSize);
 		return floorToDecimals(maxSizeRaw, market?.szDecimals ?? 0);
-	})();
+	}, [price, side, availableToBuy, availableToSell, leverage, availableBalance, positionSize, market?.szDecimals]);
 
 	const sizeInputValue = parseNumber(sizeInput) || 0;
 	const sizeValue = sizeMode === "usd" && price > 0 ? sizeInputValue / price : sizeInputValue;
@@ -190,20 +175,6 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 		isAgentApproved,
 		canSign,
 	]);
-
-	const leverageOptions = useMemo(() => {
-		const options: number[] = [];
-		for (const step of ORDER_LEVERAGE_STEPS) {
-			if (step <= maxLeverage) options.push(step);
-		}
-		if (!options.includes(maxLeverage)) options.push(maxLeverage);
-		return options.sort((a, b) => a - b);
-	}, [maxLeverage]);
-
-	// Handlers
-	const handleLeverageChange = (newLeverage: number) => {
-		if (market?.marketKey) setMarketLeverage(market.marketKey, "cross", newLeverage, maxLeverage);
-	};
 
 	const applySizeFromPercent = (pct: number) => {
 		if (maxSize <= 0) return;
@@ -264,8 +235,6 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 		const orderId = addOrder({ market: market.coin, side, size: formattedSize, status: "pending" });
 
 		try {
-			await updateLeverage({ asset: market.assetIndex, isCross: true, leverage });
-
 			const result = await placeOrder({
 				orders: [
 					{
@@ -427,35 +396,8 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					{/* Leverage and balance */}
 					<div className="flex items-center justify-between text-sm">
 						<div className="flex items-center gap-2">
-							<label htmlFor={leverageId} className="text-muted-foreground">
-								Leverage
-							</label>
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<button
-										type="button"
-										id={leverageId}
-										className={clsx(
-											"px-3 py-2 text-sm font-medium border border-terminal-cyan/40 text-terminal-cyan rounded",
-											"flex items-center gap-1 min-h-[40px]",
-										)}
-									>
-										{leverage}x <ChevronDown className="size-3" />
-									</button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="start" className="min-w-20 max-h-60 overflow-y-auto">
-									{leverageOptions.map((lv) => (
-										<DropdownMenuItem
-											key={lv}
-											onClick={() => handleLeverageChange(lv)}
-											selected={lv === leverage}
-											className="min-h-[40px]"
-										>
-											{lv}x
-										</DropdownMenuItem>
-									))}
-								</DropdownMenuContent>
-							</DropdownMenu>
+							<span className="text-muted-foreground">Leverage</span>
+							<LeverageControl marketKey={market?.marketKey} />
 						</div>
 						<div className="text-right">
 							<span className="text-muted-foreground">{ORDER_TEXT.AVAILABLE_LABEL}: </span>

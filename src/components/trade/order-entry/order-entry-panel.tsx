@@ -2,25 +2,17 @@ import { t } from "@lingui/core/macro";
 import clsx from "clsx";
 import { ChevronDown, Loader2, TrendingDown, TrendingUp } from "lucide-react";
 import { useEffect, useId, useMemo, useState } from "react";
-import { useChainId, useConnection, useSwitchChain, useWalletClient } from "wagmi";
+import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
 	ARBITRUM_CHAIN_ID,
-	DEFAULT_MAX_LEVERAGE,
 	FALLBACK_VALUE_PLACEHOLDER,
 	ORDER_FEE_RATE_MAKER,
 	ORDER_FEE_RATE_TAKER,
-	ORDER_LEVERAGE_STEPS,
 	ORDER_MIN_NOTIONAL_USD,
 	ORDER_SIZE_PERCENT_STEPS,
 } from "@/config/interface";
@@ -29,17 +21,13 @@ import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
-import { formatPriceForOrder, formatSizeForOrder, getDefaultLeverage } from "@/lib/trade/orders";
+import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { useOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
-import {
-	useDefaultLeverageByMode,
-	useMarketLeverageByMode,
-	useMarketOrderSlippageBps,
-	useTradeSettingsActions,
-} from "@/stores/use-trade-settings-store";
+import { useMarketOrderSlippageBps } from "@/stores/use-trade-settings-store";
 import { WalletDialog } from "../components/wallet-dialog";
 import { DepositModal } from "./deposit-modal";
+import { LeverageControl, useAssetLeverage } from "./leverage-control";
 import { OrderToast } from "./order-toast";
 
 type OrderType = "market" | "limit";
@@ -49,7 +37,6 @@ type SizeMode = "asset" | "usd";
 export function OrderEntryPanel() {
 	const reduceOnlyId = useId();
 	const tpSlId = useId();
-	const chainId = useChainId();
 
 	const { address, isConnected } = useConnection();
 
@@ -69,10 +56,9 @@ export function OrderEntryPanel() {
 
 	const { mutateAsync: placeOrder, isPending: isSubmitting } = useExchangeOrder();
 
-	const defaultLeverageByMode = useDefaultLeverageByMode();
-	const marketLeverageByMode = useMarketLeverageByMode();
 	const slippageBps = useMarketOrderSlippageBps();
-	const { setMarketLeverage } = useTradeSettingsActions();
+
+	const { displayLeverage: leverage, availableToSell, availableToBuy } = useAssetLeverage();
 
 	const { addOrder, updateOrder } = useOrderQueueActions();
 
@@ -108,24 +94,21 @@ export function OrderEntryPanel() {
 
 	const positionSize = parseNumber(position?.position?.szi) || 0;
 
-	const maxLeverage = market?.maxLeverage || DEFAULT_MAX_LEVERAGE;
-
-	const leverage = (() => {
-		if (!market?.marketKey) return getDefaultLeverage(maxLeverage);
-		const marketSpecific = marketLeverageByMode[market.marketKey]?.cross;
-		if (marketSpecific) return Math.min(marketSpecific, maxLeverage);
-		const defaultLev = defaultLeverageByMode.cross ?? getDefaultLeverage(maxLeverage);
-		return Math.min(defaultLev, maxLeverage);
-	})();
-
 	const ctxMarkPx = market?.ctxNumbers?.markPx;
 	const markPx =
 		typeof ctxMarkPx === "number" ? ctxMarkPx : typeof market?.midPxNumber === "number" ? market.midPxNumber : 0;
 
 	const price = type === "market" ? markPx : parseNumber(limitPriceInput) || 0;
 
-	const maxSize = (() => {
-		if (!price || price <= 0 || !leverage) return 0;
+	const maxSize = useMemo(() => {
+		if (!price || price <= 0) return 0;
+
+		const availableFromSub = side === "buy" ? availableToBuy : availableToSell;
+		if (availableFromSub !== null && availableFromSub > 0) {
+			return floorToDecimals(availableFromSub, market?.szDecimals ?? 0);
+		}
+
+		if (!leverage || availableBalance <= 0) return 0;
 		const maxNotional = availableBalance * leverage;
 		let maxSizeRaw = maxNotional / price;
 
@@ -136,7 +119,7 @@ export function OrderEntryPanel() {
 		}
 
 		return floorToDecimals(maxSizeRaw, market?.szDecimals ?? 0);
-	})();
+	}, [price, side, availableToBuy, availableToSell, leverage, availableBalance, positionSize, market?.szDecimals]);
 
 	const sizeInputValue = parseNumber(sizeInput) || 0;
 	const sizeValue = sizeMode === "usd" && price > 0 ? sizeInputValue / price : sizeInputValue;
@@ -221,25 +204,6 @@ export function OrderEntryPanel() {
 
 	const sizeHasError = sizeValue > maxSize && maxSize > 0;
 	const orderValueTooLow = orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD;
-
-	const leverageOptions = useMemo(() => {
-		const options: number[] = [];
-		for (const step of ORDER_LEVERAGE_STEPS) {
-			if (step <= maxLeverage) {
-				options.push(step);
-			}
-		}
-		if (!options.includes(maxLeverage)) {
-			options.push(maxLeverage);
-		}
-		return options.sort((a, b) => a - b);
-	}, [maxLeverage]);
-
-	const handleLeverageChange = (newLeverage: number) => {
-		if (market?.marketKey) {
-			setMarketLeverage(market.marketKey, "cross", newLeverage, maxLeverage);
-		}
-	};
 
 	const applySizeFromPercent = (pct: number) => {
 		if (maxSize <= 0) return;
@@ -426,27 +390,7 @@ export function OrderEntryPanel() {
 						</Tooltip>
 					</TabsList>
 				</Tabs>
-				<div className="flex items-center gap-2">
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<button
-								type="button"
-								className="px-2 py-0.5 text-3xs border border-terminal-cyan/40 text-terminal-cyan inline-flex items-center gap-1"
-								tabIndex={0}
-								aria-label={t`Select leverage`}
-							>
-								{leverage}x <ChevronDown className="size-2.5" />
-							</button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="min-w-16 font-mono text-xs max-h-48 overflow-y-auto">
-							{leverageOptions.map((lv) => (
-								<DropdownMenuItem key={lv} onClick={() => handleLeverageChange(lv)} selected={lv === leverage}>
-									{lv}x
-								</DropdownMenuItem>
-							))}
-						</DropdownMenuContent>
-					</DropdownMenu>
-				</div>
+				<LeverageControl marketKey={market?.marketKey} />
 			</div>
 
 			<div className="p-2 space-y-2 overflow-y-auto flex-1">
@@ -612,10 +556,9 @@ export function OrderEntryPanel() {
 				)}
 
 				<div className="flex items-center gap-3 text-3xs">
-					<div className="inline-flex items-center gap-1.5">
+					<div className="inline-flex items-center gap-2">
 						<Checkbox
 							id={reduceOnlyId}
-							className="size-3.5"
 							aria-label={t`Reduce Only`}
 							checked={reduceOnly}
 							onCheckedChange={(checked) => setReduceOnly(checked === true)}
@@ -630,8 +573,8 @@ export function OrderEntryPanel() {
 					</div>
 					<Tooltip>
 						<TooltipTrigger asChild>
-							<div className="inline-flex items-center gap-1.5 cursor-not-allowed opacity-50">
-								<Checkbox id={tpSlId} className="size-3.5" aria-label={t`Take Profit / Stop Loss`} disabled />
+							<div className="inline-flex items-center gap-2 cursor-not-allowed opacity-50">
+								<Checkbox id={tpSlId} aria-label={t`Take Profit / Stop Loss`} disabled />
 								<label htmlFor={tpSlId} className="text-muted-foreground cursor-not-allowed">
 									{t`TP/SL`}
 								</label>

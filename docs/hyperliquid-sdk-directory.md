@@ -1,12 +1,30 @@
 # Hyperliquid SDK Directory
 
 > **Package:** `@nktkas/hyperliquid`
-> **Full docs:** `hyperliquid-sdk-1.md` (lines 1-2054), `hyperliquid-sdk-2.md` (lines 1-1400)
 
-## How to Use
-1. **Find method by intent** - Scan sections below for what you want to do
-2. **Check type** - (I)nfo=read-only, (E)xchange=signed action, (S)ub=realtime stream
-3. **Get full schema** - Look up method in full docs: Info (sdk-1:1036-1775), Exchange (sdk-1:1776 + sdk-2:1-220), Sub (sdk-2:221-540)
+## How to Use This Documentation
+
+### Step 1: Find Method by Intent (This File)
+Scan the "Want to..." tables below to find the right method for your task.
+
+### Step 2: Understand the Type
+- **(I)** = Info method → read-only, no wallet needed, use `InfoClient`
+- **(E)** = Exchange method → requires signing, use `ExchangeClient` with wallet
+- **(S)** = Subscription → real-time WebSocket stream, use `SubscriptionClient`
+
+### Step 3: Get Full Parameter Schema (Full Docs)
+Once you know which method to use, look up the complete OpenAPI schema in:
+
+| Content | File | Lines |
+|---------|------|-------|
+| Intro, Transports, Clients, Errors | `hyperliquid-sdk-1.md` | 1-1035 |
+| **Info Methods** (all read-only) | `hyperliquid-sdk-1.md` | 1036-1775 |
+| **Exchange Methods** (signed actions) | `hyperliquid-sdk-1.md` + `sdk-2.md` | 1776-2054 + 1-220 |
+| **Subscription Methods** (WebSocket) | `hyperliquid-sdk-2.md` | 221-540 |
+| **Signing Utilities** | `hyperliquid-sdk-2.md` | 799-1060 |
+| Symbol Converter, Formatting | `hyperliquid-sdk-2.md` | 543-798 |
+
+---
 
 ## Clients
 | Client | Purpose | Needs Wallet |

@@ -58,6 +58,17 @@ A Uniswap-style spot swap interface for exchanging one spot asset for another on
 
 ## Technical Spec
 
+### Finding the Right API
+
+1. **Discover methods by intent** → `docs/hyperliquid-sdk-directory.md`
+   - Scan "Want to..." tables to find method names
+   - Note the type: (I)nfo, (E)xchange, or (S)ubscription
+
+2. **Get full parameter schema** → `docs/hyperliquid-sdk-1.md` or `docs/hyperliquid-sdk-2.md`
+   - Info methods: sdk-1 lines 1036-1775
+   - Exchange methods: sdk-1 lines 1776-2054 + sdk-2 lines 1-220
+   - Subscriptions: sdk-2 lines 221-540
+
 ### SDK/API Details
 
 #### spotMeta - Get Trading Pairs
@@ -250,6 +261,16 @@ function buildMarketSellOrder(
 - `src/lib/hyperliquid/hooks/info/index.ts` - Export spot hooks if needed
 
 ## UI/UX
+
+### Design Implementation
+
+When building UI components for this feature:
+
+1. **Use `/frontend-design` skill** - Invoke the frontend-design skill to generate production-grade components that match the app's visual style
+2. **Reference existing components** - Study `src/components/trade/` for patterns like order entry panels, modals, and form inputs
+3. **Follow the terminal aesthetic** - Use existing color tokens (`terminal-green`, `terminal-red`, etc.) and the monospace/tabular-nums typography
+4. **Use existing UI primitives** - Leverage components from `src/components/ui/` (Button, Input, Dialog, Popover, etc.)
+5. **Match the dark theme** - All new components should integrate seamlessly with the dark trading terminal theme
 
 ### Main Swap Panel Layout
 

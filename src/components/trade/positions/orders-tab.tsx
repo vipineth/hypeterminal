@@ -1,4 +1,5 @@
 import { t } from "@lingui/core/macro";
+import clsx from "clsx";
 import { ListOrdered } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConnection } from "wagmi";
@@ -12,7 +13,6 @@ import { useExchangeCancel } from "@/lib/hyperliquid/hooks/exchange/useExchangeC
 import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { parseNumber } from "@/lib/trade/numbers";
-import clsx from "clsx";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import { TokenAvatar } from "../components/token-avatar";
 
@@ -222,7 +222,6 @@ export function OrdersTab() {
 											onCheckedChange={handleToggleAll}
 											aria-label={t`Select all orders`}
 											disabled={openOrders.length === 0 || isCancelling}
-											className="size-3.5 border-border/70 bg-background/60 data-[state=checked]:bg-terminal-cyan data-[state=checked]:border-terminal-cyan data-[state=checked]:text-background"
 										/>
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
@@ -257,7 +256,6 @@ export function OrdersTab() {
 												onCheckedChange={(value) => handleToggleOrder(row.order.oid, value)}
 												aria-label={`${t`Select order`} ${row.coin}`}
 												disabled={isCancelling}
-												className="size-3.5 border-border/70 bg-background/60 data-[state=checked]:bg-terminal-cyan data-[state=checked]:border-terminal-cyan data-[state=checked]:text-background"
 											/>
 										</TableCell>
 										<TableCell className="text-2xs font-medium py-1.5">

@@ -1,4 +1,5 @@
 import { t } from "@lingui/core/macro";
+import clsx from "clsx";
 import { Circle } from "lucide-react";
 import { useMemo, useRef } from "react";
 import { useConnection } from "wagmi";
@@ -12,7 +13,6 @@ import { useSubAssetCtxs, useSubClearinghouseState } from "@/lib/hyperliquid/hoo
 import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
-import clsx from "clsx";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-trade-settings-store";
 import type { PerpAssetCtxs } from "@/types/hyperliquid";
