@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getTradeKey } from "./trades";
+import { getTradeKey } from "@/lib/trade/trades";
 
 describe("trades", () => {
 	it("builds stable trade keys", () => {

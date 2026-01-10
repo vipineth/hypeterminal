@@ -4,7 +4,7 @@ import { Trans } from "@lingui/react/macro";
 import type { ChangeEvent } from "react";
 import { useId, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
@@ -16,8 +16,11 @@ import {
 	type NumberFormatLocale,
 	numberFormatLocaleList,
 } from "@/lib/i18n";
-import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
-import { useMarketOrderSlippageBps, useTradeSettingsActions } from "@/stores/use-trade-settings-store";
+import {
+	useGlobalSettings,
+	useGlobalSettingsActions,
+	useMarketOrderSlippageBps,
+} from "@/stores/use-global-settings-store";
 
 interface GlobalSettingsDialogProps {
 	open: boolean;
@@ -27,7 +30,6 @@ interface GlobalSettingsDialogProps {
 export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialogProps) {
 	const { i18n } = useLingui();
 	const slippageBps = useMarketOrderSlippageBps();
-	const { setMarketOrderSlippageBps } = useTradeSettingsActions();
 	const {
 		showOrdersOnChart,
 		showPositionsOnChart,
@@ -43,6 +45,7 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 		setShowOrderbookInUsd,
 		setShowChartScanlines,
 		setNumberFormatLocale,
+		setMarketOrderSlippageBps,
 	} = useGlobalSettingsActions();
 
 	const [localSlippageInput, setLocalSlippageInput] = useState<string | null>(null);
@@ -152,12 +155,12 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 								<div className="text-4xs text-muted-foreground">{t`Max slippage allowed for market orders.`}</div>
 							</div>
 							<div className="flex items-center gap-1.5">
-								<Input
+								<NumberInput
 									ref={inputRef}
-									type="number"
 									value={slippageInputValue}
 									onChange={handleSlippageInputChange}
 									onBlur={handleSlippageInputBlur}
+									allowDecimals={false}
 									min={MARKET_ORDER_SLIPPAGE_MIN_BPS}
 									max={MARKET_ORDER_SLIPPAGE_MAX_BPS}
 									inputSize="sm"
@@ -172,7 +175,6 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 								onValueChange={handleSlippageSliderChange}
 								min={MARKET_ORDER_SLIPPAGE_MIN_BPS}
 								max={MARKET_ORDER_SLIPPAGE_MAX_BPS}
-								step={5}
 							/>
 							<div className="flex items-center justify-between text-4xs text-muted-foreground">
 								<span>{MARKET_ORDER_SLIPPAGE_MIN_BPS}</span>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aggregateLevels, getMaxTotal, getSpreadInfo, getTickSizes, processLevels } from "./orderbook";
+import { aggregateLevels, getMaxTotal, getSpreadInfo, getTickSizes, processLevels } from "@/lib/trade/orderbook";
 
 describe("processLevels", () => {
 	it("builds levels and accumulates totals", () => {

@@ -8,7 +8,7 @@ import {
 	formatUSD,
 	shortenAddress,
 	szDecimalsToPriceDecimals,
-} from "./format";
+} from "@/lib/format";
 
 describe("format", () => {
 	it("formats USD values with fixed digits", () => {

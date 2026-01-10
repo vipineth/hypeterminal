@@ -2,6 +2,7 @@ import { t } from "@lingui/core/macro";
 import { Timer } from "lucide-react";
 import { useMemo } from "react";
 import { useConnection } from "wagmi";
+import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
@@ -195,14 +196,13 @@ export function TwapTab() {
 										</TableCell>
 										<TableCell className="text-right py-1.5">
 											{row.showCancel && (
-												<button
-													type="button"
-													className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors"
-													tabIndex={0}
+												<Button
+													variant="danger"
+													size="xs"
 													aria-label={t`Cancel TWAP order`}
 												>
 													{t`Cancel`}
-												</button>
+												</Button>
 											)}
 										</TableCell>
 									</TableRow>

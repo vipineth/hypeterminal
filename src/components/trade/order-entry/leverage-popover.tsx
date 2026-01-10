@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { AlertTriangle, Check, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { NumberInput } from "@/components/ui/number-input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { LeverageSlider } from "./leverage-slider";
 
@@ -102,19 +103,16 @@ export function LeveragePopover({
 							<Trans>Leverage</Trans>
 						</span>
 						<div className="flex items-center gap-1">
-							<input
-								type="number"
-								min={1}
-								max={maxLeverage}
+							<NumberInput
 								value={inputValue}
 								onChange={handleInputChange}
 								onBlur={handleInputBlur}
 								disabled={isUpdating}
-								className={clsx(
-									"w-12 h-6 text-xs font-medium tabular-nums text-center bg-muted/30 border border-border/50 rounded-md",
-									"focus:outline-none focus:border-terminal-cyan/50",
-									"[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
-								)}
+								allowDecimals={false}
+								min={1}
+								max={maxLeverage}
+								inputSize="sm"
+								className="w-12 text-center font-medium tabular-nums"
 							/>
 							<span className="text-xs text-muted-foreground">x</span>
 						</div>

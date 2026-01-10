@@ -2,6 +2,7 @@ import { t } from "@lingui/core/macro";
 import { ClientOnly } from "@tanstack/react-router";
 import clsx from "clsx";
 import { Moon, Sun } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useTheme } from "@/providers/theme";
 
 export function ThemeToggle() {
@@ -21,28 +22,18 @@ function ThemeToggleButton() {
 		setTheme(isDark ? "light" : "dark");
 	};
 
-	const handleKeyDown = (event: React.KeyboardEvent) => {
-		if (event.key === "Enter" || event.key === " ") {
-			event.preventDefault();
-			handleToggle();
-		}
-	};
-
 	return (
-		<button
-			type="button"
+		<Button
+			variant="ghost"
+			size="icon-sm"
 			className={clsx(
-				"size-7 flex items-center justify-center transition-colors",
-				isDark
-					? "text-terminal-amber hover:text-terminal-amber/80"
-					: "text-terminal-purple hover:text-terminal-purple/80",
+				"size-7",
+				isDark ? "text-terminal-amber hover:text-terminal-amber/80" : "text-terminal-purple hover:text-terminal-purple/80",
 			)}
 			onClick={handleToggle}
-			onKeyDown={handleKeyDown}
-			tabIndex={0}
 			aria-label={isDark ? t`Switch to light mode` : t`Switch to dark mode`}
 		>
 			{isDark ? <Sun className="size-3.5" /> : <Moon className="size-3.5" />}
-		</button>
+		</Button>
 	);
 }

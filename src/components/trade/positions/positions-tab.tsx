@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { Circle } from "lucide-react";
 import { useMemo, useRef } from "react";
 import { useConnection } from "wagmi";
+import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
@@ -14,7 +15,7 @@ import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
-import { useMarketOrderSlippageBps } from "@/stores/use-trade-settings-store";
+import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import type { PerpAssetCtxs } from "@/types/hyperliquid";
 import { TokenAvatar } from "../components/token-avatar";
 
@@ -240,24 +241,22 @@ export function PositionsTab() {
 											</TableCell>
 											<TableCell className="text-right py-1.5">
 												<div className="flex justify-end gap-1">
-													<button
-														type="button"
-														className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-														tabIndex={0}
+													<Button
+														variant="danger"
+														size="xs"
 														aria-label={t`Close position`}
 														onClick={() => handleClosePosition(row)}
 														disabled={!row.canClose || isClosing}
 													>
 														{isRowClosing ? t`Closing...` : t`Close`}
-													</button>
-													<button
-														type="button"
-														className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-cyan/60 hover:text-terminal-cyan transition-colors"
-														tabIndex={0}
+													</Button>
+													<Button
+														variant="terminal"
+														size="xs"
 														aria-label={t`Set TP/SL`}
 													>
 														{t`TP/SL`}
-													</button>
+													</Button>
 												</div>
 											</TableCell>
 										</TableRow>

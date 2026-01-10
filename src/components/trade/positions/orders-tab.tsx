@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { ListOrdered } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConnection } from "wagmi";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -168,26 +169,24 @@ export function OrdersTab() {
 				{t`Open Orders`}
 				<div className="ml-auto flex items-center gap-2">
 					<span className="text-terminal-cyan tabular-nums">{headerCount}</span>
-					<button
-						type="button"
-						className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-						tabIndex={0}
+					<Button
+						variant="danger"
+						size="xs"
 						aria-label={t`Cancel selected orders`}
 						onClick={handleCancelSelected}
 						disabled={disableCancelSelected}
 					>
 						{isCancelling ? t`Canceling...` : t`Cancel selected`}
-					</button>
-					<button
-						type="button"
-						className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-						tabIndex={0}
+					</Button>
+					<Button
+						variant="danger"
+						size="xs"
 						aria-label={t`Cancel all orders`}
 						onClick={handleCancelAll}
 						disabled={disableCancelAll}
 					>
 						{isCancelling ? t`Canceling...` : t`Cancel all`}
-					</button>
+					</Button>
 				</div>
 			</div>
 			{actionError ? <div className="mb-1 text-4xs text-terminal-red/80">{actionError}</div> : null}
@@ -290,16 +289,15 @@ export function OrdersTab() {
 											</span>
 										</TableCell>
 										<TableCell className="text-right py-1.5">
-											<button
-												type="button"
-												className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-												tabIndex={0}
+											<Button
+												variant="danger"
+												size="xs"
 												aria-label={t`Cancel order`}
 												onClick={() => handleCancelOrders([row.order])}
 												disabled={!canCancel}
 											>
 												{isCancelling ? t`Canceling...` : t`Cancel`}
-											</button>
+											</Button>
 										</TableCell>
 									</TableRow>
 								))}

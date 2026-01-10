@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
 import type { PerpAssetCtx } from "@/types/hyperliquid";
-import { calculate24hPriceChange, calculateOpenInterestUSD } from "./market";
 
 describe("market", () => {
 	it("calculates 24h price change from mark and prev day", () => {

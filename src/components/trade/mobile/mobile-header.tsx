@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { Bell, Cog, Terminal } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { UI_TEXT } from "@/config/interface";
 import { GlobalSettingsDialog } from "../components/global-settings-dialog";
 import { ThemeToggle } from "../header/theme-toggle";
@@ -37,32 +38,24 @@ export function MobileHeader({ className }: Props) {
 
 				<div className="flex items-center gap-1">
 					<UserMenu />
-					<button
-						type="button"
-						className={clsx(
-							"size-11 flex items-center justify-center",
-							"text-muted-foreground hover:text-foreground",
-							"active:bg-accent/50 rounded-md transition-colors",
-						)}
-						tabIndex={0}
+					<Button
+						variant="ghost"
+						size="icon-lg"
+						className="size-11 active:bg-accent/50"
 						aria-label={TOP_NAV_TEXT.NOTIFICATIONS_ARIA}
 					>
 						<Bell className="size-4" />
-					</button>
+					</Button>
 					<ThemeToggle />
-					<button
-						type="button"
-						className={clsx(
-							"size-11 flex items-center justify-center",
-							"text-muted-foreground hover:text-foreground",
-							"active:bg-accent/50 rounded-md transition-colors",
-						)}
-						tabIndex={0}
+					<Button
+						variant="ghost"
+						size="icon-lg"
+						className="size-11 active:bg-accent/50"
 						aria-label={TOP_NAV_TEXT.SETTINGS_ARIA}
 						onClick={() => setSettingsOpen(true)}
 					>
 						<Cog className="size-4" />
-					</button>
+					</Button>
 				</div>
 			</div>
 

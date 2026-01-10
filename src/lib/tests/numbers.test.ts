@@ -9,7 +9,7 @@ import {
 	parseNumberOrZero,
 	parsePositiveDecimalInput,
 	toFiniteNumber,
-} from "./numbers";
+} from "@/lib/trade/numbers";
 
 describe("trade numbers", () => {
 	it("parses numbers from strings and returns NaN for invalid input", () => {

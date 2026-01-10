@@ -156,6 +156,8 @@ msgstr "Acheter"
 msgid "Buy Long"
 msgstr "Acheter long"
 
+#: src/components/trade/order-entry/leverage-popover.tsx
+#: src/components/trade/order-entry/leverage-sheet.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Cancel"
@@ -195,6 +197,10 @@ msgstr "Annulation..."
 msgid "cancelled"
 msgstr "annulé"
 
+#: src/components/trade/order-entry/leverage-badge.tsx
+msgid "Change leverage"
+msgstr ""
+
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Chart"
 msgstr "Graphique"
@@ -226,6 +232,11 @@ msgstr "Bientôt disponible"
 #: src/components/trade/positions/twap-tab.tsx
 msgid "completed"
 msgstr "terminé"
+
+#: src/components/trade/order-entry/leverage-popover.tsx
+#: src/components/trade/order-entry/leverage-sheet.tsx
+msgid "Confirm"
+msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "Connect a wallet to manage orders."
@@ -509,6 +520,11 @@ msgstr "Classement"
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Learn more"
+msgstr ""
+
+#: src/components/trade/order-entry/leverage-popover.tsx
+#: src/components/trade/order-entry/leverage-sheet.tsx
+msgid "Leverage"
 msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx
@@ -876,6 +892,11 @@ msgstr "Retirer des favoris"
 #~ msgid "Requirements:"
 #~ msgstr ""
 
+#: src/components/trade/order-entry/leverage-popover.tsx
+#: src/components/trade/order-entry/leverage-sheet.tsx
+msgid "Retry"
+msgstr ""
+
 #: src/components/trade/chart/token-selector.tsx
 msgid "Search markets..."
 msgstr "Rechercher des marchés..."
@@ -897,8 +918,8 @@ msgid "Select favorite markets"
 msgstr "Sélectionner les marchés favoris"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
-msgid "Select leverage"
-msgstr "Sélectionner le levier"
+#~ msgid "Select leverage"
+#~ msgstr "Sélectionner le levier"
 
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Select order"
@@ -1172,6 +1193,16 @@ msgstr "PNL non réalisé"
 #: src/components/trade/chart/datafeed.ts
 msgid "Unsupported resolution: {0}"
 msgstr "Résolution non prise en charge : {0}"
+
+#: src/components/trade/order-entry/leverage-popover.tsx
+#: src/components/trade/order-entry/leverage-sheet.tsx
+msgid "Update failed"
+msgstr ""
+
+#: src/components/trade/order-entry/leverage-popover.tsx
+#: src/components/trade/order-entry/leverage-sheet.tsx
+msgid "Updated"
+msgstr ""
 
 #: src/components/trade/chart/token-selector.tsx
 msgid "Updated live"

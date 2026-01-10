@@ -91,24 +91,19 @@ export function TopNav() {
 					<Trans>Deposit</Trans>
 				</Button>
 				<UserMenu />
-				<button
-					type="button"
-					className="size-7 flex items-center justify-center text-muted-foreground hover:text-foreground"
-					tabIndex={0}
-					aria-label={t`Notifications`}
-				>
+				<Button variant="ghost" size="icon-sm" className="size-7" aria-label={t`Notifications`}>
 					<Bell className="size-3.5" />
-				</button>
+				</Button>
 				<ThemeToggle />
-				<button
-					type="button"
-					className="size-7 flex items-center justify-center text-muted-foreground hover:text-foreground"
-					tabIndex={0}
+				<Button
+					variant="ghost"
+					size="icon-sm"
+					className="size-7"
 					aria-label={t`Settings`}
 					onClick={() => setSettingsOpen(true)}
 				>
 					<Cog className="size-3.5" />
-				</button>
+				</Button>
 			</div>
 			<DepositModal open={depositModalOpen} onOpenChange={setDepositModalOpen} />
 			<GlobalSettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />

@@ -2,8 +2,14 @@ import { z } from "zod";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useShallow } from "zustand/react/shallow";
-import { STORAGE_KEYS } from "@/config/interface";
+import {
+	DEFAULT_MARKET_ORDER_SLIPPAGE_BPS,
+	MARKET_ORDER_SLIPPAGE_MAX_BPS,
+	MARKET_ORDER_SLIPPAGE_MIN_BPS,
+	STORAGE_KEYS,
+} from "@/config/interface";
 import { type NumberFormatLocale, resolveNumberFormatLocale } from "@/lib/i18n";
+import { clampInt } from "@/lib/trade/numbers";
 import { createValidatedStorage } from "@/stores/validated-storage";
 
 const globalSettingsSchema = z.object({
@@ -14,6 +20,7 @@ const globalSettingsSchema = z.object({
 		showOrderbookInUsd: z.boolean().optional(),
 		showChartScanlines: z.boolean().optional(),
 		numberFormatLocale: z.string().optional(),
+		marketOrderSlippageBps: z.number().int().optional(),
 	}),
 });
 
@@ -26,6 +33,7 @@ const DEFAULT_GLOBAL_SETTINGS = {
 	showOrderbookInUsd: false,
 	showChartScanlines: true,
 	numberFormatLocale: "auto" as NumberFormatLocale,
+	marketOrderSlippageBps: DEFAULT_MARKET_ORDER_SLIPPAGE_BPS,
 } as const;
 
 interface GlobalSettingsStore {
@@ -35,6 +43,7 @@ interface GlobalSettingsStore {
 	showOrderbookInUsd: boolean;
 	showChartScanlines: boolean;
 	numberFormatLocale: NumberFormatLocale;
+	marketOrderSlippageBps: number;
 	actions: {
 		setShowOrdersOnChart: (next: boolean) => void;
 		setShowPositionsOnChart: (next: boolean) => void;
@@ -42,12 +51,13 @@ interface GlobalSettingsStore {
 		setShowOrderbookInUsd: (next: boolean) => void;
 		setShowChartScanlines: (next: boolean) => void;
 		setNumberFormatLocale: (next: NumberFormatLocale) => void;
+		setMarketOrderSlippageBps: (bps: number) => void;
 	};
 }
 
 const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 	persist(
-		(set) => ({
+		(set, get) => ({
 			...DEFAULT_GLOBAL_SETTINGS,
 			actions: {
 				setShowOrdersOnChart: (next) => set({ showOrdersOnChart: next }),
@@ -56,6 +66,11 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 				setShowOrderbookInUsd: (next) => set({ showOrderbookInUsd: next }),
 				setShowChartScanlines: (next) => set({ showChartScanlines: next }),
 				setNumberFormatLocale: (next) => set({ numberFormatLocale: next }),
+				setMarketOrderSlippageBps: (bps) => {
+					const next = clampInt(bps, MARKET_ORDER_SLIPPAGE_MIN_BPS, MARKET_ORDER_SLIPPAGE_MAX_BPS);
+					if (get().marketOrderSlippageBps === next) return;
+					set({ marketOrderSlippageBps: next });
+				},
 			},
 		}),
 		{
@@ -68,12 +83,21 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 				showOrderbookInUsd: state.showOrderbookInUsd,
 				showChartScanlines: state.showChartScanlines,
 				numberFormatLocale: state.numberFormatLocale,
+				marketOrderSlippageBps: state.marketOrderSlippageBps,
 			}),
-			merge: (persisted, current) => ({
-				...current,
-				...DEFAULT_GLOBAL_SETTINGS,
-				...(persisted as Partial<GlobalSettingsStore>),
-			}),
+			merge: (persisted, current) => {
+				const p = persisted as Partial<GlobalSettingsStore>;
+				return {
+					...current,
+					...DEFAULT_GLOBAL_SETTINGS,
+					...p,
+					marketOrderSlippageBps: clampInt(
+						p?.marketOrderSlippageBps ?? DEFAULT_MARKET_ORDER_SLIPPAGE_BPS,
+						MARKET_ORDER_SLIPPAGE_MIN_BPS,
+						MARKET_ORDER_SLIPPAGE_MAX_BPS,
+					),
+				};
+			},
 		},
 	),
 );
@@ -95,19 +119,15 @@ export function useGlobalSettingsActions() {
 	return useGlobalSettingsStore((state) => state.actions);
 }
 
-/**
- * Returns the resolved Intl locale string for number/date formatting.
- * Use this when you need the actual locale code (e.g., "en-US", "de-DE").
- */
+export function useMarketOrderSlippageBps() {
+	return useGlobalSettingsStore((state) => state.marketOrderSlippageBps);
+}
+
 export function useResolvedFormatLocale(): string {
 	const numberFormatLocale = useGlobalSettingsStore((state) => state.numberFormatLocale);
 	return resolveNumberFormatLocale(numberFormatLocale);
 }
 
-/**
- * Get the resolved format locale synchronously (for non-React contexts).
- * Prefer useResolvedFormatLocale() in React components for reactivity.
- */
 export function getResolvedFormatLocale(): string {
 	return resolveNumberFormatLocale(useGlobalSettingsStore.getState().numberFormatLocale);
 }

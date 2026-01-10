@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildPageHead, mergeHead, SEO_DEFAULTS } from "./seo";
+import { buildPageHead, mergeHead, SEO_DEFAULTS } from "@/lib/seo";
 
 describe("seo", () => {
 	it("builds page head with title and canonical link", () => {

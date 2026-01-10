@@ -23,7 +23,7 @@ import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
 import clsx from "clsx";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { useOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
-import { useMarketOrderSlippageBps } from "@/stores/use-trade-settings-store";
+import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { WalletDialog } from "../components/wallet-dialog";
 import { DepositModal } from "../order-entry/deposit-modal";
 import { LeverageControl } from "../order-entry/leverage-control";

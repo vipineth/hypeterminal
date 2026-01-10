@@ -33,7 +33,6 @@ export const DEFAULT_LEVERAGE_BY_MODE = { cross: 10, isolated: 10 } as const;
 
 export const STORAGE_KEYS = {
 	MARKET_PREFS: "market-prefs-v1",
-	TRADE_SETTINGS: "trade-settings-v1",
 	GLOBAL_SETTINGS: "global-settings-v1",
 	API_WALLET: "hyperliquid-api-wallet-v1",
 	LEGACY_FAVORITES: "favorites-storage-v0.2",

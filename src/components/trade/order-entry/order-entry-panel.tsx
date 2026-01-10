@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { ChevronDown, Loader2, TrendingDown, TrendingUp } from "lucide-react";
 import { useEffect, useId, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
@@ -22,9 +23,9 @@ import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOr
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
+import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { useOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
-import { useMarketOrderSlippageBps } from "@/stores/use-trade-settings-store";
 import { WalletDialog } from "../components/wallet-dialog";
 import { DepositModal } from "./deposit-modal";
 import { LeverageControl, useAssetLeverage } from "./leverage-control";
@@ -513,17 +514,15 @@ export function OrderEntryPanel() {
 
 					<div className="grid grid-cols-4 gap-1">
 						{ORDER_SIZE_PERCENT_STEPS.map((p) => (
-							<button
+							<Button
 								key={p}
-								type="button"
 								onClick={() => handlePercentClick(p)}
-								className="py-1 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-cyan/40 hover:text-terminal-cyan transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-								tabIndex={0}
+								variant="outline"
+								size="xs"
 								aria-label={t`Set ${p}%`}
-								disabled={isFormDisabled || maxSize <= 0}
 							>
 								{p === 100 ? t`Max` : `${p}%`}
-							</button>
+							</Button>
 						))}
 					</div>
 				</div>
