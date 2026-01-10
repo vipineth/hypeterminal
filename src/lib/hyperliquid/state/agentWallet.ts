@@ -92,12 +92,9 @@ export function useAgentWallet(env: HyperliquidEnv, userAddress: string | undefi
 }
 
 export function useAgentWalletActions() {
-	const setAgent = useCallback(
-		(env: HyperliquidEnv, userAddress: string, privateKey: string, publicKey: string) => {
-			writeAgentToStorage(env, userAddress, privateKey, publicKey);
-		},
-		[],
-	);
+	const setAgent = useCallback((env: HyperliquidEnv, userAddress: string, privateKey: string, publicKey: string) => {
+		writeAgentToStorage(env, userAddress, privateKey, publicKey);
+	}, []);
 
 	const clearAgent = useCallback((env: HyperliquidEnv, userAddress: string) => {
 		removeAgentFromStorage(env, userAddress);

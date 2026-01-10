@@ -9,7 +9,7 @@ import { formatNumber, formatPercent, formatUSD } from "@/lib/format";
 import { usePerpMarkets } from "@/lib/hyperliquid";
 import { useSubUserFundings } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
-import { cn } from "@/lib/utils";
+import clsx from "clsx";
 
 export function FundingTab() {
 	const { address, isConnected } = useConnection();
@@ -88,7 +88,7 @@ export function FundingTab() {
 			<div className="text-3xs uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-2">
 				<Percent className="size-3" />
 				{t`Funding Payments`}
-				<span className={cn("ml-auto tabular-nums", headerClass)}>{headerTotal}</span>
+				<span className={clsx("ml-auto tabular-nums", headerClass)}>{headerTotal}</span>
 			</div>
 			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
 				{!isConnected ? (
@@ -137,7 +137,7 @@ export function FundingTab() {
 									<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
 										<TableCell className="text-2xs font-medium py-1.5">
 											<div className="flex items-center gap-1.5">
-												<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
+												<span className={clsx("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
 													{row.sideLabel}
 												</span>
 												<span>{row.coin}</span>
@@ -145,10 +145,10 @@ export function FundingTab() {
 										</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.positionText}</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">
-											<span className={cn(row.rateClass)}>{row.rateText}</span>
+											<span className={clsx(row.rateClass)}>{row.rateText}</span>
 										</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">
-											<span className={cn(row.paymentClass)}>{row.paymentText}</span>
+											<span className={clsx(row.paymentClass)}>{row.paymentText}</span>
 										</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums text-muted-foreground py-1.5">
 											<div className="flex flex-col items-end">

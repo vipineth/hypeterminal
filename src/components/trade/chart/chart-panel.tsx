@@ -8,7 +8,7 @@ import { formatPercent, formatUSD } from "@/lib/format";
 import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { makePerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
 import { calculateOpenInterestUSD } from "@/lib/market";
-import { cn } from "@/lib/utils";
+import clsx from "clsx";
 import { useTheme } from "@/providers/theme";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import { QUOTE_ASSET } from "./constants";
@@ -62,9 +62,9 @@ export function ChartPanel() {
 								})}
 							/>
 							<div className="flex items-center gap-1">
-								<Flame className={cn("size-3", isFundingPositive ? "text-terminal-green" : "text-terminal-red")} />
+								<Flame className={clsx("size-3", isFundingPositive ? "text-terminal-green" : "text-terminal-red")} />
 								<span
-									className={cn(
+									className={clsx(
 										"text-muted-foreground tabular-nums",
 										isFundingPositive ? "text-terminal-green" : "text-terminal-red",
 									)}

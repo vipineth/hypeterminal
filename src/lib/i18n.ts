@@ -63,8 +63,7 @@ export function resolveNumberFormatLocale(formatLocale: NumberFormatLocale): str
 	return formatLocale;
 }
 
-export const isLocaleValid = (locale: string): locale is LocaleCode =>
-	Object.keys(locales).includes(locale);
+export const isLocaleValid = (locale: string): locale is LocaleCode => Object.keys(locales).includes(locale);
 
 export const defaultLocale: LocaleCode = "en";
 

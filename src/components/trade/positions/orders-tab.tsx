@@ -12,7 +12,7 @@ import { useExchangeCancel } from "@/lib/hyperliquid/hooks/exchange/useExchangeC
 import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { parseNumber } from "@/lib/trade/numbers";
-import { cn } from "@/lib/utils";
+import clsx from "clsx";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import { TokenAvatar } from "../components/token-avatar";
 
@@ -262,7 +262,7 @@ export function OrdersTab() {
 										</TableCell>
 										<TableCell className="text-2xs font-medium py-1.5">
 											<div className="flex items-center gap-1.5">
-												<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
+												<span className={clsx("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
 													{row.sideLabel}
 												</span>
 												<button
@@ -282,7 +282,7 @@ export function OrdersTab() {
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.priceText}</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.sizeText}</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">
-											<span className={cn(row.hasFilled && "text-terminal-amber")}>
+											<span className={clsx(row.hasFilled && "text-terminal-amber")}>
 												{row.filledText} ({row.fillPctText})
 											</span>
 										</TableCell>

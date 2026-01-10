@@ -11,7 +11,7 @@ import { formatNumber } from "@/lib/format";
 import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { useSubL2Book } from "@/lib/hyperliquid/hooks/subscription";
 import { processLevels } from "@/lib/trade/orderbook";
-import { cn } from "@/lib/utils";
+import clsx from "clsx";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
 import { OrderbookRow } from "../orderbook/orderbook-row";
 import { TradesPanel } from "../orderbook/trades-panel";
@@ -142,7 +142,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 	}, [priceGroupingOptions, selectedOption]);
 
 	return (
-		<div className={cn("flex flex-col h-full min-h-0", className)}>
+		<div className={clsx("flex flex-col h-full min-h-0", className)}>
 			{/* Header with tabs and controls */}
 			<div className="shrink-0 px-3 py-2 border-b border-border/60 bg-surface/30">
 				<div className="flex items-center justify-between">
@@ -151,7 +151,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 						<button
 							type="button"
 							onClick={() => setView("book")}
-							className={cn(
+							className={clsx(
 								"px-3 py-1.5 text-xs font-medium rounded transition-colors",
 								"min-h-[36px]", // Touch target
 								view === "book"
@@ -164,7 +164,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 						<button
 							type="button"
 							onClick={() => setView("trades")}
-							className={cn(
+							className={clsx(
 								"px-3 py-1.5 text-xs font-medium rounded transition-colors",
 								"min-h-[36px]",
 								view === "trades"
@@ -182,7 +182,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 						<button
 							type="button"
 							onClick={() => setShowOrderbookInUsd(!showOrderbookInUsd)}
-							className={cn(
+							className={clsx(
 								"px-2 py-1.5 text-xs border border-border/60 rounded",
 								"min-h-[36px] flex items-center gap-1",
 								"text-muted-foreground hover:text-foreground hover:border-foreground/30",
@@ -200,7 +200,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 								<DropdownMenuTrigger asChild>
 									<button
 										type="button"
-										className={cn(
+										className={clsx(
 											"px-2 py-1.5 text-xs border border-border/60 rounded",
 											"min-h-[36px] flex items-center gap-1",
 											"hover:border-foreground/30 transition-colors",

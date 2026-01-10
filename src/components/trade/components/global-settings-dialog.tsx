@@ -2,7 +2,7 @@ import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import type { ChangeEvent } from "react";
-import { useEffect, useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -45,17 +45,15 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 		setNumberFormatLocale,
 	} = useGlobalSettingsActions();
 
-	const [slippageInput, setSlippageInput] = useState(String(slippageBps));
+	const [localSlippageInput, setLocalSlippageInput] = useState<string | null>(null);
+	const inputRef = useRef<HTMLInputElement>(null);
 
 	const slippagePercent = (slippageBps / 100).toFixed(2);
-
-	useEffect(() => {
-		setSlippageInput(String(slippageBps));
-	}, [slippageBps]);
+	const slippageInputValue = localSlippageInput ?? String(slippageBps);
 
 	const handleSlippageInputChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const nextValue = event.target.value;
-		setSlippageInput(nextValue);
+		setLocalSlippageInput(nextValue);
 
 		if (nextValue.trim() === "") return;
 		const parsed = Number(nextValue);
@@ -65,9 +63,7 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 	};
 
 	const handleSlippageInputBlur = () => {
-		if (slippageInput.trim() === "") {
-			setSlippageInput(String(slippageBps));
-		}
+		setLocalSlippageInput(null);
 	};
 
 	const handleSlippageSliderChange = (values: number[]) => {
@@ -157,8 +153,9 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 							</div>
 							<div className="flex items-center gap-1.5">
 								<Input
+									ref={inputRef}
 									type="number"
-									value={slippageInput}
+									value={slippageInputValue}
 									onChange={handleSlippageInputChange}
 									onBlur={handleSlippageInputBlur}
 									min={MARKET_ORDER_SLIPPAGE_MIN_BPS}

@@ -1,4 +1,5 @@
 import { t } from "@lingui/core/macro";
+import clsx from "clsx";
 import { ChevronDown, Loader2, TrendingDown, TrendingUp } from "lucide-react";
 import { useEffect, useId, useMemo, useState } from "react";
 import { useChainId, useConnection, useSwitchChain, useWalletClient } from "wagmi";
@@ -29,7 +30,6 @@ import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOr
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder, getDefaultLeverage } from "@/lib/trade/orders";
-import { cn } from "@/lib/utils";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { useOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
 import {
@@ -409,10 +409,7 @@ export function OrderEntryPanel() {
 	const isFormDisabled = !isConnected || availableBalance <= 0;
 
 	return (
-		<div
-			className="h-full flex flex-col overflow-hidden bg-surface/20"
-			// onKeyDown={handleKeyDown}
-		>
+		<div className="h-full flex flex-col overflow-hidden bg-surface/20">
 			<div className="px-2 py-1.5 border-b border-border/40 flex items-center justify-between">
 				<Tabs value="cross">
 					<TabsList>
@@ -478,7 +475,7 @@ export function OrderEntryPanel() {
 					<button
 						type="button"
 						onClick={() => setSide("buy")}
-						className={cn(
+						className={clsx(
 							"py-2 text-2xs font-semibold uppercase tracking-wider transition-all border",
 							side === "buy"
 								? "bg-terminal-green/20 border-terminal-green text-terminal-green terminal-glow-green"
@@ -493,7 +490,7 @@ export function OrderEntryPanel() {
 					<button
 						type="button"
 						onClick={() => setSide("sell")}
-						className={cn(
+						className={clsx(
 							"py-2 text-2xs font-semibold uppercase tracking-wider transition-all border",
 							side === "sell"
 								? "bg-terminal-red/20 border-terminal-red text-terminal-red terminal-glow-red"
@@ -511,7 +508,7 @@ export function OrderEntryPanel() {
 						<span>{t`Available`}</span>
 						<div className="flex items-center gap-2">
 							<span
-								className={cn("tabular-nums", availableBalance > 0 ? "text-terminal-green" : "text-muted-foreground")}
+								className={clsx("tabular-nums", availableBalance > 0 ? "text-terminal-green" : "text-muted-foreground")}
 							>
 								{isConnected ? formatUSD(availableBalance) : FALLBACK_VALUE_PLACEHOLDER}
 							</span>
@@ -529,7 +526,7 @@ export function OrderEntryPanel() {
 					{positionSize !== 0 && (
 						<div className="flex items-center justify-between text-muted-foreground">
 							<span>{t`Position`}</span>
-							<span className={cn("tabular-nums", positionSize > 0 ? "text-terminal-green" : "text-terminal-red")}>
+							<span className={clsx("tabular-nums", positionSize > 0 ? "text-terminal-green" : "text-terminal-red")}>
 								{positionSize > 0 ? "+" : ""}
 								{formatDecimalFloor(positionSize, market?.szDecimals ?? 2)} {market?.coin}
 							</span>
@@ -553,7 +550,7 @@ export function OrderEntryPanel() {
 							placeholder="0.00"
 							value={sizeInput}
 							onChange={(e) => setSizeInput(e.target.value)}
-							className={cn(
+							className={clsx(
 								"flex-1 h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums",
 								(sizeHasError || orderValueTooLow) && "border-terminal-red focus:border-terminal-red",
 							)}
@@ -605,7 +602,7 @@ export function OrderEntryPanel() {
 							placeholder="0.00"
 							value={limitPriceInput}
 							onChange={(e) => setLimitPriceInput(e.target.value)}
-							className={cn(
+							className={clsx(
 								"h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums",
 								type === "limit" && !price && sizeValue > 0 && "border-terminal-red focus:border-terminal-red",
 							)}
@@ -626,7 +623,7 @@ export function OrderEntryPanel() {
 						/>
 						<label
 							htmlFor={reduceOnlyId}
-							className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-foreground")}
+							className={clsx("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-foreground")}
 						>
 							{t`Reduce Only`}
 						</label>
@@ -656,7 +653,7 @@ export function OrderEntryPanel() {
 					type="button"
 					onClick={buttonContent.action}
 					disabled={buttonContent.disabled}
-					className={cn(
+					className={clsx(
 						"w-full py-2.5 text-2xs font-semibold uppercase tracking-wider transition-all border disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2",
 						buttonContent.variant === "cyan"
 							? "bg-terminal-cyan/20 border-terminal-cyan text-terminal-cyan hover:bg-terminal-cyan/30"
@@ -674,7 +671,7 @@ export function OrderEntryPanel() {
 				<div className="border border-border/40 divide-y divide-border/40 text-3xs">
 					<div className="flex items-center justify-between px-2 py-1.5">
 						<span className="text-muted-foreground">{t`Liq. Price`}</span>
-						<span className={cn("tabular-nums", liqWarning ? "text-terminal-red" : "text-terminal-red/70")}>
+						<span className={clsx("tabular-nums", liqWarning ? "text-terminal-red" : "text-terminal-red/70")}>
 							{liqPrice ? formatPrice(liqPrice, { szDecimals: market?.szDecimals }) : FALLBACK_VALUE_PLACEHOLDER}
 						</span>
 					</div>

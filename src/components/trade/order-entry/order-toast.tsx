@@ -2,7 +2,7 @@ import { t } from "@lingui/core/macro";
 import { Check, Loader2, X, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/interface";
-import { cn } from "@/lib/utils";
+import clsx from "clsx";
 import { type OrderQueueItem, useOrderQueue, useOrderQueueActions } from "@/stores/use-order-queue-store";
 
 function useAutoRemove(order: OrderQueueItem, onRemove: () => void) {
@@ -34,14 +34,14 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 
 	return (
 		<div
-			className={cn(
+			className={clsx(
 				"flex items-center gap-3 py-2.5 px-3 transition-all duration-300",
 				order.status === "pending" && "animate-pulse",
 			)}
 		>
 			{/* Status Icon */}
 			<div
-				className={cn(
+				className={clsx(
 					"flex items-center justify-center size-7 rounded-md shrink-0",
 					order.status === "pending" && "bg-terminal-cyan/15 border border-terminal-cyan/30",
 					order.status === "success" && "bg-terminal-green/15 border border-terminal-green/30",
@@ -59,7 +59,7 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 			<div className="flex-1 min-w-0 space-y-0.5">
 				<div className="flex items-center gap-2">
 					<span
-						className={cn(
+						className={clsx(
 							"px-1.5 py-0.5 rounded text-2xs font-bold uppercase tracking-wide",
 							sideBg,
 							sideColor,
@@ -142,7 +142,7 @@ export function OrderToast() {
 
 	return (
 		<div
-			className={cn(
+			className={clsx(
 				"fixed bottom-6 right-6 z-50 w-80",
 				"bg-surface/95 backdrop-blur-sm",
 				"border border-border/60 rounded-lg overflow-hidden",

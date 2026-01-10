@@ -7,7 +7,7 @@ import { UI_TEXT } from "@/config/interface";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
-import { cn } from "@/lib/utils";
+import clsx from "clsx";
 import { WalletDialog } from "../components/wallet-dialog";
 import { DepositModal } from "../order-entry/deposit-modal";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
@@ -59,7 +59,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 
 	if (!isConnected) {
 		return (
-			<div className={cn("flex flex-col h-full min-h-0 bg-surface/20", className)}>
+			<div className={clsx("flex flex-col h-full min-h-0 bg-surface/20", className)}>
 				<div className="flex-1 flex flex-col items-center justify-center gap-6 p-6">
 					<div className="size-20 rounded-full bg-muted/50 flex items-center justify-center">
 						<Wallet className="size-10 text-muted-foreground" />
@@ -73,7 +73,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 					<button
 						type="button"
 						onClick={() => setWalletDialogOpen(true)}
-						className={cn(
+						className={clsx(
 							"px-6 py-3 text-base font-semibold rounded-md",
 							"bg-terminal-cyan/20 border border-terminal-cyan text-terminal-cyan",
 							"hover:bg-terminal-cyan/30 transition-colors",
@@ -90,7 +90,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 	}
 
 	return (
-		<div className={cn("flex flex-col h-full min-h-0 bg-surface/20", className)}>
+		<div className={clsx("flex flex-col h-full min-h-0 bg-surface/20", className)}>
 			{/* Account header */}
 			<div className="shrink-0 px-4 py-4 border-b border-border/60 bg-surface/30">
 				<div className="flex items-center justify-between">
@@ -109,7 +109,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 									className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
 									aria-label="Copy address"
 								>
-									<Copy className={cn("size-3.5", copied && "text-terminal-green")} />
+									<Copy className={clsx("size-3.5", copied && "text-terminal-green")} />
 								</button>
 							</div>
 							<Badge variant="outline" className="text-xs mt-0.5">
@@ -120,7 +120,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 					<button
 						type="button"
 						onClick={() => disconnect()}
-						className={cn(
+						className={clsx(
 							"p-2.5 text-muted-foreground hover:text-terminal-red",
 							"transition-colors rounded-md",
 							"min-h-[44px] min-w-[44px] flex items-center justify-center",
@@ -148,7 +148,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 								<div className="text-sm text-muted-foreground mb-1">{ACCOUNT_TEXT.EQUITY_LABEL}</div>
 								<div className="text-3xl font-bold tabular-nums">{formatUSD(accountValue)}</div>
 								<div
-									className={cn(
+									className={clsx(
 										"text-sm tabular-nums mt-1",
 										unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red",
 									)}
@@ -183,7 +183,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						<button
 							type="button"
 							onClick={() => setDepositModalOpen(true)}
-							className={cn(
+							className={clsx(
 								"py-4 text-base font-semibold rounded-md",
 								"bg-terminal-green/20 border border-terminal-green text-terminal-green",
 								"hover:bg-terminal-green/30 transition-colors",
@@ -196,7 +196,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						</button>
 						<button
 							type="button"
-							className={cn(
+							className={clsx(
 								"py-4 text-base font-semibold rounded-md",
 								"bg-muted/50 border border-border/60 text-muted-foreground",
 								"hover:bg-muted transition-colors",
@@ -248,7 +248,7 @@ function StatCard({ label, value, valueClass, isLoading }: StatCardProps) {
 			{isLoading ? (
 				<Skeleton className="h-6 w-20" />
 			) : (
-				<div className={cn("text-lg font-semibold tabular-nums", valueClass)}>{value}</div>
+				<div className={clsx("text-lg font-semibold tabular-nums", valueClass)}>{value}</div>
 			)}
 		</div>
 	);

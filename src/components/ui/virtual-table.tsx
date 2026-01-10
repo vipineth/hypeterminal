@@ -2,7 +2,7 @@ import { t } from "@lingui/core/macro";
 import { flexRender, type Header, type RowData } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import type { UseVirtualTableReturn } from "@/hooks/ui/use-virtual-table";
-import { cn } from "@/lib/utils";
+import clsx from "clsx";
 
 export interface VirtualTableProps<TData extends RowData> extends UseVirtualTableReturn<TData> {
 	className?: string;
@@ -62,7 +62,7 @@ export function VirtualTable<TData extends RowData>({
 	const headerGroups = table.getHeaderGroups();
 
 	return (
-		<div className={cn("relative overflow-hidden", className)}>
+		<div className={clsx("relative overflow-hidden", className)}>
 			{/* Sticky Header */}
 			<div className="sticky top-0 z-10 bg-surface border-b border-border/40">
 				{headerGroups.map((headerGroup) => (
@@ -71,7 +71,7 @@ export function VirtualTable<TData extends RowData>({
 							const canSort = header.column.getCanSort();
 							const headerContent = flexRender(header.column.columnDef.header, header.getContext());
 
-							const headerClassName = cn(
+							const headerClassName = clsx(
 								"flex items-center px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider",
 								canSort && "cursor-pointer select-none hover:text-foreground transition-colors",
 							);
@@ -106,7 +106,7 @@ export function VirtualTable<TData extends RowData>({
 			</div>
 
 			{/* Virtualized Body */}
-			<div ref={containerRef} className={cn("overflow-auto", containerClassName, height)}>
+			<div ref={containerRef} className={clsx("overflow-auto", containerClassName, height)}>
 				<div
 					style={{
 						height: `${totalSize}px`,

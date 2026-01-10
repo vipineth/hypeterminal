@@ -1,4 +1,4 @@
-import { useAgentRegistration, type UseAgentRegistrationResult } from "./useAgentRegistration";
+import { type UseAgentRegistrationResult, useAgentRegistration } from "./useAgentRegistration";
 
 export type UseTradingAgentResult = UseAgentRegistrationResult & {
 	registerAgent: () => Promise<`0x${string}`>;

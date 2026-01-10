@@ -28,7 +28,7 @@ import { useExchangeUpdateLeverage } from "@/lib/hyperliquid/hooks/exchange/useE
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder, getDefaultLeverage } from "@/lib/trade/orders";
-import { cn } from "@/lib/utils";
+import clsx from "clsx";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { useOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
 import {
@@ -341,7 +341,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const isFormDisabled = !isConnected || availableBalance <= 0;
 
 	return (
-		<div className={cn("flex flex-col h-full min-h-0 bg-surface/20", className)}>
+		<div className={clsx("flex flex-col h-full min-h-0 bg-surface/20", className)}>
 			{/* Market info header */}
 			<div className="shrink-0 px-4 py-3 border-b border-border/60 bg-surface/30">
 				{isMarketLoading ? (
@@ -370,7 +370,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 						<button
 							type="button"
 							onClick={() => setSide("buy")}
-							className={cn(
+							className={clsx(
 								// Large touch targets
 								"py-4 text-base font-semibold uppercase tracking-wider transition-all border rounded-md",
 								"flex items-center justify-center gap-2",
@@ -386,7 +386,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 						<button
 							type="button"
 							onClick={() => setSide("sell")}
-							className={cn(
+							className={clsx(
 								"py-4 text-base font-semibold uppercase tracking-wider transition-all border rounded-md",
 								"flex items-center justify-center gap-2",
 								"active:scale-98",
@@ -405,7 +405,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 						<button
 							type="button"
 							onClick={() => setType("market")}
-							className={cn(
+							className={clsx(
 								"flex-1 py-2.5 text-sm font-medium rounded transition-colors",
 								type === "market" ? "bg-background text-terminal-cyan shadow-sm" : "text-muted-foreground",
 							)}
@@ -415,7 +415,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 						<button
 							type="button"
 							onClick={() => setType("limit")}
-							className={cn(
+							className={clsx(
 								"flex-1 py-2.5 text-sm font-medium rounded transition-colors",
 								type === "limit" ? "bg-background text-terminal-cyan shadow-sm" : "text-muted-foreground",
 							)}
@@ -435,7 +435,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 									<button
 										type="button"
 										id={leverageId}
-										className={cn(
+										className={clsx(
 											"px-3 py-2 text-sm font-medium border border-terminal-cyan/40 text-terminal-cyan rounded",
 											"flex items-center gap-1 min-h-[40px]",
 										)}
@@ -459,7 +459,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 						</div>
 						<div className="text-right">
 							<span className="text-muted-foreground">{ORDER_TEXT.AVAILABLE_LABEL}: </span>
-							<span className={cn("tabular-nums font-medium", availableBalance > 0 ? "text-terminal-green" : "")}>
+							<span className={clsx("tabular-nums font-medium", availableBalance > 0 ? "text-terminal-green" : "")}>
 								{isConnected ? formatUSD(availableBalance) : FALLBACK_VALUE_PLACEHOLDER}
 							</span>
 						</div>
@@ -472,7 +472,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							<button
 								type="button"
 								onClick={handleSizeModeToggle}
-								className={cn(
+								className={clsx(
 									"px-3 py-3 text-sm border border-border/60 rounded-md",
 									"flex items-center gap-1 min-h-[48px]",
 									"hover:border-foreground/30 transition-colors",
@@ -488,7 +488,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 								placeholder={ORDER_TEXT.INPUT_PLACEHOLDER}
 								value={sizeInput}
 								onChange={(e) => setSizeInput(e.target.value)}
-								className={cn(
+								className={clsx(
 									"flex-1 h-12 text-base tabular-nums",
 									"bg-background/50 border-border/60",
 									"focus:border-terminal-cyan/60",
@@ -514,7 +514,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 									key={p}
 									type="button"
 									onClick={() => handlePercentClick(p)}
-									className={cn(
+									className={clsx(
 										"py-2.5 text-sm font-medium border border-border/60 rounded-md",
 										"hover:border-terminal-cyan/40 hover:text-terminal-cyan",
 										"transition-colors disabled:opacity-50",
@@ -591,7 +591,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					type="button"
 					onClick={buttonContent.action}
 					disabled={buttonContent.disabled}
-					className={cn(
+					className={clsx(
 						"w-full py-4 text-base font-semibold uppercase tracking-wider",
 						"transition-all border rounded-md",
 						"disabled:opacity-50 disabled:cursor-not-allowed",
@@ -623,7 +623,7 @@ function SummaryRow({ label, value, valueClass }: { label: string; value: string
 	return (
 		<div className="flex items-center justify-between px-3 py-2.5">
 			<span className="text-muted-foreground">{label}</span>
-			<span className={cn("tabular-nums", valueClass)}>{value}</span>
+			<span className={clsx("tabular-nums", valueClass)}>{value}</span>
 		</div>
 	);
 }

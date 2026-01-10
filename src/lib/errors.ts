@@ -1,9 +1,6 @@
 import { t } from "@lingui/core/macro";
 
-export function formatErrorForDisplay(
-	error: unknown,
-	fallbackMessage = t`Something went wrong`,
-): string {
+export function formatErrorForDisplay(error: unknown, fallbackMessage = t`Something went wrong`): string {
 	const parts: string[] = [];
 
 	function collect(err: unknown, depth: number) {

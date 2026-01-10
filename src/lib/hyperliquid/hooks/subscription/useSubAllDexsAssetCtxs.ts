@@ -1,8 +1,8 @@
 import type { AllDexsAssetCtxsWsEvent } from "@nktkas/hyperliquid";
 import { useCallback } from "react";
+import { useHyperliquid } from "../../context";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
-import { useHyperliquid } from "../../context";
 import { useSub } from "../utils/useSub";
 
 type AllDexsAssetCtxsEvent = AllDexsAssetCtxsWsEvent;

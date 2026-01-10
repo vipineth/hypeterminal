@@ -1,24 +1,23 @@
+import clsx from "clsx";
 import { Bell, Cog, Terminal } from "lucide-react";
 import { useState } from "react";
 import { UI_TEXT } from "@/config/interface";
-import { cn } from "@/lib/utils";
 import { GlobalSettingsDialog } from "../components/global-settings-dialog";
 import { ThemeToggle } from "../header/theme-toggle";
 import { UserMenu } from "../header/user-menu";
 
 const TOP_NAV_TEXT = UI_TEXT.TOP_NAV;
 
-interface MobileHeaderProps {
+interface Props {
 	className?: string;
 }
 
-export function MobileHeader({ className }: MobileHeaderProps) {
+export function MobileHeader({ className }: Props) {
 	const [settingsOpen, setSettingsOpen] = useState(false);
 
 	return (
 		<header
-			className={cn(
-				// Safe area for notched devices
+			className={clsx(
 				"pt-[env(safe-area-inset-top)]",
 				"sticky top-0 z-40 bg-background/95 backdrop-blur-sm",
 				"border-b border-border/60",
@@ -26,7 +25,6 @@ export function MobileHeader({ className }: MobileHeaderProps) {
 			)}
 		>
 			<div className="h-12 px-3 flex items-center justify-between">
-				{/* Logo */}
 				<div className="flex items-center gap-1.5">
 					<div className="size-6 rounded bg-terminal-green/20 border border-terminal-green/40 flex items-center justify-center">
 						<Terminal className="size-3.5 text-terminal-green" />
@@ -37,13 +35,11 @@ export function MobileHeader({ className }: MobileHeaderProps) {
 					</span>
 				</div>
 
-				{/* Actions */}
 				<div className="flex items-center gap-1">
 					<UserMenu />
 					<button
 						type="button"
-						className={cn(
-							// 44px minimum touch target
+						className={clsx(
 							"size-11 flex items-center justify-center",
 							"text-muted-foreground hover:text-foreground",
 							"active:bg-accent/50 rounded-md transition-colors",
@@ -56,7 +52,7 @@ export function MobileHeader({ className }: MobileHeaderProps) {
 					<ThemeToggle />
 					<button
 						type="button"
-						className={cn(
+						className={clsx(
 							"size-11 flex items-center justify-center",
 							"text-muted-foreground hover:text-foreground",
 							"active:bg-accent/50 rounded-md transition-colors",

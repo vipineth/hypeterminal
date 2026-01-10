@@ -1,7 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { ClientOnly } from "@tanstack/react-router";
+import clsx from "clsx";
 import { Moon, Sun } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { useTheme } from "@/providers/theme";
 
 export function ThemeToggle() {
@@ -31,7 +31,7 @@ function ThemeToggleButton() {
 	return (
 		<button
 			type="button"
-			className={cn(
+			className={clsx(
 				"size-7 flex items-center justify-center transition-colors",
 				isDark
 					? "text-terminal-amber hover:text-terminal-amber/80"

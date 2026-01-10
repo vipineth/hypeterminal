@@ -25,7 +25,10 @@ describe("seo", () => {
 
 	it("merges head entries", () => {
 		const base = buildPageHead({ title: "Base" });
-		const merged = mergeHead(base, { meta: [{ name: "custom", content: "yes" }], links: [{ rel: "preload", href: "/x" }] });
+		const merged = mergeHead(base, {
+			meta: [{ name: "custom", content: "yes" }],
+			links: [{ rel: "preload", href: "/x" }],
+		});
 
 		expect(merged.meta.some((m) => m.name === "custom")).toBe(true);
 		expect(merged.links.some((l) => l.rel === "preload")).toBe(true);

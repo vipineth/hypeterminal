@@ -1,20 +1,20 @@
+import clsx from "clsx";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getTokenIconUrl } from "@/config/token";
-import { cn } from "@/lib/utils";
 
-type TokenAvatarProps = {
+interface Props {
 	symbol: string;
 	className?: string;
 	fallbackClassName?: string;
-};
+}
 
-export function TokenAvatar({ symbol, className, fallbackClassName }: TokenAvatarProps) {
+export function TokenAvatar({ symbol, className, fallbackClassName }: Props) {
 	const fallbackText = symbol.slice(0, 2).toUpperCase();
 
 	return (
-		<Avatar className={cn("size-4", className)}>
+		<Avatar className={clsx("size-4", className)}>
 			<AvatarImage src={getTokenIconUrl(symbol)} alt={symbol} />
-			<AvatarFallback className={cn("text-3xs bg-terminal-amber/20 text-terminal-amber", fallbackClassName)}>
+			<AvatarFallback className={clsx("text-3xs bg-terminal-amber/20 text-terminal-amber", fallbackClassName)}>
 				{fallbackText}
 			</AvatarFallback>
 		</Avatar>

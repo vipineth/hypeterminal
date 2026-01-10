@@ -10,7 +10,7 @@ import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
 import { getTokenIconUrl, isTokenInCategory, marketCategories } from "@/config/token";
 import { formatPercent, formatPrice, formatUSD } from "@/lib/format";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
-import { cn } from "@/lib/utils";
+import clsx from "clsx";
 import { QUOTE_ASSET } from "./constants";
 import { useTokenSelector } from "./use-token-selector";
 
@@ -89,7 +89,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 									key={cat.value}
 									type="button"
 									onClick={() => handleCategorySelect(cat.value)}
-									className={cn(
+									className={clsx(
 										"px-2 py-1 text-3xs uppercase tracking-wider transition-colors inline-flex items-center gap-1",
 										category === cat.value
 											? "text-terminal-cyan bg-terminal-cyan/10"
@@ -125,7 +125,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 									key={header.id}
 									type="button"
 									onClick={header.column.getToggleSortingHandler()}
-									className={cn(
+									className={clsx(
 										"w-16 sm:w-20 flex items-center justify-end gap-1 transition-colors hover:text-foreground cursor-pointer",
 										hiddenOnMobile && "hidden sm:flex",
 									)}
@@ -170,7 +170,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 									const isFav = isFavorite(market.coin);
 									const changePct = calculate24hPriceChange(market.ctxNumbers);
 									const changeIsPositive = (changePct ?? 0) >= 0;
-									const changeClass = cn(
+									const changeClass = clsx(
 										"text-2xs font-medium tabular-nums",
 										changePct === null
 											? "text-muted-foreground"
@@ -193,7 +193,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 											role="option"
 											aria-selected={isSelected}
 											tabIndex={0}
-											className={cn(
+											className={clsx(
 												"flex items-center px-3 py-1.5 cursor-pointer border-b border-border/20",
 												"hover:bg-accent/30 transition-colors",
 												"absolute top-0 left-0 w-full",
@@ -222,7 +222,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 															aria-label={isFav ? t`Remove from favorites` : t`Add to favorites`}
 														>
 															<Star
-																className={cn(
+																className={clsx(
 																	"size-2.5 transition-colors",
 																	isFav
 																		? "fill-terminal-amber text-terminal-amber"
@@ -267,10 +267,10 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 											<div className="w-20 text-right hidden sm:block">
 												<div className="flex items-center justify-end gap-1">
 													<Flame
-														className={cn("size-2.5", isFundingPositive ? "text-terminal-green" : "text-terminal-red")}
+														className={clsx("size-2.5", isFundingPositive ? "text-terminal-green" : "text-terminal-red")}
 													/>
 													<span
-														className={cn(
+														className={clsx(
 															"text-2xs tabular-nums font-medium",
 															isFundingPositive ? "text-terminal-green" : "text-terminal-red",
 														)}

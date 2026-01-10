@@ -29,4 +29,3 @@ export function usePersistentLayout(key: string, fallback: readonly number[]) {
 
 	return { layout, onLayout } as const;
 }
-

@@ -12,7 +12,7 @@ import { useSubAssetCtxs, useSubClearinghouseState } from "@/lib/hyperliquid/hoo
 import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
-import { cn } from "@/lib/utils";
+import clsx from "clsx";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-trade-settings-store";
 import type { PerpAssetCtxs } from "@/types/hyperliquid";
@@ -209,7 +209,7 @@ export function PositionsTab() {
 										<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
 											<TableCell className="text-2xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">
-													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
+													<span className={clsx("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
 														{row.sideLabel}
 													</span>
 													<button
@@ -230,7 +230,7 @@ export function PositionsTab() {
 												{row.markText}
 											</TableCell>
 											<TableCell className="text-right py-1.5">
-												<div className={cn("text-2xs tabular-nums", row.pnlClass)}>
+												<div className={clsx("text-2xs tabular-nums", row.pnlClass)}>
 													{row.pnlText}
 													<span className="text-muted-foreground ml-1">({row.roeText})</span>
 												</div>

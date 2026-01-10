@@ -3,11 +3,11 @@ import { useHttpStatus } from "./useHttpStatus";
 import { useWsStatus } from "./useWsStatus";
 
 export function useHyperliquidApiStatus(): HyperliquidApiStatus {
-  const http = useHttpStatus();
-  const ws = useWsStatus();
+	const http = useHttpStatus();
+	const ws = useWsStatus();
 
-  return {
-    http,
-    ws,
-  };
+	return {
+		http,
+		ws,
+	};
 }

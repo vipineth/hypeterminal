@@ -1,15 +1,15 @@
 import type { ExtraAgentsResponse } from "@nktkas/hyperliquid";
-import { useCallback, useMemo, useState } from "react";
-import { useConnection } from "wagmi";
-import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo, useState } from "react";
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
+import { useConnection } from "wagmi";
 import { useHyperliquid } from "../context";
+import { infoKeys } from "../query/keys";
+import { type AgentWallet, useAgentWallet, useAgentWalletActions } from "../state/agentWallet";
+import { convertFeeToPercentageString, isAgentApproved, isBuilderFeeApproved } from "../utils/agent";
 import type { AgentRegisterStatus, AgentStatus } from "./agent/types";
-import { useAgentWallet, useAgentWalletActions, type AgentWallet } from "../state/agentWallet";
 import { useInfoExtraAgents } from "./info/useInfoExtraAgents";
 import { useInfoMaxBuilderFee } from "./info/useInfoMaxBuilderFee";
-import { infoKeys } from "../query/keys";
-import { convertFeeToPercentageString, isAgentApproved, isBuilderFeeApproved } from "../utils/agent";
 
 export interface UseAgentRegistrationResult {
 	status: AgentStatus;
@@ -129,7 +129,18 @@ export function useAgentRegistration(): UseAgentRegistrationResult {
 			setError(nextError);
 			throw nextError;
 		}
-	}, [address, exchangeClient, env, agentName, builderConfig, hasBuilderConfig, clearAgent, setAgent, queryClient, agentWallet]);
+	}, [
+		address,
+		exchangeClient,
+		env,
+		agentName,
+		builderConfig,
+		hasBuilderConfig,
+		clearAgent,
+		setAgent,
+		queryClient,
+		agentWallet,
+	]);
 
 	const reset = useCallback(() => {
 		if (address) clearAgent(env, address);

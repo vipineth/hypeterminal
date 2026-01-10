@@ -1,5 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
+import clsx from "clsx";
 import { Bell, ChevronDown, Cog, Terminal, Zap } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,6 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
 import { GlobalSettingsDialog } from "../components/global-settings-dialog";
 import { DepositModal } from "../order-entry/deposit-modal";
 import { ThemeToggle } from "./theme-toggle";
@@ -51,7 +51,7 @@ export function TopNav() {
 						<button
 							key={item.key}
 							type="button"
-							className={cn(
+							className={clsx(
 								"px-2.5 py-1.5 transition-colors",
 								idx === 0 ? "text-terminal-cyan" : "text-muted-foreground hover:text-foreground",
 							)}

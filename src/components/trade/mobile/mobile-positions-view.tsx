@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { POSITIONS_TABS, UI_TEXT } from "@/config/interface";
 import { useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
-import { cn } from "@/lib/utils";
+import clsx from "clsx";
 import { BalancesTab } from "../positions/balances-tab";
 import { FundingTab } from "../positions/funding-tab";
 import { HistoryTab } from "../positions/history-tab";
@@ -77,7 +77,7 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 	};
 
 	return (
-		<div className={cn("flex flex-col h-full min-h-0 bg-surface/20", className)}>
+		<div className={clsx("flex flex-col h-full min-h-0 bg-surface/20", className)}>
 			{/* Scrollable tabs header */}
 			<div className="shrink-0 border-b border-border/60 bg-surface/30">
 				<div className="px-3 py-2 overflow-x-auto">
@@ -94,7 +94,7 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 									key={tab.value}
 									type="button"
 									onClick={() => setActiveTab(tab.value)}
-									className={cn(
+									className={clsx(
 										"px-3 py-2.5 text-sm font-medium rounded-md transition-colors",
 										"min-h-[44px] flex items-center gap-2",
 										"active:scale-98",
@@ -109,7 +109,7 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 									) : showCount ? (
 										<Badge
 											variant="outline"
-											className={cn(
+											className={clsx(
 												"min-w-5 h-5 px-1.5 text-xs tabular-nums",
 												"border-terminal-cyan/30 bg-terminal-cyan/10 text-terminal-cyan",
 											)}
@@ -140,7 +140,7 @@ interface EmptyStateProps {
 function EmptyState({ title, icon = "empty" }: EmptyStateProps) {
 	return (
 		<div className="h-full flex flex-col items-center justify-center gap-4 p-6 text-center">
-			<div className={cn("size-16 rounded-full flex items-center justify-center", "bg-muted/50")}>
+			<div className={clsx("size-16 rounded-full flex items-center justify-center", "bg-muted/50")}>
 				{icon === "wallet" ? (
 					<Wallet className="size-8 text-muted-foreground" />
 				) : (

@@ -8,7 +8,7 @@ import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
 import { formatToken, formatUSD } from "@/lib/format";
 import { useSubClearinghouseState, useSubSpotState } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumberOrZero } from "@/lib/trade/numbers";
-import { cn } from "@/lib/utils";
+import clsx from "clsx";
 import { TokenAvatar } from "../components/token-avatar";
 
 type BalanceRow = {
@@ -156,7 +156,7 @@ export function BalancesTab() {
 												<TokenAvatar symbol={row.asset} />
 												<span className="text-terminal-cyan">{row.asset}</span>
 												<span
-													className={cn(
+													className={clsx(
 														"text-4xs px-1 py-0.5 rounded-sm uppercase",
 														row.type === "perp"
 															? "bg-terminal-purple/20 text-terminal-purple"

@@ -1,13 +1,13 @@
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 import { type ComponentPropsWithoutRef, type ElementRef, forwardRef } from "react";
 
-import { cn } from "@/lib/utils";
+import clsx from "clsx";
 
 const ScrollArea = forwardRef<
 	ElementRef<typeof ScrollAreaPrimitive.Root>,
 	ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
 >(({ className, children, ...props }, ref) => (
-	<ScrollAreaPrimitive.Root ref={ref} data-slot="scroll-area" className={cn("relative", className)} {...props}>
+	<ScrollAreaPrimitive.Root ref={ref} data-slot="scroll-area" className={clsx("relative", className)} {...props}>
 		<ScrollAreaPrimitive.Viewport
 			data-slot="scroll-area-viewport"
 			className="focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1"
@@ -28,7 +28,7 @@ const ScrollBar = forwardRef<
 		ref={ref}
 		data-slot="scroll-area-scrollbar"
 		orientation={orientation}
-		className={cn(
+		className={clsx(
 			"flex touch-none p-px transition-colors select-none",
 			orientation === "vertical" && "h-full w-2.5 border-l border-l-transparent",
 			orientation === "horizontal" && "h-2.5 flex-col border-t border-t-transparent",

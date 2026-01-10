@@ -11,11 +11,7 @@ export function useTradingStatus(): UseTradingStatusResult {
 	const { address } = useConnection();
 	const { exchange } = useSignedExchange();
 
-	const status: TradingStatus = !address
-		? "no_wallet"
-		: !exchange
-			? "needs_approval"
-			: "ready";
+	const status: TradingStatus = !address ? "no_wallet" : !exchange ? "needs_approval" : "ready";
 
 	return { status, isReady: status === "ready" };
 }

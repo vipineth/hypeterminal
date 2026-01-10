@@ -1,6 +1,9 @@
 import { Wallet } from "lucide-react";
 import type { Connector } from "wagmi";
-import { CoinbaseIcon, MetaMaskIcon, RabbyIcon, WalletConnectIcon } from "@/components/icons";
+import { CoinbaseIcon } from "@/components/icons/coinbase-icon";
+import { MetaMaskIcon } from "@/components/icons/metamask-icon";
+import { RabbyIcon } from "@/components/icons/rabby-icon";
+import { WalletConnectIcon } from "@/components/icons/walletconnect-icon";
 
 export interface WalletInfo {
 	icon: React.ComponentType<{ className?: string }>;

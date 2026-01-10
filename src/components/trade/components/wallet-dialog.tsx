@@ -1,24 +1,18 @@
 import { Trans } from "@lingui/react/macro";
+import clsx from "clsx";
 import { AlertCircle, ExternalLink, HelpCircle, Loader2, Shield, Wallet } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { type Connector, useConnect } from "wagmi";
 import { Button } from "@/components/ui/button";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
-import { getWalletInfo, getLastUsedWallet, setLastUsedWallet } from "@/config/wallet";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { getLastUsedWallet, getWalletInfo, setLastUsedWallet } from "@/config/wallet";
 
-interface WalletDialogProps {
+interface Props {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 }
 
-export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
+export function WalletDialog({ open, onOpenChange }: Props) {
 	const { connectors, connect, isPending, error } = useConnect();
 	const [connectingId, setConnectingId] = useState<string | null>(null);
 	const [showHelp, setShowHelp] = useState(false);
@@ -52,7 +46,7 @@ export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
 					setConnectingId(null);
 					onOpenChange(false);
 				},
-			}
+			},
 		);
 	};
 
@@ -90,11 +84,11 @@ export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
 											key={connector.uid}
 											onClick={() => handleConnect(connector)}
 											disabled={isPending}
-											className={cn(
+											className={clsx(
 												"w-full flex items-center gap-3 p-3 rounded-lg border transition-all",
 												"bg-background hover:bg-accent/50 hover:border-terminal-cyan/30",
 												"disabled:opacity-50 disabled:cursor-not-allowed",
-												"group focus:outline-none focus:ring-2 focus:ring-terminal-cyan/50"
+												"group focus:outline-none focus:ring-2 focus:ring-terminal-cyan/50",
 											)}
 										>
 											<div className="size-10 rounded-lg overflow-hidden flex-shrink-0 shadow-sm">
@@ -104,9 +98,7 @@ export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
 												<p className="font-medium text-sm group-hover:text-terminal-cyan transition-colors">
 													{connector.name}
 												</p>
-												<p className="text-xs text-muted-foreground truncate">
-													{walletInfo.description}
-												</p>
+												<p className="text-xs text-muted-foreground truncate">{walletInfo.description}</p>
 											</div>
 											{isConnecting ? (
 												<Loader2 className="size-4 animate-spin text-terminal-cyan flex-shrink-0" />
@@ -136,11 +128,11 @@ export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
 											key={connector.uid}
 											onClick={() => handleConnect(connector)}
 											disabled={isPending}
-											className={cn(
+											className={clsx(
 												"w-full flex items-center gap-3 p-3 rounded-lg border transition-all",
 												"bg-background hover:bg-accent/50 hover:border-terminal-cyan/30",
 												"disabled:opacity-50 disabled:cursor-not-allowed",
-												"group focus:outline-none focus:ring-2 focus:ring-terminal-cyan/50"
+												"group focus:outline-none focus:ring-2 focus:ring-terminal-cyan/50",
 											)}
 										>
 											<div className="size-10 rounded-lg overflow-hidden flex-shrink-0 shadow-sm">
@@ -150,9 +142,7 @@ export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
 												<p className="font-medium text-sm group-hover:text-terminal-cyan transition-colors">
 													{connector.name}
 												</p>
-												<p className="text-xs text-muted-foreground truncate">
-													{walletInfo.description}
-												</p>
+												<p className="text-xs text-muted-foreground truncate">{walletInfo.description}</p>
 											</div>
 											{isConnecting ? (
 												<Loader2 className="size-4 animate-spin text-terminal-cyan flex-shrink-0" />
@@ -199,7 +189,7 @@ export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
 							<HelpCircle className="size-4" />
 							<Trans>New to wallets?</Trans>
 						</span>
-						<span className={cn("transition-transform", showHelp && "rotate-180")}>
+						<span className={clsx("transition-transform", showHelp && "rotate-180")}>
 							<svg width="12" height="12" viewBox="0 0 12 12" fill="none">
 								<path
 									d="M2.5 4.5L6 8L9.5 4.5"
@@ -232,9 +222,7 @@ export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
 										<Trans>What is a wallet?</Trans>
 									</p>
 									<p className="text-muted-foreground mt-0.5">
-										<Trans>
-											A crypto wallet lets you store and manage your digital assets securely.
-										</Trans>
+										<Trans>A crypto wallet lets you store and manage your digital assets securely.</Trans>
 									</p>
 								</div>
 							</div>

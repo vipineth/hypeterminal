@@ -1,8 +1,8 @@
 import type { TwapStatesWsEvent, TwapStatesWsParameters } from "@nktkas/hyperliquid";
 import { useCallback, useMemo } from "react";
+import { useHyperliquid } from "../../context";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
-import { useHyperliquid } from "../../context";
 import { useSub } from "../utils/useSub";
 
 type TwapStatesEvent = TwapStatesWsEvent;

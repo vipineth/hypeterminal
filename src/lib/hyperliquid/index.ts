@@ -6,24 +6,17 @@ export {
 	WebSocketTransport,
 	type WebSocketTransportOptions,
 } from "@nktkas/hyperliquid";
-
-export { HyperliquidProvider, useHyperliquid, useHyperliquidOptional } from "./context";
+export { createExchangeClient, getInfoClient, getSubscriptionClient, initializeClients } from "./clients";
 export type { HyperliquidContextValue, HyperliquidProviderProps } from "./context";
-
-export { getInfoClient, getSubscriptionClient, createExchangeClient, initializeClients } from "./clients";
+export { HyperliquidProvider, useHyperliquid, useHyperliquidOptional } from "./context";
 
 export * from "./errors";
 export * from "./hooks/agent";
 export * from "./hooks/exchange";
 export * from "./hooks/info";
 export * from "./hooks/subscription";
-
+export { type UseAgentRegistrationResult, useAgentRegistration } from "./hooks/useAgentRegistration";
 export { type HyperliquidClients, useHyperliquidClients } from "./hooks/useClients";
-export { useSignedExchange, type UseSignedExchangeResult } from "./hooks/useSignedExchange";
-export { useAgentRegistration, type UseAgentRegistrationResult } from "./hooks/useAgentRegistration";
-export { useTradingStatus, type UseTradingStatusResult } from "./hooks/useTradingStatus";
-export { useTradingAgent, type UseTradingAgentResult } from "./hooks/useTradingAgent";
-
 export { useConfig } from "./hooks/useConfig";
 export { useHyperliquidApiStatus } from "./hooks/useHyperliquidApiStatus";
 export { type PerpMarketInfo, type PerpMarketsData, usePerpMarkets } from "./hooks/usePerpMarkets";
@@ -34,6 +27,9 @@ export {
 	useResolvedMarket,
 	useSelectedResolvedMarket,
 } from "./hooks/useResolvedMarket";
+export { type UseSignedExchangeResult, useSignedExchange } from "./hooks/useSignedExchange";
+export { type UseTradingAgentResult, useTradingAgent } from "./hooks/useTradingAgent";
+export { type UseTradingStatusResult, useTradingStatus } from "./hooks/useTradingStatus";
 export { useHttpTransport, useSubscriptionTransport } from "./hooks/useTransport";
 
 export * from "./types";

@@ -1,19 +1,18 @@
+import clsx from "clsx";
 import { WifiOff, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useOnlineStatus } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
 
-interface OfflineBannerProps {
+interface Props {
 	className?: string;
 }
 
-export function OfflineBanner({ className }: OfflineBannerProps) {
+export function OfflineBanner({ className }: Props) {
 	const isOnline = useOnlineStatus();
 	const [dismissed, setDismissed] = useState(false);
 	const [wasOffline, setWasOffline] = useState(false);
 	const [showReconnected, setShowReconnected] = useState(false);
 
-	// Track when we go offline
 	useEffect(() => {
 		if (!isOnline) {
 			setWasOffline(true);
@@ -21,7 +20,6 @@ export function OfflineBanner({ className }: OfflineBannerProps) {
 		}
 	}, [isOnline]);
 
-	// Show reconnected message briefly when coming back online
 	useEffect(() => {
 		if (isOnline && wasOffline) {
 			setShowReconnected(true);
@@ -33,17 +31,14 @@ export function OfflineBanner({ className }: OfflineBannerProps) {
 		}
 	}, [isOnline, wasOffline]);
 
-	// Don't render if online and not showing reconnected message
 	if (isOnline && !showReconnected) return null;
-
-	// Don't render if dismissed (only for offline state)
 	if (!isOnline && dismissed) return null;
 
 	return (
 		<div
 			role="alert"
 			aria-live="polite"
-			className={cn(
+			className={clsx(
 				"fixed top-[calc(48px+env(safe-area-inset-top))] inset-x-0 z-50",
 				"px-3 py-2",
 				"flex items-center justify-between gap-2",
@@ -73,7 +68,7 @@ export function OfflineBanner({ className }: OfflineBannerProps) {
 				<button
 					type="button"
 					onClick={() => setDismissed(true)}
-					className={cn(
+					className={clsx(
 						"size-8 flex items-center justify-center",
 						"rounded-md hover:bg-terminal-amber/20",
 						"transition-colors",

@@ -1,8 +1,8 @@
 import type { L2BookWsEvent, L2BookWsParameters } from "@nktkas/hyperliquid";
 import { useCallback, useMemo } from "react";
+import { useHyperliquid } from "../../context";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
-import { useHyperliquid } from "../../context";
 import { useSub } from "../utils/useSub";
 
 type L2BookEvent = L2BookWsEvent;

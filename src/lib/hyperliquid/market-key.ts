@@ -20,4 +20,3 @@ export function marketKindFromMarketKey(marketKey: string): MarketKind | null {
 	if (marketKey.startsWith("perpDex:")) return "builderPerp";
 	return null;
 }
-

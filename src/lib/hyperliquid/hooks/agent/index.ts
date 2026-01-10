@@ -1,5 +1,4 @@
 export { HyperliquidProvider, useHyperliquid, useHyperliquidOptional } from "../../context";
-export type { AgentRegisterStatus, AgentStatus, BuilderConfig, HyperliquidEnv, TradingStatus } from "./types";
 export {
 	type AgentWallet,
 	readAgentFromStorage,
@@ -9,6 +8,7 @@ export {
 	writeAgentToStorage,
 } from "../../state/agentWallet";
 export { useAgentRegistration } from "../useAgentRegistration";
-export { useTradingStatus } from "../useTradingStatus";
 export { useSignedExchange } from "../useSignedExchange";
-export { useTradingAgent, type UseTradingAgentResult } from "../useTradingAgent";
+export { type UseTradingAgentResult, useTradingAgent } from "../useTradingAgent";
+export { useTradingStatus } from "../useTradingStatus";
+export type { AgentRegisterStatus, AgentStatus, BuilderConfig, HyperliquidEnv, TradingStatus } from "./types";

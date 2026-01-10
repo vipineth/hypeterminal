@@ -1,8 +1,8 @@
 import type { ActiveAssetDataParameters, ActiveAssetDataResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
+import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
-import { useHyperliquid } from "../../context";
 
 type ActiveAssetDataData = ActiveAssetDataResponse;
 type ActiveAssetDataParams = ActiveAssetDataParameters;

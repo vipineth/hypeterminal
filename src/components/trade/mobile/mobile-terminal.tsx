@@ -1,8 +1,8 @@
+import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
-import { cn } from "@/lib/utils";
 import { MobileAccountView } from "./mobile-account-view";
 import { MobileBookView } from "./mobile-book-view";
 import { MobileBottomNav, type MobileTab } from "./mobile-bottom-nav";
@@ -12,11 +12,11 @@ import { MobilePositionsView } from "./mobile-positions-view";
 import { MobileTradeView } from "./mobile-trade-view";
 import { OfflineBanner } from "./offline-banner";
 
-interface MobileTerminalProps {
+interface Props {
 	className?: string;
 }
 
-export function MobileTerminal({ className }: MobileTerminalProps) {
+export function MobileTerminal({ className }: Props) {
 	const [activeTab, setActiveTab] = useState<MobileTab>("chart");
 
 	const { address, isConnected } = useConnection();
@@ -28,7 +28,6 @@ export function MobileTerminal({ className }: MobileTerminalProps) {
 	const { data: ordersEvent } = useSubOpenOrders({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
 	const openOrders = ordersEvent?.orders;
 
-	// Badge counts for bottom nav
 	const positionsCount = useMemo(() => {
 		if (!isConnected) return 0;
 		const raw = state?.assetPositions ?? [];
@@ -67,7 +66,11 @@ export function MobileTerminal({ className }: MobileTerminalProps) {
 
 	return (
 		<div
-			className={cn("h-dvh w-full flex flex-col bg-background text-foreground font-mono", "overflow-hidden", className)}
+			className={clsx(
+				"h-dvh w-full flex flex-col bg-background text-foreground font-mono",
+				"overflow-hidden",
+				className,
+			)}
 		>
 			<MobileHeader />
 			<OfflineBanner />

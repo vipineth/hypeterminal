@@ -1,4 +1,5 @@
 import { t } from "@lingui/core/macro";
+import clsx from "clsx";
 import { Flame } from "lucide-react";
 import { useCallback } from "react";
 import { Separator } from "@/components/ui/separator";
@@ -7,7 +8,6 @@ import { formatPercent, formatUSD } from "@/lib/format";
 import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { makePerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
 import { calculateOpenInterestUSD } from "@/lib/market";
-import { cn } from "@/lib/utils";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import { StatBlock } from "./chart/stat-block";
 import { TokenSelector } from "./chart/token-selector";
@@ -56,9 +56,9 @@ export function MarketOverview() {
 							})}
 						/>
 						<div className="flex items-center gap-1">
-							<Flame className={cn("size-3", isFundingPositive ? "text-terminal-green" : "text-terminal-red")} />
+							<Flame className={clsx("size-3", isFundingPositive ? "text-terminal-green" : "text-terminal-red")} />
 							<span
-								className={cn(
+								className={clsx(
 									"text-muted-foreground tabular-nums",
 									isFundingPositive ? "text-terminal-green" : "text-terminal-red",
 								)}

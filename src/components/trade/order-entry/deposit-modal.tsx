@@ -4,18 +4,22 @@ import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-interface DepositModalProps {
+interface Props {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 }
 
-export function DepositModal({ open, onOpenChange }: DepositModalProps) {
+export function DepositModal({ open, onOpenChange }: Props) {
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle><Trans>Deposit Funds</Trans></DialogTitle>
-					<DialogDescription><Trans>Transfer USDC to your Hyperliquid account to start trading.</Trans></DialogDescription>
+					<DialogTitle>
+						<Trans>Deposit Funds</Trans>
+					</DialogTitle>
+					<DialogDescription>
+						<Trans>Transfer USDC to your Hyperliquid account to start trading.</Trans>
+					</DialogDescription>
 				</DialogHeader>
 				<div className="grid gap-4 py-4">
 					<Button variant="outline" className="justify-start gap-3 h-12" asChild>

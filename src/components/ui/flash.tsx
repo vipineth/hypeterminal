@@ -1,5 +1,5 @@
 import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
+import clsx from "clsx";
 
 type FlashDirection = "up" | "down" | null;
 
@@ -45,7 +45,7 @@ export function Flash({
 	};
 
 	return (
-		<span className={cn(className)} style={style}>
+		<span className={clsx(className)} style={style}>
 			{children}
 		</span>
 	);

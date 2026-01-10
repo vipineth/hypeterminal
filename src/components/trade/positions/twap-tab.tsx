@@ -10,7 +10,7 @@ import { usePerpMarkets } from "@/lib/hyperliquid";
 import { useSubUserTwapHistory } from "@/lib/hyperliquid/hooks/subscription";
 import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { parseNumber } from "@/lib/trade/numbers";
-import { cn } from "@/lib/utils";
+import clsx from "clsx";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 
 export function TwapTab() {
@@ -146,7 +146,7 @@ export function TwapTab() {
 									<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
 										<TableCell className="text-2xs font-medium py-1.5">
 											<div className="flex items-center gap-1.5">
-												<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
+												<span className={clsx("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
 													{row.sideLabel}
 												</span>
 												<button
@@ -168,7 +168,7 @@ export function TwapTab() {
 											<div className="flex items-center gap-2">
 												<div className="flex-1 h-1.5 bg-accent/30 rounded-full overflow-hidden">
 													<div
-														className={cn(
+														className={clsx(
 															"h-full rounded-full",
 															row.rawStatus === "finished" ? "bg-terminal-green" : "bg-terminal-cyan",
 														)}
@@ -182,7 +182,7 @@ export function TwapTab() {
 										</TableCell>
 										<TableCell className="text-2xs py-1.5">
 											<span
-												className={cn(
+												className={clsx(
 													"text-4xs px-1 py-0.5 rounded-sm uppercase",
 													row.rawStatus === "activated" && "bg-terminal-cyan/20 text-terminal-cyan",
 													row.rawStatus === "finished" && "bg-terminal-green/20 text-terminal-green",
