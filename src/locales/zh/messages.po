@@ -115,8 +115,8 @@ msgid "bps"
 msgstr "基点"
 
 #: src/components/ui/breadcrumb.tsx
-msgid "Breadcrumb"
-msgstr "面包屑导航"
+#~ msgid "Breadcrumb"
+#~ msgstr "面包屑导航"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 msgid "Bridge USDC from Arbitrum or other chains to your Hyperliquid account."
@@ -471,12 +471,12 @@ msgstr "资金费用"
 #~ msgstr "Gas:"
 
 #: src/components/ui/pagination.tsx
-msgid "Go to next page"
-msgstr "下一页"
+#~ msgid "Go to next page"
+#~ msgstr "下一页"
 
 #: src/components/ui/pagination.tsx
-msgid "Go to previous page"
-msgstr "上一页"
+#~ msgid "Go to previous page"
+#~ msgstr "上一页"
 
 #: src/components/pages/not-found-page.tsx
 #: src/components/pages/not-found-page.tsx
@@ -647,7 +647,6 @@ msgid "Min order $10"
 msgstr "最小订单 $10"
 
 #: src/components/trade/header/top-nav.tsx
-#: src/components/ui/breadcrumb.tsx
 msgid "More"
 msgstr "更多"
 
@@ -656,8 +655,8 @@ msgid "More options"
 msgstr "更多选项"
 
 #: src/components/ui/pagination.tsx
-msgid "More pages"
-msgstr "更多页面"
+#~ msgid "More pages"
+#~ msgstr "更多页面"
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Must be signed by main wallet (not agent/API wallet)"
@@ -672,8 +671,8 @@ msgid "New to wallets?"
 msgstr ""
 
 #: src/components/ui/pagination.tsx
-msgid "Next"
-msgstr "下一页"
+#~ msgid "Next"
+#~ msgstr "下一页"
 
 #: src/components/trade/positions/positions-tab.tsx
 msgid "No active positions."
@@ -788,8 +787,8 @@ msgid "Page not found"
 msgstr "页面未找到"
 
 #: src/components/ui/pagination.tsx
-msgid "pagination"
-msgstr "分页"
+#~ msgid "pagination"
+#~ msgstr "分页"
 
 #: src/components/trade/positions/funding-tab.tsx
 msgid "Payment"
@@ -832,8 +831,8 @@ msgid "Position"
 msgstr "仓位"
 
 #: src/components/ui/pagination.tsx
-msgid "Previous"
-msgstr "上一页"
+#~ msgid "Previous"
+#~ msgstr "上一页"
 
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/orderbook/orderbook-panel.tsx

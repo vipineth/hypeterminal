@@ -115,8 +115,8 @@ msgid "bps"
 msgstr "pbs"
 
 #: src/components/ui/breadcrumb.tsx
-msgid "Breadcrumb"
-msgstr "Fil d'Ariane"
+#~ msgid "Breadcrumb"
+#~ msgstr "Fil d'Ariane"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 msgid "Bridge USDC from Arbitrum or other chains to your Hyperliquid account."
@@ -471,12 +471,12 @@ msgstr "Paiements de financement"
 #~ msgstr "Gas :"
 
 #: src/components/ui/pagination.tsx
-msgid "Go to next page"
-msgstr "Aller à la page suivante"
+#~ msgid "Go to next page"
+#~ msgstr "Aller à la page suivante"
 
 #: src/components/ui/pagination.tsx
-msgid "Go to previous page"
-msgstr "Aller à la page précédente"
+#~ msgid "Go to previous page"
+#~ msgstr "Aller à la page précédente"
 
 #: src/components/pages/not-found-page.tsx
 #: src/components/pages/not-found-page.tsx
@@ -647,7 +647,6 @@ msgid "Min order $10"
 msgstr "Ordre min. 10 $"
 
 #: src/components/trade/header/top-nav.tsx
-#: src/components/ui/breadcrumb.tsx
 msgid "More"
 msgstr "Plus"
 
@@ -656,8 +655,8 @@ msgid "More options"
 msgstr "Plus d'options"
 
 #: src/components/ui/pagination.tsx
-msgid "More pages"
-msgstr "Plus de pages"
+#~ msgid "More pages"
+#~ msgstr "Plus de pages"
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Must be signed by main wallet (not agent/API wallet)"
@@ -672,8 +671,8 @@ msgid "New to wallets?"
 msgstr ""
 
 #: src/components/ui/pagination.tsx
-msgid "Next"
-msgstr "Suivant"
+#~ msgid "Next"
+#~ msgstr "Suivant"
 
 #: src/components/trade/positions/positions-tab.tsx
 msgid "No active positions."
@@ -788,8 +787,8 @@ msgid "Page not found"
 msgstr "Page non trouvée"
 
 #: src/components/ui/pagination.tsx
-msgid "pagination"
-msgstr "pagination"
+#~ msgid "pagination"
+#~ msgstr "pagination"
 
 #: src/components/trade/positions/funding-tab.tsx
 msgid "Payment"
@@ -832,8 +831,8 @@ msgid "Position"
 msgstr "Position"
 
 #: src/components/ui/pagination.tsx
-msgid "Previous"
-msgstr "Précédent"
+#~ msgid "Previous"
+#~ msgstr "Précédent"
 
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/orderbook/orderbook-panel.tsx

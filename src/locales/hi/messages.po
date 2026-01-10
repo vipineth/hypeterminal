@@ -115,8 +115,8 @@ msgid "bps"
 msgstr "बीपीएस"
 
 #: src/components/ui/breadcrumb.tsx
-msgid "Breadcrumb"
-msgstr "ब्रेडक्रम्ब"
+#~ msgid "Breadcrumb"
+#~ msgstr "ब्रेडक्रम्ब"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 msgid "Bridge USDC from Arbitrum or other chains to your Hyperliquid account."
@@ -471,12 +471,12 @@ msgstr "फंडिंग भुगतान"
 #~ msgstr "गैस:"
 
 #: src/components/ui/pagination.tsx
-msgid "Go to next page"
-msgstr "अगले पृष्ठ पर जाएं"
+#~ msgid "Go to next page"
+#~ msgstr "अगले पृष्ठ पर जाएं"
 
 #: src/components/ui/pagination.tsx
-msgid "Go to previous page"
-msgstr "पिछले पृष्ठ पर जाएं"
+#~ msgid "Go to previous page"
+#~ msgstr "पिछले पृष्ठ पर जाएं"
 
 #: src/components/pages/not-found-page.tsx
 #: src/components/pages/not-found-page.tsx
@@ -647,7 +647,6 @@ msgid "Min order $10"
 msgstr "न्यूनतम ऑर्डर $10"
 
 #: src/components/trade/header/top-nav.tsx
-#: src/components/ui/breadcrumb.tsx
 msgid "More"
 msgstr "और"
 
@@ -656,8 +655,8 @@ msgid "More options"
 msgstr "और विकल्प"
 
 #: src/components/ui/pagination.tsx
-msgid "More pages"
-msgstr "और पृष्ठ"
+#~ msgid "More pages"
+#~ msgstr "और पृष्ठ"
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Must be signed by main wallet (not agent/API wallet)"
@@ -672,8 +671,8 @@ msgid "New to wallets?"
 msgstr ""
 
 #: src/components/ui/pagination.tsx
-msgid "Next"
-msgstr "अगला"
+#~ msgid "Next"
+#~ msgstr "अगला"
 
 #: src/components/trade/positions/positions-tab.tsx
 msgid "No active positions."
@@ -788,8 +787,8 @@ msgid "Page not found"
 msgstr "पृष्ठ नहीं मिला"
 
 #: src/components/ui/pagination.tsx
-msgid "pagination"
-msgstr "पृष्ठांकन"
+#~ msgid "pagination"
+#~ msgstr "पृष्ठांकन"
 
 #: src/components/trade/positions/funding-tab.tsx
 msgid "Payment"
@@ -832,8 +831,8 @@ msgid "Position"
 msgstr "पोजीशन"
 
 #: src/components/ui/pagination.tsx
-msgid "Previous"
-msgstr "पिछला"
+#~ msgid "Previous"
+#~ msgstr "पिछला"
 
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/orderbook/orderbook-panel.tsx

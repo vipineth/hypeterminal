@@ -115,8 +115,8 @@ msgid "bps"
 msgstr "نقطة أساس"
 
 #: src/components/ui/breadcrumb.tsx
-msgid "Breadcrumb"
-msgstr "مسار التنقل"
+#~ msgid "Breadcrumb"
+#~ msgstr "مسار التنقل"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 msgid "Bridge USDC from Arbitrum or other chains to your Hyperliquid account."
@@ -471,12 +471,12 @@ msgstr "مدفوعات التمويل"
 #~ msgstr "الغاز:"
 
 #: src/components/ui/pagination.tsx
-msgid "Go to next page"
-msgstr "الذهاب للصفحة التالية"
+#~ msgid "Go to next page"
+#~ msgstr "الذهاب للصفحة التالية"
 
 #: src/components/ui/pagination.tsx
-msgid "Go to previous page"
-msgstr "الذهاب للصفحة السابقة"
+#~ msgid "Go to previous page"
+#~ msgstr "الذهاب للصفحة السابقة"
 
 #: src/components/pages/not-found-page.tsx
 #: src/components/pages/not-found-page.tsx
@@ -647,7 +647,6 @@ msgid "Min order $10"
 msgstr "الحد الأدنى $10"
 
 #: src/components/trade/header/top-nav.tsx
-#: src/components/ui/breadcrumb.tsx
 msgid "More"
 msgstr "المزيد"
 
@@ -656,8 +655,8 @@ msgid "More options"
 msgstr "المزيد من الخيارات"
 
 #: src/components/ui/pagination.tsx
-msgid "More pages"
-msgstr "صفحات أخرى"
+#~ msgid "More pages"
+#~ msgstr "صفحات أخرى"
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Must be signed by main wallet (not agent/API wallet)"
@@ -672,8 +671,8 @@ msgid "New to wallets?"
 msgstr ""
 
 #: src/components/ui/pagination.tsx
-msgid "Next"
-msgstr "التالي"
+#~ msgid "Next"
+#~ msgstr "التالي"
 
 #: src/components/trade/positions/positions-tab.tsx
 msgid "No active positions."
@@ -788,8 +787,8 @@ msgid "Page not found"
 msgstr "الصفحة غير موجودة"
 
 #: src/components/ui/pagination.tsx
-msgid "pagination"
-msgstr "ترقيم الصفحات"
+#~ msgid "pagination"
+#~ msgstr "ترقيم الصفحات"
 
 #: src/components/trade/positions/funding-tab.tsx
 msgid "Payment"
@@ -832,8 +831,8 @@ msgid "Position"
 msgstr "المركز"
 
 #: src/components/ui/pagination.tsx
-msgid "Previous"
-msgstr "السابق"
+#~ msgid "Previous"
+#~ msgstr "السابق"
 
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/orderbook/orderbook-panel.tsx

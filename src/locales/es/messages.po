@@ -115,8 +115,8 @@ msgid "bps"
 msgstr "pbs"
 
 #: src/components/ui/breadcrumb.tsx
-msgid "Breadcrumb"
-msgstr "Ruta de navegación"
+#~ msgid "Breadcrumb"
+#~ msgstr "Ruta de navegación"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 msgid "Bridge USDC from Arbitrum or other chains to your Hyperliquid account."
@@ -471,12 +471,12 @@ msgstr "Pagos de financiamiento"
 #~ msgstr "Gas:"
 
 #: src/components/ui/pagination.tsx
-msgid "Go to next page"
-msgstr "Ir a página siguiente"
+#~ msgid "Go to next page"
+#~ msgstr "Ir a página siguiente"
 
 #: src/components/ui/pagination.tsx
-msgid "Go to previous page"
-msgstr "Ir a página anterior"
+#~ msgid "Go to previous page"
+#~ msgstr "Ir a página anterior"
 
 #: src/components/pages/not-found-page.tsx
 #: src/components/pages/not-found-page.tsx
@@ -647,7 +647,6 @@ msgid "Min order $10"
 msgstr "Orden mín. $10"
 
 #: src/components/trade/header/top-nav.tsx
-#: src/components/ui/breadcrumb.tsx
 msgid "More"
 msgstr "Más"
 
@@ -656,8 +655,8 @@ msgid "More options"
 msgstr "Más opciones"
 
 #: src/components/ui/pagination.tsx
-msgid "More pages"
-msgstr "Más páginas"
+#~ msgid "More pages"
+#~ msgstr "Más páginas"
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Must be signed by main wallet (not agent/API wallet)"
@@ -672,8 +671,8 @@ msgid "New to wallets?"
 msgstr ""
 
 #: src/components/ui/pagination.tsx
-msgid "Next"
-msgstr "Siguiente"
+#~ msgid "Next"
+#~ msgstr "Siguiente"
 
 #: src/components/trade/positions/positions-tab.tsx
 msgid "No active positions."
@@ -788,8 +787,8 @@ msgid "Page not found"
 msgstr "Página no encontrada"
 
 #: src/components/ui/pagination.tsx
-msgid "pagination"
-msgstr "paginación"
+#~ msgid "pagination"
+#~ msgstr "paginación"
 
 #: src/components/trade/positions/funding-tab.tsx
 msgid "Payment"
@@ -832,8 +831,8 @@ msgid "Position"
 msgstr "Posición"
 
 #: src/components/ui/pagination.tsx
-msgid "Previous"
-msgstr "Anterior"
+#~ msgid "Previous"
+#~ msgstr "Anterior"
 
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/orderbook/orderbook-panel.tsx

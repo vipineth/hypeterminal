@@ -115,8 +115,8 @@ msgid "bps"
 msgstr "bps"
 
 #: src/components/ui/breadcrumb.tsx
-msgid "Breadcrumb"
-msgstr "Breadcrumb"
+#~ msgid "Breadcrumb"
+#~ msgstr "Breadcrumb"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 msgid "Bridge USDC from Arbitrum or other chains to your Hyperliquid account."
@@ -471,12 +471,12 @@ msgstr "Funding Payments"
 #~ msgstr "Gas:"
 
 #: src/components/ui/pagination.tsx
-msgid "Go to next page"
-msgstr "Go to next page"
+#~ msgid "Go to next page"
+#~ msgstr "Go to next page"
 
 #: src/components/ui/pagination.tsx
-msgid "Go to previous page"
-msgstr "Go to previous page"
+#~ msgid "Go to previous page"
+#~ msgstr "Go to previous page"
 
 #: src/components/pages/not-found-page.tsx
 #: src/components/pages/not-found-page.tsx
@@ -651,7 +651,6 @@ msgid "Min order $10"
 msgstr "Min order $10"
 
 #: src/components/trade/header/top-nav.tsx
-#: src/components/ui/breadcrumb.tsx
 msgid "More"
 msgstr "More"
 
@@ -660,8 +659,8 @@ msgid "More options"
 msgstr "More options"
 
 #: src/components/ui/pagination.tsx
-msgid "More pages"
-msgstr "More pages"
+#~ msgid "More pages"
+#~ msgstr "More pages"
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Must be signed by main wallet (not agent/API wallet)"
@@ -676,8 +675,8 @@ msgid "New to wallets?"
 msgstr "New to wallets?"
 
 #: src/components/ui/pagination.tsx
-msgid "Next"
-msgstr "Next"
+#~ msgid "Next"
+#~ msgstr "Next"
 
 #: src/components/trade/positions/positions-tab.tsx
 msgid "No active positions."
@@ -792,8 +791,8 @@ msgid "Page not found"
 msgstr "Page not found"
 
 #: src/components/ui/pagination.tsx
-msgid "pagination"
-msgstr "pagination"
+#~ msgid "pagination"
+#~ msgstr "pagination"
 
 #: src/components/trade/positions/funding-tab.tsx
 msgid "Payment"
@@ -836,8 +835,8 @@ msgid "Position"
 msgstr "Position"
 
 #: src/components/ui/pagination.tsx
-msgid "Previous"
-msgstr "Previous"
+#~ msgid "Previous"
+#~ msgstr "Previous"
 
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/orderbook/orderbook-panel.tsx
