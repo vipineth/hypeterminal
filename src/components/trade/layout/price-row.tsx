@@ -1,9 +1,9 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { LAYOUT_PERSISTENCE } from "@/constants/app";
-import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
-import { usePersistentLayout } from "../hooks/use-persistent-layout";
+import { LAYOUT_PERSISTENCE } from "@/config/constants";
+import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { ChartPanel } from "../chart/chart-panel";
-import { OrderBookPanel } from "../orderbook/order-book-panel";
+import { usePersistentLayout } from "@/hooks/trade/use-persistent-layout";
+import { OrderbookPanel } from "../orderbook/orderbook-panel";
 
 export function PriceRow() {
 	const layout = LAYOUT_PERSISTENCE.CHART_BOOK;
@@ -21,8 +21,7 @@ export function PriceRow() {
 				</ResizablePanel>
 				<ResizableHandle className="bg-border/40 data-[resize-handle-state=hover]:bg-terminal-cyan/30 data-[resize-handle-state=drag]:bg-terminal-cyan/50" />
 				<ResizablePanel defaultSize={horizLayout[1] ?? layout.PANEL_DEFAULTS[1]} minSize={20}>
-					{/* Key resets order book state when coin changes */}
-					<OrderBookPanel key={bookKey} />
+					<OrderbookPanel key={bookKey} />
 				</ResizablePanel>
 			</ResizablePanelGroup>
 		</div>

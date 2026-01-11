@@ -70,6 +70,7 @@
       opacity: 0;
     }
   }
+
 }
 
 /* =============================================================================
@@ -383,5 +384,24 @@
   }
   .dark .depth-bar-bid {
     background: linear-gradient(90deg, oklch(0.75 0.18 145 / 0.15) 0%, transparent 100%);
+  }
+
+  /* Trade row flash on appear - subtle, full-width */
+  .trade-row-buy,
+  .trade-row-sell {
+    margin-inline: -0.5rem;
+    padding-inline: 0.5rem;
+    background-color: transparent;
+    transition: background-color 0.4s ease-out;
+  }
+  .trade-row-buy {
+    @starting-style {
+      background-color: oklch(from var(--terminal-green) l c h / 0.12);
+    }
+  }
+  .trade-row-sell {
+    @starting-style {
+      background-color: oklch(from var(--terminal-red) l c h / 0.12);
+    }
   }
 }

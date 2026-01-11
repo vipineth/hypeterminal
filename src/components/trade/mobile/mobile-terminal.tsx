@@ -1,9 +1,8 @@
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
-import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
-import { useOpenOrders } from "@/hooks/hyperliquid/use-open-orders";
+import { cn } from "@/lib/cn";
+import { useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
-import { cn } from "@/lib/utils";
 import { MobileAccountView } from "./mobile-account-view";
 import { MobileBookView } from "./mobile-book-view";
 import { MobileBottomNav, type MobileTab } from "./mobile-bottom-nav";
@@ -13,18 +12,22 @@ import { MobilePositionsView } from "./mobile-positions-view";
 import { MobileTradeView } from "./mobile-trade-view";
 import { OfflineBanner } from "./offline-banner";
 
-interface MobileTerminalProps {
+interface Props {
 	className?: string;
 }
 
-export function MobileTerminal({ className }: MobileTerminalProps) {
+export function MobileTerminal({ className }: Props) {
 	const [activeTab, setActiveTab] = useState<MobileTab>("chart");
 
 	const { address, isConnected } = useConnection();
-	const { data: state } = useClearinghouseState({ user: isConnected ? address : undefined });
-	const { data: openOrders } = useOpenOrders({ user: isConnected ? address : undefined });
+	const { data: stateEvent } = useSubClearinghouseState(
+		{ user: address ?? "0x0" },
+		{ enabled: isConnected && !!address },
+	);
+	const state = stateEvent?.clearinghouseState;
+	const { data: ordersEvent } = useSubOpenOrders({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
+	const openOrders = ordersEvent?.orders;
 
-	// Badge counts for bottom nav
 	const positionsCount = useMemo(() => {
 		if (!isConnected) return 0;
 		const raw = state?.assetPositions ?? [];

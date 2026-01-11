@@ -18,7 +18,6 @@ interface OrderQueueStore {
 		addOrder: (order: Omit<OrderQueueItem, "id" | "createdAt">) => string;
 		updateOrder: (id: string, update: Partial<Omit<OrderQueueItem, "id">>) => void;
 		removeOrder: (id: string) => void;
-		clearCompleted: () => void;
 	};
 }
 
@@ -59,11 +58,6 @@ const useOrderQueueStore = create<OrderQueueStore>()((set) => ({
 		removeOrder: (id) => {
 			set((state) => ({
 				orders: state.orders.filter((order) => order.id !== id),
-			}));
-		},
-		clearCompleted: () => {
-			set((state) => ({
-				orders: state.orders.filter((order) => order.status === "pending"),
 			}));
 		},
 	},

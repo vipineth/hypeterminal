@@ -21,8 +21,8 @@ importers:
         specifier: ^5.7.0
         version: 5.7.0(@lingui/babel-plugin-lingui-macro@5.7.0(typescript@5.9.3))(react@19.2.3)
       '@nktkas/hyperliquid':
-        specifier: ^0.29.1
-        version: 0.29.1(typescript@5.9.3)
+        specifier: ^0.30.2
+        version: 0.30.2(typescript@5.9.3)
       '@phosphor-icons/react':
         specifier: ^2.1.10
         version: 2.1.10(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -188,6 +188,9 @@ importers:
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
+      valibot:
+        specifier: ^1.2.0
+        version: 1.2.0(typescript@5.9.3)
       vaul:
         specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -981,8 +984,8 @@ packages:
   '@napi-rs/wasm-runtime@1.1.1':
     resolution: {integrity: sha512-p64ah1M1ld8xjWv3qbvFwHiFVWrq1yFvV4f7w+mzaqiR4IlSgkqhcRdHwsGgomwzBH51sRY4NEowLxnaBjcW/A==}
 
-  '@nktkas/hyperliquid@0.29.1':
-    resolution: {integrity: sha512-VA8ofr6yv26BPOOvGcjtC2snGwmQHEKB4Xd4oFvFbF8DZyVduWaGatXwgoJv+nggZmE5UVV9iqbLIOchQTe8vg==}
+  '@nktkas/hyperliquid@0.30.2':
+    resolution: {integrity: sha512-xz1/oGRunLxY1z1FOsCsXUFOWx8ADL3vL87pQkpl68gIxHT6Duf5z18uxFQWxlPPyB5PHYmpudlziJ6xVPB4Vw==}
     engines: {node: '>=20.19.0'}
     hasBin: true
 
@@ -5748,7 +5751,7 @@ snapshots:
       '@tybys/wasm-util': 0.10.1
     optional: true
 
-  '@nktkas/hyperliquid@0.29.1(typescript@5.9.3)':
+  '@nktkas/hyperliquid@0.30.2(typescript@5.9.3)':
     dependencies:
       '@nktkas/rews': 1.2.3
       '@noble/hashes': 1.8.0

@@ -6,11 +6,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { getTokenIconUrl, isTokenInCategory, marketCategories } from "@/config/token";
-import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
+import { getTokenIconUrl, isTokenInCategory, marketCategories } from "@/lib/tokens";
+import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatUSD } from "@/lib/format";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
-import { cn } from "@/lib/utils";
 import { QUOTE_ASSET } from "./constants";
 import { useTokenSelector } from "./use-token-selector";
 
@@ -64,44 +64,51 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 					<ChevronDown className="size-3 text-muted-foreground shrink-0" />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-[calc(100vw-1rem)] sm:w-xl max-w-xl p-0 border-border/60 bg-surface" align="start" sideOffset={8}>
-				<div className="flex flex-col">
-					<div className="px-2 py-2 border-b border-border/40">
+			<PopoverContent
+				className="w-[calc(100vw-1rem)] sm:w-xl max-w-xl p-0 border-border/60 bg-surface"
+				align="start"
+				sideOffset={8}
+			>
+				<div className="flex flex-col p-2">
+					<div className="border-b border-border/40">
 						<div className="relative">
 							<Search className="absolute left-2 top-1/2 -translate-y-1/2 size-3 text-muted-foreground" />
 							<Input
 								placeholder={t`Search markets...`}
 								value={search}
 								onChange={(e) => setSearch(e.target.value)}
-								className="pl-7 h-7 text-xs bg-background/50 border-border/60 focus:border-terminal-cyan/60"
+								className="pl-7 h-7 text-xs bg-background/50 border-border/60 focus:border-terminal-cyan/40"
 							/>
 						</div>
 					</div>
 
-					<div className="px-2 py-1.5 border-b border-border/40 bg-surface/50">
+					<div className="py-2 border-b border-border/40 bg-surface/50">
 						<div className="flex items-center gap-0.5 flex-wrap">
-							{marketCategories.map((cat) => (
-								<button
-									key={cat.value}
-									type="button"
-									onClick={() => handleCategorySelect(cat.value)}
-									className={cn(
-										"px-2 py-1 text-3xs uppercase tracking-wider transition-colors inline-flex items-center gap-1",
-										category === cat.value
-											? "text-terminal-cyan bg-terminal-cyan/10"
-											: "text-muted-foreground hover:text-foreground",
-									)}
-									tabIndex={0}
-									aria-label={t`Filter by ${cat.label}`}
-									aria-pressed={category === cat.value}
-								>
-									{cat.icon}
-									{cat.label}
-								</button>
-							))}
+							{marketCategories.map((cat) => {
+								const isSelected = category === cat.value;
+								return (
+									<Button
+										key={cat.value}
+										variant="ghost"
+										size="none"
+										onClick={() => handleCategorySelect(cat.value)}
+										className={cn(
+											"px-2 py-1 text-3xs uppercase tracking-wider gap-1 cursor-pointer",
+											isSelected
+												? "bg-terminal-cyan/10 text-terminal-cyan hover:bg-terminal-cyan/10 hover:text-terminal-cyan"
+												: "text-muted-foreground hover:bg-transparent",
+										)}
+										aria-label={t`Filter by ${cat.label}`}
+										aria-pressed={isSelected}
+									>
+										{cat.icon}
+										{cat.label}
+									</Button>
+								);
+							})}
 						</div>
 					</div>
-					<div className="flex items-center px-3 py-1.5 text-4xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40 bg-surface/30">
+					<div className="flex items-center py-1.5 text-4xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40 bg-surface/30">
 						{headerGroup?.headers.map((header) => {
 							if (header.id === "coin") {
 								return (
@@ -113,16 +120,16 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 
 							const sortState = header.column.getIsSorted();
 
-							// Hide some columns on mobile for better fit
 							const hiddenOnMobile = ["openInterest", "dayNtlVlm", "funding"].includes(header.id);
 
 							return (
-								<button
+								<Button
 									key={header.id}
-									type="button"
+									variant="ghost"
+									size="none"
 									onClick={header.column.getToggleSortingHandler()}
 									className={cn(
-										"w-16 sm:w-20 flex items-center justify-end gap-1 transition-colors hover:text-foreground cursor-pointer",
+										"w-16 sm:w-20 justify-end gap-1 hover:text-foreground hover:bg-transparent",
 										hiddenOnMobile && "hidden sm:flex",
 									)}
 									aria-label={t`Sort by ${String(header.column.columnDef.header ?? "")}`}
@@ -137,7 +144,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 											<ArrowUpDown className="size-2.5 opacity-40" />
 										)}
 									</span>
-								</button>
+								</Button>
 							);
 						})}
 					</div>
@@ -174,8 +181,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 												? "text-terminal-green"
 												: "text-terminal-red",
 									);
-									const changeText =
-										changePct === null ? FALLBACK_VALUE_PLACEHOLDER : formatPercent(changePct / 100);
+									const changeText = changePct === null ? FALLBACK_VALUE_PLACEHOLDER : formatPercent(changePct / 100);
 
 									return (
 										<div
@@ -209,13 +215,14 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 												<div className="min-w-0">
 													<div className="flex items-center gap-1">
 														<span className="font-semibold text-2xs">{market.coin}</span>
-														<button
-															type="button"
+														<Button
+															variant="ghost"
+															size="none"
 															onClick={(e) => {
 																e.stopPropagation();
 																toggleFavorite(market.coin);
 															}}
-															className="hover:scale-110 transition-transform"
+															className="hover:scale-110 hover:bg-transparent"
 															aria-label={isFav ? t`Remove from favorites` : t`Add to favorites`}
 														>
 															<Star
@@ -226,7 +233,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 																		: "text-muted-foreground hover:text-terminal-amber",
 																)}
 															/>
-														</button>
+														</Button>
 														{isTokenInCategory(market.coin, "new") && (
 															<Badge variant="neutral" size="xs" className="px-1 py-0 text-4xs">
 																{t`NEW`}
@@ -238,31 +245,24 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 													</div>
 												</div>
 											</div>
-											{/* Price - always visible */}
 											<div className="w-16 sm:w-20 text-right">
 												<span className="text-2xs font-medium tabular-nums">
 													{formatPrice(market.ctxNumbers?.markPx ?? null, { szDecimals: market.szDecimals })}
 												</span>
 											</div>
-											{/* 24h change - always visible */}
 											<div className="w-16 sm:w-20 text-right">
-												<span className={changeClass}>
-													{changeText}
-												</span>
+												<span className={changeClass}>{changeText}</span>
 											</div>
-											{/* Open Interest - hidden on mobile */}
 											<div className="w-20 text-right hidden sm:block">
 												<span className="text-2xs font-medium tabular-nums">
 													{formatUSD(calculateOpenInterestUSD(market.ctxNumbers))}
 												</span>
 											</div>
-											{/* Volume - hidden on mobile */}
 											<div className="w-20 text-right hidden sm:block">
 												<span className="text-2xs font-medium tabular-nums">
 													{formatUSD(market.ctxNumbers?.dayNtlVlm ?? null)}
 												</span>
 											</div>
-											{/* Funding - hidden on mobile */}
 											<div className="w-20 text-right hidden sm:block">
 												<div className="flex items-center justify-end gap-1">
 													<Flame
@@ -292,9 +292,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 						<span>
 							{filteredMarkets.length} {t`markets`}
 						</span>
-						<span className="tabular-nums">
-							{sorting.length > 0 ? t`Sorted by ${sorting[0].id}` : t`Updated live`}
-						</span>
+						<span className="tabular-nums">{sorting.length > 0 ? t`Sorted by ${sorting[0].id}` : t`Updated live`}</span>
 					</div>
 				</div>
 			</PopoverContent>

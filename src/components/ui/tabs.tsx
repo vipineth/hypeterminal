@@ -1,7 +1,6 @@
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 import type * as React from "react";
-
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 
 function Tabs({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Root>) {
 	return <TabsPrimitive.Root data-slot="tabs" className={cn("flex flex-col gap-1", className)} {...props} />;
@@ -9,11 +8,7 @@ function Tabs({ className, ...props }: React.ComponentProps<typeof TabsPrimitive
 
 function TabsList({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.List>) {
 	return (
-		<TabsPrimitive.List
-			data-slot="tabs-list"
-			className={cn("inline-flex items-center gap-1", className)}
-			{...props}
-		/>
+		<TabsPrimitive.List data-slot="tabs-list" className={cn("inline-flex items-center gap-1", className)} {...props} />
 	);
 }
 
@@ -48,4 +43,3 @@ function TabsContent({ className, ...props }: React.ComponentProps<typeof TabsPr
 }
 
 export { Tabs, TabsList, TabsTrigger, TabsContent };
-

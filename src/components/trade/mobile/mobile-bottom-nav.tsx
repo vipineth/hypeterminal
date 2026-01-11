@@ -1,6 +1,7 @@
 import { BarChart3, BookOpen, CircleDollarSign, LayoutList, TrendingUp } from "lucide-react";
 import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/cn";
 
 export type MobileTab = "chart" | "book" | "trade" | "positions" | "account";
 
@@ -18,15 +19,14 @@ const NAV_ITEMS: NavItem[] = [
 	{ id: "account", label: "Account", icon: <CircleDollarSign className="size-5" /> },
 ];
 
-interface MobileBottomNavProps {
+interface Props {
 	activeTab: MobileTab;
 	onTabChange: (tab: MobileTab) => void;
-	/** Optional badge counts for tabs */
 	badges?: Partial<Record<MobileTab, number>>;
 	className?: string;
 }
 
-export function MobileBottomNav({ activeTab, onTabChange, badges, className }: MobileBottomNavProps) {
+export function MobileBottomNav({ activeTab, onTabChange, badges, className }: Props) {
 	return (
 		<nav
 			className={cn(
@@ -43,34 +43,25 @@ export function MobileBottomNav({ activeTab, onTabChange, badges, className }: M
 					const showBadge = typeof badgeCount === "number" && badgeCount > 0;
 
 					return (
-						<button
+						<Button
 							key={item.id}
-							type="button"
+							variant="ghost"
+							size="none"
 							onClick={() => onTabChange(item.id)}
 							className={cn(
-								// Base styles - minimum 48px touch target
-								"flex-1 flex flex-col items-center justify-center gap-0.5",
+								"flex-1 flex flex-col items-center justify-center gap-0.5 rounded-none",
 								"min-h-[56px] py-2 px-1",
 								"transition-colors duration-150 ease-out",
-								// Touch feedback
 								"active:bg-accent/50 active:scale-95",
-								// Focus visible for accessibility
-								"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
-								// Active/inactive states
-								isActive
-									? "text-terminal-cyan"
-									: "text-muted-foreground hover:text-foreground",
+								"hover:bg-transparent",
+								isActive ? "text-terminal-cyan" : "text-muted-foreground hover:text-foreground",
 							)}
 							aria-current={isActive ? "page" : undefined}
 							aria-label={item.label}
 						>
 							<span className="relative">
 								{item.icon}
-								{/* Active indicator dot */}
-								{isActive && (
-									<span className="absolute -top-0.5 -right-0.5 size-1.5 rounded-full bg-terminal-cyan" />
-								)}
-								{/* Badge for counts */}
+								{isActive && <span className="absolute -top-0.5 -right-0.5 size-1.5 rounded-full bg-terminal-cyan" />}
 								{showBadge && (
 									<span
 										className={cn(
@@ -85,7 +76,7 @@ export function MobileBottomNav({ activeTab, onTabChange, badges, className }: M
 								)}
 							</span>
 							<span className="text-[10px] font-medium tracking-wide">{item.label}</span>
-						</button>
+						</Button>
 					);
 				})}
 			</div>
@@ -93,20 +84,6 @@ export function MobileBottomNav({ activeTab, onTabChange, badges, className }: M
 	);
 }
 
-/**
- * Spacer component to prevent content from being hidden behind the fixed bottom nav.
- * Place this at the bottom of scrollable content areas.
- */
 export function MobileBottomNavSpacer({ className }: { className?: string }) {
-	return (
-		<div
-			className={cn(
-				// Height matches nav + safe area
-				"h-[calc(56px+env(safe-area-inset-bottom))]",
-				"shrink-0",
-				className,
-			)}
-			aria-hidden="true"
-		/>
-	);
+	return <div className={cn("h-[calc(56px+env(safe-area-inset-bottom))]", "shrink-0", className)} aria-hidden="true" />;
 }

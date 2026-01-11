@@ -1,8 +1,9 @@
 import { t } from "@lingui/core/macro";
 import { flexRender, type Header, type RowData } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { UseVirtualTableReturn } from "@/hooks/ui/use-virtual-table";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 
 export interface VirtualTableProps<TData extends RowData> extends UseVirtualTableReturn<TData> {
 	className?: string;
@@ -63,7 +64,6 @@ export function VirtualTable<TData extends RowData>({
 
 	return (
 		<div className={cn("relative overflow-hidden", className)}>
-			{/* Sticky Header */}
 			<div className="sticky top-0 z-10 bg-surface border-b border-border/40">
 				{headerGroups.map((headerGroup) => (
 					<div key={headerGroup.id} className="flex w-full">
@@ -81,17 +81,18 @@ export function VirtualTable<TData extends RowData>({
 							if (canSort) {
 								const headerLabel = header.column.columnDef.header?.toString() ?? "";
 								return (
-									<button
+									<Button
 										key={header.id}
-										type="button"
-										className={headerClassName}
+										variant="ghost"
+										size="none"
+										className={cn(headerClassName, "hover:bg-transparent")}
 										style={headerStyle}
 										onClick={header.column.getToggleSortingHandler()}
 										aria-label={t`Sort by ${headerLabel}`}
 									>
 										{headerContent}
 										{showSortingIndicators && <SortingIndicator header={header} />}
-									</button>
+									</Button>
 								);
 							}
 

@@ -1,19 +1,26 @@
 import { create } from "zustand";
 
-interface OrderbookActionsStore {
-	/** Price selected from orderbook click */
+interface OrderbookActionsState {
 	selectedPrice: number | null;
-	/** Set price from orderbook click (triggers limit order) */
+}
+
+interface OrderbookActions {
 	setSelectedPrice: (price: number) => void;
-	/** Clear selected price after consumption */
 	clearSelectedPrice: () => void;
 }
 
-export const useOrderbookActionsStore = create<OrderbookActionsStore>((set) => ({
+interface OrderbookActionsStore extends OrderbookActionsState {
+	actions: OrderbookActions;
+}
+
+const useOrderbookActionsStore = create<OrderbookActionsStore>((set) => ({
 	selectedPrice: null,
-	setSelectedPrice: (price) => set({ selectedPrice: price }),
-	clearSelectedPrice: () => set({ selectedPrice: null }),
+	actions: {
+		setSelectedPrice: (price) => set({ selectedPrice: price }),
+		clearSelectedPrice: () => set({ selectedPrice: null }),
+	},
 }));
 
 export const useSelectedPrice = () => useOrderbookActionsStore((s) => s.selectedPrice);
-export const useSetSelectedPrice = () => useOrderbookActionsStore((s) => s.setSelectedPrice);
+export const useOrderbookActions = () => useOrderbookActionsStore((s) => s.actions);
+export const getOrderbookActionsStore = () => useOrderbookActionsStore.getState();

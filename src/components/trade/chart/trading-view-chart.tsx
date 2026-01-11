@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useGlobalSettings } from "@/stores/use-global-settings-store";
 import type {
 	ChartingLibraryWidgetConstructor,
 	IBasicDataFeed,
@@ -27,7 +28,6 @@ import {
 	getLoadingScreenColors,
 	getToolbarBgColor,
 } from "./theme-colors";
-import { useGlobalSettings } from "@/stores/use-global-settings-store";
 
 declare global {
 	interface Window {
@@ -37,17 +37,17 @@ declare global {
 	}
 }
 
-type TradingViewChartProps = {
+interface Props {
 	symbol?: string;
 	interval?: string;
 	theme?: "light" | "dark";
-};
+}
 
 export function TradingViewChart({
 	symbol = DEFAULT_CHART_SYMBOL,
 	interval = DEFAULT_CHART_INTERVAL,
 	theme = DEFAULT_CHART_THEME,
-}: TradingViewChartProps) {
+}: Props) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const widgetRef = useRef<IChartingLibraryWidget | null>(null);
 	const scriptLoadedRef = useRef(false);
@@ -56,7 +56,6 @@ export function TradingViewChart({
 
 	const { showOrdersOnChart, showPositionsOnChart, showExecutionsOnChart, showChartScanlines } = useGlobalSettings();
 
-	// React 19: Simple object creation - no useMemo needed
 	const tradingOverrides = {
 		"tradingProperties.showOrders": showOrdersOnChart,
 		"tradingProperties.showPositions": showPositionsOnChart,
@@ -203,7 +202,6 @@ export function TradingViewChart({
 	return (
 		<div className="relative w-full h-full" style={{ minHeight: "300px" }}>
 			<div ref={containerRef} className="w-full h-full" />
-			{/* Scanlines overlay to match terminal aesthetic */}
 			{showChartScanlines ? <div className="pointer-events-none absolute inset-0 terminal-scanlines" /> : null}
 		</div>
 	);

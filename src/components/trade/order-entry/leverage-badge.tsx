@@ -1,0 +1,38 @@
+import { t } from "@lingui/core/macro";
+import { ChevronDown } from "lucide-react";
+import { forwardRef } from "react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/cn";
+
+interface Props {
+	leverage: number;
+	onClick?: () => void;
+	isLoading?: boolean;
+	className?: string;
+}
+
+export const LeverageBadge = forwardRef<HTMLButtonElement, Props>(
+	({ leverage, onClick, isLoading, className }, ref) => {
+		return (
+			<Button
+				ref={ref}
+				variant="terminal"
+				size="none"
+				onClick={onClick}
+				className={cn(
+					"px-2 py-0.5 text-3xs gap-1",
+					"hover:bg-terminal-cyan/10",
+					"focus-visible:ring-1 focus-visible:ring-terminal-cyan",
+					isLoading && "opacity-70",
+					className,
+				)}
+				aria-label={t`Change leverage`}
+			>
+				<span className="tabular-nums font-medium">{leverage}x</span>
+				<ChevronDown className="size-2.5" />
+			</Button>
+		);
+	},
+);
+
+LeverageBadge.displayName = "LeverageBadge";

@@ -33,7 +33,10 @@ export function formatPriceForOrder(price: number): string {
 		return rounded.toFixed(0);
 	}
 
-	return rounded.toFixed(decimals).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+	return rounded
+		.toFixed(decimals)
+		.replace(/(\.\d*?)0+$/, "$1")
+		.replace(/\.$/, "");
 }
 
 export function formatSizeForOrder(size: number, szDecimals: number): string {

@@ -67,4 +67,3 @@ export function buildPerpMarketRegistry(meta: PerpMeta): PerpMarketRegistry {
 		assetIndexToCoin,
 	};
 }
-

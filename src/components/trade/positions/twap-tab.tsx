@@ -1,20 +1,29 @@
 import { t } from "@lingui/core/macro";
 import { Timer } from "lucide-react";
 import { useMemo } from "react";
+import { useConnection } from "wagmi";
+import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
-import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
-import { useTwapHistory } from "@/hooks/hyperliquid/use-twap-history";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
+import { cn } from "@/lib/cn";
 import { formatNumber, formatPrice } from "@/lib/format";
+import { usePerpMarkets } from "@/lib/hyperliquid";
+import { useSubUserTwapHistory } from "@/lib/hyperliquid/hooks/subscription";
+import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { parseNumber } from "@/lib/trade/numbers";
-import { cn } from "@/lib/utils";
-import { useConnection } from "wagmi";
+import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 
 export function TwapTab() {
 	const { address, isConnected } = useConnection();
-	const { data, status, error } = useTwapHistory({ user: isConnected ? address : undefined });
-	const { registry } = usePerpMarketRegistry();
+	const { setSelectedMarketKey } = useMarketPrefsActions();
+	const {
+		data: twapEvent,
+		status,
+		error,
+	} = useSubUserTwapHistory({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
+	const data = twapEvent?.history;
+	const { getSzDecimals } = usePerpMarkets();
 
 	const orders = useMemo(() => {
 		const raw = data ?? [];
@@ -34,8 +43,7 @@ export function TwapTab() {
 			const totalSize = parseNumber(order.state.sz);
 			const executedSize = parseNumber(order.state.executedSz);
 			const executedNtl = parseNumber(order.state.executedNtl);
-			const marketInfo = registry?.coinToInfo.get(order.state.coin);
-			const szDecimals = marketInfo?.szDecimals ?? 4;
+			const szDecimals = getSzDecimals(order.state.coin) ?? 4;
 
 			const avgPrice =
 				Number.isFinite(executedNtl) && Number.isFinite(executedSize) && executedSize !== 0
@@ -59,12 +67,17 @@ export function TwapTab() {
 							: rawStatus;
 
 			return {
-				key: typeof order.twapId === "number" ? order.twapId : `${order.state.coin}-${order.state.timestamp}-${order.time}`,
+				key:
+					typeof order.twapId === "number"
+						? order.twapId
+						: `${order.state.coin}-${order.state.timestamp}-${order.time}`,
 				coin: order.state.coin,
 				sideLabel: isBuy ? t`buy` : t`sell`,
 				sideClass: isBuy ? "bg-terminal-green/20 text-terminal-green" : "bg-terminal-red/20 text-terminal-red",
 				totalSizeText: Number.isFinite(totalSize) ? formatNumber(totalSize, szDecimals) : String(order.state.sz),
-				executedSizeText: Number.isFinite(executedSize) ? formatNumber(executedSize, szDecimals) : String(order.state.executedSz),
+				executedSizeText: Number.isFinite(executedSize)
+					? formatNumber(executedSize, szDecimals)
+					: String(order.state.executedSz),
 				avgPriceText: Number.isFinite(avgPrice) ? formatPrice(avgPrice, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER,
 				progressPct,
 				rawStatus,
@@ -72,7 +85,7 @@ export function TwapTab() {
 				showCancel: rawStatus === "activated",
 			};
 		});
-	}, [orders, registry]);
+	}, [orders, getSzDecimals]);
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
@@ -86,14 +99,16 @@ export function TwapTab() {
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
 						{t`Connect your wallet to view TWAP orders.`}
 					</div>
-				) : status === "pending" ? (
+				) : status === "subscribing" || status === "idle" ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
 						{t`Loading TWAP orders...`}
 					</div>
 				) : status === "error" ? (
 					<div className="h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs text-terminal-red/80">
 						<span>{t`Failed to load TWAP history.`}</span>
-						{error instanceof Error ? <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span> : null}
+						{error instanceof Error ? (
+							<span className="mt-1 text-4xs text-muted-foreground">{error.message}</span>
+						) : null}
 					</div>
 				) : orders.length === 0 ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
@@ -135,7 +150,14 @@ export function TwapTab() {
 												<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
 													{row.sideLabel}
 												</span>
-												<span>{row.coin}</span>
+												<Button
+													variant="link"
+													size="none"
+													onClick={() => setSelectedMarketKey(makePerpMarketKey(row.coin))}
+													aria-label={t`Switch to ${row.coin} market`}
+												>
+													{row.coin}
+												</Button>
 											</div>
 										</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.totalSizeText}</TableCell>
@@ -165,7 +187,8 @@ export function TwapTab() {
 													"text-4xs px-1 py-0.5 rounded-sm uppercase",
 													row.rawStatus === "activated" && "bg-terminal-cyan/20 text-terminal-cyan",
 													row.rawStatus === "finished" && "bg-terminal-green/20 text-terminal-green",
-													(row.rawStatus === "terminated" || row.rawStatus === "error") && "bg-terminal-red/20 text-terminal-red",
+													(row.rawStatus === "terminated" || row.rawStatus === "error") &&
+														"bg-terminal-red/20 text-terminal-red",
 												)}
 											>
 												{row.statusLabel}
@@ -173,14 +196,9 @@ export function TwapTab() {
 										</TableCell>
 										<TableCell className="text-right py-1.5">
 											{row.showCancel && (
-												<button
-													type="button"
-													className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors"
-													tabIndex={0}
-													aria-label={t`Cancel TWAP order`}
-												>
+												<Button variant="danger" size="xs" aria-label={t`Cancel TWAP order`}>
 													{t`Cancel`}
-												</button>
+												</Button>
 											)}
 										</TableCell>
 									</TableRow>

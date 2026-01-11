@@ -1,16 +1,16 @@
 import { t } from "@lingui/core/macro";
 import { Star } from "lucide-react";
 import { useMemo } from "react";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
-import { useActiveAssetCtxSubscription } from "@/hooks/hyperliquid/socket/use-active-asset-ctx-subscription";
-import { useAllMidsSubscription } from "@/hooks/hyperliquid/socket/use-all-mids-subscription";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice } from "@/lib/format";
-import { calculate24hPriceChange } from "@/lib/market";
+import { usePerpMarkets } from "@/lib/hyperliquid";
+import { useSubActiveAssetCtx, useSubAllMids } from "@/lib/hyperliquid/hooks/subscription";
 import { isPerpMarketKey, type PerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
+import { calculate24hPriceChange } from "@/lib/market";
 import { toFiniteNumber } from "@/lib/trade/numbers";
-import { cn } from "@/lib/utils";
 import { useFavoriteMarketKeys, useMarketPrefsActions, useSelectedMarketKey } from "@/stores/use-market-prefs-store";
+import type { PerpAssetCtx } from "@/types/hyperliquid";
 
 type FavoriteData = {
 	marketKey: PerpMarketKey;
@@ -22,31 +22,29 @@ type FavoriteData = {
 export function FavoritesStrip() {
 	const favorites = useFavoriteMarketKeys();
 	const selectedMarketKey = useSelectedMarketKey();
-	const { registry } = usePerpMarketRegistry();
-	const { data: mids } = useAllMidsSubscription<Record<string, string> | undefined>({
-		select: (event) => event?.mids,
-	});
+	const { getSzDecimals } = usePerpMarkets();
+	const { data: midsEvent } = useSubAllMids({}, {});
+	const mids = midsEvent?.mids;
 
 	const favoriteData = useMemo((): FavoriteData[] => {
 		return favorites
 			.map((marketKey) => {
 				if (!isPerpMarketKey(marketKey)) return null;
 				const coin = perpCoinFromMarketKey(marketKey);
-				const marketInfo = registry?.coinToInfo.get(coin);
 
 				return {
 					marketKey,
 					coin,
 					priceNumber: toFiniteNumber(mids?.[coin]),
-					szDecimals: marketInfo?.szDecimals ?? 4,
+					szDecimals: getSzDecimals(coin) ?? 4,
 				};
 			})
 			.filter((x): x is FavoriteData => x !== null);
-	}, [favorites, mids, registry]);
+	}, [favorites, mids, getSzDecimals]);
 
 	return (
 		<div className="py-1.5 border-b border-border/60 bg-surface/20">
-			<ScrollArea className="w-full whitespace-nowrap">
+			<div className="w-full whitespace-nowrap overflow-x-auto scrollbar-none">
 				<div className="flex items-center gap-0.5 px-2 min-w-full divide-x">
 					{favorites.length === 0 ? (
 						<EmptyState />
@@ -56,8 +54,7 @@ export function FavoritesStrip() {
 						))
 					)}
 				</div>
-				<ScrollBar orientation="horizontal" className="hidden" />
-			</ScrollArea>
+			</div>
 		</div>
 	);
 }
@@ -77,10 +74,8 @@ type FavoriteChipProps = FavoriteData & {
 
 function FavoriteChip({ marketKey, coin, priceNumber, szDecimals, isActive }: FavoriteChipProps) {
 	const { setSelectedMarketKey } = useMarketPrefsActions();
-	const { data: assetCtx } = useActiveAssetCtxSubscription({
-		params: { coin },
-		select: (event) => event?.ctx,
-	});
+	const { data: assetCtxEvent } = useSubActiveAssetCtx({ coin }, {});
+	const assetCtx = assetCtxEvent?.ctx as PerpAssetCtx | undefined;
 	const changePct = calculate24hPriceChange(assetCtx) ?? 0;
 	const isPositive = changePct >= 0;
 
@@ -96,15 +91,16 @@ function FavoriteChip({ marketKey, coin, priceNumber, szDecimals, isActive }: Fa
 	}
 
 	return (
-		<button
-			type="button"
+		<Button
+			variant="ghost"
+			size="none"
 			onClick={handleClick}
 			onKeyDown={handleKeyDown}
 			tabIndex={0}
 			aria-label={t`Select ${coin} market`}
 			aria-pressed={isActive}
 			className={cn(
-				"shrink-0 inline-flex items-center gap-2 px-2.5 py-0.5 text-3xs transition-colors cursor-pointer",
+				"shrink-0 inline-flex items-center gap-2 px-2.5 py-0.5 text-3xs transition-colors cursor-pointer rounded-none",
 				"hover:bg-accent/50",
 				isActive && "bg-terminal-cyan/10",
 			)}
@@ -121,6 +117,6 @@ function FavoriteChip({ marketKey, coin, priceNumber, szDecimals, isActive }: Fa
 					})}
 				</span>
 			)}
-		</button>
+		</Button>
 	);
 }

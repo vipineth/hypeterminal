@@ -1,20 +1,21 @@
 import { ArrowRightLeft, ChevronDown, RefreshCw, TrendingDown, TrendingUp } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/constants/app";
-import { useL2BookSubscription } from "@/hooks/hyperliquid/socket/use-l2-book-subscription";
-import { useSelectedResolvedMarket } from "@/hooks/hyperliquid/use-resolved-market";
+import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/config/constants";
+import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
-import { buildOrderBookRows } from "@/lib/trade/orderbook";
-import { cn } from "@/lib/utils";
+import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
+import { useSubL2Book } from "@/lib/hyperliquid/hooks/subscription";
+import { processLevels } from "@/lib/trade/orderbook";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
-import { BookRow } from "../orderbook/book-row";
-import { TradesView } from "../orderbook/trades-view";
+import { OrderbookRow } from "../orderbook/orderbook-row";
+import { TradesPanel } from "../orderbook/trades-panel";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
 
 const ORDERBOOK_TEXT = UI_TEXT.ORDERBOOK;
@@ -73,20 +74,21 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 	const { setShowOrderbookInUsd } = useGlobalSettingsActions();
 
 	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
-	const coin = selectedMarket?.coin ?? "BTC";
-	const szDecimals = selectedMarket?.szDecimals ?? 4;
+	const { coin, szDecimals } = selectedMarket;
 
-	const { data: book, status: bookStatus } = useL2BookSubscription({
-		params: {
+	const { data: book, status: bookStatus } = useSubL2Book(
+		{
 			coin,
 			nSigFigs: selectedOption?.nSigFigs,
 			mantissa: selectedOption?.mantissa,
 		},
-		enabled: view === "book",
-	});
+		{
+			enabled: view === "book",
+		},
+	);
 
-	const bids = useMemo(() => buildOrderBookRows(book?.levels[0]), [book?.levels]);
-	const asks = useMemo(() => buildOrderBookRows(book?.levels[1]), [book?.levels]);
+	const bids = useMemo(() => processLevels(book?.levels[0]), [book?.levels]);
+	const asks = useMemo(() => processLevels(book?.levels[1]), [book?.levels]);
 
 	const maxTotal = useMemo(() => {
 		const totals = [...asks, ...bids].map((r) => r.total);
@@ -120,7 +122,13 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 	}, [bestAsk, bestBid]);
 
 	const spreadPct = useMemo(() => {
-		if (typeof spread !== "number" || typeof mid !== "number" || !Number.isFinite(spread) || !Number.isFinite(mid) || mid === 0) {
+		if (
+			typeof spread !== "number" ||
+			typeof mid !== "number" ||
+			!Number.isFinite(spread) ||
+			!Number.isFinite(mid) ||
+			mid === 0
+		) {
 			return undefined;
 		}
 		return (spread / mid) * 100;
@@ -141,67 +149,73 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 				<div className="flex items-center justify-between">
 					{/* View toggle */}
 					<div className="flex items-center gap-1 bg-muted/50 rounded-md p-0.5">
-						<button
-							type="button"
+						<Button
+							variant="ghost"
+							size="none"
 							onClick={() => setView("book")}
 							className={cn(
 								"px-3 py-1.5 text-xs font-medium rounded transition-colors",
-								"min-h-[36px]", // Touch target
+								"min-h-[36px]",
+								"hover:bg-transparent",
 								view === "book"
 									? "bg-background text-terminal-cyan shadow-sm"
 									: "text-muted-foreground hover:text-foreground",
 							)}
 						>
 							{ORDERBOOK_TEXT.BOOK_LABEL}
-						</button>
-						<button
-							type="button"
+						</Button>
+						<Button
+							variant="ghost"
+							size="none"
 							onClick={() => setView("trades")}
 							className={cn(
 								"px-3 py-1.5 text-xs font-medium rounded transition-colors",
 								"min-h-[36px]",
+								"hover:bg-transparent",
 								view === "trades"
 									? "bg-background text-terminal-cyan shadow-sm"
 									: "text-muted-foreground hover:text-foreground",
 							)}
 						>
 							{ORDERBOOK_TEXT.TRADES_LABEL}
-						</button>
+						</Button>
 					</div>
 
 					{/* Controls */}
 					<div className="flex items-center gap-2">
 						{/* Unit toggle */}
-						<button
-							type="button"
+						<Button
+							variant="ghost"
+							size="none"
 							onClick={() => setShowOrderbookInUsd(!showOrderbookInUsd)}
 							className={cn(
 								"px-2 py-1.5 text-xs border border-border/60 rounded",
 								"min-h-[36px] flex items-center gap-1",
 								"text-muted-foreground hover:text-foreground hover:border-foreground/30",
-								"transition-colors",
+								"hover:bg-transparent transition-colors",
 							)}
 							aria-label="Toggle display units"
 						>
 							{showOrderbookInUsd ? "USD" : coin}
 							<ArrowRightLeft className="size-3" />
-						</button>
+						</Button>
 
 						{/* Aggregation selector */}
 						{view === "book" && (
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
-									<button
-										type="button"
+									<Button
+										variant="ghost"
+										size="none"
 										className={cn(
 											"px-2 py-1.5 text-xs border border-border/60 rounded",
 											"min-h-[36px] flex items-center gap-1",
-											"hover:border-foreground/30 transition-colors",
+											"hover:border-foreground/30 hover:bg-transparent transition-colors",
 										)}
 									>
 										{selectedOption?.label ?? "—"}
 										<ChevronDown className="size-3" />
-									</button>
+									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end" className="min-w-20 font-mono text-xs">
 									{priceGroupingOptions.map((option) => {
@@ -243,13 +257,13 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 								{asks
 									.slice(0, 12)
 									.reverse()
-									.map((r, index) => (
-										<BookRow
-											key={`ask-${r.price}-${index}`}
-											row={r}
-											type="ask"
+									.map((level, index) => (
+										<OrderbookRow
+											key={`ask-${level.price}-${index}`}
+											level={level}
+											side="ask"
 											maxTotal={maxTotal}
-											showInUsdc={showOrderbookInUsd}
+											showInUsd={showOrderbookInUsd}
 											szDecimals={szDecimals}
 										/>
 									))}
@@ -282,13 +296,13 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 						{/* Bids - show more rows to fill mobile screen */}
 						{bookStatus !== "error" && bids.length > 0 ? (
 							<div className="flex-1 flex flex-col gap-px py-1 overflow-hidden">
-								{bids.slice(0, 12).map((r, index) => (
-									<BookRow
-										key={`bid-${r.price}-${index}`}
-										row={r}
-										type="bid"
+								{bids.slice(0, 12).map((level, index) => (
+									<OrderbookRow
+										key={`bid-${level.price}-${index}`}
+										level={level}
+										side="bid"
 										maxTotal={maxTotal}
-										showInUsdc={showOrderbookInUsd}
+										showInUsd={showOrderbookInUsd}
 										szDecimals={szDecimals}
 									/>
 								))}
@@ -300,7 +314,10 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 					<div className="shrink-0 px-3 py-2 border-t border-border/40 flex items-center justify-between text-xs text-muted-foreground">
 						<span>{ORDERBOOK_TEXT.SPREAD_LABEL}</span>
 						<span className="tabular-nums text-terminal-amber">
-							{typeof spread === "number" && Number.isFinite(spread) && typeof spreadPct === "number" && Number.isFinite(spreadPct)
+							{typeof spread === "number" &&
+							Number.isFinite(spread) &&
+							typeof spreadPct === "number" &&
+							Number.isFinite(spreadPct)
 								? `${formatNumber(spread, 2)} (${formatNumber(spreadPct, 3)}%)`
 								: FALLBACK_VALUE_PLACEHOLDER}
 						</span>
@@ -308,7 +325,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 				</div>
 			) : (
 				<div className="flex-1 min-h-0">
-					<TradesView key={coin} />
+					<TradesPanel key={coin} />
 				</div>
 			)}
 

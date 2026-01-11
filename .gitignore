@@ -1,21 +1,30 @@
+# Dependencies
 node_modules
-.DS_Store
+
+# Build outputs
 dist
 dist-ssr
-*.local
-count.txt
+.output
 .nitro
+.vinxi
+
+# Framework temp files
 .tanstack
 .wrangler
-.output
-.vinxi
-todos.json
 
-.cursor
-
-# env
+# Environment files
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
+
+# Editor/IDE (personal, not shared)
+.cursor
+.idea
+
+# OS files
+.DS_Store
+
+# Local/personal files
+*.local
+count.txt
+todos.json

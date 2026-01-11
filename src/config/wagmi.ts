@@ -1,20 +1,10 @@
 import { createConfig, http } from "wagmi";
 import { arbitrum } from "wagmi/chains";
-import { coinbaseWallet, injected, mock, walletConnect } from "wagmi/connectors";
-
-const mockConnector = import.meta.env.DEV
-	? mock({
-			accounts: ["0x7fdafde5cfb5465924316eced2d3715494c517d1"],
-			features: {
-				defaultConnected: true,
-			},
-		})
-	: null;
+import { coinbaseWallet, injected, walletConnect } from "wagmi/connectors";
 
 export const config = createConfig({
 	chains: [arbitrum],
 	connectors: [
-		...(mockConnector ? [mockConnector] : []),
 		injected(),
 		coinbaseWallet(),
 		walletConnect({ projectId: import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID }),

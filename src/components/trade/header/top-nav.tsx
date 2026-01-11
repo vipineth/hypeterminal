@@ -9,7 +9,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 import { GlobalSettingsDialog } from "../components/global-settings-dialog";
 import { DepositModal } from "../order-entry/deposit-modal";
 import { ThemeToggle } from "./theme-toggle";
@@ -48,28 +48,30 @@ export function TopNav() {
 				<div className="h-4 w-px bg-border/60 mx-1 hidden md:block" />
 				<nav className="hidden lg:flex items-center text-3xs uppercase tracking-wider">
 					{NAV_ITEMS.map((item, idx) => (
-						<button
+						<Button
 							key={item.key}
-							type="button"
+							variant="ghost"
+							size="none"
 							className={cn(
-								"px-2.5 py-1.5 transition-colors",
+								"px-2.5 py-1.5 transition-colors hover:bg-transparent",
 								idx === 0 ? "text-terminal-cyan" : "text-muted-foreground hover:text-foreground",
 							)}
 							tabIndex={0}
 						>
 							{item.label}
-						</button>
+						</Button>
 					))}
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<button
-								type="button"
-								className="px-2.5 py-1.5 text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+							<Button
+								variant="ghost"
+								size="none"
+								className="px-2.5 py-1.5 text-muted-foreground hover:text-foreground hover:bg-transparent inline-flex items-center gap-1"
 								tabIndex={0}
 								aria-label={t`More options`}
 							>
 								<Trans>More</Trans> <ChevronDown className="size-2.5" />
-							</button>
+							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="start" className="w-32 text-xs font-mono">
 							{MORE_MENU_ITEMS.map((item) => (
@@ -91,24 +93,19 @@ export function TopNav() {
 					<Trans>Deposit</Trans>
 				</Button>
 				<UserMenu />
-				<button
-					type="button"
-					className="size-7 flex items-center justify-center text-muted-foreground hover:text-foreground"
-					tabIndex={0}
-					aria-label={t`Notifications`}
-				>
+				<Button variant="ghost" size="icon-sm" className="size-7" aria-label={t`Notifications`}>
 					<Bell className="size-3.5" />
-				</button>
+				</Button>
 				<ThemeToggle />
-				<button
-					type="button"
-					className="size-7 flex items-center justify-center text-muted-foreground hover:text-foreground"
-					tabIndex={0}
+				<Button
+					variant="ghost"
+					size="icon-sm"
+					className="size-7"
 					aria-label={t`Settings`}
 					onClick={() => setSettingsOpen(true)}
 				>
 					<Cog className="size-3.5" />
-				</button>
+				</Button>
 			</div>
 			<DepositModal open={depositModalOpen} onOpenChange={setDepositModalOpen} />
 			<GlobalSettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />

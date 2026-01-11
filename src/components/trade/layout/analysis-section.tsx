@@ -1,6 +1,6 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { LAYOUT_PERSISTENCE } from "@/constants/app";
-import { usePersistentLayout } from "../hooks/use-persistent-layout";
+import { LAYOUT_PERSISTENCE } from "@/config/constants";
+import { usePersistentLayout } from "@/hooks/trade/use-persistent-layout";
 import { PositionsPanel } from "../positions/positions-panel";
 import { PriceRow } from "./price-row";
 

@@ -1,47 +1,58 @@
-import { HttpTransport, InfoClient, SubscriptionClient, WebSocketTransport } from "@nktkas/hyperliquid";
+import {
+	ExchangeClient,
+	HttpTransport,
+	type HttpTransportOptions,
+	InfoClient,
+	type IRequestTransport,
+	type ISubscriptionTransport,
+	SubscriptionClient,
+	WebSocketTransport,
+	type WebSocketTransportOptions,
+} from "@nktkas/hyperliquid";
+import type { AbstractWallet } from "@nktkas/hyperliquid/signing";
 
-const IS_TESTNET = typeof import.meta !== "undefined" && import.meta.env?.VITE_HYPERLIQUID_TESTNET === "true";
+const cache = new Map<string, unknown>();
 
-let httpTransport: HttpTransport | null = null;
-
-export function getHttpTransport(): HttpTransport {
-	if (!httpTransport) {
-		httpTransport = new HttpTransport({ isTestnet: IS_TESTNET });
+function getOrCreate<T>(key: string, create: () => T): T {
+	let value = cache.get(key) as T | undefined;
+	if (!value) {
+		value = create();
+		cache.set(key, value);
 	}
-	return httpTransport;
+	return value;
 }
 
-let wsTransport: WebSocketTransport | null = null;
-
-export function getWebSocketTransport(): WebSocketTransport {
-	if (!wsTransport) {
-		wsTransport = new WebSocketTransport({ isTestnet: IS_TESTNET });
-	}
-	return wsTransport;
+function getHttpOptions(): HttpTransportOptions {
+	const isTestnet = typeof import.meta !== "undefined" && import.meta.env?.VITE_HYPERLIQUID_TESTNET === "true";
+	return { isTestnet };
 }
 
-/**
- * Singleton InfoClient instance
- */
-let infoClient: InfoClient | null = null;
+function getWsOptions(): WebSocketTransportOptions {
+	const isTestnet = typeof import.meta !== "undefined" && import.meta.env?.VITE_HYPERLIQUID_TESTNET === "true";
+	return { isTestnet };
+}
+
+export function getHttpTransport(): IRequestTransport {
+	return getOrCreate("http", () => new HttpTransport(getHttpOptions()));
+}
+
+export function getWsTransport(): ISubscriptionTransport {
+	return getOrCreate("ws", () => new WebSocketTransport(getWsOptions()));
+}
 
 export function getInfoClient(): InfoClient {
-	if (!infoClient) {
-		infoClient = new InfoClient({ transport: getHttpTransport() });
-	}
-	return infoClient;
+	return getOrCreate("info", () => new InfoClient({ transport: getHttpTransport() }));
 }
 
-/**
- * Singleton SubscriptionClient instance
- */
-let subscriptionClient: SubscriptionClient | null = null;
-
 export function getSubscriptionClient(): SubscriptionClient {
-	if (!subscriptionClient) {
-		subscriptionClient = new SubscriptionClient({
-			transport: getWebSocketTransport(),
-		});
-	}
-	return subscriptionClient;
+	return getOrCreate("subscription", () => new SubscriptionClient({ transport: getWsTransport() }));
+}
+
+export function createExchangeClient(wallet: AbstractWallet): ExchangeClient {
+	return new ExchangeClient({ transport: getHttpTransport(), wallet });
+}
+
+export function initializeClients(): void {
+	getInfoClient();
+	getSubscriptionClient();
 }

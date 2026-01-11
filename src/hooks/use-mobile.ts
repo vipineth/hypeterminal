@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
-import { MOBILE_BREAKPOINT_PX } from "@/constants/app";
+import { MOBILE_BREAKPOINT_PX } from "@/config/constants";
 
 function subscribeToMediaQuery(callback: () => void): () => void {
 	const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT_PX - 1}px)`);

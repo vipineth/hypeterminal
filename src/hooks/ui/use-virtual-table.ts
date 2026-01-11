@@ -10,7 +10,7 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import { useVirtualizer, type VirtualItem, type Virtualizer } from "@tanstack/react-virtual";
-import { useRef, useState, type Dispatch, type RefObject, type SetStateAction } from "react";
+import { type Dispatch, type RefObject, type SetStateAction, useRef, useState } from "react";
 
 export interface UseVirtualTableOptions<TData extends RowData> {
 	data: TData[];

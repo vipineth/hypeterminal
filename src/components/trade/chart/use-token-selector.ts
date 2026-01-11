@@ -1,12 +1,13 @@
 import { getCoreRowModel, type Row, type SortingState, useReactTable } from "@tanstack/react-table";
 import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { isTokenInCategory, type MarketCategory } from "@/config/token";
-import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
-import { usePerpAssetCtxsSnapshot } from "@/hooks/hyperliquid/use-perp-asset-ctxs-snapshot";
+import { isTokenInCategory, type MarketCategory } from "@/lib/tokens";
+import { usePerpMarkets } from "@/lib/hyperliquid";
+import { useSubAssetCtxs } from "@/lib/hyperliquid/hooks/subscription";
 import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { calculate24hPriceChange, calculateOpenInterestUSD, getMarketCtxNumbers } from "@/lib/market";
 import { useFavoriteMarketKeys, useMarketPrefsActions } from "@/stores/use-market-prefs-store";
+import type { PerpAssetCtxs } from "@/types/hyperliquid";
 import { type MarketRow, TOKEN_SELECTOR_COLUMNS } from "./constants";
 
 export interface UseTokenSelectorOptions {
@@ -37,19 +38,44 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 	const [open, setOpen] = useState(false);
 	const [category, setCategory] = useState<MarketCategory>("all");
 	const [search, setSearch] = useState("");
-	const { registry, isLoading } = usePerpMarketRegistry();
-	const ctxs = usePerpAssetCtxsSnapshot({ enabled: open, intervalMs: 10_000 });
+	const { data: marketsData, isLoading } = usePerpMarkets();
+	const { data: assetCtxsEvent } = useSubAssetCtxs({ dex: "" }, { enabled: open });
+	const liveCtxs = assetCtxsEvent?.ctxs as PerpAssetCtxs | undefined;
+
+	const [ctxs, setCtxs] = useState<PerpAssetCtxs | undefined>(undefined);
+	const latestRef = useRef<PerpAssetCtxs | undefined>(undefined);
+
+	useEffect(() => {
+		latestRef.current = liveCtxs;
+		if (ctxs === undefined && liveCtxs !== undefined) {
+			setCtxs(liveCtxs);
+		}
+		if (!open) return;
+		const id = window.setInterval(() => {
+			if (latestRef.current !== undefined) {
+				setCtxs(latestRef.current);
+			}
+		}, 10_000);
+		return () => window.clearInterval(id);
+	}, [open, liveCtxs, ctxs]);
+
 	const favorites = useFavoriteMarketKeys();
 	const { toggleFavoriteMarketKey } = useMarketPrefsActions();
 
 	const markets = useMemo((): MarketRow[] => {
-		if (!registry) return [];
-		return Array.from(registry.marketKeyToInfo.values()).map((marketInfo) => ({
-			...marketInfo,
+		if (!marketsData) return [];
+		return marketsData.markets.map((marketInfo) => ({
+			kind: "perp" as const,
+			marketKey: makePerpMarketKey(marketInfo.coin),
+			coin: marketInfo.coin,
+			assetIndex: marketInfo.assetIndex,
+			szDecimals: marketInfo.szDecimals,
+			maxLeverage: marketInfo.maxLeverage,
+			isDelisted: marketInfo.isDelisted,
 			ctx: ctxs?.[marketInfo.assetIndex],
 			ctxNumbers: getMarketCtxNumbers(ctxs?.[marketInfo.assetIndex]),
 		}));
-	}, [registry, ctxs]);
+	}, [marketsData, ctxs]);
 
 	const favoriteSet = useMemo(() => new Set(favorites), [favorites]);
 
@@ -164,7 +190,7 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 		category,
 		search,
 		setSearch,
-		isLoading: open && (isLoading || !registry),
+		isLoading: open && (isLoading || !marketsData),
 		isFavorite,
 		sorting,
 		handleSelect,

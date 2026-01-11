@@ -2,12 +2,12 @@ import { Inbox, Wallet } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { POSITIONS_TABS, UI_TEXT } from "@/constants/app";
-import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
-import { useOpenOrders } from "@/hooks/hyperliquid/use-open-orders";
+import { POSITIONS_TABS, UI_TEXT } from "@/config/constants";
+import { cn } from "@/lib/cn";
+import { useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
-import { cn } from "@/lib/utils";
 import { BalancesTab } from "../positions/balances-tab";
 import { FundingTab } from "../positions/funding-tab";
 import { HistoryTab } from "../positions/history-tab";
@@ -28,8 +28,19 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 	const [activeTab, setActiveTab] = useState<TabValue>("positions");
 
 	const { address, isConnected } = useConnection();
-	const { data: state, isLoading: isLoadingState } = useClearinghouseState({ user: isConnected ? address : undefined });
-	const { data: openOrders, isLoading: isLoadingOrders } = useOpenOrders({ user: isConnected ? address : undefined });
+	const { data: stateEvent, status: stateStatus } = useSubClearinghouseState(
+		{ user: address ?? "0x0" },
+		{ enabled: isConnected && !!address },
+	);
+	const state = stateEvent?.clearinghouseState;
+	const isLoadingState = stateStatus === "subscribing" || stateStatus === "idle";
+
+	const { data: ordersEvent, status: ordersStatus } = useSubOpenOrders(
+		{ user: address ?? "0x0" },
+		{ enabled: isConnected && !!address },
+	);
+	const openOrders = ordersEvent?.orders;
+	const isLoadingOrders = ordersStatus === "subscribing" || ordersStatus === "idle";
 
 	const positionsCount = useMemo(() => {
 		if (!isConnected) return 0;
@@ -80,14 +91,16 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 								(tab.value === "positions" && isLoadingState) || (tab.value === "orders" && isLoadingOrders);
 
 							return (
-								<button
+								<Button
 									key={tab.value}
-									type="button"
+									variant="ghost"
+									size="none"
 									onClick={() => setActiveTab(tab.value)}
 									className={cn(
 										"px-3 py-2.5 text-sm font-medium rounded-md transition-colors",
 										"min-h-[44px] flex items-center gap-2",
 										"active:scale-98",
+										"hover:bg-transparent",
 										isActive
 											? "bg-background text-terminal-cyan shadow-sm"
 											: "text-muted-foreground hover:text-foreground",
@@ -107,7 +120,7 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 											{count}
 										</Badge>
 									) : null}
-								</button>
+								</Button>
 							);
 						})}
 					</div>

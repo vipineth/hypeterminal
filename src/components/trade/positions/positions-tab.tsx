@@ -1,34 +1,39 @@
 import { t } from "@lingui/core/macro";
 import { Circle } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
-import { useConnection, useWalletClient } from "wagmi";
+import { useMemo, useRef } from "react";
+import { useConnection } from "wagmi";
+import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FALLBACK_VALUE_PLACEHOLDER } from "@/constants/app";
-import { useClearinghouseState } from "@/hooks/hyperliquid/use-clearinghouse-state";
-import { usePerpMarketRegistry } from "@/hooks/hyperliquid/use-market-registry";
-import { usePerpAssetCtxsSnapshot } from "@/hooks/hyperliquid/use-perp-asset-ctxs-snapshot";
-import { useTradingAgent } from "@/hooks/hyperliquid/use-trading-agent";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
+import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
-import { getHttpTransport } from "@/lib/hyperliquid/clients";
-import { makeExchangeConfig, placeSingleOrder } from "@/lib/hyperliquid/exchange";
+import { usePerpMarkets } from "@/lib/hyperliquid";
+import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
+import { useSubAssetCtxs, useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
+import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
-import { cn } from "@/lib/utils";
-import { useMarketOrderSlippageBps } from "@/stores/use-trade-settings-store";
+import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
+import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
+import type { PerpAssetCtxs } from "@/types/hyperliquid";
 import { TokenAvatar } from "../components/token-avatar";
 
 export function PositionsTab() {
 	const { address, isConnected } = useConnection();
-	const { data: walletClient } = useWalletClient();
-	const { data: state, status, error, refetch } = useClearinghouseState({ user: isConnected ? address : undefined });
-	const { signer: activeSigner } = useTradingAgent({
-		user: isConnected ? address : undefined,
-		walletClient,
-	});
 	const slippageBps = useMarketOrderSlippageBps();
-	const [closingKey, setClosingKey] = useState<string | null>(null);
-	const [actionError, setActionError] = useState<string | null>(null);
+	const closingKeyRef = useRef<string | null>(null);
+	const { setSelectedMarketKey } = useMarketPrefsActions();
+
+	const { mutate: placeOrder, isPending: isClosing, error: closeError, reset: resetCloseError } = useExchangeOrder();
+
+	const user = address ?? "0x0";
+	const clearinghouseEnabled = isConnected && !!address;
+	const clearinghouseParams = useMemo(() => ({ user }), [user]);
+	const clearinghouseOptions = useMemo(() => ({ enabled: clearinghouseEnabled }), [clearinghouseEnabled]);
+
+	const { data: stateEvent, status, error } = useSubClearinghouseState(clearinghouseParams, clearinghouseOptions);
+	const state = stateEvent?.clearinghouseState;
 
 	const positions = useMemo(() => {
 		const raw = state?.assetPositions ?? [];
@@ -40,11 +45,12 @@ export function PositionsTab() {
 			});
 	}, [state]);
 
-	const { registry } = usePerpMarketRegistry();
-	const snapshotCtxs = usePerpAssetCtxsSnapshot({
-		enabled: isConnected && positions.length > 0,
-		intervalMs: 10_000,
-	});
+	const { getSzDecimals, getAssetId } = usePerpMarkets();
+	const assetCtxsEnabled = isConnected && positions.length > 0;
+	const assetCtxsParams = useMemo(() => ({ dex: "" as const }), []);
+	const assetCtxsOptions = useMemo(() => ({ enabled: assetCtxsEnabled }), [assetCtxsEnabled]);
+	const { data: assetCtxsEvent } = useSubAssetCtxs(assetCtxsParams, assetCtxsOptions);
+	const assetCtxs = assetCtxsEvent?.ctxs as PerpAssetCtxs | undefined;
 
 	const tableRows = useMemo(() => {
 		return positions.map((p) => {
@@ -58,10 +64,9 @@ export function PositionsTab() {
 			const roe = parseNumber(p.returnOnEquity);
 			const liquidationPx = p.liquidationPx ? parseNumber(p.liquidationPx) : Number.NaN;
 
-			const marketInfo = registry?.coinToInfo.get(p.coin);
-			const szDecimals = marketInfo?.szDecimals ?? 4;
-			const assetIndex = marketInfo?.assetIndex;
-			const markPxRaw = typeof assetIndex === "number" ? snapshotCtxs?.[assetIndex]?.markPx : undefined;
+			const szDecimals = getSzDecimals(p.coin) ?? 4;
+			const assetIndex = getAssetId(p.coin);
+			const markPxRaw = typeof assetIndex === "number" ? assetCtxs?.[assetIndex]?.markPx : undefined;
 			const markPx = markPxRaw ? parseNumber(markPxRaw) : Number.NaN;
 
 			const canClose =
@@ -98,59 +103,46 @@ export function PositionsTab() {
 				pnlClass: unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red",
 			};
 		});
-	}, [positions, registry, snapshotCtxs]);
+	}, [positions, getSzDecimals, getAssetId, assetCtxs]);
 
 	const headerCount = isConnected ? positions.length : FALLBACK_VALUE_PLACEHOLDER;
 
-	const handleClosePosition = useCallback(
-		async (row: (typeof tableRows)[number]) => {
-			if (!activeSigner) {
-				setActionError(t`Connect a wallet to manage positions.`);
-				return;
-			}
-			if (closingKey) return;
-			if (!row.canClose) return;
+	const handleClosePosition = (row: (typeof tableRows)[number]) => {
+		if (isClosing || !row.canClose) return;
 
-			setClosingKey(row.key);
-			setActionError(null);
+		const assetIndex = row.assetIndex;
+		if (typeof assetIndex !== "number" || !Number.isFinite(row.markPx)) return;
 
-			try {
-				const assetIndex = row.assetIndex;
-				if (typeof assetIndex !== "number" || !Number.isFinite(row.markPx)) {
-					throw new Error(t`Unable to close position.`);
-				}
+		resetCloseError();
+		closingKeyRef.current = row.key;
 
-				const transport = getHttpTransport();
-				const config = makeExchangeConfig(transport, activeSigner);
-				const isBuy = !row.isLong;
-				const slippage = slippageBps / 10000;
-				const orderPrice = isBuy ? row.markPx * (1 + slippage) : row.markPx * (1 - slippage);
+		const isBuy = !row.isLong;
+		const slippage = slippageBps / 10000;
+		const orderPrice = isBuy ? row.markPx * (1 + slippage) : row.markPx * (1 - slippage);
 
-				const order = {
-					a: assetIndex,
-					b: isBuy,
-					p: formatPriceForOrder(orderPrice),
-					s: formatSizeForOrder(row.closeSize, row.szDecimals),
-					r: true,
-					t: { limit: { tif: "FrontendMarket" as const } },
-				};
+		placeOrder(
+			{
+				orders: [
+					{
+						a: assetIndex,
+						b: isBuy,
+						p: formatPriceForOrder(orderPrice),
+						s: formatSizeForOrder(row.closeSize, row.szDecimals),
+						r: true,
+						t: { limit: { tif: "FrontendMarket" as const } },
+					},
+				],
+				grouping: "na",
+			},
+			{
+				onSettled: () => {
+					closingKeyRef.current = null;
+				},
+			},
+		);
+	};
 
-				const result = await placeSingleOrder(config, { order });
-				const status = result.response?.data?.statuses?.[0];
-				if (status && typeof status === "object" && "error" in status) {
-					throw new Error(status.error as string);
-				}
-
-				await refetch();
-			} catch (error) {
-				const message = error instanceof Error ? error.message : t`Unable to close position.`;
-				setActionError(message);
-			} finally {
-				setClosingKey(null);
-			}
-		},
-		[closingKey, activeSigner, slippageBps, refetch],
-	);
+	const actionError = closeError?.message;
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
@@ -165,7 +157,7 @@ export function PositionsTab() {
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
 						{t`Connect your wallet to view positions.`}
 					</div>
-				) : status === "pending" ? (
+				) : status === "subscribing" || status === "idle" ? (
 					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
 						{t`Loading positions...`}
 					</div>
@@ -212,56 +204,61 @@ export function PositionsTab() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{tableRows.map((row) => (
-									<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
-										<TableCell className="text-2xs font-medium py-1.5">
-											<div className="flex items-center gap-1.5">
-												<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
-													{row.sideLabel}
-												</span>
-												<TokenAvatar symbol={row.coin} />
-												<span>{row.coin}</span>
-											</div>
-										</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.sizeText}</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.valueText}</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.entryText}</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
-											{row.markText}
-										</TableCell>
-										<TableCell className="text-right py-1.5">
-											<div className={cn("text-2xs tabular-nums", row.pnlClass)}>
-												{row.pnlText}
-												<span className="text-muted-foreground ml-1">({row.roeText})</span>
-											</div>
-										</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums text-terminal-red/70 py-1.5">
-											{row.liqText}
-										</TableCell>
-										<TableCell className="text-right py-1.5">
-											<div className="flex justify-end gap-1">
-												<button
-													type="button"
-													className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-													tabIndex={0}
-													aria-label={t`Close position`}
-													onClick={() => handleClosePosition(row)}
-													disabled={!row.canClose || closingKey !== null}
-												>
-													{closingKey === row.key ? t`Closing...` : t`Close`}
-												</button>
-												<button
-													type="button"
-													className="px-1.5 py-0.5 text-4xs uppercase tracking-wider border border-border/60 hover:border-terminal-cyan/60 hover:text-terminal-cyan transition-colors"
-													tabIndex={0}
-													aria-label={t`Set TP/SL`}
-												>
-													{t`TP/SL`}
-												</button>
-											</div>
-										</TableCell>
-									</TableRow>
-								))}
+								{tableRows.map((row) => {
+									const isRowClosing = isClosing && closingKeyRef.current === row.key;
+									return (
+										<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
+											<TableCell className="text-2xs font-medium py-1.5">
+												<div className="flex items-center gap-1.5">
+													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
+														{row.sideLabel}
+													</span>
+													<Button
+														variant="link"
+														size="none"
+														onClick={() => setSelectedMarketKey(makePerpMarketKey(row.coin))}
+														className="gap-1.5"
+														aria-label={t`Switch to ${row.coin} market`}
+													>
+														<TokenAvatar symbol={row.coin} />
+														<span>{row.coin}</span>
+													</Button>
+												</div>
+											</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.sizeText}</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.valueText}</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.entryText}</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
+												{row.markText}
+											</TableCell>
+											<TableCell className="text-right py-1.5">
+												<div className={cn("text-2xs tabular-nums", row.pnlClass)}>
+													{row.pnlText}
+													<span className="text-muted-foreground ml-1">({row.roeText})</span>
+												</div>
+											</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums text-terminal-red/70 py-1.5">
+												{row.liqText}
+											</TableCell>
+											<TableCell className="text-right py-1.5">
+												<div className="flex justify-end gap-1">
+													<Button
+														variant="danger"
+														size="xs"
+														aria-label={t`Close position`}
+														onClick={() => handleClosePosition(row)}
+														disabled={!row.canClose || isClosing}
+													>
+														{isRowClosing ? t`Closing...` : t`Close`}
+													</Button>
+													<Button variant="terminal" size="xs" aria-label={t`Set TP/SL`}>
+														{t`TP/SL`}
+													</Button>
+												</div>
+											</TableCell>
+										</TableRow>
+									);
+								})}
 							</TableBody>
 						</Table>
 						<ScrollBar orientation="horizontal" />

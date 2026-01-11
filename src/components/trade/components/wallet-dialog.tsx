@@ -1,24 +1,18 @@
 import { Trans } from "@lingui/react/macro";
 import { AlertCircle, ExternalLink, HelpCircle, Loader2, Shield, Wallet } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { type Connector, useConnect } from "wagmi";
 import { Button } from "@/components/ui/button";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
-import { getWalletInfo, getLastUsedWallet, setLastUsedWallet } from "@/config/wallet";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { getLastUsedWallet, getWalletInfo, setLastUsedWallet } from "@/lib/wallet-utils";
+import { cn } from "@/lib/cn";
 
-interface WalletDialogProps {
+interface Props {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 }
 
-export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
+export function WalletDialog({ open, onOpenChange }: Props) {
 	const { connectors, connect, isPending, error } = useConnect();
 	const [connectingId, setConnectingId] = useState<string | null>(null);
 	const [showHelp, setShowHelp] = useState(false);
@@ -52,7 +46,7 @@ export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
 					setConnectingId(null);
 					onOpenChange(false);
 				},
-			}
+			},
 		);
 	};
 
@@ -86,15 +80,16 @@ export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
 									const isConnecting = connectingId === connector.uid;
 
 									return (
-										<button
+										<Button
 											key={connector.uid}
+											variant="ghost"
+											size="none"
 											onClick={() => handleConnect(connector)}
 											disabled={isPending}
 											className={cn(
-												"w-full flex items-center gap-3 p-3 rounded-lg border transition-all",
+												"w-full gap-3 p-3 rounded-lg border",
 												"bg-background hover:bg-accent/50 hover:border-terminal-cyan/30",
-												"disabled:opacity-50 disabled:cursor-not-allowed",
-												"group focus:outline-none focus:ring-2 focus:ring-terminal-cyan/50"
+												"group focus:ring-2 focus:ring-terminal-cyan/50",
 											)}
 										>
 											<div className="size-10 rounded-lg overflow-hidden flex-shrink-0 shadow-sm">
@@ -104,16 +99,14 @@ export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
 												<p className="font-medium text-sm group-hover:text-terminal-cyan transition-colors">
 													{connector.name}
 												</p>
-												<p className="text-xs text-muted-foreground truncate">
-													{walletInfo.description}
-												</p>
+												<p className="text-xs text-muted-foreground truncate">{walletInfo.description}</p>
 											</div>
 											{isConnecting ? (
 												<Loader2 className="size-4 animate-spin text-terminal-cyan flex-shrink-0" />
 											) : (
 												<div className="size-4 rounded-full border border-border group-hover:border-terminal-cyan/50 flex-shrink-0 transition-colors" />
 											)}
-										</button>
+										</Button>
 									);
 								})}
 							</div>
@@ -132,15 +125,16 @@ export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
 									const isConnecting = connectingId === connector.uid;
 
 									return (
-										<button
+										<Button
 											key={connector.uid}
+											variant="ghost"
+											size="none"
 											onClick={() => handleConnect(connector)}
 											disabled={isPending}
 											className={cn(
-												"w-full flex items-center gap-3 p-3 rounded-lg border transition-all",
+												"w-full gap-3 p-3 rounded-lg border",
 												"bg-background hover:bg-accent/50 hover:border-terminal-cyan/30",
-												"disabled:opacity-50 disabled:cursor-not-allowed",
-												"group focus:outline-none focus:ring-2 focus:ring-terminal-cyan/50"
+												"group focus:ring-2 focus:ring-terminal-cyan/50",
 											)}
 										>
 											<div className="size-10 rounded-lg overflow-hidden flex-shrink-0 shadow-sm">
@@ -150,16 +144,14 @@ export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
 												<p className="font-medium text-sm group-hover:text-terminal-cyan transition-colors">
 													{connector.name}
 												</p>
-												<p className="text-xs text-muted-foreground truncate">
-													{walletInfo.description}
-												</p>
+												<p className="text-xs text-muted-foreground truncate">{walletInfo.description}</p>
 											</div>
 											{isConnecting ? (
 												<Loader2 className="size-4 animate-spin text-terminal-cyan flex-shrink-0" />
 											) : (
 												<div className="size-4 rounded-full border border-border group-hover:border-terminal-cyan/50 flex-shrink-0 transition-colors" />
 											)}
-										</button>
+										</Button>
 									);
 								})}
 							</div>
@@ -191,9 +183,11 @@ export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
 				</div>
 
 				<div className="border-t border-border/50 bg-muted/30">
-					<button
+					<Button
+						variant="ghost"
+						size="none"
 						onClick={() => setShowHelp(!showHelp)}
-						className="w-full flex items-center justify-between p-4 text-sm text-muted-foreground hover:text-foreground transition-colors"
+						className="w-full justify-between p-4 text-sm text-muted-foreground hover:text-foreground hover:bg-transparent"
 					>
 						<span className="flex items-center gap-2">
 							<HelpCircle className="size-4" />
@@ -210,7 +204,7 @@ export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
 								/>
 							</svg>
 						</span>
-					</button>
+					</Button>
 
 					{showHelp && (
 						<div className="px-4 pb-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
@@ -232,9 +226,7 @@ export function WalletDialog({ open, onOpenChange }: WalletDialogProps) {
 										<Trans>What is a wallet?</Trans>
 									</p>
 									<p className="text-muted-foreground mt-0.5">
-										<Trans>
-											A crypto wallet lets you store and manage your digital assets securely.
-										</Trans>
+										<Trans>A crypto wallet lets you store and manage your digital assets securely.</Trans>
 									</p>
 								</div>
 							</div>

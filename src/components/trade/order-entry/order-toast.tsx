@@ -1,8 +1,9 @@
 import { t } from "@lingui/core/macro";
 import { Check, Loader2, X, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
-import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/constants/app";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/constants";
+import { cn } from "@/lib/cn";
 import { type OrderQueueItem, useOrderQueue, useOrderQueueActions } from "@/stores/use-order-queue-store";
 
 function useAutoRemove(order: OrderQueueItem, onRemove: () => void) {
@@ -84,14 +85,15 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 
 			{/* Dismiss Button for Failed Orders */}
 			{order.status === "failed" && (
-				<button
-					type="button"
+				<Button
+					variant="ghost"
+					size="none"
 					onClick={onRemove}
 					className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors shrink-0"
 					aria-label={t`Dismiss`}
 				>
 					<X className="size-4" />
-				</button>
+				</Button>
 			)}
 		</div>
 	);
@@ -163,9 +165,7 @@ export function OrderToast() {
 			<div className="px-3 py-2 border-b border-border/40 bg-muted/30 flex items-center justify-between">
 				<div className="flex items-center gap-2">
 					<Zap className="size-4 text-terminal-cyan terminal-glow-cyan" />
-					<span className="text-xs font-semibold uppercase tracking-wider text-foreground">
-						{t`Order Queue`}
-					</span>
+					<span className="text-xs font-semibold uppercase tracking-wider text-foreground">{t`Order Queue`}</span>
 				</div>
 				<div className="flex items-center gap-1.5">
 					{pendingCount > 0 && (

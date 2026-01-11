@@ -1,4 +1,4 @@
-import { FALLBACK_VALUE_PLACEHOLDER, FORMAT_COMPACT_DEFAULT, FORMAT_COMPACT_THRESHOLD } from "@/constants/app";
+import { FALLBACK_VALUE_PLACEHOLDER, FORMAT_COMPACT_DEFAULT, FORMAT_COMPACT_THRESHOLD } from "@/config/constants";
 import { getResolvedFormatLocale } from "@/stores/use-global-settings-store";
 
 type Formatter = Intl.NumberFormat | Intl.DateTimeFormat | Intl.RelativeTimeFormat;
@@ -242,7 +242,7 @@ export function formatNumber(value: string | number | null | undefined, opts?: n
 	if (typeof value === "string") {
 		if (!value) return FALLBACK_VALUE_PLACEHOLDER;
 		const num = Number(value);
-		if (!Number.isFinite(num)) return value;
+		if (!Number.isFinite(num)) return FALLBACK_VALUE_PLACEHOLDER;
 
 		// Find how many decimal places the original string has
 		const decimalIndex = value.indexOf(".");

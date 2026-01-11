@@ -2,19 +2,25 @@ import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import type { ChangeEvent } from "react";
-import { useEffect, useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import { MARKET_ORDER_SLIPPAGE_MAX_BPS, MARKET_ORDER_SLIPPAGE_MIN_BPS } from "@/config/constants";
 import {
-	MARKET_ORDER_SLIPPAGE_MAX_BPS,
-	MARKET_ORDER_SLIPPAGE_MIN_BPS,
-} from "@/constants/app";
-import { dynamicActivate, type LocaleCode, localeList, type NumberFormatLocale, numberFormatLocaleList } from "@/lib/i18n";
-import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
-import { useMarketOrderSlippageBps, useTradeSettingsActions } from "@/stores/use-trade-settings-store";
+	dynamicActivate,
+	type LocaleCode,
+	localeList,
+	type NumberFormatLocale,
+	numberFormatLocaleList,
+} from "@/lib/i18n";
+import {
+	useGlobalSettings,
+	useGlobalSettingsActions,
+	useMarketOrderSlippageBps,
+} from "@/stores/use-global-settings-store";
 
 interface GlobalSettingsDialogProps {
 	open: boolean;
@@ -24,7 +30,6 @@ interface GlobalSettingsDialogProps {
 export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialogProps) {
 	const { i18n } = useLingui();
 	const slippageBps = useMarketOrderSlippageBps();
-	const { setMarketOrderSlippageBps } = useTradeSettingsActions();
 	const {
 		showOrdersOnChart,
 		showPositionsOnChart,
@@ -40,19 +45,18 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 		setShowOrderbookInUsd,
 		setShowChartScanlines,
 		setNumberFormatLocale,
+		setMarketOrderSlippageBps,
 	} = useGlobalSettingsActions();
 
-	const [slippageInput, setSlippageInput] = useState(String(slippageBps));
+	const [localSlippageInput, setLocalSlippageInput] = useState<string | null>(null);
+	const inputRef = useRef<HTMLInputElement>(null);
 
 	const slippagePercent = (slippageBps / 100).toFixed(2);
-
-	useEffect(() => {
-		setSlippageInput(String(slippageBps));
-	}, [slippageBps]);
+	const slippageInputValue = localSlippageInput ?? String(slippageBps);
 
 	const handleSlippageInputChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const nextValue = event.target.value;
-		setSlippageInput(nextValue);
+		setLocalSlippageInput(nextValue);
 
 		if (nextValue.trim() === "") return;
 		const parsed = Number(nextValue);
@@ -62,9 +66,7 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 	};
 
 	const handleSlippageInputBlur = () => {
-		if (slippageInput.trim() === "") {
-			setSlippageInput(String(slippageBps));
-		}
+		setLocalSlippageInput(null);
 	};
 
 	const handleSlippageSliderChange = (values: number[]) => {
@@ -102,10 +104,7 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 						<div className="text-xs text-muted-foreground">
 							<Trans>Display Language</Trans>
 						</div>
-						<Select
-							value={i18n.locale}
-							onValueChange={(value) => handleLanguageChange(value as LocaleCode)}
-						>
+						<Select value={i18n.locale} onValueChange={(value) => handleLanguageChange(value as LocaleCode)}>
 							<SelectTrigger className="w-32">
 								<SelectValue />
 							</SelectTrigger>
@@ -156,11 +155,12 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 								<div className="text-4xs text-muted-foreground">{t`Max slippage allowed for market orders.`}</div>
 							</div>
 							<div className="flex items-center gap-1.5">
-								<Input
-									type="number"
-									value={slippageInput}
+								<NumberInput
+									ref={inputRef}
+									value={slippageInputValue}
 									onChange={handleSlippageInputChange}
 									onBlur={handleSlippageInputBlur}
+									allowDecimals={false}
 									min={MARKET_ORDER_SLIPPAGE_MIN_BPS}
 									max={MARKET_ORDER_SLIPPAGE_MAX_BPS}
 									inputSize="sm"
@@ -175,7 +175,6 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 								onValueChange={handleSlippageSliderChange}
 								min={MARKET_ORDER_SLIPPAGE_MIN_BPS}
 								max={MARKET_ORDER_SLIPPAGE_MAX_BPS}
-								step={5}
 							/>
 							<div className="flex items-center justify-between text-4xs text-muted-foreground">
 								<span>{MARKET_ORDER_SLIPPAGE_MIN_BPS}</span>
@@ -189,9 +188,7 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 
 					{/* Toggles */}
 					<div className="space-y-3">
-						<div className="text-4xs uppercase tracking-wider text-muted-foreground">
-							{t`Chart`}
-						</div>
+						<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Chart`}</div>
 						<div className="space-y-2">
 							<div className="flex items-center justify-between gap-4">
 								<label htmlFor={showOrdersId} className="text-xs text-muted-foreground">
@@ -203,11 +200,7 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 								<label htmlFor={showPositionsId} className="text-xs text-muted-foreground">
 									{t`Show Positions on Chart`}
 								</label>
-								<Switch
-									id={showPositionsId}
-									checked={showPositionsOnChart}
-									onCheckedChange={setShowPositionsOnChart}
-								/>
+								<Switch id={showPositionsId} checked={showPositionsOnChart} onCheckedChange={setShowPositionsOnChart} />
 							</div>
 							<div className="flex items-center justify-between gap-4">
 								<label htmlFor={showExecutionsId} className="text-xs text-muted-foreground">
@@ -223,11 +216,7 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 								<label htmlFor={showScanlinesId} className="text-xs text-muted-foreground">
 									{t`Show Scanlines`}
 								</label>
-								<Switch
-									id={showScanlinesId}
-									checked={showChartScanlines}
-									onCheckedChange={setShowChartScanlines}
-								/>
+								<Switch id={showScanlinesId} checked={showChartScanlines} onCheckedChange={setShowChartScanlines} />
 							</div>
 						</div>
 					</div>
@@ -235,18 +224,12 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 					<div className="h-px bg-border/40" />
 
 					<div className="space-y-3">
-						<div className="text-4xs uppercase tracking-wider text-muted-foreground">
-							{t`Order Book`}
-						</div>
+						<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Order Book`}</div>
 						<div className="flex items-center justify-between gap-4">
 							<label htmlFor={showOrderbookUsdId} className="text-xs text-muted-foreground">
 								{t`Show Values in USD`}
 							</label>
-							<Switch
-								id={showOrderbookUsdId}
-								checked={showOrderbookInUsd}
-								onCheckedChange={setShowOrderbookInUsd}
-							/>
+							<Switch id={showOrderbookUsdId} checked={showOrderbookInUsd} onCheckedChange={setShowOrderbookInUsd} />
 						</div>
 					</div>
 				</div>
