@@ -38,6 +38,7 @@ export const STORAGE_KEYS = {
 	LEGACY_FAVORITES: "favorites-storage-v0.2",
 	META_CACHE: "hyperliquid-meta-cache-v1",
 	SIDEBAR_STATE: "sidebar_state",
+	ORDER_ENTRY: "order-entry-v1",
 } as const;
 
 export const META_CACHE_TTL_MS = 24 * 60 * 60 * 1000;

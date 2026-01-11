@@ -1,8 +1,8 @@
-import clsx from "clsx";
 import { Bell, Cog, Terminal } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { UI_TEXT } from "@/config/interface";
+import { cn } from "@/lib/cn";
 import { GlobalSettingsDialog } from "../components/global-settings-dialog";
 import { ThemeToggle } from "../header/theme-toggle";
 import { UserMenu } from "../header/user-menu";
@@ -18,7 +18,7 @@ export function MobileHeader({ className }: Props) {
 
 	return (
 		<header
-			className={clsx(
+			className={cn(
 				"pt-[env(safe-area-inset-top)]",
 				"sticky top-0 z-40 bg-background/95 backdrop-blur-sm",
 				"border-b border-border/60",

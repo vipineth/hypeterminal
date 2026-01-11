@@ -1,6 +1,5 @@
 import { t } from "@lingui/core/macro";
 import { flexRender } from "@tanstack/react-table";
-import clsx from "clsx";
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown, Flame, Search, Star } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
 import { getTokenIconUrl, isTokenInCategory, marketCategories } from "@/config/token";
+import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatUSD } from "@/lib/format";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
 import { QUOTE_ASSET } from "./constants";
@@ -69,43 +69,46 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 				align="start"
 				sideOffset={8}
 			>
-				<div className="flex flex-col">
-					<div className="px-2 py-2 border-b border-border/40">
+				<div className="flex flex-col p-2">
+					<div className="border-b border-border/40">
 						<div className="relative">
 							<Search className="absolute left-2 top-1/2 -translate-y-1/2 size-3 text-muted-foreground" />
 							<Input
 								placeholder={t`Search markets...`}
 								value={search}
 								onChange={(e) => setSearch(e.target.value)}
-								className="pl-7 h-7 text-xs bg-background/50 border-border/60 focus:border-terminal-cyan/60"
+								className="pl-7 h-7 text-xs bg-background/50 border-border/60 focus:border-terminal-cyan/40"
 							/>
 						</div>
 					</div>
 
-					<div className="px-2 py-1.5 border-b border-border/40 bg-surface/50">
+					<div className="py-2 border-b border-border/40 bg-surface/50">
 						<div className="flex items-center gap-0.5 flex-wrap">
-							{marketCategories.map((cat) => (
-								<Button
-									key={cat.value}
-									variant="ghost"
-									size="none"
-									onClick={() => handleCategorySelect(cat.value)}
-									className={clsx(
-										"px-2 py-1 text-3xs uppercase tracking-wider gap-1 hover:bg-transparent",
-										category === cat.value
-											? "text-terminal-cyan bg-terminal-cyan/10"
-											: "text-muted-foreground hover:text-foreground",
-									)}
-									aria-label={t`Filter by ${cat.label}`}
-									aria-pressed={category === cat.value}
-								>
-									{cat.icon}
-									{cat.label}
-								</Button>
-							))}
+							{marketCategories.map((cat) => {
+								const isSelected = category === cat.value;
+								return (
+									<Button
+										key={cat.value}
+										variant="ghost"
+										size="none"
+										onClick={() => handleCategorySelect(cat.value)}
+										className={cn(
+											"px-2 py-1 text-3xs uppercase tracking-wider gap-1 cursor-pointer",
+											isSelected
+												? "bg-terminal-cyan/10 text-terminal-cyan hover:bg-terminal-cyan/10 hover:text-terminal-cyan"
+												: "text-muted-foreground hover:bg-transparent",
+										)}
+										aria-label={t`Filter by ${cat.label}`}
+										aria-pressed={isSelected}
+									>
+										{cat.icon}
+										{cat.label}
+									</Button>
+								);
+							})}
 						</div>
 					</div>
-					<div className="flex items-center px-3 py-1.5 text-4xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40 bg-surface/30">
+					<div className="flex items-center py-1.5 text-4xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40 bg-surface/30">
 						{headerGroup?.headers.map((header) => {
 							if (header.id === "coin") {
 								return (
@@ -117,7 +120,6 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 
 							const sortState = header.column.getIsSorted();
 
-							// Hide some columns on mobile for better fit
 							const hiddenOnMobile = ["openInterest", "dayNtlVlm", "funding"].includes(header.id);
 
 							return (
@@ -126,7 +128,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 									variant="ghost"
 									size="none"
 									onClick={header.column.getToggleSortingHandler()}
-									className={clsx(
+									className={cn(
 										"w-16 sm:w-20 justify-end gap-1 hover:text-foreground hover:bg-transparent",
 										hiddenOnMobile && "hidden sm:flex",
 									)}
@@ -171,7 +173,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 									const isFav = isFavorite(market.coin);
 									const changePct = calculate24hPriceChange(market.ctxNumbers);
 									const changeIsPositive = (changePct ?? 0) >= 0;
-									const changeClass = clsx(
+									const changeClass = cn(
 										"text-2xs font-medium tabular-nums",
 										changePct === null
 											? "text-muted-foreground"
@@ -194,7 +196,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 											role="option"
 											aria-selected={isSelected}
 											tabIndex={0}
-											className={clsx(
+											className={cn(
 												"flex items-center px-3 py-1.5 cursor-pointer border-b border-border/20",
 												"hover:bg-accent/30 transition-colors",
 												"absolute top-0 left-0 w-full",
@@ -224,7 +226,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 															aria-label={isFav ? t`Remove from favorites` : t`Add to favorites`}
 														>
 															<Star
-																className={clsx(
+																className={cn(
 																	"size-2.5 transition-colors",
 																	isFav
 																		? "fill-terminal-amber text-terminal-amber"
@@ -243,39 +245,31 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 													</div>
 												</div>
 											</div>
-											{/* Price - always visible */}
 											<div className="w-16 sm:w-20 text-right">
 												<span className="text-2xs font-medium tabular-nums">
 													{formatPrice(market.ctxNumbers?.markPx ?? null, { szDecimals: market.szDecimals })}
 												</span>
 											</div>
-											{/* 24h change - always visible */}
 											<div className="w-16 sm:w-20 text-right">
 												<span className={changeClass}>{changeText}</span>
 											</div>
-											{/* Open Interest - hidden on mobile */}
 											<div className="w-20 text-right hidden sm:block">
 												<span className="text-2xs font-medium tabular-nums">
 													{formatUSD(calculateOpenInterestUSD(market.ctxNumbers))}
 												</span>
 											</div>
-											{/* Volume - hidden on mobile */}
 											<div className="w-20 text-right hidden sm:block">
 												<span className="text-2xs font-medium tabular-nums">
 													{formatUSD(market.ctxNumbers?.dayNtlVlm ?? null)}
 												</span>
 											</div>
-											{/* Funding - hidden on mobile */}
 											<div className="w-20 text-right hidden sm:block">
 												<div className="flex items-center justify-end gap-1">
 													<Flame
-														className={clsx(
-															"size-2.5",
-															isFundingPositive ? "text-terminal-green" : "text-terminal-red",
-														)}
+														className={cn("size-2.5", isFundingPositive ? "text-terminal-green" : "text-terminal-red")}
 													/>
 													<span
-														className={clsx(
+														className={cn(
 															"text-2xs tabular-nums font-medium",
 															isFundingPositive ? "text-terminal-green" : "text-terminal-red",
 														)}

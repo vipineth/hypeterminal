@@ -1,8 +1,8 @@
 import { t } from "@lingui/core/macro";
-import clsx from "clsx";
 import { ChevronDown } from "lucide-react";
 import { forwardRef } from "react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/cn";
 
 interface Props {
 	leverage: number;
@@ -19,7 +19,7 @@ export const LeverageBadge = forwardRef<HTMLButtonElement, Props>(
 				variant="terminal"
 				size="none"
 				onClick={onClick}
-				className={clsx(
+				className={cn(
 					"px-2 py-0.5 text-3xs gap-1",
 					"hover:bg-terminal-cyan/10",
 					"focus-visible:ring-1 focus-visible:ring-terminal-cyan",

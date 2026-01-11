@@ -1,5 +1,5 @@
 import type { ISubscription } from "@nktkas/hyperliquid";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useStore } from "zustand";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
 import { useHyperliquidStoreApi } from "../useConfig";
@@ -12,15 +12,20 @@ export function useSub<TData>(
 	const { enabled = true, onData, onError } = options;
 	const store = useHyperliquidStoreApi();
 	const entry = useStore(store, (state) => state.subscriptions[key]);
+	const subscribeRef = useRef(subscribe);
+
+	useEffect(() => {
+		subscribeRef.current = subscribe;
+	}, [subscribe]);
 
 	useEffect(() => {
 		if (!enabled) return;
 		const state = store.getState();
-		state.acquireSubscription(key, () => subscribe((data) => state.setSubscriptionData(key, data)));
+		state.acquireSubscription(key, () => subscribeRef.current((data) => state.setSubscriptionData(key, data)));
 		return () => {
 			store.getState().releaseSubscription(key);
 		};
-	}, [enabled, key, store, subscribe]);
+	}, [enabled, key, store]);
 
 	useEffect(() => {
 		if (entry?.data !== undefined) {

@@ -1,11 +1,11 @@
 import { Trans } from "@lingui/react/macro";
-import clsx from "clsx";
 import { AlertCircle, ExternalLink, HelpCircle, Loader2, Shield, Wallet } from "lucide-react";
 import { useMemo, useState } from "react";
 import { type Connector, useConnect } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { getLastUsedWallet, getWalletInfo, setLastUsedWallet } from "@/config/wallet";
+import { cn } from "@/lib/cn";
 
 interface Props {
 	open: boolean;
@@ -86,7 +86,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 											size="none"
 											onClick={() => handleConnect(connector)}
 											disabled={isPending}
-											className={clsx(
+											className={cn(
 												"w-full gap-3 p-3 rounded-lg border",
 												"bg-background hover:bg-accent/50 hover:border-terminal-cyan/30",
 												"group focus:ring-2 focus:ring-terminal-cyan/50",
@@ -131,7 +131,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 											size="none"
 											onClick={() => handleConnect(connector)}
 											disabled={isPending}
-											className={clsx(
+											className={cn(
 												"w-full gap-3 p-3 rounded-lg border",
 												"bg-background hover:bg-accent/50 hover:border-terminal-cyan/30",
 												"group focus:ring-2 focus:ring-terminal-cyan/50",
@@ -193,7 +193,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 							<HelpCircle className="size-4" />
 							<Trans>New to wallets?</Trans>
 						</span>
-						<span className={clsx("transition-transform", showHelp && "rotate-180")}>
+						<span className={cn("transition-transform", showHelp && "rotate-180")}>
 							<svg width="12" height="12" viewBox="0 0 12 12" fill="none">
 								<path
 									d="M2.5 4.5L6 8L9.5 4.5"

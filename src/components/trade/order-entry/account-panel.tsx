@@ -5,10 +5,10 @@ import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
+import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumberOrZero } from "@/lib/trade/numbers";
-import clsx from "clsx";
 
 export function AccountPanel() {
 	const [isExpanded, setIsExpanded] = useState(false);
@@ -80,7 +80,7 @@ export function AccountPanel() {
 			{
 				label: t`Unrealized PNL`,
 				value: formatUSD(accountMetrics.unrealizedPnl, { signDisplay: "exceptZero" }),
-				valueClass: clsx("tabular-nums", accountMetrics.unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red"),
+				valueClass: cn("tabular-nums", accountMetrics.unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red"),
 			},
 			{
 				label: t`Available`,
@@ -123,7 +123,7 @@ export function AccountPanel() {
 							{t`Account`}
 						</span>
 						<ChevronUp
-							className={clsx(
+							className={cn(
 								"size-3 text-muted-foreground transition-transform duration-200",
 								!isExpanded && "rotate-180",
 							)}
@@ -133,7 +133,7 @@ export function AccountPanel() {
 						<div className="flex items-center gap-1.5">
 							<span className="text-4xs text-muted-foreground uppercase">{t`Equity`}</span>
 							<span
-								className={clsx(
+								className={cn(
 									"text-sm font-semibold tabular-nums",
 									hasData ? "text-terminal-green terminal-glow-green" : "text-muted-foreground",
 								)}
@@ -143,7 +143,7 @@ export function AccountPanel() {
 						</div>
 						<div className="flex items-center gap-1.5">
 							<span className="text-4xs text-muted-foreground uppercase">{t`PNL`}</span>
-							<span className={clsx("text-2xs font-medium tabular-nums", headerPnlClass)}>{headerPnl}</span>
+							<span className={cn("text-2xs font-medium tabular-nums", headerPnlClass)}>{headerPnl}</span>
 						</div>
 					</div>
 				</Button>
@@ -158,7 +158,7 @@ export function AccountPanel() {
 							e.stopPropagation();
 							setActiveTab("perps");
 						}}
-						className={clsx(
+						className={cn(
 							"px-2 py-1 text-4xs uppercase tracking-wider hover:bg-transparent",
 							activeTab === "perps"
 								? "text-foreground border-b border-foreground"
@@ -175,7 +175,7 @@ export function AccountPanel() {
 							e.stopPropagation();
 							setActiveTab("spot");
 						}}
-						className={clsx(
+						className={cn(
 							"px-2 py-1 text-4xs uppercase tracking-wider hover:bg-transparent",
 							activeTab === "spot"
 								? "text-foreground border-b border-foreground"

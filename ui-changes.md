@@ -21,7 +21,7 @@ This document tracks UI improvements needed across the codebase:
   onChange={(e) => setInputValue(e.target.value)}
   onBlur={handleInputBlur}
   onKeyDown={handleKeyDown}
-  className={clsx(
+  className={cn(
     "w-16 h-7 px-2 text-sm text-center tabular-nums rounded-sm",
     "bg-background border border-border/60",
     "focus:border-terminal-cyan/60 focus:outline-none",
@@ -56,7 +56,7 @@ This document tracks UI improvements needed across the codebase:
   onChange={(e) => setInputValue(e.target.value)}
   onBlur={handleInputBlur}
   onKeyDown={handleKeyDown}
-  className={clsx(
+  className={cn(
     "w-20 h-10 px-3 text-lg text-center tabular-nums rounded-md",
     "bg-background border border-border/60",
     "focus:border-terminal-cyan/60 focus:outline-none",
@@ -89,7 +89,7 @@ This document tracks UI improvements needed across the codebase:
 <button
   type="button"
   onClick={() => setType("market")}
-  className={clsx(...)}
+  className={cn(...)}
 >
 
 // Could use Button component with appropriate variant
@@ -182,7 +182,7 @@ Uses shadcn components well already. No changes needed.
 // BEFORE
 <button
   type="button"
-  className={clsx(
+  className={cn(
     "px-2.5 py-1.5 transition-colors",
     idx === 0 ? "text-terminal-cyan" : "text-muted-foreground hover:text-foreground",
   )}
@@ -192,7 +192,7 @@ Uses shadcn components well already. No changes needed.
 <Button
   variant="ghost"
   size="sm"
-  className={clsx(idx === 0 && "text-terminal-cyan")}
+  className={cn(idx === 0 && "text-terminal-cyan")}
 >
 ```
 
@@ -221,7 +221,7 @@ Uses shadcn components well already. No changes needed.
 // BEFORE
 <button
   type="button"
-  className={clsx(
+  className={cn(
     "size-7 flex items-center justify-center transition-colors",
     isDark
       ? "text-terminal-amber hover:text-terminal-amber/80"
@@ -233,7 +233,7 @@ Uses shadcn components well already. No changes needed.
 <Button
   variant="ghost"
   size="icon-sm"
-  className={clsx(
+  className={cn(
     isDark ? "text-terminal-amber" : "text-terminal-purple"
   )}
 >
@@ -256,7 +256,7 @@ Uses shadcn components well already. No changes needed.
   key={cat.value}
   type="button"
   onClick={() => handleCategorySelect(cat.value)}
-  className={clsx(
+  className={cn(
     "px-2 py-1 text-3xs uppercase tracking-wider transition-colors inline-flex items-center gap-1",
     category === cat.value
       ? "text-terminal-cyan bg-terminal-cyan/10"
@@ -268,7 +268,7 @@ Uses shadcn components well already. No changes needed.
 <Button
   variant="ghost"
   size="2xs"
-  className={clsx(
+  className={cn(
     "uppercase tracking-wider",
     category === cat.value && "text-terminal-cyan bg-terminal-cyan/10"
   )}
@@ -300,7 +300,7 @@ Uses shadcn components well already. No changes needed.
   key={p}
   type="button"
   onClick={() => handlePercentClick(p)}
-  className={clsx(
+  className={cn(
     "py-2.5 text-sm font-medium border border-border/60 rounded-md",
     "hover:border-terminal-cyan/40 hover:text-terminal-cyan",
     "transition-colors disabled:opacity-50",

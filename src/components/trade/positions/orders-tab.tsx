@@ -1,5 +1,4 @@
 import { t } from "@lingui/core/macro";
-import clsx from "clsx";
 import { ListOrdered } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConnection } from "wagmi";
@@ -8,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
+import { cn } from "@/lib/cn";
 import { formatNumber, formatUSD } from "@/lib/format";
 import { usePerpMarkets } from "@/lib/hyperliquid";
 import { useExchangeCancel } from "@/lib/hyperliquid/hooks/exchange/useExchangeCancel";
@@ -259,7 +259,7 @@ export function OrdersTab() {
 										</TableCell>
 										<TableCell className="text-2xs font-medium py-1.5">
 											<div className="flex items-center gap-1.5">
-												<span className={clsx("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
+												<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
 													{row.sideLabel}
 												</span>
 												<Button
@@ -280,7 +280,7 @@ export function OrdersTab() {
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.priceText}</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.sizeText}</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">
-											<span className={clsx(row.hasFilled && "text-terminal-amber")}>
+											<span className={cn(row.hasFilled && "text-terminal-amber")}>
 												{row.filledText} ({row.fillPctText})
 											</span>
 										</TableCell>

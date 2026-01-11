@@ -1,5 +1,4 @@
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
-import clsx from "clsx";
 import type * as React from "react";
 import { cn } from "@/lib/cn";
 
@@ -15,7 +14,7 @@ function Avatar({ className, ...props }: React.ComponentProps<typeof AvatarPrimi
 
 function AvatarImage({ className, ...props }: React.ComponentProps<typeof AvatarPrimitive.Image>) {
 	return (
-		<AvatarPrimitive.Image data-slot="avatar-image" className={clsx("aspect-square size-full", className)} {...props} />
+		<AvatarPrimitive.Image data-slot="avatar-image" className={cn("aspect-square size-full", className)} {...props} />
 	);
 }
 
@@ -23,7 +22,7 @@ function AvatarFallback({ className, ...props }: React.ComponentProps<typeof Ava
 	return (
 		<AvatarPrimitive.Fallback
 			data-slot="avatar-fallback"
-			className={clsx("bg-muted flex size-full items-center justify-center rounded-full", className)}
+			className={cn("bg-muted flex size-full items-center justify-center rounded-full", className)}
 			{...props}
 		/>
 	);

@@ -1,9 +1,9 @@
 import { t } from "@lingui/core/macro";
 import { flexRender, type Header, type RowData } from "@tanstack/react-table";
-import clsx from "clsx";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { UseVirtualTableReturn } from "@/hooks/ui/use-virtual-table";
+import { cn } from "@/lib/cn";
 
 export interface VirtualTableProps<TData extends RowData> extends UseVirtualTableReturn<TData> {
 	className?: string;
@@ -63,7 +63,7 @@ export function VirtualTable<TData extends RowData>({
 	const headerGroups = table.getHeaderGroups();
 
 	return (
-		<div className={clsx("relative overflow-hidden", className)}>
+		<div className={cn("relative overflow-hidden", className)}>
 			<div className="sticky top-0 z-10 bg-surface border-b border-border/40">
 				{headerGroups.map((headerGroup) => (
 					<div key={headerGroup.id} className="flex w-full">
@@ -71,7 +71,7 @@ export function VirtualTable<TData extends RowData>({
 							const canSort = header.column.getCanSort();
 							const headerContent = flexRender(header.column.columnDef.header, header.getContext());
 
-							const headerClassName = clsx(
+							const headerClassName = cn(
 								"flex items-center px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider",
 								canSort && "cursor-pointer select-none hover:text-foreground transition-colors",
 							);
@@ -85,7 +85,7 @@ export function VirtualTable<TData extends RowData>({
 										key={header.id}
 										variant="ghost"
 										size="none"
-										className={clsx(headerClassName, "hover:bg-transparent")}
+										className={cn(headerClassName, "hover:bg-transparent")}
 										style={headerStyle}
 										onClick={header.column.getToggleSortingHandler()}
 										aria-label={t`Sort by ${headerLabel}`}
@@ -107,7 +107,7 @@ export function VirtualTable<TData extends RowData>({
 			</div>
 
 			{/* Virtualized Body */}
-			<div ref={containerRef} className={clsx("overflow-auto", containerClassName, height)}>
+			<div ref={containerRef} className={cn("overflow-auto", containerClassName, height)}>
 				<div
 					style={{
 						height: `${totalSize}px`,

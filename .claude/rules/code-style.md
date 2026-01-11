@@ -10,7 +10,8 @@ description: Code style rules
 - **No index.ts barrel files** - Import directly from the file, not through index.ts re-exports
 - **Name props interface `Props`** - The main component's props interface should always be named `Props`
 - **Prefer `interface` over `type`** - Use `interface Props` not `type Props` for component props
-- **Use `clsx` for class combining** - Always use `clsx()` to combine conditional classes, not `cn()` or template literals
+- **Prefer function declarations** - Define handlers/utilities as `function handleClick()` instead of arrow functions
+- **Use `clsx` for class combining** - Always use `cn()` to combine conditional classes, not `cn()` or template literals
 - **Keep components clean** - Move calculations and business logic to `lib/` utilities
 - **Organize utils by domain** - Use folders like `lib/trade/`, `lib/chart/`, etc.
 - **Minimize useEffect** - Only use when truly needed for side effects, not for derived state
@@ -19,7 +20,7 @@ description: Code style rules
 
 ```tsx
 // Good - interface Props and clsx usage
-import clsx from "clsx";
+import { cn } from "@/lib/cn";
 
 interface Props {
   value: number;
@@ -29,7 +30,7 @@ interface Props {
 
 export function PriceDisplay({ value, isActive, className }: Props) {
   return (
-    <span className={clsx("text-sm tabular-nums", isActive && "text-terminal-green", className)}>
+    <span className={cn("text-sm tabular-nums", isActive && "text-terminal-green", className)}>
       {value}
     </span>
   );
@@ -196,7 +197,7 @@ type PriceGroupOption = {
 ### Component Structure Pattern
 
 ```tsx
-import clsx from "clsx";
+import { cn } from "@/lib/cn";
 
 interface Props {
   coin: string;
@@ -224,7 +225,7 @@ export function SubscriptionComponent({ coin, className }: Props) {
 
   // 7. Render with explicit status handling
   return (
-    <div className={clsx("flex flex-col", className)}>
+    <div className={cn("flex flex-col", className)}>
       {status === "error" ? (
         <Placeholder>{error?.message}</Placeholder>
       ) : processed.length === 0 ? (

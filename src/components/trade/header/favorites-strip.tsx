@@ -2,13 +2,13 @@ import { t } from "@lingui/core/macro";
 import { Star } from "lucide-react";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice } from "@/lib/format";
 import { usePerpMarkets } from "@/lib/hyperliquid";
 import { useSubActiveAssetCtx, useSubAllMids } from "@/lib/hyperliquid/hooks/subscription";
 import { isPerpMarketKey, type PerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
 import { calculate24hPriceChange } from "@/lib/market";
 import { toFiniteNumber } from "@/lib/trade/numbers";
-import clsx from "clsx";
 import { useFavoriteMarketKeys, useMarketPrefsActions, useSelectedMarketKey } from "@/stores/use-market-prefs-store";
 import type { PerpAssetCtx } from "@/types/hyperliquid";
 
@@ -99,18 +99,18 @@ function FavoriteChip({ marketKey, coin, priceNumber, szDecimals, isActive }: Fa
 			tabIndex={0}
 			aria-label={t`Select ${coin} market`}
 			aria-pressed={isActive}
-			className={clsx(
+			className={cn(
 				"shrink-0 inline-flex items-center gap-2 px-2.5 py-0.5 text-3xs transition-colors cursor-pointer rounded-none",
 				"hover:bg-accent/50",
 				isActive && "bg-terminal-cyan/10",
 			)}
 		>
-			<span className={clsx("font-medium", isActive ? "text-terminal-cyan" : "text-foreground")}>{coin}</span>
+			<span className={cn("font-medium", isActive ? "text-terminal-cyan" : "text-foreground")}>{coin}</span>
 			{typeof priceNumber === "number" && (
 				<span className="text-muted-foreground tabular-nums">{formatPrice(priceNumber, { szDecimals })}</span>
 			)}
 			{assetCtx && (
-				<span className={clsx("tabular-nums font-medium", isPositive ? "text-terminal-green" : "text-terminal-red")}>
+				<span className={cn("tabular-nums font-medium", isPositive ? "text-terminal-green" : "text-terminal-red")}>
 					{formatPercent(changePct / 100, {
 						minimumFractionDigits: 2,
 						signDisplay: "exceptZero",

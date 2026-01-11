@@ -1,6 +1,6 @@
-import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
+import { cn } from "@/lib/cn";
 import { useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
 import { MobileAccountView } from "./mobile-account-view";
@@ -66,11 +66,7 @@ export function MobileTerminal({ className }: Props) {
 
 	return (
 		<div
-			className={clsx(
-				"h-dvh w-full flex flex-col bg-background text-foreground font-mono",
-				"overflow-hidden",
-				className,
-			)}
+			className={cn("h-dvh w-full flex flex-col bg-background text-foreground font-mono", "overflow-hidden", className)}
 		>
 			<MobileHeader />
 			<OfflineBanner />

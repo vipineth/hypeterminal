@@ -1,8 +1,8 @@
-import clsx from "clsx";
 import { WifiOff, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useOnlineStatus } from "@/hooks/use-mobile";
+import { cn } from "@/lib/cn";
 
 interface Props {
 	className?: string;
@@ -39,7 +39,7 @@ export function OfflineBanner({ className }: Props) {
 		<div
 			role="alert"
 			aria-live="polite"
-			className={clsx(
+			className={cn(
 				"fixed top-[calc(48px+env(safe-area-inset-top))] inset-x-0 z-50",
 				"px-3 py-2",
 				"flex items-center justify-between gap-2",
@@ -70,7 +70,7 @@ export function OfflineBanner({ className }: Props) {
 					variant="ghost"
 					size="none"
 					onClick={() => setDismissed(true)}
-					className={clsx(
+					className={cn(
 						"size-8 flex items-center justify-center",
 						"rounded-md hover:bg-terminal-amber/20",
 						"transition-colors",

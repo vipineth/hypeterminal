@@ -1,5 +1,4 @@
 import { t } from "@lingui/core/macro";
-import clsx from "clsx";
 import { Circle } from "lucide-react";
 import { useMemo, useRef } from "react";
 import { useConnection } from "wagmi";
@@ -7,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
+import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
 import { usePerpMarkets } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
@@ -14,8 +14,8 @@ import { useSubAssetCtxs, useSubClearinghouseState } from "@/lib/hyperliquid/hoo
 import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
-import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
+import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import type { PerpAssetCtxs } from "@/types/hyperliquid";
 import { TokenAvatar } from "../components/token-avatar";
 
@@ -210,7 +210,7 @@ export function PositionsTab() {
 										<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
 											<TableCell className="text-2xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">
-													<span className={clsx("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
+													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
 														{row.sideLabel}
 													</span>
 													<Button
@@ -232,7 +232,7 @@ export function PositionsTab() {
 												{row.markText}
 											</TableCell>
 											<TableCell className="text-right py-1.5">
-												<div className={clsx("text-2xs tabular-nums", row.pnlClass)}>
+												<div className={cn("text-2xs tabular-nums", row.pnlClass)}>
 													{row.pnlText}
 													<span className="text-muted-foreground ml-1">({row.roeText})</span>
 												</div>
@@ -251,11 +251,7 @@ export function PositionsTab() {
 													>
 														{isRowClosing ? t`Closing...` : t`Close`}
 													</Button>
-													<Button
-														variant="terminal"
-														size="xs"
-														aria-label={t`Set TP/SL`}
-													>
+													<Button variant="terminal" size="xs" aria-label={t`Set TP/SL`}>
 														{t`TP/SL`}
 													</Button>
 												</div>

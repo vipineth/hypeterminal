@@ -1,11 +1,11 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import clsx from "clsx";
 import { AlertTriangle, Check, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NumberInput } from "@/components/ui/number-input";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { cn } from "@/lib/cn";
 import { LeverageSlider } from "./leverage-slider";
 
 interface Props {
@@ -141,7 +141,7 @@ export function LeverageSheet({
 								size="none"
 								onClick={handleConfirm}
 								disabled={isUpdating}
-								className={clsx(
+								className={cn(
 									"flex-1 py-3 text-xs font-semibold uppercase tracking-wider gap-2 hover:bg-transparent",
 									"bg-terminal-cyan/20 border border-terminal-cyan text-terminal-cyan",
 									"hover:bg-terminal-cyan/30",
@@ -157,7 +157,7 @@ export function LeverageSheet({
 							size="none"
 							onClick={handleConfirm}
 							disabled={!isDirty || isUpdating || showSuccess}
-							className={clsx(
+							className={cn(
 								"w-full py-3 text-xs font-semibold uppercase tracking-wider gap-2 border hover:bg-transparent",
 								isDirty && !isUpdating && !showSuccess
 									? "bg-terminal-cyan/20 border-terminal-cyan text-terminal-cyan hover:bg-terminal-cyan/30"

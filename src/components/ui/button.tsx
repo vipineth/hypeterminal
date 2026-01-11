@@ -12,7 +12,7 @@ const buttonVariants = cva(
 				destructive: "bg-destructive text-white hover:bg-destructive/90 rounded-md font-medium",
 				outline: "border border-border/60 bg-background hover:bg-accent hover:text-accent-foreground rounded-md",
 				ghost: "hover:bg-accent hover:text-accent-foreground",
-				terminal: "border border-border/60 hover:border-terminal-cyan/40 hover:text-terminal-cyan",
+				terminal: "border border-terminal-cyan/40 hover:bg-terminal-cyan/40",
 				danger: "border border-border/60 hover:border-terminal-red/60 hover:text-terminal-red",
 				link: "hover:underline hover:text-terminal-cyan",
 			},
@@ -34,9 +34,7 @@ const buttonVariants = cva(
 	},
 );
 
-interface Props
-	extends React.ComponentProps<"button">,
-		VariantProps<typeof buttonVariants> {
+interface Props extends React.ComponentProps<"button">, VariantProps<typeof buttonVariants> {
 	asChild?: boolean;
 }
 

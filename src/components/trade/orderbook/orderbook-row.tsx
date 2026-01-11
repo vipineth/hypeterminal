@@ -1,9 +1,9 @@
-import clsx from "clsx";
 import { Button } from "@/components/ui/button";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
+import { cn } from "@/lib/cn";
 import { formatNumber, formatUSD } from "@/lib/format";
 import type { BookLevel } from "@/lib/trade/orderbook";
-import { useSetSelectedPrice } from "@/stores/use-orderbook-actions-store";
+import { useOrderbookActions } from "@/stores/use-orderbook-actions-store";
 
 interface Props {
 	level: BookLevel;
@@ -14,7 +14,7 @@ interface Props {
 }
 
 export function OrderbookRow({ level, side, maxTotal, showInUsd = false, szDecimals }: Props) {
-	const setSelectedPrice = useSetSelectedPrice();
+	const { setSelectedPrice } = useOrderbookActions();
 	const depthPct = maxTotal > 0 ? (level.total / maxTotal) * 100 : 0;
 	const isAsk = side === "ask";
 
@@ -36,7 +36,7 @@ export function OrderbookRow({ level, side, maxTotal, showInUsd = false, szDecim
 	return (
 		<div className="relative hover:bg-accent/30 cursor-pointer group">
 			<div
-				className={clsx("absolute inset-y-0 pointer-events-none", isAsk ? "depth-bar-ask" : "depth-bar-bid")}
+				className={cn("absolute inset-y-0 pointer-events-none", isAsk ? "depth-bar-ask" : "depth-bar-bid")}
 				style={{ width: `${depthPct}%`, [isAsk ? "right" : "left"]: 0, [isAsk ? "left" : "right"]: "auto" }}
 			/>
 			<div className="grid grid-cols-3 gap-2 text-2xs tabular-nums py-0.5 px-2 relative z-10">
@@ -44,7 +44,10 @@ export function OrderbookRow({ level, side, maxTotal, showInUsd = false, szDecim
 					variant="link"
 					size="none"
 					onClick={() => setSelectedPrice(level.price)}
-					className={clsx("text-left justify-start", isAsk ? "text-terminal-red hover:text-terminal-red" : "text-terminal-green hover:text-terminal-green")}
+					className={cn(
+						"text-left justify-start",
+						isAsk ? "text-terminal-red hover:text-terminal-red" : "text-terminal-green hover:text-terminal-green",
+					)}
 				>
 					{formatNumber(level.price)}
 				</Button>

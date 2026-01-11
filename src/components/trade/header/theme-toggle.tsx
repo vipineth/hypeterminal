@@ -1,8 +1,8 @@
 import { t } from "@lingui/core/macro";
 import { ClientOnly } from "@tanstack/react-router";
-import clsx from "clsx";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/cn";
 import { useTheme } from "@/providers/theme";
 
 export function ThemeToggle() {
@@ -26,9 +26,11 @@ function ThemeToggleButton() {
 		<Button
 			variant="ghost"
 			size="icon-sm"
-			className={clsx(
+			className={cn(
 				"size-7",
-				isDark ? "text-terminal-amber hover:text-terminal-amber/80" : "text-terminal-purple hover:text-terminal-purple/80",
+				isDark
+					? "text-terminal-amber hover:text-terminal-amber/80"
+					: "text-terminal-purple hover:text-terminal-purple/80",
 			)}
 			onClick={handleToggle}
 			aria-label={isDark ? t`Switch to light mode` : t`Switch to dark mode`}

@@ -1,6 +1,6 @@
-import clsx from "clsx";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/cn";
 
 interface Props {
 	value: number;
@@ -42,7 +42,7 @@ export function LeverageSlider({ value, onChange, max, disabled, className }: Pr
 	};
 
 	return (
-		<div className={clsx("space-y-1", disabled && "opacity-50 pointer-events-none", className)}>
+		<div className={cn("space-y-1", disabled && "opacity-50 pointer-events-none", className)}>
 			<div className="relative h-5 flex items-center">
 				<div className="absolute inset-x-0 h-1.5 bg-border rounded-full">
 					<div
@@ -61,7 +61,7 @@ export function LeverageSlider({ value, onChange, max, disabled, className }: Pr
 							style={{ left: `${markPosition}%` }}
 						>
 							<div
-								className={clsx(
+								className={cn(
 									"size-2 rounded-full transition-colors",
 									isActive ? "bg-terminal-cyan" : "bg-muted-foreground/60",
 								)}
@@ -99,11 +99,9 @@ export function LeverageSlider({ value, onChange, max, disabled, className }: Pr
 							size="none"
 							onClick={() => !disabled && onChange(mark)}
 							disabled={disabled}
-							className={clsx(
+							className={cn(
 								"absolute -translate-x-1/2 text-3xs tabular-nums hover:bg-transparent",
-								isSelected
-									? "text-terminal-cyan font-medium"
-									: "text-muted-foreground hover:text-foreground",
+								isSelected ? "text-terminal-cyan font-medium" : "text-muted-foreground hover:text-foreground",
 							)}
 							style={{ left: `${markPosition}%` }}
 						>

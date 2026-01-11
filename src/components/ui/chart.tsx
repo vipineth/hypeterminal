@@ -1,7 +1,6 @@
 import * as React from "react";
 import * as RechartsPrimitive from "recharts";
-
-import clsx from "clsx";
+import { cn } from "@/lib/cn";
 
 const THEMES = { light: "", dark: ".dark" } as const;
 
@@ -46,7 +45,7 @@ function ChartContainer({
 			<div
 				data-slot="chart"
 				data-chart={chartId}
-				className={clsx(
+				className={cn(
 					"[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border flex aspect-video justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
 					className,
 				)}
@@ -127,14 +126,14 @@ function ChartTooltipContent({
 			!labelKey && typeof label === "string" ? config[label as keyof typeof config]?.label || label : itemConfig?.label;
 
 		if (labelFormatter) {
-			return <div className={clsx("font-medium", labelClassName)}>{labelFormatter(value, payload)}</div>;
+			return <div className={cn("font-medium", labelClassName)}>{labelFormatter(value, payload)}</div>;
 		}
 
 		if (!value) {
 			return null;
 		}
 
-		return <div className={clsx("font-medium", labelClassName)}>{value}</div>;
+		return <div className={cn("font-medium", labelClassName)}>{value}</div>;
 	}, [label, labelFormatter, payload, hideLabel, labelClassName, config, labelKey]);
 
 	if (!active || !payload?.length) {
@@ -145,7 +144,7 @@ function ChartTooltipContent({
 
 	return (
 		<div
-			className={clsx(
+			className={cn(
 				"border-border/50 bg-background grid min-w-32 items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl",
 				className,
 			)}
@@ -162,7 +161,7 @@ function ChartTooltipContent({
 						return (
 							<div
 								key={item.dataKey}
-								className={clsx(
+								className={cn(
 									"[&>svg]:text-muted-foreground flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5",
 									indicator === "dot" && "items-center",
 								)}
@@ -176,7 +175,7 @@ function ChartTooltipContent({
 										) : (
 											!hideIndicator && (
 												<div
-													className={clsx("shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)", {
+													className={cn("shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)", {
 														"h-2.5 w-2.5": indicator === "dot",
 														"w-1": indicator === "line",
 														"w-0 border-[1.5px] border-dashed bg-transparent": indicator === "dashed",
@@ -192,7 +191,7 @@ function ChartTooltipContent({
 											)
 										)}
 										<div
-											className={clsx(
+											className={cn(
 												"flex flex-1 justify-between leading-none",
 												nestLabel ? "items-end" : "items-center",
 											)}
@@ -237,7 +236,7 @@ function ChartLegendContent({
 	}
 
 	return (
-		<div className={clsx("flex items-center justify-center gap-4", verticalAlign === "top" ? "pb-3" : "pt-3", className)}>
+		<div className={cn("flex items-center justify-center gap-4", verticalAlign === "top" ? "pb-3" : "pt-3", className)}>
 			{payload
 				.filter((item) => item.type !== "none")
 				.map((item) => {
@@ -247,7 +246,7 @@ function ChartLegendContent({
 					return (
 						<div
 							key={item.value}
-							className={clsx("[&>svg]:text-muted-foreground flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3")}
+							className={cn("[&>svg]:text-muted-foreground flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3")}
 						>
 							{itemConfig?.icon && !hideIcon ? (
 								<itemConfig.icon />

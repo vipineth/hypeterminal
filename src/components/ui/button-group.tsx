@@ -1,7 +1,7 @@
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Separator } from "@/components/ui/separator";
-import clsx from "clsx";
+import { cn } from "@/lib/cn";
 
 const buttonGroupVariants = cva(
 	"flex w-fit items-stretch [&>*]:focus-visible:z-10 [&>*]:focus-visible:relative [&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1 has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-md has-[>[data-slot=button-group]]:gap-2",
@@ -29,7 +29,7 @@ function ButtonGroup({
 		<fieldset
 			data-slot="button-group"
 			data-orientation={orientation}
-			className={clsx(buttonGroupVariants({ orientation }), className)}
+			className={cn(buttonGroupVariants({ orientation }), className)}
 			{...props}
 		/>
 	);
@@ -46,7 +46,7 @@ function ButtonGroupText({
 
 	return (
 		<Comp
-			className={clsx(
+			className={cn(
 				"bg-muted flex items-center gap-2 rounded-md border px-4 text-sm font-medium shadow-xs [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
 				className,
 			)}
@@ -64,7 +64,7 @@ function ButtonGroupSeparator({
 		<Separator
 			data-slot="button-group-separator"
 			orientation={orientation}
-			className={clsx("bg-input relative m-0! self-stretch data-[orientation=vertical]:h-auto", className)}
+			className={cn("bg-input relative m-0! self-stretch data-[orientation=vertical]:h-auto", className)}
 			{...props}
 		/>
 	);

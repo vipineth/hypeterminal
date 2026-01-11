@@ -3,11 +3,11 @@ import { Flame } from "lucide-react";
 import { useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DEFAULT_MARKET_KEY, UI_TEXT } from "@/config/interface";
+import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { makePerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
-import clsx from "clsx";
 import { useTheme } from "@/providers/theme";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import { QUOTE_ASSET } from "../chart/constants";
@@ -40,7 +40,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 	const change24h = calculate24hPriceChange(selectedMarket?.ctxNumbers);
 
 	return (
-		<div className={clsx("flex flex-col h-full min-h-0", className)}>
+		<div className={cn("flex flex-col h-full min-h-0", className)}>
 			{/* Market selector header */}
 			<div className="shrink-0 px-3 py-2 border-b border-border/60 bg-surface/30">
 				<div className="flex items-center justify-between gap-3">
@@ -57,7 +57,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 								</div>
 								{typeof change24h === "number" && (
 									<span
-										className={clsx(
+										className={cn(
 											"text-sm tabular-nums font-medium",
 											change24h >= 0 ? "text-terminal-green" : "text-terminal-red",
 										)}
@@ -103,9 +103,9 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 								})}
 							/>
 							<div className="flex items-center gap-1">
-								<Flame className={clsx("size-3", isFundingPositive ? "text-terminal-green" : "text-terminal-red")} />
+								<Flame className={cn("size-3", isFundingPositive ? "text-terminal-green" : "text-terminal-red")} />
 								<span
-									className={clsx(
+									className={cn(
 										"tabular-nums font-medium",
 										isFundingPositive ? "text-terminal-green" : "text-terminal-red",
 									)}

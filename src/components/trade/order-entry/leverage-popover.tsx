@@ -1,11 +1,11 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import clsx from "clsx";
 import { AlertTriangle, Check, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NumberInput } from "@/components/ui/number-input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/cn";
 import { LeverageSlider } from "./leverage-slider";
 
 interface Props {
@@ -136,7 +136,7 @@ export function LeveragePopover({
 
 					{updateError ? (
 						<div className="flex gap-2">
-							<Button variant="outline" size="sm" className="flex-1" onClick={handleCancel}>
+							<Button variant="outline" size="xs" className="flex-1" onClick={handleCancel}>
 								<Trans>Cancel</Trans>
 							</Button>
 							<Button
@@ -144,7 +144,7 @@ export function LeveragePopover({
 								size="none"
 								onClick={handleConfirm}
 								disabled={isUpdating}
-								className={clsx(
+								className={cn(
 									"flex-1 py-2 text-2xs font-semibold uppercase tracking-wider gap-1.5 hover:bg-transparent",
 									"bg-terminal-cyan/20 border border-terminal-cyan text-terminal-cyan",
 									"hover:bg-terminal-cyan/30",
@@ -156,16 +156,11 @@ export function LeveragePopover({
 						</div>
 					) : (
 						<Button
-							variant="ghost"
-							size="none"
+							variant="terminal"
+							size="xs"
 							onClick={handleConfirm}
 							disabled={!isDirty || isUpdating || showSuccess}
-							className={clsx(
-								"w-full py-2 text-2xs font-semibold uppercase tracking-wider gap-1.5 border hover:bg-transparent",
-								isDirty && !isUpdating && !showSuccess
-									? "bg-terminal-cyan/20 border-terminal-cyan text-terminal-cyan hover:bg-terminal-cyan/30"
-									: "bg-terminal-cyan/10 border-terminal-cyan/30 text-terminal-cyan/50",
-							)}
+							className={cn("w-full py-2 uppercase tracking-wider gap-1.5")}
 						>
 							{isUpdating && <Loader2 className="size-3 animate-spin" />}
 							<Trans>Confirm</Trans>

@@ -1,11 +1,11 @@
 import { t } from "@lingui/core/macro";
-import clsx from "clsx";
 import { Wallet } from "lucide-react";
 import { useMemo } from "react";
 import { useConnection } from "wagmi";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
+import { cn } from "@/lib/cn";
 import { formatToken, formatUSD } from "@/lib/format";
 import { useSubClearinghouseState, useSubSpotState } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumberOrZero } from "@/lib/trade/numbers";
@@ -156,7 +156,7 @@ export function BalancesTab() {
 												<TokenAvatar symbol={row.asset} />
 												<span className="text-terminal-cyan">{row.asset}</span>
 												<span
-													className={clsx(
+													className={cn(
 														"text-4xs px-1 py-0.5 rounded-sm uppercase",
 														row.type === "perp"
 															? "bg-terminal-purple/20 text-terminal-purple"

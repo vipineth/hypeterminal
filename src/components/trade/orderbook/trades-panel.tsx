@@ -3,11 +3,11 @@ import { ArrowRightLeft, ExternalLink } from "lucide-react";
 import { memo, useEffect, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { useRingBuffer } from "@/lib/circular-buffer";
+import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
 import { useSelectedResolvedMarket, useSubTrades } from "@/lib/hyperliquid";
 import { getExplorerTxUrl } from "@/lib/hyperliquid/explorer";
 import { getTradeKey, type ProcessedTrade, processTrades, type RawTrade } from "@/lib/trade/trades";
-import clsx from "clsx";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
 
 const MAX_TRADES = 100;
@@ -28,7 +28,7 @@ const TradeRow = memo(function TradeRow({ trade, szDecimals, showInUsd }: Props)
 			href={getExplorerTxUrl(trade.hash)}
 			target="_blank"
 			rel="noopener noreferrer"
-			className={clsx(
+			className={cn(
 				"grid grid-cols-3 gap-2 text-2xs tabular-nums py-0.5 hover:bg-accent/30 group",
 				trade.side === "buy" ? "trade-row-buy" : "trade-row-sell",
 			)}
@@ -37,7 +37,7 @@ const TradeRow = memo(function TradeRow({ trade, szDecimals, showInUsd }: Props)
 				{trade.time}
 				<ExternalLink className="size-2.5 opacity-100 hover:opacity-80" />
 			</div>
-			<div className={clsx("text-right", trade.side === "buy" ? "text-terminal-green" : "text-terminal-red")}>
+			<div className={cn("text-right", trade.side === "buy" ? "text-terminal-green" : "text-terminal-red")}>
 				{formatNumber(trade.price, 2)}
 			</div>
 			<div className="text-right text-muted-foreground">{sizeDisplay}</div>

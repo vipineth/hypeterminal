@@ -8,11 +8,11 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/config/interface";
+import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
 import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { useSubL2Book } from "@/lib/hyperliquid/hooks/subscription";
 import { processLevels } from "@/lib/trade/orderbook";
-import clsx from "clsx";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
 import { OrderbookRow } from "../orderbook/orderbook-row";
 import { TradesPanel } from "../orderbook/trades-panel";
@@ -143,7 +143,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 	}, [priceGroupingOptions, selectedOption]);
 
 	return (
-		<div className={clsx("flex flex-col h-full min-h-0", className)}>
+		<div className={cn("flex flex-col h-full min-h-0", className)}>
 			{/* Header with tabs and controls */}
 			<div className="shrink-0 px-3 py-2 border-b border-border/60 bg-surface/30">
 				<div className="flex items-center justify-between">
@@ -153,7 +153,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 							variant="ghost"
 							size="none"
 							onClick={() => setView("book")}
-							className={clsx(
+							className={cn(
 								"px-3 py-1.5 text-xs font-medium rounded transition-colors",
 								"min-h-[36px]",
 								"hover:bg-transparent",
@@ -168,7 +168,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 							variant="ghost"
 							size="none"
 							onClick={() => setView("trades")}
-							className={clsx(
+							className={cn(
 								"px-3 py-1.5 text-xs font-medium rounded transition-colors",
 								"min-h-[36px]",
 								"hover:bg-transparent",
@@ -188,7 +188,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 							variant="ghost"
 							size="none"
 							onClick={() => setShowOrderbookInUsd(!showOrderbookInUsd)}
-							className={clsx(
+							className={cn(
 								"px-2 py-1.5 text-xs border border-border/60 rounded",
 								"min-h-[36px] flex items-center gap-1",
 								"text-muted-foreground hover:text-foreground hover:border-foreground/30",
@@ -207,7 +207,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 									<Button
 										variant="ghost"
 										size="none"
-										className={clsx(
+										className={cn(
 											"px-2 py-1.5 text-xs border border-border/60 rounded",
 											"min-h-[36px] flex items-center gap-1",
 											"hover:border-foreground/30 hover:bg-transparent transition-colors",

@@ -1,7 +1,7 @@
-import clsx from "clsx";
 import { BarChart3, BookOpen, CircleDollarSign, LayoutList, TrendingUp } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/cn";
 
 export type MobileTab = "chart" | "book" | "trade" | "positions" | "account";
 
@@ -29,7 +29,7 @@ interface Props {
 export function MobileBottomNav({ activeTab, onTabChange, badges, className }: Props) {
 	return (
 		<nav
-			className={clsx(
+			className={cn(
 				"fixed inset-x-0 bottom-0 z-50 bg-background/95 backdrop-blur-sm border-t border-border/60",
 				"pb-[env(safe-area-inset-bottom)]",
 				className,
@@ -48,7 +48,7 @@ export function MobileBottomNav({ activeTab, onTabChange, badges, className }: P
 							variant="ghost"
 							size="none"
 							onClick={() => onTabChange(item.id)}
-							className={clsx(
+							className={cn(
 								"flex-1 flex flex-col items-center justify-center gap-0.5 rounded-none",
 								"min-h-[56px] py-2 px-1",
 								"transition-colors duration-150 ease-out",
@@ -64,7 +64,7 @@ export function MobileBottomNav({ activeTab, onTabChange, badges, className }: P
 								{isActive && <span className="absolute -top-0.5 -right-0.5 size-1.5 rounded-full bg-terminal-cyan" />}
 								{showBadge && (
 									<span
-										className={clsx(
+										className={cn(
 											"absolute -top-1 -right-2 min-w-4 h-4 px-1",
 											"flex items-center justify-center",
 											"rounded-full text-[10px] font-medium tabular-nums",
@@ -85,7 +85,5 @@ export function MobileBottomNav({ activeTab, onTabChange, badges, className }: P
 }
 
 export function MobileBottomNavSpacer({ className }: { className?: string }) {
-	return (
-		<div className={clsx("h-[calc(56px+env(safe-area-inset-bottom))]", "shrink-0", className)} aria-hidden="true" />
-	);
+	return <div className={cn("h-[calc(56px+env(safe-area-inset-bottom))]", "shrink-0", className)} aria-hidden="true" />;
 }

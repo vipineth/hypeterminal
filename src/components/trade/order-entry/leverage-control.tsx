@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAssetLeverage } from "@/hooks/trade/use-asset-leverage";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { LeverageBadge } from "./leverage-badge";
@@ -6,11 +6,10 @@ import { LeveragePopover } from "./leverage-popover";
 import { LeverageSheet } from "./leverage-sheet";
 
 interface Props {
-	marketKey?: string;
 	className?: string;
 }
 
-export function LeverageControl({ marketKey, className }: Props) {
+export function LeverageControl({ className }: Props) {
 	const isMobile = useIsMobile();
 	const [open, setOpen] = useState(false);
 
@@ -27,10 +26,6 @@ export function LeverageControl({ marketKey, className }: Props) {
 		confirmLeverage,
 		resetPending,
 	} = useAssetLeverage();
-
-	useEffect(() => {
-		setOpen(false);
-	}, [marketKey]);
 
 	const handleOpenChange = (newOpen: boolean) => {
 		if (!newOpen) {
