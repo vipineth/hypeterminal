@@ -13,7 +13,7 @@ import {
 	ORDER_MIN_NOTIONAL_USD,
 	ORDER_SIZE_PERCENT_STEPS,
 	UI_TEXT,
-} from "@/config/interface";
+} from "@/config/constants";
 import { useAssetLeverage } from "@/hooks/trade/use-asset-leverage";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";

@@ -1,7 +1,7 @@
 import { getCoreRowModel, type Row, type SortingState, useReactTable } from "@tanstack/react-table";
 import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { isTokenInCategory, type MarketCategory } from "@/config/token";
+import { isTokenInCategory, type MarketCategory } from "@/lib/tokens";
 import { usePerpMarkets } from "@/lib/hyperliquid";
 import { useSubAssetCtxs } from "@/lib/hyperliquid/hooks/subscription";
 import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";

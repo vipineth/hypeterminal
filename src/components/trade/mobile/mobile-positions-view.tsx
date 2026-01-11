@@ -4,7 +4,7 @@ import { useConnection } from "wagmi";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { POSITIONS_TABS, UI_TEXT } from "@/config/interface";
+import { POSITIONS_TABS, UI_TEXT } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";

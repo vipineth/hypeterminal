@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { DEFAULT_MARKET_KEY, STORAGE_KEYS } from "@/config/interface";
+import { DEFAULT_MARKET_KEY, STORAGE_KEYS } from "@/config/constants";
 import { createValidatedStorage } from "@/stores/validated-storage";
 
 const marketPrefsSchema = z.object({

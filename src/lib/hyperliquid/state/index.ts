@@ -5,4 +5,4 @@ export {
 	useAgentWallet,
 	useAgentWalletActions,
 	writeAgentToStorage,
-} from "./agentWallet";
+} from "./agent-wallet";

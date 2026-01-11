@@ -1,8 +1,8 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { LAYOUT_PERSISTENCE } from "@/config/interface";
+import { LAYOUT_PERSISTENCE } from "@/config/constants";
 import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { ChartPanel } from "../chart/chart-panel";
-import { usePersistentLayout } from "../hooks/use-persistent-layout";
+import { usePersistentLayout } from "@/hooks/trade/use-persistent-layout";
 import { OrderbookPanel } from "../orderbook/orderbook-panel";
 
 export function PriceRow() {

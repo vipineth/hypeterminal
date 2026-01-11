@@ -6,7 +6,7 @@ export {
 	useAgentWallet,
 	useAgentWalletActions,
 	writeAgentToStorage,
-} from "../../state/agentWallet";
+} from "../../state/agent-wallet";
 export { useAgentRegistration } from "../useAgentRegistration";
 export { useSignedExchange } from "../useSignedExchange";
 export { type UseTradingAgentResult, useTradingAgent } from "../useTradingAgent";

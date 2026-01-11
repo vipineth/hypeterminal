@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";

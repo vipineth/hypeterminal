@@ -2,7 +2,7 @@ import { t } from "@lingui/core/macro";
 import { Check, Loader2, X, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/interface";
+import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { type OrderQueueItem, useOrderQueue, useOrderQueueActions } from "@/stores/use-order-queue-store";
 

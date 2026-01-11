@@ -4,7 +4,7 @@ import { useConnection, useDisconnect } from "wagmi";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { UI_TEXT } from "@/config/interface";
+import { UI_TEXT } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";

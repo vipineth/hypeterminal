@@ -1,5 +1,5 @@
 import { TrendingUp, Zap } from "lucide-react";
-import { MARKET_CATEGORY_LABELS, TOKEN_ICON_BASE_URL } from "@/config/interface";
+import { MARKET_CATEGORY_LABELS, TOKEN_ICON_BASE_URL } from "@/config/constants";
 
 export function getTokenIconUrl(token: string) {
 	return `${TOKEN_ICON_BASE_URL}/${token}.svg`;

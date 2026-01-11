@@ -5,7 +5,7 @@ import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { useConnection } from "wagmi";
 import { useHyperliquid } from "../context";
 import { infoKeys } from "../query/keys";
-import { type AgentWallet, useAgentWallet, useAgentWalletActions } from "../state/agentWallet";
+import { type AgentWallet, useAgentWallet, useAgentWalletActions } from "../state/agent-wallet";
 import { convertFeeToPercentageString, isAgentApproved, isBuilderFeeApproved } from "../utils/agent";
 import type { AgentRegisterStatus, AgentStatus } from "./agent/types";
 import { useInfoExtraAgents } from "./info/useInfoExtraAgents";

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { STORAGE_KEYS } from "@/config/interface";
+import { STORAGE_KEYS } from "@/config/constants";
 import { createValidatedStorage } from "@/stores/validated-storage";
 
 type OrderType = "market" | "limit";

@@ -11,17 +11,25 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import {
 	ARBITRUM_CHAIN_ID,
 	FALLBACK_VALUE_PLACEHOLDER,
-	ORDER_FEE_RATE_MAKER,
-	ORDER_FEE_RATE_TAKER,
 	ORDER_MIN_NOTIONAL_USD,
 	ORDER_SIZE_PERCENT_STEPS,
-} from "@/config/interface";
+} from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
-import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
+import { formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
+import {
+	getConversionPrice,
+	getExecutedPrice,
+	getLiquidationInfo,
+	getMaxSize,
+	getOrderMetrics,
+	getOrderPrice,
+	getSizeValues,
+	getSliderValue,
+} from "@/lib/trade/order-entry-calcs";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import {
@@ -118,38 +126,48 @@ export function OrderEntryPanel() {
 	const ctxMarkPx = market?.ctxNumbers?.markPx;
 	const markPx =
 		typeof ctxMarkPx === "number" ? ctxMarkPx : typeof market?.midPxNumber === "number" ? market.midPxNumber : 0;
-	const price = orderType === "market" ? markPx : parseNumber(limitPriceInput) || 0;
+	const price = getOrderPrice(orderType, markPx, limitPriceInput);
 
-	const maxSize = useMemo(() => {
-		if (!isConnected) return 0;
-		const maxTradeSize = maxTradeSzs?.[1];
-		if (typeof maxTradeSize === "number" && maxTradeSize > 0) {
-			return floorToDecimals(maxTradeSize, market?.szDecimals ?? 0);
-		}
-		const available = side === "buy" ? availableToBuy : availableToSell;
-		if (available === null || available <= 0) return 0;
-		return floorToDecimals(available, market?.szDecimals ?? 0);
-	}, [isConnected, maxTradeSzs, market?.szDecimals, side, availableToBuy, availableToSell]);
+	const maxSize = useMemo(
+		() =>
+			getMaxSize({
+				isConnected,
+				maxTradeSzs,
+				szDecimals: market?.szDecimals,
+				side,
+				availableToBuy,
+				availableToSell,
+			}),
+		[availableToBuy, availableToSell, isConnected, market?.szDecimals, maxTradeSzs, side],
+	);
 
-	const conversionPx = markPx > 0 ? markPx : price;
-	const sizeInputValue = parseNumber(sizeInput) || 0;
-	const sizeValue = sizeMode === "usd" && conversionPx > 0 ? sizeInputValue / conversionPx : sizeInputValue;
+	const conversionPx = getConversionPrice(markPx, price);
+	const { sizeValue } = useMemo(
+		() => getSizeValues({ sizeInput, sizeMode, conversionPx }),
+		[conversionPx, sizeInput, sizeMode],
+	);
 
-	const orderValue = useMemo(() => sizeValue * price, [price, sizeValue]);
-	const marginRequired = useMemo(() => (leverage ? orderValue / leverage : 0), [leverage, orderValue]);
-	const feeRate = orderType === "market" ? ORDER_FEE_RATE_TAKER : ORDER_FEE_RATE_MAKER;
-	const estimatedFee = orderValue * feeRate;
+	const { orderValue, marginRequired, estimatedFee } = useMemo(
+		() =>
+			getOrderMetrics({
+				sizeValue,
+				price,
+				leverage,
+				orderType,
+			}),
+		[leverage, orderType, price, sizeValue],
+	);
 
-	const liqPrice = useMemo(() => {
-		if (!price || !sizeValue || !leverage) return null;
-		const buffer = price * (1 / leverage) * 0.9;
-		return side === "buy" ? price - buffer : price + buffer;
-	}, [leverage, price, side, sizeValue]);
-
-	const liqWarning = useMemo(() => {
-		if (!liqPrice || !price) return false;
-		return Math.abs(liqPrice - price) / price < 0.05;
-	}, [liqPrice, price]);
+	const { liqPrice, liqWarning } = useMemo(
+		() =>
+			getLiquidationInfo({
+				price,
+				sizeValue,
+				leverage,
+				side,
+			}),
+		[leverage, price, side, sizeValue],
+	);
 
 	const needsAgentApproval = agentStatus !== "valid";
 	const isReadyToTrade = agentStatus === "valid";
@@ -215,20 +233,17 @@ export function OrderEntryPanel() {
 	const sizeHasError = sizeValue > maxSize && maxSize > 0;
 	const orderValueTooLow = orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD;
 
-	const applySizePercent = useCallback(
-		(pct: number) => {
-			if (maxSize <= 0) return;
-			const newSize = maxSize * (pct / 100);
-			if (sizeMode === "usd" && conversionPx > 0) {
-				setSizeInput((newSize * conversionPx).toFixed(2));
-				return;
-			}
-			setSizeInput(formatDecimalFloor(newSize, market?.szDecimals ?? 0) || "");
-		},
-		[conversionPx, market?.szDecimals, maxSize, sizeMode],
-	);
+	function applySizePercent(pct: number) {
+		if (maxSize <= 0) return;
+		const newSize = maxSize * (pct / 100);
+		if (sizeMode === "usd" && conversionPx > 0) {
+			setSizeInput((newSize * conversionPx).toFixed(2));
+			return;
+		}
+		setSizeInput(formatDecimalFloor(newSize, market?.szDecimals ?? 0) || "");
+	}
 
-	const handleSizeModeToggle = useCallback(() => {
+	function handleSizeModeToggle() {
 		const newMode = sizeMode === "asset" ? "usd" : "asset";
 		if (conversionPx > 0 && sizeValue > 0) {
 			setSizeInput(
@@ -238,93 +253,93 @@ export function OrderEntryPanel() {
 			);
 		}
 		setSizeMode(newMode);
-	}, [conversionPx, market?.szDecimals, setSizeMode, sizeMode, sizeValue]);
+	}
 
 	const isRegistering = registerStatus === "signing" || registerStatus === "verifying";
 
-	const handleRegister = useCallback(() => {
-		if (isRegistering) return;
-		setApprovalError(null);
-		registerAgent().catch((error) => {
-			const message = error instanceof Error ? error.message : t`Failed to enable trading`;
-			setApprovalError(message);
-		});
-	}, [isRegistering, registerAgent]);
+	const handleRegister = useCallback(
+		function handleRegister() {
+			if (isRegistering) return;
+			setApprovalError(null);
+			registerAgent().catch((error) => {
+				const message = error instanceof Error ? error.message : t`Failed to enable trading`;
+				setApprovalError(message);
+			});
+		},
+		[isRegistering, registerAgent],
+	);
 
-	const handleSubmit = useCallback(async () => {
-		if (!validation.canSubmit || isSubmitting) return;
-		if (typeof market?.assetIndex !== "number") return;
+	const handleSubmit = useCallback(
+		async function handleSubmit() {
+			if (!validation.canSubmit || isSubmitting) return;
+			if (typeof market?.assetIndex !== "number") return;
 
-		let orderPrice = price;
-		if (orderType === "market") {
-			orderPrice = side === "buy" ? markPx * (1 + slippageBps / 10000) : markPx * (1 - slippageBps / 10000);
-		}
+			const orderPrice = getExecutedPrice(orderType, side, markPx, slippageBps, price);
 
-		const szDecimals = market.szDecimals ?? 0;
-		const formattedPrice = formatPriceForOrder(orderPrice);
-		const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
+			const szDecimals = market.szDecimals ?? 0;
+			const formattedPrice = formatPriceForOrder(orderPrice);
+			const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
 
-		const orderId = addOrder({
-			market: market.coin,
-			side,
-			size: formattedSize,
-			status: "pending",
-		});
-
-		try {
-			const result = await placeOrder({
-				orders: [
-					{
-						a: market.assetIndex,
-						b: side === "buy",
-						p: formattedPrice,
-						s: formattedSize,
-						r: reduceOnly,
-						t:
-							orderType === "market"
-								? { limit: { tif: "FrontendMarket" as const } }
-								: { limit: { tif: "Gtc" as const } },
-					},
-				],
-				grouping: "na",
+			const orderId = addOrder({
+				market: market.coin,
+				side,
+				size: formattedSize,
+				status: "pending",
 			});
 
-			const status = result.response?.data?.statuses?.[0];
-			if (status && typeof status === "object" && "error" in status && typeof status.error === "string") {
-				throw new Error(status.error);
+			try {
+				const result = await placeOrder({
+					orders: [
+						{
+							a: market.assetIndex,
+							b: side === "buy",
+							p: formattedPrice,
+							s: formattedSize,
+							r: reduceOnly,
+							t:
+								orderType === "market"
+									? { limit: { tif: "FrontendMarket" as const } }
+									: { limit: { tif: "Gtc" as const } },
+						},
+					],
+					grouping: "na",
+				});
+
+				const status = result.response?.data?.statuses?.[0];
+				if (status && typeof status === "object" && "error" in status && typeof status.error === "string") {
+					throw new Error(status.error);
+				}
+
+				updateOrder(orderId, { status: "success", fillPercent: 100 });
+
+				setSizeInput("");
+				setLimitPriceInput("");
+				return;
+			} catch (error) {
+				const errorMessage = error instanceof Error ? error.message : t`Order failed`;
+				updateOrder(orderId, { status: "failed", error: errorMessage });
 			}
+		},
+		[
+			addOrder,
+			isSubmitting,
+			market?.assetIndex,
+			market?.coin,
+			market?.szDecimals,
+			markPx,
+			orderType,
+			placeOrder,
+			price,
+			reduceOnly,
+			side,
+			sizeValue,
+			slippageBps,
+			updateOrder,
+			validation.canSubmit,
+		],
+	);
 
-			updateOrder(orderId, { status: "success", fillPercent: 100 });
-
-			setSizeInput("");
-			setLimitPriceInput("");
-			return;
-		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : t`Order failed`;
-			updateOrder(orderId, { status: "failed", error: errorMessage });
-		}
-	}, [
-		addOrder,
-		isSubmitting,
-		market?.assetIndex,
-		market?.coin,
-		market?.szDecimals,
-		markPx,
-		orderType,
-		placeOrder,
-		price,
-		reduceOnly,
-		side,
-		sizeValue,
-		slippageBps,
-		updateOrder,
-		validation.canSubmit,
-	]);
-
-	const sliderValue = useMemo(() => {
-		if (!maxSize || maxSize <= 0) return 25;
-		return Math.min(100, (sizeValue / maxSize) * 100);
-	}, [maxSize, sizeValue]);
+	const sliderValue = useMemo(() => getSliderValue(sizeValue, maxSize), [maxSize, sizeValue]);
 
 	const registerText = useMemo(() => {
 		if (isLoadingAgents) return t`Loading...`;

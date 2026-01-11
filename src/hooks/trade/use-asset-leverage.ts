@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConnection } from "wagmi";
-import { DEFAULT_MAX_LEVERAGE } from "@/config/interface";
+import { DEFAULT_MAX_LEVERAGE } from "@/config/constants";
 import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { useExchangeUpdateLeverage } from "@/lib/hyperliquid/hooks/exchange/useExchangeUpdateLeverage";
 import { useSubActiveAssetData } from "@/lib/hyperliquid/hooks/subscription";

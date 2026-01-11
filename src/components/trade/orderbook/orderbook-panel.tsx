@@ -9,7 +9,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { formatNumber } from "@/lib/format";
 import { useSelectedResolvedMarket, useSubL2Book } from "@/lib/hyperliquid";
 import {

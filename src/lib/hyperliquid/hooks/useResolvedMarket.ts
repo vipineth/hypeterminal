@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { DEFAULT_MARKET_KEY } from "@/config/interface";
+import { DEFAULT_MARKET_KEY } from "@/config/constants";
 import { getMarketCtxNumbers, type MarketCtxNumbers } from "@/lib/market";
 import { toFiniteNumber } from "@/lib/trade/numbers";
 import { useSelectedMarketKey } from "@/stores/use-market-prefs-store";

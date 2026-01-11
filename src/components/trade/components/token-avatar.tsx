@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getTokenIconUrl } from "@/config/token";
+import { getTokenIconUrl } from "@/lib/tokens";
 import { cn } from "@/lib/cn";
 
 interface Props {

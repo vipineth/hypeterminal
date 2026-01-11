@@ -2,7 +2,7 @@ import { t } from "@lingui/core/macro";
 import { Flame } from "lucide-react";
 import { useCallback } from "react";
 import { Separator } from "@/components/ui/separator";
-import { DEFAULT_MARKET_KEY } from "@/config/interface";
+import { DEFAULT_MARKET_KEY } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { useSelectedResolvedMarket } from "@/lib/hyperliquid";

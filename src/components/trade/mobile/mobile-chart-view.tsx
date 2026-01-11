@@ -2,7 +2,7 @@ import { ClientOnly } from "@tanstack/react-router";
 import { Flame } from "lucide-react";
 import { useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DEFAULT_MARKET_KEY, UI_TEXT } from "@/config/interface";
+import { DEFAULT_MARKET_KEY, UI_TEXT } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { useSelectedResolvedMarket } from "@/lib/hyperliquid";

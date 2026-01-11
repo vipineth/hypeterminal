@@ -7,7 +7,7 @@ import {
 	MARKET_ORDER_SLIPPAGE_MAX_BPS,
 	MARKET_ORDER_SLIPPAGE_MIN_BPS,
 	STORAGE_KEYS,
-} from "@/config/interface";
+} from "@/config/constants";
 import { type NumberFormatLocale, resolveNumberFormatLocale } from "@/lib/i18n";
 import { clampInt } from "@/lib/trade/numbers";
 import { createValidatedStorage } from "@/stores/validated-storage";

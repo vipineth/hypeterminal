@@ -13,7 +13,7 @@
  * ```
  */
 
-import { SEO_BASE_KEYWORDS, SEO_DEFAULTS } from "@/config/interface";
+import { SEO_BASE_KEYWORDS, SEO_DEFAULTS } from "@/config/constants";
 
 export { SEO_DEFAULTS };
 

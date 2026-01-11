@@ -7,7 +7,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/config/interface";
+import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
 import { useSelectedResolvedMarket } from "@/lib/hyperliquid";

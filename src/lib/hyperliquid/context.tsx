@@ -4,7 +4,7 @@ import { createContext, useContext, useMemo, useRef } from "react";
 import { useConnection, useWalletClient } from "wagmi";
 import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/hyperliquid";
 import { createExchangeClient, getInfoClient, getSubscriptionClient, initializeClients } from "./clients";
-import { createHyperliquidConfig } from "./createConfig";
+import { createHyperliquidConfig } from "./create-config";
 import type { BuilderConfig, HyperliquidEnv } from "./hooks/agent/types";
 import { createHyperliquidStore, type HyperliquidStore } from "./store";
 import { toHyperliquidWallet } from "./wallet";

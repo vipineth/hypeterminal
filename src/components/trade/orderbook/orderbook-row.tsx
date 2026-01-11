@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/interface";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatNumber, formatUSD } from "@/lib/format";
 import type { BookLevel } from "@/lib/trade/orderbook";

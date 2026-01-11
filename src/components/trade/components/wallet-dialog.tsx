@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { type Connector, useConnect } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { getLastUsedWallet, getWalletInfo, setLastUsedWallet } from "@/config/wallet";
+import { getLastUsedWallet, getWalletInfo, setLastUsedWallet } from "@/lib/wallet-utils";
 import { cn } from "@/lib/cn";
 
 interface Props {
