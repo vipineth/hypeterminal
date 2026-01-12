@@ -101,6 +101,11 @@ msgid "Asset"
 msgstr "资产"
 
 #: src/components/trade/order-entry/account-panel.tsx
+msgid "Assets"
+msgstr ""
+
+#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/balances-tab.tsx
 msgid "Available"
@@ -229,8 +234,8 @@ msgid "Closing..."
 msgstr "平仓中..."
 
 #: src/components/trade/order-entry/account-panel.tsx
-msgid "Collapse account panel"
-msgstr "收起账户面板"
+#~ msgid "Collapse account panel"
+#~ msgstr "收起账户面板"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
@@ -431,8 +436,8 @@ msgid "Executed"
 msgstr "已执行"
 
 #: src/components/trade/order-entry/account-panel.tsx
-msgid "Expand account panel"
-msgstr "展开账户面板"
+#~ msgid "Expand account panel"
+#~ msgstr "展开账户面板"
 
 #: src/components/trade/order-entry/order-toast.tsx
 msgid "failed"
@@ -527,6 +532,10 @@ msgstr "资金费用"
 #: src/components/pages/not-found-page.tsx
 msgid "Go to trading terminal"
 msgstr "前往交易终端"
+
+#: src/components/trade/order-entry/account-panel.tsx
+msgid "In Orders"
+msgstr ""
 
 #: src/components/trade/positions/balances-tab.tsx
 msgid "In Use"
@@ -1239,6 +1248,10 @@ msgstr "合计"
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Total Size"
 msgstr "总数量"
+
+#: src/components/trade/order-entry/account-panel.tsx
+msgid "Total Value"
+msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx
 msgid "TP"

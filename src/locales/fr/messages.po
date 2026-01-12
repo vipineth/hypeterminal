@@ -101,6 +101,11 @@ msgid "Asset"
 msgstr "Actif"
 
 #: src/components/trade/order-entry/account-panel.tsx
+msgid "Assets"
+msgstr ""
+
+#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/balances-tab.tsx
 msgid "Available"
@@ -229,8 +234,8 @@ msgid "Closing..."
 msgstr "Fermeture..."
 
 #: src/components/trade/order-entry/account-panel.tsx
-msgid "Collapse account panel"
-msgstr "Réduire le panneau du compte"
+#~ msgid "Collapse account panel"
+#~ msgstr "Réduire le panneau du compte"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
@@ -431,8 +436,8 @@ msgid "Executed"
 msgstr "Exécuté"
 
 #: src/components/trade/order-entry/account-panel.tsx
-msgid "Expand account panel"
-msgstr "Développer le panneau du compte"
+#~ msgid "Expand account panel"
+#~ msgstr "Développer le panneau du compte"
 
 #: src/components/trade/order-entry/order-toast.tsx
 msgid "failed"
@@ -527,6 +532,10 @@ msgstr "Paiements de financement"
 #: src/components/pages/not-found-page.tsx
 msgid "Go to trading terminal"
 msgstr "Aller au terminal de trading"
+
+#: src/components/trade/order-entry/account-panel.tsx
+msgid "In Orders"
+msgstr ""
 
 #: src/components/trade/positions/balances-tab.tsx
 msgid "In Use"
@@ -1239,6 +1248,10 @@ msgstr "Total"
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Total Size"
 msgstr "Taille totale"
+
+#: src/components/trade/order-entry/account-panel.tsx
+msgid "Total Value"
+msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx
 msgid "TP"
