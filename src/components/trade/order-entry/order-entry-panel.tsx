@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { ArrowLeftRight, Loader2, TrendingDown, TrendingUp } from "lucide-react";
+import { ArrowLeftRight, Loader2, PencilIcon, TrendingDown, TrendingUp } from "lucide-react";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,7 @@ import {
 } from "@/stores/use-order-entry-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
+import { GlobalSettingsDialog } from "../components/global-settings-dialog";
 import { WalletDialog } from "../components/wallet-dialog";
 import { DepositModal } from "./deposit-modal";
 import { LeverageControl, useAssetLeverage } from "./leverage-control";
@@ -105,6 +106,7 @@ export function OrderEntryPanel() {
 	const [approvalError, setApprovalError] = useState<string | null>(null);
 	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
 	const [depositModalOpen, setDepositModalOpen] = useState(false);
+	const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
 	const [tpSlEnabled, setTpSlEnabled] = useState(false);
 	const [tpPriceInput, setTpPriceInput] = useState("");
 	const [slPriceInput, setSlPriceInput] = useState("");
@@ -320,7 +322,9 @@ export function OrderEntryPanel() {
 					p: string;
 					s: string;
 					r: boolean;
-					t: { limit: { tif: "FrontendMarket" | "Gtc" } } | { trigger: { isMarket: boolean; triggerPx: string; tpsl: "tp" | "sl" } };
+					t:
+						| { limit: { tif: "FrontendMarket" | "Gtc" } }
+						| { trigger: { isMarket: boolean; triggerPx: string; tpsl: "tp" | "sl" } };
 				}> = [
 					{
 						a: market.assetIndex,
@@ -505,60 +509,63 @@ export function OrderEntryPanel() {
 				<LeverageControl key={market?.marketKey} />
 			</div>
 
-			<div className="p-2 space-y-2 overflow-y-auto flex-1">
-				<Tabs value={orderType} onValueChange={(v) => setOrderType(v as "market" | "limit")}>
-					<TabsList>
-						<TabsTrigger value="market" variant="underline">
-							{t`Market`}
-						</TabsTrigger>
-						<TabsTrigger value="limit" variant="underline">
-							{t`Limit`}
-						</TabsTrigger>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<span>
-									<TabsTrigger value="stop" variant="underline" disabled className="opacity-50 cursor-not-allowed">
-										{t`Stop`}
-									</TabsTrigger>
-								</span>
-							</TooltipTrigger>
-							<TooltipContent>{t`Coming soon`}</TooltipContent>
-						</Tooltip>
-					</TabsList>
-				</Tabs>
+			<div className="p-2 space-y-4 overflow-y-auto flex-1">
+				<div className="space-y-2">
+					<Tabs value={orderType} onValueChange={(v) => setOrderType(v as "market" | "limit")}>
+						<TabsList>
+							<TabsTrigger value="market" variant="underline">
+								{t`Market`}
+							</TabsTrigger>
+							<TabsTrigger value="limit" variant="underline">
+								{t`Limit`}
+							</TabsTrigger>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<span>
+										<TabsTrigger value="stop" variant="underline" disabled className="opacity-50 cursor-not-allowed">
+											{t`Stop`}
+										</TabsTrigger>
+									</span>
+								</TooltipTrigger>
+								<TooltipContent>{t`Coming soon`}</TooltipContent>
+							</Tooltip>
+						</TabsList>
+					</Tabs>
 
-				<div className="grid grid-cols-2 gap-1">
-					<Button
-						variant="ghost"
-						size="none"
-						onClick={() => setSide("buy")}
-						className={cn(
-							"py-2 text-2xs font-semibold uppercase tracking-wider border hover:bg-transparent",
-							side === "buy"
-								? "bg-terminal-green/20 border-terminal-green text-terminal-green terminal-glow-green"
-								: "border-border/60 text-muted-foreground hover:border-terminal-green/40 hover:text-terminal-green",
-						)}
-						aria-label={t`Buy Long`}
-					>
-						<TrendingUp className="size-3 inline mr-1" />
-						{t`Long`}
-					</Button>
-					<Button
-						variant="ghost"
-						size="none"
-						onClick={() => setSide("sell")}
-						className={cn(
-							"py-2 text-2xs font-semibold uppercase tracking-wider border hover:bg-transparent",
-							side === "sell"
-								? "bg-terminal-red/20 border-terminal-red text-terminal-red terminal-glow-red"
-								: "border-border/60 text-muted-foreground hover:border-terminal-red/40 hover:text-terminal-red",
-						)}
-						aria-label={t`Sell Short`}
-					>
-						<TrendingDown className="size-3 inline mr-1" />
-						{t`Short`}
-					</Button>
+					<div className="grid grid-cols-2 gap-1">
+						<Button
+							variant="ghost"
+							size="none"
+							onClick={() => setSide("buy")}
+							className={cn(
+								"py-2 text-2xs font-semibold uppercase tracking-wider border hover:bg-transparent",
+								side === "buy"
+									? "bg-terminal-green/20 border-terminal-green text-terminal-green terminal-glow-green"
+									: "border-border/60 text-muted-foreground hover:border-terminal-green/40 hover:text-terminal-green",
+							)}
+							aria-label={t`Buy Long`}
+						>
+							<TrendingUp className="size-3 inline mr-1" />
+							{t`Long`}
+						</Button>
+						<Button
+							variant="ghost"
+							size="none"
+							onClick={() => setSide("sell")}
+							className={cn(
+								"py-2 text-2xs font-semibold uppercase tracking-wider border hover:bg-transparent",
+								side === "sell"
+									? "bg-terminal-red/20 border-terminal-red text-terminal-red terminal-glow-red"
+									: "border-border/60 text-muted-foreground hover:border-terminal-red/40 hover:text-terminal-red",
+							)}
+							aria-label={t`Sell Short`}
+						>
+							<TrendingDown className="size-3 inline mr-1" />
+							{t`Short`}
+						</Button>
+					</div>
 				</div>
+
 				<div className="space-y-0.5 text-3xs">
 					<div className="flex items-center justify-between text-muted-foreground">
 						<span>{t`Available`}</span>
@@ -590,6 +597,7 @@ export function OrderEntryPanel() {
 						</div>
 					)}
 				</div>
+
 				<div className="space-y-1.5">
 					<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Size`}</div>
 					<div className="flex items-center gap-1">
@@ -661,79 +669,81 @@ export function OrderEntryPanel() {
 					</div>
 				)}
 
-				<div className="flex items-center gap-3 text-3xs">
-					<div className="inline-flex items-center gap-2">
-						<Checkbox
-							id={reduceOnlyId}
-							aria-label={t`Reduce Only`}
-							checked={reduceOnly}
-							onCheckedChange={(checked) => setReduceOnly(checked === true)}
+				<div className="space-y-4">
+					<div className="flex items-center gap-3 text-3xs">
+						<div className="inline-flex items-center gap-2">
+							<Checkbox
+								id={reduceOnlyId}
+								aria-label={t`Reduce Only`}
+								checked={reduceOnly}
+								onCheckedChange={(checked) => setReduceOnly(checked === true)}
+								disabled={isFormDisabled}
+							/>
+							<label
+								htmlFor={reduceOnlyId}
+								className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-foreground")}
+							>
+								{t`Reduce Only`}
+							</label>
+						</div>
+						<div className="inline-flex items-center gap-2">
+							<Checkbox
+								id={tpSlId}
+								aria-label={t`Take Profit / Stop Loss`}
+								checked={tpSlEnabled}
+								onCheckedChange={(checked) => setTpSlEnabled(checked === true)}
+								disabled={isFormDisabled}
+							/>
+							<label
+								htmlFor={tpSlId}
+								className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-foreground")}
+							>
+								{t`TP/SL`}
+							</label>
+						</div>
+					</div>
+
+					{tpSlEnabled && (
+						<TpSlSection
+							side={side}
+							referencePrice={price}
+							size={sizeValue}
+							szDecimals={market?.szDecimals}
+							tpPrice={tpPriceInput}
+							slPrice={slPriceInput}
+							onTpPriceChange={setTpPriceInput}
+							onSlPriceChange={setSlPriceInput}
 							disabled={isFormDisabled}
 						/>
-						<label
-							htmlFor={reduceOnlyId}
-							className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-foreground")}
-						>
-							{t`Reduce Only`}
-						</label>
-					</div>
-					<div className="inline-flex items-center gap-2">
-						<Checkbox
-							id={tpSlId}
-							aria-label={t`Take Profit / Stop Loss`}
-							checked={tpSlEnabled}
-							onCheckedChange={(checked) => setTpSlEnabled(checked === true)}
-							disabled={isFormDisabled}
-						/>
-						<label
-							htmlFor={tpSlId}
-							className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-foreground")}
-						>
-							{t`TP/SL`}
-						</label>
-					</div>
+					)}
 				</div>
 
-				{tpSlEnabled && (
-					<TpSlSection
-						side={side}
-						referencePrice={price}
-						size={sizeValue}
-						szDecimals={market?.szDecimals}
-						tpPrice={tpPriceInput}
-						slPrice={slPriceInput}
-						onTpPriceChange={setTpPriceInput}
-						onSlPriceChange={setSlPriceInput}
-						disabled={isFormDisabled}
-					/>
-				)}
-
-				<div className="h-4" />
-
-				{validation.errors.length > 0 && isConnected && availableBalance > 0 && !validation.needsApproval && (
-					<div className="text-4xs text-terminal-red">{validation.errors.join(" • ")}</div>
-				)}
-
-				{approvalError && <div className="text-4xs text-terminal-red">{approvalError}</div>}
-
-				<Button
-					variant="ghost"
-					size="none"
-					onClick={buttonContent.action}
-					disabled={buttonContent.disabled}
-					className={cn(
-						"w-full py-2.5 text-2xs font-semibold uppercase tracking-wider border gap-2 hover:bg-transparent",
-						buttonContent.variant === "cyan"
-							? "bg-terminal-cyan/20 border-terminal-cyan text-terminal-cyan hover:bg-terminal-cyan/30"
-							: buttonContent.variant === "buy"
-								? "bg-terminal-green/20 border-terminal-green text-terminal-green hover:bg-terminal-green/30"
-								: "bg-terminal-red/20 border-terminal-red text-terminal-red hover:bg-terminal-red/30",
+				<div className="space-y-2">
+					{validation.errors.length > 0 && isConnected && availableBalance > 0 && !validation.needsApproval && (
+						<div className="text-4xs text-terminal-red">{validation.errors.join(" • ")}</div>
 					)}
-					aria-label={buttonContent.text}
-				>
-					{(isSubmitting || isRegistering) && <Loader2 className="size-3 animate-spin" />}
-					{buttonContent.text}
-				</Button>
+
+					{approvalError && <div className="text-4xs text-terminal-red">{approvalError}</div>}
+
+					<Button
+						variant="ghost"
+						size="none"
+						onClick={buttonContent.action}
+						disabled={buttonContent.disabled}
+						className={cn(
+							"w-full py-2.5 text-2xs font-semibold uppercase tracking-wider border gap-2 hover:bg-transparent",
+							buttonContent.variant === "cyan"
+								? "bg-terminal-cyan/20 border-terminal-cyan text-terminal-cyan hover:bg-terminal-cyan/30"
+								: buttonContent.variant === "buy"
+									? "bg-terminal-green/20 border-terminal-green text-terminal-green hover:bg-terminal-green/30"
+									: "bg-terminal-red/20 border-terminal-red text-terminal-red hover:bg-terminal-red/30",
+						)}
+						aria-label={buttonContent.text}
+					>
+						{(isSubmitting || isRegistering) && <Loader2 className="size-3 animate-spin" />}
+						{buttonContent.text}
+					</Button>
+				</div>
 
 				<div className="border border-border/40 divide-y divide-border/40 text-3xs">
 					<div className="flex items-center justify-between px-2 py-1.5">
@@ -754,7 +764,14 @@ export function OrderEntryPanel() {
 					</div>
 					<div className="flex items-center justify-between px-2 py-1.5">
 						<span className="text-muted-foreground">{t`Slippage`}</span>
-						<span className="tabular-nums text-terminal-amber">{(slippageBps / 100).toFixed(2)}%</span>
+						<button
+							type="button"
+							onClick={() => setSettingsDialogOpen(true)}
+							className="flex items-center gap-1 hover:text-foreground transition-colors"
+						>
+							<span className="tabular-nums text-terminal-amber">{(slippageBps / 100).toFixed(2)}%</span>
+							<PencilIcon className="size-2 text-muted-foreground" />
+						</button>
 					</div>
 					<div className="flex items-center justify-between px-2 py-1.5">
 						<span className="text-muted-foreground">{t`Est. Fee`}</span>
@@ -767,6 +784,7 @@ export function OrderEntryPanel() {
 
 			<WalletDialog open={walletDialogOpen} onOpenChange={setWalletDialogOpen} />
 			<DepositModal open={depositModalOpen} onOpenChange={setDepositModalOpen} />
+			<GlobalSettingsDialog open={settingsDialogOpen} onOpenChange={setSettingsDialogOpen} />
 
 			<OrderToast />
 		</div>
