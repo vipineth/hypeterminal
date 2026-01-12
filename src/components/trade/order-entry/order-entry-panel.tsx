@@ -31,6 +31,7 @@ import {
 	getSliderValue,
 } from "@/lib/trade/order-entry-calcs";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
+import { validateSlPrice, validateTpPrice } from "@/lib/trade/tpsl";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import {
 	useOrderEntryActions,
@@ -45,6 +46,7 @@ import { WalletDialog } from "../components/wallet-dialog";
 import { DepositModal } from "./deposit-modal";
 import { LeverageControl, useAssetLeverage } from "./leverage-control";
 import { OrderToast } from "./order-toast";
+import { TpSlSection } from "./tp-sl-section";
 
 type ValidationResult = {
 	valid: boolean;
@@ -103,6 +105,9 @@ export function OrderEntryPanel() {
 	const [approvalError, setApprovalError] = useState<string | null>(null);
 	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
 	const [depositModalOpen, setDepositModalOpen] = useState(false);
+	const [tpSlEnabled, setTpSlEnabled] = useState(false);
+	const [tpPriceInput, setTpPriceInput] = useState("");
+	const [slPriceInput, setSlPriceInput] = useState("");
 
 	useEffect(() => {
 		if (selectedPrice !== null) {
@@ -111,6 +116,9 @@ export function OrderEntryPanel() {
 			getOrderbookActionsStore().actions.clearSelectedPrice();
 		}
 	}, [selectedPrice, setOrderType]);
+
+	const tpPriceNum = parseFloat(tpPriceInput) || 0;
+	const slPriceNum = parseFloat(slPriceInput) || 0;
 
 	const accountValue = parseNumber(clearinghouse?.crossMarginSummary?.accountValue) || 0;
 	const marginUsed = parseNumber(clearinghouse?.crossMarginSummary?.totalMarginUsed) || 0;
@@ -214,6 +222,20 @@ export function OrderEntryPanel() {
 			errors.push(t`Exceeds max size`);
 		}
 
+		if (tpSlEnabled) {
+			const hasTp = tpPriceNum > 0;
+			const hasSl = slPriceNum > 0;
+			if (!hasTp && !hasSl) {
+				errors.push(t`Enter TP or SL price`);
+			}
+			if (hasTp && !validateTpPrice(price, tpPriceNum, side)) {
+				errors.push(side === "buy" ? t`TP must be above entry` : t`TP must be below entry`);
+			}
+			if (hasSl && !validateSlPrice(price, slPriceNum, side)) {
+				errors.push(side === "buy" ? t`SL must be below entry` : t`SL must be above entry`);
+			}
+		}
+
 		return { valid: errors.length === 0, errors, canSubmit: errors.length === 0, needsApproval: false };
 	}, [
 		isConnected,
@@ -228,6 +250,10 @@ export function OrderEntryPanel() {
 		maxSize,
 		needsAgentApproval,
 		isReadyToTrade,
+		tpSlEnabled,
+		tpPriceNum,
+		slPriceNum,
+		side,
 	]);
 
 	const sizeHasError = sizeValue > maxSize && maxSize > 0;
@@ -288,22 +314,67 @@ export function OrderEntryPanel() {
 			});
 
 			try {
-				const result = await placeOrder({
-					orders: [
-						{
-							a: market.assetIndex,
-							b: side === "buy",
-							p: formattedPrice,
-							s: formattedSize,
-							r: reduceOnly,
-							t:
-								orderType === "market"
-									? { limit: { tif: "FrontendMarket" as const } }
-									: { limit: { tif: "Gtc" as const } },
+				const orders: Array<{
+					a: number;
+					b: boolean;
+					p: string;
+					s: string;
+					r: boolean;
+					t: { limit: { tif: "FrontendMarket" | "Gtc" } } | { trigger: { isMarket: boolean; triggerPx: string; tpsl: "tp" | "sl" } };
+				}> = [
+					{
+						a: market.assetIndex,
+						b: side === "buy",
+						p: formattedPrice,
+						s: formattedSize,
+						r: reduceOnly,
+						t:
+							orderType === "market"
+								? { limit: { tif: "FrontendMarket" as const } }
+								: { limit: { tif: "Gtc" as const } },
+					},
+				];
+
+				const hasTp = tpSlEnabled && tpPriceNum > 0;
+				const hasSl = tpSlEnabled && slPriceNum > 0;
+
+				if (hasTp) {
+					orders.push({
+						a: market.assetIndex,
+						b: side !== "buy",
+						p: formatPriceForOrder(tpPriceNum),
+						s: formattedSize,
+						r: true,
+						t: {
+							trigger: {
+								isMarket: true,
+								triggerPx: formatPriceForOrder(tpPriceNum),
+								tpsl: "tp",
+							},
 						},
-					],
-					grouping: "na",
-				});
+					});
+				}
+
+				if (hasSl) {
+					orders.push({
+						a: market.assetIndex,
+						b: side !== "buy",
+						p: formatPriceForOrder(slPriceNum),
+						s: formattedSize,
+						r: true,
+						t: {
+							trigger: {
+								isMarket: true,
+								triggerPx: formatPriceForOrder(slPriceNum),
+								tpsl: "sl",
+							},
+						},
+					});
+				}
+
+				const grouping = hasTp || hasSl ? "positionTpsl" : "na";
+
+				const result = await placeOrder({ orders, grouping });
 
 				const status = result.response?.data?.statuses?.[0];
 				if (status && typeof status === "object" && "error" in status && typeof status.error === "string") {
@@ -314,6 +385,9 @@ export function OrderEntryPanel() {
 
 				setSizeInput("");
 				setLimitPriceInput("");
+				setTpPriceInput("");
+				setSlPriceInput("");
+				setTpSlEnabled(false);
 				return;
 			} catch (error) {
 				const errorMessage = error instanceof Error ? error.message : t`Order failed`;
@@ -334,6 +408,9 @@ export function OrderEntryPanel() {
 			side,
 			sizeValue,
 			slippageBps,
+			slPriceNum,
+			tpPriceNum,
+			tpSlEnabled,
 			updateOrder,
 			validation.canSubmit,
 		],
@@ -600,18 +677,36 @@ export function OrderEntryPanel() {
 							{t`Reduce Only`}
 						</label>
 					</div>
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<div className="inline-flex items-center gap-2 cursor-not-allowed opacity-50">
-								<Checkbox id={tpSlId} aria-label={t`Take Profit / Stop Loss`} disabled />
-								<label htmlFor={tpSlId} className="text-muted-foreground cursor-not-allowed">
-									{t`TP/SL`}
-								</label>
-							</div>
-						</TooltipTrigger>
-						<TooltipContent>{t`Coming soon`}</TooltipContent>
-					</Tooltip>
+					<div className="inline-flex items-center gap-2">
+						<Checkbox
+							id={tpSlId}
+							aria-label={t`Take Profit / Stop Loss`}
+							checked={tpSlEnabled}
+							onCheckedChange={(checked) => setTpSlEnabled(checked === true)}
+							disabled={isFormDisabled}
+						/>
+						<label
+							htmlFor={tpSlId}
+							className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-foreground")}
+						>
+							{t`TP/SL`}
+						</label>
+					</div>
 				</div>
+
+				{tpSlEnabled && (
+					<TpSlSection
+						side={side}
+						referencePrice={price}
+						size={sizeValue}
+						szDecimals={market?.szDecimals}
+						tpPrice={tpPriceInput}
+						slPrice={slPriceInput}
+						onTpPriceChange={setTpPriceInput}
+						onSlPriceChange={setSlPriceInput}
+						disabled={isFormDisabled}
+					/>
+				)}
 
 				<div className="h-4" />
 

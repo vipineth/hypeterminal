@@ -5,13 +5,13 @@
 | Field | Value |
 |-------|-------|
 | Priority | High |
-| Status | Planned |
+| Status | In Progress |
 | Created | 2026-01-10 |
-| Updated | 2026-01-10 |
+| Updated | 2026-01-12 |
 
 ## Summary
 
-A Uniswap-style spot swap interface for exchanging one spot asset for another on Hyperliquid. Supports market swaps, limit orders, and displays real-time prices and user balances.
+A spot swap interface for exchanging one spot asset for another on Hyperliquid. Current implementation covers token selection, live orderbook quotes, market/limit orders, slippage settings stored in global settings, and the trading-agent approval flow. Balances and tokens come from spot APIs (`spotState`/`spotClearinghouseState` and `spotMeta`), not perp. No confirmation modal is planned. Next work is a minimal open-orders + history section on the same page and defaulting the "From" token to USDC.
 
 ## User Stories
 
@@ -20,24 +20,29 @@ A Uniswap-style spot swap interface for exchanging one spot asset for another on
 - As a trader, I want to set limit orders for better prices so I can get favorable rates
 - As a trader, I want to see my token balances so I know what I can swap
 - As a trader, I want to reverse the swap direction with one click for convenience
+- As a trader, I want to see open limit orders and recent fills without leaving the swap page
 
 ## Requirements
 
 ### Must Have
 
-- [ ] Token selection for "From" and "To" assets
-- [ ] Display user's spot balances for each token
-- [ ] Real-time price quotes from orderbook
-- [ ] Market swap (instant execution at best price)
-- [ ] Limit order placement at specified price
-- [ ] Slippage tolerance setting
-- [ ] Swap direction reversal (flip button)
-- [ ] Transaction confirmation with price impact warning
-- [ ] Order history for spot trades
+- [x] Token selection for "From" and "To" spot assets
+- [x] Spot balances from `spotState` (subscription) with optional `spotClearinghouseState` fallback
+- [x] Spot tokens and pairs from `spotMeta` (not perp meta)
+- [x] Real-time price quotes from spot orderbook
+- [x] Market swap (IOC execution at best price)
+- [x] Limit order placement at specified price (GTC)
+- [x] Slippage tolerance setting (global settings)
+- [x] Swap direction reversal (flip button)
+- [x] Trading agent approval flow (Enable Trading)
+- [x] Chain switch flow when wallet is on a non-Arbitrum chain
+- [ ] Default "From" token to USDC (spot)
+- [ ] Open limit orders and order history shown on the swap page (minimal layout)
+- [ ] Orders list is spot-only by filtering against `spotMeta.universe` names
 
 ### Nice to Have
 
-- [ ] Multi-hop routing (e.g., TOKEN → USDC → BTC)
+- [ ] Multi-hop routing (e.g., TOKEN -> USDC -> BTC)
 - [ ] Price chart for selected pair
 - [ ] Favorite/recent token pairs
 - [ ] TWAP orders for large swaps
@@ -45,33 +50,46 @@ A Uniswap-style spot swap interface for exchanging one spot asset for another on
 
 ## Tasks
 
-1. [ ] Create spot swap page layout and routing
-2. [ ] Build token selector component with search and balances
-3. [ ] Implement price fetching from orderbook via `useSubL2Book`
-4. [ ] Create swap preview with estimated output and price impact
-5. [ ] Add market swap execution using `useExchangeOrder`
-6. [ ] Add limit order functionality
-7. [ ] Implement slippage controls
-8. [ ] Build order confirmation modal
-9. [ ] Add spot order history section
-10. [ ] Connect to user's spot balances via `useInfoSpotClearinghouseState`
+1. [x] Create spot swap page layout and routing (`src/routes/swap.tsx`, `src/components/spot/swap-page.tsx`)
+2. [x] Build token selector component with search and balances (`src/components/spot/swap-token-selector.tsx`)
+3. [x] Implement price fetching from orderbook via `useSubL2Book`
+4. [x] Create swap preview with estimated output and price impact (`src/components/spot/swap-preview.tsx`)
+5. [x] Add market swap execution using `useExchangeOrder`
+6. [x] Add limit order functionality (GTC)
+7. [x] Implement slippage controls (`src/components/spot/swap-settings.tsx`)
+8. [x] Connect to user's spot balances via `useSubSpotState`
+9. [ ] Default "From" token to USDC once `spotMeta` loads
+10. [ ] Add open orders section using `useInfoFrontendOpenOrders` (spot-only filter)
+11. [ ] Add history section using `useInfoHistoricalOrders` (spot-only filter)
+12. [ ] Add cancel action for open orders via `useExchangeCancel`
+
+## Current Implementation Snapshot
+
+- Route: `src/routes/swap.tsx` -> `SwapPage`
+- UI: `src/components/spot/swap-page.tsx`, `src/components/spot/swap-panel.tsx`
+- Token selector: `src/components/spot/swap-token-selector.tsx`
+- Preview: `src/components/spot/swap-preview.tsx`
+- Slippage dialog: `src/components/spot/swap-settings.tsx`
+- Quote math: `src/lib/swap/quote.ts`
+- Execution: `src/lib/hyperliquid/hooks/exchange/useExchangeOrder.ts`
+- Agent approval: `src/lib/hyperliquid/hooks/useTradingAgent.ts` and `src/lib/hyperliquid/hooks/useAgentRegistration.ts`
+- Order feedback: `src/components/trade/order-entry/order-toast.tsx`
 
 ## Technical Spec
 
 ### Finding the Right API
 
-1. **Discover methods by intent** → `docs/hyperliquid-sdk-directory.md`
+1. Discover methods by intent -> `docs/hyperliquid-sdk-directory.md`
    - Scan "Want to..." tables to find method names
    - Note the type: (I)nfo, (E)xchange, or (S)ubscription
-
-2. **Get full parameter schema** → `docs/hyperliquid-sdk-1.md` or `docs/hyperliquid-sdk-2.md`
+2. Get full parameter schema -> `docs/hyperliquid-sdk-1.md` or `docs/hyperliquid-sdk-2.md`
    - Info methods: sdk-1 lines 1036-1775
    - Exchange methods: sdk-1 lines 1776-2054 + sdk-2 lines 1-220
    - Subscriptions: sdk-2 lines 221-540
 
 ### SDK/API Details
 
-#### spotMeta - Get Trading Pairs
+#### spotMeta - Get Trading Pairs (Spot Only)
 
 ```typescript
 // Request
@@ -81,7 +99,7 @@ A Uniswap-style spot swap interface for exchanging one spot asset for another on
 {
   universe: [{
     tokens: [baseTokenIndex, quoteTokenIndex],  // e.g., [1, 0] for BTC/USDC
-    name: string,                                // e.g., "BTC"
+    name: string,                                // e.g., "BTC/USDC"
     index: number,                               // Spot pair index
     isCanonical: boolean
   }],
@@ -98,40 +116,62 @@ A Uniswap-style spot swap interface for exchanging one spot asset for another on
 }
 ```
 
-#### spotClearinghouseState - User Balances
+#### spotState (subscription) - Spot Balances
+
+```typescript
+// Subscription
+{ type: "spotState", user: "0x..." }
+
+// Event payload (SpotStateWsEvent)
+{
+  spotState: {
+    balances: [{
+      coin: string,     // Token symbol (e.g., "USDC")
+      total: string,    // Total balance
+      hold: string      // Amount on hold
+    }]
+  }
+}
+```
+
+#### spotClearinghouseState (info) - Spot Balances Snapshot
 
 ```typescript
 // Request
 { type: "spotClearinghouseState", user: "0x..." }
-
-// Response
-{
-  balances: [{
-    coin: string,       // Token symbol (e.g., "USDC")
-    token: number,      // Token index
-    total: string,      // Total balance
-    hold: string,       // Amount on hold (in orders)
-    entryNtl: string    // Entry notional value
-  }]
-}
 ```
 
-#### l2Book - Orderbook for Price
+#### l2Book - Orderbook for Price (Spot Pair Name)
 
 ```typescript
 // Request
-{ coin: "BTC" }  // Use pair name from universe
+{ coin: "BTC/USDC" }  // Use pair name from spotMeta.universe
+```
 
-// Response
+#### frontendOpenOrders / historicalOrders - Orders & History
+
+```typescript
+// Requests
+{ type: "frontendOpenOrders", user: "0x..." }
+{ type: "historicalOrders", user: "0x..." }
+
+// Each order includes fields like:
 {
-  coin: string,
-  time: number,
-  levels: [
-    [{ px: string, sz: string, n: number }],  // Bids
-    [{ px: string, sz: string, n: number }]   // Asks
-  ]
+  coin: string,        // Pair or asset symbol
+  side: "B" | "A",
+  limitPx: string,
+  sz: string,
+  oid: number,
+  timestamp: number,
+  orderType: "Market" | "Limit" | "Stop Market" | "Stop Limit" | "Take Profit Market" | "Take Profit Limit",
+  tif: "Gtc" | "Ioc" | "Alo" | "FrontendMarket" | "LiquidationMarket" | null
 }
 ```
+
+Spot-only filtering:
+- Build a Set of `spotMeta.universe[].name` values.
+- Keep orders whose `coin` matches one of those names.
+- Default filter: "All spot"; optional filter: "Selected pair".
 
 #### Order Action for Spot Swap
 
@@ -142,25 +182,12 @@ A Uniswap-style spot swap interface for exchanging one spot asset for another on
   orders: [{
     a: number,      // Spot pair index
     b: boolean,     // true = buy base token, false = sell base token
-    p: string,      // Limit price
+    p: string,      // Limit price (quote per base)
     s: string,      // Size in base currency
     r: false,       // Not reduce-only for spot
     t: {
       limit: { tif: "Ioc" }  // Ioc for market swap, Gtc for limit
     }
-  }],
-  grouping: "na"
-}
-
-// Example: Buy 0.1 BTC with USDC at market price
-{
-  orders: [{
-    a: 1,              // BTC/USDC pair index
-    b: true,           // Buy BTC
-    p: "95500",        // Limit price (with slippage)
-    s: "0.1",          // 0.1 BTC
-    r: false,
-    t: { limit: { tif: "Ioc" } }  // Fill or kill
   }],
   grouping: "na"
 }
@@ -171,14 +198,18 @@ A Uniswap-style spot swap interface for exchanging one spot asset for another on
 | Hook | Purpose |
 |------|---------|
 | `useInfoSpotMeta` | Get all spot pairs and tokens |
-| `useInfoSpotClearinghouseState` | Get user's spot balances |
+| `useSubSpotState` | Get user balances via subscription |
+| `useInfoSpotClearinghouseState` | Snapshot fallback for balances |
 | `useSubL2Book` | Subscribe to orderbook for real-time prices |
+| `useTradingAgent` | Agent approval flow ("Enable Trading") |
 | `useExchangeOrder` | Place swap orders |
-| `useExchangeCancel` | Cancel limit orders |
-| `useInfoFrontendOpenOrders` | Get pending orders |
-| `useInfoHistoricalOrders` | Get order history |
+| `useMarketOrderSlippageBps` | Read persisted slippage |
+| `useGlobalSettingsActions` | Update slippage |
+| `useInfoFrontendOpenOrders` | Open orders list |
+| `useInfoHistoricalOrders` | History list |
+| `useExchangeCancel` | Cancel open orders |
 
-### State Management
+### State Management (Current)
 
 ```typescript
 // Swap form state (local component state)
@@ -186,79 +217,71 @@ interface SwapFormState {
   fromToken: SpotToken | null;
   toToken: SpotToken | null;
   fromAmount: string;
-  toAmount: string;
   orderType: "market" | "limit";
   limitPrice: string;
-  slippageBps: number;  // Default 50 (0.5%)
+  slippageBps: number;
+  settingsOpen: boolean;
+  tokenSelectorOpen: "from" | "to" | null;
+  walletDialogOpen: boolean;
+  approvalError: string | null;
 }
 
-// Derived values
+// Derived values (src/lib/swap/quote.ts)
 interface SwapQuote {
-  expectedOutput: string;
-  minimumOutput: string;    // After slippage
-  priceImpact: number;      // Percentage
-  executionPrice: string;
-  fee: string;
+  inputAmount: number;
+  outputAmount: number;
+  minimumOutput: number;
+  executionPrice: number;
+  midPrice: number;
+  priceImpactPct: number;
+  fee: number;
 }
 ```
 
-### Swap Execution Logic
+### Swap Execution Logic (Current)
 
 ```typescript
-// For market swap (buy base token)
-function buildMarketBuyOrder(
-  pairIndex: number,
-  baseAmount: string,
-  bestAsk: string,
-  slippageBps: number
-): Order {
-  const maxPrice = applySlippage(bestAsk, slippageBps, "up");
-  return {
-    a: pairIndex,
-    b: true,  // Buy
-    p: maxPrice,
-    s: baseAmount,
-    r: false,
-    t: { limit: { tif: "Ioc" } }
-  };
-}
+// Calculate quote from orderbook levels
+const quote = calculateSwapQuote(spotPair, side, fromAmountNum, levels, slippageBps, ORDER_FEE_RATE_TAKER);
 
-// For market swap (sell base token)
-function buildMarketSellOrder(
-  pairIndex: number,
-  baseAmount: string,
-  bestBid: string,
-  slippageBps: number
-): Order {
-  const minPrice = applySlippage(bestBid, slippageBps, "down");
-  return {
-    a: pairIndex,
-    b: false,  // Sell
-    p: minPrice,
-    s: baseAmount,
-    r: false,
-    t: { limit: { tif: "Ioc" } }
-  };
-}
+// Determine base size for order
+const baseSize = side === "buy" ? quote.outputAmount : fromAmountNum;
+
+// Use limit price if provided, otherwise use execution price from quote
+const price = orderType === "limit" ? parseNumberOrZero(limitPrice) : quote.executionPrice;
+
+// Apply slippage in the correct direction
+const priceWithSlippage = applySlippage(price, slippageBps, side === "buy" ? "up" : "down");
+
+// Place order using IOC for market or GTC for limit
 ```
 
 ## Files
 
-### Create
+### Current
 
-- `src/app/swap/page.tsx` - Swap page
-- `src/components/swap/swap-panel.tsx` - Main swap interface
-- `src/components/swap/token-selector.tsx` - Token selection dropdown
-- `src/components/swap/swap-preview.tsx` - Preview with price impact
-- `src/components/swap/swap-settings.tsx` - Slippage settings
-- `src/components/swap/swap-history.tsx` - Recent swaps
-- `src/lib/swap/quote.ts` - Price calculation utilities
-- `src/lib/swap/routing.ts` - Find best route for swap
+- `src/routes/swap.tsx`
+- `src/components/spot/swap-page.tsx`
+- `src/components/spot/swap-panel.tsx`
+- `src/components/spot/swap-token-selector.tsx`
+- `src/components/spot/swap-preview.tsx`
+- `src/components/spot/swap-settings.tsx`
+- `src/lib/swap/quote.ts`
 
-### Modify
+### Planned
 
-- `src/components/layout/navigation.tsx` - Add swap link
-- `src/lib/hyperliquid/hooks/info/index.ts` - Export spot hooks if needed
+- `src/components/spot/swap-orders-panel.tsx` (open + history tabs)
+- `src/components/spot/swap-orders-list.tsx` (shared row renderer)
+
+### Related
+
+- `src/lib/hyperliquid/hooks/subscription/useSubSpotState.ts`
+- `src/lib/hyperliquid/hooks/subscription/useSubL2Book.ts`
+- `src/lib/hyperliquid/hooks/info/useInfoSpotClearinghouseState.ts`
+- `src/lib/hyperliquid/hooks/info/useInfoFrontendOpenOrders.ts`
+- `src/lib/hyperliquid/hooks/info/useInfoHistoricalOrders.ts`
+- `src/lib/hyperliquid/hooks/exchange/useExchangeCancel.ts`
+- `src/components/trade/order-entry/order-toast.tsx`
 
 ## UI/UX
 
@@ -266,11 +289,11 @@ function buildMarketSellOrder(
 
 When building UI components for this feature:
 
-1. **Use `/frontend-design` skill** - Invoke the frontend-design skill to generate production-grade components that match the app's visual style
-2. **Reference existing components** - Study `src/components/trade/` for patterns like order entry panels, modals, and form inputs
-3. **Follow the terminal aesthetic** - Use existing color tokens (`terminal-green`, `terminal-red`, etc.) and the monospace/tabular-nums typography
-4. **Use existing UI primitives** - Leverage components from `src/components/ui/` (Button, Input, Dialog, Popover, etc.)
-5. **Match the dark theme** - All new components should integrate seamlessly with the dark trading terminal theme
+1. Use `/frontend-design` skill for new UI work
+2. Reference existing components in `src/components/trade/` for patterns
+3. Follow the terminal aesthetic using existing color tokens and monospace typography
+4. Use existing UI primitives from `src/components/ui/`
+5. Match the dark terminal theme
 
 ### Main Swap Panel Layout
 
@@ -280,7 +303,7 @@ When building UI components for this feature:
 ├─────────────────────────────────────┤
 │  From                               │
 │  ┌─────────────────────────────────┐│
-│  │ [🔵 USDC ▼]        1,234.56    ││
+│  │ [USDC ▼]            1,234.56   ││
 │  │                    Balance: 5000││
 │  └─────────────────────────────────┘│
 │                                     │
@@ -288,8 +311,8 @@ When building UI components for this feature:
 │                                     │
 │  To                                 │
 │  ┌─────────────────────────────────┐│
-│  │ [🟠 BTC ▼]         0.0129      ││
-│  │                    Balance: 0.5 ││
+│  │ [Select ▼]         0.0000     ││
+│  │                    Balance: 0.0 ││
 │  └─────────────────────────────────┘│
 │                                     │
 │  ○ Market  ● Limit                  │
@@ -308,102 +331,91 @@ When building UI components for this feature:
 └─────────────────────────────────────┘
 ```
 
-### Token Selector Modal
+### Orders + History (Minimal, Same Page)
 
 ```
 ┌─────────────────────────────────────┐
-│  Select Token               ✕       │
+│  Orders                             │
+│  [Open] [History]                   │
 ├─────────────────────────────────────┤
-│  🔍 [Search by name or address   ] │
-├─────────────────────────────────────┤
-│  Popular                            │
-│  [USDC] [BTC] [ETH] [HYPE]          │
-├─────────────────────────────────────┤
-│  Your Tokens                        │
-│  ┌─────────────────────────────────┐│
-│  │ 🔵 USDC          5,000.00      ││
-│  │ 🟠 BTC              0.5000     ││
-│  │ 🔷 ETH              2.5000     ││
-│  │ 🟣 HYPE         1,234.00       ││
-│  └─────────────────────────────────┘│
+│  Side  Pair     Price   Size   Time │
+│  B     BTC/USDC 95500   0.10   2m    │
+│  A     ETH/USDC 3200    1.50   9m    │
+│  [Cancel] on open orders only       │
 └─────────────────────────────────────┘
 ```
 
-### Settings Popover
+Notes:
+- Keep it compact: one-line rows, 4-5 columns max, truncate where needed.
+- Default filter: "All spot" with optional "Selected pair".
+- History shows status (filled/canceled) and hides cancel actions.
+- Set a max height for the orders container and make the list scrollable.
+
+### Settings Dialog (Current)
 
 ```
 ┌─────────────────────────────────────┐
-│  Transaction Settings               │
+│  Swap Settings                      │
 ├─────────────────────────────────────┤
 │  Slippage Tolerance                 │
-│  [0.1%] [0.5%] [1.0%] [Custom: __]  │
-│                                     │
-│  Transaction Deadline               │
-│  [30] minutes                       │
+│  [0.1%] [0.25%] [0.5%] [1.0%]       │
+│  Custom: [__] %                     │
 └─────────────────────────────────────┘
 ```
 
-### User Flow
+### User Flow (Current)
 
 1. User navigates to /swap
-2. "From" defaults to USDC, "To" is empty
-3. User clicks "To" token selector → modal with available tokens
-4. User selects BTC → price fetched from orderbook
-5. User enters amount in "From" field → "To" amount auto-calculates
-6. Preview shows rate, price impact, min received
-7. User clicks "Swap" → confirmation modal
-8. User confirms → wallet signature
-9. Order submitted → toast shows result
-10. Balances update on success
+2. "From" defaults to USDC; "To" is unselected
+3. User connects wallet if not connected
+4. If chain mismatch, user switches to Arbitrum
+5. User selects a "To" token
+6. Orderbook subscription loads; preview shows rate/impact/min received
+7. If agent not approved, user clicks "Enable Trading" and signs
+8. User enters amount and clicks "Swap" (or places limit order)
+9. Orders and history list update below the swap panel (All spot by default)
 
-### Visual States
+### Visual States (Current)
 
 ```
 Disconnected:
-[Connect Wallet to Swap]
+[Connect Wallet]
+
+Needs approval:
+[Enable Trading]
 
 No balance:
-[Insufficient USDC balance]
-
-High price impact (>2%):
-⚠️ Price Impact Warning
-Price impact is 3.5%. Your trade may be frontrun.
-[Swap Anyway] [Cancel]
+Insufficient balance
 
 Loading price:
-[Fetching best price...]
+Orderbook error or Loading...
 
-Success:
-✅ Swapped 1,000 USDC for 0.0105 BTC
+Orders empty:
+No open orders / No history yet
 ```
 
 ## Edge Cases
 
-- **No direct pair exists** - Route through USDC (TOKEN1 → USDC → TOKEN2)
-- **Insufficient balance** - Disable swap button, show error
-- **High price impact (>2%)** - Show warning, require confirmation
-- **Order partially filled** - Show actual received vs expected
-- **Slippage exceeded** - Show "Price moved" error, suggest retry
-- **Token has no liquidity** - Show "No liquidity" message
-- **Same token selected** - Disable swap, show message
-- **Very small amounts** - Check against min order size
+- No direct pair exists (no quote / Swap disabled)
+- "To" token not selected (disable submit)
+- Insufficient balance disables submit and shows error
+- Min notional below $10 (ORDER_MIN_NOTIONAL_USD) disables submit
+- Orderbook subscription error disables submit
+- Chain mismatch requires switch to Arbitrum
+- Same token selected auto-swaps the other side
+- Token has no liquidity (no quote)
 
 ## Research Notes
 
-- Spot pairs in `universe` have `tokens: [baseIndex, quoteIndex]`
-- Most pairs are quoted in USDC (token index 0)
-- Order `b: true` = buy base token (spend quote), `b: false` = sell base token (receive quote)
-- `tif: "Ioc"` ensures immediate fill or nothing (for market orders)
-- `tif: "Gtc"` for limit orders that rest on book
+- Spot pairs in `spotMeta.universe` have `tokens: [baseIndex, quoteIndex]`
+- Spot tokens list is `spotMeta.tokens` (do not use perp `meta`)
+- Spot balances come from `spotState` or `spotClearinghouseState`
+- `b: true` = buy base token (spend quote), `b: false` = sell base token
+- `tif: "Ioc"` for market, `tif: "Gtc"` for limit
 - Price impact = (execution price - mid price) / mid price
-- Best ask (lowest) for buying, best bid (highest) for selling
-- Spot has no leverage - simple asset exchange
+- `parseSpotBalances` uses total - hold for available balance
+- Slippage is persisted in global settings
 
 ## Open Questions
 
-- [ ] Should we support multi-hop routing (A → USDC → B)?
-- [ ] Show mini chart in swap panel?
-- [ ] Add "Max" button that uses full balance minus gas?
-- [ ] Support TWAP for large swaps?
-- [ ] Show historical swaps or link to existing order history?
-- [ ] Add price comparison with external sources?
+- How many history rows should we show by default, and do we need pagination or infinite scroll?
