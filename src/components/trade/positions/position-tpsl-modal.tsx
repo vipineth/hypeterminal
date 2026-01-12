@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
-import { isPositive } from "@/lib/trade/numbers";
+import { isPositive, toNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
 import { validateSlPrice, validateTpPrice } from "@/lib/trade/tpsl";
 import { TokenAvatar } from "../components/token-avatar";
@@ -53,8 +53,8 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 		}
 	}, [open, position]);
 
-	const tpPriceNum = parseFloat(tpPriceInput) || 0;
-	const slPriceNum = parseFloat(slPriceInput) || 0;
+	const tpPriceNum = toNumber(tpPriceInput);
+	const slPriceNum = toNumber(slPriceInput);
 
 	const side = position?.isLong ? "buy" : "sell";
 	const referencePrice = position?.entryPx ?? 0;

@@ -326,12 +326,12 @@ msgid "Cross Leverage"
 msgstr "Cross Leverage"
 
 #: src/components/trade/order-entry/tp-sl-section.tsx
-msgid "Custom SL percentage"
-msgstr "Custom SL percentage"
+#~ msgid "Custom SL percentage"
+#~ msgstr "Custom SL percentage"
 
 #: src/components/trade/order-entry/tp-sl-section.tsx
-msgid "Custom TP percentage"
-msgstr "Custom TP percentage"
+#~ msgid "Custom TP percentage"
+#~ msgstr "Custom TP percentage"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Customize your trading experience."
@@ -419,8 +419,8 @@ msgstr "Est. Fee"
 
 #: src/components/trade/order-entry/tp-sl-section.tsx
 #: src/components/trade/order-entry/tp-sl-section.tsx
-msgid "Est. P&L"
-msgstr "Est. P&L"
+#~ msgid "Est. P&L"
+#~ msgstr "Est. P&L"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Exceeds max size"
@@ -898,6 +898,8 @@ msgstr "Position"
 #~ msgstr "Previous"
 
 #: src/components/trade/chart/constants.ts
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/order-entry/tp-sl-section.tsx
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
@@ -1100,8 +1102,12 @@ msgid "SL must be below entry"
 msgstr "SL must be below entry"
 
 #: src/components/trade/order-entry/tp-sl-section.tsx
-msgid "SL trigger price"
-msgstr "SL trigger price"
+msgid "SL Price"
+msgstr "SL Price"
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "SL trigger price"
+#~ msgstr "SL trigger price"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Slippage"
@@ -1156,6 +1162,7 @@ msgid "Stop"
 msgstr "Stop"
 
 #: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/order-entry/tp-sl-section.tsx
 msgid "Stop Loss"
 msgstr "Stop Loss"
 
@@ -1191,6 +1198,7 @@ msgstr "Switch to light mode"
 msgid "Switching..."
 msgstr "Switching..."
 
+#: src/components/trade/order-entry/tp-sl-section.tsx
 #: src/components/trade/order-entry/tp-sl-section.tsx
 msgid "Take Profit"
 msgstr "Take Profit"
@@ -1251,8 +1259,12 @@ msgid "TP must be below entry"
 msgstr "TP must be below entry"
 
 #: src/components/trade/order-entry/tp-sl-section.tsx
-msgid "TP trigger price"
-msgstr "TP trigger price"
+msgid "TP Price"
+msgstr "TP Price"
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "TP trigger price"
+#~ msgstr "TP trigger price"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/positions-tab.tsx

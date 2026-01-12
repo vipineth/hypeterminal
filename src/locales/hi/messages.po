@@ -326,12 +326,12 @@ msgid "Cross Leverage"
 msgstr "क्रॉस लीवरेज"
 
 #: src/components/trade/order-entry/tp-sl-section.tsx
-msgid "Custom SL percentage"
-msgstr ""
+#~ msgid "Custom SL percentage"
+#~ msgstr ""
 
 #: src/components/trade/order-entry/tp-sl-section.tsx
-msgid "Custom TP percentage"
-msgstr ""
+#~ msgid "Custom TP percentage"
+#~ msgstr ""
 
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Customize your trading experience."
@@ -419,8 +419,8 @@ msgstr "अनु. शुल्क"
 
 #: src/components/trade/order-entry/tp-sl-section.tsx
 #: src/components/trade/order-entry/tp-sl-section.tsx
-msgid "Est. P&L"
-msgstr ""
+#~ msgid "Est. P&L"
+#~ msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Exceeds max size"
@@ -894,6 +894,8 @@ msgstr "पोजीशन"
 #~ msgstr "पिछला"
 
 #: src/components/trade/chart/constants.ts
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/order-entry/tp-sl-section.tsx
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
@@ -1096,8 +1098,12 @@ msgid "SL must be below entry"
 msgstr ""
 
 #: src/components/trade/order-entry/tp-sl-section.tsx
-msgid "SL trigger price"
+msgid "SL Price"
 msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "SL trigger price"
+#~ msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Slippage"
@@ -1152,6 +1158,7 @@ msgid "Stop"
 msgstr "स्टॉप"
 
 #: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/order-entry/tp-sl-section.tsx
 msgid "Stop Loss"
 msgstr ""
 
@@ -1187,6 +1194,7 @@ msgstr "लाइट मोड में बदलें"
 msgid "Switching..."
 msgstr "स्विच हो रहा है..."
 
+#: src/components/trade/order-entry/tp-sl-section.tsx
 #: src/components/trade/order-entry/tp-sl-section.tsx
 msgid "Take Profit"
 msgstr ""
@@ -1247,8 +1255,12 @@ msgid "TP must be below entry"
 msgstr ""
 
 #: src/components/trade/order-entry/tp-sl-section.tsx
-msgid "TP trigger price"
+msgid "TP Price"
 msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "TP trigger price"
+#~ msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/positions-tab.tsx

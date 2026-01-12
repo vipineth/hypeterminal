@@ -1,89 +1,92 @@
+import { calc, isPositive, toBig, toNumber } from "./numbers";
+
 type Side = "buy" | "sell";
 
 interface TpSlCalcParams {
-	referencePrice: number;
+	referencePrice: unknown;
 	side: Side;
-	size: number;
+	size: unknown;
 }
 
-export function calculateTpPrice(referencePrice: number, side: Side, tpPercent: number): number {
-	if (!Number.isFinite(referencePrice) || referencePrice <= 0 || !Number.isFinite(tpPercent)) {
-		return 0;
+export function calculateTpPrice(referencePrice: unknown, side: Side, tpPercent: unknown): number | null {
+	if (!isPositive(referencePrice) || !isPositive(tpPercent)) {
+		return null;
 	}
-	const multiplier = side === "buy" ? 1 + tpPercent / 100 : 1 - tpPercent / 100;
-	return referencePrice * multiplier;
+	const percentValue = calc.percent(referencePrice, tpPercent);
+	if (percentValue === null) return null;
+
+	return side === "buy" ? calc.add(referencePrice, percentValue) : calc.subtract(referencePrice, percentValue);
 }
 
-export function calculateSlPrice(referencePrice: number, side: Side, slPercent: number): number {
-	if (!Number.isFinite(referencePrice) || referencePrice <= 0 || !Number.isFinite(slPercent)) {
-		return 0;
+export function calculateSlPrice(referencePrice: unknown, side: Side, slPercent: unknown): number | null {
+	if (!isPositive(referencePrice) || !isPositive(slPercent)) {
+		return null;
 	}
-	const multiplier = side === "buy" ? 1 - slPercent / 100 : 1 + slPercent / 100;
-	return referencePrice * multiplier;
+	const percentValue = calc.percent(referencePrice, slPercent);
+	if (percentValue === null) return null;
+
+	return side === "buy" ? calc.subtract(referencePrice, percentValue) : calc.add(referencePrice, percentValue);
 }
 
 export function calculatePercentFromPrice(
-	referencePrice: number,
-	targetPrice: number,
+	referencePrice: unknown,
+	targetPrice: unknown,
 	side: Side,
 	type: "tp" | "sl",
-): number {
-	if (
-		!Number.isFinite(referencePrice) ||
-		referencePrice <= 0 ||
-		!Number.isFinite(targetPrice) ||
-		targetPrice <= 0
-	) {
-		return 0;
+): number | null {
+	if (!isPositive(referencePrice) || !isPositive(targetPrice)) {
+		return null;
 	}
-	const diff = targetPrice - referencePrice;
-	const percent = (diff / referencePrice) * 100;
+	const percent = calc.percentChange(referencePrice, targetPrice);
+	if (percent === null) return null;
 
 	if (type === "tp") {
-		return side === "buy" ? percent : -percent;
+		return side === "buy" ? percent : calc.multiply(percent, -1);
 	}
-	return side === "buy" ? -percent : percent;
+	return side === "buy" ? calc.multiply(percent, -1) : percent;
 }
 
-export function calculateEstimatedPnl(params: TpSlCalcParams, targetPrice: number): number {
-	if (
-		!Number.isFinite(params.referencePrice) ||
-		params.referencePrice <= 0 ||
-		!Number.isFinite(targetPrice) ||
-		targetPrice <= 0 ||
-		!Number.isFinite(params.size) ||
-		params.size <= 0
-	) {
-		return 0;
+export function calculateEstimatedPnl(params: TpSlCalcParams, targetPrice: unknown): number | null {
+	if (!isPositive(params.referencePrice) || !isPositive(targetPrice) || !isPositive(params.size)) {
+		return null;
 	}
-	const priceDiff = targetPrice - params.referencePrice;
-	return params.side === "buy" ? priceDiff * params.size : -priceDiff * params.size;
+	const priceDiff = calc.subtract(targetPrice, params.referencePrice);
+	if (priceDiff === null) return null;
+
+	const pnl = calc.multiply(priceDiff, params.size);
+	if (pnl === null) return null;
+
+	return params.side === "buy" ? pnl : calc.multiply(pnl, -1);
 }
 
-export function validateTpPrice(referencePrice: number, tpPrice: number, side: Side): boolean {
-	if (!Number.isFinite(referencePrice) || referencePrice <= 0 || !Number.isFinite(tpPrice) || tpPrice <= 0) {
+export function validateTpPrice(referencePrice: unknown, tpPrice: unknown, side: Side): boolean {
+	const refNum = toNumber(referencePrice);
+	const tpNum = toNumber(tpPrice);
+	if (!isPositive(refNum) || !isPositive(tpNum)) {
 		return false;
 	}
-	return side === "buy" ? tpPrice > referencePrice : tpPrice < referencePrice;
+	return side === "buy" ? tpNum > refNum : tpNum < refNum;
 }
 
-export function validateSlPrice(referencePrice: number, slPrice: number, side: Side): boolean {
-	if (!Number.isFinite(referencePrice) || referencePrice <= 0 || !Number.isFinite(slPrice) || slPrice <= 0) {
+export function validateSlPrice(referencePrice: unknown, slPrice: unknown, side: Side): boolean {
+	const refNum = toNumber(referencePrice);
+	const slNum = toNumber(slPrice);
+	if (!isPositive(refNum) || !isPositive(slNum)) {
 		return false;
 	}
-	return side === "buy" ? slPrice < referencePrice : slPrice > referencePrice;
+	return side === "buy" ? slNum < refNum : slNum > refNum;
 }
 
 export function getTpSlValidationError(
-	referencePrice: number,
+	referencePrice: unknown,
 	tpPrice: number | null,
 	slPrice: number | null,
 	side: Side,
 ): string | null {
-	if (tpPrice !== null && tpPrice > 0 && !validateTpPrice(referencePrice, tpPrice, side)) {
+	if (isPositive(tpPrice) && !validateTpPrice(referencePrice, tpPrice, side)) {
 		return side === "buy" ? "TP must be above entry price" : "TP must be below entry price";
 	}
-	if (slPrice !== null && slPrice > 0 && !validateSlPrice(referencePrice, slPrice, side)) {
+	if (isPositive(slPrice) && !validateSlPrice(referencePrice, slPrice, side)) {
 		return side === "buy" ? "SL must be below entry price" : "SL must be above entry price";
 	}
 	return null;
@@ -96,15 +99,17 @@ export interface RiskRewardDisplay {
 	isFavorable: boolean;
 }
 
-export function formatRiskRewardRatio(ratio: number): RiskRewardDisplay | null {
-	if (!Number.isFinite(ratio) || ratio <= 0) {
+export function formatRiskRewardRatio(ratio: unknown): RiskRewardDisplay | null {
+	const ratioBig = toBig(ratio);
+	if (!ratioBig || ratioBig.lte(0)) {
 		return null;
 	}
 
-	const isFavorable = ratio >= 1;
+	const ratioNum = ratioBig.toNumber();
+	const isFavorable = ratioNum >= 1;
 
-	if (ratio >= 1) {
-		const rounded = Math.round(ratio * 10) / 10;
+	if (ratioNum >= 1) {
+		const rounded = ratioBig.round(1).toNumber();
 		const isWhole = rounded === Math.round(rounded);
 		return {
 			risk: 1,
@@ -114,8 +119,10 @@ export function formatRiskRewardRatio(ratio: number): RiskRewardDisplay | null {
 		};
 	}
 
-	const inverted = 1 / ratio;
-	const rounded = Math.round(inverted * 10) / 10;
+	const inverted = toBig(1)?.div(ratioBig);
+	if (!inverted) return null;
+
+	const rounded = inverted.round(1).toNumber();
 	const isWhole = rounded === Math.round(rounded);
 	return {
 		risk: rounded,

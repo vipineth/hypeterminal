@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { SL_QUICK_PERCENT_OPTIONS, TP_QUICK_PERCENT_OPTIONS } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
+import { calc, isPositive, toFixed, toNumber } from "@/lib/trade/numbers";
 import { calculateEstimatedPnl, calculateSlPrice, calculateTpPrice, formatRiskRewardRatio } from "@/lib/trade/tpsl";
 
 interface Props {
@@ -36,16 +37,16 @@ export function TpSlSection({
 	disabled,
 	compact,
 }: Props) {
-	const tpPriceNum = parseFloat(tpPrice) || 0;
-	const slPriceNum = parseFloat(slPrice) || 0;
+	const tpPriceNum = toNumber(tpPrice);
+	const slPriceNum = toNumber(slPrice);
 
 	const tpPnl = useMemo(() => {
-		if (tpPriceNum <= 0 || referencePrice <= 0 || size <= 0) return null;
+		if (!isPositive(tpPriceNum) || !isPositive(referencePrice) || !isPositive(size)) return null;
 		return calculateEstimatedPnl({ referencePrice, side, size }, tpPriceNum);
 	}, [tpPriceNum, referencePrice, side, size]);
 
 	const slPnl = useMemo(() => {
-		if (slPriceNum <= 0 || referencePrice <= 0 || size <= 0) return null;
+		if (!isPositive(slPriceNum) || !isPositive(referencePrice) || !isPositive(size)) return null;
 		return calculateEstimatedPnl({ referencePrice, side, size }, slPriceNum);
 	}, [slPriceNum, referencePrice, side, size]);
 
@@ -53,22 +54,30 @@ export function TpSlSection({
 		if (tpPnl === null || slPnl === null || slPnl >= 0) return null;
 		const reward = Math.abs(tpPnl);
 		const risk = Math.abs(slPnl);
-		if (risk === 0) return null;
-		return reward / risk;
+		return calc.divide(reward, risk);
 	}, [tpPnl, slPnl]);
 
+	const riskRewardDisplay = useMemo(() => {
+		if (riskRewardRatio === null || tpPnl === null || slPnl === null) return null;
+		const rrDisplay = formatRiskRewardRatio(riskRewardRatio);
+		if (!rrDisplay) return null;
+		return { rrDisplay, tpPnl, slPnl };
+	}, [riskRewardRatio, tpPnl, slPnl]);
+
 	function handleTpPercentClick(percent: number) {
-		if (referencePrice <= 0) return;
+		if (!isPositive(referencePrice)) return;
 		const price = calculateTpPrice(referencePrice, side, percent);
+		if (price === null) return;
 		const decimals = szDecimalsToPriceDecimals(szDecimals ?? 4);
-		onTpPriceChange(price.toFixed(decimals));
+		onTpPriceChange(toFixed(price, decimals));
 	}
 
 	function handleSlPercentClick(percent: number) {
-		if (referencePrice <= 0) return;
+		if (!isPositive(referencePrice)) return;
 		const price = calculateSlPrice(referencePrice, side, percent);
+		if (price === null) return;
 		const decimals = szDecimalsToPriceDecimals(szDecimals ?? 4);
-		onSlPriceChange(price.toFixed(decimals));
+		onSlPriceChange(toFixed(price, decimals));
 	}
 
 	if (compact) {
@@ -141,7 +150,7 @@ export function TpSlSection({
 								key={p}
 								type="button"
 								onClick={() => handleTpPercentClick(p)}
-								disabled={disabled || referencePrice <= 0}
+								disabled={disabled || !isPositive(referencePrice)}
 								className="px-1.5 py-1 text-4xs font-medium text-muted-foreground bg-muted hover:text-foreground hover:bg-terminal-cyan/20 rounded-xs transition-colors disabled:opacity-50"
 								aria-label={t`Set TP to ${p}%`}
 							>
@@ -184,7 +193,7 @@ export function TpSlSection({
 								key={p}
 								type="button"
 								onClick={() => handleSlPercentClick(p)}
-								disabled={disabled || referencePrice <= 0}
+								disabled={disabled || !isPositive(referencePrice)}
 								className="px-1.5 py-1 text-4xs font-medium text-muted-foreground bg-muted hover:text-foreground hover:bg-terminal-cyan/20 rounded-xs transition-colors disabled:opacity-50"
 								aria-label={t`Set SL to ${p}%`}
 							>
@@ -196,46 +205,43 @@ export function TpSlSection({
 				{slError && <div className="text-4xs text-terminal-red">{slError}</div>}
 			</div>
 
-			{riskRewardRatio !== null &&
-				tpPnl !== null &&
-				slPnl !== null &&
-				(() => {
-					const rrDisplay = formatRiskRewardRatio(riskRewardRatio);
-					if (!rrDisplay) return null;
-					return (
-						<div className="rounded-md border border-border/40 bg-muted/20 p-2.5 space-y-2">
-							<div className="flex items-center justify-between">
-								<span className="text-3xs text-muted-foreground">{t`Risk/Reward`}</span>
-								<span
-									className={cn(
-										"text-3xs font-semibold tabular-nums",
-										rrDisplay.isFavorable ? "text-terminal-green" : "text-terminal-amber",
-									)}
-								>
-									{rrDisplay.label}
-								</span>
-							</div>
-							<div className="flex h-1.5 rounded-full overflow-hidden bg-muted/50">
-								<div
-									className="bg-terminal-red"
-									style={{ width: `${(rrDisplay.risk / (rrDisplay.risk + rrDisplay.reward)) * 100}%` }}
-								/>
-								<div
-									className="bg-terminal-green"
-									style={{ width: `${(rrDisplay.reward / (rrDisplay.risk + rrDisplay.reward)) * 100}%` }}
-								/>
-							</div>
-							<div className="flex items-center justify-between text-3xs">
-								<span className="tabular-nums text-terminal-red">
-									{formatUSD(slPnl, { signDisplay: "exceptZero" })}
-								</span>
-								<span className="tabular-nums text-terminal-green">
-									{formatUSD(tpPnl, { signDisplay: "exceptZero" })}
-								</span>
-							</div>
-						</div>
-					);
-				})()}
+			{riskRewardDisplay && (
+				<div className="rounded-md border border-border/40 bg-muted/20 p-2.5 space-y-2">
+					<div className="flex items-center justify-between">
+						<span className="text-3xs text-muted-foreground">{t`Risk/Reward`}</span>
+						<span
+							className={cn(
+								"text-3xs font-semibold tabular-nums",
+								riskRewardDisplay.rrDisplay.isFavorable ? "text-terminal-green" : "text-terminal-amber",
+							)}
+						>
+							{riskRewardDisplay.rrDisplay.label}
+						</span>
+					</div>
+					<div className="flex h-1.5 rounded-full overflow-hidden bg-muted/50">
+						<div
+							className="bg-terminal-red"
+							style={{
+								width: `${(riskRewardDisplay.rrDisplay.risk / (riskRewardDisplay.rrDisplay.risk + riskRewardDisplay.rrDisplay.reward)) * 100}%`,
+							}}
+						/>
+						<div
+							className="bg-terminal-green"
+							style={{
+								width: `${(riskRewardDisplay.rrDisplay.reward / (riskRewardDisplay.rrDisplay.risk + riskRewardDisplay.rrDisplay.reward)) * 100}%`,
+							}}
+						/>
+					</div>
+					<div className="flex items-center justify-between text-3xs">
+						<span className="tabular-nums text-terminal-red">
+							{formatUSD(riskRewardDisplay.slPnl, { signDisplay: "exceptZero" })}
+						</span>
+						<span className="tabular-nums text-terminal-green">
+							{formatUSD(riskRewardDisplay.tpPnl, { signDisplay: "exceptZero" })}
+						</span>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }
