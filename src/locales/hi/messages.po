@@ -55,6 +55,10 @@ msgstr "सक्रिय"
 msgid "Active Positions"
 msgstr "सक्रिय पोजीशन"
 
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Add"
+msgstr ""
+
 #: src/components/trade/header/user-menu.tsx
 msgid "Add funds"
 msgstr "धन जोड़ें"
@@ -62,6 +66,10 @@ msgstr "धन जोड़ें"
 #: src/components/trade/chart/token-selector.tsx
 msgid "Add to favorites"
 msgstr "पसंदीदा में जोड़ें"
+
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Add TP/SL"
+msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Agent"
@@ -317,6 +325,14 @@ msgstr "क्रॉस"
 msgid "Cross Leverage"
 msgstr "क्रॉस लीवरेज"
 
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Custom SL percentage"
+msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Custom TP percentage"
+msgstr ""
+
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Customize your trading experience."
 msgstr "अपने ट्रेडिंग अनुभव को अनुकूलित करें।"
@@ -385,10 +401,13 @@ msgstr "साइज दर्ज करें"
 msgid "Enter TP or SL price"
 msgstr ""
 
-#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Entry"
 msgstr "प्रवेश"
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Entry Price"
+msgstr ""
 
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "Equity"
@@ -628,7 +647,6 @@ msgid "Margin Used"
 msgstr "उपयोग किया गया मार्जिन"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
-#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Mark"
 msgstr "मार्क"
@@ -637,6 +655,10 @@ msgstr "मार्क"
 #: src/components/trade/market-overview.tsx
 msgid "MARK"
 msgstr "मार्क"
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Mark Price"
+msgstr ""
 
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/order-entry/order-entry-panel.tsx
@@ -816,8 +838,8 @@ msgid "Other Options"
 msgstr ""
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
-msgid "P&L"
-msgstr ""
+#~ msgid "P&L"
+#~ msgstr ""
 
 #: src/components/pages/not-found-page.tsx
 msgid "Page not found"
@@ -918,6 +940,10 @@ msgstr "पसंदीदा से हटाएं"
 msgid "Retry"
 msgstr ""
 
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Risk/Reward"
+msgstr ""
+
 #: src/components/trade/chart/token-selector.tsx
 msgid "Search markets..."
 msgstr "बाज़ार खोजें..."
@@ -985,13 +1011,12 @@ msgid "Set TP to {p}%"
 msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
-msgid "Set TP/SL"
-msgstr "TP/SL सेट करें"
+#~ msgid "Set TP/SL"
+#~ msgstr "TP/SL सेट करें"
 
-#. placeholder {0}: position.coin
 #: src/components/trade/positions/position-tpsl-modal.tsx
-msgid "Set TP/SL for {0}"
-msgstr ""
+#~ msgid "Set TP/SL for {0}"
+#~ msgstr ""
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #: src/components/trade/header/top-nav.tsx
@@ -1026,8 +1051,8 @@ msgid "Show Values in USD"
 msgstr "USD में मान दिखाएं"
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
-msgid "Side"
-msgstr ""
+#~ msgid "Side"
+#~ msgstr ""
 
 #: src/components/ui/sidebar.tsx
 msgid "Sidebar"
@@ -1130,9 +1155,9 @@ msgstr "स्टॉप"
 msgid "Stop Loss"
 msgstr ""
 
-#: src/components/pages/builder-page.tsx
-#~ msgid "Submitting..."
-#~ msgstr ""
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Submitting..."
+msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
 msgid "Support"
@@ -1227,7 +1252,6 @@ msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/positions-tab.tsx
-#: src/components/trade/positions/positions-tab.tsx
 msgid "TP/SL"
 msgstr "TP/SL"
 
@@ -1269,6 +1293,10 @@ msgstr "प्रकार"
 #: src/components/trade/chart/datafeed.ts
 msgid "Unknown symbol: {symbolName}"
 msgstr "अज्ञात प्रतीक: {symbolName}"
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Unrealized P&L"
+msgstr ""
 
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "Unrealized PNL"

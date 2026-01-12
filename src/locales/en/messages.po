@@ -55,6 +55,10 @@ msgstr "Active"
 msgid "Active Positions"
 msgstr "Active Positions"
 
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Add"
+msgstr "Add"
+
 #: src/components/trade/header/user-menu.tsx
 msgid "Add funds"
 msgstr "Add funds"
@@ -62,6 +66,10 @@ msgstr "Add funds"
 #: src/components/trade/chart/token-selector.tsx
 msgid "Add to favorites"
 msgstr "Add to favorites"
+
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Add TP/SL"
+msgstr "Add TP/SL"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Agent"
@@ -317,6 +325,14 @@ msgstr "Cross"
 msgid "Cross Leverage"
 msgstr "Cross Leverage"
 
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Custom SL percentage"
+msgstr "Custom SL percentage"
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Custom TP percentage"
+msgstr "Custom TP percentage"
+
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Customize your trading experience."
 msgstr "Customize your trading experience."
@@ -385,10 +401,13 @@ msgstr "Enter size"
 msgid "Enter TP or SL price"
 msgstr "Enter TP or SL price"
 
-#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Entry"
 msgstr "Entry"
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Entry Price"
+msgstr "Entry Price"
 
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "Equity"
@@ -632,7 +651,6 @@ msgid "Margin Used"
 msgstr "Margin Used"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
-#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Mark"
 msgstr "Mark"
@@ -641,6 +659,10 @@ msgstr "Mark"
 #: src/components/trade/market-overview.tsx
 msgid "MARK"
 msgstr "MARK"
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Mark Price"
+msgstr "Mark Price"
 
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/order-entry/order-entry-panel.tsx
@@ -820,8 +842,8 @@ msgid "Other Options"
 msgstr "Other Options"
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
-msgid "P&L"
-msgstr "P&L"
+#~ msgid "P&L"
+#~ msgstr "P&L"
 
 #: src/components/pages/not-found-page.tsx
 msgid "Page not found"
@@ -922,6 +944,10 @@ msgstr "Remove from favorites"
 msgid "Retry"
 msgstr "Retry"
 
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Risk/Reward"
+msgstr "Risk/Reward"
+
 #: src/components/trade/chart/token-selector.tsx
 msgid "Search markets..."
 msgstr "Search markets..."
@@ -989,13 +1015,12 @@ msgid "Set TP to {p}%"
 msgstr "Set TP to {p}%"
 
 #: src/components/trade/positions/positions-tab.tsx
-msgid "Set TP/SL"
-msgstr "Set TP/SL"
+#~ msgid "Set TP/SL"
+#~ msgstr "Set TP/SL"
 
-#. placeholder {0}: position.coin
 #: src/components/trade/positions/position-tpsl-modal.tsx
-msgid "Set TP/SL for {0}"
-msgstr "Set TP/SL for {0}"
+#~ msgid "Set TP/SL for {0}"
+#~ msgstr "Set TP/SL for {0}"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #: src/components/trade/header/top-nav.tsx
@@ -1030,8 +1055,8 @@ msgid "Show Values in USD"
 msgstr "Show Values in USD"
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
-msgid "Side"
-msgstr "Side"
+#~ msgid "Side"
+#~ msgstr "Side"
 
 #: src/components/ui/sidebar.tsx
 msgid "Sidebar"
@@ -1134,9 +1159,9 @@ msgstr "Stop"
 msgid "Stop Loss"
 msgstr "Stop Loss"
 
-#: src/components/pages/builder-page.tsx
-#~ msgid "Submitting..."
-#~ msgstr "Submitting..."
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Submitting..."
+msgstr "Submitting..."
 
 #: src/components/trade/header/top-nav.tsx
 msgid "Support"
@@ -1231,7 +1256,6 @@ msgstr "TP trigger price"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/positions-tab.tsx
-#: src/components/trade/positions/positions-tab.tsx
 msgid "TP/SL"
 msgstr "TP/SL"
 
@@ -1277,6 +1301,10 @@ msgstr "Type"
 #: src/components/trade/chart/datafeed.ts
 msgid "Unknown symbol: {symbolName}"
 msgstr "Unknown symbol: {symbolName}"
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Unrealized P&L"
+msgstr "Unrealized P&L"
 
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "Unrealized PNL"
