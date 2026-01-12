@@ -3,6 +3,10 @@ import type { ChartingLibraryFeatureset, ResolutionString, TimeFrameItem } from 
 export const APP_NAME = "HypeTerminal";
 export const APP_VERSION = "v0.1.0";
 
+export const QUICK_PERCENT_OPTIONS = [25, 50, 100, 200, 400] as const;
+export const TP_QUICK_PERCENT_OPTIONS = [25, 50, 100, 200] as const;
+export const SL_QUICK_PERCENT_OPTIONS = [5, 10, 25, 50] as const;
+
 export const FALLBACK_VALUE_PLACEHOLDER = "-";
 export const FORMAT_COMPACT_THRESHOLD = 10_000;
 export const FORMAT_COMPACT_DEFAULT = true;
@@ -44,24 +48,6 @@ export const STORAGE_KEYS = {
 export const META_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 export const TOKEN_ICON_BASE_URL = "https://app.hyperliquid.xyz/coins";
-
-export const LAYOUT_PERSISTENCE = {
-	MAIN: {
-		KEY: "terminal:layout:main",
-		FALLBACK: [82, 18] as const,
-		PANEL_DEFAULTS: [78, 22],
-	},
-	VERTICAL: {
-		KEY: "terminal:layout:vert",
-		FALLBACK: [65, 35] as const,
-		PANEL_DEFAULTS: [65, 35],
-	},
-	CHART_BOOK: {
-		KEY: "terminal:layout:chart-book",
-		FALLBACK: [75, 25] as const,
-		PANEL_DEFAULTS: [70, 30],
-	},
-} as const;
 
 export const SIDEBAR_LAYOUT = {
 	WIDTH: "16rem",

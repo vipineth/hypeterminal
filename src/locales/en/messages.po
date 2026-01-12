@@ -55,6 +55,10 @@ msgstr "Active"
 msgid "Active Positions"
 msgstr "Active Positions"
 
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Add"
+msgstr "Add"
+
 #: src/components/trade/header/user-menu.tsx
 msgid "Add funds"
 msgstr "Add funds"
@@ -62,6 +66,10 @@ msgstr "Add funds"
 #: src/components/trade/chart/token-selector.tsx
 msgid "Add to favorites"
 msgstr "Add to favorites"
+
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Add TP/SL"
+msgstr "Add TP/SL"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Agent"
@@ -92,6 +100,11 @@ msgstr "API"
 msgid "Asset"
 msgstr "Asset"
 
+#: src/components/trade/order-entry/account-panel.tsx
+msgid "Assets"
+msgstr "Assets"
+
+#: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/balances-tab.tsx
@@ -159,6 +172,7 @@ msgstr "Buy Long"
 #: src/components/trade/order-entry/leverage-popover.tsx
 #: src/components/trade/order-entry/leverage-sheet.tsx
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Cancel"
 msgstr "Cancel"
@@ -220,10 +234,9 @@ msgid "Closing..."
 msgstr "Closing..."
 
 #: src/components/trade/order-entry/account-panel.tsx
-msgid "Collapse account panel"
-msgstr "Collapse account panel"
+#~ msgid "Collapse account panel"
+#~ msgstr "Collapse account panel"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Coming soon"
@@ -235,6 +248,7 @@ msgstr "completed"
 
 #: src/components/trade/order-entry/leverage-popover.tsx
 #: src/components/trade/order-entry/leverage-sheet.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 msgid "Confirm"
 msgstr "Confirm"
 
@@ -316,6 +330,14 @@ msgstr "Cross"
 msgid "Cross Leverage"
 msgstr "Cross Leverage"
 
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "Custom SL percentage"
+#~ msgstr "Custom SL percentage"
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "Custom TP percentage"
+#~ msgstr "Custom TP percentage"
+
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Customize your trading experience."
 msgstr "Customize your trading experience."
@@ -364,6 +386,10 @@ msgstr "Displays the mobile sidebar."
 msgid "Docs"
 msgstr "Docs"
 
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Edit TP/SL"
+msgstr "Edit TP/SL"
+
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enable Trading"
 msgstr "Enable Trading"
@@ -376,9 +402,17 @@ msgstr "Enter limit price"
 msgid "Enter size"
 msgstr "Enter size"
 
+#: src/components/trade/order-entry/order-entry-panel.tsx
+msgid "Enter TP or SL price"
+msgstr "Enter TP or SL price"
+
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Entry"
 msgstr "Entry"
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Entry Price"
+msgstr "Entry Price"
 
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "Equity"
@@ -387,6 +421,11 @@ msgstr "Equity"
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Est. Fee"
 msgstr "Est. Fee"
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "Est. P&L"
+#~ msgstr "Est. P&L"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Exceeds max size"
@@ -397,8 +436,8 @@ msgid "Executed"
 msgstr "Executed"
 
 #: src/components/trade/order-entry/account-panel.tsx
-msgid "Expand account panel"
-msgstr "Expand account panel"
+#~ msgid "Expand account panel"
+#~ msgstr "Expand account panel"
 
 #: src/components/trade/order-entry/order-toast.tsx
 msgid "failed"
@@ -493,6 +532,10 @@ msgstr "Funding Payments"
 #: src/components/pages/not-found-page.tsx
 msgid "Go to trading terminal"
 msgstr "Go to trading terminal"
+
+#: src/components/trade/order-entry/account-panel.tsx
+msgid "In Orders"
+msgstr "In Orders"
 
 #: src/components/trade/positions/balances-tab.tsx
 msgid "In Use"
@@ -599,6 +642,7 @@ msgstr "Loading..."
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Long"
 msgstr "Long"
@@ -624,6 +668,10 @@ msgstr "Mark"
 #: src/components/trade/market-overview.tsx
 msgid "MARK"
 msgstr "MARK"
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Mark Price"
+msgstr "Mark Price"
 
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/order-entry/order-entry-panel.tsx
@@ -802,6 +850,10 @@ msgstr "Order Value"
 msgid "Other Options"
 msgstr "Other Options"
 
+#: src/components/trade/positions/position-tpsl-modal.tsx
+#~ msgid "P&L"
+#~ msgstr "P&L"
+
 #: src/components/pages/not-found-page.tsx
 msgid "Page not found"
 msgstr "Page not found"
@@ -855,6 +907,8 @@ msgstr "Position"
 #~ msgstr "Previous"
 
 #: src/components/trade/chart/constants.ts
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/order-entry/tp-sl-section.tsx
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
@@ -900,6 +954,10 @@ msgstr "Remove from favorites"
 #: src/components/trade/order-entry/leverage-sheet.tsx
 msgid "Retry"
 msgstr "Retry"
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Risk/Reward"
+msgstr "Risk/Reward"
 
 #: src/components/trade/chart/token-selector.tsx
 msgid "Search markets..."
@@ -959,9 +1017,21 @@ msgstr "Sell Short"
 msgid "Set {p}%"
 msgstr "Set {p}%"
 
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Set SL to {p}%"
+msgstr "Set SL to {p}%"
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Set TP to {p}%"
+msgstr "Set TP to {p}%"
+
 #: src/components/trade/positions/positions-tab.tsx
-msgid "Set TP/SL"
-msgstr "Set TP/SL"
+#~ msgid "Set TP/SL"
+#~ msgstr "Set TP/SL"
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
+#~ msgid "Set TP/SL for {0}"
+#~ msgstr "Set TP/SL for {0}"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #: src/components/trade/header/top-nav.tsx
@@ -970,6 +1040,7 @@ msgstr "Settings"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Short"
 msgstr "Short"
@@ -994,6 +1065,10 @@ msgstr "Show Scanlines"
 msgid "Show Values in USD"
 msgstr "Show Values in USD"
 
+#: src/components/trade/positions/position-tpsl-modal.tsx
+#~ msgid "Side"
+#~ msgstr "Side"
+
 #: src/components/ui/sidebar.tsx
 msgid "Sidebar"
 msgstr "Sidebar"
@@ -1016,9 +1091,32 @@ msgstr "Signer not ready"
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Size"
 msgstr "Size"
+
+#: src/components/trade/positions/orders-tab.tsx
+msgid "SL"
+msgstr "SL"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "SL must be above entry"
+msgstr "SL must be above entry"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "SL must be below entry"
+msgstr "SL must be below entry"
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "SL Price"
+msgstr "SL Price"
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "SL trigger price"
+#~ msgstr "SL trigger price"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Slippage"
@@ -1072,9 +1170,14 @@ msgstr "Status"
 msgid "Stop"
 msgstr "Stop"
 
-#: src/components/pages/builder-page.tsx
-#~ msgid "Submitting..."
-#~ msgstr "Submitting..."
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Stop Loss"
+msgstr "Stop Loss"
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Submitting..."
+msgstr "Submitting..."
 
 #: src/components/trade/header/top-nav.tsx
 msgid "Support"
@@ -1103,6 +1206,11 @@ msgstr "Switch to light mode"
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Switching..."
 msgstr "Switching..."
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Take Profit"
+msgstr "Take Profit"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Take Profit / Stop Loss"
@@ -1144,6 +1252,32 @@ msgstr "Total"
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Total Size"
 msgstr "Total Size"
+
+#: src/components/trade/order-entry/account-panel.tsx
+msgid "Total Value"
+msgstr "Total Value"
+
+#: src/components/trade/positions/orders-tab.tsx
+msgid "TP"
+msgstr "TP"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "TP must be above entry"
+msgstr "TP must be above entry"
+
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "TP must be below entry"
+msgstr "TP must be below entry"
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "TP Price"
+msgstr "TP Price"
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "TP trigger price"
+#~ msgstr "TP trigger price"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -1193,6 +1327,10 @@ msgstr "Type"
 msgid "Unknown symbol: {symbolName}"
 msgstr "Unknown symbol: {symbolName}"
 
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Unrealized P&L"
+msgstr "Unrealized P&L"
+
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "Unrealized PNL"
 msgstr "Unrealized PNL"
@@ -1221,8 +1359,8 @@ msgid "USD Value"
 msgstr "USD Value"
 
 #: src/components/trade/positions/positions-tab.tsx
-msgid "Value"
-msgstr "Value"
+#~ msgid "Value"
+#~ msgstr "Value"
 
 #: src/components/trade/header/top-nav.tsx
 msgid "Vaults"
@@ -1240,6 +1378,10 @@ msgstr "VOL"
 #: src/components/trade/chart/constants.ts
 msgid "Volume"
 msgstr "Volume"
+
+#: src/components/trade/positions/orders-tab.tsx
+msgid "waiting"
+msgstr "waiting"
 
 #: src/components/trade/orderbook/orderbook-panel.tsx
 msgid "Waiting for order book..."

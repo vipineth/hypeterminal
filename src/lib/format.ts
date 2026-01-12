@@ -124,6 +124,8 @@ export function szDecimalsToPriceDecimals(szDecimals: number): number {
 export interface FormatPriceOptions extends FormatOptions {
 	/** Size decimals from market metadata - used to derive price decimals */
 	szDecimals?: number;
+	/** Remove trailing zeros (e.g., 12.00 -> 12, 12.50 -> 12.5). Defaults to true. */
+	trimZeros?: boolean;
 }
 
 /**
@@ -139,13 +141,13 @@ export function formatPrice(value: number | null | undefined, opts?: FormatPrice
 
 	// Derive decimals from szDecimals if provided, otherwise use explicit digits or default to 2
 	const decimals = opts?.digits ?? (opts?.szDecimals !== undefined ? szDecimalsToPriceDecimals(opts.szDecimals) : 2);
-	const { compact, szDecimals: _, ...rest } = opts ?? {};
+	const { compact, szDecimals: _, trimZeros, ...rest } = opts ?? {};
 	const shouldCompact = (compact ?? false) && Math.abs(value) >= FORMAT_COMPACT_THRESHOLD;
 
 	const defaults: Intl.NumberFormatOptions = {
 		style: "currency",
 		currency: "USD",
-		minimumFractionDigits: decimals,
+		minimumFractionDigits: trimZeros === false ? decimals : 0,
 		maximumFractionDigits: decimals,
 		...(shouldCompact && { notation: "compact", compactDisplay: "short" }),
 	};

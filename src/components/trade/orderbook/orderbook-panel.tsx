@@ -23,7 +23,7 @@ import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global
 import { OrderbookRow } from "./orderbook-row";
 import { TradesPanel } from "./trades-panel";
 
-const VISIBLE_ROWS = 9;
+const VISIBLE_ROWS = 10;
 
 export function OrderbookPanel() {
 	const [selectedOption, setSelectedOption] = useState<L2BookPriceGroupOption | null>(null);

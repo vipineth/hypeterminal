@@ -55,6 +55,10 @@ msgstr "सक्रिय"
 msgid "Active Positions"
 msgstr "सक्रिय पोजीशन"
 
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Add"
+msgstr ""
+
 #: src/components/trade/header/user-menu.tsx
 msgid "Add funds"
 msgstr "धन जोड़ें"
@@ -62,6 +66,10 @@ msgstr "धन जोड़ें"
 #: src/components/trade/chart/token-selector.tsx
 msgid "Add to favorites"
 msgstr "पसंदीदा में जोड़ें"
+
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Add TP/SL"
+msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Agent"
@@ -92,6 +100,11 @@ msgstr "API"
 msgid "Asset"
 msgstr "संपत्ति"
 
+#: src/components/trade/order-entry/account-panel.tsx
+msgid "Assets"
+msgstr ""
+
+#: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/balances-tab.tsx
@@ -159,6 +172,7 @@ msgstr "लॉन्ग खरीदें"
 #: src/components/trade/order-entry/leverage-popover.tsx
 #: src/components/trade/order-entry/leverage-sheet.tsx
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Cancel"
 msgstr "रद्द करें"
@@ -220,10 +234,9 @@ msgid "Closing..."
 msgstr "बंद हो रहा है..."
 
 #: src/components/trade/order-entry/account-panel.tsx
-msgid "Collapse account panel"
-msgstr "खाता पैनल छोटा करें"
+#~ msgid "Collapse account panel"
+#~ msgstr "खाता पैनल छोटा करें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Coming soon"
@@ -235,6 +248,7 @@ msgstr "पूर्ण"
 
 #: src/components/trade/order-entry/leverage-popover.tsx
 #: src/components/trade/order-entry/leverage-sheet.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 msgid "Confirm"
 msgstr ""
 
@@ -316,6 +330,14 @@ msgstr "क्रॉस"
 msgid "Cross Leverage"
 msgstr "क्रॉस लीवरेज"
 
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "Custom SL percentage"
+#~ msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "Custom TP percentage"
+#~ msgstr ""
+
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Customize your trading experience."
 msgstr "अपने ट्रेडिंग अनुभव को अनुकूलित करें।"
@@ -364,6 +386,10 @@ msgstr "मोबाइल साइडबार दिखाता है।"
 msgid "Docs"
 msgstr "दस्तावेज़"
 
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Edit TP/SL"
+msgstr ""
+
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enable Trading"
 msgstr "ट्रेडिंग सक्षम करें"
@@ -376,9 +402,17 @@ msgstr "लिमिट प्राइस दर्ज करें"
 msgid "Enter size"
 msgstr "साइज दर्ज करें"
 
+#: src/components/trade/order-entry/order-entry-panel.tsx
+msgid "Enter TP or SL price"
+msgstr ""
+
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Entry"
 msgstr "प्रवेश"
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Entry Price"
+msgstr ""
 
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "Equity"
@@ -387,6 +421,11 @@ msgstr "इक्विटी"
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Est. Fee"
 msgstr "अनु. शुल्क"
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "Est. P&L"
+#~ msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Exceeds max size"
@@ -397,8 +436,8 @@ msgid "Executed"
 msgstr "निष्पादित"
 
 #: src/components/trade/order-entry/account-panel.tsx
-msgid "Expand account panel"
-msgstr "खाता पैनल विस्तृत करें"
+#~ msgid "Expand account panel"
+#~ msgstr "खाता पैनल विस्तृत करें"
 
 #: src/components/trade/order-entry/order-toast.tsx
 msgid "failed"
@@ -493,6 +532,10 @@ msgstr "फंडिंग भुगतान"
 #: src/components/pages/not-found-page.tsx
 msgid "Go to trading terminal"
 msgstr "ट्रेडिंग टर्मिनल पर जाएं"
+
+#: src/components/trade/order-entry/account-panel.tsx
+msgid "In Orders"
+msgstr ""
 
 #: src/components/trade/positions/balances-tab.tsx
 msgid "In Use"
@@ -595,6 +638,7 @@ msgstr "लोड हो रहा है..."
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Long"
 msgstr "लॉन्ग"
@@ -620,6 +664,10 @@ msgstr "मार्क"
 #: src/components/trade/market-overview.tsx
 msgid "MARK"
 msgstr "मार्क"
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Mark Price"
+msgstr ""
 
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/order-entry/order-entry-panel.tsx
@@ -798,6 +846,10 @@ msgstr "ऑर्डर वैल्यू"
 msgid "Other Options"
 msgstr ""
 
+#: src/components/trade/positions/position-tpsl-modal.tsx
+#~ msgid "P&L"
+#~ msgstr ""
+
 #: src/components/pages/not-found-page.tsx
 msgid "Page not found"
 msgstr "पृष्ठ नहीं मिला"
@@ -851,6 +903,8 @@ msgstr "पोजीशन"
 #~ msgstr "पिछला"
 
 #: src/components/trade/chart/constants.ts
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/order-entry/tp-sl-section.tsx
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
@@ -895,6 +949,10 @@ msgstr "पसंदीदा से हटाएं"
 #: src/components/trade/order-entry/leverage-popover.tsx
 #: src/components/trade/order-entry/leverage-sheet.tsx
 msgid "Retry"
+msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Risk/Reward"
 msgstr ""
 
 #: src/components/trade/chart/token-selector.tsx
@@ -955,9 +1013,21 @@ msgstr "शॉर्ट बेचें"
 msgid "Set {p}%"
 msgstr "{p}% सेट करें"
 
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Set SL to {p}%"
+msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Set TP to {p}%"
+msgstr ""
+
 #: src/components/trade/positions/positions-tab.tsx
-msgid "Set TP/SL"
-msgstr "TP/SL सेट करें"
+#~ msgid "Set TP/SL"
+#~ msgstr "TP/SL सेट करें"
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
+#~ msgid "Set TP/SL for {0}"
+#~ msgstr ""
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #: src/components/trade/header/top-nav.tsx
@@ -966,6 +1036,7 @@ msgstr "सेटिंग्स"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Short"
 msgstr "शॉर्ट"
@@ -990,6 +1061,10 @@ msgstr "स्कैनलाइन दिखाएं"
 msgid "Show Values in USD"
 msgstr "USD में मान दिखाएं"
 
+#: src/components/trade/positions/position-tpsl-modal.tsx
+#~ msgid "Side"
+#~ msgstr ""
+
 #: src/components/ui/sidebar.tsx
 msgid "Sidebar"
 msgstr "साइडबार"
@@ -1012,9 +1087,32 @@ msgstr "साइनर तैयार नहीं"
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Size"
 msgstr "आकार"
+
+#: src/components/trade/positions/orders-tab.tsx
+msgid "SL"
+msgstr ""
+
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "SL must be above entry"
+msgstr ""
+
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "SL must be below entry"
+msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "SL Price"
+msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "SL trigger price"
+#~ msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Slippage"
@@ -1068,9 +1166,14 @@ msgstr "स्थिति"
 msgid "Stop"
 msgstr "स्टॉप"
 
-#: src/components/pages/builder-page.tsx
-#~ msgid "Submitting..."
-#~ msgstr ""
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Stop Loss"
+msgstr ""
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Submitting..."
+msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
 msgid "Support"
@@ -1099,6 +1202,11 @@ msgstr "लाइट मोड में बदलें"
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Switching..."
 msgstr "स्विच हो रहा है..."
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Take Profit"
+msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Take Profit / Stop Loss"
@@ -1140,6 +1248,32 @@ msgstr "कुल"
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Total Size"
 msgstr "कुल आकार"
+
+#: src/components/trade/order-entry/account-panel.tsx
+msgid "Total Value"
+msgstr ""
+
+#: src/components/trade/positions/orders-tab.tsx
+msgid "TP"
+msgstr ""
+
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "TP must be above entry"
+msgstr ""
+
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "TP must be below entry"
+msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "TP Price"
+msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "TP trigger price"
+#~ msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -1185,6 +1319,10 @@ msgstr "प्रकार"
 msgid "Unknown symbol: {symbolName}"
 msgstr "अज्ञात प्रतीक: {symbolName}"
 
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Unrealized P&L"
+msgstr ""
+
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "Unrealized PNL"
 msgstr "अवास्तविक PNL"
@@ -1213,8 +1351,8 @@ msgid "USD Value"
 msgstr "USD मूल्य"
 
 #: src/components/trade/positions/positions-tab.tsx
-msgid "Value"
-msgstr "वैल्यू"
+#~ msgid "Value"
+#~ msgstr "वैल्यू"
 
 #: src/components/trade/header/top-nav.tsx
 msgid "Vaults"
@@ -1232,6 +1370,10 @@ msgstr "वॉल्यूम"
 #: src/components/trade/chart/constants.ts
 msgid "Volume"
 msgstr "वॉल्यूम"
+
+#: src/components/trade/positions/orders-tab.tsx
+msgid "waiting"
+msgstr ""
 
 #: src/components/trade/orderbook/orderbook-panel.tsx
 msgid "Waiting for order book..."

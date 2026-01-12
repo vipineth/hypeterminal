@@ -1,16 +1,17 @@
 import { t } from "@lingui/core/macro";
-import { Circle } from "lucide-react";
-import { useMemo, useRef } from "react";
+import { Circle, Pencil, Plus } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
 import { usePerpMarkets } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
-import { useSubAssetCtxs, useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
+import { useSubAssetCtxs, useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
@@ -18,12 +19,38 @@ import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import type { PerpAssetCtxs } from "@/types/hyperliquid";
 import { TokenAvatar } from "../components/token-avatar";
+import { PositionTpSlModal } from "./position-tpsl-modal";
+
+interface TpSlPositionData {
+	coin: string;
+	assetIndex: number;
+	isLong: boolean;
+	size: number;
+	entryPx: number;
+	markPx: number;
+	unrealizedPnl: number;
+	roe: number;
+	szDecimals: number;
+	existingTpPrice?: number;
+	existingSlPrice?: number;
+	existingTpOrderId?: number;
+	existingSlOrderId?: number;
+}
+
+interface TpSlOrderInfo {
+	tpPrice?: number;
+	slPrice?: number;
+	tpOrderId?: number;
+	slOrderId?: number;
+}
 
 export function PositionsTab() {
 	const { address, isConnected } = useConnection();
 	const slippageBps = useMarketOrderSlippageBps();
 	const closingKeyRef = useRef<string | null>(null);
 	const { setSelectedMarketKey } = useMarketPrefsActions();
+	const [tpSlModalOpen, setTpSlModalOpen] = useState(false);
+	const [selectedTpSlPosition, setSelectedTpSlPosition] = useState<TpSlPositionData | null>(null);
 
 	const { mutate: placeOrder, isPending: isClosing, error: closeError, reset: resetCloseError } = useExchangeOrder();
 
@@ -52,6 +79,33 @@ export function PositionsTab() {
 	const { data: assetCtxsEvent } = useSubAssetCtxs(assetCtxsParams, assetCtxsOptions);
 	const assetCtxs = assetCtxsEvent?.ctxs as PerpAssetCtxs | undefined;
 
+	const { data: openOrdersEvent } = useSubOpenOrders({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
+	const openOrders = openOrdersEvent?.orders ?? [];
+
+	const tpSlOrdersByCoin = useMemo(() => {
+		const map = new Map<string, TpSlOrderInfo>();
+		for (const order of openOrders) {
+			const orderType = (order as { orderType?: string }).orderType;
+			const isTp = orderType === "Take Profit Market" || orderType === "Take Profit Limit";
+			const isSl = orderType === "Stop Market" || orderType === "Stop Limit";
+			if (!isTp && !isSl) continue;
+
+			const triggerPx = parseNumber((order as { triggerPx?: string }).triggerPx);
+			if (!Number.isFinite(triggerPx) || triggerPx <= 0) continue;
+
+			const existing = map.get(order.coin) ?? {};
+			if (isTp) {
+				existing.tpPrice = triggerPx;
+				existing.tpOrderId = order.oid;
+			} else {
+				existing.slPrice = triggerPx;
+				existing.slOrderId = order.oid;
+			}
+			map.set(order.coin, existing);
+		}
+		return map;
+	}, [openOrders]);
+
 	const tableRows = useMemo(() => {
 		return positions.map((p) => {
 			const size = parseNumber(p.szi);
@@ -76,6 +130,8 @@ export function PositionsTab() {
 				Number.isFinite(markPx) &&
 				markPx > 0;
 
+			const tpSlInfo = tpSlOrdersByCoin.get(p.coin);
+
 			return {
 				key: `${p.coin}-${p.entryPx}-${p.szi}`,
 				coin: p.coin,
@@ -85,6 +141,9 @@ export function PositionsTab() {
 				markPx,
 				szDecimals,
 				canClose,
+				entryPx,
+				unrealizedPnl,
+				roe,
 				sideLabel: isLong ? t`Long` : t`Short`,
 				sideClass: isLong ? "bg-terminal-green/20 text-terminal-green" : "bg-terminal-red/20 text-terminal-red",
 				sizeText: Number.isFinite(size) ? formatToken(Math.abs(size), szDecimals) : FALLBACK_VALUE_PLACEHOLDER,
@@ -101,9 +160,14 @@ export function PositionsTab() {
 					: FALLBACK_VALUE_PLACEHOLDER,
 				roeText: Number.isFinite(roe) ? formatPercent(roe, 1) : FALLBACK_VALUE_PLACEHOLDER,
 				pnlClass: unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red",
+				tpPrice: tpSlInfo?.tpPrice,
+				slPrice: tpSlInfo?.slPrice,
+				tpOrderId: tpSlInfo?.tpOrderId,
+				slOrderId: tpSlInfo?.slOrderId,
+				hasTpSl: !!(tpSlInfo?.tpPrice || tpSlInfo?.slPrice),
 			};
 		});
-	}, [positions, getSzDecimals, getAssetId, assetCtxs]);
+	}, [positions, getSzDecimals, getAssetId, assetCtxs, tpSlOrdersByCoin]);
 
 	const headerCount = isConnected ? positions.length : FALLBACK_VALUE_PLACEHOLDER;
 
@@ -143,6 +207,26 @@ export function PositionsTab() {
 	};
 
 	const actionError = closeError?.message;
+
+	function handleOpenTpSlModal(row: (typeof tableRows)[number]) {
+		if (typeof row.assetIndex !== "number") return;
+		setSelectedTpSlPosition({
+			coin: row.coin,
+			assetIndex: row.assetIndex,
+			isLong: row.isLong,
+			size: row.closeSize,
+			entryPx: row.entryPx,
+			markPx: row.markPx,
+			unrealizedPnl: row.unrealizedPnl,
+			roe: row.roe,
+			szDecimals: row.szDecimals,
+			existingTpPrice: row.tpPrice,
+			existingSlPrice: row.slPrice,
+			existingTpOrderId: row.tpOrderId,
+			existingSlOrderId: row.slOrderId,
+		});
+		setTpSlModalOpen(true);
+	}
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
@@ -184,19 +268,19 @@ export function PositionsTab() {
 										{t`Size`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{t`Value`}
-									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
 										{t`Entry`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
 										{t`Mark`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+										{t`Liq`}
+									</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
 										{t`PNL`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
-										{t`Liq`}
+										{t`TP/SL`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
 										{t`Actions`}
@@ -226,10 +310,12 @@ export function PositionsTab() {
 												</div>
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.sizeText}</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.valueText}</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.entryText}</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
 												{row.markText}
+											</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums text-terminal-red/70 py-1.5">
+												{row.liqText}
 											</TableCell>
 											<TableCell className="text-right py-1.5">
 												<div className={cn("text-2xs tabular-nums", row.pnlClass)}>
@@ -237,24 +323,69 @@ export function PositionsTab() {
 													<span className="text-muted-foreground ml-1">({row.roeText})</span>
 												</div>
 											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums text-terminal-red/70 py-1.5">
-												{row.liqText}
+											<TableCell className="text-right py-1.5">
+												<Tooltip>
+													<TooltipTrigger asChild>
+														<button
+															type="button"
+															onClick={() => handleOpenTpSlModal(row)}
+															disabled={typeof row.assetIndex !== "number"}
+															className={cn(
+																"group inline-flex items-center gap-1.5 cursor-pointer transition-opacity disabled:cursor-not-allowed disabled:opacity-50",
+																!row.hasTpSl && "text-muted-foreground/60 hover:text-muted-foreground",
+															)}
+														>
+															{row.tpPrice && row.slPrice ? (
+																<>
+																	<div className="flex items-center gap-1 text-3xs tabular-nums">
+																		<span className="text-terminal-green">
+																			{formatPrice(row.tpPrice, { szDecimals: row.szDecimals })}
+																		</span>
+																		<span className="text-muted-foreground/50">/</span>
+																		<span className="text-terminal-red">
+																			{formatPrice(row.slPrice, { szDecimals: row.szDecimals })}
+																		</span>
+																	</div>
+																	<Pencil className="size-3 text-muted-foreground/60 group-hover:text-foreground transition-colors" />
+																</>
+															) : row.hasTpSl ? (
+																<>
+																	<div className="flex items-center gap-1 text-3xs tabular-nums">
+																		{row.tpPrice ? (
+																			<span className="text-terminal-green">
+																				{formatPrice(row.tpPrice, { szDecimals: row.szDecimals })}
+																			</span>
+																		) : (
+																			<span className="text-terminal-red">
+																				{formatPrice(row.slPrice, { szDecimals: row.szDecimals })}
+																			</span>
+																		)}
+																	</div>
+																	<Plus className="size-3 text-muted-foreground/60 group-hover:text-foreground transition-colors" />
+																</>
+															) : (
+																<div className="flex items-center gap-0.5 text-3xs">
+																	<Plus className="size-3 group-hover:text-foreground transition-colors" />
+																	<span>{t`Add`}</span>
+																</div>
+															)}
+														</button>
+													</TooltipTrigger>
+													<TooltipContent side="left">
+														{row.tpPrice && row.slPrice ? t`Edit TP/SL` : t`Add TP/SL`}
+													</TooltipContent>
+												</Tooltip>
 											</TableCell>
 											<TableCell className="text-right py-1.5">
-												<div className="flex justify-end gap-1">
-													<Button
-														variant="danger"
-														size="xs"
-														aria-label={t`Close position`}
-														onClick={() => handleClosePosition(row)}
-														disabled={!row.canClose || isClosing}
-													>
-														{isRowClosing ? t`Closing...` : t`Close`}
-													</Button>
-													<Button variant="terminal" size="xs" aria-label={t`Set TP/SL`}>
-														{t`TP/SL`}
-													</Button>
-												</div>
+												<Button
+													variant="danger"
+													size="xs"
+													aria-label={t`Close position`}
+													onClick={() => handleClosePosition(row)}
+													disabled={!row.canClose || isClosing}
+												>
+													{isRowClosing ? t`Closing...` : t`Close`}
+												</Button>
 											</TableCell>
 										</TableRow>
 									);
@@ -265,6 +396,8 @@ export function PositionsTab() {
 					</ScrollArea>
 				)}
 			</div>
+
+			<PositionTpSlModal open={tpSlModalOpen} onOpenChange={setTpSlModalOpen} position={selectedTpSlPosition} />
 		</div>
 	);
 }

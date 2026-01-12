@@ -55,6 +55,10 @@ msgstr "活跃"
 msgid "Active Positions"
 msgstr "活跃仓位"
 
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Add"
+msgstr ""
+
 #: src/components/trade/header/user-menu.tsx
 msgid "Add funds"
 msgstr "添加资金"
@@ -62,6 +66,10 @@ msgstr "添加资金"
 #: src/components/trade/chart/token-selector.tsx
 msgid "Add to favorites"
 msgstr "添加到收藏"
+
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Add TP/SL"
+msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Agent"
@@ -92,6 +100,11 @@ msgstr "API"
 msgid "Asset"
 msgstr "资产"
 
+#: src/components/trade/order-entry/account-panel.tsx
+msgid "Assets"
+msgstr ""
+
+#: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/balances-tab.tsx
@@ -159,6 +172,7 @@ msgstr "买入做多"
 #: src/components/trade/order-entry/leverage-popover.tsx
 #: src/components/trade/order-entry/leverage-sheet.tsx
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Cancel"
 msgstr "取消"
@@ -220,10 +234,9 @@ msgid "Closing..."
 msgstr "平仓中..."
 
 #: src/components/trade/order-entry/account-panel.tsx
-msgid "Collapse account panel"
-msgstr "收起账户面板"
+#~ msgid "Collapse account panel"
+#~ msgstr "收起账户面板"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Coming soon"
@@ -235,6 +248,7 @@ msgstr "已完成"
 
 #: src/components/trade/order-entry/leverage-popover.tsx
 #: src/components/trade/order-entry/leverage-sheet.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 msgid "Confirm"
 msgstr ""
 
@@ -316,6 +330,14 @@ msgstr "全仓"
 msgid "Cross Leverage"
 msgstr "全仓杠杆"
 
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "Custom SL percentage"
+#~ msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "Custom TP percentage"
+#~ msgstr ""
+
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Customize your trading experience."
 msgstr "自定义您的交易体验。"
@@ -364,6 +386,10 @@ msgstr "显示移动端侧边栏。"
 msgid "Docs"
 msgstr "文档"
 
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Edit TP/SL"
+msgstr ""
+
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enable Trading"
 msgstr "启用交易"
@@ -376,9 +402,17 @@ msgstr "输入限价"
 msgid "Enter size"
 msgstr "输入数量"
 
+#: src/components/trade/order-entry/order-entry-panel.tsx
+msgid "Enter TP or SL price"
+msgstr ""
+
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Entry"
 msgstr "开仓价"
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Entry Price"
+msgstr ""
 
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "Equity"
@@ -387,6 +421,11 @@ msgstr "净值"
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Est. Fee"
 msgstr "预估费用"
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "Est. P&L"
+#~ msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Exceeds max size"
@@ -397,8 +436,8 @@ msgid "Executed"
 msgstr "已执行"
 
 #: src/components/trade/order-entry/account-panel.tsx
-msgid "Expand account panel"
-msgstr "展开账户面板"
+#~ msgid "Expand account panel"
+#~ msgstr "展开账户面板"
 
 #: src/components/trade/order-entry/order-toast.tsx
 msgid "failed"
@@ -493,6 +532,10 @@ msgstr "资金费用"
 #: src/components/pages/not-found-page.tsx
 msgid "Go to trading terminal"
 msgstr "前往交易终端"
+
+#: src/components/trade/order-entry/account-panel.tsx
+msgid "In Orders"
+msgstr ""
 
 #: src/components/trade/positions/balances-tab.tsx
 msgid "In Use"
@@ -595,6 +638,7 @@ msgstr "加载中..."
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Long"
 msgstr "多"
@@ -620,6 +664,10 @@ msgstr "标记价"
 #: src/components/trade/market-overview.tsx
 msgid "MARK"
 msgstr "标记"
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Mark Price"
+msgstr ""
 
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/order-entry/order-entry-panel.tsx
@@ -798,6 +846,10 @@ msgstr "订单价值"
 msgid "Other Options"
 msgstr ""
 
+#: src/components/trade/positions/position-tpsl-modal.tsx
+#~ msgid "P&L"
+#~ msgstr ""
+
 #: src/components/pages/not-found-page.tsx
 msgid "Page not found"
 msgstr "页面未找到"
@@ -851,6 +903,8 @@ msgstr "仓位"
 #~ msgstr "上一页"
 
 #: src/components/trade/chart/constants.ts
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/order-entry/tp-sl-section.tsx
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
@@ -895,6 +949,10 @@ msgstr "从收藏中移除"
 #: src/components/trade/order-entry/leverage-popover.tsx
 #: src/components/trade/order-entry/leverage-sheet.tsx
 msgid "Retry"
+msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Risk/Reward"
 msgstr ""
 
 #: src/components/trade/chart/token-selector.tsx
@@ -955,9 +1013,21 @@ msgstr "卖出做空"
 msgid "Set {p}%"
 msgstr "设置 {p}%"
 
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Set SL to {p}%"
+msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Set TP to {p}%"
+msgstr ""
+
 #: src/components/trade/positions/positions-tab.tsx
-msgid "Set TP/SL"
-msgstr "设置止盈止损"
+#~ msgid "Set TP/SL"
+#~ msgstr "设置止盈止损"
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
+#~ msgid "Set TP/SL for {0}"
+#~ msgstr ""
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #: src/components/trade/header/top-nav.tsx
@@ -966,6 +1036,7 @@ msgstr "设置"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Short"
 msgstr "空"
@@ -990,6 +1061,10 @@ msgstr "显示扫描线"
 msgid "Show Values in USD"
 msgstr "以美元显示数值"
 
+#: src/components/trade/positions/position-tpsl-modal.tsx
+#~ msgid "Side"
+#~ msgstr ""
+
 #: src/components/ui/sidebar.tsx
 msgid "Sidebar"
 msgstr "侧边栏"
@@ -1012,9 +1087,32 @@ msgstr "签名器未就绪"
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Size"
 msgstr "数量"
+
+#: src/components/trade/positions/orders-tab.tsx
+msgid "SL"
+msgstr ""
+
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "SL must be above entry"
+msgstr ""
+
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "SL must be below entry"
+msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "SL Price"
+msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "SL trigger price"
+#~ msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Slippage"
@@ -1068,9 +1166,14 @@ msgstr "状态"
 msgid "Stop"
 msgstr "止损"
 
-#: src/components/pages/builder-page.tsx
-#~ msgid "Submitting..."
-#~ msgstr ""
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Stop Loss"
+msgstr ""
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Submitting..."
+msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
 msgid "Support"
@@ -1099,6 +1202,11 @@ msgstr "切换到浅色模式"
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Switching..."
 msgstr "切换中..."
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Take Profit"
+msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Take Profit / Stop Loss"
@@ -1140,6 +1248,32 @@ msgstr "合计"
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Total Size"
 msgstr "总数量"
+
+#: src/components/trade/order-entry/account-panel.tsx
+msgid "Total Value"
+msgstr ""
+
+#: src/components/trade/positions/orders-tab.tsx
+msgid "TP"
+msgstr ""
+
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "TP must be above entry"
+msgstr ""
+
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "TP must be below entry"
+msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "TP Price"
+msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#~ msgid "TP trigger price"
+#~ msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -1185,6 +1319,10 @@ msgstr "类型"
 msgid "Unknown symbol: {symbolName}"
 msgstr "未知交易对: {symbolName}"
 
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Unrealized P&L"
+msgstr ""
+
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "Unrealized PNL"
 msgstr "未实现盈亏"
@@ -1213,8 +1351,8 @@ msgid "USD Value"
 msgstr "美元价值"
 
 #: src/components/trade/positions/positions-tab.tsx
-msgid "Value"
-msgstr "价值"
+#~ msgid "Value"
+#~ msgstr "价值"
 
 #: src/components/trade/header/top-nav.tsx
 msgid "Vaults"
@@ -1232,6 +1370,10 @@ msgstr "成交量"
 #: src/components/trade/chart/constants.ts
 msgid "Volume"
 msgstr "成交量"
+
+#: src/components/trade/positions/orders-tab.tsx
+msgid "waiting"
+msgstr ""
 
 #: src/components/trade/orderbook/orderbook-panel.tsx
 msgid "Waiting for order book..."

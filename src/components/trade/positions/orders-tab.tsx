@@ -140,19 +140,42 @@ export function OrdersTab() {
 			const limitPx = parseNumber(order.limitPx);
 			const szDecimals = getSzDecimals(order.coin) ?? 4;
 
+			const orderType = (order as { orderType?: string }).orderType;
+			const isTp = orderType === "Take Profit Market" || orderType === "Take Profit Limit";
+			const isSl = orderType === "Stop Market" || orderType === "Stop Limit";
+			const isTrigger = isTp || isSl;
+
+			let typeLabel: string;
+			let typeClass: string;
+			if (isTp) {
+				typeLabel = t`TP`;
+				typeClass = "bg-terminal-green/20 text-terminal-green";
+			} else if (isSl) {
+				typeLabel = t`SL`;
+				typeClass = "bg-terminal-red/20 text-terminal-red";
+			} else if (order.reduceOnly) {
+				typeLabel = t`limit ro`;
+				typeClass = "bg-accent/50";
+			} else {
+				typeLabel = t`limit`;
+				typeClass = "bg-accent/50";
+			}
+
 			return {
 				key: order.oid,
 				order,
 				coin: order.coin,
 				sideLabel: isBuy ? t`buy` : t`sell`,
 				sideClass: isBuy ? "bg-terminal-green/20 text-terminal-green" : "bg-terminal-red/20 text-terminal-red",
-				typeLabel: order.reduceOnly ? t`limit ro` : t`limit`,
+				typeLabel,
+				typeClass,
+				isTrigger,
 				priceText: Number.isFinite(limitPx) ? formatUSD(limitPx, { compact: false }) : String(order.limitPx),
 				sizeText: Number.isFinite(origSz) ? formatNumber(origSz, szDecimals) : String(order.origSz),
 				filledText: Number.isFinite(filled) ? formatNumber(filled, szDecimals) : FALLBACK_VALUE_PLACEHOLDER,
 				hasFilled: Number.isFinite(filled) && filled > 0,
 				fillPctText: `${fillPct.toFixed(0)}%`,
-				statusLabel: t`open`,
+				statusLabel: isTrigger ? t`waiting` : t`open`,
 			};
 		});
 	}, [openOrders, getSzDecimals]);
@@ -275,7 +298,7 @@ export function OrdersTab() {
 											</div>
 										</TableCell>
 										<TableCell className="text-2xs py-1.5">
-											<span className="text-4xs px-1 py-0.5 rounded-sm uppercase bg-accent/50">{row.typeLabel}</span>
+											<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.typeClass)}>{row.typeLabel}</span>
 										</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.priceText}</TableCell>
 										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.sizeText}</TableCell>
@@ -285,7 +308,14 @@ export function OrdersTab() {
 											</span>
 										</TableCell>
 										<TableCell className="text-2xs py-1.5">
-											<span className="text-4xs px-1 py-0.5 rounded-sm uppercase bg-terminal-cyan/20 text-terminal-cyan">
+											<span
+												className={cn(
+													"text-4xs px-1 py-0.5 rounded-sm uppercase",
+													row.isTrigger
+														? "bg-terminal-amber/20 text-terminal-amber"
+														: "bg-terminal-cyan/20 text-terminal-cyan",
+												)}
+											>
 												{row.statusLabel}
 											</span>
 										</TableCell>

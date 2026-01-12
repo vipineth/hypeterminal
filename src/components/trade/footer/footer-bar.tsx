@@ -6,7 +6,7 @@ import { formatTime } from "@/lib/format";
 
 export function FooterBar() {
 	return (
-		<footer className="h-6 border-t border-border/60 px-2 text-4xs uppercase tracking-wider flex items-center justify-between bg-surface/40">
+		<footer className="fixed bottom-0 left-0 right-0 z-40 h-6 border-t border-border/60 px-2 text-4xs uppercase tracking-wider flex items-center justify-between bg-surface">
 			<div className="flex items-center gap-3">
 				<div className="flex items-center gap-1.5">
 					<Wifi className="size-3 text-terminal-green" />
