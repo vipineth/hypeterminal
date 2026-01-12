@@ -88,3 +88,39 @@ export function getTpSlValidationError(
 	}
 	return null;
 }
+
+export interface RiskRewardDisplay {
+	risk: number;
+	reward: number;
+	label: string;
+	isFavorable: boolean;
+}
+
+export function formatRiskRewardRatio(ratio: number): RiskRewardDisplay | null {
+	if (!Number.isFinite(ratio) || ratio <= 0) {
+		return null;
+	}
+
+	const isFavorable = ratio >= 1;
+
+	if (ratio >= 1) {
+		const rounded = Math.round(ratio * 10) / 10;
+		const isWhole = rounded === Math.round(rounded);
+		return {
+			risk: 1,
+			reward: rounded,
+			label: `1:${isWhole ? Math.round(rounded) : rounded.toFixed(1)}`,
+			isFavorable,
+		};
+	}
+
+	const inverted = 1 / ratio;
+	const rounded = Math.round(inverted * 10) / 10;
+	const isWhole = rounded === Math.round(rounded);
+	return {
+		risk: rounded,
+		reward: 1,
+		label: `${isWhole ? Math.round(rounded) : rounded.toFixed(1)}:1`,
+		isFavorable,
+	};
+}

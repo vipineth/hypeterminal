@@ -1,6 +1,7 @@
 import { t } from "@lingui/core/macro";
-import { Loader2 } from "lucide-react";
+import { Loader2, TrendingDown, TrendingUp } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/cn";
@@ -9,6 +10,7 @@ import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOr
 import { isPositive } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
 import { validateSlPrice, validateTpPrice } from "@/lib/trade/tpsl";
+import { TokenAvatar } from "../components/token-avatar";
 import { TpSlSection } from "../order-entry/tp-sl-section";
 
 interface PositionData {
@@ -148,50 +150,67 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 
 	if (!position) return null;
 
+	const isProfitable = position.unrealizedPnl >= 0;
+
 	return (
 		<Dialog open={open} onOpenChange={handleOpenChange}>
-			<DialogContent className="sm:max-w-md">
-				<DialogHeader>
-					<DialogTitle>{t`Set TP/SL for ${position.coin}`}</DialogTitle>
+			<DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden">
+				<DialogHeader className="px-5 pt-5 pb-3">
+					<DialogTitle className="flex items-center gap-1">
+						<TokenAvatar symbol={position.coin} />
+						<span className="text-base font-semibold">{position.coin}</span>
+						<Badge variant={position.isLong ? "long" : "short"} size="sm">
+							{position.isLong ? (
+								<>
+									<TrendingUp className="size-3" />
+									{t`Long`}
+								</>
+							) : (
+								<>
+									<TrendingDown className="size-3" />
+									{t`Short`}
+								</>
+							)}
+						</Badge>
+					</DialogTitle>
 				</DialogHeader>
 
-				<div className="space-y-4">
-					<div className="border border-border/40 rounded-sm p-3 space-y-2 text-2xs">
+				<div className="px-5 pb-4">
+					<div className="rounded-lg border border-border/50 bg-muted/20 p-3 space-y-1">
 						<div className="flex items-center justify-between">
-							<span className="text-muted-foreground">{t`Side`}</span>
-							<span className={cn(position.isLong ? "text-terminal-green" : "text-terminal-red")}>
-								{position.isLong ? t`Long` : t`Short`}
-							</span>
-						</div>
-						<div className="flex items-center justify-between">
-							<span className="text-muted-foreground">{t`Size`}</span>
-							<span className="tabular-nums">
+							<span className="text-2xs text-muted-foreground">{t`Size`}</span>
+							<span className="text-2xs tabular-nums font-medium">
 								{formatToken(position.size, position.szDecimals)} {position.coin}
 							</span>
 						</div>
 						<div className="flex items-center justify-between">
-							<span className="text-muted-foreground">{t`Entry`}</span>
-							<span className="tabular-nums">{formatPrice(position.entryPx, { szDecimals: position.szDecimals })}</span>
+							<span className="text-2xs text-muted-foreground">{t`Entry Price`}</span>
+							<span className="text-2xs tabular-nums font-medium">
+								{formatPrice(position.entryPx, { szDecimals: position.szDecimals })}
+							</span>
 						</div>
 						<div className="flex items-center justify-between">
-							<span className="text-muted-foreground">{t`Mark`}</span>
-							<span className="tabular-nums text-terminal-amber">
+							<span className="text-2xs text-muted-foreground">{t`Mark Price`}</span>
+							<span className="text-2xs tabular-nums font-medium text-terminal-amber">
 								{formatPrice(position.markPx, { szDecimals: position.szDecimals })}
 							</span>
 						</div>
-						<div className="flex items-center justify-between">
-							<span className="text-muted-foreground">{t`P&L`}</span>
+						<div className="border-t border-border/50 pt-3 flex items-center justify-between">
+							<span className="text-2xs text-muted-foreground">{t`Unrealized P&L`}</span>
 							<span
 								className={cn(
-									"tabular-nums",
-									position.unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red",
+									"text-2xs tabular-nums font-semibold",
+									isProfitable ? "text-terminal-green" : "text-terminal-red",
 								)}
 							>
-								{formatUSD(position.unrealizedPnl, { signDisplay: "exceptZero" })} ({formatPercent(position.roe, 1)})
+								{formatUSD(position.unrealizedPnl, { signDisplay: "exceptZero" })}
+								<span className="font-normal text-muted-foreground ml-1">({formatPercent(position.roe, 1)})</span>
 							</span>
 						</div>
 					</div>
+				</div>
 
+				<div className="px-5 pb-4">
 					<TpSlSection
 						side={side}
 						referencePrice={referencePrice}
@@ -205,16 +224,32 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 						slError={slError}
 					/>
 
-					{error && <div className="text-3xs text-terminal-red">{error.message}</div>}
+					{error && (
+						<div className="mt-3 px-2 py-1.5 rounded-md bg-terminal-red/10 border border-terminal-red/20 text-3xs text-terminal-red">
+							{error.message}
+						</div>
+					)}
 				</div>
 
-				<DialogFooter className="gap-2">
-					<Button size="sm" variant="outline" onClick={() => handleOpenChange(false)} disabled={isSubmitting}>
+				<DialogFooter className="px-5 py-3 border-t border-border/50">
+					<Button
+						size="sm"
+						variant="ghost"
+						onClick={() => handleOpenChange(false)}
+						disabled={isSubmitting}
+						className="text-muted-foreground hover:text-foreground"
+					>
 						{t`Cancel`}
 					</Button>
-					<Button size="sm" variant="terminal" onClick={handleSubmit} disabled={!canSubmit}>
-						{isSubmitting && <Loader2 className="size-3 animate-spin mr-2" />}
-						{t`Confirm`}
+					<Button size="sm" variant="terminal" onClick={handleSubmit} disabled={!canSubmit} className="min-w-24">
+						{isSubmitting ? (
+							<>
+								<Loader2 className="size-3.5 animate-spin" />
+								{t`Submitting...`}
+							</>
+						) : (
+							t`Confirm`
+						)}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

@@ -4,6 +4,8 @@ export const APP_NAME = "HypeTerminal";
 export const APP_VERSION = "v0.1.0";
 
 export const QUICK_PERCENT_OPTIONS = [25, 50, 100, 200, 400] as const;
+export const TP_QUICK_PERCENT_OPTIONS = [25, 50, 100, 200] as const;
+export const SL_QUICK_PERCENT_OPTIONS = [5, 10, 25, 50] as const;
 
 export const FALLBACK_VALUE_PLACEHOLDER = "-";
 export const FORMAT_COMPACT_THRESHOLD = 10_000;

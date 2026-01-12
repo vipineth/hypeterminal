@@ -1,10 +1,11 @@
 import { t } from "@lingui/core/macro";
-import { Circle, Pencil } from "lucide-react";
+import { Circle, Pencil, Plus } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
@@ -78,10 +79,7 @@ export function PositionsTab() {
 	const { data: assetCtxsEvent } = useSubAssetCtxs(assetCtxsParams, assetCtxsOptions);
 	const assetCtxs = assetCtxsEvent?.ctxs as PerpAssetCtxs | undefined;
 
-	const { data: openOrdersEvent } = useSubOpenOrders(
-		{ user: address ?? "0x0" },
-		{ enabled: isConnected && !!address },
-	);
+	const { data: openOrdersEvent } = useSubOpenOrders({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
 	const openOrders = openOrdersEvent?.orders ?? [];
 
 	const tpSlOrdersByCoin = useMemo(() => {
@@ -326,57 +324,68 @@ export function PositionsTab() {
 												</div>
 											</TableCell>
 											<TableCell className="text-right py-1.5">
-												<div className="flex items-center justify-end gap-1.5">
-													{row.hasTpSl ? (
-														<>
-															<div className="flex flex-col items-end gap-0.5 text-3xs tabular-nums">
-																{row.tpPrice && (
-																	<span className="text-terminal-green">
-																		{formatPrice(row.tpPrice, { szDecimals: row.szDecimals })}
-																	</span>
-																)}
-																{row.slPrice && (
-																	<span className="text-terminal-red">
-																		{formatPrice(row.slPrice, { szDecimals: row.szDecimals })}
-																	</span>
-																)}
-															</div>
-															<Button
-																variant="ghost"
-																size="none"
-																className="h-5 w-5 p-0 text-muted-foreground hover:text-foreground"
-																aria-label={t`Edit TP/SL`}
-																onClick={() => handleOpenTpSlModal(row)}
-															>
-																<Pencil className="size-3" />
-															</Button>
-														</>
-													) : (
-														<span className="text-3xs text-muted-foreground/50">—</span>
-													)}
-												</div>
+												<Tooltip>
+													<TooltipTrigger asChild>
+														<button
+															type="button"
+															onClick={() => handleOpenTpSlModal(row)}
+															disabled={typeof row.assetIndex !== "number"}
+															className={cn(
+																"group inline-flex items-center gap-1.5 cursor-pointer transition-opacity disabled:cursor-not-allowed disabled:opacity-50",
+																!row.hasTpSl && "text-muted-foreground/60 hover:text-muted-foreground",
+															)}
+														>
+															{row.tpPrice && row.slPrice ? (
+																<>
+																	<div className="flex items-center gap-1 text-3xs tabular-nums">
+																		<span className="text-terminal-green">
+																			{formatPrice(row.tpPrice, { szDecimals: row.szDecimals })}
+																		</span>
+																		<span className="text-muted-foreground/50">/</span>
+																		<span className="text-terminal-red">
+																			{formatPrice(row.slPrice, { szDecimals: row.szDecimals })}
+																		</span>
+																	</div>
+																	<Pencil className="size-3 text-muted-foreground/60 group-hover:text-foreground transition-colors" />
+																</>
+															) : row.hasTpSl ? (
+																<>
+																	<div className="flex items-center gap-1 text-3xs tabular-nums">
+																		{row.tpPrice ? (
+																			<span className="text-terminal-green">
+																				{formatPrice(row.tpPrice, { szDecimals: row.szDecimals })}
+																			</span>
+																		) : (
+																			<span className="text-terminal-red">
+																				{formatPrice(row.slPrice, { szDecimals: row.szDecimals })}
+																			</span>
+																		)}
+																	</div>
+																	<Plus className="size-3 text-muted-foreground/60 group-hover:text-foreground transition-colors" />
+																</>
+															) : (
+																<div className="flex items-center gap-0.5 text-3xs">
+																	<Plus className="size-3 group-hover:text-foreground transition-colors" />
+																	<span>{t`Add`}</span>
+																</div>
+															)}
+														</button>
+													</TooltipTrigger>
+													<TooltipContent side="left">
+														{row.tpPrice && row.slPrice ? t`Edit TP/SL` : t`Add TP/SL`}
+													</TooltipContent>
+												</Tooltip>
 											</TableCell>
 											<TableCell className="text-right py-1.5">
-												<div className="flex justify-end gap-1">
-													<Button
-														variant="danger"
-														size="xs"
-														aria-label={t`Close position`}
-														onClick={() => handleClosePosition(row)}
-														disabled={!row.canClose || isClosing}
-													>
-														{isRowClosing ? t`Closing...` : t`Close`}
-													</Button>
-													<Button
-														variant="terminal"
-														size="xs"
-														aria-label={t`Set TP/SL`}
-														onClick={() => handleOpenTpSlModal(row)}
-														disabled={typeof row.assetIndex !== "number"}
-													>
-														{t`TP/SL`}
-													</Button>
-												</div>
+												<Button
+													variant="danger"
+													size="xs"
+													aria-label={t`Close position`}
+													onClick={() => handleClosePosition(row)}
+													disabled={!row.canClose || isClosing}
+												>
+													{isRowClosing ? t`Closing...` : t`Close`}
+												</Button>
 											</TableCell>
 										</TableRow>
 									);
@@ -388,11 +397,7 @@ export function PositionsTab() {
 				)}
 			</div>
 
-			<PositionTpSlModal
-				open={tpSlModalOpen}
-				onOpenChange={setTpSlModalOpen}
-				position={selectedTpSlPosition}
-			/>
+			<PositionTpSlModal open={tpSlModalOpen} onOpenChange={setTpSlModalOpen} position={selectedTpSlPosition} />
 		</div>
 	);
 }

@@ -159,6 +159,7 @@ msgstr "شراء طويل"
 #: src/components/trade/order-entry/leverage-popover.tsx
 #: src/components/trade/order-entry/leverage-sheet.tsx
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Cancel"
 msgstr "إلغاء"
@@ -225,7 +226,6 @@ msgstr "طي لوحة الحساب"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
-#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Coming soon"
 msgstr "قريباً"
 
@@ -235,6 +235,7 @@ msgstr "مكتمل"
 
 #: src/components/trade/order-entry/leverage-popover.tsx
 #: src/components/trade/order-entry/leverage-sheet.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 msgid "Confirm"
 msgstr ""
 
@@ -364,6 +365,10 @@ msgstr "يعرض الشريط الجانبي للجوال."
 msgid "Docs"
 msgstr "المستندات"
 
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Edit TP/SL"
+msgstr ""
+
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enable Trading"
 msgstr "تفعيل التداول"
@@ -376,6 +381,11 @@ msgstr "أدخل السعر المحدد"
 msgid "Enter size"
 msgstr "أدخل الحجم"
 
+#: src/components/trade/order-entry/order-entry-panel.tsx
+msgid "Enter TP or SL price"
+msgstr ""
+
+#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Entry"
 msgstr "الدخول"
@@ -387,6 +397,11 @@ msgstr "حقوق الملكية"
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Est. Fee"
 msgstr "الرسوم المقدرة"
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Est. P&L"
+msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Exceeds max size"
@@ -595,6 +610,7 @@ msgstr "جارٍ التحميل..."
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Long"
 msgstr "شراء"
@@ -612,6 +628,7 @@ msgid "Margin Used"
 msgstr "الهامش المستخدم"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Mark"
 msgstr "السعر المرجعي"
@@ -798,6 +815,10 @@ msgstr "قيمة الطلب"
 msgid "Other Options"
 msgstr ""
 
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "P&L"
+msgstr ""
+
 #: src/components/pages/not-found-page.tsx
 msgid "Page not found"
 msgstr "الصفحة غير موجودة"
@@ -955,9 +976,22 @@ msgstr "بيع قصير"
 msgid "Set {p}%"
 msgstr "تعيين {p}%"
 
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Set SL to {p}%"
+msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Set TP to {p}%"
+msgstr ""
+
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Set TP/SL"
 msgstr "تعيين TP/SL"
+
+#. placeholder {0}: position.coin
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Set TP/SL for {0}"
+msgstr ""
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #: src/components/trade/header/top-nav.tsx
@@ -966,6 +1000,7 @@ msgstr "الإعدادات"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Short"
 msgstr "بيع"
@@ -990,6 +1025,10 @@ msgstr "إظهار خطوط المسح"
 msgid "Show Values in USD"
 msgstr "إظهار القيم بالدولار"
 
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "Side"
+msgstr ""
+
 #: src/components/ui/sidebar.tsx
 msgid "Sidebar"
 msgstr "الشريط الجانبي"
@@ -1012,9 +1051,28 @@ msgstr "المُوقِّع غير جاهز"
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Size"
 msgstr "الحجم"
+
+#: src/components/trade/positions/orders-tab.tsx
+msgid "SL"
+msgstr ""
+
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "SL must be above entry"
+msgstr ""
+
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "SL must be below entry"
+msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "SL trigger price"
+msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Slippage"
@@ -1068,6 +1126,10 @@ msgstr "الحالة"
 msgid "Stop"
 msgstr "إيقاف"
 
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Stop Loss"
+msgstr ""
+
 #: src/components/pages/builder-page.tsx
 #~ msgid "Submitting..."
 #~ msgstr ""
@@ -1099,6 +1161,10 @@ msgstr "التبديل إلى الوضع الفاتح"
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Switching..."
 msgstr "جاري التبديل..."
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "Take Profit"
+msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Take Profit / Stop Loss"
@@ -1141,7 +1207,26 @@ msgstr "الإجمالي"
 msgid "Total Size"
 msgstr "الحجم الإجمالي"
 
+#: src/components/trade/positions/orders-tab.tsx
+msgid "TP"
+msgstr ""
+
 #: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "TP must be above entry"
+msgstr ""
+
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/position-tpsl-modal.tsx
+msgid "TP must be below entry"
+msgstr ""
+
+#: src/components/trade/order-entry/tp-sl-section.tsx
+msgid "TP trigger price"
+msgstr ""
+
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "TP/SL"
 msgstr "TP/SL"
@@ -1213,8 +1298,8 @@ msgid "USD Value"
 msgstr "القيمة بالدولار"
 
 #: src/components/trade/positions/positions-tab.tsx
-msgid "Value"
-msgstr "القيمة"
+#~ msgid "Value"
+#~ msgstr "القيمة"
 
 #: src/components/trade/header/top-nav.tsx
 msgid "Vaults"
@@ -1232,6 +1317,10 @@ msgstr "الحجم"
 #: src/components/trade/chart/constants.ts
 msgid "Volume"
 msgstr "الحجم"
+
+#: src/components/trade/positions/orders-tab.tsx
+msgid "waiting"
+msgstr ""
 
 #: src/components/trade/orderbook/orderbook-panel.tsx
 msgid "Waiting for order book..."
