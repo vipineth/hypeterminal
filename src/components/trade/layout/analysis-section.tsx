@@ -1,12 +1,11 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { LAYOUT_PERSISTENCE } from "@/config/constants";
-import { usePersistentLayout } from "@/hooks/trade/use-persistent-layout";
+import { LAYOUT_PERSISTENCE, usePersistentLayout } from "@/hooks/trade/use-persistent-layout";
 import { PositionsPanel } from "../positions/positions-panel";
 import { PriceRow } from "./price-row";
 
 export function AnalysisSection() {
 	const layout = LAYOUT_PERSISTENCE.VERTICAL;
-	const { layout: vertLayout, onLayout: onVertLayout } = usePersistentLayout(layout.KEY, layout.FALLBACK);
+	const { onLayout: onVertLayout } = usePersistentLayout(layout.KEY, layout.FALLBACK);
 
 	return (
 		<div className="h-full min-h-0">

@@ -1,10 +1,28 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 
-function readStoredLayout(key: string): number[] | null {
-	if (typeof window === "undefined") return null;
+export const LAYOUT_PERSISTENCE = {
+	MAIN: {
+		KEY: "terminal:layout:main",
+		FALLBACK: [82, 18] as const,
+		PANEL_DEFAULTS: [78, 22],
+	},
+	VERTICAL: {
+		KEY: "terminal:layout:vert",
+		FALLBACK: [65, 35] as const,
+		PANEL_DEFAULTS: [48, 52],
+	},
+	CHART_BOOK: {
+		KEY: "terminal:layout:chart-book",
+		FALLBACK: [75, 25] as const,
+		PANEL_DEFAULTS: [70, 30],
+	},
+} as const;
+
+function readStoredLayout(key: string, fallback: readonly number[]): number[] {
+	if (typeof window === "undefined") return [...fallback];
 	try {
 		const stored = localStorage.getItem(key);
-		if (!stored) return null;
+		if (!stored) return [...fallback];
 		const arr = JSON.parse(stored);
 		if (Array.isArray(arr) && arr.every((n) => typeof n === "number")) {
 			return arr;
@@ -12,28 +30,21 @@ function readStoredLayout(key: string): number[] | null {
 	} catch {
 		// Ignore localStorage errors
 	}
-	return null;
+	return [...fallback];
 }
 
 export function usePersistentLayout(key: string, fallback: readonly number[]) {
-	const fallbackLayout = useMemo(() => [...fallback], [fallback]);
-	const [layout, setLayout] = useState<number[]>(() => [...fallbackLayout]);
+	const [layout, setLayout] = useState<number[]>(() => readStoredLayout(key, fallback));
 
-	useEffect(() => {
-		const stored = readStoredLayout(key);
-		if (stored) {
-			setLayout(stored);
-		}
-	}, [key, fallbackLayout]);
-
-	const onLayout = (sizes: number[]) => {
+	const onLayout = useCallback((sizes: number[]) => {
 		setLayout(sizes);
 		try {
+			if (typeof window === "undefined") return;
 			localStorage.setItem(key, JSON.stringify(sizes));
 		} catch {
 			// Ignore storage errors
 		}
-	};
+	}, [key]);
 
 	return { layout, onLayout } as const;
 }

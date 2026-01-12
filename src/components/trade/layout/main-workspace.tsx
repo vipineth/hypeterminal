@@ -1,6 +1,5 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { LAYOUT_PERSISTENCE } from "@/config/constants";
-import { usePersistentLayout } from "@/hooks/trade/use-persistent-layout";
+import { LAYOUT_PERSISTENCE, usePersistentLayout } from "@/hooks/trade/use-persistent-layout";
 import { FavoritesStrip } from "../header/favorites-strip";
 import { AnalysisSection } from "./analysis-section";
 import { OrderSidebar } from "./order-sidebar";

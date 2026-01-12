@@ -49,24 +49,6 @@ export const META_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 export const TOKEN_ICON_BASE_URL = "https://app.hyperliquid.xyz/coins";
 
-export const LAYOUT_PERSISTENCE = {
-	MAIN: {
-		KEY: "terminal:layout:main",
-		FALLBACK: [82, 18] as const,
-		PANEL_DEFAULTS: [78, 22],
-	},
-	VERTICAL: {
-		KEY: "terminal:layout:vert",
-		FALLBACK: [65, 35] as const,
-		PANEL_DEFAULTS: [48, 52],
-	},
-	CHART_BOOK: {
-		KEY: "terminal:layout:chart-book",
-		FALLBACK: [75, 25] as const,
-		PANEL_DEFAULTS: [70, 30],
-	},
-} as const;
-
 export const SIDEBAR_LAYOUT = {
 	WIDTH: "16rem",
 	WIDTH_MOBILE: "18rem",
