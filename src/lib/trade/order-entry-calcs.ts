@@ -97,7 +97,7 @@ export function getLiquidationInfo(input: LiquidationInput): LiquidationResult {
 }
 
 export function getSliderValue(sizeValue: number, maxSize: number): number {
-	if (!maxSize || maxSize <= 0) return 25;
+	if (!maxSize || maxSize <= 0 || !sizeValue || sizeValue <= 0) return 0;
 	return Math.min(100, (sizeValue / maxSize) * 100);
 }
 

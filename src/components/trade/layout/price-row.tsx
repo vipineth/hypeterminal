@@ -1,15 +1,14 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { LAYOUT_PERSISTENCE } from "@/config/constants";
+import { usePersistentLayout } from "@/hooks/trade/use-persistent-layout";
 import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { ChartPanel } from "../chart/chart-panel";
-import { usePersistentLayout } from "@/hooks/trade/use-persistent-layout";
 import { OrderbookPanel } from "../orderbook/orderbook-panel";
 
 export function PriceRow() {
 	const layout = LAYOUT_PERSISTENCE.CHART_BOOK;
 	const { layout: horizLayout, onLayout: onHorizLayout } = usePersistentLayout(layout.KEY, layout.FALLBACK);
 
-	// React 19: Use key prop to reset OrderBookPanel when coin changes
 	const { data: market } = useSelectedResolvedMarket({ ctxMode: "none" });
 	const bookKey = market?.coin ?? "default";
 

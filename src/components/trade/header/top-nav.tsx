@@ -34,7 +34,7 @@ export function TopNav() {
 	const [settingsOpen, setSettingsOpen] = useState(false);
 
 	return (
-		<header className="h-11 border-b border-border/60 px-2 flex items-center justify-between bg-surface/40">
+		<header className="fixed top-0 left-0 right-0 z-40 h-11 border-b border-border/60 px-2 flex items-center justify-between bg-surface">
 			<div className="flex items-center gap-2 min-w-0">
 				<div className="flex items-center gap-1.5">
 					<div className="size-5 rounded bg-terminal-green/20 border border-terminal-green/40 flex items-center justify-center">

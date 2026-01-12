@@ -19,7 +19,7 @@ import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format"
 import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
-import { formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
+import { formatDecimalFloor, isPositive, parseNumber, toNumber } from "@/lib/trade/numbers";
 import {
 	getConversionPrice,
 	getExecutedPrice,
@@ -102,6 +102,7 @@ export function OrderEntryPanel() {
 	const { setSide, setOrderType, setSizeMode, setReduceOnly } = useOrderEntryActions();
 
 	const [sizeInput, setSizeInput] = useState("");
+	const [hasUserSized, setHasUserSized] = useState(false);
 	const [limitPriceInput, setLimitPriceInput] = useState("");
 	const [approvalError, setApprovalError] = useState<string | null>(null);
 	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
@@ -119,8 +120,8 @@ export function OrderEntryPanel() {
 		}
 	}, [selectedPrice, setOrderType]);
 
-	const tpPriceNum = parseFloat(tpPriceInput) || 0;
-	const slPriceNum = parseFloat(slPriceInput) || 0;
+	const tpPriceNum = toNumber(tpPriceInput);
+	const slPriceNum = toNumber(slPriceInput);
 
 	const accountValue = parseNumber(clearinghouse?.crossMarginSummary?.accountValue) || 0;
 	const marginUsed = parseNumber(clearinghouse?.crossMarginSummary?.totalMarginUsed) || 0;
@@ -225,8 +226,8 @@ export function OrderEntryPanel() {
 		}
 
 		if (tpSlEnabled) {
-			const hasTp = tpPriceNum > 0;
-			const hasSl = slPriceNum > 0;
+			const hasTp = isPositive(tpPriceNum);
+			const hasSl = isPositive(slPriceNum);
 			if (!hasTp && !hasSl) {
 				errors.push(t`Enter TP or SL price`);
 			}
@@ -263,6 +264,7 @@ export function OrderEntryPanel() {
 
 	function applySizePercent(pct: number) {
 		if (maxSize <= 0) return;
+		setHasUserSized(true);
 		const newSize = maxSize * (pct / 100);
 		if (sizeMode === "usd" && conversionPx > 0) {
 			setSizeInput((newSize * conversionPx).toFixed(2));
@@ -274,6 +276,7 @@ export function OrderEntryPanel() {
 	function handleSizeModeToggle() {
 		const newMode = sizeMode === "asset" ? "usd" : "asset";
 		if (conversionPx > 0 && sizeValue > 0) {
+			setHasUserSized(true);
 			setSizeInput(
 				newMode === "usd"
 					? (sizeValue * conversionPx).toFixed(2)
@@ -339,8 +342,8 @@ export function OrderEntryPanel() {
 					},
 				];
 
-				const hasTp = tpSlEnabled && tpPriceNum > 0;
-				const hasSl = tpSlEnabled && slPriceNum > 0;
+				const hasTp = tpSlEnabled && isPositive(tpPriceNum);
+				const hasSl = tpSlEnabled && isPositive(slPriceNum);
 
 				if (hasTp) {
 					orders.push({
@@ -388,6 +391,7 @@ export function OrderEntryPanel() {
 				updateOrder(orderId, { status: "success", fillPercent: 100 });
 
 				setSizeInput("");
+				setHasUserSized(false);
 				setLimitPriceInput("");
 				setTpPriceInput("");
 				setSlPriceInput("");
@@ -420,7 +424,10 @@ export function OrderEntryPanel() {
 		],
 	);
 
-	const sliderValue = useMemo(() => getSliderValue(sizeValue, maxSize), [maxSize, sizeValue]);
+	const sliderValue = useMemo(() => {
+		if (!hasUserSized) return 25;
+		return getSliderValue(sizeValue, maxSize);
+	}, [hasUserSized, maxSize, sizeValue]);
 
 	const registerText = useMemo(() => {
 		if (isLoadingAgents) return t`Loading...`;
@@ -614,7 +621,10 @@ export function OrderEntryPanel() {
 						<Input
 							placeholder="0.00"
 							value={sizeInput}
-							onChange={(e) => setSizeInput(e.target.value)}
+							onChange={(e) => {
+								setHasUserSized(true);
+								setSizeInput(e.target.value);
+							}}
 							className={cn(
 								"flex-1 h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums",
 								(sizeHasError || orderValueTooLow) && "border-terminal-red focus:border-terminal-red",
@@ -625,7 +635,7 @@ export function OrderEntryPanel() {
 
 					<Slider
 						value={[sliderValue]}
-						onValueChange={(v) => applySizePercent(v[0])}
+						onValueCommit={(v) => applySizePercent(v[0])}
 						max={100}
 						step={0.1}
 						className="py-5"

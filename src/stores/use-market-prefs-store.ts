@@ -13,6 +13,11 @@ const marketPrefsSchema = z.object({
 
 const validatedStorage = createValidatedStorage(marketPrefsSchema, "market prefs");
 
+const DEFAULT_MARKET_PREFS = {
+	selectedMarketKey: DEFAULT_MARKET_KEY,
+	favoriteMarketKeys: ["perp:BTC", "perp:ETH", "perp:HYPE"] as string[],
+} as const;
+
 interface MarketPrefsStore {
 	selectedMarketKey: string;
 	favoriteMarketKeys: string[];
@@ -25,8 +30,8 @@ interface MarketPrefsStore {
 const useMarketPrefsStore = create<MarketPrefsStore>()(
 	persist(
 		(set) => ({
-			selectedMarketKey: DEFAULT_MARKET_KEY,
-			favoriteMarketKeys: [],
+			selectedMarketKey: DEFAULT_MARKET_PREFS.selectedMarketKey,
+			favoriteMarketKeys: DEFAULT_MARKET_PREFS.favoriteMarketKeys,
 			actions: {
 				setSelectedMarketKey: (marketKey) => {
 					set({ selectedMarketKey: marketKey });
