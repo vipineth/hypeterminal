@@ -8,7 +8,7 @@ export const LAYOUT_PERSISTENCE = {
 	},
 	VERTICAL: {
 		KEY: "terminal:layout:vert",
-		FALLBACK: [65, 35] as const,
+		FALLBACK: [55, 45] as const,
 		PANEL_DEFAULTS: [45, 55],
 	},
 	CHART_BOOK: {

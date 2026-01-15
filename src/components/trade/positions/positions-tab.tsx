@@ -122,6 +122,7 @@ export function PositionsTab() {
 			const assetIndex = getAssetId(p.coin);
 			const markPxRaw = typeof assetIndex === "number" ? assetCtxs?.[assetIndex]?.markPx : undefined;
 			const markPx = markPxRaw ? parseNumber(markPxRaw) : Number.NaN;
+			const cumFundingSinceOpen = parseNumber((p as { cumFunding?: { sinceOpen?: string } }).cumFunding?.sinceOpen);
 
 			const canClose =
 				Number.isFinite(closeSize) &&
@@ -160,6 +161,10 @@ export function PositionsTab() {
 					: FALLBACK_VALUE_PLACEHOLDER,
 				roeText: Number.isFinite(roe) ? formatPercent(roe, 1) : FALLBACK_VALUE_PLACEHOLDER,
 				pnlClass: unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red",
+				fundingText: Number.isFinite(cumFundingSinceOpen)
+					? formatUSD(-cumFundingSinceOpen, { signDisplay: "exceptZero" })
+					: FALLBACK_VALUE_PLACEHOLDER,
+				fundingClass: cumFundingSinceOpen >= 0 ? "text-terminal-red" : "text-terminal-green",
 				tpPrice: tpSlInfo?.tpPrice,
 				slPrice: tpSlInfo?.slPrice,
 				tpOrderId: tpSlInfo?.tpOrderId,
@@ -277,6 +282,9 @@ export function PositionsTab() {
 										{t`Liq`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+										{t`Funding`}
+									</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
 										{t`PNL`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
@@ -316,6 +324,9 @@ export function PositionsTab() {
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums text-terminal-red/70 py-1.5">
 												{row.liqText}
+											</TableCell>
+											<TableCell className={cn("text-2xs text-right tabular-nums py-1.5", row.fundingClass)}>
+												{row.fundingText}
 											</TableCell>
 											<TableCell className="text-right py-1.5">
 												<div className={cn("text-2xs tabular-nums", row.pnlClass)}>

@@ -34,23 +34,146 @@ Enable isolated margin mode for perp positions, allowing users to allocate speci
 
 ## Requirements
 
-### Must Have
+### Phase 1: Cross/Isolated Switch (This PR)
 
-- [ ] Toggle between cross and isolated margin mode when setting leverage
-- [ ] Display margin mode indicator on position rows (Cross/Isolated badge)
+- [x] Replace Cross/Isolated tabs with toggle switch in order entry panel
+- [x] Toggle switch opens confirmation modal on click
+- [x] Modal shows detailed comparison table (Cross vs Isolated differences)
+- [x] Modal "Confirm" button triggers wallet signature
+- [x] Modal auto-closes immediately on successful signature
+- [x] Show toast notification on signature error/failure
+- [x] Lock icon on toggle when position exists, clicking shows modal with "Cannot switch leverage type with open position" message
+- [x] Per-asset margin mode (each asset tracks its own mode independently)
+- [x] Remember last selected mode in localStorage for new assets
+- [x] Display "ISO" badge on isolated position rows in positions panel
+- [x] Terminal-cyan accent styling for toggle switch
+
+### Phase 2: Margin Adjustment (Follow-up)
+
 - [ ] Show isolated margin amount (`rawUsd`) for isolated positions
 - [ ] Add/remove margin controls for isolated positions
 - [ ] Display per-position liquidation price for isolated positions
-- [ ] Update `availableToTrade` calculation awareness (backend handles, UI displays)
-- [ ] Prevent mode switch when position exists (Hyperliquid restriction)
-- [ ] Handle different leverage config structure: `{ type: "isolated", value: number, rawUsd: string }`
-
-### Nice to Have
-
 - [ ] Quick margin adjustment presets (+25%, +50%, -25%, -50%)
 - [ ] Liquidation price warning threshold indicator
-- [ ] Margin ratio visualization per position
-- [ ] Bulk margin adjustment for multiple isolated positions
+
+## Switch Implementation Spec
+
+### Toggle Switch Component
+
+**Location**: Replaces the current `<Tabs value="cross">` in `order-entry-panel.tsx` (lines 501-515)
+
+**Visual Design**:
+```
+┌─────────────────────────────────────────────────┐
+│  [Cross ○────────● Isolated]   20x [▼]         │
+│   ↑ Toggle switch              ↑ Leverage      │
+└─────────────────────────────────────────────────┘
+```
+
+**Styling**:
+- Terminal-cyan accent for active/selected state
+- Labels: "Cross" and "Isolated" (full names, not abbreviated)
+- Compact inline layout alongside leverage control
+- Lock icon overlay when position exists
+
+### Confirmation Modal
+
+**Trigger**: Clicking the toggle switch (either direction)
+
+**Modal Content - Normal State** (no position):
+```
+┌─────────────────────────────────────────────────┐
+│  Switch to [Isolated/Cross] Margin         [X] │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│  [Description text based on target mode]        │
+│                                                 │
+│         [ Cancel ]     [ Confirm ]             │
+│                         ↑ Triggers signature   │
+└─────────────────────────────────────────────────┘
+```
+
+**Modal Description Text**:
+
+When switching to **Cross**:
+> All cross positions share the same cross margin as collateral. In the event of liquidation, your cross margin balance and any remaining open positions under assets in this mode may be forfeited.
+
+When switching to **Isolated**:
+> Manage your risk on individual positions by restricting the amount of margin allocated to each. If the margin ratio of an isolated position reaches 100%, the position will be liquidated. Margin can be added or removed to individual positions in this mode.
+
+**Modal Content - Locked State** (position exists):
+```
+┌─────────────────────────────────────────────────┐
+│  Cannot Switch Margin Mode                 [X] │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│  ⚠️ Cannot switch leverage type with open      │
+│     position.                                   │
+│                                                 │
+│  Close your [ASSET] position first to change   │
+│  between Cross and Isolated margin modes.      │
+│                                                 │
+│                    [ OK ]                       │
+└─────────────────────────────────────────────────┘
+```
+
+### State Management
+
+**Per-Asset Mode Tracking**:
+- Each asset maintains its own margin mode
+- Mode is fetched from `useSubActiveAssetData` → `leverage.type`
+- When switching assets, toggle reflects that asset's current mode
+
+**Default for New Assets**:
+- Check localStorage for `hyperliquid:lastMarginMode`
+- If stored preference exists, use it
+- Otherwise default to "cross"
+- On successful mode switch, update localStorage preference
+
+**State Flow**:
+```
+User clicks toggle
+    ↓
+Modal opens (show comparison or locked message)
+    ↓
+User clicks "Confirm" (if allowed)
+    ↓
+Call updateLeverage({ asset, isCross: newMode === "cross", leverage: currentLeverage })
+    ↓
+Wallet signature prompt
+    ↓
+On success: Modal auto-closes, toggle updates, update localStorage
+On error: Modal closes, show toast with error message
+```
+
+### Error Handling
+
+**Toast Notification on Error**:
+- Position: Bottom-right corner
+- Style: Terminal-red accent
+- Content: Error message from API or "Failed to switch margin mode"
+- Auto-dismiss after 5 seconds
+- Include retry action in toast (optional)
+
+### Position Badge
+
+**Location**: Position rows in `positions-tab.tsx`
+
+**Design**:
+```
+┌──────────────────────────────────────────────────────────────┐
+│ BTC   Long   0.5 BTC   $95,000   +$234.56   [ISO]   [Close] │
+│                                              ↑ Badge        │
+└──────────────────────────────────────────────────────────────┘
+```
+
+**Badge Styling**:
+- Text: "ISO" (short for Isolated)
+- Background: `terminal-cyan/15`
+- Border: `terminal-cyan/30`
+- Text color: `terminal-cyan`
+- Font: `text-4xs uppercase`
+- Only shown for isolated positions (cross positions show no badge)
 
 ## Key Implementation Differences
 
@@ -100,18 +223,26 @@ interface Position {
 
 ## Tasks
 
-1. [ ] Update `LeverageConfig` type to union of cross/isolated
-2. [ ] Add margin mode toggle (Cross/Isolated) to leverage popover
-3. [ ] Update `useAssetLeverage` hook to handle both modes
-4. [ ] Create `useExchangeUpdateIsolatedMargin` hook
-5. [ ] Add isolated margin indicator to position row
-6. [ ] Create `IsolatedMarginAdjuster` component for +/- margin
-7. [ ] Update position row to show `rawUsd` for isolated positions
-8. [ ] Add liquidation price display per position
-9. [ ] Handle mode switch restrictions (no position exists)
-10. [ ] Update `availableToTrade` display logic
-11. [ ] Add margin adjustment modal/popover
-12. [ ] Test edge cases (liquidation, insufficient margin, etc.)
+### Phase 1: Switch Implementation
+
+1. [ ] Create `MarginModeToggle` component with terminal-cyan styling
+2. [ ] Create `MarginModeSwitchModal` component with comparison table
+3. [ ] Create `MarginModeLockedModal` component for position-exists state
+4. [ ] Update `order-entry-panel.tsx` to use toggle instead of tabs
+5. [ ] Add localStorage persistence for last selected mode
+6. [ ] Update `useAssetLeverage` hook to expose margin mode and switch action
+7. [ ] Add toast notification system for errors (if not already present)
+8. [ ] Create `IsolatedBadge` component for position rows
+9. [ ] Update `positions-tab.tsx` to show badge for isolated positions
+10. [ ] Test mode switching flow end-to-end
+
+### Phase 2: Margin Adjustment (Future)
+
+1. [ ] Create `useExchangeUpdateIsolatedMargin` hook
+2. [ ] Create `IsolatedMarginAdjuster` component
+3. [ ] Add margin amount display to position rows
+4. [ ] Add liquidation price display
+5. [ ] Implement quick adjustment presets
 
 ## Technical Spec
 
@@ -151,7 +282,7 @@ await exchange.updateLeverage({
 });
 ```
 
-#### updateIsolatedMargin (Margin Adjustment)
+#### updateIsolatedMargin (Margin Adjustment - Phase 2)
 
 ```typescript
 // Parameters
@@ -215,7 +346,7 @@ type LeverageConfig =
 ### Hooks to Use
 
 - `useExchangeUpdateLeverage` - Set leverage AND margin mode (existing)
-- `useExchangeUpdateIsolatedMargin` - Add/remove margin (new)
+- `useExchangeUpdateIsolatedMargin` - Add/remove margin (Phase 2)
 - `useSubClearinghouseState` - Get position data including isolated margin
 - `useSubActiveAssetData` - Get real-time leverage config and availableToTrade
 - `useSelectedResolvedMarket` - Get market info (assetIndex, maxLeverage)
@@ -235,15 +366,10 @@ interface UseAssetLeverageReturn {
 
   // NEW: Margin mode fields
   marginMode: "cross" | "isolated";
-  pendingMarginMode: "cross" | "isolated" | null;
-
-  // NEW: Isolated margin fields (only relevant when mode = isolated)
-  isolatedMargin: number | null;        // Current rawUsd
-  pendingIsolatedMargin: number | null; // Pending adjustment
+  hasPosition: boolean;              // Whether position exists for this asset
 
   // NEW: Actions
-  setMarginMode: (mode: "cross" | "isolated") => void;
-  adjustIsolatedMargin: (delta: number) => Promise<void>;
+  switchMarginMode: (mode: "cross" | "isolated") => Promise<void>;
 
   // Existing actions...
   setPendingLeverage: (value: number) => void;
@@ -252,9 +378,9 @@ interface UseAssetLeverageReturn {
 
   // Status
   isUpdating: boolean;
-  isAdjustingMargin: boolean;           // NEW
+  isSwitchingMode: boolean;          // NEW
   updateError: Error | null;
-  marginAdjustError: Error | null;      // NEW
+  switchModeError: Error | null;     // NEW
 }
 ```
 
@@ -288,169 +414,113 @@ function getPositionMarginInfo(position: Position): PositionMarginInfo {
 
 ## Files
 
-### Modify
+### Phase 1: Modify
 
 - `src/components/trade/order-entry/order-entry-panel.tsx`
-  - Add margin mode toggle to leverage section
-  - Pass margin mode to leverage popover
-
-- `src/components/trade/order-entry/leverage-popover.tsx`
-  - Add Cross/Isolated toggle switch
-  - Show warning when switching modes with existing position
-  - Update confirm action to include `isCross` parameter
+  - Replace Cross/Isolated tabs with `MarginModeToggle` component
+  - Add modal trigger on toggle click
 
 - `src/hooks/trade/use-asset-leverage.ts`
-  - Add `marginMode` and `pendingMarginMode` state
-  - Add `setMarginMode` action
-  - Update `confirmLeverage` to pass `isCross`
-  - Handle isolated leverage config parsing
+  - Add `marginMode` from subscription data
+  - Add `hasPosition` check
+  - Add `switchMarginMode` action
+  - Add `isSwitchingMode` and `switchModeError` status
 
 - `src/components/trade/positions/positions-tab.tsx`
-  - Add margin mode badge to position rows
-  - Add isolated margin column/display
-  - Add +/- margin buttons for isolated positions
+  - Add `IsolatedBadge` to position rows
 
-- `src/lib/hyperliquid/hooks/exchange/index.ts`
-  - Export new `useExchangeUpdateIsolatedMargin` hook
-
-### Create
-
-- `src/lib/hyperliquid/hooks/exchange/useExchangeUpdateIsolatedMargin.ts`
-  - Hook wrapper for `updateIsolatedMargin` action
-  - Handle loading/error states
-
-- `src/components/trade/positions/isolated-margin-adjuster.tsx`
-  - Popover/modal for adjusting isolated margin
-  - Input field for margin amount
-  - Add/Remove buttons
-  - Shows current margin, max removable
-  - Loading/error states
+### Phase 1: Create
 
 - `src/components/trade/order-entry/margin-mode-toggle.tsx`
-  - Toggle switch component for Cross/Isolated
-  - Disabled state when position exists
-  - Tooltip explaining the modes
+  - Toggle switch component
+  - Props: `mode`, `disabled`, `onClick`
+  - Terminal-cyan accent styling
+  - Lock icon overlay when disabled
 
+- `src/components/trade/order-entry/margin-mode-switch-modal.tsx`
+  - Confirmation modal with comparison table
+  - Props: `open`, `onOpenChange`, `targetMode`, `asset`, `onConfirm`, `isLoading`
+  - Auto-closes on success
+
+- `src/components/trade/order-entry/margin-mode-locked-modal.tsx`
+  - Modal explaining position restriction
+  - Props: `open`, `onOpenChange`, `asset`
+  - Simple "OK" dismissal
+
+- `src/components/trade/positions/isolated-badge.tsx`
+  - Small "ISO" badge component
+  - Terminal-cyan styling
+
+- `src/lib/trade/margin-mode.ts`
+  - `getStoredMarginModePreference(): "cross" | "isolated"`
+  - `setStoredMarginModePreference(mode: "cross" | "isolated"): void`
+  - `isIsolatedPosition(position: Position): boolean`
+
+### Phase 2: Create (Future)
+
+- `src/lib/hyperliquid/hooks/exchange/useExchangeUpdateIsolatedMargin.ts`
+- `src/components/trade/positions/isolated-margin-adjuster.tsx`
 - `src/lib/trade/isolated-margin.ts`
-  - Helper functions for isolated margin calculations
-  - `calculateMaxRemovable(position)`
-  - `calculateNewLiquidationPx(position, marginDelta)`
-  - `isIsolatedPosition(position)`
 
-## UI/UX
+## User Flows
 
-### Components
+### Flow 1: Switching to Isolated (No Position)
 
-- **MarginModeToggle** - Switch between Cross and Isolated in leverage popover
-- **IsolatedMarginBadge** - Shows "Isolated" badge on position row
-- **IsolatedMarginDisplay** - Shows allocated margin amount in position row
-- **IsolatedMarginAdjuster** - Popover for +/- margin adjustment
+1. User sees toggle switch showing "Cross" state
+2. User clicks toggle
+3. Modal opens with comparison table: "Switch to Isolated Margin"
+4. User reviews comparison table
+5. User clicks "Confirm"
+6. Wallet signature prompt appears
+7. On success: Modal auto-closes, toggle shows "Isolated"
+8. localStorage updated with preference
 
-### User Flows
+### Flow 2: Switching Mode (Position Exists)
 
-#### Flow 1: Setting Isolated Margin on New Position
+1. User has existing BTC position
+2. User clicks toggle switch (shows lock icon)
+3. Modal opens: "Cannot Switch Margin Mode"
+4. Modal explains: "Cannot switch leverage type with open position"
+5. User clicks "OK" to dismiss
+6. Toggle remains unchanged
 
-1. User opens leverage popover (no existing position)
-2. User toggles from "Cross" to "Isolated"
-3. User adjusts leverage slider
-4. User clicks "Confirm"
-5. Wallet signature request
-6. On success: Future orders on this asset use isolated margin
-7. When order fills: Position created with isolated margin
+### Flow 3: Signature Error
 
-#### Flow 2: Adjusting Isolated Margin on Existing Position
+1. User clicks toggle
+2. Modal opens with comparison
+3. User clicks "Confirm"
+4. Wallet signature prompt appears
+5. User rejects or error occurs
+6. Modal closes
+7. Toast notification appears: "Failed to switch margin mode"
+8. Toggle remains in original state
 
-1. User sees position row with "Isolated" badge
-2. User clicks margin amount or +/- button
-3. Margin adjustment popover opens
-4. Shows: Current margin, Liquidation price, Max removable
-5. User enters amount to add or remove
-6. Preview shows: New margin, New liquidation price
-7. User clicks "Confirm"
-8. Wallet signature request
-9. On success: Margin updated, liquidation price recalculated
+### Flow 4: Switching Assets
 
-#### Flow 3: Switching Mode (Restricted)
-
-1. User has existing BTC position in cross margin
-2. User opens leverage popover for BTC
-3. "Isolated" toggle is disabled with tooltip: "Close position to change margin mode"
-4. User must close position first, then can switch modes
-
-### Visual States
-
-```
-Leverage Popover (Updated):
-┌─────────────────────────────────┐
-│ Leverage                    [X] │
-├─────────────────────────────────┤
-│                                 │
-│ Margin Mode:                    │
-│ ┌─────────┬──────────┐          │
-│ │ Cross   │ Isolated │ ←───────── Toggle (disabled if position exists)
-│ └─────────┴──────────┘          │
-│                                 │
-│ ○────●────○────○────○ max      │
-│ 1x   5x   10x  20x  50x        │
-│                                 │
-│ Value: [  10  ]x               │
-│                                 │
-│         [ Confirm ]            │
-└─────────────────────────────────┘
-
-Position Row (Isolated):
-┌──────────────────────────────────────────────────────────────────┐
-│ BTC   Long   0.5   $95,000   +$234.56   [Isolated]   $500   [±]  │
-│                                          ↑ Badge      ↑ Margin ↑ Adjust
-└──────────────────────────────────────────────────────────────────┘
-
-Margin Adjustment Popover:
-┌─────────────────────────────────┐
-│ Adjust Isolated Margin      [X] │
-├─────────────────────────────────┤
-│                                 │
-│ Current Margin:     $500.00    │
-│ Liquidation Price:  $89,234    │
-│ Max Removable:      $200.00    │
-│                                 │
-│ Amount: [ +100    ] USD        │
-│         ↑ Positive = add       │
-│         ↑ Negative = remove    │
-│                                 │
-│ Preview:                        │
-│ New Margin:         $600.00    │
-│ New Liq. Price:     $87,123    │
-│                                 │
-│  [ Cancel ]    [ Confirm ]     │
-└─────────────────────────────────┘
-
-Quick Adjust Buttons (Alternative):
-┌─────────────────────────────────┐
-│ Margin: $500    [+] [-]        │
-│                                 │
-│ Quick: [+25%] [+50%] [-25%]    │
-└─────────────────────────────────┘
-```
+1. User is on BTC (Cross mode)
+2. User switches to ETH (previously set to Isolated)
+3. Toggle updates to show "Isolated" state
+4. Mode reflects ETH's actual on-chain mode
 
 ## Edge Cases
 
 ### Mode Switching Restrictions
-- **Position exists** → Cannot switch modes, show disabled toggle with tooltip
+- **Position exists** → Show lock icon on toggle, clicking opens locked modal
 - **Open orders exist** → May need to cancel orders first (verify behavior)
 - **Zero position after close** → Can switch modes freely
 
-### Margin Adjustment Limits
+### Margin Adjustment Limits (Phase 2)
 - **Remove too much** → Error: "Insufficient margin, would cause liquidation"
 - **Add more than available** → Error: "Insufficient account balance"
 - **Remove all margin** → Not allowed, minimum margin required
 
-### Liquidation Scenarios
+### Liquidation Scenarios (Phase 2)
 - **Isolated position liquidated** → Only that position closed, other positions unaffected
 - **Approaching liquidation** → Show warning indicator when margin ratio critical
 - **Margin call** → Consider adding margin suggestion
 
 ### Data Consistency
-- **Subscription delay** → Optimistic update UI, revert if actual differs
+- **Subscription delay** → Toggle reflects actual mode from subscription, not optimistic
 - **Multiple positions** → Each has independent isolated margin
 - **Mode mismatch** → Ensure UI reflects actual on-chain mode
 
@@ -473,12 +543,12 @@ Quick Adjust Buttons (Alternative):
 
 ## Open Questions
 
-- [ ] Can we switch modes with open orders (no position)?
+- [x] Can we switch modes with open orders (no position)? → Need to verify
 - [ ] Is there a minimum isolated margin requirement per asset?
-- [ ] Should we show projected liquidation price before confirming leverage change?
+- [ ] Should we show projected liquidation price before confirming leverage change? (Phase 2)
 - [ ] How does isolated margin interact with sub-accounts?
-- [ ] Should we warn users when isolated margin is close to liquidation threshold?
-- [ ] Do we need to handle partial liquidations differently for isolated?
+- [ ] Should we warn users when isolated margin is close to liquidation threshold? (Phase 2)
+- [ ] Do we need to handle partial liquidations differently for isolated? (Phase 2)
 
 ## References
 

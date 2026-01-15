@@ -3,8 +3,10 @@ import { useConnection } from "wagmi";
 import { DEFAULT_MAX_LEVERAGE } from "@/config/constants";
 import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { useExchangeUpdateLeverage } from "@/lib/hyperliquid/hooks/exchange/useExchangeUpdateLeverage";
-import { useSubActiveAssetData } from "@/lib/hyperliquid/hooks/subscription";
+import { useSubActiveAssetData, useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
+import { getMarginModeFromLeverage, type MarginMode } from "@/lib/trade/margin-mode";
 import { parseNumber } from "@/lib/trade/numbers";
+import { useGlobalSettingsActions, useMarginMode } from "@/stores/use-global-settings-store";
 
 interface UseAssetLeverageReturn {
 	currentLeverage: number;
@@ -22,6 +24,11 @@ interface UseAssetLeverageReturn {
 	isUpdating: boolean;
 	updateError: Error | null;
 	subscriptionStatus: "idle" | "loading" | "success" | "error";
+	marginMode: MarginMode;
+	hasPosition: boolean;
+	switchMarginMode: (mode: MarginMode) => Promise<void>;
+	isSwitchingMode: boolean;
+	switchModeError: Error | null;
 }
 
 function getDefaultLeverage(maxLeverage: number): number {
@@ -32,6 +39,9 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	const { address, isConnected } = useConnection();
 	const { data: market } = useSelectedResolvedMarket({ ctxMode: "realtime" });
 
+	const storedMarginMode = useMarginMode();
+	const { setMarginMode: setStoredMarginMode } = useGlobalSettingsActions();
+
 	const maxLeverage = market?.maxLeverage ?? DEFAULT_MAX_LEVERAGE;
 	const coin = market?.coin;
 	const assetIndex = market?.assetIndex;
@@ -41,6 +51,11 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		{ enabled: isConnected && !!address && !!coin },
 	);
 
+	const { data: clearinghouseEvent } = useSubClearinghouseState(
+		{ user: address ?? "" },
+		{ enabled: isConnected && !!address },
+	);
+
 	const {
 		mutateAsync: updateLeverage,
 		isPending: isUpdating,
@@ -48,10 +63,33 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		reset: resetMutation,
 	} = useExchangeUpdateLeverage();
 
+	const {
+		mutateAsync: updateLeverageForMode,
+		isPending: isSwitchingMode,
+		error: switchModeError,
+		reset: resetModeMutation,
+	} = useExchangeUpdateLeverage();
+
 	const [pendingLeverage, setPendingLeverageState] = useState<number | null>(null);
 	const [disconnectedLeverage, setDisconnectedLeverage] = useState<number | null>(null);
 
 	const onChainLeverage = activeAssetData?.leverage?.value ?? null;
+	const onChainMarginMode = getMarginModeFromLeverage(activeAssetData?.leverage);
+
+	const marginMode = useMemo((): MarginMode => {
+		if (isConnected && activeAssetData?.leverage) {
+			return onChainMarginMode;
+		}
+		return storedMarginMode;
+	}, [isConnected, activeAssetData?.leverage, onChainMarginMode, storedMarginMode]);
+
+	const hasPosition = useMemo(() => {
+		if (!coin || !clearinghouseEvent?.clearinghouseState?.assetPositions) return false;
+		const position = clearinghouseEvent.clearinghouseState.assetPositions.find((p) => p.position.coin === coin);
+		if (!position) return false;
+		const size = parseNumber(position.position.szi);
+		return Number.isFinite(size) && size !== 0;
+	}, [coin, clearinghouseEvent?.clearinghouseState?.assetPositions]);
 
 	const currentLeverage = useMemo(() => {
 		if (isConnected && onChainLeverage !== null) {
@@ -66,10 +104,12 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	const displayLeverage = pendingLeverage ?? currentLeverage;
 	const isDirty = pendingLeverage !== null && pendingLeverage !== currentLeverage;
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Reset state when coin changes
 	useEffect(() => {
 		setPendingLeverageState(null);
 		resetMutation();
-	}, [coin, resetMutation]);
+		resetModeMutation();
+	}, [coin, resetMutation, resetModeMutation]);
 
 	const setPendingLeverage = useCallback(
 		(value: number) => {
@@ -100,12 +140,31 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 
 		await updateLeverage({
 			asset: assetIndex,
-			isCross: true,
+			isCross: marginMode === "cross",
 			leverage: pendingLeverage,
 		});
 
 		setPendingLeverageState(null);
-	}, [pendingLeverage, assetIndex, updateLeverage]);
+	}, [pendingLeverage, assetIndex, updateLeverage, marginMode]);
+
+	const switchMarginMode = useCallback(
+		async (mode: MarginMode) => {
+			if (typeof assetIndex !== "number") return;
+			if (!isConnected) {
+				setStoredMarginMode(mode);
+				return;
+			}
+
+			await updateLeverageForMode({
+				asset: assetIndex,
+				isCross: mode === "cross",
+				leverage: currentLeverage,
+			});
+
+			setStoredMarginMode(mode);
+		},
+		[assetIndex, isConnected, currentLeverage, updateLeverageForMode, setStoredMarginMode],
+	);
 
 	const availableToSell = useMemo(() => {
 		const raw = activeAssetData?.availableToTrade?.[0];
@@ -149,5 +208,10 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		isUpdating,
 		updateError: updateError as Error | null,
 		subscriptionStatus: normalizedStatus,
+		marginMode,
+		hasPosition,
+		switchMarginMode,
+		isSwitchingMode,
+		switchModeError: switchModeError as Error | null,
 	};
 }
