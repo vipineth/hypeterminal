@@ -117,6 +117,8 @@ export function PositionsTab() {
 			const unrealizedPnl = parseNumber(p.unrealizedPnl);
 			const roe = parseNumber(p.returnOnEquity);
 			const liquidationPx = p.liquidationPx ? parseNumber(p.liquidationPx) : Number.NaN;
+			const marginUsed = parseNumber((p as { marginUsed?: string }).marginUsed);
+			const leverageType = (p as { leverage?: { type?: string } }).leverage?.type as "cross" | "isolated" | undefined;
 
 			const szDecimals = getSzDecimals(p.coin) ?? 4;
 			const assetIndex = getAssetId(p.coin);
@@ -165,6 +167,8 @@ export function PositionsTab() {
 					? formatUSD(-cumFundingSinceOpen, { signDisplay: "exceptZero" })
 					: FALLBACK_VALUE_PLACEHOLDER,
 				fundingClass: cumFundingSinceOpen >= 0 ? "text-terminal-red" : "text-terminal-green",
+				marginText: Number.isFinite(marginUsed) ? formatUSD(marginUsed) : FALLBACK_VALUE_PLACEHOLDER,
+				marginMode: leverageType ?? "cross",
 				tpPrice: tpSlInfo?.tpPrice,
 				slPrice: tpSlInfo?.slPrice,
 				tpOrderId: tpSlInfo?.tpOrderId,
@@ -273,6 +277,9 @@ export function PositionsTab() {
 										{t`Size`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+										{t`Margin`}
+									</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
 										{t`Entry`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
@@ -318,6 +325,14 @@ export function PositionsTab() {
 												</div>
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.sizeText}</TableCell>
+											<TableCell className="text-2xs text-right py-1.5">
+												<div className="flex flex-col items-end">
+													<span className="tabular-nums">{row.marginText}</span>
+													<span className="text-3xs text-muted-foreground uppercase">
+														{row.marginMode === "isolated" ? t`Isolated` : t`Cross`}
+													</span>
+												</div>
+											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.entryText}</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
 												{row.markText}

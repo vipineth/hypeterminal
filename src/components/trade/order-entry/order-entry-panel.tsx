@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -541,6 +541,9 @@ export function OrderEntryPanel() {
 				isUpdating={isSwitchingMode}
 				updateError={switchModeError}
 				onConfirm={handleMarginModeConfirm}
+				needsTradingEnabled={agentStatus !== "valid"}
+				isEnablingTrading={isRegistering}
+				onEnableTrading={handleRegister}
 			/>
 
 			<div className="p-2 space-y-4 overflow-y-auto flex-1">
@@ -645,7 +648,7 @@ export function OrderEntryPanel() {
 						>
 							{sizeMode === "asset" ? market?.coin || "---" : "USD"} <ArrowLeftRight className="size-2.5" />
 						</Button>
-						<Input
+						<NumberInput
 							placeholder="0.00"
 							value={sizeInput}
 							onChange={(e) => {
@@ -700,7 +703,7 @@ export function OrderEntryPanel() {
 								</Button>
 							)}
 						</div>
-						<Input
+						<NumberInput
 							placeholder="0.00"
 							value={limitPriceInput}
 							onChange={(e) => setLimitPriceInput(e.target.value)}
