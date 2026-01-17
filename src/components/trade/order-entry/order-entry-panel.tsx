@@ -541,9 +541,6 @@ export function OrderEntryPanel() {
 				isUpdating={isSwitchingMode}
 				updateError={switchModeError}
 				onConfirm={handleMarginModeConfirm}
-				needsTradingEnabled={agentStatus !== "valid"}
-				isEnablingTrading={isRegistering}
-				onEnableTrading={handleRegister}
 			/>
 
 			<div className="p-2 space-y-4 overflow-y-auto flex-1">

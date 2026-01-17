@@ -11,6 +11,7 @@ import { isPositive, toNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
 import { validateSlPrice, validateTpPrice } from "@/lib/trade/tpsl";
 import { TokenAvatar } from "../components/token-avatar";
+import { TradingActionButton } from "../components/trading-action-button";
 import { TpSlSection } from "../order-entry/tp-sl-section";
 
 interface PositionData {
@@ -241,7 +242,13 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 					>
 						{t`Cancel`}
 					</Button>
-					<Button size="sm" variant="terminal" onClick={handleSubmit} disabled={!canSubmit} className="min-w-24">
+					<TradingActionButton
+						size="sm"
+						variant="terminal"
+						onClick={handleSubmit}
+						disabled={!canSubmit}
+						className="min-w-24"
+					>
 						{isSubmitting ? (
 							<>
 								<Loader2 className="size-3.5 animate-spin" />
@@ -250,7 +257,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 						) : (
 							t`Confirm`
 						)}
-					</Button>
+					</TradingActionButton>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

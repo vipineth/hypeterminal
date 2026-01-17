@@ -19,6 +19,7 @@ import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import type { PerpAssetCtxs } from "@/types/hyperliquid";
 import { TokenAvatar } from "../components/token-avatar";
+import { TradingActionButton } from "../components/trading-action-button";
 import { PositionTpSlModal } from "./position-tpsl-modal";
 
 interface TpSlPositionData {
@@ -403,7 +404,7 @@ export function PositionsTab() {
 												</Tooltip>
 											</TableCell>
 											<TableCell className="text-right py-1.5">
-												<Button
+												<TradingActionButton
 													variant="danger"
 													size="xs"
 													aria-label={t`Close position`}
@@ -411,7 +412,7 @@ export function PositionsTab() {
 													disabled={!row.canClose || isClosing}
 												>
 													{isRowClosing ? t`Closing...` : t`Close`}
-												</Button>
+												</TradingActionButton>
 											</TableCell>
 										</TableRow>
 									);

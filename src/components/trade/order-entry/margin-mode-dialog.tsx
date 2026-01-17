@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/cn";
 import type { MarginMode } from "@/lib/trade/margin-mode";
+import { TradingActionButton } from "../components/trading-action-button";
 
 interface Props {
 	open: boolean;
@@ -15,9 +16,6 @@ interface Props {
 	isUpdating: boolean;
 	updateError: Error | null;
 	onConfirm: (mode: MarginMode) => Promise<void>;
-	needsTradingEnabled?: boolean;
-	isEnablingTrading?: boolean;
-	onEnableTrading?: () => void;
 }
 
 const MODE_OPTIONS: Array<{
@@ -50,9 +48,6 @@ export function MarginModeDialog({
 	isUpdating,
 	updateError,
 	onConfirm,
-	needsTradingEnabled,
-	isEnablingTrading,
-	onEnableTrading,
 }: Props) {
 	const [selectedMode, setSelectedMode] = useState<MarginMode>(currentMode);
 	const autoCloseTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -181,24 +176,6 @@ export function MarginModeDialog({
 					<div className="flex items-center gap-2 p-2.5 bg-terminal-red/10 border border-terminal-red/20 rounded-sm text-xs text-terminal-red">
 						<AlertTriangle className="size-3.5 shrink-0" />
 						<span className="flex-1 truncate">{updateError.message || t`Update failed`}</span>
-						{needsTradingEnabled && onEnableTrading && (
-							<Button
-								variant="link"
-								size="none"
-								onClick={onEnableTrading}
-								disabled={isEnablingTrading}
-								className="text-terminal-cyan text-xs shrink-0"
-							>
-								{isEnablingTrading ? (
-									<>
-										<Loader2 className="size-3 animate-spin mr-1" />
-										<Trans>Enabling...</Trans>
-									</>
-								) : (
-									<Trans>Enable Trading</Trans>
-								)}
-							</Button>
-						)}
 					</div>
 				)}
 
@@ -213,7 +190,7 @@ export function MarginModeDialog({
 					<Button variant="outline" size="sm" onClick={handleCancel} disabled={isUpdating}>
 						<Trans>Cancel</Trans>
 					</Button>
-					<Button
+					<TradingActionButton
 						variant="terminal"
 						size="sm"
 						onClick={handleConfirm}
@@ -222,7 +199,7 @@ export function MarginModeDialog({
 					>
 						{isUpdating && <Loader2 className="size-3.5 animate-spin" />}
 						<Trans>Confirm</Trans>
-					</Button>
+					</TradingActionButton>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

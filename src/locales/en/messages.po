@@ -337,6 +337,7 @@ msgstr "Copy Address"
 
 #: src/components/trade/order-entry/margin-mode-dialog.tsx
 #: src/components/trade/order-entry/margin-mode-toggle.tsx
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Cross"
 msgstr "Cross"
 
@@ -408,9 +409,14 @@ msgstr "Docs"
 msgid "Edit TP/SL"
 msgstr "Edit TP/SL"
 
+#: src/components/trade/order-entry/margin-mode-dialog.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enable Trading"
 msgstr "Enable Trading"
+
+#: src/components/trade/order-entry/margin-mode-dialog.tsx
+msgid "Enabling..."
+msgstr "Enabling..."
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enter limit price"
@@ -574,6 +580,7 @@ msgstr "Install a wallet extension to continue"
 
 #: src/components/trade/order-entry/margin-mode-dialog.tsx
 #: src/components/trade/order-entry/margin-mode-toggle.tsx
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Isolated"
 msgstr "Isolated"
 
@@ -674,6 +681,10 @@ msgstr "Long"
 #: src/components/trade/order-entry/margin-mode-dialog.tsx
 msgid "Manage your risk on individual positions by restricting the amount of margin allocated to each. If the margin ratio of an isolated position reaches 100%, the position will be liquidated. Margin can be added or removed to individual positions in this mode."
 msgstr "Manage your risk on individual positions by restricting the amount of margin allocated to each. If the margin ratio of an isolated position reaches 100%, the position will be liquidated. Margin can be added or removed to individual positions in this mode."
+
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Margin"
+msgstr "Margin"
 
 #: src/components/trade/order-entry/margin-mode-dialog.tsx
 msgid "Margin Mode"

@@ -337,6 +337,7 @@ msgstr "نسخ العنوان"
 
 #: src/components/trade/order-entry/margin-mode-dialog.tsx
 #: src/components/trade/order-entry/margin-mode-toggle.tsx
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Cross"
 msgstr "متقاطع"
 
@@ -408,9 +409,14 @@ msgstr "المستندات"
 msgid "Edit TP/SL"
 msgstr ""
 
+#: src/components/trade/order-entry/margin-mode-dialog.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enable Trading"
 msgstr "تفعيل التداول"
+
+#: src/components/trade/order-entry/margin-mode-dialog.tsx
+msgid "Enabling..."
+msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enter limit price"
@@ -574,6 +580,7 @@ msgstr ""
 
 #: src/components/trade/order-entry/margin-mode-dialog.tsx
 #: src/components/trade/order-entry/margin-mode-toggle.tsx
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Isolated"
 msgstr "معزول"
 
@@ -669,6 +676,10 @@ msgstr "شراء"
 
 #: src/components/trade/order-entry/margin-mode-dialog.tsx
 msgid "Manage your risk on individual positions by restricting the amount of margin allocated to each. If the margin ratio of an isolated position reaches 100%, the position will be liquidated. Margin can be added or removed to individual positions in this mode."
+msgstr ""
+
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Margin"
 msgstr ""
 
 #: src/components/trade/order-entry/margin-mode-dialog.tsx
