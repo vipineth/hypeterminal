@@ -409,14 +409,14 @@ msgstr "المستندات"
 msgid "Edit TP/SL"
 msgstr ""
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/components/trading-action-button.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enable Trading"
 msgstr "تفعيل التداول"
 
 #: src/components/trade/order-entry/margin-mode-dialog.tsx
-msgid "Enabling..."
-msgstr ""
+#~ msgid "Enabling..."
+#~ msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enter limit price"
@@ -1120,6 +1120,7 @@ msgstr "إظهار القيم بالدولار"
 msgid "Sidebar"
 msgstr "الشريط الجانبي"
 
+#: src/components/trade/components/trading-action-button.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Sign in wallet..."
 msgstr ""
@@ -1411,6 +1412,7 @@ msgstr "القيمة بالدولار"
 msgid "Vaults"
 msgstr "الخزائن"
 
+#: src/components/trade/components/trading-action-button.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Verifying..."
 msgstr ""

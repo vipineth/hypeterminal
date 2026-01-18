@@ -409,14 +409,14 @@ msgstr "Documentation"
 msgid "Edit TP/SL"
 msgstr ""
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/components/trading-action-button.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enable Trading"
 msgstr "Activer le trading"
 
 #: src/components/trade/order-entry/margin-mode-dialog.tsx
-msgid "Enabling..."
-msgstr ""
+#~ msgid "Enabling..."
+#~ msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enter limit price"
@@ -1120,6 +1120,7 @@ msgstr "Afficher les valeurs en USD"
 msgid "Sidebar"
 msgstr "Barre latérale"
 
+#: src/components/trade/components/trading-action-button.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Sign in wallet..."
 msgstr ""
@@ -1411,6 +1412,7 @@ msgstr "Valeur en USD"
 msgid "Vaults"
 msgstr "Coffres"
 
+#: src/components/trade/components/trading-action-button.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Verifying..."
 msgstr ""

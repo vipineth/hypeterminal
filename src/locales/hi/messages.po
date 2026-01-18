@@ -409,14 +409,14 @@ msgstr "दस्तावेज़"
 msgid "Edit TP/SL"
 msgstr ""
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/components/trading-action-button.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enable Trading"
 msgstr "ट्रेडिंग सक्षम करें"
 
 #: src/components/trade/order-entry/margin-mode-dialog.tsx
-msgid "Enabling..."
-msgstr ""
+#~ msgid "Enabling..."
+#~ msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enter limit price"
@@ -1120,6 +1120,7 @@ msgstr "USD में मान दिखाएं"
 msgid "Sidebar"
 msgstr "साइडबार"
 
+#: src/components/trade/components/trading-action-button.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Sign in wallet..."
 msgstr ""
@@ -1411,6 +1412,7 @@ msgstr "USD मूल्य"
 msgid "Vaults"
 msgstr "वॉल्ट"
 
+#: src/components/trade/components/trading-action-button.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Verifying..."
 msgstr ""

@@ -57,6 +57,9 @@ export function MarginModeDialog({
 		if (open) {
 			setSelectedMode(currentMode);
 			setShowSuccess(false);
+		} else if (autoCloseTimerRef.current) {
+			clearTimeout(autoCloseTimerRef.current);
+			autoCloseTimerRef.current = null;
 		}
 	}, [open, currentMode]);
 

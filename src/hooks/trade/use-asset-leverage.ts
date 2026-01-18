@@ -5,7 +5,7 @@ import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { useExchangeUpdateLeverage } from "@/lib/hyperliquid/hooks/exchange/useExchangeUpdateLeverage";
 import { useSubActiveAssetData, useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { getMarginModeFromLeverage, type MarginMode } from "@/lib/trade/margin-mode";
-import { parseNumber } from "@/lib/trade/numbers";
+import { parseNumber, toNumber } from "@/lib/trade/numbers";
 import { useGlobalSettingsActions, useMarginMode } from "@/stores/use-global-settings-store";
 
 interface UseAssetLeverageReturn {
@@ -87,8 +87,8 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		if (!coin || !clearinghouseEvent?.clearinghouseState?.assetPositions) return false;
 		const position = clearinghouseEvent.clearinghouseState.assetPositions.find((p) => p.position.coin === coin);
 		if (!position) return false;
-		const size = parseNumber(position.position.szi);
-		return Number.isFinite(size) && size !== 0;
+		const size = toNumber(position.position.szi);
+		return size !== null && size !== 0;
 	}, [coin, clearinghouseEvent?.clearinghouseState?.assetPositions]);
 
 	const currentLeverage = useMemo(() => {
@@ -104,7 +104,7 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	const displayLeverage = pendingLeverage ?? currentLeverage;
 	const isDirty = pendingLeverage !== null && pendingLeverage !== currentLeverage;
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: Reset state when coin changes
+	// biome-ignore lint/correctness/useExhaustiveDependencies: coin change triggers reset
 	useEffect(() => {
 		setPendingLeverageState(null);
 		resetMutation();

@@ -1,7 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { ArrowLeftRight, Loader2, PencilIcon, TrendingDown, TrendingUp } from "lucide-react";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
-import { toast } from "sonner";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -307,13 +306,7 @@ export function OrderEntryPanel() {
 
 	const handleMarginModeConfirm = useCallback(
 		async (mode: MarginMode) => {
-			try {
-				await switchMarginMode(mode);
-			} catch (error) {
-				const message = error instanceof Error ? error.message : t`Failed to switch margin mode`;
-				toast.error(message);
-				throw error;
-			}
+			await switchMarginMode(mode);
 		},
 		[switchMarginMode],
 	);

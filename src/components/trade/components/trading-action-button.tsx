@@ -25,7 +25,7 @@ export function TradingActionButton({ onClick, children, disabled, className, ..
 		if (prevStatusRef.current !== "valid" && status === "valid" && pendingActionRef.current) {
 			const action = pendingActionRef.current;
 			pendingActionRef.current = null;
-			action();
+			Promise.resolve(action()).catch(() => {});
 		}
 		prevStatusRef.current = status;
 	}, [status]);
