@@ -13,7 +13,7 @@ interface Props extends Omit<ButtonProps, "onClick"> {
 }
 
 export function TradingActionButton({ onClick, children, disabled, className, ...buttonProps }: Props) {
-	const { isReady, isEnabling, needsTrading, guardAction, error } = useTradingGuard();
+	const { isReady, isEnabling, needsTrading, guardAction } = useTradingGuard();
 
 	const handleClick = useCallback(() => {
 		guardAction(onClick);
@@ -26,25 +26,24 @@ export function TradingActionButton({ onClick, children, disabled, className, ..
 			<Button
 				{...buttonProps}
 				onClick={handleClick}
-				disabled={disabled || isEnabling || !isReady && !needsTrading}
+				disabled={disabled || isEnabling || (!isReady && !needsTrading)}
 				className={cn(
 					showEnableTrading &&
-						"bg-terminal-cyan/20 border-terminal-cyan text-terminal-cyan hover:bg-terminal-cyan/30",
+						"bg-terminal-cyan/20 border-terminal-cyan text-terminal-cyan hover:border-terminal-red hover:text-terminal-red hover:bg-terminal-cyan/30",
 					className,
 				)}
 			>
 				{isEnabling ? (
 					<>
 						<Loader2 className="size-3 animate-spin" />
-						{t`Enabling...`}
+						{t`Enabling`}
 					</>
 				) : showEnableTrading ? (
-					t`Enable Trading`
+					t`Enable`
 				) : (
 					children
 				)}
 			</Button>
-			{error && <span className="text-4xs text-terminal-red">{error.message}</span>}
 		</div>
 	);
 }
