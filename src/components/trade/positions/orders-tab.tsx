@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { ListOrdered } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -16,11 +16,9 @@ import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import {
 	getFilledSize,
 	getFillPercent,
-	getOrderTypeClass,
-	getOrderTypeLabel,
+	getOrderTypeConfig,
 	getOrderValue,
-	getSideClass,
-	getSideLabel,
+	getSideConfig,
 	type OpenOrder,
 } from "@/lib/trade/open-orders";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
@@ -62,7 +60,7 @@ export function OrdersTab() {
 		reset: resetCancelError,
 	} = useExchangeCancel();
 
-	const openOrders = useMemo(() => (openOrdersEvent?.orders ?? []) as OpenOrder[], [openOrdersEvent?.orders]);
+	const openOrders = openOrdersEvent?.orders ?? [];
 	const headerCount = isConnected ? openOrders.length : FALLBACK_VALUE_PLACEHOLDER;
 
 	useEffect(() => {
@@ -295,6 +293,8 @@ function OrderRow({
 	onSelectMarket,
 }: OrderRowProps) {
 	const fillPct = getFillPercent(order);
+	const sideConfig = getSideConfig(order);
+	const typeConfig = getOrderTypeConfig(order);
 
 	return (
 		<TableRow className="border-border/40 hover:bg-accent/30">
@@ -321,14 +321,14 @@ function OrderRow({
 						<TokenAvatar symbol={order.coin} />
 						<span>{order.coin}</span>
 					</Button>
-					<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", getSideClass(order))}>
-						{getSideLabel(order)}
+					<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideConfig.class)}>
+						{sideConfig.label}
 					</span>
 				</div>
 			</TableCell>
 			<TableCell className="text-2xs py-1.5">
-				<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", getOrderTypeClass(order))}>
-					{getOrderTypeLabel(order)}
+				<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", typeConfig.class)}>
+					{typeConfig.label}
 				</span>
 			</TableCell>
 			<TableCell className="text-2xs text-right tabular-nums py-1.5">

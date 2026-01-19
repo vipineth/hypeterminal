@@ -8,12 +8,7 @@ import { NumberInput } from "@/components/ui/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-	ARBITRUM_CHAIN_ID,
-	FALLBACK_VALUE_PLACEHOLDER,
-	ORDER_MIN_NOTIONAL_USD,
-	ORDER_SIZE_PERCENT_STEPS,
-} from "@/config/constants";
+import { FALLBACK_VALUE_PLACEHOLDER, ORDER_MIN_NOTIONAL_USD, ORDER_SIZE_PERCENT_STEPS } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
@@ -21,15 +16,7 @@ import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOr
 import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeTwapOrder";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import type { MarginMode } from "@/lib/trade/margin-mode";
-import {
-	calc,
-	clampInt,
-	formatDecimalFloor,
-	isPositive,
-	parseNumberOrZero,
-	toFixed,
-	toNumber,
-} from "@/lib/trade/numbers";
+import { calc, clampInt, formatDecimalFloor, isPositive, parseNumberOrZero, toFixed, toNumber } from "@/lib/trade/numbers";
 import {
 	getConversionPrice,
 	getExecutedPrice,
@@ -55,7 +42,9 @@ import {
 	usesTriggerPrice as usesTriggerPriceForOrder,
 } from "@/lib/trade/order-types";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
-import { validateSlPrice, validateTpPrice } from "@/lib/trade/tpsl";
+import type { ActiveDialog, ButtonContent } from "@/lib/trade/types";
+import { useButtonContent } from "@/lib/trade/use-button-content";
+import { useOrderValidation } from "@/lib/trade/use-order-validation";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import {
 	useLimitPrice,
@@ -89,20 +78,6 @@ import { OrderSummary } from "./order-summary";
 import { OrderToast } from "./order-toast";
 import { SideToggle } from "./side-toggle";
 import { TpSlSection } from "./tp-sl-section";
-
-type ValidationResult = {
-	valid: boolean;
-	errors: string[];
-	canSubmit: boolean;
-	needsApproval: boolean;
-};
-
-type ButtonContent = {
-	text: string;
-	action: () => void;
-	disabled: boolean;
-	variant: "cyan" | "buy" | "sell";
-};
 
 function getMarketPrice(ctxMarkPx: unknown, midPx: unknown): number {
 	if (typeof ctxMarkPx === "number") return ctxMarkPx;
@@ -210,10 +185,7 @@ export function OrderEntryPanel() {
 	const [isDraggingSlider, setIsDraggingSlider] = useState(false);
 	const [dragSliderValue, setDragSliderValue] = useState(25);
 	const [approvalError, setApprovalError] = useState<string | null>(null);
-	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
-	const [depositModalOpen, setDepositModalOpen] = useState(false);
-	const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
-	const [marginModeDialogOpen, setMarginModeDialogOpen] = useState(false);
+	const [activeDialog, setActiveDialog] = useState<ActiveDialog>(null);
 
 	useEffect(() => {
 		if (selectedPrice !== null) {
@@ -283,120 +255,39 @@ export function OrderEntryPanel() {
 
 	const needsAgentApproval = agentStatus !== "valid";
 	const isReadyToTrade = agentStatus === "valid";
-	const isLoadingAgents = agentStatus === "loading";
 	const canApprove = !!walletClient && !!address;
 
-	const validation = useMemo<ValidationResult>(() => {
-		if (!isConnected) {
-			return { valid: false, errors: [t`Not connected`], canSubmit: false, needsApproval: false };
-		}
-		if (isWalletLoading) {
-			return { valid: false, errors: [t`Loading wallet...`], canSubmit: false, needsApproval: false };
-		}
-		if (availableBalance <= 0) {
-			return { valid: false, errors: [t`No balance`], canSubmit: false, needsApproval: false };
-		}
-		if (!market) {
-			return { valid: false, errors: [t`No market`], canSubmit: false, needsApproval: false };
-		}
-		if (typeof market.assetIndex !== "number") {
-			return { valid: false, errors: [t`Market not ready`], canSubmit: false, needsApproval: false };
-		}
-		if (needsAgentApproval) {
-			return { valid: false, errors: [], canSubmit: false, needsApproval: true };
-		}
-		if (!isReadyToTrade) {
-			return { valid: false, errors: [t`Signer not ready`], canSubmit: false, needsApproval: false };
-		}
-		if (orderType === "market" && !markPx) {
-			return { valid: false, errors: [t`No mark price`], canSubmit: false, needsApproval: false };
-		}
-
-		const errors: string[] = [];
-		if (usesLimitPrice && !price) errors.push(t`Enter limit price`);
-		if (usesTriggerPrice && !isPositive(triggerPriceNum)) errors.push(t`Enter trigger price`);
-		if (!sizeValue || sizeValue <= 0) errors.push(t`Enter size`);
-		if (orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD) errors.push(t`Min order $10`);
-		if (sizeValue > maxSize && maxSize > 0) errors.push(t`Exceeds max size`);
-
-		if (tpSlEnabled && canUseTpSl) {
-			const hasTp = isPositive(tpPriceNum);
-			const hasSl = isPositive(slPriceNum);
-			if (!hasTp && !hasSl) errors.push(t`Enter TP or SL price`);
-			if (hasTp && !validateTpPrice(price, tpPriceNum, side)) {
-				errors.push(side === "buy" ? t`TP must be above entry` : t`TP must be below entry`);
-			}
-			if (hasSl && !validateSlPrice(price, slPriceNum, side)) {
-				errors.push(side === "buy" ? t`SL must be below entry` : t`SL must be above entry`);
-			}
-		}
-
-		if (usesTriggerPrice && isPositive(triggerPriceNum) && markPx > 0) {
-			if (stopOrder) {
-				const needsAbove = side === "buy";
-				if (needsAbove && triggerPriceNum <= markPx) errors.push(t`Stop trigger must be above mark`);
-				if (!needsAbove && triggerPriceNum >= markPx) errors.push(t`Stop trigger must be below mark`);
-			}
-			if (takeProfitOrder) {
-				const needsAbove = side === "sell";
-				if (needsAbove && triggerPriceNum <= markPx) errors.push(t`Take profit trigger must be above mark`);
-				if (!needsAbove && triggerPriceNum >= markPx) errors.push(t`Take profit trigger must be below mark`);
-			}
-		}
-
-		if (scaleOrder) {
-			const levels = clampInt(Math.round(scaleLevelsNum ?? 0), 0, 100);
-			if (!isPositive(scaleStartPriceNum) || !isPositive(scaleEndPriceNum)) errors.push(t`Enter price range`);
-			if (levels < 2 || levels > 20) errors.push(t`Scale levels must be 2-20`);
-			if (isPositive(scaleStartPriceNum) && isPositive(scaleEndPriceNum) && scaleStartPriceNum === scaleEndPriceNum) {
-				errors.push(t`Start and end must differ`);
-			}
-			if (levels >= 2 && sizeValue > 0) {
-				const averagePrice = price > 0 ? price : markPx;
-				const perLevelSize = sizeValue / levels;
-				const perLevelNotional = averagePrice > 0 ? perLevelSize * averagePrice : 0;
-				if (perLevelNotional > 0 && perLevelNotional < ORDER_MIN_NOTIONAL_USD) {
-					errors.push(t`Scale level below min notional`);
-				}
-			}
-		}
-
-		if (twapOrder) {
-			const minutes = Math.round(twapMinutesNum ?? 0);
-			if (minutes < 5 || minutes > 1440) errors.push(t`TWAP minutes must be 5-1440`);
-		}
-
-		return { valid: errors.length === 0, errors, canSubmit: errors.length === 0, needsApproval: false };
-	}, [
+	const validation = useOrderValidation({
 		isConnected,
 		isWalletLoading,
 		availableBalance,
-		market,
+		hasMarket: !!market,
+		hasAssetIndex: typeof market?.assetIndex === "number",
+		needsAgentApproval,
+		isReadyToTrade,
 		orderType,
 		markPx,
 		price,
 		sizeValue,
 		orderValue,
 		maxSize,
-		needsAgentApproval,
-		isReadyToTrade,
-		tpSlEnabled,
-		tpPriceNum,
-		slPriceNum,
+		side,
+		usesLimitPrice,
+		usesTriggerPrice,
 		triggerPriceNum,
-		twapMinutesNum,
-		scaleStartPriceNum,
-		scaleEndPriceNum,
-		scaleLevelsNum,
 		stopOrder,
 		takeProfitOrder,
 		scaleOrder,
 		twapOrder,
-		usesLimitPrice,
-		usesTriggerPrice,
+		scaleStartPriceNum,
+		scaleEndPriceNum,
+		scaleLevelsNum,
+		twapMinutesNum,
+		tpSlEnabled,
 		canUseTpSl,
-		side,
-	]);
+		tpPriceNum,
+		slPriceNum,
+	});
 
 	const sizeHasError = (sizeValue > maxSize && maxSize > 0) || (orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD);
 
@@ -609,59 +500,23 @@ export function OrderEntryPanel() {
 		return getSliderValue(sizeValue, maxSize);
 	}, [isDraggingSlider, dragSliderValue, hasUserSized, sizeValue, maxSize]);
 
-	const registerText = useMemo(() => {
-		if (isLoadingAgents) return t`Loading...`;
-		if (!canApprove) return t`Loading...`;
-		if (registerStatus === "signing") return t`Sign in wallet...`;
-		if (registerStatus === "verifying") return t`Verifying...`;
-		return t`Enable Trading`;
-	}, [canApprove, isLoadingAgents, registerStatus]);
-
-	const buttonContent = useMemo<ButtonContent>(() => {
-		if (!isConnected) {
-			return { text: t`Connect Wallet`, action: () => setWalletDialogOpen(true), disabled: false, variant: "cyan" };
-		}
-		if (needsChainSwitch) {
-			return {
-				text: switchChain.isPending ? t`Switching...` : t`Switch to Arbitrum`,
-				action: () => switchChain.mutate({ chainId: ARBITRUM_CHAIN_ID }),
-				disabled: switchChain.isPending,
-				variant: "cyan",
-			};
-		}
-		if (availableBalance <= 0) {
-			return { text: t`Deposit`, action: () => setDepositModalOpen(true), disabled: false, variant: "cyan" };
-		}
-		if (validation.needsApproval) {
-			return {
-				text: registerText,
-				action: handleRegister,
-				disabled: isRegistering || !canApprove || isLoadingAgents,
-				variant: "cyan",
-			};
-		}
-		return {
-			text: side === "buy" ? t`Buy` : t`Sell`,
-			action: handleSubmit,
-			disabled: !validation.canSubmit || isSubmitting,
-			variant: side as "buy" | "sell",
-		};
-	}, [
+	const buttonContent = useButtonContent({
 		isConnected,
 		needsChainSwitch,
-		switchChain,
+		isSwitchingChain: switchChain.isPending,
+		switchChain: (chainId) => switchChain.mutate({ chainId }),
 		availableBalance,
-		validation.needsApproval,
-		registerText,
-		isRegistering,
+		validation,
+		agentStatus,
+		registerStatus,
 		canApprove,
-		isLoadingAgents,
-		handleRegister,
-		handleSubmit,
 		side,
-		validation.canSubmit,
 		isSubmitting,
-	]);
+		onConnectWallet: () => setActiveDialog("wallet"),
+		onDeposit: () => setActiveDialog("deposit"),
+		onRegister: handleRegister,
+		onSubmit: handleSubmit,
+	});
 
 	const isFormDisabled = !isConnected || availableBalance <= 0;
 	const actionButtonClass = getActionButtonClass(buttonContent.variant);
@@ -669,13 +524,13 @@ export function OrderEntryPanel() {
 	return (
 		<div className="h-full flex flex-col overflow-hidden bg-surface/20">
 			<div className="px-2 py-1.5 border-b border-border/40 flex items-center justify-between">
-				<MarginModeToggle mode={marginMode} disabled={isSwitchingMode} onClick={() => setMarginModeDialogOpen(true)} />
+				<MarginModeToggle mode={marginMode} disabled={isSwitchingMode} onClick={() => setActiveDialog("marginMode")} />
 				<LeverageControl key={market?.marketKey} />
 			</div>
 
 			<MarginModeDialog
-				open={marginModeDialogOpen}
-				onOpenChange={setMarginModeDialogOpen}
+				open={activeDialog === "marginMode"}
+				onOpenChange={(open) => setActiveDialog(open ? "marginMode" : null)}
 				currentMode={marginMode}
 				hasPosition={hasPosition}
 				isUpdating={isSwitchingMode}
@@ -715,7 +570,7 @@ export function OrderEntryPanel() {
 								<Button
 									variant="link"
 									size="none"
-									onClick={() => setDepositModalOpen(true)}
+									onClick={() => setActiveDialog("deposit")}
 									className="text-terminal-cyan text-4xs uppercase"
 								>
 									{t`Deposit`}
@@ -1012,13 +867,16 @@ export function OrderEntryPanel() {
 					estimatedFee={estimatedFee}
 					slippageBps={slippageBps}
 					szDecimals={market?.szDecimals}
-					onSlippageClick={() => setSettingsDialogOpen(true)}
+					onSlippageClick={() => setActiveDialog("settings")}
 				/>
 			</div>
 
-			<WalletDialog open={walletDialogOpen} onOpenChange={setWalletDialogOpen} />
-			<DepositModal open={depositModalOpen} onOpenChange={setDepositModalOpen} />
-			<GlobalSettingsDialog open={settingsDialogOpen} onOpenChange={setSettingsDialogOpen} />
+			<WalletDialog open={activeDialog === "wallet"} onOpenChange={(open) => setActiveDialog(open ? "wallet" : null)} />
+			<DepositModal open={activeDialog === "deposit"} onOpenChange={(open) => setActiveDialog(open ? "deposit" : null)} />
+			<GlobalSettingsDialog
+				open={activeDialog === "settings"}
+				onOpenChange={(open) => setActiveDialog(open ? "settings" : null)}
+			/>
 
 			<OrderToast />
 		</div>
