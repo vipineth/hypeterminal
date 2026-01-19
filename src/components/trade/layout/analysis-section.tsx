@@ -1,23 +1,23 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { LAYOUT_PERSISTENCE, usePersistentLayout } from "@/hooks/trade/use-persistent-layout";
+import { LAYOUT_PRESETS, usePersistentLayout } from "@/hooks/trade/use-persistent-layout";
 import { PositionsPanel } from "../positions/positions-panel";
-import { PriceRow } from "./price-row";
+import { MarketInfo } from "./market-info";
 
 export function AnalysisSection() {
-	const layout = LAYOUT_PERSISTENCE.VERTICAL;
-	const { layout: vertLayout, onLayout: onVertLayout } = usePersistentLayout(layout.KEY, layout.FALLBACK);
+	const layoutPreset = LAYOUT_PRESETS.ANALYSIS_STACK;
+	const { sizes, handleLayoutChange } = usePersistentLayout(layoutPreset.storageKey, layoutPreset.fallbackSizes);
 
 	return (
 		<div className="h-full min-h-0">
-			<ResizablePanelGroup direction="vertical" className="h-full min-h-0" onLayout={onVertLayout}>
-				<ResizablePanel defaultSize={vertLayout[0] ?? layout.PANEL_DEFAULTS[0]} minSize={30}>
-					<PriceRow />
+			<ResizablePanelGroup direction="vertical" className="h-full min-h-0" onLayout={handleLayoutChange}>
+				<ResizablePanel defaultSize={sizes[0] ?? layoutPreset.defaultSizes[0]} minSize={30}>
+					<MarketInfo />
 				</ResizablePanel>
 				<ResizableHandle
 					withHandle
 					className="bg-border/40 data-[resize-handle-state=hover]:bg-terminal-cyan/30 data-[resize-handle-state=drag]:bg-terminal-cyan/50"
 				/>
-				<ResizablePanel defaultSize={vertLayout[1] ?? layout.PANEL_DEFAULTS[1]} minSize={20}>
+				<ResizablePanel defaultSize={sizes[1] ?? layoutPreset.defaultSizes[1]} minSize={20}>
 					<PositionsPanel />
 				</ResizablePanel>
 			</ResizablePanelGroup>
