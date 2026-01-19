@@ -14,6 +14,24 @@ import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { parseNumber } from "@/lib/trade/numbers";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 
+interface PlaceholderProps {
+	children: React.ReactNode;
+	variant?: "error";
+}
+
+function Placeholder({ children, variant }: PlaceholderProps) {
+	return (
+		<div
+			className={cn(
+				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
+				variant === "error" ? "text-terminal-red/80" : "text-muted-foreground",
+			)}
+		>
+			{children}
+		</div>
+	);
+}
+
 export function HistoryTab() {
 	const { address, isConnected } = useConnection();
 	const { setSelectedMarketKey } = useMarketPrefsActions();
@@ -35,20 +53,6 @@ export function HistoryTab() {
 
 	const tableRows = useMemo(() => {
 		return fills.map((fill) => {
-			const isBuy = fill.side === "B";
-			const date = new Date(fill.time);
-			const timeStr = date.toLocaleTimeString("en-US", {
-				hour: "2-digit",
-				minute: "2-digit",
-				hour12: false,
-			});
-			const dateStr = date.toLocaleDateString("en-US", {
-				month: "short",
-				day: "numeric",
-			});
-
-			const px = parseNumber(fill.px);
-			const sz = parseNumber(fill.sz);
 			const fee = parseNumber(fill.fee);
 			const closedPnl = parseNumber(fill.closedPnl);
 			const szDecimals = getSzDecimals(fill.coin) ?? 4;
@@ -56,24 +60,34 @@ export function HistoryTab() {
 			return {
 				key: `${fill.hash}-${fill.tid}`,
 				coin: fill.coin,
-				sideLabel: isBuy ? t`buy` : t`sell`,
-				sideClass: isBuy ? "bg-terminal-green/20 text-terminal-green" : "bg-terminal-red/20 text-terminal-red",
-				typeLabel: fill.dir,
-				priceText: Number.isFinite(px) ? formatUSD(px) : String(fill.px),
-				sizeText: Number.isFinite(sz) ? formatNumber(sz, szDecimals) : String(fill.sz),
-				feeText: Number.isFinite(fee) ? formatUSD(fee, { signDisplay: "exceptZero" }) : FALLBACK_VALUE_PLACEHOLDER,
-				feeClass: Number.isFinite(fee) && fee < 0 ? "text-terminal-green" : "text-muted-foreground",
-				pnlText:
-					Number.isFinite(closedPnl) && closedPnl !== 0
-						? formatUSD(closedPnl, { signDisplay: "exceptZero" })
-						: FALLBACK_VALUE_PLACEHOLDER,
-				pnlClass: closedPnl >= 0 ? "text-terminal-green" : "text-terminal-red",
-				showPnl: Number.isFinite(closedPnl) && closedPnl !== 0,
-				timeStr,
-				dateStr,
+				isBuy: fill.side === "B",
+				dir: fill.dir,
+				px: fill.px,
+				sz: fill.sz,
+				szDecimals,
+				fee,
+				closedPnl,
+				time: fill.time,
 			};
 		});
 	}, [fills, getSzDecimals]);
+
+	function renderPlaceholder() {
+		if (!isConnected) return <Placeholder>{t`Connect your wallet to view trade history.`}</Placeholder>;
+		if (status === "subscribing" || status === "idle") return <Placeholder>{t`Loading trade history...`}</Placeholder>;
+		if (status === "error") {
+			return (
+				<Placeholder variant="error">
+					<span>{t`Failed to load trade history.`}</span>
+					{error instanceof Error && <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span>}
+				</Placeholder>
+			);
+		}
+		if (fills.length === 0) return <Placeholder>{t`No fills found.`}</Placeholder>;
+		return null;
+	}
+
+	const placeholder = renderPlaceholder();
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
@@ -83,26 +97,7 @@ export function HistoryTab() {
 				<span className="text-terminal-cyan ml-auto tabular-nums">{headerCount}</span>
 			</div>
 			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
-				{!isConnected ? (
-					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{t`Connect your wallet to view trade history.`}
-					</div>
-				) : status === "subscribing" || status === "idle" ? (
-					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{t`Loading trade history...`}
-					</div>
-				) : status === "error" ? (
-					<div className="h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs text-terminal-red/80">
-						<span>{t`Failed to load trade history.`}</span>
-						{error instanceof Error ? (
-							<span className="mt-1 text-4xs text-muted-foreground">{error.message}</span>
-						) : null}
-					</div>
-				) : fills.length === 0 ? (
-					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{t`No fills found.`}
-					</div>
-				) : (
+				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
@@ -131,46 +126,60 @@ export function HistoryTab() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{tableRows.map((row) => (
-									<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
-										<TableCell className="text-2xs font-medium py-1.5">
-											<div className="flex items-center gap-1.5">
-												<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
-													{row.sideLabel}
-												</span>
-												<Button
-													variant="link"
-													size="none"
-													onClick={() => setSelectedMarketKey(makePerpMarketKey(row.coin))}
-													aria-label={t`Switch to ${row.coin} market`}
-												>
-													{row.coin}
-												</Button>
-											</div>
-										</TableCell>
-										<TableCell className="text-2xs py-1.5">
-											<span className="text-4xs px-1 py-0.5 rounded-sm uppercase bg-accent/50">{row.typeLabel}</span>
-										</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.priceText}</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.sizeText}</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums py-1.5">
-											<span className={cn(row.feeClass)}>{row.feeText}</span>
-										</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums py-1.5">
-											{row.showPnl ? (
-												<span className={cn(row.pnlClass)}>{row.pnlText}</span>
-											) : (
-												<span className="text-muted-foreground">{FALLBACK_VALUE_PLACEHOLDER}</span>
-											)}
-										</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums text-muted-foreground py-1.5">
-											<div className="flex flex-col items-end">
-												<span>{row.timeStr}</span>
-												<span className="text-4xs">{row.dateStr}</span>
-											</div>
-										</TableCell>
-									</TableRow>
-								))}
+								{tableRows.map((row) => {
+									const sideClass = row.isBuy
+										? "bg-terminal-green/20 text-terminal-green"
+										: "bg-terminal-red/20 text-terminal-red";
+									const feeClass = row.fee < 0 ? "text-terminal-green" : "text-muted-foreground";
+									const showPnl = Number.isFinite(row.closedPnl) && row.closedPnl !== 0;
+									const pnlClass = row.closedPnl >= 0 ? "text-terminal-green" : "text-terminal-red";
+									const date = new Date(row.time);
+									const timeStr = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+									const dateStr = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+									return (
+										<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
+											<TableCell className="text-2xs font-medium py-1.5">
+												<div className="flex items-center gap-1.5">
+													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideClass)}>
+														{row.isBuy ? t`buy` : t`sell`}
+													</span>
+													<Button
+														variant="link"
+														size="none"
+														onClick={() => setSelectedMarketKey(makePerpMarketKey(row.coin))}
+														aria-label={t`Switch to ${row.coin} market`}
+													>
+														{row.coin}
+													</Button>
+												</div>
+											</TableCell>
+											<TableCell className="text-2xs py-1.5">
+												<span className="text-4xs px-1 py-0.5 rounded-sm uppercase bg-accent/50">{row.dir}</span>
+											</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums py-1.5">{formatUSD(row.px)}</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums py-1.5">
+												{formatNumber(row.sz, row.szDecimals)}
+											</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums py-1.5">
+												<span className={feeClass}>{formatUSD(row.fee, { signDisplay: "exceptZero" })}</span>
+											</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums py-1.5">
+												{showPnl ? (
+													<span className={pnlClass}>{formatUSD(row.closedPnl, { signDisplay: "exceptZero" })}</span>
+												) : (
+													<span className="text-muted-foreground">{FALLBACK_VALUE_PLACEHOLDER}</span>
+												)}
+											</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums text-muted-foreground py-1.5">
+												<div className="flex flex-col items-end">
+													<span>{timeStr}</span>
+													<span className="text-4xs">{dateStr}</span>
+												</div>
+											</TableCell>
+										</TableRow>
+									);
+								})}
 							</TableBody>
 						</Table>
 						<ScrollBar orientation="horizontal" />
