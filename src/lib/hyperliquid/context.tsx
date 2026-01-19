@@ -3,7 +3,14 @@ import type { ReactNode } from "react";
 import { createContext, useContext, useMemo, useRef } from "react";
 import { useConnection, useWalletClient } from "wagmi";
 import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/hyperliquid";
-import { createExchangeClient, getInfoClient, getSubscriptionClient, initializeClients } from "./clients";
+import {
+	createExchangeClient,
+	getHttpTransport,
+	getInfoClient,
+	getSubscriptionClient,
+	getWsTransport,
+	initializeClients,
+} from "./clients";
 import { createHyperliquidConfig } from "./create-config";
 import type { BuilderConfig, HyperliquidEnv } from "./hooks/agent/types";
 import { createHyperliquidStore, type HyperliquidStore } from "./store";
@@ -46,7 +53,13 @@ export function HyperliquidProvider({
 
 	const storeRef = useRef<HyperliquidStore | null>(null);
 	if (!storeRef.current) {
-		storeRef.current = createHyperliquidStore(createHyperliquidConfig({ ssr: false }));
+		storeRef.current = createHyperliquidStore(
+			createHyperliquidConfig({
+				httpTransport: getHttpTransport(),
+				wsTransport: getWsTransport(),
+				ssr: false,
+			}),
+		);
 	}
 
 	const wallet = useMemo(() => toHyperliquidWallet(walletClient, address), [walletClient, address]);

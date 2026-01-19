@@ -19,6 +19,7 @@ import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import type { PerpAssetCtxs } from "@/types/hyperliquid";
 import { TokenAvatar } from "../components/token-avatar";
+import { TradingActionButton } from "../components/trading-action-button";
 import { PositionTpSlModal } from "./position-tpsl-modal";
 
 interface TpSlPositionData {
@@ -117,11 +118,14 @@ export function PositionsTab() {
 			const unrealizedPnl = parseNumber(p.unrealizedPnl);
 			const roe = parseNumber(p.returnOnEquity);
 			const liquidationPx = p.liquidationPx ? parseNumber(p.liquidationPx) : Number.NaN;
+			const marginUsed = parseNumber((p as { marginUsed?: string }).marginUsed);
+			const leverageType = (p as { leverage?: { type?: string } }).leverage?.type as "cross" | "isolated" | undefined;
 
 			const szDecimals = getSzDecimals(p.coin) ?? 4;
 			const assetIndex = getAssetId(p.coin);
 			const markPxRaw = typeof assetIndex === "number" ? assetCtxs?.[assetIndex]?.markPx : undefined;
 			const markPx = markPxRaw ? parseNumber(markPxRaw) : Number.NaN;
+			const cumFundingSinceOpen = parseNumber((p as { cumFunding?: { sinceOpen?: string } }).cumFunding?.sinceOpen);
 
 			const canClose =
 				Number.isFinite(closeSize) &&
@@ -160,6 +164,12 @@ export function PositionsTab() {
 					: FALLBACK_VALUE_PLACEHOLDER,
 				roeText: Number.isFinite(roe) ? formatPercent(roe, 1) : FALLBACK_VALUE_PLACEHOLDER,
 				pnlClass: unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red",
+				fundingText: Number.isFinite(cumFundingSinceOpen)
+					? formatUSD(-cumFundingSinceOpen, { signDisplay: "exceptZero" })
+					: FALLBACK_VALUE_PLACEHOLDER,
+				fundingClass: cumFundingSinceOpen >= 0 ? "text-terminal-red" : "text-terminal-green",
+				marginText: Number.isFinite(marginUsed) ? formatUSD(marginUsed) : FALLBACK_VALUE_PLACEHOLDER,
+				marginMode: leverageType ?? "cross",
 				tpPrice: tpSlInfo?.tpPrice,
 				slPrice: tpSlInfo?.slPrice,
 				tpOrderId: tpSlInfo?.tpOrderId,
@@ -268,6 +278,9 @@ export function PositionsTab() {
 										{t`Size`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+										{t`Margin`}
+									</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
 										{t`Entry`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
@@ -275,6 +288,9 @@ export function PositionsTab() {
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
 										{t`Liq`}
+									</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+										{t`Funding`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
 										{t`PNL`}
@@ -310,12 +326,23 @@ export function PositionsTab() {
 												</div>
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.sizeText}</TableCell>
+											<TableCell className="text-2xs text-right py-1.5">
+												<div className="flex flex-col items-end">
+													<span className="tabular-nums">{row.marginText}</span>
+													<span className="text-3xs text-muted-foreground uppercase">
+														{row.marginMode === "isolated" ? t`Isolated` : t`Cross`}
+													</span>
+												</div>
+											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.entryText}</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
 												{row.markText}
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums text-terminal-red/70 py-1.5">
 												{row.liqText}
+											</TableCell>
+											<TableCell className={cn("text-2xs text-right tabular-nums py-1.5", row.fundingClass)}>
+												{row.fundingText}
 											</TableCell>
 											<TableCell className="text-right py-1.5">
 												<div className={cn("text-2xs tabular-nums", row.pnlClass)}>
@@ -377,7 +404,7 @@ export function PositionsTab() {
 												</Tooltip>
 											</TableCell>
 											<TableCell className="text-right py-1.5">
-												<Button
+												<TradingActionButton
 													variant="danger"
 													size="xs"
 													aria-label={t`Close position`}
@@ -385,7 +412,7 @@ export function PositionsTab() {
 													disabled={!row.canClose || isClosing}
 												>
 													{isRowClosing ? t`Closing...` : t`Close`}
-												</Button>
+												</TradingActionButton>
 											</TableCell>
 										</TableRow>
 									);

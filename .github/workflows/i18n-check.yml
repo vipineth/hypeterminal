@@ -1,0 +1,45 @@
+name: Check Translations
+
+on:
+  pull_request:
+    paths:
+      - "src/**/*.ts"
+      - "src/**/*.tsx"
+      - "src/locales/**/*.po"
+
+jobs:
+  check:
+    name: Validate translation catalogs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Extract translations
+        run: pnpm i18n:extract
+
+      - name: Check for uncommitted changes
+        run: |
+          if ! git diff --quiet src/locales/**/*.po; then
+            echo "::error::Translation catalogs are out of date."
+            echo ""
+            echo "Run 'pnpm i18n:extract' locally and commit the changes."
+            echo ""
+            echo "Changed files:"
+            git diff --name-only src/locales/**/*.po
+            echo ""
+            echo "Diff:"
+            git diff src/locales/**/*.po
+            exit 1
+          fi
+          echo "Translation catalogs are up to date."

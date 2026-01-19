@@ -4,7 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
-		"build": "vite build",
+		"build": "lingui compile && vite build",
 		"serve": "vite preview",
 		"format": "biome format",
 		"lint": "biome lint",
@@ -84,6 +84,8 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.4",
+		"@commitlint/cli": "^20.3.1",
+		"@commitlint/config-conventional": "^20.3.1",
 		"@lingui/babel-plugin-lingui-macro": "^5.7.0",
 		"@lingui/cli": "^5.7.0",
 		"@lingui/vite-plugin": "^5.7.0",

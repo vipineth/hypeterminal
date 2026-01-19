@@ -73,7 +73,10 @@ Enable users to deposit USDC from Arbitrum directly into their Hyperliquid tradi
 - [ ] Quick amount buttons (25%, 50%, 75%, 100%)
 - [ ] Estimated gas cost display
 - [ ] Transaction history of deposits
-- [ ] Support for other source chains via bridge aggregators
+
+### Future Enhancement: Multi-Chain Bridge via LI.FI
+
+- [ ] Integrate LI.FI SDK for multi-chain deposits (see below)
 
 ## Tasks
 
@@ -878,3 +881,235 @@ Wrong Network:
 - [Bridge2 Contract on Arbiscan](https://arbiscan.io/address/0x2df1c51e09aecf9cacb7bc98cb1742757f163df7)
 - [Bridge2 Source Code](https://github.com/hyperliquid-dex/contracts/blob/master/Bridge2.sol)
 - [How to start trading - Hyperliquid Docs](https://hyperliquid.gitbook.io/hyperliquid-docs/onboarding/how-to-start-trading)
+
+---
+
+## Future Enhancement: Multi-Chain Deposits via LI.FI
+
+> **Status**: Planned for future release after direct Arbitrum bridge is implemented
+
+### Why LI.FI?
+
+| Feature | Benefit |
+|---------|---------|
+| **50+ Source Chains** | Users can deposit from Ethereum, Optimism, Base, Polygon, Solana, etc. |
+| **Direct HyperCore Routing** | Only aggregator with native perps balance integration |
+| **Proven Track Record** | $130M+ volume on Hyperliquid via Jumper Exchange |
+| **Speed** | 3-6 second transfers via intent-based bridges |
+| **Route Optimization** | Automatically finds best bridge/DEX path |
+
+### Comparison: Direct Bridge vs LI.FI
+
+| Aspect | Direct Arbitrum Bridge | LI.FI Aggregator |
+|--------|------------------------|------------------|
+| Source chains | Arbitrum only | 50+ chains |
+| Dependencies | None (just wagmi) | `@lifi/sdk` package |
+| Fees | Gas only | Gas + ~0.25% bridge fee |
+| Complexity | Simple | Medium |
+| Speed | < 1 min | 3-6 seconds |
+| User has USDC on | Must be Arbitrum | Any supported chain |
+
+### Implementation Plan
+
+#### Installation
+
+```bash
+pnpm add @lifi/sdk
+```
+
+#### File: `src/hooks/bridge/use-lifi-deposit.ts`
+
+```typescript
+import { createConfig, getQuote, executeRoute, getRoutes } from '@lifi/sdk'
+import { useState, useCallback } from 'react'
+import { useWalletClient, useSwitchChain } from 'wagmi'
+
+// Chain IDs
+const HYPERLIQUID_CHAIN_ID = 999 // TODO: Verify actual LI.FI chain ID for HyperCore
+
+// Initialize LI.FI SDK
+createConfig({
+  integrator: 'hypeterminal',
+})
+
+interface UseLifiDepositProps {
+  fromChainId: number
+  fromTokenAddress: string
+  amount: string
+  userAddress: string
+}
+
+export function useLifiDeposit() {
+  const { data: walletClient } = useWalletClient()
+  const { switchChainAsync } = useSwitchChain()
+
+  const [quote, setQuote] = useState<any>(null)
+  const [isQuoting, setIsQuoting] = useState(false)
+  const [isExecuting, setIsExecuting] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+  const [txHash, setTxHash] = useState<string | null>(null)
+
+  const getDepositQuote = useCallback(async ({
+    fromChainId,
+    fromTokenAddress,
+    amount,
+    userAddress,
+  }: UseLifiDepositProps) => {
+    setIsQuoting(true)
+    setError(null)
+
+    try {
+      const result = await getQuote({
+        fromAddress: userAddress,
+        fromChain: fromChainId,
+        toChain: HYPERLIQUID_CHAIN_ID,
+        fromToken: fromTokenAddress,
+        toToken: 'USDC', // Native USDC on HyperCore
+        fromAmount: amount,
+      })
+
+      setQuote(result)
+      return result
+    } catch (err) {
+      setError(err as Error)
+      throw err
+    } finally {
+      setIsQuoting(false)
+    }
+  }, [])
+
+  const executeDeposit = useCallback(async () => {
+    if (!quote || !walletClient) return
+
+    setIsExecuting(true)
+    setError(null)
+
+    try {
+      const result = await executeRoute(quote, {
+        updateRouteHook: (updatedRoute) => {
+          // Track transaction hash when available
+          const step = updatedRoute.steps[0]
+          if (step?.execution?.process?.[0]?.txHash) {
+            setTxHash(step.execution.process[0].txHash)
+          }
+        },
+        switchChainHook: async (chainId) => {
+          await switchChainAsync({ chainId })
+          return walletClient
+        },
+      })
+
+      return result
+    } catch (err) {
+      setError(err as Error)
+      throw err
+    } finally {
+      setIsExecuting(false)
+    }
+  }, [quote, walletClient, switchChainAsync])
+
+  const reset = useCallback(() => {
+    setQuote(null)
+    setError(null)
+    setTxHash(null)
+  }, [])
+
+  return {
+    // Quote
+    quote,
+    getDepositQuote,
+    isQuoting,
+
+    // Execution
+    executeDeposit,
+    isExecuting,
+    txHash,
+
+    // State
+    error,
+    reset,
+
+    // Derived
+    estimatedOutput: quote?.estimate?.toAmount,
+    estimatedTime: quote?.estimate?.executionDuration,
+    fees: quote?.estimate?.feeCosts,
+  }
+}
+```
+
+#### File: `src/config/supported-chains.ts`
+
+```typescript
+// Chains users can deposit from via LI.FI
+export const DEPOSIT_SOURCE_CHAINS = [
+  { id: 1, name: 'Ethereum', icon: 'eth' },
+  { id: 42161, name: 'Arbitrum', icon: 'arb' },
+  { id: 10, name: 'Optimism', icon: 'op' },
+  { id: 8453, name: 'Base', icon: 'base' },
+  { id: 137, name: 'Polygon', icon: 'polygon' },
+  { id: 56, name: 'BNB Chain', icon: 'bnb' },
+  { id: 43114, name: 'Avalanche', icon: 'avax' },
+] as const
+
+// Common USDC addresses per chain
+export const USDC_ADDRESSES: Record<number, string> = {
+  1: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',      // Ethereum
+  42161: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',  // Arbitrum
+  10: '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85',     // Optimism
+  8453: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',   // Base
+  137: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359',    // Polygon
+  56: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d',     // BNB Chain
+  43114: '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E',  // Avalanche
+}
+```
+
+#### Updated Deposit Modal UI (Future)
+
+```
+Multi-Chain Deposit Modal:
+┌─────────────────────────────────────────┐
+│ Deposit USDC                        [X] │
+├─────────────────────────────────────────┤
+│                                         │
+│ From:                                   │
+│ ┌─────────────────────────────────────┐ │
+│ │ [◉] Arbitrum          ▼            │ │  ← Chain selector
+│ └─────────────────────────────────────┘ │
+│                                         │
+│ Balance: 1,234.56 USDC                  │
+│                                         │
+│ Amount:                                 │
+│ ┌─────────────────────────────┬───────┐ │
+│ │ 100                         │  MAX  │ │
+│ └─────────────────────────────┴───────┘ │
+│                                         │
+│ Route: Arbitrum → Hyperliquid           │
+│ Via: Relay • Est. 4 seconds             │
+│ Fee: ~$0.25 (0.25%)                     │
+│                                         │
+│ You receive: ~99.75 USDC                │
+│                                         │
+│ ┌─────────────────────────────────────┐ │
+│ │            Deposit                  │ │
+│ └─────────────────────────────────────┘ │
+└─────────────────────────────────────────┘
+```
+
+### Tasks for LI.FI Enhancement
+
+1. [ ] Add `@lifi/sdk` package
+2. [ ] Create `src/config/supported-chains.ts` with chain list
+3. [ ] Create `src/hooks/bridge/use-lifi-deposit.ts` hook
+4. [ ] Add chain selector dropdown to deposit modal
+5. [ ] Display route info (bridge used, estimated time, fees)
+6. [ ] Handle chain switching during execution
+7. [ ] Add fallback to direct Arbitrum bridge if LI.FI fails
+8. [ ] Test with multiple source chains
+
+### LI.FI References
+
+- [LI.FI SDK GitHub](https://github.com/lifinance/sdk)
+- [@lifi/sdk npm](https://www.npmjs.com/package/@lifi/sdk)
+- [LI.FI Documentation](https://docs.li.fi/sdk/installing-the-sdk)
+- [LI.FI HyperCore Integration](https://li.fi/knowledge-hub/step-into-hypercore-with-li-fi/)
+- [Jumper Exchange](https://jumper.exchange) - LI.FI powered, proven Hyperliquid integration

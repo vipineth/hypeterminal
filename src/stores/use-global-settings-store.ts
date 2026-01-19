@@ -9,6 +9,7 @@ import {
 	STORAGE_KEYS,
 } from "@/config/constants";
 import { type NumberFormatLocale, resolveNumberFormatLocale } from "@/lib/i18n";
+import type { MarginMode } from "@/lib/trade/margin-mode";
 import { clampInt } from "@/lib/trade/numbers";
 import { createValidatedStorage } from "@/stores/validated-storage";
 
@@ -21,6 +22,7 @@ const globalSettingsSchema = z.object({
 		showChartScanlines: z.boolean().optional(),
 		numberFormatLocale: z.string().optional(),
 		marketOrderSlippageBps: z.number().int().optional(),
+		marginMode: z.enum(["cross", "isolated"]).optional(),
 	}),
 });
 
@@ -34,6 +36,7 @@ const DEFAULT_GLOBAL_SETTINGS = {
 	showChartScanlines: true,
 	numberFormatLocale: "auto" as NumberFormatLocale,
 	marketOrderSlippageBps: DEFAULT_MARKET_ORDER_SLIPPAGE_BPS,
+	marginMode: "cross" as MarginMode,
 } as const;
 
 interface GlobalSettingsStore {
@@ -44,6 +47,7 @@ interface GlobalSettingsStore {
 	showChartScanlines: boolean;
 	numberFormatLocale: NumberFormatLocale;
 	marketOrderSlippageBps: number;
+	marginMode: MarginMode;
 	actions: {
 		setShowOrdersOnChart: (next: boolean) => void;
 		setShowPositionsOnChart: (next: boolean) => void;
@@ -52,6 +56,7 @@ interface GlobalSettingsStore {
 		setShowChartScanlines: (next: boolean) => void;
 		setNumberFormatLocale: (next: NumberFormatLocale) => void;
 		setMarketOrderSlippageBps: (bps: number) => void;
+		setMarginMode: (mode: MarginMode) => void;
 	};
 }
 
@@ -71,6 +76,7 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 					if (get().marketOrderSlippageBps === next) return;
 					set({ marketOrderSlippageBps: next });
 				},
+				setMarginMode: (mode) => set({ marginMode: mode }),
 			},
 		}),
 		{
@@ -84,6 +90,7 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 				showChartScanlines: state.showChartScanlines,
 				numberFormatLocale: state.numberFormatLocale,
 				marketOrderSlippageBps: state.marketOrderSlippageBps,
+				marginMode: state.marginMode,
 			}),
 			merge: (persisted, current) => {
 				const p = persisted as Partial<GlobalSettingsStore>;
@@ -96,6 +103,7 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 						MARKET_ORDER_SLIPPAGE_MIN_BPS,
 						MARKET_ORDER_SLIPPAGE_MAX_BPS,
 					),
+					marginMode: p?.marginMode === "isolated" ? "isolated" : "cross",
 				};
 			},
 		},
@@ -121,6 +129,10 @@ export function useGlobalSettingsActions() {
 
 export function useMarketOrderSlippageBps() {
 	return useGlobalSettingsStore((state) => state.marketOrderSlippageBps);
+}
+
+export function useMarginMode() {
+	return useGlobalSettingsStore((state) => state.marginMode);
 }
 
 export function useResolvedFormatLocale(): string {

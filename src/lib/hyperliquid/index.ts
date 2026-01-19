@@ -29,6 +29,7 @@ export {
 } from "./hooks/useResolvedMarket";
 export { type UseSignedExchangeResult, useSignedExchange } from "./hooks/useSignedExchange";
 export { type UseTradingAgentResult, useTradingAgent } from "./hooks/useTradingAgent";
+export { useTradingGuard } from "./hooks/useTradingGuard";
 export { type UseTradingStatusResult, useTradingStatus } from "./hooks/useTradingStatus";
 export { useHttpTransport, useSubscriptionTransport } from "./hooks/useTransport";
 

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -19,7 +19,8 @@ import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format"
 import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
-import { formatDecimalFloor, isPositive, parseNumber, toNumber } from "@/lib/trade/numbers";
+import type { MarginMode } from "@/lib/trade/margin-mode";
+import { calc, formatDecimalFloor, isPositive, parseNumberOrZero, toFixed, toNumber } from "@/lib/trade/numbers";
 import {
 	getConversionPrice,
 	getExecutedPrice,
@@ -46,6 +47,8 @@ import { GlobalSettingsDialog } from "../components/global-settings-dialog";
 import { WalletDialog } from "../components/wallet-dialog";
 import { DepositModal } from "./deposit-modal";
 import { LeverageControl, useAssetLeverage } from "./leverage-control";
+import { MarginModeDialog } from "./margin-mode-dialog";
+import { MarginModeToggle } from "./margin-mode-toggle";
 import { OrderToast } from "./order-toast";
 import { TpSlSection } from "./tp-sl-section";
 
@@ -88,7 +91,17 @@ export function OrderEntryPanel() {
 
 	const slippageBps = useMarketOrderSlippageBps();
 
-	const { displayLeverage: leverage, availableToSell, availableToBuy, maxTradeSzs } = useAssetLeverage();
+	const {
+		displayLeverage: leverage,
+		availableToSell,
+		availableToBuy,
+		maxTradeSzs,
+		marginMode,
+		hasPosition,
+		switchMarginMode,
+		isSwitchingMode,
+		switchModeError,
+	} = useAssetLeverage();
 
 	const { addOrder, updateOrder } = useOrderQueueActions();
 
@@ -104,6 +117,8 @@ export function OrderEntryPanel() {
 	const [sizeInput, setSizeInput] = useState("");
 	const [hasUserSized, setHasUserSized] = useState(false);
 	const [limitPriceInput, setLimitPriceInput] = useState("");
+	const [isDraggingSlider, setIsDraggingSlider] = useState(false);
+	const [dragSliderValue, setDragSliderValue] = useState(25);
 	const [approvalError, setApprovalError] = useState<string | null>(null);
 	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
 	const [depositModalOpen, setDepositModalOpen] = useState(false);
@@ -111,6 +126,7 @@ export function OrderEntryPanel() {
 	const [tpSlEnabled, setTpSlEnabled] = useState(false);
 	const [tpPriceInput, setTpPriceInput] = useState("");
 	const [slPriceInput, setSlPriceInput] = useState("");
+	const [marginModeDialogOpen, setMarginModeDialogOpen] = useState(false);
 
 	useEffect(() => {
 		if (selectedPrice !== null) {
@@ -123,16 +139,16 @@ export function OrderEntryPanel() {
 	const tpPriceNum = toNumber(tpPriceInput);
 	const slPriceNum = toNumber(slPriceInput);
 
-	const accountValue = parseNumber(clearinghouse?.crossMarginSummary?.accountValue) || 0;
-	const marginUsed = parseNumber(clearinghouse?.crossMarginSummary?.totalMarginUsed) || 0;
-	const availableBalance = Math.max(0, accountValue - marginUsed);
+	const accountValue = parseNumberOrZero(clearinghouse?.crossMarginSummary?.accountValue);
+	const marginUsed = parseNumberOrZero(clearinghouse?.crossMarginSummary?.totalMarginUsed);
+	const availableBalance = Math.max(0, calc.subtract(accountValue, marginUsed) ?? 0);
 
 	const position =
 		!clearinghouse?.assetPositions || !market?.coin
 			? null
 			: (clearinghouse.assetPositions.find((p) => p.position.coin === market.coin) ?? null);
 
-	const positionSize = parseNumber(position?.position?.szi) || 0;
+	const positionSize = parseNumberOrZero(position?.position?.szi);
 
 	const ctxMarkPx = market?.ctxNumbers?.markPx;
 	const markPx =
@@ -265,9 +281,9 @@ export function OrderEntryPanel() {
 	function applySizePercent(pct: number) {
 		if (maxSize <= 0) return;
 		setHasUserSized(true);
-		const newSize = maxSize * (pct / 100);
+		const newSize = calc.percent(maxSize, pct) ?? 0;
 		if (sizeMode === "usd" && conversionPx > 0) {
-			setSizeInput((newSize * conversionPx).toFixed(2));
+			setSizeInput(toFixed(calc.multiply(newSize, conversionPx), 2));
 			return;
 		}
 		setSizeInput(formatDecimalFloor(newSize, market?.szDecimals ?? 0) || "");
@@ -279,7 +295,7 @@ export function OrderEntryPanel() {
 			setHasUserSized(true);
 			setSizeInput(
 				newMode === "usd"
-					? (sizeValue * conversionPx).toFixed(2)
+					? toFixed(calc.multiply(sizeValue, conversionPx), 2)
 					: formatDecimalFloor(sizeValue, market?.szDecimals ?? 0) || "",
 			);
 		}
@@ -287,6 +303,13 @@ export function OrderEntryPanel() {
 	}
 
 	const isRegistering = registerStatus === "signing" || registerStatus === "verifying";
+
+	const handleMarginModeConfirm = useCallback(
+		async (mode: MarginMode) => {
+			await switchMarginMode(mode);
+		},
+		[switchMarginMode],
+	);
 
 	const handleRegister = useCallback(
 		function handleRegister() {
@@ -425,9 +448,10 @@ export function OrderEntryPanel() {
 	);
 
 	const sliderValue = useMemo(() => {
-		if (!hasUserSized) return 25;
+		if (isDraggingSlider) return dragSliderValue;
+		if (!hasUserSized || sizeValue <= 0) return 25;
 		return getSliderValue(sizeValue, maxSize);
-	}, [hasUserSized, maxSize, sizeValue]);
+	}, [isDraggingSlider, dragSliderValue, hasUserSized, sizeValue, maxSize]);
 
 	const registerText = useMemo(() => {
 		if (isLoadingAgents) return t`Loading...`;
@@ -498,23 +522,19 @@ export function OrderEntryPanel() {
 	return (
 		<div className="h-full flex flex-col overflow-hidden bg-surface/20">
 			<div className="px-2 py-1.5 border-b border-border/40 flex items-center justify-between">
-				<Tabs value="cross">
-					<TabsList>
-						<TabsTrigger value="cross">{t`Cross`}</TabsTrigger>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<span>
-									<TabsTrigger value="isolated" disabled className="opacity-50 cursor-not-allowed">
-										{t`Isolated`}
-									</TabsTrigger>
-								</span>
-							</TooltipTrigger>
-							<TooltipContent>{t`Coming soon`}</TooltipContent>
-						</Tooltip>
-					</TabsList>
-				</Tabs>
+				<MarginModeToggle mode={marginMode} disabled={isSwitchingMode} onClick={() => setMarginModeDialogOpen(true)} />
 				<LeverageControl key={market?.marketKey} />
 			</div>
+
+			<MarginModeDialog
+				open={marginModeDialogOpen}
+				onOpenChange={setMarginModeDialogOpen}
+				currentMode={marginMode}
+				hasPosition={hasPosition}
+				isUpdating={isSwitchingMode}
+				updateError={switchModeError}
+				onConfirm={handleMarginModeConfirm}
+			/>
 
 			<div className="p-2 space-y-4 overflow-y-auto flex-1">
 				<div className="space-y-2">
@@ -618,7 +638,7 @@ export function OrderEntryPanel() {
 						>
 							{sizeMode === "asset" ? market?.coin || "---" : "USD"} <ArrowLeftRight className="size-2.5" />
 						</Button>
-						<Input
+						<NumberInput
 							placeholder="0.00"
 							value={sizeInput}
 							onChange={(e) => {
@@ -635,7 +655,14 @@ export function OrderEntryPanel() {
 
 					<Slider
 						value={[sliderValue]}
-						onValueCommit={(v) => applySizePercent(v[0])}
+						onValueChange={(v) => {
+							setIsDraggingSlider(true);
+							setDragSliderValue(v[0]);
+						}}
+						onValueCommit={(v) => {
+							setIsDraggingSlider(false);
+							applySizePercent(v[0]);
+						}}
 						max={100}
 						step={0.1}
 						className="py-5"
@@ -659,14 +686,16 @@ export function OrderEntryPanel() {
 								<Button
 									variant="ghost"
 									size="none"
-									onClick={() => setLimitPriceInput(markPx.toFixed(szDecimalsToPriceDecimals(market?.szDecimals ?? 4)))}
+									onClick={() =>
+										setLimitPriceInput(toFixed(markPx, szDecimalsToPriceDecimals(market?.szDecimals ?? 4)))
+									}
 									className="text-4xs text-muted-foreground hover:text-terminal-cyan hover:bg-transparent tabular-nums"
 								>
 									{t`Mark`}: {formatPrice(markPx, { szDecimals: market?.szDecimals })}
 								</Button>
 							)}
 						</div>
-						<Input
+						<NumberInput
 							placeholder="0.00"
 							value={limitPriceInput}
 							onChange={(e) => setLimitPriceInput(e.target.value)}
@@ -779,7 +808,7 @@ export function OrderEntryPanel() {
 							onClick={() => setSettingsDialogOpen(true)}
 							className="flex items-center gap-1 hover:text-foreground transition-colors"
 						>
-							<span className="tabular-nums text-terminal-amber">{(slippageBps / 100).toFixed(2)}%</span>
+							<span className="tabular-nums text-terminal-amber">{toFixed(calc.divide(slippageBps, 100), 2)}%</span>
 							<PencilIcon className="size-2 text-muted-foreground" />
 						</button>
 					</div>

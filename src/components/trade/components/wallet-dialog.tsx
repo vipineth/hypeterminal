@@ -1,11 +1,14 @@
 import { Trans } from "@lingui/react/macro";
-import { AlertCircle, ExternalLink, HelpCircle, Loader2, Shield, Wallet } from "lucide-react";
+import { AlertCircle, ExternalLink, FlaskConical, HelpCircle, Loader2, Shield, Wallet } from "lucide-react";
 import { useMemo, useState } from "react";
-import { type Connector, useConnect } from "wagmi";
+import { isAddress } from "viem";
+import { type Connector, useConnect, useConnectors } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { getLastUsedWallet, getWalletInfo, setLastUsedWallet } from "@/lib/wallet-utils";
+import { Input } from "@/components/ui/input";
+import { MOCK_WALLETS } from "@/config/wagmi";
 import { cn } from "@/lib/cn";
+import { getLastUsedWallet, getWalletInfo, isMockConnector, setLastUsedWallet } from "@/lib/wallet-utils";
 
 interface Props {
 	open: boolean;
@@ -13,14 +16,30 @@ interface Props {
 }
 
 export function WalletDialog({ open, onOpenChange }: Props) {
-	const { connectors, connect, isPending, error } = useConnect();
+	const connectors = useConnectors();
+	const { connect, isPending, error } = useConnect();
 	const [connectingId, setConnectingId] = useState<string | null>(null);
 	const [showHelp, setShowHelp] = useState(false);
 	const [lastUsedWallet] = useState(() => getLastUsedWallet());
+	const [customAddress, setCustomAddress] = useState("");
+	const [customAddressError, setCustomAddressError] = useState<string | null>(null);
+
+	const { mockConnectors, regularConnectors } = useMemo(() => {
+		const mock: Connector[] = [];
+		const regular: Connector[] = [];
+
+		for (const connector of connectors) {
+			if (isMockConnector(connector)) {
+				mock.push(connector);
+			} else {
+				regular.push(connector);
+			}
+		}
+
+		return { mockConnectors: mock, regularConnectors: regular };
+	}, [connectors]);
 
 	const availableConnectors = useMemo(() => {
-		const filtered = connectors.filter((c) => c.id !== "mock");
-
 		const sortByPriority = (a: Connector, b: Connector) => {
 			if (lastUsedWallet) {
 				if (a.id === lastUsedWallet) return -1;
@@ -31,10 +50,10 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 			return priorityA - priorityB;
 		};
 
-		const popular = filtered.filter((c) => getWalletInfo(c).popular).sort(sortByPriority);
-		const other = filtered.filter((c) => !getWalletInfo(c).popular).sort(sortByPriority);
-		return { popular, other, all: filtered };
-	}, [connectors, lastUsedWallet]);
+		const popular = regularConnectors.filter((c) => getWalletInfo(c).popular).sort(sortByPriority);
+		const other = regularConnectors.filter((c) => !getWalletInfo(c).popular).sort(sortByPriority);
+		return { popular, other, all: regularConnectors };
+	}, [regularConnectors, lastUsedWallet]);
 
 	const handleConnect = (connector: Connector) => {
 		setConnectingId(connector.uid);
@@ -50,7 +69,30 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 		);
 	};
 
-	const hasConnectors = availableConnectors.all.length > 0;
+	const handleCustomAddressConnect = () => {
+		const trimmed = customAddress.trim();
+		if (!trimmed) {
+			setCustomAddressError("Please enter an address");
+			return;
+		}
+		if (!isAddress(trimmed)) {
+			setCustomAddressError("Invalid Ethereum address");
+			return;
+		}
+		setCustomAddressError(null);
+
+		const mockWalletIndex = MOCK_WALLETS.findIndex((w) => w.address.toLowerCase() === trimmed.toLowerCase());
+
+		if (mockWalletIndex !== -1 && mockConnectors[mockWalletIndex]) {
+			handleConnect(mockConnectors[mockWalletIndex]);
+		} else if (mockConnectors.length > 0) {
+			handleConnect(mockConnectors[0]);
+		} else {
+			setCustomAddressError("No mock connector available");
+		}
+	};
+
+	const hasConnectors = availableConnectors.all.length > 0 || mockConnectors.length > 0;
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -67,7 +109,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 					</DialogHeader>
 				</div>
 
-				<div className="p-4 space-y-4">
+				<div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
 					{availableConnectors.popular.length > 0 && (
 						<div className="space-y-2">
 							<p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-1">
@@ -158,6 +200,75 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 						</div>
 					)}
 
+					{mockConnectors.length > 0 && (
+						<div className="space-y-2">
+							<p className="text-xs font-medium text-terminal-yellow uppercase tracking-wider px-1">
+								<Trans>Mock Wallet (Testing)</Trans>
+							</p>
+							<div className="space-y-2">
+								{mockConnectors.map((connector, index) => {
+									const config = MOCK_WALLETS[index];
+									const isConnecting = connectingId === connector.uid;
+
+									return (
+										<Button
+											key={connector.uid}
+											variant="ghost"
+											size="none"
+											onClick={() => handleConnect(connector)}
+											disabled={isPending}
+											className={cn(
+												"w-full gap-3 p-3 rounded-lg border border-terminal-yellow/30",
+												"bg-terminal-yellow/5 hover:bg-terminal-yellow/10 hover:border-terminal-yellow/50",
+												"group focus:ring-2 focus:ring-terminal-yellow/50",
+											)}
+										>
+											<div className="size-10 rounded-lg overflow-hidden flex-shrink-0 shadow-sm bg-terminal-yellow/20 flex items-center justify-center">
+												<FlaskConical className="size-5 text-terminal-yellow" />
+											</div>
+											<div className="flex-1 text-left min-w-0">
+												<p className="font-medium text-sm group-hover:text-terminal-yellow transition-colors">
+													{config?.name ?? connector.name}
+												</p>
+												<p className="text-xs text-muted-foreground truncate font-mono">
+													{config?.address ?? "Mock wallet"}
+												</p>
+											</div>
+											{isConnecting ? (
+												<Loader2 className="size-4 animate-spin text-terminal-yellow flex-shrink-0" />
+											) : (
+												<div className="size-4 rounded-full border border-terminal-yellow/50 flex-shrink-0 transition-colors" />
+											)}
+										</Button>
+									);
+								})}
+							</div>
+							<div className="pt-2 space-y-2">
+								<div className="flex gap-2">
+									<Input
+										placeholder="0x..."
+										value={customAddress}
+										onChange={(e) => {
+											setCustomAddress(e.target.value);
+											setCustomAddressError(null);
+										}}
+										className="font-mono text-xs"
+									/>
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={handleCustomAddressConnect}
+										disabled={isPending}
+										className="shrink-0"
+									>
+										<Trans>Connect</Trans>
+									</Button>
+								</div>
+								{customAddressError && <p className="text-xs text-destructive px-1">{customAddressError}</p>}
+							</div>
+						</div>
+					)}
+
 					{!hasConnectors && (
 						<div className="py-8 text-center space-y-3">
 							<div className="size-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto">
@@ -194,7 +305,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 							<Trans>New to wallets?</Trans>
 						</span>
 						<span className={cn("transition-transform", showHelp && "rotate-180")}>
-							<svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+							<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
 								<path
 									d="M2.5 4.5L6 8L9.5 4.5"
 									stroke="currentColor"

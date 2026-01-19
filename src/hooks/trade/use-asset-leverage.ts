@@ -1,10 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useConnection } from "wagmi";
 import { DEFAULT_MAX_LEVERAGE } from "@/config/constants";
 import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { useExchangeUpdateLeverage } from "@/lib/hyperliquid/hooks/exchange/useExchangeUpdateLeverage";
-import { useSubActiveAssetData } from "@/lib/hyperliquid/hooks/subscription";
-import { parseNumber } from "@/lib/trade/numbers";
+import { useSubActiveAssetData, useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
+import { getMarginModeFromLeverage, type MarginMode } from "@/lib/trade/margin-mode";
+import { parseNumber, toNumber } from "@/lib/trade/numbers";
+import { useGlobalSettingsActions, useMarginMode } from "@/stores/use-global-settings-store";
+
+type OperationType = "leverage" | "mode" | null;
 
 interface UseAssetLeverageReturn {
 	currentLeverage: number;
@@ -22,6 +26,11 @@ interface UseAssetLeverageReturn {
 	isUpdating: boolean;
 	updateError: Error | null;
 	subscriptionStatus: "idle" | "loading" | "success" | "error";
+	marginMode: MarginMode;
+	hasPosition: boolean;
+	switchMarginMode: (mode: MarginMode) => Promise<void>;
+	isSwitchingMode: boolean;
+	switchModeError: Error | null;
 }
 
 function getDefaultLeverage(maxLeverage: number): number {
@@ -32,6 +41,9 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	const { address, isConnected } = useConnection();
 	const { data: market } = useSelectedResolvedMarket({ ctxMode: "realtime" });
 
+	const storedMarginMode = useMarginMode();
+	const { setMarginMode: setStoredMarginMode } = useGlobalSettingsActions();
+
 	const maxLeverage = market?.maxLeverage ?? DEFAULT_MAX_LEVERAGE;
 	const coin = market?.coin;
 	const assetIndex = market?.assetIndex;
@@ -41,17 +53,34 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		{ enabled: isConnected && !!address && !!coin },
 	);
 
-	const {
-		mutateAsync: updateLeverage,
-		isPending: isUpdating,
-		error: updateError,
-		reset: resetMutation,
-	} = useExchangeUpdateLeverage();
+	const { data: clearinghouseEvent } = useSubClearinghouseState(
+		{ user: address ?? "" },
+		{ enabled: isConnected && !!address },
+	);
 
+	const { mutateAsync: updateLeverage, isPending, error, reset: resetMutation } = useExchangeUpdateLeverage();
+
+	const operationTypeRef = useRef<OperationType>(null);
 	const [pendingLeverage, setPendingLeverageState] = useState<number | null>(null);
 	const [disconnectedLeverage, setDisconnectedLeverage] = useState<number | null>(null);
 
 	const onChainLeverage = activeAssetData?.leverage?.value ?? null;
+	const onChainMarginMode = getMarginModeFromLeverage(activeAssetData?.leverage);
+
+	const marginMode = useMemo((): MarginMode => {
+		if (isConnected && activeAssetData?.leverage) {
+			return onChainMarginMode;
+		}
+		return storedMarginMode;
+	}, [isConnected, activeAssetData?.leverage, onChainMarginMode, storedMarginMode]);
+
+	const hasPosition = useMemo(() => {
+		if (!coin || !clearinghouseEvent?.clearinghouseState?.assetPositions) return false;
+		const position = clearinghouseEvent.clearinghouseState.assetPositions.find((p) => p.position.coin === coin);
+		if (!position) return false;
+		const size = toNumber(position.position.szi);
+		return size !== null && size !== 0;
+	}, [coin, clearinghouseEvent?.clearinghouseState?.assetPositions]);
 
 	const currentLeverage = useMemo(() => {
 		if (isConnected && onChainLeverage !== null) {
@@ -66,8 +95,10 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	const displayLeverage = pendingLeverage ?? currentLeverage;
 	const isDirty = pendingLeverage !== null && pendingLeverage !== currentLeverage;
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: coin change triggers reset
 	useEffect(() => {
 		setPendingLeverageState(null);
+		operationTypeRef.current = null;
 		resetMutation();
 	}, [coin, resetMutation]);
 
@@ -90,6 +121,7 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 
 	const resetPending = useCallback(() => {
 		setPendingLeverageState(null);
+		operationTypeRef.current = null;
 		resetMutation();
 	}, [resetMutation]);
 
@@ -98,14 +130,40 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 			return;
 		}
 
+		operationTypeRef.current = "leverage";
 		await updateLeverage({
 			asset: assetIndex,
-			isCross: true,
+			isCross: marginMode === "cross",
 			leverage: pendingLeverage,
 		});
 
 		setPendingLeverageState(null);
-	}, [pendingLeverage, assetIndex, updateLeverage]);
+	}, [pendingLeverage, assetIndex, updateLeverage, marginMode]);
+
+	const switchMarginMode = useCallback(
+		async (mode: MarginMode) => {
+			if (typeof assetIndex !== "number") return;
+
+			if (!isConnected) {
+				setStoredMarginMode(mode);
+				return;
+			}
+
+			if (mode === "isolated" && marginMode === "cross" && hasPosition) {
+				throw new Error("Cannot switch to isolated mode with an open position");
+			}
+
+			operationTypeRef.current = "mode";
+			await updateLeverage({
+				asset: assetIndex,
+				isCross: mode === "cross",
+				leverage: currentLeverage,
+			});
+
+			setStoredMarginMode(mode);
+		},
+		[assetIndex, isConnected, currentLeverage, marginMode, hasPosition, updateLeverage, setStoredMarginMode],
+	);
 
 	const availableToSell = useMemo(() => {
 		const raw = activeAssetData?.availableToTrade?.[0];
@@ -133,6 +191,11 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		return "idle";
 	}, [isConnected, coin, subscriptionStatus]);
 
+	const isUpdating = isPending && operationTypeRef.current === "leverage";
+	const isSwitchingMode = isPending && operationTypeRef.current === "mode";
+	const updateError = error && operationTypeRef.current === "leverage" ? (error as Error) : null;
+	const switchModeError = error && operationTypeRef.current === "mode" ? (error as Error) : null;
+
 	return {
 		currentLeverage,
 		pendingLeverage,
@@ -147,7 +210,12 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		availableToBuy,
 		maxTradeSzs,
 		isUpdating,
-		updateError: updateError as Error | null,
+		updateError,
 		subscriptionStatus: normalizedStatus,
+		marginMode,
+		hasPosition,
+		switchMarginMode,
+		isSwitchingMode,
+		switchModeError,
 	};
 }

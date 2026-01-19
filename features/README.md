@@ -7,6 +7,7 @@ This folder contains specifications for planned features. Each feature has its o
 | Feature | Priority | Status | File |
 |---------|----------|--------|------|
 | TP/SL Orders | High | Planned | [tp-sl.md](./tp-sl.md) |
+| Advanced Order Types | High | Planned | [advanced-order-types.md](./advanced-order-types.md) |
 | Leverage Management | High | Planned | [leverage-management.md](./leverage-management.md) |
 | Spot Swap | High | Planned | [spot-swap.md](./spot-swap.md) |
 

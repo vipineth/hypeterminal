@@ -80,6 +80,9 @@ Once you know which method to use, look up the complete OpenAPI schema in:
 |------------|--------|------|
 | Place limit/market/trigger orders | `order({orders, grouping, builder?})` | E |
 | Place TWAP order | `twapOrder({a, b, s, r, m, t})` | E |
+| Get TWAP history | `twapHistory({user})` | I |
+| Stream TWAP history | `userTwapHistory({user})` | S |
+| Stream TWAP slice fills | `userTwapSliceFills({user})` | S |
 | Get my open orders | `openOrders({user})` | I |
 | Get open orders with display info | `frontendOpenOrders({user})` | I |
 | Stream open orders | `openOrders({user, dex?})` | S |
@@ -95,6 +98,14 @@ Once you know which method to use, look up the complete OpenAPI schema in:
 
 **Order structure:** `{a: assetId, b: isBuy, p: price, s: size, r: reduceOnly, t: orderType, c?: cloid}`
 **Order types:** `{limit: {tif: "Gtc"|"Ioc"|"Alo"}}` or `{trigger: {isMarket, triggerPx, tpsl: "tp"|"sl"}}`
+**Trigger order mapping:**
+- Stop Market → `t.trigger` with `isMarket: true`, `tpsl: "sl"`, `triggerPx = stop price`
+- Stop Limit → `t.trigger` with `isMarket: false`, `tpsl: "sl"`, `triggerPx = stop price`, `p = limit price`
+- Take Profit Market → `t.trigger` with `isMarket: true`, `tpsl: "tp"`, `triggerPx = take price`
+- Take Profit Limit → `t.trigger` with `isMarket: false`, `tpsl: "tp"`, `triggerPx = take price`, `p = limit price`
+**Market orders:** Use `t.limit.tif = "FrontendMarket"` (or `"Ioc"`) with an aggressive `p`.
+**Scale/ladder orders:** Not native; send multiple limit orders in one `order({orders: [...]})` call.
+**OrderType labels:** `frontendOpenOrders` / `openOrders` / `historicalOrders` return `orderType` values for display.
 **Grouping:** `"na"` (standalone), `"normalTpsl"` (fixed TP/SL size), `"positionTpsl"` (TP/SL scales with position)
 
 ---

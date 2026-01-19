@@ -83,6 +83,10 @@ msgstr "Add TP/SL"
 #~ msgid "Agent verification failed"
 #~ msgstr "Agent verification failed"
 
+#: src/components/trade/order-entry/margin-mode-dialog.tsx
+msgid "All cross positions share the same cross margin as collateral. In the event of liquidation, your cross margin balance and any remaining open positions under assets in this mode may be forfeited."
+msgstr "All cross positions share the same cross margin as collateral. In the event of liquidation, your cross margin balance and any remaining open positions under assets in this mode may be forfeited."
+
 #: src/components/trade/header/top-nav.tsx
 msgid "API"
 msgstr "API"
@@ -171,6 +175,7 @@ msgstr "Buy Long"
 
 #: src/components/trade/order-entry/leverage-popover.tsx
 #: src/components/trade/order-entry/leverage-sheet.tsx
+#: src/components/trade/order-entry/margin-mode-dialog.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -211,6 +216,10 @@ msgstr "Canceling..."
 msgid "cancelled"
 msgstr "cancelled"
 
+#: src/components/trade/order-entry/margin-mode-dialog.tsx
+msgid "Cannot switch to Isolated mode with an open position. Close your position first."
+msgstr "Cannot switch to Isolated mode with an open position. Close your position first."
+
 #: src/components/trade/order-entry/leverage-badge.tsx
 msgid "Change leverage"
 msgstr "Change leverage"
@@ -238,7 +247,6 @@ msgstr "Closing..."
 #~ msgstr "Collapse account panel"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
-#: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Coming soon"
 msgstr "Coming soon"
 
@@ -248,9 +256,14 @@ msgstr "completed"
 
 #: src/components/trade/order-entry/leverage-popover.tsx
 #: src/components/trade/order-entry/leverage-sheet.tsx
+#: src/components/trade/order-entry/margin-mode-dialog.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 msgid "Confirm"
 msgstr "Confirm"
+
+#: src/components/trade/components/wallet-dialog.tsx
+msgid "Connect"
+msgstr "Connect"
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "Connect a wallet to manage orders."
@@ -322,13 +335,19 @@ msgstr "Copy Address"
 #~ msgid "Could not create wallet"
 #~ msgstr "Could not create wallet"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/order-entry/margin-mode-toggle.tsx
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Cross"
 msgstr "Cross"
 
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "Cross Leverage"
 msgstr "Cross Leverage"
+
+#: src/components/trade/order-entry/margin-mode-dialog.tsx
+msgid "Current"
+msgstr "Current"
 
 #: src/components/trade/order-entry/tp-sl-section.tsx
 #~ msgid "Custom SL percentage"
@@ -390,9 +409,14 @@ msgstr "Docs"
 msgid "Edit TP/SL"
 msgstr "Edit TP/SL"
 
+#: src/components/trade/components/trading-action-button.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enable Trading"
 msgstr "Enable Trading"
+
+#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#~ msgid "Enabling..."
+#~ msgstr "Enabling..."
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Enter limit price"
@@ -483,6 +507,10 @@ msgstr "Failed to load TWAP history."
 #~ msgid "Failed to register builder code"
 #~ msgstr "Failed to register builder code"
 
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#~ msgid "Failed to switch margin mode"
+#~ msgstr "Failed to switch margin mode"
+
 #: src/components/trade/positions/history-tab.tsx
 msgid "Fee"
 msgstr "Fee"
@@ -509,6 +537,7 @@ msgid "Format for numbers and dates"
 msgstr "Format for numbers and dates"
 
 #: src/components/trade/chart/constants.ts
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Funding"
 msgstr "Funding"
 
@@ -549,7 +578,9 @@ msgstr "Install a wallet extension to continue"
 #~ msgid "Invalid Ethereum address"
 #~ msgstr "Invalid Ethereum address"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/order-entry/margin-mode-toggle.tsx
+#: src/components/trade/positions/positions-tab.tsx
 msgid "Isolated"
 msgstr "Isolated"
 
@@ -647,6 +678,18 @@ msgstr "Loading..."
 msgid "Long"
 msgstr "Long"
 
+#: src/components/trade/order-entry/margin-mode-dialog.tsx
+msgid "Manage your risk on individual positions by restricting the amount of margin allocated to each. If the margin ratio of an isolated position reaches 100%, the position will be liquidated. Margin can be added or removed to individual positions in this mode."
+msgstr "Manage your risk on individual positions by restricting the amount of margin allocated to each. If the margin ratio of an isolated position reaches 100%, the position will be liquidated. Margin can be added or removed to individual positions in this mode."
+
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Margin"
+msgstr "Margin"
+
+#: src/components/trade/order-entry/margin-mode-dialog.tsx
+msgid "Margin Mode"
+msgstr "Margin Mode"
+
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "Margin Ratio"
 msgstr "Margin Ratio"
@@ -713,6 +756,10 @@ msgstr "Max slippage allowed for market orders."
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Min order $10"
 msgstr "Min order $10"
+
+#: src/components/trade/components/wallet-dialog.tsx
+msgid "Mock Wallet (Testing)"
+msgstr "Mock Wallet (Testing)"
 
 #: src/components/trade/header/top-nav.tsx
 msgid "More"
@@ -979,6 +1026,10 @@ msgstr "Select all orders"
 msgid "Select favorite markets"
 msgstr "Select favorite markets"
 
+#: src/components/trade/order-entry/margin-mode-dialog.tsx
+msgid "Select how margin is allocated for your positions"
+msgstr "Select how margin is allocated for your positions"
+
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Select leverage"
 #~ msgstr "Select leverage"
@@ -1073,6 +1124,7 @@ msgstr "Show Values in USD"
 msgid "Sidebar"
 msgstr "Sidebar"
 
+#: src/components/trade/components/trading-action-button.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Sign in wallet..."
 msgstr "Sign in wallet..."
@@ -1342,11 +1394,13 @@ msgstr "Unsupported resolution: {0}"
 
 #: src/components/trade/order-entry/leverage-popover.tsx
 #: src/components/trade/order-entry/leverage-sheet.tsx
+#: src/components/trade/order-entry/margin-mode-dialog.tsx
 msgid "Update failed"
 msgstr "Update failed"
 
 #: src/components/trade/order-entry/leverage-popover.tsx
 #: src/components/trade/order-entry/leverage-sheet.tsx
+#: src/components/trade/order-entry/margin-mode-dialog.tsx
 msgid "Updated"
 msgstr "Updated"
 
@@ -1366,6 +1420,7 @@ msgstr "USD Value"
 msgid "Vaults"
 msgstr "Vaults"
 
+#: src/components/trade/components/trading-action-button.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Verifying..."
 msgstr "Verifying..."

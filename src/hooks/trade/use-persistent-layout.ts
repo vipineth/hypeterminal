@@ -8,8 +8,8 @@ export const LAYOUT_PERSISTENCE = {
 	},
 	VERTICAL: {
 		KEY: "terminal:layout:vert",
-		FALLBACK: [65, 35] as const,
-		PANEL_DEFAULTS: [48, 52],
+		FALLBACK: [55, 45] as const,
+		PANEL_DEFAULTS: [45, 55],
 	},
 	CHART_BOOK: {
 		KEY: "terminal:layout:chart-book",
@@ -36,15 +36,18 @@ function readStoredLayout(key: string, fallback: readonly number[]): number[] {
 export function usePersistentLayout(key: string, fallback: readonly number[]) {
 	const [layout, setLayout] = useState<number[]>(() => readStoredLayout(key, fallback));
 
-	const onLayout = useCallback((sizes: number[]) => {
-		setLayout(sizes);
-		try {
-			if (typeof window === "undefined") return;
-			localStorage.setItem(key, JSON.stringify(sizes));
-		} catch {
-			// Ignore storage errors
-		}
-	}, [key]);
+	const onLayout = useCallback(
+		(sizes: number[]) => {
+			setLayout(sizes);
+			try {
+				if (typeof window === "undefined") return;
+				localStorage.setItem(key, JSON.stringify(sizes));
+			} catch {
+				// Ignore storage errors
+			}
+		},
+		[key],
+	);
 
 	return { layout, onLayout } as const;
 }

@@ -8,6 +8,9 @@ dist-ssr
 .nitro
 .vinxi
 
+# Compiled translation catalogs (generated at build time)
+src/locales/**/messages.js
+
 # Framework temp files
 .tanstack
 .wrangler
