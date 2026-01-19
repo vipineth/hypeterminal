@@ -1,7 +1,6 @@
 import { useCallback, useSyncExternalStore } from "react";
 import { z } from "zod";
-
-export type HyperliquidEnv = "mainnet" | "testnet";
+import type { HyperliquidEnv } from "@/lib/hyperliquid/hooks/agent/types";
 
 const privateKeySchema = z
 	.string()

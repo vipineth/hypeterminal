@@ -1,16 +1,13 @@
 import type { FrontendOpenOrdersResponse } from "@nktkas/hyperliquid";
 import { calc, parseNumber } from "@/lib/trade/numbers";
+import type { ApiSide } from "@/lib/trade/types";
 
-/** Single open order from SDK type */
 export type OpenOrder = FrontendOpenOrdersResponse[number];
-
-/** Order side from SDK */
-export type OrderSide = OpenOrder["side"];
 
 export const ORDER_SIDE_CONFIG = {
 	B: { label: "long", class: "bg-terminal-green/20 text-terminal-green" },
 	A: { label: "short", class: "bg-terminal-red/20 text-terminal-red" },
-} as const satisfies Record<OrderSide, { label: string; class: string }>;
+} as const satisfies Record<ApiSide, { label: string; class: string }>;
 
 export const ORDER_TYPE_CONFIG = {
 	takeProfit: { prefix: "Take Profit", class: "bg-terminal-green/20 text-terminal-green" },

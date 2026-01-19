@@ -42,8 +42,8 @@ import {
 	usesTriggerPrice as usesTriggerPriceForOrder,
 } from "@/lib/trade/order-types";
 import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/lib/trade/orders";
-import type { ActiveDialog, ButtonContent } from "@/lib/trade/types";
-import { useButtonContent } from "@/lib/trade/use-button-content";
+import type { ActiveDialog } from "@/lib/trade/types";
+import { type ButtonContent, useButtonContent } from "@/lib/trade/use-button-content";
 import { useOrderValidation } from "@/lib/trade/use-order-validation";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import {

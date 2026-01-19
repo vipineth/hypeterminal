@@ -2,7 +2,14 @@ import { t } from "@lingui/core/macro";
 import { useMemo } from "react";
 import { ARBITRUM_CHAIN_ID } from "@/config/constants";
 import type { AgentRegisterStatus, AgentStatus } from "@/lib/hyperliquid/hooks/agent/types";
-import type { ButtonContent, Side, ValidationResult } from "@/lib/trade/types";
+import type { Side, ValidationResult } from "@/lib/trade/types";
+
+export interface ButtonContent {
+	text: string;
+	action: () => void;
+	disabled: boolean;
+	variant: "cyan" | "buy" | "sell";
+}
 
 interface ButtonContentInput {
 	isConnected: boolean;

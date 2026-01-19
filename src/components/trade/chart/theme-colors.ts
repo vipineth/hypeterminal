@@ -6,15 +6,14 @@
 import type { ColorGradient, CustomThemeColors } from "@/types/charting_library";
 
 type ChartColors = {
-	background: string;
-	foreground: string;
+	bg: string;
+	fg: string;
 	muted: string;
-	mutedForeground: string;
 	border: string;
-	green: string;
-	red: string;
-	accent: string;
-	surface: string;
+	positive: string;
+	negative: string;
+	warning: string;
+	info: string;
 };
 
 /**
@@ -68,15 +67,14 @@ function colorToRgba(cssColor: string, alpha: number): string {
  */
 export function getChartColors(): ChartColors {
 	return {
-		background: getCssVar("--background"),
-		foreground: getCssVar("--foreground"),
+		bg: getCssVar("--bg"),
+		fg: getCssVar("--fg"),
 		muted: getCssVar("--muted"),
-		mutedForeground: getCssVar("--muted-foreground"),
 		border: getCssVar("--border"),
-		green: getCssVar("--terminal-green"),
-		red: getCssVar("--terminal-red"),
-		accent: getCssVar("--terminal-cyan"),
-		surface: getCssVar("--surface"),
+		positive: getCssVar("--positive"),
+		negative: getCssVar("--negative"),
+		warning: getCssVar("--warning"),
+		info: getCssVar("--info"),
 	};
 }
 
@@ -86,14 +84,14 @@ export function getChartColors(): ChartColors {
 export function buildChartOverrides(): Record<string, string | number | boolean> {
 	const colors = getChartColors();
 
-	const bg = colorToHex(colors.background);
-	const mutedFg = colorToHex(colors.mutedForeground);
-	const green = colorToHex(colors.green);
-	const red = colorToHex(colors.red);
-	const accent = colorToHex(colors.accent);
+	const bg = colorToHex(colors.bg);
+	const muted = colorToHex(colors.muted);
+	const positive = colorToHex(colors.positive);
+	const negative = colorToHex(colors.negative);
+	const info = colorToHex(colors.info);
 
 	const gridColor = colorToRgba(colors.border, 0.3);
-	const crosshairColor = accent;
+	const crosshairColor = info;
 
 	return {
 		// Pane (chart area)
@@ -118,60 +116,60 @@ export function buildChartOverrides(): Record<string, string | number | boolean>
 		// Scales (price/time axis)
 		"scalesProperties.backgroundColor": bg,
 		"scalesProperties.lineColor": colorToRgba(colors.border, 0.5),
-		"scalesProperties.textColor": mutedFg,
+		"scalesProperties.textColor": muted,
 		"scalesProperties.fontSize": 10,
 		"scalesProperties.scaleSeriesOnly": false,
 
 		// Candles
-		"mainSeriesProperties.candleStyle.upColor": green,
-		"mainSeriesProperties.candleStyle.downColor": red,
-		"mainSeriesProperties.candleStyle.borderUpColor": green,
-		"mainSeriesProperties.candleStyle.borderDownColor": red,
-		"mainSeriesProperties.candleStyle.wickUpColor": green,
-		"mainSeriesProperties.candleStyle.wickDownColor": red,
+		"mainSeriesProperties.candleStyle.upColor": positive,
+		"mainSeriesProperties.candleStyle.downColor": negative,
+		"mainSeriesProperties.candleStyle.borderUpColor": positive,
+		"mainSeriesProperties.candleStyle.borderDownColor": negative,
+		"mainSeriesProperties.candleStyle.wickUpColor": positive,
+		"mainSeriesProperties.candleStyle.wickDownColor": negative,
 		"mainSeriesProperties.candleStyle.drawBorder": true,
 		"mainSeriesProperties.candleStyle.drawWick": true,
 
 		// Hollow candles
-		"mainSeriesProperties.hollowCandleStyle.upColor": green,
-		"mainSeriesProperties.hollowCandleStyle.downColor": red,
-		"mainSeriesProperties.hollowCandleStyle.borderUpColor": green,
-		"mainSeriesProperties.hollowCandleStyle.borderDownColor": red,
-		"mainSeriesProperties.hollowCandleStyle.wickUpColor": green,
-		"mainSeriesProperties.hollowCandleStyle.wickDownColor": red,
+		"mainSeriesProperties.hollowCandleStyle.upColor": positive,
+		"mainSeriesProperties.hollowCandleStyle.downColor": negative,
+		"mainSeriesProperties.hollowCandleStyle.borderUpColor": positive,
+		"mainSeriesProperties.hollowCandleStyle.borderDownColor": negative,
+		"mainSeriesProperties.hollowCandleStyle.wickUpColor": positive,
+		"mainSeriesProperties.hollowCandleStyle.wickDownColor": negative,
 
 		// Heikin Ashi
-		"mainSeriesProperties.haStyle.upColor": green,
-		"mainSeriesProperties.haStyle.downColor": red,
-		"mainSeriesProperties.haStyle.borderUpColor": green,
-		"mainSeriesProperties.haStyle.borderDownColor": red,
-		"mainSeriesProperties.haStyle.wickUpColor": green,
-		"mainSeriesProperties.haStyle.wickDownColor": red,
+		"mainSeriesProperties.haStyle.upColor": positive,
+		"mainSeriesProperties.haStyle.downColor": negative,
+		"mainSeriesProperties.haStyle.borderUpColor": positive,
+		"mainSeriesProperties.haStyle.borderDownColor": negative,
+		"mainSeriesProperties.haStyle.wickUpColor": positive,
+		"mainSeriesProperties.haStyle.wickDownColor": negative,
 
 		// Bar style
-		"mainSeriesProperties.barStyle.upColor": green,
-		"mainSeriesProperties.barStyle.downColor": red,
+		"mainSeriesProperties.barStyle.upColor": positive,
+		"mainSeriesProperties.barStyle.downColor": negative,
 
 		// Line style
-		"mainSeriesProperties.lineStyle.color": accent,
+		"mainSeriesProperties.lineStyle.color": info,
 		"mainSeriesProperties.lineStyle.linewidth": 2,
 
 		// Area style
-		"mainSeriesProperties.areaStyle.color1": colorToRgba(colors.accent, 0.28),
-		"mainSeriesProperties.areaStyle.color2": colorToRgba(colors.accent, 0.02),
-		"mainSeriesProperties.areaStyle.linecolor": accent,
+		"mainSeriesProperties.areaStyle.color1": colorToRgba(colors.info, 0.28),
+		"mainSeriesProperties.areaStyle.color2": colorToRgba(colors.info, 0.02),
+		"mainSeriesProperties.areaStyle.linecolor": info,
 		"mainSeriesProperties.areaStyle.linewidth": 2,
 
 		// Baseline style
-		"mainSeriesProperties.baselineStyle.topFillColor1": colorToRgba(colors.green, 0.28),
-		"mainSeriesProperties.baselineStyle.topFillColor2": colorToRgba(colors.green, 0.02),
-		"mainSeriesProperties.baselineStyle.bottomFillColor1": colorToRgba(colors.red, 0.02),
-		"mainSeriesProperties.baselineStyle.bottomFillColor2": colorToRgba(colors.red, 0.28),
-		"mainSeriesProperties.baselineStyle.topLineColor": green,
-		"mainSeriesProperties.baselineStyle.bottomLineColor": red,
+		"mainSeriesProperties.baselineStyle.topFillColor1": colorToRgba(colors.positive, 0.28),
+		"mainSeriesProperties.baselineStyle.topFillColor2": colorToRgba(colors.positive, 0.02),
+		"mainSeriesProperties.baselineStyle.bottomFillColor1": colorToRgba(colors.negative, 0.02),
+		"mainSeriesProperties.baselineStyle.bottomFillColor2": colorToRgba(colors.negative, 0.28),
+		"mainSeriesProperties.baselineStyle.topLineColor": positive,
+		"mainSeriesProperties.baselineStyle.bottomLineColor": negative,
 
 		// Price line
-		"mainSeriesProperties.priceLineColor": accent,
+		"mainSeriesProperties.priceLineColor": info,
 		"mainSeriesProperties.priceLineWidth": 1,
 		"mainSeriesProperties.showPriceLine": true,
 		"mainSeriesProperties.showCountdown": true,
@@ -184,7 +182,7 @@ export function buildChartOverrides(): Record<string, string | number | boolean>
 
 		// Watermark
 		"symbolWatermarkProperties.transparency": 96,
-		"symbolWatermarkProperties.color": colorToRgba(colors.foreground, 0.03),
+		"symbolWatermarkProperties.color": colorToRgba(colors.fg, 0.03),
 
 		// Volume
 		volumePaneSize: "small",
