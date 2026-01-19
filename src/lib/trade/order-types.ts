@@ -18,6 +18,15 @@ export type AdvancedOrderGroup = "trigger" | "execution";
 export type ExchangeOrder = OrderParameters["orders"][number];
 export type TwapOrderParams = TwapOrderParameters;
 
+type OrderTypeSpec = ExchangeOrder["t"];
+export type LimitTif = Extract<OrderTypeSpec, { limit: unknown }>["limit"]["tif"];
+
+export const TIF_OPTIONS: Record<"Gtc" | "Ioc" | "Alo", { label: string; description: string }> = {
+	Gtc: { label: "GTC", description: "Good til Cancelled" },
+	Ioc: { label: "IOC", description: "Immediate or Cancel" },
+	Alo: { label: "Post Only", description: "Add Liquidity Only" },
+};
+
 export const ADVANCED_ORDER_TYPES: AdvancedOrderType[] = [
 	"stopMarket",
 	"stopLimit",

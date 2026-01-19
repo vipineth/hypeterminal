@@ -328,7 +328,7 @@ export function PositionsTab() {
 											<TableCell className="text-2xs text-right py-1.5">
 												<div className="flex flex-col items-end">
 													<span className="tabular-nums">{row.marginText}</span>
-													<span className="text-3xs text-muted-foreground uppercase">
+													<span className="text-4xs text-muted-foreground">
 														{row.marginMode === "isolated" ? t`Isolated` : t`Cross`}
 													</span>
 												</div>

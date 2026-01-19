@@ -14,7 +14,6 @@ import {
 	ORDER_MIN_NOTIONAL_USD,
 	ORDER_SIZE_PERCENT_STEPS,
 } from "@/config/constants";
-import { type LimitTif, TIF_OPTIONS } from "@/config/order-types";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
@@ -22,7 +21,15 @@ import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOr
 import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeTwapOrder";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import type { MarginMode } from "@/lib/trade/margin-mode";
-import { calc, clampInt, formatDecimalFloor, isPositive, parseNumberOrZero, toFixed, toNumber } from "@/lib/trade/numbers";
+import {
+	calc,
+	clampInt,
+	formatDecimalFloor,
+	isPositive,
+	parseNumberOrZero,
+	toFixed,
+	toNumber,
+} from "@/lib/trade/numbers";
 import {
 	getConversionPrice,
 	getExecutedPrice,
@@ -42,6 +49,8 @@ import {
 	isTakeProfitOrderType,
 	isTriggerOrderType,
 	isTwapOrderType,
+	type LimitTif,
+	TIF_OPTIONS,
 	usesLimitPrice as usesLimitPriceForOrder,
 	usesTriggerPrice as usesTriggerPriceForOrder,
 } from "@/lib/trade/order-types";
@@ -213,12 +222,6 @@ export function OrderEntryPanel() {
 			getOrderbookActionsStore().actions.clearSelectedPrice();
 		}
 	}, [selectedPrice, setOrderType, setLimitPrice]);
-
-	useEffect(() => {
-		if (!canUseTpSl && tpSlEnabled) {
-			setTpSlEnabled(false);
-		}
-	}, [canUseTpSl, tpSlEnabled, setTpSlEnabled]);
 
 	const tpPriceNum = toNumber(tpPriceInput);
 	const slPriceNum = toNumber(slPriceInput);
@@ -922,7 +925,7 @@ export function OrderEntryPanel() {
 								onCheckedChange={(checked) => setTwapRandomize(checked === true)}
 								disabled={isFormDisabled}
 							/>
-							<span className={cn(isFormDisabled && "text-muted-foreground")}>{t`Randomize execution timing`}</span>
+							<span className={cn(isFormDisabled && "text-muted-foreground")}>{t`Randomize timing`}</span>
 						</div>
 					</>
 				)}

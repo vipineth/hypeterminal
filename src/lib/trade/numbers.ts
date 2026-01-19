@@ -44,10 +44,6 @@ export function toNumberOrZero(value: unknown): number {
 	return toNumber(value) ?? 0;
 }
 
-export function isFinite(value: unknown): value is number {
-	return typeof value === "number" && Number.isFinite(value);
-}
-
 export function isPositive(value: unknown): value is number {
 	const num = toNumber(value);
 	return num !== null && num > 0;
@@ -227,9 +223,7 @@ export const calc = {
 		const bigPrice = toBig(price);
 		const bigSlippage = toBig(slippageBps);
 		if (!bigPrice || !bigSlippage) return null;
-		const multiplier = isBuy
-			? new Big(1).plus(bigSlippage.div(10000))
-			: new Big(1).minus(bigSlippage.div(10000));
+		const multiplier = isBuy ? new Big(1).plus(bigSlippage.div(10000)) : new Big(1).minus(bigSlippage.div(10000));
 		return bigPrice.times(multiplier).toNumber();
 	},
 };
