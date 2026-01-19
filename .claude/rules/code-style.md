@@ -238,6 +238,28 @@ export function SubscriptionComponent({ coin, className }: Props) {
 }
 ```
 
+## Format Functions
+
+Format functions in `@/lib/format.ts` accept both strings and numbers, and handle invalid inputs by returning `FALLBACK_VALUE_PLACEHOLDER`. Pass API values directly without parsing.
+
+```tsx
+// Bad - unnecessary parsing (format functions accept strings directly)
+{formatUSD(Number(order.limitPx))}
+{formatUSD(parseNumber(order.limitPx))}
+{orderValue !== null ? formatUSD(orderValue) : FALLBACK_VALUE_PLACEHOLDER}
+
+// Good - pass strings directly, let formatters handle parsing and fallbacks
+{formatUSD(order.limitPx)}
+{formatPrice(order.entryPx)}
+{formatNumber(order.sz, szDecimals)}
+{formatToken(balance)}
+```
+
+All number format functions accept `string | number | null | undefined`:
+- `formatUSD`, `formatPrice`, `formatPriceRaw` - currency formatting
+- `formatNumber`, `formatToken`, `formatPercent` - decimal formatting
+- Date functions (`formatDate`, `formatTime`, `formatDateTime`) - handle invalid dates
+
 ## Examples
 
 ```tsx

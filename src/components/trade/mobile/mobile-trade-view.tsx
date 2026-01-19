@@ -21,7 +21,7 @@ import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
-import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
+import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/lib/trade/orders";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
@@ -218,7 +218,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 
 	const handleSubmit = async () => {
 		if (!validation.canSubmit || isSubmitting) return;
-		if (typeof market?.assetIndex !== "number") return;
+		if (!market || typeof market.assetIndex !== "number") return;
 
 		let orderPrice = price;
 		if (type === "market") {
@@ -246,9 +246,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 				grouping: "na",
 			});
 
-			const status = result.response?.data?.statuses?.[0];
-			if (status && typeof status === "object" && "error" in status && typeof status.error === "string")
-				throw new Error(status.error);
+			throwIfResponseError(result.response?.data?.statuses?.[0]);
 
 			updateOrder(orderId, { status: "success", fillPercent: 100 });
 			setSizeInput("");

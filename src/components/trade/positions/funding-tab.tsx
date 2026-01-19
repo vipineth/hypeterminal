@@ -9,7 +9,25 @@ import { cn } from "@/lib/cn";
 import { formatNumber, formatPercent, formatUSD } from "@/lib/format";
 import { usePerpMarkets } from "@/lib/hyperliquid";
 import { useSubUserFundings } from "@/lib/hyperliquid/hooks/subscription";
-import { parseNumber } from "@/lib/trade/numbers";
+import { parseNumber, toNumberOrZero } from "@/lib/trade/numbers";
+
+interface PlaceholderProps {
+	children: React.ReactNode;
+	variant?: "error";
+}
+
+function Placeholder({ children, variant }: PlaceholderProps) {
+	return (
+		<div
+			className={cn(
+				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
+				variant === "error" ? "text-terminal-red/80" : "text-muted-foreground",
+			)}
+		>
+			{children}
+		</div>
+	);
+}
 
 export function FundingTab() {
 	const { address, isConnected } = useConnection();
@@ -28,10 +46,7 @@ export function FundingTab() {
 	}, [data]);
 
 	const totalFunding = useMemo(() => {
-		return updates.reduce((acc, f) => {
-			const usdc = parseNumber(f.usdc);
-			return acc + (Number.isFinite(usdc) ? usdc : 0);
-		}, 0);
+		return updates.reduce((acc, f) => acc + toNumberOrZero(f.usdc), 0);
 	}, [updates]);
 
 	const headerTotal =
@@ -44,44 +59,39 @@ export function FundingTab() {
 		return updates.map((update, index) => {
 			const szi = parseNumber(update.szi);
 			const isLong = Number.isFinite(szi) ? szi > 0 : true;
-			const positionSize = Number.isFinite(szi) ? Math.abs(szi) : Number.NaN;
 			const szDecimals = getSzDecimals(update.coin) ?? 4;
-
 			const rate = parseNumber(update.fundingRate);
 			const usdc = parseNumber(update.usdc);
-
-			const date = new Date(update.time);
-			const timeStr = date.toLocaleTimeString("en-US", {
-				hour: "2-digit",
-				minute: "2-digit",
-				hour12: false,
-			});
-			const dateStr = date.toLocaleDateString("en-US", {
-				month: "short",
-				day: "numeric",
-			});
 
 			return {
 				key: `${update.coin}-${update.time}-${index}`,
 				coin: update.coin,
-				sideLabel: isLong ? t`Long` : t`Short`,
-				sideClass: isLong ? "bg-terminal-green/20 text-terminal-green" : "bg-terminal-red/20 text-terminal-red",
-				positionText: Number.isFinite(positionSize)
-					? formatNumber(positionSize, szDecimals)
-					: FALLBACK_VALUE_PLACEHOLDER,
-				rateText: Number.isFinite(rate)
-					? formatPercent(rate, { minimumFractionDigits: 4, maximumFractionDigits: 4 })
-					: FALLBACK_VALUE_PLACEHOLDER,
-				rateClass: rate >= 0 ? "text-terminal-green" : "text-terminal-red",
-				paymentText: Number.isFinite(usdc)
-					? formatUSD(usdc, { signDisplay: "exceptZero" })
-					: FALLBACK_VALUE_PLACEHOLDER,
-				paymentClass: usdc >= 0 ? "text-terminal-green" : "text-terminal-red",
-				timeStr,
-				dateStr,
+				isLong,
+				positionSize: Number.isFinite(szi) ? Math.abs(szi) : null,
+				szDecimals,
+				rate,
+				usdc,
+				time: update.time,
 			};
 		});
 	}, [updates, getSzDecimals]);
+
+	function renderPlaceholder() {
+		if (!isConnected) return <Placeholder>{t`Connect your wallet to view funding payments.`}</Placeholder>;
+		if (status === "subscribing" || status === "idle") return <Placeholder>{t`Loading funding history...`}</Placeholder>;
+		if (status === "error") {
+			return (
+				<Placeholder variant="error">
+					<span>{t`Failed to load funding history.`}</span>
+					{error instanceof Error && <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span>}
+				</Placeholder>
+			);
+		}
+		if (updates.length === 0) return <Placeholder>{t`No funding payments found.`}</Placeholder>;
+		return null;
+	}
+
+	const placeholder = renderPlaceholder();
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
@@ -91,26 +101,7 @@ export function FundingTab() {
 				<span className={cn("ml-auto tabular-nums", headerClass)}>{headerTotal}</span>
 			</div>
 			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
-				{!isConnected ? (
-					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{t`Connect your wallet to view funding payments.`}
-					</div>
-				) : status === "subscribing" || status === "idle" ? (
-					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{t`Loading funding history...`}
-					</div>
-				) : status === "error" ? (
-					<div className="h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs text-terminal-red/80">
-						<span>{t`Failed to load funding history.`}</span>
-						{error instanceof Error ? (
-							<span className="mt-1 text-4xs text-muted-foreground">{error.message}</span>
-						) : null}
-					</div>
-				) : updates.length === 0 ? (
-					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{t`No funding payments found.`}
-					</div>
-				) : (
+				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
@@ -133,31 +124,48 @@ export function FundingTab() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{tableRows.map((row) => (
-									<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
-										<TableCell className="text-2xs font-medium py-1.5">
-											<div className="flex items-center gap-1.5">
-												<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
-													{row.sideLabel}
+								{tableRows.map((row) => {
+									const sideClass = row.isLong
+										? "bg-terminal-green/20 text-terminal-green"
+										: "bg-terminal-red/20 text-terminal-red";
+									const rateClass = row.rate >= 0 ? "text-terminal-green" : "text-terminal-red";
+									const paymentClass = row.usdc >= 0 ? "text-terminal-green" : "text-terminal-red";
+									const date = new Date(row.time);
+									const timeStr = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+									const dateStr = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+									return (
+										<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
+											<TableCell className="text-2xs font-medium py-1.5">
+												<div className="flex items-center gap-1.5">
+													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideClass)}>
+														{row.isLong ? t`Long` : t`Short`}
+													</span>
+													<span>{row.coin}</span>
+												</div>
+											</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums py-1.5">
+												{formatNumber(row.positionSize, row.szDecimals)}
+											</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums py-1.5">
+												<span className={rateClass}>
+													{formatPercent(row.rate, { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
 												</span>
-												<span>{row.coin}</span>
-											</div>
-										</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.positionText}</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums py-1.5">
-											<span className={cn(row.rateClass)}>{row.rateText}</span>
-										</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums py-1.5">
-											<span className={cn(row.paymentClass)}>{row.paymentText}</span>
-										</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums text-muted-foreground py-1.5">
-											<div className="flex flex-col items-end">
-												<span>{row.timeStr}</span>
-												<span className="text-4xs">{row.dateStr}</span>
-											</div>
-										</TableCell>
-									</TableRow>
-								))}
+											</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums py-1.5">
+												<span className={paymentClass}>
+													{formatUSD(row.usdc, { signDisplay: "exceptZero" })}
+												</span>
+											</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums text-muted-foreground py-1.5">
+												<div className="flex flex-col items-end">
+													<span>{timeStr}</span>
+													<span className="text-4xs">{dateStr}</span>
+												</div>
+											</TableCell>
+										</TableRow>
+									);
+								})}
 							</TableBody>
 						</Table>
 						<ScrollBar orientation="horizontal" />

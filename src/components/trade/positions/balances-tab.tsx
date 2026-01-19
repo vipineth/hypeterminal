@@ -11,14 +11,32 @@ import { useSubClearinghouseState, useSubSpotState } from "@/lib/hyperliquid/hoo
 import { parseNumberOrZero } from "@/lib/trade/numbers";
 import { TokenAvatar } from "../components/token-avatar";
 
-type BalanceRow = {
+interface PlaceholderProps {
+	children: React.ReactNode;
+	variant?: "error";
+}
+
+function Placeholder({ children, variant }: PlaceholderProps) {
+	return (
+		<div
+			className={cn(
+				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
+				variant === "error" ? "text-terminal-red/80" : "text-muted-foreground",
+			)}
+		>
+			{children}
+		</div>
+	);
+}
+
+interface BalanceRow {
 	asset: string;
 	type: "perp" | "spot";
 	available: number;
 	inOrder: number;
 	total: number;
 	usdValue: number;
-};
+}
 
 export function BalancesTab() {
 	const { address, isConnected } = useConnection();
@@ -82,23 +100,19 @@ export function BalancesTab() {
 	}, [perpData, spotData]);
 
 	const totalValue = balances.reduce((acc, b) => acc + b.usdValue, 0);
-	const displayRows = useMemo(() => {
-		return balances.map((balance) => {
-			const decimals = balance.asset === "USDC" ? 2 : 5;
-			return {
-				...balance,
-				decimals,
-				availableText: formatToken(balance.available, decimals),
-				inOrderText: formatToken(balance.inOrder, decimals),
-				totalText: formatToken(balance.total, decimals),
-				usdValueText: formatUSD(balance.usdValue, { compact: true }),
-			};
-		});
-	}, [balances]);
-
 	const isLoading =
 		perpStatus === "subscribing" || spotStatus === "subscribing" || perpStatus === "idle" || spotStatus === "idle";
 	const hasError = perpStatus === "error" || spotStatus === "error";
+
+	function renderPlaceholder() {
+		if (!isConnected) return <Placeholder>{t`Connect your wallet to view balances.`}</Placeholder>;
+		if (isLoading) return <Placeholder>{t`Loading balances...`}</Placeholder>;
+		if (hasError) return <Placeholder variant="error">{t`Failed to load balances.`}</Placeholder>;
+		if (balances.length === 0) return <Placeholder>{t`No balances found. Deposit funds to start trading.`}</Placeholder>;
+		return null;
+	}
+
+	const placeholder = renderPlaceholder();
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
@@ -110,23 +124,7 @@ export function BalancesTab() {
 				</span>
 			</div>
 			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
-				{!isConnected ? (
-					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{t`Connect your wallet to view balances.`}
-					</div>
-				) : isLoading ? (
-					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{t`Loading balances...`}
-					</div>
-				) : hasError ? (
-					<div className="h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs text-terminal-red/80">
-						<span>{t`Failed to load balances.`}</span>
-					</div>
-				) : balances.length === 0 ? (
-					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{t`No balances found. Deposit funds to start trading.`}
-					</div>
-				) : (
+				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
@@ -149,34 +147,41 @@ export function BalancesTab() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{displayRows.map((row) => (
-									<TableRow key={`${row.type}-${row.asset}`} className="border-border/40 hover:bg-accent/30">
-										<TableCell className="text-2xs font-medium py-1.5">
-											<div className="flex items-center gap-1.5">
-												<TokenAvatar symbol={row.asset} />
-												<span className="text-terminal-cyan">{row.asset}</span>
-												<span
-													className={cn(
-														"text-4xs px-1 py-0.5 rounded-sm uppercase",
-														row.type === "perp"
-															? "bg-terminal-purple/20 text-terminal-purple"
-															: "bg-terminal-amber/20 text-terminal-amber",
-													)}
-												>
-													{row.type === "perp" ? t`perp` : t`spot`}
-												</span>
-											</div>
-										</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.availableText}</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
-											{row.inOrderText}
-										</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.totalText}</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums text-terminal-green py-1.5">
-											{row.usdValueText}
-										</TableCell>
-									</TableRow>
-								))}
+								{balances.map((row) => {
+									const decimals = row.asset === "USDC" ? 2 : 5;
+									return (
+										<TableRow key={`${row.type}-${row.asset}`} className="border-border/40 hover:bg-accent/30">
+											<TableCell className="text-2xs font-medium py-1.5">
+												<div className="flex items-center gap-1.5">
+													<TokenAvatar symbol={row.asset} />
+													<span className="text-terminal-cyan">{row.asset}</span>
+													<span
+														className={cn(
+															"text-4xs px-1 py-0.5 rounded-sm uppercase",
+															row.type === "perp"
+																? "bg-terminal-purple/20 text-terminal-purple"
+																: "bg-terminal-amber/20 text-terminal-amber",
+														)}
+													>
+														{row.type === "perp" ? t`perp` : t`spot`}
+													</span>
+												</div>
+											</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums py-1.5">
+												{formatToken(row.available, decimals)}
+											</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
+												{formatToken(row.inOrder, decimals)}
+											</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums py-1.5">
+												{formatToken(row.total, decimals)}
+											</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums text-terminal-green py-1.5">
+												{formatUSD(row.usdValue, { compact: true })}
+											</TableCell>
+										</TableRow>
+									);
+								})}
 							</TableBody>
 						</Table>
 						<ScrollBar orientation="horizontal" />

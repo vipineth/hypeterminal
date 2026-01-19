@@ -1,76 +1,164 @@
 import { z } from "zod";
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middleware";
 import { STORAGE_KEYS } from "@/config/constants";
+import { isTriggerOrderType, type LimitTif, ORDER_TYPES, type OrderType } from "@/lib/trade/order-types";
+import type { Side, SizeMode } from "@/lib/trade/types";
 import { createValidatedStorage } from "@/stores/validated-storage";
 
-type OrderType = "market" | "limit";
-type Side = "buy" | "sell";
-type SizeMode = "asset" | "usd";
-
-const orderEntrySchema = z.object({
-	state: z.object({
-		side: z.enum(["buy", "sell"]).optional(),
-		orderType: z.enum(["market", "limit"]).optional(),
-		sizeMode: z.enum(["asset", "usd"]).optional(),
-		reduceOnly: z.boolean().optional(),
-	}),
-});
-
-const validatedStorage = createValidatedStorage(orderEntrySchema, "order entry");
-
-const DEFAULT_ORDER_ENTRY = {
-	side: "buy" as Side,
-	orderType: "market" as OrderType,
-	sizeMode: "asset" as SizeMode,
-	reduceOnly: false,
-} as const;
-
-interface OrderEntryState {
+interface PersistedState {
 	side: Side;
 	orderType: OrderType;
 	sizeMode: SizeMode;
-	reduceOnly: boolean;
 }
+
+interface FormState {
+	size: string;
+	limitPrice: string;
+	triggerPrice: string;
+	scaleStart: string;
+	scaleEnd: string;
+	scaleLevels: number;
+	twapMinutes: number;
+	twapRandomize: boolean;
+	reduceOnly: boolean;
+	tpSlEnabled: boolean;
+	tpPrice: string;
+	slPrice: string;
+	tif: LimitTif;
+}
+
+interface OrderEntryState extends PersistedState, FormState {}
 
 interface OrderEntryActions {
 	setSide: (side: Side) => void;
-	setOrderType: (type: OrderType) => void;
+	setOrderType: (orderType: OrderType) => void;
 	setSizeMode: (mode: SizeMode) => void;
 	toggleSizeMode: () => void;
-	setReduceOnly: (value: boolean) => void;
+
+	setSize: (size: string) => void;
+	setLimitPrice: (price: string) => void;
+	setTriggerPrice: (price: string) => void;
+	setScaleStart: (price: string) => void;
+	setScaleEnd: (price: string) => void;
+	setScaleLevels: (levels: number) => void;
+	setTwapMinutes: (minutes: number) => void;
+	setTwapRandomize: (randomize: boolean) => void;
+	setReduceOnly: (reduceOnly: boolean) => void;
+	setTpSlEnabled: (enabled: boolean) => void;
+	setTpPrice: (price: string) => void;
+	setSlPrice: (price: string) => void;
+	setTif: (tif: LimitTif) => void;
+
+	resetForm: () => void;
+	resetPrices: () => void;
 }
 
 interface OrderEntryStore extends OrderEntryState {
 	actions: OrderEntryActions;
 }
 
+const DEFAULT_PERSISTED: PersistedState = {
+	side: "buy",
+	orderType: "market",
+	sizeMode: "asset",
+};
+
+const DEFAULT_FORM: FormState = {
+	size: "",
+	limitPrice: "",
+	triggerPrice: "",
+	scaleStart: "",
+	scaleEnd: "",
+	scaleLevels: 4,
+	twapMinutes: 30,
+	twapRandomize: true,
+	reduceOnly: false,
+	tpSlEnabled: false,
+	tpPrice: "",
+	slPrice: "",
+	tif: "Gtc",
+};
+
+const orderEntrySchema = z.object({
+	state: z.object({
+		side: z.enum(["buy", "sell"]).optional(),
+		orderType: z.enum(ORDER_TYPES).optional(),
+		sizeMode: z.enum(["asset", "usd"]).optional(),
+	}),
+});
+
+const validatedStorage = createValidatedStorage(orderEntrySchema, "order entry");
+
 const useOrderEntryStore = create<OrderEntryStore>()(
-	persist(
-		(set) => ({
-			...DEFAULT_ORDER_ENTRY,
-			actions: {
-				setSide: (side) => set({ side }),
-				setOrderType: (orderType) => set({ orderType }),
-				setSizeMode: (sizeMode) => set({ sizeMode }),
-				toggleSizeMode: () => set((state) => ({ sizeMode: state.sizeMode === "asset" ? "usd" : "asset" })),
-				setReduceOnly: (reduceOnly) => set({ reduceOnly }),
+	subscribeWithSelector(
+		persist(
+			(set) => ({
+				...DEFAULT_PERSISTED,
+				...DEFAULT_FORM,
+
+				actions: {
+					setSide: (side) => set({ side }),
+
+					setOrderType: (orderType) => {
+						const isTrigger = isTriggerOrderType(orderType);
+						set((state) => ({
+							orderType,
+							reduceOnly: isTrigger ? true : state.reduceOnly,
+							tpSlEnabled: isTrigger ? false : state.tpSlEnabled,
+						}));
+					},
+
+					setSizeMode: (sizeMode) => set({ sizeMode }),
+
+					toggleSizeMode: () =>
+						set((state) => ({
+							sizeMode: state.sizeMode === "asset" ? "usd" : "asset",
+						})),
+
+					setSize: (size) => set({ size }),
+					setLimitPrice: (limitPrice) => set({ limitPrice }),
+					setTriggerPrice: (triggerPrice) => set({ triggerPrice }),
+					setScaleStart: (scaleStart) => set({ scaleStart }),
+					setScaleEnd: (scaleEnd) => set({ scaleEnd }),
+					setScaleLevels: (scaleLevels) => set({ scaleLevels }),
+					setTwapMinutes: (twapMinutes) => set({ twapMinutes }),
+					setTwapRandomize: (twapRandomize) => set({ twapRandomize }),
+					setReduceOnly: (reduceOnly) => set({ reduceOnly }),
+					setTpSlEnabled: (tpSlEnabled) => set({ tpSlEnabled }),
+					setTpPrice: (tpPrice) => set({ tpPrice }),
+					setSlPrice: (slPrice) => set({ slPrice }),
+					setTif: (tif) => set({ tif }),
+
+					resetForm: () => set({ ...DEFAULT_FORM }),
+
+					resetPrices: () =>
+						set({
+							limitPrice: "",
+							triggerPrice: "",
+							scaleStart: "",
+							scaleEnd: "",
+							tpPrice: "",
+							slPrice: "",
+						}),
+				},
+			}),
+			{
+				name: STORAGE_KEYS.ORDER_ENTRY,
+				storage: createJSONStorage(() => validatedStorage),
+				partialize: (state) => ({
+					side: state.side,
+					orderType: state.orderType,
+					sizeMode: state.sizeMode,
+				}),
+				merge: (persisted, current) => ({
+					...current,
+					...DEFAULT_PERSISTED,
+					...DEFAULT_FORM,
+					...(persisted as Partial<PersistedState>),
+				}),
 			},
-		}),
-		{
-			name: STORAGE_KEYS.ORDER_ENTRY,
-			storage: createJSONStorage(() => validatedStorage),
-			partialize: (state) => ({
-				side: state.side,
-				orderType: state.orderType,
-				sizeMode: state.sizeMode,
-			}),
-			merge: (persisted, current) => ({
-				...current,
-				...DEFAULT_ORDER_ENTRY,
-				...(persisted as Partial<OrderEntryState>),
-			}),
-		},
+		),
 	),
 );
 
@@ -79,4 +167,45 @@ export const useOrderType = () => useOrderEntryStore((s) => s.orderType);
 export const useSizeMode = () => useOrderEntryStore((s) => s.sizeMode);
 export const useReduceOnly = () => useOrderEntryStore((s) => s.reduceOnly);
 
+export const useOrderSize = () => useOrderEntryStore((s) => s.size);
+export const useLimitPrice = () => useOrderEntryStore((s) => s.limitPrice);
+export const useTriggerPrice = () => useOrderEntryStore((s) => s.triggerPrice);
+
+export const useScaleStart = () => useOrderEntryStore((s) => s.scaleStart);
+export const useScaleEnd = () => useOrderEntryStore((s) => s.scaleEnd);
+export const useScaleLevels = () => useOrderEntryStore((s) => s.scaleLevels);
+
+export const useTwapMinutes = () => useOrderEntryStore((s) => s.twapMinutes);
+export const useTwapRandomize = () => useOrderEntryStore((s) => s.twapRandomize);
+
+export const useTpSlEnabled = () => useOrderEntryStore((s) => s.tpSlEnabled);
+export const useTpPrice = () => useOrderEntryStore((s) => s.tpPrice);
+export const useSlPrice = () => useOrderEntryStore((s) => s.slPrice);
+
+export const useTif = () => useOrderEntryStore((s) => s.tif);
+
 export const useOrderEntryActions = () => useOrderEntryStore((s) => s.actions);
+
+export function getOrderEntryState(): OrderEntryState {
+	const s = useOrderEntryStore.getState();
+	return {
+		side: s.side,
+		orderType: s.orderType,
+		sizeMode: s.sizeMode,
+		size: s.size,
+		limitPrice: s.limitPrice,
+		triggerPrice: s.triggerPrice,
+		scaleStart: s.scaleStart,
+		scaleEnd: s.scaleEnd,
+		scaleLevels: s.scaleLevels,
+		twapMinutes: s.twapMinutes,
+		twapRandomize: s.twapRandomize,
+		reduceOnly: s.reduceOnly,
+		tpSlEnabled: s.tpSlEnabled,
+		tpPrice: s.tpPrice,
+		slPrice: s.slPrice,
+		tif: s.tif,
+	};
+}
+
+export type { OrderEntryState, FormState, PersistedState };

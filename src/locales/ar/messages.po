@@ -1415,7 +1415,7 @@ msgstr "الخزائن"
 #: src/components/trade/components/trading-action-button.tsx
 #: src/components/trade/order-entry/order-entry-panel.tsx
 msgid "Verifying..."
-msgstr ""
+msgstr "جارٍ التحقق..."
 
 #: src/components/trade/chart/chart-panel.tsx
 #: src/components/trade/market-overview.tsx

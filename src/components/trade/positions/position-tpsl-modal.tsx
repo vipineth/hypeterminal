@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { isPositive, toNumber } from "@/lib/trade/numbers";
-import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
+import { formatPriceForOrder, formatSizeForOrder, throwIfAnyResponseError } from "@/lib/trade/orders";
 import { validateSlPrice, validateTpPrice } from "@/lib/trade/tpsl";
 import { TokenAvatar } from "../components/token-avatar";
 import { TradingActionButton } from "../components/trading-action-button";
@@ -121,15 +121,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 
 		try {
 			const result = await placeOrder({ orders, grouping: "positionTpsl" });
-
-			const statuses = result.response?.data?.statuses;
-			if (statuses) {
-				for (const status of statuses) {
-					if (status && typeof status === "object" && "error" in status && typeof status.error === "string") {
-						throw new Error(status.error);
-					}
-				}
-			}
+			throwIfAnyResponseError(result.response?.data?.statuses);
 
 			setTpPriceInput("");
 			setSlPriceInput("");
