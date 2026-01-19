@@ -1,14 +1,14 @@
 import { Trans } from "@lingui/react/macro";
 import { AlertCircle, ExternalLink, FlaskConical, HelpCircle, Loader2, Shield, Wallet } from "lucide-react";
 import { useMemo, useState } from "react";
-import { type Connector, useConnect } from "wagmi";
 import { isAddress } from "viem";
+import { type Connector, useConnect, useConnectors } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { MOCK_WALLETS } from "@/config/wagmi";
-import { getLastUsedWallet, getWalletInfo, isMockConnector, setLastUsedWallet } from "@/lib/wallet-utils";
 import { cn } from "@/lib/cn";
+import { getLastUsedWallet, getWalletInfo, isMockConnector, setLastUsedWallet } from "@/lib/wallet-utils";
 
 interface Props {
 	open: boolean;
@@ -16,7 +16,8 @@ interface Props {
 }
 
 export function WalletDialog({ open, onOpenChange }: Props) {
-	const { connectors, connect, isPending, error } = useConnect();
+	const connectors = useConnectors();
+	const { connect, isPending, error } = useConnect();
 	const [connectingId, setConnectingId] = useState<string | null>(null);
 	const [showHelp, setShowHelp] = useState(false);
 	const [lastUsedWallet] = useState(() => getLastUsedWallet());
@@ -80,9 +81,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 		}
 		setCustomAddressError(null);
 
-		const mockWalletIndex = MOCK_WALLETS.findIndex(
-			(w) => w.address.toLowerCase() === trimmed.toLowerCase(),
-		);
+		const mockWalletIndex = MOCK_WALLETS.findIndex((w) => w.address.toLowerCase() === trimmed.toLowerCase());
 
 		if (mockWalletIndex !== -1 && mockConnectors[mockWalletIndex]) {
 			handleConnect(mockConnectors[mockWalletIndex]);
@@ -265,9 +264,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 										<Trans>Connect</Trans>
 									</Button>
 								</div>
-								{customAddressError && (
-									<p className="text-xs text-destructive px-1">{customAddressError}</p>
-								)}
+								{customAddressError && <p className="text-xs text-destructive px-1">{customAddressError}</p>}
 							</div>
 						</div>
 					)}
@@ -308,7 +305,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 							<Trans>New to wallets?</Trans>
 						</span>
 						<span className={cn("transition-transform", showHelp && "rotate-180")}>
-							<svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+							<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
 								<path
 									d="M2.5 4.5L6 8L9.5 4.5"
 									stroke="currentColor"

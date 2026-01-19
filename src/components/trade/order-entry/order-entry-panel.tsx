@@ -20,7 +20,7 @@ import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import type { MarginMode } from "@/lib/trade/margin-mode";
-import { formatDecimalFloor, isPositive, parseNumber, toNumber } from "@/lib/trade/numbers";
+import { calc, formatDecimalFloor, isPositive, parseNumberOrZero, toFixed, toNumber } from "@/lib/trade/numbers";
 import {
 	getConversionPrice,
 	getExecutedPrice,
@@ -139,16 +139,16 @@ export function OrderEntryPanel() {
 	const tpPriceNum = toNumber(tpPriceInput);
 	const slPriceNum = toNumber(slPriceInput);
 
-	const accountValue = parseNumber(clearinghouse?.crossMarginSummary?.accountValue) || 0;
-	const marginUsed = parseNumber(clearinghouse?.crossMarginSummary?.totalMarginUsed) || 0;
-	const availableBalance = Math.max(0, accountValue - marginUsed);
+	const accountValue = parseNumberOrZero(clearinghouse?.crossMarginSummary?.accountValue);
+	const marginUsed = parseNumberOrZero(clearinghouse?.crossMarginSummary?.totalMarginUsed);
+	const availableBalance = Math.max(0, calc.subtract(accountValue, marginUsed) ?? 0);
 
 	const position =
 		!clearinghouse?.assetPositions || !market?.coin
 			? null
 			: (clearinghouse.assetPositions.find((p) => p.position.coin === market.coin) ?? null);
 
-	const positionSize = parseNumber(position?.position?.szi) || 0;
+	const positionSize = parseNumberOrZero(position?.position?.szi);
 
 	const ctxMarkPx = market?.ctxNumbers?.markPx;
 	const markPx =
@@ -281,9 +281,9 @@ export function OrderEntryPanel() {
 	function applySizePercent(pct: number) {
 		if (maxSize <= 0) return;
 		setHasUserSized(true);
-		const newSize = maxSize * (pct / 100);
+		const newSize = calc.percent(maxSize, pct) ?? 0;
 		if (sizeMode === "usd" && conversionPx > 0) {
-			setSizeInput((newSize * conversionPx).toFixed(2));
+			setSizeInput(toFixed(calc.multiply(newSize, conversionPx), 2));
 			return;
 		}
 		setSizeInput(formatDecimalFloor(newSize, market?.szDecimals ?? 0) || "");
@@ -295,7 +295,7 @@ export function OrderEntryPanel() {
 			setHasUserSized(true);
 			setSizeInput(
 				newMode === "usd"
-					? (sizeValue * conversionPx).toFixed(2)
+					? toFixed(calc.multiply(sizeValue, conversionPx), 2)
 					: formatDecimalFloor(sizeValue, market?.szDecimals ?? 0) || "",
 			);
 		}
@@ -686,7 +686,9 @@ export function OrderEntryPanel() {
 								<Button
 									variant="ghost"
 									size="none"
-									onClick={() => setLimitPriceInput(markPx.toFixed(szDecimalsToPriceDecimals(market?.szDecimals ?? 4)))}
+									onClick={() =>
+										setLimitPriceInput(toFixed(markPx, szDecimalsToPriceDecimals(market?.szDecimals ?? 4)))
+									}
 									className="text-4xs text-muted-foreground hover:text-terminal-cyan hover:bg-transparent tabular-nums"
 								>
 									{t`Mark`}: {formatPrice(markPx, { szDecimals: market?.szDecimals })}
@@ -806,7 +808,7 @@ export function OrderEntryPanel() {
 							onClick={() => setSettingsDialogOpen(true)}
 							className="flex items-center gap-1 hover:text-foreground transition-colors"
 						>
-							<span className="tabular-nums text-terminal-amber">{(slippageBps / 100).toFixed(2)}%</span>
+							<span className="tabular-nums text-terminal-amber">{toFixed(calc.divide(slippageBps, 100), 2)}%</span>
 							<PencilIcon className="size-2 text-muted-foreground" />
 						</button>
 					</div>

@@ -45,12 +45,11 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 	useEffect(() => {
 		if (open && position) {
 			const decimals = szDecimalsToPriceDecimals(position.szDecimals);
-			if (isPositive(position.existingTpPrice)) {
-				setTpPriceInput(position.existingTpPrice.toFixed(decimals));
-			}
-			if (isPositive(position.existingSlPrice)) {
-				setSlPriceInput(position.existingSlPrice.toFixed(decimals));
-			}
+			setTpPriceInput(isPositive(position.existingTpPrice) ? position.existingTpPrice.toFixed(decimals) : "");
+			setSlPriceInput(isPositive(position.existingSlPrice) ? position.existingSlPrice.toFixed(decimals) : "");
+		} else if (!open) {
+			setTpPriceInput("");
+			setSlPriceInput("");
 		}
 	}, [open, position]);
 

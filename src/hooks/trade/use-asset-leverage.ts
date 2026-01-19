@@ -138,7 +138,6 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		});
 
 		setPendingLeverageState(null);
-		operationTypeRef.current = null;
 	}, [pendingLeverage, assetIndex, updateLeverage, marginMode]);
 
 	const switchMarginMode = useCallback(
@@ -162,7 +161,6 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 			});
 
 			setStoredMarginMode(mode);
-			operationTypeRef.current = null;
 		},
 		[assetIndex, isConnected, currentLeverage, marginMode, hasPosition, updateLeverage, setStoredMarginMode],
 	);
@@ -195,8 +193,8 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 
 	const isUpdating = isPending && operationTypeRef.current === "leverage";
 	const isSwitchingMode = isPending && operationTypeRef.current === "mode";
-	const updateError = operationTypeRef.current === "leverage" ? (error as Error | null) : null;
-	const switchModeError = operationTypeRef.current === "mode" ? (error as Error | null) : null;
+	const updateError = error && operationTypeRef.current === "leverage" ? (error as Error) : null;
+	const switchModeError = error && operationTypeRef.current === "mode" ? (error as Error) : null;
 
 	return {
 		currentLeverage,

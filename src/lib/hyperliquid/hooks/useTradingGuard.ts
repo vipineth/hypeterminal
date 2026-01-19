@@ -17,6 +17,7 @@ export function useTradingGuard(): UseTradingGuardResult {
 	const { status, registerStatus, registerAgent, error: agentError } = useTradingAgent();
 	const pendingActionRef = useRef<PendingAction | null>(null);
 	const prevStatusRef = useRef(status);
+	const mountedRef = useRef(true);
 	const [localError, setLocalError] = useState<Error | null>(null);
 
 	const isReady = status === "valid";
@@ -24,10 +25,17 @@ export function useTradingGuard(): UseTradingGuardResult {
 	const needsTrading = status !== "valid" && status !== "loading";
 
 	useEffect(() => {
+		mountedRef.current = true;
+		return () => {
+			mountedRef.current = false;
+		};
+	}, []);
+
+	useEffect(() => {
 		const wasValid = prevStatusRef.current === "valid";
 		const isNowValid = status === "valid";
 
-		if (!wasValid && isNowValid && pendingActionRef.current) {
+		if (!wasValid && isNowValid && pendingActionRef.current && mountedRef.current) {
 			const action = pendingActionRef.current;
 			pendingActionRef.current = null;
 			Promise.resolve(action()).catch(() => {});
@@ -45,6 +53,7 @@ export function useTradingGuard(): UseTradingGuardResult {
 		setLocalError(null);
 		registerAgent().catch((err) => {
 			pendingActionRef.current = null;
+			if (!mountedRef.current) return;
 			const error = err instanceof Error ? err : new Error(String(err));
 			setLocalError(error);
 		});

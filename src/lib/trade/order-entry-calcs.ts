@@ -1,5 +1,5 @@
 import { ORDER_FEE_RATE_MAKER, ORDER_FEE_RATE_TAKER } from "@/config/constants";
-import { floorToDecimals, parseNumber } from "@/lib/trade/numbers";
+import { calc, floorToDecimals, parseNumberOrZero } from "@/lib/trade/numbers";
 
 type OrderType = "market" | "limit";
 type Side = "buy" | "sell";
@@ -65,9 +65,11 @@ export function getConversionPrice(markPx: number, price: number): number {
 }
 
 export function getSizeValues(input: SizeValueInput): SizeValueResult {
-	const sizeInputValue = parseNumber(input.sizeInput) || 0;
+	const sizeInputValue = parseNumberOrZero(input.sizeInput);
 	const sizeValue =
-		input.sizeMode === "usd" && input.conversionPx > 0 ? sizeInputValue / input.conversionPx : sizeInputValue;
+		input.sizeMode === "usd" && input.conversionPx > 0
+			? (calc.divide(sizeInputValue, input.conversionPx) ?? 0)
+			: sizeInputValue;
 	return { sizeInputValue, sizeValue };
 }
 
@@ -75,14 +77,14 @@ export function getOrderPrice(orderType: OrderType, markPx: number, limitPriceIn
 	if (orderType === "market") {
 		return markPx;
 	}
-	return parseNumber(limitPriceInput) || 0;
+	return parseNumberOrZero(limitPriceInput);
 }
 
 export function getOrderMetrics(input: OrderMetricsInput): OrderMetricsResult {
-	const orderValue = input.sizeValue * input.price;
+	const orderValue = calc.multiply(input.sizeValue, input.price) ?? 0;
 	const feeRate = input.orderType === "market" ? ORDER_FEE_RATE_TAKER : ORDER_FEE_RATE_MAKER;
-	const estimatedFee = orderValue * feeRate;
-	const marginRequired = input.leverage ? orderValue / input.leverage : 0;
+	const estimatedFee = calc.multiply(orderValue, feeRate) ?? 0;
+	const marginRequired = input.leverage ? (calc.divide(orderValue, input.leverage) ?? 0) : 0;
 	return { orderValue, marginRequired, estimatedFee };
 }
 
@@ -90,15 +92,24 @@ export function getLiquidationInfo(input: LiquidationInput): LiquidationResult {
 	if (!input.price || !input.sizeValue || !input.leverage) {
 		return { liqPrice: null, liqWarning: false };
 	}
-	const buffer = input.price * (1 / input.leverage) * 0.9;
-	const liqPrice = input.side === "buy" ? input.price - buffer : input.price + buffer;
-	const liqWarning = Math.abs(liqPrice - input.price) / input.price < 0.05;
+	const leverageMultiplier = calc.divide(1, input.leverage);
+	const buffer =
+		leverageMultiplier !== null ? calc.multiply(calc.multiply(input.price, leverageMultiplier), 0.9) : null;
+	if (buffer === null) {
+		return { liqPrice: null, liqWarning: false };
+	}
+	const liqPrice = input.side === "buy" ? calc.subtract(input.price, buffer) : calc.add(input.price, buffer);
+	if (liqPrice === null) {
+		return { liqPrice: null, liqWarning: false };
+	}
+	const priceDiff = Math.abs(liqPrice - input.price);
+	const liqWarning = calc.divide(priceDiff, input.price) !== null && (calc.divide(priceDiff, input.price) ?? 1) < 0.05;
 	return { liqPrice, liqWarning };
 }
 
 export function getSliderValue(sizeValue: number, maxSize: number): number {
 	if (!maxSize || maxSize <= 0 || !sizeValue || sizeValue <= 0) return 0;
-	return Math.min(100, (sizeValue / maxSize) * 100);
+	return Math.min(100, calc.percentOf(sizeValue, maxSize) ?? 0);
 }
 
 export function getExecutedPrice(
@@ -109,7 +120,7 @@ export function getExecutedPrice(
 	price: number,
 ): number {
 	if (orderType === "market") {
-		return side === "buy" ? markPx * (1 + slippageBps / 10000) : markPx * (1 - slippageBps / 10000);
+		return calc.applySlippage(markPx, slippageBps, side === "buy") ?? markPx;
 	}
 	return price;
 }
