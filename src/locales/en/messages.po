@@ -508,8 +508,8 @@ msgstr "Failed to load TWAP history."
 #~ msgstr "Failed to register builder code"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
-msgid "Failed to switch margin mode"
-msgstr "Failed to switch margin mode"
+#~ msgid "Failed to switch margin mode"
+#~ msgstr "Failed to switch margin mode"
 
 #: src/components/trade/positions/history-tab.tsx
 msgid "Fee"

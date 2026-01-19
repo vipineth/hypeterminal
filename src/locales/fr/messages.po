@@ -508,8 +508,8 @@ msgstr "Échec du chargement de l'historique TWAP."
 #~ msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
-msgid "Failed to switch margin mode"
-msgstr ""
+#~ msgid "Failed to switch margin mode"
+#~ msgstr ""
 
 #: src/components/trade/positions/history-tab.tsx
 msgid "Fee"

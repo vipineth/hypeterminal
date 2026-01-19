@@ -1,11 +1,2 @@
-pre-commit:
-  parallel: true
-  commands:
-    i18n-extract:
-      glob: "*.{ts,tsx}"
-      run: pnpm i18n:extract
-      stage_fixed: true
-    i18n-compile:
-      glob: "*.{ts,tsx,po}"
-      run: pnpm i18n:compile
-      stage_fixed: true
+# Pre-commit hooks
+# Translation extraction/compilation handled by CI and build process

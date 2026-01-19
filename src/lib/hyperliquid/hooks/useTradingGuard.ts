@@ -24,11 +24,19 @@ export function useTradingGuard(): UseTradingGuardResult {
 	const needsTrading = status !== "valid" && status !== "loading";
 
 	useEffect(() => {
-		if (prevStatusRef.current !== "valid" && status === "valid" && pendingActionRef.current) {
+		const wasValid = prevStatusRef.current === "valid";
+		const isNowValid = status === "valid";
+
+		if (!wasValid && isNowValid && pendingActionRef.current) {
 			const action = pendingActionRef.current;
 			pendingActionRef.current = null;
 			Promise.resolve(action()).catch(() => {});
 		}
+
+		if (wasValid && !isNowValid) {
+			pendingActionRef.current = null;
+		}
+
 		prevStatusRef.current = status;
 	}, [status]);
 
@@ -36,6 +44,7 @@ export function useTradingGuard(): UseTradingGuardResult {
 		if (isEnabling) return;
 		setLocalError(null);
 		registerAgent().catch((err) => {
+			pendingActionRef.current = null;
 			const error = err instanceof Error ? err : new Error(String(err));
 			setLocalError(error);
 		});

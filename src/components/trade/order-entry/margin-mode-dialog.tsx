@@ -8,6 +8,8 @@ import { cn } from "@/lib/cn";
 import type { MarginMode } from "@/lib/trade/margin-mode";
 import { TradingActionButton } from "../components/trading-action-button";
 
+const SUCCESS_DISPLAY_DURATION_MS = 1000;
+
 interface Props {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -61,20 +63,18 @@ export function MarginModeDialog({
 			clearTimeout(autoCloseTimerRef.current);
 			autoCloseTimerRef.current = null;
 		}
-	}, [open, currentMode]);
 
-	useEffect(() => {
 		return () => {
 			if (autoCloseTimerRef.current) {
 				clearTimeout(autoCloseTimerRef.current);
 			}
 		};
-	}, []);
+	}, [open, currentMode]);
 
 	const isDirty = selectedMode !== currentMode;
 	const cannotSwitch = hasPosition && selectedMode === "isolated" && currentMode === "cross";
 
-	async function handleConfirm() {
+	async function handleConfirm(): Promise<void> {
 		if (!isDirty || cannotSwitch) return;
 		try {
 			await onConfirm(selectedMode);
@@ -82,7 +82,7 @@ export function MarginModeDialog({
 			autoCloseTimerRef.current = setTimeout(() => {
 				onOpenChange(false);
 				setShowSuccess(false);
-			}, 1000);
+			}, SUCCESS_DISPLAY_DURATION_MS);
 		} catch {
 			// Error handled by hook
 		}
