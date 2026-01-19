@@ -1,5 +1,24 @@
 import { formatDecimalFloor } from "@/lib/trade/numbers";
 
+export function extractResponseError(status: unknown): string | null {
+	if (status && typeof status === "object" && "error" in status && typeof status.error === "string") {
+		return status.error;
+	}
+	return null;
+}
+
+export function throwIfResponseError(status: unknown): void {
+	const error = extractResponseError(status);
+	if (error) throw new Error(error);
+}
+
+export function throwIfAnyResponseError(statuses: unknown[] | undefined): void {
+	if (!statuses) return;
+	for (const status of statuses) {
+		throwIfResponseError(status);
+	}
+}
+
 export function getDefaultLeverage(maxLeverage: number): number {
 	if (maxLeverage <= 5) return maxLeverage;
 	return Math.floor(maxLeverage / 2);

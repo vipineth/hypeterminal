@@ -3,7 +3,6 @@
  */
 
 export type Side = "buy" | "sell";
-export type OrderType = "market" | "limit";
 export type SizeMode = "asset" | "usd";
 
 export interface ValidationResult {

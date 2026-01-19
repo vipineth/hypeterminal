@@ -3,10 +3,8 @@ import { create } from "zustand";
 import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middleware";
 import { STORAGE_KEYS } from "@/config/constants";
 import { isTriggerOrderType, type LimitTif, ORDER_TYPES, type OrderType } from "@/lib/trade/order-types";
+import type { Side, SizeMode } from "@/lib/trade/types";
 import { createValidatedStorage } from "@/stores/validated-storage";
-
-export type Side = "buy" | "sell";
-export type SizeMode = "asset" | "usd";
 
 interface PersistedState {
 	side: Side;
@@ -95,7 +93,7 @@ const validatedStorage = createValidatedStorage(orderEntrySchema, "order entry")
 const useOrderEntryStore = create<OrderEntryStore>()(
 	subscribeWithSelector(
 		persist(
-			(set, get) => ({
+			(set) => ({
 				...DEFAULT_PERSISTED,
 				...DEFAULT_FORM,
 
@@ -103,13 +101,12 @@ const useOrderEntryStore = create<OrderEntryStore>()(
 					setSide: (side) => set({ side }),
 
 					setOrderType: (orderType) => {
-						const current = get();
 						const isTrigger = isTriggerOrderType(orderType);
-						set({
+						set((state) => ({
 							orderType,
-							reduceOnly: isTrigger ? true : current.reduceOnly,
-							tpSlEnabled: isTrigger ? false : current.tpSlEnabled,
-						});
+							reduceOnly: isTrigger ? true : state.reduceOnly,
+							tpSlEnabled: isTrigger ? false : state.tpSlEnabled,
+						}));
 					},
 
 					setSizeMode: (sizeMode) => set({ sizeMode }),

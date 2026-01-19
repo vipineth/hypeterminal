@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { useMemo } from "react";
-import { ORDER_MIN_NOTIONAL_USD } from "@/config/constants";
+import { ORDER_MIN_NOTIONAL_USD, SCALE_LEVELS_MAX, SCALE_LEVELS_MIN, TWAP_MINUTES_MAX, TWAP_MINUTES_MIN } from "@/config/constants";
 import { clampInt, isPositive } from "@/lib/trade/numbers";
 import { validateSlPrice, validateTpPrice } from "@/lib/trade/tpsl";
 import type { Side, ValidationResult } from "@/lib/trade/types";
@@ -102,7 +102,7 @@ export function useOrderValidation(input: ValidationInput): ValidationResult {
 			if (!isPositive(input.scaleStartPriceNum) || !isPositive(input.scaleEndPriceNum)) {
 				errors.push(t`Enter price range`);
 			}
-			if (levels < 2 || levels > 20) errors.push(t`Scale levels must be 2-20`);
+			if (levels < SCALE_LEVELS_MIN || levels > SCALE_LEVELS_MAX) errors.push(t`Scale levels must be ${SCALE_LEVELS_MIN}-${SCALE_LEVELS_MAX}`);
 			if (
 				isPositive(input.scaleStartPriceNum) &&
 				isPositive(input.scaleEndPriceNum) &&
@@ -122,7 +122,7 @@ export function useOrderValidation(input: ValidationInput): ValidationResult {
 
 		if (input.twapOrder) {
 			const minutes = Math.round(input.twapMinutesNum ?? 0);
-			if (minutes < 5 || minutes > 1440) errors.push(t`TWAP minutes must be 5-1440`);
+			if (minutes < TWAP_MINUTES_MIN || minutes > TWAP_MINUTES_MAX) errors.push(t`TWAP minutes must be ${TWAP_MINUTES_MIN}-${TWAP_MINUTES_MAX}`);
 		}
 
 		return { valid: errors.length === 0, errors, canSubmit: errors.length === 0, needsApproval: false };

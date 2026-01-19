@@ -1,6 +1,5 @@
 import { calc, isPositive, toBig, toNumber } from "./numbers";
-
-type Side = "buy" | "sell";
+import type { Side } from "./types";
 
 interface TpSlCalcParams {
 	referencePrice: unknown;

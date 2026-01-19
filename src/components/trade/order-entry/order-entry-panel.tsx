@@ -8,7 +8,7 @@ import { NumberInput } from "@/components/ui/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FALLBACK_VALUE_PLACEHOLDER, ORDER_MIN_NOTIONAL_USD, ORDER_SIZE_PERCENT_STEPS } from "@/config/constants";
+import { FALLBACK_VALUE_PLACEHOLDER, ORDER_MIN_NOTIONAL_USD, ORDER_SIZE_PERCENT_STEPS, SCALE_LEVELS_MAX, SCALE_LEVELS_MIN, TWAP_MINUTES_MAX, TWAP_MINUTES_MIN } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
@@ -41,7 +41,7 @@ import {
 	usesLimitPrice as usesLimitPriceForOrder,
 	usesTriggerPrice as usesTriggerPriceForOrder,
 } from "@/lib/trade/order-types";
-import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
+import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/lib/trade/orders";
 import type { ActiveDialog, ButtonContent } from "@/lib/trade/types";
 import { useButtonContent } from "@/lib/trade/use-button-content";
 import { useOrderValidation } from "@/lib/trade/use-order-validation";
@@ -335,7 +335,7 @@ export function OrderEntryPanel() {
 
 	const handleSubmit = useCallback(async () => {
 		if (!validation.canSubmit || isSubmitting) return;
-		if (typeof market?.assetIndex !== "number") return;
+		if (!market || typeof market.assetIndex !== "number") return;
 
 		const szDecimals = market.szDecimals ?? 0;
 		const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
@@ -349,7 +349,7 @@ export function OrderEntryPanel() {
 
 		try {
 			if (twapOrder) {
-				const minutes = clampInt(Math.round(twapMinutesNum ?? 0), 5, 1440);
+				const minutes = clampInt(Math.round(twapMinutesNum ?? 0), TWAP_MINUTES_MIN, TWAP_MINUTES_MAX);
 				const result = await placeTwapOrder({
 					twap: {
 						a: market.assetIndex,
@@ -360,10 +360,7 @@ export function OrderEntryPanel() {
 						t: twapRandomize,
 					},
 				});
-				const status = result.response?.data?.status;
-				if (status && typeof status === "object" && "error" in status && typeof status.error === "string") {
-					throw new Error(status.error);
-				}
+				throwIfResponseError(result.response?.data?.status);
 				updateOrder(orderId, { status: "success", fillPercent: 100 });
 			} else {
 				const orders: ExchangeOrder[] = [];
@@ -371,7 +368,7 @@ export function OrderEntryPanel() {
 				const hasSl = tpSlEnabled && canUseTpSl && isPositive(slPriceNum);
 
 				if (scaleOrder) {
-					const levels = clampInt(Math.round(scaleLevelsNum ?? 0), 2, 20);
+					const levels = clampInt(Math.round(scaleLevelsNum ?? 0), SCALE_LEVELS_MIN, SCALE_LEVELS_MAX);
 					const start = parseNumberOrZero(scaleStartPriceInput);
 					const end = parseNumberOrZero(scaleEndPriceInput);
 					const step = levels > 1 ? (end - start) / (levels - 1) : 0;
@@ -443,10 +440,7 @@ export function OrderEntryPanel() {
 				const grouping = hasTp || hasSl ? "positionTpsl" : "na";
 				const result = await placeOrder({ orders, grouping });
 
-				const status = result.response?.data?.statuses?.[0];
-				if (status && typeof status === "object" && "error" in status && typeof status.error === "string") {
-					throw new Error(status.error);
-				}
+				throwIfResponseError(result.response?.data?.statuses?.[0]);
 				updateOrder(orderId, { status: "success", fillPercent: 100 });
 			}
 
@@ -744,7 +738,7 @@ export function OrderEntryPanel() {
 						<div className="space-y-1.5">
 							<div className="flex items-center justify-between">
 								<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Number of Orders`}</div>
-								<span className="text-4xs text-muted-foreground">{t`2-20`}</span>
+								<span className="text-4xs text-muted-foreground">{`${SCALE_LEVELS_MIN}-${SCALE_LEVELS_MAX}`}</span>
 							</div>
 							<NumberInput
 								placeholder="4"
@@ -763,7 +757,7 @@ export function OrderEntryPanel() {
 						<div className="space-y-1.5">
 							<div className="flex items-center justify-between">
 								<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Duration (Minutes)`}</div>
-								<span className="text-4xs text-muted-foreground">{t`5-1440`}</span>
+								<span className="text-4xs text-muted-foreground">{`${TWAP_MINUTES_MIN}-${TWAP_MINUTES_MAX}`}</span>
 							</div>
 							<NumberInput
 								placeholder="30"

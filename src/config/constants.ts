@@ -28,6 +28,11 @@ export const ORDER_FEE_RATE_MAKER = 0.00015;
 export const ORDER_SIZE_PERCENT_STEPS = [25, 50, 75, 100] as const;
 export const ORDER_LEVERAGE_STEPS = [1, 2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 125, 150, 200] as const;
 
+export const TWAP_MINUTES_MIN = 5;
+export const TWAP_MINUTES_MAX = 1440;
+export const SCALE_LEVELS_MIN = 2;
+export const SCALE_LEVELS_MAX = 20;
+
 export const DEFAULT_MAX_LEVERAGE = 50;
 export const MARKET_LEVERAGE_HARD_MAX = 100;
 export const DEFAULT_MARKET_ORDER_SLIPPAGE_BPS = 25;
