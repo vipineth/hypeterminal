@@ -13,7 +13,7 @@ import { usePerpMarkets } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useSubAssetCtxs, useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
-import { parseNumber } from "@/lib/trade/numbers";
+import { calc, parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
@@ -191,8 +191,7 @@ export function PositionsTab() {
 		closingKeyRef.current = row.key;
 
 		const isBuy = !row.isLong;
-		const slippage = slippageBps / 10000;
-		const orderPrice = isBuy ? row.markPx * (1 + slippage) : row.markPx * (1 - slippage);
+		const orderPrice = calc.applySlippage(row.markPx, slippageBps, isBuy) ?? row.markPx;
 
 		placeOrder(
 			{

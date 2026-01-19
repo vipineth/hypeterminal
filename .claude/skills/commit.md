@@ -33,8 +33,6 @@ You are a commit message generator for this project. Follow the commit conventio
 
 ```
 <type>: <subject>
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 ```
 
 ## Examples
