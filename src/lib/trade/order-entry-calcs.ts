@@ -1,7 +1,15 @@
 import { ORDER_FEE_RATE_MAKER, ORDER_FEE_RATE_TAKER } from "@/config/constants";
 import { calc, floorToDecimals, parseNumberOrZero } from "@/lib/trade/numbers";
-
-type OrderType = "market" | "limit";
+import {
+	type OrderType,
+	isMarketExecutionOrderType,
+	isScaleOrderType,
+	isStopOrderType,
+	isTakeProfitOrderType,
+	isTakerOrderType,
+	isTwapOrderType,
+	usesLimitPrice,
+} from "@/lib/trade/order-types";
 type Side = "buy" | "sell";
 
 interface MaxSizeInput {
@@ -73,16 +81,34 @@ export function getSizeValues(input: SizeValueInput): SizeValueResult {
 	return { sizeInputValue, sizeValue };
 }
 
-export function getOrderPrice(orderType: OrderType, markPx: number, limitPriceInput: string): number {
-	if (orderType === "market") {
+export function getOrderPrice(
+	orderType: OrderType,
+	markPx: number,
+	limitPriceInput: string,
+	triggerPriceInput: string,
+	scaleStartPriceInput: string,
+	scaleEndPriceInput: string,
+): number {
+	if (orderType === "market" || isTwapOrderType(orderType)) {
 		return markPx;
+	}
+	if (isStopOrderType(orderType) || isTakeProfitOrderType(orderType)) {
+		return usesLimitPrice(orderType) ? parseNumberOrZero(limitPriceInput) : parseNumberOrZero(triggerPriceInput);
+	}
+	if (isScaleOrderType(orderType)) {
+		const start = parseNumberOrZero(scaleStartPriceInput);
+		const end = parseNumberOrZero(scaleEndPriceInput);
+		if (start > 0 && end > 0) {
+			return calc.divide(calc.add(start, end), 2) ?? start;
+		}
+		return start > 0 ? start : end;
 	}
 	return parseNumberOrZero(limitPriceInput);
 }
 
 export function getOrderMetrics(input: OrderMetricsInput): OrderMetricsResult {
 	const orderValue = calc.multiply(input.sizeValue, input.price) ?? 0;
-	const feeRate = input.orderType === "market" ? ORDER_FEE_RATE_TAKER : ORDER_FEE_RATE_MAKER;
+	const feeRate = isTakerOrderType(input.orderType) ? ORDER_FEE_RATE_TAKER : ORDER_FEE_RATE_MAKER;
 	const estimatedFee = calc.multiply(orderValue, feeRate) ?? 0;
 	const marginRequired = input.leverage ? (calc.divide(orderValue, input.leverage) ?? 0) : 0;
 	return { orderValue, marginRequired, estimatedFee };
@@ -119,7 +145,7 @@ export function getExecutedPrice(
 	slippageBps: number,
 	price: number,
 ): number {
-	if (orderType === "market") {
+	if (isMarketExecutionOrderType(orderType)) {
 		return calc.applySlippage(markPx, slippageBps, side === "buy") ?? markPx;
 	}
 	return price;

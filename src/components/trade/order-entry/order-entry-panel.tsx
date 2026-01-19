@@ -1,26 +1,28 @@
 import { t } from "@lingui/core/macro";
-import { ArrowLeftRight, Loader2, PencilIcon, TrendingDown, TrendingUp } from "lucide-react";
+import { ArrowLeftRight, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { NumberInput } from "@/components/ui/number-input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
 	ARBITRUM_CHAIN_ID,
 	FALLBACK_VALUE_PLACEHOLDER,
 	ORDER_MIN_NOTIONAL_USD,
 	ORDER_SIZE_PERCENT_STEPS,
 } from "@/config/constants";
+import { type LimitTif, TIF_OPTIONS } from "@/config/order-types";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
+import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeTwapOrder";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import type { MarginMode } from "@/lib/trade/margin-mode";
-import { calc, formatDecimalFloor, isPositive, parseNumberOrZero, toFixed, toNumber } from "@/lib/trade/numbers";
+import { calc, clampInt, formatDecimalFloor, isPositive, parseNumberOrZero, toFixed, toNumber } from "@/lib/trade/numbers";
 import {
 	getConversionPrice,
 	getExecutedPrice,
@@ -31,25 +33,52 @@ import {
 	getSizeValues,
 	getSliderValue,
 } from "@/lib/trade/order-entry-calcs";
+import {
+	canUseTpSl as canUseTpSlForOrder,
+	type ExchangeOrder,
+	getTabsOrderType,
+	isScaleOrderType,
+	isStopOrderType,
+	isTakeProfitOrderType,
+	isTriggerOrderType,
+	isTwapOrderType,
+	usesLimitPrice as usesLimitPriceForOrder,
+	usesTriggerPrice as usesTriggerPriceForOrder,
+} from "@/lib/trade/order-types";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
 import { validateSlPrice, validateTpPrice } from "@/lib/trade/tpsl";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import {
+	useLimitPrice,
 	useOrderEntryActions,
 	useOrderSide,
+	useOrderSize,
 	useOrderType,
 	useReduceOnly,
+	useScaleEnd,
+	useScaleLevels,
+	useScaleStart,
 	useSizeMode,
+	useSlPrice,
+	useTif,
+	useTpPrice,
+	useTpSlEnabled,
+	useTriggerPrice,
+	useTwapMinutes,
+	useTwapRandomize,
 } from "@/stores/use-order-entry-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
 import { GlobalSettingsDialog } from "../components/global-settings-dialog";
 import { WalletDialog } from "../components/wallet-dialog";
+import { AdvancedOrderDropdown } from "./advanced-order-dropdown";
 import { DepositModal } from "./deposit-modal";
 import { LeverageControl, useAssetLeverage } from "./leverage-control";
 import { MarginModeDialog } from "./margin-mode-dialog";
 import { MarginModeToggle } from "./margin-mode-toggle";
+import { OrderSummary } from "./order-summary";
 import { OrderToast } from "./order-toast";
+import { SideToggle } from "./side-toggle";
 import { TpSlSection } from "./tp-sl-section";
 
 type ValidationResult = {
@@ -66,15 +95,29 @@ type ButtonContent = {
 	variant: "cyan" | "buy" | "sell";
 };
 
+function getMarketPrice(ctxMarkPx: unknown, midPx: unknown): number {
+	if (typeof ctxMarkPx === "number") return ctxMarkPx;
+	if (typeof midPx === "number") return midPx;
+	return 0;
+}
+
+function getActionButtonClass(variant: ButtonContent["variant"]): string {
+	if (variant === "cyan") {
+		return "bg-terminal-cyan/20 border-terminal-cyan text-terminal-cyan hover:bg-terminal-cyan/30";
+	}
+	if (variant === "buy") {
+		return "bg-terminal-green/20 border-terminal-green text-terminal-green hover:bg-terminal-green/30";
+	}
+	return "bg-terminal-red/20 border-terminal-red text-terminal-red hover:bg-terminal-red/30";
+}
+
 export function OrderEntryPanel() {
 	const reduceOnlyId = useId();
 	const tpSlId = useId();
 
 	const { address, isConnected } = useConnection();
-
 	const { data: walletClient, isLoading: isWalletLoading, error: walletClientError } = useWalletClient();
 	const switchChain = useSwitchChain();
-
 	const needsChainSwitch = !!walletClientError && walletClientError.message.includes("does not match");
 
 	const { data: market } = useSelectedResolvedMarket({ ctxMode: "realtime" });
@@ -82,12 +125,11 @@ export function OrderEntryPanel() {
 		{ user: address ?? "0x0" },
 		{ enabled: isConnected && !!address },
 	);
-
 	const clearinghouse = clearinghouseEvent?.clearinghouseState;
 
 	const { status: agentStatus, registerStatus, registerAgent } = useTradingAgent();
-
-	const { mutateAsync: placeOrder, isPending: isSubmitting } = useExchangeOrder();
+	const { mutateAsync: placeOrder, isPending: isSubmittingOrder } = useExchangeOrder();
+	const { mutateAsync: placeTwapOrder, isPending: isSubmittingTwap } = useExchangeTwapOrder();
 
 	const slippageBps = useMarketOrderSlippageBps();
 
@@ -104,40 +146,87 @@ export function OrderEntryPanel() {
 	} = useAssetLeverage();
 
 	const { addOrder, updateOrder } = useOrderQueueActions();
-
 	const selectedPrice = useSelectedPrice();
 
 	const side = useOrderSide();
 	const orderType = useOrderType();
 	const sizeMode = useSizeMode();
 	const reduceOnly = useReduceOnly();
+	const sizeInput = useOrderSize();
+	const limitPriceInput = useLimitPrice();
+	const triggerPriceInput = useTriggerPrice();
+	const scaleStartPriceInput = useScaleStart();
+	const scaleEndPriceInput = useScaleEnd();
+	const scaleLevelsNum = useScaleLevels();
+	const twapMinutesNum = useTwapMinutes();
+	const twapRandomize = useTwapRandomize();
+	const tpSlEnabled = useTpSlEnabled();
+	const tpPriceInput = useTpPrice();
+	const slPriceInput = useSlPrice();
+	const tif = useTif();
 
-	const { setSide, setOrderType, setSizeMode, setReduceOnly } = useOrderEntryActions();
+	const stopOrder = isStopOrderType(orderType);
+	const takeProfitOrder = isTakeProfitOrderType(orderType);
+	const triggerOrder = isTriggerOrderType(orderType);
+	const twapOrder = isTwapOrderType(orderType);
+	const scaleOrder = isScaleOrderType(orderType);
+	const usesLimitPrice = usesLimitPriceForOrder(orderType);
+	const usesTriggerPrice = usesTriggerPriceForOrder(orderType);
+	const tabsOrderType = getTabsOrderType(orderType);
+	const canUseTpSl = canUseTpSlForOrder(orderType);
+	const showTif = orderType === "limit" || orderType === "scale";
+	const availableTifOptions = orderType === "limit" ? (["Gtc", "Ioc", "Alo"] as const) : (["Gtc", "Alo"] as const);
 
-	const [sizeInput, setSizeInput] = useState("");
+	const {
+		setSide,
+		setOrderType,
+		setSizeMode,
+		setReduceOnly,
+		setSize,
+		setLimitPrice,
+		setTriggerPrice,
+		setScaleStart,
+		setScaleEnd,
+		setScaleLevels,
+		setTwapMinutes,
+		setTwapRandomize,
+		setTpSlEnabled,
+		setTpPrice,
+		setSlPrice,
+		setTif,
+		resetForm,
+	} = useOrderEntryActions();
+
 	const [hasUserSized, setHasUserSized] = useState(false);
-	const [limitPriceInput, setLimitPriceInput] = useState("");
 	const [isDraggingSlider, setIsDraggingSlider] = useState(false);
 	const [dragSliderValue, setDragSliderValue] = useState(25);
 	const [approvalError, setApprovalError] = useState<string | null>(null);
 	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
 	const [depositModalOpen, setDepositModalOpen] = useState(false);
 	const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
-	const [tpSlEnabled, setTpSlEnabled] = useState(false);
-	const [tpPriceInput, setTpPriceInput] = useState("");
-	const [slPriceInput, setSlPriceInput] = useState("");
 	const [marginModeDialogOpen, setMarginModeDialogOpen] = useState(false);
 
 	useEffect(() => {
 		if (selectedPrice !== null) {
 			setOrderType("limit");
-			setLimitPriceInput(String(selectedPrice));
+			setLimitPrice(String(selectedPrice));
 			getOrderbookActionsStore().actions.clearSelectedPrice();
 		}
-	}, [selectedPrice, setOrderType]);
+	}, [selectedPrice, setOrderType, setLimitPrice]);
+
+	useEffect(() => {
+		if (!canUseTpSl && tpSlEnabled) {
+			setTpSlEnabled(false);
+		}
+	}, [canUseTpSl, tpSlEnabled, setTpSlEnabled]);
 
 	const tpPriceNum = toNumber(tpPriceInput);
 	const slPriceNum = toNumber(slPriceInput);
+	const triggerPriceNum = toNumber(triggerPriceInput);
+	const scaleStartPriceNum = toNumber(scaleStartPriceInput);
+	const scaleEndPriceNum = toNumber(scaleEndPriceInput);
+
+	const isSubmitting = isSubmittingOrder || isSubmittingTwap;
 
 	const accountValue = parseNumberOrZero(clearinghouse?.crossMarginSummary?.accountValue);
 	const marginUsed = parseNumberOrZero(clearinghouse?.crossMarginSummary?.totalMarginUsed);
@@ -147,13 +236,18 @@ export function OrderEntryPanel() {
 		!clearinghouse?.assetPositions || !market?.coin
 			? null
 			: (clearinghouse.assetPositions.find((p) => p.position.coin === market.coin) ?? null);
-
 	const positionSize = parseNumberOrZero(position?.position?.szi);
 
 	const ctxMarkPx = market?.ctxNumbers?.markPx;
-	const markPx =
-		typeof ctxMarkPx === "number" ? ctxMarkPx : typeof market?.midPxNumber === "number" ? market.midPxNumber : 0;
-	const price = getOrderPrice(orderType, markPx, limitPriceInput);
+	const markPx = getMarketPrice(ctxMarkPx, market?.midPxNumber);
+	const price = getOrderPrice(
+		orderType,
+		markPx,
+		limitPriceInput,
+		triggerPriceInput,
+		scaleStartPriceInput,
+		scaleEndPriceInput,
+	);
 
 	const maxSize = useMemo(
 		() =>
@@ -175,24 +269,12 @@ export function OrderEntryPanel() {
 	);
 
 	const { orderValue, marginRequired, estimatedFee } = useMemo(
-		() =>
-			getOrderMetrics({
-				sizeValue,
-				price,
-				leverage,
-				orderType,
-			}),
+		() => getOrderMetrics({ sizeValue, price, leverage, orderType }),
 		[leverage, orderType, price, sizeValue],
 	);
 
 	const { liqPrice, liqWarning } = useMemo(
-		() =>
-			getLiquidationInfo({
-				price,
-				sizeValue,
-				leverage,
-				side,
-			}),
+		() => getLiquidationInfo({ price, sizeValue, leverage, side }),
 		[leverage, price, side, sizeValue],
 	);
 
@@ -228,31 +310,57 @@ export function OrderEntryPanel() {
 		}
 
 		const errors: string[] = [];
-		if (orderType === "limit" && !price) {
-			errors.push(t`Enter limit price`);
-		}
-		if (!sizeValue || sizeValue <= 0) {
-			errors.push(t`Enter size`);
-		}
-		if (orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD) {
-			errors.push(t`Min order $10`);
-		}
-		if (sizeValue > maxSize && maxSize > 0) {
-			errors.push(t`Exceeds max size`);
-		}
+		if (usesLimitPrice && !price) errors.push(t`Enter limit price`);
+		if (usesTriggerPrice && !isPositive(triggerPriceNum)) errors.push(t`Enter trigger price`);
+		if (!sizeValue || sizeValue <= 0) errors.push(t`Enter size`);
+		if (orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD) errors.push(t`Min order $10`);
+		if (sizeValue > maxSize && maxSize > 0) errors.push(t`Exceeds max size`);
 
-		if (tpSlEnabled) {
+		if (tpSlEnabled && canUseTpSl) {
 			const hasTp = isPositive(tpPriceNum);
 			const hasSl = isPositive(slPriceNum);
-			if (!hasTp && !hasSl) {
-				errors.push(t`Enter TP or SL price`);
-			}
+			if (!hasTp && !hasSl) errors.push(t`Enter TP or SL price`);
 			if (hasTp && !validateTpPrice(price, tpPriceNum, side)) {
 				errors.push(side === "buy" ? t`TP must be above entry` : t`TP must be below entry`);
 			}
 			if (hasSl && !validateSlPrice(price, slPriceNum, side)) {
 				errors.push(side === "buy" ? t`SL must be below entry` : t`SL must be above entry`);
 			}
+		}
+
+		if (usesTriggerPrice && isPositive(triggerPriceNum) && markPx > 0) {
+			if (stopOrder) {
+				const needsAbove = side === "buy";
+				if (needsAbove && triggerPriceNum <= markPx) errors.push(t`Stop trigger must be above mark`);
+				if (!needsAbove && triggerPriceNum >= markPx) errors.push(t`Stop trigger must be below mark`);
+			}
+			if (takeProfitOrder) {
+				const needsAbove = side === "sell";
+				if (needsAbove && triggerPriceNum <= markPx) errors.push(t`Take profit trigger must be above mark`);
+				if (!needsAbove && triggerPriceNum >= markPx) errors.push(t`Take profit trigger must be below mark`);
+			}
+		}
+
+		if (scaleOrder) {
+			const levels = clampInt(Math.round(scaleLevelsNum ?? 0), 0, 100);
+			if (!isPositive(scaleStartPriceNum) || !isPositive(scaleEndPriceNum)) errors.push(t`Enter price range`);
+			if (levels < 2 || levels > 20) errors.push(t`Scale levels must be 2-20`);
+			if (isPositive(scaleStartPriceNum) && isPositive(scaleEndPriceNum) && scaleStartPriceNum === scaleEndPriceNum) {
+				errors.push(t`Start and end must differ`);
+			}
+			if (levels >= 2 && sizeValue > 0) {
+				const averagePrice = price > 0 ? price : markPx;
+				const perLevelSize = sizeValue / levels;
+				const perLevelNotional = averagePrice > 0 ? perLevelSize * averagePrice : 0;
+				if (perLevelNotional > 0 && perLevelNotional < ORDER_MIN_NOTIONAL_USD) {
+					errors.push(t`Scale level below min notional`);
+				}
+			}
+		}
+
+		if (twapOrder) {
+			const minutes = Math.round(twapMinutesNum ?? 0);
+			if (minutes < 5 || minutes > 1440) errors.push(t`TWAP minutes must be 5-1440`);
 		}
 
 		return { valid: errors.length === 0, errors, canSubmit: errors.length === 0, needsApproval: false };
@@ -272,28 +380,39 @@ export function OrderEntryPanel() {
 		tpSlEnabled,
 		tpPriceNum,
 		slPriceNum,
+		triggerPriceNum,
+		twapMinutesNum,
+		scaleStartPriceNum,
+		scaleEndPriceNum,
+		scaleLevelsNum,
+		stopOrder,
+		takeProfitOrder,
+		scaleOrder,
+		twapOrder,
+		usesLimitPrice,
+		usesTriggerPrice,
+		canUseTpSl,
 		side,
 	]);
 
-	const sizeHasError = sizeValue > maxSize && maxSize > 0;
-	const orderValueTooLow = orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD;
+	const sizeHasError = (sizeValue > maxSize && maxSize > 0) || (orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD);
 
 	function applySizePercent(pct: number) {
 		if (maxSize <= 0) return;
 		setHasUserSized(true);
 		const newSize = calc.percent(maxSize, pct) ?? 0;
 		if (sizeMode === "usd" && conversionPx > 0) {
-			setSizeInput(toFixed(calc.multiply(newSize, conversionPx), 2));
+			setSize(toFixed(calc.multiply(newSize, conversionPx), 2));
 			return;
 		}
-		setSizeInput(formatDecimalFloor(newSize, market?.szDecimals ?? 0) || "");
+		setSize(formatDecimalFloor(newSize, market?.szDecimals ?? 0) || "");
 	}
 
 	function handleSizeModeToggle() {
 		const newMode = sizeMode === "asset" ? "usd" : "asset";
 		if (conversionPx > 0 && sizeValue > 0) {
 			setHasUserSized(true);
-			setSizeInput(
+			setSize(
 				newMode === "usd"
 					? toFixed(calc.multiply(sizeValue, conversionPx), 2)
 					: formatDecimalFloor(sizeValue, market?.szDecimals ?? 0) || "",
@@ -311,141 +430,175 @@ export function OrderEntryPanel() {
 		[switchMarginMode],
 	);
 
-	const handleRegister = useCallback(
-		function handleRegister() {
-			if (isRegistering) return;
-			setApprovalError(null);
-			registerAgent().catch((error) => {
-				const message = error instanceof Error ? error.message : t`Failed to enable trading`;
-				setApprovalError(message);
-			});
-		},
-		[isRegistering, registerAgent],
-	);
+	const handleRegister = useCallback(() => {
+		if (isRegistering) return;
+		setApprovalError(null);
+		registerAgent().catch((error) => {
+			const message = error instanceof Error ? error.message : t`Failed to enable trading`;
+			setApprovalError(message);
+		});
+	}, [isRegistering, registerAgent]);
 
-	const handleSubmit = useCallback(
-		async function handleSubmit() {
-			if (!validation.canSubmit || isSubmitting) return;
-			if (typeof market?.assetIndex !== "number") return;
+	const handleSubmit = useCallback(async () => {
+		if (!validation.canSubmit || isSubmitting) return;
+		if (typeof market?.assetIndex !== "number") return;
 
-			const orderPrice = getExecutedPrice(orderType, side, markPx, slippageBps, price);
+		const szDecimals = market.szDecimals ?? 0;
+		const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
 
-			const szDecimals = market.szDecimals ?? 0;
-			const formattedPrice = formatPriceForOrder(orderPrice);
-			const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
+		const orderId = addOrder({
+			market: market.coin,
+			side,
+			size: formattedSize,
+			status: "pending",
+		});
 
-			const orderId = addOrder({
-				market: market.coin,
-				side,
-				size: formattedSize,
-				status: "pending",
-			});
+		try {
+			if (twapOrder) {
+				const minutes = clampInt(Math.round(twapMinutesNum ?? 0), 5, 1440);
+				const result = await placeTwapOrder({
+					twap: {
+						a: market.assetIndex,
+						b: side === "buy",
+						s: formattedSize,
+						r: reduceOnly,
+						m: minutes,
+						t: twapRandomize,
+					},
+				});
+				const status = result.response?.data?.status;
+				if (status && typeof status === "object" && "error" in status && typeof status.error === "string") {
+					throw new Error(status.error);
+				}
+				updateOrder(orderId, { status: "success", fillPercent: 100 });
+			} else {
+				const orders: ExchangeOrder[] = [];
+				const hasTp = tpSlEnabled && canUseTpSl && isPositive(tpPriceNum);
+				const hasSl = tpSlEnabled && canUseTpSl && isPositive(slPriceNum);
 
-			try {
-				const orders: Array<{
-					a: number;
-					b: boolean;
-					p: string;
-					s: string;
-					r: boolean;
-					t:
-						| { limit: { tif: "FrontendMarket" | "Gtc" } }
-						| { trigger: { isMarket: boolean; triggerPx: string; tpsl: "tp" | "sl" } };
-				}> = [
-					{
+				if (scaleOrder) {
+					const levels = clampInt(Math.round(scaleLevelsNum ?? 0), 2, 20);
+					const start = parseNumberOrZero(scaleStartPriceInput);
+					const end = parseNumberOrZero(scaleEndPriceInput);
+					const step = levels > 1 ? (end - start) / (levels - 1) : 0;
+					const perLevelSize = sizeValue / levels;
+					for (let i = 0; i < levels; i += 1) {
+						const levelPrice = start + step * i;
+						orders.push({
+							a: market.assetIndex,
+							b: side === "buy",
+							p: formatPriceForOrder(levelPrice),
+							s: formatSizeForOrder(perLevelSize, szDecimals),
+							r: reduceOnly,
+							t: { limit: { tif } },
+						});
+					}
+				} else if (triggerOrder) {
+					const triggerPx = formatPriceForOrder(parseNumberOrZero(triggerPriceInput));
+					const limitPx = formatPriceForOrder(parseNumberOrZero(limitPriceInput));
+					orders.push({
+						a: market.assetIndex,
+						b: side === "buy",
+						p: usesLimitPrice ? limitPx : triggerPx,
+						s: formattedSize,
+						r: reduceOnly,
+						t: {
+							trigger: {
+								isMarket: !usesLimitPrice,
+								triggerPx,
+								tpsl: stopOrder ? "sl" : "tp",
+							},
+						},
+					});
+				} else {
+					const orderPrice = getExecutedPrice(orderType, side, markPx, slippageBps, price);
+					const formattedPrice = formatPriceForOrder(orderPrice);
+
+					orders.push({
 						a: market.assetIndex,
 						b: side === "buy",
 						p: formattedPrice,
 						s: formattedSize,
 						r: reduceOnly,
-						t:
-							orderType === "market"
-								? { limit: { tif: "FrontendMarket" as const } }
-								: { limit: { tif: "Gtc" as const } },
-					},
-				];
-
-				const hasTp = tpSlEnabled && isPositive(tpPriceNum);
-				const hasSl = tpSlEnabled && isPositive(slPriceNum);
-
-				if (hasTp) {
-					orders.push({
-						a: market.assetIndex,
-						b: side !== "buy",
-						p: formatPriceForOrder(tpPriceNum),
-						s: formattedSize,
-						r: true,
-						t: {
-							trigger: {
-								isMarket: true,
-								triggerPx: formatPriceForOrder(tpPriceNum),
-								tpsl: "tp",
-							},
-						},
+						t: orderType === "market" ? { limit: { tif: "FrontendMarket" as const } } : { limit: { tif } },
 					});
-				}
 
-				if (hasSl) {
-					orders.push({
-						a: market.assetIndex,
-						b: side !== "buy",
-						p: formatPriceForOrder(slPriceNum),
-						s: formattedSize,
-						r: true,
-						t: {
-							trigger: {
-								isMarket: true,
-								triggerPx: formatPriceForOrder(slPriceNum),
-								tpsl: "sl",
-							},
-						},
-					});
+					if (hasTp) {
+						orders.push({
+							a: market.assetIndex,
+							b: side !== "buy",
+							p: formatPriceForOrder(tpPriceNum),
+							s: formattedSize,
+							r: true,
+							t: { trigger: { isMarket: true, triggerPx: formatPriceForOrder(tpPriceNum), tpsl: "tp" } },
+						});
+					}
+
+					if (hasSl) {
+						orders.push({
+							a: market.assetIndex,
+							b: side !== "buy",
+							p: formatPriceForOrder(slPriceNum),
+							s: formattedSize,
+							r: true,
+							t: { trigger: { isMarket: true, triggerPx: formatPriceForOrder(slPriceNum), tpsl: "sl" } },
+						});
+					}
 				}
 
 				const grouping = hasTp || hasSl ? "positionTpsl" : "na";
-
 				const result = await placeOrder({ orders, grouping });
 
 				const status = result.response?.data?.statuses?.[0];
 				if (status && typeof status === "object" && "error" in status && typeof status.error === "string") {
 					throw new Error(status.error);
 				}
-
 				updateOrder(orderId, { status: "success", fillPercent: 100 });
-
-				setSizeInput("");
-				setHasUserSized(false);
-				setLimitPriceInput("");
-				setTpPriceInput("");
-				setSlPriceInput("");
-				setTpSlEnabled(false);
-				return;
-			} catch (error) {
-				const errorMessage = error instanceof Error ? error.message : t`Order failed`;
-				updateOrder(orderId, { status: "failed", error: errorMessage });
 			}
-		},
-		[
-			addOrder,
-			isSubmitting,
-			market?.assetIndex,
-			market?.coin,
-			market?.szDecimals,
-			markPx,
-			orderType,
-			placeOrder,
-			price,
-			reduceOnly,
-			side,
-			sizeValue,
-			slippageBps,
-			slPriceNum,
-			tpPriceNum,
-			tpSlEnabled,
-			updateOrder,
-			validation.canSubmit,
-		],
-	);
+
+			resetForm();
+			setHasUserSized(false);
+			return;
+		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : t`Order failed`;
+			updateOrder(orderId, { status: "failed", error: errorMessage });
+		}
+	}, [
+		addOrder,
+		scaleOrder,
+		isSubmitting,
+		stopOrder,
+		twapOrder,
+		triggerOrder,
+		limitPriceInput,
+		market?.assetIndex,
+		market?.coin,
+		market?.szDecimals,
+		markPx,
+		orderType,
+		placeOrder,
+		placeTwapOrder,
+		price,
+		reduceOnly,
+		scaleEndPriceInput,
+		scaleLevelsNum,
+		scaleStartPriceInput,
+		side,
+		sizeValue,
+		slippageBps,
+		slPriceNum,
+		tpPriceNum,
+		tpSlEnabled,
+		triggerPriceInput,
+		twapMinutesNum,
+		twapRandomize,
+		updateOrder,
+		usesLimitPrice,
+		canUseTpSl,
+		validation.canSubmit,
+		resetForm,
+		tif,
+	]);
 
 	const sliderValue = useMemo(() => {
 		if (isDraggingSlider) return dragSliderValue;
@@ -463,12 +616,7 @@ export function OrderEntryPanel() {
 
 	const buttonContent = useMemo<ButtonContent>(() => {
 		if (!isConnected) {
-			return {
-				text: t`Connect Wallet`,
-				action: () => setWalletDialogOpen(true),
-				disabled: false,
-				variant: "cyan",
-			};
+			return { text: t`Connect Wallet`, action: () => setWalletDialogOpen(true), disabled: false, variant: "cyan" };
 		}
 		if (needsChainSwitch) {
 			return {
@@ -479,12 +627,7 @@ export function OrderEntryPanel() {
 			};
 		}
 		if (availableBalance <= 0) {
-			return {
-				text: t`Deposit`,
-				action: () => setDepositModalOpen(true),
-				disabled: false,
-				variant: "cyan",
-			};
+			return { text: t`Deposit`, action: () => setDepositModalOpen(true), disabled: false, variant: "cyan" };
 		}
 		if (validation.needsApproval) {
 			return {
@@ -518,6 +661,7 @@ export function OrderEntryPanel() {
 	]);
 
 	const isFormDisabled = !isConnected || availableBalance <= 0;
+	const actionButtonClass = getActionButtonClass(buttonContent.variant);
 
 	return (
 		<div className="h-full flex flex-col overflow-hidden bg-surface/20">
@@ -538,59 +682,21 @@ export function OrderEntryPanel() {
 
 			<div className="p-2 space-y-4 overflow-y-auto flex-1">
 				<div className="space-y-2">
-					<Tabs value={orderType} onValueChange={(v) => setOrderType(v as "market" | "limit")}>
-						<TabsList>
-							<TabsTrigger value="market" variant="underline">
-								{t`Market`}
-							</TabsTrigger>
-							<TabsTrigger value="limit" variant="underline">
-								{t`Limit`}
-							</TabsTrigger>
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<span>
-										<TabsTrigger value="stop" variant="underline" disabled className="opacity-50 cursor-not-allowed">
-											{t`Stop`}
-										</TabsTrigger>
-									</span>
-								</TooltipTrigger>
-								<TooltipContent>{t`Coming soon`}</TooltipContent>
-							</Tooltip>
-						</TabsList>
-					</Tabs>
-
-					<div className="grid grid-cols-2 gap-1">
-						<Button
-							variant="ghost"
-							size="none"
-							onClick={() => setSide("buy")}
-							className={cn(
-								"py-2 text-2xs font-semibold uppercase tracking-wider border hover:bg-transparent",
-								side === "buy"
-									? "bg-terminal-green/20 border-terminal-green text-terminal-green terminal-glow-green"
-									: "border-border/60 text-muted-foreground hover:border-terminal-green/40 hover:text-terminal-green",
-							)}
-							aria-label={t`Buy Long`}
-						>
-							<TrendingUp className="size-3 inline mr-1" />
-							{t`Long`}
-						</Button>
-						<Button
-							variant="ghost"
-							size="none"
-							onClick={() => setSide("sell")}
-							className={cn(
-								"py-2 text-2xs font-semibold uppercase tracking-wider border hover:bg-transparent",
-								side === "sell"
-									? "bg-terminal-red/20 border-terminal-red text-terminal-red terminal-glow-red"
-									: "border-border/60 text-muted-foreground hover:border-terminal-red/40 hover:text-terminal-red",
-							)}
-							aria-label={t`Sell Short`}
-						>
-							<TrendingDown className="size-3 inline mr-1" />
-							{t`Short`}
-						</Button>
+					<div className="flex items-center justify-between gap-2">
+						<Tabs value={tabsOrderType} onValueChange={(v) => setOrderType(v as "market" | "limit")}>
+							<TabsList>
+								<TabsTrigger value="market" variant="underline">
+									{t`Market`}
+								</TabsTrigger>
+								<TabsTrigger value="limit" variant="underline">
+									{t`Limit`}
+								</TabsTrigger>
+							</TabsList>
+						</Tabs>
+						<AdvancedOrderDropdown orderType={orderType} onOrderTypeChange={setOrderType} />
 					</div>
+
+					<SideToggle side={side} onSideChange={setSide} />
 				</div>
 
 				<div className="space-y-0.5 text-3xs">
@@ -643,11 +749,11 @@ export function OrderEntryPanel() {
 							value={sizeInput}
 							onChange={(e) => {
 								setHasUserSized(true);
-								setSizeInput(e.target.value);
+								setSize(e.target.value);
 							}}
 							className={cn(
 								"flex-1 h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums",
-								(sizeHasError || orderValueTooLow) && "border-terminal-red focus:border-terminal-red",
+								sizeHasError && "border-terminal-red focus:border-terminal-red",
 							)}
 							disabled={isFormDisabled}
 						/>
@@ -678,17 +784,46 @@ export function OrderEntryPanel() {
 					</div>
 				</div>
 
-				{orderType === "limit" && (
+				{usesTriggerPrice && (
 					<div className="space-y-1.5">
 						<div className="flex items-center justify-between">
-							<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Limit Price`}</div>
+							<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Trigger Price (USDC)`}</div>
 							{markPx > 0 && (
 								<Button
 									variant="ghost"
 									size="none"
-									onClick={() =>
-										setLimitPriceInput(toFixed(markPx, szDecimalsToPriceDecimals(market?.szDecimals ?? 4)))
-									}
+									onClick={() => setTriggerPrice(toFixed(markPx, szDecimalsToPriceDecimals(market?.szDecimals ?? 4)))}
+									className="text-4xs text-muted-foreground hover:text-terminal-cyan hover:bg-transparent tabular-nums"
+								>
+									{t`Mark`}: {formatPrice(markPx, { szDecimals: market?.szDecimals })}
+								</Button>
+							)}
+						</div>
+						<NumberInput
+							placeholder="0.00"
+							value={triggerPriceInput}
+							onChange={(e) => setTriggerPrice(e.target.value)}
+							className={cn(
+								"w-full h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums",
+								usesTriggerPrice &&
+									!isPositive(triggerPriceNum) &&
+									sizeValue > 0 &&
+									"border-terminal-red focus:border-terminal-red",
+							)}
+							disabled={isFormDisabled}
+						/>
+					</div>
+				)}
+
+				{usesLimitPrice && (
+					<div className="space-y-1.5">
+						<div className="flex items-center justify-between">
+							<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Limit Price (USDC)`}</div>
+							{markPx > 0 && (
+								<Button
+									variant="ghost"
+									size="none"
+									onClick={() => setLimitPrice(toFixed(markPx, szDecimalsToPriceDecimals(market?.szDecimals ?? 4)))}
 									className="text-4xs text-muted-foreground hover:text-terminal-cyan hover:bg-transparent tabular-nums"
 								>
 									{t`Mark`}: {formatPrice(markPx, { szDecimals: market?.szDecimals })}
@@ -698,14 +833,98 @@ export function OrderEntryPanel() {
 						<NumberInput
 							placeholder="0.00"
 							value={limitPriceInput}
-							onChange={(e) => setLimitPriceInput(e.target.value)}
+							onChange={(e) => setLimitPrice(e.target.value)}
 							className={cn(
-								"h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums",
-								orderType === "limit" && !price && sizeValue > 0 && "border-terminal-red focus:border-terminal-red",
+								"w-full h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums",
+								usesLimitPrice && !price && sizeValue > 0 && "border-terminal-red focus:border-terminal-red",
 							)}
 							disabled={isFormDisabled}
 						/>
 					</div>
+				)}
+
+				{showTif && (
+					<div className="space-y-1.5">
+						<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Time in Force`}</div>
+						<Select value={tif} onValueChange={(value) => setTif(value as LimitTif)} disabled={isFormDisabled}>
+							<SelectTrigger className="w-full h-8 text-sm bg-background/50 border-border/60">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{availableTifOptions.map((option) => (
+									<SelectItem key={option} value={option}>
+										{TIF_OPTIONS[option].label}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
+				)}
+
+				{scaleOrder && (
+					<>
+						<div className="space-y-1.5">
+							<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Start Price (USDC)`}</div>
+							<NumberInput
+								placeholder="0.00"
+								value={scaleStartPriceInput}
+								onChange={(e) => setScaleStart(e.target.value)}
+								className="w-full h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums"
+								disabled={isFormDisabled}
+							/>
+						</div>
+						<div className="space-y-1.5">
+							<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`End Price (USDC)`}</div>
+							<NumberInput
+								placeholder="0.00"
+								value={scaleEndPriceInput}
+								onChange={(e) => setScaleEnd(e.target.value)}
+								className="w-full h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums"
+								disabled={isFormDisabled}
+							/>
+						</div>
+						<div className="space-y-1.5">
+							<div className="flex items-center justify-between">
+								<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Number of Orders`}</div>
+								<span className="text-4xs text-muted-foreground">{t`2-20`}</span>
+							</div>
+							<NumberInput
+								placeholder="4"
+								value={String(scaleLevelsNum)}
+								onChange={(e) => setScaleLevels(Number(e.target.value) || 4)}
+								allowDecimals={false}
+								className="w-full h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums"
+								disabled={isFormDisabled}
+							/>
+						</div>
+					</>
+				)}
+
+				{twapOrder && (
+					<>
+						<div className="space-y-1.5">
+							<div className="flex items-center justify-between">
+								<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Duration (Minutes)`}</div>
+								<span className="text-4xs text-muted-foreground">{t`5-1440`}</span>
+							</div>
+							<NumberInput
+								placeholder="30"
+								value={String(twapMinutesNum)}
+								onChange={(e) => setTwapMinutes(Number(e.target.value) || 30)}
+								allowDecimals={false}
+								className="w-full h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums"
+								disabled={isFormDisabled}
+							/>
+						</div>
+						<div className="flex items-center gap-2 text-3xs">
+							<Checkbox
+								checked={twapRandomize}
+								onCheckedChange={(checked) => setTwapRandomize(checked === true)}
+								disabled={isFormDisabled}
+							/>
+							<span className={cn(isFormDisabled && "text-muted-foreground")}>{t`Randomize execution timing`}</span>
+						</div>
+					</>
 				)}
 
 				<div className="space-y-4">
@@ -725,24 +944,26 @@ export function OrderEntryPanel() {
 								{t`Reduce Only`}
 							</label>
 						</div>
-						<div className="inline-flex items-center gap-2">
-							<Checkbox
-								id={tpSlId}
-								aria-label={t`Take Profit / Stop Loss`}
-								checked={tpSlEnabled}
-								onCheckedChange={(checked) => setTpSlEnabled(checked === true)}
-								disabled={isFormDisabled}
-							/>
-							<label
-								htmlFor={tpSlId}
-								className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-foreground")}
-							>
-								{t`TP/SL`}
-							</label>
-						</div>
+						{canUseTpSl && (
+							<div className="inline-flex items-center gap-2">
+								<Checkbox
+									id={tpSlId}
+									aria-label={t`Take Profit / Stop Loss`}
+									checked={tpSlEnabled}
+									onCheckedChange={(checked) => setTpSlEnabled(checked === true)}
+									disabled={isFormDisabled}
+								/>
+								<label
+									htmlFor={tpSlId}
+									className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-foreground")}
+								>
+									{t`TP/SL`}
+								</label>
+							</div>
+						)}
 					</div>
 
-					{tpSlEnabled && (
+					{tpSlEnabled && canUseTpSl && (
 						<TpSlSection
 							side={side}
 							referencePrice={price}
@@ -750,8 +971,8 @@ export function OrderEntryPanel() {
 							szDecimals={market?.szDecimals}
 							tpPrice={tpPriceInput}
 							slPrice={slPriceInput}
-							onTpPriceChange={setTpPriceInput}
-							onSlPriceChange={setSlPriceInput}
+							onTpPriceChange={setTpPrice}
+							onSlPriceChange={setSlPrice}
 							disabled={isFormDisabled}
 						/>
 					)}
@@ -771,11 +992,7 @@ export function OrderEntryPanel() {
 						disabled={buttonContent.disabled}
 						className={cn(
 							"w-full py-2.5 text-2xs font-semibold uppercase tracking-wider border gap-2 hover:bg-transparent",
-							buttonContent.variant === "cyan"
-								? "bg-terminal-cyan/20 border-terminal-cyan text-terminal-cyan hover:bg-terminal-cyan/30"
-								: buttonContent.variant === "buy"
-									? "bg-terminal-green/20 border-terminal-green text-terminal-green hover:bg-terminal-green/30"
-									: "bg-terminal-red/20 border-terminal-red text-terminal-red hover:bg-terminal-red/30",
+							actionButtonClass,
 						)}
 						aria-label={buttonContent.text}
 					>
@@ -784,41 +1001,16 @@ export function OrderEntryPanel() {
 					</Button>
 				</div>
 
-				<div className="border border-border/40 divide-y divide-border/40 text-3xs">
-					<div className="flex items-center justify-between px-2 py-1.5">
-						<span className="text-muted-foreground">{t`Liq. Price`}</span>
-						<span className={cn("tabular-nums", liqWarning ? "text-terminal-red" : "text-terminal-red/70")}>
-							{liqPrice ? formatPrice(liqPrice, { szDecimals: market?.szDecimals }) : FALLBACK_VALUE_PLACEHOLDER}
-						</span>
-					</div>
-					<div className="flex items-center justify-between px-2 py-1.5">
-						<span className="text-muted-foreground">{t`Order Value`}</span>
-						<span className="tabular-nums">{orderValue > 0 ? formatUSD(orderValue) : FALLBACK_VALUE_PLACEHOLDER}</span>
-					</div>
-					<div className="flex items-center justify-between px-2 py-1.5">
-						<span className="text-muted-foreground">{t`Margin Req.`}</span>
-						<span className="tabular-nums">
-							{marginRequired > 0 ? formatUSD(marginRequired) : FALLBACK_VALUE_PLACEHOLDER}
-						</span>
-					</div>
-					<div className="flex items-center justify-between px-2 py-1.5">
-						<span className="text-muted-foreground">{t`Slippage`}</span>
-						<button
-							type="button"
-							onClick={() => setSettingsDialogOpen(true)}
-							className="flex items-center gap-1 hover:text-foreground transition-colors"
-						>
-							<span className="tabular-nums text-terminal-amber">{toFixed(calc.divide(slippageBps, 100), 2)}%</span>
-							<PencilIcon className="size-2 text-muted-foreground" />
-						</button>
-					</div>
-					<div className="flex items-center justify-between px-2 py-1.5">
-						<span className="text-muted-foreground">{t`Est. Fee`}</span>
-						<span className="tabular-nums text-muted-foreground">
-							{estimatedFee > 0 ? formatUSD(estimatedFee) : FALLBACK_VALUE_PLACEHOLDER}
-						</span>
-					</div>
-				</div>
+				<OrderSummary
+					liqPrice={liqPrice}
+					liqWarning={liqWarning}
+					orderValue={orderValue}
+					marginRequired={marginRequired}
+					estimatedFee={estimatedFee}
+					slippageBps={slippageBps}
+					szDecimals={market?.szDecimals}
+					onSlippageClick={() => setSettingsDialogOpen(true)}
+				/>
 			</div>
 
 			<WalletDialog open={walletDialogOpen} onOpenChange={setWalletDialogOpen} />

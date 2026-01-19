@@ -287,7 +287,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 
 					{error && (
 						<div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/20">
-							<AlertCircle className="size-4 text-destructive flex-shrink-0 mt-0.5" />
+							<AlertCircle className="size-4 text-destructive shrink-0 mt-0.5" />
 							<p className="text-xs text-destructive">{error.message}</p>
 						</div>
 					)}
