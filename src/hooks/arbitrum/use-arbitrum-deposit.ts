@@ -1,77 +1,127 @@
 import { useCallback, useEffect, useState } from "react";
-import { parseUnits } from "viem";
-import { useConnection } from "wagmi";
-import { MIN_DEPOSIT_USDC, USDC_DECIMALS } from "@/config/contracts";
-import { useApproveUSDC } from "./use-approve-usdc";
-import { useArbitrumNetwork } from "./use-arbitrum-network";
-import { useDepositToHyperliquid } from "./use-deposit-to-hyperliquid";
-import { useUSDCAllowance } from "./use-usdc-allowance";
-import { useUSDCBalance } from "./use-usdc-balance";
+import { formatUnits, hexToSignature, parseUnits } from "viem";
+import {
+	useAccount,
+	useReadContract,
+	useSignTypedData,
+	useSwitchChain,
+	useWaitForTransactionReceipt,
+	useWriteContract,
+} from "wagmi";
+import {
+	ARBITRUM_CHAIN_ID,
+	BRIDGE2_ABI,
+	CONTRACTS,
+	MIN_DEPOSIT_USDC,
+	USDC_ABI,
+	USDC_DECIMALS,
+} from "@/config/contracts";
 
-type DepositStep = "idle" | "approving" | "depositing" | "success" | "error";
+type DepositStep = "idle" | "signing" | "depositing" | "success" | "error";
+
+const PERMIT_TYPES = {
+	EIP712Domain: [
+		{ name: "name", type: "string" },
+		{ name: "version", type: "string" },
+		{ name: "chainId", type: "uint256" },
+		{ name: "verifyingContract", type: "address" },
+	],
+	Permit: [
+		{ name: "owner", type: "address" },
+		{ name: "spender", type: "address" },
+		{ name: "value", type: "uint256" },
+		{ name: "nonce", type: "uint256" },
+		{ name: "deadline", type: "uint256" },
+	],
+} as const;
+
+const USDC_DOMAIN = {
+	name: "USD Coin",
+	version: "2",
+	chainId: BigInt(ARBITRUM_CHAIN_ID),
+	verifyingContract: CONTRACTS.arbitrum.usdc,
+};
 
 export function useArbitrumDeposit() {
-	const { address } = useConnection();
+	const { address, chainId } = useAccount();
+	const { switchChain, isPending: isSwitching, error: switchError } = useSwitchChain();
 	const [step, setStep] = useState<DepositStep>("idle");
-	const [pendingAmount, setPendingAmount] = useState<bigint>(0n);
 
-	const { isArbitrum, switchToArbitrum, isSwitching } = useArbitrumNetwork();
+	const isArbitrum = chainId === ARBITRUM_CHAIN_ID;
 
-	const {
-		balance,
-		balanceRaw,
-		refetch: refetchBalance,
-	} = useUSDCBalance({
-		address,
-		enabled: isArbitrum,
+	// USDC Balance
+	const { data: balanceData, refetch: refetchBalance } = useReadContract({
+		address: CONTRACTS.arbitrum.usdc,
+		abi: USDC_ABI,
+		functionName: "balanceOf",
+		args: address ? [address] : undefined,
+		chainId: ARBITRUM_CHAIN_ID,
+		query: { enabled: isArbitrum && !!address },
 	});
 
-	const { allowance, refetch: refetchAllowance } = useUSDCAllowance({
-		owner: address,
-		enabled: isArbitrum,
+	const balance = balanceData ? formatUnits(balanceData, USDC_DECIMALS) : "0";
+	const balanceRaw = balanceData ?? 0n;
+
+	// USDC Nonce for permit
+	const { data: nonce } = useReadContract({
+		address: CONTRACTS.arbitrum.usdc,
+		abi: USDC_ABI,
+		functionName: "nonces",
+		args: address ? [address] : undefined,
+		chainId: ARBITRUM_CHAIN_ID,
+		query: { enabled: isArbitrum && !!address },
 	});
 
+	// Sign permit
 	const {
-		approve,
-		isPending: isApproving,
-		isConfirming: isApprovalConfirming,
-		isSuccess: isApprovalSuccess,
-		error: approvalError,
-		reset: resetApproval,
-	} = useApproveUSDC();
+		signTypedData,
+		isPending: isSigning,
+		error: signError,
+		reset: resetSign,
+	} = useSignTypedData();
 
+	// Write to bridge contract
 	const {
-		deposit: executeDeposit,
-		isPending: isDepositing,
-		isConfirming: isDepositConfirming,
-		isSuccess: isDepositSuccess,
-		hash: depositHash,
-		error: depositError,
-		reset: resetDeposit,
-	} = useDepositToHyperliquid();
+		writeContract,
+		data: hash,
+		isPending: isSubmitting,
+		error: submitError,
+		reset: resetSubmit,
+	} = useWriteContract();
 
+	const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+
+	// Track step changes
 	useEffect(() => {
-		if (isApprovalSuccess && step === "approving" && pendingAmount > 0n) {
-			refetchAllowance();
-			setStep("depositing");
-			executeDeposit(pendingAmount);
+		if (isSigning && step === "idle") {
+			setStep("signing");
 		}
-	}, [isApprovalSuccess, step, pendingAmount, refetchAllowance, executeDeposit]);
+	}, [isSigning, step]);
 
 	useEffect(() => {
-		if (isDepositSuccess && step === "depositing") {
+		if (isSubmitting || isConfirming) {
+			setStep("depositing");
+		}
+	}, [isSubmitting, isConfirming]);
+
+	useEffect(() => {
+		if (isSuccess && step === "depositing") {
 			setStep("success");
 			refetchBalance();
 		}
-	}, [isDepositSuccess, step, refetchBalance]);
+	}, [isSuccess, step, refetchBalance]);
+
+	const depositError = signError || submitError;
 
 	useEffect(() => {
-		if ((approvalError || depositError) && step !== "idle") {
+		if (depositError && step !== "idle") {
 			setStep("error");
 		}
-	}, [approvalError, depositError, step]);
+	}, [depositError, step]);
 
-	const needsApproval = useCallback((amount: bigint) => allowance < amount, [allowance]);
+	function switchToArbitrum() {
+		switchChain({ chainId: ARBITRUM_CHAIN_ID });
+	}
 
 	const validateAmount = useCallback(
 		(amount: string): { valid: boolean; error: string | null } => {
@@ -96,47 +146,94 @@ export function useArbitrumDeposit() {
 
 	const startDeposit = useCallback(
 		(amount: string) => {
-			const amountRaw = parseUnits(amount, USDC_DECIMALS);
-			setPendingAmount(amountRaw);
+			if (!address || nonce === undefined) return;
 
-			if (needsApproval(amountRaw)) {
-				setStep("approving");
-				approve(amountRaw);
-			} else {
-				setStep("depositing");
-				executeDeposit(amountRaw);
-			}
+			const amountRaw = parseUnits(amount, USDC_DECIMALS);
+			const deadline = BigInt(Math.floor(Date.now() / 1000) + 3600);
+
+			signTypedData(
+				{
+					domain: USDC_DOMAIN,
+					types: PERMIT_TYPES,
+					primaryType: "Permit",
+					message: {
+						owner: address,
+						spender: CONTRACTS.arbitrum.bridge2,
+						value: amountRaw,
+						nonce,
+						deadline,
+					},
+				},
+				{
+					onSuccess: (sig) => {
+						const { r, s, v } = hexToSignature(sig);
+						// Ensure v is 27 or 28 (some wallets return 0 or 1)
+						const vNormalized = Number(v) < 27 ? Number(v) + 27 : Number(v);
+
+						console.log("Deposit params:", {
+							user: address,
+							usd: amountRaw.toString(),
+							deadline: deadline.toString(),
+							nonce: nonce?.toString(),
+							r,
+							s,
+							v: vNormalized,
+						});
+
+						writeContract({
+							address: CONTRACTS.arbitrum.bridge2,
+							abi: BRIDGE2_ABI,
+							functionName: "batchedDepositWithPermit",
+							args: [
+								[
+									{
+										user: address,
+										usd: amountRaw,
+										deadline,
+										signature: {
+											r: BigInt(r),
+											s: BigInt(s),
+											v: vNormalized,
+										},
+									},
+								],
+							],
+							chainId: ARBITRUM_CHAIN_ID,
+							account: address,
+						});
+					},
+				},
+			);
 		},
-		[needsApproval, approve, executeDeposit],
+		[address, nonce, signTypedData, writeContract],
 	);
 
 	const reset = useCallback(() => {
 		setStep("idle");
-		setPendingAmount(0n);
-		resetApproval();
-		resetDeposit();
-	}, [resetApproval, resetDeposit]);
+		resetSign();
+		resetSubmit();
+	}, [resetSign, resetSubmit]);
 
 	return {
+		chainId,
 		isArbitrum,
 		switchToArbitrum,
 		isSwitching,
+		switchError,
 
 		balance,
 		balanceRaw,
 
 		step,
-		error: approvalError || depositError,
+		error: depositError,
 
 		startDeposit,
 		validateAmount,
-		needsApproval,
 		reset,
 		refetchBalance,
 
-		isApproving: isApproving || isApprovalConfirming,
-		isDepositing: isDepositing || isDepositConfirming,
-		isSuccess: isDepositSuccess,
-		depositHash,
+		isPending: isSigning || isSubmitting,
+		isSuccess,
+		depositHash: hash,
 	};
 }

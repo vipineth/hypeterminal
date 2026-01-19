@@ -45,6 +45,7 @@ import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@
 import type { ActiveDialog, ButtonContent } from "@/lib/trade/types";
 import { useButtonContent } from "@/lib/trade/use-button-content";
 import { useOrderValidation } from "@/lib/trade/use-order-validation";
+import { useDepositModalActions, useDepositModalOpen, useDepositModalTab } from "@/stores/use-deposit-modal-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import {
 	useLimitPrice,
@@ -186,6 +187,10 @@ export function OrderEntryPanel() {
 	const [dragSliderValue, setDragSliderValue] = useState(25);
 	const [approvalError, setApprovalError] = useState<string | null>(null);
 	const [activeDialog, setActiveDialog] = useState<ActiveDialog>(null);
+
+	const depositModalOpen = useDepositModalOpen();
+	const depositModalTab = useDepositModalTab();
+	const { open: openDepositModal, close: closeDepositModal, setTab: setDepositModalTab } = useDepositModalActions();
 
 	useEffect(() => {
 		if (selectedPrice !== null) {
@@ -507,7 +512,7 @@ export function OrderEntryPanel() {
 		side,
 		isSubmitting,
 		onConnectWallet: () => setActiveDialog("wallet"),
-		onDeposit: () => setActiveDialog("deposit"),
+		onDeposit: () => openDepositModal("deposit"),
 		onRegister: handleRegister,
 		onSubmit: handleSubmit,
 	});
@@ -564,7 +569,7 @@ export function OrderEntryPanel() {
 								<Button
 									variant="link"
 									size="none"
-									onClick={() => setActiveDialog("deposit")}
+									onClick={() => openDepositModal("deposit")}
 									className="text-terminal-cyan text-4xs uppercase"
 								>
 									{t`Deposit`}
@@ -866,7 +871,12 @@ export function OrderEntryPanel() {
 			</div>
 
 			<WalletDialog open={activeDialog === "wallet"} onOpenChange={(open) => setActiveDialog(open ? "wallet" : null)} />
-			<DepositModal open={activeDialog === "deposit"} onOpenChange={(open) => setActiveDialog(open ? "deposit" : null)} />
+			<DepositModal
+				open={depositModalOpen}
+				onOpenChange={(open) => (open ? openDepositModal(depositModalTab) : closeDepositModal())}
+				defaultTab={depositModalTab}
+				onTabChange={setDepositModalTab}
+			/>
 			<GlobalSettingsDialog
 				open={activeDialog === "settings"}
 				onOpenChange={(open) => setActiveDialog(open ? "settings" : null)}

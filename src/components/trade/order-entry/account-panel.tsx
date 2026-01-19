@@ -7,6 +7,7 @@ import { cn } from "@/lib/cn";
 import { formatPercent, formatToken, formatUSD } from "@/lib/format";
 import { useSubClearinghouseState, useSubSpotState } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumberOrZero } from "@/lib/trade/numbers";
+import { useDepositModalActions } from "@/stores/use-deposit-modal-store";
 
 type SummaryRow = {
 	label: string;
@@ -16,6 +17,7 @@ type SummaryRow = {
 
 export function AccountPanel() {
 	const [activeTab, setActiveTab] = useState<"perps" | "spot">("perps");
+	const { open: openDepositModal } = useDepositModalActions();
 
 	const { address, isConnected } = useConnection();
 	const { data: stateEvent } = useSubClearinghouseState(
@@ -272,6 +274,7 @@ export function AccountPanel() {
 							<Button
 								variant="ghost"
 								size="none"
+								onClick={() => openDepositModal("deposit")}
 								className="py-1.5 text-3xs uppercase tracking-wider border border-terminal-green/40 text-terminal-green hover:bg-terminal-green/10"
 								aria-label={t`Deposit`}
 							>
@@ -280,6 +283,7 @@ export function AccountPanel() {
 							<Button
 								variant="ghost"
 								size="none"
+								onClick={() => openDepositModal("withdraw")}
 								className="py-1.5 text-3xs uppercase tracking-wider border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:bg-transparent"
 								aria-label={t`Withdraw`}
 							>
