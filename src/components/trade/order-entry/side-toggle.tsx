@@ -2,7 +2,7 @@ import { t } from "@lingui/core/macro";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
-import type { Side } from "@/stores/use-order-entry-store";
+import type { Side } from "@/lib/trade/types";
 
 interface Props {
 	side: Side;

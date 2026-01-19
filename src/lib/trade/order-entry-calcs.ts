@@ -10,7 +10,7 @@ import {
 	isTwapOrderType,
 	usesLimitPrice,
 } from "@/lib/trade/order-types";
-type Side = "buy" | "sell";
+import type { Side } from "@/lib/trade/types";
 
 interface MaxSizeInput {
 	isConnected: boolean;
