@@ -13,7 +13,7 @@ import { usePerpMarkets } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useSubAssetCtxs, useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
-import { calc, parseNumber } from "@/lib/trade/numbers";
+import { calc, isPositive, parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
@@ -21,6 +21,24 @@ import type { PerpAssetCtxs } from "@/types/hyperliquid";
 import { TokenAvatar } from "../components/token-avatar";
 import { TradingActionButton } from "../components/trading-action-button";
 import { PositionTpSlModal } from "./position-tpsl-modal";
+
+interface PlaceholderProps {
+	children: React.ReactNode;
+	variant?: "error";
+}
+
+function Placeholder({ children, variant }: PlaceholderProps) {
+	return (
+		<div
+			className={cn(
+				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
+				variant === "error" ? "text-terminal-red/80" : "text-muted-foreground",
+			)}
+		>
+			{children}
+		</div>
+	);
+}
 
 interface TpSlPositionData {
 	coin: string;
@@ -92,7 +110,7 @@ export function PositionsTab() {
 			if (!isTp && !isSl) continue;
 
 			const triggerPx = parseNumber((order as { triggerPx?: string }).triggerPx);
-			if (!Number.isFinite(triggerPx) || triggerPx <= 0) continue;
+			if (!isPositive(triggerPx)) continue;
 
 			const existing = map.get(order.coin) ?? {};
 			if (isTp) {
@@ -113,27 +131,17 @@ export function PositionsTab() {
 			const isLong = size > 0;
 			const closeSize = Math.abs(size);
 
-			const entryPx = parseNumber(p.entryPx);
-			const positionValue = parseNumber(p.positionValue);
-			const unrealizedPnl = parseNumber(p.unrealizedPnl);
-			const roe = parseNumber(p.returnOnEquity);
-			const liquidationPx = p.liquidationPx ? parseNumber(p.liquidationPx) : Number.NaN;
-			const marginUsed = parseNumber((p as { marginUsed?: string }).marginUsed);
-			const leverageType = (p as { leverage?: { type?: string } }).leverage?.type as "cross" | "isolated" | undefined;
-
 			const szDecimals = getSzDecimals(p.coin) ?? 4;
 			const assetIndex = getAssetId(p.coin);
 			const markPxRaw = typeof assetIndex === "number" ? assetCtxs?.[assetIndex]?.markPx : undefined;
 			const markPx = markPxRaw ? parseNumber(markPxRaw) : Number.NaN;
-			const cumFundingSinceOpen = parseNumber((p as { cumFunding?: { sinceOpen?: string } }).cumFunding?.sinceOpen);
+			const entryPx = parseNumber(p.entryPx);
+			const unrealizedPnl = parseNumber(p.unrealizedPnl);
+			const roe = parseNumber(p.returnOnEquity);
+			const cumFunding = parseNumber((p as { cumFunding?: { sinceOpen?: string } }).cumFunding?.sinceOpen);
+			const leverageType = (p as { leverage?: { type?: string } }).leverage?.type as "cross" | "isolated" | undefined;
 
-			const canClose =
-				Number.isFinite(closeSize) &&
-				closeSize > 0 &&
-				typeof assetIndex === "number" &&
-				Number.isFinite(markPx) &&
-				markPx > 0;
-
+			const canClose = isPositive(closeSize) && typeof assetIndex === "number" && isPositive(markPx);
 			const tpSlInfo = tpSlOrdersByCoin.get(p.coin);
 
 			return {
@@ -148,28 +156,12 @@ export function PositionsTab() {
 				entryPx,
 				unrealizedPnl,
 				roe,
-				sideLabel: isLong ? t`Long` : t`Short`,
-				sideClass: isLong ? "bg-terminal-green/20 text-terminal-green" : "bg-terminal-red/20 text-terminal-red",
-				sizeText: Number.isFinite(size) ? formatToken(Math.abs(size), szDecimals) : FALLBACK_VALUE_PLACEHOLDER,
-				valueText: Number.isFinite(positionValue)
-					? formatUSD(Math.abs(positionValue), { compact: true })
-					: FALLBACK_VALUE_PLACEHOLDER,
-				entryText: Number.isFinite(entryPx) ? formatPrice(entryPx, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER,
-				markText: Number.isFinite(markPx) ? formatPrice(markPx, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER,
-				liqText: Number.isFinite(liquidationPx)
-					? formatPrice(liquidationPx, { szDecimals })
-					: FALLBACK_VALUE_PLACEHOLDER,
-				pnlText: Number.isFinite(unrealizedPnl)
-					? formatUSD(unrealizedPnl, { signDisplay: "exceptZero" })
-					: FALLBACK_VALUE_PLACEHOLDER,
-				roeText: Number.isFinite(roe) ? formatPercent(roe, 1) : FALLBACK_VALUE_PLACEHOLDER,
-				pnlClass: unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red",
-				fundingText: Number.isFinite(cumFundingSinceOpen)
-					? formatUSD(-cumFundingSinceOpen, { signDisplay: "exceptZero" })
-					: FALLBACK_VALUE_PLACEHOLDER,
-				fundingClass: cumFundingSinceOpen >= 0 ? "text-terminal-red" : "text-terminal-green",
-				marginText: Number.isFinite(marginUsed) ? formatUSD(marginUsed) : FALLBACK_VALUE_PLACEHOLDER,
+				size: Math.abs(size),
+				positionValue: p.positionValue,
+				liquidationPx: p.liquidationPx,
+				marginUsed: (p as { marginUsed?: string }).marginUsed,
 				marginMode: leverageType ?? "cross",
+				cumFunding,
 				tpPrice: tpSlInfo?.tpPrice,
 				slPrice: tpSlInfo?.slPrice,
 				tpOrderId: tpSlInfo?.tpOrderId,
@@ -217,6 +209,23 @@ export function PositionsTab() {
 
 	const actionError = closeError?.message;
 
+	function renderPlaceholder() {
+		if (!isConnected) return <Placeholder>{t`Connect your wallet to view positions.`}</Placeholder>;
+		if (status === "subscribing" || status === "idle") return <Placeholder>{t`Loading positions...`}</Placeholder>;
+		if (status === "error") {
+			return (
+				<Placeholder variant="error">
+					<span>{t`Failed to load positions.`}</span>
+					{error instanceof Error && <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span>}
+				</Placeholder>
+			);
+		}
+		if (positions.length === 0) return <Placeholder>{t`No active positions.`}</Placeholder>;
+		return null;
+	}
+
+	const placeholder = renderPlaceholder();
+
 	function handleOpenTpSlModal(row: (typeof tableRows)[number]) {
 		if (typeof row.assetIndex !== "number") return;
 		setSelectedTpSlPosition({
@@ -246,26 +255,7 @@ export function PositionsTab() {
 			</div>
 			{actionError ? <div className="mb-1 text-4xs text-terminal-red/80">{actionError}</div> : null}
 			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
-				{!isConnected ? (
-					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{t`Connect your wallet to view positions.`}
-					</div>
-				) : status === "subscribing" || status === "idle" ? (
-					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{t`Loading positions...`}
-					</div>
-				) : status === "error" ? (
-					<div className="h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs text-terminal-red/80">
-						<span>{t`Failed to load positions.`}</span>
-						{error instanceof Error ? (
-							<span className="mt-1 text-4xs text-muted-foreground">{error.message}</span>
-						) : null}
-					</div>
-				) : positions.length === 0 ? (
-					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{t`No active positions.`}
-					</div>
-				) : (
+				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
@@ -305,12 +295,18 @@ export function PositionsTab() {
 							<TableBody>
 								{tableRows.map((row) => {
 									const isRowClosing = isClosing && closingKeyRef.current === row.key;
+									const sideClass = row.isLong
+										? "bg-terminal-green/20 text-terminal-green"
+										: "bg-terminal-red/20 text-terminal-red";
+									const pnlClass = row.unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red";
+									const fundingClass = row.cumFunding >= 0 ? "text-terminal-red" : "text-terminal-green";
+
 									return (
 										<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
 											<TableCell className="text-2xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">
-													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
-														{row.sideLabel}
+													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideClass)}>
+														{row.isLong ? t`Long` : t`Short`}
 													</span>
 													<Button
 														variant="link"
@@ -324,29 +320,36 @@ export function PositionsTab() {
 													</Button>
 												</div>
 											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.sizeText}</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums py-1.5">
+												{formatToken(row.size, row.szDecimals)}{" "}
+												<span className="text-muted-foreground">
+													({formatUSD(row.positionValue, { compact: true })})
+												</span>
+											</TableCell>
 											<TableCell className="text-2xs text-right py-1.5">
 												<div className="flex flex-col items-end">
-													<span className="tabular-nums">{row.marginText}</span>
+													<span className="tabular-nums">{formatUSD(row.marginUsed)}</span>
 													<span className="text-4xs text-muted-foreground">
 														{row.marginMode === "isolated" ? t`Isolated` : t`Cross`}
 													</span>
 												</div>
 											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.entryText}</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums py-1.5">
+												{formatPrice(row.entryPx, { szDecimals: row.szDecimals })}
+											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
-												{row.markText}
+												{formatPrice(row.markPx, { szDecimals: row.szDecimals })}
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums text-terminal-red/70 py-1.5">
-												{row.liqText}
+												{formatPrice(row.liquidationPx, { szDecimals: row.szDecimals })}
 											</TableCell>
-											<TableCell className={cn("text-2xs text-right tabular-nums py-1.5", row.fundingClass)}>
-												{row.fundingText}
+											<TableCell className={cn("text-2xs text-right tabular-nums py-1.5", fundingClass)}>
+												{formatUSD(row.cumFunding ? -row.cumFunding : null, { signDisplay: "exceptZero" })}
 											</TableCell>
 											<TableCell className="text-right py-1.5">
-												<div className={cn("text-2xs tabular-nums", row.pnlClass)}>
-													{row.pnlText}
-													<span className="text-muted-foreground ml-1">({row.roeText})</span>
+												<div className={cn("text-2xs tabular-nums", pnlClass)}>
+													{formatUSD(row.unrealizedPnl, { signDisplay: "exceptZero" })}
+													<span className="text-muted-foreground ml-1">({formatPercent(row.roe, 1)})</span>
 												</div>
 											</TableCell>
 											<TableCell className="text-right py-1.5">

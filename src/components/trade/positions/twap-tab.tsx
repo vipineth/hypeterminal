@@ -11,8 +11,26 @@ import { formatNumber, formatPrice } from "@/lib/format";
 import { usePerpMarkets } from "@/lib/hyperliquid";
 import { useSubUserTwapHistory } from "@/lib/hyperliquid/hooks/subscription";
 import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
-import { parseNumber } from "@/lib/trade/numbers";
+import { calc, parseNumber } from "@/lib/trade/numbers";
 import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
+
+interface PlaceholderProps {
+	children: React.ReactNode;
+	variant?: "error";
+}
+
+function Placeholder({ children, variant }: PlaceholderProps) {
+	return (
+		<div
+			className={cn(
+				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
+				variant === "error" ? "text-terminal-red/80" : "text-muted-foreground",
+			)}
+		>
+			{children}
+		</div>
+	);
+}
 
 export function TwapTab() {
 	const { address, isConnected } = useConnection();
@@ -42,29 +60,10 @@ export function TwapTab() {
 			const isBuy = order.state.side === "B";
 			const totalSize = parseNumber(order.state.sz);
 			const executedSize = parseNumber(order.state.executedSz);
-			const executedNtl = parseNumber(order.state.executedNtl);
+			const avgPrice = calc.divide(order.state.executedNtl, order.state.executedSz);
 			const szDecimals = getSzDecimals(order.state.coin) ?? 4;
-
-			const avgPrice =
-				Number.isFinite(executedNtl) && Number.isFinite(executedSize) && executedSize !== 0
-					? executedNtl / executedSize
-					: Number.NaN;
-
-			const rawProgressPct =
-				Number.isFinite(totalSize) && totalSize !== 0 && Number.isFinite(executedSize)
-					? (executedSize / totalSize) * 100
-					: 0;
-			const progressPct = Math.max(0, Math.min(100, rawProgressPct));
-
-			const rawStatus = order.status.status;
-			const statusLabel =
-				rawStatus === "activated"
-					? t`active`
-					: rawStatus === "finished"
-						? t`completed`
-						: rawStatus === "terminated"
-							? t`cancelled`
-							: rawStatus;
+			const progressPct = calc.percentOf(executedSize, totalSize) ?? 0;
+			const status = order.status.status;
 
 			return {
 				key:
@@ -72,20 +71,34 @@ export function TwapTab() {
 						? order.twapId
 						: `${order.state.coin}-${order.state.timestamp}-${order.time}`,
 				coin: order.state.coin,
-				sideLabel: isBuy ? t`buy` : t`sell`,
-				sideClass: isBuy ? "bg-terminal-green/20 text-terminal-green" : "bg-terminal-red/20 text-terminal-red",
-				totalSizeText: Number.isFinite(totalSize) ? formatNumber(totalSize, szDecimals) : String(order.state.sz),
-				executedSizeText: Number.isFinite(executedSize)
-					? formatNumber(executedSize, szDecimals)
-					: String(order.state.executedSz),
-				avgPriceText: Number.isFinite(avgPrice) ? formatPrice(avgPrice, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER,
-				progressPct,
-				rawStatus,
-				statusLabel,
-				showCancel: rawStatus === "activated",
+				isBuy,
+				totalSize,
+				executedSize,
+				avgPrice,
+				szDecimals,
+				progressPct: Math.max(0, Math.min(100, progressPct)),
+				status,
+				showCancel: status === "activated",
 			};
 		});
 	}, [orders, getSzDecimals]);
+
+	function renderPlaceholder() {
+		if (!isConnected) return <Placeholder>{t`Connect your wallet to view TWAP orders.`}</Placeholder>;
+		if (status === "subscribing" || status === "idle") return <Placeholder>{t`Loading TWAP orders...`}</Placeholder>;
+		if (status === "error") {
+			return (
+				<Placeholder variant="error">
+					<span>{t`Failed to load TWAP history.`}</span>
+					{error instanceof Error && <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span>}
+				</Placeholder>
+			);
+		}
+		if (orders.length === 0) return <Placeholder>{t`No TWAP orders found.`}</Placeholder>;
+		return null;
+	}
+
+	const placeholder = renderPlaceholder();
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
@@ -95,26 +108,7 @@ export function TwapTab() {
 				<span className="text-terminal-cyan ml-auto tabular-nums">{headerCount}</span>
 			</div>
 			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
-				{!isConnected ? (
-					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{t`Connect your wallet to view TWAP orders.`}
-					</div>
-				) : status === "subscribing" || status === "idle" ? (
-					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{t`Loading TWAP orders...`}
-					</div>
-				) : status === "error" ? (
-					<div className="h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs text-terminal-red/80">
-						<span>{t`Failed to load TWAP history.`}</span>
-						{error instanceof Error ? (
-							<span className="mt-1 text-4xs text-muted-foreground">{error.message}</span>
-						) : null}
-					</div>
-				) : orders.length === 0 ? (
-					<div className="h-full w-full flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
-						{t`No TWAP orders found.`}
-					</div>
-				) : (
+				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
@@ -143,66 +137,84 @@ export function TwapTab() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{tableRows.map((row) => (
-									<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
-										<TableCell className="text-2xs font-medium py-1.5">
-											<div className="flex items-center gap-1.5">
-												<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", row.sideClass)}>
-													{row.sideLabel}
-												</span>
-												<Button
-													variant="link"
-													size="none"
-													onClick={() => setSelectedMarketKey(makePerpMarketKey(row.coin))}
-													aria-label={t`Switch to ${row.coin} market`}
-												>
-													{row.coin}
-												</Button>
-											</div>
-										</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.totalSizeText}</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
-											{row.executedSizeText}
-										</TableCell>
-										<TableCell className="text-2xs text-right tabular-nums py-1.5">{row.avgPriceText}</TableCell>
-										<TableCell className="py-1.5">
-											<div className="flex items-center gap-2">
-												<div className="flex-1 h-1.5 bg-accent/30 rounded-full overflow-hidden">
-													<div
-														className={cn(
-															"h-full rounded-full",
-															row.rawStatus === "finished" ? "bg-terminal-green" : "bg-terminal-cyan",
-														)}
-														style={{ width: `${row.progressPct}%` }}
-													/>
+								{tableRows.map((row) => {
+									const sideClass = row.isBuy
+										? "bg-terminal-green/20 text-terminal-green"
+										: "bg-terminal-red/20 text-terminal-red";
+									const statusLabel =
+										row.status === "activated"
+											? t`active`
+											: row.status === "finished"
+												? t`completed`
+												: row.status === "terminated"
+													? t`cancelled`
+													: row.status;
+
+									return (
+										<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
+											<TableCell className="text-2xs font-medium py-1.5">
+												<div className="flex items-center gap-1.5">
+													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideClass)}>
+														{row.isBuy ? t`buy` : t`sell`}
+													</span>
+													<Button
+														variant="link"
+														size="none"
+														onClick={() => setSelectedMarketKey(makePerpMarketKey(row.coin))}
+														aria-label={t`Switch to ${row.coin} market`}
+													>
+														{row.coin}
+													</Button>
 												</div>
-												<span className="text-4xs tabular-nums text-muted-foreground">
-													{row.progressPct.toFixed(0)}%
+											</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums py-1.5">
+												{formatNumber(row.totalSize, row.szDecimals)}
+											</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
+												{formatNumber(row.executedSize, row.szDecimals)}
+											</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums py-1.5">
+												{formatPrice(row.avgPrice, { szDecimals: row.szDecimals })}
+											</TableCell>
+											<TableCell className="py-1.5">
+												<div className="flex items-center gap-2">
+													<div className="flex-1 h-1.5 bg-accent/30 rounded-full overflow-hidden">
+														<div
+															className={cn(
+																"h-full rounded-full",
+																row.status === "finished" ? "bg-terminal-green" : "bg-terminal-cyan",
+															)}
+															style={{ width: `${row.progressPct}%` }}
+														/>
+													</div>
+													<span className="text-4xs tabular-nums text-muted-foreground">
+														{row.progressPct.toFixed(0)}%
+													</span>
+												</div>
+											</TableCell>
+											<TableCell className="text-2xs py-1.5">
+												<span
+													className={cn(
+														"text-4xs px-1 py-0.5 rounded-sm uppercase",
+														row.status === "activated" && "bg-terminal-cyan/20 text-terminal-cyan",
+														row.status === "finished" && "bg-terminal-green/20 text-terminal-green",
+														(row.status === "terminated" || row.status === "error") &&
+															"bg-terminal-red/20 text-terminal-red",
+													)}
+												>
+													{statusLabel}
 												</span>
-											</div>
-										</TableCell>
-										<TableCell className="text-2xs py-1.5">
-											<span
-												className={cn(
-													"text-4xs px-1 py-0.5 rounded-sm uppercase",
-													row.rawStatus === "activated" && "bg-terminal-cyan/20 text-terminal-cyan",
-													row.rawStatus === "finished" && "bg-terminal-green/20 text-terminal-green",
-													(row.rawStatus === "terminated" || row.rawStatus === "error") &&
-														"bg-terminal-red/20 text-terminal-red",
+											</TableCell>
+											<TableCell className="text-right py-1.5">
+												{row.showCancel && (
+													<Button variant="danger" size="xs" aria-label={t`Cancel TWAP order`}>
+														{t`Cancel`}
+													</Button>
 												)}
-											>
-												{row.statusLabel}
-											</span>
-										</TableCell>
-										<TableCell className="text-right py-1.5">
-											{row.showCancel && (
-												<Button variant="danger" size="xs" aria-label={t`Cancel TWAP order`}>
-													{t`Cancel`}
-												</Button>
-											)}
-										</TableCell>
-									</TableRow>
-								))}
+											</TableCell>
+										</TableRow>
+									);
+								})}
 							</TableBody>
 						</Table>
 						<ScrollBar orientation="horizontal" />
