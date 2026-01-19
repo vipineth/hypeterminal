@@ -2,8 +2,7 @@ import { z } from "zod";
 import { create } from "zustand";
 import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middleware";
 import { STORAGE_KEYS } from "@/config/constants";
-import type { LimitTif } from "@/config/order-types";
-import { isTriggerOrderType, ORDER_TYPES, type OrderType } from "@/lib/trade/order-types";
+import { isTriggerOrderType, type LimitTif, ORDER_TYPES, type OrderType } from "@/lib/trade/order-types";
 import { createValidatedStorage } from "@/stores/validated-storage";
 
 export type Side = "buy" | "sell";

@@ -1,5 +1,6 @@
 import { FALLBACK_VALUE_PLACEHOLDER, FORMAT_COMPACT_DEFAULT, FORMAT_COMPACT_THRESHOLD } from "@/config/constants";
 import { getResolvedFormatLocale } from "@/stores/use-global-settings-store";
+import { toNumber } from "@/lib/trade/numbers";
 
 type Formatter = Intl.NumberFormat | Intl.DateTimeFormat | Intl.RelativeTimeFormat;
 type DateInput = Date | number | string | null | undefined;
@@ -89,15 +90,17 @@ function mergeOptions(defaults: Intl.NumberFormatOptions, opts: FormatOptions): 
 /**
  * Format as USD currency
  * @example formatUSD(1234.56) -> "$1,234.56"
+ * @example formatUSD("1234.56") -> "$1,234.56"
  * @example formatUSD(1234.56, 0) -> "$1,235"
  * @example formatUSD(150000) -> "$150K"
  * @example formatUSD(150000, { compact: false }) -> "$150,000.00"
  */
-export function formatUSD(value: number | null | undefined, opts?: number | FormatOptions) {
-	if (!isValidNumber(value)) return FALLBACK_VALUE_PLACEHOLDER;
+export function formatUSD(value: string | number | null | undefined, opts?: number | FormatOptions) {
+	const num = typeof value === "string" ? toNumber(value) : value;
+	if (!isValidNumber(num)) return FALLBACK_VALUE_PLACEHOLDER;
 
 	const { digits, compact, ...rest } = resolveOptions(opts);
-	const shouldCompact = (compact ?? FORMAT_COMPACT_DEFAULT) && Math.abs(value) >= FORMAT_COMPACT_THRESHOLD;
+	const shouldCompact = (compact ?? FORMAT_COMPACT_DEFAULT) && Math.abs(num) >= FORMAT_COMPACT_THRESHOLD;
 
 	const defaults: Intl.NumberFormatOptions = {
 		style: "currency",
@@ -106,7 +109,7 @@ export function formatUSD(value: number | null | undefined, opts?: number | Form
 		maximumFractionDigits: digits ?? 2,
 		...(shouldCompact && { notation: "compact", compactDisplay: "short" }),
 	};
-	return getFormatter("number", getResolvedFormatLocale(), mergeOptions(defaults, rest)).format(value);
+	return getFormatter("number", getResolvedFormatLocale(), mergeOptions(defaults, rest)).format(num);
 }
 
 /**
@@ -133,16 +136,17 @@ export interface FormatPriceOptions extends FormatOptions {
  * Uses Hyperliquid's rule: priceDecimals = max(0, 6 - szDecimals)
  *
  * @example formatPrice(88140.123, { szDecimals: 4 }) -> "$88,140.12" (BTC)
- * @example formatPrice(3456.789, { szDecimals: 3 }) -> "$3,456.789" (ETH)
+ * @example formatPrice("3456.789", { szDecimals: 3 }) -> "$3,456.789" (ETH)
  * @example formatPrice(0.00001234, { szDecimals: 0 }) -> "$0.000012" (low-priced)
  */
-export function formatPrice(value: number | null | undefined, opts?: FormatPriceOptions): string {
-	if (!isValidNumber(value)) return FALLBACK_VALUE_PLACEHOLDER;
+export function formatPrice(value: string | number | null | undefined, opts?: FormatPriceOptions): string {
+	const num = typeof value === "string" ? toNumber(value) : value;
+	if (!isValidNumber(num)) return FALLBACK_VALUE_PLACEHOLDER;
 
 	// Derive decimals from szDecimals if provided, otherwise use explicit digits or default to 2
 	const decimals = opts?.digits ?? (opts?.szDecimals !== undefined ? szDecimalsToPriceDecimals(opts.szDecimals) : 2);
 	const { compact, szDecimals: _, trimZeros, ...rest } = opts ?? {};
-	const shouldCompact = (compact ?? false) && Math.abs(value) >= FORMAT_COMPACT_THRESHOLD;
+	const shouldCompact = (compact ?? false) && Math.abs(num) >= FORMAT_COMPACT_THRESHOLD;
 
 	const defaults: Intl.NumberFormatOptions = {
 		style: "currency",
@@ -152,7 +156,7 @@ export function formatPrice(value: number | null | undefined, opts?: FormatPrice
 		...(shouldCompact && { notation: "compact", compactDisplay: "short" }),
 	};
 
-	return getFormatter("number", getResolvedFormatLocale(), mergeOptions(defaults, rest)).format(value);
+	return getFormatter("number", getResolvedFormatLocale(), mergeOptions(defaults, rest)).format(num);
 }
 
 /**
@@ -160,10 +164,11 @@ export function formatPrice(value: number | null | undefined, opts?: FormatPrice
  * Useful for input fields and raw price display.
  *
  * @example formatPriceRaw(88140.123, 4) -> "88,140.12" (szDecimals=4 -> 2 price decimals)
- * @example formatPriceRaw(3456.789, 3) -> "3,456.789" (szDecimals=3 -> 3 price decimals)
+ * @example formatPriceRaw("3456.789", 3) -> "3,456.789" (szDecimals=3 -> 3 price decimals)
  */
-export function formatPriceRaw(value: number | null | undefined, szDecimals?: number): string {
-	if (!isValidNumber(value)) return FALLBACK_VALUE_PLACEHOLDER;
+export function formatPriceRaw(value: string | number | null | undefined, szDecimals?: number): string {
+	const num = typeof value === "string" ? toNumber(value) : value;
+	if (!isValidNumber(num)) return FALLBACK_VALUE_PLACEHOLDER;
 
 	const decimals = szDecimals !== undefined ? szDecimalsToPriceDecimals(szDecimals) : 2;
 
@@ -173,18 +178,19 @@ export function formatPriceRaw(value: number | null | undefined, szDecimals?: nu
 		maximumFractionDigits: decimals,
 	};
 
-	return getFormatter("number", getResolvedFormatLocale(), defaults).format(value);
+	return getFormatter("number", getResolvedFormatLocale(), defaults).format(num);
 }
 
 /**
  * Format token amount
  * @example formatToken(1.234567) -> "1.23457"
- * @example formatToken(1.234567, 2) -> "1.23"
+ * @example formatToken("1.234567", 2) -> "1.23"
  * @example formatToken(1.234567, "ETH") -> "1.23457 ETH"
  * @example formatToken(1.234567, { digits: 2, symbol: "ETH" }) -> "1.23 ETH"
  */
-export function formatToken(value: number | null | undefined, opts?: number | string | FormatTokenOptions) {
-	if (!isValidNumber(value)) return FALLBACK_VALUE_PLACEHOLDER;
+export function formatToken(value: string | number | null | undefined, opts?: number | string | FormatTokenOptions) {
+	const num = typeof value === "string" ? toNumber(value) : value;
+	if (!isValidNumber(num)) return FALLBACK_VALUE_PLACEHOLDER;
 
 	let options: FormatTokenOptions = {};
 
@@ -204,7 +210,7 @@ export function formatToken(value: number | null | undefined, opts?: number | st
 		maximumFractionDigits: digits ?? 5,
 	};
 
-	const number = getFormatter("number", getResolvedFormatLocale(), mergeOptions(defaults, rest)).format(value);
+	const number = getFormatter("number", getResolvedFormatLocale(), mergeOptions(defaults, rest)).format(num);
 	return symbol ? `${number} ${symbol}` : number;
 }
 
@@ -212,10 +218,11 @@ export function formatToken(value: number | null | undefined, opts?: number | st
  * Format percentage
  * Expects decimal input (0.15 = 15%)
  * @example formatPercent(0.153) -> "15.30%"
- * @example formatPercent(0.153, 1) -> "15.3%"
+ * @example formatPercent("0.153", 1) -> "15.3%"
  */
-export function formatPercent(value: number | null | undefined, opts?: number | FormatOptions) {
-	if (!isValidNumber(value)) return FALLBACK_VALUE_PLACEHOLDER;
+export function formatPercent(value: string | number | null | undefined, opts?: number | FormatOptions) {
+	const num = typeof value === "string" ? toNumber(value) : value;
+	if (!isValidNumber(num)) return FALLBACK_VALUE_PLACEHOLDER;
 
 	const { digits, ...rest } = resolveOptions(opts);
 	const defaults: Intl.NumberFormatOptions = {
@@ -224,7 +231,7 @@ export function formatPercent(value: number | null | undefined, opts?: number | 
 		maximumFractionDigits: digits ?? 2,
 		signDisplay: "exceptZero",
 	};
-	return getFormatter("number", getResolvedFormatLocale(), mergeOptions(defaults, rest)).format(value);
+	return getFormatter("number", getResolvedFormatLocale(), mergeOptions(defaults, rest)).format(num);
 }
 
 /**
@@ -242,9 +249,8 @@ export function formatPercent(value: number | null | undefined, opts?: number | 
 export function formatNumber(value: string | number | null | undefined, opts?: number | FormatOptions): string {
 	// Handle string input - preserve original decimal precision
 	if (typeof value === "string") {
-		if (!value) return FALLBACK_VALUE_PLACEHOLDER;
-		const num = Number(value);
-		if (!Number.isFinite(num)) return FALLBACK_VALUE_PLACEHOLDER;
+		const num = toNumber(value);
+		if (num === null) return FALLBACK_VALUE_PLACEHOLDER;
 
 		// Find how many decimal places the original string has
 		const decimalIndex = value.indexOf(".");

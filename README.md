@@ -197,6 +197,73 @@ if (isPositive(price)) {
 
 See `.claude/rules/calculations.md` for details.
 
+## Color System
+
+This project uses a semantic color system with Tailwind CSS v4 and OKLch color format for perceptually uniform colors across light and dark modes.
+
+### Semantic UI Colors
+
+| Token | Purpose | Usage |
+|-------|---------|-------|
+| `background` | Page background | Main app background |
+| `foreground` | Primary text | Body text, headings |
+| `surface` | Elevated surfaces | Cards, panels, modals |
+| `surface-foreground` | Text on surfaces | Content inside cards |
+| `primary` | Brand/main action | Primary buttons, links |
+| `primary-foreground` | Text on primary | Button labels |
+| `secondary` | Secondary actions | Secondary buttons, tabs |
+| `secondary-foreground` | Text on secondary | Secondary button text |
+| `muted` | Subdued elements | Disabled states, backgrounds |
+| `muted-foreground` | Subdued text | Placeholders, captions |
+| `accent` | Highlights | Hover states, selections |
+| `accent-foreground` | Text on accent | Selected item text |
+| `destructive` | Danger actions | Delete buttons, errors |
+| `destructive-foreground` | Text on destructive | Delete button text |
+| `border` | Borders | Dividers, input borders |
+| `input` | Input backgrounds | Form field backgrounds |
+| `ring` | Focus rings | Keyboard focus indicators |
+
+### Trading Colors
+
+| Token | Purpose | Usage |
+|-------|---------|-------|
+| `terminal-green` | Long/buy/positive | Buy orders, profit, positive PnL |
+| `terminal-red` | Short/sell/negative | Sell orders, loss, negative PnL |
+| `terminal-cyan` | Information/chart | Chart lines, info highlights |
+| `terminal-amber` | Warning/caution | Warnings, pending states |
+| `terminal-purple` | Secondary accent | Special highlights, badges |
+
+### Usage Examples
+
+```tsx
+// Tailwind classes
+<span className="text-terminal-green">+$1,234.56</span>
+<span className="text-terminal-red">-$567.89</span>
+<button className="bg-primary text-primary-foreground">Place Order</button>
+<div className="bg-surface border-border">Card content</div>
+
+// Conditional styling
+<span className={cn(
+  "tabular-nums",
+  pnl >= 0 ? "text-terminal-green" : "text-terminal-red"
+)}>
+  {formatUSD(pnl)}
+</span>
+```
+
+### Color Naming Convention
+
+Colors follow a **semantic naming** approach (describing purpose, not appearance):
+
+| Pattern | Example | Description |
+|---------|---------|-------------|
+| `{role}` | `primary`, `muted` | Base color for a role |
+| `{role}-foreground` | `primary-foreground` | Text color on that role |
+| `terminal-{color}` | `terminal-green` | Trading-specific colors |
+| `sidebar-{role}` | `sidebar-accent` | Sidebar-scoped variants |
+
+Colors are defined in `src/styles.css` and automatically adapt between light and dark modes.
+
 ## License
 
 [MIT](LICENSE)
