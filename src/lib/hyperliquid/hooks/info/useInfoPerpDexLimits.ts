@@ -1,7 +1,8 @@
-import type { PerpDexLimitsParameters, PerpDexLimitsResponse } from "@nktkas/hyperliquid";
+import type { InfoClient, PerpDexLimitsParameters, PerpDexLimitsResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import type { QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type PerpDexLimitsData = PerpDexLimitsResponse;
@@ -11,16 +12,27 @@ export type UseInfoPerpDexLimitsParameters = PerpDexLimitsParams;
 export type UseInfoPerpDexLimitsOptions<TData = PerpDexLimitsData> = QueryParameter<PerpDexLimitsData, TData>;
 export type UseInfoPerpDexLimitsReturnType<TData = PerpDexLimitsData> = UseQueryResult<TData, HyperliquidQueryError>;
 
+export function getPerpDexLimitsQueryOptions(
+	info: InfoClient,
+	params: PerpDexLimitsParams,
+): QueryOptions<PerpDexLimitsData> {
+	return {
+		queryKey: infoKeys.method("perpDexLimits", params),
+		queryFn: ({ signal }) => info.perpDexLimits(params, signal),
+	};
+}
+
 export function useInfoPerpDexLimits<TData = PerpDexLimitsData>(
 	params: UseInfoPerpDexLimitsParameters,
 	options: UseInfoPerpDexLimitsOptions<TData> = {},
 ): UseInfoPerpDexLimitsReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("perpDexLimits", params);
+	const queryOptions = getPerpDexLimitsQueryOptions(info, params);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.perpDexLimits(params, signal),
+		...queryOptions,
 	});
+
+	return query;
 }

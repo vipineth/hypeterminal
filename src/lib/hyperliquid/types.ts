@@ -46,11 +46,9 @@ export type HyperliquidApiStatus = {
 	};
 };
 
-export type SubscriptionOptions<TData> = {
+export interface SubscriptionOptions {
 	enabled?: boolean;
-	onData?: (data: TData) => void;
-	onError?: (error: unknown) => void;
-};
+}
 
 export type SubscriptionResult<TData> = {
 	data: TData | undefined;

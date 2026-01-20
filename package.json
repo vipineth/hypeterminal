@@ -9,6 +9,7 @@
 		"format": "biome format",
 		"lint": "biome lint",
 		"check": "biome check",
+		"fix": "biome check --write",
 		"test": "vitest run",
 		"i18n:extract": "lingui extract",
 		"i18n:compile": "lingui compile",

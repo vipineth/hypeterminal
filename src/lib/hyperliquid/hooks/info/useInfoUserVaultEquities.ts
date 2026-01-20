@@ -1,7 +1,8 @@
-import type { UserVaultEquitiesParameters, UserVaultEquitiesResponse } from "@nktkas/hyperliquid";
+import type { InfoClient, UserVaultEquitiesParameters, UserVaultEquitiesResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import { computeEnabled, type QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type UserVaultEquitiesData = UserVaultEquitiesResponse;
@@ -17,16 +18,29 @@ export type UseInfoUserVaultEquitiesReturnType<TData = UserVaultEquitiesData> = 
 	HyperliquidQueryError
 >;
 
+export function getUserVaultEquitiesQueryOptions(
+	info: InfoClient,
+	params: UserVaultEquitiesParams,
+): QueryOptions<UserVaultEquitiesData> {
+	return {
+		queryKey: infoKeys.method("userVaultEquities", params),
+		queryFn: ({ signal }) => info.userVaultEquities(params, signal),
+	};
+}
+
 export function useInfoUserVaultEquities<TData = UserVaultEquitiesData>(
 	params: UseInfoUserVaultEquitiesParameters,
 	options: UseInfoUserVaultEquitiesOptions<TData> = {},
 ): UseInfoUserVaultEquitiesReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("userVaultEquities", params);
+	const queryOptions = getUserVaultEquitiesQueryOptions(info, params);
+	const enabled = computeEnabled(Boolean(params.user), options);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.userVaultEquities(params, signal),
+		...queryOptions,
+		enabled,
 	});
+
+	return query;
 }

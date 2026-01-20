@@ -321,15 +321,11 @@ function OrderRow({
 						<TokenAvatar symbol={order.coin} />
 						<span>{order.coin}</span>
 					</Button>
-					<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideConfig.class)}>
-						{sideConfig.label}
-					</span>
+					<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideConfig.class)}>{sideConfig.label}</span>
 				</div>
 			</TableCell>
 			<TableCell className="text-2xs py-1.5">
-				<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", typeConfig.class)}>
-					{typeConfig.label}
-				</span>
+				<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", typeConfig.class)}>{typeConfig.label}</span>
 			</TableCell>
 			<TableCell className="text-2xs text-right tabular-nums py-1.5">
 				{formatUSD(order.limitPx, { compact: false })}

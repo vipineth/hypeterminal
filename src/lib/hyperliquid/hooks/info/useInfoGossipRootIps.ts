@@ -1,7 +1,8 @@
-import type { GossipRootIpsResponse } from "@nktkas/hyperliquid";
+import type { GossipRootIpsResponse, InfoClient } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import type { QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type GossipRootIpsData = GossipRootIpsResponse;
@@ -9,15 +10,23 @@ type GossipRootIpsData = GossipRootIpsResponse;
 export type UseInfoGossipRootIpsOptions<TData = GossipRootIpsData> = QueryParameter<GossipRootIpsData, TData>;
 export type UseInfoGossipRootIpsReturnType<TData = GossipRootIpsData> = UseQueryResult<TData, HyperliquidQueryError>;
 
+export function getGossipRootIpsQueryOptions(info: InfoClient): QueryOptions<GossipRootIpsData> {
+	return {
+		queryKey: infoKeys.method("gossipRootIps"),
+		queryFn: ({ signal }) => info.gossipRootIps(signal),
+	};
+}
+
 export function useInfoGossipRootIps<TData = GossipRootIpsData>(
 	options: UseInfoGossipRootIpsOptions<TData> = {},
 ): UseInfoGossipRootIpsReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("gossipRootIps");
+	const queryOptions = getGossipRootIpsQueryOptions(info);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.gossipRootIps(signal),
+		...queryOptions,
 	});
+
+	return query;
 }

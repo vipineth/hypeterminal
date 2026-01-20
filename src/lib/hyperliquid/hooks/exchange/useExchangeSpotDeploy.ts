@@ -1,7 +1,11 @@
-import type { SpotDeployParameters, SpotDeploySuccessResponse } from "@nktkas/hyperliquid";
+import type { ExchangeClient, SpotDeployParameters, SpotDeploySuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { MissingWalletError } from "../../errors";
-import { exchangeKeys } from "../../query/keys";
+import {
+	createMutationKey,
+	guardedMutationFn,
+	type MutationOptions,
+	mergeMutationOptions,
+} from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -15,15 +19,17 @@ export type UseExchangeSpotDeployReturnType = UseMutationResult<
 	SpotDeployParams
 >;
 
+export function getSpotDeployMutationOptions(
+	exchange: ExchangeClient | null,
+): MutationOptions<SpotDeployData, SpotDeployParams> {
+	return {
+		mutationKey: createMutationKey("spotDeploy"),
+		mutationFn: guardedMutationFn(exchange, (ex, params) => ex.spotDeploy(params)),
+	};
+}
+
 export function useExchangeSpotDeploy(options: UseExchangeSpotDeployOptions = {}): UseExchangeSpotDeployReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation({
-		...options,
-		mutationKey: exchangeKeys.method("spotDeploy"),
-		mutationFn: (params) => {
-			if (!exchange) throw new MissingWalletError();
-			return exchange.spotDeploy(params);
-		},
-	});
+	return useMutation(mergeMutationOptions(options, getSpotDeployMutationOptions(exchange)));
 }

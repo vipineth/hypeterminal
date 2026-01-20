@@ -1,7 +1,11 @@
-import type { PerpDeployParameters, PerpDeploySuccessResponse } from "@nktkas/hyperliquid";
+import type { ExchangeClient, PerpDeployParameters, PerpDeploySuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { MissingWalletError } from "../../errors";
-import { exchangeKeys } from "../../query/keys";
+import {
+	createMutationKey,
+	guardedMutationFn,
+	type MutationOptions,
+	mergeMutationOptions,
+} from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -15,15 +19,17 @@ export type UseExchangePerpDeployReturnType = UseMutationResult<
 	PerpDeployParams
 >;
 
+export function getPerpDeployMutationOptions(
+	exchange: ExchangeClient | null,
+): MutationOptions<PerpDeployData, PerpDeployParams> {
+	return {
+		mutationKey: createMutationKey("perpDeploy"),
+		mutationFn: guardedMutationFn(exchange, (ex, params) => ex.perpDeploy(params)),
+	};
+}
+
 export function useExchangePerpDeploy(options: UseExchangePerpDeployOptions = {}): UseExchangePerpDeployReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation({
-		...options,
-		mutationKey: exchangeKeys.method("perpDeploy"),
-		mutationFn: (params) => {
-			if (!exchange) throw new MissingWalletError();
-			return exchange.perpDeploy(params);
-		},
-	});
+	return useMutation(mergeMutationOptions(options, getPerpDeployMutationOptions(exchange)));
 }

@@ -9,8 +9,8 @@ import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
+import { useDepositModalActions } from "@/stores/use-deposit-modal-store";
 import { WalletDialog } from "../components/wallet-dialog";
-import { DepositModal } from "../order-entry/deposit-modal";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
 
 const ACCOUNT_TEXT = UI_TEXT.ACCOUNT_PANEL;
@@ -31,8 +31,8 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 	const isLoading = status === "subscribing" || status === "idle";
 
 	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
-	const [depositModalOpen, setDepositModalOpen] = useState(false);
 	const [copied, setCopied] = useState(false);
+	const { open: openDepositModal } = useDepositModalActions();
 
 	const handleCopyAddress = async () => {
 		if (!address) return;
@@ -187,7 +187,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						<Button
 							variant="ghost"
 							size="none"
-							onClick={() => setDepositModalOpen(true)}
+							onClick={() => openDepositModal("deposit")}
 							className={cn(
 								"py-4 text-base font-semibold rounded-md",
 								"bg-positive/20 border border-positive text-positive",
@@ -235,7 +235,6 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 			</div>
 
 			<MobileBottomNavSpacer />
-			<DepositModal open={depositModalOpen} onOpenChange={setDepositModalOpen} />
 		</div>
 	);
 }

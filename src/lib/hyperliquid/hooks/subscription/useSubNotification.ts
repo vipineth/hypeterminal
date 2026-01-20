@@ -1,5 +1,4 @@
 import type { NotificationWsEvent, NotificationWsParameters } from "@nktkas/hyperliquid";
-import { useCallback, useMemo } from "react";
 import { useHyperliquid } from "../../context";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
@@ -9,7 +8,7 @@ type NotificationEvent = NotificationWsEvent;
 type NotificationParams = NotificationWsParameters;
 
 export type UseSubNotificationParameters = NotificationParams;
-export type UseSubNotificationOptions = SubscriptionOptions<NotificationEvent>;
+export type UseSubNotificationOptions = SubscriptionOptions;
 export type UseSubNotificationReturnType = SubscriptionResult<NotificationEvent>;
 
 export function useSubNotification(
@@ -18,12 +17,6 @@ export function useSubNotification(
 ): UseSubNotificationReturnType {
 	const { subscription } = useHyperliquid();
 	const key = serializeKey(subscriptionKeys.method("notification", params));
-	const stableParams = useMemo(() => params, [key]);
 
-	const subscribe = useCallback(
-		(listener: (data: NotificationEvent) => void) => subscription.notification(stableParams, listener),
-		[subscription, stableParams],
-	);
-
-	return useSub(key, subscribe, options);
+	return useSub(key, (listener) => subscription.notification(params, listener), options);
 }

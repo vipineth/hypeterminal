@@ -1,5 +1,4 @@
 import type { ActiveAssetDataWsEvent, ActiveAssetDataWsParameters } from "@nktkas/hyperliquid";
-import { useCallback, useMemo } from "react";
 import { useHyperliquid } from "../../context";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
@@ -9,7 +8,7 @@ type ActiveAssetDataEvent = ActiveAssetDataWsEvent;
 type ActiveAssetDataParams = ActiveAssetDataWsParameters;
 
 export type UseSubActiveAssetDataParameters = ActiveAssetDataParams;
-export type UseSubActiveAssetDataOptions = SubscriptionOptions<ActiveAssetDataEvent>;
+export type UseSubActiveAssetDataOptions = SubscriptionOptions;
 export type UseSubActiveAssetDataReturnType = SubscriptionResult<ActiveAssetDataEvent>;
 
 export function useSubActiveAssetData(
@@ -18,12 +17,6 @@ export function useSubActiveAssetData(
 ): UseSubActiveAssetDataReturnType {
 	const { subscription } = useHyperliquid();
 	const key = serializeKey(subscriptionKeys.method("activeAssetData", params));
-	const stableParams = useMemo(() => params, [key]);
 
-	const subscribe = useCallback(
-		(listener: (data: ActiveAssetDataEvent) => void) => subscription.activeAssetData(stableParams, listener),
-		[subscription, stableParams],
-	);
-
-	return useSub(key, subscribe, options);
+	return useSub(key, (listener) => subscription.activeAssetData(params, listener), options);
 }

@@ -78,7 +78,8 @@ export function FundingTab() {
 
 	function renderPlaceholder() {
 		if (!isConnected) return <Placeholder>{t`Connect your wallet to view funding payments.`}</Placeholder>;
-		if (status === "subscribing" || status === "idle") return <Placeholder>{t`Loading funding history...`}</Placeholder>;
+		if (status === "subscribing" || status === "idle")
+			return <Placeholder>{t`Loading funding history...`}</Placeholder>;
 		if (status === "error") {
 			return (
 				<Placeholder variant="error">
@@ -131,7 +132,11 @@ export function FundingTab() {
 									const rateClass = row.rate >= 0 ? "text-positive" : "text-negative";
 									const paymentClass = row.usdc >= 0 ? "text-positive" : "text-negative";
 									const date = new Date(row.time);
-									const timeStr = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+									const timeStr = date.toLocaleTimeString("en-US", {
+										hour: "2-digit",
+										minute: "2-digit",
+										hour12: false,
+									});
 									const dateStr = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
 									return (
@@ -153,9 +158,7 @@ export function FundingTab() {
 												</span>
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
-												<span className={paymentClass}>
-													{formatUSD(row.usdc, { signDisplay: "exceptZero" })}
-												</span>
+												<span className={paymentClass}>{formatUSD(row.usdc, { signDisplay: "exceptZero" })}</span>
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums text-muted-fg py-1.5">
 												<div className="flex flex-col items-end">

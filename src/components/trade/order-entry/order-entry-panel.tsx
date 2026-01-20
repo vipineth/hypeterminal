@@ -8,7 +8,15 @@ import { NumberInput } from "@/components/ui/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FALLBACK_VALUE_PLACEHOLDER, ORDER_MIN_NOTIONAL_USD, ORDER_SIZE_PERCENT_STEPS, SCALE_LEVELS_MAX, SCALE_LEVELS_MIN, TWAP_MINUTES_MAX, TWAP_MINUTES_MIN } from "@/config/constants";
+import {
+	FALLBACK_VALUE_PLACEHOLDER,
+	ORDER_MIN_NOTIONAL_USD,
+	ORDER_SIZE_PERCENT_STEPS,
+	SCALE_LEVELS_MAX,
+	SCALE_LEVELS_MIN,
+	TWAP_MINUTES_MAX,
+	TWAP_MINUTES_MIN,
+} from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
@@ -16,7 +24,15 @@ import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOr
 import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeTwapOrder";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import type { MarginMode } from "@/lib/trade/margin-mode";
-import { calc, clampInt, formatDecimalFloor, isPositive, parseNumberOrZero, toFixed, toNumber } from "@/lib/trade/numbers";
+import {
+	calc,
+	clampInt,
+	formatDecimalFloor,
+	isPositive,
+	parseNumberOrZero,
+	toFixed,
+	toNumber,
+} from "@/lib/trade/numbers";
 import {
 	getConversionPrice,
 	getExecutedPrice,
@@ -45,7 +61,7 @@ import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@
 import type { ActiveDialog, ButtonContent } from "@/lib/trade/types";
 import { useButtonContent } from "@/lib/trade/use-button-content";
 import { useOrderValidation } from "@/lib/trade/use-order-validation";
-import { useDepositModalActions, useDepositModalOpen, useDepositModalTab } from "@/stores/use-deposit-modal-store";
+import { useDepositModalActions } from "@/stores/use-deposit-modal-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import {
 	useLimitPrice,
@@ -68,10 +84,9 @@ import {
 } from "@/stores/use-order-entry-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
-import { GlobalSettingsDialog } from "../components/global-settings-dialog";
+import { useSettingsDialogActions } from "@/stores/use-settings-dialog-store";
 import { WalletDialog } from "../components/wallet-dialog";
 import { AdvancedOrderDropdown } from "./advanced-order-dropdown";
-import { DepositModal } from "./deposit-modal";
 import { LeverageControl, useAssetLeverage } from "./leverage-control";
 import { MarginModeDialog } from "./margin-mode-dialog";
 import { MarginModeToggle } from "./margin-mode-toggle";
@@ -188,9 +203,8 @@ export function OrderEntryPanel() {
 	const [approvalError, setApprovalError] = useState<string | null>(null);
 	const [activeDialog, setActiveDialog] = useState<ActiveDialog>(null);
 
-	const depositModalOpen = useDepositModalOpen();
-	const depositModalTab = useDepositModalTab();
-	const { open: openDepositModal, close: closeDepositModal, setTab: setDepositModalTab } = useDepositModalActions();
+	const { open: openDepositModal } = useDepositModalActions();
+	const { open: openSettingsDialog } = useSettingsDialogActions();
 
 	useEffect(() => {
 		if (selectedPrice !== null) {
@@ -866,21 +880,11 @@ export function OrderEntryPanel() {
 					estimatedFee={estimatedFee}
 					slippageBps={slippageBps}
 					szDecimals={market?.szDecimals}
-					onSlippageClick={() => setActiveDialog("settings")}
+					onSlippageClick={openSettingsDialog}
 				/>
 			</div>
 
 			<WalletDialog open={activeDialog === "wallet"} onOpenChange={(open) => setActiveDialog(open ? "wallet" : null)} />
-			<DepositModal
-				open={depositModalOpen}
-				onOpenChange={(open) => (open ? openDepositModal(depositModalTab) : closeDepositModal())}
-				defaultTab={depositModalTab}
-				onTabChange={setDepositModalTab}
-			/>
-			<GlobalSettingsDialog
-				open={activeDialog === "settings"}
-				onOpenChange={(open) => setActiveDialog(open ? "settings" : null)}
-			/>
 
 			<OrderToast />
 		</div>

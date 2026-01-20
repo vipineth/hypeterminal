@@ -22,11 +22,11 @@ import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOr
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/lib/trade/orders";
+import { useDepositModalActions } from "@/stores/use-deposit-modal-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
 import { WalletDialog } from "../components/wallet-dialog";
-import { DepositModal } from "../order-entry/deposit-modal";
 import { LeverageControl } from "../order-entry/leverage-control";
 import { OrderToast } from "../order-entry/order-toast";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
@@ -77,7 +77,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const [approvalError, setApprovalError] = useState<string | null>(null);
 
 	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
-	const [depositModalOpen, setDepositModalOpen] = useState(false);
+	const { open: openDepositModal } = useDepositModalActions();
 
 	const { mutateAsync: placeOrder, isPending: isSubmitting } = useExchangeOrder();
 
@@ -279,7 +279,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 		if (availableBalance <= 0)
 			return {
 				text: ORDER_TEXT.BUTTON_DEPOSIT,
-				action: () => setDepositModalOpen(true),
+				action: () => openDepositModal("deposit"),
 				disabled: false,
 				variant: "cyan" as const,
 			};
@@ -544,9 +544,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 
 			<MobileBottomNavSpacer />
 
-			{/* Modals */}
 			<WalletDialog open={walletDialogOpen} onOpenChange={setWalletDialogOpen} />
-			<DepositModal open={depositModalOpen} onOpenChange={setDepositModalOpen} />
 			<OrderToast />
 		</div>
 	);

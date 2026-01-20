@@ -1,7 +1,8 @@
-import type { SpotDeployStateParameters, SpotDeployStateResponse } from "@nktkas/hyperliquid";
+import type { InfoClient, SpotDeployStateParameters, SpotDeployStateResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import { computeEnabled, type QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type SpotDeployStateData = SpotDeployStateResponse;
@@ -14,16 +15,29 @@ export type UseInfoSpotDeployStateReturnType<TData = SpotDeployStateData> = UseQ
 	HyperliquidQueryError
 >;
 
+export function getSpotDeployStateQueryOptions(
+	info: InfoClient,
+	params: SpotDeployStateParams,
+): QueryOptions<SpotDeployStateData> {
+	return {
+		queryKey: infoKeys.method("spotDeployState", params),
+		queryFn: ({ signal }) => info.spotDeployState(params, signal),
+	};
+}
+
 export function useInfoSpotDeployState<TData = SpotDeployStateData>(
 	params: UseInfoSpotDeployStateParameters,
 	options: UseInfoSpotDeployStateOptions<TData> = {},
 ): UseInfoSpotDeployStateReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("spotDeployState", params);
+	const queryOptions = getSpotDeployStateQueryOptions(info, params);
+	const enabled = computeEnabled(Boolean(params.user), options);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.spotDeployState(params, signal),
+		...queryOptions,
+		enabled,
 	});
+
+	return query;
 }

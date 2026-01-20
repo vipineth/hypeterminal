@@ -108,7 +108,8 @@ export function BalancesTab() {
 		if (!isConnected) return <Placeholder>{t`Connect your wallet to view balances.`}</Placeholder>;
 		if (isLoading) return <Placeholder>{t`Loading balances...`}</Placeholder>;
 		if (hasError) return <Placeholder variant="error">{t`Failed to load balances.`}</Placeholder>;
-		if (balances.length === 0) return <Placeholder>{t`No balances found. Deposit funds to start trading.`}</Placeholder>;
+		if (balances.length === 0)
+			return <Placeholder>{t`No balances found. Deposit funds to start trading.`}</Placeholder>;
 		return null;
 	}
 

@@ -1,6 +1,12 @@
 import { t } from "@lingui/core/macro";
 import { useMemo } from "react";
-import { ORDER_MIN_NOTIONAL_USD, SCALE_LEVELS_MAX, SCALE_LEVELS_MIN, TWAP_MINUTES_MAX, TWAP_MINUTES_MIN } from "@/config/constants";
+import {
+	ORDER_MIN_NOTIONAL_USD,
+	SCALE_LEVELS_MAX,
+	SCALE_LEVELS_MIN,
+	TWAP_MINUTES_MAX,
+	TWAP_MINUTES_MIN,
+} from "@/config/constants";
 import { clampInt, isPositive } from "@/lib/trade/numbers";
 import { validateSlPrice, validateTpPrice } from "@/lib/trade/tpsl";
 import type { Side, ValidationResult } from "@/lib/trade/types";
@@ -93,7 +99,8 @@ export function useOrderValidation(input: ValidationInput): ValidationResult {
 			if (input.takeProfitOrder) {
 				const needsAbove = input.side === "sell";
 				if (needsAbove && input.triggerPriceNum <= input.markPx) errors.push(t`Take profit trigger must be above mark`);
-				if (!needsAbove && input.triggerPriceNum >= input.markPx) errors.push(t`Take profit trigger must be below mark`);
+				if (!needsAbove && input.triggerPriceNum >= input.markPx)
+					errors.push(t`Take profit trigger must be below mark`);
 			}
 		}
 
@@ -102,7 +109,8 @@ export function useOrderValidation(input: ValidationInput): ValidationResult {
 			if (!isPositive(input.scaleStartPriceNum) || !isPositive(input.scaleEndPriceNum)) {
 				errors.push(t`Enter price range`);
 			}
-			if (levels < SCALE_LEVELS_MIN || levels > SCALE_LEVELS_MAX) errors.push(t`Scale levels must be ${SCALE_LEVELS_MIN}-${SCALE_LEVELS_MAX}`);
+			if (levels < SCALE_LEVELS_MIN || levels > SCALE_LEVELS_MAX)
+				errors.push(t`Scale levels must be ${SCALE_LEVELS_MIN}-${SCALE_LEVELS_MAX}`);
 			if (
 				isPositive(input.scaleStartPriceNum) &&
 				isPositive(input.scaleEndPriceNum) &&
@@ -122,7 +130,8 @@ export function useOrderValidation(input: ValidationInput): ValidationResult {
 
 		if (input.twapOrder) {
 			const minutes = Math.round(input.twapMinutesNum ?? 0);
-			if (minutes < TWAP_MINUTES_MIN || minutes > TWAP_MINUTES_MAX) errors.push(t`TWAP minutes must be ${TWAP_MINUTES_MIN}-${TWAP_MINUTES_MAX}`);
+			if (minutes < TWAP_MINUTES_MIN || minutes > TWAP_MINUTES_MAX)
+				errors.push(t`TWAP minutes must be ${TWAP_MINUTES_MIN}-${TWAP_MINUTES_MAX}`);
 		}
 
 		return { valid: errors.length === 0, errors, canSubmit: errors.length === 0, needsApproval: false };

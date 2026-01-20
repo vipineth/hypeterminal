@@ -1,7 +1,8 @@
-import type { MaxMarketOrderNtlsResponse } from "@nktkas/hyperliquid";
+import type { InfoClient, MaxMarketOrderNtlsResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import type { QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type MaxMarketOrderNtlsData = MaxMarketOrderNtlsResponse;
@@ -15,15 +16,23 @@ export type UseInfoMaxMarketOrderNtlsReturnType<TData = MaxMarketOrderNtlsData> 
 	HyperliquidQueryError
 >;
 
+export function getMaxMarketOrderNtlsQueryOptions(info: InfoClient): QueryOptions<MaxMarketOrderNtlsData> {
+	return {
+		queryKey: infoKeys.method("maxMarketOrderNtls"),
+		queryFn: ({ signal }) => info.maxMarketOrderNtls(signal),
+	};
+}
+
 export function useInfoMaxMarketOrderNtls<TData = MaxMarketOrderNtlsData>(
 	options: UseInfoMaxMarketOrderNtlsOptions<TData> = {},
 ): UseInfoMaxMarketOrderNtlsReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("maxMarketOrderNtls");
+	const queryOptions = getMaxMarketOrderNtlsQueryOptions(info);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.maxMarketOrderNtls(signal),
+		...queryOptions,
 	});
+
+	return query;
 }
