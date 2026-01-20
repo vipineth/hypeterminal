@@ -1,6 +1,11 @@
 import type { ExchangeClient, NoopSuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { createMutationKey, guardedMutationFn, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
+import {
+	createMutationKey,
+	guardedMutationFn,
+	type MutationOptions,
+	mergeMutationOptions,
+} from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
