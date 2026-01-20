@@ -1,10 +1,9 @@
 import { useCallback, useMemo } from "react";
 import { useConnection } from "wagmi";
+import { MIN_WITHDRAW_USD } from "@/config/contracts";
 import { useExchangeWithdraw3 } from "@/lib/hyperliquid/hooks/exchange/useExchangeWithdraw3";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription/useSubClearinghouseState";
 import { isPositive, parseNumber } from "@/lib/trade/numbers";
-
-const MIN_WITHDRAW_USD = 1;
 
 export function useHyperliquidWithdraw() {
 	const { address } = useConnection();

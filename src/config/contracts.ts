@@ -16,3 +16,5 @@ export const CONTRACTS = {
 
 export const USDC_DECIMALS = 6;
 export const MIN_DEPOSIT_USDC = 5n * 10n ** 6n;
+export const MIN_WITHDRAW_USD = 1;
+export const WITHDRAWAL_FEE_USD = 1;

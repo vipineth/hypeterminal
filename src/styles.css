@@ -78,80 +78,118 @@
    Using :root and .dark for values that change between modes
    ============================================================================= */
 
-:root {
-  /* Semantic Colors - Light Mode */
-  --background: oklch(0.97 0.005 240);
-  --foreground: oklch(0.2 0.02 250);
-  --surface: oklch(0.99 0.003 240);
-  --surface-foreground: oklch(0.2 0.02 250);
-  --primary: oklch(0.45 0.15 250);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.94 0.01 240);
-  --secondary-foreground: oklch(0.3 0.02 250);
-  --muted: oklch(0.95 0.008 240);
-  --muted-foreground: oklch(0.5 0.02 250);
-  --accent: oklch(0.92 0.015 240);
-  --accent-foreground: oklch(0.2 0.02 250);
-  --destructive: oklch(0.55 0.22 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.88 0.015 240);
-  --input: oklch(0.94 0.01 240);
-  --ring: oklch(0.45 0.15 250);
+:root,
+:root[data-color-theme="terminal"] {
+  /* UI Tokens - Light Mode */
+  --ui-bg: oklch(0.97 0.005 240);
+  --ui-fg: oklch(0.2 0.02 250);
+  --ui-surface: oklch(0.99 0.003 240);
+  --ui-surface-fg: oklch(0.2 0.02 250);
+  --ui-primary: oklch(0.45 0.15 250);
+  --ui-primary-fg: oklch(0.98 0 0);
+  --ui-secondary: oklch(0.94 0.01 240);
+  --ui-secondary-fg: oklch(0.3 0.02 250);
+  --ui-muted: oklch(0.95 0.008 240);
+  --ui-muted-fg: oklch(0.5 0.02 250);
+  --ui-accent: oklch(0.92 0.015 240);
+  --ui-accent-fg: oklch(0.2 0.02 250);
+  --ui-destructive: oklch(0.55 0.22 25);
+  --ui-destructive-fg: oklch(0.98 0 0);
+  --ui-border: oklch(0.88 0.015 240);
+  --ui-input: oklch(0.94 0.01 240);
+  --ui-ring: oklch(0.45 0.15 250);
+  --ui-selection: oklch(0.85 0.01 240 / 0.3);
 
-  /* Sidebar - Light Mode */
-  --sidebar: oklch(0.97 0.005 240);
-  --sidebar-foreground: oklch(0.2 0.02 250);
-  --sidebar-primary: oklch(0.45 0.15 250);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.92 0.015 240);
-  --sidebar-accent-foreground: oklch(0.2 0.02 250);
-  --sidebar-border: oklch(0.88 0.015 240);
-  --sidebar-ring: oklch(0.45 0.15 250);
+  /* Sidebar Tokens - Light Mode */
+  --ui-sidebar-bg: oklch(0.97 0.005 240);
+  --ui-sidebar-fg: oklch(0.2 0.02 250);
+  --ui-sidebar-primary: oklch(0.45 0.15 250);
+  --ui-sidebar-primary-fg: oklch(0.98 0 0);
+  --ui-sidebar-accent: oklch(0.92 0.015 240);
+  --ui-sidebar-accent-fg: oklch(0.2 0.02 250);
+  --ui-sidebar-border: oklch(0.88 0.015 240);
+  --ui-sidebar-ring: oklch(0.45 0.15 250);
 
-  /* Terminal Colors - Light Mode */
-  --terminal-green: oklch(0.45 0.18 145);
-  --terminal-red: oklch(0.5 0.2 25);
-  --terminal-cyan: oklch(0.45 0.12 230);
-  --terminal-amber: oklch(0.55 0.16 70);
-  --terminal-purple: oklch(0.5 0.18 290);
+  /* Status Tokens - Light Mode */
+  --status-positive: oklch(0.45 0.18 145);
+  --status-negative: oklch(0.5 0.2 25);
+  --status-info: oklch(0.45 0.12 230);
+  --status-warning: oklch(0.55 0.16 70);
+  --status-highlight: oklch(0.5 0.18 290);
+
+  /* Legacy aliases (deprecated) */
+  --background: var(--ui-bg);
+  --foreground: var(--ui-fg);
+  --surface: var(--ui-surface);
+  --surface-foreground: var(--ui-surface-fg);
+  --primary: var(--ui-primary);
+  --primary-foreground: var(--ui-primary-fg);
+  --secondary: var(--ui-secondary);
+  --secondary-foreground: var(--ui-secondary-fg);
+  --muted: var(--ui-muted);
+  --muted-foreground: var(--ui-muted-fg);
+  --accent: var(--ui-accent);
+  --accent-foreground: var(--ui-accent-fg);
+  --destructive: var(--ui-destructive);
+  --destructive-foreground: var(--ui-destructive-fg);
+  --border: var(--ui-border);
+  --input: var(--ui-input);
+  --ring: var(--ui-ring);
+
+  --sidebar: var(--ui-sidebar-bg);
+  --sidebar-foreground: var(--ui-sidebar-fg);
+  --sidebar-primary: var(--ui-sidebar-primary);
+  --sidebar-primary-foreground: var(--ui-sidebar-primary-fg);
+  --sidebar-accent: var(--ui-sidebar-accent);
+  --sidebar-accent-foreground: var(--ui-sidebar-accent-fg);
+  --sidebar-border: var(--ui-sidebar-border);
+  --sidebar-ring: var(--ui-sidebar-ring);
+
+  --terminal-green: var(--status-positive);
+  --terminal-red: var(--status-negative);
+  --terminal-cyan: var(--status-info);
+  --terminal-amber: var(--status-warning);
+  --terminal-purple: var(--status-highlight);
 }
 
-.dark {
-  /* Semantic Colors - Dark Mode */
-  --background: oklch(0.05 0 0);
-  --foreground: oklch(0.85 0 0);
-  --surface: oklch(0.08 0 0);
-  --surface-foreground: oklch(0.85 0 0);
-  --primary: oklch(0.75 0.18 160);
-  --primary-foreground: oklch(0.05 0 0);
-  --secondary: oklch(0.15 0 0);
-  --secondary-foreground: oklch(0.75 0 0);
-  --muted: oklch(0.12 0 0);
-  --muted-foreground: oklch(0.55 0 0);
-  --accent: oklch(0.18 0 0);
-  --accent-foreground: oklch(0.85 0 0);
-  --destructive: oklch(0.65 0.25 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.2 0 0);
-  --input: oklch(0.12 0 0);
-  --ring: oklch(0.75 0.18 160);
+.dark,
+:root[data-color-theme="terminal"].dark {
+  /* UI Tokens - Dark Mode */
+  --ui-bg: oklch(0.05 0 0);
+  --ui-fg: oklch(0.85 0 0);
+  --ui-surface: oklch(0.08 0 0);
+  --ui-surface-fg: oklch(0.85 0 0);
+  --ui-primary: oklch(0.75 0.18 160);
+  --ui-primary-fg: oklch(0.05 0 0);
+  --ui-secondary: oklch(0.15 0 0);
+  --ui-secondary-fg: oklch(0.75 0 0);
+  --ui-muted: oklch(0.12 0 0);
+  --ui-muted-fg: oklch(0.55 0 0);
+  --ui-accent: oklch(0.18 0 0);
+  --ui-accent-fg: oklch(0.85 0 0);
+  --ui-destructive: oklch(0.65 0.25 25);
+  --ui-destructive-fg: oklch(0.98 0 0);
+  --ui-border: oklch(0.2 0 0);
+  --ui-input: oklch(0.12 0 0);
+  --ui-ring: oklch(0.75 0.18 160);
+  --ui-selection: oklch(0.7 0.01 240 / 0.3);
 
-  /* Sidebar - Dark Mode */
-  --sidebar: oklch(0.08 0 0);
-  --sidebar-foreground: oklch(0.85 0 0);
-  --sidebar-primary: oklch(0.75 0.18 160);
-  --sidebar-primary-foreground: oklch(0.05 0 0);
-  --sidebar-accent: oklch(0.15 0 0);
-  --sidebar-accent-foreground: oklch(0.85 0 0);
-  --sidebar-border: oklch(0.2 0 0);
-  --sidebar-ring: oklch(0.75 0.18 160);
+  /* Sidebar Tokens - Dark Mode */
+  --ui-sidebar-bg: oklch(0.08 0 0);
+  --ui-sidebar-fg: oklch(0.85 0 0);
+  --ui-sidebar-primary: oklch(0.75 0.18 160);
+  --ui-sidebar-primary-fg: oklch(0.05 0 0);
+  --ui-sidebar-accent: oklch(0.15 0 0);
+  --ui-sidebar-accent-fg: oklch(0.85 0 0);
+  --ui-sidebar-border: oklch(0.2 0 0);
+  --ui-sidebar-ring: oklch(0.75 0.18 160);
 
-  /* Terminal Colors - Dark Mode */
-  --terminal-green: oklch(0.75 0.18 145);
-  --terminal-red: oklch(0.65 0.22 25);
-  --terminal-cyan: oklch(0.78 0.12 195);
-  --terminal-amber: oklch(0.8 0.16 85);
-  --terminal-purple: oklch(0.7 0.15 300);
+  /* Status Tokens - Dark Mode */
+  --status-positive: oklch(0.75 0.18 145);
+  --status-negative: oklch(0.65 0.22 25);
+  --status-info: oklch(0.78 0.12 195);
+  --status-warning: oklch(0.8 0.16 85);
+  --status-highlight: oklch(0.7 0.15 300);
 
   /* Override shadows for dark mode */
   --shadow-2xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.09);
@@ -171,40 +209,47 @@
 
 @theme inline {
   /* Semantic Colors */
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-surface: var(--surface);
-  --color-surface-foreground: var(--surface-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+  --color-background: var(--ui-bg);
+  --color-foreground: var(--ui-fg);
+  --color-surface: var(--ui-surface);
+  --color-surface-foreground: var(--ui-surface-fg);
+  --color-primary: var(--ui-primary);
+  --color-primary-foreground: var(--ui-primary-fg);
+  --color-secondary: var(--ui-secondary);
+  --color-secondary-foreground: var(--ui-secondary-fg);
+  --color-muted: var(--ui-muted);
+  --color-muted-foreground: var(--ui-muted-fg);
+  --color-accent: var(--ui-accent);
+  --color-accent-foreground: var(--ui-accent-fg);
+  --color-destructive: var(--ui-destructive);
+  --color-destructive-foreground: var(--ui-destructive-fg);
+  --color-border: var(--ui-border);
+  --color-input: var(--ui-input);
+  --color-ring: var(--ui-ring);
 
   /* Sidebar */
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar: var(--ui-sidebar-bg);
+  --color-sidebar-foreground: var(--ui-sidebar-fg);
+  --color-sidebar-primary: var(--ui-sidebar-primary);
+  --color-sidebar-primary-foreground: var(--ui-sidebar-primary-fg);
+  --color-sidebar-accent: var(--ui-sidebar-accent);
+  --color-sidebar-accent-foreground: var(--ui-sidebar-accent-fg);
+  --color-sidebar-border: var(--ui-sidebar-border);
+  --color-sidebar-ring: var(--ui-sidebar-ring);
 
-  /* Terminal Colors */
-  --color-terminal-green: var(--terminal-green);
-  --color-terminal-red: var(--terminal-red);
-  --color-terminal-cyan: var(--terminal-cyan);
-  --color-terminal-amber: var(--terminal-amber);
-  --color-terminal-purple: var(--terminal-purple);
+  /* Status Colors */
+  --color-positive: var(--status-positive);
+  --color-negative: var(--status-negative);
+  --color-info: var(--status-info);
+  --color-warning: var(--status-warning);
+  --color-highlight: var(--status-highlight);
+
+  /* Legacy aliases (deprecated) */
+  --color-terminal-green: var(--status-positive);
+  --color-terminal-red: var(--status-negative);
+  --color-terminal-cyan: var(--status-info);
+  --color-terminal-amber: var(--status-warning);
+  --color-terminal-purple: var(--status-highlight);
 
   /* Shadows (for dark mode override support) */
   --shadow-2xs: var(--shadow-2xs);
@@ -229,11 +274,7 @@
     @apply bg-background text-foreground;
   }
   ::selection {
-    background: oklch(0.85 0.01 240 / 0.3);
-    color: inherit;
-  }
-  .dark ::selection {
-    background: oklch(0.7 0.01 240 / 0.3);
+    background: var(--ui-selection);
     color: inherit;
   }
 }
@@ -312,30 +353,30 @@
   }
 
   /* Terminal Glow Effects */
-  .terminal-glow-green {
+  .glow-positive {
     text-shadow: none;
   }
-  .terminal-glow-red {
+  .glow-negative {
     text-shadow: none;
   }
-  .terminal-glow-cyan {
+  .glow-info {
     text-shadow: none;
   }
-  .terminal-glow-amber {
+  .glow-warning {
     text-shadow: none;
   }
 
-  .dark .terminal-glow-green {
-    text-shadow: 0 0 8px oklch(0.75 0.18 145 / 0.6);
+  .dark .glow-positive {
+    text-shadow: 0 0 8px oklch(from var(--status-positive) l c h / 0.6);
   }
-  .dark .terminal-glow-red {
-    text-shadow: 0 0 8px oklch(0.65 0.22 25 / 0.6);
+  .dark .glow-negative {
+    text-shadow: 0 0 8px oklch(from var(--status-negative) l c h / 0.6);
   }
-  .dark .terminal-glow-cyan {
-    text-shadow: 0 0 8px oklch(0.78 0.12 195 / 0.6);
+  .dark .glow-info {
+    text-shadow: 0 0 8px oklch(from var(--status-info) l c h / 0.6);
   }
-  .dark .terminal-glow-amber {
-    text-shadow: 0 0 8px oklch(0.8 0.16 85 / 0.6);
+  .dark .glow-warning {
+    text-shadow: 0 0 8px oklch(from var(--status-warning) l c h / 0.6);
   }
 
   /* Terminal Scanlines */
@@ -344,46 +385,37 @@
       0deg,
       transparent,
       transparent 1px,
-      oklch(0.5 0 0 / 0.02) 1px,
-      oklch(0.5 0 0 / 0.02) 2px
-    );
-  }
-  .dark .terminal-scanlines {
-    background-image: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 1px,
-      oklch(1 0 0 / 0.02) 1px,
-      oklch(1 0 0 / 0.02) 2px
+      oklch(from var(--ui-fg) l c h / 0.02) 1px,
+      oklch(from var(--ui-fg) l c h / 0.02) 2px
     );
   }
 
   /* Terminal Grid */
   .terminal-grid {
     background-image: 
-      linear-gradient(oklch(0.5 0.02 240 / 0.15) 1px, transparent 1px),
-      linear-gradient(90deg, oklch(0.5 0.02 240 / 0.15) 1px, transparent 1px);
+      linear-gradient(oklch(from var(--ui-border) l c h / 0.15) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(from var(--ui-border) l c h / 0.15) 1px, transparent 1px);
     background-size: 20px 20px;
   }
   .dark .terminal-grid {
     background-image: 
-      linear-gradient(oklch(0.2 0 0 / 0.3) 1px, transparent 1px),
-      linear-gradient(90deg, oklch(0.2 0 0 / 0.3) 1px, transparent 1px);
+      linear-gradient(oklch(from var(--ui-border) l c h / 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(from var(--ui-border) l c h / 0.3) 1px, transparent 1px);
     background-size: 20px 20px;
   }
 
   /* Depth Bars */
   .depth-bar-ask {
-    background: linear-gradient(90deg, transparent 0%, oklch(0.5 0.2 25 / 0.12) 100%);
+    background: linear-gradient(90deg, transparent 0%, oklch(from var(--status-negative) l c h / 0.12) 100%);
   }
   .depth-bar-bid {
-    background: linear-gradient(90deg, oklch(0.45 0.18 145 / 0.12) 0%, transparent 100%);
+    background: linear-gradient(90deg, oklch(from var(--status-positive) l c h / 0.12) 0%, transparent 100%);
   }
   .dark .depth-bar-ask {
-    background: linear-gradient(90deg, transparent 0%, oklch(0.65 0.22 25 / 0.15) 100%);
+    background: linear-gradient(90deg, transparent 0%, oklch(from var(--status-negative) l c h / 0.15) 100%);
   }
   .dark .depth-bar-bid {
-    background: linear-gradient(90deg, oklch(0.75 0.18 145 / 0.15) 0%, transparent 100%);
+    background: linear-gradient(90deg, oklch(from var(--status-positive) l c h / 0.15) 0%, transparent 100%);
   }
 
   /* Trade row flash on appear - subtle, full-width */
@@ -396,12 +428,12 @@
   }
   .trade-row-buy {
     @starting-style {
-      background-color: oklch(from var(--terminal-green) l c h / 0.12);
+      background-color: oklch(from var(--status-positive) l c h / 0.12);
     }
   }
   .trade-row-sell {
     @starting-style {
-      background-color: oklch(from var(--terminal-red) l c h / 0.12);
+      background-color: oklch(from var(--status-negative) l c h / 0.12);
     }
   }
 }
