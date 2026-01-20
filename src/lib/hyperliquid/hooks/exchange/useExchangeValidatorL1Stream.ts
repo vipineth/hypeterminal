@@ -4,8 +4,12 @@ import type {
 	ValidatorL1StreamSuccessResponse,
 } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { assertExchange } from "../../errors";
-import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
+import {
+	createMutationKey,
+	guardedMutationFn,
+	type MutationOptions,
+	mergeMutationOptions,
+} from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -24,10 +28,7 @@ export function getValidatorL1StreamMutationOptions(
 ): MutationOptions<ValidatorL1StreamData, ValidatorL1StreamParams> {
 	return {
 		mutationKey: createMutationKey("validatorL1Stream"),
-		mutationFn: (params) => {
-			assertExchange(exchange);
-			return exchange.validatorL1Stream(params);
-		},
+		mutationFn: guardedMutationFn(exchange, (ex, params) => ex.validatorL1Stream(params)),
 	};
 }
 

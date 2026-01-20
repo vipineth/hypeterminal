@@ -36,12 +36,12 @@ export function useAgentRegistration(): UseAgentRegistrationResult {
 	const hasBuilderConfig = !!builderConfig?.b;
 
 	const { data: maxBuilderFee, isLoading: isLoadingBuilderFee } = useInfoMaxBuilderFee(
-		{ user: address ?? "0x0000000000000000000000000000000000000000", builder: builderConfig?.b ?? "0x0" },
+		{ user: address ?? "0x0", builder: builderConfig?.b ?? "0x0" },
 		{ enabled: !!address && hasBuilderConfig, staleTime: 5_000 },
 	);
 
 	const { data: extraAgents, isLoading: isLoadingAgents } = useInfoExtraAgents(
-		{ user: address ?? "0x0000000000000000000000000000000000000000" },
+		{ user: address ?? "0x0" },
 		{ enabled: !!address, staleTime: 5_000, refetchInterval: 30_000 },
 	);
 

@@ -1,8 +1,12 @@
 import type { ExchangeClient, OrderParameters, OrderSuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
-import { assertExchange } from "../../errors";
-import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
+import {
+	createMutationKey,
+	guardedMutationFn,
+	type MutationOptions,
+	mergeMutationOptions,
+} from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import type { BuilderConfig } from "../agent/types";
 import { useHyperliquidClients } from "../useClients";
@@ -20,10 +24,7 @@ export function getOrderMutationOptions(
 ): MutationOptions<OrderData, OrderParams> {
 	return {
 		mutationKey: createMutationKey("order", clientKey),
-		mutationFn: (params) => {
-			assertExchange(exchange);
-			return exchange.order({ ...params, builder: builderConfig });
-		},
+		mutationFn: guardedMutationFn(exchange, (ex, params) => ex.order({ ...params, builder: builderConfig })),
 	};
 }
 
