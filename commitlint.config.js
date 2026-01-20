@@ -15,6 +15,7 @@ export default {
 				"ci",
 				"i18n",
 				"docs",
+				"chore",
 			],
 		],
 		"type-case": [2, "always", "lower-case"],
