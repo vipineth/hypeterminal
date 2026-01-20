@@ -1,4 +1,5 @@
 export { useExchangeAgentEnableDexAbstraction } from "./useExchangeAgentEnableDexAbstraction";
+export { useExchangeApproveAgent } from "./useExchangeApproveAgent";
 export { useExchangeApproveBuilderFee } from "./useExchangeApproveBuilderFee";
 export { useExchangeBatchModify } from "./useExchangeBatchModify";
 export { useExchangeCancel } from "./useExchangeCancel";
