@@ -3,14 +3,11 @@ export { USDC_ABI } from "./abi/usdc";
 
 export const ARBITRUM_CHAIN_ID = 42161;
 
-/**
- * Verified contract addresses
- * Arbitrum USDC: https://arbiscan.io/address/0xaf88d065e77c8cC2239327C5EDb3A432268e5831
- * Hyperliquid Bridge2: https://arbiscan.io/address/0x2df1c51e09aecf9cacb7bc98cb1742757f163df7
- */
 export const CONTRACTS = {
 	arbitrum: {
+		// https://arbiscan.io/address/0xaf88d065e77c8cC2239327C5EDb3A432268e5831
 		usdc: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831" as const,
+		// https://arbiscan.io/address/0x2df1c51e09aecf9cacb7bc98cb1742757f163df7
 		bridge2: "0x2df1c51e09aecf9cacb7bc98cb1742757f163df7" as const,
 	},
 	arbitrumSepolia: {

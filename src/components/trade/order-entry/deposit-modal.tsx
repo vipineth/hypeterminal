@@ -179,11 +179,9 @@ interface DepositFormProps {
 }
 
 function DepositForm({ amount, onAmountChange, balance, validation, isPending, onSubmit }: DepositFormProps) {
-	const [network, setNetwork] = useState<NetworkId>("arbitrum");
-
 	return (
 		<div className="space-y-4">
-			<NetworkSelect label={<Trans>From</Trans>} value={network} onChange={setNetwork} />
+			<NetworkSelect label={<Trans>From</Trans>} value="arbitrum" onChange={() => {}} disabled />
 
 			<div className="space-y-1.5">
 				<div className="flex items-center justify-between">
@@ -279,11 +277,9 @@ function WithdrawForm({
 	isPending,
 	onSubmit,
 }: WithdrawFormProps) {
-	const [network, setNetwork] = useState<NetworkId>("arbitrum");
-
 	return (
 		<div className="space-y-4">
-			<NetworkSelect label={<Trans>To</Trans>} value={network} onChange={setNetwork} disabled={isPending} />
+			<NetworkSelect label={<Trans>To</Trans>} value="arbitrum" onChange={() => {}} disabled />
 
 			<div className="space-y-1.5">
 				<div className="flex items-center justify-between">

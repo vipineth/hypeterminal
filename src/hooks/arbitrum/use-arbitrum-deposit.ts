@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { useCallback, useEffect, useState } from "react";
 import { formatUnits, parseSignature, parseUnits } from "viem";
 import {
@@ -18,6 +19,8 @@ import {
 } from "@/config/contracts";
 
 type DepositStep = "idle" | "signing" | "depositing" | "success" | "error";
+
+const PERMIT_DEADLINE_SECONDS = 3600;
 
 const PERMIT_TYPES = {
 	EIP712Domain: [
@@ -42,14 +45,22 @@ const USDC_DOMAIN = {
 	verifyingContract: CONTRACTS.arbitrum.usdc,
 };
 
+function normalizeSignatureV(v: bigint | undefined, yParity: number): number {
+	const vRaw = v !== undefined ? Number(v) : yParity + 27;
+	const vNormalized = vRaw < 27 ? vRaw + 27 : vRaw;
+	if (vNormalized !== 27 && vNormalized !== 28) {
+		throw new Error(`Invalid signature v value: ${vNormalized}`);
+	}
+	return vNormalized;
+}
+
 export function useArbitrumDeposit() {
 	const { address, chainId } = useConnection();
-	const { switchChain, isPending: isSwitching, error: switchError } = useSwitchChain();
+	const { mutate: switchChain, isPending: isSwitching, error: switchError } = useSwitchChain();
 	const [step, setStep] = useState<DepositStep>("idle");
 
 	const isArbitrum = chainId === ARBITRUM_CHAIN_ID;
 
-	// USDC Balance
 	const { data: balanceData, refetch: refetchBalance } = useReadContract({
 		address: CONTRACTS.arbitrum.usdc,
 		abi: USDC_ABI,
@@ -62,7 +73,6 @@ export function useArbitrumDeposit() {
 	const balance = balanceData ? formatUnits(balanceData, USDC_DECIMALS) : "0";
 	const balanceRaw = balanceData ?? 0n;
 
-	// USDC Nonce for permit
 	const { data: nonce } = useReadContract({
 		address: CONTRACTS.arbitrum.usdc,
 		abi: USDC_ABI,
@@ -72,10 +82,8 @@ export function useArbitrumDeposit() {
 		query: { enabled: isArbitrum && !!address },
 	});
 
-	// Sign permit
 	const { signTypedData, isPending: isSigning, error: signError, reset: resetSign } = useSignTypedData();
 
-	// Write to bridge contract
 	const {
 		writeContract,
 		data: hash,
@@ -86,7 +94,6 @@ export function useArbitrumDeposit() {
 
 	const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
-	// Track step changes
 	useEffect(() => {
 		if (isSigning && step === "idle") {
 			setStep("signing");
@@ -114,9 +121,9 @@ export function useArbitrumDeposit() {
 		}
 	}, [depositError, step]);
 
-	function switchToArbitrum() {
+	const switchToArbitrum = useCallback(() => {
 		switchChain({ chainId: ARBITRUM_CHAIN_ID });
-	}
+	}, [switchChain]);
 
 	const validateAmount = useCallback(
 		(amount: string): { valid: boolean; error: string | null } => {
@@ -126,25 +133,25 @@ export function useArbitrumDeposit() {
 			try {
 				const amountRaw = parseUnits(amount, USDC_DECIMALS);
 				if (amountRaw < MIN_DEPOSIT_USDC) {
-					return { valid: false, error: "Minimum deposit is 5 USDC" };
+					return { valid: false, error: t`Minimum deposit is 5 USDC` };
 				}
 				if (amountRaw > balanceRaw) {
-					return { valid: false, error: "Insufficient balance" };
+					return { valid: false, error: t`Insufficient balance` };
 				}
 				return { valid: true, error: null };
 			} catch {
-				return { valid: false, error: "Invalid amount" };
+				return { valid: false, error: t`Invalid amount` };
 			}
 		},
 		[balanceRaw],
 	);
-
+	// TODO: refactor this
 	const startDeposit = useCallback(
 		(amount: string) => {
 			if (!address || nonce === undefined) return;
 
 			const amountRaw = parseUnits(amount, USDC_DECIMALS);
-			const deadline = BigInt(Math.floor(Date.now() / 1000) + 3600);
+			const deadline = BigInt(Math.floor(Date.now() / 1000) + PERMIT_DEADLINE_SECONDS);
 
 			signTypedData(
 				{
@@ -162,11 +169,7 @@ export function useArbitrumDeposit() {
 				{
 					onSuccess: (sig) => {
 						const { r, s, v, yParity } = parseSignature(sig);
-						const vRaw = v !== undefined ? Number(v) : yParity + 27;
-						const vNormalized = vRaw < 27 ? vRaw + 27 : vRaw;
-						if (vNormalized !== 27 && vNormalized !== 28) {
-							throw new Error(`Invalid signature v value: ${vNormalized}`);
-						}
+						const vNormalized = normalizeSignatureV(v, yParity);
 
 						writeContract({
 							address: CONTRACTS.arbitrum.bridge2,
@@ -203,25 +206,20 @@ export function useArbitrumDeposit() {
 	}, [resetSign, resetSubmit]);
 
 	return {
-		chainId,
 		isArbitrum,
 		switchToArbitrum,
 		isSwitching,
 		switchError,
 
 		balance,
-		balanceRaw,
-
 		step,
 		error: depositError,
 
 		startDeposit,
 		validateAmount,
 		reset,
-		refetchBalance,
 
 		isPending: isSigning || isSubmitting,
-		isSuccess,
 		depositHash: hash,
 	};
 }
