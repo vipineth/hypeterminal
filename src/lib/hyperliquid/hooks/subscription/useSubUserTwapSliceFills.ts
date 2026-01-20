@@ -1,5 +1,4 @@
 import type { UserTwapSliceFillsWsEvent, UserTwapSliceFillsWsParameters } from "@nktkas/hyperliquid";
-import { useCallback, useMemo } from "react";
 import { useHyperliquid } from "../../context";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
@@ -9,7 +8,7 @@ type UserTwapSliceFillsEvent = UserTwapSliceFillsWsEvent;
 type UserTwapSliceFillsParams = UserTwapSliceFillsWsParameters;
 
 export type UseSubUserTwapSliceFillsParameters = UserTwapSliceFillsParams;
-export type UseSubUserTwapSliceFillsOptions = SubscriptionOptions<UserTwapSliceFillsEvent>;
+export type UseSubUserTwapSliceFillsOptions = SubscriptionOptions;
 export type UseSubUserTwapSliceFillsReturnType = SubscriptionResult<UserTwapSliceFillsEvent>;
 
 export function useSubUserTwapSliceFills(
@@ -18,12 +17,6 @@ export function useSubUserTwapSliceFills(
 ): UseSubUserTwapSliceFillsReturnType {
 	const { subscription } = useHyperliquid();
 	const key = serializeKey(subscriptionKeys.method("userTwapSliceFills", params));
-	const stableParams = useMemo(() => params, [key]);
 
-	const subscribe = useCallback(
-		(listener: (data: UserTwapSliceFillsEvent) => void) => subscription.userTwapSliceFills(stableParams, listener),
-		[subscription, stableParams],
-	);
-
-	return useSub(key, subscribe, options);
+	return useSub(key, (listener) => subscription.userTwapSliceFills(params, listener), options);
 }

@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
-import { getTokenIconUrl, isTokenInCategory, marketCategories } from "@/lib/tokens";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatUSD } from "@/lib/format";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
+import { getTokenIconUrl, isTokenInCategory, marketCategories } from "@/lib/tokens";
 import { QUOTE_ASSET } from "./constants";
 import { useTokenSelector } from "./use-token-selector";
 

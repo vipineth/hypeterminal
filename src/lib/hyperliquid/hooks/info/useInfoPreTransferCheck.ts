@@ -1,7 +1,8 @@
-import type { PreTransferCheckParameters, PreTransferCheckResponse } from "@nktkas/hyperliquid";
+import type { InfoClient, PreTransferCheckParameters, PreTransferCheckResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import { computeEnabled, type QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type PreTransferCheckData = PreTransferCheckResponse;
@@ -12,18 +13,36 @@ export type UseInfoPreTransferCheckOptions<TData = PreTransferCheckData> = Query
 export type UseInfoPreTransferCheckReturnType<TData = PreTransferCheckData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
->;
+> & {
+	queryKey: readonly unknown[];
+};
+
+export function getPreTransferCheckQueryOptions(
+	info: InfoClient,
+	params: PreTransferCheckParams,
+): QueryOptions<PreTransferCheckData> {
+	return {
+		queryKey: infoKeys.method("preTransferCheck", params),
+		queryFn: ({ signal }) => info.preTransferCheck(params, signal),
+	};
+}
 
 export function useInfoPreTransferCheck<TData = PreTransferCheckData>(
 	params: UseInfoPreTransferCheckParameters,
 	options: UseInfoPreTransferCheckOptions<TData> = {},
 ): UseInfoPreTransferCheckReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("preTransferCheck", params);
+	const queryOptions = getPreTransferCheckQueryOptions(info, params);
+	const enabled = computeEnabled(Boolean(params.user), options);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.preTransferCheck(params, signal),
+		...queryOptions,
+		enabled,
 	});
+
+	return {
+		...query,
+		queryKey: queryOptions.queryKey,
+	};
 }

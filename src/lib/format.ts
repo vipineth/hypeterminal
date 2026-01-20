@@ -1,6 +1,6 @@
 import { FALLBACK_VALUE_PLACEHOLDER, FORMAT_COMPACT_DEFAULT, FORMAT_COMPACT_THRESHOLD } from "@/config/constants";
-import { getResolvedFormatLocale } from "@/stores/use-global-settings-store";
 import { toNumber } from "@/lib/trade/numbers";
+import { getResolvedFormatLocale } from "@/stores/use-global-settings-store";
 
 type Formatter = Intl.NumberFormat | Intl.DateTimeFormat | Intl.RelativeTimeFormat;
 type DateInput = Date | number | string | null | undefined;

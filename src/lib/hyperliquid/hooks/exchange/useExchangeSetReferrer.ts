@@ -1,7 +1,7 @@
-import type { SetReferrerParameters, SetReferrerSuccessResponse } from "@nktkas/hyperliquid";
+import type { ExchangeClient, SetReferrerParameters, SetReferrerSuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
 import { MissingWalletError } from "../../errors";
-import { exchangeKeys } from "../../query/keys";
+import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -15,15 +15,24 @@ export type UseExchangeSetReferrerReturnType = UseMutationResult<
 	SetReferrerParams
 >;
 
+interface SetReferrerMutationContext {
+	exchange: ExchangeClient | null;
+}
+
+export function getSetReferrerMutationOptions(
+	context: SetReferrerMutationContext,
+): MutationOptions<SetReferrerData, SetReferrerParams> {
+	return {
+		mutationKey: createMutationKey("setReferrer"),
+		mutationFn: (params) => {
+			if (!context.exchange) throw new MissingWalletError();
+			return context.exchange.setReferrer(params);
+		},
+	};
+}
+
 export function useExchangeSetReferrer(options: UseExchangeSetReferrerOptions = {}): UseExchangeSetReferrerReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation({
-		...options,
-		mutationKey: exchangeKeys.method("setReferrer"),
-		mutationFn: (params) => {
-			if (!exchange) throw new MissingWalletError();
-			return exchange.setReferrer(params);
-		},
-	});
+	return useMutation(mergeMutationOptions(options, getSetReferrerMutationOptions({ exchange })));
 }

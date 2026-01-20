@@ -1,11 +1,11 @@
 import { getCoreRowModel, type Row, type SortingState, useReactTable } from "@tanstack/react-table";
 import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { isTokenInCategory, type MarketCategory } from "@/lib/tokens";
 import { usePerpMarkets } from "@/lib/hyperliquid";
 import { useSubAssetCtxs } from "@/lib/hyperliquid/hooks/subscription";
 import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { calculate24hPriceChange, calculateOpenInterestUSD, getMarketCtxNumbers } from "@/lib/market";
+import { isTokenInCategory, type MarketCategory } from "@/lib/tokens";
 import { useFavoriteMarketKeys, useMarketPrefsActions } from "@/stores/use-market-prefs-store";
 import type { PerpAssetCtxs } from "@/types/hyperliquid";
 import { type MarketRow, TOKEN_SELECTOR_COLUMNS } from "./constants";

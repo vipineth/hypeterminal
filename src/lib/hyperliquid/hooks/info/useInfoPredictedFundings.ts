@@ -1,7 +1,8 @@
-import type { PredictedFundingsResponse } from "@nktkas/hyperliquid";
+import type { InfoClient, PredictedFundingsResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import type { QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type PredictedFundingsData = PredictedFundingsResponse;
@@ -13,17 +14,30 @@ export type UseInfoPredictedFundingsOptions<TData = PredictedFundingsData> = Que
 export type UseInfoPredictedFundingsReturnType<TData = PredictedFundingsData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
->;
+> & {
+	queryKey: readonly unknown[];
+};
+
+export function getPredictedFundingsQueryOptions(info: InfoClient): QueryOptions<PredictedFundingsData> {
+	return {
+		queryKey: infoKeys.method("predictedFundings"),
+		queryFn: ({ signal }) => info.predictedFundings(signal),
+	};
+}
 
 export function useInfoPredictedFundings<TData = PredictedFundingsData>(
 	options: UseInfoPredictedFundingsOptions<TData> = {},
 ): UseInfoPredictedFundingsReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("predictedFundings");
+	const queryOptions = getPredictedFundingsQueryOptions(info);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.predictedFundings(signal),
+		...queryOptions,
 	});
+
+	return {
+		...query,
+		queryKey: queryOptions.queryKey,
+	};
 }

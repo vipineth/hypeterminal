@@ -1,5 +1,4 @@
 import type { AllMidsWsEvent, AllMidsWsParameters } from "@nktkas/hyperliquid";
-import { useCallback, useMemo } from "react";
 import { useHyperliquid } from "../../context";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
@@ -9,7 +8,7 @@ type AllMidsEvent = AllMidsWsEvent;
 type AllMidsParams = AllMidsWsParameters;
 
 export type UseSubAllMidsParameters = AllMidsParams;
-export type UseSubAllMidsOptions = SubscriptionOptions<AllMidsEvent>;
+export type UseSubAllMidsOptions = SubscriptionOptions;
 export type UseSubAllMidsReturnType = SubscriptionResult<AllMidsEvent>;
 
 export function useSubAllMids(
@@ -18,12 +17,6 @@ export function useSubAllMids(
 ): UseSubAllMidsReturnType {
 	const { subscription } = useHyperliquid();
 	const key = serializeKey(subscriptionKeys.method("allMids", params));
-	const stableParams = useMemo(() => params, [key]);
 
-	const subscribe = useCallback(
-		(listener: (data: AllMidsEvent) => void) => subscription.allMids(stableParams, listener),
-		[subscription, stableParams],
-	);
-
-	return useSub(key, subscribe, options);
+	return useSub(key, (listener) => subscription.allMids(params, listener), options);
 }

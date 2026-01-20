@@ -1,7 +1,11 @@
-import type { SubAccountTransferParameters, SubAccountTransferSuccessResponse } from "@nktkas/hyperliquid";
+import type {
+	ExchangeClient,
+	SubAccountTransferParameters,
+	SubAccountTransferSuccessResponse,
+} from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
 import { MissingWalletError } from "../../errors";
-import { exchangeKeys } from "../../query/keys";
+import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -15,17 +19,26 @@ export type UseExchangeSubAccountTransferReturnType = UseMutationResult<
 	SubAccountTransferParams
 >;
 
+interface SubAccountTransferMutationContext {
+	exchange: ExchangeClient | null;
+}
+
+export function getSubAccountTransferMutationOptions(
+	context: SubAccountTransferMutationContext,
+): MutationOptions<SubAccountTransferData, SubAccountTransferParams> {
+	return {
+		mutationKey: createMutationKey("subAccountTransfer"),
+		mutationFn: (params) => {
+			if (!context.exchange) throw new MissingWalletError();
+			return context.exchange.subAccountTransfer(params);
+		},
+	};
+}
+
 export function useExchangeSubAccountTransfer(
 	options: UseExchangeSubAccountTransferOptions = {},
 ): UseExchangeSubAccountTransferReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation({
-		...options,
-		mutationKey: exchangeKeys.method("subAccountTransfer"),
-		mutationFn: (params) => {
-			if (!exchange) throw new MissingWalletError();
-			return exchange.subAccountTransfer(params);
-		},
-	});
+	return useMutation(mergeMutationOptions(options, getSubAccountTransferMutationOptions({ exchange })));
 }

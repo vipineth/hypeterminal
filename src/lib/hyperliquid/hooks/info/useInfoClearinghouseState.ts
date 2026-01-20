@@ -1,7 +1,8 @@
-import type { ClearinghouseStateParameters, ClearinghouseStateResponse } from "@nktkas/hyperliquid";
+import type { ClearinghouseStateParameters, ClearinghouseStateResponse, InfoClient } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import { computeEnabled, type QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type ClearinghouseStateData = ClearinghouseStateResponse;
@@ -15,18 +16,36 @@ export type UseInfoClearinghouseStateOptions<TData = ClearinghouseStateData> = Q
 export type UseInfoClearinghouseStateReturnType<TData = ClearinghouseStateData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
->;
+> & {
+	queryKey: readonly unknown[];
+};
+
+export function getClearinghouseStateQueryOptions(
+	info: InfoClient,
+	params: ClearinghouseStateParams,
+): QueryOptions<ClearinghouseStateData> {
+	return {
+		queryKey: infoKeys.method("clearinghouseState", params),
+		queryFn: ({ signal }) => info.clearinghouseState(params, signal),
+	};
+}
 
 export function useInfoClearinghouseState<TData = ClearinghouseStateData>(
 	params: UseInfoClearinghouseStateParameters,
 	options: UseInfoClearinghouseStateOptions<TData> = {},
 ): UseInfoClearinghouseStateReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("clearinghouseState", params);
+	const queryOptions = getClearinghouseStateQueryOptions(info, params);
+	const enabled = computeEnabled(Boolean(params.user), options);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.clearinghouseState(params, signal),
+		...queryOptions,
+		enabled,
 	});
+
+	return {
+		...query,
+		queryKey: queryOptions.queryKey,
+	};
 }

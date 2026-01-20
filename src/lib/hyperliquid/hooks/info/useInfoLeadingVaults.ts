@@ -1,7 +1,8 @@
-import type { LeadingVaultsParameters, LeadingVaultsResponse } from "@nktkas/hyperliquid";
+import type { InfoClient, LeadingVaultsParameters, LeadingVaultsResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import { computeEnabled, type QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type LeadingVaultsData = LeadingVaultsResponse;
@@ -9,18 +10,36 @@ type LeadingVaultsParams = LeadingVaultsParameters;
 
 export type UseInfoLeadingVaultsParameters = LeadingVaultsParams;
 export type UseInfoLeadingVaultsOptions<TData = LeadingVaultsData> = QueryParameter<LeadingVaultsData, TData>;
-export type UseInfoLeadingVaultsReturnType<TData = LeadingVaultsData> = UseQueryResult<TData, HyperliquidQueryError>;
+export type UseInfoLeadingVaultsReturnType<TData = LeadingVaultsData> = UseQueryResult<TData, HyperliquidQueryError> & {
+	queryKey: readonly unknown[];
+};
+
+export function getLeadingVaultsQueryOptions(
+	info: InfoClient,
+	params: LeadingVaultsParams,
+): QueryOptions<LeadingVaultsData> {
+	return {
+		queryKey: infoKeys.method("leadingVaults", params),
+		queryFn: ({ signal }) => info.leadingVaults(params, signal),
+	};
+}
 
 export function useInfoLeadingVaults<TData = LeadingVaultsData>(
 	params: UseInfoLeadingVaultsParameters,
 	options: UseInfoLeadingVaultsOptions<TData> = {},
 ): UseInfoLeadingVaultsReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("leadingVaults", params);
+	const queryOptions = getLeadingVaultsQueryOptions(info, params);
+	const enabled = computeEnabled(Boolean(params.user), options);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.leadingVaults(params, signal),
+		...queryOptions,
+		enabled,
 	});
+
+	return {
+		...query,
+		queryKey: queryOptions.queryKey,
+	};
 }

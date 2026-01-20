@@ -73,12 +73,7 @@ export function useArbitrumDeposit() {
 	});
 
 	// Sign permit
-	const {
-		signTypedData,
-		isPending: isSigning,
-		error: signError,
-		reset: resetSign,
-	} = useSignTypedData();
+	const { signTypedData, isPending: isSigning, error: signError, reset: resetSign } = useSignTypedData();
 
 	// Write to bridge contract
 	const {

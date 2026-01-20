@@ -1,7 +1,7 @@
-import type { CSignerActionParameters, CSignerActionSuccessResponse } from "@nktkas/hyperliquid";
+import type { CSignerActionParameters, CSignerActionSuccessResponse, ExchangeClient } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
 import { MissingWalletError } from "../../errors";
-import { exchangeKeys } from "../../query/keys";
+import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -15,17 +15,26 @@ export type UseExchangeCSignerActionReturnType = UseMutationResult<
 	CSignerActionParams
 >;
 
+interface CSignerActionMutationContext {
+	exchange: ExchangeClient | null;
+}
+
+export function getCSignerActionMutationOptions(
+	context: CSignerActionMutationContext,
+): MutationOptions<CSignerActionData, CSignerActionParams> {
+	return {
+		mutationKey: createMutationKey("cSignerAction"),
+		mutationFn: (params) => {
+			if (!context.exchange) throw new MissingWalletError();
+			return context.exchange.cSignerAction(params);
+		},
+	};
+}
+
 export function useExchangeCSignerAction(
 	options: UseExchangeCSignerActionOptions = {},
 ): UseExchangeCSignerActionReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation({
-		...options,
-		mutationKey: exchangeKeys.method("cSignerAction"),
-		mutationFn: (params) => {
-			if (!exchange) throw new MissingWalletError();
-			return exchange.cSignerAction(params);
-		},
-	});
+	return useMutation(mergeMutationOptions(options, getCSignerActionMutationOptions({ exchange })));
 }

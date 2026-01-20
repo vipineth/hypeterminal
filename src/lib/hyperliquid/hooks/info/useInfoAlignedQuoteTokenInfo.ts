@@ -1,7 +1,8 @@
-import type { AlignedQuoteTokenInfoParameters, AlignedQuoteTokenInfoResponse } from "@nktkas/hyperliquid";
+import type { AlignedQuoteTokenInfoParameters, AlignedQuoteTokenInfoResponse, InfoClient } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import type { QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type AlignedQuoteTokenInfoData = AlignedQuoteTokenInfoResponse;
@@ -15,18 +16,34 @@ export type UseInfoAlignedQuoteTokenInfoOptions<TData = AlignedQuoteTokenInfoDat
 export type UseInfoAlignedQuoteTokenInfoReturnType<TData = AlignedQuoteTokenInfoData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
->;
+> & {
+	queryKey: readonly unknown[];
+};
+
+export function getAlignedQuoteTokenInfoQueryOptions(
+	info: InfoClient,
+	params: AlignedQuoteTokenInfoParams,
+): QueryOptions<AlignedQuoteTokenInfoData> {
+	return {
+		queryKey: infoKeys.method("alignedQuoteTokenInfo", params),
+		queryFn: ({ signal }) => info.alignedQuoteTokenInfo(params, signal),
+	};
+}
 
 export function useInfoAlignedQuoteTokenInfo<TData = AlignedQuoteTokenInfoData>(
 	params: UseInfoAlignedQuoteTokenInfoParameters,
 	options: UseInfoAlignedQuoteTokenInfoOptions<TData> = {},
 ): UseInfoAlignedQuoteTokenInfoReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("alignedQuoteTokenInfo", params);
+	const queryOptions = getAlignedQuoteTokenInfoQueryOptions(info, params);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.alignedQuoteTokenInfo(params, signal),
+		...queryOptions,
 	});
+
+	return {
+		...query,
+		queryKey: queryOptions.queryKey,
+	};
 }

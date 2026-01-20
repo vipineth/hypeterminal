@@ -1,7 +1,8 @@
-import type { SpotClearinghouseStateParameters, SpotClearinghouseStateResponse } from "@nktkas/hyperliquid";
+import type { InfoClient, SpotClearinghouseStateParameters, SpotClearinghouseStateResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import { computeEnabled, type QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type SpotClearinghouseStateData = SpotClearinghouseStateResponse;
@@ -15,18 +16,36 @@ export type UseInfoSpotClearinghouseStateOptions<TData = SpotClearinghouseStateD
 export type UseInfoSpotClearinghouseStateReturnType<TData = SpotClearinghouseStateData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
->;
+> & {
+	queryKey: readonly unknown[];
+};
+
+export function getSpotClearinghouseStateQueryOptions(
+	info: InfoClient,
+	params: SpotClearinghouseStateParams,
+): QueryOptions<SpotClearinghouseStateData> {
+	return {
+		queryKey: infoKeys.method("spotClearinghouseState", params),
+		queryFn: ({ signal }) => info.spotClearinghouseState(params, signal),
+	};
+}
 
 export function useInfoSpotClearinghouseState<TData = SpotClearinghouseStateData>(
 	params: UseInfoSpotClearinghouseStateParameters,
 	options: UseInfoSpotClearinghouseStateOptions<TData> = {},
 ): UseInfoSpotClearinghouseStateReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("spotClearinghouseState", params);
+	const queryOptions = getSpotClearinghouseStateQueryOptions(info, params);
+	const enabled = computeEnabled(Boolean(params.user), options);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.spotClearinghouseState(params, signal),
+		...queryOptions,
+		enabled,
 	});
+
+	return {
+		...query,
+		queryKey: queryOptions.queryKey,
+	};
 }

@@ -1,7 +1,8 @@
-import type { DelegationsParameters, DelegationsResponse } from "@nktkas/hyperliquid";
+import type { DelegationsParameters, DelegationsResponse, InfoClient } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import { computeEnabled, type QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type DelegationsData = DelegationsResponse;
@@ -9,18 +10,33 @@ type DelegationsParams = DelegationsParameters;
 
 export type UseInfoDelegationsParameters = DelegationsParams;
 export type UseInfoDelegationsOptions<TData = DelegationsData> = QueryParameter<DelegationsData, TData>;
-export type UseInfoDelegationsReturnType<TData = DelegationsData> = UseQueryResult<TData, HyperliquidQueryError>;
+export type UseInfoDelegationsReturnType<TData = DelegationsData> = UseQueryResult<TData, HyperliquidQueryError> & {
+	queryKey: readonly unknown[];
+};
+
+export function getDelegationsQueryOptions(info: InfoClient, params: DelegationsParams): QueryOptions<DelegationsData> {
+	return {
+		queryKey: infoKeys.method("delegations", params),
+		queryFn: ({ signal }) => info.delegations(params, signal),
+	};
+}
 
 export function useInfoDelegations<TData = DelegationsData>(
 	params: UseInfoDelegationsParameters,
 	options: UseInfoDelegationsOptions<TData> = {},
 ): UseInfoDelegationsReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("delegations", params);
+	const queryOptions = getDelegationsQueryOptions(info, params);
+	const enabled = computeEnabled(Boolean(params.user), options);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.delegations(params, signal),
+		...queryOptions,
+		enabled,
 	});
+
+	return {
+		...query,
+		queryKey: queryOptions.queryKey,
+	};
 }

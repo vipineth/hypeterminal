@@ -132,9 +132,7 @@ function getMockWalletInfo(connector: Connector): WalletInfo {
 	const address = config?.address;
 	return {
 		icon: FlaskConical,
-		description: address
-			? `${address.slice(0, 6)}...${address.slice(-4)}`
-			: "Mock wallet for testing",
+		description: address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "Mock wallet for testing",
 		popular: false,
 		priority: 0,
 	};

@@ -1,7 +1,8 @@
-import type { SpotPairDeployAuctionStatusResponse } from "@nktkas/hyperliquid";
+import type { InfoClient, SpotPairDeployAuctionStatusResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import type { QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type SpotPairDeployAuctionStatusData = SpotPairDeployAuctionStatusResponse;
@@ -13,17 +14,32 @@ export type UseInfoSpotPairDeployAuctionStatusOptions<TData = SpotPairDeployAuct
 export type UseInfoSpotPairDeployAuctionStatusReturnType<TData = SpotPairDeployAuctionStatusData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
->;
+> & {
+	queryKey: readonly unknown[];
+};
+
+export function getSpotPairDeployAuctionStatusQueryOptions(
+	info: InfoClient,
+): QueryOptions<SpotPairDeployAuctionStatusData> {
+	return {
+		queryKey: infoKeys.method("spotPairDeployAuctionStatus"),
+		queryFn: ({ signal }) => info.spotPairDeployAuctionStatus(signal),
+	};
+}
 
 export function useInfoSpotPairDeployAuctionStatus<TData = SpotPairDeployAuctionStatusData>(
 	options: UseInfoSpotPairDeployAuctionStatusOptions<TData> = {},
 ): UseInfoSpotPairDeployAuctionStatusReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("spotPairDeployAuctionStatus");
+	const queryOptions = getSpotPairDeployAuctionStatusQueryOptions(info);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.spotPairDeployAuctionStatus(signal),
+		...queryOptions,
 	});
+
+	return {
+		...query,
+		queryKey: queryOptions.queryKey,
+	};
 }

@@ -1,7 +1,8 @@
-import type { MetaAndAssetCtxsParameters, MetaAndAssetCtxsResponse } from "@nktkas/hyperliquid";
+import type { InfoClient, MetaAndAssetCtxsParameters, MetaAndAssetCtxsResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import type { QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type MetaAndAssetCtxsData = MetaAndAssetCtxsResponse;
@@ -12,18 +13,34 @@ export type UseInfoMetaAndAssetCtxsOptions<TData = MetaAndAssetCtxsData> = Query
 export type UseInfoMetaAndAssetCtxsReturnType<TData = MetaAndAssetCtxsData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
->;
+> & {
+	queryKey: readonly unknown[];
+};
+
+export function getMetaAndAssetCtxsQueryOptions(
+	info: InfoClient,
+	params: MetaAndAssetCtxsParams,
+): QueryOptions<MetaAndAssetCtxsData> {
+	return {
+		queryKey: infoKeys.method("metaAndAssetCtxs", params),
+		queryFn: ({ signal }) => info.metaAndAssetCtxs(params, signal),
+	};
+}
 
 export function useInfoMetaAndAssetCtxs<TData = MetaAndAssetCtxsData>(
 	params: UseInfoMetaAndAssetCtxsParameters,
 	options: UseInfoMetaAndAssetCtxsOptions<TData> = {},
 ): UseInfoMetaAndAssetCtxsReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("metaAndAssetCtxs", params);
+	const queryOptions = getMetaAndAssetCtxsQueryOptions(info, params);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.metaAndAssetCtxs(params, signal),
+		...queryOptions,
 	});
+
+	return {
+		...query,
+		queryKey: queryOptions.queryKey,
+	};
 }

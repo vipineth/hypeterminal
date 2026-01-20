@@ -1,5 +1,4 @@
 import type { UserFundingsWsEvent, UserFundingsWsParameters } from "@nktkas/hyperliquid";
-import { useCallback, useMemo } from "react";
 import { useHyperliquid } from "../../context";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
@@ -9,7 +8,7 @@ type UserFundingsEvent = UserFundingsWsEvent;
 type UserFundingsParams = UserFundingsWsParameters;
 
 export type UseSubUserFundingsParameters = UserFundingsParams;
-export type UseSubUserFundingsOptions = SubscriptionOptions<UserFundingsEvent>;
+export type UseSubUserFundingsOptions = SubscriptionOptions;
 export type UseSubUserFundingsReturnType = SubscriptionResult<UserFundingsEvent>;
 
 export function useSubUserFundings(
@@ -18,12 +17,6 @@ export function useSubUserFundings(
 ): UseSubUserFundingsReturnType {
 	const { subscription } = useHyperliquid();
 	const key = serializeKey(subscriptionKeys.method("userFundings", params));
-	const stableParams = useMemo(() => params, [key]);
 
-	const subscribe = useCallback(
-		(listener: (data: UserFundingsEvent) => void) => subscription.userFundings(stableParams, listener),
-		[subscription, stableParams],
-	);
-
-	return useSub(key, subscribe, options);
+	return useSub(key, (listener) => subscription.userFundings(params, listener), options);
 }

@@ -1,7 +1,7 @@
-import type { ScheduleCancelParameters, ScheduleCancelSuccessResponse } from "@nktkas/hyperliquid";
+import type { ExchangeClient, ScheduleCancelParameters, ScheduleCancelSuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
 import { MissingWalletError } from "../../errors";
-import { exchangeKeys } from "../../query/keys";
+import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -15,17 +15,26 @@ export type UseExchangeScheduleCancelReturnType = UseMutationResult<
 	ScheduleCancelParams
 >;
 
+interface ScheduleCancelMutationContext {
+	exchange: ExchangeClient | null;
+}
+
+export function getScheduleCancelMutationOptions(
+	context: ScheduleCancelMutationContext,
+): MutationOptions<ScheduleCancelData, ScheduleCancelParams> {
+	return {
+		mutationKey: createMutationKey("scheduleCancel"),
+		mutationFn: (params) => {
+			if (!context.exchange) throw new MissingWalletError();
+			return context.exchange.scheduleCancel(params);
+		},
+	};
+}
+
 export function useExchangeScheduleCancel(
 	options: UseExchangeScheduleCancelOptions = {},
 ): UseExchangeScheduleCancelReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation({
-		...options,
-		mutationKey: exchangeKeys.method("scheduleCancel"),
-		mutationFn: (params) => {
-			if (!exchange) throw new MissingWalletError();
-			return exchange.scheduleCancel(params);
-		},
-	});
+	return useMutation(mergeMutationOptions(options, getScheduleCancelMutationOptions({ exchange })));
 }

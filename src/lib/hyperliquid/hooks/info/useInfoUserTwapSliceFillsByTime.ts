@@ -1,7 +1,12 @@
-import type { UserTwapSliceFillsByTimeParameters, UserTwapSliceFillsByTimeResponse } from "@nktkas/hyperliquid";
+import type {
+	InfoClient,
+	UserTwapSliceFillsByTimeParameters,
+	UserTwapSliceFillsByTimeResponse,
+} from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import { computeEnabled, type QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type UserTwapSliceFillsByTimeData = UserTwapSliceFillsByTimeResponse;
@@ -15,18 +20,36 @@ export type UseInfoUserTwapSliceFillsByTimeOptions<TData = UserTwapSliceFillsByT
 export type UseInfoUserTwapSliceFillsByTimeReturnType<TData = UserTwapSliceFillsByTimeData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
->;
+> & {
+	queryKey: readonly unknown[];
+};
+
+export function getUserTwapSliceFillsByTimeQueryOptions(
+	info: InfoClient,
+	params: UserTwapSliceFillsByTimeParams,
+): QueryOptions<UserTwapSliceFillsByTimeData> {
+	return {
+		queryKey: infoKeys.method("userTwapSliceFillsByTime", params),
+		queryFn: ({ signal }) => info.userTwapSliceFillsByTime(params, signal),
+	};
+}
 
 export function useInfoUserTwapSliceFillsByTime<TData = UserTwapSliceFillsByTimeData>(
 	params: UseInfoUserTwapSliceFillsByTimeParameters,
 	options: UseInfoUserTwapSliceFillsByTimeOptions<TData> = {},
 ): UseInfoUserTwapSliceFillsByTimeReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("userTwapSliceFillsByTime", params);
+	const queryOptions = getUserTwapSliceFillsByTimeQueryOptions(info, params);
+	const enabled = computeEnabled(Boolean(params.user), options);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.userTwapSliceFillsByTime(params, signal),
+		...queryOptions,
+		enabled,
 	});
+
+	return {
+		...query,
+		queryKey: queryOptions.queryKey,
+	};
 }

@@ -1,7 +1,7 @@
-import type { UsdClassTransferParameters, UsdClassTransferSuccessResponse } from "@nktkas/hyperliquid";
+import type { ExchangeClient, UsdClassTransferParameters, UsdClassTransferSuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
 import { MissingWalletError } from "../../errors";
-import { exchangeKeys } from "../../query/keys";
+import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -15,17 +15,26 @@ export type UseExchangeUsdClassTransferReturnType = UseMutationResult<
 	UsdClassTransferParams
 >;
 
+interface UsdClassTransferMutationContext {
+	exchange: ExchangeClient | null;
+}
+
+export function getUsdClassTransferMutationOptions(
+	context: UsdClassTransferMutationContext,
+): MutationOptions<UsdClassTransferData, UsdClassTransferParams> {
+	return {
+		mutationKey: createMutationKey("usdClassTransfer"),
+		mutationFn: (params) => {
+			if (!context.exchange) throw new MissingWalletError();
+			return context.exchange.usdClassTransfer(params);
+		},
+	};
+}
+
 export function useExchangeUsdClassTransfer(
 	options: UseExchangeUsdClassTransferOptions = {},
 ): UseExchangeUsdClassTransferReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation({
-		...options,
-		mutationKey: exchangeKeys.method("usdClassTransfer"),
-		mutationFn: (params) => {
-			if (!exchange) throw new MissingWalletError();
-			return exchange.usdClassTransfer(params);
-		},
-	});
+	return useMutation(mergeMutationOptions(options, getUsdClassTransferMutationOptions({ exchange })));
 }
