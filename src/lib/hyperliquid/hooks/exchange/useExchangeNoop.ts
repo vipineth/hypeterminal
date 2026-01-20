@@ -1,7 +1,6 @@
 import type { ExchangeClient, NoopSuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { assertExchange } from "../../errors";
-import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
+import { createMutationKey, guardedMutationFn, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -13,10 +12,7 @@ export type UseExchangeNoopReturnType = UseMutationResult<NoopData, HyperliquidQ
 export function getNoopMutationOptions(exchange: ExchangeClient | null): MutationOptions<NoopData, void> {
 	return {
 		mutationKey: createMutationKey("noop"),
-		mutationFn: () => {
-			assertExchange(exchange);
-			return exchange.noop();
-		},
+		mutationFn: guardedMutationFn(exchange, (ex) => ex.noop()),
 	};
 }
 

@@ -1,7 +1,6 @@
 import type { ExchangeClient, TokenDelegateParameters, TokenDelegateSuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { assertExchange } from "../../errors";
-import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
+import { createMutationKey, guardedMutationFn, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -20,10 +19,7 @@ export function getTokenDelegateMutationOptions(
 ): MutationOptions<TokenDelegateData, TokenDelegateParams> {
 	return {
 		mutationKey: createMutationKey("tokenDelegate"),
-		mutationFn: (params) => {
-			assertExchange(exchange);
-			return exchange.tokenDelegate(params);
-		},
+		mutationFn: guardedMutationFn(exchange, (ex, params) => ex.tokenDelegate(params)),
 	};
 }
 

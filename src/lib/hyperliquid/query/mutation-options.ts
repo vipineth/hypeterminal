@@ -1,4 +1,6 @@
+import type { ExchangeClient } from "@nktkas/hyperliquid";
 import type { UseMutationOptions } from "@tanstack/react-query";
+import { assertExchange } from "../errors";
 import type { HyperliquidQueryError, MutationParameter } from "../types";
 
 /**
@@ -57,4 +59,22 @@ export function createMutationOptions<TData, TVariables>(
 	mutationFn: (variables: TVariables) => Promise<TData>,
 ): MutationOptions<TData, TVariables> {
 	return { mutationKey, mutationFn };
+}
+
+/**
+ * Creates a guarded mutation function that asserts exchange is available.
+ * Centralizes the exchange null check for all exchange mutation hooks.
+ *
+ * @param exchange - The exchange client (may be null if wallet not connected)
+ * @param fn - Function that receives the validated exchange and params
+ * @returns A mutation function that throws MissingWalletError if exchange is null
+ */
+export function guardedMutationFn<TParams, TData>(
+	exchange: ExchangeClient | null,
+	fn: (exchange: ExchangeClient, params: TParams) => Promise<TData>,
+): (params: TParams) => Promise<TData> {
+	return (params) => {
+		assertExchange(exchange);
+		return fn(exchange, params);
+	};
 }

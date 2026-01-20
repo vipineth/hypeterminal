@@ -1,7 +1,6 @@
 import type { ExchangeClient, SpotDeployParameters, SpotDeploySuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { assertExchange } from "../../errors";
-import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
+import { createMutationKey, guardedMutationFn, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -20,10 +19,7 @@ export function getSpotDeployMutationOptions(
 ): MutationOptions<SpotDeployData, SpotDeployParams> {
 	return {
 		mutationKey: createMutationKey("spotDeploy"),
-		mutationFn: (params) => {
-			assertExchange(exchange);
-			return exchange.spotDeploy(params);
-		},
+		mutationFn: guardedMutationFn(exchange, (ex, params) => ex.spotDeploy(params)),
 	};
 }
 

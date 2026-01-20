@@ -1,7 +1,6 @@
 import type { CWithdrawParameters, CWithdrawSuccessResponse, ExchangeClient } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { assertExchange } from "../../errors";
-import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
+import { createMutationKey, guardedMutationFn, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -16,10 +15,7 @@ export function getCWithdrawMutationOptions(
 ): MutationOptions<CWithdrawData, CWithdrawParams> {
 	return {
 		mutationKey: createMutationKey("cWithdraw"),
-		mutationFn: (params) => {
-			assertExchange(exchange);
-			return exchange.cWithdraw(params);
-		},
+		mutationFn: guardedMutationFn(exchange, (ex, params) => ex.cWithdraw(params)),
 	};
 }
 

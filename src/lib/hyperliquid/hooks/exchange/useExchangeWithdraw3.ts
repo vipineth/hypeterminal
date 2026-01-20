@@ -1,7 +1,6 @@
 import type { ExchangeClient, Withdraw3Parameters, Withdraw3SuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { assertExchange } from "../../errors";
-import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
+import { createMutationKey, guardedMutationFn, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -16,10 +15,7 @@ export function getWithdraw3MutationOptions(
 ): MutationOptions<Withdraw3Data, Withdraw3Params> {
 	return {
 		mutationKey: createMutationKey("withdraw3"),
-		mutationFn: (params) => {
-			assertExchange(exchange);
-			return exchange.withdraw3(params);
-		},
+		mutationFn: guardedMutationFn(exchange, (ex, params) => ex.withdraw3(params)),
 	};
 }
 
