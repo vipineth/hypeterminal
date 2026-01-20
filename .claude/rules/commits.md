@@ -25,6 +25,7 @@ Standard commit message format for this project, based on Conventional Commits.
 
 ## Subject Rules
 
+- **Single line only** - never use multi-line commit messages
 - **Max 50 characters** - keeps git log clean
 - **Lowercase** - no capital letters
 - **No period** - don't end with punctuation
@@ -64,18 +65,6 @@ FIX: correct calculation
 
 # Describes how, not what
 refactor: use useMemo instead of useEffect
-```
-
-## Multi-line Messages
-
-For complex changes, add a body after a blank line:
-
-```
-feat: add isolated margin mode
-
-- Support per-position leverage settings
-- Add margin mode toggle in position panel
-- Update order entry to respect isolated margin
 ```
 
 ## Breaking Changes
