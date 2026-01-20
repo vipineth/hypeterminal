@@ -96,13 +96,7 @@ export function TopNav() {
 					<Bell className="size-3.5" />
 				</Button>
 				<ThemeToggle />
-				<Button
-					variant="ghost"
-					size="icon-sm"
-					className="size-7"
-					aria-label={t`Settings`}
-					onClick={openSettingsDialog}
-				>
+				<Button variant="ghost" size="icon-sm" className="size-7" aria-label={t`Settings`} onClick={openSettingsDialog}>
 					<Cog className="size-3.5" />
 				</Button>
 			</div>

@@ -8,7 +8,15 @@ import { NumberInput } from "@/components/ui/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FALLBACK_VALUE_PLACEHOLDER, ORDER_MIN_NOTIONAL_USD, ORDER_SIZE_PERCENT_STEPS, SCALE_LEVELS_MAX, SCALE_LEVELS_MIN, TWAP_MINUTES_MAX, TWAP_MINUTES_MIN } from "@/config/constants";
+import {
+	FALLBACK_VALUE_PLACEHOLDER,
+	ORDER_MIN_NOTIONAL_USD,
+	ORDER_SIZE_PERCENT_STEPS,
+	SCALE_LEVELS_MAX,
+	SCALE_LEVELS_MIN,
+	TWAP_MINUTES_MAX,
+	TWAP_MINUTES_MIN,
+} from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
@@ -16,7 +24,15 @@ import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOr
 import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeTwapOrder";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import type { MarginMode } from "@/lib/trade/margin-mode";
-import { calc, clampInt, formatDecimalFloor, isPositive, parseNumberOrZero, toFixed, toNumber } from "@/lib/trade/numbers";
+import {
+	calc,
+	clampInt,
+	formatDecimalFloor,
+	isPositive,
+	parseNumberOrZero,
+	toFixed,
+	toNumber,
+} from "@/lib/trade/numbers";
 import {
 	getConversionPrice,
 	getExecutedPrice,
@@ -47,7 +63,6 @@ import { useButtonContent } from "@/lib/trade/use-button-content";
 import { useOrderValidation } from "@/lib/trade/use-order-validation";
 import { useDepositModalActions } from "@/stores/use-deposit-modal-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
-import { useSettingsDialogActions } from "@/stores/use-settings-dialog-store";
 import {
 	useLimitPrice,
 	useOrderEntryActions,
@@ -69,6 +84,7 @@ import {
 } from "@/stores/use-order-entry-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
+import { useSettingsDialogActions } from "@/stores/use-settings-dialog-store";
 import { WalletDialog } from "../components/wallet-dialog";
 import { AdvancedOrderDropdown } from "./advanced-order-dropdown";
 import { LeverageControl, useAssetLeverage } from "./leverage-control";

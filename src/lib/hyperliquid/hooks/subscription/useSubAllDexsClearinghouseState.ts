@@ -1,5 +1,4 @@
 import type { AllDexsClearinghouseStateWsEvent, AllDexsClearinghouseStateWsParameters } from "@nktkas/hyperliquid";
-import { useCallback, useMemo } from "react";
 import { useHyperliquid } from "../../context";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
@@ -9,7 +8,7 @@ type AllDexsClearinghouseStateEvent = AllDexsClearinghouseStateWsEvent;
 type AllDexsClearinghouseStateParams = AllDexsClearinghouseStateWsParameters;
 
 export type UseSubAllDexsClearinghouseStateParameters = AllDexsClearinghouseStateParams;
-export type UseSubAllDexsClearinghouseStateOptions = SubscriptionOptions<AllDexsClearinghouseStateEvent>;
+export type UseSubAllDexsClearinghouseStateOptions = SubscriptionOptions;
 export type UseSubAllDexsClearinghouseStateReturnType = SubscriptionResult<AllDexsClearinghouseStateEvent>;
 
 export function useSubAllDexsClearinghouseState(
@@ -18,13 +17,6 @@ export function useSubAllDexsClearinghouseState(
 ): UseSubAllDexsClearinghouseStateReturnType {
 	const { subscription } = useHyperliquid();
 	const key = serializeKey(subscriptionKeys.method("allDexsClearinghouseState", params));
-	const stableParams = useMemo(() => params, [key]);
 
-	const subscribe = useCallback(
-		(listener: (data: AllDexsClearinghouseStateEvent) => void) =>
-			subscription.allDexsClearinghouseState(stableParams, listener),
-		[subscription, stableParams],
-	);
-
-	return useSub(key, subscribe, options);
+	return useSub(key, (listener) => subscription.allDexsClearinghouseState(params, listener), options);
 }

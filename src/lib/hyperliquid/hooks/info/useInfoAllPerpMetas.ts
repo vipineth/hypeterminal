@@ -1,7 +1,8 @@
-import type { AllPerpMetasResponse } from "@nktkas/hyperliquid";
+import type { AllPerpMetasResponse, InfoClient } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import type { QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type AllPerpMetasData = AllPerpMetasResponse;
@@ -9,15 +10,23 @@ type AllPerpMetasData = AllPerpMetasResponse;
 export type UseInfoAllPerpMetasOptions<TData = AllPerpMetasData> = QueryParameter<AllPerpMetasData, TData>;
 export type UseInfoAllPerpMetasReturnType<TData = AllPerpMetasData> = UseQueryResult<TData, HyperliquidQueryError>;
 
+export function getAllPerpMetasQueryOptions(info: InfoClient): QueryOptions<AllPerpMetasData> {
+	return {
+		queryKey: infoKeys.method("allPerpMetas"),
+		queryFn: ({ signal }) => info.allPerpMetas(signal),
+	};
+}
+
 export function useInfoAllPerpMetas<TData = AllPerpMetasData>(
 	options: UseInfoAllPerpMetasOptions<TData> = {},
 ): UseInfoAllPerpMetasReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("allPerpMetas");
+	const queryOptions = getAllPerpMetasQueryOptions(info);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.allPerpMetas(signal),
+		...queryOptions,
 	});
+
+	return query;
 }

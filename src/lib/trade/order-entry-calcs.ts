@@ -1,13 +1,13 @@
 import { ORDER_FEE_RATE_MAKER, ORDER_FEE_RATE_TAKER } from "@/config/constants";
 import { calc, floorToDecimals, parseNumberOrZero } from "@/lib/trade/numbers";
 import {
-	type OrderType,
 	isMarketExecutionOrderType,
 	isScaleOrderType,
 	isStopOrderType,
 	isTakeProfitOrderType,
 	isTakerOrderType,
 	isTwapOrderType,
+	type OrderType,
 	usesLimitPrice,
 } from "@/lib/trade/order-types";
 import type { Side } from "@/lib/trade/types";

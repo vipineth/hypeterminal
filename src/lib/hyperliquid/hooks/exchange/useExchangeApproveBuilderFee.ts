@@ -1,7 +1,11 @@
-import type { ApproveBuilderFeeParameters, ApproveBuilderFeeSuccessResponse } from "@nktkas/hyperliquid";
+import type {
+	ApproveBuilderFeeParameters,
+	ApproveBuilderFeeSuccessResponse,
+	ExchangeClient,
+} from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { MissingWalletError } from "../../errors";
-import { exchangeKeys } from "../../query/keys";
+import { assertExchange } from "../../errors";
+import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -15,17 +19,22 @@ export type UseExchangeApproveBuilderFeeReturnType = UseMutationResult<
 	ApproveBuilderFeeParams
 >;
 
+export function getApproveBuilderFeeMutationOptions(
+	exchange: ExchangeClient | null,
+): MutationOptions<ApproveBuilderFeeData, ApproveBuilderFeeParams> {
+	return {
+		mutationKey: createMutationKey("approveBuilderFee"),
+		mutationFn: (params) => {
+			assertExchange(exchange);
+			return exchange.approveBuilderFee(params);
+		},
+	};
+}
+
 export function useExchangeApproveBuilderFee(
 	options: UseExchangeApproveBuilderFeeOptions = {},
 ): UseExchangeApproveBuilderFeeReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation({
-		...options,
-		mutationKey: exchangeKeys.method("approveBuilderFee"),
-		mutationFn: (params) => {
-			if (!exchange) throw new MissingWalletError();
-			return exchange.approveBuilderFee(params);
-		},
-	});
+	return useMutation(mergeMutationOptions(options, getApproveBuilderFeeMutationOptions(exchange)));
 }

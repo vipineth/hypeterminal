@@ -134,7 +134,11 @@ export function HistoryTab() {
 									const showPnl = Number.isFinite(row.closedPnl) && row.closedPnl !== 0;
 									const pnlClass = row.closedPnl >= 0 ? "text-terminal-green" : "text-terminal-red";
 									const date = new Date(row.time);
-									const timeStr = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+									const timeStr = date.toLocaleTimeString("en-US", {
+										hour: "2-digit",
+										minute: "2-digit",
+										hour12: false,
+									});
 									const dateStr = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
 									return (

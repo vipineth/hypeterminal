@@ -1,7 +1,8 @@
-import type { ActiveAssetDataParameters, ActiveAssetDataResponse } from "@nktkas/hyperliquid";
+import type { ActiveAssetDataParameters, ActiveAssetDataResponse, InfoClient } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import { computeEnabled, type QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type ActiveAssetDataData = ActiveAssetDataResponse;
@@ -14,16 +15,29 @@ export type UseInfoActiveAssetDataReturnType<TData = ActiveAssetDataData> = UseQ
 	HyperliquidQueryError
 >;
 
+export function getActiveAssetDataQueryOptions(
+	info: InfoClient,
+	params: ActiveAssetDataParams,
+): QueryOptions<ActiveAssetDataData> {
+	return {
+		queryKey: infoKeys.method("activeAssetData", params),
+		queryFn: ({ signal }) => info.activeAssetData(params, signal),
+	};
+}
+
 export function useInfoActiveAssetData<TData = ActiveAssetDataData>(
 	params: UseInfoActiveAssetDataParameters,
 	options: UseInfoActiveAssetDataOptions<TData> = {},
 ): UseInfoActiveAssetDataReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("activeAssetData", params);
+	const queryOptions = getActiveAssetDataQueryOptions(info, params);
+	const enabled = computeEnabled(Boolean(params.user), options);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.activeAssetData(params, signal),
+		...queryOptions,
+		enabled,
 	});
+
+	return query;
 }

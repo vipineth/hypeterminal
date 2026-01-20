@@ -1,7 +1,8 @@
-import type { UserTwapSliceFillsParameters, UserTwapSliceFillsResponse } from "@nktkas/hyperliquid";
+import type { InfoClient, UserTwapSliceFillsParameters, UserTwapSliceFillsResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import { computeEnabled, type QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type UserTwapSliceFillsData = UserTwapSliceFillsResponse;
@@ -17,16 +18,29 @@ export type UseInfoUserTwapSliceFillsReturnType<TData = UserTwapSliceFillsData> 
 	HyperliquidQueryError
 >;
 
+export function getUserTwapSliceFillsQueryOptions(
+	info: InfoClient,
+	params: UserTwapSliceFillsParams,
+): QueryOptions<UserTwapSliceFillsData> {
+	return {
+		queryKey: infoKeys.method("userTwapSliceFills", params),
+		queryFn: ({ signal }) => info.userTwapSliceFills(params, signal),
+	};
+}
+
 export function useInfoUserTwapSliceFills<TData = UserTwapSliceFillsData>(
 	params: UseInfoUserTwapSliceFillsParameters,
 	options: UseInfoUserTwapSliceFillsOptions<TData> = {},
 ): UseInfoUserTwapSliceFillsReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("userTwapSliceFills", params);
+	const queryOptions = getUserTwapSliceFillsQueryOptions(info, params);
+	const enabled = computeEnabled(Boolean(params.user), options);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.userTwapSliceFills(params, signal),
+		...queryOptions,
+		enabled,
 	});
+
+	return query;
 }

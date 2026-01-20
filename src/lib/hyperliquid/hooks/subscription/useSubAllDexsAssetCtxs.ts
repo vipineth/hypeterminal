@@ -1,5 +1,4 @@
 import type { AllDexsAssetCtxsWsEvent } from "@nktkas/hyperliquid";
-import { useCallback } from "react";
 import { useHyperliquid } from "../../context";
 import { serializeKey, subscriptionKeys } from "../../query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
@@ -7,17 +6,12 @@ import { useSub } from "../utils/useSub";
 
 type AllDexsAssetCtxsEvent = AllDexsAssetCtxsWsEvent;
 
-export type UseSubAllDexsAssetCtxsOptions = SubscriptionOptions<AllDexsAssetCtxsEvent>;
+export type UseSubAllDexsAssetCtxsOptions = SubscriptionOptions;
 export type UseSubAllDexsAssetCtxsReturnType = SubscriptionResult<AllDexsAssetCtxsEvent>;
 
 export function useSubAllDexsAssetCtxs(options: UseSubAllDexsAssetCtxsOptions = {}): UseSubAllDexsAssetCtxsReturnType {
 	const { subscription } = useHyperliquid();
 	const key = serializeKey(subscriptionKeys.method("allDexsAssetCtxs"));
 
-	const subscribe = useCallback(
-		(listener: (data: AllDexsAssetCtxsEvent) => void) => subscription.allDexsAssetCtxs(listener),
-		[subscription],
-	);
-
-	return useSub(key, subscribe, options);
+	return useSub(key, (listener) => subscription.allDexsAssetCtxs(listener), options);
 }

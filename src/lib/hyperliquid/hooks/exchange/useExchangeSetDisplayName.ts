@@ -1,7 +1,7 @@
-import type { SetDisplayNameParameters, SetDisplayNameSuccessResponse } from "@nktkas/hyperliquid";
+import type { ExchangeClient, SetDisplayNameParameters, SetDisplayNameSuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { MissingWalletError } from "../../errors";
-import { exchangeKeys } from "../../query/keys";
+import { assertExchange } from "../../errors";
+import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -15,17 +15,22 @@ export type UseExchangeSetDisplayNameReturnType = UseMutationResult<
 	SetDisplayNameParams
 >;
 
+export function getSetDisplayNameMutationOptions(
+	exchange: ExchangeClient | null,
+): MutationOptions<SetDisplayNameData, SetDisplayNameParams> {
+	return {
+		mutationKey: createMutationKey("setDisplayName"),
+		mutationFn: (params) => {
+			assertExchange(exchange);
+			return exchange.setDisplayName(params);
+		},
+	};
+}
+
 export function useExchangeSetDisplayName(
 	options: UseExchangeSetDisplayNameOptions = {},
 ): UseExchangeSetDisplayNameReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation({
-		...options,
-		mutationKey: exchangeKeys.method("setDisplayName"),
-		mutationFn: (params) => {
-			if (!exchange) throw new MissingWalletError();
-			return exchange.setDisplayName(params);
-		},
-	});
+	return useMutation(mergeMutationOptions(options, getSetDisplayNameMutationOptions(exchange)));
 }

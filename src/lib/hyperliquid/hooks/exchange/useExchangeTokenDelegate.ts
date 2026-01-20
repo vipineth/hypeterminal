@@ -1,7 +1,7 @@
-import type { TokenDelegateParameters, TokenDelegateSuccessResponse } from "@nktkas/hyperliquid";
+import type { ExchangeClient, TokenDelegateParameters, TokenDelegateSuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { MissingWalletError } from "../../errors";
-import { exchangeKeys } from "../../query/keys";
+import { assertExchange } from "../../errors";
+import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -15,17 +15,22 @@ export type UseExchangeTokenDelegateReturnType = UseMutationResult<
 	TokenDelegateParams
 >;
 
+export function getTokenDelegateMutationOptions(
+	exchange: ExchangeClient | null,
+): MutationOptions<TokenDelegateData, TokenDelegateParams> {
+	return {
+		mutationKey: createMutationKey("tokenDelegate"),
+		mutationFn: (params) => {
+			assertExchange(exchange);
+			return exchange.tokenDelegate(params);
+		},
+	};
+}
+
 export function useExchangeTokenDelegate(
 	options: UseExchangeTokenDelegateOptions = {},
 ): UseExchangeTokenDelegateReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation({
-		...options,
-		mutationKey: exchangeKeys.method("tokenDelegate"),
-		mutationFn: (params) => {
-			if (!exchange) throw new MissingWalletError();
-			return exchange.tokenDelegate(params);
-		},
-	});
+	return useMutation(mergeMutationOptions(options, getTokenDelegateMutationOptions(exchange)));
 }

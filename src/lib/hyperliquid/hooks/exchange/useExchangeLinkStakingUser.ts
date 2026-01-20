@@ -1,7 +1,7 @@
-import type { LinkStakingUserParameters, LinkStakingUserSuccessResponse } from "@nktkas/hyperliquid";
+import type { ExchangeClient, LinkStakingUserParameters, LinkStakingUserSuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { MissingWalletError } from "../../errors";
-import { exchangeKeys } from "../../query/keys";
+import { assertExchange } from "../../errors";
+import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -15,17 +15,22 @@ export type UseExchangeLinkStakingUserReturnType = UseMutationResult<
 	LinkStakingUserParams
 >;
 
+export function getLinkStakingUserMutationOptions(
+	exchange: ExchangeClient | null,
+): MutationOptions<LinkStakingUserData, LinkStakingUserParams> {
+	return {
+		mutationKey: createMutationKey("linkStakingUser"),
+		mutationFn: (params) => {
+			assertExchange(exchange);
+			return exchange.linkStakingUser(params);
+		},
+	};
+}
+
 export function useExchangeLinkStakingUser(
 	options: UseExchangeLinkStakingUserOptions = {},
 ): UseExchangeLinkStakingUserReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation({
-		...options,
-		mutationKey: exchangeKeys.method("linkStakingUser"),
-		mutationFn: (params) => {
-			if (!exchange) throw new MissingWalletError();
-			return exchange.linkStakingUser(params);
-		},
-	});
+	return useMutation(mergeMutationOptions(options, getLinkStakingUserMutationOptions(exchange)));
 }

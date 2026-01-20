@@ -82,6 +82,7 @@ export function useArbitrumDeposit() {
 		query: { enabled: isArbitrum && !!address },
 	});
 
+	// Sign permit
 	const { signTypedData, isPending: isSigning, error: signError, reset: resetSign } = useSignTypedData();
 
 	const {

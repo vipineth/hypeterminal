@@ -18,3 +18,7 @@ export class MissingWalletError extends Error {
 		this.name = "MissingWalletError";
 	}
 }
+
+export function assertExchange<T>(exchange: T | null): asserts exchange is T {
+	if (!exchange) throw new MissingWalletError();
+}

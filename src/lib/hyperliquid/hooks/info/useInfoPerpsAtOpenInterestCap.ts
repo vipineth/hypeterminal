@@ -1,7 +1,8 @@
-import type { PerpsAtOpenInterestCapParameters, PerpsAtOpenInterestCapResponse } from "@nktkas/hyperliquid";
+import type { InfoClient, PerpsAtOpenInterestCapParameters, PerpsAtOpenInterestCapResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import type { QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type PerpsAtOpenInterestCapData = PerpsAtOpenInterestCapResponse;
@@ -17,16 +18,27 @@ export type UseInfoPerpsAtOpenInterestCapReturnType<TData = PerpsAtOpenInterestC
 	HyperliquidQueryError
 >;
 
+export function getPerpsAtOpenInterestCapQueryOptions(
+	info: InfoClient,
+	params: PerpsAtOpenInterestCapParams,
+): QueryOptions<PerpsAtOpenInterestCapData> {
+	return {
+		queryKey: infoKeys.method("perpsAtOpenInterestCap", params),
+		queryFn: ({ signal }) => info.perpsAtOpenInterestCap(params, signal),
+	};
+}
+
 export function useInfoPerpsAtOpenInterestCap<TData = PerpsAtOpenInterestCapData>(
 	params: UseInfoPerpsAtOpenInterestCapParameters,
 	options: UseInfoPerpsAtOpenInterestCapOptions<TData> = {},
 ): UseInfoPerpsAtOpenInterestCapReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("perpsAtOpenInterestCap", params);
+	const queryOptions = getPerpsAtOpenInterestCapQueryOptions(info, params);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.perpsAtOpenInterestCap(params, signal),
+		...queryOptions,
 	});
+
+	return query;
 }

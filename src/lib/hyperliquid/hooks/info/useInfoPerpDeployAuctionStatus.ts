@@ -1,7 +1,8 @@
-import type { PerpDeployAuctionStatusResponse } from "@nktkas/hyperliquid";
+import type { InfoClient, PerpDeployAuctionStatusResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import type { QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type PerpDeployAuctionStatusData = PerpDeployAuctionStatusResponse;
@@ -15,15 +16,23 @@ export type UseInfoPerpDeployAuctionStatusReturnType<TData = PerpDeployAuctionSt
 	HyperliquidQueryError
 >;
 
+export function getPerpDeployAuctionStatusQueryOptions(info: InfoClient): QueryOptions<PerpDeployAuctionStatusData> {
+	return {
+		queryKey: infoKeys.method("perpDeployAuctionStatus"),
+		queryFn: ({ signal }) => info.perpDeployAuctionStatus(signal),
+	};
+}
+
 export function useInfoPerpDeployAuctionStatus<TData = PerpDeployAuctionStatusData>(
 	options: UseInfoPerpDeployAuctionStatusOptions<TData> = {},
 ): UseInfoPerpDeployAuctionStatusReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("perpDeployAuctionStatus");
+	const queryOptions = getPerpDeployAuctionStatusQueryOptions(info);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.perpDeployAuctionStatus(signal),
+		...queryOptions,
 	});
+
+	return query;
 }

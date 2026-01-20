@@ -1,7 +1,7 @@
-import type { VaultModifyParameters, VaultModifySuccessResponse } from "@nktkas/hyperliquid";
+import type { ExchangeClient, VaultModifyParameters, VaultModifySuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { MissingWalletError } from "../../errors";
-import { exchangeKeys } from "../../query/keys";
+import { assertExchange } from "../../errors";
+import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -15,15 +15,20 @@ export type UseExchangeVaultModifyReturnType = UseMutationResult<
 	VaultModifyParams
 >;
 
+export function getVaultModifyMutationOptions(
+	exchange: ExchangeClient | null,
+): MutationOptions<VaultModifyData, VaultModifyParams> {
+	return {
+		mutationKey: createMutationKey("vaultModify"),
+		mutationFn: (params) => {
+			assertExchange(exchange);
+			return exchange.vaultModify(params);
+		},
+	};
+}
+
 export function useExchangeVaultModify(options: UseExchangeVaultModifyOptions = {}): UseExchangeVaultModifyReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation({
-		...options,
-		mutationKey: exchangeKeys.method("vaultModify"),
-		mutationFn: (params) => {
-			if (!exchange) throw new MissingWalletError();
-			return exchange.vaultModify(params);
-		},
-	});
+	return useMutation(mergeMutationOptions(options, getVaultModifyMutationOptions(exchange)));
 }

@@ -1,7 +1,7 @@
-import type { CreateSubAccountParameters, CreateSubAccountSuccessResponse } from "@nktkas/hyperliquid";
+import type { CreateSubAccountParameters, CreateSubAccountSuccessResponse, ExchangeClient } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { MissingWalletError } from "../../errors";
-import { exchangeKeys } from "../../query/keys";
+import { assertExchange } from "../../errors";
+import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
 
@@ -15,17 +15,22 @@ export type UseExchangeCreateSubAccountReturnType = UseMutationResult<
 	CreateSubAccountParams
 >;
 
+export function getCreateSubAccountMutationOptions(
+	exchange: ExchangeClient | null,
+): MutationOptions<CreateSubAccountData, CreateSubAccountParams> {
+	return {
+		mutationKey: createMutationKey("createSubAccount"),
+		mutationFn: (params) => {
+			assertExchange(exchange);
+			return exchange.createSubAccount(params);
+		},
+	};
+}
+
 export function useExchangeCreateSubAccount(
 	options: UseExchangeCreateSubAccountOptions = {},
 ): UseExchangeCreateSubAccountReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation({
-		...options,
-		mutationKey: exchangeKeys.method("createSubAccount"),
-		mutationFn: (params) => {
-			if (!exchange) throw new MissingWalletError();
-			return exchange.createSubAccount(params);
-		},
-	});
+	return useMutation(mergeMutationOptions(options, getCreateSubAccountMutationOptions(exchange)));
 }

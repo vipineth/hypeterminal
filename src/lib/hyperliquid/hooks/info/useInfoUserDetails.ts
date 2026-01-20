@@ -1,7 +1,8 @@
-import type { UserDetailsParameters, UserDetailsResponse } from "@nktkas/hyperliquid";
+import type { InfoClient, UserDetailsParameters, UserDetailsResponse } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import { computeEnabled, type QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type UserDetailsData = UserDetailsResponse;
@@ -11,16 +12,26 @@ export type UseInfoUserDetailsParameters = UserDetailsParams;
 export type UseInfoUserDetailsOptions<TData = UserDetailsData> = QueryParameter<UserDetailsData, TData>;
 export type UseInfoUserDetailsReturnType<TData = UserDetailsData> = UseQueryResult<TData, HyperliquidQueryError>;
 
+export function getUserDetailsQueryOptions(info: InfoClient, params: UserDetailsParams): QueryOptions<UserDetailsData> {
+	return {
+		queryKey: infoKeys.method("userDetails", params),
+		queryFn: ({ signal }) => info.userDetails(params, signal),
+	};
+}
+
 export function useInfoUserDetails<TData = UserDetailsData>(
 	params: UseInfoUserDetailsParameters,
 	options: UseInfoUserDetailsOptions<TData> = {},
 ): UseInfoUserDetailsReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("userDetails", params);
+	const queryOptions = getUserDetailsQueryOptions(info, params);
+	const enabled = computeEnabled(Boolean(params.user), options);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.userDetails(params, signal),
+		...queryOptions,
+		enabled,
 	});
+
+	return query;
 }

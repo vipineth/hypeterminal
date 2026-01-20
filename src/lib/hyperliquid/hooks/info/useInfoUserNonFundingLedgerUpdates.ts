@@ -1,7 +1,12 @@
-import type { UserNonFundingLedgerUpdatesParameters, UserNonFundingLedgerUpdatesResponse } from "@nktkas/hyperliquid";
+import type {
+	InfoClient,
+	UserNonFundingLedgerUpdatesParameters,
+	UserNonFundingLedgerUpdatesResponse,
+} from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import { computeEnabled, type QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type UserNonFundingLedgerUpdatesData = UserNonFundingLedgerUpdatesResponse;
@@ -17,16 +22,29 @@ export type UseInfoUserNonFundingLedgerUpdatesReturnType<TData = UserNonFundingL
 	HyperliquidQueryError
 >;
 
+export function getUserNonFundingLedgerUpdatesQueryOptions(
+	info: InfoClient,
+	params: UserNonFundingLedgerUpdatesParams,
+): QueryOptions<UserNonFundingLedgerUpdatesData> {
+	return {
+		queryKey: infoKeys.method("userNonFundingLedgerUpdates", params),
+		queryFn: ({ signal }) => info.userNonFundingLedgerUpdates(params, signal),
+	};
+}
+
 export function useInfoUserNonFundingLedgerUpdates<TData = UserNonFundingLedgerUpdatesData>(
 	params: UseInfoUserNonFundingLedgerUpdatesParameters,
 	options: UseInfoUserNonFundingLedgerUpdatesOptions<TData> = {},
 ): UseInfoUserNonFundingLedgerUpdatesReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("userNonFundingLedgerUpdates", params);
+	const queryOptions = getUserNonFundingLedgerUpdatesQueryOptions(info, params);
+	const enabled = computeEnabled(Boolean(params.user), options);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.userNonFundingLedgerUpdates(params, signal),
+		...queryOptions,
+		enabled,
 	});
+
+	return query;
 }

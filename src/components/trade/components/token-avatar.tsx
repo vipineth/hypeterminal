@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getTokenIconUrl } from "@/lib/tokens";
 import { cn } from "@/lib/cn";
+import { getTokenIconUrl } from "@/lib/tokens";
 
 interface Props {
 	symbol: string;

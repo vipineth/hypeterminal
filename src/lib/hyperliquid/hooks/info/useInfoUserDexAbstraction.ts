@@ -1,7 +1,8 @@
-import type { UserDexAbstractionInfoResponse, UserDexAbstractionParameters } from "@nktkas/hyperliquid";
+import type { InfoClient, UserDexAbstractionInfoResponse, UserDexAbstractionParameters } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useHyperliquid } from "../../context";
 import { infoKeys } from "../../query/keys";
+import { computeEnabled, type QueryOptions } from "../../query/options";
 import type { HyperliquidQueryError, QueryParameter } from "../../types";
 
 type UserDexAbstractionData = UserDexAbstractionInfoResponse;
@@ -17,16 +18,29 @@ export type UseInfoUserDexAbstractionReturnType<TData = UserDexAbstractionData> 
 	HyperliquidQueryError
 >;
 
+export function getUserDexAbstractionQueryOptions(
+	info: InfoClient,
+	params: UserDexAbstractionParams,
+): QueryOptions<UserDexAbstractionData> {
+	return {
+		queryKey: infoKeys.method("userDexAbstraction", params),
+		queryFn: ({ signal }) => info.userDexAbstraction(params, signal),
+	};
+}
+
 export function useInfoUserDexAbstraction<TData = UserDexAbstractionData>(
 	params: UseInfoUserDexAbstractionParameters,
 	options: UseInfoUserDexAbstractionOptions<TData> = {},
 ): UseInfoUserDexAbstractionReturnType<TData> {
 	const { info } = useHyperliquid();
-	const queryKey = infoKeys.method("userDexAbstraction", params);
+	const queryOptions = getUserDexAbstractionQueryOptions(info, params);
+	const enabled = computeEnabled(Boolean(params.user), options);
 
-	return useQuery({
+	const query = useQuery({
 		...options,
-		queryKey,
-		queryFn: ({ signal }) => info.userDexAbstraction(params, signal),
+		...queryOptions,
+		enabled,
 	});
+
+	return query;
 }
