@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { useCallback, useMemo } from "react";
 import { useConnection } from "wagmi";
 import { MIN_WITHDRAW_USD } from "@/config/contracts";
@@ -20,7 +21,7 @@ export function useHyperliquidWithdraw() {
 		return clearinghouse.clearinghouseState.withdrawable;
 	}, [clearinghouse]);
 
-	const withdrawableRaw = parseNumber(withdrawable);
+	const withdrawableNum = parseNumber(withdrawable);
 
 	const validateAmount = useCallback(
 		(amount: string): { valid: boolean; error: string | null } => {
@@ -30,20 +31,20 @@ export function useHyperliquidWithdraw() {
 
 			const amountNum = parseNumber(amount);
 			if (!isPositive(amountNum)) {
-				return { valid: false, error: "Invalid amount" };
+				return { valid: false, error: t`Invalid amount` };
 			}
 
 			if (amountNum < MIN_WITHDRAW_USD) {
-				return { valid: false, error: `Minimum withdrawal is $${MIN_WITHDRAW_USD}` };
+				return { valid: false, error: t`Minimum withdrawal is $${MIN_WITHDRAW_USD}` };
 			}
 
-			if (amountNum > withdrawableRaw) {
-				return { valid: false, error: "Insufficient balance" };
+			if (amountNum > withdrawableNum) {
+				return { valid: false, error: t`Insufficient balance` };
 			}
 
 			return { valid: true, error: null };
 		},
-		[withdrawableRaw],
+		[withdrawableNum],
 	);
 
 	const startWithdraw = useCallback(
@@ -61,7 +62,6 @@ export function useHyperliquidWithdraw() {
 	return {
 		address,
 		withdrawable,
-		withdrawableRaw,
 		balanceStatus,
 
 		validateAmount,
