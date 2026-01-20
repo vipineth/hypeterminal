@@ -17,7 +17,7 @@ export function MarketInfo() {
 				<ResizablePanel defaultSize={sizes[0] ?? layoutPreset.defaultSizes[0]} minSize={40}>
 					<ChartPanel />
 				</ResizablePanel>
-				<ResizableHandle className="bg-border/40 data-[resize-handle-state=hover]:bg-terminal-cyan/30 data-[resize-handle-state=drag]:bg-terminal-cyan/50" />
+				<ResizableHandle className="bg-border/40 data-[resize-handle-state=hover]:bg-info/30 data-[resize-handle-state=drag]:bg-info/50" />
 				<ResizablePanel defaultSize={sizes[1] ?? layoutPreset.defaultSizes[1]} minSize={20}>
 					<OrderbookPanel key={orderbookKey} />
 				</ResizablePanel>

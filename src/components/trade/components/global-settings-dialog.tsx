@@ -101,7 +101,7 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 				<div className="space-y-6 text-xs">
 					{/* Language */}
 					<div className="flex items-center justify-between gap-4">
-						<div className="text-xs text-muted-foreground">
+						<div className="text-xs text-muted-fg">
 							<Trans>Display Language</Trans>
 						</div>
 						<Select value={i18n.locale} onValueChange={(value) => handleLanguageChange(value as LocaleCode)}>
@@ -121,10 +121,10 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 					{/* Number Format */}
 					<div className="flex items-center justify-between gap-4">
 						<div className="space-y-0.5">
-							<div className="text-xs text-muted-foreground">
+							<div className="text-xs text-muted-fg">
 								<Trans>Number Format</Trans>
 							</div>
-							<div className="text-4xs text-muted-foreground/70">
+							<div className="text-4xs text-muted-fg/70">
 								<Trans>Format for numbers and dates</Trans>
 							</div>
 						</div>
@@ -152,7 +152,7 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 						<div className="flex items-center justify-between gap-4">
 							<div className="space-y-0.5">
 								<div className="text-xs">{t`Market Order Slippage`}</div>
-								<div className="text-4xs text-muted-foreground">{t`Max slippage allowed for market orders.`}</div>
+								<div className="text-4xs text-muted-fg">{t`Max slippage allowed for market orders.`}</div>
 							</div>
 							<div className="flex items-center gap-1.5">
 								<NumberInput
@@ -166,7 +166,7 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 									inputSize="sm"
 									className="w-16 text-right tabular-nums"
 								/>
-								<span className="text-4xs text-muted-foreground w-6">{t`bps`}</span>
+								<span className="text-4xs text-muted-fg w-6">{t`bps`}</span>
 							</div>
 						</div>
 						<div className="space-y-1">
@@ -176,9 +176,9 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 								min={MARKET_ORDER_SLIPPAGE_MIN_BPS}
 								max={MARKET_ORDER_SLIPPAGE_MAX_BPS}
 							/>
-							<div className="flex items-center justify-between text-4xs text-muted-foreground">
+							<div className="flex items-center justify-between text-4xs text-muted-fg">
 								<span>{MARKET_ORDER_SLIPPAGE_MIN_BPS}</span>
-								<span className="font-medium text-foreground">{slippagePercent}%</span>
+								<span className="font-medium text-fg">{slippagePercent}%</span>
 								<span>{MARKET_ORDER_SLIPPAGE_MAX_BPS}</span>
 							</div>
 						</div>
@@ -188,22 +188,22 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 
 					{/* Toggles */}
 					<div className="space-y-3">
-						<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Chart`}</div>
+						<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Chart`}</div>
 						<div className="space-y-2">
 							<div className="flex items-center justify-between gap-4">
-								<label htmlFor={showOrdersId} className="text-xs text-muted-foreground">
+								<label htmlFor={showOrdersId} className="text-xs text-muted-fg">
 									{t`Show Orders on Chart`}
 								</label>
 								<Switch id={showOrdersId} checked={showOrdersOnChart} onCheckedChange={setShowOrdersOnChart} />
 							</div>
 							<div className="flex items-center justify-between gap-4">
-								<label htmlFor={showPositionsId} className="text-xs text-muted-foreground">
+								<label htmlFor={showPositionsId} className="text-xs text-muted-fg">
 									{t`Show Positions on Chart`}
 								</label>
 								<Switch id={showPositionsId} checked={showPositionsOnChart} onCheckedChange={setShowPositionsOnChart} />
 							</div>
 							<div className="flex items-center justify-between gap-4">
-								<label htmlFor={showExecutionsId} className="text-xs text-muted-foreground">
+								<label htmlFor={showExecutionsId} className="text-xs text-muted-fg">
 									{t`Show Executions on Chart`}
 								</label>
 								<Switch
@@ -213,7 +213,7 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 								/>
 							</div>
 							<div className="flex items-center justify-between gap-4">
-								<label htmlFor={showScanlinesId} className="text-xs text-muted-foreground">
+								<label htmlFor={showScanlinesId} className="text-xs text-muted-fg">
 									{t`Show Scanlines`}
 								</label>
 								<Switch id={showScanlinesId} checked={showChartScanlines} onCheckedChange={setShowChartScanlines} />
@@ -224,9 +224,9 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 					<div className="h-px bg-border/40" />
 
 					<div className="space-y-3">
-						<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Order Book`}</div>
+						<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Order Book`}</div>
 						<div className="flex items-center justify-between gap-4">
-							<label htmlFor={showOrderbookUsdId} className="text-xs text-muted-foreground">
+							<label htmlFor={showOrderbookUsdId} className="text-xs text-muted-fg">
 								{t`Show Values in USD`}
 							</label>
 							<Switch id={showOrderbookUsdId} checked={showOrderbookInUsd} onCheckedChange={setShowOrderbookInUsd} />

@@ -88,12 +88,12 @@ function getMarketPrice(ctxMarkPx: unknown, midPx: unknown): number {
 
 function getActionButtonClass(variant: ButtonContent["variant"]): string {
 	if (variant === "cyan") {
-		return "bg-terminal-cyan/20 border-terminal-cyan text-terminal-cyan hover:bg-terminal-cyan/30";
+		return "bg-info/20 border-info text-info hover:bg-info/30";
 	}
 	if (variant === "buy") {
-		return "bg-terminal-green/20 border-terminal-green text-terminal-green hover:bg-terminal-green/30";
+		return "bg-positive/20 border-positive text-positive hover:bg-positive/30";
 	}
-	return "bg-terminal-red/20 border-terminal-red text-terminal-red hover:bg-terminal-red/30";
+	return "bg-negative/20 border-negative text-negative hover:bg-negative/30";
 }
 
 export function OrderEntryPanel() {
@@ -557,11 +557,11 @@ export function OrderEntryPanel() {
 				</div>
 
 				<div className="space-y-0.5 text-3xs">
-					<div className="flex items-center justify-between text-muted-foreground">
+					<div className="flex items-center justify-between text-muted-fg">
 						<span>{t`Available`}</span>
 						<div className="flex items-center gap-2">
 							<span
-								className={cn("tabular-nums", availableBalance > 0 ? "text-terminal-green" : "text-muted-foreground")}
+								className={cn("tabular-nums", availableBalance > 0 ? "text-positive" : "text-muted-fg")}
 							>
 								{isConnected ? formatUSD(availableBalance) : FALLBACK_VALUE_PLACEHOLDER}
 							</span>
@@ -570,7 +570,7 @@ export function OrderEntryPanel() {
 									variant="link"
 									size="none"
 									onClick={() => openDepositModal("deposit")}
-									className="text-terminal-cyan text-4xs uppercase"
+									className="text-info text-4xs uppercase"
 								>
 									{t`Deposit`}
 								</Button>
@@ -578,9 +578,9 @@ export function OrderEntryPanel() {
 						</div>
 					</div>
 					{positionSize !== 0 && (
-						<div className="flex items-center justify-between text-muted-foreground">
+						<div className="flex items-center justify-between text-muted-fg">
 							<span>{t`Position`}</span>
-							<span className={cn("tabular-nums", positionSize > 0 ? "text-terminal-green" : "text-terminal-red")}>
+							<span className={cn("tabular-nums", positionSize > 0 ? "text-positive" : "text-negative")}>
 								{positionSize > 0 ? "+" : ""}
 								{formatDecimalFloor(positionSize, market?.szDecimals ?? 2)} {market?.coin}
 							</span>
@@ -589,13 +589,13 @@ export function OrderEntryPanel() {
 				</div>
 
 				<div className="space-y-1.5">
-					<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Size`}</div>
+					<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Size`}</div>
 					<div className="flex items-center gap-1">
 						<Button
 							variant="ghost"
 							size="none"
 							onClick={handleSizeModeToggle}
-							className="px-2 py-1.5 text-3xs border border-border/60 hover:border-foreground/30 hover:bg-transparent gap-1"
+							className="px-2 py-1.5 text-3xs border border-border/60 hover:border-fg/30 hover:bg-transparent gap-1"
 							aria-label={t`Toggle size mode`}
 							disabled={isFormDisabled}
 						>
@@ -609,8 +609,8 @@ export function OrderEntryPanel() {
 								setSize(e.target.value);
 							}}
 							className={cn(
-								"flex-1 h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums",
-								sizeHasError && "border-terminal-red focus:border-terminal-red",
+								"flex-1 h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums",
+								sizeHasError && "border-negative focus:border-negative",
 							)}
 							disabled={isFormDisabled}
 						/>
@@ -644,13 +644,13 @@ export function OrderEntryPanel() {
 				{usesTriggerPrice && (
 					<div className="space-y-1.5">
 						<div className="flex items-center justify-between">
-							<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Trigger Price (USDC)`}</div>
+							<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Trigger Price (USDC)`}</div>
 							{markPx > 0 && (
 								<Button
 									variant="ghost"
 									size="none"
 									onClick={() => setTriggerPrice(toFixed(markPx, szDecimalsToPriceDecimals(market?.szDecimals ?? 4)))}
-									className="text-4xs text-muted-foreground hover:text-terminal-cyan hover:bg-transparent tabular-nums"
+									className="text-4xs text-muted-fg hover:text-info hover:bg-transparent tabular-nums"
 								>
 									{t`Mark`}: {formatPrice(markPx, { szDecimals: market?.szDecimals })}
 								</Button>
@@ -661,11 +661,11 @@ export function OrderEntryPanel() {
 							value={triggerPriceInput}
 							onChange={(e) => setTriggerPrice(e.target.value)}
 							className={cn(
-								"w-full h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums",
+								"w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums",
 								usesTriggerPrice &&
 									!isPositive(triggerPriceNum) &&
 									sizeValue > 0 &&
-									"border-terminal-red focus:border-terminal-red",
+									"border-negative focus:border-negative",
 							)}
 							disabled={isFormDisabled}
 						/>
@@ -675,13 +675,13 @@ export function OrderEntryPanel() {
 				{usesLimitPrice && (
 					<div className="space-y-1.5">
 						<div className="flex items-center justify-between">
-							<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Limit Price (USDC)`}</div>
+							<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Limit Price (USDC)`}</div>
 							{markPx > 0 && (
 								<Button
 									variant="ghost"
 									size="none"
 									onClick={() => setLimitPrice(toFixed(markPx, szDecimalsToPriceDecimals(market?.szDecimals ?? 4)))}
-									className="text-4xs text-muted-foreground hover:text-terminal-cyan hover:bg-transparent tabular-nums"
+									className="text-4xs text-muted-fg hover:text-info hover:bg-transparent tabular-nums"
 								>
 									{t`Mark`}: {formatPrice(markPx, { szDecimals: market?.szDecimals })}
 								</Button>
@@ -692,8 +692,8 @@ export function OrderEntryPanel() {
 							value={limitPriceInput}
 							onChange={(e) => setLimitPrice(e.target.value)}
 							className={cn(
-								"w-full h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums",
-								usesLimitPrice && !price && sizeValue > 0 && "border-terminal-red focus:border-terminal-red",
+								"w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums",
+								usesLimitPrice && !price && sizeValue > 0 && "border-negative focus:border-negative",
 							)}
 							disabled={isFormDisabled}
 						/>
@@ -702,9 +702,9 @@ export function OrderEntryPanel() {
 
 				{showTif && (
 					<div className="space-y-1.5">
-						<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Time in Force`}</div>
+						<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Time in Force`}</div>
 						<Select value={tif} onValueChange={(value) => setTif(value as LimitTif)} disabled={isFormDisabled}>
-							<SelectTrigger className="w-full h-8 text-sm bg-background/50 border-border/60">
+							<SelectTrigger className="w-full h-8 text-sm bg-bg/50 border-border/60">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
@@ -721,36 +721,36 @@ export function OrderEntryPanel() {
 				{scaleOrder && (
 					<>
 						<div className="space-y-1.5">
-							<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Start Price (USDC)`}</div>
+							<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Start Price (USDC)`}</div>
 							<NumberInput
 								placeholder="0.00"
 								value={scaleStartPriceInput}
 								onChange={(e) => setScaleStart(e.target.value)}
-								className="w-full h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums"
+								className="w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums"
 								disabled={isFormDisabled}
 							/>
 						</div>
 						<div className="space-y-1.5">
-							<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`End Price (USDC)`}</div>
+							<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`End Price (USDC)`}</div>
 							<NumberInput
 								placeholder="0.00"
 								value={scaleEndPriceInput}
 								onChange={(e) => setScaleEnd(e.target.value)}
-								className="w-full h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums"
+								className="w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums"
 								disabled={isFormDisabled}
 							/>
 						</div>
 						<div className="space-y-1.5">
 							<div className="flex items-center justify-between">
-								<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Number of Orders`}</div>
-								<span className="text-4xs text-muted-foreground">{`${SCALE_LEVELS_MIN}-${SCALE_LEVELS_MAX}`}</span>
+								<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Number of Orders`}</div>
+								<span className="text-4xs text-muted-fg">{`${SCALE_LEVELS_MIN}-${SCALE_LEVELS_MAX}`}</span>
 							</div>
 							<NumberInput
 								placeholder="4"
 								value={String(scaleLevelsNum)}
 								onChange={(e) => setScaleLevels(Number(e.target.value) || 4)}
 								allowDecimals={false}
-								className="w-full h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums"
+								className="w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums"
 								disabled={isFormDisabled}
 							/>
 						</div>
@@ -761,15 +761,15 @@ export function OrderEntryPanel() {
 					<>
 						<div className="space-y-1.5">
 							<div className="flex items-center justify-between">
-								<div className="text-4xs uppercase tracking-wider text-muted-foreground">{t`Duration (Minutes)`}</div>
-								<span className="text-4xs text-muted-foreground">{`${TWAP_MINUTES_MIN}-${TWAP_MINUTES_MAX}`}</span>
+								<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Duration (Minutes)`}</div>
+								<span className="text-4xs text-muted-fg">{`${TWAP_MINUTES_MIN}-${TWAP_MINUTES_MAX}`}</span>
 							</div>
 							<NumberInput
 								placeholder="30"
 								value={String(twapMinutesNum)}
 								onChange={(e) => setTwapMinutes(Number(e.target.value) || 30)}
 								allowDecimals={false}
-								className="w-full h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums"
+								className="w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums"
 								disabled={isFormDisabled}
 							/>
 						</div>
@@ -779,7 +779,7 @@ export function OrderEntryPanel() {
 								onCheckedChange={(checked) => setTwapRandomize(checked === true)}
 								disabled={isFormDisabled}
 							/>
-							<span className={cn(isFormDisabled && "text-muted-foreground")}>{t`Randomize timing`}</span>
+							<span className={cn(isFormDisabled && "text-muted-fg")}>{t`Randomize timing`}</span>
 						</div>
 					</>
 				)}
@@ -796,7 +796,7 @@ export function OrderEntryPanel() {
 							/>
 							<label
 								htmlFor={reduceOnlyId}
-								className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-foreground")}
+								className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-fg")}
 							>
 								{t`Reduce Only`}
 							</label>
@@ -812,7 +812,7 @@ export function OrderEntryPanel() {
 								/>
 								<label
 									htmlFor={tpSlId}
-									className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-foreground")}
+									className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-fg")}
 								>
 									{t`TP/SL`}
 								</label>
@@ -837,10 +837,10 @@ export function OrderEntryPanel() {
 
 				<div className="space-y-2">
 					{validation.errors.length > 0 && isConnected && availableBalance > 0 && !validation.needsApproval && (
-						<div className="text-4xs text-terminal-red">{validation.errors.join(" • ")}</div>
+						<div className="text-4xs text-negative">{validation.errors.join(" • ")}</div>
 					)}
 
-					{approvalError && <div className="text-4xs text-terminal-red">{approvalError}</div>}
+					{approvalError && <div className="text-4xs text-negative">{approvalError}</div>}
 
 					<Button
 						variant="ghost"

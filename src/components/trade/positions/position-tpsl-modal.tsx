@@ -170,33 +170,33 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 				<div className="px-5 pb-4">
 					<div className="rounded-lg border border-border/50 bg-muted/20 p-3 space-y-1">
 						<div className="flex items-center justify-between">
-							<span className="text-2xs text-muted-foreground">{t`Size`}</span>
+							<span className="text-2xs text-muted-fg">{t`Size`}</span>
 							<span className="text-2xs tabular-nums font-medium">
 								{formatToken(position.size, position.szDecimals)} {position.coin}
 							</span>
 						</div>
 						<div className="flex items-center justify-between">
-							<span className="text-2xs text-muted-foreground">{t`Entry Price`}</span>
+							<span className="text-2xs text-muted-fg">{t`Entry Price`}</span>
 							<span className="text-2xs tabular-nums font-medium">
 								{formatPrice(position.entryPx, { szDecimals: position.szDecimals })}
 							</span>
 						</div>
 						<div className="flex items-center justify-between">
-							<span className="text-2xs text-muted-foreground">{t`Mark Price`}</span>
-							<span className="text-2xs tabular-nums font-medium text-terminal-amber">
+							<span className="text-2xs text-muted-fg">{t`Mark Price`}</span>
+							<span className="text-2xs tabular-nums font-medium text-warning">
 								{formatPrice(position.markPx, { szDecimals: position.szDecimals })}
 							</span>
 						</div>
 						<div className="border-t border-border/50 pt-3 flex items-center justify-between">
-							<span className="text-2xs text-muted-foreground">{t`Unrealized P&L`}</span>
+							<span className="text-2xs text-muted-fg">{t`Unrealized P&L`}</span>
 							<span
 								className={cn(
 									"text-2xs tabular-nums font-semibold",
-									isProfitable ? "text-terminal-green" : "text-terminal-red",
+									isProfitable ? "text-positive" : "text-negative",
 								)}
 							>
 								{formatUSD(position.unrealizedPnl, { signDisplay: "exceptZero" })}
-								<span className="font-normal text-muted-foreground ml-1">({formatPercent(position.roe, 1)})</span>
+								<span className="font-normal text-muted-fg ml-1">({formatPercent(position.roe, 1)})</span>
 							</span>
 						</div>
 					</div>
@@ -217,7 +217,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 					/>
 
 					{error && (
-						<div className="mt-3 px-2 py-1.5 rounded-md bg-terminal-red/10 border border-terminal-red/20 text-3xs text-terminal-red">
+						<div className="mt-3 px-2 py-1.5 rounded-md bg-negative/10 border border-negative/20 text-3xs text-negative">
 							{error.message}
 						</div>
 					)}
@@ -229,7 +229,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 						variant="ghost"
 						onClick={() => handleOpenChange(false)}
 						disabled={isSubmitting}
-						className="text-muted-foreground hover:text-foreground"
+						className="text-muted-fg hover:text-fg"
 					>
 						{t`Cancel`}
 					</Button>

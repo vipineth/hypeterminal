@@ -10,6 +10,7 @@ This folder contains specifications for planned features. Each feature has its o
 | Advanced Order Types | High | Planned | [advanced-order-types.md](./advanced-order-types.md) |
 | Leverage Management | High | Planned | [leverage-management.md](./leverage-management.md) |
 | Spot Swap | High | Planned | [spot-swap.md](./spot-swap.md) |
+| Color Tokens and Theme Naming | High | In Progress | [color-tokens.md](./color-tokens.md) |
 
 ## Status Legend
 

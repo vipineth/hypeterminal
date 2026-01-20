@@ -42,7 +42,7 @@ interface InfoRowProps {
 function InfoRow({ label, value }: InfoRowProps) {
 	return (
 		<div className="flex items-center justify-between text-3xs">
-			<span className="text-muted-foreground">{label}</span>
+			<span className="text-muted-fg">{label}</span>
 			<span>{value}</span>
 		</div>
 	);
@@ -68,31 +68,31 @@ function StatusScreen({ title, icon, heading, description, txHash, children, onC
 				</DialogHeader>
 				<div className="flex flex-col items-center gap-4 py-4">
 					{icon === "loading" ? (
-						<Loader2 className="size-8 animate-spin text-terminal-cyan" />
+						<Loader2 className="size-8 animate-spin text-info" />
 					) : (
 						<div
 							className={cn(
 								"flex size-12 items-center justify-center rounded-full",
-								icon === "success" ? "bg-terminal-green/20" : "bg-terminal-red/20",
+								icon === "success" ? "bg-positive/20" : "bg-negative/20",
 							)}
 						>
 							{icon === "success" ? (
-								<CheckCircle2 className="size-6 text-terminal-green" />
+								<CheckCircle2 className="size-6 text-positive" />
 							) : (
-								<AlertCircle className="size-6 text-terminal-red" />
+								<AlertCircle className="size-6 text-negative" />
 							)}
 						</div>
 					)}
 					<div className="text-center space-y-1">
 						<p className="text-sm font-medium">{heading}</p>
-						{description && <p className="text-xs text-muted-foreground">{description}</p>}
+						{description && <p className="text-xs text-muted-fg">{description}</p>}
 					</div>
 					{txHash && (
 						<a
 							href={`${ARBISCAN_TX_URL}${txHash}`}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="inline-flex items-center gap-1 text-3xs text-terminal-cyan hover:underline"
+							className="inline-flex items-center gap-1 text-3xs text-info hover:underline"
 						>
 							<Trans>View transaction</Trans>
 							<ExternalLink className="size-3" />
@@ -175,18 +175,18 @@ export function DepositModal({ open, onOpenChange, defaultTab = "deposit", onTab
 						</DialogTitle>
 					</DialogHeader>
 					<div className="space-y-4">
-						<div className="flex items-center gap-3 rounded-md border border-terminal-amber/40 bg-terminal-amber/10 p-3">
-							<AlertCircle className="size-5 text-terminal-amber shrink-0" />
+						<div className="flex items-center gap-3 rounded-md border border-warning/40 bg-warning/10 p-3">
+							<AlertCircle className="size-5 text-warning shrink-0" />
 							<div className="space-y-0.5">
 								<p className="text-xs font-medium">
 									<Trans>Wrong network</Trans>
 								</p>
-								<p className="text-3xs text-muted-foreground">
+								<p className="text-3xs text-muted-fg">
 									<Trans>Switch to Arbitrum to deposit</Trans>
 								</p>
 							</div>
 						</div>
-						{switchError && <p className="text-3xs text-terminal-red">{switchError.message}</p>}
+						{switchError && <p className="text-3xs text-negative">{switchError.message}</p>}
 						<Button onClick={switchToArbitrum} disabled={isSwitching} className="w-full">
 							{isSwitching ? (
 								<>
@@ -212,7 +212,7 @@ export function DepositModal({ open, onOpenChange, defaultTab = "deposit", onTab
 				heading={<Trans>Deposit complete</Trans>}
 				description={
 					<>
-						<span className="tabular-nums text-terminal-green">{depositAmount} USDC</span>{" "}
+						<span className="tabular-nums text-positive">{depositAmount} USDC</span>{" "}
 						<Trans>sent to Hyperliquid</Trans>
 					</>
 				}
@@ -271,7 +271,7 @@ export function DepositModal({ open, onOpenChange, defaultTab = "deposit", onTab
 				heading={<Trans>Withdrawal submitted</Trans>}
 				description={
 					<>
-						<span className="tabular-nums text-terminal-green">${withdrawAmount}</span>{" "}
+						<span className="tabular-nums text-positive">${withdrawAmount}</span>{" "}
 						<Trans>will arrive in ~3 min</Trans>
 					</>
 				}
@@ -342,11 +342,11 @@ export function DepositModal({ open, onOpenChange, defaultTab = "deposit", onTab
 					<TabsContent value="deposit" className="space-y-4">
 						<div className="space-y-1.5">
 							<div className="flex items-center justify-between">
-								<span className="text-4xs uppercase tracking-wider text-muted-foreground">
+								<span className="text-4xs uppercase tracking-wider text-muted-fg">
 									<Trans>Amount</Trans>
 								</span>
-								<span className="text-3xs text-muted-foreground">
-									<span className="tabular-nums text-foreground">{formatNumber(depositBalance, 2)}</span> USDC
+								<span className="text-3xs text-muted-fg">
+									<span className="tabular-nums text-fg">{formatNumber(depositBalance, 2)}</span> USDC
 								</span>
 							</div>
 							<div className="flex items-center gap-1">
@@ -355,20 +355,20 @@ export function DepositModal({ open, onOpenChange, defaultTab = "deposit", onTab
 									value={depositAmount}
 									onChange={(e) => setDepositAmount(e.target.value)}
 									className={cn(
-										"flex-1 h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums",
-										depositValidation.error && "border-terminal-red focus:border-terminal-red",
+										"flex-1 h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums",
+										depositValidation.error && "border-negative focus:border-negative",
 									)}
 								/>
 								<Button
 									variant="ghost"
 									size="none"
 									onClick={() => setDepositAmount(depositBalance)}
-									className="px-2 py-1.5 text-3xs border border-border/60 hover:border-foreground/30 hover:bg-transparent"
+									className="px-2 py-1.5 text-3xs border border-border/60 hover:border-fg/30 hover:bg-transparent"
 								>
 									{t`Max`}
 								</Button>
 							</div>
-							{depositValidation.error && <p className="text-4xs text-terminal-red">{depositValidation.error}</p>}
+							{depositValidation.error && <p className="text-4xs text-negative">{depositValidation.error}</p>}
 						</div>
 
 						<div className="rounded-md border border-border/40 bg-muted/20 p-2.5 space-y-1.5">
@@ -396,8 +396,8 @@ export function DepositModal({ open, onOpenChange, defaultTab = "deposit", onTab
 					<TabsContent value="withdraw" className="space-y-4">
 						{!address ? (
 							<div className="flex flex-col items-center gap-3 py-6">
-								<AlertCircle className="size-6 text-muted-foreground" />
-								<p className="text-xs text-muted-foreground">
+								<AlertCircle className="size-6 text-muted-fg" />
+								<p className="text-xs text-muted-fg">
 									<Trans>Connect wallet to withdraw</Trans>
 								</p>
 							</div>
@@ -405,15 +405,15 @@ export function DepositModal({ open, onOpenChange, defaultTab = "deposit", onTab
 							<>
 								<div className="space-y-1.5">
 									<div className="flex items-center justify-between">
-										<span className="text-4xs uppercase tracking-wider text-muted-foreground">
+										<span className="text-4xs uppercase tracking-wider text-muted-fg">
 											<Trans>Amount</Trans>
 										</span>
-										<span className="text-3xs text-muted-foreground">
+										<span className="text-3xs text-muted-fg">
 											{balanceStatus === "subscribing" ? (
 												<Trans>Loading...</Trans>
 											) : (
 												<>
-													<span className="tabular-nums text-foreground">${formatNumber(withdrawable, 2)}</span>{" "}
+													<span className="tabular-nums text-fg">${formatNumber(withdrawable, 2)}</span>{" "}
 													<Trans>available</Trans>
 												</>
 											)}
@@ -425,20 +425,20 @@ export function DepositModal({ open, onOpenChange, defaultTab = "deposit", onTab
 											value={withdrawAmount}
 											onChange={(e) => setWithdrawAmount(e.target.value)}
 											className={cn(
-												"flex-1 h-8 text-sm bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums",
-												withdrawValidation.error && "border-terminal-red focus:border-terminal-red",
+												"flex-1 h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums",
+												withdrawValidation.error && "border-negative focus:border-negative",
 											)}
 										/>
 										<Button
 											variant="ghost"
 											size="none"
 											onClick={() => setWithdrawAmount(withdrawable)}
-											className="px-2 py-1.5 text-3xs border border-border/60 hover:border-foreground/30 hover:bg-transparent"
+											className="px-2 py-1.5 text-3xs border border-border/60 hover:border-fg/30 hover:bg-transparent"
 										>
 											{t`Max`}
 										</Button>
 									</div>
-									{withdrawValidation.error && <p className="text-4xs text-terminal-red">{withdrawValidation.error}</p>}
+									{withdrawValidation.error && <p className="text-4xs text-negative">{withdrawValidation.error}</p>}
 								</div>
 
 								<div className="rounded-md border border-border/40 bg-muted/20 p-2.5 space-y-1.5">

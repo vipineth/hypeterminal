@@ -119,7 +119,7 @@ export function MarginModeDialog({
 								disabled={isUpdating}
 								className={cn(
 									"w-full text-left p-3 rounded-sm border transition-colors",
-									isSelected ? "border-terminal-cyan/50 bg-terminal-cyan/5" : "border-border/60 hover:border-border",
+									isSelected ? "border-info/50 bg-info/5" : "border-border/60 hover:border-border",
 								)}
 							>
 								<div className="flex gap-3">
@@ -127,14 +127,14 @@ export function MarginModeDialog({
 										className={cn(
 											"flex items-center justify-center size-8 rounded-sm shrink-0 transition-colors",
 											isSelected
-												? "bg-terminal-cyan/10 border border-terminal-cyan/30"
+												? "bg-info/10 border border-info/30"
 												: "bg-surface border border-border/60",
 										)}
 									>
 										<Icon
 											className={cn(
 												"size-4 transition-colors",
-												isSelected ? "text-terminal-cyan" : "text-muted-foreground",
+												isSelected ? "text-info" : "text-muted-fg",
 											)}
 										/>
 									</div>
@@ -144,21 +144,21 @@ export function MarginModeDialog({
 											<span
 												className={cn(
 													"text-xs font-medium uppercase tracking-wider",
-													isSelected ? "text-terminal-cyan" : "text-foreground",
+													isSelected ? "text-info" : "text-fg",
 												)}
 											>
 												{option.label()}
 											</span>
 											<div className="flex items-center gap-2">
 												{isCurrent && (
-													<span className="text-3xs text-muted-foreground uppercase tracking-wider">
+													<span className="text-3xs text-muted-fg uppercase tracking-wider">
 														<Trans>Current</Trans>
 													</span>
 												)}
-												{isSelected && !isCurrent && <Check className="size-3.5 text-terminal-cyan" />}
+												{isSelected && !isCurrent && <Check className="size-3.5 text-info" />}
 											</div>
 										</div>
-										<p className="text-3xs text-muted-foreground leading-relaxed">{option.description()}</p>
+										<p className="text-3xs text-muted-fg leading-relaxed">{option.description()}</p>
 									</div>
 								</div>
 							</button>
@@ -167,23 +167,23 @@ export function MarginModeDialog({
 				</div>
 
 				{cannotSwitch && (
-					<div className="flex items-start gap-2 p-2.5 bg-terminal-amber/10 border border-terminal-amber/20 rounded-sm">
-						<AlertTriangle className="size-3.5 text-terminal-amber shrink-0 mt-0.5" />
-						<p className="text-xs text-terminal-amber leading-relaxed">
+					<div className="flex items-start gap-2 p-2.5 bg-warning/10 border border-warning/20 rounded-sm">
+						<AlertTriangle className="size-3.5 text-warning shrink-0 mt-0.5" />
+						<p className="text-xs text-warning leading-relaxed">
 							<Trans>Cannot switch to Isolated mode with an open position. Close your position first.</Trans>
 						</p>
 					</div>
 				)}
 
 				{updateError && (
-					<div className="flex items-center gap-2 p-2.5 bg-terminal-red/10 border border-terminal-red/20 rounded-sm text-xs text-terminal-red">
+					<div className="flex items-center gap-2 p-2.5 bg-negative/10 border border-negative/20 rounded-sm text-xs text-negative">
 						<AlertTriangle className="size-3.5 shrink-0" />
 						<span className="flex-1 truncate">{updateError.message || t`Update failed`}</span>
 					</div>
 				)}
 
 				{showSuccess && (
-					<div className="flex items-center justify-center gap-2 p-2.5 bg-terminal-green/10 border border-terminal-green/20 rounded-sm text-xs text-terminal-green">
+					<div className="flex items-center justify-center gap-2 p-2.5 bg-positive/10 border border-positive/20 rounded-sm text-xs text-positive">
 						<Check className="size-3.5" />
 						<Trans>Updated</Trans>
 					</div>

@@ -86,32 +86,32 @@ export function TpSlSection({
 			<div className="rounded-md border border-border/50 bg-muted/20 p-2.5">
 				<div className="grid grid-cols-2 gap-2">
 					<div className="space-y-1">
-						<span className="text-3xs text-muted-foreground">{t`Take Profit`}</span>
+						<span className="text-3xs text-muted-fg">{t`Take Profit`}</span>
 						<Input
 							placeholder={t`TP Price`}
 							value={tpPrice}
 							onChange={(e) => onTpPriceChange(e.target.value)}
 							className={cn(
-								"h-7 text-2xs bg-background tabular-nums",
-								tpError && "border-terminal-red focus:border-terminal-red",
+								"h-7 text-2xs bg-bg tabular-nums",
+								tpError && "border-negative focus:border-negative",
 							)}
 							disabled={disabled}
 						/>
-						{tpError && <div className="text-4xs text-terminal-red">{tpError}</div>}
+						{tpError && <div className="text-4xs text-negative">{tpError}</div>}
 					</div>
 					<div className="space-y-1">
-						<span className="text-3xs text-muted-foreground">{t`Stop Loss`}</span>
+						<span className="text-3xs text-muted-fg">{t`Stop Loss`}</span>
 						<Input
 							placeholder={t`SL Price`}
 							value={slPrice}
 							onChange={(e) => onSlPriceChange(e.target.value)}
 							className={cn(
-								"h-7 text-2xs bg-background tabular-nums",
-								slError && "border-terminal-red focus:border-terminal-red",
+								"h-7 text-2xs bg-bg tabular-nums",
+								slError && "border-negative focus:border-negative",
 							)}
 							disabled={disabled}
 						/>
-						{slError && <div className="text-4xs text-terminal-red">{slError}</div>}
+						{slError && <div className="text-4xs text-negative">{slError}</div>}
 					</div>
 				</div>
 			</div>
@@ -149,11 +149,11 @@ export function TpSlSection({
 			{riskRewardDisplay && (
 				<div className="rounded-md border border-border/40 bg-muted/20 p-2.5 space-y-2">
 					<div className="flex items-center justify-between">
-						<span className="text-3xs text-muted-foreground">{t`Risk/Reward`}</span>
+						<span className="text-3xs text-muted-fg">{t`Risk/Reward`}</span>
 						<span
 							className={cn(
 								"text-3xs font-semibold tabular-nums",
-								riskRewardDisplay.rrDisplay.isFavorable ? "text-terminal-green" : "text-terminal-amber",
+								riskRewardDisplay.rrDisplay.isFavorable ? "text-positive" : "text-warning",
 							)}
 						>
 							{riskRewardDisplay.rrDisplay.label}
@@ -161,23 +161,23 @@ export function TpSlSection({
 					</div>
 					<div className="flex h-1.5 rounded-full overflow-hidden bg-muted/50">
 						<div
-							className="bg-terminal-red"
+							className="bg-negative"
 							style={{
 								width: `${(riskRewardDisplay.rrDisplay.risk / (riskRewardDisplay.rrDisplay.risk + riskRewardDisplay.rrDisplay.reward)) * 100}%`,
 							}}
 						/>
 						<div
-							className="bg-terminal-green"
+							className="bg-positive"
 							style={{
 								width: `${(riskRewardDisplay.rrDisplay.reward / (riskRewardDisplay.rrDisplay.risk + riskRewardDisplay.rrDisplay.reward)) * 100}%`,
 							}}
 						/>
 					</div>
 					<div className="flex items-center justify-between text-3xs">
-						<span className="tabular-nums text-terminal-red">
+						<span className="tabular-nums text-negative">
 							{formatUSD(riskRewardDisplay.slPnl, { signDisplay: "exceptZero" })}
 						</span>
-						<span className="tabular-nums text-terminal-green">
+						<span className="tabular-nums text-positive">
 							{formatUSD(riskRewardDisplay.tpPnl, { signDisplay: "exceptZero" })}
 						</span>
 					</div>

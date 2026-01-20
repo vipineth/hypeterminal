@@ -58,7 +58,7 @@ export function UserMenu() {
 				<Button
 					size="sm"
 					variant="outline"
-					className="h-7 text-3xs uppercase tracking-wider border-terminal-green/40 text-terminal-green hover:bg-terminal-green/10 hover:text-terminal-green"
+					className="h-7 text-3xs uppercase tracking-wider border-positive/40 text-positive hover:bg-positive/10 hover:text-positive"
 					onClick={() => setIsOpen(true)}
 				>
 					<Zap className="size-3 mr-1" />
@@ -74,7 +74,7 @@ export function UserMenu() {
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Button variant="ghost" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider">
-						<div className="size-1.5 rounded-full bg-terminal-green animate-pulse" />
+						<div className="size-1.5 rounded-full bg-positive animate-pulse" />
 						{ensName ?? (address ? shortenAddress(address) : "")}
 						<ChevronDown className="size-2.5" />
 					</Button>
@@ -82,7 +82,7 @@ export function UserMenu() {
 				<DropdownMenuContent align="end" className="min-w-40 text-xs font-mono">
 					{address && <CopyAddressMenuItem address={address} />}
 					<DropdownMenuItem className="flex items-center gap-2">
-						<PlusCircle className="size-3.5 text-muted-foreground" />
+						<PlusCircle className="size-3.5 text-muted-fg" />
 						<span>
 							<Trans>Add funds</Trans>
 						</span>

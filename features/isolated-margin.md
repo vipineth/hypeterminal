@@ -169,9 +169,9 @@ On error: Modal closes, show toast with error message
 
 **Badge Styling**:
 - Text: "ISO" (short for Isolated)
-- Background: `terminal-cyan/15`
-- Border: `terminal-cyan/30`
-- Text color: `terminal-cyan`
+- Background: `info/15`
+- Border: `info/30`
+- Text color: `info`
 - Font: `text-4xs uppercase`
 - Only shown for isolated positions (cross positions show no badge)
 
@@ -225,7 +225,7 @@ interface Position {
 
 ### Phase 1: Switch Implementation
 
-1. [ ] Create `MarginModeToggle` component with terminal-cyan styling
+1. [ ] Create `MarginModeToggle` component with info styling
 2. [ ] Create `MarginModeSwitchModal` component with comparison table
 3. [ ] Create `MarginModeLockedModal` component for position-exists state
 4. [ ] Update `order-entry-panel.tsx` to use toggle instead of tabs

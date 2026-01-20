@@ -753,7 +753,7 @@ export const UI_TEXT = {
     <TableRow>
       <TableCell>ETH-PERP</TableCell>
       <TableCell><Badge variant="long" size="xs">LONG</Badge></TableCell>
-      <TableCell className="text-right text-terminal-green">+$125.50</TableCell>
+      <TableCell className="text-right text-positive">+$125.50</TableCell>
     </TableRow>
   </TableBody>
 </Table>`,
@@ -787,11 +787,11 @@ export const UI_TEXT = {
 <p className="text-3xs">Labels (10px)</p>
 <p className="text-4xs">Micro (9px)</p>
 
-<span className="text-terminal-green">Green</span>
-<span className="text-terminal-red">Red</span>
-<span className="text-terminal-cyan">Cyan</span>
-<span className="text-terminal-amber">Amber</span>
-<span className="text-terminal-purple">Purple</span>`,
+<span className="text-positive">Green</span>
+<span className="text-negative">Red</span>
+<span className="text-info">Cyan</span>
+<span className="text-warning">Amber</span>
+<span className="text-highlight">Purple</span>`,
 			LINES: {
 				BODY: "Default body (14px)",
 				SMALL: "Small text (12px)",
@@ -814,11 +814,11 @@ export const UI_TEXT = {
 				PURPLE: "Purple",
 			},
 			COLOR_TOKENS: {
-				GREEN: "terminal-green",
-				RED: "terminal-red",
-				CYAN: "terminal-cyan",
-				AMBER: "terminal-amber",
-				PURPLE: "terminal-purple",
+				GREEN: "positive",
+				RED: "negative",
+				CYAN: "info",
+				AMBER: "warning",
+				PURPLE: "highlight",
 			},
 		},
 	},

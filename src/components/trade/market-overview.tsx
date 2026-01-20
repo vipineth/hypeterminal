@@ -38,7 +38,7 @@ export function MarketOverview() {
 						<StatBlock
 							label={t`MARK`}
 							value={formatUSD(selectedMarket?.ctxNumbers?.markPx ?? null)}
-							valueClass="text-terminal-amber terminal-glow-amber"
+							valueClass="text-warning"
 						/>
 						<StatBlock label={t`ORACLE`} value={formatUSD(selectedMarket?.ctxNumbers?.oraclePx ?? null)} />
 						<StatBlock
@@ -56,11 +56,11 @@ export function MarketOverview() {
 							})}
 						/>
 						<div className="flex items-center gap-1">
-							<Flame className={cn("size-3", isFundingPositive ? "text-terminal-green" : "text-terminal-red")} />
+							<Flame className={cn("size-3", isFundingPositive ? "text-positive" : "text-negative")} />
 							<span
 								className={cn(
-									"text-muted-foreground tabular-nums",
-									isFundingPositive ? "text-terminal-green" : "text-terminal-red",
+									"text-muted-fg tabular-nums",
+									isFundingPositive ? "text-positive" : "text-negative",
 								)}
 							>
 								{formatPercent(fundingNum, {

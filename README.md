@@ -205,20 +205,20 @@ This project uses a semantic color system with Tailwind CSS v4 and OKLch color f
 
 | Token | Purpose | Usage |
 |-------|---------|-------|
-| `background` | Page background | Main app background |
-| `foreground` | Primary text | Body text, headings |
+| `bg` | Page background | Main app background |
+| `fg` | Primary text | Body text, headings |
 | `surface` | Elevated surfaces | Cards, panels, modals |
-| `surface-foreground` | Text on surfaces | Content inside cards |
+| `surface-fg` | Text on surfaces | Content inside cards |
 | `primary` | Brand/main action | Primary buttons, links |
-| `primary-foreground` | Text on primary | Button labels |
+| `primary-fg` | Text on primary | Button labels |
 | `secondary` | Secondary actions | Secondary buttons, tabs |
-| `secondary-foreground` | Text on secondary | Secondary button text |
+| `secondary-fg` | Text on secondary | Secondary button text |
 | `muted` | Subdued elements | Disabled states, backgrounds |
-| `muted-foreground` | Subdued text | Placeholders, captions |
+| `muted-fg` | Subdued text | Placeholders, captions |
 | `accent` | Highlights | Hover states, selections |
-| `accent-foreground` | Text on accent | Selected item text |
-| `destructive` | Danger actions | Delete buttons, errors |
-| `destructive-foreground` | Text on destructive | Delete button text |
+| `accent-fg` | Text on accent | Selected item text |
+| `danger` | Danger actions | Delete buttons, errors |
+| `danger-fg` | Text on danger | Delete button text |
 | `border` | Borders | Dividers, input borders |
 | `input` | Input backgrounds | Form field backgrounds |
 | `ring` | Focus rings | Keyboard focus indicators |
@@ -227,25 +227,26 @@ This project uses a semantic color system with Tailwind CSS v4 and OKLch color f
 
 | Token | Purpose | Usage |
 |-------|---------|-------|
-| `terminal-green` | Long/buy/positive | Buy orders, profit, positive PnL |
-| `terminal-red` | Short/sell/negative | Sell orders, loss, negative PnL |
-| `terminal-cyan` | Information/chart | Chart lines, info highlights |
-| `terminal-amber` | Warning/caution | Warnings, pending states |
-| `terminal-purple` | Secondary accent | Special highlights, badges |
+| `positive` | Long/buy/positive | Buy orders, profit, positive PnL |
+| `negative` | Short/sell/negative | Sell orders, loss, negative PnL |
+| `info` | Information/chart | Chart lines, info highlights |
+| `warning` | Warning/caution | Warnings, pending states |
+| `highlight` | Secondary accent | Special highlights, badges |
 
 ### Usage Examples
 
 ```tsx
 // Tailwind classes
-<span className="text-terminal-green">+$1,234.56</span>
-<span className="text-terminal-red">-$567.89</span>
-<button className="bg-primary text-primary-foreground">Place Order</button>
+<span className="text-positive">+$1,234.56</span>
+<span className="text-negative">-$567.89</span>
+<button className="bg-primary text-primary-fg">Place Order</button>
+<button className="bg-danger text-danger-fg">Cancel Order</button>
 <div className="bg-surface border-border">Card content</div>
 
 // Conditional styling
 <span className={cn(
   "tabular-nums",
-  pnl >= 0 ? "text-terminal-green" : "text-terminal-red"
+  pnl >= 0 ? "text-positive" : "text-negative"
 )}>
   {formatUSD(pnl)}
 </span>
@@ -258,9 +259,8 @@ Colors follow a **semantic naming** approach (describing purpose, not appearance
 | Pattern | Example | Description |
 |---------|---------|-------------|
 | `{role}` | `primary`, `muted` | Base color for a role |
-| `{role}-foreground` | `primary-foreground` | Text color on that role |
-| `terminal-{color}` | `terminal-green` | Trading-specific colors |
-| `sidebar-{role}` | `sidebar-accent` | Sidebar-scoped variants |
+| `{role}-fg` | `primary-fg` | Text color on that role |
+| `signal` | `positive`, `negative`, `info`, `warning`, `highlight` | Trading-specific colors |
 
 Colors are defined in `src/styles.css` and automatically adapt between light and dark modes.
 

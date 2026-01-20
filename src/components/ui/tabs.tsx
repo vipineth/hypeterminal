@@ -22,14 +22,14 @@ function TabsTrigger({ className, variant = "default", ...props }: TabsTriggerPr
 			data-slot="tabs-trigger"
 			className={cn(
 				"px-2 py-0.5 text-3xs uppercase tracking-wider transition-colors",
-				"text-muted-foreground hover:text-foreground",
-				"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-terminal-cyan/50",
+				"text-muted-fg hover:text-fg",
+				"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-info/50",
 				"disabled:pointer-events-none disabled:opacity-50",
 				"[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3",
-				variant === "default" && "data-[state=active]:text-terminal-cyan data-[state=active]:bg-terminal-cyan/10",
+				variant === "default" && "data-[state=active]:text-info data-[state=active]:bg-info/10",
 				variant === "underline" && [
 					"border-b border-transparent",
-					"data-[state=active]:text-terminal-cyan data-[state=active]:border-terminal-cyan",
+					"data-[state=active]:text-info data-[state=active]:border-info",
 				],
 				className,
 			)}

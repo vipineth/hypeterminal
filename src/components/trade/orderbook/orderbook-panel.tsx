@@ -73,7 +73,7 @@ export function OrderbookPanel() {
 								<Button
 									variant="ghost"
 									size="none"
-									className="px-1.5 py-0.5 text-4xs border border-border/60 hover:border-foreground/30 hover:bg-transparent inline-flex items-center gap-1"
+									className="px-1.5 py-0.5 text-4xs border border-border/60 hover:border-fg/30 hover:bg-transparent inline-flex items-center gap-1"
 									aria-label={t`Select order book aggregation`}
 								>
 									{selectedOption?.label ?? priceGroupingOptions[0]?.label ?? "—"}
@@ -99,7 +99,7 @@ export function OrderbookPanel() {
 						variant="ghost"
 						size="none"
 						onClick={toggleUsdDisplay}
-						className="text-right hover:text-foreground hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
+						className="text-right hover:text-fg hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
 					>
 						{t`Size`}
 						<span className="opacity-60">({showOrderbookInUsd ? "$" : selectedMarket.coin})</span>
@@ -109,7 +109,7 @@ export function OrderbookPanel() {
 						variant="ghost"
 						size="none"
 						onClick={toggleUsdDisplay}
-						className="text-right hover:text-foreground hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
+						className="text-right hover:text-fg hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
 					>
 						{t`Total`}
 						<span className="opacity-60">({showOrderbookInUsd ? "$" : selectedMarket.coin})</span>
@@ -132,13 +132,13 @@ export function OrderbookPanel() {
 							))}
 						</div>
 					) : (
-						<div className="flex-1 flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
+						<div className="flex-1 flex items-center justify-center px-2 py-6 text-3xs text-muted-fg">
 							{orderbookStatus === "error" ? t`Failed to load order book.` : t`Waiting for order book...`}
 						</div>
 					)}
 
 					<div className="shrink-0 py-1.5 px-2 flex items-center justify-center gap-2 border-y border-border/40 bg-surface/30">
-						<span className="text-sm font-semibold tabular-nums text-terminal-amber terminal-glow-amber">
+						<span className="text-sm font-semibold tabular-nums text-warning">
 							{formatNumber(spreadInfo.mid, selectedMarket.szDecimals)}
 						</span>
 					</div>
@@ -159,16 +159,16 @@ export function OrderbookPanel() {
 					)}
 				</div>
 
-				<div className="mt-auto shrink-0 px-2 py-1.5 border-t border-border/40 flex items-center justify-between text-4xs text-muted-foreground">
+				<div className="mt-auto shrink-0 px-2 py-1.5 border-t border-border/40 flex items-center justify-between text-4xs text-muted-fg">
 					<span>{t`Spread`}</span>
-					<span className="tabular-nums text-terminal-amber">
+					<span className="tabular-nums text-warning">
 						{spreadInfo.spread && spreadInfo.spreadPct
 							? `${formatNumber(spreadInfo.spread, 2)} (${formatNumber(spreadInfo.spreadPct, 3)}%)`
 							: FALLBACK_VALUE_PLACEHOLDER}
 					</span>
 				</div>
 				{orderbookStatus === "error" && (
-					<div className="shrink-0 px-2 pb-1.5 text-4xs text-terminal-red/80">
+					<div className="shrink-0 px-2 pb-1.5 text-4xs text-negative/80">
 						{orderbookError instanceof Error ? orderbookError.message : t`WebSocket error`}
 					</div>
 				)}

@@ -29,7 +29,7 @@ export function TradingActionButton({ onClick, children, disabled, className, ..
 				disabled={disabled || isEnabling || (!isReady && !needsTrading)}
 				className={cn(
 					showEnableTrading &&
-						"bg-terminal-cyan/20 border-terminal-cyan text-terminal-cyan hover:border-terminal-red hover:text-terminal-red hover:bg-terminal-cyan/30",
+						"bg-info/20 border-info text-info hover:border-negative hover:text-negative hover:bg-info/30",
 					className,
 				)}
 			>

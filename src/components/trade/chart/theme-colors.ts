@@ -68,14 +68,14 @@ function colorToRgba(cssColor: string, alpha: number): string {
  */
 export function getChartColors(): ChartColors {
 	return {
-		background: getCssVar("--background"),
-		foreground: getCssVar("--foreground"),
+		background: getCssVar("--bg"),
+		foreground: getCssVar("--fg"),
 		muted: getCssVar("--muted"),
-		mutedForeground: getCssVar("--muted-foreground"),
+		mutedForeground: getCssVar("--muted-fg"),
 		border: getCssVar("--border"),
-		green: getCssVar("--terminal-green"),
-		red: getCssVar("--terminal-red"),
-		accent: getCssVar("--terminal-cyan"),
+		green: getCssVar("--positive"),
+		red: getCssVar("--negative"),
+		accent: getCssVar("--info"),
 		surface: getCssVar("--surface"),
 	};
 }
@@ -268,8 +268,8 @@ export function getCustomThemeColors(): CustomThemeColors {
 	const muted = colorToHex(colors.muted);
 	const red = colorToHex(colors.red);
 	const green = colorToHex(colors.green);
-	const amber = colorToHex(getCssVar("--terminal-amber") || colors.accent);
-	const purple = colorToHex(getCssVar("--terminal-purple") || colors.accent);
+	const amber = colorToHex(getCssVar("--warning") || colors.accent);
+	const purple = colorToHex(getCssVar("--highlight") || colors.accent);
 	const bg = colorToHex(colors.background);
 	const fg = colorToHex(colors.foreground);
 

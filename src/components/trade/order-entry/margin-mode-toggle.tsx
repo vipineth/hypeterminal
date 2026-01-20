@@ -24,7 +24,7 @@ export function MarginModeToggle({ mode, disabled, onClick, className }: Props) 
 				"border border-border/60",
 				"transition-colors duration-150",
 				disabled && "opacity-50 cursor-not-allowed",
-				!disabled && "hover:border-terminal-cyan/50 hover:text-terminal-cyan",
+				!disabled && "hover:border-info/50 hover:text-info",
 				className,
 			)}
 		>

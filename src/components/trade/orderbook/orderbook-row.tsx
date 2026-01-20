@@ -46,13 +46,13 @@ export function OrderbookRow({ level, side, maxTotal, showInUsd = false, szDecim
 					onClick={() => setSelectedPrice(level.price)}
 					className={cn(
 						"text-left justify-start",
-						isAsk ? "text-terminal-red hover:text-terminal-red" : "text-terminal-green hover:text-terminal-green",
+						isAsk ? "text-negative hover:text-negative" : "text-positive hover:text-positive",
 					)}
 				>
 					{formatNumber(level.price)}
 				</Button>
-				<div className="text-right text-muted-foreground group-hover:text-foreground">{sizeText}</div>
-				<div className="text-right text-muted-foreground/70 group-hover:text-muted-foreground">{totalText}</div>
+				<div className="text-right text-muted-fg group-hover:text-fg">{sizeText}</div>
+				<div className="text-right text-muted-fg/70 group-hover:text-muted-fg">{totalText}</div>
 			</div>
 		</div>
 	);

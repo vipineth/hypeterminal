@@ -123,9 +123,9 @@ export function AccountPanel() {
 	const headerPnlClass =
 		activeTab === "perps" && hasPerpData
 			? perpMetrics.unrealizedPnl >= 0
-				? "text-terminal-green"
-				: "text-terminal-red"
-			: "text-muted-foreground";
+				? "text-positive"
+				: "text-negative"
+			: "text-muted-fg";
 
 	const perpRows = useMemo((): SummaryRow[] => {
 		if (!perpMetrics) return [];
@@ -138,7 +138,7 @@ export function AccountPanel() {
 			{
 				label: t`Unrealized PNL`,
 				value: formatUSD(perpMetrics.unrealizedPnl, { signDisplay: "exceptZero" }),
-				valueClass: cn("tabular-nums", perpMetrics.unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red"),
+				valueClass: cn("tabular-nums", perpMetrics.unrealizedPnl >= 0 ? "text-positive" : "text-negative"),
 			},
 			{
 				label: t`Available`,
@@ -179,7 +179,7 @@ export function AccountPanel() {
 			{
 				label: t`In Orders`,
 				value: formatUSD(spotMetrics.inOrderValue),
-				valueClass: "tabular-nums text-terminal-amber",
+				valueClass: "tabular-nums text-warning",
 			},
 			{
 				label: t`Assets`,
@@ -198,17 +198,17 @@ export function AccountPanel() {
 	const hasData = activeTab === "perps" ? hasPerpData : hasSpotData;
 
 	return (
-		<div className="shrink-0 flex flex-col relative bg-linear-to-b from-surface to-background border-t border-terminal-cyan/20">
-			<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-terminal-cyan/40 to-transparent" />
+		<div className="shrink-0 flex flex-col relative bg-linear-to-b from-surface to-bg border-t border-info/20">
+			<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-info/40 to-transparent" />
 			<div className="px-2 py-2 border-b border-border/40 flex items-center justify-between backdrop-blur-sm">
-				<span className="text-3xs uppercase tracking-wider text-terminal-cyan/70">{t`Account`}</span>
+				<span className="text-3xs uppercase tracking-wider text-info/70">{t`Account`}</span>
 				<div className="flex items-center gap-3">
 					<div className="flex items-center gap-1.5">
-						<span className="text-4xs text-muted-foreground uppercase">{t`Equity`}</span>
+						<span className="text-4xs text-muted-fg uppercase">{t`Equity`}</span>
 						<span
 							className={cn(
 								"text-sm font-semibold tabular-nums",
-								hasData ? "text-terminal-green terminal-glow-green" : "text-muted-foreground",
+								hasData ? "text-positive" : "text-muted-fg",
 							)}
 						>
 							{headerEquity}
@@ -216,7 +216,7 @@ export function AccountPanel() {
 					</div>
 					{activeTab === "perps" && (
 						<div className="flex items-center gap-1.5">
-							<span className="text-4xs text-muted-foreground uppercase">{t`PNL`}</span>
+							<span className="text-4xs text-muted-fg uppercase">{t`PNL`}</span>
 							<span className={cn("text-2xs font-medium tabular-nums", headerPnlClass)}>{headerPnl}</span>
 						</div>
 					)}
@@ -231,8 +231,8 @@ export function AccountPanel() {
 					className={cn(
 						"px-2 py-1 text-4xs uppercase tracking-wider hover:bg-transparent",
 						activeTab === "perps"
-							? "text-foreground border-b border-foreground"
-							: "text-muted-foreground hover:text-foreground",
+							? "text-fg border-b border-fg"
+							: "text-muted-fg hover:text-fg",
 					)}
 					aria-label={t`Perps`}
 				>
@@ -245,8 +245,8 @@ export function AccountPanel() {
 					className={cn(
 						"px-2 py-1 text-4xs uppercase tracking-wider hover:bg-transparent",
 						activeTab === "spot"
-							? "text-foreground border-b border-foreground"
-							: "text-muted-foreground hover:text-foreground",
+							? "text-fg border-b border-fg"
+							: "text-muted-fg hover:text-fg",
 					)}
 					aria-label={t`Spot`}
 				>
@@ -256,15 +256,15 @@ export function AccountPanel() {
 
 			<div className="p-2 space-y-2 overflow-y-auto">
 				{!isConnected ? (
-					<div className="text-3xs text-muted-foreground text-center py-4">{t`Connect wallet to view account`}</div>
+					<div className="text-3xs text-muted-fg text-center py-4">{t`Connect wallet to view account`}</div>
 				) : !hasData ? (
-					<div className="text-3xs text-muted-foreground text-center py-4">{t`Loading...`}</div>
+					<div className="text-3xs text-muted-fg text-center py-4">{t`Loading...`}</div>
 				) : (
 					<>
-						<div className="border border-terminal-cyan/10 bg-background divide-y divide-border/30 text-3xs">
+						<div className="border border-info/10 bg-bg divide-y divide-border/30 text-3xs">
 							{summaryRows.map((row) => (
 								<div key={row.label} className="flex items-center justify-between px-2 py-1.5">
-									<span className="text-muted-foreground">{row.label}</span>
+									<span className="text-muted-fg">{row.label}</span>
 									<span className={row.valueClass}>{row.value}</span>
 								</div>
 							))}
@@ -275,7 +275,7 @@ export function AccountPanel() {
 								variant="ghost"
 								size="none"
 								onClick={() => openDepositModal("deposit")}
-								className="py-1.5 text-3xs uppercase tracking-wider border border-terminal-green/40 text-terminal-green hover:bg-terminal-green/10"
+								className="py-1.5 text-3xs uppercase tracking-wider border border-positive/40 text-positive hover:bg-positive/10"
 								aria-label={t`Deposit`}
 							>
 								{t`Deposit`}
@@ -284,7 +284,7 @@ export function AccountPanel() {
 								variant="ghost"
 								size="none"
 								onClick={() => openDepositModal("withdraw")}
-								className="py-1.5 text-3xs uppercase tracking-wider border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:bg-transparent"
+								className="py-1.5 text-3xs uppercase tracking-wider border border-border/60 text-muted-fg hover:text-fg hover:border-fg/30 hover:bg-transparent"
 								aria-label={t`Withdraw`}
 							>
 								{t`Withdraw`}

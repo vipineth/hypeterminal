@@ -46,7 +46,7 @@ export function LeverageSlider({ value, onChange, max, disabled, className }: Pr
 			<div className="relative h-5 flex items-center">
 				<div className="absolute inset-x-0 h-1.5 bg-border rounded-full">
 					<div
-						className="absolute inset-y-0 left-0 bg-terminal-cyan rounded-full transition-all duration-75"
+						className="absolute inset-y-0 left-0 bg-info rounded-full transition-all duration-75"
 						style={{ width: `${percentage}%` }}
 					/>
 				</div>
@@ -63,7 +63,7 @@ export function LeverageSlider({ value, onChange, max, disabled, className }: Pr
 							<div
 								className={cn(
 									"size-2 rounded-full transition-colors",
-									isActive ? "bg-terminal-cyan" : "bg-muted-foreground/60",
+									isActive ? "bg-info" : "bg-muted-fg/60",
 								)}
 							/>
 						</div>
@@ -84,7 +84,7 @@ export function LeverageSlider({ value, onChange, max, disabled, className }: Pr
 					className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 pointer-events-none transition-all duration-75"
 					style={{ left: `${percentage}%` }}
 				>
-					<div className="size-3.5 rounded-full bg-terminal-cyan border-2 border-background shadow-sm" />
+					<div className="size-3.5 rounded-full bg-info border-2 border-bg shadow-sm" />
 				</div>
 			</div>
 
@@ -101,7 +101,7 @@ export function LeverageSlider({ value, onChange, max, disabled, className }: Pr
 							disabled={disabled}
 							className={cn(
 								"absolute -translate-x-1/2 text-3xs tabular-nums hover:bg-transparent",
-								isSelected ? "text-terminal-cyan font-medium" : "text-muted-foreground hover:text-foreground",
+								isSelected ? "text-info font-medium" : "text-muted-fg hover:text-fg",
 							)}
 							style={{ left: `${markPosition}%` }}
 						>

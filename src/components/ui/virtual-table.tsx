@@ -72,8 +72,8 @@ export function VirtualTable<TData extends RowData>({
 							const headerContent = flexRender(header.column.columnDef.header, header.getContext());
 
 							const headerClassName = cn(
-								"flex items-center px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider",
-								canSort && "cursor-pointer select-none hover:text-foreground transition-colors",
+								"flex items-center px-3 py-2 text-xs font-medium text-muted-fg uppercase tracking-wider",
+								canSort && "cursor-pointer select-none hover:text-fg transition-colors",
 							);
 
 							const headerStyle = { width: header.getSize() };

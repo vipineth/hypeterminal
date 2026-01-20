@@ -19,8 +19,8 @@ export function SideToggle({ side, onSideChange }: Props) {
 				className={cn(
 					"py-2 text-2xs font-semibold uppercase tracking-wider border hover:bg-transparent",
 					side === "buy"
-						? "bg-terminal-green/20 border-terminal-green text-terminal-green terminal-glow-green"
-						: "border-border/60 text-muted-foreground hover:border-terminal-green/40 hover:text-terminal-green",
+						? "bg-positive/20 border-positive text-positive"
+						: "border-border/60 text-muted-fg hover:border-positive/40 hover:text-positive",
 				)}
 				aria-label={t`Buy Long`}
 			>
@@ -34,8 +34,8 @@ export function SideToggle({ side, onSideChange }: Props) {
 				className={cn(
 					"py-2 text-2xs font-semibold uppercase tracking-wider border hover:bg-transparent",
 					side === "sell"
-						? "bg-terminal-red/20 border-terminal-red text-terminal-red terminal-glow-red"
-						: "border-border/60 text-muted-foreground hover:border-terminal-red/40 hover:text-terminal-red",
+						? "bg-negative/20 border-negative text-negative"
+						: "border-border/60 text-muted-fg hover:border-negative/40 hover:text-negative",
 				)}
 				aria-label={t`Sell Short`}
 			>

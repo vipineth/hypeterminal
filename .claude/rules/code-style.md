@@ -30,7 +30,7 @@ interface Props {
 
 export function PriceDisplay({ value, isActive, className }: Props) {
   return (
-    <span className={cn("text-sm tabular-nums", isActive && "text-terminal-green", className)}>
+    <span className={cn("text-sm tabular-nums", isActive && "text-positive", className)}>
       {value}
     </span>
   );

@@ -14,7 +14,7 @@ export function TokenAvatar({ symbol, className, fallbackClassName }: Props) {
 	return (
 		<Avatar className={cn("size-4", className)}>
 			<AvatarImage className="size-4" src={getTokenIconUrl(symbol)} alt={symbol} />
-			<AvatarFallback className={cn("text-3xs bg-terminal-amber/20 text-terminal-amber", fallbackClassName)}>
+			<AvatarFallback className={cn("text-3xs bg-warning/20 text-warning", fallbackClassName)}>
 				{fallbackText}
 			</AvatarFallback>
 		</Avatar>

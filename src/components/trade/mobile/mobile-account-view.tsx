@@ -63,11 +63,11 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 			<div className={cn("flex flex-col h-full min-h-0 bg-surface/20", className)}>
 				<div className="flex-1 flex flex-col items-center justify-center gap-6 p-6">
 					<div className="size-20 rounded-full bg-muted/50 flex items-center justify-center">
-						<Wallet className="size-10 text-muted-foreground" />
+						<Wallet className="size-10 text-muted-fg" />
 					</div>
 					<div className="text-center space-y-2">
 						<h2 className="text-lg font-semibold">Connect Wallet</h2>
-						<p className="text-sm text-muted-foreground max-w-xs">
+						<p className="text-sm text-muted-fg max-w-xs">
 							Connect your wallet to view your account, positions, and start trading.
 						</p>
 					</div>
@@ -77,8 +77,8 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						onClick={() => setWalletDialogOpen(true)}
 						className={cn(
 							"px-6 py-3 text-base font-semibold rounded-md",
-							"bg-terminal-cyan/20 border border-terminal-cyan text-terminal-cyan",
-							"hover:bg-terminal-cyan/30 transition-colors",
+							"bg-info/20 border border-info text-info",
+							"hover:bg-info/30 transition-colors",
 							"min-h-[48px]",
 						)}
 					>
@@ -97,8 +97,8 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 			<div className="shrink-0 px-4 py-4 border-b border-border/60 bg-surface/30">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3">
-						<div className="size-10 rounded-full bg-terminal-cyan/20 flex items-center justify-center">
-							<span className="text-terminal-cyan font-bold">{address?.slice(2, 4).toUpperCase()}</span>
+						<div className="size-10 rounded-full bg-info/20 flex items-center justify-center">
+							<span className="text-info font-bold">{address?.slice(2, 4).toUpperCase()}</span>
 						</div>
 						<div>
 							<div className="flex items-center gap-2">
@@ -109,10 +109,10 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 									variant="ghost"
 									size="none"
 									onClick={handleCopyAddress}
-									className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-transparent transition-colors"
+									className="p-1.5 text-muted-fg hover:text-fg hover:bg-transparent transition-colors"
 									aria-label="Copy address"
 								>
-									<Copy className={cn("size-3.5", copied && "text-terminal-green")} />
+									<Copy className={cn("size-3.5", copied && "text-positive")} />
 								</Button>
 							</div>
 							<Badge variant="outline" className="text-xs mt-0.5">
@@ -125,7 +125,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						size="none"
 						onClick={() => disconnect()}
 						className={cn(
-							"p-2.5 text-muted-foreground hover:text-terminal-red",
+							"p-2.5 text-muted-fg hover:text-negative",
 							"transition-colors rounded-md hover:bg-transparent",
 							"min-h-[44px] min-w-[44px] flex items-center justify-center",
 						)}
@@ -149,12 +149,12 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 							</div>
 						) : (
 							<>
-								<div className="text-sm text-muted-foreground mb-1">{ACCOUNT_TEXT.EQUITY_LABEL}</div>
+								<div className="text-sm text-muted-fg mb-1">{ACCOUNT_TEXT.EQUITY_LABEL}</div>
 								<div className="text-3xl font-bold tabular-nums">{formatUSD(accountValue)}</div>
 								<div
 									className={cn(
 										"text-sm tabular-nums mt-1",
-										unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red",
+										unrealizedPnl >= 0 ? "text-positive" : "text-negative",
 									)}
 								>
 									{unrealizedPnl >= 0 ? "+" : ""}
@@ -169,14 +169,14 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						<StatCard
 							label={ACCOUNT_TEXT.AVAILABLE_LABEL}
 							value={formatUSD(availableBalance)}
-							valueClass="text-terminal-green"
+							valueClass="text-positive"
 							isLoading={isLoading}
 						/>
 						<StatCard label={ACCOUNT_TEXT.MARGIN_USED_LABEL} value={formatUSD(totalMarginUsed)} isLoading={isLoading} />
 						<StatCard
 							label={ACCOUNT_TEXT.MARGIN_RATIO_LABEL}
 							value={formatPercent(marginRatio)}
-							valueClass={marginRatio > 0.8 ? "text-terminal-red" : marginRatio > 0.5 ? "text-terminal-amber" : ""}
+							valueClass={marginRatio > 0.8 ? "text-negative" : marginRatio > 0.5 ? "text-warning" : ""}
 							isLoading={isLoading}
 						/>
 						<StatCard label="Total Position" value={formatUSD(Math.abs(totalNtlPos))} isLoading={isLoading} />
@@ -190,8 +190,8 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 							onClick={() => setDepositModalOpen(true)}
 							className={cn(
 								"py-4 text-base font-semibold rounded-md",
-								"bg-terminal-green/20 border border-terminal-green text-terminal-green",
-								"hover:bg-terminal-green/30 transition-colors",
+								"bg-positive/20 border border-positive text-positive",
+								"hover:bg-positive/30 transition-colors",
 								"flex items-center justify-center gap-2",
 								"min-h-[56px]",
 							)}
@@ -204,7 +204,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 							size="none"
 							className={cn(
 								"py-4 text-base font-semibold rounded-md",
-								"bg-muted/50 border border-border/60 text-muted-foreground",
+								"bg-muted/50 border border-border/60 text-muted-fg",
 								"hover:bg-muted transition-colors",
 								"flex items-center justify-center gap-2",
 								"min-h-[56px]",
@@ -218,7 +218,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 
 					{/* Additional info */}
 					<div className="pt-4 space-y-3">
-						<h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Account Details</h3>
+						<h3 className="text-sm font-medium text-muted-fg uppercase tracking-wider">Account Details</h3>
 						<div className="space-y-2 text-sm">
 							<DetailRow label="Account Value" value={formatUSD(accountValue)} isLoading={isLoading} />
 							<DetailRow label="Total Raw USD" value={formatUSD(totalRawUsd)} isLoading={isLoading} />
@@ -250,7 +250,7 @@ interface StatCardProps {
 function StatCard({ label, value, valueClass, isLoading }: StatCardProps) {
 	return (
 		<div className="p-3 rounded-lg border border-border/40 bg-surface/20">
-			<div className="text-xs text-muted-foreground mb-1">{label}</div>
+			<div className="text-xs text-muted-fg mb-1">{label}</div>
 			{isLoading ? (
 				<Skeleton className="h-6 w-20" />
 			) : (
@@ -269,7 +269,7 @@ interface DetailRowProps {
 function DetailRow({ label, value, isLoading }: DetailRowProps) {
 	return (
 		<div className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
-			<span className="text-muted-foreground">{label}</span>
+			<span className="text-muted-fg">{label}</span>
 			{isLoading ? <Skeleton className="h-4 w-16" /> : <span className="tabular-nums font-medium">{value}</span>}
 		</div>
 	);

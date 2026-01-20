@@ -12,7 +12,7 @@ export function TradeTerminalPage() {
 	}
 
 	return (
-		<div className="bg-background text-foreground min-h-screen w-full flex flex-col font-mono terminal-scanlines pt-11 pb-6">
+		<div className="bg-bg text-fg min-h-screen w-full flex flex-col font-mono terminal-scanlines pt-11 pb-6">
 			<TopNav />
 			<MainWorkspace />
 			<FooterBar />

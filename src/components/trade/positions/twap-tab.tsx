@@ -24,7 +24,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 		<div
 			className={cn(
 				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-terminal-red/80" : "text-muted-foreground",
+				variant === "error" ? "text-negative/80" : "text-muted-fg",
 			)}
 		>
 			{children}
@@ -90,7 +90,7 @@ export function TwapTab() {
 			return (
 				<Placeholder variant="error">
 					<span>{t`Failed to load TWAP history.`}</span>
-					{error instanceof Error && <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span>}
+					{error instanceof Error && <span className="mt-1 text-4xs text-muted-fg">{error.message}</span>}
 				</Placeholder>
 			);
 		}
@@ -102,36 +102,36 @@ export function TwapTab() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
-			<div className="text-3xs uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-2">
+			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
 				<Timer className="size-3" />
 				{t`TWAP Orders`}
-				<span className="text-terminal-cyan ml-auto tabular-nums">{headerCount}</span>
+				<span className="text-info ml-auto tabular-nums">{headerCount}</span>
 			</div>
-			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
+			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-bg/50">
 				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
 										{t`Asset`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Total Size`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Executed`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Avg Price`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
 										{t`Progress`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
 										{t`Status`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Actions`}
 									</TableHead>
 								</TableRow>
@@ -139,8 +139,8 @@ export function TwapTab() {
 							<TableBody>
 								{tableRows.map((row) => {
 									const sideClass = row.isBuy
-										? "bg-terminal-green/20 text-terminal-green"
-										: "bg-terminal-red/20 text-terminal-red";
+										? "bg-positive/20 text-positive"
+										: "bg-negative/20 text-negative";
 									const statusLabel =
 										row.status === "activated"
 											? t`active`
@@ -170,7 +170,7 @@ export function TwapTab() {
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
 												{formatNumber(row.totalSize, row.szDecimals)}
 											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
+											<TableCell className="text-2xs text-right tabular-nums text-warning py-1.5">
 												{formatNumber(row.executedSize, row.szDecimals)}
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
@@ -182,12 +182,12 @@ export function TwapTab() {
 														<div
 															className={cn(
 																"h-full rounded-full",
-																row.status === "finished" ? "bg-terminal-green" : "bg-terminal-cyan",
+																row.status === "finished" ? "bg-positive" : "bg-info",
 															)}
 															style={{ width: `${row.progressPct}%` }}
 														/>
 													</div>
-													<span className="text-4xs tabular-nums text-muted-foreground">
+													<span className="text-4xs tabular-nums text-muted-fg">
 														{row.progressPct.toFixed(0)}%
 													</span>
 												</div>
@@ -196,10 +196,10 @@ export function TwapTab() {
 												<span
 													className={cn(
 														"text-4xs px-1 py-0.5 rounded-sm uppercase",
-														row.status === "activated" && "bg-terminal-cyan/20 text-terminal-cyan",
-														row.status === "finished" && "bg-terminal-green/20 text-terminal-green",
+														row.status === "activated" && "bg-info/20 text-info",
+														row.status === "finished" && "bg-positive/20 text-positive",
 														(row.status === "terminated" || row.status === "error") &&
-															"bg-terminal-red/20 text-terminal-red",
+															"bg-negative/20 text-negative",
 													)}
 												>
 													{statusLabel}

@@ -50,7 +50,7 @@ export function PositionsPanel() {
 								>
 									<span>{tab.label}</span>
 									{typeof count === "number" ? (
-										<span className="min-w-4 h-4 px-1 inline-flex items-center justify-center rounded-full border border-terminal-cyan/30 bg-terminal-cyan/15 text-terminal-cyan text-4xs tabular-nums">
+										<span className="min-w-4 h-4 px-1 inline-flex items-center justify-center rounded-full border border-info/30 bg-info/15 text-info text-4xs tabular-nums">
 											{count}
 										</span>
 									) : null}

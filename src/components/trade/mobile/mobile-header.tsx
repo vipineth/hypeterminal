@@ -20,19 +20,19 @@ export function MobileHeader({ className }: Props) {
 		<header
 			className={cn(
 				"pt-[env(safe-area-inset-top)]",
-				"sticky top-0 z-40 bg-background/95 backdrop-blur-sm",
+				"sticky top-0 z-40 bg-bg/95 backdrop-blur-sm",
 				"border-b border-border/60",
 				className,
 			)}
 		>
 			<div className="h-12 px-3 flex items-center justify-between">
 				<div className="flex items-center gap-1.5">
-					<div className="size-6 rounded bg-terminal-green/20 border border-terminal-green/40 flex items-center justify-center">
-						<Terminal className="size-3.5 text-terminal-green" />
+					<div className="size-6 rounded bg-positive/20 border border-positive/40 flex items-center justify-center">
+						<Terminal className="size-3.5 text-positive" />
 					</div>
-					<span className="text-xs font-semibold tracking-tight text-terminal-cyan">
+					<span className="text-xs font-semibold tracking-tight text-info">
 						{TOP_NAV_TEXT.BRAND_PREFIX}
-						<span className="text-foreground">{TOP_NAV_TEXT.BRAND_SUFFIX}</span>
+						<span className="text-fg">{TOP_NAV_TEXT.BRAND_SUFFIX}</span>
 					</span>
 				</div>
 

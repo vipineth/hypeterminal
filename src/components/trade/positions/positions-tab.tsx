@@ -32,7 +32,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 		<div
 			className={cn(
 				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-terminal-red/80" : "text-muted-foreground",
+				variant === "error" ? "text-negative/80" : "text-muted-fg",
 			)}
 		>
 			{children}
@@ -216,7 +216,7 @@ export function PositionsTab() {
 			return (
 				<Placeholder variant="error">
 					<span>{t`Failed to load positions.`}</span>
-					{error instanceof Error && <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span>}
+					{error instanceof Error && <span className="mt-1 text-4xs text-muted-fg">{error.message}</span>}
 				</Placeholder>
 			);
 		}
@@ -248,46 +248,46 @@ export function PositionsTab() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
-			<div className="text-3xs uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-2">
-				<Circle className="size-1.5 fill-terminal-green text-terminal-green" />
+			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
+				<Circle className="size-1.5 fill-positive text-positive" />
 				{t`Active Positions`}
-				<span className="text-terminal-cyan ml-auto tabular-nums">{headerCount}</span>
+				<span className="text-info ml-auto tabular-nums">{headerCount}</span>
 			</div>
-			{actionError ? <div className="mb-1 text-4xs text-terminal-red/80">{actionError}</div> : null}
-			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
+			{actionError ? <div className="mb-1 text-4xs text-negative/80">{actionError}</div> : null}
+			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-bg/50">
 				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
 										{t`Asset`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Size`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Margin`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Entry`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Mark`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Liq`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Funding`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`PNL`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`TP/SL`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Actions`}
 									</TableHead>
 								</TableRow>
@@ -296,10 +296,10 @@ export function PositionsTab() {
 								{tableRows.map((row) => {
 									const isRowClosing = isClosing && closingKeyRef.current === row.key;
 									const sideClass = row.isLong
-										? "bg-terminal-green/20 text-terminal-green"
-										: "bg-terminal-red/20 text-terminal-red";
-									const pnlClass = row.unrealizedPnl >= 0 ? "text-terminal-green" : "text-terminal-red";
-									const fundingClass = row.cumFunding >= 0 ? "text-terminal-red" : "text-terminal-green";
+										? "bg-positive/20 text-positive"
+										: "bg-negative/20 text-negative";
+									const pnlClass = row.unrealizedPnl >= 0 ? "text-positive" : "text-negative";
+									const fundingClass = row.cumFunding >= 0 ? "text-negative" : "text-positive";
 
 									return (
 										<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
@@ -322,14 +322,14 @@ export function PositionsTab() {
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
 												{formatToken(row.size, row.szDecimals)}{" "}
-												<span className="text-muted-foreground">
+												<span className="text-muted-fg">
 													({formatUSD(row.positionValue, { compact: true })})
 												</span>
 											</TableCell>
 											<TableCell className="text-2xs text-right py-1.5">
 												<div className="flex flex-col items-end">
 													<span className="tabular-nums">{formatUSD(row.marginUsed)}</span>
-													<span className="text-4xs text-muted-foreground">
+													<span className="text-4xs text-muted-fg">
 														{row.marginMode === "isolated" ? t`Isolated` : t`Cross`}
 													</span>
 												</div>
@@ -337,10 +337,10 @@ export function PositionsTab() {
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
 												{formatPrice(row.entryPx, { szDecimals: row.szDecimals })}
 											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
+											<TableCell className="text-2xs text-right tabular-nums text-warning py-1.5">
 												{formatPrice(row.markPx, { szDecimals: row.szDecimals })}
 											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums text-terminal-red/70 py-1.5">
+											<TableCell className="text-2xs text-right tabular-nums text-negative/70 py-1.5">
 												{formatPrice(row.liquidationPx, { szDecimals: row.szDecimals })}
 											</TableCell>
 											<TableCell className={cn("text-2xs text-right tabular-nums py-1.5", fundingClass)}>
@@ -349,7 +349,7 @@ export function PositionsTab() {
 											<TableCell className="text-right py-1.5">
 												<div className={cn("text-2xs tabular-nums", pnlClass)}>
 													{formatUSD(row.unrealizedPnl, { signDisplay: "exceptZero" })}
-													<span className="text-muted-foreground ml-1">({formatPercent(row.roe, 1)})</span>
+													<span className="text-muted-fg ml-1">({formatPercent(row.roe, 1)})</span>
 												</div>
 											</TableCell>
 											<TableCell className="text-right py-1.5">
@@ -361,40 +361,40 @@ export function PositionsTab() {
 															disabled={typeof row.assetIndex !== "number"}
 															className={cn(
 																"group inline-flex items-center gap-1.5 cursor-pointer transition-opacity disabled:cursor-not-allowed disabled:opacity-50",
-																!row.hasTpSl && "text-muted-foreground/60 hover:text-muted-foreground",
+																!row.hasTpSl && "text-muted-fg/60 hover:text-muted-fg",
 															)}
 														>
 															{row.tpPrice && row.slPrice ? (
 																<>
 																	<div className="flex items-center gap-1 text-3xs tabular-nums">
-																		<span className="text-terminal-green">
+																		<span className="text-positive">
 																			{formatPrice(row.tpPrice, { szDecimals: row.szDecimals })}
 																		</span>
-																		<span className="text-muted-foreground/50">/</span>
-																		<span className="text-terminal-red">
+																		<span className="text-muted-fg/50">/</span>
+																		<span className="text-negative">
 																			{formatPrice(row.slPrice, { szDecimals: row.szDecimals })}
 																		</span>
 																	</div>
-																	<Pencil className="size-3 text-muted-foreground/60 group-hover:text-foreground transition-colors" />
+																	<Pencil className="size-3 text-muted-fg/60 group-hover:text-fg transition-colors" />
 																</>
 															) : row.hasTpSl ? (
 																<>
 																	<div className="flex items-center gap-1 text-3xs tabular-nums">
 																		{row.tpPrice ? (
-																			<span className="text-terminal-green">
+																			<span className="text-positive">
 																				{formatPrice(row.tpPrice, { szDecimals: row.szDecimals })}
 																			</span>
 																		) : (
-																			<span className="text-terminal-red">
+																			<span className="text-negative">
 																				{formatPrice(row.slPrice, { szDecimals: row.szDecimals })}
 																			</span>
 																		)}
 																	</div>
-																	<Plus className="size-3 text-muted-foreground/60 group-hover:text-foreground transition-colors" />
+																	<Plus className="size-3 text-muted-fg/60 group-hover:text-fg transition-colors" />
 																</>
 															) : (
 																<div className="flex items-center gap-0.5 text-3xs">
-																	<Plus className="size-3 group-hover:text-foreground transition-colors" />
+																	<Plus className="size-3 group-hover:text-fg transition-colors" />
 																	<span>{t`Add`}</span>
 																</div>
 															)}

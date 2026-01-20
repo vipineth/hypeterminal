@@ -52,14 +52,14 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 							<Skeleton className="h-6 w-24" />
 						) : (
 							<>
-								<div className="text-lg font-semibold tabular-nums text-terminal-amber terminal-glow-amber">
+								<div className="text-lg font-semibold tabular-nums text-warning">
 									{formatUSD(markPx ?? null)}
 								</div>
 								{typeof change24h === "number" && (
 									<span
 										className={cn(
 											"text-sm tabular-nums font-medium",
-											change24h >= 0 ? "text-terminal-green" : "text-terminal-red",
+											change24h >= 0 ? "text-positive" : "text-negative",
 										)}
 									>
 										{change24h >= 0 ? "+" : ""}
@@ -103,11 +103,11 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 								})}
 							/>
 							<div className="flex items-center gap-1">
-								<Flame className={cn("size-3", isFundingPositive ? "text-terminal-green" : "text-terminal-red")} />
+								<Flame className={cn("size-3", isFundingPositive ? "text-positive" : "text-negative")} />
 								<span
 									className={cn(
 										"tabular-nums font-medium",
-										isFundingPositive ? "text-terminal-green" : "text-terminal-red",
+										isFundingPositive ? "text-positive" : "text-negative",
 									)}
 								>
 									{formatPercent(fundingNum, {
@@ -142,8 +142,8 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 function StatPill({ label, value }: { label: string; value: string }) {
 	return (
 		<div className="flex items-center gap-1.5">
-			<span className="text-muted-foreground uppercase tracking-wider text-[10px]">{label}</span>
-			<span className="tabular-nums text-foreground">{value}</span>
+			<span className="text-muted-fg uppercase tracking-wider text-[10px]">{label}</span>
+			<span className="tabular-nums text-fg">{value}</span>
 		</div>
 	);
 }

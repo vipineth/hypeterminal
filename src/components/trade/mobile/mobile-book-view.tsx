@@ -158,8 +158,8 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 								"min-h-[36px]",
 								"hover:bg-transparent",
 								view === "book"
-									? "bg-background text-terminal-cyan shadow-sm"
-									: "text-muted-foreground hover:text-foreground",
+									? "bg-bg text-info shadow-sm"
+									: "text-muted-fg hover:text-fg",
 							)}
 						>
 							{ORDERBOOK_TEXT.BOOK_LABEL}
@@ -173,8 +173,8 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 								"min-h-[36px]",
 								"hover:bg-transparent",
 								view === "trades"
-									? "bg-background text-terminal-cyan shadow-sm"
-									: "text-muted-foreground hover:text-foreground",
+									? "bg-bg text-info shadow-sm"
+									: "text-muted-fg hover:text-fg",
 							)}
 						>
 							{ORDERBOOK_TEXT.TRADES_LABEL}
@@ -191,7 +191,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 							className={cn(
 								"px-2 py-1.5 text-xs border border-border/60 rounded",
 								"min-h-[36px] flex items-center gap-1",
-								"text-muted-foreground hover:text-foreground hover:border-foreground/30",
+								"text-muted-fg hover:text-fg hover:border-fg/30",
 								"hover:bg-transparent transition-colors",
 							)}
 							aria-label="Toggle display units"
@@ -210,7 +210,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 										className={cn(
 											"px-2 py-1.5 text-xs border border-border/60 rounded",
 											"min-h-[36px] flex items-center gap-1",
-											"hover:border-foreground/30 hover:bg-transparent transition-colors",
+											"hover:border-fg/30 hover:bg-transparent transition-colors",
 										)}
 									>
 										{selectedOption?.label ?? "—"}
@@ -243,7 +243,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 			{view === "book" ? (
 				<div className="flex-1 min-h-0 flex flex-col overflow-hidden">
 					{/* Column headers */}
-					<div className="shrink-0 grid grid-cols-3 gap-2 px-3 py-2 text-xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40">
+					<div className="shrink-0 grid grid-cols-3 gap-2 px-3 py-2 text-xs uppercase tracking-wider text-muted-fg/70 border-b border-border/40">
 						<div>{ORDERBOOK_TEXT.HEADER_PRICE}</div>
 						<div className="text-right">{ORDERBOOK_TEXT.HEADER_SIZE}</div>
 						<div className="text-right">{ORDERBOOK_TEXT.HEADER_TOTAL}</div>
@@ -271,9 +271,9 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 						) : (
 							<div className="flex-1 flex items-center justify-center">
 								{bookStatus === "error" ? (
-									<div className="text-sm text-terminal-red">{ORDERBOOK_TEXT.FAILED}</div>
+									<div className="text-sm text-negative">{ORDERBOOK_TEXT.FAILED}</div>
 								) : (
-									<div className="flex flex-col items-center gap-2 text-muted-foreground">
+									<div className="flex flex-col items-center gap-2 text-muted-fg">
 										<RefreshCw className="size-5 animate-spin" />
 										<span className="text-sm">{ORDERBOOK_TEXT.WAITING}</span>
 									</div>
@@ -282,14 +282,14 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 						)}
 
 						{/* Mid price */}
-						<div className="shrink-0 py-2 px-3 flex items-center justify-center gap-3 border-y border-border/40 bg-surface/30">
-							<span className="text-xl font-bold tabular-nums text-terminal-amber terminal-glow-amber">
-								{typeof mid === "number" && Number.isFinite(mid) ? formatNumber(mid, 2) : FALLBACK_VALUE_PLACEHOLDER}
-							</span>
+					<div className="shrink-0 py-2 px-3 flex items-center justify-center gap-3 border-y border-border/40 bg-surface/30">
+						<span className="text-xl font-bold tabular-nums text-warning">
+							{typeof mid === "number" && Number.isFinite(mid) ? formatNumber(mid, 2) : FALLBACK_VALUE_PLACEHOLDER}
+						</span>
 							{midDirection === "up" ? (
-								<TrendingUp className="size-5 text-terminal-green" />
+								<TrendingUp className="size-5 text-positive" />
 							) : midDirection === "down" ? (
-								<TrendingDown className="size-5 text-terminal-red" />
+								<TrendingDown className="size-5 text-negative" />
 							) : null}
 						</div>
 
@@ -311,9 +311,9 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 					</div>
 
 					{/* Spread */}
-					<div className="shrink-0 px-3 py-2 border-t border-border/40 flex items-center justify-between text-xs text-muted-foreground">
+					<div className="shrink-0 px-3 py-2 border-t border-border/40 flex items-center justify-between text-xs text-muted-fg">
 						<span>{ORDERBOOK_TEXT.SPREAD_LABEL}</span>
-						<span className="tabular-nums text-terminal-amber">
+						<span className="tabular-nums text-warning">
 							{typeof spread === "number" &&
 							Number.isFinite(spread) &&
 							typeof spreadPct === "number" &&

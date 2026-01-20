@@ -71,20 +71,20 @@ export function AdvancedOrderDropdown({ orderType, onOrderTypeChange }: Props) {
 					type="button"
 					className={cn(
 						"text-3xs uppercase tracking-wider transition-colors",
-						"text-muted-foreground hover:text-foreground",
+						"text-muted-fg hover:text-fg",
 						"border-b border-transparent",
-						isAdvanced && "text-terminal-cyan border-terminal-cyan",
+						isAdvanced && "text-info border-info",
 					)}
 					aria-label={t`Advanced order types`}
 				>
 					<span className="inline-flex items-center gap-1">
 						{isAdvanced ? label : t`Pro`}
-						<ChevronDown className={cn("size-3", isAdvanced ? "text-terminal-cyan" : "text-muted-foreground")} />
+						<ChevronDown className={cn("size-3", isAdvanced ? "text-info" : "text-muted-fg")} />
 					</span>
 				</button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="min-w-44">
-				<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-muted-foreground/70">
+				<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-muted-fg/70">
 					{t`Trigger`}
 				</DropdownMenuLabel>
 				{TRIGGER_OPTIONS.map((option) => (
@@ -96,7 +96,7 @@ export function AdvancedOrderDropdown({ orderType, onOrderTypeChange }: Props) {
 					/>
 				))}
 				<DropdownMenuSeparator />
-				<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-muted-foreground/70">
+				<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-muted-fg/70">
 					{t`Execution`}
 				</DropdownMenuLabel>
 				{EXECUTION_OPTIONS.map((option) => (
@@ -125,15 +125,15 @@ function AdvancedOrderItem({ option, isSelected, onSelect }: AdvancedOrderItemPr
 			<span
 				className={cn(
 					"flex size-5 items-center justify-center rounded transition-colors",
-					isSelected ? "bg-terminal-cyan/15 text-terminal-cyan" : "bg-muted/40 text-muted-foreground",
+					isSelected ? "bg-info/15 text-info" : "bg-muted/40 text-muted-fg",
 				)}
 			>
 				<Icon className="size-3" />
 			</span>
-			<span className={cn("flex-1 text-xs", isSelected ? "text-foreground font-medium" : "text-muted-foreground")}>
+			<span className={cn("flex-1 text-xs", isSelected ? "text-fg font-medium" : "text-muted-fg")}>
 				{option.label}
 			</span>
-			{isSelected && <Check className="size-3.5 text-terminal-cyan" />}
+			{isSelected && <Check className="size-3.5 text-info" />}
 		</DropdownMenuItem>
 	);
 }

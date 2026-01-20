@@ -21,7 +21,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 		<div
 			className={cn(
 				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-terminal-red/80" : "text-muted-foreground",
+				variant === "error" ? "text-negative/80" : "text-muted-fg",
 			)}
 		>
 			{children}
@@ -53,7 +53,7 @@ export function FundingTab() {
 		isConnected && status === "active"
 			? formatUSD(totalFunding, { signDisplay: "exceptZero" })
 			: FALLBACK_VALUE_PLACEHOLDER;
-	const headerClass = totalFunding >= 0 ? "text-terminal-green" : "text-terminal-red";
+	const headerClass = totalFunding >= 0 ? "text-positive" : "text-negative";
 
 	const tableRows = useMemo(() => {
 		return updates.map((update, index) => {
@@ -83,7 +83,7 @@ export function FundingTab() {
 			return (
 				<Placeholder variant="error">
 					<span>{t`Failed to load funding history.`}</span>
-					{error instanceof Error && <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span>}
+					{error instanceof Error && <span className="mt-1 text-4xs text-muted-fg">{error.message}</span>}
 				</Placeholder>
 			);
 		}
@@ -95,30 +95,30 @@ export function FundingTab() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
-			<div className="text-3xs uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-2">
+			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
 				<Percent className="size-3" />
 				{t`Funding Payments`}
 				<span className={cn("ml-auto tabular-nums", headerClass)}>{headerTotal}</span>
 			</div>
-			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
+			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-bg/50">
 				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
 										{t`Asset`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Position`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Rate`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Payment`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Time`}
 									</TableHead>
 								</TableRow>
@@ -126,10 +126,10 @@ export function FundingTab() {
 							<TableBody>
 								{tableRows.map((row) => {
 									const sideClass = row.isLong
-										? "bg-terminal-green/20 text-terminal-green"
-										: "bg-terminal-red/20 text-terminal-red";
-									const rateClass = row.rate >= 0 ? "text-terminal-green" : "text-terminal-red";
-									const paymentClass = row.usdc >= 0 ? "text-terminal-green" : "text-terminal-red";
+										? "bg-positive/20 text-positive"
+										: "bg-negative/20 text-negative";
+									const rateClass = row.rate >= 0 ? "text-positive" : "text-negative";
+									const paymentClass = row.usdc >= 0 ? "text-positive" : "text-negative";
 									const date = new Date(row.time);
 									const timeStr = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
 									const dateStr = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
@@ -157,7 +157,7 @@ export function FundingTab() {
 													{formatUSD(row.usdc, { signDisplay: "exceptZero" })}
 												</span>
 											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums text-muted-foreground py-1.5">
+											<TableCell className="text-2xs text-right tabular-nums text-muted-fg py-1.5">
 												<div className="flex flex-col items-end">
 													<span>{timeStr}</span>
 													<span className="text-4xs">{dateStr}</span>

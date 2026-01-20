@@ -102,8 +102,8 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 										"active:scale-98",
 										"hover:bg-transparent",
 										isActive
-											? "bg-background text-terminal-cyan shadow-sm"
-											: "text-muted-foreground hover:text-foreground",
+											? "bg-bg text-info shadow-sm"
+											: "text-muted-fg hover:text-fg",
 									)}
 								>
 									<span>{tab.label}</span>
@@ -114,7 +114,7 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 											variant="outline"
 											className={cn(
 												"min-w-5 h-5 px-1.5 text-xs tabular-nums",
-												"border-terminal-cyan/30 bg-terminal-cyan/10 text-terminal-cyan",
+												"border-info/30 bg-info/10 text-info",
 											)}
 										>
 											{count}
@@ -145,12 +145,12 @@ function EmptyState({ title, icon = "empty" }: EmptyStateProps) {
 		<div className="h-full flex flex-col items-center justify-center gap-4 p-6 text-center">
 			<div className={cn("size-16 rounded-full flex items-center justify-center", "bg-muted/50")}>
 				{icon === "wallet" ? (
-					<Wallet className="size-8 text-muted-foreground" />
+					<Wallet className="size-8 text-muted-fg" />
 				) : (
-					<Inbox className="size-8 text-muted-foreground" />
+					<Inbox className="size-8 text-muted-fg" />
 				)}
 			</div>
-			<p className="text-sm text-muted-foreground max-w-xs">{title}</p>
+			<p className="text-sm text-muted-fg max-w-xs">{title}</p>
 		</div>
 	);
 }

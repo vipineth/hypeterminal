@@ -60,7 +60,7 @@ When refactoring UI, analyze these dimensions in order:
 
 // After: Clear hierarchy
 <div>
-  <span className="text-sm text-muted-foreground">Label</span>
+  <span className="text-sm text-muted-fg">Label</span>
   <span className="text-lg font-semibold">Value</span>
 </div>
 ```
@@ -108,7 +108,7 @@ When refactoring UI, analyze these dimensions in order:
 
 // After: Constrained palette
 <h1 className="text-2xl font-semibold">Title</h1>
-<p className="text-base text-muted-foreground">Body text</p>
+<p className="text-base text-muted-fg">Body text</p>
 ```
 
 ### 4. Color Usage
@@ -250,7 +250,7 @@ When reviewing a component, check:
 
 // After: Let format speak
 <div>
-  <span className="text-muted-foreground text-sm">john@example.com</span>
+  <span className="text-muted-fg text-sm">john@example.com</span>
 </div>
 // Email format is self-evident
 ```
@@ -265,7 +265,7 @@ When reviewing a component, check:
 
 // After: De-emphasize the label
 <div>
-  <span className="text-xs uppercase tracking-wide text-muted-foreground">
+  <span className="text-xs uppercase tracking-wide text-muted-fg">
     Active Users
   </span>
   <span className="text-2xl font-semibold">1,234</span>
@@ -292,7 +292,7 @@ When reviewing a component, check:
   <div className="flex items-start justify-between mb-4">
     <div>
       <h3 className="font-semibold">Title</h3>
-      <p className="text-sm text-muted-foreground">Subtitle</p>
+      <p className="text-sm text-muted-fg">Subtitle</p>
     </div>
     <Badge>Status</Badge>
   </div>
@@ -306,7 +306,7 @@ When reviewing a component, check:
 ```tsx
 // Professional stat
 <div className="space-y-1">
-  <p className="text-xs uppercase tracking-wider text-muted-foreground">
+  <p className="text-xs uppercase tracking-wider text-muted-fg">
     Total Revenue
   </p>
   <p className="text-3xl font-semibold tabular-nums">
@@ -339,7 +339,7 @@ This project uses:
 - Tailwind CSS for styling
 - `cn()` utility for class composition (from `@/lib/cn`)
 - shadcn/ui component patterns
-- CSS custom properties for theming (--background, --foreground, etc.)
+- CSS custom properties for theming (--bg, --fg, etc.)
 - Prefer `interface Props` over `type Props`
 
 When refactoring, maintain consistency with existing patterns in the codebase.

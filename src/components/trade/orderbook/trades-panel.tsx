@@ -33,14 +33,14 @@ const TradeRow = memo(function TradeRow({ trade, szDecimals, showInUsd }: Props)
 				trade.side === "buy" ? "trade-row-buy" : "trade-row-sell",
 			)}
 		>
-			<div className="text-muted-foreground/70 flex items-center gap-1">
+			<div className="text-muted-fg/70 flex items-center gap-1">
 				{trade.time}
 				<ExternalLink className="size-2.5 opacity-100 hover:opacity-80" />
 			</div>
-			<div className={cn("text-right", trade.side === "buy" ? "text-terminal-green" : "text-terminal-red")}>
+			<div className={cn("text-right", trade.side === "buy" ? "text-positive" : "text-negative")}>
 				{formatNumber(trade.price, 2)}
 			</div>
-			<div className="text-right text-muted-foreground">{sizeDisplay}</div>
+			<div className="text-right text-muted-fg">{sizeDisplay}</div>
 		</a>
 	);
 });
@@ -86,14 +86,14 @@ export function TradesPanel() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col">
-			<div className="grid grid-cols-3 gap-2 px-2 py-1 text-4xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40">
+			<div className="grid grid-cols-3 gap-2 px-2 py-1 text-4xs uppercase tracking-wider text-muted-fg/70 border-b border-border/40">
 				<div>{t`Time`}</div>
 				<div className="text-right">{t`Price`}</div>
 				<Button
 					variant="ghost"
 					size="none"
 					onClick={toggleUsdDisplay}
-					className="text-right hover:text-foreground hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
+					className="text-right hover:text-fg hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
 				>
 					{t`Size`}
 					<span className="opacity-60">({showOrderbookInUsd ? "$" : selectedMarket.coin})</span>
@@ -102,11 +102,11 @@ export function TradesPanel() {
 			</div>
 
 			{status === "error" ? (
-				<div className="flex-1 flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
+				<div className="flex-1 flex items-center justify-center px-2 py-6 text-3xs text-muted-fg">
 					{error instanceof Error ? error.message : t`Failed to load trades.`}
 				</div>
 			) : processed.length === 0 ? (
-				<div className="flex-1 flex items-center justify-center px-2 py-6 text-3xs text-muted-foreground">
+				<div className="flex-1 flex items-center justify-center px-2 py-6 text-3xs text-muted-fg">
 					{t`Waiting for trades...`}
 				</div>
 			) : (

@@ -61,7 +61,7 @@ export function FavoritesStrip() {
 
 function EmptyState() {
 	return (
-		<div className="flex items-center gap-2 text-3xs text-muted-foreground">
+		<div className="flex items-center gap-2 text-3xs text-muted-fg">
 			<Star className="size-3" />
 			<span>{t`Select favorite markets`}</span>
 		</div>
@@ -102,15 +102,15 @@ function FavoriteChip({ marketKey, coin, priceNumber, szDecimals, isActive }: Fa
 			className={cn(
 				"shrink-0 inline-flex items-center gap-2 px-2.5 py-0.5 text-3xs transition-colors cursor-pointer rounded-none",
 				"hover:bg-accent/50",
-				isActive && "bg-terminal-cyan/10",
+				isActive && "bg-info/10",
 			)}
 		>
-			<span className={cn("font-medium", isActive ? "text-terminal-cyan" : "text-foreground")}>{coin}</span>
+			<span className={cn("font-medium", isActive ? "text-info" : "text-fg")}>{coin}</span>
 			{typeof priceNumber === "number" && (
-				<span className="text-muted-foreground tabular-nums">{formatPrice(priceNumber, { szDecimals })}</span>
+				<span className="text-muted-fg tabular-nums">{formatPrice(priceNumber, { szDecimals })}</span>
 			)}
 			{assetCtx && (
-				<span className={cn("tabular-nums font-medium", isPositive ? "text-terminal-green" : "text-terminal-red")}>
+				<span className={cn("tabular-nums font-medium", isPositive ? "text-positive" : "text-negative")}>
 					{formatPercent(changePct / 100, {
 						minimumFractionDigits: 2,
 						signDisplay: "exceptZero",

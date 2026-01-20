@@ -5,8 +5,6 @@
 
 @theme {
   /* Typography - Font Families */
-  --font-sans: Geist, sans-serif;
-  --font-serif: Georgia, serif;
   --font-mono: "JetBrains Mono", "Fira Code", "SF Mono", Menlo, monospace;
 
   /* Typography - Custom smaller text sizes for dense UI */
@@ -24,10 +22,8 @@
   --radius-xl: calc(0.125rem + 4px);
 
   /* Shadows - Light Mode */
-  --shadow-2xs: 0px 1px 2px 0px hsl(220 20% 20% / 0.06);
   --shadow-xs: 0px 1px 2px 0px hsl(220 20% 20% / 0.08);
   --shadow-sm: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 1px 2px -1px hsl(220 20% 20% / 0.1);
-  --shadow: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 1px 2px -1px hsl(220 20% 20% / 0.1);
   --shadow-md: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 2px 4px -1px hsl(220 20% 20% / 0.1);
   --shadow-lg: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 4px 6px -1px hsl(220 20% 20% / 0.1);
   --shadow-xl: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 8px 10px -1px hsl(220 20% 20% / 0.1);
@@ -78,86 +74,68 @@
    Using :root and .dark for values that change between modes
    ============================================================================= */
 
-:root {
-  /* Semantic Colors - Light Mode */
-  --background: oklch(0.97 0.005 240);
-  --foreground: oklch(0.2 0.02 250);
+:root,
+:root[data-color-theme="terminal"] {
+  /* Core UI - Light Mode */
+  --bg: oklch(0.97 0.005 240);
+  --fg: oklch(0.2 0.02 250);
   --surface: oklch(0.99 0.003 240);
-  --surface-foreground: oklch(0.2 0.02 250);
+  --surface-fg: oklch(0.2 0.02 250);
   --primary: oklch(0.45 0.15 250);
-  --primary-foreground: oklch(0.98 0 0);
+  --primary-fg: oklch(0.98 0 0);
   --secondary: oklch(0.94 0.01 240);
-  --secondary-foreground: oklch(0.3 0.02 250);
+  --secondary-fg: oklch(0.3 0.02 250);
   --muted: oklch(0.95 0.008 240);
-  --muted-foreground: oklch(0.5 0.02 250);
+  --muted-fg: oklch(0.5 0.02 250);
   --accent: oklch(0.92 0.015 240);
-  --accent-foreground: oklch(0.2 0.02 250);
-  --destructive: oklch(0.55 0.22 25);
-  --destructive-foreground: oklch(0.98 0 0);
+  --accent-fg: oklch(0.2 0.02 250);
+  --danger: oklch(0.55 0.22 25);
+  --danger-fg: oklch(0.98 0 0);
   --border: oklch(0.88 0.015 240);
   --input: oklch(0.94 0.01 240);
   --ring: oklch(0.45 0.15 250);
+  --sel: oklch(0.85 0.01 240 / 0.3);
 
-  /* Sidebar - Light Mode */
-  --sidebar: oklch(0.97 0.005 240);
-  --sidebar-foreground: oklch(0.2 0.02 250);
-  --sidebar-primary: oklch(0.45 0.15 250);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.92 0.015 240);
-  --sidebar-accent-foreground: oklch(0.2 0.02 250);
-  --sidebar-border: oklch(0.88 0.015 240);
-  --sidebar-ring: oklch(0.45 0.15 250);
-
-  /* Terminal Colors - Light Mode */
-  --terminal-green: oklch(0.45 0.18 145);
-  --terminal-red: oklch(0.5 0.2 25);
-  --terminal-cyan: oklch(0.45 0.12 230);
-  --terminal-amber: oklch(0.55 0.16 70);
-  --terminal-purple: oklch(0.5 0.18 290);
+  /* Signals - Light Mode */
+  --positive: oklch(0.45 0.18 145);
+  --negative: oklch(0.5 0.2 25);
+  --info: oklch(0.45 0.12 230);
+  --warning: oklch(0.55 0.16 70);
+  --highlight: oklch(0.5 0.18 290);
 }
 
-.dark {
-  /* Semantic Colors - Dark Mode */
-  --background: oklch(0.05 0 0);
-  --foreground: oklch(0.85 0 0);
+.dark,
+:root[data-color-theme="terminal"].dark {
+  /* Core UI - Dark Mode */
+  --bg: oklch(0.05 0 0);
+  --fg: oklch(0.85 0 0);
   --surface: oklch(0.08 0 0);
-  --surface-foreground: oklch(0.85 0 0);
+  --surface-fg: oklch(0.85 0 0);
   --primary: oklch(0.75 0.18 160);
-  --primary-foreground: oklch(0.05 0 0);
+  --primary-fg: oklch(0.05 0 0);
   --secondary: oklch(0.15 0 0);
-  --secondary-foreground: oklch(0.75 0 0);
+  --secondary-fg: oklch(0.75 0 0);
   --muted: oklch(0.12 0 0);
-  --muted-foreground: oklch(0.55 0 0);
+  --muted-fg: oklch(0.55 0 0);
   --accent: oklch(0.18 0 0);
-  --accent-foreground: oklch(0.85 0 0);
-  --destructive: oklch(0.65 0.25 25);
-  --destructive-foreground: oklch(0.98 0 0);
+  --accent-fg: oklch(0.85 0 0);
+  --danger: oklch(0.65 0.25 25);
+  --danger-fg: oklch(0.98 0 0);
   --border: oklch(0.2 0 0);
   --input: oklch(0.12 0 0);
   --ring: oklch(0.75 0.18 160);
+  --sel: oklch(0.7 0.01 240 / 0.3);
 
-  /* Sidebar - Dark Mode */
-  --sidebar: oklch(0.08 0 0);
-  --sidebar-foreground: oklch(0.85 0 0);
-  --sidebar-primary: oklch(0.75 0.18 160);
-  --sidebar-primary-foreground: oklch(0.05 0 0);
-  --sidebar-accent: oklch(0.15 0 0);
-  --sidebar-accent-foreground: oklch(0.85 0 0);
-  --sidebar-border: oklch(0.2 0 0);
-  --sidebar-ring: oklch(0.75 0.18 160);
-
-  /* Terminal Colors - Dark Mode */
-  --terminal-green: oklch(0.75 0.18 145);
-  --terminal-red: oklch(0.65 0.22 25);
-  --terminal-cyan: oklch(0.78 0.12 195);
-  --terminal-amber: oklch(0.8 0.16 85);
-  --terminal-purple: oklch(0.7 0.15 300);
+  /* Signals - Dark Mode */
+  --positive: oklch(0.75 0.18 145);
+  --negative: oklch(0.65 0.22 25);
+  --info: oklch(0.78 0.12 195);
+  --warning: oklch(0.8 0.16 85);
+  --highlight: oklch(0.7 0.15 300);
 
   /* Override shadows for dark mode */
-  --shadow-2xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.09);
   --shadow-xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.09);
   --shadow-sm: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 1px 2px -1px hsl(0 0% 0% / 0.18);
-  --shadow: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 1px 2px -1px hsl(0 0% 0% / 0.18);
   --shadow-md: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 2px 4px -1px hsl(0 0% 0% / 0.18);
   --shadow-lg: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 4px 6px -1px hsl(0 0% 0% / 0.18);
   --shadow-xl: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 8px 10px -1px hsl(0 0% 0% / 0.18);
@@ -171,46 +149,34 @@
 
 @theme inline {
   /* Semantic Colors */
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
   --color-surface: var(--surface);
-  --color-surface-foreground: var(--surface-foreground);
+  --color-surface-fg: var(--surface-fg);
   --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-fg: var(--primary-fg);
   --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary-fg: var(--secondary-fg);
   --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
+  --color-muted-fg: var(--muted-fg);
   --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
+  --color-accent-fg: var(--accent-fg);
+  --color-danger: var(--danger);
+  --color-danger-fg: var(--danger-fg);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  /* Sidebar */
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-
-  /* Terminal Colors */
-  --color-terminal-green: var(--terminal-green);
-  --color-terminal-red: var(--terminal-red);
-  --color-terminal-cyan: var(--terminal-cyan);
-  --color-terminal-amber: var(--terminal-amber);
-  --color-terminal-purple: var(--terminal-purple);
+  /* Signals */
+  --color-positive: var(--positive);
+  --color-negative: var(--negative);
+  --color-info: var(--info);
+  --color-warning: var(--warning);
+  --color-highlight: var(--highlight);
 
   /* Shadows (for dark mode override support) */
-  --shadow-2xs: var(--shadow-2xs);
   --shadow-xs: var(--shadow-xs);
   --shadow-sm: var(--shadow-sm);
-  --shadow: var(--shadow);
   --shadow-md: var(--shadow-md);
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
@@ -226,14 +192,10 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-bg text-fg font-mono;
   }
   ::selection {
-    background: oklch(0.85 0.01 240 / 0.3);
-    color: inherit;
-  }
-  .dark ::selection {
-    background: oklch(0.7 0.01 240 / 0.3);
+    background: var(--sel);
     color: inherit;
   }
 }
@@ -311,79 +273,43 @@
     min-width: 48px;
   }
 
-  /* Terminal Glow Effects */
-  .terminal-glow-green {
-    text-shadow: none;
-  }
-  .terminal-glow-red {
-    text-shadow: none;
-  }
-  .terminal-glow-cyan {
-    text-shadow: none;
-  }
-  .terminal-glow-amber {
-    text-shadow: none;
-  }
-
-  .dark .terminal-glow-green {
-    text-shadow: 0 0 8px oklch(0.75 0.18 145 / 0.6);
-  }
-  .dark .terminal-glow-red {
-    text-shadow: 0 0 8px oklch(0.65 0.22 25 / 0.6);
-  }
-  .dark .terminal-glow-cyan {
-    text-shadow: 0 0 8px oklch(0.78 0.12 195 / 0.6);
-  }
-  .dark .terminal-glow-amber {
-    text-shadow: 0 0 8px oklch(0.8 0.16 85 / 0.6);
-  }
-
   /* Terminal Scanlines */
   .terminal-scanlines {
     background-image: repeating-linear-gradient(
       0deg,
       transparent,
       transparent 1px,
-      oklch(0.5 0 0 / 0.02) 1px,
-      oklch(0.5 0 0 / 0.02) 2px
-    );
-  }
-  .dark .terminal-scanlines {
-    background-image: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 1px,
-      oklch(1 0 0 / 0.02) 1px,
-      oklch(1 0 0 / 0.02) 2px
+      oklch(from var(--fg) l c h / 0.02) 1px,
+      oklch(from var(--fg) l c h / 0.02) 2px
     );
   }
 
   /* Terminal Grid */
   .terminal-grid {
-    background-image: 
-      linear-gradient(oklch(0.5 0.02 240 / 0.15) 1px, transparent 1px),
-      linear-gradient(90deg, oklch(0.5 0.02 240 / 0.15) 1px, transparent 1px);
+    background-image:
+      linear-gradient(oklch(from var(--border) l c h / 0.15) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(from var(--border) l c h / 0.15) 1px, transparent 1px);
     background-size: 20px 20px;
   }
   .dark .terminal-grid {
-    background-image: 
-      linear-gradient(oklch(0.2 0 0 / 0.3) 1px, transparent 1px),
-      linear-gradient(90deg, oklch(0.2 0 0 / 0.3) 1px, transparent 1px);
+    background-image:
+      linear-gradient(oklch(from var(--border) l c h / 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(from var(--border) l c h / 0.3) 1px, transparent 1px);
     background-size: 20px 20px;
   }
 
   /* Depth Bars */
   .depth-bar-ask {
-    background: linear-gradient(90deg, transparent 0%, oklch(0.5 0.2 25 / 0.12) 100%);
+    background: linear-gradient(90deg, transparent 0%, oklch(from var(--negative) l c h / 0.12) 100%);
   }
   .depth-bar-bid {
-    background: linear-gradient(90deg, oklch(0.45 0.18 145 / 0.12) 0%, transparent 100%);
+    background: linear-gradient(90deg, oklch(from var(--positive) l c h / 0.12) 0%, transparent 100%);
   }
   .dark .depth-bar-ask {
-    background: linear-gradient(90deg, transparent 0%, oklch(0.65 0.22 25 / 0.15) 100%);
+    background: linear-gradient(90deg, transparent 0%, oklch(from var(--negative) l c h / 0.15) 100%);
   }
   .dark .depth-bar-bid {
-    background: linear-gradient(90deg, oklch(0.75 0.18 145 / 0.15) 0%, transparent 100%);
+    background: linear-gradient(90deg, oklch(from var(--positive) l c h / 0.15) 0%, transparent 100%);
   }
 
   /* Trade row flash on appear - subtle, full-width */
@@ -396,12 +322,12 @@
   }
   .trade-row-buy {
     @starting-style {
-      background-color: oklch(from var(--terminal-green) l c h / 0.12);
+      background-color: oklch(from var(--positive) l c h / 0.12);
     }
   }
   .trade-row-sell {
     @starting-style {
-      background-color: oklch(from var(--terminal-red) l c h / 0.12);
+      background-color: oklch(from var(--negative) l c h / 0.12);
     }
   }
 }

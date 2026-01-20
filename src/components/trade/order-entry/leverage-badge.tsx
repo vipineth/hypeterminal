@@ -21,8 +21,8 @@ export const LeverageBadge = forwardRef<HTMLButtonElement, Props>(
 				onClick={onClick}
 				className={cn(
 					"px-2 py-0.5 text-3xs gap-1",
-					"hover:bg-terminal-cyan/10",
-					"focus-visible:ring-1 focus-visible:ring-terminal-cyan",
+					"hover:bg-info/10",
+					"focus-visible:ring-1 focus-visible:ring-info",
 					isLoading && "opacity-70",
 					className,
 				)}

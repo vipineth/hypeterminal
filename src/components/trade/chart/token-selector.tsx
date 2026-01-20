@@ -55,13 +55,13 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 				>
 					<Avatar className="size-5 shrink-0">
 						<AvatarImage src={getTokenIconUrl(value)} alt={value} />
-						<AvatarFallback className="text-3xs bg-terminal-amber/20 text-terminal-amber">
+						<AvatarFallback className="text-3xs bg-warning/20 text-warning">
 							{value.slice(0, 2)}
 						</AvatarFallback>
 					</Avatar>
-					<span className="text-terminal-amber truncate">{value}</span>
-					<span className="text-muted-foreground hidden sm:inline">/{QUOTE_ASSET}</span>
-					<ChevronDown className="size-3 text-muted-foreground shrink-0" />
+					<span className="text-warning truncate">{value}</span>
+					<span className="text-muted-fg hidden sm:inline">/{QUOTE_ASSET}</span>
+					<ChevronDown className="size-3 text-muted-fg shrink-0" />
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent
@@ -72,12 +72,12 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 				<div className="flex flex-col p-2">
 					<div className="border-b border-border/40">
 						<div className="relative">
-							<Search className="absolute left-2 top-1/2 -translate-y-1/2 size-3 text-muted-foreground" />
+							<Search className="absolute left-2 top-1/2 -translate-y-1/2 size-3 text-muted-fg" />
 							<Input
 								placeholder={t`Search markets...`}
 								value={search}
 								onChange={(e) => setSearch(e.target.value)}
-								className="pl-7 h-7 text-xs bg-background/50 border-border/60 focus:border-terminal-cyan/40"
+								className="pl-7 h-7 text-xs bg-bg/50 border-border/60 focus:border-info/40"
 							/>
 						</div>
 					</div>
@@ -95,8 +95,8 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 										className={cn(
 											"px-2 py-1 text-3xs uppercase tracking-wider gap-1 cursor-pointer",
 											isSelected
-												? "bg-terminal-cyan/10 text-terminal-cyan hover:bg-terminal-cyan/10 hover:text-terminal-cyan"
-												: "text-muted-foreground hover:bg-transparent",
+												? "bg-info/10 text-info hover:bg-info/10 hover:text-info"
+												: "text-muted-fg hover:bg-transparent",
 										)}
 										aria-label={t`Filter by ${cat.label}`}
 										aria-pressed={isSelected}
@@ -108,7 +108,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 							})}
 						</div>
 					</div>
-					<div className="flex items-center py-1.5 text-4xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40 bg-surface/30">
+					<div className="flex items-center py-1.5 text-4xs uppercase tracking-wider text-muted-fg/70 border-b border-border/40 bg-surface/30">
 						{headerGroup?.headers.map((header) => {
 							if (header.id === "coin") {
 								return (
@@ -129,7 +129,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 									size="none"
 									onClick={header.column.getToggleSortingHandler()}
 									className={cn(
-										"w-16 sm:w-20 justify-end gap-1 hover:text-foreground hover:bg-transparent",
+										"w-16 sm:w-20 justify-end gap-1 hover:text-fg hover:bg-transparent",
 										hiddenOnMobile && "hidden sm:flex",
 									)}
 									aria-label={t`Sort by ${String(header.column.columnDef.header ?? "")}`}
@@ -152,10 +152,10 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 					<div ref={containerRef} className="h-72 overflow-auto">
 						{isLoading ? (
 							<div className="flex items-center justify-center py-8">
-								<span className="text-3xs text-muted-foreground">{t`Loading markets...`}</span>
+								<span className="text-3xs text-muted-fg">{t`Loading markets...`}</span>
 							</div>
 						) : rows.length === 0 ? (
-							<div className="py-8 text-center text-3xs text-muted-foreground">{t`No markets found.`}</div>
+							<div className="py-8 text-center text-3xs text-muted-fg">{t`No markets found.`}</div>
 						) : (
 							<div
 								style={{
@@ -176,10 +176,10 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 									const changeClass = cn(
 										"text-2xs font-medium tabular-nums",
 										changePct === null
-											? "text-muted-foreground"
+											? "text-muted-fg"
 											: changeIsPositive
-												? "text-terminal-green"
-												: "text-terminal-red",
+												? "text-positive"
+												: "text-negative",
 									);
 									const changeText = changePct === null ? FALLBACK_VALUE_PLACEHOLDER : formatPercent(changePct / 100);
 
@@ -200,7 +200,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 												"flex items-center px-3 py-1.5 cursor-pointer border-b border-border/20",
 												"hover:bg-accent/30 transition-colors",
 												"absolute top-0 left-0 w-full",
-												isSelected && "bg-terminal-cyan/5",
+												isSelected && "bg-info/5",
 											)}
 											style={{
 												height: `${virtualItem.size}px`,
@@ -229,8 +229,8 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 																className={cn(
 																	"size-2.5 transition-colors",
 																	isFav
-																		? "fill-terminal-amber text-terminal-amber"
-																		: "text-muted-foreground hover:text-terminal-amber",
+																		? "fill-warning text-warning"
+																		: "text-muted-fg hover:text-warning",
 																)}
 															/>
 														</Button>
@@ -240,7 +240,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 															</Badge>
 														)}
 													</div>
-													<div className="flex items-center gap-1.5 text-4xs text-muted-foreground">
+													<div className="flex items-center gap-1.5 text-4xs text-muted-fg">
 														<span>{market.maxLeverage}x</span>
 													</div>
 												</div>
@@ -266,12 +266,12 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 											<div className="w-20 text-right hidden sm:block">
 												<div className="flex items-center justify-end gap-1">
 													<Flame
-														className={cn("size-2.5", isFundingPositive ? "text-terminal-green" : "text-terminal-red")}
+														className={cn("size-2.5", isFundingPositive ? "text-positive" : "text-negative")}
 													/>
 													<span
 														className={cn(
 															"text-2xs tabular-nums font-medium",
-															isFundingPositive ? "text-terminal-green" : "text-terminal-red",
+															isFundingPositive ? "text-positive" : "text-negative",
 														)}
 													>
 														{formatPercent(fundingNum, {
@@ -288,7 +288,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 						)}
 					</div>
 
-					<div className="px-3 py-1.5 bg-surface/30 flex items-center justify-between text-4xs text-muted-foreground">
+					<div className="px-3 py-1.5 bg-surface/30 flex items-center justify-between text-4xs text-muted-fg">
 						<span>
 							{filteredMarkets.length} {t`markets`}
 						</span>

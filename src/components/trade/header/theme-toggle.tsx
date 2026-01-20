@@ -29,8 +29,8 @@ function ThemeToggleButton() {
 			className={cn(
 				"size-7",
 				isDark
-					? "text-terminal-amber hover:text-terminal-amber/80"
-					: "text-terminal-purple hover:text-terminal-purple/80",
+					? "text-warning hover:text-warning/80"
+					: "text-highlight hover:text-highlight/80",
 			)}
 			onClick={handleToggle}
 			aria-label={isDark ? t`Switch to light mode` : t`Switch to dark mode`}

@@ -8,13 +8,13 @@ export type OpenOrder = FrontendOpenOrdersResponse[number];
 export type OrderSide = OpenOrder["side"];
 
 export const ORDER_SIDE_CONFIG = {
-	B: { label: "long", class: "bg-terminal-green/20 text-terminal-green" },
-	A: { label: "short", class: "bg-terminal-red/20 text-terminal-red" },
+	B: { label: "long", class: "bg-positive/20 text-positive" },
+	A: { label: "short", class: "bg-negative/20 text-negative" },
 } as const satisfies Record<OrderSide, { label: string; class: string }>;
 
 export const ORDER_TYPE_CONFIG = {
-	takeProfit: { prefix: "Take Profit", class: "bg-terminal-green/20 text-terminal-green" },
-	stop: { prefix: "Stop", class: "bg-terminal-amber/20 text-terminal-amber" },
+	takeProfit: { prefix: "Take Profit", class: "bg-positive/20 text-positive" },
+	stop: { prefix: "Stop", class: "bg-warning/20 text-warning" },
 	default: { class: "bg-accent/50" },
 } as const;
 

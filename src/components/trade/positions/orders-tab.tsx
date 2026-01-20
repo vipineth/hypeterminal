@@ -34,7 +34,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 		<div
 			className={cn(
 				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-terminal-red/80" : "text-muted-foreground",
+				variant === "error" ? "text-negative/80" : "text-muted-fg",
 			)}
 		>
 			{children}
@@ -166,7 +166,7 @@ export function OrdersTab() {
 			return (
 				<Placeholder variant="error">
 					<span>{t`Failed to load open orders.`}</span>
-					{error instanceof Error && <span className="mt-1 text-4xs text-muted-foreground">{error.message}</span>}
+					{error instanceof Error && <span className="mt-1 text-4xs text-muted-fg">{error.message}</span>}
 				</Placeholder>
 			);
 		}
@@ -178,11 +178,11 @@ export function OrdersTab() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
-			<div className="text-3xs uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-2">
+			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
 				<ListOrdered className="size-3" />
 				{t`Open Orders`}
 				<div className="ml-auto flex items-center gap-2">
-					<span className="text-terminal-cyan tabular-nums">{headerCount}</span>
+					<span className="text-info tabular-nums">{headerCount}</span>
 					<Button
 						variant="danger"
 						size="xs"
@@ -203,8 +203,8 @@ export function OrdersTab() {
 					</Button>
 				</div>
 			</div>
-			{actionError ? <div className="mb-1 text-4xs text-terminal-red/80">{actionError}</div> : null}
-			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
+			{actionError ? <div className="mb-1 text-4xs text-negative/80">{actionError}</div> : null}
+			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-bg/50">
 				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table>
@@ -218,31 +218,31 @@ export function OrdersTab() {
 											disabled={openOrders.length === 0 || isCancelling}
 										/>
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
 										{t`Time`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
 										{t`Asset`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
 										{t`Type`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Price`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Size`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Filled`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
 										{t`Trigger`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
 										{t`Reduce`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Actions`}
 									</TableHead>
 								</TableRow>
@@ -306,7 +306,7 @@ function OrderRow({
 					disabled={isCancelling}
 				/>
 			</TableCell>
-			<TableCell className="text-2xs text-muted-foreground py-1.5 whitespace-nowrap">
+			<TableCell className="text-2xs text-muted-fg py-1.5 whitespace-nowrap">
 				{formatDateTime(order.timestamp, { dateStyle: "short", timeStyle: "short" })}
 			</TableCell>
 			<TableCell className="text-2xs font-medium py-1.5">
@@ -336,21 +336,21 @@ function OrderRow({
 			</TableCell>
 			<TableCell className="text-2xs text-right tabular-nums py-1.5">
 				{formatNumber(order.origSz, szDecimals)} {order.coin}{" "}
-				<span className="text-muted-foreground">({formatUSD(getOrderValue(order), { compact: false })})</span>
+				<span className="text-muted-fg">({formatUSD(getOrderValue(order), { compact: false })})</span>
 			</TableCell>
 			<TableCell className="text-2xs text-right tabular-nums py-1.5">
-				<span className={cn(fillPct > 0 && "text-terminal-amber")}>
+				<span className={cn(fillPct > 0 && "text-warning")}>
 					{formatNumber(getFilledSize(order), szDecimals)} ({fillPct.toFixed(0)}%)
 				</span>
 			</TableCell>
-			<TableCell className="text-2xs text-muted-foreground py-1.5">
+			<TableCell className="text-2xs text-muted-fg py-1.5">
 				{order.triggerCondition || FALLBACK_VALUE_PLACEHOLDER}
 			</TableCell>
 			<TableCell className="text-2xs py-1.5">
 				{order.reduceOnly ? (
-					<span className="text-terminal-cyan">{t`Yes`}</span>
+					<span className="text-info">{t`Yes`}</span>
 				) : (
-					<span className="text-muted-foreground">{t`No`}</span>
+					<span className="text-muted-fg">{t`No`}</span>
 				)}
 			</TableCell>
 			<TableCell className="text-right py-1.5">

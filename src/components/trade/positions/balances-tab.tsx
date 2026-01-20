@@ -21,7 +21,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 		<div
 			className={cn(
 				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-terminal-red/80" : "text-muted-foreground",
+				variant === "error" ? "text-negative/80" : "text-muted-fg",
 			)}
 		>
 			{children}
@@ -116,32 +116,32 @@ export function BalancesTab() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
-			<div className="text-3xs uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-2">
+			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
 				<Wallet className="size-3" />
 				{t`Account Balances`}
-				<span className="text-terminal-cyan ml-auto tabular-nums">
+				<span className="text-info ml-auto tabular-nums">
 					{isConnected && !isLoading ? formatUSD(totalValue, { compact: true }) : FALLBACK_VALUE_PLACEHOLDER}
 				</span>
 			</div>
-			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-background/50">
+			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-bg/50">
 				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
 										{t`Asset`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Available`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`In Use`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Total`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-foreground/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`USD Value`}
 									</TableHead>
 								</TableRow>
@@ -154,13 +154,13 @@ export function BalancesTab() {
 											<TableCell className="text-2xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">
 													<TokenAvatar symbol={row.asset} />
-													<span className="text-terminal-cyan">{row.asset}</span>
+													<span className="text-info">{row.asset}</span>
 													<span
 														className={cn(
 															"text-4xs px-1 py-0.5 rounded-sm uppercase",
 															row.type === "perp"
-																? "bg-terminal-purple/20 text-terminal-purple"
-																: "bg-terminal-amber/20 text-terminal-amber",
+																? "bg-highlight/20 text-highlight"
+																: "bg-warning/20 text-warning",
 														)}
 													>
 														{row.type === "perp" ? t`perp` : t`spot`}
@@ -170,13 +170,13 @@ export function BalancesTab() {
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
 												{formatToken(row.available, decimals)}
 											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums text-terminal-amber py-1.5">
+											<TableCell className="text-2xs text-right tabular-nums text-warning py-1.5">
 												{formatToken(row.inOrder, decimals)}
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
 												{formatToken(row.total, decimals)}
 											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums text-terminal-green py-1.5">
+											<TableCell className="text-2xs text-right tabular-nums text-positive py-1.5">
 												{formatUSD(row.usdValue, { compact: true })}
 											</TableCell>
 										</TableRow>
