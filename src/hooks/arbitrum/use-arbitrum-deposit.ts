@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { formatUnits, hexToSignature, parseUnits } from "viem";
+import { formatUnits, parseSignature, parseUnits } from "viem";
 import {
-	useAccount,
+	useConnection,
 	useReadContract,
 	useSignTypedData,
 	useSwitchChain,
@@ -43,7 +43,7 @@ const USDC_DOMAIN = {
 };
 
 export function useArbitrumDeposit() {
-	const { address, chainId } = useAccount();
+	const { address, chainId } = useConnection();
 	const { switchChain, isPending: isSwitching, error: switchError } = useSwitchChain();
 	const [step, setStep] = useState<DepositStep>("idle");
 
@@ -73,12 +73,7 @@ export function useArbitrumDeposit() {
 	});
 
 	// Sign permit
-	const {
-		signTypedData,
-		isPending: isSigning,
-		error: signError,
-		reset: resetSign,
-	} = useSignTypedData();
+	const { signTypedData, isPending: isSigning, error: signError, reset: resetSign } = useSignTypedData();
 
 	// Write to bridge contract
 	const {
@@ -166,19 +161,12 @@ export function useArbitrumDeposit() {
 				},
 				{
 					onSuccess: (sig) => {
-						const { r, s, v } = hexToSignature(sig);
-						// Ensure v is 27 or 28 (some wallets return 0 or 1)
-						const vNormalized = Number(v) < 27 ? Number(v) + 27 : Number(v);
-
-						console.log("Deposit params:", {
-							user: address,
-							usd: amountRaw.toString(),
-							deadline: deadline.toString(),
-							nonce: nonce?.toString(),
-							r,
-							s,
-							v: vNormalized,
-						});
+						const { r, s, v, yParity } = parseSignature(sig);
+						const vRaw = v !== undefined ? Number(v) : yParity + 27;
+						const vNormalized = vRaw < 27 ? vRaw + 27 : vRaw;
+						if (vNormalized !== 27 && vNormalized !== 28) {
+							throw new Error(`Invalid signature v value: ${vNormalized}`);
+						}
 
 						writeContract({
 							address: CONTRACTS.arbitrum.bridge2,
