@@ -31,7 +31,7 @@ export function getLinkStakingUserMutationOptions(
 export function useExchangeLinkStakingUser(
 	options: UseExchangeLinkStakingUserOptions = {},
 ): UseExchangeLinkStakingUserReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getLinkStakingUserMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getLinkStakingUserMutationOptions(trading)));
 }

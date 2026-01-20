@@ -25,7 +25,7 @@ export function getSpotUserMutationOptions(
 }
 
 export function useExchangeSpotUser(options: UseExchangeSpotUserOptions = {}): UseExchangeSpotUserReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getSpotUserMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getSpotUserMutationOptions(trading)));
 }

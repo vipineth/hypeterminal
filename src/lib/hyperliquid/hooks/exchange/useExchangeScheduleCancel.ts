@@ -31,7 +31,7 @@ export function getScheduleCancelMutationOptions(
 export function useExchangeScheduleCancel(
 	options: UseExchangeScheduleCancelOptions = {},
 ): UseExchangeScheduleCancelReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getScheduleCancelMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getScheduleCancelMutationOptions(trading)));
 }

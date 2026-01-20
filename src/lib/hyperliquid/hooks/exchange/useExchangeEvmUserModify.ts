@@ -31,7 +31,7 @@ export function getEvmUserModifyMutationOptions(
 export function useExchangeEvmUserModify(
 	options: UseExchangeEvmUserModifyOptions = {},
 ): UseExchangeEvmUserModifyReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getEvmUserModifyMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getEvmUserModifyMutationOptions(trading)));
 }

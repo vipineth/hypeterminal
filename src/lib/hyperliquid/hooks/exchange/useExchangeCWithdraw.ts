@@ -25,7 +25,7 @@ export function getCWithdrawMutationOptions(
 }
 
 export function useExchangeCWithdraw(options: UseExchangeCWithdrawOptions = {}): UseExchangeCWithdrawReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getCWithdrawMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getCWithdrawMutationOptions(trading)));
 }

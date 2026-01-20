@@ -29,7 +29,7 @@ export function getPerpDeployMutationOptions(
 }
 
 export function useExchangePerpDeploy(options: UseExchangePerpDeployOptions = {}): UseExchangePerpDeployReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getPerpDeployMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getPerpDeployMutationOptions(trading)));
 }

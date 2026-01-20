@@ -31,7 +31,7 @@ export function getSubAccountModifyMutationOptions(
 export function useExchangeSubAccountModify(
 	options: UseExchangeSubAccountModifyOptions = {},
 ): UseExchangeSubAccountModifyReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getSubAccountModifyMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getSubAccountModifyMutationOptions(trading)));
 }

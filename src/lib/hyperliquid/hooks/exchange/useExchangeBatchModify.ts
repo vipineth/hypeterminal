@@ -29,7 +29,7 @@ export function getBatchModifyMutationOptions(
 }
 
 export function useExchangeBatchModify(options: UseExchangeBatchModifyOptions = {}): UseExchangeBatchModifyReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getBatchModifyMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getBatchModifyMutationOptions(trading)));
 }

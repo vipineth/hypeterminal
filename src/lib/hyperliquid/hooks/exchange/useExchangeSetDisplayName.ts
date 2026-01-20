@@ -31,7 +31,7 @@ export function getSetDisplayNameMutationOptions(
 export function useExchangeSetDisplayName(
 	options: UseExchangeSetDisplayNameOptions = {},
 ): UseExchangeSetDisplayNameReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getSetDisplayNameMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getSetDisplayNameMutationOptions(trading)));
 }

@@ -22,7 +22,7 @@ export function getNoopMutationOptions(exchange: ExchangeClient | null): Mutatio
 }
 
 export function useExchangeNoop(options: UseExchangeNoopOptions = {}): UseExchangeNoopReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getNoopMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getNoopMutationOptions(trading)));
 }

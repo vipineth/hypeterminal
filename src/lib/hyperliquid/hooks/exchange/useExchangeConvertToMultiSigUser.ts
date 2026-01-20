@@ -38,7 +38,7 @@ export function getConvertToMultiSigUserMutationOptions(
 export function useExchangeConvertToMultiSigUser(
 	options: UseExchangeConvertToMultiSigUserOptions = {},
 ): UseExchangeConvertToMultiSigUserReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getConvertToMultiSigUserMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getConvertToMultiSigUserMutationOptions(trading)));
 }

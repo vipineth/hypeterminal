@@ -35,7 +35,7 @@ export function getValidatorL1StreamMutationOptions(
 export function useExchangeValidatorL1Stream(
 	options: UseExchangeValidatorL1StreamOptions = {},
 ): UseExchangeValidatorL1StreamReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getValidatorL1StreamMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getValidatorL1StreamMutationOptions(trading)));
 }

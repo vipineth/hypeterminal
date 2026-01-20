@@ -31,7 +31,7 @@ export function getCSignerActionMutationOptions(
 export function useExchangeCSignerAction(
 	options: UseExchangeCSignerActionOptions = {},
 ): UseExchangeCSignerActionReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getCSignerActionMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getCSignerActionMutationOptions(trading)));
 }

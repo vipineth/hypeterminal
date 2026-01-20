@@ -25,7 +25,7 @@ export function getUsdSendMutationOptions(
 }
 
 export function useExchangeUsdSend(options: UseExchangeUsdSendOptions = {}): UseExchangeUsdSendReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { admin } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getUsdSendMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getUsdSendMutationOptions(admin)));
 }

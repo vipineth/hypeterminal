@@ -31,7 +31,7 @@ export function getUpdateLeverageMutationOptions(
 export function useExchangeUpdateLeverage(
 	options: UseExchangeUpdateLeverageOptions = {},
 ): UseExchangeUpdateLeverageReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getUpdateLeverageMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getUpdateLeverageMutationOptions(trading)));
 }

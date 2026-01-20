@@ -38,7 +38,7 @@ export function getUpdateIsolatedMarginMutationOptions(
 export function useExchangeUpdateIsolatedMargin(
 	options: UseExchangeUpdateIsolatedMarginOptions = {},
 ): UseExchangeUpdateIsolatedMarginReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getUpdateIsolatedMarginMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getUpdateIsolatedMarginMutationOptions(trading)));
 }

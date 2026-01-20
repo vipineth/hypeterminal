@@ -23,7 +23,7 @@ export function getModifyMutationOptions(exchange: ExchangeClient | null): Mutat
 }
 
 export function useExchangeModify(options: UseExchangeModifyOptions = {}): UseExchangeModifyReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getModifyMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getModifyMutationOptions(trading)));
 }

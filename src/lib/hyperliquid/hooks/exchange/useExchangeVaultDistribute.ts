@@ -31,7 +31,7 @@ export function getVaultDistributeMutationOptions(
 export function useExchangeVaultDistribute(
 	options: UseExchangeVaultDistributeOptions = {},
 ): UseExchangeVaultDistributeReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getVaultDistributeMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getVaultDistributeMutationOptions(trading)));
 }

@@ -31,7 +31,7 @@ export function getVaultTransferMutationOptions(
 export function useExchangeVaultTransfer(
 	options: UseExchangeVaultTransferOptions = {},
 ): UseExchangeVaultTransferReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getVaultTransferMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getVaultTransferMutationOptions(trading)));
 }

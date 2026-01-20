@@ -38,7 +38,7 @@ export function getReserveRequestWeightMutationOptions(
 export function useExchangeReserveRequestWeight(
 	options: UseExchangeReserveRequestWeightOptions = {},
 ): UseExchangeReserveRequestWeightReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getReserveRequestWeightMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getReserveRequestWeightMutationOptions(trading)));
 }

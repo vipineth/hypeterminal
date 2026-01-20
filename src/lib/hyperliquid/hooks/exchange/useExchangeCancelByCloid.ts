@@ -31,7 +31,7 @@ export function getCancelByCloidMutationOptions(
 export function useExchangeCancelByCloid(
 	options: UseExchangeCancelByCloidOptions = {},
 ): UseExchangeCancelByCloidReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getCancelByCloidMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getCancelByCloidMutationOptions(trading)));
 }

@@ -31,7 +31,7 @@ export function getRegisterReferrerMutationOptions(
 export function useExchangeRegisterReferrer(
 	options: UseExchangeRegisterReferrerOptions = {},
 ): UseExchangeRegisterReferrerReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getRegisterReferrerMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getRegisterReferrerMutationOptions(trading)));
 }

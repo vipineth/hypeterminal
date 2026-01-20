@@ -25,7 +25,7 @@ export function getWithdraw3MutationOptions(
 }
 
 export function useExchangeWithdraw3(options: UseExchangeWithdraw3Options = {}): UseExchangeWithdraw3ReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { admin } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getWithdraw3MutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getWithdraw3MutationOptions(admin)));
 }

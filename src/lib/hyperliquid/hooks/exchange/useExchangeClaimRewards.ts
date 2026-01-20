@@ -26,7 +26,7 @@ export function getClaimRewardsMutationOptions(
 export function useExchangeClaimRewards(
 	options: UseExchangeClaimRewardsOptions = {},
 ): UseExchangeClaimRewardsReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getClaimRewardsMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getClaimRewardsMutationOptions(trading)));
 }

@@ -25,7 +25,7 @@ export function getSpotSendMutationOptions(
 }
 
 export function useExchangeSpotSend(options: UseExchangeSpotSendOptions = {}): UseExchangeSpotSendReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { admin } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getSpotSendMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getSpotSendMutationOptions(admin)));
 }

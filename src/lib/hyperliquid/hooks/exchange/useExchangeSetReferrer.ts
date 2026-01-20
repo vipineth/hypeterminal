@@ -29,7 +29,7 @@ export function getSetReferrerMutationOptions(
 }
 
 export function useExchangeSetReferrer(options: UseExchangeSetReferrerOptions = {}): UseExchangeSetReferrerReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getSetReferrerMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getSetReferrerMutationOptions(trading)));
 }

@@ -25,7 +25,7 @@ export function getTwapOrderMutationOptions(
 }
 
 export function useExchangeTwapOrder(options: UseExchangeTwapOrderOptions = {}): UseExchangeTwapOrderReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getTwapOrderMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getTwapOrderMutationOptions(trading)));
 }

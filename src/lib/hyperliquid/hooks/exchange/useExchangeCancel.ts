@@ -27,8 +27,8 @@ export function getCancelMutationOptions(
 }
 
 export function useExchangeCancel(options: UseExchangeCancelOptions = {}): UseExchangeCancelReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 	const { clientKey } = useHyperliquid();
 
-	return useMutation(mergeMutationOptions(options, getCancelMutationOptions(exchange, clientKey)));
+	return useMutation(mergeMutationOptions(options, getCancelMutationOptions(trading, clientKey)));
 }

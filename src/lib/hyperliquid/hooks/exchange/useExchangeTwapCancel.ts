@@ -29,7 +29,7 @@ export function getTwapCancelMutationOptions(
 }
 
 export function useExchangeTwapCancel(options: UseExchangeTwapCancelOptions = {}): UseExchangeTwapCancelReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getTwapCancelMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getTwapCancelMutationOptions(trading)));
 }

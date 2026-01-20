@@ -29,7 +29,7 @@ export function getSpotDeployMutationOptions(
 }
 
 export function useExchangeSpotDeploy(options: UseExchangeSpotDeployOptions = {}): UseExchangeSpotDeployReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getSpotDeployMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getSpotDeployMutationOptions(trading)));
 }

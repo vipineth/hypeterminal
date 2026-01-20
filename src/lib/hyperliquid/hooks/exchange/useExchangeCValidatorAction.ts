@@ -31,7 +31,7 @@ export function getCValidatorActionMutationOptions(
 export function useExchangeCValidatorAction(
 	options: UseExchangeCValidatorActionOptions = {},
 ): UseExchangeCValidatorActionReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getCValidatorActionMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getCValidatorActionMutationOptions(trading)));
 }

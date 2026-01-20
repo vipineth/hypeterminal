@@ -29,10 +29,10 @@ export function getOrderMutationOptions(
 }
 
 export function useExchangeOrder(options: UseExchangeOrderOptions = {}): UseExchangeOrderReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 	const { builderConfig, clientKey } = useHyperliquid();
 
-	const mutationOptions = getOrderMutationOptions(exchange, builderConfig, clientKey);
+	const mutationOptions = getOrderMutationOptions(trading, builderConfig, clientKey);
 
 	return useMutation(mergeMutationOptions(options, mutationOptions));
 }

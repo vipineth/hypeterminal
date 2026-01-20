@@ -25,7 +25,7 @@ export function getCDepositMutationOptions(
 }
 
 export function useExchangeCDeposit(options: UseExchangeCDepositOptions = {}): UseExchangeCDepositReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getCDepositMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getCDepositMutationOptions(trading)));
 }

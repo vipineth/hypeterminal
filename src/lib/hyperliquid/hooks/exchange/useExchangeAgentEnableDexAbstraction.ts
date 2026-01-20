@@ -30,7 +30,7 @@ export function getAgentEnableDexAbstractionMutationOptions(
 export function useExchangeAgentEnableDexAbstraction(
 	options: UseExchangeAgentEnableDexAbstractionOptions = {},
 ): UseExchangeAgentEnableDexAbstractionReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getAgentEnableDexAbstractionMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getAgentEnableDexAbstractionMutationOptions(trading)));
 }
