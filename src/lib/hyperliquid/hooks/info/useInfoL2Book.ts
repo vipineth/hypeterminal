@@ -10,9 +10,7 @@ type L2BookParams = L2BookParameters;
 
 export type UseInfoL2BookParameters = L2BookParams;
 export type UseInfoL2BookOptions<TData = L2BookData> = QueryParameter<L2BookData, TData>;
-export type UseInfoL2BookReturnType<TData = L2BookData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoL2BookReturnType<TData = L2BookData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getL2BookQueryOptions(info: InfoClient, params: L2BookParams): QueryOptions<L2BookData> {
 	return {
@@ -33,8 +31,5 @@ export function useInfoL2Book<TData = L2BookData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

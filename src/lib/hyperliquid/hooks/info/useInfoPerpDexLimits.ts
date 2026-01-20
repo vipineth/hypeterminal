@@ -10,9 +10,7 @@ type PerpDexLimitsParams = PerpDexLimitsParameters;
 
 export type UseInfoPerpDexLimitsParameters = PerpDexLimitsParams;
 export type UseInfoPerpDexLimitsOptions<TData = PerpDexLimitsData> = QueryParameter<PerpDexLimitsData, TData>;
-export type UseInfoPerpDexLimitsReturnType<TData = PerpDexLimitsData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoPerpDexLimitsReturnType<TData = PerpDexLimitsData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getPerpDexLimitsQueryOptions(
 	info: InfoClient,
@@ -36,8 +34,5 @@ export function useInfoPerpDexLimits<TData = PerpDexLimitsData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

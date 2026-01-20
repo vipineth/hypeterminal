@@ -10,9 +10,7 @@ type MaxBuilderFeeParams = MaxBuilderFeeParameters;
 
 export type UseInfoMaxBuilderFeeParameters = MaxBuilderFeeParams;
 export type UseInfoMaxBuilderFeeOptions<TData = MaxBuilderFeeData> = QueryParameter<MaxBuilderFeeData, TData>;
-export type UseInfoMaxBuilderFeeReturnType<TData = MaxBuilderFeeData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoMaxBuilderFeeReturnType<TData = MaxBuilderFeeData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getMaxBuilderFeeQueryOptions(
 	info: InfoClient,
@@ -38,8 +36,5 @@ export function useInfoMaxBuilderFee<TData = MaxBuilderFeeData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

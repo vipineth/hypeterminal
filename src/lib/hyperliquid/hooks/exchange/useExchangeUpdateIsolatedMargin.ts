@@ -4,7 +4,7 @@ import type {
 	UpdateIsolatedMarginSuccessResponse,
 } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { MissingWalletError } from "../../errors";
+import { assertExchange } from "../../errors";
 import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
@@ -22,18 +22,14 @@ export type UseExchangeUpdateIsolatedMarginReturnType = UseMutationResult<
 	UpdateIsolatedMarginParams
 >;
 
-interface UpdateIsolatedMarginMutationContext {
-	exchange: ExchangeClient | null;
-}
-
 export function getUpdateIsolatedMarginMutationOptions(
-	context: UpdateIsolatedMarginMutationContext,
+	exchange: ExchangeClient | null,
 ): MutationOptions<UpdateIsolatedMarginData, UpdateIsolatedMarginParams> {
 	return {
 		mutationKey: createMutationKey("updateIsolatedMargin"),
 		mutationFn: (params) => {
-			if (!context.exchange) throw new MissingWalletError();
-			return context.exchange.updateIsolatedMargin(params);
+			assertExchange(exchange);
+			return exchange.updateIsolatedMargin(params);
 		},
 	};
 }
@@ -43,5 +39,5 @@ export function useExchangeUpdateIsolatedMargin(
 ): UseExchangeUpdateIsolatedMarginReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getUpdateIsolatedMarginMutationOptions({ exchange })));
+	return useMutation(mergeMutationOptions(options, getUpdateIsolatedMarginMutationOptions(exchange)));
 }

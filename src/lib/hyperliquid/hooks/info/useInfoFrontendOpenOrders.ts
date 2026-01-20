@@ -16,9 +16,7 @@ export type UseInfoFrontendOpenOrdersOptions<TData = FrontendOpenOrdersData> = Q
 export type UseInfoFrontendOpenOrdersReturnType<TData = FrontendOpenOrdersData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getFrontendOpenOrdersQueryOptions(
 	info: InfoClient,
@@ -44,8 +42,5 @@ export function useInfoFrontendOpenOrders<TData = FrontendOpenOrdersData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

@@ -8,9 +8,7 @@ import type { HyperliquidQueryError, QueryParameter } from "../../types";
 type PerpDexsData = PerpDexsResponse;
 
 export type UseInfoPerpDexsOptions<TData = PerpDexsData> = QueryParameter<PerpDexsData, TData>;
-export type UseInfoPerpDexsReturnType<TData = PerpDexsData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoPerpDexsReturnType<TData = PerpDexsData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getPerpDexsQueryOptions(info: InfoClient): QueryOptions<PerpDexsData> {
 	return {
@@ -30,8 +28,5 @@ export function useInfoPerpDexs<TData = PerpDexsData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

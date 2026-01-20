@@ -10,9 +10,7 @@ type TxDetailsParams = TxDetailsParameters;
 
 export type UseInfoTxDetailsParameters = TxDetailsParams;
 export type UseInfoTxDetailsOptions<TData = TxDetailsData> = QueryParameter<TxDetailsData, TData>;
-export type UseInfoTxDetailsReturnType<TData = TxDetailsData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoTxDetailsReturnType<TData = TxDetailsData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getTxDetailsQueryOptions(info: InfoClient, params: TxDetailsParams): QueryOptions<TxDetailsData> {
 	return {
@@ -33,8 +31,5 @@ export function useInfoTxDetails<TData = TxDetailsData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

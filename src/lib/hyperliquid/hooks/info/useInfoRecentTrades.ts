@@ -10,9 +10,7 @@ type RecentTradesParams = RecentTradesParameters;
 
 export type UseInfoRecentTradesParameters = RecentTradesParams;
 export type UseInfoRecentTradesOptions<TData = RecentTradesData> = QueryParameter<RecentTradesData, TData>;
-export type UseInfoRecentTradesReturnType<TData = RecentTradesData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoRecentTradesReturnType<TData = RecentTradesData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getRecentTradesQueryOptions(
 	info: InfoClient,
@@ -36,8 +34,5 @@ export function useInfoRecentTrades<TData = RecentTradesData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

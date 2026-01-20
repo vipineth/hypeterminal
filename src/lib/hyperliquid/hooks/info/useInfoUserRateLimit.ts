@@ -10,9 +10,7 @@ type UserRateLimitParams = UserRateLimitParameters;
 
 export type UseInfoUserRateLimitParameters = UserRateLimitParams;
 export type UseInfoUserRateLimitOptions<TData = UserRateLimitData> = QueryParameter<UserRateLimitData, TData>;
-export type UseInfoUserRateLimitReturnType<TData = UserRateLimitData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoUserRateLimitReturnType<TData = UserRateLimitData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getUserRateLimitQueryOptions(
 	info: InfoClient,
@@ -38,8 +36,5 @@ export function useInfoUserRateLimit<TData = UserRateLimitData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

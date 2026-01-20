@@ -10,9 +10,7 @@ type UserRoleParams = UserRoleParameters;
 
 export type UseInfoUserRoleParameters = UserRoleParams;
 export type UseInfoUserRoleOptions<TData = UserRoleData> = QueryParameter<UserRoleData, TData>;
-export type UseInfoUserRoleReturnType<TData = UserRoleData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoUserRoleReturnType<TData = UserRoleData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getUserRoleQueryOptions(info: InfoClient, params: UserRoleParams): QueryOptions<UserRoleData> {
 	return {
@@ -35,8 +33,5 @@ export function useInfoUserRole<TData = UserRoleData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

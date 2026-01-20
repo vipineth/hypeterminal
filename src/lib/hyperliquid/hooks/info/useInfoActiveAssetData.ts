@@ -13,9 +13,7 @@ export type UseInfoActiveAssetDataOptions<TData = ActiveAssetDataData> = QueryPa
 export type UseInfoActiveAssetDataReturnType<TData = ActiveAssetDataData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getActiveAssetDataQueryOptions(
 	info: InfoClient,
@@ -41,8 +39,5 @@ export function useInfoActiveAssetData<TData = ActiveAssetDataData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

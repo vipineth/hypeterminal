@@ -10,9 +10,7 @@ type MarginTableParams = MarginTableParameters;
 
 export type UseInfoMarginTableParameters = MarginTableParams;
 export type UseInfoMarginTableOptions<TData = MarginTableData> = QueryParameter<MarginTableData, TData>;
-export type UseInfoMarginTableReturnType<TData = MarginTableData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoMarginTableReturnType<TData = MarginTableData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getMarginTableQueryOptions(info: InfoClient, params: MarginTableParams): QueryOptions<MarginTableData> {
 	return {
@@ -33,8 +31,5 @@ export function useInfoMarginTable<TData = MarginTableData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

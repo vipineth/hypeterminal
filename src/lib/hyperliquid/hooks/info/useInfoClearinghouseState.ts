@@ -16,9 +16,7 @@ export type UseInfoClearinghouseStateOptions<TData = ClearinghouseStateData> = Q
 export type UseInfoClearinghouseStateReturnType<TData = ClearinghouseStateData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getClearinghouseStateQueryOptions(
 	info: InfoClient,
@@ -44,8 +42,5 @@ export function useInfoClearinghouseState<TData = ClearinghouseStateData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

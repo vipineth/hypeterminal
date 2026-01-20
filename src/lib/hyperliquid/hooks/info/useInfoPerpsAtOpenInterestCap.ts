@@ -16,9 +16,7 @@ export type UseInfoPerpsAtOpenInterestCapOptions<TData = PerpsAtOpenInterestCapD
 export type UseInfoPerpsAtOpenInterestCapReturnType<TData = PerpsAtOpenInterestCapData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getPerpsAtOpenInterestCapQueryOptions(
 	info: InfoClient,
@@ -42,8 +40,5 @@ export function useInfoPerpsAtOpenInterestCap<TData = PerpsAtOpenInterestCapData
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

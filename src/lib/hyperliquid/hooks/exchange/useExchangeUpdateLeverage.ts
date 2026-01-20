@@ -1,6 +1,6 @@
 import type { ExchangeClient, UpdateLeverageParameters, UpdateLeverageSuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { MissingWalletError } from "../../errors";
+import { assertExchange } from "../../errors";
 import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
@@ -15,18 +15,14 @@ export type UseExchangeUpdateLeverageReturnType = UseMutationResult<
 	UpdateLeverageParams
 >;
 
-interface UpdateLeverageMutationContext {
-	exchange: ExchangeClient | null;
-}
-
 export function getUpdateLeverageMutationOptions(
-	context: UpdateLeverageMutationContext,
+	exchange: ExchangeClient | null,
 ): MutationOptions<UpdateLeverageData, UpdateLeverageParams> {
 	return {
 		mutationKey: createMutationKey("updateLeverage"),
 		mutationFn: (params) => {
-			if (!context.exchange) throw new MissingWalletError();
-			return context.exchange.updateLeverage(params);
+			assertExchange(exchange);
+			return exchange.updateLeverage(params);
 		},
 	};
 }
@@ -36,5 +32,5 @@ export function useExchangeUpdateLeverage(
 ): UseExchangeUpdateLeverageReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getUpdateLeverageMutationOptions({ exchange })));
+	return useMutation(mergeMutationOptions(options, getUpdateLeverageMutationOptions(exchange)));
 }

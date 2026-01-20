@@ -8,9 +8,7 @@ import type { HyperliquidQueryError, QueryParameter } from "../../types";
 type LiquidatableData = LiquidatableResponse;
 
 export type UseInfoLiquidatableOptions<TData = LiquidatableData> = QueryParameter<LiquidatableData, TData>;
-export type UseInfoLiquidatableReturnType<TData = LiquidatableData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoLiquidatableReturnType<TData = LiquidatableData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getLiquidatableQueryOptions(info: InfoClient): QueryOptions<LiquidatableData> {
 	return {
@@ -30,8 +28,5 @@ export function useInfoLiquidatable<TData = LiquidatableData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

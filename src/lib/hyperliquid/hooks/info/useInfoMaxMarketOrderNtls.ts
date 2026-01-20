@@ -14,9 +14,7 @@ export type UseInfoMaxMarketOrderNtlsOptions<TData = MaxMarketOrderNtlsData> = Q
 export type UseInfoMaxMarketOrderNtlsReturnType<TData = MaxMarketOrderNtlsData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getMaxMarketOrderNtlsQueryOptions(info: InfoClient): QueryOptions<MaxMarketOrderNtlsData> {
 	return {
@@ -36,8 +34,5 @@ export function useInfoMaxMarketOrderNtls<TData = MaxMarketOrderNtlsData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

@@ -10,9 +10,7 @@ type PerpDexStatusParams = PerpDexStatusParameters;
 
 export type UseInfoPerpDexStatusParameters = PerpDexStatusParams;
 export type UseInfoPerpDexStatusOptions<TData = PerpDexStatusData> = QueryParameter<PerpDexStatusData, TData>;
-export type UseInfoPerpDexStatusReturnType<TData = PerpDexStatusData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoPerpDexStatusReturnType<TData = PerpDexStatusData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getPerpDexStatusQueryOptions(
 	info: InfoClient,
@@ -36,8 +34,5 @@ export function useInfoPerpDexStatus<TData = PerpDexStatusData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

@@ -10,9 +10,7 @@ type IsVipParams = IsVipParameters;
 
 export type UseInfoIsVipParameters = IsVipParams;
 export type UseInfoIsVipOptions<TData = IsVipData> = QueryParameter<IsVipData, TData>;
-export type UseInfoIsVipReturnType<TData = IsVipData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoIsVipReturnType<TData = IsVipData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getIsVipQueryOptions(info: InfoClient, params: IsVipParams): QueryOptions<IsVipData> {
 	return {
@@ -35,8 +33,5 @@ export function useInfoIsVip<TData = IsVipData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

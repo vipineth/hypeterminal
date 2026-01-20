@@ -10,9 +10,7 @@ type OpenOrdersParams = OpenOrdersParameters;
 
 export type UseInfoOpenOrdersParameters = OpenOrdersParams;
 export type UseInfoOpenOrdersOptions<TData = OpenOrdersData> = QueryParameter<OpenOrdersData, TData>;
-export type UseInfoOpenOrdersReturnType<TData = OpenOrdersData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoOpenOrdersReturnType<TData = OpenOrdersData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getOpenOrdersQueryOptions(info: InfoClient, params: OpenOrdersParams): QueryOptions<OpenOrdersData> {
 	return {
@@ -35,8 +33,5 @@ export function useInfoOpenOrders<TData = OpenOrdersData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

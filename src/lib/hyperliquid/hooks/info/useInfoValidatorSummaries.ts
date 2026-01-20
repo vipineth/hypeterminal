@@ -14,9 +14,7 @@ export type UseInfoValidatorSummariesOptions<TData = ValidatorSummariesData> = Q
 export type UseInfoValidatorSummariesReturnType<TData = ValidatorSummariesData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getValidatorSummariesQueryOptions(info: InfoClient): QueryOptions<ValidatorSummariesData> {
 	return {
@@ -36,8 +34,5 @@ export function useInfoValidatorSummaries<TData = ValidatorSummariesData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

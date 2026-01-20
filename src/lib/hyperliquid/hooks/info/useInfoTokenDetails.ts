@@ -10,9 +10,7 @@ type TokenDetailsParams = TokenDetailsParameters;
 
 export type UseInfoTokenDetailsParameters = TokenDetailsParams;
 export type UseInfoTokenDetailsOptions<TData = TokenDetailsData> = QueryParameter<TokenDetailsData, TData>;
-export type UseInfoTokenDetailsReturnType<TData = TokenDetailsData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoTokenDetailsReturnType<TData = TokenDetailsData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getTokenDetailsQueryOptions(
 	info: InfoClient,
@@ -36,8 +34,5 @@ export function useInfoTokenDetails<TData = TokenDetailsData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

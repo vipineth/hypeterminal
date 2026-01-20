@@ -8,12 +8,7 @@ import type { HyperliquidQueryError, QueryParameter } from "../../types";
 type VaultSummariesData = VaultSummariesResponse;
 
 export type UseInfoVaultSummariesOptions<TData = VaultSummariesData> = QueryParameter<VaultSummariesData, TData>;
-export type UseInfoVaultSummariesReturnType<TData = VaultSummariesData> = UseQueryResult<
-	TData,
-	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoVaultSummariesReturnType<TData = VaultSummariesData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getVaultSummariesQueryOptions(info: InfoClient): QueryOptions<VaultSummariesData> {
 	return {
@@ -33,8 +28,5 @@ export function useInfoVaultSummaries<TData = VaultSummariesData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

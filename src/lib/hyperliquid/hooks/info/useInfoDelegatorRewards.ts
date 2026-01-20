@@ -13,9 +13,7 @@ export type UseInfoDelegatorRewardsOptions<TData = DelegatorRewardsData> = Query
 export type UseInfoDelegatorRewardsReturnType<TData = DelegatorRewardsData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getDelegatorRewardsQueryOptions(
 	info: InfoClient,
@@ -41,8 +39,5 @@ export function useInfoDelegatorRewards<TData = DelegatorRewardsData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

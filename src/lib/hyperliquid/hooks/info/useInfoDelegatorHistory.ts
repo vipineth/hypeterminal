@@ -13,9 +13,7 @@ export type UseInfoDelegatorHistoryOptions<TData = DelegatorHistoryData> = Query
 export type UseInfoDelegatorHistoryReturnType<TData = DelegatorHistoryData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getDelegatorHistoryQueryOptions(
 	info: InfoClient,
@@ -41,8 +39,5 @@ export function useInfoDelegatorHistory<TData = DelegatorHistoryData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

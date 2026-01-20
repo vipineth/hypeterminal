@@ -13,9 +13,7 @@ export type UseInfoPreTransferCheckOptions<TData = PreTransferCheckData> = Query
 export type UseInfoPreTransferCheckReturnType<TData = PreTransferCheckData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getPreTransferCheckQueryOptions(
 	info: InfoClient,
@@ -41,8 +39,5 @@ export function useInfoPreTransferCheck<TData = PreTransferCheckData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

@@ -32,5 +32,6 @@ export { type UseTradingAgentResult, useTradingAgent } from "./hooks/useTradingA
 export { useTradingGuard } from "./hooks/useTradingGuard";
 export { type UseTradingStatusResult, useTradingStatus } from "./hooks/useTradingStatus";
 export { useHttpTransport, useSubscriptionTransport } from "./hooks/useTransport";
+export { infoKeys } from "./query/keys";
 
 export * from "./types";

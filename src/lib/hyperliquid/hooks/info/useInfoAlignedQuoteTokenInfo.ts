@@ -16,9 +16,7 @@ export type UseInfoAlignedQuoteTokenInfoOptions<TData = AlignedQuoteTokenInfoDat
 export type UseInfoAlignedQuoteTokenInfoReturnType<TData = AlignedQuoteTokenInfoData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getAlignedQuoteTokenInfoQueryOptions(
 	info: InfoClient,
@@ -42,8 +40,5 @@ export function useInfoAlignedQuoteTokenInfo<TData = AlignedQuoteTokenInfoData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

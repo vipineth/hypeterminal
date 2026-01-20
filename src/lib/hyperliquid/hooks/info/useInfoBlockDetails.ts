@@ -10,9 +10,7 @@ type BlockDetailsParams = BlockDetailsParameters;
 
 export type UseInfoBlockDetailsParameters = BlockDetailsParams;
 export type UseInfoBlockDetailsOptions<TData = BlockDetailsData> = QueryParameter<BlockDetailsData, TData>;
-export type UseInfoBlockDetailsReturnType<TData = BlockDetailsData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoBlockDetailsReturnType<TData = BlockDetailsData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getBlockDetailsQueryOptions(
 	info: InfoClient,
@@ -36,8 +34,5 @@ export function useInfoBlockDetails<TData = BlockDetailsData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

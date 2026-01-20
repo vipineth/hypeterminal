@@ -8,9 +8,7 @@ import type { HyperliquidQueryError, QueryParameter } from "../../types";
 type SpotMetaData = SpotMetaResponse;
 
 export type UseInfoSpotMetaOptions<TData = SpotMetaData> = QueryParameter<SpotMetaData, TData>;
-export type UseInfoSpotMetaReturnType<TData = SpotMetaData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoSpotMetaReturnType<TData = SpotMetaData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getSpotMetaQueryOptions(info: InfoClient): QueryOptions<SpotMetaData> {
 	return {
@@ -30,8 +28,5 @@ export function useInfoSpotMeta<TData = SpotMetaData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

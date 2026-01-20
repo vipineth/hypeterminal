@@ -1,6 +1,6 @@
 import type { ExchangeClient, VaultDistributeParameters, VaultDistributeSuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { MissingWalletError } from "../../errors";
+import { assertExchange } from "../../errors";
 import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
@@ -15,18 +15,14 @@ export type UseExchangeVaultDistributeReturnType = UseMutationResult<
 	VaultDistributeParams
 >;
 
-interface VaultDistributeMutationContext {
-	exchange: ExchangeClient | null;
-}
-
 export function getVaultDistributeMutationOptions(
-	context: VaultDistributeMutationContext,
+	exchange: ExchangeClient | null,
 ): MutationOptions<VaultDistributeData, VaultDistributeParams> {
 	return {
 		mutationKey: createMutationKey("vaultDistribute"),
 		mutationFn: (params) => {
-			if (!context.exchange) throw new MissingWalletError();
-			return context.exchange.vaultDistribute(params);
+			assertExchange(exchange);
+			return exchange.vaultDistribute(params);
 		},
 	};
 }
@@ -36,5 +32,5 @@ export function useExchangeVaultDistribute(
 ): UseExchangeVaultDistributeReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getVaultDistributeMutationOptions({ exchange })));
+	return useMutation(mergeMutationOptions(options, getVaultDistributeMutationOptions(exchange)));
 }

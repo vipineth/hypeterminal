@@ -13,9 +13,7 @@ export type UseInfoMetaAndAssetCtxsOptions<TData = MetaAndAssetCtxsData> = Query
 export type UseInfoMetaAndAssetCtxsReturnType<TData = MetaAndAssetCtxsData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getMetaAndAssetCtxsQueryOptions(
 	info: InfoClient,
@@ -39,8 +37,5 @@ export function useInfoMetaAndAssetCtxs<TData = MetaAndAssetCtxsData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

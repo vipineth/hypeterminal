@@ -16,9 +16,7 @@ export type UseInfoSpotClearinghouseStateOptions<TData = SpotClearinghouseStateD
 export type UseInfoSpotClearinghouseStateReturnType<TData = SpotClearinghouseStateData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getSpotClearinghouseStateQueryOptions(
 	info: InfoClient,
@@ -44,8 +42,5 @@ export function useInfoSpotClearinghouseState<TData = SpotClearinghouseStateData
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

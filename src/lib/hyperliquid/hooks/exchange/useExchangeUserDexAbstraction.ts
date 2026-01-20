@@ -4,7 +4,7 @@ import type {
 	UserDexAbstractionSuccessResponse,
 } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { MissingWalletError } from "../../errors";
+import { assertExchange } from "../../errors";
 import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
@@ -19,18 +19,14 @@ export type UseExchangeUserDexAbstractionReturnType = UseMutationResult<
 	UserDexAbstractionParams
 >;
 
-interface UserDexAbstractionMutationContext {
-	exchange: ExchangeClient | null;
-}
-
 export function getUserDexAbstractionMutationOptions(
-	context: UserDexAbstractionMutationContext,
+	exchange: ExchangeClient | null,
 ): MutationOptions<UserDexAbstractionData, UserDexAbstractionParams> {
 	return {
 		mutationKey: createMutationKey("userDexAbstraction"),
 		mutationFn: (params) => {
-			if (!context.exchange) throw new MissingWalletError();
-			return context.exchange.userDexAbstraction(params);
+			assertExchange(exchange);
+			return exchange.userDexAbstraction(params);
 		},
 	};
 }
@@ -40,5 +36,5 @@ export function useExchangeUserDexAbstraction(
 ): UseExchangeUserDexAbstractionReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getUserDexAbstractionMutationOptions({ exchange })));
+	return useMutation(mergeMutationOptions(options, getUserDexAbstractionMutationOptions(exchange)));
 }

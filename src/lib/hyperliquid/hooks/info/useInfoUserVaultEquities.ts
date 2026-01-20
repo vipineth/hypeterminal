@@ -16,9 +16,7 @@ export type UseInfoUserVaultEquitiesOptions<TData = UserVaultEquitiesData> = Que
 export type UseInfoUserVaultEquitiesReturnType<TData = UserVaultEquitiesData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getUserVaultEquitiesQueryOptions(
 	info: InfoClient,
@@ -44,8 +42,5 @@ export function useInfoUserVaultEquities<TData = UserVaultEquitiesData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

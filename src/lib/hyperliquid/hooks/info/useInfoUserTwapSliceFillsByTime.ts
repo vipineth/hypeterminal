@@ -20,9 +20,7 @@ export type UseInfoUserTwapSliceFillsByTimeOptions<TData = UserTwapSliceFillsByT
 export type UseInfoUserTwapSliceFillsByTimeReturnType<TData = UserTwapSliceFillsByTimeData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getUserTwapSliceFillsByTimeQueryOptions(
 	info: InfoClient,
@@ -48,8 +46,5 @@ export function useInfoUserTwapSliceFillsByTime<TData = UserTwapSliceFillsByTime
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

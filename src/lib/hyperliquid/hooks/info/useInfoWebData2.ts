@@ -10,9 +10,7 @@ type WebData2Params = WebData2Parameters;
 
 export type UseInfoWebData2Parameters = WebData2Params;
 export type UseInfoWebData2Options<TData = WebData2Data> = QueryParameter<WebData2Data, TData>;
-export type UseInfoWebData2ReturnType<TData = WebData2Data> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoWebData2ReturnType<TData = WebData2Data> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getWebData2QueryOptions(info: InfoClient, params: WebData2Params): QueryOptions<WebData2Data> {
 	return {
@@ -35,8 +33,5 @@ export function useInfoWebData2<TData = WebData2Data>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

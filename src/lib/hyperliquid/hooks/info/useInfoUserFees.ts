@@ -10,9 +10,7 @@ type UserFeesParams = UserFeesParameters;
 
 export type UseInfoUserFeesParameters = UserFeesParams;
 export type UseInfoUserFeesOptions<TData = UserFeesData> = QueryParameter<UserFeesData, TData>;
-export type UseInfoUserFeesReturnType<TData = UserFeesData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoUserFeesReturnType<TData = UserFeesData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getUserFeesQueryOptions(info: InfoClient, params: UserFeesParams): QueryOptions<UserFeesData> {
 	return {
@@ -35,8 +33,5 @@ export function useInfoUserFees<TData = UserFeesData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

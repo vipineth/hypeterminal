@@ -10,9 +10,7 @@ type ReferralParams = ReferralParameters;
 
 export type UseInfoReferralParameters = ReferralParams;
 export type UseInfoReferralOptions<TData = ReferralData> = QueryParameter<ReferralData, TData>;
-export type UseInfoReferralReturnType<TData = ReferralData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoReferralReturnType<TData = ReferralData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getReferralQueryOptions(info: InfoClient, params: ReferralParams): QueryOptions<ReferralData> {
 	return {
@@ -35,8 +33,5 @@ export function useInfoReferral<TData = ReferralData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

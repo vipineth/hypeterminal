@@ -8,12 +8,7 @@ import type { HyperliquidQueryError, QueryParameter } from "../../types";
 type ExchangeStatusData = ExchangeStatusResponse;
 
 export type UseInfoExchangeStatusOptions<TData = ExchangeStatusData> = QueryParameter<ExchangeStatusData, TData>;
-export type UseInfoExchangeStatusReturnType<TData = ExchangeStatusData> = UseQueryResult<
-	TData,
-	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoExchangeStatusReturnType<TData = ExchangeStatusData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getExchangeStatusQueryOptions(info: InfoClient): QueryOptions<ExchangeStatusData> {
 	return {
@@ -33,8 +28,5 @@ export function useInfoExchangeStatus<TData = ExchangeStatusData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

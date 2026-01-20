@@ -10,9 +10,7 @@ type UserDetailsParams = UserDetailsParameters;
 
 export type UseInfoUserDetailsParameters = UserDetailsParams;
 export type UseInfoUserDetailsOptions<TData = UserDetailsData> = QueryParameter<UserDetailsData, TData>;
-export type UseInfoUserDetailsReturnType<TData = UserDetailsData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoUserDetailsReturnType<TData = UserDetailsData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getUserDetailsQueryOptions(info: InfoClient, params: UserDetailsParams): QueryOptions<UserDetailsData> {
 	return {
@@ -35,8 +33,5 @@ export function useInfoUserDetails<TData = UserDetailsData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

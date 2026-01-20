@@ -10,12 +10,7 @@ type CandleSnapshotParams = CandleSnapshotParameters;
 
 export type UseInfoCandleSnapshotParameters = CandleSnapshotParams;
 export type UseInfoCandleSnapshotOptions<TData = CandleSnapshotData> = QueryParameter<CandleSnapshotData, TData>;
-export type UseInfoCandleSnapshotReturnType<TData = CandleSnapshotData> = UseQueryResult<
-	TData,
-	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoCandleSnapshotReturnType<TData = CandleSnapshotData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getCandleSnapshotQueryOptions(
 	info: InfoClient,
@@ -39,8 +34,5 @@ export function useInfoCandleSnapshot<TData = CandleSnapshotData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

@@ -10,9 +10,7 @@ type UserFillsParams = UserFillsParameters;
 
 export type UseInfoUserFillsParameters = UserFillsParams;
 export type UseInfoUserFillsOptions<TData = UserFillsData> = QueryParameter<UserFillsData, TData>;
-export type UseInfoUserFillsReturnType<TData = UserFillsData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoUserFillsReturnType<TData = UserFillsData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getUserFillsQueryOptions(info: InfoClient, params: UserFillsParams): QueryOptions<UserFillsData> {
 	return {
@@ -35,8 +33,5 @@ export function useInfoUserFills<TData = UserFillsData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

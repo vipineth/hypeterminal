@@ -14,9 +14,7 @@ export type UseInfoSpotPairDeployAuctionStatusOptions<TData = SpotPairDeployAuct
 export type UseInfoSpotPairDeployAuctionStatusReturnType<TData = SpotPairDeployAuctionStatusData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getSpotPairDeployAuctionStatusQueryOptions(
 	info: InfoClient,
@@ -38,8 +36,5 @@ export function useInfoSpotPairDeployAuctionStatus<TData = SpotPairDeployAuction
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

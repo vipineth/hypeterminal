@@ -14,9 +14,7 @@ export type UseInfoPredictedFundingsOptions<TData = PredictedFundingsData> = Que
 export type UseInfoPredictedFundingsReturnType<TData = PredictedFundingsData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getPredictedFundingsQueryOptions(info: InfoClient): QueryOptions<PredictedFundingsData> {
 	return {
@@ -36,8 +34,5 @@ export function useInfoPredictedFundings<TData = PredictedFundingsData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

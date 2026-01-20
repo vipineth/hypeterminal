@@ -10,9 +10,7 @@ type PortfolioParams = PortfolioParameters;
 
 export type UseInfoPortfolioParameters = PortfolioParams;
 export type UseInfoPortfolioOptions<TData = PortfolioData> = QueryParameter<PortfolioData, TData>;
-export type UseInfoPortfolioReturnType<TData = PortfolioData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoPortfolioReturnType<TData = PortfolioData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getPortfolioQueryOptions(info: InfoClient, params: PortfolioParams): QueryOptions<PortfolioData> {
 	return {
@@ -35,8 +33,5 @@ export function useInfoPortfolio<TData = PortfolioData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

@@ -13,9 +13,7 @@ export type UseInfoDelegatorSummaryOptions<TData = DelegatorSummaryData> = Query
 export type UseInfoDelegatorSummaryReturnType<TData = DelegatorSummaryData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getDelegatorSummaryQueryOptions(
 	info: InfoClient,
@@ -41,8 +39,5 @@ export function useInfoDelegatorSummary<TData = DelegatorSummaryData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

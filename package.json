@@ -7,7 +7,6 @@
 		"build": "lingui compile && vite build",
 		"serve": "vite preview",
 		"format": "biome format",
-		"fix": "biome check --write",
 		"lint": "biome lint",
 		"check": "biome check",
 		"fix": "biome check --write",

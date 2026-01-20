@@ -10,9 +10,7 @@ type SubAccounts2Params = SubAccounts2Parameters;
 
 export type UseInfoSubAccounts2Parameters = SubAccounts2Params;
 export type UseInfoSubAccounts2Options<TData = SubAccounts2Data> = QueryParameter<SubAccounts2Data, TData>;
-export type UseInfoSubAccounts2ReturnType<TData = SubAccounts2Data> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoSubAccounts2ReturnType<TData = SubAccounts2Data> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getSubAccounts2QueryOptions(
 	info: InfoClient,
@@ -38,8 +36,5 @@ export function useInfoSubAccounts2<TData = SubAccounts2Data>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

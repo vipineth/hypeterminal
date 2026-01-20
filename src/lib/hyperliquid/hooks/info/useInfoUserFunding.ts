@@ -10,9 +10,7 @@ type UserFundingParams = UserFundingParameters;
 
 export type UseInfoUserFundingParameters = UserFundingParams;
 export type UseInfoUserFundingOptions<TData = UserFundingData> = QueryParameter<UserFundingData, TData>;
-export type UseInfoUserFundingReturnType<TData = UserFundingData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoUserFundingReturnType<TData = UserFundingData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getUserFundingQueryOptions(info: InfoClient, params: UserFundingParams): QueryOptions<UserFundingData> {
 	return {
@@ -35,8 +33,5 @@ export function useInfoUserFunding<TData = UserFundingData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

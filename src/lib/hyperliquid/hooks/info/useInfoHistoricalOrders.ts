@@ -13,9 +13,7 @@ export type UseInfoHistoricalOrdersOptions<TData = HistoricalOrdersData> = Query
 export type UseInfoHistoricalOrdersReturnType<TData = HistoricalOrdersData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getHistoricalOrdersQueryOptions(
 	info: InfoClient,
@@ -41,8 +39,5 @@ export function useInfoHistoricalOrders<TData = HistoricalOrdersData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

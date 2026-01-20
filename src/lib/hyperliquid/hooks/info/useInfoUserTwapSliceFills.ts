@@ -16,9 +16,7 @@ export type UseInfoUserTwapSliceFillsOptions<TData = UserTwapSliceFillsData> = Q
 export type UseInfoUserTwapSliceFillsReturnType<TData = UserTwapSliceFillsData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getUserTwapSliceFillsQueryOptions(
 	info: InfoClient,
@@ -44,8 +42,5 @@ export function useInfoUserTwapSliceFills<TData = UserTwapSliceFillsData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

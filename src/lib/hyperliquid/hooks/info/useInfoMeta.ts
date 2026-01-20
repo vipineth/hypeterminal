@@ -10,9 +10,7 @@ type MetaParams = MetaParameters;
 
 export type UseInfoMetaParameters = MetaParams;
 export type UseInfoMetaOptions<TData = MetaData> = QueryParameter<MetaData, TData>;
-export type UseInfoMetaReturnType<TData = MetaData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoMetaReturnType<TData = MetaData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getMetaQueryOptions(info: InfoClient, params: MetaParams): QueryOptions<MetaData> {
 	return {
@@ -33,8 +31,5 @@ export function useInfoMeta<TData = MetaData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

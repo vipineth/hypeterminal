@@ -10,9 +10,7 @@ type ExtraAgentsParams = ExtraAgentsParameters;
 
 export type UseInfoExtraAgentsParameters = ExtraAgentsParams;
 export type UseInfoExtraAgentsOptions<TData = ExtraAgentsData> = QueryParameter<ExtraAgentsData, TData>;
-export type UseInfoExtraAgentsReturnType<TData = ExtraAgentsData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoExtraAgentsReturnType<TData = ExtraAgentsData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getExtraAgentsQueryOptions(info: InfoClient, params: ExtraAgentsParams): QueryOptions<ExtraAgentsData> {
 	return {
@@ -35,8 +33,5 @@ export function useInfoExtraAgents<TData = ExtraAgentsData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

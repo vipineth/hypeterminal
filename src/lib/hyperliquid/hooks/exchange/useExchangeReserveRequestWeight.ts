@@ -4,7 +4,7 @@ import type {
 	ReserveRequestWeightSuccessResponse,
 } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { MissingWalletError } from "../../errors";
+import { assertExchange } from "../../errors";
 import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
@@ -22,18 +22,14 @@ export type UseExchangeReserveRequestWeightReturnType = UseMutationResult<
 	ReserveRequestWeightParams
 >;
 
-interface ReserveRequestWeightMutationContext {
-	exchange: ExchangeClient | null;
-}
-
 export function getReserveRequestWeightMutationOptions(
-	context: ReserveRequestWeightMutationContext,
+	exchange: ExchangeClient | null,
 ): MutationOptions<ReserveRequestWeightData, ReserveRequestWeightParams> {
 	return {
 		mutationKey: createMutationKey("reserveRequestWeight"),
 		mutationFn: (params) => {
-			if (!context.exchange) throw new MissingWalletError();
-			return context.exchange.reserveRequestWeight(params);
+			assertExchange(exchange);
+			return exchange.reserveRequestWeight(params);
 		},
 	};
 }
@@ -43,5 +39,5 @@ export function useExchangeReserveRequestWeight(
 ): UseExchangeReserveRequestWeightReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getReserveRequestWeightMutationOptions({ exchange })));
+	return useMutation(mergeMutationOptions(options, getReserveRequestWeightMutationOptions(exchange)));
 }

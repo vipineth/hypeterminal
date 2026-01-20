@@ -10,12 +10,7 @@ type FundingHistoryParams = FundingHistoryParameters;
 
 export type UseInfoFundingHistoryParameters = FundingHistoryParams;
 export type UseInfoFundingHistoryOptions<TData = FundingHistoryData> = QueryParameter<FundingHistoryData, TData>;
-export type UseInfoFundingHistoryReturnType<TData = FundingHistoryData> = UseQueryResult<
-	TData,
-	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoFundingHistoryReturnType<TData = FundingHistoryData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getFundingHistoryQueryOptions(
 	info: InfoClient,
@@ -39,8 +34,5 @@ export function useInfoFundingHistory<TData = FundingHistoryData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

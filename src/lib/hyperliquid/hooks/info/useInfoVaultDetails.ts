@@ -10,9 +10,7 @@ type VaultDetailsParams = VaultDetailsParameters;
 
 export type UseInfoVaultDetailsParameters = VaultDetailsParams;
 export type UseInfoVaultDetailsOptions<TData = VaultDetailsData> = QueryParameter<VaultDetailsData, TData>;
-export type UseInfoVaultDetailsReturnType<TData = VaultDetailsData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoVaultDetailsReturnType<TData = VaultDetailsData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getVaultDetailsQueryOptions(
 	info: InfoClient,
@@ -36,8 +34,5 @@ export function useInfoVaultDetails<TData = VaultDetailsData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

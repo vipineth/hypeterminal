@@ -10,9 +10,7 @@ type AllMidsParams = AllMidsParameters;
 
 export type UseInfoAllMidsParameters = AllMidsParams;
 export type UseInfoAllMidsOptions<TData = AllMidsData> = QueryParameter<AllMidsData, TData>;
-export type UseInfoAllMidsReturnType<TData = AllMidsData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoAllMidsReturnType<TData = AllMidsData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getAllMidsQueryOptions(info: InfoClient, params: AllMidsParams): QueryOptions<AllMidsData> {
 	return {
@@ -33,8 +31,5 @@ export function useInfoAllMids<TData = AllMidsData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

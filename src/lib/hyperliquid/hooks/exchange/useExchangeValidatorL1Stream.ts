@@ -4,7 +4,7 @@ import type {
 	ValidatorL1StreamSuccessResponse,
 } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { MissingWalletError } from "../../errors";
+import { assertExchange } from "../../errors";
 import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
@@ -19,18 +19,14 @@ export type UseExchangeValidatorL1StreamReturnType = UseMutationResult<
 	ValidatorL1StreamParams
 >;
 
-interface ValidatorL1StreamMutationContext {
-	exchange: ExchangeClient | null;
-}
-
 export function getValidatorL1StreamMutationOptions(
-	context: ValidatorL1StreamMutationContext,
+	exchange: ExchangeClient | null,
 ): MutationOptions<ValidatorL1StreamData, ValidatorL1StreamParams> {
 	return {
 		mutationKey: createMutationKey("validatorL1Stream"),
 		mutationFn: (params) => {
-			if (!context.exchange) throw new MissingWalletError();
-			return context.exchange.validatorL1Stream(params);
+			assertExchange(exchange);
+			return exchange.validatorL1Stream(params);
 		},
 	};
 }
@@ -40,5 +36,5 @@ export function useExchangeValidatorL1Stream(
 ): UseExchangeValidatorL1StreamReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getValidatorL1StreamMutationOptions({ exchange })));
+	return useMutation(mergeMutationOptions(options, getValidatorL1StreamMutationOptions(exchange)));
 }

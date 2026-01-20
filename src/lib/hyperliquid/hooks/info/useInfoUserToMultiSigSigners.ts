@@ -16,9 +16,7 @@ export type UseInfoUserToMultiSigSignersOptions<TData = UserToMultiSigSignersDat
 export type UseInfoUserToMultiSigSignersReturnType<TData = UserToMultiSigSignersData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getUserToMultiSigSignersQueryOptions(
 	info: InfoClient,
@@ -44,8 +42,5 @@ export function useInfoUserToMultiSigSigners<TData = UserToMultiSigSignersData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

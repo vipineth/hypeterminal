@@ -10,9 +10,7 @@ type TwapHistoryParams = TwapHistoryParameters;
 
 export type UseInfoTwapHistoryParameters = TwapHistoryParams;
 export type UseInfoTwapHistoryOptions<TData = TwapHistoryData> = QueryParameter<TwapHistoryData, TData>;
-export type UseInfoTwapHistoryReturnType<TData = TwapHistoryData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoTwapHistoryReturnType<TData = TwapHistoryData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getTwapHistoryQueryOptions(info: InfoClient, params: TwapHistoryParams): QueryOptions<TwapHistoryData> {
 	return {
@@ -35,8 +33,5 @@ export function useInfoTwapHistory<TData = TwapHistoryData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

@@ -10,9 +10,7 @@ type LeadingVaultsParams = LeadingVaultsParameters;
 
 export type UseInfoLeadingVaultsParameters = LeadingVaultsParams;
 export type UseInfoLeadingVaultsOptions<TData = LeadingVaultsData> = QueryParameter<LeadingVaultsData, TData>;
-export type UseInfoLeadingVaultsReturnType<TData = LeadingVaultsData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoLeadingVaultsReturnType<TData = LeadingVaultsData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getLeadingVaultsQueryOptions(
 	info: InfoClient,
@@ -38,8 +36,5 @@ export function useInfoLeadingVaults<TData = LeadingVaultsData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

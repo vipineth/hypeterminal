@@ -1,6 +1,6 @@
 import type { BatchModifyParameters, BatchModifySuccessResponse, ExchangeClient } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { MissingWalletError } from "../../errors";
+import { assertExchange } from "../../errors";
 import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
@@ -15,18 +15,14 @@ export type UseExchangeBatchModifyReturnType = UseMutationResult<
 	BatchModifyParams
 >;
 
-interface BatchModifyMutationContext {
-	exchange: ExchangeClient | null;
-}
-
 export function getBatchModifyMutationOptions(
-	context: BatchModifyMutationContext,
+	exchange: ExchangeClient | null,
 ): MutationOptions<BatchModifyData, BatchModifyParams> {
 	return {
 		mutationKey: createMutationKey("batchModify"),
 		mutationFn: (params) => {
-			if (!context.exchange) throw new MissingWalletError();
-			return context.exchange.batchModify(params);
+			assertExchange(exchange);
+			return exchange.batchModify(params);
 		},
 	};
 }
@@ -34,5 +30,5 @@ export function getBatchModifyMutationOptions(
 export function useExchangeBatchModify(options: UseExchangeBatchModifyOptions = {}): UseExchangeBatchModifyReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getBatchModifyMutationOptions({ exchange })));
+	return useMutation(mergeMutationOptions(options, getBatchModifyMutationOptions(exchange)));
 }

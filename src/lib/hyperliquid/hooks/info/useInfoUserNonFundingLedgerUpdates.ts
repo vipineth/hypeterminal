@@ -20,9 +20,7 @@ export type UseInfoUserNonFundingLedgerUpdatesOptions<TData = UserNonFundingLedg
 export type UseInfoUserNonFundingLedgerUpdatesReturnType<TData = UserNonFundingLedgerUpdatesData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getUserNonFundingLedgerUpdatesQueryOptions(
 	info: InfoClient,
@@ -48,8 +46,5 @@ export function useInfoUserNonFundingLedgerUpdates<TData = UserNonFundingLedgerU
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

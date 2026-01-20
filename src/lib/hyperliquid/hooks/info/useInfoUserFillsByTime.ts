@@ -13,9 +13,7 @@ export type UseInfoUserFillsByTimeOptions<TData = UserFillsByTimeData> = QueryPa
 export type UseInfoUserFillsByTimeReturnType<TData = UserFillsByTimeData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getUserFillsByTimeQueryOptions(
 	info: InfoClient,
@@ -41,8 +39,5 @@ export function useInfoUserFillsByTime<TData = UserFillsByTimeData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

@@ -10,9 +10,7 @@ type DelegationsParams = DelegationsParameters;
 
 export type UseInfoDelegationsParameters = DelegationsParams;
 export type UseInfoDelegationsOptions<TData = DelegationsData> = QueryParameter<DelegationsData, TData>;
-export type UseInfoDelegationsReturnType<TData = DelegationsData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoDelegationsReturnType<TData = DelegationsData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getDelegationsQueryOptions(info: InfoClient, params: DelegationsParams): QueryOptions<DelegationsData> {
 	return {
@@ -35,8 +33,5 @@ export function useInfoDelegations<TData = DelegationsData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

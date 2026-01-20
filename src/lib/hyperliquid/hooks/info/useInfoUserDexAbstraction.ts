@@ -16,9 +16,7 @@ export type UseInfoUserDexAbstractionOptions<TData = UserDexAbstractionData> = Q
 export type UseInfoUserDexAbstractionReturnType<TData = UserDexAbstractionData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getUserDexAbstractionQueryOptions(
 	info: InfoClient,
@@ -44,8 +42,5 @@ export function useInfoUserDexAbstraction<TData = UserDexAbstractionData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

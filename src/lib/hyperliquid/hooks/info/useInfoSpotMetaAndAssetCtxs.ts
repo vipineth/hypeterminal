@@ -14,9 +14,7 @@ export type UseInfoSpotMetaAndAssetCtxsOptions<TData = SpotMetaAndAssetCtxsData>
 export type UseInfoSpotMetaAndAssetCtxsReturnType<TData = SpotMetaAndAssetCtxsData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getSpotMetaAndAssetCtxsQueryOptions(info: InfoClient): QueryOptions<SpotMetaAndAssetCtxsData> {
 	return {
@@ -36,8 +34,5 @@ export function useInfoSpotMetaAndAssetCtxs<TData = SpotMetaAndAssetCtxsData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

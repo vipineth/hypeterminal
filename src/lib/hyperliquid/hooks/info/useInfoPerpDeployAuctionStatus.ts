@@ -14,9 +14,7 @@ export type UseInfoPerpDeployAuctionStatusOptions<TData = PerpDeployAuctionStatu
 export type UseInfoPerpDeployAuctionStatusReturnType<TData = PerpDeployAuctionStatusData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getPerpDeployAuctionStatusQueryOptions(info: InfoClient): QueryOptions<PerpDeployAuctionStatusData> {
 	return {
@@ -36,8 +34,5 @@ export function useInfoPerpDeployAuctionStatus<TData = PerpDeployAuctionStatusDa
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

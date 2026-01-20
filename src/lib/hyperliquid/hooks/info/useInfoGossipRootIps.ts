@@ -8,9 +8,7 @@ import type { HyperliquidQueryError, QueryParameter } from "../../types";
 type GossipRootIpsData = GossipRootIpsResponse;
 
 export type UseInfoGossipRootIpsOptions<TData = GossipRootIpsData> = QueryParameter<GossipRootIpsData, TData>;
-export type UseInfoGossipRootIpsReturnType<TData = GossipRootIpsData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoGossipRootIpsReturnType<TData = GossipRootIpsData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getGossipRootIpsQueryOptions(info: InfoClient): QueryOptions<GossipRootIpsData> {
 	return {
@@ -30,8 +28,5 @@ export function useInfoGossipRootIps<TData = GossipRootIpsData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

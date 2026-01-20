@@ -11,9 +11,7 @@ export type UseInfoValidatorL1VotesOptions<TData = ValidatorL1VotesData> = Query
 export type UseInfoValidatorL1VotesReturnType<TData = ValidatorL1VotesData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getValidatorL1VotesQueryOptions(info: InfoClient): QueryOptions<ValidatorL1VotesData> {
 	return {
@@ -33,8 +31,5 @@ export function useInfoValidatorL1Votes<TData = ValidatorL1VotesData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

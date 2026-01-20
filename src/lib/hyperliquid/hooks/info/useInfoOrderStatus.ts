@@ -10,9 +10,7 @@ type OrderStatusParams = OrderStatusParameters;
 
 export type UseInfoOrderStatusParameters = OrderStatusParams;
 export type UseInfoOrderStatusOptions<TData = OrderStatusData> = QueryParameter<OrderStatusData, TData>;
-export type UseInfoOrderStatusReturnType<TData = OrderStatusData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoOrderStatusReturnType<TData = OrderStatusData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getOrderStatusQueryOptions(info: InfoClient, params: OrderStatusParams): QueryOptions<OrderStatusData> {
 	return {
@@ -35,8 +33,5 @@ export function useInfoOrderStatus<TData = OrderStatusData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

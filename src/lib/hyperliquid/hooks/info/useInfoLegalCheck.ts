@@ -10,9 +10,7 @@ type LegalCheckParams = LegalCheckParameters;
 
 export type UseInfoLegalCheckParameters = LegalCheckParams;
 export type UseInfoLegalCheckOptions<TData = LegalCheckData> = QueryParameter<LegalCheckData, TData>;
-export type UseInfoLegalCheckReturnType<TData = LegalCheckData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoLegalCheckReturnType<TData = LegalCheckData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getLegalCheckQueryOptions(info: InfoClient, params: LegalCheckParams): QueryOptions<LegalCheckData> {
 	return {
@@ -35,8 +33,5 @@ export function useInfoLegalCheck<TData = LegalCheckData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

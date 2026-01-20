@@ -13,9 +13,7 @@ export type UseInfoSpotDeployStateOptions<TData = SpotDeployStateData> = QueryPa
 export type UseInfoSpotDeployStateReturnType<TData = SpotDeployStateData> = UseQueryResult<
 	TData,
 	HyperliquidQueryError
-> & {
-	queryKey: readonly unknown[];
-};
+>;
 
 export function getSpotDeployStateQueryOptions(
 	info: InfoClient,
@@ -41,8 +39,5 @@ export function useInfoSpotDeployState<TData = SpotDeployStateData>(
 		enabled,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

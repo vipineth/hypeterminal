@@ -8,9 +8,7 @@ import type { HyperliquidQueryError, QueryParameter } from "../../types";
 type AllPerpMetasData = AllPerpMetasResponse;
 
 export type UseInfoAllPerpMetasOptions<TData = AllPerpMetasData> = QueryParameter<AllPerpMetasData, TData>;
-export type UseInfoAllPerpMetasReturnType<TData = AllPerpMetasData> = UseQueryResult<TData, HyperliquidQueryError> & {
-	queryKey: readonly unknown[];
-};
+export type UseInfoAllPerpMetasReturnType<TData = AllPerpMetasData> = UseQueryResult<TData, HyperliquidQueryError>;
 
 export function getAllPerpMetasQueryOptions(info: InfoClient): QueryOptions<AllPerpMetasData> {
 	return {
@@ -30,8 +28,5 @@ export function useInfoAllPerpMetas<TData = AllPerpMetasData>(
 		...queryOptions,
 	});
 
-	return {
-		...query,
-		queryKey: queryOptions.queryKey,
-	};
+	return query;
 }

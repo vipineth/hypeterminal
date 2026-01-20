@@ -1,6 +1,6 @@
 import type { CValidatorActionParameters, CValidatorActionSuccessResponse, ExchangeClient } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { MissingWalletError } from "../../errors";
+import { assertExchange } from "../../errors";
 import { createMutationKey, type MutationOptions, mergeMutationOptions } from "../../query/mutation-options";
 import type { HyperliquidQueryError, MutationParameter } from "../../types";
 import { useHyperliquidClients } from "../useClients";
@@ -15,18 +15,14 @@ export type UseExchangeCValidatorActionReturnType = UseMutationResult<
 	CValidatorActionParams
 >;
 
-interface CValidatorActionMutationContext {
-	exchange: ExchangeClient | null;
-}
-
 export function getCValidatorActionMutationOptions(
-	context: CValidatorActionMutationContext,
+	exchange: ExchangeClient | null,
 ): MutationOptions<CValidatorActionData, CValidatorActionParams> {
 	return {
 		mutationKey: createMutationKey("cValidatorAction"),
 		mutationFn: (params) => {
-			if (!context.exchange) throw new MissingWalletError();
-			return context.exchange.cValidatorAction(params);
+			assertExchange(exchange);
+			return exchange.cValidatorAction(params);
 		},
 	};
 }
@@ -36,5 +32,5 @@ export function useExchangeCValidatorAction(
 ): UseExchangeCValidatorActionReturnType {
 	const { exchange } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getCValidatorActionMutationOptions({ exchange })));
+	return useMutation(mergeMutationOptions(options, getCValidatorActionMutationOptions(exchange)));
 }
