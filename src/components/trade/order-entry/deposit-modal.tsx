@@ -169,6 +169,276 @@ function StatusScreen({
 	);
 }
 
+interface DepositFormProps {
+	amount: string;
+	onAmountChange: (value: string) => void;
+	balance: string;
+	validation: { valid: boolean; error: string | null };
+	isPending: boolean;
+	onSubmit: () => void;
+}
+
+function DepositForm({ amount, onAmountChange, balance, validation, isPending, onSubmit }: DepositFormProps) {
+	const [network, setNetwork] = useState<NetworkId>("arbitrum");
+
+	return (
+		<div className="space-y-4">
+			<NetworkSelect label={<Trans>From</Trans>} value={network} onChange={setNetwork} />
+
+			<div className="space-y-1.5">
+				<div className="flex items-center justify-between">
+					<span className="text-4xs uppercase tracking-wider text-muted-foreground">
+						<Trans>Amount</Trans>
+					</span>
+					<Button
+						type="button"
+						variant="link"
+						size="none"
+						onClick={() => onAmountChange(balance)}
+						className="h-auto p-0 text-3xs text-muted-foreground hover:text-foreground"
+					>
+						<Trans>Balance:</Trans>{" "}
+						<span className="tabular-nums text-foreground font-medium">{formatNumber(balance, 2)}</span>{" "}
+						<span className="text-terminal-cyan">USDC</span>
+					</Button>
+				</div>
+				<div className="flex items-center gap-1">
+					<NumberInput
+						placeholder="0.00"
+						value={amount}
+						onChange={(e) => onAmountChange(e.target.value)}
+						className={cn(
+							"flex-1 h-10 text-base bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums font-medium",
+							validation.error && "border-terminal-red focus:border-terminal-red",
+						)}
+					/>
+					<Button
+						variant="ghost"
+						size="none"
+						onClick={() => onAmountChange(balance)}
+						className="h-10 px-3 text-3xs border border-border/60 hover:border-terminal-cyan/40 hover:bg-terminal-cyan/5 hover:text-terminal-cyan transition-colors"
+					>
+						{t`MAX`}
+					</Button>
+				</div>
+				{validation.error && (
+					<p className="text-4xs text-terminal-red flex items-center gap-1">
+						<AlertCircle className="size-3" />
+						{validation.error}
+					</p>
+				)}
+			</div>
+
+			<div className="rounded-lg border border-border/40 bg-muted/10 p-3 space-y-2">
+				<InfoRow
+					label={<Trans>Minimum</Trans>}
+					value={<span className="tabular-nums">{formatUnits(MIN_DEPOSIT_USDC, USDC_DECIMALS)} USDC</span>}
+					icon={<Wallet className="size-3" />}
+				/>
+				<InfoRow
+					label={<Trans>Estimated time</Trans>}
+					value={<span className="tabular-nums">~1 min</span>}
+					icon={<Clock className="size-3" />}
+					highlight
+				/>
+			</div>
+
+			<Button variant="terminal" onClick={onSubmit} disabled={!validation.valid || isPending} className="w-full">
+				{isPending ? (
+					<>
+						<Loader2 className="size-4 animate-spin" />
+						<Trans>Processing...</Trans>
+					</>
+				) : (
+					<>
+						<ArrowDownToLine className="size-4" />
+						<Trans>Deposit</Trans>
+					</>
+				)}
+			</Button>
+		</div>
+	);
+}
+
+interface WithdrawFormProps {
+	amount: string;
+	onAmountChange: (value: string) => void;
+	available: string;
+	balanceStatus: string;
+	validation: { valid: boolean; error: string | null };
+	isPending: boolean;
+	onSubmit: () => void;
+}
+
+function WithdrawForm({
+	amount,
+	onAmountChange,
+	available,
+	balanceStatus,
+	validation,
+	isPending,
+	onSubmit,
+}: WithdrawFormProps) {
+	const [network, setNetwork] = useState<NetworkId>("arbitrum");
+
+	return (
+		<div className="space-y-4">
+			<NetworkSelect label={<Trans>To</Trans>} value={network} onChange={setNetwork} disabled={isPending} />
+
+			<div className="space-y-1.5">
+				<div className="flex items-center justify-between">
+					<span className="text-4xs uppercase tracking-wider text-muted-foreground">
+						<Trans>Amount</Trans>
+					</span>
+					<Button
+						type="button"
+						variant="link"
+						size="none"
+						onClick={() => !isPending && onAmountChange(available)}
+						disabled={isPending}
+						className="h-auto p-0 text-3xs text-muted-foreground hover:text-foreground disabled:opacity-50"
+					>
+						{balanceStatus === "subscribing" ? (
+							<Trans>Loading...</Trans>
+						) : (
+							<>
+								<Trans>Available:</Trans>{" "}
+								<span className="tabular-nums text-foreground font-medium">${formatNumber(available, 2)}</span>
+							</>
+						)}
+					</Button>
+				</div>
+				<div className="flex items-center gap-1">
+					<NumberInput
+						placeholder="0.00"
+						value={amount}
+						onChange={(e) => onAmountChange(e.target.value)}
+						disabled={isPending}
+						className={cn(
+							"flex-1 h-10 text-base bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums font-medium",
+							validation.error && "border-terminal-red focus:border-terminal-red",
+						)}
+					/>
+					<Button
+						variant="ghost"
+						size="none"
+						onClick={() => !isPending && onAmountChange(available)}
+						disabled={isPending}
+						className="h-10 px-3 text-3xs border border-border/60 hover:border-terminal-cyan/40 hover:bg-terminal-cyan/5 hover:text-terminal-cyan transition-colors disabled:opacity-50"
+					>
+						{t`MAX`}
+					</Button>
+				</div>
+				{validation.error && (
+					<p className="text-4xs text-terminal-red flex items-center gap-1">
+						<AlertCircle className="size-3" />
+						{validation.error}
+					</p>
+				)}
+			</div>
+
+			<div className="rounded-lg border border-border/40 bg-muted/10 p-3 space-y-2">
+				<InfoRow
+					label={<Trans>Network fee</Trans>}
+					value={<span className="tabular-nums">${WITHDRAWAL_FEE_USD}</span>}
+					icon={<Wallet className="size-3" />}
+				/>
+				<InfoRow
+					label={<Trans>Minimum</Trans>}
+					value={<span className="tabular-nums">${MIN_WITHDRAW_USD}</span>}
+					icon={<ArrowUpFromLine className="size-3" />}
+				/>
+				<InfoRow
+					label={<Trans>Estimated time</Trans>}
+					value={<span className="tabular-nums">~3 min</span>}
+					icon={<Clock className="size-3" />}
+					highlight
+				/>
+			</div>
+
+			<Button variant="terminal" onClick={onSubmit} disabled={!validation.valid || isPending} className="w-full">
+				{isPending ? (
+					<>
+						<Loader2 className="size-4 animate-spin" />
+						<Trans>Processing...</Trans>
+					</>
+				) : (
+					<>
+						<ArrowUpFromLine className="size-4" />
+						<Trans>Withdraw</Trans>
+					</>
+				)}
+			</Button>
+		</div>
+	);
+}
+
+function WalletNotConnected() {
+	return (
+		<div className="flex flex-col items-center gap-4 py-8">
+			<div className="flex size-12 items-center justify-center rounded-full bg-muted/30 border border-border/40">
+				<Wallet className="size-6 text-muted-foreground" />
+			</div>
+			<div className="text-center space-y-1">
+				<p className="text-sm font-medium">
+					<Trans>Wallet not connected</Trans>
+				</p>
+				<p className="text-3xs text-muted-foreground">
+					<Trans>Connect your wallet to withdraw funds</Trans>
+				</p>
+			</div>
+		</div>
+	);
+}
+
+interface WrongNetworkScreenProps {
+	open: boolean;
+	onClose: () => void;
+	onSwitch: () => void;
+	isSwitching: boolean;
+	error?: Error | null;
+}
+
+function WrongNetworkScreen({ open, onClose, onSwitch, isSwitching, error }: WrongNetworkScreenProps) {
+	return (
+		<Dialog open={open} onOpenChange={onClose}>
+			<DialogContent className="sm:max-w-md">
+				<DialogHeader>
+					<DialogTitle>
+						<Trans>Transfer</Trans>
+					</DialogTitle>
+				</DialogHeader>
+				<div className="space-y-4 py-2">
+					<div className="flex items-start gap-3 rounded-lg border border-terminal-amber/40 bg-terminal-amber/5 p-4">
+						<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-terminal-amber/20">
+							<AlertCircle className="size-4 text-terminal-amber" />
+						</div>
+						<div className="space-y-1">
+							<p className="text-sm font-medium">
+								<Trans>Wrong network</Trans>
+							</p>
+							<p className="text-3xs text-muted-foreground">
+								<Trans>Switch to Arbitrum to deposit USDC to Hyperliquid</Trans>
+							</p>
+						</div>
+					</div>
+					{error && <p className="text-3xs text-terminal-red px-1">{error.message}</p>}
+					<Button onClick={onSwitch} disabled={isSwitching} className="w-full">
+						{isSwitching ? (
+							<>
+								<Loader2 className="size-4 animate-spin" />
+								<Trans>Switching...</Trans>
+							</>
+						) : (
+							<Trans>Switch to Arbitrum</Trans>
+						)}
+					</Button>
+				</div>
+			</DialogContent>
+		</Dialog>
+	);
+}
+
 export function DepositModal() {
 	const open = useDepositModalOpen();
 	const activeTab = useDepositModalTab();
@@ -176,8 +446,6 @@ export function DepositModal() {
 
 	const [depositAmount, setDepositAmount] = useState("");
 	const [withdrawAmount, setWithdrawAmount] = useState("");
-	const [depositNetwork, setDepositNetwork] = useState<NetworkId>("arbitrum");
-	const [withdrawNetwork, setWithdrawNetwork] = useState<NetworkId>("arbitrum");
 
 	const {
 		isArbitrum,
@@ -209,46 +477,6 @@ export function DepositModal() {
 	const depositValidation = validateDepositAmount(depositAmount);
 	const withdrawValidation = validateWithdrawAmount(withdrawAmount);
 
-	function handleDepositAmountChange(event: React.ChangeEvent<HTMLInputElement>) {
-		setDepositAmount(event.target.value);
-	}
-
-	function handleWithdrawAmountChange(event: React.ChangeEvent<HTMLInputElement>) {
-		setWithdrawAmount(event.target.value);
-	}
-
-	function handleTabChange(tab: "deposit" | "withdraw") {
-		setTab(tab);
-	}
-
-	function handleSetDepositMax() {
-		setDepositAmount(depositBalance);
-	}
-
-	function handleSetWithdrawMax() {
-		if (isWithdrawPending) {
-			return;
-		}
-
-		setWithdrawAmount(withdrawable);
-	}
-
-	function handleDepositSubmit() {
-		if (!depositValidation.valid) {
-			return;
-		}
-
-		startDeposit(depositAmount);
-	}
-
-	function handleWithdrawSubmit() {
-		if (!withdrawValidation.valid || !address) {
-			return;
-		}
-
-		startWithdraw(withdrawAmount, address);
-	}
-
 	function handleClose() {
 		resetDeposit();
 		resetWithdraw();
@@ -257,46 +485,32 @@ export function DepositModal() {
 		close();
 	}
 
+	function handleDepositSubmit() {
+		if (depositValidation.valid) {
+			startDeposit(depositAmount);
+		}
+	}
+
+	function handleWithdrawSubmit() {
+		if (withdrawValidation.valid && address) {
+			startWithdraw(withdrawAmount, address);
+		}
+	}
+
+	// Wrong network state
 	if (!isArbitrum && activeTab === "deposit") {
 		return (
-			<Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
-				<DialogContent className="sm:max-w-md">
-					<DialogHeader>
-						<DialogTitle>
-							<Trans>Transfer</Trans>
-						</DialogTitle>
-					</DialogHeader>
-					<div className="space-y-4 py-2">
-						<div className="flex items-start gap-3 rounded-lg border border-terminal-amber/40 bg-terminal-amber/5 p-4">
-							<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-terminal-amber/20">
-								<AlertCircle className="size-4 text-terminal-amber" />
-							</div>
-							<div className="space-y-1">
-								<p className="text-sm font-medium">
-									<Trans>Wrong network</Trans>
-								</p>
-								<p className="text-3xs text-muted-foreground">
-									<Trans>Switch to Arbitrum to deposit USDC to Hyperliquid</Trans>
-								</p>
-							</div>
-						</div>
-						{switchError && <p className="text-3xs text-terminal-red px-1">{switchError.message}</p>}
-						<Button onClick={switchToArbitrum} disabled={isSwitching} className="w-full">
-							{isSwitching ? (
-								<>
-									<Loader2 className="size-4 animate-spin" />
-									<Trans>Switching...</Trans>
-								</>
-							) : (
-								<Trans>Switch to Arbitrum</Trans>
-							)}
-						</Button>
-					</div>
-				</DialogContent>
-			</Dialog>
+			<WrongNetworkScreen
+				open={open}
+				onClose={handleClose}
+				onSwitch={switchToArbitrum}
+				isSwitching={isSwitching}
+				error={switchError}
+			/>
 		);
 	}
 
+	// Deposit status screens
 	if (depositStep === "success") {
 		return (
 			<StatusScreen
@@ -353,6 +567,7 @@ export function DepositModal() {
 		);
 	}
 
+	// Withdraw status screens
 	if (isWithdrawSuccess) {
 		return (
 			<StatusScreen
@@ -395,8 +610,9 @@ export function DepositModal() {
 		);
 	}
 
+	// Main form
 	return (
-		<Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
+		<Dialog open={open} onOpenChange={handleClose}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle>
@@ -404,11 +620,7 @@ export function DepositModal() {
 					</DialogTitle>
 				</DialogHeader>
 
-				<Tabs
-					value={activeTab}
-					onValueChange={(v) => handleTabChange(v as "deposit" | "withdraw")}
-					className="space-y-4"
-				>
+				<Tabs value={activeTab} onValueChange={(v) => setTab(v as "deposit" | "withdraw")} className="space-y-4">
 					<TabsList className="w-full grid grid-cols-2 p-1 bg-muted/30 rounded-lg border border-border/40">
 						<TabsTrigger
 							value="deposit"
@@ -436,203 +648,30 @@ export function DepositModal() {
 						</TabsTrigger>
 					</TabsList>
 
-					<TabsContent value="deposit" className="space-y-4">
-						<NetworkSelect label={<Trans>From</Trans>} value={depositNetwork} onChange={setDepositNetwork} />
-
-						<div className="space-y-1.5">
-							<div className="flex items-center justify-between">
-								<span className="text-4xs uppercase tracking-wider text-muted-foreground">
-									<Trans>Amount</Trans>
-								</span>
-								<Button
-									type="button"
-									variant="link"
-									size="none"
-									onClick={handleSetDepositMax}
-									className="h-auto p-0 text-3xs text-muted-foreground hover:text-foreground"
-								>
-									<Trans>Balance:</Trans>{" "}
-									<span className="tabular-nums text-foreground font-medium">{formatNumber(depositBalance, 2)}</span>{" "}
-									<span className="text-terminal-cyan">USDC</span>
-								</Button>
-							</div>
-							<div className="flex items-center gap-1">
-								<NumberInput
-									placeholder="0.00"
-									value={depositAmount}
-									onChange={handleDepositAmountChange}
-									className={cn(
-										"flex-1 h-10 text-base bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums font-medium",
-										depositValidation.error && "border-terminal-red focus:border-terminal-red",
-									)}
-								/>
-								<Button
-									variant="ghost"
-									size="none"
-									onClick={handleSetDepositMax}
-									className="h-10 px-3 text-3xs border border-border/60 hover:border-terminal-cyan/40 hover:bg-terminal-cyan/5 hover:text-terminal-cyan transition-colors"
-								>
-									{t`MAX`}
-								</Button>
-							</div>
-							{depositValidation.error && (
-								<p className="text-4xs text-terminal-red flex items-center gap-1">
-									<AlertCircle className="size-3" />
-									{depositValidation.error}
-								</p>
-							)}
-						</div>
-
-						<div className="rounded-lg border border-border/40 bg-muted/10 p-3 space-y-2">
-							<InfoRow
-								label={<Trans>Minimum</Trans>}
-								value={<span className="tabular-nums">{formatUnits(MIN_DEPOSIT_USDC, USDC_DECIMALS)} USDC</span>}
-								icon={<Wallet className="size-3" />}
-							/>
-							<InfoRow
-								label={<Trans>Estimated time</Trans>}
-								value={<span className="tabular-nums">~1 min</span>}
-								icon={<Clock className="size-3" />}
-								highlight
-							/>
-						</div>
-
-						<Button
-							variant="terminal"
-							onClick={handleDepositSubmit}
-							disabled={!depositValidation.valid || isDepositPending}
-							className="w-full"
-						>
-							{isDepositPending ? (
-								<>
-									<Loader2 className="size-4 animate-spin" />
-									<Trans>Processing...</Trans>
-								</>
-							) : (
-								<>
-									<ArrowDownToLine className="size-4" />
-									<Trans>Deposit</Trans>
-								</>
-							)}
-						</Button>
+					<TabsContent value="deposit">
+						<DepositForm
+							amount={depositAmount}
+							onAmountChange={setDepositAmount}
+							balance={depositBalance}
+							validation={depositValidation}
+							isPending={isDepositPending}
+							onSubmit={handleDepositSubmit}
+						/>
 					</TabsContent>
 
-					<TabsContent value="withdraw" className="space-y-4">
+					<TabsContent value="withdraw">
 						{!address ? (
-							<div className="flex flex-col items-center gap-4 py-8">
-								<div className="flex size-12 items-center justify-center rounded-full bg-muted/30 border border-border/40">
-									<Wallet className="size-6 text-muted-foreground" />
-								</div>
-								<div className="text-center space-y-1">
-									<p className="text-sm font-medium">
-										<Trans>Wallet not connected</Trans>
-									</p>
-									<p className="text-3xs text-muted-foreground">
-										<Trans>Connect your wallet to withdraw funds</Trans>
-									</p>
-								</div>
-							</div>
+							<WalletNotConnected />
 						) : (
-							<>
-								<NetworkSelect
-									label={<Trans>To</Trans>}
-									value={withdrawNetwork}
-									onChange={setWithdrawNetwork}
-									disabled={isWithdrawPending}
-								/>
-
-								<div className="space-y-1.5">
-									<div className="flex items-center justify-between">
-										<span className="text-4xs uppercase tracking-wider text-muted-foreground">
-											<Trans>Amount</Trans>
-										</span>
-										<Button
-											type="button"
-											variant="link"
-											size="none"
-											onClick={handleSetWithdrawMax}
-											disabled={isWithdrawPending}
-											className="h-auto p-0 text-3xs text-muted-foreground hover:text-foreground disabled:opacity-50"
-										>
-											{balanceStatus === "subscribing" ? (
-												<Trans>Loading...</Trans>
-											) : (
-												<>
-													<Trans>Available:</Trans>{" "}
-													<span className="tabular-nums text-foreground font-medium">
-														${formatNumber(withdrawable, 2)}
-													</span>
-												</>
-											)}
-										</Button>
-									</div>
-									<div className="flex items-center gap-1">
-										<NumberInput
-											placeholder="0.00"
-											value={withdrawAmount}
-											onChange={handleWithdrawAmountChange}
-											disabled={isWithdrawPending}
-											className={cn(
-												"flex-1 h-10 text-base bg-background/50 border-border/60 focus:border-terminal-cyan/60 tabular-nums font-medium",
-												withdrawValidation.error && "border-terminal-red focus:border-terminal-red",
-											)}
-										/>
-										<Button
-											variant="ghost"
-											size="none"
-											onClick={handleSetWithdrawMax}
-											disabled={isWithdrawPending}
-											className="h-10 px-3 text-3xs border border-border/60 hover:border-terminal-cyan/40 hover:bg-terminal-cyan/5 hover:text-terminal-cyan transition-colors disabled:opacity-50"
-										>
-											{t`MAX`}
-										</Button>
-									</div>
-									{withdrawValidation.error && (
-										<p className="text-4xs text-terminal-red flex items-center gap-1">
-											<AlertCircle className="size-3" />
-											{withdrawValidation.error}
-										</p>
-									)}
-								</div>
-
-								<div className="rounded-lg border border-border/40 bg-muted/10 p-3 space-y-2">
-									<InfoRow
-										label={<Trans>Network fee</Trans>}
-										value={<span className="tabular-nums">${WITHDRAWAL_FEE_USD}</span>}
-										icon={<Wallet className="size-3" />}
-									/>
-									<InfoRow
-										label={<Trans>Minimum</Trans>}
-										value={<span className="tabular-nums">${MIN_WITHDRAW_USD}</span>}
-										icon={<ArrowUpFromLine className="size-3" />}
-									/>
-									<InfoRow
-										label={<Trans>Estimated time</Trans>}
-										value={<span className="tabular-nums">~3 min</span>}
-										icon={<Clock className="size-3" />}
-										highlight
-									/>
-								</div>
-
-								<Button
-									variant="terminal"
-									onClick={handleWithdrawSubmit}
-									disabled={!withdrawValidation.valid || isWithdrawPending}
-									className="w-full"
-								>
-									{isWithdrawPending ? (
-										<>
-											<Loader2 className="size-4 animate-spin" />
-											<Trans>Processing...</Trans>
-										</>
-									) : (
-										<>
-											<ArrowUpFromLine className="size-4" />
-											<Trans>Withdraw</Trans>
-										</>
-									)}
-								</Button>
-							</>
+							<WithdrawForm
+								amount={withdrawAmount}
+								onAmountChange={setWithdrawAmount}
+								available={withdrawable}
+								balanceStatus={balanceStatus}
+								validation={withdrawValidation}
+								isPending={isWithdrawPending}
+								onSubmit={handleWithdrawSubmit}
+							/>
 						)}
 					</TabsContent>
 				</Tabs>

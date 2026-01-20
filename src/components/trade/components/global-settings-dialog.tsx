@@ -21,13 +21,11 @@ import {
 	useGlobalSettingsActions,
 	useMarketOrderSlippageBps,
 } from "@/stores/use-global-settings-store";
+import { useSettingsDialogActions, useSettingsDialogOpen } from "@/stores/use-settings-dialog-store";
 
-interface GlobalSettingsDialogProps {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
-}
-
-export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialogProps) {
+export function GlobalSettingsDialog() {
+	const open = useSettingsDialogOpen();
+	const { close } = useSettingsDialogActions();
 	const { i18n } = useLingui();
 	const slippageBps = useMarketOrderSlippageBps();
 	const {
@@ -91,7 +89,7 @@ export function GlobalSettingsDialog({ open, onOpenChange }: GlobalSettingsDialo
 	};
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
+		<Dialog open={open} onOpenChange={close}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle>{t`Settings`}</DialogTitle>

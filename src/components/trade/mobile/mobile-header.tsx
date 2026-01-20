@@ -1,9 +1,8 @@
 import { Bell, Cog, Terminal } from "lucide-react";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { UI_TEXT } from "@/config/constants";
 import { cn } from "@/lib/cn";
-import { GlobalSettingsDialog } from "../components/global-settings-dialog";
+import { useSettingsDialogActions } from "@/stores/use-settings-dialog-store";
 import { ThemeToggle } from "../header/theme-toggle";
 import { UserMenu } from "../header/user-menu";
 
@@ -14,7 +13,7 @@ interface Props {
 }
 
 export function MobileHeader({ className }: Props) {
-	const [settingsOpen, setSettingsOpen] = useState(false);
+	const { open: openSettingsDialog } = useSettingsDialogActions();
 
 	return (
 		<header
@@ -52,14 +51,12 @@ export function MobileHeader({ className }: Props) {
 						size="icon-lg"
 						className="size-11 active:bg-accent/50"
 						aria-label={TOP_NAV_TEXT.SETTINGS_ARIA}
-						onClick={() => setSettingsOpen(true)}
+						onClick={openSettingsDialog}
 					>
 						<Cog className="size-4" />
 					</Button>
 				</div>
 			</div>
-
-			<GlobalSettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
 		</header>
 	);
 }

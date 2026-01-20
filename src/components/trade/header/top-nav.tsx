@@ -1,7 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { Bell, ChevronDown, Cog, Terminal, Zap } from "lucide-react";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -11,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/cn";
 import { useDepositModalActions } from "@/stores/use-deposit-modal-store";
-import { GlobalSettingsDialog } from "../components/global-settings-dialog";
+import { useSettingsDialogActions } from "@/stores/use-settings-dialog-store";
 import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
 
@@ -30,8 +29,8 @@ const MORE_MENU_ITEMS = [
 ] as const;
 
 export function TopNav() {
-	const [settingsOpen, setSettingsOpen] = useState(false);
 	const { open: openDepositModal } = useDepositModalActions();
+	const { open: openSettingsDialog } = useSettingsDialogActions();
 
 	return (
 		<header className="fixed top-0 left-0 right-0 z-40 h-11 border-b border-border/60 px-2 flex items-center justify-between bg-surface">
@@ -102,12 +101,11 @@ export function TopNav() {
 					size="icon-sm"
 					className="size-7"
 					aria-label={t`Settings`}
-					onClick={() => setSettingsOpen(true)}
+					onClick={openSettingsDialog}
 				>
 					<Cog className="size-3.5" />
 				</Button>
 			</div>
-			<GlobalSettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
 		</header>
 	);
 }

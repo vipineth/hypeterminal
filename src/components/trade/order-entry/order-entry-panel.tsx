@@ -47,6 +47,7 @@ import { useButtonContent } from "@/lib/trade/use-button-content";
 import { useOrderValidation } from "@/lib/trade/use-order-validation";
 import { useDepositModalActions } from "@/stores/use-deposit-modal-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
+import { useSettingsDialogActions } from "@/stores/use-settings-dialog-store";
 import {
 	useLimitPrice,
 	useOrderEntryActions,
@@ -68,7 +69,6 @@ import {
 } from "@/stores/use-order-entry-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
-import { GlobalSettingsDialog } from "../components/global-settings-dialog";
 import { WalletDialog } from "../components/wallet-dialog";
 import { AdvancedOrderDropdown } from "./advanced-order-dropdown";
 import { LeverageControl, useAssetLeverage } from "./leverage-control";
@@ -188,6 +188,7 @@ export function OrderEntryPanel() {
 	const [activeDialog, setActiveDialog] = useState<ActiveDialog>(null);
 
 	const { open: openDepositModal } = useDepositModalActions();
+	const { open: openSettingsDialog } = useSettingsDialogActions();
 
 	useEffect(() => {
 		if (selectedPrice !== null) {
@@ -863,15 +864,11 @@ export function OrderEntryPanel() {
 					estimatedFee={estimatedFee}
 					slippageBps={slippageBps}
 					szDecimals={market?.szDecimals}
-					onSlippageClick={() => setActiveDialog("settings")}
+					onSlippageClick={openSettingsDialog}
 				/>
 			</div>
 
 			<WalletDialog open={activeDialog === "wallet"} onOpenChange={(open) => setActiveDialog(open ? "wallet" : null)} />
-			<GlobalSettingsDialog
-				open={activeDialog === "settings"}
-				onOpenChange={(open) => setActiveDialog(open ? "settings" : null)}
-			/>
 
 			<OrderToast />
 		</div>
