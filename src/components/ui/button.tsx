@@ -11,7 +11,7 @@ const buttonVariants = cva(
 				default: "bg-primary text-primary-fg hover:bg-primary/90 rounded-md font-medium",
 				destructive: "bg-danger text-danger-fg hover:bg-danger/90 rounded-md font-medium",
 				outline: "border border-border/60 bg-bg hover:bg-accent hover:text-accent-fg rounded-md",
-				ghost: "hover:bg-accent hover:text-accent-fg",
+				ghost: "hover:bg-accent",
 				terminal: "border border-info/40 hover:bg-info/40",
 				danger: "border border-border/60 hover:border-negative/60 hover:text-negative",
 				link: "hover:underline hover:text-info",

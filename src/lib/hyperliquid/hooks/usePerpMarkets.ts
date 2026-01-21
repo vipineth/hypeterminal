@@ -1,5 +1,6 @@
-import { useMemo } from "react";
-import { useInfoMeta } from "./info/useInfoMeta";
+import { useMemo, useCallback } from "react";
+import { makePerpMarketKey } from "../market-key";
+import { useMarkets } from "./useMarkets";
 
 export type PerpMarketInfo = {
 	coin: string;
@@ -29,67 +30,83 @@ export type UsePerpMarketsReturn = {
 };
 
 export function usePerpMarkets(): UsePerpMarketsReturn {
-	const { data: meta, isLoading, error, refetch } = useInfoMeta({});
+	const {
+		data: marketsData,
+		isLoading,
+		error,
+		refetch,
+		getAssetId: getAssetIdByKey,
+		getSzDecimals: getSzDecimalsByKey,
+		getMaxLeverage: getMaxLeverageByKey,
+		isDelisted: isDelistedByKey,
+		getMarketInfo: getMarketInfoByKey,
+	} = useMarkets({ perp: true, spot: false, builderDexs: false, excludeDelisted: false });
 
-	const marketsData = useMemo((): PerpMarketsData | undefined => {
-		if (!meta?.universe) return undefined;
+	const perpMarketsData = useMemo((): PerpMarketsData | undefined => {
+		if (!marketsData) return undefined;
 
 		const markets: PerpMarketInfo[] = [];
 		const coinToMarket = new Map<string, PerpMarketInfo>();
 		const assetIndexToCoin: string[] = [];
 
-		meta.universe.forEach((asset, index) => {
+		for (const market of marketsData.perpMarkets) {
 			const info: PerpMarketInfo = {
-				coin: asset.name,
-				assetIndex: index,
-				szDecimals: asset.szDecimals,
-				maxLeverage: asset.maxLeverage,
-				isDelisted: asset.isDelisted === true,
-				onlyIsolated: asset.onlyIsolated === true,
+				coin: market.coin,
+				assetIndex: market.assetId,
+				szDecimals: market.szDecimals,
+				maxLeverage: market.maxLeverage,
+				isDelisted: market.isDelisted,
+				onlyIsolated: market.onlyIsolated,
 			};
 
 			markets.push(info);
-			coinToMarket.set(asset.name, info);
-			assetIndexToCoin[index] = asset.name;
-		});
+			coinToMarket.set(market.coin, info);
+			assetIndexToCoin[market.assetId] = market.coin;
+		}
 
 		return { markets, coinToMarket, assetIndexToCoin };
-	}, [meta]);
-
-	const getAssetId = useMemo(() => {
-		return (coin: string): number | undefined => {
-			return marketsData?.coinToMarket.get(coin)?.assetIndex;
-		};
 	}, [marketsData]);
 
-	const getSzDecimals = useMemo(() => {
-		return (coin: string): number | undefined => {
-			return marketsData?.coinToMarket.get(coin)?.szDecimals;
-		};
-	}, [marketsData]);
+	const getAssetId = useCallback(
+		(coin: string): number | undefined => getAssetIdByKey(makePerpMarketKey(coin)),
+		[getAssetIdByKey],
+	);
 
-	const getMaxLeverage = useMemo(() => {
-		return (coin: string): number | undefined => {
-			return marketsData?.coinToMarket.get(coin)?.maxLeverage;
-		};
-	}, [marketsData]);
+	const getSzDecimals = useCallback(
+		(coin: string): number | undefined => getSzDecimalsByKey(makePerpMarketKey(coin)),
+		[getSzDecimalsByKey],
+	);
 
-	const isDelisted = useMemo(() => {
-		return (coin: string): boolean => {
-			return marketsData?.coinToMarket.get(coin)?.isDelisted ?? false;
-		};
-	}, [marketsData]);
+	const getMaxLeverage = useCallback(
+		(coin: string): number | undefined => getMaxLeverageByKey(makePerpMarketKey(coin)),
+		[getMaxLeverageByKey],
+	);
 
-	const getMarketInfo = useMemo(() => {
-		return (coin: string): PerpMarketInfo | undefined => {
-			return marketsData?.coinToMarket.get(coin);
-		};
-	}, [marketsData]);
+	const isDelisted = useCallback(
+		(coin: string): boolean => isDelistedByKey(makePerpMarketKey(coin)),
+		[isDelistedByKey],
+	);
+
+	const getMarketInfo = useCallback(
+		(coin: string): PerpMarketInfo | undefined => {
+			const info = getMarketInfoByKey(makePerpMarketKey(coin));
+			if (!info || info.kind !== "perp") return undefined;
+			return {
+				coin: info.coin,
+				assetIndex: info.assetId,
+				szDecimals: info.szDecimals,
+				maxLeverage: info.maxLeverage,
+				isDelisted: info.isDelisted,
+				onlyIsolated: info.onlyIsolated,
+			};
+		},
+		[getMarketInfoByKey],
+	);
 
 	return {
-		data: marketsData,
+		data: perpMarketsData,
 		isLoading,
-		error: error ?? null,
+		error,
 		refetch,
 		getAssetId,
 		getSzDecimals,

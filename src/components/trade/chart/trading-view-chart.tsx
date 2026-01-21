@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import type { ColorTheme } from "@/providers/theme";
 import { useGlobalSettings } from "@/stores/use-global-settings-store";
 import type {
 	ChartingLibraryWidgetConstructor,
@@ -41,12 +42,14 @@ interface Props {
 	symbol?: string;
 	interval?: string;
 	theme?: "light" | "dark";
+	colorTheme?: ColorTheme;
 }
 
 export function TradingViewChart({
 	symbol = DEFAULT_CHART_SYMBOL,
 	interval = DEFAULT_CHART_INTERVAL,
 	theme = DEFAULT_CHART_THEME,
+	colorTheme = "terminal",
 }: Props) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const widgetRef = useRef<IChartingLibraryWidget | null>(null);
@@ -192,7 +195,7 @@ export function TradingViewChart({
 				cssUrlRef.current = null;
 			}
 		};
-	}, [symbol, interval, theme]);
+	}, [symbol, interval, theme, colorTheme]);
 
 	useEffect(() => {
 		if (!widgetRef.current || !chartReadyRef.current) return;

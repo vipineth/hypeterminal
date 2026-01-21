@@ -22,7 +22,7 @@ interface MobileChartViewProps {
 }
 
 export function MobileChartView({ className }: MobileChartViewProps) {
-	const { theme } = useTheme();
+	const { theme, colorTheme } = useTheme();
 	const { data: selectedMarket, isLoading } = useSelectedResolvedMarket({ ctxMode: "realtime" });
 	const selectedCoin = selectedMarket?.coin ?? perpCoinFromMarketKey(DEFAULT_MARKET_KEY);
 	const { setSelectedMarketKey } = useMarketPrefsActions();
@@ -123,7 +123,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 						</div>
 					}
 				>
-					<TradingViewChart symbol={`${selectedCoin}/${QUOTE_ASSET}`} theme={theme === "dark" ? "dark" : "light"} />
+					<TradingViewChart symbol={`${selectedCoin}/${QUOTE_ASSET}`} theme={theme === "dark" ? "dark" : "light"} colorTheme={colorTheme} />
 				</ClientOnly>
 			</div>
 

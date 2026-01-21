@@ -280,6 +280,37 @@ background: linear-gradient(
 
 ---
 
+## Available Color Themes
+
+The system now includes 5 color themes, each with light and dark variants:
+
+| Theme | Description | Primary Hue | Personality |
+|-------|-------------|-------------|-------------|
+| **Terminal** | Clean monochrome, Linear-inspired | 250 (blue-gray) | Professional, minimal |
+| **Midnight** | Deep blues, saturated accents | 260 (indigo) | Focused, immersive |
+| **Forest** | Green-tinted, nature-inspired | 145 (green) | Calm, organic |
+| **Ember** | Warm amber and orange tones | 45 (amber) | Energetic, warm |
+| **Arctic** | Cool cyan and frost blues | 210 (cyan) | Clean, refreshing |
+
+### Theme Selection UI
+
+Located in Settings dialog under "Appearance":
+- Grid of 5 color theme buttons with preview swatches
+- Light/dark mode toggle in the same section
+- Persisted to `localStorage` under `hypeterminal-color-theme`
+
+### Implementation
+
+```tsx
+// Using the theme
+const { colorTheme, setColorTheme, theme, setTheme } = useTheme();
+
+// Available themes exported from provider
+import { colorThemes, type ColorTheme } from "@/providers/theme";
+```
+
+---
+
 ## Open Questions
 
 - [ ] Should we offer a colorblind mode toggle (blue/orange signals)?
