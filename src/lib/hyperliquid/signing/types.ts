@@ -5,12 +5,7 @@ export type HyperliquidEnv = "Mainnet" | "Testnet";
 
 export type BuilderConfig = OrderParameters["builder"];
 
-export type RegistrationStatus =
-	| "idle"
-	| "approving_fee"
-	| "approving_agent"
-	| "verifying"
-	| "error";
+export type RegistrationStatus = "idle" | "approving_fee" | "approving_agent" | "verifying" | "error";
 
 export interface AgentWallet {
 	privateKey: Hex;

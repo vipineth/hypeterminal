@@ -468,12 +468,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							<div className="flex items-center justify-between">
 								<p className="text-sm text-muted-fg">{ORDER_TEXT.LIMIT_PRICE_LABEL}</p>
 								{markPx > 0 && (
-									<Button
-										variant="link"
-										size="none"
-										onClick={handleMarkPriceClick}
-										className="text-xs text-info"
-									>
+									<Button variant="link" size="none" onClick={handleMarkPriceClick} className="text-xs text-info">
 										{ORDER_TEXT.MARK_PRICE_LABEL}: {formatPrice(markPx, { szDecimals: market?.szDecimals })}
 									</Button>
 								)}

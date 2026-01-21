@@ -576,9 +576,7 @@ export function OrderEntryPanel() {
 					<div className="flex items-center justify-between text-muted-fg">
 						<span>{t`Available`}</span>
 						<div className="flex items-center gap-2">
-							<span
-								className={cn("tabular-nums", availableBalance > 0 ? "text-positive" : "text-muted-fg")}
-							>
+							<span className={cn("tabular-nums", availableBalance > 0 ? "text-positive" : "text-muted-fg")}>
 								{isConnected ? formatUSD(availableBalance) : FALLBACK_VALUE_PLACEHOLDER}
 							</span>
 							{isConnected && (

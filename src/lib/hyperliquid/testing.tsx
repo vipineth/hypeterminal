@@ -2,7 +2,7 @@ import type { InfoClient, SubscriptionClient } from "@nktkas/hyperliquid";
 import type { ReactNode } from "react";
 import { createContext, useContext } from "react";
 import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/hyperliquid";
-import type { HyperliquidContextValue } from "./context";
+import type { HyperliquidContextValue } from "./provider";
 import type { BuilderConfig, HyperliquidEnv } from "./signing/types";
 
 const HyperliquidContext = createContext<HyperliquidContextValue | null>(null);

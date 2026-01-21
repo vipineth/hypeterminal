@@ -72,10 +72,7 @@ function subscribeToStorage(callback: () => void): () => void {
 	return () => window.removeEventListener("storage", handleStorage);
 }
 
-export function useAgentWalletStorage(
-	env: HyperliquidEnv,
-	userAddress: string | undefined,
-): AgentWallet | null {
+export function useAgentWalletStorage(env: HyperliquidEnv, userAddress: string | undefined): AgentWallet | null {
 	const getSnapshot = useCallback(() => {
 		if (!userAddress) return null;
 		return readAgentFromStorage(env, userAddress);
@@ -94,12 +91,9 @@ export function useAgentWalletStorage(
 }
 
 export function useAgentWalletActions() {
-	const setAgent = useCallback(
-		(env: HyperliquidEnv, userAddress: string, privateKey: string, publicKey: string) => {
-			writeAgentToStorage(env, userAddress, privateKey, publicKey);
-		},
-		[],
-	);
+	const setAgent = useCallback((env: HyperliquidEnv, userAddress: string, privateKey: string, publicKey: string) => {
+		writeAgentToStorage(env, userAddress, privateKey, publicKey);
+	}, []);
 
 	const clearAgent = useCallback((env: HyperliquidEnv, userAddress: string) => {
 		removeAgentFromStorage(env, userAddress);

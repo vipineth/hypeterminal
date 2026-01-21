@@ -40,7 +40,9 @@ export function OrderSummary({
 			</div>
 			<div className="flex items-center justify-between px-2 py-1.5">
 				<span className="text-muted-fg">{t`Margin Req.`}</span>
-				<span className="tabular-nums">{marginRequired > 0 ? formatUSD(marginRequired) : FALLBACK_VALUE_PLACEHOLDER}</span>
+				<span className="tabular-nums">
+					{marginRequired > 0 ? formatUSD(marginRequired) : FALLBACK_VALUE_PLACEHOLDER}
+				</span>
 			</div>
 			<div className="flex items-center justify-between px-2 py-1.5">
 				<span className="text-muted-fg">{t`Slippage`}</span>

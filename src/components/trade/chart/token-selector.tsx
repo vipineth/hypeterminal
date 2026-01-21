@@ -55,9 +55,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 				>
 					<Avatar className="size-5 shrink-0">
 						<AvatarImage src={getTokenIconUrl(value)} alt={value} />
-						<AvatarFallback className="text-3xs bg-warning/20 text-warning">
-							{value.slice(0, 2)}
-						</AvatarFallback>
+						<AvatarFallback className="text-3xs bg-warning/20 text-warning">{value.slice(0, 2)}</AvatarFallback>
 					</Avatar>
 					<span className="text-warning truncate">{value}</span>
 					<span className="text-muted-fg hidden sm:inline">/{QUOTE_ASSET}</span>
@@ -175,11 +173,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 									const changeIsPositive = (changePct ?? 0) >= 0;
 									const changeClass = cn(
 										"text-2xs font-medium tabular-nums",
-										changePct === null
-											? "text-muted-fg"
-											: changeIsPositive
-												? "text-positive"
-												: "text-negative",
+										changePct === null ? "text-muted-fg" : changeIsPositive ? "text-positive" : "text-negative",
 									);
 									const changeText = changePct === null ? FALLBACK_VALUE_PLACEHOLDER : formatPercent(changePct / 100);
 
@@ -228,9 +222,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 															<Star
 																className={cn(
 																	"size-2.5 transition-colors",
-																	isFav
-																		? "fill-warning text-warning"
-																		: "text-muted-fg hover:text-warning",
+																	isFav ? "fill-warning text-warning" : "text-muted-fg hover:text-warning",
 																)}
 															/>
 														</Button>
@@ -265,9 +257,7 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 											</div>
 											<div className="w-20 text-right hidden sm:block">
 												<div className="flex items-center justify-end gap-1">
-													<Flame
-														className={cn("size-2.5", isFundingPositive ? "text-positive" : "text-negative")}
-													/>
+													<Flame className={cn("size-2.5", isFundingPositive ? "text-positive" : "text-negative")} />
 													<span
 														className={cn(
 															"text-2xs tabular-nums font-medium",

@@ -260,9 +260,7 @@ export function PositionsTab() {
 						<Table>
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
-										{t`Asset`}
-									</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Asset`}</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Size`}
 									</TableHead>
@@ -295,9 +293,7 @@ export function PositionsTab() {
 							<TableBody>
 								{tableRows.map((row) => {
 									const isRowClosing = isClosing && closingKeyRef.current === row.key;
-									const sideClass = row.isLong
-										? "bg-positive/20 text-positive"
-										: "bg-negative/20 text-negative";
+									const sideClass = row.isLong ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
 									const pnlClass = row.unrealizedPnl >= 0 ? "text-positive" : "text-negative";
 									const fundingClass = row.cumFunding >= 0 ? "text-negative" : "text-positive";
 
@@ -322,9 +318,7 @@ export function PositionsTab() {
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
 												{formatToken(row.size, row.szDecimals)}{" "}
-												<span className="text-muted-fg">
-													({formatUSD(row.positionValue, { compact: true })})
-												</span>
+												<span className="text-muted-fg">({formatUSD(row.positionValue, { compact: true })})</span>
 											</TableCell>
 											<TableCell className="text-2xs text-right py-1.5">
 												<div className="flex flex-col items-end">

@@ -1,10 +1,10 @@
 import { t } from "@lingui/core/macro";
 import type { AllMidsResponse, MetaResponse } from "@nktkas/hyperliquid";
-import { getInfoClient } from "@/lib/hyperliquid/clients";
 import { candleSnapshotToBar, filterAndSortBars } from "@/lib/chart/candle";
 import { resolutionToInterval } from "@/lib/chart/resolution";
 import { getCandleStore, streamKey } from "@/lib/chart/store";
 import { coinFromSymbolName, inferPriceScaleFromMids, symbolFromCoin } from "@/lib/chart/symbol";
+import { getInfoClient } from "@/lib/hyperliquid/clients";
 import type {
 	Bar,
 	DatafeedConfiguration,

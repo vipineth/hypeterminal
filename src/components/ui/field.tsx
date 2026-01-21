@@ -151,10 +151,7 @@ function FieldSeparator({
 		>
 			<Separator className="absolute inset-0 top-1/2" />
 			{children && (
-				<span
-					className="bg-bg text-muted-fg relative mx-auto block w-fit px-2"
-					data-slot="field-separator-content"
-				>
+				<span className="bg-bg text-muted-fg relative mx-auto block w-fit px-2" data-slot="field-separator-content">
 					{children}
 				</span>
 			)}
@@ -207,12 +204,7 @@ function FieldError({
 	}
 
 	return (
-		<div
-			role="alert"
-			data-slot="field-error"
-			className={cn("text-danger text-sm font-normal", className)}
-			{...props}
-		>
+		<div role="alert" data-slot="field-error" className={cn("text-danger text-sm font-normal", className)} {...props}>
 			{content}
 		</div>
 	);

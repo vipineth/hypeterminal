@@ -138,9 +138,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 												<Icon className="size-full" />
 											</div>
 											<div className="flex-1 text-left min-w-0">
-												<p className="font-medium text-sm group-hover:text-info transition-colors">
-													{connector.name}
-												</p>
+												<p className="font-medium text-sm group-hover:text-info transition-colors">{connector.name}</p>
 												<p className="text-xs text-muted-fg truncate">{walletInfo.description}</p>
 											</div>
 											{isConnecting ? (
@@ -183,9 +181,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 												<Icon className="size-full" />
 											</div>
 											<div className="flex-1 text-left min-w-0">
-												<p className="font-medium text-sm group-hover:text-info transition-colors">
-													{connector.name}
-												</p>
+												<p className="font-medium text-sm group-hover:text-info transition-colors">{connector.name}</p>
 												<p className="text-xs text-muted-fg truncate">{walletInfo.description}</p>
 											</div>
 											{isConnecting ? (
@@ -230,9 +226,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 												<p className="font-medium text-sm group-hover:text-warning transition-colors">
 													{config?.name ?? connector.name}
 												</p>
-												<p className="text-xs text-muted-fg truncate font-mono">
-													{config?.address ?? "Mock wallet"}
-												</p>
+												<p className="text-xs text-muted-fg truncate font-mono">{config?.address ?? "Mock wallet"}</p>
 											</div>
 											{isConnecting ? (
 												<Loader2 className="size-4 animate-spin text-warning flex-shrink-0" />

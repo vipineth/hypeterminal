@@ -101,9 +101,7 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 										"min-h-[44px] flex items-center gap-2",
 										"active:scale-98",
 										"hover:bg-transparent",
-										isActive
-											? "bg-bg text-info shadow-sm"
-											: "text-muted-fg hover:text-fg",
+										isActive ? "bg-bg text-info shadow-sm" : "text-muted-fg hover:text-fg",
 									)}
 								>
 									<span>{tab.label}</span>
@@ -112,10 +110,7 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 									) : showCount ? (
 										<Badge
 											variant="outline"
-											className={cn(
-												"min-w-5 h-5 px-1.5 text-xs tabular-nums",
-												"border-info/30 bg-info/10 text-info",
-											)}
+											className={cn("min-w-5 h-5 px-1.5 text-xs tabular-nums", "border-info/30 bg-info/10 text-info")}
 										>
 											{count}
 										</Badge>
@@ -144,11 +139,7 @@ function EmptyState({ title, icon = "empty" }: EmptyStateProps) {
 	return (
 		<div className="h-full flex flex-col items-center justify-center gap-4 p-6 text-center">
 			<div className={cn("size-16 rounded-full flex items-center justify-center", "bg-muted/50")}>
-				{icon === "wallet" ? (
-					<Wallet className="size-8 text-muted-fg" />
-				) : (
-					<Inbox className="size-8 text-muted-fg" />
-				)}
+				{icon === "wallet" ? <Wallet className="size-8 text-muted-fg" /> : <Inbox className="size-8 text-muted-fg" />}
 			</div>
 			<p className="text-sm text-muted-fg max-w-xs">{title}</p>
 		</div>

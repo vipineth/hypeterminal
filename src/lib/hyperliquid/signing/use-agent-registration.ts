@@ -4,13 +4,13 @@ import type { Address } from "viem";
 import { zeroAddress } from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { useConnection } from "wagmi";
-import { useHyperliquid } from "../context";
-import { useExchangeApproveAgent } from "../hooks/exchange/useExchangeApproveAgent";
-import { useExchangeApproveBuilderFee } from "../hooks/exchange/useExchangeApproveBuilderFee";
+import { useExchangeApproveAgent } from "@/lib/hyperliquid/hooks/exchange/useExchangeApproveAgent";
+import { useExchangeApproveBuilderFee } from "@/lib/hyperliquid/hooks/exchange/useExchangeApproveBuilderFee";
+import { useHyperliquid } from "@/lib/hyperliquid/provider";
 import { useAgentWalletActions } from "./agent-storage";
 import { convertFeeToPercentageString } from "./agent-utils";
-import { useAgentStatus } from "./use-agent-status";
 import type { RegistrationStatus } from "./types";
+import { useAgentStatus } from "./use-agent-status";
 
 export type RegistrationStep = "fee" | "agent" | null;
 
@@ -22,7 +22,11 @@ export interface UseAgentRegistrationResult {
 	reset: () => void;
 }
 
-function deriveRegistrationStatus(isPending: boolean, isError: boolean, currentStep: RegistrationStep): RegistrationStatus {
+function deriveRegistrationStatus(
+	isPending: boolean,
+	isError: boolean,
+	currentStep: RegistrationStep,
+): RegistrationStatus {
 	if (!isPending) return isError ? "error" : "idle";
 	if (currentStep === "fee") return "approving_fee";
 	if (currentStep === "agent") return "approving_agent";

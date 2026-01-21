@@ -1,14 +1,14 @@
 import type { CancelParameters, CancelSuccessResponse, ExchangeClient } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { useHyperliquid } from "../../context";
+import { useHyperliquidClients } from "@/lib/hyperliquid/hooks/useClients";
+import { useHyperliquid } from "@/lib/hyperliquid/provider";
 import {
 	createMutationKey,
 	guardedMutationFn,
 	type MutationOptions,
 	mergeMutationOptions,
-} from "../../query/mutation-options";
-import type { HyperliquidQueryError, MutationParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+} from "@/lib/hyperliquid/query/mutation-options";
+import type { HyperliquidQueryError, MutationParameter } from "@/lib/hyperliquid/types";
 
 type CancelData = CancelSuccessResponse;
 type CancelParams = CancelParameters;

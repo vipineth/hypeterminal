@@ -190,10 +190,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 						<div className="border-t border-border/50 pt-3 flex items-center justify-between">
 							<span className="text-2xs text-muted-fg">{t`Unrealized P&L`}</span>
 							<span
-								className={cn(
-									"text-2xs tabular-nums font-semibold",
-									isProfitable ? "text-positive" : "text-negative",
-								)}
+								className={cn("text-2xs tabular-nums font-semibold", isProfitable ? "text-positive" : "text-negative")}
 							>
 								{formatUSD(position.unrealizedPnl, { signDisplay: "exceptZero" })}
 								<span className="font-normal text-muted-fg ml-1">({formatPercent(position.roe, 1)})</span>

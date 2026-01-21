@@ -1,8 +1,8 @@
 import type { ISubscription } from "@nktkas/hyperliquid";
 import { useEffect, useRef } from "react";
 import { useStore } from "zustand";
-import type { SubscriptionOptions, SubscriptionResult } from "../../types";
-import { useHyperliquidStoreApi } from "../useConfig";
+import { useHyperliquidStoreApi } from "@/lib/hyperliquid/provider";
+import type { SubscriptionOptions, SubscriptionResult } from "@/lib/hyperliquid/types";
 
 /**
  * Core subscription hook using the standard WebSocket pattern.

@@ -130,9 +130,7 @@ export function BalancesTab() {
 						<Table>
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
-										{t`Asset`}
-									</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Asset`}</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Available`}
 									</TableHead>
@@ -159,9 +157,7 @@ export function BalancesTab() {
 													<span
 														className={cn(
 															"text-4xs px-1 py-0.5 rounded-sm uppercase",
-															row.type === "perp"
-																? "bg-highlight/20 text-highlight"
-																: "bg-warning/20 text-warning",
+															row.type === "perp" ? "bg-highlight/20 text-highlight" : "bg-warning/20 text-warning",
 														)}
 													>
 														{row.type === "perp" ? t`perp` : t`spot`}

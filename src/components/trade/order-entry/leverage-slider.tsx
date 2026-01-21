@@ -60,12 +60,7 @@ export function LeverageSlider({ value, onChange, max, disabled, className }: Pr
 							className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 pointer-events-none"
 							style={{ left: `${markPosition}%` }}
 						>
-							<div
-								className={cn(
-									"size-2 rounded-full transition-colors",
-									isActive ? "bg-info" : "bg-muted-fg/60",
-								)}
-							/>
+							<div className={cn("size-2 rounded-full transition-colors", isActive ? "bg-info" : "bg-muted-fg/60")} />
 						</div>
 					);
 				})}

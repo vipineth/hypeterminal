@@ -1,10 +1,10 @@
 import type { ExchangeClient, InfoClient, SubscriptionClient } from "@nktkas/hyperliquid";
 import { useMemo } from "react";
 import { useConnection, useWalletClient } from "wagmi";
-import { createExchangeClient } from "../clients";
-import { useHyperliquid } from "../context";
-import { useAgentWallet } from "../signing/use-agent-wallet";
-import { toHyperliquidWallet } from "../wallet";
+import { createExchangeClient } from "@/lib/hyperliquid/clients";
+import { useHyperliquid } from "@/lib/hyperliquid/provider";
+import { useAgentWallet } from "@/lib/hyperliquid/signing/use-agent-wallet";
+import { toHyperliquidWallet } from "@/lib/hyperliquid/wallet";
 
 export interface HyperliquidClients {
 	info: InfoClient;

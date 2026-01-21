@@ -152,10 +152,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 								<div className="text-sm text-muted-fg mb-1">{ACCOUNT_TEXT.EQUITY_LABEL}</div>
 								<div className="text-3xl font-bold tabular-nums">{formatUSD(accountValue)}</div>
 								<div
-									className={cn(
-										"text-sm tabular-nums mt-1",
-										unrealizedPnl >= 0 ? "text-positive" : "text-negative",
-									)}
+									className={cn("text-sm tabular-nums mt-1", unrealizedPnl >= 0 ? "text-positive" : "text-negative")}
 								>
 									{unrealizedPnl >= 0 ? "+" : ""}
 									{formatUSD(unrealizedPnl)} {ACCOUNT_TEXT.UNREALIZED_LABEL}

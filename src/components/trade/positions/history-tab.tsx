@@ -102,12 +102,8 @@ export function HistoryTab() {
 						<Table>
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
-										{t`Asset`}
-									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
-										{t`Type`}
-									</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Asset`}</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Type`}</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Price`}
 									</TableHead>
@@ -127,9 +123,7 @@ export function HistoryTab() {
 							</TableHeader>
 							<TableBody>
 								{tableRows.map((row) => {
-									const sideClass = row.isBuy
-										? "bg-positive/20 text-positive"
-										: "bg-negative/20 text-negative";
+									const sideClass = row.isBuy ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
 									const feeClass = row.fee < 0 ? "text-positive" : "text-muted-fg";
 									const showPnl = Number.isFinite(row.closedPnl) && row.closedPnl !== 0;
 									const pnlClass = row.closedPnl >= 0 ? "text-positive" : "text-negative";

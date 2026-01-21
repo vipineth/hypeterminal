@@ -1,9 +1,9 @@
 import type { ExtraAgentsResponse, MaxBuilderFeeResponse } from "@nktkas/hyperliquid";
 import { type Address, zeroAddress } from "viem";
 import { useConnection } from "wagmi";
-import { useHyperliquid } from "../context";
-import { useInfoExtraAgents } from "../hooks/info/useInfoExtraAgents";
-import { useInfoMaxBuilderFee } from "../hooks/info/useInfoMaxBuilderFee";
+import { useInfoExtraAgents } from "@/lib/hyperliquid/hooks/info/useInfoExtraAgents";
+import { useInfoMaxBuilderFee } from "@/lib/hyperliquid/hooks/info/useInfoMaxBuilderFee";
+import { useHyperliquid } from "@/lib/hyperliquid/provider";
 import { useAgentWalletStorage } from "./agent-storage";
 import { isAgentApproved, isBuilderFeeApproved } from "./agent-utils";
 import type { BuilderConfig } from "./types";
@@ -53,10 +53,7 @@ export function useAgentStatus(): UseAgentStatusResult {
 		{ enabled: !!address && hasBuilderConfig },
 	);
 
-	const extraAgentsQuery = useInfoExtraAgents(
-		{ user: userAddress },
-		{ enabled: !!address },
-	);
+	const extraAgentsQuery = useInfoExtraAgents({ user: userAddress }, { enabled: !!address });
 
 	const isLoading = builderFeeQuery.isLoading || extraAgentsQuery.isLoading;
 	const requirements = deriveRequirements(
@@ -67,10 +64,7 @@ export function useAgentStatus(): UseAgentStatusResult {
 	);
 
 	async function refetch(): Promise<AgentRequirements> {
-		const [feeResult, agentsResult] = await Promise.all([
-			builderFeeQuery.refetch(),
-			extraAgentsQuery.refetch(),
-		]);
+		const [feeResult, agentsResult] = await Promise.all([builderFeeQuery.refetch(), extraAgentsQuery.refetch()]);
 
 		return deriveRequirements(feeResult.data, agentsResult.data, localAgent?.publicKey, builderConfig);
 	}

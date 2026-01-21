@@ -52,9 +52,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 							<Skeleton className="h-6 w-24" />
 						) : (
 							<>
-								<div className="text-lg font-semibold tabular-nums text-warning">
-									{formatUSD(markPx ?? null)}
-								</div>
+								<div className="text-lg font-semibold tabular-nums text-warning">{formatUSD(markPx ?? null)}</div>
 								{typeof change24h === "number" && (
 									<span
 										className={cn(
@@ -104,12 +102,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 							/>
 							<div className="flex items-center gap-1">
 								<Flame className={cn("size-3", isFundingPositive ? "text-positive" : "text-negative")} />
-								<span
-									className={cn(
-										"tabular-nums font-medium",
-										isFundingPositive ? "text-positive" : "text-negative",
-									)}
-								>
+								<span className={cn("tabular-nums font-medium", isFundingPositive ? "text-positive" : "text-negative")}>
 									{formatPercent(fundingNum, {
 										minimumFractionDigits: 4,
 										signDisplay: "exceptZero",

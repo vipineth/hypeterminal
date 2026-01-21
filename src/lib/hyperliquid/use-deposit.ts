@@ -33,7 +33,12 @@ export interface UseDepositResult {
 	reset: () => void;
 }
 
-function deriveStatus(isPending: boolean, isConfirming: boolean, isSuccess: boolean, error: Error | null): DepositStatus {
+function deriveStatus(
+	isPending: boolean,
+	isConfirming: boolean,
+	isSuccess: boolean,
+	error: Error | null,
+): DepositStatus {
 	if (isPending) return "pending";
 	if (isConfirming) return "confirming";
 	if (isSuccess) return "success";

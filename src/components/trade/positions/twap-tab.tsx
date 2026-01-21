@@ -113,9 +113,7 @@ export function TwapTab() {
 						<Table>
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
-										{t`Asset`}
-									</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Asset`}</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Total Size`}
 									</TableHead>
@@ -128,9 +126,7 @@ export function TwapTab() {
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
 										{t`Progress`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
-										{t`Status`}
-									</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Status`}</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Actions`}
 									</TableHead>
@@ -138,9 +134,7 @@ export function TwapTab() {
 							</TableHeader>
 							<TableBody>
 								{tableRows.map((row) => {
-									const sideClass = row.isBuy
-										? "bg-positive/20 text-positive"
-										: "bg-negative/20 text-negative";
+									const sideClass = row.isBuy ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
 									const statusLabel =
 										row.status === "activated"
 											? t`active`
@@ -187,9 +181,7 @@ export function TwapTab() {
 															style={{ width: `${row.progressPct}%` }}
 														/>
 													</div>
-													<span className="text-4xs tabular-nums text-muted-fg">
-														{row.progressPct.toFixed(0)}%
-													</span>
+													<span className="text-4xs tabular-nums text-muted-fg">{row.progressPct.toFixed(0)}%</span>
 												</div>
 											</TableCell>
 											<TableCell className="text-2xs py-1.5">
@@ -198,8 +190,7 @@ export function TwapTab() {
 														"text-4xs px-1 py-0.5 rounded-sm uppercase",
 														row.status === "activated" && "bg-info/20 text-info",
 														row.status === "finished" && "bg-positive/20 text-positive",
-														(row.status === "terminated" || row.status === "error") &&
-															"bg-negative/20 text-negative",
+														(row.status === "terminated" || row.status === "error") && "bg-negative/20 text-negative",
 													)}
 												>
 													{statusLabel}

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useAgentRegistration } from "../signing/use-agent-registration";
-import { useAgentStatus } from "../signing/use-agent-status";
+import { useAgentRegistration } from "@/lib/hyperliquid/signing/use-agent-registration";
+import { useAgentStatus } from "@/lib/hyperliquid/signing/use-agent-status";
 
 type PendingAction = () => void | Promise<void>;
 

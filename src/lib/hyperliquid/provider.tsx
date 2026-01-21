@@ -2,11 +2,13 @@ import type { InfoClient, SubscriptionClient } from "@nktkas/hyperliquid";
 import type { ReactNode } from "react";
 import { createContext, useContext, useRef } from "react";
 import { useConnection } from "wagmi";
+import { useStore } from "zustand";
 import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/hyperliquid";
 import { getHttpTransport, getInfoClient, getSubscriptionClient, getWsTransport, initializeClients } from "./clients";
 import { createHyperliquidConfig } from "./create-config";
+import { ProviderNotFoundError } from "./errors";
 import type { BuilderConfig, HyperliquidEnv } from "./signing/types";
-import { createHyperliquidStore, type HyperliquidStore } from "./store";
+import { createHyperliquidStore, type HyperliquidStore, type HyperliquidStoreState } from "./store";
 
 export interface HyperliquidContextValue {
 	info: InfoClient;
@@ -80,4 +82,20 @@ export function useHyperliquid(): HyperliquidContextValue {
 
 export function useHyperliquidOptional(): HyperliquidContextValue | null {
 	return useContext(HyperliquidContext);
+}
+
+export function useHyperliquidStoreApi() {
+	const store = useContext(HyperliquidStoreContext);
+	if (!store) {
+		throw new ProviderNotFoundError();
+	}
+	return store;
+}
+
+export function useHyperliquidStore<T>(selector: (state: HyperliquidStoreState) => T): T {
+	return useStore(useHyperliquidStoreApi(), selector);
+}
+
+export function useConfig() {
+	return useHyperliquidStore((state) => state.config);
 }

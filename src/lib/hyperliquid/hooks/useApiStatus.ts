@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { statusKeys } from "../query/keys";
+import { useConfig, useHyperliquidStore } from "@/lib/hyperliquid/provider";
+import { statusKeys } from "@/lib/hyperliquid/query/keys";
 import { useHyperliquidClients } from "./useClients";
-import { useConfig, useHyperliquidStore } from "./useConfig";
 
 const HTTP_STATUS_INTERVAL_MS = 60_000;
 
@@ -16,7 +16,11 @@ export function useApiStatus(): ApiStatusResult {
 	const config = useConfig();
 	const { info } = useHyperliquidClients();
 
-	const { status: httpQueryStatus, fetchStatus, error: httpError } = useQuery({
+	const {
+		status: httpQueryStatus,
+		fetchStatus,
+		error: httpError,
+	} = useQuery({
 		queryKey: statusKeys.http(),
 		queryFn: async () => {
 			await info.allMids();

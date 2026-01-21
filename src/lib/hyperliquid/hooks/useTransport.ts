@@ -1,6 +1,6 @@
 import type { IRequestTransport, ISubscriptionTransport } from "@nktkas/hyperliquid";
-import { MissingTransportError } from "../errors";
-import { useConfig } from "./useConfig";
+import { MissingTransportError } from "@/lib/hyperliquid/errors";
+import { useConfig } from "@/lib/hyperliquid/provider";
 
 export function useHttpTransport(): IRequestTransport {
 	const { httpTransport } = useConfig();

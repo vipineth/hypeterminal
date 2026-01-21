@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import type { Address } from "viem";
 import { type PrivateKeyAccount, privateKeyToAccount } from "viem/accounts";
 import { useConnection } from "wagmi";
-import { useHyperliquid } from "../context";
+import { useHyperliquid } from "@/lib/hyperliquid/provider";
 import { useAgentWalletStorage } from "./agent-storage";
 import type { AgentWallet } from "./types";
 import { useAgentStatus } from "./use-agent-status";

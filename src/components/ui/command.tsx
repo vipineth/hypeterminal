@@ -8,10 +8,7 @@ function Command({ className, ...props }: React.ComponentProps<typeof CommandPri
 	return (
 		<CommandPrimitive
 			data-slot="command"
-			className={cn(
-				"bg-surface text-surface-fg flex h-full w-full flex-col overflow-hidden rounded-md",
-				className,
-			)}
+			className={cn("bg-surface text-surface-fg flex h-full w-full flex-col overflow-hidden rounded-md", className)}
 			{...props}
 		/>
 	);

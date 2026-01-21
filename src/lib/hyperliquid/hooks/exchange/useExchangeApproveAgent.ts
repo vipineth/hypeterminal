@@ -1,13 +1,13 @@
 import type { ApproveAgentParameters, ApproveAgentSuccessResponse, ExchangeClient } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
+import { useHyperliquidClients } from "@/lib/hyperliquid/hooks/useClients";
 import {
 	createMutationKey,
 	guardedMutationFn,
 	type MutationOptions,
 	mergeMutationOptions,
-} from "../../query/mutation-options";
-import type { HyperliquidQueryError, MutationParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+} from "@/lib/hyperliquid/query/mutation-options";
+import type { HyperliquidQueryError, MutationParameter } from "@/lib/hyperliquid/types";
 
 type ApproveAgentData = ApproveAgentSuccessResponse;
 type ApproveAgentParams = ApproveAgentParameters;

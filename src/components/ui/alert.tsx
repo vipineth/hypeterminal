@@ -8,8 +8,7 @@ const alertVariants = cva(
 		variants: {
 			variant: {
 				default: "bg-surface text-surface-fg",
-				destructive:
-					"text-danger bg-surface [&>svg]:text-current *:data-[slot=alert-description]:text-danger/90",
+				destructive: "text-danger bg-surface [&>svg]:text-current *:data-[slot=alert-description]:text-danger/90",
 			},
 		},
 		defaultVariants: {
