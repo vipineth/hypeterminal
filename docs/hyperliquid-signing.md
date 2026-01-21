@@ -373,6 +373,19 @@ Solution: Two-wallet pattern
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
+### Agent Key Storage Security
+
+Agent private keys are stored in browser localStorage. This is acceptable because:
+
+| Concern | Mitigation |
+|---------|------------|
+| **Limited permissions** | Agent keys can only execute trades - they cannot withdraw funds or transfer assets |
+| **User-revocable** | Users can revoke agent approval anytime from their master wallet |
+| **Session-scoped risk** | Compromise only affects trading, not custody of funds |
+| **Standard pattern** | This is the recommended Hyperliquid pattern for web applications |
+
+The master wallet (hardware wallet / MetaMask) never has its keys stored - it only signs the initial agent approval and admin operations like withdrawals.
+
 ### Current Implementation
 
 ```typescript
@@ -388,7 +401,7 @@ const register = async () => {
     agentName,
   });
 
-  // 3. Store agent in localStorage
+  // 3. Store agent in localStorage (safe - agent has limited permissions)
   setAgent(env, address, privateKey, account.address);
 };
 
