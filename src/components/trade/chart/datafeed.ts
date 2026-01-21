@@ -95,8 +95,7 @@ async function inferPriceScale(coin: string): Promise<number> {
 	try {
 		const mids = await getAllMids();
 		return inferPriceScaleFromMids(coin, mids);
-	} catch (error) {
-		console.warn("Failed to infer pricescale:", error);
+	} catch {
 		return DEFAULT_PRICESCALE;
 	}
 }
@@ -137,9 +136,7 @@ export function createDatafeed(): IBasicDataFeed {
 				let coins: string[] = [];
 				try {
 					coins = await searchCoins(userInput);
-				} catch (error) {
-					console.warn("searchSymbols failed:", error);
-				}
+				} catch {}
 
 				const items: SearchSymbolResultItem[] = coins.slice(0, CHART_DATAFEED_CONFIG.SEARCH_LIMIT).map((coin) => {
 					const symbol = symbolFromCoin(coin);
@@ -249,10 +246,7 @@ export function createDatafeed(): IBasicDataFeed {
 			onResetCacheNeededCallback: () => void,
 		) => {
 			const interval = resolutionToInterval(resolution);
-			if (!interval) {
-				console.warn("subscribeBars unsupported resolution:", resolution);
-				return;
-			}
+			if (!interval) return;
 
 			const existingStreamKey = listenerToStream.get(listenerGuid);
 			if (existingStreamKey) {

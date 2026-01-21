@@ -130,9 +130,7 @@ function AdvancedOrderItem({ option, isSelected, onSelect }: AdvancedOrderItemPr
 			>
 				<Icon className="size-3" />
 			</span>
-			<span className={cn("flex-1 text-xs", isSelected ? "text-fg font-medium" : "text-muted-fg")}>
-				{option.label}
-			</span>
+			<span className={cn("flex-1 text-xs", isSelected ? "text-fg font-medium" : "text-muted-fg")}>{option.label}</span>
 			{isSelected && <Check className="size-3.5 text-info" />}
 		</DropdownMenuItem>
 	);
