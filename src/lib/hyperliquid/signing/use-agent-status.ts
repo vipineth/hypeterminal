@@ -1,54 +1,85 @@
-import { useMemo } from "react";
+import type { ExtraAgentsResponse, MaxBuilderFeeResponse } from "@nktkas/hyperliquid";
+import { type Address, zeroAddress } from "viem";
 import { useConnection } from "wagmi";
 import { useHyperliquid } from "../context";
 import { useInfoExtraAgents } from "../hooks/info/useInfoExtraAgents";
 import { useInfoMaxBuilderFee } from "../hooks/info/useInfoMaxBuilderFee";
-import { isAgentApproved, isBuilderFeeApproved } from "./agent-utils";
 import { useAgentWalletStorage } from "./agent-storage";
-import type { AgentStatus } from "./types";
+import { isAgentApproved, isBuilderFeeApproved } from "./agent-utils";
+import type { BuilderConfig } from "./types";
 
-export interface UseAgentStatusResult {
-	status: AgentStatus;
-	agentAddress: `0x${string}` | null;
+export interface AgentRequirements {
+	needsBuilderFee: boolean;
+	needsAgent: boolean;
+	signaturesRequired: number;
 	isReady: boolean;
+}
+
+export interface UseAgentStatusResult extends AgentRequirements {
 	isLoading: boolean;
+	agentAddress: Address | null;
+	refetch: () => Promise<AgentRequirements>;
+}
+
+function deriveRequirements(
+	builderFeeData: MaxBuilderFeeResponse | undefined,
+	extraAgentsData: ExtraAgentsResponse | undefined,
+	localAgentPublicKey: Address | undefined,
+	builderConfig: BuilderConfig | undefined,
+): AgentRequirements {
+	const hasBuilderConfig = !!builderConfig?.b;
+	const needsBuilderFee = hasBuilderConfig && !isBuilderFeeApproved(builderFeeData, builderConfig?.f);
+	const needsAgent = !isAgentApproved(extraAgentsData, localAgentPublicKey);
+	const signaturesRequired = (needsBuilderFee ? 1 : 0) + (needsAgent ? 1 : 0);
+
+	return {
+		needsBuilderFee,
+		needsAgent,
+		signaturesRequired,
+		isReady: signaturesRequired === 0,
+	};
 }
 
 export function useAgentStatus(): UseAgentStatusResult {
 	const { env, builderConfig } = useHyperliquid();
 	const { address } = useConnection();
 
-	const agentWallet = useAgentWalletStorage(env, address);
+	const localAgent = useAgentWalletStorage(env, address);
 	const hasBuilderConfig = !!builderConfig?.b;
+	const userAddress = address ?? zeroAddress;
 
-	const { data: maxBuilderFee, isLoading: isLoadingBuilderFee } = useInfoMaxBuilderFee(
-		{ user: address ?? "0x0", builder: builderConfig?.b ?? "0x0" },
-		{ enabled: !!address && hasBuilderConfig, staleTime: 5_000 },
+	const builderFeeQuery = useInfoMaxBuilderFee(
+		{ user: userAddress, builder: builderConfig?.b ?? zeroAddress },
+		{ enabled: !!address && hasBuilderConfig },
 	);
 
-	const { data: extraAgents, isLoading: isLoadingAgents } = useInfoExtraAgents(
-		{ user: address ?? "0x0" },
-		{ enabled: !!address, staleTime: 5_000, refetchInterval: 30_000 },
+	const extraAgentsQuery = useInfoExtraAgents(
+		{ user: userAddress },
+		{ enabled: !!address },
 	);
 
-	const builderFeeApproved = !hasBuilderConfig || isBuilderFeeApproved(maxBuilderFee, builderConfig?.f);
-	const agentApproved = isAgentApproved(extraAgents, agentWallet?.publicKey);
+	const isLoading = builderFeeQuery.isLoading || extraAgentsQuery.isLoading;
+	const requirements = deriveRequirements(
+		builderFeeQuery.data,
+		extraAgentsQuery.data,
+		localAgent?.publicKey,
+		builderConfig,
+	);
 
-	const isLoading = (hasBuilderConfig && isLoadingBuilderFee) || isLoadingAgents;
+	async function refetch(): Promise<AgentRequirements> {
+		const [feeResult, agentsResult] = await Promise.all([
+			builderFeeQuery.refetch(),
+			extraAgentsQuery.refetch(),
+		]);
 
-	const status: AgentStatus = useMemo(() => {
-		if (!address) return "needs_agent";
-		if (isLoading) return "loading";
-		if (!builderFeeApproved) return "needs_builder_fee";
-		if (!agentWallet) return "needs_agent";
-		if (agentApproved) return "ready";
-		return "invalid";
-	}, [address, isLoading, builderFeeApproved, agentWallet, agentApproved]);
+		return deriveRequirements(feeResult.data, agentsResult.data, localAgent?.publicKey, builderConfig);
+	}
 
 	return {
-		status,
-		agentAddress: agentWallet?.publicKey ?? null,
-		isReady: status === "ready",
+		...requirements,
+		isReady: !isLoading && requirements.isReady,
 		isLoading,
+		agentAddress: localAgent?.publicKey ?? null,
+		refetch,
 	};
 }

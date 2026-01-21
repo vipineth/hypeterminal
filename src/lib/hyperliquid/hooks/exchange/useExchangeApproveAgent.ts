@@ -31,7 +31,7 @@ export function getApproveAgentMutationOptions(
 export function useExchangeApproveAgent(
 	options: UseExchangeApproveAgentOptions = {},
 ): UseExchangeApproveAgentReturnType {
-	const { trading } = useHyperliquidClients();
+	const { user } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getApproveAgentMutationOptions(trading)));
+	return useMutation(mergeMutationOptions(options, getApproveAgentMutationOptions(user)));
 }

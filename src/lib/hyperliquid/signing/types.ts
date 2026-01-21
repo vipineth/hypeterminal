@@ -1,15 +1,9 @@
 import type { OrderParameters } from "@nktkas/hyperliquid";
+import type { Address, Hex } from "viem";
 
 export type HyperliquidEnv = "Mainnet" | "Testnet";
 
 export type BuilderConfig = OrderParameters["builder"];
-
-export type AgentStatus =
-	| "loading"
-	| "needs_builder_fee"
-	| "needs_agent"
-	| "ready"
-	| "invalid";
 
 export type RegistrationStatus =
 	| "idle"
@@ -19,6 +13,6 @@ export type RegistrationStatus =
 	| "error";
 
 export interface AgentWallet {
-	privateKey: `0x${string}`;
-	publicKey: `0x${string}`;
+	privateKey: Hex;
+	publicKey: Address;
 }

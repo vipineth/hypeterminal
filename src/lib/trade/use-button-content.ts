@@ -1,7 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { useMemo } from "react";
 import { ARBITRUM_CHAIN_ID } from "@/config/constants";
-import type { AgentStatus, RegistrationStatus } from "@/lib/hyperliquid/signing/types";
+import type { RegistrationStatus } from "@/lib/hyperliquid/signing/types";
 import type { ButtonContent, Side, ValidationResult } from "@/lib/trade/types";
 
 interface ButtonContentInput {
@@ -11,7 +11,7 @@ interface ButtonContentInput {
 	switchChain: (chainId: number) => void;
 	availableBalance: number;
 	validation: ValidationResult;
-	agentStatus: AgentStatus;
+	isAgentLoading: boolean;
 	registerStatus: RegistrationStatus;
 	canApprove: boolean;
 	side: Side;
@@ -22,8 +22,8 @@ interface ButtonContentInput {
 	onSubmit: () => void;
 }
 
-function getRegisterText(agentStatus: AgentStatus, registerStatus: RegistrationStatus, canApprove: boolean): string {
-	if (agentStatus === "loading") return t`Loading...`;
+function getRegisterText(isLoading: boolean, registerStatus: RegistrationStatus, canApprove: boolean): string {
+	if (isLoading) return t`Loading...`;
 	if (!canApprove) return t`Loading...`;
 	if (registerStatus === "approving_fee" || registerStatus === "approving_agent") return t`Sign in wallet...`;
 	if (registerStatus === "verifying") return t`Verifying...`;
@@ -35,11 +35,10 @@ export function useButtonContent(input: ButtonContentInput): ButtonContent {
 		input.registerStatus === "approving_fee" ||
 		input.registerStatus === "approving_agent" ||
 		input.registerStatus === "verifying";
-	const isLoadingAgents = input.agentStatus === "loading";
 
 	const registerText = useMemo(
-		() => getRegisterText(input.agentStatus, input.registerStatus, input.canApprove),
-		[input.agentStatus, input.registerStatus, input.canApprove],
+		() => getRegisterText(input.isAgentLoading, input.registerStatus, input.canApprove),
+		[input.isAgentLoading, input.registerStatus, input.canApprove],
 	);
 
 	return useMemo<ButtonContent>(() => {
@@ -71,7 +70,7 @@ export function useButtonContent(input: ButtonContentInput): ButtonContent {
 			return {
 				text: registerText,
 				action: input.onRegister,
-				disabled: isRegistering || !input.canApprove || isLoadingAgents,
+				disabled: isRegistering || !input.canApprove || input.isAgentLoading,
 				variant: "cyan",
 			};
 		}
@@ -92,7 +91,7 @@ export function useButtonContent(input: ButtonContentInput): ButtonContent {
 		registerText,
 		isRegistering,
 		input.canApprove,
-		isLoadingAgents,
+		input.isAgentLoading,
 		input.onConnectWallet,
 		input.onDeposit,
 		input.onRegister,

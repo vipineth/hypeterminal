@@ -25,20 +25,17 @@ description: Code style rules
 
 Only create helpers when logic is reused, complex, or significantly improves readability. Don't create helpers for simple one-liners.
 
+## Ternary Operators
+
+- Use ternaries only for simple single-level conditionals
+- **Never nest ternary operators** - use a helper function with early returns instead
+
 ## React Hooks
 
-**useEffect**: Only for side effects (subscriptions, DOM, external APIs). Never for derived state.
-**useMemo**: For expensive calculations or referential equality. Don't over-memoize.
-**useState**: Prefer primitives/indices over complex objects.
-**useCallback**: Only when passing to memoized children.
-
-```tsx
-// Bad - useEffect for derived state
-useEffect(() => { if (!selected && options.length) setSelected(options[0]); }, [options]);
-
-// Good - derive directly
-const selected = options[selectedIndex] ?? options[0];
-```
+- **useEffect**: Only for side effects (subscriptions, DOM, external APIs). Never for derived state.
+- **useMemo**: For expensive calculations or referential equality. Don't over-memoize.
+- **useState**: Prefer primitives/indices over complex objects.
+- **useCallback**: Only when passing to memoized children.
 
 ## hl-react Subscriptions
 

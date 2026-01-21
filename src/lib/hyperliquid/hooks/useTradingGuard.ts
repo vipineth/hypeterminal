@@ -15,17 +15,16 @@ interface UseTradingGuardResult {
 }
 
 export function useTradingGuard(): UseTradingGuardResult {
-	const { status } = useAgentStatus();
+	const { isReady, isLoading, signaturesRequired } = useAgentStatus();
 	const { register: registerAgent, status: registerStatus, error: agentError } = useAgentRegistration();
 	const pendingActionRef = useRef<PendingAction | null>(null);
-	const prevStatusRef = useRef(status);
+	const prevIsReadyRef = useRef(isReady);
 	const mountedRef = useRef(true);
 	const [localError, setLocalError] = useState<Error | null>(null);
 
-	const isReady = status === "ready";
 	const isEnabling =
 		registerStatus === "approving_fee" || registerStatus === "approving_agent" || registerStatus === "verifying";
-	const needsTrading = status !== "ready" && status !== "loading";
+	const needsTrading = !isLoading && signaturesRequired > 0;
 
 	useEffect(() => {
 		mountedRef.current = true;
@@ -35,21 +34,20 @@ export function useTradingGuard(): UseTradingGuardResult {
 	}, []);
 
 	useEffect(() => {
-		const wasValid = prevStatusRef.current === "ready";
-		const isNowValid = status === "ready";
+		const wasReady = prevIsReadyRef.current;
 
-		if (!wasValid && isNowValid && pendingActionRef.current && mountedRef.current) {
+		if (!wasReady && isReady && pendingActionRef.current && mountedRef.current) {
 			const action = pendingActionRef.current;
 			pendingActionRef.current = null;
 			Promise.resolve(action()).catch(() => {});
 		}
 
-		if (wasValid && !isNowValid) {
+		if (wasReady && !isReady) {
 			pendingActionRef.current = null;
 		}
 
-		prevStatusRef.current = status;
-	}, [status]);
+		prevIsReadyRef.current = isReady;
+	}, [isReady]);
 
 	const enableTrading = useCallback(() => {
 		if (isEnabling) return;

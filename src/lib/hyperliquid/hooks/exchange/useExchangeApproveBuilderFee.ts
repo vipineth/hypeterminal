@@ -35,7 +35,7 @@ export function getApproveBuilderFeeMutationOptions(
 export function useExchangeApproveBuilderFee(
 	options: UseExchangeApproveBuilderFeeOptions = {},
 ): UseExchangeApproveBuilderFeeReturnType {
-	const { trading } = useHyperliquidClients();
+	const { user } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getApproveBuilderFeeMutationOptions(trading)));
+	return useMutation(mergeMutationOptions(options, getApproveBuilderFeeMutationOptions(user)));
 }

@@ -1,16 +1,17 @@
 import { useCallback, useSyncExternalStore } from "react";
+import type { Address, Hex } from "viem";
 import { z } from "zod";
 import type { AgentWallet, HyperliquidEnv } from "./types";
 
 const privateKeySchema = z
 	.string()
 	.regex(/^0x[0-9a-fA-F]{64}$/)
-	.transform((v) => v.toLowerCase() as `0x${string}`);
+	.transform((v) => v.toLowerCase() as Hex);
 
 const publicKeySchema = z
 	.string()
 	.regex(/^0x[0-9a-fA-F]{40}$/)
-	.transform((v) => v.toLowerCase() as `0x${string}`);
+	.transform((v) => v.toLowerCase() as Address);
 
 const agentWalletSchema = z.object({
 	privateKey: privateKeySchema,

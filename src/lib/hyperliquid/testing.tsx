@@ -28,7 +28,6 @@ function createMockSubscriptionClient(): SubscriptionClient {
 
 export function MockHyperliquidProvider({ children, value = {} }: MockHyperliquidProviderProps) {
 	const mockValue: HyperliquidContextValue = {
-		exchangeClient: null,
 		info: createMockInfoClient(),
 		subscription: createMockSubscriptionClient(),
 		env: "Testnet" as HyperliquidEnv,

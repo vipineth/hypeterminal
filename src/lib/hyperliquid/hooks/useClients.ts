@@ -1,31 +1,32 @@
 import type { ExchangeClient, InfoClient, SubscriptionClient } from "@nktkas/hyperliquid";
 import { useMemo } from "react";
+import { useConnection, useWalletClient } from "wagmi";
 import { createExchangeClient } from "../clients";
 import { useHyperliquid } from "../context";
 import { useAgentWallet } from "../signing/use-agent-wallet";
-import { useUserWallet } from "../use-user-wallet";
 import { toHyperliquidWallet } from "../wallet";
 
 export interface HyperliquidClients {
 	info: InfoClient;
 	subscription: SubscriptionClient;
+	/** Exchange client using agent wallet - for L1 trading actions (order, cancel, etc.) */
 	trading: ExchangeClient | null;
-	admin: ExchangeClient | null;
-	/** @deprecated Use `trading` for L1 actions or `admin` for User-Signed actions */
-	exchange: ExchangeClient | null;
+	/** Exchange client using user wallet - for user-signed actions (approveAgent, approveBuilderFee, withdraw, etc.) */
+	user: ExchangeClient | null;
 }
 
 export function useHyperliquidClients(): HyperliquidClients {
 	const { info, subscription } = useHyperliquid();
 	const { signer, isReady: agentReady } = useAgentWallet();
-	const { address, walletClient } = useUserWallet();
+	const { address } = useConnection();
+	const { data: walletClient } = useWalletClient();
 
 	const trading = useMemo(() => {
 		if (!signer || !agentReady) return null;
 		return createExchangeClient(signer);
 	}, [signer, agentReady]);
 
-	const admin = useMemo(() => {
+	const user = useMemo(() => {
 		if (!walletClient || !address) return null;
 		const wallet = toHyperliquidWallet(walletClient, address);
 		if (!wallet) return null;
@@ -36,7 +37,6 @@ export function useHyperliquidClients(): HyperliquidClients {
 		info,
 		subscription,
 		trading,
-		admin,
-		exchange: trading,
+		user,
 	};
 }

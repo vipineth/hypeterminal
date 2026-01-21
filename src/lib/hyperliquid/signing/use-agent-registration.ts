@@ -1,76 +1,63 @@
-import type { ExtraAgentsResponse } from "@nktkas/hyperliquid";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
+import type { Address } from "viem";
+import { zeroAddress } from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
-import { useConnection, useWalletClient } from "wagmi";
-import { createExchangeClient } from "../clients";
+import { useConnection } from "wagmi";
 import { useHyperliquid } from "../context";
-import { infoKeys } from "../query/keys";
-import { toHyperliquidWallet } from "../wallet";
-import { useAgentWalletActions, useAgentWalletStorage } from "./agent-storage";
-import { convertFeeToPercentageString, isAgentApproved, isBuilderFeeApproved } from "./agent-utils";
+import { useExchangeApproveAgent } from "../hooks/exchange/useExchangeApproveAgent";
+import { useExchangeApproveBuilderFee } from "../hooks/exchange/useExchangeApproveBuilderFee";
+import { useAgentWalletActions } from "./agent-storage";
+import { convertFeeToPercentageString } from "./agent-utils";
+import { useAgentStatus } from "./use-agent-status";
 import type { RegistrationStatus } from "./types";
 
+export type RegistrationStep = "fee" | "agent" | null;
+
 export interface UseAgentRegistrationResult {
-	register: () => Promise<`0x${string}`>;
+	register: () => void;
 	status: RegistrationStatus;
+	currentStep: RegistrationStep;
 	error: Error | null;
 	reset: () => void;
+}
+
+function deriveRegistrationStatus(isPending: boolean, isError: boolean, currentStep: RegistrationStep): RegistrationStatus {
+	if (!isPending) return isError ? "error" : "idle";
+	if (currentStep === "fee") return "approving_fee";
+	if (currentStep === "agent") return "approving_agent";
+	return "verifying";
 }
 
 export function useAgentRegistration(): UseAgentRegistrationResult {
 	const { env, agentName, builderConfig } = useHyperliquid();
 	const { address } = useConnection();
-	const { data: walletClient } = useWalletClient();
-	const queryClient = useQueryClient();
 
-	const [status, setStatus] = useState<RegistrationStatus>("idle");
-	const [error, setError] = useState<Error | null>(null);
-
-	const agentWallet = useAgentWalletStorage(env, address);
+	const [currentStep, setCurrentStep] = useState<RegistrationStep>(null);
 	const { setAgent, clearAgent } = useAgentWalletActions();
 
-	const hasBuilderConfig = !!builderConfig?.b;
+	const agentStatus = useAgentStatus();
+	const approveBuilderFee = useExchangeApproveBuilderFee();
+	const approveAgent = useExchangeApproveAgent();
 
-	const register = useCallback(async (): Promise<`0x${string}`> => {
-		if (!address) throw new Error("No wallet connected");
-		if (!walletClient) throw new Error("No wallet client available");
+	const registration = useMutation({
+		mutationKey: ["hl", "registration", address],
+		mutationFn: async (): Promise<Address> => {
+			if (!address) throw new Error("No wallet connected");
 
-		const wallet = toHyperliquidWallet(walletClient, address);
-		if (!wallet) throw new Error("Failed to create wallet adapter");
+			let requirements = await agentStatus.refetch();
 
-		const exchangeClient = createExchangeClient(wallet);
-
-		setError(null);
-		setStatus("approving_fee");
-
-		try {
-			const currentMaxBuilderFee = queryClient.getQueryData<number>(
-				infoKeys.method("maxBuilderFee", { user: address, builder: builderConfig?.b ?? "0x0" }),
-			);
-			const needsBuilderFee = hasBuilderConfig && !isBuilderFeeApproved(currentMaxBuilderFee, builderConfig?.f);
-
-			if (needsBuilderFee && builderConfig?.b && builderConfig?.f !== undefined) {
-				await exchangeClient.approveBuilderFee({
+			if (requirements.needsBuilderFee && builderConfig?.b && builderConfig?.f !== undefined) {
+				setCurrentStep("fee");
+				await approveBuilderFee.mutateAsync({
 					builder: builderConfig.b,
 					maxFeeRate: convertFeeToPercentageString(builderConfig.f),
 				});
-
-				setStatus("verifying");
-				await queryClient.invalidateQueries({
-					queryKey: infoKeys.method("maxBuilderFee", { user: address, builder: builderConfig.b }),
-				});
+				requirements = await agentStatus.refetch();
 			}
 
-			setStatus("approving_agent");
-
-			const currentExtraAgents = queryClient.getQueryData<ExtraAgentsResponse>(
-				infoKeys.method("extraAgents", { user: address }),
-			);
-			const existingWallet = agentWallet;
-			const needsAgentApproval = !isAgentApproved(currentExtraAgents, existingWallet?.publicKey);
-
-			if (needsAgentApproval) {
+			if (requirements.needsAgent) {
+				setCurrentStep("agent");
 				clearAgent(env, address);
 
 				const privateKey = generatePrivateKey();
@@ -78,41 +65,31 @@ export function useAgentRegistration(): UseAgentRegistrationResult {
 				const publicKey = account.address;
 
 				setAgent(env, address, privateKey, publicKey);
+				await approveAgent.mutateAsync({ agentAddress: publicKey, agentName });
+				await agentStatus.refetch();
 
-				await exchangeClient.approveAgent({ agentAddress: publicKey, agentName });
-
-				setStatus("verifying");
-				await queryClient.invalidateQueries({
-					queryKey: infoKeys.method("extraAgents", { user: address }),
-				});
+				setCurrentStep(null);
+				return publicKey;
 			}
 
-			setStatus("idle");
-			return agentWallet?.publicKey ?? "0x0";
-		} catch (err) {
-			setStatus("error");
-			const nextError = err instanceof Error ? err : new Error(String(err));
-			setError(nextError);
-			throw nextError;
-		}
-	}, [
-		address,
-		walletClient,
-		env,
-		agentName,
-		builderConfig,
-		hasBuilderConfig,
-		clearAgent,
-		setAgent,
-		queryClient,
-		agentWallet,
-	]);
+			setCurrentStep(null);
+			return agentStatus.agentAddress ?? zeroAddress;
+		},
+	});
+
+	const status = deriveRegistrationStatus(registration.isPending, registration.isError, currentStep);
 
 	const reset = useCallback(() => {
 		if (address) clearAgent(env, address);
-		setStatus("idle");
-		setError(null);
-	}, [address, env, clearAgent]);
+		registration.reset();
+		setCurrentStep(null);
+	}, [address, env, clearAgent, registration]);
 
-	return { register, status, error, reset };
+	return {
+		register: registration.mutate,
+		status,
+		currentStep,
+		error: registration.error,
+		reset,
+	};
 }

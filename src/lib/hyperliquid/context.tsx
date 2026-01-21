@@ -1,23 +1,14 @@
-import type { ExchangeClient, InfoClient, SubscriptionClient } from "@nktkas/hyperliquid";
+import type { InfoClient, SubscriptionClient } from "@nktkas/hyperliquid";
 import type { ReactNode } from "react";
-import { createContext, useContext, useMemo, useRef } from "react";
-import { useConnection, useWalletClient } from "wagmi";
+import { createContext, useContext, useRef } from "react";
+import { useConnection } from "wagmi";
 import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/hyperliquid";
-import {
-	createExchangeClient,
-	getHttpTransport,
-	getInfoClient,
-	getSubscriptionClient,
-	getWsTransport,
-	initializeClients,
-} from "./clients";
+import { getHttpTransport, getInfoClient, getSubscriptionClient, getWsTransport, initializeClients } from "./clients";
 import { createHyperliquidConfig } from "./create-config";
 import type { BuilderConfig, HyperliquidEnv } from "./signing/types";
 import { createHyperliquidStore, type HyperliquidStore } from "./store";
-import { toHyperliquidWallet } from "./wallet";
 
 export interface HyperliquidContextValue {
-	exchangeClient: ExchangeClient | null;
 	info: InfoClient;
 	subscription: SubscriptionClient;
 	env: HyperliquidEnv;
@@ -43,7 +34,6 @@ export function HyperliquidProvider({
 	agentName = PROJECT_NAME,
 }: HyperliquidProviderProps) {
 	const { address } = useConnection();
-	const { data: walletClient } = useWalletClient();
 
 	const initRef = useRef(false);
 	if (!initRef.current) {
@@ -62,17 +52,9 @@ export function HyperliquidProvider({
 		);
 	}
 
-	const wallet = useMemo(() => toHyperliquidWallet(walletClient, address), [walletClient, address]);
-
-	const exchangeClient = useMemo(() => {
-		if (!wallet) return null;
-		return createExchangeClient(wallet);
-	}, [wallet]);
-
 	const clientKey = address ?? "disconnected";
 
 	const value = {
-		exchangeClient,
 		info: getInfoClient(),
 		subscription: getSubscriptionClient(),
 		env,
@@ -98,9 +80,4 @@ export function useHyperliquid(): HyperliquidContextValue {
 
 export function useHyperliquidOptional(): HyperliquidContextValue | null {
 	return useContext(HyperliquidContext);
-}
-
-export function useExchangeClient(): ExchangeClient | null {
-	const { exchangeClient } = useHyperliquid();
-	return exchangeClient;
 }

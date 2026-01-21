@@ -127,7 +127,7 @@ export function OrderEntryPanel() {
 	);
 	const clearinghouse = clearinghouseEvent?.clearinghouseState;
 
-	const { status: agentStatus } = useAgentStatus();
+	const { isReady: isAgentReady, isLoading: isAgentLoading } = useAgentStatus();
 	const { register: registerAgent, status: registerStatus } = useAgentRegistration();
 	const { mutateAsync: placeOrder, isPending: isSubmittingOrder } = useExchangeOrder();
 	const { mutateAsync: placeTwapOrder, isPending: isSubmittingTwap } = useExchangeTwapOrder();
@@ -273,8 +273,8 @@ export function OrderEntryPanel() {
 		[leverage, price, side, sizeValue],
 	);
 
-	const needsAgentApproval = agentStatus !== "ready";
-	const isReadyToTrade = agentStatus === "ready";
+	const needsAgentApproval = !isAgentReady;
+	const isReadyToTrade = isAgentReady;
 	const canApprove = !!walletClient && !!address;
 
 	const validation = useOrderValidation({
@@ -522,7 +522,7 @@ export function OrderEntryPanel() {
 		switchChain: (chainId) => switchChain.mutate({ chainId }),
 		availableBalance,
 		validation,
-		agentStatus,
+		isAgentLoading,
 		registerStatus,
 		canApprove,
 		side,
