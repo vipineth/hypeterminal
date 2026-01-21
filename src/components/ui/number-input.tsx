@@ -152,7 +152,7 @@ function NumberInput({
 			data-size={inputSize}
 			value={value}
 			className={cn(
-				"file:text-fg placeholder:text-muted-fg selection:bg-primary selection:text-primary-fg dark:bg-input/30 border-input min-w-0 rounded-sm border bg-transparent px-2 py-1 shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+				"file:text-fg placeholder:text-muted-fg selection:bg-primary selection:text-primary-fg dark:bg-input/30 border-border min-w-0 rounded-sm border bg-transparent px-2 py-1 shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
 				"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
 				"aria-invalid:ring-danger/20 dark:aria-invalid:ring-danger/40 aria-invalid:border-danger",
 				inputSize === "sm" && "h-6 text-2xs px-1.5",
