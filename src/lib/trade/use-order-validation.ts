@@ -51,6 +51,9 @@ export function useOrderValidation(input: ValidationInput): ValidationResult {
 		if (input.isWalletLoading) {
 			return { valid: false, errors: [t`Loading wallet...`], canSubmit: false, needsApproval: false };
 		}
+		if (input.needsAgentApproval) {
+			return { valid: false, errors: [], canSubmit: false, needsApproval: true };
+		}
 		if (input.availableBalance <= 0) {
 			return { valid: false, errors: [t`No balance`], canSubmit: false, needsApproval: false };
 		}
@@ -59,9 +62,6 @@ export function useOrderValidation(input: ValidationInput): ValidationResult {
 		}
 		if (!input.hasAssetIndex) {
 			return { valid: false, errors: [t`Market not ready`], canSubmit: false, needsApproval: false };
-		}
-		if (input.needsAgentApproval) {
-			return { valid: false, errors: [], canSubmit: false, needsApproval: true };
 		}
 		if (!input.isReadyToTrade) {
 			return { valid: false, errors: [t`Signer not ready`], canSubmit: false, needsApproval: false };

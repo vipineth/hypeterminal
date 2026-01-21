@@ -58,19 +58,19 @@ export function useButtonContent(input: ButtonContentInput): ButtonContent {
 				variant: "cyan",
 			};
 		}
-		if (input.availableBalance <= 0) {
-			return {
-				text: t`Deposit`,
-				action: input.onDeposit,
-				disabled: false,
-				variant: "cyan",
-			};
-		}
 		if (input.validation.needsApproval) {
 			return {
 				text: registerText,
 				action: input.onRegister,
 				disabled: isRegistering || !input.canApprove || input.isAgentLoading,
+				variant: "cyan",
+			};
+		}
+		if (input.availableBalance <= 0) {
+			return {
+				text: t`Deposit`,
+				action: input.onDeposit,
+				disabled: false,
 				variant: "cyan",
 			};
 		}

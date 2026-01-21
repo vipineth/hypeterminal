@@ -1,14 +1,10 @@
 import { t } from "@lingui/core/macro";
-import type {
-	AllMidsResponse,
-	CandleSnapshotParameters,
-	CandleSnapshotResponse,
-	CandleWsEvent,
-	ISubscription,
-	MetaResponse,
-} from "@nktkas/hyperliquid";
-import { getInfoClient, getSubscriptionClient } from "@/lib/hyperliquid/clients";
-import { toFiniteNumber } from "@/lib/trade/numbers";
+import type { AllMidsResponse, MetaResponse } from "@nktkas/hyperliquid";
+import { getInfoClient } from "@/lib/hyperliquid/clients";
+import { candleSnapshotToBar, filterAndSortBars } from "@/lib/chart/candle";
+import { resolutionToInterval } from "@/lib/chart/resolution";
+import { getCandleStore, streamKey } from "@/lib/chart/store";
+import { coinFromSymbolName, inferPriceScaleFromMids, symbolFromCoin } from "@/lib/chart/symbol";
 import type {
 	Bar,
 	DatafeedConfiguration,
@@ -35,8 +31,6 @@ import {
 	SUPPORTED_RESOLUTIONS,
 	TIMEZONE,
 } from "./constants";
-
-type CandleInterval = CandleSnapshotParameters["interval"];
 
 let metaCache: { value: MetaResponse; fetchedAt: number } | undefined;
 let metaPromise: Promise<MetaResponse> | undefined;
@@ -79,134 +73,6 @@ async function getAllMids(): Promise<AllMidsResponse> {
 	return allMidsPromise;
 }
 
-function normalizeSymbolName(symbolName: string): string {
-	const trimmed = symbolName.trim();
-	const withoutExchange = trimmed.includes(":") ? (trimmed.split(":").pop() ?? trimmed) : trimmed;
-	return withoutExchange.trim();
-}
-
-function coinFromSymbolName(symbolName: string): string {
-	const normalized = normalizeSymbolName(symbolName);
-	return normalized.split(/[/-]/)[0] ?? normalized;
-}
-
-function symbolFromCoin(coin: string): string {
-	return `${coin}/${QUOTE_ASSET}`;
-}
-
-function resolutionToInterval(resolution: ResolutionString): CandleInterval | undefined {
-	const r = resolution as unknown as string;
-
-	switch (r) {
-		case "1":
-			return "1m";
-		case "3":
-			return "3m";
-		case "5":
-			return "5m";
-		case "15":
-			return "15m";
-		case "30":
-			return "30m";
-		case "60":
-			return "1h";
-		case "120":
-			return "2h";
-		case "240":
-			return "4h";
-		case "480":
-			return "8h";
-		case "720":
-			return "12h";
-		case "D":
-		case "1D":
-			return "1d";
-		case "3D":
-			return "3d";
-		case "W":
-		case "1W":
-			return "1w";
-		case "M":
-		case "1M":
-			return "1M";
-		default:
-			return undefined;
-	}
-}
-
-function parseDecimal(value: unknown): number {
-	const parsed = toFiniteNumber(value);
-	return parsed ?? Number.NaN;
-}
-
-function candleSnapshotToBar(candle: CandleSnapshotResponse[number]): Bar | null {
-	const open = parseDecimal(candle.o);
-	const high = parseDecimal(candle.h);
-	const low = parseDecimal(candle.l);
-	const close = parseDecimal(candle.c);
-	const volume = parseDecimal(candle.v);
-
-	if (!Number.isFinite(open) || !Number.isFinite(high) || !Number.isFinite(low) || !Number.isFinite(close)) {
-		return null;
-	}
-
-	return {
-		time: candle.t,
-		open,
-		high,
-		low,
-		close,
-		volume: Number.isFinite(volume) ? volume : undefined,
-	};
-}
-
-function candleEventToBar(event: CandleWsEvent): Bar | null {
-	const open = parseDecimal(event.o);
-	const high = parseDecimal(event.h);
-	const low = parseDecimal(event.l);
-	const close = parseDecimal(event.c);
-	const volume = parseDecimal(event.v);
-
-	if (!Number.isFinite(open) || !Number.isFinite(high) || !Number.isFinite(low) || !Number.isFinite(close)) {
-		return null;
-	}
-
-	return {
-		time: event.t,
-		open,
-		high,
-		low,
-		close,
-		volume: Number.isFinite(volume) ? volume : undefined,
-	};
-}
-
-function inferDecimalPlaces(value: string): number {
-	const match = value.match(/\.(\d+)/);
-	if (!match) return 0;
-	return match[1]?.replace(/0+$/, "").length ?? 0;
-}
-
-function priceScaleFromMid(mid: string): number {
-	const decimals = inferDecimalPlaces(mid);
-	const digits = Math.min(Math.max(decimals, 2), 8);
-	return 10 ** digits;
-}
-
-async function inferPriceScale(coin: string): Promise<number> {
-	try {
-		const mids = await getAllMids();
-		const mid = mids[coin];
-		if (typeof mid === "string" && mid.length > 0) {
-			return priceScaleFromMid(mid);
-		}
-	} catch (error) {
-		console.warn("Failed to infer pricescale from allMids:", error);
-	}
-
-	return DEFAULT_PRICESCALE;
-}
-
 async function isKnownCoin(coin: string): Promise<boolean> {
 	try {
 		const meta = await getMeta();
@@ -225,121 +91,31 @@ async function searchCoins(query: string): Promise<string[]> {
 		.filter((coin) => (q.length === 0 ? true : coin.toLowerCase().includes(q)));
 }
 
-function cacheKey(symbol: LibrarySymbolInfo, resolution: ResolutionString): string {
-	return `${symbol.ticker ?? symbol.name}:${resolution as unknown as string}`;
+async function inferPriceScale(coin: string): Promise<number> {
+	try {
+		const mids = await getAllMids();
+		return inferPriceScaleFromMids(coin, mids);
+	} catch (error) {
+		console.warn("Failed to infer pricescale:", error);
+		return DEFAULT_PRICESCALE;
+	}
 }
 
+function cacheKey(symbol: LibrarySymbolInfo, resolution: ResolutionString): string {
+	return `${symbol.ticker ?? symbol.name}:${resolution as string}`;
+}
+
+const configuration: DatafeedConfiguration = {
+	exchanges: [{ value: EXCHANGE, name: EXCHANGE, desc: EXCHANGE }],
+	supported_resolutions: SUPPORTED_RESOLUTIONS,
+	supports_marks: false,
+	supports_time: true,
+	supports_timescale_marks: false,
+};
+
 export function createDatafeed(): IBasicDataFeed {
-	const lastBarCache = new Map<string, Bar>();
-	const listenerToStreamKey = new Map<string, string>();
-
-	type CandleListener = {
-		onTick: SubscribeBarsCallback;
-		onResetCacheNeededCallback: () => void;
-		symbolCacheKey: string;
-	};
-
-	type CandleStream = {
-		subscriptionPromise: Promise<ISubscription>;
-		listeners: Map<string, CandleListener>;
-		lastBar?: Bar;
-	};
-
-	const candleStreams = new Map<string, CandleStream>();
-
-	function streamKeyFor(coin: string, interval: CandleInterval): string {
-		return `${coin}:${interval}`;
-	}
-
-	function removeListener(listenerGuid: string): void {
-		const streamKey = listenerToStreamKey.get(listenerGuid);
-		if (!streamKey) return;
-
-		const stream = candleStreams.get(streamKey);
-		listenerToStreamKey.delete(listenerGuid);
-
-		if (!stream) return;
-
-		stream.listeners.delete(listenerGuid);
-
-		if (stream.listeners.size === 0) {
-			candleStreams.delete(streamKey);
-			stream.subscriptionPromise.then((sub) => sub.unsubscribe()).catch(() => {});
-		}
-	}
-
-	function getOrCreateStream(coin: string, interval: CandleInterval): CandleStream {
-		const streamKey = streamKeyFor(coin, interval);
-		const existing = candleStreams.get(streamKey);
-		if (existing) return existing;
-
-		const stream: CandleStream = {
-			subscriptionPromise: Promise.resolve({
-				unsubscribe: async () => {},
-				failureSignal: new AbortController().signal,
-			}),
-			listeners: new Map<string, CandleListener>(),
-			lastBar: undefined,
-		};
-
-		const subscriptionPromise = getSubscriptionClient().candle({ coin, interval }, (event) => {
-			const bar = candleEventToBar(event);
-			if (!bar) return;
-
-			const current = candleStreams.get(streamKey);
-			if (!current) return;
-
-			current.lastBar = bar;
-
-			for (const listener of current.listeners.values()) {
-				lastBarCache.set(listener.symbolCacheKey, bar);
-				listener.onTick(bar);
-			}
-		});
-
-		stream.subscriptionPromise = subscriptionPromise;
-		candleStreams.set(streamKey, stream);
-
-		subscriptionPromise
-			.then((sub) => {
-				sub.failureSignal.addEventListener(
-					"abort",
-					() => {
-						const current = candleStreams.get(streamKey);
-						if (!current) return;
-						console.warn("Candle subscription aborted:", sub.failureSignal.reason);
-						for (const listener of current.listeners.values()) {
-							listener.onResetCacheNeededCallback();
-						}
-					},
-					{ once: true },
-				);
-			})
-			.catch((error) => {
-				const current = candleStreams.get(streamKey);
-				if (!current) return;
-
-				console.error("Candle subscription failed:", error);
-
-				for (const [listenerGuid, listener] of current.listeners.entries()) {
-					listenerToStreamKey.delete(listenerGuid);
-					listener.onResetCacheNeededCallback();
-				}
-
-				candleStreams.delete(streamKey);
-			});
-
-		return stream;
-	}
-
-	const configuration: DatafeedConfiguration = {
-		exchanges: [{ value: EXCHANGE, name: EXCHANGE, desc: EXCHANGE }],
-		supported_resolutions: SUPPORTED_RESOLUTIONS,
-		supports_marks: false,
-		supports_time: true,
-		supports_timescale_marks: false,
-		// symbols_types: CHART_DATAFEED_CONFIG.SYMBOL_TYPES,
-	};
+	const store = getCandleStore();
+	const listenerToStream = new Map<string, string>();
 
 	return {
 		onReady: (callback: OnReadyCallback) => {
@@ -384,8 +160,7 @@ export function createDatafeed(): IBasicDataFeed {
 			void extension;
 
 			void (async () => {
-				const normalized = normalizeSymbolName(symbolName);
-				const coin = coinFromSymbolName(normalized);
+				const coin = coinFromSymbolName(symbolName);
 				const symbol = symbolFromCoin(coin);
 
 				if (!(await isKnownCoin(coin))) {
@@ -449,11 +224,7 @@ export function createDatafeed(): IBasicDataFeed {
 					endTime: toMs,
 				});
 
-				const bars = candles
-					.map(candleSnapshotToBar)
-					.filter((bar): bar is Bar => !!bar)
-					.filter((bar) => bar.time >= fromMs && bar.time < toMs)
-					.sort((a, b) => a.time - b.time);
+				const bars = filterAndSortBars(candles.map(candleSnapshotToBar), fromMs, toMs);
 
 				if (bars.length === 0) {
 					onResult([], { noData: true });
@@ -461,7 +232,8 @@ export function createDatafeed(): IBasicDataFeed {
 				}
 
 				const key = cacheKey(symbolInfo, resolution);
-				lastBarCache.set(key, bars[bars.length - 1]);
+				const lastBar = bars[bars.length - 1];
+				store.getState().setLastBar(key, lastBar);
 
 				onResult(bars, { noData: false });
 			})().catch((error) => {
@@ -482,23 +254,36 @@ export function createDatafeed(): IBasicDataFeed {
 				return;
 			}
 
-			removeListener(listenerGuid);
+			const existingStreamKey = listenerToStream.get(listenerGuid);
+			if (existingStreamKey) {
+				store.getState().unsubscribe(existingStreamKey, listenerGuid);
+			}
 
 			const coin = coinFromSymbolName(symbolInfo.ticker ?? symbolInfo.name);
 			const symbolCacheKey = cacheKey(symbolInfo, resolution);
+			const key = streamKey(coin, interval);
 
-			const streamKey = streamKeyFor(coin, interval);
-			const stream = getOrCreateStream(coin, interval);
+			listenerToStream.set(listenerGuid, key);
 
-			stream.listeners.set(listenerGuid, { onTick, onResetCacheNeededCallback, symbolCacheKey });
-			listenerToStreamKey.set(listenerGuid, streamKey);
+			const wrappedOnTick = (bar: Bar) => {
+				store.getState().setLastBar(symbolCacheKey, bar);
+				onTick(bar);
+			};
 
-			const cached = lastBarCache.get(symbolCacheKey) ?? stream.lastBar;
-			if (cached) onTick(cached);
+			store.getState().subscribe(key, coin, interval, listenerGuid, wrappedOnTick, onResetCacheNeededCallback);
+
+			const cached = store.getState().getLastBar(symbolCacheKey);
+			if (cached) {
+				onTick(cached);
+			}
 		},
 
 		unsubscribeBars: (listenerGuid: string) => {
-			removeListener(listenerGuid);
+			const key = listenerToStream.get(listenerGuid);
+			if (key) {
+				store.getState().unsubscribe(key, listenerGuid);
+				listenerToStream.delete(listenerGuid);
+			}
 		},
 
 		getServerTime: (callback: ServerTimeCallback) => {
