@@ -1,6 +1,6 @@
 import { useCallback, useSyncExternalStore } from "react";
 import { z } from "zod";
-import type { HyperliquidEnv } from "../hooks/agent/types";
+import type { HyperliquidEnv } from "../signing/types";
 
 const privateKeySchema = z
 	.string()

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useTradingAgent } from "./useTradingAgent";
+import { useAgentRegistration } from "../signing/use-agent-registration";
+import { useAgentStatus } from "../signing/use-agent-status";
 
 type PendingAction = () => void | Promise<void>;
 
@@ -14,15 +15,17 @@ interface UseTradingGuardResult {
 }
 
 export function useTradingGuard(): UseTradingGuardResult {
-	const { status, registerStatus, registerAgent, error: agentError } = useTradingAgent();
+	const { status } = useAgentStatus();
+	const { register: registerAgent, status: registerStatus, error: agentError } = useAgentRegistration();
 	const pendingActionRef = useRef<PendingAction | null>(null);
 	const prevStatusRef = useRef(status);
 	const mountedRef = useRef(true);
 	const [localError, setLocalError] = useState<Error | null>(null);
 
-	const isReady = status === "valid";
-	const isEnabling = registerStatus === "signing" || registerStatus === "verifying";
-	const needsTrading = status !== "valid" && status !== "loading";
+	const isReady = status === "ready";
+	const isEnabling =
+		registerStatus === "approving_fee" || registerStatus === "approving_agent" || registerStatus === "verifying";
+	const needsTrading = status !== "ready" && status !== "loading";
 
 	useEffect(() => {
 		mountedRef.current = true;
@@ -32,8 +35,8 @@ export function useTradingGuard(): UseTradingGuardResult {
 	}, []);
 
 	useEffect(() => {
-		const wasValid = prevStatusRef.current === "valid";
-		const isNowValid = status === "valid";
+		const wasValid = prevStatusRef.current === "ready";
+		const isNowValid = status === "ready";
 
 		if (!wasValid && isNowValid && pendingActionRef.current && mountedRef.current) {
 			const action = pendingActionRef.current;

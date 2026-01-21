@@ -17,7 +17,7 @@ import {
 import { useAssetLeverage } from "@/hooks/trade/use-asset-leverage";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
-import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
+import { useAgentRegistration, useAgentStatus, useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
@@ -55,12 +55,12 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	);
 	const clearinghouse = clearinghouseEvent?.clearinghouseState;
 
-	const { status: agentStatus, registerStatus, signer: agentSigner, registerAgent } = useTradingAgent();
+	const { isReady: isAgentApproved } = useAgentStatus();
+	const { register: registerAgent, status: registerStatus } = useAgentRegistration();
 
-	const isAgentApproved = agentStatus === "valid";
-	const apiWalletSigner = agentSigner;
 	const canApprove = !!walletClient && !!address;
-	const isRegistering = registerStatus === "signing" || registerStatus === "verifying";
+	const isRegistering =
+		registerStatus === "approving_fee" || registerStatus === "approving_agent" || registerStatus === "verifying";
 
 	const slippageBps = useMarketOrderSlippageBps();
 
@@ -135,7 +135,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 		return side === "buy" ? price - buffer : price + buffer;
 	})();
 
-	const canSign = isAgentApproved ? !!apiWalletSigner : !!walletClient;
+	const canSign = isAgentApproved || !!walletClient;
 
 	const validation = useMemo(() => {
 		const errors: string[] = [];

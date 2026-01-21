@@ -12,7 +12,7 @@ import {
 	initializeClients,
 } from "./clients";
 import { createHyperliquidConfig } from "./create-config";
-import type { BuilderConfig, HyperliquidEnv } from "./hooks/agent/types";
+import type { BuilderConfig, HyperliquidEnv } from "./signing/types";
 import { createHyperliquidStore, type HyperliquidStore } from "./store";
 import { toHyperliquidWallet } from "./wallet";
 

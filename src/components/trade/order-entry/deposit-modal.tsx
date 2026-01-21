@@ -12,17 +12,18 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { formatUnits } from "viem";
+import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NumberInput } from "@/components/ui/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MIN_DEPOSIT_USDC, MIN_WITHDRAW_USD, USDC_DECIMALS, WITHDRAWAL_FEE_USD } from "@/config/contracts";
-import { useArbitrumDeposit } from "@/hooks/arbitrum/use-arbitrum-deposit";
-import { useHyperliquidWithdraw } from "@/hooks/arbitrum/use-hyperliquid-withdraw";
 import { cn } from "@/lib/cn";
 import { getExplorerTxUrl } from "@/lib/explorer";
 import { formatNumber } from "@/lib/format";
+import { useDeposit, useExchangeWithdraw3, useSubClearinghouseState } from "@/lib/hyperliquid";
+import { isPositive, parseNumber } from "@/lib/trade/numbers";
 import { formatTransferError } from "@/lib/transfer/errors";
 import { useDepositModalActions, useDepositModalOpen, useDepositModalTab } from "@/stores/use-deposit-modal-store";
 
@@ -131,9 +132,7 @@ function StatusScreen({
 						<div
 							className={cn(
 								"flex size-14 items-center justify-center rounded-full border",
-								icon === "success"
-									? "bg-positive/10 border-positive/30"
-									: "bg-negative/10 border-negative/30",
+								icon === "success" ? "bg-positive/10 border-positive/30" : "bg-negative/10 border-negative/30",
 							)}
 						>
 							{icon === "success" ? (
@@ -148,12 +147,7 @@ function StatusScreen({
 						{description && <p className="text-xs text-muted-fg">{description}</p>}
 					</div>
 					{explorerUrl && (
-						<Button
-							asChild
-							variant="link"
-							size="none"
-							className="h-auto p-0 text-3xs text-info hover:underline"
-						>
+						<Button asChild variant="link" size="none" className="h-auto p-0 text-3xs text-info hover:underline">
 							<a href={explorerUrl} target="_blank" rel="noopener noreferrer">
 								<span className="inline-flex items-center gap-1.5">
 									<Trans>View on explorer</Trans>
@@ -195,8 +189,7 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 						onClick={() => onAmountChange(balance)}
 						className="h-auto p-0 text-3xs text-muted-fg hover:text-fg"
 					>
-						<Trans>Balance:</Trans>{" "}
-						<span className="tabular-nums text-fg font-medium">{formatNumber(balance, 2)}</span>{" "}
+						<Trans>Balance:</Trans> <span className="tabular-nums text-fg font-medium">{formatNumber(balance, 2)}</span>{" "}
 						<span className="text-info">USDC</span>
 					</Button>
 				</div>
@@ -449,29 +442,44 @@ export function DepositModal() {
 		isSwitching,
 		switchError,
 		balance: depositBalance,
-		step: depositStep,
+		status: depositStatus,
 		error: depositError,
-		startDeposit,
-		validateAmount: validateDepositAmount,
+		hash: depositHash,
+		deposit,
+		validate: validateDeposit,
 		reset: resetDeposit,
-		isPending: isDepositPending,
-		depositHash,
-	} = useArbitrumDeposit();
+	} = useDeposit();
+
+	const { address } = useConnection();
+
+	const { data: clearinghouse, status: balanceStatus } = useSubClearinghouseState(
+		{ user: address ?? "0x" },
+		{ enabled: !!address },
+	);
+
+	const withdrawable = clearinghouse?.clearinghouseState?.withdrawable ?? "0";
+	const withdrawableNum = parseNumber(withdrawable);
 
 	const {
-		address,
-		withdrawable,
-		balanceStatus,
-		validateAmount: validateWithdrawAmount,
-		startWithdraw,
-		reset: resetWithdraw,
+		mutate: withdraw,
 		isPending: isWithdrawPending,
 		isSuccess: isWithdrawSuccess,
 		error: withdrawError,
-	} = useHyperliquidWithdraw();
+		reset: resetWithdraw,
+	} = useExchangeWithdraw3();
 
-	const depositValidation = validateDepositAmount(depositAmount);
-	const withdrawValidation = validateWithdrawAmount(withdrawAmount);
+	const depositValidation = validateDeposit(depositAmount);
+
+	function validateWithdraw(amount: string) {
+		if (!amount || amount === "0") return { valid: false, error: null };
+		const amountNum = parseNumber(amount);
+		if (!isPositive(amountNum)) return { valid: false, error: t`Invalid amount` };
+		if (amountNum < MIN_WITHDRAW_USD) return { valid: false, error: t`Minimum withdrawal is $${MIN_WITHDRAW_USD}` };
+		if (amountNum > withdrawableNum) return { valid: false, error: t`Insufficient balance` };
+		return { valid: true, error: null };
+	}
+
+	const withdrawValidation = validateWithdraw(withdrawAmount);
 
 	function handleClose() {
 		resetDeposit();
@@ -483,13 +491,13 @@ export function DepositModal() {
 
 	function handleDepositSubmit() {
 		if (depositValidation.valid) {
-			startDeposit(depositAmount);
+			deposit(depositAmount);
 		}
 	}
 
 	function handleWithdrawSubmit() {
 		if (withdrawValidation.valid && address) {
-			startWithdraw(withdrawAmount, address);
+			withdraw({ destination: address, amount: withdrawAmount });
 		}
 	}
 
@@ -507,7 +515,7 @@ export function DepositModal() {
 	}
 
 	// Deposit status screens
-	if (depositStep === "success") {
+	if (depositStatus === "success") {
 		return (
 			<StatusScreen
 				title={<Trans>Deposit</Trans>}
@@ -529,7 +537,7 @@ export function DepositModal() {
 		);
 	}
 
-	if (depositStep === "error") {
+	if (depositStatus === "error") {
 		return (
 			<StatusScreen
 				title={<Trans>Deposit</Trans>}
@@ -550,14 +558,14 @@ export function DepositModal() {
 		);
 	}
 
-	if (depositStep === "signing" || depositStep === "depositing") {
+	if (depositStatus === "pending" || depositStatus === "confirming") {
 		return (
 			<StatusScreen
 				title={<Trans>Deposit</Trans>}
 				icon="loading"
-				heading={depositStep === "signing" ? <Trans>Confirm in wallet</Trans> : <Trans>Processing deposit</Trans>}
+				heading={depositStatus === "pending" ? <Trans>Confirm in wallet</Trans> : <Trans>Processing deposit</Trans>}
 				description={<span className="tabular-nums">{depositAmount} USDC → Hyperliquid</span>}
-				txHash={depositStep === "depositing" ? depositHash : undefined}
+				txHash={depositStatus === "confirming" ? depositHash : undefined}
 				closable={false}
 			/>
 		);
@@ -650,7 +658,7 @@ export function DepositModal() {
 							onAmountChange={setDepositAmount}
 							balance={depositBalance}
 							validation={depositValidation}
-							isPending={isDepositPending}
+							isPending={depositStatus === "pending"}
 							onSubmit={handleDepositSubmit}
 						/>
 					</TabsContent>

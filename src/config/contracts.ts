@@ -1,5 +1,4 @@
 export { BRIDGE2_ABI } from "./abi/bridge2";
-export { USDC_ABI } from "./abi/usdc";
 
 export const ARBITRUM_CHAIN_ID = 42161;
 

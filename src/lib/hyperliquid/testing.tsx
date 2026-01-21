@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { createContext, useContext } from "react";
 import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/hyperliquid";
 import type { HyperliquidContextValue } from "./context";
-import type { BuilderConfig, HyperliquidEnv } from "./hooks/agent/types";
+import type { BuilderConfig, HyperliquidEnv } from "./signing/types";
 
 const HyperliquidContext = createContext<HyperliquidContextValue | null>(null);
 

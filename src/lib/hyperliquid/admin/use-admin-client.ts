@@ -1,8 +1,8 @@
 import type { ExchangeClient } from "@nktkas/hyperliquid";
 import { useMemo } from "react";
-import { useConnection, useWalletClient } from "wagmi";
 import { createExchangeClient } from "../clients";
 import { toHyperliquidWallet } from "../wallet";
+import { useUserWallet } from "./use-user-wallet";
 
 export interface UseAdminClientResult {
 	client: ExchangeClient | null;
@@ -10,8 +10,7 @@ export interface UseAdminClientResult {
 }
 
 export function useAdminClient(): UseAdminClientResult {
-	const { address } = useConnection();
-	const { data: walletClient } = useWalletClient();
+	const { address, walletClient } = useUserWallet();
 
 	const client = useMemo(() => {
 		if (!walletClient || !address) return null;

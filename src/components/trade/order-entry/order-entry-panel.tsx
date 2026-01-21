@@ -19,7 +19,7 @@ import {
 } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
-import { useSelectedResolvedMarket, useTradingAgent } from "@/lib/hyperliquid";
+import { useAgentRegistration, useAgentStatus, useSelectedResolvedMarket } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeTwapOrder";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
@@ -127,7 +127,8 @@ export function OrderEntryPanel() {
 	);
 	const clearinghouse = clearinghouseEvent?.clearinghouseState;
 
-	const { status: agentStatus, registerStatus, registerAgent } = useTradingAgent();
+	const { status: agentStatus } = useAgentStatus();
+	const { register: registerAgent, status: registerStatus } = useAgentRegistration();
 	const { mutateAsync: placeOrder, isPending: isSubmittingOrder } = useExchangeOrder();
 	const { mutateAsync: placeTwapOrder, isPending: isSubmittingTwap } = useExchangeTwapOrder();
 
@@ -272,8 +273,8 @@ export function OrderEntryPanel() {
 		[leverage, price, side, sizeValue],
 	);
 
-	const needsAgentApproval = agentStatus !== "valid";
-	const isReadyToTrade = agentStatus === "valid";
+	const needsAgentApproval = agentStatus !== "ready";
+	const isReadyToTrade = agentStatus === "ready";
 	const canApprove = !!walletClient && !!address;
 
 	const validation = useOrderValidation({
@@ -334,7 +335,8 @@ export function OrderEntryPanel() {
 		setSizeMode(newMode);
 	}
 
-	const isRegistering = registerStatus === "signing" || registerStatus === "verifying";
+	const isRegistering =
+		registerStatus === "approving_fee" || registerStatus === "approving_agent" || registerStatus === "verifying";
 
 	const handleMarginModeConfirm = useCallback(
 		async (mode: MarginMode) => {
