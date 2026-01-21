@@ -58,7 +58,7 @@ function DropdownMenuItem({
 			data-selected={selected}
 			className={cn(
 				"focus:bg-accent focus:text-accent-fg data-[variant=destructive]:text-danger data-[variant=destructive]:focus:bg-danger/10 dark:data-[variant=destructive]:focus:bg-danger/20 data-[variant=destructive]:focus:text-danger data-[variant=destructive]:*:[svg]:text-danger! [&_svg:not([class*='text-'])]:text-muted-fg relative flex cursor-default items-center gap-1.5 rounded-sm px-2 py-1.5 text-xs outline-hidden select-none transition-colors data-disabled:pointer-events-none data-disabled:opacity-50 data-inset:pl-6 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5",
-				"data-[selected=true]:bg-info/10 data-[selected=true]:text-info data-[selected=true]:before:absolute data-[selected=true]:before:left-0 data-[selected=true]:before:top-1/2 data-[selected=true]:before:-translate-y-1/2 data-[selected=true]:before:h-3 data-[selected=true]:before:w-0.5 data-[selected=true]:before:bg-info data-[selected=true]:before:rounded-full",
+				"data-[selected=true]:bg-info/10 data-[selected=true]:text-info data-[selected=true]:focus:bg-info/15 data-[selected=true]:focus:text-info data-[selected=true]:before:absolute data-[selected=true]:before:left-0 data-[selected=true]:before:top-1/2 data-[selected=true]:before:-translate-y-1/2 data-[selected=true]:before:h-3 data-[selected=true]:before:w-0.5 data-[selected=true]:before:bg-info data-[selected=true]:before:rounded-full",
 				className,
 			)}
 			{...props}

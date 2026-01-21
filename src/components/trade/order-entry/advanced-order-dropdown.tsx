@@ -70,7 +70,7 @@ export function AdvancedOrderDropdown({ orderType, onOrderTypeChange }: Props) {
 				<button
 					type="button"
 					className={cn(
-						"text-3xs uppercase tracking-wider transition-colors",
+						"text-3xs uppercase tracking-wider transition-colors outline-none",
 						"text-muted-fg hover:text-fg",
 						"border-b border-transparent",
 						isAdvanced && "text-info border-info",

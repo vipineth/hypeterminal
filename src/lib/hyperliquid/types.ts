@@ -33,18 +33,6 @@ export type InferSubParams<TMethod extends AnyMethod> = Exclude<Parameters<TMeth
 
 export type SubscriptionStatus = "idle" | "subscribing" | "active" | "error";
 export type WebSocketStatus = "idle" | "connecting" | "open" | "error";
-export type HttpApiStatus = "idle" | "checking" | "ok" | "error";
-
-export type HyperliquidApiStatus = {
-	http: {
-		status: HttpApiStatus;
-		error: unknown;
-	};
-	ws: {
-		status: WebSocketStatus;
-		error: unknown;
-	};
-};
 
 export interface SubscriptionOptions {
 	enabled?: boolean;
