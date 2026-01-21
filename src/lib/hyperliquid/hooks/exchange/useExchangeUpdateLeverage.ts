@@ -1,13 +1,13 @@
 import type { ExchangeClient, UpdateLeverageParameters, UpdateLeverageSuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
+import { useHyperliquidClients } from "@/lib/hyperliquid/hooks/useClients";
 import {
 	createMutationKey,
 	guardedMutationFn,
 	type MutationOptions,
 	mergeMutationOptions,
-} from "../../query/mutation-options";
-import type { HyperliquidQueryError, MutationParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+} from "@/lib/hyperliquid/query/mutation-options";
+import type { HyperliquidQueryError, MutationParameter } from "@/lib/hyperliquid/types";
 
 type UpdateLeverageData = UpdateLeverageSuccessResponse;
 type UpdateLeverageParams = UpdateLeverageParameters;
@@ -31,7 +31,7 @@ export function getUpdateLeverageMutationOptions(
 export function useExchangeUpdateLeverage(
 	options: UseExchangeUpdateLeverageOptions = {},
 ): UseExchangeUpdateLeverageReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getUpdateLeverageMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getUpdateLeverageMutationOptions(trading)));
 }

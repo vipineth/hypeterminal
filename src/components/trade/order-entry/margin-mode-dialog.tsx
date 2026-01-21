@@ -133,17 +133,10 @@ export function MarginModeDialog({
 									<div
 										className={cn(
 											"flex items-center justify-center size-8 rounded-sm shrink-0 transition-colors",
-											isSelected
-												? "bg-info/10 border border-info/30"
-												: "bg-surface border border-border/60",
+											isSelected ? "bg-info/10 border border-info/30" : "bg-surface border border-border/60",
 										)}
 									>
-										<Icon
-											className={cn(
-												"size-4 transition-colors",
-												isSelected ? "text-info" : "text-muted-fg",
-											)}
-										/>
+										<Icon className={cn("size-4 transition-colors", isSelected ? "text-info" : "text-muted-fg")} />
 									</div>
 
 									<div className="flex-1 min-w-0">

@@ -1,13 +1,13 @@
 import type { ExchangeClient, VaultTransferParameters, VaultTransferSuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
+import { useHyperliquidClients } from "@/lib/hyperliquid/hooks/useClients";
 import {
 	createMutationKey,
 	guardedMutationFn,
 	type MutationOptions,
 	mergeMutationOptions,
-} from "../../query/mutation-options";
-import type { HyperliquidQueryError, MutationParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+} from "@/lib/hyperliquid/query/mutation-options";
+import type { HyperliquidQueryError, MutationParameter } from "@/lib/hyperliquid/types";
 
 type VaultTransferData = VaultTransferSuccessResponse;
 type VaultTransferParams = VaultTransferParameters;
@@ -31,7 +31,7 @@ export function getVaultTransferMutationOptions(
 export function useExchangeVaultTransfer(
 	options: UseExchangeVaultTransferOptions = {},
 ): UseExchangeVaultTransferReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getVaultTransferMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getVaultTransferMutationOptions(trading)));
 }

@@ -26,12 +26,7 @@ function ThemeToggleButton() {
 		<Button
 			variant="ghost"
 			size="icon-sm"
-			className={cn(
-				"size-7",
-				isDark
-					? "text-warning hover:text-warning/80"
-					: "text-highlight hover:text-highlight/80",
-			)}
+			className={cn("size-7", isDark ? "text-warning hover:text-warning/80" : "text-highlight hover:text-highlight/80")}
 			onClick={handleToggle}
 			aria-label={isDark ? t`Switch to light mode` : t`Switch to dark mode`}
 		>

@@ -1,13 +1,13 @@
 import type { ExchangeClient, SpotDeployParameters, SpotDeploySuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
+import { useHyperliquidClients } from "@/lib/hyperliquid/hooks/useClients";
 import {
 	createMutationKey,
 	guardedMutationFn,
 	type MutationOptions,
 	mergeMutationOptions,
-} from "../../query/mutation-options";
-import type { HyperliquidQueryError, MutationParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+} from "@/lib/hyperliquid/query/mutation-options";
+import type { HyperliquidQueryError, MutationParameter } from "@/lib/hyperliquid/types";
 
 type SpotDeployData = SpotDeploySuccessResponse;
 type SpotDeployParams = SpotDeployParameters;
@@ -29,7 +29,7 @@ export function getSpotDeployMutationOptions(
 }
 
 export function useExchangeSpotDeploy(options: UseExchangeSpotDeployOptions = {}): UseExchangeSpotDeployReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getSpotDeployMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getSpotDeployMutationOptions(trading)));
 }

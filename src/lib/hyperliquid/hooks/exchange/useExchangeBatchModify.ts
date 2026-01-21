@@ -1,13 +1,13 @@
 import type { BatchModifyParameters, BatchModifySuccessResponse, ExchangeClient } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
+import { useHyperliquidClients } from "@/lib/hyperliquid/hooks/useClients";
 import {
 	createMutationKey,
 	guardedMutationFn,
 	type MutationOptions,
 	mergeMutationOptions,
-} from "../../query/mutation-options";
-import type { HyperliquidQueryError, MutationParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+} from "@/lib/hyperliquid/query/mutation-options";
+import type { HyperliquidQueryError, MutationParameter } from "@/lib/hyperliquid/types";
 
 type BatchModifyData = BatchModifySuccessResponse;
 type BatchModifyParams = BatchModifyParameters;
@@ -29,7 +29,7 @@ export function getBatchModifyMutationOptions(
 }
 
 export function useExchangeBatchModify(options: UseExchangeBatchModifyOptions = {}): UseExchangeBatchModifyReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getBatchModifyMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getBatchModifyMutationOptions(trading)));
 }

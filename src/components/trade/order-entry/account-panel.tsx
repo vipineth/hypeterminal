@@ -205,12 +205,7 @@ export function AccountPanel() {
 				<div className="flex items-center gap-3">
 					<div className="flex items-center gap-1.5">
 						<span className="text-4xs text-muted-fg uppercase">{t`Equity`}</span>
-						<span
-							className={cn(
-								"text-sm font-semibold tabular-nums",
-								hasData ? "text-positive" : "text-muted-fg",
-							)}
-						>
+						<span className={cn("text-sm font-semibold tabular-nums", hasData ? "text-positive" : "text-muted-fg")}>
 							{headerEquity}
 						</span>
 					</div>
@@ -230,9 +225,7 @@ export function AccountPanel() {
 					onClick={() => setActiveTab("perps")}
 					className={cn(
 						"px-2 py-1 text-4xs uppercase tracking-wider hover:bg-transparent",
-						activeTab === "perps"
-							? "text-fg border-b border-fg"
-							: "text-muted-fg hover:text-fg",
+						activeTab === "perps" ? "text-fg border-b border-fg" : "text-muted-fg hover:text-fg",
 					)}
 					aria-label={t`Perps`}
 				>
@@ -244,9 +237,7 @@ export function AccountPanel() {
 					onClick={() => setActiveTab("spot")}
 					className={cn(
 						"px-2 py-1 text-4xs uppercase tracking-wider hover:bg-transparent",
-						activeTab === "spot"
-							? "text-fg border-b border-fg"
-							: "text-muted-fg hover:text-fg",
+						activeTab === "spot" ? "text-fg border-b border-fg" : "text-muted-fg hover:text-fg",
 					)}
 					aria-label={t`Spot`}
 				>

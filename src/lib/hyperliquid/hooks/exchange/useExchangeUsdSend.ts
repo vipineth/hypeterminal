@@ -1,13 +1,13 @@
 import type { ExchangeClient, UsdSendParameters, UsdSendSuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
+import { useHyperliquidClients } from "@/lib/hyperliquid/hooks/useClients";
 import {
 	createMutationKey,
 	guardedMutationFn,
 	type MutationOptions,
 	mergeMutationOptions,
-} from "../../query/mutation-options";
-import type { HyperliquidQueryError, MutationParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+} from "@/lib/hyperliquid/query/mutation-options";
+import type { HyperliquidQueryError, MutationParameter } from "@/lib/hyperliquid/types";
 
 type UsdSendData = UsdSendSuccessResponse;
 type UsdSendParams = UsdSendParameters;
@@ -25,7 +25,7 @@ export function getUsdSendMutationOptions(
 }
 
 export function useExchangeUsdSend(options: UseExchangeUsdSendOptions = {}): UseExchangeUsdSendReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { admin } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getUsdSendMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getUsdSendMutationOptions(admin)));
 }

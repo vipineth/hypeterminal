@@ -4,14 +4,14 @@ import type {
 	ExchangeClient,
 } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
+import { useHyperliquidClients } from "@/lib/hyperliquid/hooks/useClients";
 import {
 	createMutationKey,
 	guardedMutationFn,
 	type MutationOptions,
 	mergeMutationOptions,
-} from "../../query/mutation-options";
-import type { HyperliquidQueryError, MutationParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+} from "@/lib/hyperliquid/query/mutation-options";
+import type { HyperliquidQueryError, MutationParameter } from "@/lib/hyperliquid/types";
 
 type ApproveBuilderFeeData = ApproveBuilderFeeSuccessResponse;
 type ApproveBuilderFeeParams = ApproveBuilderFeeParameters;
@@ -35,7 +35,7 @@ export function getApproveBuilderFeeMutationOptions(
 export function useExchangeApproveBuilderFee(
 	options: UseExchangeApproveBuilderFeeOptions = {},
 ): UseExchangeApproveBuilderFeeReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { user } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getApproveBuilderFeeMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getApproveBuilderFeeMutationOptions(user)));
 }

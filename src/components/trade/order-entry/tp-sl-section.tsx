@@ -91,10 +91,7 @@ export function TpSlSection({
 							placeholder={t`TP Price`}
 							value={tpPrice}
 							onChange={(e) => onTpPriceChange(e.target.value)}
-							className={cn(
-								"h-7 text-2xs bg-bg tabular-nums",
-								tpError && "border-negative focus:border-negative",
-							)}
+							className={cn("h-7 text-2xs bg-bg tabular-nums", tpError && "border-negative focus:border-negative")}
 							disabled={disabled}
 						/>
 						{tpError && <div className="text-4xs text-negative">{tpError}</div>}
@@ -105,10 +102,7 @@ export function TpSlSection({
 							placeholder={t`SL Price`}
 							value={slPrice}
 							onChange={(e) => onSlPriceChange(e.target.value)}
-							className={cn(
-								"h-7 text-2xs bg-bg tabular-nums",
-								slError && "border-negative focus:border-negative",
-							)}
+							className={cn("h-7 text-2xs bg-bg tabular-nums", slError && "border-negative focus:border-negative")}
 							disabled={disabled}
 						/>
 						{slError && <div className="text-4xs text-negative">{slError}</div>}

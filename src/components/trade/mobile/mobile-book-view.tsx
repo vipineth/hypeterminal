@@ -157,9 +157,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 								"px-3 py-1.5 text-xs font-medium rounded transition-colors",
 								"min-h-[36px]",
 								"hover:bg-transparent",
-								view === "book"
-									? "bg-bg text-info shadow-sm"
-									: "text-muted-fg hover:text-fg",
+								view === "book" ? "bg-bg text-info shadow-sm" : "text-muted-fg hover:text-fg",
 							)}
 						>
 							{ORDERBOOK_TEXT.BOOK_LABEL}
@@ -172,9 +170,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 								"px-3 py-1.5 text-xs font-medium rounded transition-colors",
 								"min-h-[36px]",
 								"hover:bg-transparent",
-								view === "trades"
-									? "bg-bg text-info shadow-sm"
-									: "text-muted-fg hover:text-fg",
+								view === "trades" ? "bg-bg text-info shadow-sm" : "text-muted-fg hover:text-fg",
 							)}
 						>
 							{ORDERBOOK_TEXT.TRADES_LABEL}
@@ -282,10 +278,10 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 						)}
 
 						{/* Mid price */}
-					<div className="shrink-0 py-2 px-3 flex items-center justify-center gap-3 border-y border-border/40 bg-surface/30">
-						<span className="text-xl font-bold tabular-nums text-warning">
-							{typeof mid === "number" && Number.isFinite(mid) ? formatNumber(mid, 2) : FALLBACK_VALUE_PLACEHOLDER}
-						</span>
+						<div className="shrink-0 py-2 px-3 flex items-center justify-center gap-3 border-y border-border/40 bg-surface/30">
+							<span className="text-xl font-bold tabular-nums text-warning">
+								{typeof mid === "number" && Number.isFinite(mid) ? formatNumber(mid, 2) : FALLBACK_VALUE_PLACEHOLDER}
+							</span>
 							{midDirection === "up" ? (
 								<TrendingUp className="size-5 text-positive" />
 							) : midDirection === "down" ? (

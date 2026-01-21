@@ -1,13 +1,13 @@
 import type { CValidatorActionParameters, CValidatorActionSuccessResponse, ExchangeClient } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
+import { useHyperliquidClients } from "@/lib/hyperliquid/hooks/useClients";
 import {
 	createMutationKey,
 	guardedMutationFn,
 	type MutationOptions,
 	mergeMutationOptions,
-} from "../../query/mutation-options";
-import type { HyperliquidQueryError, MutationParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+} from "@/lib/hyperliquid/query/mutation-options";
+import type { HyperliquidQueryError, MutationParameter } from "@/lib/hyperliquid/types";
 
 type CValidatorActionData = CValidatorActionSuccessResponse;
 type CValidatorActionParams = CValidatorActionParameters;
@@ -31,7 +31,7 @@ export function getCValidatorActionMutationOptions(
 export function useExchangeCValidatorAction(
 	options: UseExchangeCValidatorActionOptions = {},
 ): UseExchangeCValidatorActionReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getCValidatorActionMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getCValidatorActionMutationOptions(trading)));
 }

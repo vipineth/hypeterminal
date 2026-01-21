@@ -1,15 +1,15 @@
 import type { ExchangeClient, OrderParameters, OrderSuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
-import { useHyperliquid } from "../../context";
+import { useHyperliquidClients } from "@/lib/hyperliquid/hooks/useClients";
+import { useHyperliquid } from "@/lib/hyperliquid/provider";
 import {
 	createMutationKey,
 	guardedMutationFn,
 	type MutationOptions,
 	mergeMutationOptions,
-} from "../../query/mutation-options";
-import type { HyperliquidQueryError, MutationParameter } from "../../types";
-import type { BuilderConfig } from "../agent/types";
-import { useHyperliquidClients } from "../useClients";
+} from "@/lib/hyperliquid/query/mutation-options";
+import type { BuilderConfig } from "@/lib/hyperliquid/signing/types";
+import type { HyperliquidQueryError, MutationParameter } from "@/lib/hyperliquid/types";
 
 type OrderData = OrderSuccessResponse;
 type OrderParams = OrderParameters;
@@ -29,10 +29,10 @@ export function getOrderMutationOptions(
 }
 
 export function useExchangeOrder(options: UseExchangeOrderOptions = {}): UseExchangeOrderReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 	const { builderConfig, clientKey } = useHyperliquid();
 
-	const mutationOptions = getOrderMutationOptions(exchange, builderConfig, clientKey);
+	const mutationOptions = getOrderMutationOptions(trading, builderConfig, clientKey);
 
 	return useMutation(mergeMutationOptions(options, mutationOptions));
 }

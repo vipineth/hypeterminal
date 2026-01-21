@@ -1,13 +1,13 @@
 import type { ExchangeClient, ModifyParameters, ModifySuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
+import { useHyperliquidClients } from "@/lib/hyperliquid/hooks/useClients";
 import {
 	createMutationKey,
 	guardedMutationFn,
 	type MutationOptions,
 	mergeMutationOptions,
-} from "../../query/mutation-options";
-import type { HyperliquidQueryError, MutationParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+} from "@/lib/hyperliquid/query/mutation-options";
+import type { HyperliquidQueryError, MutationParameter } from "@/lib/hyperliquid/types";
 
 type ModifyData = ModifySuccessResponse;
 type ModifyParams = ModifyParameters;
@@ -23,7 +23,7 @@ export function getModifyMutationOptions(exchange: ExchangeClient | null): Mutat
 }
 
 export function useExchangeModify(options: UseExchangeModifyOptions = {}): UseExchangeModifyReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getModifyMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getModifyMutationOptions(trading)));
 }

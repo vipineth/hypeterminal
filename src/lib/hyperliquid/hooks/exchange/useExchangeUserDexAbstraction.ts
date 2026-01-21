@@ -4,14 +4,14 @@ import type {
 	UserDexAbstractionSuccessResponse,
 } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
+import { useHyperliquidClients } from "@/lib/hyperliquid/hooks/useClients";
 import {
 	createMutationKey,
 	guardedMutationFn,
 	type MutationOptions,
 	mergeMutationOptions,
-} from "../../query/mutation-options";
-import type { HyperliquidQueryError, MutationParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+} from "@/lib/hyperliquid/query/mutation-options";
+import type { HyperliquidQueryError, MutationParameter } from "@/lib/hyperliquid/types";
 
 type UserDexAbstractionData = UserDexAbstractionSuccessResponse;
 type UserDexAbstractionParams = UserDexAbstractionParameters;
@@ -35,7 +35,7 @@ export function getUserDexAbstractionMutationOptions(
 export function useExchangeUserDexAbstraction(
 	options: UseExchangeUserDexAbstractionOptions = {},
 ): UseExchangeUserDexAbstractionReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { admin } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getUserDexAbstractionMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getUserDexAbstractionMutationOptions(admin)));
 }

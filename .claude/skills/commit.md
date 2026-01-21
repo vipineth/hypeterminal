@@ -22,6 +22,7 @@ You are a commit message generator for this project. Follow the commit conventio
    - `docs` - documentation only
 
 3. **Write subject**:
+   - **Single line only** - never use multi-line commit messages
    - Max 50 characters
    - Lowercase, no period
    - Imperative mood ("add" not "added")

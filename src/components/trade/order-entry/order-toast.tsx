@@ -56,13 +56,7 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 			{/* Order Details */}
 			<div className="flex-1 min-w-0 space-y-0.5">
 				<div className="flex items-center gap-2">
-					<span
-						className={cn(
-							"px-1.5 py-0.5 rounded text-2xs font-bold uppercase tracking-wide",
-							sideBg,
-							sideColor,
-						)}
-					>
+					<span className={cn("px-1.5 py-0.5 rounded text-2xs font-bold uppercase tracking-wide", sideBg, sideColor)}>
 						{order.side}
 					</span>
 					<span className="text-xs font-medium text-fg">{order.market}</span>
@@ -120,10 +114,7 @@ function CountdownBar({ order }: { order: OrderQueueItem }) {
 
 	return (
 		<div className="absolute bottom-0 left-0 right-0 h-0.5 bg-positive/20 overflow-hidden">
-			<div
-				className="h-full bg-positive/60 transition-all duration-50 ease-linear"
-				style={{ width: `${progress}%` }}
-			/>
+			<div className="h-full bg-positive/60 transition-all duration-50 ease-linear" style={{ width: `${progress}%` }} />
 		</div>
 	);
 }

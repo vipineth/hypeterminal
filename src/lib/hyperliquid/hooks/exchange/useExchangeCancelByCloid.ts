@@ -1,13 +1,13 @@
 import type { CancelByCloidParameters, CancelByCloidSuccessResponse, ExchangeClient } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
+import { useHyperliquidClients } from "@/lib/hyperliquid/hooks/useClients";
 import {
 	createMutationKey,
 	guardedMutationFn,
 	type MutationOptions,
 	mergeMutationOptions,
-} from "../../query/mutation-options";
-import type { HyperliquidQueryError, MutationParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+} from "@/lib/hyperliquid/query/mutation-options";
+import type { HyperliquidQueryError, MutationParameter } from "@/lib/hyperliquid/types";
 
 type CancelByCloidData = CancelByCloidSuccessResponse;
 type CancelByCloidParams = CancelByCloidParameters;
@@ -31,7 +31,7 @@ export function getCancelByCloidMutationOptions(
 export function useExchangeCancelByCloid(
 	options: UseExchangeCancelByCloidOptions = {},
 ): UseExchangeCancelByCloidReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getCancelByCloidMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getCancelByCloidMutationOptions(trading)));
 }

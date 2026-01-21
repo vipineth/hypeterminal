@@ -1,13 +1,13 @@
 import type { ExchangeClient, TokenDelegateParameters, TokenDelegateSuccessResponse } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
+import { useHyperliquidClients } from "@/lib/hyperliquid/hooks/useClients";
 import {
 	createMutationKey,
 	guardedMutationFn,
 	type MutationOptions,
 	mergeMutationOptions,
-} from "../../query/mutation-options";
-import type { HyperliquidQueryError, MutationParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+} from "@/lib/hyperliquid/query/mutation-options";
+import type { HyperliquidQueryError, MutationParameter } from "@/lib/hyperliquid/types";
 
 type TokenDelegateData = TokenDelegateSuccessResponse;
 type TokenDelegateParams = TokenDelegateParameters;
@@ -31,7 +31,7 @@ export function getTokenDelegateMutationOptions(
 export function useExchangeTokenDelegate(
 	options: UseExchangeTokenDelegateOptions = {},
 ): UseExchangeTokenDelegateReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { admin } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getTokenDelegateMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getTokenDelegateMutationOptions(admin)));
 }

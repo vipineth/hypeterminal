@@ -1,9 +1,9 @@
 import type { ClearinghouseStateParameters, ClearinghouseStateResponse, InfoClient } from "@nktkas/hyperliquid";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
-import { useHyperliquid } from "../../context";
-import { infoKeys } from "../../query/keys";
-import { computeEnabled, type QueryOptions } from "../../query/options";
-import type { HyperliquidQueryError, QueryParameter } from "../../types";
+import { useHyperliquid } from "@/lib/hyperliquid/provider";
+import { infoKeys } from "@/lib/hyperliquid/query/keys";
+import { computeEnabled, type QueryOptions } from "@/lib/hyperliquid/query/options";
+import type { HyperliquidQueryError, QueryParameter } from "@/lib/hyperliquid/types";
 
 type ClearinghouseStateData = ClearinghouseStateResponse;
 type ClearinghouseStateParams = ClearinghouseStateParameters;

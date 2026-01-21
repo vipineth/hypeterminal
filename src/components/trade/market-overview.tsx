@@ -57,12 +57,7 @@ export function MarketOverview() {
 						/>
 						<div className="flex items-center gap-1">
 							<Flame className={cn("size-3", isFundingPositive ? "text-positive" : "text-negative")} />
-							<span
-								className={cn(
-									"text-muted-fg tabular-nums",
-									isFundingPositive ? "text-positive" : "text-negative",
-								)}
-							>
+							<span className={cn("text-muted-fg tabular-nums", isFundingPositive ? "text-positive" : "text-negative")}>
 								{formatPercent(fundingNum, {
 									minimumFractionDigits: 4,
 									signDisplay: "exceptZero",

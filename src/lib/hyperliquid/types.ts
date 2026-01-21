@@ -3,7 +3,7 @@ import type { AbstractWallet } from "@nktkas/hyperliquid/signing";
 import type { QueryKey, UseMutationOptions, UseQueryOptions } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import type { BaseIssue, BaseSchema, BaseSchemaAsync, ValiError } from "valibot";
-import type { BuilderConfig, HyperliquidEnv } from "./hooks/agent/types";
+import type { BuilderConfig, HyperliquidEnv } from "./signing/types";
 
 type AnyValiErrorSchema =
 	| BaseSchema<unknown, unknown, BaseIssue<unknown>>
@@ -33,18 +33,6 @@ export type InferSubParams<TMethod extends AnyMethod> = Exclude<Parameters<TMeth
 
 export type SubscriptionStatus = "idle" | "subscribing" | "active" | "error";
 export type WebSocketStatus = "idle" | "connecting" | "open" | "error";
-export type HttpApiStatus = "idle" | "checking" | "ok" | "error";
-
-export type HyperliquidApiStatus = {
-	http: {
-		status: HttpApiStatus;
-		error: unknown;
-	};
-	ws: {
-		status: WebSocketStatus;
-		error: unknown;
-	};
-};
 
 export interface SubscriptionOptions {
 	enabled?: boolean;

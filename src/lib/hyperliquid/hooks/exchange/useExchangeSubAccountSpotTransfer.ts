@@ -4,14 +4,14 @@ import type {
 	SubAccountSpotTransferSuccessResponse,
 } from "@nktkas/hyperliquid";
 import { type UseMutationResult, useMutation } from "@tanstack/react-query";
+import { useHyperliquidClients } from "@/lib/hyperliquid/hooks/useClients";
 import {
 	createMutationKey,
 	guardedMutationFn,
 	type MutationOptions,
 	mergeMutationOptions,
-} from "../../query/mutation-options";
-import type { HyperliquidQueryError, MutationParameter } from "../../types";
-import { useHyperliquidClients } from "../useClients";
+} from "@/lib/hyperliquid/query/mutation-options";
+import type { HyperliquidQueryError, MutationParameter } from "@/lib/hyperliquid/types";
 
 type SubAccountSpotTransferData = SubAccountSpotTransferSuccessResponse;
 type SubAccountSpotTransferParams = SubAccountSpotTransferParameters;
@@ -38,7 +38,7 @@ export function getSubAccountSpotTransferMutationOptions(
 export function useExchangeSubAccountSpotTransfer(
 	options: UseExchangeSubAccountSpotTransferOptions = {},
 ): UseExchangeSubAccountSpotTransferReturnType {
-	const { exchange } = useHyperliquidClients();
+	const { trading } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getSubAccountSpotTransferMutationOptions(exchange)));
+	return useMutation(mergeMutationOptions(options, getSubAccountSpotTransferMutationOptions(trading)));
 }

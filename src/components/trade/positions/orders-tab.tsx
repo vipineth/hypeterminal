@@ -218,15 +218,9 @@ export function OrdersTab() {
 											disabled={openOrders.length === 0 || isCancelling}
 										/>
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
-										{t`Time`}
-									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
-										{t`Asset`}
-									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
-										{t`Type`}
-									</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Time`}</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Asset`}</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Type`}</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Price`}
 									</TableHead>
@@ -236,12 +230,8 @@ export function OrdersTab() {
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Filled`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
-										{t`Trigger`}
-									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
-										{t`Reduce`}
-									</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Trigger`}</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Reduce`}</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Actions`}
 									</TableHead>

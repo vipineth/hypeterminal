@@ -107,9 +107,7 @@ export function FundingTab() {
 						<Table>
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
-										{t`Asset`}
-									</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Asset`}</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Position`}
 									</TableHead>
@@ -126,9 +124,7 @@ export function FundingTab() {
 							</TableHeader>
 							<TableBody>
 								{tableRows.map((row) => {
-									const sideClass = row.isLong
-										? "bg-positive/20 text-positive"
-										: "bg-negative/20 text-negative";
+									const sideClass = row.isLong ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
 									const rateClass = row.rate >= 0 ? "text-positive" : "text-negative";
 									const paymentClass = row.usdc >= 0 ? "text-positive" : "text-negative";
 									const date = new Date(row.time);

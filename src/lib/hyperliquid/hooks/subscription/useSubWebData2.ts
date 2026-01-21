@@ -1,8 +1,8 @@
 import type { WebData2WsEvent, WebData2WsParameters } from "@nktkas/hyperliquid";
-import { useHyperliquid } from "../../context";
-import { serializeKey, subscriptionKeys } from "../../query/keys";
-import type { SubscriptionOptions, SubscriptionResult } from "../../types";
-import { useSub } from "../utils/useSub";
+import { useSub } from "@/lib/hyperliquid/hooks/utils/useSub";
+import { useHyperliquid } from "@/lib/hyperliquid/provider";
+import { serializeKey, subscriptionKeys } from "@/lib/hyperliquid/query/keys";
+import type { SubscriptionOptions, SubscriptionResult } from "@/lib/hyperliquid/types";
 
 type WebData2Event = WebData2WsEvent;
 type WebData2Params = WebData2WsParameters;
