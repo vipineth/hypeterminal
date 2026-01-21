@@ -6,9 +6,9 @@ import { useConnection, useWalletClient } from "wagmi";
 import { createExchangeClient } from "../clients";
 import { useHyperliquid } from "../context";
 import { infoKeys } from "../query/keys";
-import { convertFeeToPercentageString, isAgentApproved, isBuilderFeeApproved } from "../utils/agent";
 import { toHyperliquidWallet } from "../wallet";
 import { useAgentWalletActions, useAgentWalletStorage } from "./agent-storage";
+import { convertFeeToPercentageString, isAgentApproved, isBuilderFeeApproved } from "./agent-utils";
 import type { RegistrationStatus } from "./types";
 
 export interface UseAgentRegistrationResult {

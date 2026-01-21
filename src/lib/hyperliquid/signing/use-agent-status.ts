@@ -3,7 +3,7 @@ import { useConnection } from "wagmi";
 import { useHyperliquid } from "../context";
 import { useInfoExtraAgents } from "../hooks/info/useInfoExtraAgents";
 import { useInfoMaxBuilderFee } from "../hooks/info/useInfoMaxBuilderFee";
-import { isAgentApproved, isBuilderFeeApproved } from "../utils/agent";
+import { isAgentApproved, isBuilderFeeApproved } from "./agent-utils";
 import { useAgentWalletStorage } from "./agent-storage";
 import type { AgentStatus } from "./types";
 

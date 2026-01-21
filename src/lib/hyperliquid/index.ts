@@ -6,7 +6,6 @@ export {
 	WebSocketTransport,
 	type WebSocketTransportOptions,
 } from "@nktkas/hyperliquid";
-export * from "./admin";
 export { createExchangeClient, getInfoClient, getSubscriptionClient, initializeClients } from "./clients";
 export type { HyperliquidContextValue, HyperliquidProviderProps } from "./context";
 export { HyperliquidProvider, useHyperliquid, useHyperliquidOptional } from "./context";
@@ -29,7 +28,7 @@ export { useTradingGuard } from "./hooks/useTradingGuard";
 export { useHttpTransport, useSubscriptionTransport } from "./hooks/useTransport";
 export { infoKeys } from "./query/keys";
 export * from "./signing";
-export * from "./trading";
-export * from "./transfers";
+export { type DepositStatus, type UseDepositResult, useDeposit } from "./use-deposit";
+export { type UseUserWalletResult, useUserWallet } from "./use-user-wallet";
 
 export * from "./types";

@@ -11,7 +11,6 @@ import {
 	useWriteContract,
 } from "wagmi";
 import { ARBITRUM_CHAIN_ID, CONTRACTS, MIN_DEPOSIT_USDC, USDC_DECIMALS } from "@/config/contracts";
-import type { TransferValidation } from "./types";
 
 export type DepositStatus = "idle" | "pending" | "confirming" | "success" | "error";
 
@@ -25,7 +24,7 @@ export interface UseDepositResult {
 	error: Error | null;
 	hash: Hash | undefined;
 	deposit: (amount: string) => void;
-	validate: (amount: string) => TransferValidation;
+	validate: (amount: string) => { valid: boolean; error: string | null };
 	reset: () => void;
 }
 
@@ -65,7 +64,7 @@ export function useDeposit(): UseDepositResult {
 	}, [switchChain]);
 
 	const validate = useCallback(
-		(amount: string): TransferValidation => {
+		(amount: string): { valid: boolean; error: string | null } => {
 			if (!amount || amount === "0") return { valid: false, error: null };
 			try {
 				const raw = parseUnits(amount, USDC_DECIMALS);
