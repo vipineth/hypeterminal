@@ -13,7 +13,11 @@ export * from "./hooks/info";
 export * from "./hooks/subscription";
 export { type ApiStatus, type ApiStatusResult, useApiStatus } from "./hooks/useApiStatus";
 export { type HyperliquidClients, useHyperliquidClients } from "./hooks/useClients";
+export { useMarkets } from "./hooks/useMarkets";
 export { type PerpMarketInfo, type PerpMarketsData, usePerpMarkets } from "./hooks/usePerpMarkets";
+export * from "./types/markets";
+export * from "./market-key";
+export * from "./asset-id";
 export {
 	type ResolvedMarket,
 	type ResolvedPerpMarket,

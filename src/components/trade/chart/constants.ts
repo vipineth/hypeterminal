@@ -21,10 +21,10 @@ import {
 	CHART_TIMEZONE,
 	CHART_WIDGET_DEFAULTS,
 } from "@/config/constants";
-import type { PerpMarketInfo } from "@/lib/hyperliquid/market-registry";
+import type { MarketInfo } from "@/lib/hyperliquid/types/markets";
 import type { MarketCtxNumbers } from "@/lib/market";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
-import type { PerpAssetCtx } from "@/types/hyperliquid";
+import type { PerpAssetCtx, SpotAssetCtx } from "@/types/hyperliquid";
 
 export {
 	CHART_LIBRARY_PATH,
@@ -48,8 +48,8 @@ export {
 	CHART_DATAFEED_CONFIG,
 };
 
-export type MarketRow = PerpMarketInfo & {
-	ctx: PerpAssetCtx | undefined;
+export type MarketRow = MarketInfo & {
+	ctx: PerpAssetCtx | SpotAssetCtx | undefined;
 	ctxNumbers: MarketCtxNumbers | null;
 };
 
