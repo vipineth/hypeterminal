@@ -15,7 +15,8 @@
 		"i18n:extract": "lingui extract",
 		"i18n:compile": "lingui compile",
 		"prepare": "lefthook install",
-		"perf:bundle": "npx vite-bundle-visualizer"
+		"perf:bundle": "npx vite-bundle-visualizer",
+		"perf:compare": "node scripts/compare-bundle.js"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^5.2.2",
