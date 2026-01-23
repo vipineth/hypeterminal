@@ -1,16 +1,19 @@
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import { useConnection } from "wagmi";
+import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { POSITIONS_TABS } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
+import { createLazyComponent } from "@/lib/lazy";
 import { parseNumber, parseNumberOrZero } from "@/lib/trade/numbers";
-import { BalancesTab } from "./balances-tab";
-import { FundingTab } from "./funding-tab";
-import { HistoryTab } from "./history-tab";
-import { OrdersTab } from "./orders-tab";
-import { PositionsTab } from "./positions-tab";
-import { TwapTab } from "./twap-tab";
+
+const BalancesTab = createLazyComponent(() => import("./balances-tab"), "BalancesTab");
+const FundingTab = createLazyComponent(() => import("./funding-tab"), "FundingTab");
+const HistoryTab = createLazyComponent(() => import("./history-tab"), "HistoryTab");
+const OrdersTab = createLazyComponent(() => import("./orders-tab"), "OrdersTab");
+const PositionsTab = createLazyComponent(() => import("./positions-tab"), "PositionsTab");
+const TwapTab = createLazyComponent(() => import("./twap-tab"), "TwapTab");
 
 export function PositionsPanel() {
 	const { address, isConnected } = useConnection();
@@ -72,24 +75,44 @@ export function PositionsPanel() {
 					</TabsList>
 				</div>
 				<TabsContent value="balances" className="flex-1 min-h-0 flex flex-col mt-0">
-					<BalancesTab />
+					<Suspense fallback={<TabLoadingFallback />}>
+						<BalancesTab />
+					</Suspense>
 				</TabsContent>
 				<TabsContent value="positions" className="flex-1 min-h-0 flex flex-col mt-0">
-					<PositionsTab />
+					<Suspense fallback={<TabLoadingFallback />}>
+						<PositionsTab />
+					</Suspense>
 				</TabsContent>
 				<TabsContent value="orders" className="flex-1 min-h-0 flex flex-col mt-0">
-					<OrdersTab />
+					<Suspense fallback={<TabLoadingFallback />}>
+						<OrdersTab />
+					</Suspense>
 				</TabsContent>
 				<TabsContent value="twap" className="flex-1 min-h-0 flex flex-col mt-0">
-					<TwapTab />
+					<Suspense fallback={<TabLoadingFallback />}>
+						<TwapTab />
+					</Suspense>
 				</TabsContent>
 				<TabsContent value="history" className="flex-1 min-h-0 flex flex-col mt-0">
-					<HistoryTab />
+					<Suspense fallback={<TabLoadingFallback />}>
+						<HistoryTab />
+					</Suspense>
 				</TabsContent>
 				<TabsContent value="funding" className="flex-1 min-h-0 flex flex-col mt-0">
-					<FundingTab />
+					<Suspense fallback={<TabLoadingFallback />}>
+						<FundingTab />
+					</Suspense>
 				</TabsContent>
 			</Tabs>
+		</div>
+	);
+}
+
+function TabLoadingFallback() {
+	return (
+		<div className="flex-1 flex items-center justify-center">
+			<Spinner className="size-4 text-muted-fg" />
 		</div>
 	);
 }

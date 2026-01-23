@@ -43,7 +43,11 @@ const config = defineConfig({
       projects: ['./tsconfig.json'],
     }),
     tailwindcss(),
-    tanstackStart(),
+    tanstackStart({
+      router: {
+        autoCodeSplitting: true,
+      },
+    }),
     viteReact({
       babel: {
         plugins: ['@lingui/babel-plugin-lingui-macro', 'babel-plugin-react-compiler'],

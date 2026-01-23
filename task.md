@@ -142,10 +142,15 @@
 ## Phase 6: Build Optimization
 
 ### 6.1 Code Splitting
-- [ ] Analyze current chunk strategy
-- [ ] Implement route-based splitting (TanStack Router)
-- [ ] Lazy load heavy components (charts, modals)
-- [ ] Check vendor chunk optimization
+- [x] Analyze current chunk strategy
+- [x] Implement route-based splitting (TanStack Router `autoCodeSplitting: true`)
+- [x] Lazy load heavy components using `lazyRouteComponent`:
+  - TradingViewChart, MobileTerminal, GlobalModals
+  - DepositModal, GlobalSettingsDialog
+  - All position tabs (Balances, Funding, History, Orders, Positions, Twap)
+- [x] Check vendor chunk optimization (radix, tanstack, web3)
+- [x] Created `src/lib/lazy.ts` utility for consistent lazy loading
+- [x] Created `docs/tanstack-start-optimization.md` documentation
 
 ### 6.2 Tree Shaking Verification
 - [ ] Verify ESM imports throughout
@@ -261,6 +266,18 @@ import { createRoot } from 'react-dom/profiling'
 - [x] Ran bundle analysis and identified optimization targets
 - [x] Created `pnpm perf:compare` script for tracking improvements
 
+### Day 1 - Code Splitting Implementation
+- [x] Researched TanStack Start/Router code splitting best practices
+- [x] Enabled `autoCodeSplitting: true` in TanStack Start vite plugin
+- [x] Created `src/lib/lazy.ts` utility using `lazyRouteComponent`
+- [x] Implemented component-level code splitting:
+  - `MobileTerminal` (46.7KB split from main)
+  - `GlobalModals` including DepositModal & GlobalSettingsDialog
+  - `TradingViewChart` (14.6KB split)
+  - All 6 position tabs (Balances, Funding, History, Orders, Positions, Twap)
+- [x] Created `docs/tanstack-start-optimization.md` documentation
+- [x] **Results**: Index route reduced from 380KB to 229KB (-40%)
+
 ---
 
 ## Metrics to Track
@@ -274,19 +291,34 @@ import { createRoot } from 'react-dom/profiling'
 | Memory (idle) | TBD | TBD | 🔴 |
 | Memory (after 10min) | TBD | TBD | 🔴 |
 
-### Bundle Breakdown (Client) - Analyzed Jan 23
+### Bundle Breakdown (Client) - Updated Jan 23 (After Code Splitting)
 | Chunk | Size | Gzip | Notes |
 |-------|------|------|-------|
-| **main** | 582KB | 173KB | ⚠️ App code - NEEDS SPLITTING |
-| **index** | 380KB | 112KB | ⚠️ Index route - large |
-| vendor-web3 | 251KB | 77KB | viem, wagmi - expected |
-| vendor-radix | 155KB | 49KB | Radix UI components |
-| vendor-tanstack | 101KB | 28KB | Query, Table, Virtual |
+| **main** | 568KB | 169KB | Core app code (-14KB) |
+| **index** | 229KB | 70KB | ✅ Index route (-151KB, -40%) |
+| vendor-web3 | 246KB | 75KB | viem, wagmi |
+| vendor-radix | 152KB | 48KB | Radix UI components |
+| vendor-tanstack | 99KB | 28KB | Query, Table, Virtual |
 | init (perf) | 6KB | 2.5KB | Performance monitoring |
-| styles | 125KB | 19KB | CSS (Tailwind) |
-| i18n messages | ~67KB | ~29KB | 5 locale files |
+| styles | 123KB | 19KB | CSS (Tailwind) |
+| i18n messages | ~66KB | ~28KB | 5 locale files |
+| **code-split chunks** | 153KB | 54KB | Lazy-loaded components |
 
-**Total Client JS: ~1.54MB (gzip: ~470KB)**
+**Total Client JS: ~1.64MB (gzip: ~494KB)**
+
+### Code-Split Chunks Created
+| Component | Size | Gzip |
+|-----------|------|------|
+| mobile-terminal | 46.7KB | 15.2KB |
+| deposit-modal | 26.8KB | 8.6KB |
+| positions-tab | 15.4KB | 5.0KB |
+| trading-view-chart | 14.6KB | 5.2KB |
+| orders-tab | 13.2KB | 5.3KB |
+| global-settings-dialog | 10.2KB | 3.6KB |
+| twap-tab | 6.6KB | 2.6KB |
+| history-tab | 6.2KB | 2.5KB |
+| funding-tab | 5.8KB | 2.4KB |
+| balances-tab | 5.2KB | 2.2KB |
 
 ### Key Optimization Opportunities
 1. **main.js (582KB)** - Split by feature/route

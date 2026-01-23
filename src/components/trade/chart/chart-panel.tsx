@@ -1,13 +1,16 @@
 import { ClientOnly } from "@tanstack/react-router";
-import { useCallback } from "react";
+import { Suspense, useCallback } from "react";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { createChartName } from "@/lib/chart/candle";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
+import { createLazyComponent } from "@/lib/lazy";
 import { useTheme } from "@/providers/theme";
 import { useMarketActions } from "@/stores/use-market-store";
 import { MarketOverview } from "../market-overview";
 import { TokenSelector } from "./token-selector";
-import { TradingViewChart } from "./trading-view-chart";
+
+const TradingViewChart = createLazyComponent(() => import("./trading-view-chart"), "TradingViewChart");
 
 export function ChartPanel() {
 	const { theme } = useTheme();
@@ -35,14 +38,24 @@ export function ChartPanel() {
 
 			<div className="flex-1 min-h-0">
 				<ClientOnly>
-					{selectedMarket && (
-						<TradingViewChart
-							symbol={createChartName(selectedMarket.displayName, selectedMarket.name)}
-							theme={theme === "dark" ? "dark" : "light"}
-						/>
-					)}
+					<Suspense fallback={<ChartLoadingFallback />}>
+						{selectedMarket && (
+							<TradingViewChart
+								symbol={createChartName(selectedMarket.displayName, selectedMarket.name)}
+								theme={theme === "dark" ? "dark" : "light"}
+							/>
+						)}
+					</Suspense>
 				</ClientOnly>
 			</div>
+		</div>
+	);
+}
+
+function ChartLoadingFallback() {
+	return (
+		<div className="h-full w-full flex items-center justify-center bg-surface/20">
+			<Skeleton className="h-full w-full" />
 		</div>
 	);
 }

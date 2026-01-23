@@ -1,9 +1,13 @@
+import { Suspense } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { GlobalModals } from "./components/global-modals";
+import { createLazyComponent } from "@/lib/lazy";
 import { FooterBar } from "./footer/footer-bar";
 import { TopNav } from "./header/top-nav";
 import { MainWorkspace } from "./layout/main-workspace";
-import { MobileTerminal } from "./mobile/mobile-terminal";
+
+const MobileTerminal = createLazyComponent(() => import("./mobile/mobile-terminal"), "MobileTerminal");
+
+const GlobalModals = createLazyComponent(() => import("./components/global-modals"), "GlobalModals");
 
 export function TradeTerminalPage() {
 	const isMobile = useIsMobile();
@@ -11,7 +15,9 @@ export function TradeTerminalPage() {
 	return (
 		<>
 			{isMobile ? (
-				<MobileTerminal />
+				<Suspense fallback={<MobileLoadingFallback />}>
+					<MobileTerminal />
+				</Suspense>
 			) : (
 				<div className="bg-bg text-fg min-h-screen w-full flex flex-col font-mono terminal-scanlines pt-11 pb-6">
 					<TopNav />
@@ -19,7 +25,17 @@ export function TradeTerminalPage() {
 					<FooterBar />
 				</div>
 			)}
-			<GlobalModals />
+			<Suspense fallback={null}>
+				<GlobalModals />
+			</Suspense>
 		</>
+	);
+}
+
+function MobileLoadingFallback() {
+	return (
+		<div className="h-dvh w-full flex items-center justify-center bg-bg text-fg">
+			<div className="animate-pulse text-muted-fg">Loading...</div>
+		</div>
 	);
 }
