@@ -63,11 +63,13 @@
 - [ ] Check for request deduplication (TanStack Query)
 
 ### 2.4 Bundle Analysis
-- [ ] Generate production build with source maps
-- [ ] Run bundle analyzer
-- [ ] Identify large dependencies
-- [ ] Check tree-shaking effectiveness
-- [ ] Identify code splitting opportunities
+- [x] Generate production build with source maps
+- [x] Run bundle analyzer
+- [x] Identify large dependencies
+- [x] Check tree-shaking effectiveness
+- [x] Identify code splitting opportunities
+- [x] Store baseline metrics (`perf-baseline.json`)
+- [x] Create comparison script (`pnpm perf:compare`)
 
 ---
 
@@ -167,6 +169,9 @@ pnpm build:analyze
 
 # Alternative: quick bundle visualizer
 pnpm perf:bundle
+
+# Compare current build to baseline (run after pnpm build)
+pnpm perf:compare
 ```
 
 ### Dev Console Performance API
@@ -252,8 +257,9 @@ import { createRoot } from 'react-dom/profiling'
 - [x] Integrated performance monitoring into RootProvider
 - [x] Added `window.perf` dev tools API for console access
 - [x] Configured Vite with manual chunks for better code splitting
-- [ ] Create initial profiling baseline
-- [ ] Run first bundle analysis
+- [x] Created initial profiling baseline (`perf-baseline.json`)
+- [x] Ran bundle analysis and identified optimization targets
+- [x] Created `pnpm perf:compare` script for tracking improvements
 
 ---
 
@@ -268,16 +274,34 @@ import { createRoot } from 'react-dom/profiling'
 | Memory (idle) | TBD | TBD | 🔴 |
 | Memory (after 10min) | TBD | TBD | 🔴 |
 
-### Bundle Breakdown (Client)
+### Bundle Breakdown (Client) - Analyzed Jan 23
 | Chunk | Size | Gzip | Notes |
 |-------|------|------|-------|
-| main | 568KB | ~164KB | App code - needs splitting |
-| index | 371KB | ~175KB | Index route |
-| vendor-web3 | 246KB | ~73KB | viem, wagmi |
-| vendor-radix | 152KB | ~36KB | Radix UI |
-| vendor-tanstack | 98KB | ~62KB | Query, Table, Virtual |
-| init (perf) | 6KB | ~2.5KB | Performance monitoring |
-| styles | 125KB | ~19KB | CSS |
+| **main** | 582KB | 173KB | ⚠️ App code - NEEDS SPLITTING |
+| **index** | 380KB | 112KB | ⚠️ Index route - large |
+| vendor-web3 | 251KB | 77KB | viem, wagmi - expected |
+| vendor-radix | 155KB | 49KB | Radix UI components |
+| vendor-tanstack | 101KB | 28KB | Query, Table, Virtual |
+| init (perf) | 6KB | 2.5KB | Performance monitoring |
+| styles | 125KB | 19KB | CSS (Tailwind) |
+| i18n messages | ~67KB | ~29KB | 5 locale files |
+
+**Total Client JS: ~1.54MB (gzip: ~470KB)**
+
+### Key Optimization Opportunities
+1. **main.js (582KB)** - Split by feature/route
+   - Trading components
+   - Chart components (recharts)
+   - Order entry forms
+
+2. **index.js (380KB)** - Lazy load non-critical
+   - Modals/dialogs
+   - Settings panels
+
+3. **vendor-web3 (251KB)** - Load on wallet connect
+   - Defer until user needs wallet features
+
+4. **Locale files** - Load only user's language
 
 ---
 
