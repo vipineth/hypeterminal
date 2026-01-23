@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/cn";
 import type { MarketKind } from "@/lib/hyperliquid/market-key";
-import { getTokenIconUrl } from "@/lib/tokens";
+import { getIconUrlFromPair } from "@/lib/tokens";
 
 interface Props {
 	symbol: string;
@@ -15,7 +15,7 @@ export function TokenAvatar({ symbol, kind, className, fallbackClassName }: Prop
 
 	return (
 		<Avatar className={cn("size-4", className)}>
-			<AvatarImage src={getTokenIconUrl(symbol, kind)} alt={symbol} />
+			<AvatarImage src={getIconUrlFromPair(symbol, kind)} alt={symbol} />
 			<AvatarFallback className={cn("text-4xs bg-muted", fallbackClassName)}>{fallbackText}</AvatarFallback>
 		</Avatar>
 	);

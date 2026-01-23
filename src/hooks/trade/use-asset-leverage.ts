@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useConnection } from "wagmi";
 import { DEFAULT_MAX_LEVERAGE } from "@/config/constants";
-import { useSelectedMarketInfo } from "@/lib/hyperliquid";
+import { getMarketCapabilities, useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { getBaseToken } from "@/lib/market";
 import { useExchangeUpdateLeverage } from "@/lib/hyperliquid/hooks/exchange/useExchangeUpdateLeverage";
 import { useSubActiveAssetData, useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
@@ -32,6 +32,8 @@ interface UseAssetLeverageReturn {
 	switchMarginMode: (mode: MarginMode) => Promise<void>;
 	isSwitchingMode: boolean;
 	switchModeError: Error | null;
+	isOnlyIsolated: boolean;
+	allowsCrossMargin: boolean;
 }
 
 function getDefaultLeverage(maxLeverage: number): number {
@@ -44,6 +46,9 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 
 	const storedMarginMode = useMarginMode();
 	const { setMarginMode: setStoredMarginMode } = useGlobalSettingsActions();
+
+	const capabilities = getMarketCapabilities(market);
+	const { isOnlyIsolated, allowsCrossMargin } = capabilities;
 
 	const maxLeverage = market?.kind === "spot" ? 1 : (market?.maxLeverage ?? DEFAULT_MAX_LEVERAGE);
 	const baseToken = market ? getBaseToken(market.displayName, market.kind) : undefined;
@@ -69,11 +74,14 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	const onChainMarginMode = getMarginModeFromLeverage(activeAssetData?.leverage);
 
 	const marginMode = useMemo((): MarginMode => {
+		if (isOnlyIsolated) {
+			return "isolated";
+		}
 		if (isConnected && activeAssetData?.leverage) {
 			return onChainMarginMode;
 		}
 		return storedMarginMode;
-	}, [isConnected, activeAssetData?.leverage, onChainMarginMode, storedMarginMode]);
+	}, [isOnlyIsolated, isConnected, activeAssetData?.leverage, onChainMarginMode, storedMarginMode]);
 
 	const hasPosition = useMemo(() => {
 		if (!baseToken || !clearinghouseEvent?.clearinghouseState?.assetPositions) return false;
@@ -145,6 +153,10 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		async (mode: MarginMode) => {
 			if (typeof assetId !== "number") return;
 
+			if (isOnlyIsolated && mode === "cross") {
+				throw new Error("This market only supports isolated margin mode");
+			}
+
 			if (!isConnected) {
 				setStoredMarginMode(mode);
 				return;
@@ -163,7 +175,7 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 
 			setStoredMarginMode(mode);
 		},
-		[assetId, isConnected, currentLeverage, marginMode, hasPosition, updateLeverage, setStoredMarginMode],
+		[assetId, isConnected, isOnlyIsolated, currentLeverage, marginMode, hasPosition, updateLeverage, setStoredMarginMode],
 	);
 
 	const availableToSell = useMemo(() => {
@@ -218,5 +230,7 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		switchMarginMode,
 		isSwitchingMode,
 		switchModeError,
+		isOnlyIsolated,
+		allowsCrossMargin,
 	};
 }

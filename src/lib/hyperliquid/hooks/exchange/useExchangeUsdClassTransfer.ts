@@ -31,7 +31,7 @@ export function getUsdClassTransferMutationOptions(
 export function useExchangeUsdClassTransfer(
 	options: UseExchangeUsdClassTransferOptions = {},
 ): UseExchangeUsdClassTransferReturnType {
-	const { admin } = useHyperliquidClients();
+	const { user } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getUsdClassTransferMutationOptions(admin)));
+	return useMutation(mergeMutationOptions(options, getUsdClassTransferMutationOptions(user)));
 }

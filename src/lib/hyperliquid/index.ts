@@ -7,6 +7,7 @@ export {
 	type WebSocketTransportOptions,
 } from "@nktkas/hyperliquid";
 export * from "./asset-id";
+export { type MarketCapabilities, getMarketCapabilities } from "./capabilities";
 export { createExchangeClient, getInfoClient, getSubscriptionClient, initializeClients } from "./clients";
 export * from "./errors";
 export * from "./hooks/exchange";
@@ -38,6 +39,7 @@ export {
 	useMarketsInfo,
 	useSelectedMarketInfo,
 } from "./hooks/useMarketsInfo";
+export { type UseSpotTokensReturn, useSpotTokens } from "./hooks/useSpotTokens";
 export { useTradingGuard } from "./hooks/useTradingGuard";
 export { useHttpTransport, useSubscriptionTransport } from "./hooks/useTransport";
 export * from "./market-key";

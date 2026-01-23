@@ -15,7 +15,7 @@ import { useAgentStatus } from "./use-agent-status";
 export type RegistrationStep = "fee" | "agent" | null;
 
 export interface UseAgentRegistrationResult {
-	register: () => void;
+	register: () => Promise<Address>;
 	status: RegistrationStatus;
 	currentStep: RegistrationStep;
 	error: Error | null;
@@ -90,7 +90,7 @@ export function useAgentRegistration(): UseAgentRegistrationResult {
 	}, [address, env, clearAgent, registration]);
 
 	return {
-		register: registration.mutate,
+		register: registration.mutateAsync,
 		status,
 		currentStep,
 		error: registration.error,

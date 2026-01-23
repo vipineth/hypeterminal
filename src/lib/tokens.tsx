@@ -21,7 +21,7 @@ export function isMarketBuilderPerp(marketName: string) {
 	return marketName.includes(":");
 }
 
-export function getTokenIconUrl(tokenName: string, kind?: MarketKind) {
+export function getIconUrlFromPair(tokenName: string, kind?: MarketKind) {
 	if (kind === "spot") {
 		const [base] = tokenName.split(SPOT_NAME_SEPARATOR);
 		return `${TOKEN_ICON_BASE_URL}/${base}_spot.svg`;
@@ -30,6 +30,14 @@ export function getTokenIconUrl(tokenName: string, kind?: MarketKind) {
 	if (kind === "perp" || kind === "builderPerp") {
 		const [base] = tokenName.split(PERP_NAME_SEPARATOR);
 		return `${TOKEN_ICON_BASE_URL}/${base}.svg`;
+	}
+
+	return `${TOKEN_ICON_BASE_URL}/${tokenName}.svg`;
+}
+
+export function getIconUrlFromToken(tokenName: string, kind?: MarketKind) {
+	if (kind === "spot") {
+		return `${TOKEN_ICON_BASE_URL}/${tokenName}_spot.svg`;
 	}
 
 	return `${TOKEN_ICON_BASE_URL}/${tokenName}.svg`;

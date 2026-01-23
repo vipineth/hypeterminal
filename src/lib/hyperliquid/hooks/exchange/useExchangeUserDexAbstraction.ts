@@ -35,7 +35,7 @@ export function getUserDexAbstractionMutationOptions(
 export function useExchangeUserDexAbstraction(
 	options: UseExchangeUserDexAbstractionOptions = {},
 ): UseExchangeUserDexAbstractionReturnType {
-	const { admin } = useHyperliquidClients();
+	const { user } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getUserDexAbstractionMutationOptions(admin)));
+	return useMutation(mergeMutationOptions(options, getUserDexAbstractionMutationOptions(user)));
 }
