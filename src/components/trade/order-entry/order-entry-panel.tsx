@@ -26,7 +26,9 @@ import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchan
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import type { MarginMode } from "@/lib/trade/margin-mode";
 import { clampInt, formatDecimalFloor, isPositive, parseNumberOrZero, toFixed, toNumber } from "@/lib/trade/numbers";
-import { getLiquidationInfo, getOrderMetrics, getOrderPrice, getSliderValue } from "@/lib/trade/order-entry-calcs";
+import { getLiquidationInfo, getOrderMetrics } from "@/lib/trade/order-entry/metrics";
+import { getOrderPrice } from "@/lib/trade/order-entry/price";
+import { getSliderValue } from "@/lib/trade/order-entry/size";
 import {
 	canUseTpSl as canUseTpSlForOrder,
 	getTabsOrderType,

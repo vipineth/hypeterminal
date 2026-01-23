@@ -14,13 +14,13 @@ import {
 	ORDER_SIZE_PERCENT_STEPS,
 	UI_TEXT,
 } from "@/config/constants";
+import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { useAssetLeverage } from "@/hooks/trade/use-asset-leverage";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo } from "@/lib/hyperliquid";
-import { getBaseToken } from "@/lib/market";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
-import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
+import { getBaseToken } from "@/lib/market";
 import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
 import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/lib/trade/orders";
 import { useDepositModalActions } from "@/stores/use-deposit-modal-store";
@@ -52,11 +52,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const { data: market, isLoading: isMarketLoading } = useSelectedMarketInfo();
 	const baseToken = market ? getBaseToken(market.displayName, market.kind) : undefined;
 
-	const { data: clearinghouseEvent } = useSubClearinghouseState(
-		{ user: address ?? "0x0" },
-		{ enabled: isConnected && !!address },
-	);
-	const clearinghouse = clearinghouseEvent?.clearinghouseState;
+	const { perpSummary, perpPositions } = useAccountBalances();
 
 	const { isReady: isAgentApproved } = useAgentStatus();
 	const { register: registerAgent, status: registerStatus } = useAgentRegistration();
@@ -94,14 +90,12 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	}, [selectedPrice]);
 
 	// Derived values
-	const accountValue = parseNumber(clearinghouse?.crossMarginSummary?.accountValue) || 0;
-	const marginUsed = parseNumber(clearinghouse?.crossMarginSummary?.totalMarginUsed) || 0;
+	const accountValue = parseNumber(perpSummary?.accountValue) || 0;
+	const marginUsed = parseNumber(perpSummary?.totalMarginUsed) || 0;
 	const availableBalance = Math.max(0, accountValue - marginUsed);
 
 	const position =
-		!clearinghouse?.assetPositions || !baseToken
-			? null
-			: (clearinghouse.assetPositions.find((p) => p.position.coin === baseToken) ?? null);
+		!perpPositions.length || !baseToken ? null : (perpPositions.find((p) => p.position.coin === baseToken) ?? null);
 	const positionSize = parseNumber(position?.position?.szi) || 0;
 
 	const markPx = market?.markPx ?? 0;

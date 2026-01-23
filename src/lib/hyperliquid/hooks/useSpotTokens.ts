@@ -36,7 +36,9 @@ export function useSpotTokens() {
 
 	const getDecimals = useCallback(
 		(coin: string): number => {
-			return tokenMap.get(coin)?.szDecimals ?? 2;
+			const token = tokenMap.get(coin);
+			if (!token) return 2;
+			return token.szDecimals - (token.evmContract?.evm_extra_wei_decimals ?? 0);
 		},
 		[tokenMap],
 	);

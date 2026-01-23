@@ -1,68 +1,40 @@
-import { useMemo } from "react";
+import type { ClearinghouseStateWsEvent, SpotStateWsEvent } from "@nktkas/hyperliquid";
 import { useConnection } from "wagmi";
 import { useSubClearinghouseState, useSubSpotState } from "@/lib/hyperliquid/hooks/subscription";
 
-export interface SpotBalance {
-	coin: string;
-	total: string;
-	hold: string;
-	entryNtl: string;
-}
-
-export interface PerpBalance {
-	accountValue: string;
-	totalMarginUsed: string;
-}
+export type PerpSummary = ClearinghouseStateWsEvent["clearinghouseState"]["crossMarginSummary"];
+export type PerpPosition = NonNullable<ClearinghouseStateWsEvent["clearinghouseState"]["assetPositions"]>[number];
+export type SpotBalance = NonNullable<SpotStateWsEvent["spotState"]["balances"]>[number];
 
 export interface AccountBalances {
-	perp: PerpBalance;
-	spot: SpotBalance[];
+	perpSummary: PerpSummary | null;
+	perpPositions: PerpPosition[];
+	spotBalances: SpotBalance[];
 	isLoading: boolean;
 	hasError: boolean;
 }
 
+const EMPTY_SPOT_BALANCES: SpotBalance[] = [];
+const EMPTY_PERP_POSITIONS: PerpPosition[] = [];
+
 export function useAccountBalances(): AccountBalances {
 	const { address, isConnected } = useConnection();
+	const enabled = isConnected && !!address;
 
-	const { data: perpEvent, status: perpStatus } = useSubClearinghouseState(
-		{ user: address ?? "0x0" },
-		{ enabled: isConnected && !!address },
-	);
+	const { data: perpEvent, status: perpStatus } = useSubClearinghouseState({ user: address ?? "0x0" }, { enabled });
 
-	const { data: spotEvent, status: spotStatus } = useSubSpotState(
-		{ user: address ?? "0x0" },
-		{ enabled: isConnected && !!address },
-	);
+	const { data: spotEvent, status: spotStatus } = useSubSpotState({ user: address ?? "0x0" }, { enabled });
 
-	const perp = useMemo((): PerpBalance => {
-		const summary = perpEvent?.clearinghouseState?.crossMarginSummary;
-		return {
-			accountValue: summary?.accountValue ?? "0",
-			totalMarginUsed: summary?.totalMarginUsed ?? "0",
-		};
-	}, [perpEvent]);
-
-	const spot = useMemo((): SpotBalance[] => {
-		const balances = spotEvent?.spotState?.balances;
-		if (!balances) return [];
-
-		return balances
-			.filter((b) => parseFloat(b.total ?? "0") !== 0)
-			.map((b) => ({
-				coin: b.coin,
-				total: b.total ?? "0",
-				hold: b.hold ?? "0",
-				entryNtl: b.entryNtl ?? "0",
-			}));
-	}, [spotEvent]);
+	const perpState = perpEvent?.clearinghouseState;
+	const spotState = spotEvent?.spotState;
+	const perpSummary = perpState?.crossMarginSummary ?? null;
+	const perpPositions = perpState?.assetPositions ?? EMPTY_PERP_POSITIONS;
+	const spotBalances = spotState?.balances ?? EMPTY_SPOT_BALANCES;
 
 	const isLoading =
 		perpStatus === "subscribing" || spotStatus === "subscribing" || perpStatus === "idle" || spotStatus === "idle";
 	const hasError = perpStatus === "error" || spotStatus === "error";
 
-	return { perp, spot, isLoading, hasError };
+	return { perpSummary, perpPositions, spotBalances, isLoading, hasError };
 }
-
-export function getSpotBalance(balances: SpotBalance[], coin: string): SpotBalance | null {
-	return balances.find((b) => b.coin === coin) ?? null;
-}
+export { getSpotBalance } from "@/lib/trade/balances";

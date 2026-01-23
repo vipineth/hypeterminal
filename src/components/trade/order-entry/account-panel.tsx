@@ -3,9 +3,9 @@ import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
+import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatToken, formatUSD } from "@/lib/format";
-import { useSubClearinghouseState, useSubSpotState } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumberOrZero } from "@/lib/trade/numbers";
 import { useDepositModalActions } from "@/stores/use-deposit-modal-store";
 
@@ -19,30 +19,21 @@ export function AccountPanel() {
 	const [activeTab, setActiveTab] = useState<"perps" | "spot">("perps");
 	const { open: openDepositModal } = useDepositModalActions();
 
-	const { address, isConnected } = useConnection();
-	const { data: stateEvent } = useSubClearinghouseState(
-		{ user: address ?? "0x0" },
-		{ enabled: isConnected && !!address },
-	);
-	const clearinghouse = stateEvent?.clearinghouseState;
-
-	const { data: spotEvent } = useSubSpotState({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
-	const spotData = spotEvent?.spotState;
+	const { isConnected } = useConnection();
+	const { perpSummary, perpPositions, spotBalances } = useAccountBalances();
 
 	const perpMetrics = useMemo(() => {
-		if (!clearinghouse?.crossMarginSummary) {
+		if (!perpSummary) {
 			return null;
 		}
 
-		const summary = clearinghouse.crossMarginSummary;
-
-		const accountValue = parseNumberOrZero(summary.accountValue);
-		const totalNtlPos = parseNumberOrZero(summary.totalNtlPos);
-		const totalMarginUsed = parseNumberOrZero(summary.totalMarginUsed);
-		const totalRawUsd = parseNumberOrZero(summary.totalRawUsd);
+		const accountValue = parseNumberOrZero(perpSummary.accountValue);
+		const totalNtlPos = parseNumberOrZero(perpSummary.totalNtlPos);
+		const totalMarginUsed = parseNumberOrZero(perpSummary.totalMarginUsed);
+		const totalRawUsd = parseNumberOrZero(perpSummary.totalRawUsd);
 
 		let unrealizedPnl = 0;
-		for (const pos of clearinghouse.assetPositions ?? []) {
+		for (const pos of perpPositions) {
 			unrealizedPnl += parseNumberOrZero(pos.position.unrealizedPnl);
 		}
 
@@ -61,10 +52,10 @@ export function AccountPanel() {
 			availableBalance,
 			totalMarginUsed,
 		};
-	}, [clearinghouse]);
+	}, [perpPositions, perpSummary]);
 
 	const spotMetrics = useMemo(() => {
-		if (!spotData?.balances) {
+		if (!isConnected) {
 			return null;
 		}
 
@@ -73,7 +64,7 @@ export function AccountPanel() {
 		let inOrderValue = 0;
 		const tokens: Array<{ coin: string; total: number; available: number; usdValue: number }> = [];
 
-		for (const b of spotData.balances) {
+		for (const b of spotBalances) {
 			const total = parseNumberOrZero(b.total);
 			const hold = parseNumberOrZero(b.hold);
 			const entryNtl = parseNumberOrZero(b.entryNtl);
@@ -99,7 +90,7 @@ export function AccountPanel() {
 			tokenCount: tokens.length,
 			topTokens: tokens.slice(0, 3),
 		};
-	}, [spotData]);
+	}, [isConnected, spotBalances]);
 
 	const hasPerpData = isConnected && perpMetrics !== null;
 	const hasSpotData = isConnected && spotMetrics !== null;

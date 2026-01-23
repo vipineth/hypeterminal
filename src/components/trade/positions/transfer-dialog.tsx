@@ -1,15 +1,17 @@
-import Big from "big.js";
 import { t } from "@lingui/core/macro";
+import Big from "big.js";
 import { ArrowRight, Loader2 } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NumberInput } from "@/components/ui/number-input";
+import { getSpotBalance, useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken } from "@/lib/format";
 import { useExchangeSendAsset } from "@/lib/hyperliquid/hooks/exchange";
-import { limitDecimalInput } from "@/lib/trade/numbers";
+import { getAvailableFromTotals, getPerpAvailable } from "@/lib/trade/balances";
+import { floorToString, limitDecimalInput } from "@/lib/trade/numbers";
 
 type TransferDirection = "toSpot" | "toPerp";
 
@@ -17,21 +19,35 @@ interface Props {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	direction: TransferDirection;
-	availableBalance: string;
 }
 
 const USDC_TOKEN = "USDC:0x6d1e7cde53ba9467b783cb7c530ce054";
-const USDC_DECIMALS = 2;
+const USDC_DECIMALS = 6;
 
-export function TransferDialog({ open, onOpenChange, direction, availableBalance }: Props) {
+export function TransferDialog({ open, onOpenChange, direction }: Props) {
 	const [amount, setAmount] = useState("");
 	const [error, setError] = useState<string | null>(null);
 
 	const { address } = useConnection();
 	const { mutateAsync: sendAsset, isPending } = useExchangeSendAsset();
+	const { perpSummary, spotBalances } = useAccountBalances();
+
+	const spotUsdc = useMemo(() => getSpotBalance(spotBalances, "USDC"), [spotBalances]);
+	const availableBalanceValue = useMemo(() => {
+		if (direction === "toSpot") {
+			return getPerpAvailable(perpSummary?.accountValue, perpSummary?.totalMarginUsed);
+		}
+
+		return getAvailableFromTotals(spotUsdc?.total, spotUsdc?.hold);
+	}, [direction, perpSummary, spotUsdc]);
+
+	const availableBalance = useMemo(
+		() => floorToString(availableBalanceValue, USDC_DECIMALS),
+		[availableBalanceValue],
+	);
 
 	const amountBig = amount ? Big(amount) : Big(0);
-	const availableBig = Big(availableBalance);
+	const availableBig = Big(availableBalanceValue);
 	const isValidAmount = amountBig.gt(0) && amountBig.lte(availableBig) && !!address;
 
 	const fromLabel = direction === "toSpot" ? t`Perp` : t`Spot`;
@@ -63,7 +79,7 @@ export function TransferDialog({ open, onOpenChange, direction, availableBalance
 	}
 
 	function handleMaxClick() {
-		setAmount(Big(availableBalance).toFixed(USDC_DECIMALS));
+		setAmount(floorToString(availableBalanceValue, USDC_DECIMALS));
 	}
 
 	function handleOpenChange(newOpen: boolean) {

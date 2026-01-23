@@ -1,7 +1,7 @@
 import { SCALE_LEVELS_MAX, SCALE_LEVELS_MIN } from "@/config/constants";
 import { clampInt, formatDecimalFloor, isPositive, parseNumberOrZero } from "@/lib/trade/numbers";
+import { getExecutedPrice } from "@/lib/trade/order-entry/price";
 import type { ExchangeOrder, LimitTif, OrderType } from "@/lib/trade/order-types";
-import { getExecutedPrice } from "@/lib/trade/order-entry-calcs";
 import type { Side } from "@/lib/trade/types";
 
 export interface OrderBuildParams {
@@ -191,7 +191,13 @@ interface StandardOrderParams {
 }
 
 function buildStandardOrder(orders: ExchangeOrder[], params: StandardOrderParams): void {
-	const orderPrice = getExecutedPrice(params.orderType, params.isBuy ? "buy" : "sell", params.markPx, params.slippageBps, params.price);
+	const orderPrice = getExecutedPrice(
+		params.orderType,
+		params.isBuy ? "buy" : "sell",
+		params.markPx,
+		params.slippageBps,
+		params.price,
+	);
 	const formattedPrice = formatPriceForOrder(orderPrice);
 
 	orders.push({

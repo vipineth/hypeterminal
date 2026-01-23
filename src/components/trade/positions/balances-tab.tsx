@@ -11,6 +11,7 @@ import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken, formatUSD } from "@/lib/format";
 import { useSpotTokens } from "@/lib/hyperliquid";
+import { type BalanceRow, filterBalanceRowsByUsdValue, getBalanceRows, getTotalUsdValue } from "@/lib/trade/balances";
 import { useGlobalSettingsActions, useHideSmallBalances } from "@/stores/use-global-settings-store";
 import { TokenAvatar } from "../components/token-avatar";
 import { TransferDialog } from "./transfer-dialog";
@@ -33,22 +34,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 	);
 }
 
-interface BalanceRow {
-	asset: string;
-	type: "perp" | "spot";
-	available: string;
-	inOrder: string;
-	total: string;
-	usdValue: string;
-}
-
 type TransferDirection = "toSpot" | "toPerp";
-
-interface TransferState {
-	open: boolean;
-	direction: TransferDirection;
-	availableBalance: string;
-}
 
 const SMALL_BALANCE_THRESHOLD = 1;
 
@@ -57,58 +43,21 @@ export function BalancesTab() {
 	const { getDisplayName, getDecimals } = useSpotTokens();
 	const hideSmallBalances = useHideSmallBalances();
 	const { setHideSmallBalances } = useGlobalSettingsActions();
-	const [transferState, setTransferState] = useState<TransferState>({
+	const [transferState, setTransferState] = useState<{ open: boolean; direction: TransferDirection }>({
 		open: false,
 		direction: "toSpot",
-		availableBalance: "0",
 	});
 
-	const { perp, spot, isLoading, hasError } = useAccountBalances();
+	const { perpSummary, spotBalances, isLoading, hasError } = useAccountBalances();
 
-	const balances = useMemo((): BalanceRow[] => {
-		const rows: BalanceRow[] = [];
-
-		const perpAccountValue = parseFloat(perp.accountValue) || 0;
-		const perpMarginUsed = parseFloat(perp.totalMarginUsed) || 0;
-		const perpAvailable = Math.max(0, perpAccountValue - perpMarginUsed);
-
-		if (perpAccountValue > 0) {
-			rows.push({
-				asset: "USDC",
-				type: "perp",
-				available: String(perpAvailable),
-				inOrder: perp.totalMarginUsed,
-				total: perp.accountValue,
-				usdValue: perp.accountValue,
-			});
-		}
-
-		for (const b of spot) {
-			const total = parseFloat(b.total) || 0;
-			const hold = parseFloat(b.hold) || 0;
-			const available = Math.max(0, total - hold);
-			const usdValue = b.coin === "USDC" ? b.total : b.entryNtl;
-
-			rows.push({
-				asset: b.coin,
-				type: "spot",
-				available: String(available),
-				inOrder: b.hold,
-				total: b.total,
-				usdValue,
-			});
-		}
-
-		rows.sort((a, b) => parseFloat(b.usdValue) - parseFloat(a.usdValue));
-		return rows;
-	}, [perp, spot]);
+	const balances = useMemo(() => getBalanceRows(perpSummary, spotBalances), [perpSummary, spotBalances]);
 
 	const filteredBalances = useMemo(() => {
 		if (!hideSmallBalances) return balances;
-		return balances.filter((b) => parseFloat(b.usdValue) >= SMALL_BALANCE_THRESHOLD);
+		return filterBalanceRowsByUsdValue(balances, SMALL_BALANCE_THRESHOLD);
 	}, [balances, hideSmallBalances]);
 
-	const totalValue = balances.reduce((sum, b) => sum + (parseFloat(b.usdValue) || 0), 0);
+	const totalValue = useMemo(() => getTotalUsdValue(balances), [balances]);
 
 	function handleTransferClick(row: BalanceRow) {
 		if (row.asset !== "USDC") return;
@@ -116,7 +65,6 @@ export function BalancesTab() {
 		setTransferState({
 			open: true,
 			direction,
-			availableBalance: row.available,
 		});
 	}
 
@@ -238,7 +186,6 @@ export function BalancesTab() {
 				open={transferState.open}
 				onOpenChange={(open) => setTransferState((prev) => ({ ...prev, open }))}
 				direction={transferState.direction}
-				availableBalance={transferState.availableBalance}
 			/>
 		</div>
 	);
