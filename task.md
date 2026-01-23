@@ -278,6 +278,78 @@ import { createRoot } from 'react-dom/profiling'
 - [x] Created `docs/tanstack-start-optimization.md` documentation
 - [x] **Results**: Index route reduced from 380KB to 229KB (-40%)
 
+### Day 2 - Runtime Performance Research & Documentation
+- [x] Created `docs/websocket-optimization.md`:
+  - Message batching with requestAnimationFrame
+  - Backpressure control patterns
+  - Web Worker offloading strategies
+  - Delta updates vs full snapshots
+- [x] Created `docs/memory-management.md`:
+  - Chrome DevTools heap snapshot workflow
+  - Common React memory leak patterns
+  - useEffect cleanup checklist
+  - TanStack Query cache cleanup
+- [x] Created `docs/concurrent-rendering.md`:
+  - useTransition for non-urgent updates
+  - useDeferredValue for expensive renders
+  - React 19.2 Performance Tracks
+  - Suspense boundary optimization
+- [x] Created `docs/web3-bundle-optimization.md`:
+  - wagmi/viem lazy loading challenges
+  - Connector lazy loading strategies
+  - Tree-shaking verification
+
+---
+
+## Phase 2: Runtime Performance Optimization ✅ COMPLETE
+
+### Task 1: WebSocket Optimization ✅
+- [x] Researched message batching strategies (buffer + rAF flush)
+- [x] Researched backpressure handling for high-frequency updates
+- [x] Researched delta updates vs full payload patterns
+- [x] Researched Web Worker offloading for message processing
+- [x] Created `docs/websocket-optimization.md`
+
+**Key findings:**
+- Current architecture uses Zustand store with reference counting (good)
+- Ring buffer already implemented for trades (good)
+- Opportunities: rAF batching, ref-based updates, Web Workers
+
+### Task 2: Memory Management & Leak Detection ✅
+- [x] Documented Chrome DevTools heap snapshot workflow
+- [x] Documented common React memory leak patterns
+- [x] Audited useEffect cleanup patterns in codebase
+- [x] Documented TanStack Query cleanup strategies
+- [x] Documented WebSocket listener cleanup patterns
+- [x] Created `docs/memory-management.md`
+
+**Key findings:**
+- Most cleanup patterns are implemented correctly
+- useSub hook has proper cleanup
+- Ring buffer uses useSyncExternalStore correctly
+
+### Task 3: React 19 Concurrent Rendering ✅
+- [x] Researched useTransition for tab switching, filters
+- [x] Researched useDeferredValue for expensive derived state
+- [x] Researched Suspense boundary optimization
+- [x] Documented React Performance Tracks usage
+- [x] Created `docs/concurrent-rendering.md`
+
+**Key findings:**
+- No useTransition/useDeferredValue currently used
+- Opportunities: positions panel tabs, token selector, orderbook
+
+### Task 4: Defer vendor-web3 Loading ✅
+- [x] Researched dynamic import patterns for wagmi
+- [x] Identified wallet-dependent code paths (31 files)
+- [x] Documented lazy connector loading approach
+- [x] Created `docs/web3-bundle-optimization.md`
+
+**Key findings:**
+- Full lazy load difficult due to provider requirement
+- WalletConnect connector (~50KB) can be lazy loaded
+- Tree-shaking already in use
+
 ---
 
 ## Metrics to Track
