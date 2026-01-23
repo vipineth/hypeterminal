@@ -1,5 +1,4 @@
 import { t } from "@lingui/core/macro";
-import Big from "big.js";
 import { ArrowLeftRight, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
@@ -139,11 +138,6 @@ export function OrderEntryPanel() {
 		szDecimals,
 	} = useOrderEntryData({ market, side, markPx, sizeMode, sizeInput });
 
-	const sizeValueNum = Big(sizeValue).toNumber();
-	const orderValueNum = Big(orderValue).toNumber();
-	const maxSizeNum = Big(maxSize).toNumber();
-	const availableBalanceNum = Big(availableBalance).toNumber();
-
 	const { addOrder, updateOrder } = useOrderQueueActions();
 	const selectedPrice = useSelectedPrice();
 	const orderType = useOrderType();
@@ -233,13 +227,13 @@ export function OrderEntryPanel() {
 	);
 
 	const { marginRequired, estimatedFee } = useMemo(
-		() => getOrderMetrics({ sizeValue: sizeValueNum, price, leverage, orderType }),
-		[leverage, orderType, price, sizeValueNum],
+		() => getOrderMetrics({ sizeValue, price, leverage, orderType }),
+		[leverage, orderType, price, sizeValue],
 	);
 
 	const { liqPrice, liqWarning } = useMemo(
-		() => getLiquidationInfo({ price, sizeValue: sizeValueNum, leverage, side }),
-		[leverage, price, side, sizeValueNum],
+		() => getLiquidationInfo({ price, sizeValue, leverage, side }),
+		[leverage, price, side, sizeValue],
 	);
 
 	const needsAgentApproval = !isAgentReady;
@@ -249,7 +243,7 @@ export function OrderEntryPanel() {
 	const validation = useOrderValidation({
 		isConnected,
 		isWalletLoading,
-		availableBalance: availableBalanceNum,
+		availableBalance,
 		hasMarket: !!market,
 		hasAssetIndex: typeof market?.assetId === "number",
 		needsAgentApproval,
@@ -257,9 +251,9 @@ export function OrderEntryPanel() {
 		orderType,
 		markPx,
 		price,
-		sizeValue: sizeValueNum,
-		orderValue: orderValueNum,
-		maxSize: maxSizeNum,
+		sizeValue,
+		orderValue,
+		maxSize,
 		side,
 		usesLimitPrice,
 		usesTriggerPrice,
@@ -278,12 +272,10 @@ export function OrderEntryPanel() {
 		slPriceNum,
 	});
 
-	const sizeHasError =
-		(Big(sizeValue).gt(maxSize) && Big(maxSize).gt(0)) ||
-		(Big(orderValue).gt(0) && Big(orderValue).lt(ORDER_MIN_NOTIONAL_USD));
+	const sizeHasError = (sizeValue > maxSize && maxSize > 0) || (orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD);
 
 	function applySizePercent(pct: number) {
-		if (Big(maxSize).lte(0)) return;
+		if (maxSize <= 0) return;
 		setHasUserSized(true);
 		const newSize = getSizeForPercent(pct);
 		if (newSize) setSize(newSize);
@@ -353,7 +345,7 @@ export function OrderEntryPanel() {
 					assetId: market.assetId,
 					side,
 					orderType,
-					sizeValue: sizeValueNum,
+					sizeValue,
 					szDecimals,
 					markPx,
 					price,
@@ -407,7 +399,6 @@ export function OrderEntryPanel() {
 		scaleStartPriceInput,
 		side,
 		sizeValue,
-		sizeValueNum,
 		slippageBps,
 		slPriceNum,
 		stopOrder,
@@ -426,16 +417,16 @@ export function OrderEntryPanel() {
 
 	const sliderValue = useMemo(() => {
 		if (isDraggingSlider) return dragSliderValue;
-		if (!hasUserSized || sizeValueNum <= 0) return 25;
-		return getSliderValue(sizeValueNum, maxSizeNum);
-	}, [isDraggingSlider, dragSliderValue, hasUserSized, sizeValueNum, maxSizeNum]);
+		if (!hasUserSized || sizeValue <= 0) return 25;
+		return getSliderValue(sizeValue, maxSize);
+	}, [isDraggingSlider, dragSliderValue, hasUserSized, sizeValue, maxSize]);
 
 	const buttonContent = useButtonContent({
 		isConnected,
 		needsChainSwitch,
 		isSwitchingChain: switchChain.isPending,
 		switchChain: (chainId) => switchChain.mutate({ chainId }),
-		availableBalance: availableBalanceNum,
+		availableBalance,
 		validation,
 		isAgentLoading,
 		registerStatus,
@@ -448,7 +439,7 @@ export function OrderEntryPanel() {
 		onSubmit: handleSubmit,
 	});
 
-	const isFormDisabled = !isConnected || Big(availableBalance).lte(0);
+	const isFormDisabled = !isConnected || availableBalance <= 0;
 	const actionButtonClass = getActionButtonClass(buttonContent.variant);
 
 	function formatAvailableBalance(): string {
@@ -510,7 +501,7 @@ export function OrderEntryPanel() {
 					<div className="flex items-center justify-between text-muted-fg">
 						<span>{t`Available`}</span>
 						<div className="flex items-center gap-2">
-							<span className={cn("tabular-nums", Big(availableBalance).gt(0) ? "text-positive" : "text-muted-fg")}>
+							<span className={cn("tabular-nums", availableBalance > 0 ? "text-positive" : "text-muted-fg")}>
 								{formatAvailableBalance()}
 							</span>
 							{isConnected && (
@@ -577,7 +568,7 @@ export function OrderEntryPanel() {
 						max={100}
 						step={0.1}
 						className="py-5"
-						disabled={isFormDisabled || Big(maxSize).lte(0)}
+						disabled={isFormDisabled || maxSize <= 0}
 					/>
 
 					<div className="grid grid-cols-4 gap-1">
@@ -612,7 +603,7 @@ export function OrderEntryPanel() {
 								"w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums",
 								usesTriggerPrice &&
 									!isPositive(triggerPriceNum) &&
-									sizeValueNum > 0 &&
+									sizeValue > 0 &&
 									"border-negative focus:border-negative",
 							)}
 							disabled={isFormDisabled}
@@ -641,7 +632,7 @@ export function OrderEntryPanel() {
 							onChange={(e) => setLimitPrice(e.target.value)}
 							className={cn(
 								"w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums",
-								usesLimitPrice && !price && sizeValueNum > 0 && "border-negative focus:border-negative",
+								usesLimitPrice && !price && sizeValue > 0 && "border-negative focus:border-negative",
 							)}
 							disabled={isFormDisabled}
 						/>
@@ -775,7 +766,7 @@ export function OrderEntryPanel() {
 							<TpSlSection
 								side={side}
 								referencePrice={price}
-								size={sizeValueNum}
+								size={sizeValue}
 								szDecimals={market?.szDecimals}
 								tpPrice={tpPriceInput}
 								slPrice={slPriceInput}
@@ -788,7 +779,7 @@ export function OrderEntryPanel() {
 				)}
 
 				<div className="space-y-2">
-					{validation.errors.length > 0 && isConnected && Big(availableBalance).gt(0) && (
+					{validation.errors.length > 0 && isConnected && availableBalance > 0 && (
 						<div className="text-4xs text-negative">{validation.errors.join(" • ")}</div>
 					)}
 
@@ -813,7 +804,7 @@ export function OrderEntryPanel() {
 				<OrderSummary
 					liqPrice={liqPrice}
 					liqWarning={liqWarning}
-					orderValue={orderValueNum}
+					orderValue={orderValue}
 					marginRequired={marginRequired}
 					estimatedFee={estimatedFee}
 					slippageBps={slippageBps}

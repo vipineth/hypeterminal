@@ -484,7 +484,7 @@ export const UI_TEXT = {
 		ERROR_NO_MARK_PRICE: "No mark price",
 		ERROR_LIMIT_PRICE: "Enter limit price",
 		ERROR_SIZE: "Enter size",
-		ERROR_MIN_NOTIONAL: "Min order $10",
+		ERROR_MIN_NOTIONAL: "Min order value $10",
 		ERROR_EXCEEDS_MAX: "Exceeds max size",
 		BUTTON_CONNECT: "Connect Wallet",
 		BUTTON_SWITCHING: "Switching...",

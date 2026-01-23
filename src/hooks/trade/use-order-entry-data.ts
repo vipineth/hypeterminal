@@ -1,15 +1,27 @@
-import Big from "big.js";
 import { useCallback, useMemo } from "react";
 import { useConnection } from "wagmi";
 import { getMarketCapabilities, type MarketCapabilities } from "@/lib/hyperliquid";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 import type { Side } from "@/lib/trade/types";
-import { percent, useAccountBalances, getAvailableForCoin } from "./use-account-balances";
+import { getSpotBalance, useAccountBalances } from "./use-account-balances";
 import { useAssetLeverage } from "./use-asset-leverage";
 
-interface SpotBalance {
-	base: string;
-	quote: string;
+// Floor a number to specific decimal places
+function floor(value: number, decimals: number): number {
+	if (!Number.isFinite(value) || value <= 0) return 0;
+	const factor = 10 ** decimals;
+	return Math.floor(value * factor) / factor;
+}
+
+// Format a number to string with specific decimal places, trimming trailing zeros
+function toStr(value: number, decimals: number): string {
+	if (!Number.isFinite(value) || value <= 0) return "0";
+	return floor(value, decimals).toString();
+}
+
+interface SpotBalanceData {
+	baseAvailable: number;
+	quoteAvailable: number;
 	baseToken: string;
 	quoteToken: string;
 }
@@ -27,23 +39,28 @@ interface OrderEntryData {
 	baseToken: string;
 	quoteToken: string;
 	capabilities: MarketCapabilities;
+	szDecimals: number;
 
-	availableBalance: string;
+	// Balances
+	availableBalance: number;
 	availableBalanceToken: string;
-	spotBalance: SpotBalance;
-	perpAvailableBalance: string;
+	perpAvailable: number;
+	spotBalance: SpotBalanceData;
 
-	maxSize: string;
-	sizeValue: string;
-	orderValue: string;
-	conversionPrice: string;
+	// Size calculations
+	maxSize: number;
+	sizeValue: number;
+	orderValue: number;
 
+	// UI
 	sideLabels: SideLabels;
 	sizeModeLabel: string;
 
+	// Functions
 	getSizeForPercent: (pct: number) => string;
 	convertSizeForModeToggle: () => string;
 
+	// Leverage & margin
 	leverage: number;
 	marginMode: "cross" | "isolated";
 	hasPosition: boolean;
@@ -52,8 +69,6 @@ interface OrderEntryData {
 	switchModeError: Error | null;
 	isOnlyIsolated: boolean;
 	allowsCrossMargin: boolean;
-
-	szDecimals: number;
 	maxTradeSzs: [number, number] | null;
 	availableToBuy: number | null;
 	availableToSell: number | null;
@@ -78,6 +93,7 @@ export function useOrderEntryData({
 	const isSpotMarket = market?.kind === "spot";
 	const capabilities = getMarketCapabilities(market);
 	const szDecimals = market?.szDecimals ?? 0;
+	const price = markPx > 0 ? markPx : 0;
 
 	const { perp, spot } = useAccountBalances();
 
@@ -95,31 +111,46 @@ export function useOrderEntryData({
 		allowsCrossMargin,
 	} = useAssetLeverage();
 
-	const spotBalance = useMemo((): SpotBalance => {
-		if (!isSpotMarket) {
-			return { base: "0", quote: "0", baseToken: "", quoteToken: "USDC" };
+	// Parse perp available balance
+	const perpAvailable = useMemo(() => {
+		const accountValue = parseFloat(perp.accountValue) || 0;
+		const marginUsed = parseFloat(perp.totalMarginUsed) || 0;
+		return Math.max(0, accountValue - marginUsed);
+	}, [perp.accountValue, perp.totalMarginUsed]);
+
+	// Parse spot balances for current market
+	const spotBalance = useMemo((): SpotBalanceData => {
+		if (!isSpotMarket || market?.kind !== "spot") {
+			return { baseAvailable: 0, quoteAvailable: 0, baseToken: "", quoteToken: "USDC" };
 		}
 
-		const spotMarket = market?.kind === "spot" ? market : null;
-		const baseTokenName = spotMarket?.tokensInfo?.[0]?.name ?? "";
-		const quoteTokenName = spotMarket?.tokensInfo?.[1]?.name ?? "USDC";
+		const baseToken = market.tokensInfo?.[0]?.name ?? "";
+		const quoteToken = market.tokensInfo?.[1]?.name ?? "USDC";
+
+		const baseBalance = getSpotBalance(spot, baseToken);
+		const quoteBalance = getSpotBalance(spot, quoteToken);
+
+		const baseTotal = parseFloat(baseBalance?.total ?? "0") || 0;
+		const baseHold = parseFloat(baseBalance?.hold ?? "0") || 0;
+		const quoteTotal = parseFloat(quoteBalance?.total ?? "0") || 0;
+		const quoteHold = parseFloat(quoteBalance?.hold ?? "0") || 0;
 
 		return {
-			base: getAvailableForCoin(spot, baseTokenName),
-			quote: getAvailableForCoin(spot, quoteTokenName),
-			baseToken: baseTokenName,
-			quoteToken: quoteTokenName,
+			baseAvailable: Math.max(0, baseTotal - baseHold),
+			quoteAvailable: Math.max(0, quoteTotal - quoteHold),
+			baseToken,
+			quoteToken,
 		};
-	}, [isSpotMarket, spot, market]);
+	}, [isSpotMarket, market, spot]);
 
 	const baseToken = isSpotMarket ? spotBalance.baseToken : (market?.displayName?.split("-")[0] ?? "");
 	const quoteToken = isSpotMarket ? spotBalance.quoteToken : "USD";
 
 	const availableBalance = isSpotMarket
 		? side === "buy"
-			? spotBalance.quote
-			: spotBalance.base
-		: perp.available;
+			? spotBalance.quoteAvailable
+			: spotBalance.baseAvailable
+		: perpAvailable;
 
 	const availableBalanceToken = isSpotMarket
 		? side === "buy"
@@ -127,50 +158,39 @@ export function useOrderEntryData({
 			: spotBalance.baseToken
 		: "USD";
 
-	const conversionPrice = markPx > 0 ? String(markPx) : "0";
-
-	const sizeValue = useMemo((): string => {
-		if (!sizeInput || sizeInput === "0") return "0";
-		if (sizeMode === "usd" && Big(conversionPrice).gt(0)) {
-			return Big(sizeInput).div(conversionPrice).toString();
-		}
-		return sizeInput;
-	}, [sizeMode, sizeInput, conversionPrice]);
-
-	const orderValue = useMemo((): string => {
-		if (Big(sizeValue).eq(0) || Big(conversionPrice).eq(0)) return "0";
-		return Big(sizeValue).times(conversionPrice).toString();
-	}, [sizeValue, conversionPrice]);
-
-	const maxSize = useMemo((): string => {
-		if (!isConnected) return "0";
+	const maxSize = useMemo((): number => {
+		if (!isConnected) return 0;
 
 		if (isSpotMarket) {
 			if (side === "buy") {
-				if (Big(conversionPrice).lte(0) || Big(spotBalance.quote).lte(0)) return "0";
-				return Big(spotBalance.quote).div(conversionPrice).toString();
+				if (price <= 0 || spotBalance.quoteAvailable <= 0) return 0;
+				return floor(spotBalance.quoteAvailable / price, szDecimals);
 			}
-			return spotBalance.base;
+			return floor(spotBalance.baseAvailable, szDecimals);
 		}
 
-		return getPerpMaxSize({
-			isConnected,
-			maxTradeSzs,
-			side,
-			availableToBuy,
-			availableToSell,
-		});
-	}, [
-		availableToBuy,
-		availableToSell,
-		isConnected,
-		isSpotMarket,
-		conversionPrice,
-		maxTradeSzs,
-		side,
-		spotBalance.base,
-		spotBalance.quote,
-	]);
+		const maxTradeSize = maxTradeSzs?.[1];
+		if (typeof maxTradeSize === "number" && maxTradeSize > 0) {
+			return maxTradeSize;
+		}
+		const available = side === "buy" ? availableToBuy : availableToSell;
+		return available ?? 0;
+	}, [isConnected, isSpotMarket, side, price, spotBalance, szDecimals, maxTradeSzs, availableToBuy, availableToSell]);
+
+	const sizeValue = useMemo((): number => {
+		const input = parseFloat(sizeInput) || 0;
+		if (input <= 0) return 0;
+
+		if (sizeMode === "usd" && price > 0) {
+			return floor(input / price, szDecimals);
+		}
+		return input;
+	}, [sizeInput, sizeMode, price, szDecimals]);
+
+	const orderValue = useMemo((): number => {
+		if (sizeValue <= 0 || price <= 0) return 0;
+		return sizeValue * price;
+	}, [sizeValue, price]);
 
 	const sideLabels = useMemo((): SideLabels => {
 		if (isSpotMarket) {
@@ -179,6 +199,7 @@ export function useOrderEntryData({
 		return { buy: "Long", sell: "Short", buyAria: "Buy Long", sellAria: "Sell Short" };
 	}, [isSpotMarket]);
 
+	// Size mode label (shows current unit)
 	const sizeModeLabel = useMemo(() => {
 		if (isSpotMarket) {
 			if (side === "buy") {
@@ -189,51 +210,65 @@ export function useOrderEntryData({
 		return sizeMode === "asset" ? baseToken || "---" : "USD";
 	}, [isSpotMarket, side, sizeMode, spotBalance.quoteToken, baseToken]);
 
+	// Get size for a percentage of max
+	// Returns a string in the current sizeMode unit (asset or usd)
 	const getSizeForPercent = useCallback(
 		(pct: number): string => {
-			if (Big(maxSize).lte(0)) return "";
+			if (price <= 0) return "";
 
-			if (pct === 100) {
-				if (isSpotMarket) {
-					if (side === "sell") return spotBalance.base;
-					if (sizeMode === "usd") return Big(spotBalance.quote).toFixed(2);
-					return maxSize;
-				}
-				if (sizeMode === "usd" && Big(conversionPrice).gt(0)) {
-					return Big(maxSize).times(conversionPrice).toFixed(2);
-				}
-				return maxSize;
-			}
-
-			const newSize = percent(maxSize, pct);
-
-			if (isSpotMarket && sizeMode === "usd") {
+			if (isSpotMarket) {
+				// SPOT MARKET
 				if (side === "buy") {
-					return Big(percent(availableBalance, pct)).toFixed(2);
+					// Buying tokens with USDC
+					// quoteAvailable = how much USDC we have
+					// maxSize = how many tokens we can buy (quoteAvailable / price)
+					if (sizeMode === "usd") {
+						// Return USDC amount
+						const usdAmount = (spotBalance.quoteAvailable * pct) / 100;
+						return usdAmount.toFixed(2);
+					}
+					// Return token amount
+					const tokenAmount = (maxSize * pct) / 100;
+					return toStr(tokenAmount, szDecimals);
 				}
-				return Big(newSize).times(conversionPrice).toFixed(2);
+
+				// Selling tokens for USDC
+				// baseAvailable = how many tokens we have
+				// maxSize = baseAvailable (floored)
+				if (sizeMode === "usd") {
+					// Return USDC equivalent
+					const tokenAmount = (spotBalance.baseAvailable * pct) / 100;
+					const usdAmount = tokenAmount * price;
+					return usdAmount.toFixed(2);
+				}
+				// Return token amount
+				const tokenAmount = (spotBalance.baseAvailable * pct) / 100;
+				return toStr(tokenAmount, szDecimals);
 			}
 
-			if (sizeMode === "usd" && Big(conversionPrice).gt(0)) {
-				return Big(newSize).times(conversionPrice).toFixed(2);
-			}
+			// PERP MARKET
+			if (maxSize <= 0) return "";
+			const size = (maxSize * pct) / 100;
 
-			const factor = Big(10).pow(szDecimals);
-			return Big(newSize).times(factor).round(0, Big.roundDown).div(factor).toString();
+			if (sizeMode === "usd") {
+				return (size * price).toFixed(2);
+			}
+			return toStr(size, szDecimals);
 		},
-		[maxSize, isSpotMarket, sizeMode, side, availableBalance, conversionPrice, szDecimals, spotBalance.base, spotBalance.quote],
+		[maxSize, isSpotMarket, side, spotBalance.baseAvailable, spotBalance.quoteAvailable, szDecimals, sizeMode, price],
 	);
 
+	// Convert current size when toggling between asset/USD mode
 	const convertSizeForModeToggle = useCallback((): string => {
-		if (Big(conversionPrice).lte(0) || Big(sizeValue).lte(0)) return "";
+		if (sizeValue <= 0 || price <= 0) return "";
 
-		const newMode = sizeMode === "asset" ? "usd" : "asset";
-		if (newMode === "usd") {
-			return Big(sizeValue).times(conversionPrice).toFixed(2);
+		if (sizeMode === "asset") {
+			// Converting to USD
+			return (sizeValue * price).toFixed(2);
 		}
-		const factor = Big(10).pow(szDecimals);
-		return Big(sizeValue).times(factor).round(0, Big.roundDown).div(factor).toString();
-	}, [sizeMode, sizeValue, conversionPrice, szDecimals]);
+		// Converting to asset
+		return toStr(sizeValue, szDecimals);
+	}, [sizeMode, sizeValue, price, szDecimals]);
 
 	return {
 		isConnected,
@@ -241,14 +276,14 @@ export function useOrderEntryData({
 		baseToken,
 		quoteToken,
 		capabilities,
+		szDecimals,
 		availableBalance,
 		availableBalanceToken,
+		perpAvailable,
 		spotBalance,
-		perpAvailableBalance: perp.available,
 		maxSize,
 		sizeValue,
 		orderValue,
-		conversionPrice,
 		sideLabels,
 		sizeModeLabel,
 		getSizeForPercent,
@@ -261,26 +296,8 @@ export function useOrderEntryData({
 		switchModeError,
 		isOnlyIsolated,
 		allowsCrossMargin,
-		szDecimals,
 		maxTradeSzs,
 		availableToBuy,
 		availableToSell,
 	};
-}
-
-function getPerpMaxSize(input: {
-	isConnected: boolean;
-	maxTradeSzs: [number, number] | null;
-	side: Side;
-	availableToBuy: number | null;
-	availableToSell: number | null;
-}): string {
-	if (!input.isConnected) return "0";
-	const maxTradeSize = input.maxTradeSzs?.[1];
-	if (typeof maxTradeSize === "number" && maxTradeSize > 0) {
-		return String(maxTradeSize);
-	}
-	const available = input.side === "buy" ? input.availableToBuy : input.availableToSell;
-	if (available === null || available <= 0) return "0";
-	return String(available);
 }

@@ -71,11 +71,7 @@ export function PositionsPanel() {
 									className="inline-flex items-center gap-1"
 								>
 									<span>{tab.label}</span>
-									{typeof count === "number" ? (
-										<span className="size-4 p-1 inline-flex items-center justify-center border border-info/10 bg-info/10 text-info text-4xs tabular-nums">
-											{count}
-										</span>
-									) : null}
+									{typeof count === "number" ? <span>({count})</span> : null}
 								</TabsTrigger>
 							);
 						})}

@@ -25,7 +25,7 @@ export function ChartPanel() {
 		<div className="h-full flex flex-col overflow-hidden">
 			<div className="px-2 py-1.5 border-b border-border/60 bg-surface/30">
 				<div className="flex items-center justify-between gap-2">
-					<div className="flex items-center gap-2 min-w-0">
+					<div className="flex items-center gap-0.5 min-w-0">
 						<TokenSelector selectedMarket={selectedMarket} onValueChange={handleMarketChange} />
 						<Separator orientation="vertical" className="mx-1 h-4" />
 						<MarketOverview />

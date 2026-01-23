@@ -1,9 +1,9 @@
-import Big from "big.js";
 import { t } from "@lingui/core/macro";
 import { ArrowLeftRight, Wallet } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
@@ -11,6 +11,7 @@ import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken, formatUSD } from "@/lib/format";
 import { useSpotTokens } from "@/lib/hyperliquid";
+import { useGlobalSettingsActions, useHideSmallBalances } from "@/stores/use-global-settings-store";
 import { TokenAvatar } from "../components/token-avatar";
 import { TransferDialog } from "./transfer-dialog";
 
@@ -49,9 +50,13 @@ interface TransferState {
 	availableBalance: string;
 }
 
+const SMALL_BALANCE_THRESHOLD = 1;
+
 export function BalancesTab() {
 	const { isConnected } = useConnection();
 	const { getDisplayName, getDecimals } = useSpotTokens();
+	const hideSmallBalances = useHideSmallBalances();
+	const { setHideSmallBalances } = useGlobalSettingsActions();
 	const [transferState, setTransferState] = useState<TransferState>({
 		open: false,
 		direction: "toSpot",
@@ -63,11 +68,15 @@ export function BalancesTab() {
 	const balances = useMemo((): BalanceRow[] => {
 		const rows: BalanceRow[] = [];
 
-		if (Big(perp.accountValue).gt(0)) {
+		const perpAccountValue = parseFloat(perp.accountValue) || 0;
+		const perpMarginUsed = parseFloat(perp.totalMarginUsed) || 0;
+		const perpAvailable = Math.max(0, perpAccountValue - perpMarginUsed);
+
+		if (perpAccountValue > 0) {
 			rows.push({
 				asset: "USDC",
 				type: "perp",
-				available: perp.available,
+				available: String(perpAvailable),
 				inOrder: perp.totalMarginUsed,
 				total: perp.accountValue,
 				usdValue: perp.accountValue,
@@ -75,22 +84,31 @@ export function BalancesTab() {
 		}
 
 		for (const b of spot) {
+			const total = parseFloat(b.total) || 0;
+			const hold = parseFloat(b.hold) || 0;
+			const available = Math.max(0, total - hold);
 			const usdValue = b.coin === "USDC" ? b.total : b.entryNtl;
+
 			rows.push({
 				asset: b.coin,
 				type: "spot",
-				available: b.available,
+				available: String(available),
 				inOrder: b.hold,
 				total: b.total,
 				usdValue,
 			});
 		}
 
-		rows.sort((a, b) => Big(b.usdValue).minus(a.usdValue).toNumber());
+		rows.sort((a, b) => parseFloat(b.usdValue) - parseFloat(a.usdValue));
 		return rows;
 	}, [perp, spot]);
 
-	const totalValue = balances.reduce((acc, b) => acc.plus(b.usdValue), Big(0)).toString();
+	const filteredBalances = useMemo(() => {
+		if (!hideSmallBalances) return balances;
+		return balances.filter((b) => parseFloat(b.usdValue) >= SMALL_BALANCE_THRESHOLD);
+	}, [balances, hideSmallBalances]);
+
+	const totalValue = balances.reduce((sum, b) => sum + (parseFloat(b.usdValue) || 0), 0);
 
 	function handleTransferClick(row: BalanceRow) {
 		if (row.asset !== "USDC") return;
@@ -118,7 +136,18 @@ export function BalancesTab() {
 			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
 				<Wallet className="size-3" />
 				{t`Account Balances`}
-				<span className="text-positive ml-auto tabular-nums">
+				<label
+					htmlFor="hideSmallBalances"
+					className="ml-auto flex items-center gap-1.5 cursor-pointer text-4xs normal-case tracking-normal"
+				>
+					<Checkbox
+						checked={hideSmallBalances}
+						onCheckedChange={(checked) => setHideSmallBalances(Boolean(checked))}
+						className="size-3"
+					/>
+					{t`Hide small`}
+				</label>
+				<span className="text-positive tabular-nums">
 					{isConnected && !isLoading ? formatUSD(totalValue, { compact: true }) : FALLBACK_VALUE_PLACEHOLDER}
 				</span>
 			</div>
@@ -149,10 +178,10 @@ export function BalancesTab() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{balances.map((row) => {
+								{filteredBalances.map((row) => {
 									const displayName = getDisplayName(row.asset);
 									const decimals = getDecimals(row.asset);
-									const canTransfer = row.asset === "USDC" && Big(row.available).gt(0);
+									const canTransfer = row.asset === "USDC" && parseFloat(row.available) > 0;
 									const transferLabel = row.type === "perp" ? t`To Spot` : t`To Perp`;
 									return (
 										<TableRow key={`${row.type}-${row.asset}`} className="border-border/40 hover:bg-accent/30">
