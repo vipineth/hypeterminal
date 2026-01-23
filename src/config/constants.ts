@@ -20,6 +20,7 @@ export const ARBITRUM_CHAIN_ID = 42161;
 export const ARBITRUM_CHAIN_ID_HEX = "0xa4b1" as const;
 
 export const DEFAULT_MARKET_KEY = "perp:BTC";
+export const DEFAULT_MARKET_NAME = "BTC";
 export const DEFAULT_MARKET_SCOPE = "perp" as const;
 
 export const ORDER_MIN_NOTIONAL_USD = 10;

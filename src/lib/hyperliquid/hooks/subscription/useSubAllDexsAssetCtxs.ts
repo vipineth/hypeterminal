@@ -4,10 +4,13 @@ import { useHyperliquid } from "@/lib/hyperliquid/provider";
 import { serializeKey, subscriptionKeys } from "@/lib/hyperliquid/query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "@/lib/hyperliquid/types";
 
-type AllDexsAssetCtxsEvent = AllDexsAssetCtxsWsEvent;
+export type { AllDexsAssetCtxsWsEvent };
+export type AllDexsAssetCtxs = AllDexsAssetCtxsWsEvent["ctxs"];
+export type DexAssetCtxs = AllDexsAssetCtxs[number];
+export type DexAssetCtx = DexAssetCtxs[1][number];
 
 export type UseSubAllDexsAssetCtxsOptions = SubscriptionOptions;
-export type UseSubAllDexsAssetCtxsReturnType = SubscriptionResult<AllDexsAssetCtxsEvent>;
+export type UseSubAllDexsAssetCtxsReturnType = SubscriptionResult<AllDexsAssetCtxsWsEvent>;
 
 export function useSubAllDexsAssetCtxs(options: UseSubAllDexsAssetCtxsOptions = {}): UseSubAllDexsAssetCtxsReturnType {
 	const { subscription } = useHyperliquid();

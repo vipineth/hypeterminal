@@ -17,7 +17,8 @@ import {
 import { useAssetLeverage } from "@/hooks/trade/use-asset-leverage";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
-import { useAgentRegistration, useAgentStatus, useSelectedResolvedMarket } from "@/lib/hyperliquid";
+import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo } from "@/lib/hyperliquid";
+import { getBaseToken } from "@/lib/market";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
@@ -48,7 +49,9 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 
 	const needsChainSwitch = !!walletClientError && walletClientError.message.includes("does not match");
 
-	const { data: market, isLoading: isMarketLoading } = useSelectedResolvedMarket({ ctxMode: "realtime" });
+	const { data: market, isLoading: isMarketLoading } = useSelectedMarketInfo();
+	const baseToken = market ? getBaseToken(market.displayName, market.kind) : undefined;
+
 	const { data: clearinghouseEvent } = useSubClearinghouseState(
 		{ user: address ?? "0x0" },
 		{ enabled: isConnected && !!address },
@@ -96,14 +99,12 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const availableBalance = Math.max(0, accountValue - marginUsed);
 
 	const position =
-		!clearinghouse?.assetPositions || !market?.coin
+		!clearinghouse?.assetPositions || !baseToken
 			? null
-			: (clearinghouse.assetPositions.find((p) => p.position.coin === market.coin) ?? null);
+			: (clearinghouse.assetPositions.find((p) => p.position.coin === baseToken) ?? null);
 	const positionSize = parseNumber(position?.position?.szi) || 0;
 
-	const ctxMarkPx = market?.ctxNumbers?.markPx;
-	const markPx =
-		typeof ctxMarkPx === "number" ? ctxMarkPx : typeof market?.midPxNumber === "number" ? market.midPxNumber : 0;
+	const markPx = market?.markPx ?? 0;
 	const price = type === "market" ? markPx : parseNumber(limitPriceInput) || 0;
 
 	const maxSize = useMemo(() => {
@@ -146,7 +147,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 		if (availableBalance <= 0)
 			return { valid: false, errors: [ORDER_TEXT.ERROR_NO_BALANCE], canSubmit: false, needsApproval: false };
 		if (!market) return { valid: false, errors: [ORDER_TEXT.ERROR_NO_MARKET], canSubmit: false, needsApproval: false };
-		if (typeof market.assetIndex !== "number")
+		if (typeof market.assetId !== "number")
 			return { valid: false, errors: [ORDER_TEXT.ERROR_MARKET_NOT_READY], canSubmit: false, needsApproval: false };
 		if (!isAgentApproved) return { valid: false, errors: [], canSubmit: false, needsApproval: true };
 		if (!canSign)
@@ -218,7 +219,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 
 	const handleSubmit = async () => {
 		if (!validation.canSubmit || isSubmitting) return;
-		if (!market || typeof market.assetIndex !== "number") return;
+		if (!market || !baseToken || typeof market.assetId !== "number") return;
 
 		let orderPrice = price;
 		if (type === "market") {
@@ -229,13 +230,13 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 		const formattedPrice = formatPriceForOrder(orderPrice);
 		const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
 
-		const orderId = addOrder({ market: market.coin, side, size: formattedSize, status: "pending" });
+		const orderId = addOrder({ market: baseToken, side, size: formattedSize, status: "pending" });
 
 		try {
 			const result = await placeOrder({
 				orders: [
 					{
-						a: market.assetIndex,
+						a: market.assetId,
 						b: side === "buy",
 						p: formattedPrice,
 						s: formattedSize,
@@ -316,7 +317,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 				) : (
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-2">
-							<span className="text-lg font-semibold">{market?.coin ?? "—"}</span>
+							<span className="text-lg font-semibold">{baseToken ?? "—"}</span>
 							<span className="text-xs text-muted-fg">PERP</span>
 						</div>
 						<div className="text-right">
@@ -393,7 +394,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					<div className="flex items-center justify-between text-sm">
 						<div className="flex items-center gap-2">
 							<span className="text-muted-fg">Leverage</span>
-							<LeverageControl key={market?.marketKey} />
+							<LeverageControl key={market?.name} />
 						</div>
 						<div className="text-right">
 							<span className="text-muted-fg">{ORDER_TEXT.AVAILABLE_LABEL}: </span>
@@ -417,7 +418,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 								)}
 								disabled={isFormDisabled}
 							>
-								{sizeMode === "asset" ? market?.coin || "—" : "USD"}
+								{sizeMode === "asset" ? baseToken || "—" : "USD"}
 								<ChevronDown className="size-3" />
 							</Button>
 							<Input

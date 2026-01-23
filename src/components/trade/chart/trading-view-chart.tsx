@@ -1,12 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { ColorTheme } from "@/providers/theme";
-import { useGlobalSettings } from "@/stores/use-global-settings-store";
-import type {
-	ChartingLibraryWidgetConstructor,
-	IBasicDataFeed,
-	IChartingLibraryWidget,
-	ResolutionString,
-} from "@/types/charting_library";
+import type { IBasicDataFeed, IChartingLibraryWidget, ResolutionString } from "@/types/charting_library";
 import {
 	CHART_CUSTOM_FONT_FAMILY,
 	CHART_DISABLED_FEATURES,
@@ -30,14 +24,6 @@ import {
 	getToolbarBgColor,
 } from "./theme-colors";
 
-declare global {
-	interface Window {
-		TradingView: {
-			widget: ChartingLibraryWidgetConstructor;
-		};
-	}
-}
-
 interface Props {
 	symbol?: string;
 	interval?: string;
@@ -56,18 +42,6 @@ export function TradingViewChart({
 	const scriptLoadedRef = useRef(false);
 	const cssUrlRef = useRef<string | null>(null);
 	const chartReadyRef = useRef(false);
-
-	const { showOrdersOnChart, showPositionsOnChart, showExecutionsOnChart, showChartScanlines } = useGlobalSettings();
-
-	const tradingOverrides = {
-		"tradingProperties.showOrders": showOrdersOnChart,
-		"tradingProperties.showPositions": showPositionsOnChart,
-		"tradingProperties.showExecutions": showExecutionsOnChart,
-		"tradingProperties.showExecutionsLabels": showExecutionsOnChart,
-	};
-
-	const tradingOverridesRef = useRef(tradingOverrides);
-	tradingOverridesRef.current = tradingOverrides;
 
 	useEffect(() => {
 		if (!containerRef.current) return;
@@ -175,7 +149,6 @@ export function TradingViewChart({
 
 				widgetRef.current.onChartReady(() => {
 					chartReadyRef.current = true;
-					widgetRef.current?.applyOverrides(tradingOverridesRef.current);
 				});
 			} catch (error) {
 				console.error("Error initializing TradingView widget:", error);
@@ -197,15 +170,9 @@ export function TradingViewChart({
 		};
 	}, [symbol, interval, theme, colorTheme]);
 
-	useEffect(() => {
-		if (!widgetRef.current || !chartReadyRef.current) return;
-		widgetRef.current.applyOverrides(tradingOverrides);
-	}, [tradingOverrides]);
-
 	return (
 		<div className="relative w-full h-full" style={{ minHeight: "300px" }}>
 			<div ref={containerRef} className="w-full h-full" />
-			{showChartScanlines ? <div className="pointer-events-none absolute inset-0 terminal-scanlines" /> : null}
 		</div>
 	);
 }

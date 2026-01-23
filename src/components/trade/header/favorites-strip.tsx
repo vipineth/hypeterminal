@@ -1,46 +1,15 @@
 import { t } from "@lingui/core/macro";
 import { Star } from "lucide-react";
-import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice } from "@/lib/format";
-import { usePerpMarkets } from "@/lib/hyperliquid";
-import { useSubActiveAssetCtx, useSubAllMids } from "@/lib/hyperliquid/hooks/subscription";
-import { isPerpMarketKey, type PerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
+import { useMarketsInfo } from "@/lib/hyperliquid";
 import { calculate24hPriceChange } from "@/lib/market";
-import { toFiniteNumber } from "@/lib/trade/numbers";
-import { useFavoriteMarketKeys, useMarketPrefsActions, useSelectedMarketKey } from "@/stores/use-market-prefs-store";
-import type { PerpAssetCtx } from "@/types/hyperliquid";
-
-type FavoriteData = {
-	marketKey: PerpMarketKey;
-	coin: string;
-	priceNumber: number | null;
-	szDecimals: number;
-};
+import { useFavoriteMarkets, useMarketActions, useSelectedMarket } from "@/stores/use-market-store";
 
 export function FavoritesStrip() {
-	const favorites = useFavoriteMarketKeys();
-	const selectedMarketKey = useSelectedMarketKey();
-	const { getSzDecimals } = usePerpMarkets();
-	const { data: midsEvent } = useSubAllMids({}, {});
-	const mids = midsEvent?.mids;
-
-	const favoriteData = useMemo((): FavoriteData[] => {
-		return favorites
-			.map((marketKey) => {
-				if (!isPerpMarketKey(marketKey)) return null;
-				const coin = perpCoinFromMarketKey(marketKey);
-
-				return {
-					marketKey,
-					coin,
-					priceNumber: toFiniteNumber(mids?.[coin]),
-					szDecimals: getSzDecimals(coin) ?? 4,
-				};
-			})
-			.filter((x): x is FavoriteData => x !== null);
-	}, [favorites, mids, getSzDecimals]);
+	const favorites = useFavoriteMarkets();
+	const selectedMarket = useSelectedMarket();
 
 	return (
 		<div className="py-1.5 border-b border-border/60 bg-surface/20">
@@ -49,8 +18,8 @@ export function FavoritesStrip() {
 					{favorites.length === 0 ? (
 						<EmptyState />
 					) : (
-						favoriteData.map((data) => (
-							<FavoriteChip key={data.marketKey} {...data} isActive={data.marketKey === selectedMarketKey} />
+						favorites.map((name) => (
+							<FavoriteChip key={name} name={name} isActive={name === selectedMarket} />
 						))
 					)}
 				</div>
@@ -68,25 +37,29 @@ function EmptyState() {
 	);
 }
 
-type FavoriteChipProps = FavoriteData & {
+interface FavoriteChipProps {
+	name: string;
 	isActive: boolean;
-};
+}
 
-function FavoriteChip({ marketKey, coin, priceNumber, szDecimals, isActive }: FavoriteChipProps) {
-	const { setSelectedMarketKey } = useMarketPrefsActions();
-	const { data: assetCtxEvent } = useSubActiveAssetCtx({ coin }, {});
-	const assetCtx = assetCtxEvent?.ctx as PerpAssetCtx | undefined;
-	const changePct = calculate24hPriceChange(assetCtx) ?? 0;
-	const isPositive = changePct >= 0;
+function FavoriteChip({ name, isActive }: FavoriteChipProps) {
+	const { setSelectedMarket } = useMarketActions();
+	const { getMarketInfo } = useMarketsInfo();
+
+	const market = getMarketInfo(name);
+	const displayName = market?.displayName ?? name;
+	const changePct = calculate24hPriceChange(market?.prevDayPx, market?.markPx);
+	const isPositive = (changePct ?? 0) >= 0;
+	const szDecimals = market?.szDecimals ?? 4;
 
 	function handleClick() {
-		setSelectedMarketKey(marketKey);
+		setSelectedMarket(name);
 	}
 
 	function handleKeyDown(e: React.KeyboardEvent) {
 		if (e.key === "Enter" || e.key === " ") {
 			e.preventDefault();
-			setSelectedMarketKey(marketKey);
+			setSelectedMarket(name);
 		}
 	}
 
@@ -97,25 +70,23 @@ function FavoriteChip({ marketKey, coin, priceNumber, szDecimals, isActive }: Fa
 			onClick={handleClick}
 			onKeyDown={handleKeyDown}
 			tabIndex={0}
-			aria-label={t`Select ${coin} market`}
-			aria-pressed={isActive}
+			aria-label={t`Select ${displayName} market`}
 			className={cn(
-				"shrink-0 inline-flex items-center gap-2 px-2.5 py-0.5 text-3xs transition-colors cursor-pointer rounded-none",
-				"hover:bg-accent/50",
-				isActive && "bg-info/10",
+				"flex items-center gap-1.5 px-2 py-1 text-2xs cursor-pointer rounded-none first:rounded-l last:rounded-r",
+				"hover:bg-accent/40 transition-colors border-border/30",
+				isActive && "bg-info/5 text-info",
 			)}
 		>
-			<span className={cn("font-medium", isActive ? "text-info" : "text-fg")}>{coin}</span>
-			{typeof priceNumber === "number" && (
-				<span className="text-muted-fg tabular-nums">{formatPrice(priceNumber, { szDecimals })}</span>
-			)}
-			{assetCtx && (
-				<span className={cn("tabular-nums font-medium", isPositive ? "text-positive" : "text-negative")}>
-					{formatPercent(changePct / 100, {
-						minimumFractionDigits: 2,
-						signDisplay: "exceptZero",
-					})}
-				</span>
+			<span className="font-semibold">{displayName}</span>
+			{market?.markPx != null && (
+				<>
+					<span className="tabular-nums text-muted-fg">{formatPrice(market.markPx, { szDecimals })}</span>
+					{changePct != null && (
+						<span className={cn("tabular-nums text-3xs", isPositive ? "text-positive" : "text-negative")}>
+							{formatPercent(changePct / 100)}
+						</span>
+					)}
+				</>
 			)}
 		</Button>
 	);

@@ -9,9 +9,9 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { formatNumber } from "@/lib/format";
-import { useSelectedResolvedMarket, useSubL2Book } from "@/lib/hyperliquid";
+import { useSelectedMarketInfo, useSubL2Book } from "@/lib/hyperliquid";
+import { getBaseQuoteFromDisplayName } from "@/lib/market";
 import {
 	getMaxTotal,
 	getPriceGroupingOptions,
@@ -30,17 +30,25 @@ export function OrderbookPanel() {
 	const { showOrderbookInUsd } = useGlobalSettings();
 	const { setShowOrderbookInUsd } = useGlobalSettingsActions();
 
-	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
+	const { data: selectedMarket } = useSelectedMarketInfo();
 
 	const {
 		data: orderbook,
 		status: orderbookStatus,
 		error: orderbookError,
-	} = useSubL2Book({
-		coin: selectedMarket.coin,
-		nSigFigs: selectedOption?.nSigFigs,
-		mantissa: selectedOption?.mantissa,
-	});
+	} = useSubL2Book(
+		{
+			coin: selectedMarket?.name ?? "",
+			nSigFigs: selectedOption?.nSigFigs,
+			mantissa: selectedOption?.mantissa,
+		},
+		{ enabled: !!selectedMarket?.name },
+	);
+
+	const { baseToken, quoteToken } = useMemo(() => {
+		if (!selectedMarket) return { baseToken: "", quoteToken: "" };
+		return getBaseQuoteFromDisplayName(selectedMarket.displayName, selectedMarket.kind);
+	}, [selectedMarket]);
 
 	const bids = useMemo(() => processLevels(orderbook?.levels[0], VISIBLE_ROWS), [orderbook?.levels]);
 	const asks = useMemo(() => processLevels(orderbook?.levels[1], VISIBLE_ROWS), [orderbook?.levels]);
@@ -48,7 +56,8 @@ export function OrderbookPanel() {
 	const spreadInfo = getSpreadInfo(bids, asks);
 	const priceGroupingOptions = getPriceGroupingOptions(spreadInfo.mid);
 
-	const szDecimals = selectedMarket.szDecimals;
+	const szDecimals = selectedMarket?.szDecimals ?? 4;
+
 	const toggleUsdDisplay = () => setShowOrderbookInUsd(!showOrderbookInUsd);
 
 	return (
@@ -102,7 +111,7 @@ export function OrderbookPanel() {
 						className="text-right hover:text-fg hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
 					>
 						{t`Size`}
-						<span className="opacity-60">({showOrderbookInUsd ? "$" : selectedMarket.coin})</span>
+						<span className="opacity-60">({showOrderbookInUsd ? quoteToken : baseToken})</span>
 						<ArrowRightLeft className="size-2 opacity-40" />
 					</Button>
 					<Button
@@ -112,7 +121,7 @@ export function OrderbookPanel() {
 						className="text-right hover:text-fg hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
 					>
 						{t`Total`}
-						<span className="opacity-60">({showOrderbookInUsd ? "$" : selectedMarket.coin})</span>
+						<span className="opacity-60">({showOrderbookInUsd ? quoteToken : baseToken})</span>
 						<ArrowRightLeft className="size-2 opacity-40" />
 					</Button>
 				</div>
@@ -139,7 +148,7 @@ export function OrderbookPanel() {
 
 					<div className="shrink-0 py-1.5 px-2 flex items-center justify-center gap-2 border-y border-border/40 bg-surface/30">
 						<span className="text-sm font-semibold tabular-nums text-warning">
-							{formatNumber(spreadInfo.mid, selectedMarket.szDecimals)}
+							{formatNumber(spreadInfo.mid, selectedMarket?.szDecimals)}
 						</span>
 					</div>
 
@@ -162,9 +171,7 @@ export function OrderbookPanel() {
 				<div className="mt-auto shrink-0 px-2 py-1.5 border-t border-border/40 flex items-center justify-between text-4xs text-muted-fg">
 					<span>{t`Spread`}</span>
 					<span className="tabular-nums text-warning">
-						{spreadInfo.spread && spreadInfo.spreadPct
-							? `${formatNumber(spreadInfo.spread, 2)} (${formatNumber(spreadInfo.spreadPct, 3)}%)`
-							: FALLBACK_VALUE_PLACEHOLDER}
+						{`${formatNumber(spreadInfo.spread, 2)} (${formatNumber(spreadInfo.spreadPct, 3)}%)`}
 					</span>
 				</div>
 				{orderbookStatus === "error" && (
@@ -175,7 +182,7 @@ export function OrderbookPanel() {
 			</TabsContent>
 
 			<TabsContent value="trades" className="flex-1 min-h-0 flex flex-col">
-				<TradesPanel key={selectedMarket.coin} />
+				<TradesPanel key={selectedMarket?.name} />
 			</TabsContent>
 		</Tabs>
 	);

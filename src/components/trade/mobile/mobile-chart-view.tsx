@@ -2,15 +2,14 @@ import { ClientOnly } from "@tanstack/react-router";
 import { Flame } from "lucide-react";
 import { useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DEFAULT_MARKET_KEY, UI_TEXT } from "@/config/constants";
+import { UI_TEXT } from "@/config/constants";
+import { createChartName } from "@/lib/chart/candle";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
-import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
-import { makePerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
+import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
 import { useTheme } from "@/providers/theme";
-import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
-import { QUOTE_ASSET } from "../chart/constants";
+import { useMarketActions } from "@/stores/use-market-store";
 import { TokenSelector } from "../chart/token-selector";
 import { TradingViewChart } from "../chart/trading-view-chart";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
@@ -23,30 +22,27 @@ interface MobileChartViewProps {
 
 export function MobileChartView({ className }: MobileChartViewProps) {
 	const { theme, colorTheme } = useTheme();
-	const { data: selectedMarket, isLoading } = useSelectedResolvedMarket({ ctxMode: "realtime" });
-	const selectedCoin = selectedMarket?.coin ?? perpCoinFromMarketKey(DEFAULT_MARKET_KEY);
-	const { setSelectedMarketKey } = useMarketPrefsActions();
+	const { data: selectedMarket, isLoading } = useSelectedMarketInfo();
+	const { setSelectedMarket } = useMarketActions();
 
-	const handleCoinChange = useCallback(
-		(coin: string) => {
-			setSelectedMarketKey(makePerpMarketKey(coin));
+	const handleMarketChange = useCallback(
+		(marketName: string) => {
+			setSelectedMarket(marketName);
 		},
-		[setSelectedMarketKey],
+		[setSelectedMarket],
 	);
 
-	const fundingNum = selectedMarket?.ctxNumbers?.funding ?? 0;
+	const fundingNum = selectedMarket?.funding ?? 0;
 	const isFundingPositive = fundingNum >= 0;
-	const markPx = selectedMarket?.ctxNumbers?.markPx;
-	const change24h = calculate24hPriceChange(selectedMarket?.ctxNumbers);
+	const markPx = selectedMarket?.markPx;
+	const change24h = calculate24hPriceChange(selectedMarket?.prevDayPx, selectedMarket?.markPx);
 
 	return (
 		<div className={cn("flex flex-col h-full min-h-0", className)}>
-			{/* Market selector header */}
 			<div className="shrink-0 px-3 py-2 border-b border-border/60 bg-surface/30">
 				<div className="flex items-center justify-between gap-3">
-					<TokenSelector value={selectedCoin} onValueChange={handleCoinChange} />
+					<TokenSelector selectedMarket={selectedMarket} onValueChange={handleMarketChange} />
 
-					{/* Price and change */}
 					<div className="flex items-center gap-3 text-right">
 						{isLoading ? (
 							<Skeleton className="h-6 w-24" />
@@ -70,7 +66,6 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 				</div>
 			</div>
 
-			{/* Stats bar - horizontal scrollable on mobile */}
 			<div className="shrink-0 px-3 py-1.5 border-b border-border/40 bg-surface/20 overflow-x-auto">
 				<div className="flex items-center gap-4 text-xs min-w-max">
 					{isLoading ? (
@@ -84,21 +79,27 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 						<>
 							<StatPill
 								label={overviewText.LABEL_ORACLE}
-								value={formatUSD(selectedMarket?.ctxNumbers?.oraclePx ?? null)}
+								value={formatUSD(selectedMarket?.oraclePx)}
 							/>
 							<StatPill
 								label={overviewText.LABEL_VOLUME}
-								value={formatUSD(selectedMarket?.ctxNumbers?.dayNtlVlm ?? null, {
+								value={formatUSD(selectedMarket?.dayNtlVlm, {
 									notation: "compact",
 									compactDisplay: "short",
 								})}
 							/>
 							<StatPill
 								label={overviewText.LABEL_OPEN_INTEREST}
-								value={formatUSD(calculateOpenInterestUSD(selectedMarket?.ctxNumbers), {
-									notation: "compact",
-									compactDisplay: "short",
-								})}
+								value={formatUSD(
+									calculateOpenInterestUSD(
+										selectedMarket?.openInterest,
+										selectedMarket?.markPx,
+									),
+									{
+										notation: "compact",
+										compactDisplay: "short",
+									},
+								)}
 							/>
 							<div className="flex items-center gap-1">
 								<Flame className={cn("size-3", isFundingPositive ? "text-positive" : "text-negative")} />
@@ -114,7 +115,6 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 				</div>
 			</div>
 
-			{/* Chart */}
 			<div className="flex-1 min-h-0">
 				<ClientOnly
 					fallback={
@@ -123,7 +123,13 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 						</div>
 					}
 				>
-					<TradingViewChart symbol={`${selectedCoin}/${QUOTE_ASSET}`} theme={theme === "dark" ? "dark" : "light"} colorTheme={colorTheme} />
+					{selectedMarket && (
+						<TradingViewChart
+							symbol={createChartName(selectedMarket.displayName, selectedMarket.name)}
+							theme={theme === "dark" ? "dark" : "light"}
+							colorTheme={colorTheme}
+						/>
+					)}
 				</ClientOnly>
 			</div>
 

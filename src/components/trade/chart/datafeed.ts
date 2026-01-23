@@ -1,9 +1,9 @@
 import { t } from "@lingui/core/macro";
 import type { AllMidsResponse, MetaResponse } from "@nktkas/hyperliquid";
-import { candleSnapshotToBar, filterAndSortBars } from "@/lib/chart/candle";
+import { candleSnapshotToBar, filterAndSortBars, parseChartName } from "@/lib/chart/candle";
 import { resolutionToInterval } from "@/lib/chart/resolution";
 import { getCandleStore, streamKey } from "@/lib/chart/store";
-import { coinFromSymbolName, inferPriceScaleFromMids, symbolFromCoin } from "@/lib/chart/symbol";
+import { coinFromSymbolName, inferPriceScaleFromMids } from "@/lib/chart/symbol";
 import { getInfoClient } from "@/lib/hyperliquid/clients";
 import type {
 	Bar,
@@ -16,8 +16,6 @@ import type {
 	PeriodParams,
 	ResolutionString,
 	ResolveCallback,
-	SearchSymbolResultItem,
-	SearchSymbolsCallback,
 	ServerTimeCallback,
 	SubscribeBarsCallback,
 } from "@/types/charting_library";
@@ -26,7 +24,6 @@ import {
 	CHART_DATAFEED_CONFIG,
 	DEFAULT_PRICESCALE,
 	EXCHANGE,
-	QUOTE_ASSET,
 	SESSION_24X7,
 	SUPPORTED_RESOLUTIONS,
 	TIMEZONE,
@@ -74,21 +71,19 @@ async function getAllMids(): Promise<AllMidsResponse> {
 }
 
 async function isKnownCoin(coin: string): Promise<boolean> {
+	// Spot markets use @id format (e.g., @232)
+	if (coin.startsWith("@")) return true;
+
+	// HIP-3 markets use dex:coin format (e.g., xyz:XYZ100)
+	if (coin.includes(":")) return true;
+
+	// Perp markets - check against meta
 	try {
 		const meta = await getMeta();
 		return meta.universe.some((asset) => asset.name === coin && !(asset.isDelisted ?? false));
 	} catch {
 		return true;
 	}
-}
-
-async function searchCoins(query: string): Promise<string[]> {
-	const meta = await getMeta();
-	const q = query.trim().toLowerCase();
-	return meta.universe
-		.filter((asset) => !(asset.isDelisted ?? false))
-		.map((asset) => asset.name)
-		.filter((coin) => (q.length === 0 ? true : coin.toLowerCase().includes(q)));
 }
 
 async function inferPriceScale(coin: string): Promise<number> {
@@ -121,56 +116,25 @@ export function createDatafeed(): IBasicDataFeed {
 			setTimeout(() => callback(configuration), 0);
 		},
 
-		searchSymbols: (userInput: string, exchange: string, symbolType: string, onResult: SearchSymbolsCallback) => {
-			void (async () => {
-				if (exchange && exchange !== EXCHANGE) {
-					onResult([]);
-					return;
-				}
-
-				if (symbolType && symbolType !== "crypto") {
-					onResult([]);
-					return;
-				}
-
-				let coins: string[] = [];
-				try {
-					coins = await searchCoins(userInput);
-				} catch {}
-
-				const items: SearchSymbolResultItem[] = coins.slice(0, CHART_DATAFEED_CONFIG.SEARCH_LIMIT).map((coin) => {
-					const symbol = symbolFromCoin(coin);
-					return {
-						symbol,
-						ticker: symbol,
-						description: `${coin} / ${QUOTE_ASSET}`,
-						exchange: EXCHANGE,
-						type: CHART_DATAFEED_CONFIG.SYMBOL_TYPE,
-					};
-				});
-
-				onResult(items);
-			})();
-		},
+		searchSymbols: () => {},
 
 		resolveSymbol: (symbolName: string, onResolve: ResolveCallback, onError: DatafeedErrorCallback, extension) => {
 			void extension;
 
 			void (async () => {
-				const coin = coinFromSymbolName(symbolName);
-				const symbol = symbolFromCoin(coin);
+				const { displayName, symbol: ticker } = parseChartName(symbolName);
 
-				if (!(await isKnownCoin(coin))) {
+				if (!(await isKnownCoin(ticker))) {
 					onError(t`Unknown symbol: ${symbolName}`);
 					return;
 				}
 
-				const pricescale = await inferPriceScale(coin);
+				const pricescale = await inferPriceScale(ticker);
 
 				const symbolInfo: LibrarySymbolInfo = {
-					name: symbol,
-					ticker: symbol,
-					description: `${coin} / ${QUOTE_ASSET}`,
+					name: displayName,
+					ticker: ticker,
+					description: displayName,
 					type: CHART_DATAFEED_CONFIG.SYMBOL_TYPE,
 					session: SESSION_24X7,
 					timezone: TIMEZONE,

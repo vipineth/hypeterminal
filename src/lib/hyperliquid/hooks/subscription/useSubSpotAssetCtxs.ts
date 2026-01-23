@@ -4,10 +4,12 @@ import { useHyperliquid } from "@/lib/hyperliquid/provider";
 import { serializeKey, subscriptionKeys } from "@/lib/hyperliquid/query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "@/lib/hyperliquid/types";
 
-type SpotAssetCtxsEvent = SpotAssetCtxsWsEvent;
+export type { SpotAssetCtxsWsEvent };
+export type SpotAssetCtx = SpotAssetCtxsWsEvent[number];
+export type SpotAssetCtxs = SpotAssetCtxsWsEvent;
 
 export type UseSubSpotAssetCtxsOptions = SubscriptionOptions;
-export type UseSubSpotAssetCtxsReturnType = SubscriptionResult<SpotAssetCtxsEvent>;
+export type UseSubSpotAssetCtxsReturnType = SubscriptionResult<SpotAssetCtxsWsEvent>;
 
 export function useSubSpotAssetCtxs(options: UseSubSpotAssetCtxsOptions = {}): UseSubSpotAssetCtxsReturnType {
 	const { subscription } = useHyperliquid();

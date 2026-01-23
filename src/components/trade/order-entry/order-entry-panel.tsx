@@ -19,7 +19,8 @@ import {
 } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
-import { useAgentRegistration, useAgentStatus, useSelectedResolvedMarket } from "@/lib/hyperliquid";
+import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo } from "@/lib/hyperliquid";
+import { getBaseToken } from "@/lib/market";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeTwapOrder";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
@@ -95,12 +96,6 @@ import { OrderToast } from "./order-toast";
 import { SideToggle } from "./side-toggle";
 import { TpSlSection } from "./tp-sl-section";
 
-function getMarketPrice(ctxMarkPx: unknown, midPx: unknown): number {
-	if (typeof ctxMarkPx === "number") return ctxMarkPx;
-	if (typeof midPx === "number") return midPx;
-	return 0;
-}
-
 function getActionButtonClass(variant: ButtonContent["variant"]): string {
 	if (variant === "cyan") {
 		return "bg-info/20 border-info text-info hover:bg-info/30";
@@ -120,7 +115,9 @@ export function OrderEntryPanel() {
 	const switchChain = useSwitchChain();
 	const needsChainSwitch = !!walletClientError && walletClientError.message.includes("does not match");
 
-	const { data: market } = useSelectedResolvedMarket({ ctxMode: "realtime" });
+	const { data: market } = useSelectedMarketInfo();
+	const baseToken = market ? getBaseToken(market.displayName, market.kind) : undefined;
+
 	const { data: clearinghouseEvent } = useSubClearinghouseState(
 		{ user: address ?? "0x0" },
 		{ enabled: isConnected && !!address },
@@ -228,13 +225,12 @@ export function OrderEntryPanel() {
 	const availableBalance = Math.max(0, calc.subtract(accountValue, marginUsed) ?? 0);
 
 	const position =
-		!clearinghouse?.assetPositions || !market?.coin
+		!clearinghouse?.assetPositions || !baseToken
 			? null
-			: (clearinghouse.assetPositions.find((p) => p.position.coin === market.coin) ?? null);
+			: (clearinghouse.assetPositions.find((p) => p.position.coin === baseToken) ?? null);
 	const positionSize = parseNumberOrZero(position?.position?.szi);
 
-	const ctxMarkPx = market?.ctxNumbers?.markPx;
-	const markPx = getMarketPrice(ctxMarkPx, market?.midPxNumber);
+	const markPx = market?.markPx ?? 0;
 	const price = getOrderPrice(
 		orderType,
 		markPx,
@@ -282,7 +278,7 @@ export function OrderEntryPanel() {
 		isWalletLoading,
 		availableBalance,
 		hasMarket: !!market,
-		hasAssetIndex: typeof market?.assetIndex === "number",
+		hasAssetIndex: typeof market?.assetId === "number",
 		needsAgentApproval,
 		isReadyToTrade,
 		orderType,
@@ -356,13 +352,13 @@ export function OrderEntryPanel() {
 
 	const handleSubmit = useCallback(async () => {
 		if (!validation.canSubmit || isSubmitting) return;
-		if (!market || typeof market.assetIndex !== "number") return;
+		if (!market || !baseToken || typeof market.assetId !== "number") return;
 
 		const szDecimals = market.szDecimals ?? 0;
 		const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
 
 		const orderId = addOrder({
-			market: market.coin,
+			market: baseToken,
 			side,
 			size: formattedSize,
 			status: "pending",
@@ -373,7 +369,7 @@ export function OrderEntryPanel() {
 				const minutes = clampInt(Math.round(twapMinutesNum ?? 0), TWAP_MINUTES_MIN, TWAP_MINUTES_MAX);
 				const result = await placeTwapOrder({
 					twap: {
-						a: market.assetIndex,
+						a: market.assetId,
 						b: side === "buy",
 						s: formattedSize,
 						r: reduceOnly,
@@ -397,7 +393,7 @@ export function OrderEntryPanel() {
 					for (let i = 0; i < levels; i += 1) {
 						const levelPrice = start + step * i;
 						orders.push({
-							a: market.assetIndex,
+							a: market.assetId,
 							b: side === "buy",
 							p: formatPriceForOrder(levelPrice),
 							s: formatSizeForOrder(perLevelSize, szDecimals),
@@ -409,7 +405,7 @@ export function OrderEntryPanel() {
 					const triggerPx = formatPriceForOrder(parseNumberOrZero(triggerPriceInput));
 					const limitPx = formatPriceForOrder(parseNumberOrZero(limitPriceInput));
 					orders.push({
-						a: market.assetIndex,
+						a: market.assetId,
 						b: side === "buy",
 						p: usesLimitPrice ? limitPx : triggerPx,
 						s: formattedSize,
@@ -427,7 +423,7 @@ export function OrderEntryPanel() {
 					const formattedPrice = formatPriceForOrder(orderPrice);
 
 					orders.push({
-						a: market.assetIndex,
+						a: market.assetId,
 						b: side === "buy",
 						p: formattedPrice,
 						s: formattedSize,
@@ -437,7 +433,7 @@ export function OrderEntryPanel() {
 
 					if (hasTp) {
 						orders.push({
-							a: market.assetIndex,
+							a: market.assetId,
 							b: side !== "buy",
 							p: formatPriceForOrder(tpPriceNum),
 							s: formattedSize,
@@ -448,7 +444,7 @@ export function OrderEntryPanel() {
 
 					if (hasSl) {
 						orders.push({
-							a: market.assetIndex,
+							a: market.assetId,
 							b: side !== "buy",
 							p: formatPriceForOrder(slPriceNum),
 							s: formattedSize,
@@ -480,8 +476,8 @@ export function OrderEntryPanel() {
 		twapOrder,
 		triggerOrder,
 		limitPriceInput,
-		market?.assetIndex,
-		market?.coin,
+		market?.assetId,
+		baseToken,
 		market?.szDecimals,
 		markPx,
 		orderType,
@@ -540,7 +536,7 @@ export function OrderEntryPanel() {
 		<div className="h-full flex flex-col overflow-hidden bg-surface/20">
 			<div className="px-2 py-1.5 border-b border-border/40 flex items-center justify-between">
 				<MarginModeToggle mode={marginMode} disabled={isSwitchingMode} onClick={() => setActiveDialog("marginMode")} />
-				<LeverageControl key={market?.marketKey} />
+				<LeverageControl key={market?.name} />
 			</div>
 
 			<MarginModeDialog
@@ -596,7 +592,7 @@ export function OrderEntryPanel() {
 							<span>{t`Position`}</span>
 							<span className={cn("tabular-nums", positionSize > 0 ? "text-positive" : "text-negative")}>
 								{positionSize > 0 ? "+" : ""}
-								{formatDecimalFloor(positionSize, market?.szDecimals ?? 2)} {market?.coin}
+								{formatDecimalFloor(positionSize, market?.szDecimals ?? 2)} {baseToken}
 							</span>
 						</div>
 					)}
@@ -613,7 +609,7 @@ export function OrderEntryPanel() {
 							aria-label={t`Toggle size mode`}
 							disabled={isFormDisabled}
 						>
-							{sizeMode === "asset" ? market?.coin || "---" : "USD"} <ArrowLeftRight className="size-2.5" />
+							{sizeMode === "asset" ? baseToken || "---" : "USD"} <ArrowLeftRight className="size-2.5" />
 						</Button>
 						<NumberInput
 							placeholder="0.00"

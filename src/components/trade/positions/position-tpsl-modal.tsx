@@ -16,7 +16,7 @@ import { TpSlSection } from "../order-entry/tp-sl-section";
 
 interface PositionData {
 	coin: string;
-	assetIndex: number;
+	assetId: number;
 	isLong: boolean;
 	size: number;
 	entryPx: number;
@@ -87,7 +87,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 
 		if (hasTp) {
 			orders.push({
-				a: position.assetIndex,
+				a: position.assetId,
 				b: !position.isLong,
 				p: formatPriceForOrder(tpPriceNum),
 				s: formattedSize,
@@ -104,7 +104,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 
 		if (hasSl) {
 			orders.push({
-				a: position.assetIndex,
+				a: position.assetId,
 				b: !position.isLong,
 				p: formatPriceForOrder(slPriceNum),
 				s: formattedSize,

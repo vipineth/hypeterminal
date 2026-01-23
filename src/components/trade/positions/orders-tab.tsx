@@ -9,10 +9,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatDateTime, formatNumber, formatUSD } from "@/lib/format";
-import { usePerpMarkets } from "@/lib/hyperliquid";
+import { useMarkets } from "@/lib/hyperliquid";
 import { useExchangeCancel } from "@/lib/hyperliquid/hooks/exchange/useExchangeCancel";
 import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
-import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import {
 	getFilledSize,
 	getFillPercent,
@@ -21,7 +20,7 @@ import {
 	getSideConfig,
 	type OpenOrder,
 } from "@/lib/trade/open-orders";
-import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
+import { useMarketActions } from "@/stores/use-market-store";
 import { TokenAvatar } from "../components/token-avatar";
 
 interface PlaceholderProps {
@@ -44,13 +43,13 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 
 export function OrdersTab() {
 	const { address, isConnected } = useConnection();
-	const { setSelectedMarketKey } = useMarketPrefsActions();
+	const { setSelectedMarket } = useMarketActions();
 	const {
 		data: openOrdersEvent,
 		status,
 		error,
 	} = useSubOpenOrders({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
-	const { getSzDecimals, getAssetId } = usePerpMarkets();
+	const { getAssetId, getSzDecimals } = useMarkets();
 	const [selectedOrderIds, setSelectedOrderIds] = useState<Set<number>>(() => new Set());
 
 	const {
@@ -118,9 +117,9 @@ export function OrdersTab() {
 			if (isCancelling || ordersToCancel.length === 0) return;
 
 			const cancels = ordersToCancel.reduce<{ a: number; o: number }[]>((acc, order) => {
-				const assetIndex = getAssetId(order.coin);
-				if (typeof assetIndex !== "number") return acc;
-				acc.push({ a: assetIndex, o: order.oid });
+				const assetId = getAssetId(order.coin);
+				if (typeof assetId !== "number") return acc;
+				acc.push({ a: assetId, o: order.oid });
 				return acc;
 			}, []);
 
@@ -248,7 +247,7 @@ export function OrdersTab() {
 										canCancel={canCancel}
 										onToggle={handleToggleOrder}
 										onCancel={handleCancelOrders}
-										onSelectMarket={setSelectedMarketKey}
+										onSelectMarket={setSelectedMarket}
 									/>
 								))}
 							</TableBody>
@@ -269,7 +268,7 @@ interface OrderRowProps {
 	canCancel: boolean;
 	onToggle: (orderId: number, value: boolean | "indeterminate") => void;
 	onCancel: (orders: OpenOrder[]) => void;
-	onSelectMarket: (marketKey: string) => void;
+	onSelectMarket: (marketName: string) => void;
 }
 
 function OrderRow({
@@ -304,7 +303,7 @@ function OrderRow({
 					<Button
 						variant="link"
 						size="none"
-						onClick={() => onSelectMarket(makePerpMarketKey(order.coin))}
+						onClick={() => onSelectMarket(order.coin)}
 						className="gap-1.5"
 						aria-label={t`Switch to ${order.coin} market`}
 					>
