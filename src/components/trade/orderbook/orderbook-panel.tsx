@@ -27,8 +27,8 @@ const VISIBLE_ROWS = 10;
 
 export function OrderbookPanel() {
 	const [selectedOption, setSelectedOption] = useState<L2BookPriceGroupOption | null>(null);
-	const { showOrderbookInUsd } = useGlobalSettings();
-	const { setShowOrderbookInUsd } = useGlobalSettingsActions();
+	const { showOrderbookInQuote } = useGlobalSettings();
+	const { setShowOrderbookInQuote } = useGlobalSettingsActions();
 
 	const { data: selectedMarket } = useSelectedMarketInfo();
 
@@ -58,7 +58,8 @@ export function OrderbookPanel() {
 
 	const szDecimals = selectedMarket?.szDecimals ?? 4;
 
-	const toggleUsdDisplay = () => setShowOrderbookInUsd(!showOrderbookInUsd);
+	const displayAsset = showOrderbookInQuote ? quoteToken : baseToken;
+	const toggleAssetDisplay = () => setShowOrderbookInQuote(!showOrderbookInQuote);
 
 	return (
 		<Tabs defaultValue="book" className="h-full min-h-0 flex flex-col overflow-hidden border-l border-border/40">
@@ -107,21 +108,21 @@ export function OrderbookPanel() {
 					<Button
 						variant="ghost"
 						size="none"
-						onClick={toggleUsdDisplay}
+						onClick={toggleAssetDisplay}
 						className="text-right hover:text-fg hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
 					>
 						{t`Size`}
-						<span className="opacity-60">({showOrderbookInUsd ? quoteToken : baseToken})</span>
+						<span className="opacity-60">({displayAsset})</span>
 						<ArrowRightLeft className="size-2 opacity-40" />
 					</Button>
 					<Button
 						variant="ghost"
 						size="none"
-						onClick={toggleUsdDisplay}
+						onClick={toggleAssetDisplay}
 						className="text-right hover:text-fg hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
 					>
 						{t`Total`}
-						<span className="opacity-60">({showOrderbookInUsd ? quoteToken : baseToken})</span>
+						<span className="opacity-60">({displayAsset})</span>
 						<ArrowRightLeft className="size-2 opacity-40" />
 					</Button>
 				</div>
@@ -135,7 +136,7 @@ export function OrderbookPanel() {
 									level={level}
 									side="ask"
 									maxTotal={maxTotal}
-									showInUsd={showOrderbookInUsd}
+									showInQuote={showOrderbookInQuote}
 									szDecimals={szDecimals}
 								/>
 							))}
@@ -160,7 +161,7 @@ export function OrderbookPanel() {
 									level={level}
 									side="bid"
 									maxTotal={maxTotal}
-									showInUsd={showOrderbookInUsd}
+									showInQuote={showOrderbookInQuote}
 									szDecimals={szDecimals}
 								/>
 							))}

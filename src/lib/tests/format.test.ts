@@ -3,7 +3,6 @@ import {
 	formatNumber,
 	formatPercent,
 	formatPrice,
-	formatPriceRaw,
 	formatToken,
 	formatUSD,
 	shortenAddress,
@@ -19,7 +18,6 @@ describe("format", () => {
 	it("formats prices using szDecimals", () => {
 		expect(szDecimalsToPriceDecimals(4)).toBe(2);
 		expect(formatPrice(88140.123, { szDecimals: 4 })).toBe("$88,140.12");
-		expect(formatPriceRaw(88140.123, 4)).toBe("88,140.12");
 	});
 
 	it("formats token amounts and percentages", () => {

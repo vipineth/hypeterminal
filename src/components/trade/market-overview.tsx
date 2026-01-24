@@ -1,8 +1,9 @@
 import { t } from "@lingui/core/macro";
-import { Flame } from "lucide-react";
+import { ExternalLink, Flame } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { formatPercent, formatUSD } from "@/lib/format";
+import { formatPercent, formatUSD, shortenAddress } from "@/lib/format";
 import { type UnifiedMarketInfo, useSelectedMarketInfo } from "@/lib/hyperliquid";
+import { getExplorerTokenUrl } from "@/lib/hyperliquid/explorer";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
 import { Badge } from "../ui/badge";
 import { StatBlock } from "./chart/stat-block";
@@ -15,6 +16,15 @@ function getLabelForMarketKind(market: UnifiedMarketInfo | undefined): string {
 	return "";
 }
 
+function getSpotTokenAddress(market: UnifiedMarketInfo | undefined): string | null {
+	if (market?.kind !== "spot") return null;
+	const baseToken = market.tokensInfo[0];
+	if (!baseToken) return null;
+	const tokenId = (baseToken as { tokenId?: string }).tokenId;
+	if (!tokenId || !tokenId.startsWith("0x")) return null;
+	return tokenId;
+}
+
 export function MarketOverview() {
 	const { data: selectedMarketInfo } = useSelectedMarketInfo();
 
@@ -23,6 +33,7 @@ export function MarketOverview() {
 	const isFundingPositive = fundingNum >= 0;
 	const change24h = calculate24hPriceChange(selectedMarketInfo?.prevDayPx, selectedMarketInfo?.markPx);
 	const isChange24hPositive = (change24h ?? 0) >= 0;
+	const spotTokenAddress = getSpotTokenAddress(selectedMarketInfo);
 
 	return (
 		<div className="hidden md:flex items-center gap-4 text-3xs">
@@ -67,6 +78,17 @@ export function MarketOverview() {
 					compactDisplay: "short",
 				})}
 			/>
+			{spotTokenAddress && (
+				<a
+					href={getExplorerTokenUrl(spotTokenAddress)}
+					target="_blank"
+					rel="noopener noreferrer"
+					className="flex items-center gap-1 text-muted-fg hover:text-fg transition-colors"
+				>
+					<span className="font-mono">{shortenAddress(spotTokenAddress, 4, 4)}</span>
+					<ExternalLink className="size-3" />
+				</a>
+			)}
 		</div>
 	);
 }

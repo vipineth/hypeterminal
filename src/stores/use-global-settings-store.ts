@@ -19,7 +19,7 @@ const globalSettingsSchema = z.object({
 		showOrdersOnChart: z.boolean().optional(),
 		showPositionsOnChart: z.boolean().optional(),
 		showExecutionsOnChart: z.boolean().optional(),
-		showOrderbookInUsd: z.boolean().optional(),
+		showOrderbookInQuote: z.boolean().optional(),
 		showChartScanlines: z.boolean().optional(),
 		numberFormatLocale: z.string().optional(),
 		marketOrderSlippageBps: z.number().int().optional(),
@@ -34,7 +34,7 @@ const DEFAULT_GLOBAL_SETTINGS = {
 	showOrdersOnChart: true,
 	showPositionsOnChart: true,
 	showExecutionsOnChart: false,
-	showOrderbookInUsd: false,
+	showOrderbookInQuote: false,
 	showChartScanlines: true,
 	numberFormatLocale: "auto" as NumberFormatLocale,
 	marketOrderSlippageBps: DEFAULT_MARKET_ORDER_SLIPPAGE_BPS,
@@ -46,7 +46,7 @@ interface GlobalSettingsStore {
 	showOrdersOnChart: boolean;
 	showPositionsOnChart: boolean;
 	showExecutionsOnChart: boolean;
-	showOrderbookInUsd: boolean;
+	showOrderbookInQuote: boolean;
 	showChartScanlines: boolean;
 	numberFormatLocale: NumberFormatLocale;
 	marketOrderSlippageBps: number;
@@ -56,7 +56,7 @@ interface GlobalSettingsStore {
 		setShowOrdersOnChart: (next: boolean) => void;
 		setShowPositionsOnChart: (next: boolean) => void;
 		setShowExecutionsOnChart: (next: boolean) => void;
-		setShowOrderbookInUsd: (next: boolean) => void;
+		setShowOrderbookInQuote: (next: boolean) => void;
 		setShowChartScanlines: (next: boolean) => void;
 		setNumberFormatLocale: (next: NumberFormatLocale) => void;
 		setMarketOrderSlippageBps: (bps: number) => void;
@@ -73,7 +73,7 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 				setShowOrdersOnChart: (next) => set({ showOrdersOnChart: next }),
 				setShowPositionsOnChart: (next) => set({ showPositionsOnChart: next }),
 				setShowExecutionsOnChart: (next) => set({ showExecutionsOnChart: next }),
-				setShowOrderbookInUsd: (next) => set({ showOrderbookInUsd: next }),
+				setShowOrderbookInQuote: (next) => set({ showOrderbookInQuote: next }),
 				setShowChartScanlines: (next) => set({ showChartScanlines: next }),
 				setNumberFormatLocale: (next) => set({ numberFormatLocale: next }),
 				setMarketOrderSlippageBps: (bps) => {
@@ -92,7 +92,7 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 				showOrdersOnChart: state.showOrdersOnChart,
 				showPositionsOnChart: state.showPositionsOnChart,
 				showExecutionsOnChart: state.showExecutionsOnChart,
-				showOrderbookInUsd: state.showOrderbookInUsd,
+				showOrderbookInQuote: state.showOrderbookInQuote,
 				showChartScanlines: state.showChartScanlines,
 				numberFormatLocale: state.numberFormatLocale,
 				marketOrderSlippageBps: state.marketOrderSlippageBps,
@@ -100,10 +100,15 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 			}),
 			merge: (persisted, current) => {
 				const p = persisted as Partial<GlobalSettingsStore>;
+				const showOrderbookInQuote =
+					typeof p.showOrderbookInQuote === "boolean"
+						? p.showOrderbookInQuote
+						: DEFAULT_GLOBAL_SETTINGS.showOrderbookInQuote;
 				return {
 					...current,
 					...DEFAULT_GLOBAL_SETTINGS,
 					...p,
+					showOrderbookInQuote,
 					marketOrderSlippageBps: clampInt(
 						p?.marketOrderSlippageBps ?? DEFAULT_MARKET_ORDER_SLIPPAGE_BPS,
 						MARKET_ORDER_SLIPPAGE_MIN_BPS,
@@ -123,7 +128,7 @@ export function useGlobalSettings() {
 			showOrdersOnChart: state.showOrdersOnChart,
 			showPositionsOnChart: state.showPositionsOnChart,
 			showExecutionsOnChart: state.showExecutionsOnChart,
-			showOrderbookInUsd: state.showOrderbookInUsd,
+			showOrderbookInQuote: state.showOrderbookInQuote,
 			showChartScanlines: state.showChartScanlines,
 			numberFormatLocale: state.numberFormatLocale,
 		})),

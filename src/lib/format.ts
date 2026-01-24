@@ -2,7 +2,7 @@ import { FALLBACK_VALUE_PLACEHOLDER, FORMAT_COMPACT_DEFAULT, FORMAT_COMPACT_THRE
 import { toNumber } from "@/lib/trade/numbers";
 import { getResolvedFormatLocale } from "@/stores/use-global-settings-store";
 
-type Formatter = Intl.NumberFormat | Intl.DateTimeFormat | Intl.RelativeTimeFormat;
+type Formatter = Intl.NumberFormat | Intl.DateTimeFormat;
 type DateInput = Date | number | string | null | undefined;
 
 const formatterCache = new Map<string, Formatter>();
@@ -36,14 +36,9 @@ function toDate(value: Date | number | string): Date {
 function getFormatter(type: "number", locale: string | undefined, opts: Intl.NumberFormatOptions): Intl.NumberFormat;
 function getFormatter(type: "date", locale: string | undefined, opts: Intl.DateTimeFormatOptions): Intl.DateTimeFormat;
 function getFormatter(
-	type: "relative",
+	type: "number" | "date",
 	locale: string | undefined,
-	opts: Intl.RelativeTimeFormatOptions,
-): Intl.RelativeTimeFormat;
-function getFormatter(
-	type: "number" | "date" | "relative",
-	locale: string | undefined,
-	opts: Intl.NumberFormatOptions | Intl.DateTimeFormatOptions | Intl.RelativeTimeFormatOptions,
+	opts: Intl.NumberFormatOptions | Intl.DateTimeFormatOptions,
 ): Formatter {
 	const key = `${type}-${locale || "default"}-${JSON.stringify(opts)}`;
 	const resolvedLocale = locale || "en-US";
@@ -51,10 +46,8 @@ function getFormatter(
 	if (!formatterCache.has(key)) {
 		if (type === "number") {
 			formatterCache.set(key, new Intl.NumberFormat(resolvedLocale, opts as Intl.NumberFormatOptions));
-		} else if (type === "date") {
-			formatterCache.set(key, new Intl.DateTimeFormat(resolvedLocale, opts as Intl.DateTimeFormatOptions));
 		} else {
-			formatterCache.set(key, new Intl.RelativeTimeFormat(resolvedLocale, opts as Intl.RelativeTimeFormatOptions));
+			formatterCache.set(key, new Intl.DateTimeFormat(resolvedLocale, opts as Intl.DateTimeFormatOptions));
 		}
 	}
 
@@ -87,6 +80,33 @@ function mergeOptions(defaults: Intl.NumberFormatOptions, opts: FormatOptions): 
 	return merged;
 }
 
+function parseNumberInput(
+	value: string | number | null | undefined,
+): { value: number | null | undefined; stringDecimals?: number } {
+	if (typeof value === "string") {
+		const trimmed = value.trim();
+		const num = toNumber(trimmed);
+		if (num === null) return { value: null };
+		const decimalIndex = trimmed.indexOf(".");
+		const decimals = decimalIndex === -1 ? 0 : trimmed.length - decimalIndex - 1;
+		return { value: num, stringDecimals: decimals };
+	}
+	return { value };
+}
+
+function buildNumberFormatOptions(
+	value: number,
+	opts: FormatOptions,
+	defaults: Intl.NumberFormatOptions,
+	compactDefault: boolean,
+): Intl.NumberFormatOptions {
+	const { compact, ...rest } = opts;
+	const shouldCompact = (compact ?? compactDefault) && Math.abs(value) >= FORMAT_COMPACT_THRESHOLD;
+	const compactOptions = shouldCompact ? { notation: "compact", compactDisplay: "short" } : {};
+
+	return mergeOptions({ ...defaults, ...compactOptions }, rest);
+}
+
 /**
  * Format as USD currency
  * @example formatUSD(1234.56) -> "$1,234.56"
@@ -96,20 +116,19 @@ function mergeOptions(defaults: Intl.NumberFormatOptions, opts: FormatOptions): 
  * @example formatUSD(150000, { compact: false }) -> "$150,000.00"
  */
 export function formatUSD(value: string | number | null | undefined, opts?: number | FormatOptions) {
-	const num = typeof value === "string" ? toNumber(value) : value;
-	if (!isValidNumber(num)) return FALLBACK_VALUE_PLACEHOLDER;
+	const parsed = parseNumberInput(value);
+	if (!isValidNumber(parsed.value)) return FALLBACK_VALUE_PLACEHOLDER;
 
 	const { digits, compact, ...rest } = resolveOptions(opts);
-	const shouldCompact = (compact ?? FORMAT_COMPACT_DEFAULT) && Math.abs(num) >= FORMAT_COMPACT_THRESHOLD;
 
 	const defaults: Intl.NumberFormatOptions = {
 		style: "currency",
 		currency: "USD",
 		minimumFractionDigits: digits ?? 2,
 		maximumFractionDigits: digits ?? 2,
-		...(shouldCompact && { notation: "compact", compactDisplay: "short" }),
 	};
-	return getFormatter("number", getResolvedFormatLocale(), mergeOptions(defaults, rest)).format(num);
+	const formatOptions = buildNumberFormatOptions(parsed.value, { compact, ...rest }, defaults, FORMAT_COMPACT_DEFAULT);
+	return getFormatter("number", getResolvedFormatLocale(), formatOptions).format(parsed.value);
 }
 
 /**
@@ -140,45 +159,22 @@ export interface FormatPriceOptions extends FormatOptions {
  * @example formatPrice(0.00001234, { szDecimals: 0 }) -> "$0.000012" (low-priced)
  */
 export function formatPrice(value: string | number | null | undefined, opts?: FormatPriceOptions): string {
-	const num = typeof value === "string" ? toNumber(value) : value;
-	if (!isValidNumber(num)) return FALLBACK_VALUE_PLACEHOLDER;
+	const parsed = parseNumberInput(value);
+	if (!isValidNumber(parsed.value)) return FALLBACK_VALUE_PLACEHOLDER;
 
 	// Derive decimals from szDecimals if provided, otherwise use explicit digits or default to 2
-	const decimals = opts?.digits ?? (opts?.szDecimals !== undefined ? szDecimalsToPriceDecimals(opts.szDecimals) : 2);
-	const { compact, szDecimals: _, trimZeros, ...rest } = opts ?? {};
-	const shouldCompact = (compact ?? false) && Math.abs(num) >= FORMAT_COMPACT_THRESHOLD;
+	const { digits, compact, szDecimals, trimZeros, ...rest } = opts ?? {};
+	const decimals = digits ?? (szDecimals !== undefined ? szDecimalsToPriceDecimals(szDecimals) : 2);
 
 	const defaults: Intl.NumberFormatOptions = {
 		style: "currency",
 		currency: "USD",
 		minimumFractionDigits: trimZeros === false ? decimals : 0,
 		maximumFractionDigits: decimals,
-		...(shouldCompact && { notation: "compact", compactDisplay: "short" }),
 	};
 
-	return getFormatter("number", getResolvedFormatLocale(), mergeOptions(defaults, rest)).format(num);
-}
-
-/**
- * Format a price without currency symbol.
- * Useful for input fields and raw price display.
- *
- * @example formatPriceRaw(88140.123, 4) -> "88,140.12" (szDecimals=4 -> 2 price decimals)
- * @example formatPriceRaw("3456.789", 3) -> "3,456.789" (szDecimals=3 -> 3 price decimals)
- */
-export function formatPriceRaw(value: string | number | null | undefined, szDecimals?: number): string {
-	const num = typeof value === "string" ? toNumber(value) : value;
-	if (!isValidNumber(num)) return FALLBACK_VALUE_PLACEHOLDER;
-
-	const decimals = szDecimals !== undefined ? szDecimalsToPriceDecimals(szDecimals) : 2;
-
-	const defaults: Intl.NumberFormatOptions = {
-		style: "decimal",
-		minimumFractionDigits: decimals,
-		maximumFractionDigits: decimals,
-	};
-
-	return getFormatter("number", getResolvedFormatLocale(), defaults).format(num);
+	const formatOptions = buildNumberFormatOptions(parsed.value, { compact, ...rest }, defaults, false);
+	return getFormatter("number", getResolvedFormatLocale(), formatOptions).format(parsed.value);
 }
 
 /**
@@ -189,8 +185,8 @@ export function formatPriceRaw(value: string | number | null | undefined, szDeci
  * @example formatToken(1.234567, { digits: 2, symbol: "ETH" }) -> "1.23 ETH"
  */
 export function formatToken(value: string | number | null | undefined, opts?: number | string | FormatTokenOptions) {
-	const num = typeof value === "string" ? toNumber(value) : value;
-	if (!isValidNumber(num)) return FALLBACK_VALUE_PLACEHOLDER;
+	const parsed = parseNumberInput(value);
+	if (!isValidNumber(parsed.value)) return FALLBACK_VALUE_PLACEHOLDER;
 
 	let options: FormatTokenOptions = {};
 
@@ -202,7 +198,7 @@ export function formatToken(value: string | number | null | undefined, opts?: nu
 		options = opts || {};
 	}
 
-	const { digits, symbol, ...rest } = options;
+	const { digits, symbol, compact, ...rest } = options;
 
 	const defaults: Intl.NumberFormatOptions = {
 		style: "decimal",
@@ -210,7 +206,8 @@ export function formatToken(value: string | number | null | undefined, opts?: nu
 		maximumFractionDigits: digits ?? 5,
 	};
 
-	const number = getFormatter("number", getResolvedFormatLocale(), mergeOptions(defaults, rest)).format(num);
+	const formatOptions = buildNumberFormatOptions(parsed.value, { compact, ...rest }, defaults, false);
+	const number = getFormatter("number", getResolvedFormatLocale(), formatOptions).format(parsed.value);
 	return symbol ? `${number} ${symbol}` : number;
 }
 
@@ -221,23 +218,24 @@ export function formatToken(value: string | number | null | undefined, opts?: nu
  * @example formatPercent("0.153", 1) -> "15.3%"
  */
 export function formatPercent(value: string | number | null | undefined, opts?: number | FormatOptions) {
-	const num = typeof value === "string" ? toNumber(value) : value;
-	if (!isValidNumber(num)) return FALLBACK_VALUE_PLACEHOLDER;
+	const parsed = parseNumberInput(value);
+	if (!isValidNumber(parsed.value)) return FALLBACK_VALUE_PLACEHOLDER;
 
-	const { digits, ...rest } = resolveOptions(opts);
+	const { digits, compact, ...rest } = resolveOptions(opts);
 	const defaults: Intl.NumberFormatOptions = {
 		style: "percent",
 		minimumFractionDigits: digits ?? 2,
 		maximumFractionDigits: digits ?? 2,
 		signDisplay: "exceptZero",
 	};
-	return getFormatter("number", getResolvedFormatLocale(), mergeOptions(defaults, rest)).format(num);
+	const formatOptions = buildNumberFormatOptions(parsed.value, { compact, ...rest }, defaults, false);
+	return getFormatter("number", getResolvedFormatLocale(), formatOptions).format(parsed.value);
 }
 
 /**
  * Format a number with commas and decimal precision.
  *
- * - If value is a string, preserves its original decimal precision (for API values)
+ * - If value is a string and digits are not provided, preserves its original decimal precision (for API values)
  * - If value is a number with digits specified, uses those
  * - If value is a number without digits, uses 0-3 decimals
  *
@@ -247,32 +245,19 @@ export function formatPercent(value: string | number | null | undefined, opts?: 
  * @example formatNumber(1234.5) -> "1,234.5" (number, default 0-3 decimals)
  */
 export function formatNumber(value: string | number | null | undefined, opts?: number | FormatOptions): string {
-	// Handle string input - preserve original decimal precision
-	if (typeof value === "string") {
-		const num = toNumber(value);
-		if (num === null) return FALLBACK_VALUE_PLACEHOLDER;
+	const parsed = parseNumberInput(value);
+	if (!isValidNumber(parsed.value)) return FALLBACK_VALUE_PLACEHOLDER;
 
-		// Find how many decimal places the original string has
-		const decimalIndex = value.indexOf(".");
-		const decimals = decimalIndex === -1 ? 0 : value.length - decimalIndex - 1;
-
-		return getFormatter("number", getResolvedFormatLocale(), {
-			style: "decimal",
-			minimumFractionDigits: decimals,
-			maximumFractionDigits: decimals,
-		}).format(num);
-	}
-
-	// Handle number input
-	if (!isValidNumber(value)) return FALLBACK_VALUE_PLACEHOLDER;
-
-	const { digits, ...rest } = resolveOptions(opts);
+	const { digits, compact, ...rest } = resolveOptions(opts);
+	const stringDecimals = parsed.stringDecimals;
+	const resolvedDigits = digits ?? (typeof stringDecimals === "number" ? stringDecimals : undefined);
 	const defaults: Intl.NumberFormatOptions = {
 		style: "decimal",
-		minimumFractionDigits: digits ?? 0,
-		maximumFractionDigits: digits ?? 3,
+		minimumFractionDigits: resolvedDigits ?? 0,
+		maximumFractionDigits: resolvedDigits ?? 3,
 	};
-	return getFormatter("number", getResolvedFormatLocale(), mergeOptions(defaults, rest)).format(value);
+	const formatOptions = buildNumberFormatOptions(parsed.value, { compact, ...rest }, defaults, false);
+	return getFormatter("number", getResolvedFormatLocale(), formatOptions).format(parsed.value);
 }
 
 /**
@@ -293,25 +278,6 @@ export function shortenAddress(address: string, startLength = 4, endLength = 4):
 
 export interface FormatDateOptions extends Intl.DateTimeFormatOptions {
 	locale?: string;
-}
-
-/**
- * Format a date
- * @example formatDate(new Date()) -> "Jan 5, 2026"
- * @example formatDate(1704067200000) -> "Jan 1, 2024"
- * @example formatDate("2024-01-01") -> "Jan 1, 2024"
- * @example formatDate(new Date(), { dateStyle: "full" }) -> "Monday, January 5, 2026"
- */
-export function formatDate(value: DateInput, opts?: FormatDateOptions): string {
-	if (!isValidDate(value)) return FALLBACK_VALUE_PLACEHOLDER;
-
-	const { locale, ...rest } = opts ?? {};
-	const defaults: Intl.DateTimeFormatOptions = {
-		dateStyle: "medium",
-		...rest,
-	};
-
-	return getFormatter("date", locale ?? getResolvedFormatLocale(), defaults).format(toDate(value));
 }
 
 /**
@@ -348,49 +314,4 @@ export function formatDateTime(value: DateInput, opts?: FormatDateOptions): stri
 	};
 
 	return getFormatter("date", locale ?? getResolvedFormatLocale(), defaults).format(toDate(value));
-}
-
-const RELATIVE_TIME_UNITS: Array<{ unit: Intl.RelativeTimeFormatUnit; ms: number }> = [
-	{ unit: "year", ms: 365 * 24 * 60 * 60 * 1000 },
-	{ unit: "month", ms: 30 * 24 * 60 * 60 * 1000 },
-	{ unit: "week", ms: 7 * 24 * 60 * 60 * 1000 },
-	{ unit: "day", ms: 24 * 60 * 60 * 1000 },
-	{ unit: "hour", ms: 60 * 60 * 1000 },
-	{ unit: "minute", ms: 60 * 1000 },
-	{ unit: "second", ms: 1000 },
-];
-
-export interface FormatRelativeTimeOptions extends Intl.RelativeTimeFormatOptions {
-	locale?: string;
-}
-
-/**
- * Format relative time (e.g., "2 hours ago", "in 3 days")
- * @example formatRelativeTime(Date.now() - 3600000) -> "1 hour ago"
- * @example formatRelativeTime(Date.now() + 86400000) -> "in 1 day"
- * @example formatRelativeTime(Date.now() - 120000) -> "2 minutes ago"
- */
-export function formatRelativeTime(value: DateInput, opts?: FormatRelativeTimeOptions): string {
-	if (!isValidDate(value)) return FALLBACK_VALUE_PLACEHOLDER;
-
-	const { locale, ...rest } = opts ?? {};
-	const resolvedLocale = locale ?? getResolvedFormatLocale();
-	const defaults: Intl.RelativeTimeFormatOptions = {
-		numeric: "auto",
-		style: "long",
-		...rest,
-	};
-
-	const date = toDate(value);
-	const diff = date.getTime() - Date.now();
-	const absDiff = Math.abs(diff);
-
-	for (const { unit, ms } of RELATIVE_TIME_UNITS) {
-		if (absDiff >= ms || unit === "second") {
-			const amount = Math.round(diff / ms);
-			return getFormatter("relative", resolvedLocale, defaults).format(amount, unit);
-		}
-	}
-
-	return getFormatter("relative", resolvedLocale, defaults).format(0, "second");
 }
