@@ -17,35 +17,20 @@ import {
 	TWAP_MINUTES_MAX,
 	TWAP_MINUTES_MIN,
 } from "@/config/constants";
+import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import { cn } from "@/lib/cn";
-import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
-import { useAgentRegistration, useAgentStatus, useSelectedResolvedMarket } from "@/lib/hyperliquid";
+import { formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
+import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeTwapOrder";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import type { MarginMode } from "@/lib/trade/margin-mode";
-import {
-	calc,
-	clampInt,
-	formatDecimalFloor,
-	isPositive,
-	parseNumberOrZero,
-	toFixed,
-	toNumber,
-} from "@/lib/trade/numbers";
-import {
-	getConversionPrice,
-	getExecutedPrice,
-	getLiquidationInfo,
-	getMaxSize,
-	getOrderMetrics,
-	getOrderPrice,
-	getSizeValues,
-	getSliderValue,
-} from "@/lib/trade/order-entry-calcs";
+import { clampInt, formatDecimalFloor, isPositive, parseNumberOrZero, toFixed, toNumber } from "@/lib/trade/numbers";
+import { getLiquidationInfo, getOrderMetrics } from "@/domain/trade/order-entry/metrics";
+import { getOrderPrice } from "@/domain/trade/order-entry/price";
+import { getSliderValue } from "@/domain/trade/order-entry/size";
 import {
 	canUseTpSl as canUseTpSlForOrder,
-	type ExchangeOrder,
 	getTabsOrderType,
 	isScaleOrderType,
 	isStopOrderType,
@@ -57,7 +42,7 @@ import {
 	usesLimitPrice as usesLimitPriceForOrder,
 	usesTriggerPrice as usesTriggerPriceForOrder,
 } from "@/lib/trade/order-types";
-import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/lib/trade/orders";
+import { buildOrders, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import type { ActiveDialog, ButtonContent } from "@/lib/trade/types";
 import { useButtonContent } from "@/lib/trade/use-button-content";
 import { useOrderValidation } from "@/lib/trade/use-order-validation";
@@ -87,19 +72,13 @@ import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbo
 import { useSettingsDialogActions } from "@/stores/use-settings-dialog-store";
 import { WalletDialog } from "../components/wallet-dialog";
 import { AdvancedOrderDropdown } from "./advanced-order-dropdown";
-import { LeverageControl, useAssetLeverage } from "./leverage-control";
+import { LeverageControl } from "./leverage-control";
 import { MarginModeDialog } from "./margin-mode-dialog";
 import { MarginModeToggle } from "./margin-mode-toggle";
 import { OrderSummary } from "./order-summary";
 import { OrderToast } from "./order-toast";
 import { SideToggle } from "./side-toggle";
 import { TpSlSection } from "./tp-sl-section";
-
-function getMarketPrice(ctxMarkPx: unknown, midPx: unknown): number {
-	if (typeof ctxMarkPx === "number") return ctxMarkPx;
-	if (typeof midPx === "number") return midPx;
-	return 0;
-}
 
 function getActionButtonClass(variant: ButtonContent["variant"]): string {
 	if (variant === "cyan") {
@@ -120,7 +99,8 @@ export function OrderEntryPanel() {
 	const switchChain = useSwitchChain();
 	const needsChainSwitch = !!walletClientError && walletClientError.message.includes("does not match");
 
-	const { data: market } = useSelectedResolvedMarket({ ctxMode: "realtime" });
+	const { data: market } = useSelectedMarketInfo();
+
 	const { data: clearinghouseEvent } = useSubClearinghouseState(
 		{ user: address ?? "0x0" },
 		{ enabled: isConnected && !!address },
@@ -133,27 +113,37 @@ export function OrderEntryPanel() {
 	const { mutateAsync: placeTwapOrder, isPending: isSubmittingTwap } = useExchangeTwapOrder();
 
 	const slippageBps = useMarketOrderSlippageBps();
+	const side = useOrderSide();
+	const markPx = market?.markPx ?? 0;
+	const sizeMode = useSizeMode();
+	const sizeInput = useOrderSize();
 
 	const {
-		displayLeverage: leverage,
-		availableToSell,
-		availableToBuy,
-		maxTradeSzs,
+		isSpotMarket,
+		baseToken,
+		capabilities,
+		availableBalance,
+		availableBalanceToken,
+		maxSize,
+		sizeValue,
+		orderValue,
+		sideLabels,
+		sizeModeLabel,
+		getSizeForPercent,
+		convertSizeForModeToggle,
+		leverage,
 		marginMode,
 		hasPosition,
 		switchMarginMode,
 		isSwitchingMode,
 		switchModeError,
-	} = useAssetLeverage();
+		szDecimals,
+	} = useOrderEntryData({ market, side, markPx, sizeMode, sizeInput });
 
 	const { addOrder, updateOrder } = useOrderQueueActions();
 	const selectedPrice = useSelectedPrice();
-
-	const side = useOrderSide();
 	const orderType = useOrderType();
-	const sizeMode = useSizeMode();
 	const reduceOnly = useReduceOnly();
-	const sizeInput = useOrderSize();
 	const limitPriceInput = useLimitPrice();
 	const triggerPriceInput = useTriggerPrice();
 	const scaleStartPriceInput = useScaleStart();
@@ -223,18 +213,12 @@ export function OrderEntryPanel() {
 
 	const isSubmitting = isSubmittingOrder || isSubmittingTwap;
 
-	const accountValue = parseNumberOrZero(clearinghouse?.crossMarginSummary?.accountValue);
-	const marginUsed = parseNumberOrZero(clearinghouse?.crossMarginSummary?.totalMarginUsed);
-	const availableBalance = Math.max(0, calc.subtract(accountValue, marginUsed) ?? 0);
-
 	const position =
-		!clearinghouse?.assetPositions || !market?.coin
+		!clearinghouse?.assetPositions || !baseToken
 			? null
-			: (clearinghouse.assetPositions.find((p) => p.position.coin === market.coin) ?? null);
+			: (clearinghouse.assetPositions.find((p) => p.position.coin === baseToken) ?? null);
 	const positionSize = parseNumberOrZero(position?.position?.szi);
 
-	const ctxMarkPx = market?.ctxNumbers?.markPx;
-	const markPx = getMarketPrice(ctxMarkPx, market?.midPxNumber);
 	const price = getOrderPrice(
 		orderType,
 		markPx,
@@ -244,26 +228,7 @@ export function OrderEntryPanel() {
 		scaleEndPriceInput,
 	);
 
-	const maxSize = useMemo(
-		() =>
-			getMaxSize({
-				isConnected,
-				maxTradeSzs,
-				szDecimals: market?.szDecimals,
-				side,
-				availableToBuy,
-				availableToSell,
-			}),
-		[availableToBuy, availableToSell, isConnected, market?.szDecimals, maxTradeSzs, side],
-	);
-
-	const conversionPx = getConversionPrice(markPx, price);
-	const { sizeValue } = useMemo(
-		() => getSizeValues({ sizeInput, sizeMode, conversionPx }),
-		[conversionPx, sizeInput, sizeMode],
-	);
-
-	const { orderValue, marginRequired, estimatedFee } = useMemo(
+	const { marginRequired, estimatedFee } = useMemo(
 		() => getOrderMetrics({ sizeValue, price, leverage, orderType }),
 		[leverage, orderType, price, sizeValue],
 	);
@@ -282,7 +247,7 @@ export function OrderEntryPanel() {
 		isWalletLoading,
 		availableBalance,
 		hasMarket: !!market,
-		hasAssetIndex: typeof market?.assetIndex === "number",
+		hasAssetIndex: typeof market?.assetId === "number",
 		needsAgentApproval,
 		isReadyToTrade,
 		orderType,
@@ -314,23 +279,16 @@ export function OrderEntryPanel() {
 	function applySizePercent(pct: number) {
 		if (maxSize <= 0) return;
 		setHasUserSized(true);
-		const newSize = calc.percent(maxSize, pct) ?? 0;
-		if (sizeMode === "usd" && conversionPx > 0) {
-			setSize(toFixed(calc.multiply(newSize, conversionPx), 2));
-			return;
-		}
-		setSize(formatDecimalFloor(newSize, market?.szDecimals ?? 0) || "");
+		const newSize = getSizeForPercent(pct);
+		if (newSize) setSize(newSize);
 	}
 
 	function handleSizeModeToggle() {
 		const newMode = sizeMode === "asset" ? "usd" : "asset";
-		if (conversionPx > 0 && sizeValue > 0) {
+		const convertedSize = convertSizeForModeToggle();
+		if (convertedSize) {
 			setHasUserSized(true);
-			setSize(
-				newMode === "usd"
-					? toFixed(calc.multiply(sizeValue, conversionPx), 2)
-					: formatDecimalFloor(sizeValue, market?.szDecimals ?? 0) || "",
-			);
+			setSize(convertedSize);
 		}
 		setSizeMode(newMode);
 	}
@@ -348,7 +306,8 @@ export function OrderEntryPanel() {
 	const handleRegister = useCallback(() => {
 		if (isRegistering) return;
 		setApprovalError(null);
-		registerAgent().catch((error) => {
+
+		registerAgent().catch((error: unknown) => {
 			const message = error instanceof Error ? error.message : t`Failed to enable trading`;
 			setApprovalError(message);
 		});
@@ -356,13 +315,13 @@ export function OrderEntryPanel() {
 
 	const handleSubmit = useCallback(async () => {
 		if (!validation.canSubmit || isSubmitting) return;
-		if (!market || typeof market.assetIndex !== "number") return;
+		if (!market || !baseToken || typeof market.assetId !== "number") return;
 
 		const szDecimals = market.szDecimals ?? 0;
 		const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
 
 		const orderId = addOrder({
-			market: market.coin,
+			market: baseToken,
 			side,
 			size: formattedSize,
 			status: "pending",
@@ -373,7 +332,7 @@ export function OrderEntryPanel() {
 				const minutes = clampInt(Math.round(twapMinutesNum ?? 0), TWAP_MINUTES_MIN, TWAP_MINUTES_MAX);
 				const result = await placeTwapOrder({
 					twap: {
-						a: market.assetIndex,
+						a: market.assetId,
 						b: side === "buy",
 						s: formattedSize,
 						r: reduceOnly,
@@ -384,83 +343,33 @@ export function OrderEntryPanel() {
 				throwIfResponseError(result.response?.data?.status);
 				updateOrder(orderId, { status: "success", fillPercent: 100 });
 			} else {
-				const orders: ExchangeOrder[] = [];
-				const hasTp = tpSlEnabled && canUseTpSl && isPositive(tpPriceNum);
-				const hasSl = tpSlEnabled && canUseTpSl && isPositive(slPriceNum);
+				const { orders, grouping } = buildOrders({
+					assetId: market.assetId,
+					side,
+					orderType,
+					sizeValue,
+					szDecimals,
+					markPx,
+					price,
+					slippageBps,
+					reduceOnly,
+					tif,
+					limitPriceInput,
+					triggerPriceInput,
+					scaleStartPriceInput,
+					scaleEndPriceInput,
+					scaleLevelsNum,
+					tpSlEnabled,
+					canUseTpSl,
+					tpPriceNum,
+					slPriceNum,
+					isStopOrder: stopOrder,
+					isTriggerOrder: triggerOrder,
+					isScaleOrder: scaleOrder,
+					usesLimitPriceForOrder: usesLimitPrice,
+				});
 
-				if (scaleOrder) {
-					const levels = clampInt(Math.round(scaleLevelsNum ?? 0), SCALE_LEVELS_MIN, SCALE_LEVELS_MAX);
-					const start = parseNumberOrZero(scaleStartPriceInput);
-					const end = parseNumberOrZero(scaleEndPriceInput);
-					const step = levels > 1 ? (end - start) / (levels - 1) : 0;
-					const perLevelSize = sizeValue / levels;
-					for (let i = 0; i < levels; i += 1) {
-						const levelPrice = start + step * i;
-						orders.push({
-							a: market.assetIndex,
-							b: side === "buy",
-							p: formatPriceForOrder(levelPrice),
-							s: formatSizeForOrder(perLevelSize, szDecimals),
-							r: reduceOnly,
-							t: { limit: { tif } },
-						});
-					}
-				} else if (triggerOrder) {
-					const triggerPx = formatPriceForOrder(parseNumberOrZero(triggerPriceInput));
-					const limitPx = formatPriceForOrder(parseNumberOrZero(limitPriceInput));
-					orders.push({
-						a: market.assetIndex,
-						b: side === "buy",
-						p: usesLimitPrice ? limitPx : triggerPx,
-						s: formattedSize,
-						r: reduceOnly,
-						t: {
-							trigger: {
-								isMarket: !usesLimitPrice,
-								triggerPx,
-								tpsl: stopOrder ? "sl" : "tp",
-							},
-						},
-					});
-				} else {
-					const orderPrice = getExecutedPrice(orderType, side, markPx, slippageBps, price);
-					const formattedPrice = formatPriceForOrder(orderPrice);
-
-					orders.push({
-						a: market.assetIndex,
-						b: side === "buy",
-						p: formattedPrice,
-						s: formattedSize,
-						r: reduceOnly,
-						t: orderType === "market" ? { limit: { tif: "FrontendMarket" as const } } : { limit: { tif } },
-					});
-
-					if (hasTp) {
-						orders.push({
-							a: market.assetIndex,
-							b: side !== "buy",
-							p: formatPriceForOrder(tpPriceNum),
-							s: formattedSize,
-							r: true,
-							t: { trigger: { isMarket: true, triggerPx: formatPriceForOrder(tpPriceNum), tpsl: "tp" } },
-						});
-					}
-
-					if (hasSl) {
-						orders.push({
-							a: market.assetIndex,
-							b: side !== "buy",
-							p: formatPriceForOrder(slPriceNum),
-							s: formattedSize,
-							r: true,
-							t: { trigger: { isMarket: true, triggerPx: formatPriceForOrder(slPriceNum), tpsl: "sl" } },
-						});
-					}
-				}
-
-				const grouping = hasTp || hasSl ? "positionTpsl" : "na";
 				const result = await placeOrder({ orders, grouping });
-
 				throwIfResponseError(result.response?.data?.statuses?.[0]);
 				updateOrder(orderId, { status: "success", fillPercent: 100 });
 			}
@@ -474,39 +383,38 @@ export function OrderEntryPanel() {
 		}
 	}, [
 		addOrder,
-		scaleOrder,
+		baseToken,
+		canUseTpSl,
 		isSubmitting,
-		stopOrder,
-		twapOrder,
-		triggerOrder,
 		limitPriceInput,
-		market?.assetIndex,
-		market?.coin,
-		market?.szDecimals,
+		market,
 		markPx,
 		orderType,
 		placeOrder,
 		placeTwapOrder,
 		price,
 		reduceOnly,
+		resetForm,
 		scaleEndPriceInput,
 		scaleLevelsNum,
+		scaleOrder,
 		scaleStartPriceInput,
 		side,
 		sizeValue,
 		slippageBps,
 		slPriceNum,
+		stopOrder,
+		tif,
 		tpPriceNum,
 		tpSlEnabled,
+		triggerOrder,
 		triggerPriceInput,
 		twapMinutesNum,
+		twapOrder,
 		twapRandomize,
 		updateOrder,
 		usesLimitPrice,
-		canUseTpSl,
 		validation.canSubmit,
-		resetForm,
-		tif,
 	]);
 
 	const sliderValue = useMemo(() => {
@@ -536,12 +444,31 @@ export function OrderEntryPanel() {
 	const isFormDisabled = !isConnected || availableBalance <= 0;
 	const actionButtonClass = getActionButtonClass(buttonContent.variant);
 
+	function formatAvailableBalance(): string {
+		if (!isConnected) return FALLBACK_VALUE_PLACEHOLDER;
+		if (isSpotMarket) {
+			const decimals = side === "buy" ? 2 : szDecimals;
+			return `${formatToken(availableBalance, decimals)} ${availableBalanceToken}`;
+		}
+		return formatUSD(availableBalance);
+	}
+
 	return (
 		<div className="h-full flex flex-col overflow-hidden bg-surface/20">
-			<div className="px-2 py-1.5 border-b border-border/40 flex items-center justify-between">
-				<MarginModeToggle mode={marginMode} disabled={isSwitchingMode} onClick={() => setActiveDialog("marginMode")} />
-				<LeverageControl key={market?.marketKey} />
-			</div>
+			{capabilities.isLeveraged && (
+				<div className="px-2 py-1.5 border-b border-border/40 flex items-center justify-between">
+					{capabilities.hasMarginMode ? (
+						<MarginModeToggle
+							mode={marginMode}
+							disabled={isSwitchingMode}
+							onClick={() => setActiveDialog("marginMode")}
+						/>
+					) : (
+						<MarginModeToggle mode="isolated" disabled onClick={() => {}} />
+					)}
+					<LeverageControl key={market?.name} />
+				</div>
+			)}
 
 			<MarginModeDialog
 				open={activeDialog === "marginMode"}
@@ -566,10 +493,10 @@ export function OrderEntryPanel() {
 								</TabsTrigger>
 							</TabsList>
 						</Tabs>
-						<AdvancedOrderDropdown orderType={orderType} onOrderTypeChange={setOrderType} />
+						<AdvancedOrderDropdown orderType={orderType} onOrderTypeChange={setOrderType} marketKind={market?.kind} />
 					</div>
 
-					<SideToggle side={side} onSideChange={setSide} />
+					<SideToggle side={side} onSideChange={setSide} labels={sideLabels} />
 				</div>
 
 				<div className="space-y-0.5 text-3xs">
@@ -577,7 +504,7 @@ export function OrderEntryPanel() {
 						<span>{t`Available`}</span>
 						<div className="flex items-center gap-2">
 							<span className={cn("tabular-nums", availableBalance > 0 ? "text-positive" : "text-muted-fg")}>
-								{isConnected ? formatUSD(availableBalance) : FALLBACK_VALUE_PLACEHOLDER}
+								{formatAvailableBalance()}
 							</span>
 							{isConnected && (
 								<Button
@@ -591,12 +518,12 @@ export function OrderEntryPanel() {
 							)}
 						</div>
 					</div>
-					{positionSize !== 0 && (
+					{!isSpotMarket && positionSize !== 0 && (
 						<div className="flex items-center justify-between text-muted-fg">
 							<span>{t`Position`}</span>
 							<span className={cn("tabular-nums", positionSize > 0 ? "text-positive" : "text-negative")}>
 								{positionSize > 0 ? "+" : ""}
-								{formatDecimalFloor(positionSize, market?.szDecimals ?? 2)} {market?.coin}
+								{formatDecimalFloor(positionSize, szDecimals)} {baseToken}
 							</span>
 						</div>
 					)}
@@ -613,7 +540,7 @@ export function OrderEntryPanel() {
 							aria-label={t`Toggle size mode`}
 							disabled={isFormDisabled}
 						>
-							{sizeMode === "asset" ? market?.coin || "---" : "USD"} <ArrowLeftRight className="size-2.5" />
+							{sizeModeLabel} <ArrowLeftRight className="size-2.5" />
 						</Button>
 						<NumberInput
 							placeholder="0.00"
@@ -798,59 +725,63 @@ export function OrderEntryPanel() {
 					</>
 				)}
 
-				<div className="space-y-4">
-					<div className="flex items-center gap-3 text-3xs">
-						<div className="inline-flex items-center gap-2">
-							<Checkbox
-								id={reduceOnlyId}
-								aria-label={t`Reduce Only`}
-								checked={reduceOnly}
-								onCheckedChange={(checked) => setReduceOnly(checked === true)}
+				{(capabilities.hasReduceOnly || (capabilities.hasTpSl && canUseTpSl)) && (
+					<div className="space-y-4">
+						<div className="flex items-center gap-3 text-3xs">
+							{capabilities.hasReduceOnly && (
+								<div className="inline-flex items-center gap-2">
+									<Checkbox
+										id={reduceOnlyId}
+										aria-label={t`Reduce Only`}
+										checked={reduceOnly}
+										onCheckedChange={(checked) => setReduceOnly(checked === true)}
+										disabled={isFormDisabled}
+									/>
+									<label
+										htmlFor={reduceOnlyId}
+										className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-fg")}
+									>
+										{t`Reduce Only`}
+									</label>
+								</div>
+							)}
+							{capabilities.hasTpSl && canUseTpSl && (
+								<div className="inline-flex items-center gap-2">
+									<Checkbox
+										id={tpSlId}
+										aria-label={t`Take Profit / Stop Loss`}
+										checked={tpSlEnabled}
+										onCheckedChange={(checked) => setTpSlEnabled(checked === true)}
+										disabled={isFormDisabled}
+									/>
+									<label
+										htmlFor={tpSlId}
+										className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-fg")}
+									>
+										{t`TP/SL`}
+									</label>
+								</div>
+							)}
+						</div>
+
+						{capabilities.hasTpSl && tpSlEnabled && canUseTpSl && (
+							<TpSlSection
+								side={side}
+								referencePrice={price}
+								size={sizeValue}
+								szDecimals={market?.szDecimals}
+								tpPrice={tpPriceInput}
+								slPrice={slPriceInput}
+								onTpPriceChange={setTpPrice}
+								onSlPriceChange={setSlPrice}
 								disabled={isFormDisabled}
 							/>
-							<label
-								htmlFor={reduceOnlyId}
-								className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-fg")}
-							>
-								{t`Reduce Only`}
-							</label>
-						</div>
-						{canUseTpSl && (
-							<div className="inline-flex items-center gap-2">
-								<Checkbox
-									id={tpSlId}
-									aria-label={t`Take Profit / Stop Loss`}
-									checked={tpSlEnabled}
-									onCheckedChange={(checked) => setTpSlEnabled(checked === true)}
-									disabled={isFormDisabled}
-								/>
-								<label
-									htmlFor={tpSlId}
-									className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-fg")}
-								>
-									{t`TP/SL`}
-								</label>
-							</div>
 						)}
 					</div>
-
-					{tpSlEnabled && canUseTpSl && (
-						<TpSlSection
-							side={side}
-							referencePrice={price}
-							size={sizeValue}
-							szDecimals={market?.szDecimals}
-							tpPrice={tpPriceInput}
-							slPrice={slPriceInput}
-							onTpPriceChange={setTpPrice}
-							onSlPriceChange={setSlPrice}
-							disabled={isFormDisabled}
-						/>
-					)}
-				</div>
+				)}
 
 				<div className="space-y-2">
-					{validation.errors.length > 0 && isConnected && availableBalance > 0 && !validation.needsApproval && (
+					{validation.errors.length > 0 && isConnected && availableBalance > 0 && (
 						<div className="text-4xs text-negative">{validation.errors.join(" • ")}</div>
 					)}
 
@@ -881,6 +812,7 @@ export function OrderEntryPanel() {
 					slippageBps={slippageBps}
 					szDecimals={market?.szDecimals}
 					onSlippageClick={openSettingsDialog}
+					marketKind={market?.kind}
 				/>
 			</div>
 

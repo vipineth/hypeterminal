@@ -31,7 +31,7 @@ export function getTokenDelegateMutationOptions(
 export function useExchangeTokenDelegate(
 	options: UseExchangeTokenDelegateOptions = {},
 ): UseExchangeTokenDelegateReturnType {
-	const { admin } = useHyperliquidClients();
+	const { user } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getTokenDelegateMutationOptions(admin)));
+	return useMutation(mergeMutationOptions(options, getTokenDelegateMutationOptions(user)));
 }

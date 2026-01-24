@@ -25,7 +25,7 @@ export function getSendAssetMutationOptions(
 }
 
 export function useExchangeSendAsset(options: UseExchangeSendAssetOptions = {}): UseExchangeSendAssetReturnType {
-	const { admin } = useHyperliquidClients();
+	const { user } = useHyperliquidClients();
 
-	return useMutation(mergeMutationOptions(options, getSendAssetMutationOptions(admin)));
+	return useMutation(mergeMutationOptions(options, getSendAssetMutationOptions(user)));
 }

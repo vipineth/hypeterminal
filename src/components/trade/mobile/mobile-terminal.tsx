@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { cn } from "@/lib/cn";
-import { useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
+import { useAccountBalances } from "@/hooks/trade/use-account-balances";
+import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
 import { MobileAccountView } from "./mobile-account-view";
 import { MobileBookView } from "./mobile-book-view";
@@ -20,23 +21,18 @@ export function MobileTerminal({ className }: Props) {
 	const [activeTab, setActiveTab] = useState<MobileTab>("chart");
 
 	const { address, isConnected } = useConnection();
-	const { data: stateEvent } = useSubClearinghouseState(
-		{ user: address ?? "0x0" },
-		{ enabled: isConnected && !!address },
-	);
-	const state = stateEvent?.clearinghouseState;
+	const { perpPositions } = useAccountBalances();
 	const { data: ordersEvent } = useSubOpenOrders({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
 	const openOrders = ordersEvent?.orders;
 
 	const positionsCount = useMemo(() => {
 		if (!isConnected) return 0;
-		const raw = state?.assetPositions ?? [];
-		return raw.reduce((count, entry) => {
+		return perpPositions.reduce((count, entry) => {
 			const size = parseNumber(entry.position.szi);
 			if (!Number.isFinite(size) || size === 0) return count;
 			return count + 1;
 		}, 0);
-	}, [isConnected, state?.assetPositions]);
+	}, [isConnected, perpPositions]);
 
 	const ordersCount = isConnected ? (openOrders?.length ?? 0) : 0;
 

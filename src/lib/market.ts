@@ -1,51 +1,59 @@
-import { toFiniteNumber } from "@/lib/trade/numbers";
+import { calc, toFiniteNumber } from "@/lib/trade/numbers";
+import { PERP_NAME_SEPARATOR, SPOT_NAME_SEPARATOR } from "./tokens";
 
-type MarketCtxLike = {
-	markPx?: string | number | null;
-	prevDayPx?: string | number | null;
-	openInterest?: string | number | null;
-	oraclePx?: string | number | null;
-	dayNtlVlm?: string | number | null;
-	funding?: string | number | null;
-};
+type MarketCtxLike = object | null | undefined;
+type MarketKind = "perp" | "spot" | "builderPerp";
 
-export type MarketCtxNumbers = {
+export interface MarketCtxNumbers {
 	markPx: number | null;
 	prevDayPx: number | null;
 	openInterest: number | null;
 	oraclePx: number | null;
 	dayNtlVlm: number | null;
 	funding: number | null;
-};
+}
 
-export function getMarketCtxNumbers(ctx: MarketCtxLike | null | undefined): MarketCtxNumbers | null {
+export function getMarketCtxNumbers(ctx: MarketCtxLike): MarketCtxNumbers | null {
 	if (!ctx) return null;
+
+	const rawCtx = ctx as Record<string, unknown>;
 	return {
-		markPx: toFiniteNumber(ctx.markPx),
-		prevDayPx: toFiniteNumber(ctx.prevDayPx),
-		openInterest: toFiniteNumber(ctx.openInterest),
-		oraclePx: toFiniteNumber(ctx.oraclePx),
-		dayNtlVlm: toFiniteNumber(ctx.dayNtlVlm),
-		funding: toFiniteNumber(ctx.funding),
+		markPx: toFiniteNumber(rawCtx.markPx),
+		prevDayPx: toFiniteNumber(rawCtx.prevDayPx),
+		openInterest: toFiniteNumber(rawCtx.openInterest),
+		oraclePx: toFiniteNumber(rawCtx.oraclePx),
+		dayNtlVlm: toFiniteNumber(rawCtx.dayNtlVlm),
+		funding: toFiniteNumber(rawCtx.funding),
 	};
 }
 
-export function calculate24hPriceChange(ctx: MarketCtxLike | null | undefined): number | null {
-	const numbers = getMarketCtxNumbers(ctx);
-	if (!numbers) return null;
-
-	const { markPx, prevDayPx } = numbers;
-	if (markPx === null || prevDayPx === null || prevDayPx === 0) return null;
-
-	return ((markPx - prevDayPx) / prevDayPx) * 100;
+export function calculate24hPriceChange(prevDayPx: unknown, markPx: unknown): number | null {
+	return calc.percentChange(prevDayPx, markPx);
 }
 
-export function calculateOpenInterestUSD(ctx: MarketCtxLike | null | undefined): number | null {
-	const numbers = getMarketCtxNumbers(ctx);
-	if (!numbers) return null;
+export function calculateOpenInterestUSD(openInterest: unknown, markPx: unknown): number | null {
+	return calc.multiply(openInterest, markPx);
+}
 
-	const { openInterest, markPx } = numbers;
-	if (openInterest === null || markPx === null) return null;
+export function getMarketSeparator(kind: MarketKind): string {
+	if (kind === "spot") return SPOT_NAME_SEPARATOR;
+	return PERP_NAME_SEPARATOR;
+}
 
-	return openInterest * markPx;
+export function getBaseQuoteFromDisplayName(
+	displayName: string,
+	kind: MarketKind,
+): { baseToken: string; quoteToken: string } {
+	const separator = getMarketSeparator(kind);
+	const [baseToken, quoteToken] = displayName.split(separator);
+
+	return { baseToken, quoteToken };
+}
+
+export function getBaseToken(displayName: string, kind: MarketKind): string {
+	return getBaseQuoteFromDisplayName(displayName, kind).baseToken;
+}
+
+export function getQuoteToken(displayName: string, kind: MarketKind): string {
+	return getBaseQuoteFromDisplayName(displayName, kind).quoteToken;
 }

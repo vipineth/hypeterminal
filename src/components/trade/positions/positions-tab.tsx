@@ -9,14 +9,13 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
-import { usePerpMarkets } from "@/lib/hyperliquid";
+import { useMarkets } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useSubAssetCtxs, useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
-import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { calc, isPositive, parseNumber } from "@/lib/trade/numbers";
-import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
+import { formatPriceForOrder, formatSizeForOrder } from "@/domain/trade/orders";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
-import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
+import { useMarketActions } from "@/stores/use-market-store";
 import type { PerpAssetCtxs } from "@/types/hyperliquid";
 import { TokenAvatar } from "../components/token-avatar";
 import { TradingActionButton } from "../components/trading-action-button";
@@ -42,7 +41,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 
 interface TpSlPositionData {
 	coin: string;
-	assetIndex: number;
+	assetId: number;
 	isLong: boolean;
 	size: number;
 	entryPx: number;
@@ -67,7 +66,7 @@ export function PositionsTab() {
 	const { address, isConnected } = useConnection();
 	const slippageBps = useMarketOrderSlippageBps();
 	const closingKeyRef = useRef<string | null>(null);
-	const { setSelectedMarketKey } = useMarketPrefsActions();
+	const { setSelectedMarket } = useMarketActions();
 	const [tpSlModalOpen, setTpSlModalOpen] = useState(false);
 	const [selectedTpSlPosition, setSelectedTpSlPosition] = useState<TpSlPositionData | null>(null);
 
@@ -91,7 +90,7 @@ export function PositionsTab() {
 			});
 	}, [state]);
 
-	const { getSzDecimals, getAssetId } = usePerpMarkets();
+	const { getMarket, getAssetId, getSzDecimals } = useMarkets();
 	const assetCtxsEnabled = isConnected && positions.length > 0;
 	const assetCtxsParams = useMemo(() => ({ dex: "" as const }), []);
 	const assetCtxsOptions = useMemo(() => ({ enabled: assetCtxsEnabled }), [assetCtxsEnabled]);
@@ -131,9 +130,10 @@ export function PositionsTab() {
 			const isLong = size > 0;
 			const closeSize = Math.abs(size);
 
+			const market = getMarket(p.coin);
+			const assetId = getAssetId(p.coin);
 			const szDecimals = getSzDecimals(p.coin) ?? 4;
-			const assetIndex = getAssetId(p.coin);
-			const markPxRaw = typeof assetIndex === "number" ? assetCtxs?.[assetIndex]?.markPx : undefined;
+			const markPxRaw = typeof assetId === "number" ? assetCtxs?.[assetId]?.markPx : undefined;
 			const markPx = markPxRaw ? parseNumber(markPxRaw) : Number.NaN;
 			const entryPx = parseNumber(p.entryPx);
 			const unrealizedPnl = parseNumber(p.unrealizedPnl);
@@ -141,17 +141,19 @@ export function PositionsTab() {
 			const cumFunding = parseNumber((p as { cumFunding?: { sinceOpen?: string } }).cumFunding?.sinceOpen);
 			const leverageType = (p as { leverage?: { type?: string } }).leverage?.type as "cross" | "isolated" | undefined;
 
-			const canClose = isPositive(closeSize) && typeof assetIndex === "number" && isPositive(markPx);
+			const canClose = isPositive(closeSize) && typeof assetId === "number" && isPositive(markPx);
 			const tpSlInfo = tpSlOrdersByCoin.get(p.coin);
+			const maxLeverage = market && market.kind !== "spot" ? market.maxLeverage : undefined;
 
 			return {
 				key: `${p.coin}-${p.entryPx}-${p.szi}`,
 				coin: p.coin,
 				isLong,
 				closeSize,
-				assetIndex,
+				assetId,
 				markPx,
 				szDecimals,
+				maxLeverage,
 				canClose,
 				entryPx,
 				unrealizedPnl,
@@ -169,15 +171,15 @@ export function PositionsTab() {
 				hasTpSl: !!(tpSlInfo?.tpPrice || tpSlInfo?.slPrice),
 			};
 		});
-	}, [positions, getSzDecimals, getAssetId, assetCtxs, tpSlOrdersByCoin]);
+	}, [positions, getMarket, getAssetId, getSzDecimals, assetCtxs, tpSlOrdersByCoin]);
 
 	const headerCount = isConnected ? positions.length : FALLBACK_VALUE_PLACEHOLDER;
 
 	const handleClosePosition = (row: (typeof tableRows)[number]) => {
 		if (isClosing || !row.canClose) return;
 
-		const assetIndex = row.assetIndex;
-		if (typeof assetIndex !== "number" || !Number.isFinite(row.markPx)) return;
+		const assetId = row.assetId;
+		if (typeof assetId !== "number" || !Number.isFinite(row.markPx)) return;
 
 		resetCloseError();
 		closingKeyRef.current = row.key;
@@ -189,7 +191,7 @@ export function PositionsTab() {
 			{
 				orders: [
 					{
-						a: assetIndex,
+						a: assetId,
 						b: isBuy,
 						p: formatPriceForOrder(orderPrice),
 						s: formatSizeForOrder(row.closeSize, row.szDecimals),
@@ -227,10 +229,10 @@ export function PositionsTab() {
 	const placeholder = renderPlaceholder();
 
 	function handleOpenTpSlModal(row: (typeof tableRows)[number]) {
-		if (typeof row.assetIndex !== "number") return;
+		if (typeof row.assetId !== "number") return;
 		setSelectedTpSlPosition({
 			coin: row.coin,
-			assetIndex: row.assetIndex,
+			assetId: row.assetId,
 			isLong: row.isLong,
 			size: row.closeSize,
 			entryPx: row.entryPx,
@@ -307,7 +309,7 @@ export function PositionsTab() {
 													<Button
 														variant="link"
 														size="none"
-														onClick={() => setSelectedMarketKey(makePerpMarketKey(row.coin))}
+														onClick={() => setSelectedMarket(row.coin)}
 														className="gap-1.5"
 														aria-label={t`Switch to ${row.coin} market`}
 													>
@@ -352,7 +354,7 @@ export function PositionsTab() {
 														<button
 															type="button"
 															onClick={() => handleOpenTpSlModal(row)}
-															disabled={typeof row.assetIndex !== "number"}
+															disabled={typeof row.assetId !== "number"}
 															className={cn(
 																"group inline-flex items-center gap-1.5 cursor-pointer transition-opacity disabled:cursor-not-allowed disabled:opacity-50",
 																!row.hasTpSl && "text-muted-fg/60 hover:text-muted-fg",

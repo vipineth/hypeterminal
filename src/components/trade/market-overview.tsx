@@ -1,72 +1,72 @@
 import { t } from "@lingui/core/macro";
 import { Flame } from "lucide-react";
-import { useCallback } from "react";
-import { Separator } from "@/components/ui/separator";
-import { DEFAULT_MARKET_KEY } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
-import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
-import { makePerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
-import { calculateOpenInterestUSD } from "@/lib/market";
-import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
+import { type UnifiedMarketInfo, useSelectedMarketInfo } from "@/lib/hyperliquid";
+import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
+import { Badge } from "../ui/badge";
 import { StatBlock } from "./chart/stat-block";
-import { TokenSelector } from "./chart/token-selector";
+
+function getLabelForMarketKind(market: UnifiedMarketInfo | undefined): string {
+	if (!market) return "";
+	if (market.kind === "spot") return "Spot";
+	if (market.kind === "perp") return "Perp";
+	if (market.kind === "builderPerp") return `Perp: ${market.dex}`;
+	return "";
+}
 
 export function MarketOverview() {
-	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "realtime" });
-	const selectedCoin = selectedMarket?.coin ?? perpCoinFromMarketKey(DEFAULT_MARKET_KEY);
-	const { setSelectedMarketKey } = useMarketPrefsActions();
+	const { data: selectedMarketInfo } = useSelectedMarketInfo();
 
-	const handleCoinChange = useCallback(
-		(coin: string) => {
-			setSelectedMarketKey(makePerpMarketKey(coin));
-		},
-		[setSelectedMarketKey],
-	);
-
-	const fundingNum = selectedMarket?.ctxNumbers?.funding ?? 0;
+	const isSpot = selectedMarketInfo?.kind === "spot";
+	const fundingNum = selectedMarketInfo?.funding ?? 0;
 	const isFundingPositive = fundingNum >= 0;
+	const change24h = calculate24hPriceChange(selectedMarketInfo?.prevDayPx, selectedMarketInfo?.markPx);
+	const isChange24hPositive = (change24h ?? 0) >= 0;
 
 	return (
-		<div className="px-2 py-1.5 border-b border-border/60 bg-surface/30">
-			<div className="flex items-center justify-between gap-2">
-				<div className="flex items-center gap-2 min-w-0">
-					<TokenSelector value={selectedCoin} onValueChange={handleCoinChange} />
-
-					<Separator orientation="vertical" className="mx-1 h-4" />
-					<div className="hidden md:flex items-center gap-4 text-3xs">
-						<StatBlock
-							label={t`MARK`}
-							value={formatUSD(selectedMarket?.ctxNumbers?.markPx ?? null)}
-							valueClass="text-warning"
-						/>
-						<StatBlock label={t`ORACLE`} value={formatUSD(selectedMarket?.ctxNumbers?.oraclePx ?? null)} />
-						<StatBlock
-							label={t`VOL`}
-							value={formatUSD(selectedMarket?.ctxNumbers?.dayNtlVlm ?? null, {
-								notation: "compact",
-								compactDisplay: "short",
+		<div className="hidden md:flex items-center gap-4 text-3xs">
+			<Badge className="uppercase text-4xs" variant="neutral">
+				{getLabelForMarketKind(selectedMarketInfo)}
+			</Badge>
+			<StatBlock
+				label={isSpot ? t`PRICE` : t`MARK`}
+				value={formatUSD(selectedMarketInfo?.markPx)}
+				valueClass="text-warning"
+			/>
+			<StatBlock
+				label={t`24H`}
+				value={change24h !== null ? formatPercent(change24h / 100, { signDisplay: "exceptZero" }) : "—"}
+				valueClass={isChange24hPositive ? "text-positive" : "text-negative"}
+			/>
+			{!isSpot && (
+				<>
+					<StatBlock label={t`ORACLE`} value={formatUSD(selectedMarketInfo?.oraclePx)} />
+					<StatBlock
+						label={t`OI`}
+						value={formatUSD(calculateOpenInterestUSD(selectedMarketInfo?.openInterest, selectedMarketInfo?.markPx), {
+							notation: "compact",
+							compactDisplay: "short",
+						})}
+					/>
+					<div className="flex items-center gap-1">
+						<Flame className={cn("size-3", isFundingPositive ? "text-positive" : "text-negative")} />
+						<span className={cn("text-muted-fg tabular-nums", isFundingPositive ? "text-positive" : "text-negative")}>
+							{formatPercent(fundingNum, {
+								minimumFractionDigits: 4,
+								signDisplay: "exceptZero",
 							})}
-						/>
-						<StatBlock
-							label={t`OI`}
-							value={formatUSD(calculateOpenInterestUSD(selectedMarket?.ctxNumbers), {
-								notation: "compact",
-								compactDisplay: "short",
-							})}
-						/>
-						<div className="flex items-center gap-1">
-							<Flame className={cn("size-3", isFundingPositive ? "text-positive" : "text-negative")} />
-							<span className={cn("text-muted-fg tabular-nums", isFundingPositive ? "text-positive" : "text-negative")}>
-								{formatPercent(fundingNum, {
-									minimumFractionDigits: 4,
-									signDisplay: "exceptZero",
-								})}
-							</span>
-						</div>
+						</span>
 					</div>
-				</div>
-			</div>
+				</>
+			)}
+			<StatBlock
+				label={t`VOL`}
+				value={formatUSD(selectedMarketInfo?.dayNtlVlm, {
+					notation: "compact",
+					compactDisplay: "short",
+				})}
+			/>
 		</div>
 	);
 }

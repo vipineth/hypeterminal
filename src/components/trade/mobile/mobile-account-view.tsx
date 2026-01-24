@@ -5,9 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UI_TEXT } from "@/config/constants";
+import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
-import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
 import { useDepositModalActions } from "@/stores/use-deposit-modal-store";
 import { WalletDialog } from "../components/wallet-dialog";
@@ -21,14 +21,9 @@ interface MobileAccountViewProps {
 
 export function MobileAccountView({ className }: MobileAccountViewProps) {
 	const { address, isConnected } = useConnection();
-	const { disconnect } = useDisconnect();
+	const disconnect = useDisconnect();
 
-	const { data: stateEvent, status } = useSubClearinghouseState(
-		{ user: address ?? "0x0" },
-		{ enabled: isConnected && !!address },
-	);
-	const state = stateEvent?.clearinghouseState;
-	const isLoading = status === "subscribing" || status === "idle";
+	const { perpSummary, perpPositions, isLoading } = useAccountBalances();
 
 	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
 	const [copied, setCopied] = useState(false);
@@ -41,22 +36,18 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 		setTimeout(() => setCopied(false), 2000);
 	};
 
-	// Parse account data
-	const crossMargin = state?.crossMarginSummary;
-	const accountValue = parseNumber(crossMargin?.accountValue) || 0;
-	const totalMarginUsed = parseNumber(crossMargin?.totalMarginUsed) || 0;
-	const totalNtlPos = parseNumber(crossMargin?.totalNtlPos) || 0;
-	const totalRawUsd = parseNumber(crossMargin?.totalRawUsd) || 0;
+	const accountValue = parseNumber(perpSummary?.accountValue) || 0;
+	const totalMarginUsed = parseNumber(perpSummary?.totalMarginUsed) || 0;
+	const totalNtlPos = parseNumber(perpSummary?.totalNtlPos) || 0;
+	const totalRawUsd = parseNumber(perpSummary?.totalRawUsd) || 0;
 
 	const availableBalance = Math.max(0, accountValue - totalMarginUsed);
 	const marginRatio = accountValue > 0 ? totalMarginUsed / accountValue : 0;
 
-	// Calculate unrealized PnL from positions
-	const unrealizedPnl =
-		state?.assetPositions?.reduce((sum, pos) => {
-			const pnl = parseNumber(pos.position.unrealizedPnl);
-			return sum + (Number.isFinite(pnl) ? pnl : 0);
-		}, 0) ?? 0;
+	const unrealizedPnl = perpPositions.reduce((sum, pos) => {
+		const pnl = parseNumber(pos.position.unrealizedPnl);
+		return sum + (Number.isFinite(pnl) ? pnl : 0);
+	}, 0);
 
 	if (!isConnected) {
 		return (
@@ -123,7 +114,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 					<Button
 						variant="ghost"
 						size="none"
-						onClick={() => disconnect()}
+						onClick={() => disconnect.mutate()}
 						className={cn(
 							"p-2.5 text-muted-fg hover:text-negative",
 							"transition-colors rounded-md hover:bg-transparent",

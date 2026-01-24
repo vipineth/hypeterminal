@@ -1,10 +1,10 @@
-import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
+import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { AccountPanel } from "../order-entry/account-panel";
 import { OrderEntryPanel } from "../order-entry/order-entry-panel";
 
 export function OrderSidebar() {
-	const { data: market } = useSelectedResolvedMarket({ ctxMode: "none" });
-	const formKey = market?.marketKey ?? "default";
+	const { data: market } = useSelectedMarketInfo();
+	const formKey = market?.name ?? "default";
 
 	return (
 		<div className="h-full min-h-0 flex flex-col overflow-y-auto gap-32">

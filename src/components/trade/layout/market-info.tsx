@@ -1,6 +1,6 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { LAYOUT_PRESETS, usePersistentLayout } from "@/hooks/trade/use-persistent-layout";
-import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
+import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { ChartPanel } from "../chart/chart-panel";
 import { OrderbookPanel } from "../orderbook/orderbook-panel";
 
@@ -8,8 +8,8 @@ export function MarketInfo() {
 	const layoutPreset = LAYOUT_PRESETS.MARKET_INFO;
 	const { sizes, handleLayoutChange } = usePersistentLayout(layoutPreset.storageKey, layoutPreset.fallbackSizes);
 
-	const { data: market } = useSelectedResolvedMarket({ ctxMode: "none" });
-	const orderbookKey = market?.coin ?? "default";
+	const { data: market } = useSelectedMarketInfo();
+	const orderbookKey = market?.name ?? "default";
 
 	return (
 		<div className="h-full min-h-0">

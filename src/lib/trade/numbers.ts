@@ -236,10 +236,19 @@ export function floorToDecimals(value: number, maxDecimals: number): number {
 	return floor(value, maxDecimals) ?? Number.NaN;
 }
 
-export function formatDecimalFloor(value: number, maxDecimals: number): string {
+export function formatDecimalFloor(value: string | number, maxDecimals: number): string {
 	return floorToString(value, maxDecimals).replace(/\.?0+$/, "");
 }
 
 export function toFiniteNumber(value: unknown): number | null {
 	return toNumber(value);
+}
+
+export function limitDecimalInput(input: string, maxDecimals: number): string {
+	if (!input) return input;
+	const decimalIndex = input.indexOf(".");
+	if (decimalIndex === -1) return input;
+	const decimalsInInput = input.length - decimalIndex - 1;
+	if (decimalsInInput <= maxDecimals) return input;
+	return input.slice(0, decimalIndex + maxDecimals + 1);
 }

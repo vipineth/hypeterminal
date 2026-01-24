@@ -20,6 +20,7 @@ export const ARBITRUM_CHAIN_ID = 42161;
 export const ARBITRUM_CHAIN_ID_HEX = "0xa4b1" as const;
 
 export const DEFAULT_MARKET_KEY = "perp:BTC";
+export const DEFAULT_MARKET_NAME = "BTC";
 export const DEFAULT_MARKET_SCOPE = "perp" as const;
 
 export const ORDER_MIN_NOTIONAL_USD = 10;
@@ -483,7 +484,7 @@ export const UI_TEXT = {
 		ERROR_NO_MARK_PRICE: "No mark price",
 		ERROR_LIMIT_PRICE: "Enter limit price",
 		ERROR_SIZE: "Enter size",
-		ERROR_MIN_NOTIONAL: "Min order $10",
+		ERROR_MIN_NOTIONAL: "Min order value $10",
 		ERROR_EXCEEDS_MAX: "Exceeds max size",
 		BUTTON_CONNECT: "Connect Wallet",
 		BUTTON_SWITCHING: "Switching...",

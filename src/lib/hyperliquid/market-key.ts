@@ -106,3 +106,19 @@ export function getApiParams(marketKey: string): { dex: string; coin: string } |
 			return { dex: parsed.dex, coin: parsed.coin };
 	}
 }
+
+export function makeMarketKeyFromMarket(market: {
+	kind: MarketKind;
+	name: string;
+	displayName: string;
+	dex?: string;
+}): MarketKey {
+	switch (market.kind) {
+		case "perp":
+			return makePerpMarketKey(market.name);
+		case "spot":
+			return makeSpotMarketKey(market.displayName);
+		case "builderPerp":
+			return makeBuilderPerpMarketKey(market.dex ?? "", market.displayName);
+	}
+}

@@ -8,11 +8,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatNumber, formatUSD } from "@/lib/format";
-import { usePerpMarkets } from "@/lib/hyperliquid";
 import { useSubUserFills } from "@/lib/hyperliquid/hooks/subscription";
-import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
+import { useMarkets } from "@/lib/hyperliquid/hooks/useMarkets";
 import { parseNumber } from "@/lib/trade/numbers";
-import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
+import { useMarketActions } from "@/stores/use-market-store";
 
 interface PlaceholderProps {
 	children: React.ReactNode;
@@ -34,14 +33,14 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 
 export function HistoryTab() {
 	const { address, isConnected } = useConnection();
-	const { setSelectedMarketKey } = useMarketPrefsActions();
+	const { setSelectedMarket } = useMarketActions();
+	const { getSzDecimals } = useMarkets();
 	const {
 		data: fillsEvent,
 		status,
 		error,
 	} = useSubUserFills({ user: address ?? "0x0", aggregateByTime: true }, { enabled: isConnected && !!address });
 	const data = fillsEvent?.fills;
-	const { getSzDecimals } = usePerpMarkets();
 
 	const fills = useMemo(() => {
 		const raw = data ?? [];
@@ -55,7 +54,6 @@ export function HistoryTab() {
 		return fills.map((fill) => {
 			const fee = parseNumber(fill.fee);
 			const closedPnl = parseNumber(fill.closedPnl);
-			const szDecimals = getSzDecimals(fill.coin) ?? 4;
 
 			return {
 				key: `${fill.hash}-${fill.tid}`,
@@ -64,7 +62,7 @@ export function HistoryTab() {
 				dir: fill.dir,
 				px: fill.px,
 				sz: fill.sz,
-				szDecimals,
+				szDecimals: getSzDecimals(fill.coin) ?? 4,
 				fee,
 				closedPnl,
 				time: fill.time,
@@ -145,7 +143,7 @@ export function HistoryTab() {
 													<Button
 														variant="link"
 														size="none"
-														onClick={() => setSelectedMarketKey(makePerpMarketKey(row.coin))}
+														onClick={() => setSelectedMarket(row.coin)}
 														aria-label={t`Switch to ${row.coin} market`}
 													>
 														{row.coin}

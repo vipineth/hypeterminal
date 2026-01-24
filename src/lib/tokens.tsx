@@ -1,8 +1,46 @@
 import { TrendingUp, Zap } from "lucide-react";
 import { MARKET_CATEGORY_LABELS, TOKEN_ICON_BASE_URL } from "@/config/constants";
+import type { MarketKind } from "@/lib/hyperliquid/market-key";
+import type { SpotToken } from "./hyperliquid";
 
-export function getTokenIconUrl(token: string) {
-	return `${TOKEN_ICON_BASE_URL}/${token}.svg`;
+export const PERP_NAME_SEPARATOR = "-";
+export const SPOT_NAME_SEPARATOR = "/";
+
+export function getUnderlyingAsset(token: SpotToken): string | undefined {
+	// Unit Protocol tokens
+	if (token.fullName?.startsWith("Unit")) {
+		return token.name.replace("U", "");
+	}
+}
+
+export function isMarketSpot(marketName: string) {
+	return marketName.startsWith("@");
+}
+
+export function isMarketBuilderPerp(marketName: string) {
+	return marketName.includes(":");
+}
+
+export function getIconUrlFromPair(tokenName: string, kind?: MarketKind) {
+	if (kind === "spot") {
+		const [base] = tokenName.split(SPOT_NAME_SEPARATOR);
+		return `${TOKEN_ICON_BASE_URL}/${base}_spot.svg`;
+	}
+
+	if (kind === "perp" || kind === "builderPerp") {
+		const [base] = tokenName.split(PERP_NAME_SEPARATOR);
+		return `${TOKEN_ICON_BASE_URL}/${base}.svg`;
+	}
+
+	return `${TOKEN_ICON_BASE_URL}/${tokenName}.svg`;
+}
+
+export function getIconUrlFromToken(tokenName: string, kind?: MarketKind) {
+	if (kind === "spot") {
+		return `${TOKEN_ICON_BASE_URL}/${tokenName}_spot.svg`;
+	}
+
+	return `${TOKEN_ICON_BASE_URL}/${tokenName}.svg`;
 }
 
 export type MarketCategory = "all" | "trending" | "new" | "defi" | "layer1" | "layer2" | "meme";

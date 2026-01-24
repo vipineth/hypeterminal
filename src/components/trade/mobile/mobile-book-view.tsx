@@ -10,8 +10,9 @@ import {
 import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
-import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
+import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { useSubL2Book } from "@/lib/hyperliquid/hooks/subscription";
+import { getBaseQuoteFromDisplayName } from "@/lib/market";
 import { processLevels } from "@/lib/trade/orderbook";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
 import { OrderbookRow } from "../orderbook/orderbook-row";
@@ -73,17 +74,18 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 	const { showOrderbookInUsd } = useGlobalSettings();
 	const { setShowOrderbookInUsd } = useGlobalSettingsActions();
 
-	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "none" });
-	const { coin, szDecimals } = selectedMarket;
+	const { data: selectedMarket } = useSelectedMarketInfo();
+	const name = selectedMarket?.name ?? "";
+	const szDecimals = selectedMarket?.szDecimals ?? 4;
 
 	const { data: book, status: bookStatus } = useSubL2Book(
 		{
-			coin,
+			coin: name,
 			nSigFigs: selectedOption?.nSigFigs,
 			mantissa: selectedOption?.mantissa,
 		},
 		{
-			enabled: view === "book",
+			enabled: view === "book" && !!selectedMarket && !!name,
 		},
 	);
 
@@ -136,6 +138,11 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 
 	const priceGroupingOptions = useMemo(() => generatePriceGroupingOptions(mid), [mid]);
 
+	const { baseToken, quoteToken } = useMemo(() => {
+		if (!selectedMarket) return { baseToken: "", quoteToken: "" };
+		return getBaseQuoteFromDisplayName(selectedMarket.displayName, selectedMarket.kind);
+	}, [selectedMarket]);
+
 	useEffect(() => {
 		if (selectedOption === null && priceGroupingOptions.length > 0) {
 			setSelectedOption(priceGroupingOptions[0]);
@@ -144,10 +151,8 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 
 	return (
 		<div className={cn("flex flex-col h-full min-h-0", className)}>
-			{/* Header with tabs and controls */}
 			<div className="shrink-0 px-3 py-2 border-b border-border/60 bg-surface/30">
 				<div className="flex items-center justify-between">
-					{/* View toggle */}
 					<div className="flex items-center gap-1 bg-muted/50 rounded-md p-0.5">
 						<Button
 							variant="ghost"
@@ -177,9 +182,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 						</Button>
 					</div>
 
-					{/* Controls */}
 					<div className="flex items-center gap-2">
-						{/* Unit toggle */}
 						<Button
 							variant="ghost"
 							size="none"
@@ -192,11 +195,10 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 							)}
 							aria-label="Toggle display units"
 						>
-							{showOrderbookInUsd ? "USD" : coin}
+							{showOrderbookInUsd ? quoteToken : baseToken}
 							<ArrowRightLeft className="size-3" />
 						</Button>
 
-						{/* Aggregation selector */}
 						{view === "book" && (
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
@@ -321,7 +323,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 				</div>
 			) : (
 				<div className="flex-1 min-h-0">
-					<TradesPanel key={coin} />
+					<TradesPanel key={name} />
 				</div>
 			)}
 

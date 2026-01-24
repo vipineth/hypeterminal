@@ -1,85 +1,46 @@
-import { t } from "@lingui/core/macro";
 import { ClientOnly } from "@tanstack/react-router";
-import { Flame } from "lucide-react";
 import { useCallback } from "react";
 import { Separator } from "@/components/ui/separator";
-import { DEFAULT_MARKET_KEY } from "@/config/constants";
-import { cn } from "@/lib/cn";
-import { formatPercent, formatUSD } from "@/lib/format";
-import { useSelectedResolvedMarket } from "@/lib/hyperliquid";
-import { makePerpMarketKey, perpCoinFromMarketKey } from "@/lib/hyperliquid/market-key";
-import { calculateOpenInterestUSD } from "@/lib/market";
+import { createChartName } from "@/lib/chart/candle";
+import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { useTheme } from "@/providers/theme";
-import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
-import { QUOTE_ASSET } from "./constants";
-import { StatBlock } from "./stat-block";
+import { useMarketActions } from "@/stores/use-market-store";
+import { MarketOverview } from "../market-overview";
 import { TokenSelector } from "./token-selector";
 import { TradingViewChart } from "./trading-view-chart";
 
 export function ChartPanel() {
 	const { theme } = useTheme();
-	const { data: selectedMarket } = useSelectedResolvedMarket({ ctxMode: "realtime" });
-	const selectedCoin = selectedMarket?.coin ?? perpCoinFromMarketKey(DEFAULT_MARKET_KEY);
-	const { setSelectedMarketKey } = useMarketPrefsActions();
+	const { data: selectedMarket } = useSelectedMarketInfo();
+	const { setSelectedMarket } = useMarketActions();
 
-	const handleCoinChange = useCallback(
-		(coin: string) => {
-			setSelectedMarketKey(makePerpMarketKey(coin));
+	const handleMarketChange = useCallback(
+		(marketName: string) => {
+			setSelectedMarket(marketName);
 		},
-		[setSelectedMarketKey],
+		[setSelectedMarket],
 	);
-
-	const fundingNum = selectedMarket?.ctxNumbers?.funding ?? 0;
-	const isFundingPositive = fundingNum >= 0;
 
 	return (
 		<div className="h-full flex flex-col overflow-hidden">
 			<div className="px-2 py-1.5 border-b border-border/60 bg-surface/30">
 				<div className="flex items-center justify-between gap-2">
-					<div className="flex items-center gap-2 min-w-0">
-						<TokenSelector value={selectedCoin} onValueChange={handleCoinChange} />
-
+					<div className="flex items-center gap-0.5 min-w-0">
+						<TokenSelector selectedMarket={selectedMarket} onValueChange={handleMarketChange} />
 						<Separator orientation="vertical" className="mx-1 h-4" />
-						<div className="hidden md:flex items-center gap-4 text-3xs">
-							<StatBlock
-								label={t`MARK`}
-								value={formatUSD(selectedMarket?.ctxNumbers?.markPx ?? null)}
-								valueClass="text-warning"
-							/>
-							<StatBlock label={t`ORACLE`} value={formatUSD(selectedMarket?.ctxNumbers?.oraclePx ?? null)} />
-							<StatBlock
-								label={t`VOL`}
-								value={formatUSD(selectedMarket?.ctxNumbers?.dayNtlVlm ?? null, {
-									notation: "compact",
-									compactDisplay: "short",
-								})}
-							/>
-							<StatBlock
-								label={t`OI`}
-								value={formatUSD(calculateOpenInterestUSD(selectedMarket?.ctxNumbers), {
-									notation: "compact",
-									compactDisplay: "short",
-								})}
-							/>
-							<div className="flex items-center gap-1">
-								<Flame className={cn("size-3", isFundingPositive ? "text-positive" : "text-negative")} />
-								<span
-									className={cn("text-muted-fg tabular-nums", isFundingPositive ? "text-positive" : "text-negative")}
-								>
-									{formatPercent(fundingNum, {
-										minimumFractionDigits: 4,
-										signDisplay: "exceptZero",
-									})}
-								</span>
-							</div>
-						</div>
+						<MarketOverview />
 					</div>
 				</div>
 			</div>
 
 			<div className="flex-1 min-h-0">
 				<ClientOnly>
-					<TradingViewChart symbol={`${selectedCoin}/${QUOTE_ASSET}`} theme={theme === "dark" ? "dark" : "light"} />
+					{selectedMarket && (
+						<TradingViewChart
+							symbol={createChartName(selectedMarket.displayName, selectedMarket.name)}
+							theme={theme === "dark" ? "dark" : "light"}
+						/>
+					)}
 				</ClientOnly>
 			</div>
 		</div>

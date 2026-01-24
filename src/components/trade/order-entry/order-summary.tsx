@@ -3,6 +3,7 @@ import { PencilIcon } from "lucide-react";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD } from "@/lib/format";
+import type { MarketKind } from "@/lib/hyperliquid";
 import { calc, toFixed } from "@/lib/trade/numbers";
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 	slippageBps: number;
 	szDecimals: number | undefined;
 	onSlippageClick: () => void;
+	marketKind?: MarketKind;
 }
 
 export function OrderSummary({
@@ -25,25 +27,32 @@ export function OrderSummary({
 	slippageBps,
 	szDecimals,
 	onSlippageClick,
+	marketKind = "perp",
 }: Props) {
+	const isLeveraged = marketKind !== "spot";
+
 	return (
 		<div className="border border-border/40 divide-y divide-border/40 text-3xs">
-			<div className="flex items-center justify-between px-2 py-1.5">
-				<span className="text-muted-fg">{t`Liq. Price`}</span>
-				<span className={cn("tabular-nums", liqWarning ? "text-negative" : "text-negative/70")}>
-					{liqPrice ? formatPrice(liqPrice, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER}
-				</span>
-			</div>
+			{isLeveraged && (
+				<div className="flex items-center justify-between px-2 py-1.5">
+					<span className="text-muted-fg">{t`Liq. Price`}</span>
+					<span className={cn("tabular-nums", liqWarning ? "text-negative" : "text-negative/70")}>
+						{liqPrice ? formatPrice(liqPrice, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER}
+					</span>
+				</div>
+			)}
 			<div className="flex items-center justify-between px-2 py-1.5">
 				<span className="text-muted-fg">{t`Order Value`}</span>
 				<span className="tabular-nums">{orderValue > 0 ? formatUSD(orderValue) : FALLBACK_VALUE_PLACEHOLDER}</span>
 			</div>
-			<div className="flex items-center justify-between px-2 py-1.5">
-				<span className="text-muted-fg">{t`Margin Req.`}</span>
-				<span className="tabular-nums">
-					{marginRequired > 0 ? formatUSD(marginRequired) : FALLBACK_VALUE_PLACEHOLDER}
-				</span>
-			</div>
+			{isLeveraged && (
+				<div className="flex items-center justify-between px-2 py-1.5">
+					<span className="text-muted-fg">{t`Margin Req.`}</span>
+					<span className="tabular-nums">
+						{marginRequired > 0 ? formatUSD(marginRequired) : FALLBACK_VALUE_PLACEHOLDER}
+					</span>
+				</div>
+			)}
 			<div className="flex items-center justify-between px-2 py-1.5">
 				<span className="text-muted-fg">{t`Slippage`}</span>
 				<button

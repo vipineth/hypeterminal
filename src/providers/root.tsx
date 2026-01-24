@@ -5,6 +5,7 @@ import { WagmiProvider } from "wagmi";
 import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/hyperliquid";
 import { config } from "@/config/wagmi";
 import { HyperliquidProvider } from "@/lib/hyperliquid";
+import { MarketsInfoProvider } from "@/lib/hyperliquid/hooks/MarketsInfoProvider";
 import { ThemeProvider } from "./theme";
 import "@/lib/i18n";
 
@@ -24,7 +25,7 @@ export function RootProvider({ children, queryClient }: { children: React.ReactN
 				<I18nProvider i18n={i18n}>
 					<ThemeProvider>
 						<HyperliquidProvider env={env} builderConfig={DEFAULT_BUILDER_CONFIG} agentName={PROJECT_NAME}>
-							{children}
+							<MarketsInfoProvider>{children}</MarketsInfoProvider>
 						</HyperliquidProvider>
 					</ThemeProvider>
 				</I18nProvider>

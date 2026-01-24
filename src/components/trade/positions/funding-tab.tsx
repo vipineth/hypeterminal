@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatNumber, formatPercent, formatUSD } from "@/lib/format";
-import { usePerpMarkets } from "@/lib/hyperliquid";
+import { useMarkets } from "@/lib/hyperliquid";
 import { useSubUserFundings } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber, toNumberOrZero } from "@/lib/trade/numbers";
 
@@ -37,7 +37,7 @@ export function FundingTab() {
 		error,
 	} = useSubUserFundings({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
 	const data = fundingEvent?.fundings;
-	const { getSzDecimals } = usePerpMarkets();
+	const { getSzDecimals } = useMarkets();
 
 	const updates = useMemo(() => {
 		const raw = data ?? [];
@@ -59,7 +59,6 @@ export function FundingTab() {
 		return updates.map((update, index) => {
 			const szi = parseNumber(update.szi);
 			const isLong = Number.isFinite(szi) ? szi > 0 : true;
-			const szDecimals = getSzDecimals(update.coin) ?? 4;
 			const rate = parseNumber(update.fundingRate);
 			const usdc = parseNumber(update.usdc);
 
@@ -68,7 +67,7 @@ export function FundingTab() {
 				coin: update.coin,
 				isLong,
 				positionSize: Number.isFinite(szi) ? Math.abs(szi) : null,
-				szDecimals,
+				szDecimals: getSzDecimals(update.coin) ?? 4,
 				rate,
 				usdc,
 				time: update.time,

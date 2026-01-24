@@ -19,6 +19,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/cn";
+import type { MarketKind } from "@/lib/hyperliquid";
 import {
 	ADVANCED_ORDER_GROUPS,
 	ADVANCED_ORDER_LABELS,
@@ -32,6 +33,7 @@ import {
 interface Props {
 	orderType: OrderType;
 	onOrderTypeChange: (type: OrderType) => void;
+	marketKind?: MarketKind;
 }
 
 type AdvancedOrderOption = {
@@ -60,9 +62,22 @@ const ADVANCED_ORDER_OPTIONS: AdvancedOrderOption[] = ADVANCED_ORDER_TYPES.map((
 const TRIGGER_OPTIONS = ADVANCED_ORDER_OPTIONS.filter((option) => option.group === "trigger");
 const EXECUTION_OPTIONS = ADVANCED_ORDER_OPTIONS.filter((option) => option.group === "execution");
 
-export function AdvancedOrderDropdown({ orderType, onOrderTypeChange }: Props) {
+const SPOT_ALLOWED_TYPES: AdvancedOrderType[] = ["twap", "scale"];
+
+function getFilteredOptions(options: AdvancedOrderOption[], marketKind: MarketKind): AdvancedOrderOption[] {
+	if (marketKind === "spot") {
+		return options.filter((option) => SPOT_ALLOWED_TYPES.includes(option.value));
+	}
+	return options;
+}
+
+export function AdvancedOrderDropdown({ orderType, onOrderTypeChange, marketKind = "perp" }: Props) {
 	const isAdvanced = isAdvancedOrderType(orderType);
 	const label = getAdvancedOrderLabel(orderType, t`Pro`);
+
+	const triggerOptions = getFilteredOptions(TRIGGER_OPTIONS, marketKind);
+	const executionOptions = getFilteredOptions(EXECUTION_OPTIONS, marketKind);
+	const hasTriggerOptions = triggerOptions.length > 0;
 
 	return (
 		<DropdownMenu>
@@ -84,22 +99,26 @@ export function AdvancedOrderDropdown({ orderType, onOrderTypeChange }: Props) {
 				</button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="min-w-44">
-				<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-muted-fg/70">
-					{t`Trigger`}
-				</DropdownMenuLabel>
-				{TRIGGER_OPTIONS.map((option) => (
-					<AdvancedOrderItem
-						key={option.value}
-						option={option}
-						isSelected={orderType === option.value}
-						onSelect={() => onOrderTypeChange(option.value)}
-					/>
-				))}
-				<DropdownMenuSeparator />
+				{hasTriggerOptions && (
+					<>
+						<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-muted-fg/70">
+							{t`Trigger`}
+						</DropdownMenuLabel>
+						{triggerOptions.map((option) => (
+							<AdvancedOrderItem
+								key={option.value}
+								option={option}
+								isSelected={orderType === option.value}
+								onSelect={() => onOrderTypeChange(option.value)}
+							/>
+						))}
+						<DropdownMenuSeparator />
+					</>
+				)}
 				<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-muted-fg/70">
 					{t`Execution`}
 				</DropdownMenuLabel>
-				{EXECUTION_OPTIONS.map((option) => (
+				{executionOptions.map((option) => (
 					<AdvancedOrderItem
 						key={option.value}
 						option={option}

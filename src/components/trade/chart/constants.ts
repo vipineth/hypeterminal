@@ -21,10 +21,8 @@ import {
 	CHART_TIMEZONE,
 	CHART_WIDGET_DEFAULTS,
 } from "@/config/constants";
-import type { MarketInfo } from "@/lib/hyperliquid/types/markets";
-import type { MarketCtxNumbers } from "@/lib/market";
+import type { UnifiedMarketInfo } from "@/lib/hyperliquid";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
-import type { PerpAssetCtx, SpotAssetCtx } from "@/types/hyperliquid";
 
 export {
 	CHART_LIBRARY_PATH,
@@ -48,44 +46,43 @@ export {
 	CHART_DATAFEED_CONFIG,
 };
 
-export type MarketRow = MarketInfo & {
-	ctx: PerpAssetCtx | SpotAssetCtx | undefined;
-	ctxNumbers: MarketCtxNumbers | null;
-};
+export type MarketScope = "all" | "perp" | "spot" | "hip3";
+
+export type MarketRow = UnifiedMarketInfo;
 
 const columnHelper = createColumnHelper<MarketRow>();
 
 export const TOKEN_SELECTOR_COLUMNS = [
-	columnHelper.accessor("coin", {
+	columnHelper.accessor("displayName", {
 		header: t`Market`,
 		size: 160,
 		enableSorting: false,
 	}),
-	columnHelper.accessor((row) => row.ctxNumbers?.markPx ?? 0, {
+	columnHelper.accessor((row) => row.markPx ?? 0, {
 		id: "price",
 		header: t`Price`,
 		size: 80,
 		enableSorting: true,
 	}),
-	columnHelper.accessor((row) => calculate24hPriceChange(row.ctxNumbers) ?? 0, {
+	columnHelper.accessor((row) => calculate24hPriceChange(row.prevDayPx, row.markPx) ?? 0, {
 		id: "24h-change",
-		header: t`24h Price`,
+		header: t`24h Change`,
 		size: 80,
 		enableSorting: true,
 	}),
-	columnHelper.accessor((row) => calculateOpenInterestUSD(row.ctxNumbers) ?? 0, {
+	columnHelper.accessor((row) => calculateOpenInterestUSD(row.openInterest, row.markPx) ?? 0, {
 		id: "oi",
 		header: t`Open Interest`,
 		size: 80,
 		enableSorting: true,
 	}),
-	columnHelper.accessor((row) => row.ctxNumbers?.dayNtlVlm ?? 0, {
+	columnHelper.accessor((row) => row.dayNtlVlm ?? 0, {
 		id: "volume",
 		header: t`Volume`,
 		size: 80,
 		enableSorting: true,
 	}),
-	columnHelper.accessor((row) => row.ctxNumbers?.funding ?? 0, {
+	columnHelper.accessor((row) => row.funding ?? 0, {
 		id: "funding",
 		header: t`Funding`,
 		size: 80,

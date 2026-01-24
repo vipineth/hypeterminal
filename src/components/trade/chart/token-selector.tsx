@@ -1,43 +1,72 @@
 import { t } from "@lingui/core/macro";
 import { flexRender } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown, Flame, Search, Star } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatUSD } from "@/lib/format";
-import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
-import { getTokenIconUrl, isTokenInCategory, marketCategories } from "@/lib/tokens";
-import { QUOTE_ASSET } from "./constants";
+import { isTokenInCategory } from "@/lib/tokens";
+import { TokenAvatar } from "../components/token-avatar";
+import type { MarketRow, MarketScope } from "./constants";
 import { useTokenSelector } from "./use-token-selector";
 
+interface SelectedMarketProp {
+	name: string;
+	displayName: string;
+	kind: "perp" | "spot" | "builderPerp";
+}
+
 export type TokenSelectorProps = {
-	value: string;
+	selectedMarket: SelectedMarketProp | undefined;
 	onValueChange: (value: string) => void;
 };
 
-export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
+const marketScopes: { value: MarketScope; label: string }[] = [
+	{ value: "all", label: "All" },
+	{ value: "perp", label: "Perp" },
+	{ value: "spot", label: "Spot" },
+	{ value: "hip3", label: "HIP-3" },
+];
+
+function getSzDecimals(market: MarketRow): number {
+	if (market.kind === "spot") return market.tokensInfo[0]?.szDecimals ?? 4;
+	return market.szDecimals;
+}
+
+function getMaxLeverage(market: MarketRow): number | null {
+	if (market.kind === "spot") return null;
+	return market.maxLeverage ?? null;
+}
+
+function getDex(market: MarketRow): string | undefined {
+	if (market.kind === "builderPerp") return market.dex;
+	return undefined;
+}
+
+export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorProps) {
 	const {
 		open,
 		setOpen,
-		category,
+		scope,
+		subcategory,
+		subcategories,
 		search,
 		setSearch,
 		isLoading,
 		isFavorite,
 		sorting,
 		handleSelect,
-		handleCategorySelect,
+		handleSubcategorySelect,
+		handleScopeSelect,
 		toggleFavorite,
 		table,
 		rows,
 		virtualizer,
 		containerRef,
 		filteredMarkets,
-	} = useTokenSelector({ value, onValueChange });
+	} = useTokenSelector({ value: selectedMarket?.name ?? "", onValueChange });
 
 	const virtualItems = virtualizer.getVirtualItems();
 	const headerGroup = table.getHeaderGroups()[0];
@@ -53,17 +82,17 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 					aria-label={t`Select token`}
 					className="h-6 gap-1.5 text-xs font-semibold px-2"
 				>
-					<Avatar className="size-5 shrink-0">
-						<AvatarImage src={getTokenIconUrl(value)} alt={value} />
-						<AvatarFallback className="text-3xs bg-warning/20 text-warning">{value.slice(0, 2)}</AvatarFallback>
-					</Avatar>
-					<span className="text-warning truncate">{value}</span>
-					<span className="text-muted-fg hidden sm:inline">/{QUOTE_ASSET}</span>
+					<TokenAvatar
+						className="size-5 shrink-0"
+						symbol={selectedMarket?.displayName ?? ""}
+						kind={selectedMarket?.kind}
+					/>
+					<span className="text-warning truncate">{selectedMarket?.displayName ?? "Select"}</span>
 					<ChevronDown className="size-3 text-muted-fg shrink-0" />
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent
-				className="w-[calc(100vw-1rem)] sm:w-xl max-w-xl p-0 border-border/60 bg-surface"
+				className="w-[calc(100vw-1rem)] sm:w-2xl max-w-2xl p-0 border-border/60 bg-surface"
 				align="start"
 				sideOffset={8}
 			>
@@ -82,69 +111,88 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 
 					<div className="py-2 border-b border-border/40 bg-surface/50">
 						<div className="flex items-center gap-0.5 flex-wrap">
-							{marketCategories.map((cat) => {
-								const isSelected = category === cat.value;
+							{marketScopes.map((s) => {
+								const isSelected = scope === s.value;
 								return (
 									<Button
-										key={cat.value}
+										key={s.value}
 										variant="ghost"
 										size="none"
-										onClick={() => handleCategorySelect(cat.value)}
+										onClick={() => handleScopeSelect(s.value)}
 										className={cn(
-											"px-2 py-1 text-3xs uppercase tracking-wider gap-1 cursor-pointer",
+											"px-2 py-1 text-3xs uppercase tracking-wider cursor-pointer",
 											isSelected
-												? "bg-info/10 text-info hover:bg-info/10 hover:text-info"
+												? "bg-warning/10 text-warning hover:bg-warning/10 hover:text-warning"
 												: "text-muted-fg hover:bg-transparent",
 										)}
-										aria-label={t`Filter by ${cat.label}`}
-										aria-pressed={isSelected}
 									>
-										{cat.icon}
-										{cat.label}
+										{s.label}
 									</Button>
 								);
 							})}
 						</div>
+						{subcategories.length > 0 && (
+							<div className="flex items-center gap-0.5 flex-wrap mt-1.5 pt-1.5 pl-2 ml-1">
+								{subcategories.map((sub) => {
+									const isSelected = subcategory === sub.value;
+									return (
+										<Button
+											key={sub.value}
+											variant="ghost"
+											size="none"
+											onClick={() => handleSubcategorySelect(sub.value)}
+											className={cn(
+												"px-2 py-0.5 text-4xs tracking-wider cursor-pointer",
+												isSelected
+													? "bg-info/10 text-info hover:bg-info/10 hover:text-info"
+													: "text-muted-fg/80 hover:bg-transparent hover:text-muted-fg",
+											)}
+											aria-label={t`Filter by ${sub.label}`}
+											aria-pressed={isSelected}
+										>
+											{sub.label}
+										</Button>
+									);
+								})}
+							</div>
+						)}
 					</div>
-					<div className="flex items-center py-1.5 text-4xs uppercase tracking-wider text-muted-fg/70 border-b border-border/40 bg-surface/30">
-						{headerGroup?.headers.map((header) => {
-							if (header.id === "coin") {
+					<div className="flex items-center px-3 py-1.5 text-4xs uppercase tracking-wider text-muted-fg/70 border-b border-border/40 bg-surface/30">
+						<div className="flex-1 min-w-0">{t`Market`}</div>
+						{headerGroup?.headers
+							.filter((h) => h.id !== "displayName")
+							.map((header) => {
+								const sortState = header.column.getIsSorted();
+								const hiddenOnMobile = ["oi", "volume", "funding"].includes(header.id);
+								const hideForSpot = scope === "spot" && ["oi", "funding"].includes(header.id);
+
+								if (hideForSpot) return null;
+
 								return (
-									<div key={header.id} className="flex-1 min-w-0">
-										{flexRender(header.column.columnDef.header, header.getContext())}
-									</div>
-								);
-							}
-
-							const sortState = header.column.getIsSorted();
-
-							const hiddenOnMobile = ["openInterest", "dayNtlVlm", "funding"].includes(header.id);
-
-							return (
-								<Button
-									key={header.id}
-									variant="ghost"
-									size="none"
-									onClick={header.column.getToggleSortingHandler()}
-									className={cn(
-										"w-16 sm:w-20 justify-end gap-1 hover:text-fg hover:bg-transparent",
-										hiddenOnMobile && "hidden sm:flex",
-									)}
-									aria-label={t`Sort by ${String(header.column.columnDef.header ?? "")}`}
-								>
-									<span className="truncate">{flexRender(header.column.columnDef.header, header.getContext())}</span>
-									<span className="shrink-0">
-										{sortState === "asc" ? (
-											<ArrowUp className="size-2.5" />
-										) : sortState === "desc" ? (
-											<ArrowDown className="size-2.5" />
-										) : (
-											<ArrowUpDown className="size-2.5 opacity-40" />
+									<Button
+										key={header.id}
+										variant="ghost"
+										size="none"
+										onClick={header.column.getToggleSortingHandler()}
+										className={cn(
+											"w-16 sm:w-20 justify-end gap-1 hover:text-fg hover:bg-transparent",
+											hiddenOnMobile && "hidden sm:flex",
 										)}
-									</span>
-								</Button>
-							);
-						})}
+										aria-label={t`Sort by ${String(header.column.columnDef.header ?? "")}`}
+									>
+										<span className="truncate">{flexRender(header.column.columnDef.header, header.getContext())}</span>
+										<span className="shrink-0">
+											{sortState === "asc" ? (
+												<ArrowUp className="size-2.5" />
+											) : sortState === "desc" ? (
+												<ArrowDown className="size-2.5" />
+											) : (
+												<ArrowUpDown className="size-2.5 opacity-40" />
+											)}
+										</span>
+									</Button>
+								);
+							})}
 					</div>
 
 					<div ref={containerRef} className="h-72 overflow-auto">
@@ -165,26 +213,33 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 								{virtualItems.map((virtualItem) => {
 									const row = rows[virtualItem.index];
 									const market = row.original;
-									const fundingNum = market.ctxNumbers?.funding ?? 0;
-									const isFundingPositive = fundingNum >= 0;
-									const isSelected = value === market.coin;
-									const isFav = isFavorite(market.coin);
-									const changePct = calculate24hPriceChange(market.ctxNumbers);
-									const changeIsPositive = (changePct ?? 0) >= 0;
+									const isFundingPositive = (market.funding ?? 0) >= 0;
+									const isSelected = selectedMarket?.name === market.name;
+									const isFav = isFavorite(market.name);
+
+									const { markPx, prevDayPx } = market;
+									const changeDecimal =
+										markPx && prevDayPx && prevDayPx !== 0 ? (markPx - prevDayPx) / prevDayPx : null;
+									const changeIsPositive = (changeDecimal ?? 0) >= 0;
 									const changeClass = cn(
 										"text-2xs font-medium tabular-nums",
-										changePct === null ? "text-muted-fg" : changeIsPositive ? "text-positive" : "text-negative",
+										changeDecimal === null ? "text-muted-fg" : changeIsPositive ? "text-positive" : "text-negative",
 									);
-									const changeText = changePct === null ? FALLBACK_VALUE_PLACEHOLDER : formatPercent(changePct / 100);
+									const changeText = formatPercent(changeDecimal);
+
+									const isSpot = market.kind === "spot";
+									const isHip3 = market.kind === "builderPerp";
+
+									const oiValue = market.openInterest && market.markPx ? market.openInterest * market.markPx : null;
 
 									return (
 										<div
 											key={row.id}
 											data-index={virtualItem.index}
-											onClick={() => handleSelect(market.coin)}
+											onClick={() => handleSelect(market.name)}
 											onKeyDown={(e) => {
 												if (e.key === "Enter" || e.key === " ") {
-													handleSelect(market.coin);
+													handleSelect(market.name);
 												}
 											}}
 											role="option"
@@ -202,19 +257,16 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 											}}
 										>
 											<div className="flex-1 min-w-0 flex items-center gap-2">
-												<Avatar className="size-5 shrink-0">
-													<AvatarImage src={getTokenIconUrl(market.coin)} alt={market.coin} />
-													<AvatarFallback className="text-4xs bg-muted">{market.coin.slice(0, 2)}</AvatarFallback>
-												</Avatar>
+												<TokenAvatar className="size-5 shrink-0" symbol={market.displayName} kind={market.kind} />
 												<div className="min-w-0">
 													<div className="flex items-center gap-1">
-														<span className="font-semibold text-2xs">{market.coin}</span>
+														<span className="font-semibold text-2xs">{market.displayName}</span>
 														<Button
 															variant="ghost"
 															size="none"
 															onClick={(e) => {
 																e.stopPropagation();
-																toggleFavorite(market.coin);
+																toggleFavorite(market.name);
 															}}
 															className="hover:scale-110 hover:bg-transparent"
 															aria-label={isFav ? t`Remove from favorites` : t`Add to favorites`}
@@ -226,51 +278,61 @@ export function TokenSelector({ value, onValueChange }: TokenSelectorProps) {
 																)}
 															/>
 														</Button>
-														{isTokenInCategory(market.coin, "new") && (
+														{isTokenInCategory(market.displayName, "new") && (
 															<Badge variant="neutral" size="xs" className="px-1 py-0 text-4xs">
 																{t`NEW`}
 															</Badge>
 														)}
 													</div>
 													<div className="flex items-center gap-1.5 text-4xs text-muted-fg">
-														<span>{market.maxLeverage}x</span>
+														{getMaxLeverage(market) && <span>{getMaxLeverage(market)}x</span>}
+														{isSpot && <span className="text-info">Spot</span>}
+														{isHip3 && <span className="text-warning">{getDex(market)}</span>}
 													</div>
 												</div>
 											</div>
 											<div className="w-16 sm:w-20 text-right">
 												<span className="text-2xs font-medium tabular-nums">
-													{formatPrice(market.ctxNumbers?.markPx ?? null, { szDecimals: market.szDecimals })}
+													{formatPrice(market.markPx, { szDecimals: getSzDecimals(market) })}
 												</span>
 											</div>
 											<div className="w-16 sm:w-20 text-right">
 												<span className={changeClass}>{changeText}</span>
 											</div>
-											<div className="w-20 text-right hidden sm:block">
-												<span className="text-2xs font-medium tabular-nums">
-													{formatUSD(calculateOpenInterestUSD(market.ctxNumbers))}
-												</span>
-											</div>
-											<div className="w-20 text-right hidden sm:block">
-												<span className="text-2xs font-medium tabular-nums">
-													{formatUSD(market.ctxNumbers?.dayNtlVlm ?? null)}
-												</span>
-											</div>
-											<div className="w-20 text-right hidden sm:block">
-												<div className="flex items-center justify-end gap-1">
-													<Flame className={cn("size-2.5", isFundingPositive ? "text-positive" : "text-negative")} />
-													<span
-														className={cn(
-															"text-2xs tabular-nums font-medium",
-															isFundingPositive ? "text-positive" : "text-negative",
-														)}
-													>
-														{formatPercent(fundingNum, {
-															minimumFractionDigits: 4,
-															signDisplay: "exceptZero",
-														})}
-													</span>
+											{scope !== "spot" && (
+												<div className="w-16 sm:w-20 text-right hidden sm:block">
+													<span className="text-2xs font-medium tabular-nums">{formatUSD(oiValue)}</span>
 												</div>
+											)}
+											<div className="w-16 sm:w-20 text-right hidden sm:block">
+												<span className="text-2xs font-medium tabular-nums">{formatUSD(market.dayNtlVlm)}</span>
 											</div>
+											{scope !== "spot" && (
+												<div className="w-16 sm:w-20 text-right hidden sm:block">
+													<div className="flex items-center justify-end gap-1">
+														{market.funding !== null && (
+															<Flame
+																className={cn("size-2.5", isFundingPositive ? "text-positive" : "text-negative")}
+															/>
+														)}
+														<span
+															className={cn(
+																"text-2xs tabular-nums font-medium",
+																market.funding === null
+																	? "text-muted-fg"
+																	: isFundingPositive
+																		? "text-positive"
+																		: "text-negative",
+															)}
+														>
+															{formatPercent(market.funding, {
+																minimumFractionDigits: 4,
+																signDisplay: "exceptZero",
+															})}
+														</span>
+													</div>
+												</div>
+											)}
 										</div>
 									);
 								})}

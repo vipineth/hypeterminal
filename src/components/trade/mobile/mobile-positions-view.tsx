@@ -5,8 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { POSITIONS_TABS, UI_TEXT } from "@/config/constants";
+import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
-import { useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
+import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
 import { BalancesTab } from "../positions/balances-tab";
 import { FundingTab } from "../positions/funding-tab";
@@ -28,12 +29,7 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 	const [activeTab, setActiveTab] = useState<TabValue>("positions");
 
 	const { address, isConnected } = useConnection();
-	const { data: stateEvent, status: stateStatus } = useSubClearinghouseState(
-		{ user: address ?? "0x0" },
-		{ enabled: isConnected && !!address },
-	);
-	const state = stateEvent?.clearinghouseState;
-	const isLoadingState = stateStatus === "subscribing" || stateStatus === "idle";
+	const { perpPositions, isLoading: isLoadingState } = useAccountBalances();
 
 	const { data: ordersEvent, status: ordersStatus } = useSubOpenOrders(
 		{ user: address ?? "0x0" },
@@ -44,13 +40,12 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 
 	const positionsCount = useMemo(() => {
 		if (!isConnected) return 0;
-		const raw = state?.assetPositions ?? [];
-		return raw.reduce((count, entry) => {
+		return perpPositions.reduce((count, entry) => {
 			const size = parseNumber(entry.position.szi);
 			if (!Number.isFinite(size) || size === 0) return count;
 			return count + 1;
 		}, 0);
-	}, [isConnected, state?.assetPositions]);
+	}, [isConnected, perpPositions]);
 
 	const ordersCount = isConnected ? (openOrders?.length ?? 0) : 0;
 

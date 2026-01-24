@@ -1,15 +1,21 @@
 import { t } from "@lingui/core/macro";
-import { Wallet } from "lucide-react";
-import { useMemo } from "react";
+import { ArrowLeftRight, Send, Wallet } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
+import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken, formatUSD } from "@/lib/format";
-import { useSubClearinghouseState, useSubSpotState } from "@/lib/hyperliquid/hooks/subscription";
-import { parseNumberOrZero } from "@/lib/trade/numbers";
+import { useSpotTokens } from "@/lib/hyperliquid";
+import { type BalanceRow, filterBalanceRowsByUsdValue, getBalanceRows, getTotalUsdValue } from "@/domain/trade/balances";
+import { useGlobalSettingsActions, useHideSmallBalances } from "@/stores/use-global-settings-store";
 import { TokenAvatar } from "../components/token-avatar";
+import { SendDialog } from "./send-dialog";
+import { TransferDialog } from "./transfer-dialog";
 
 interface PlaceholderProps {
 	children: React.ReactNode;
@@ -29,80 +35,56 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 	);
 }
 
-interface BalanceRow {
-	asset: string;
-	type: "perp" | "spot";
-	available: number;
-	inOrder: number;
-	total: number;
-	usdValue: number;
-}
+type TransferDirection = "toSpot" | "toPerp";
+
+const SMALL_BALANCE_THRESHOLD = 1;
 
 export function BalancesTab() {
-	const { address, isConnected } = useConnection();
+	const { isConnected } = useConnection();
+	const { getDisplayName, getTransferDecimals } = useSpotTokens();
+	const hideSmallBalances = useHideSmallBalances();
+	const { setHideSmallBalances } = useGlobalSettingsActions();
+	const [transferState, setTransferState] = useState<{ open: boolean; direction: TransferDirection }>({
+		open: false,
+		direction: "toSpot",
+	});
+	const [sendState, setSendState] = useState<{
+		open: boolean;
+		asset: string;
+		accountType: "perp" | "spot";
+	}>({
+		open: false,
+		asset: "USDC",
+		accountType: "spot",
+	});
 
-	const { data: perpEvent, status: perpStatus } = useSubClearinghouseState(
-		{ user: address ?? "0x0" },
-		{ enabled: isConnected && !!address },
-	);
-	const perpData = perpEvent?.clearinghouseState;
+	const { perpSummary, spotBalances, isLoading, hasError } = useAccountBalances();
 
-	const { data: spotEvent, status: spotStatus } = useSubSpotState(
-		{ user: address ?? "0x0" },
-		{ enabled: isConnected && !!address },
-	);
-	const spotData = spotEvent?.spotState;
+	const balances = useMemo(() => getBalanceRows(perpSummary, spotBalances), [perpSummary, spotBalances]);
 
-	const balances = useMemo((): BalanceRow[] => {
-		const rows: BalanceRow[] = [];
+	const filteredBalances = useMemo(() => {
+		if (!hideSmallBalances) return balances;
+		return filterBalanceRowsByUsdValue(balances, SMALL_BALANCE_THRESHOLD);
+	}, [balances, hideSmallBalances]);
 
-		if (perpData?.crossMarginSummary) {
-			const summary = perpData.crossMarginSummary;
-			const accountValue = parseNumberOrZero(summary.accountValue);
-			const totalMarginUsed = parseNumberOrZero(summary.totalMarginUsed);
+	const totalValue = useMemo(() => getTotalUsdValue(balances), [balances]);
 
-			if (accountValue > 0) {
-				rows.push({
-					asset: "USDC",
-					type: "perp",
-					available: Math.max(0, accountValue - totalMarginUsed),
-					inOrder: totalMarginUsed,
-					total: accountValue,
-					usdValue: accountValue,
-				});
-			}
-		}
+	function handleTransferClick(row: BalanceRow) {
+		if (row.asset !== "USDC") return;
+		const direction: TransferDirection = row.type === "perp" ? "toSpot" : "toPerp";
+		setTransferState({
+			open: true,
+			direction,
+		});
+	}
 
-		if (spotData?.balances) {
-			for (const b of spotData.balances) {
-				const total = parseNumberOrZero(b.total);
-				const hold = parseNumberOrZero(b.hold);
-				const entryNtl = parseNumberOrZero(b.entryNtl);
-
-				if (total === 0) continue;
-
-				const available = Math.max(0, total - hold);
-				const usdValue = b.coin === "USDC" ? total : entryNtl;
-
-				rows.push({
-					asset: b.coin,
-					type: "spot",
-					available,
-					inOrder: hold,
-					total,
-					usdValue,
-				});
-			}
-		}
-
-		rows.sort((a, b) => b.usdValue - a.usdValue);
-		return rows;
-	}, [perpData, spotData]);
-
-	const totalValue = balances.reduce((acc, b) => acc + b.usdValue, 0);
-	const isLoading =
-		perpStatus === "subscribing" || spotStatus === "subscribing" || perpStatus === "idle" || spotStatus === "idle";
-	const hasError = perpStatus === "error" || spotStatus === "error";
+	function handleSendClick(row: BalanceRow) {
+		setSendState({
+			open: true,
+			asset: row.asset,
+			accountType: row.type,
+		});
+	}
 
 	function renderPlaceholder() {
 		if (!isConnected) return <Placeholder>{t`Connect your wallet to view balances.`}</Placeholder>;
@@ -120,43 +102,62 @@ export function BalancesTab() {
 			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
 				<Wallet className="size-3" />
 				{t`Account Balances`}
-				<span className="text-info ml-auto tabular-nums">
+				<label
+					htmlFor="hideSmallBalances"
+					className="ml-auto flex items-center gap-1.5 cursor-pointer text-4xs normal-case tracking-normal"
+				>
+					<Checkbox
+						checked={hideSmallBalances}
+						onCheckedChange={(checked) => setHideSmallBalances(Boolean(checked))}
+						className="size-3"
+					/>
+					{t`Hide small`}
+				</label>
+				<span className="text-positive tabular-nums">
 					{isConnected && !isLoading ? formatUSD(totalValue, { compact: true }) : FALLBACK_VALUE_PLACEHOLDER}
 				</span>
 			</div>
 			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-bg/50">
 				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
-						<Table>
+						<Table className="w-auto min-w-full">
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Asset`}</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7 w-[140px]">
+										{t`Asset`}
+									</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-[90px]">
 										{t`Available`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-[80px]">
 										{t`In Use`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-[90px]">
 										{t`Total`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-[90px]">
 										{t`USD Value`}
+									</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-[80px]">
+										{t`Actions`}
 									</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{balances.map((row) => {
-									const decimals = row.asset === "USDC" ? 2 : 5;
+								{filteredBalances.map((row) => {
+									const displayName = getDisplayName(row.asset);
+									const decimals = getTransferDecimals(row.asset);
+									const canTransfer = row.asset === "USDC" && parseFloat(row.available) > 0;
+									const transferLabel = row.type === "perp" ? t`To Spot` : t`To Perp`;
 									return (
 										<TableRow key={`${row.type}-${row.asset}`} className="border-border/40 hover:bg-accent/30">
 											<TableCell className="text-2xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">
-													<TokenAvatar symbol={row.asset} />
-													<span className="text-info">{row.asset}</span>
+													<TokenAvatar symbol={displayName} />
+													<span className="text-info">{displayName}</span>
 													<span
 														className={cn(
-															"text-4xs px-1 py-0.5 rounded-sm uppercase",
+															"text-4xs px-1 py-0.5 uppercase",
 															row.type === "perp" ? "bg-highlight/20 text-highlight" : "bg-warning/20 text-warning",
 														)}
 													>
@@ -176,6 +177,32 @@ export function BalancesTab() {
 											<TableCell className="text-2xs text-right tabular-nums text-positive py-1.5">
 												{formatUSD(row.usdValue, { compact: true })}
 											</TableCell>
+											<TableCell className="text-right py-1.5">
+												<div className="flex items-center justify-end gap-1">
+													{canTransfer && (
+														<Button
+															variant="ghost"
+															size="none"
+															onClick={() => handleTransferClick(row)}
+															className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
+														>
+															<ArrowLeftRight className="size-2.5" />
+															{transferLabel}
+														</Button>
+													)}
+													{parseFloat(row.available) > 0 && (
+														<Button
+															variant="ghost"
+															size="none"
+															onClick={() => handleSendClick(row)}
+															className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
+														>
+															<Send className="size-2.5" />
+															{t`Send`}
+														</Button>
+													)}
+												</div>
+											</TableCell>
 										</TableRow>
 									);
 								})}
@@ -185,6 +212,19 @@ export function BalancesTab() {
 					</ScrollArea>
 				)}
 			</div>
+
+			<TransferDialog
+				open={transferState.open}
+				onOpenChange={(open) => setTransferState((prev) => ({ ...prev, open }))}
+				initialDirection={transferState.direction}
+			/>
+
+			<SendDialog
+				open={sendState.open}
+				onOpenChange={(open) => setSendState((prev) => ({ ...prev, open }))}
+				initialAsset={sendState.asset}
+				initialAccountType={sendState.accountType}
+			/>
 		</div>
 	);
 }

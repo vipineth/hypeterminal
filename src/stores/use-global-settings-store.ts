@@ -15,6 +15,7 @@ import { createValidatedStorage } from "@/stores/validated-storage";
 
 const globalSettingsSchema = z.object({
 	state: z.object({
+		hideSmallBalances: z.boolean().optional(),
 		showOrdersOnChart: z.boolean().optional(),
 		showPositionsOnChart: z.boolean().optional(),
 		showExecutionsOnChart: z.boolean().optional(),
@@ -29,6 +30,7 @@ const globalSettingsSchema = z.object({
 const validatedStorage = createValidatedStorage(globalSettingsSchema, "global settings");
 
 const DEFAULT_GLOBAL_SETTINGS = {
+	hideSmallBalances: true,
 	showOrdersOnChart: true,
 	showPositionsOnChart: true,
 	showExecutionsOnChart: false,
@@ -40,6 +42,7 @@ const DEFAULT_GLOBAL_SETTINGS = {
 } as const;
 
 interface GlobalSettingsStore {
+	hideSmallBalances: boolean;
 	showOrdersOnChart: boolean;
 	showPositionsOnChart: boolean;
 	showExecutionsOnChart: boolean;
@@ -49,6 +52,7 @@ interface GlobalSettingsStore {
 	marketOrderSlippageBps: number;
 	marginMode: MarginMode;
 	actions: {
+		setHideSmallBalances: (next: boolean) => void;
 		setShowOrdersOnChart: (next: boolean) => void;
 		setShowPositionsOnChart: (next: boolean) => void;
 		setShowExecutionsOnChart: (next: boolean) => void;
@@ -65,6 +69,7 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 		(set, get) => ({
 			...DEFAULT_GLOBAL_SETTINGS,
 			actions: {
+				setHideSmallBalances: (next) => set({ hideSmallBalances: next }),
 				setShowOrdersOnChart: (next) => set({ showOrdersOnChart: next }),
 				setShowPositionsOnChart: (next) => set({ showPositionsOnChart: next }),
 				setShowExecutionsOnChart: (next) => set({ showExecutionsOnChart: next }),
@@ -83,6 +88,7 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 			name: STORAGE_KEYS.GLOBAL_SETTINGS,
 			storage: createJSONStorage(() => validatedStorage),
 			partialize: (state) => ({
+				hideSmallBalances: state.hideSmallBalances,
 				showOrdersOnChart: state.showOrdersOnChart,
 				showPositionsOnChart: state.showPositionsOnChart,
 				showExecutionsOnChart: state.showExecutionsOnChart,
@@ -113,6 +119,7 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 export function useGlobalSettings() {
 	return useGlobalSettingsStore(
 		useShallow((state) => ({
+			hideSmallBalances: state.hideSmallBalances,
 			showOrdersOnChart: state.showOrdersOnChart,
 			showPositionsOnChart: state.showPositionsOnChart,
 			showExecutionsOnChart: state.showExecutionsOnChart,
@@ -142,4 +149,8 @@ export function useResolvedFormatLocale(): string {
 
 export function getResolvedFormatLocale(): string {
 	return resolveNumberFormatLocale(useGlobalSettingsStore.getState().numberFormatLocale);
+}
+
+export function useHideSmallBalances() {
+	return useGlobalSettingsStore((state) => state.hideSmallBalances);
 }

@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { useRingBuffer } from "@/lib/circular-buffer";
 import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
-import { useSelectedResolvedMarket, useSubTrades } from "@/lib/hyperliquid";
+import { useSelectedMarketInfo, useSubTrades } from "@/lib/hyperliquid";
 import { getExplorerTxUrl } from "@/lib/hyperliquid/explorer";
+import { getBaseQuoteFromDisplayName } from "@/lib/market";
 import { getTradeKey, type ProcessedTrade, processTrades, type RawTrade } from "@/lib/trade/trades";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
 
@@ -45,13 +46,17 @@ const TradeRow = memo(function TradeRow({ trade, szDecimals, showInUsd }: Props)
 	);
 });
 
-const RESOLVED_MARKET_OPTIONS = { ctxMode: "none" } as const;
-
 export function TradesPanel() {
-	const { data: selectedMarket } = useSelectedResolvedMarket(RESOLVED_MARKET_OPTIONS);
-	const coin = selectedMarket.coin;
-	const params = useMemo(() => ({ coin }), [coin]);
-	const { data: tradesBatch, status, error } = useSubTrades(params);
+	const { data: selectedMarket } = useSelectedMarketInfo();
+	const subscriptionCoin = selectedMarket?.name ?? "";
+	const params = useMemo(() => ({ coin: subscriptionCoin }), [subscriptionCoin]);
+	const {
+		data: tradesBatch,
+		status,
+		error,
+	} = useSubTrades(params, {
+		enabled: !!selectedMarket && !!subscriptionCoin,
+	});
 	const { showOrderbookInUsd } = useGlobalSettings();
 	const { setShowOrderbookInUsd } = useGlobalSettingsActions();
 
@@ -69,8 +74,8 @@ export function TradesPanel() {
 	const lastCoinRef = useRef<string | undefined>(undefined);
 
 	useEffect(() => {
-		if (coin !== lastCoinRef.current) {
-			lastCoinRef.current = coin;
+		if (subscriptionCoin !== lastCoinRef.current) {
+			lastCoinRef.current = subscriptionCoin;
 			lastBatchRef.current = undefined;
 			clear();
 		}
@@ -78,9 +83,14 @@ export function TradesPanel() {
 			lastBatchRef.current = tradesBatch;
 			add(tradesBatch);
 		}
-	}, [coin, tradesBatch, add, clear]);
+	}, [subscriptionCoin, tradesBatch, add, clear]);
 
-	const szDecimals = selectedMarket.szDecimals;
+	const { baseToken, quoteToken } = useMemo(() => {
+		if (!selectedMarket) return { baseToken: "", quoteToken: "" };
+		return getBaseQuoteFromDisplayName(selectedMarket.displayName, selectedMarket.kind);
+	}, [selectedMarket]);
+
+	const szDecimals = selectedMarket?.szDecimals ?? 4;
 	const processed = useMemo(() => processTrades(trades), [trades]);
 	const toggleUsdDisplay = () => setShowOrderbookInUsd(!showOrderbookInUsd);
 
@@ -96,7 +106,7 @@ export function TradesPanel() {
 					className="text-right hover:text-fg hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
 				>
 					{t`Size`}
-					<span className="opacity-60">({showOrderbookInUsd ? "$" : selectedMarket.coin})</span>
+					<span className="opacity-60">({showOrderbookInUsd ? quoteToken : baseToken})</span>
 					<ArrowRightLeft className="size-2 opacity-40" />
 				</Button>
 			</div>

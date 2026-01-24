@@ -8,11 +8,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatNumber, formatPrice } from "@/lib/format";
-import { usePerpMarkets } from "@/lib/hyperliquid";
+import { useMarkets } from "@/lib/hyperliquid";
 import { useSubUserTwapHistory } from "@/lib/hyperliquid/hooks/subscription";
-import { makePerpMarketKey } from "@/lib/hyperliquid/market-key";
 import { calc, parseNumber } from "@/lib/trade/numbers";
-import { useMarketPrefsActions } from "@/stores/use-market-prefs-store";
+import { useMarketActions } from "@/stores/use-market-store";
 
 interface PlaceholderProps {
 	children: React.ReactNode;
@@ -34,14 +33,14 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 
 export function TwapTab() {
 	const { address, isConnected } = useConnection();
-	const { setSelectedMarketKey } = useMarketPrefsActions();
+	const { setSelectedMarket } = useMarketActions();
 	const {
 		data: twapEvent,
 		status,
 		error,
 	} = useSubUserTwapHistory({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
 	const data = twapEvent?.history;
-	const { getSzDecimals } = usePerpMarkets();
+	const { getSzDecimals } = useMarkets();
 
 	const orders = useMemo(() => {
 		const raw = data ?? [];
@@ -61,7 +60,6 @@ export function TwapTab() {
 			const totalSize = parseNumber(order.state.sz);
 			const executedSize = parseNumber(order.state.executedSz);
 			const avgPrice = calc.divide(order.state.executedNtl, order.state.executedSz);
-			const szDecimals = getSzDecimals(order.state.coin) ?? 4;
 			const progressPct = calc.percentOf(executedSize, totalSize) ?? 0;
 			const status = order.status.status;
 
@@ -75,7 +73,7 @@ export function TwapTab() {
 				totalSize,
 				executedSize,
 				avgPrice,
-				szDecimals,
+				szDecimals: getSzDecimals(order.state.coin) ?? 4,
 				progressPct: Math.max(0, Math.min(100, progressPct)),
 				status,
 				showCancel: status === "activated",
@@ -154,7 +152,7 @@ export function TwapTab() {
 													<Button
 														variant="link"
 														size="none"
-														onClick={() => setSelectedMarketKey(makePerpMarketKey(row.coin))}
+														onClick={() => setSelectedMarket(row.coin)}
 														aria-label={t`Switch to ${row.coin} market`}
 													>
 														{row.coin}
