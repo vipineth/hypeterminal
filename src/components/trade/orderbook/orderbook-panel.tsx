@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { ArrowRightLeft, ChevronDown } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -45,13 +45,15 @@ export function OrderbookPanel() {
 		{ enabled: !!selectedMarket?.name },
 	);
 
+	const deferredOrderbook = useDeferredValue(orderbook);
+
 	const { baseToken, quoteToken } = useMemo(() => {
 		if (!selectedMarket) return { baseToken: "", quoteToken: "" };
 		return getBaseQuoteFromDisplayName(selectedMarket.displayName, selectedMarket.kind);
 	}, [selectedMarket]);
 
-	const bids = useMemo(() => processLevels(orderbook?.levels[0], VISIBLE_ROWS), [orderbook?.levels]);
-	const asks = useMemo(() => processLevels(orderbook?.levels[1], VISIBLE_ROWS), [orderbook?.levels]);
+	const bids = useMemo(() => processLevels(deferredOrderbook?.levels[0], VISIBLE_ROWS), [deferredOrderbook?.levels]);
+	const asks = useMemo(() => processLevels(deferredOrderbook?.levels[1], VISIBLE_ROWS), [deferredOrderbook?.levels]);
 	const maxTotal = getMaxTotal(bids, asks);
 	const spreadInfo = getSpreadInfo(bids, asks);
 	const priceGroupingOptions = getPriceGroupingOptions(spreadInfo.mid);

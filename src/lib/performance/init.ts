@@ -1,3 +1,4 @@
+import { clearLeakData, enableLeakDetector, getLeakedComponents, reportLeaks } from "./leak-detector";
 import { analyzeMemoryTrend, logCurrentMemory, startMemoryMonitoring, takeMemorySnapshot } from "./memory";
 import { analyzeNetworkPerformance } from "./network";
 import { analyzeRenders } from "./render-tracker";
@@ -9,6 +10,12 @@ interface PerformanceAPI {
 	memory: () => unknown;
 	network: () => void;
 	snapshot: () => unknown;
+	leaks: {
+		enable: () => void;
+		report: () => void;
+		get: () => ReturnType<typeof getLeakedComponents>;
+		clear: () => void;
+	};
 }
 
 declare global {
@@ -32,9 +39,15 @@ export function initPerformanceMonitoring() {
 			memory: analyzeMemoryTrend,
 			network: analyzeNetworkPerformance,
 			snapshot: takeMemorySnapshot,
+			leaks: {
+				enable: enableLeakDetector,
+				report: reportLeaks,
+				get: getLeakedComponents,
+				clear: clearLeakData,
+			},
 		};
 		console.log(
-			"%c[Performance] Dev tools available: window.perf.vitals(), .renders(), .memory(), .network(), .snapshot()",
+			"%c[Performance] Dev tools available: window.perf.vitals(), .renders(), .memory(), .network(), .snapshot(), .leaks.enable()",
 			"color: #888; font-style: italic;",
 		);
 	}

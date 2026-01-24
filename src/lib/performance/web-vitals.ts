@@ -42,8 +42,9 @@ function logMetric(metric: Metric) {
 
 	console.log(`%c[Web Vitals] ${metric.name}: ${formattedValue} (${rating})`, `color: ${color}; font-weight: bold;`);
 
-	if (metric.attribution) {
-		console.log(`  Attribution:`, metric.attribution);
+	const attribution = (metric as Metric & { attribution?: unknown }).attribution;
+	if (attribution) {
+		console.log(`  Attribution:`, attribution);
 	}
 }
 
@@ -69,7 +70,7 @@ function createMetricHandler(callback?: VitalsCallback) {
 			rating,
 			delta: metric.delta,
 			id: metric.id,
-			attribution: metric.attribution,
+			attribution: (metric as Metric & { attribution?: unknown }).attribution,
 		};
 
 		collectedMetrics.push(data);
@@ -82,8 +83,25 @@ function createMetricHandler(callback?: VitalsCallback) {
 	};
 }
 
+export type VitalsReporter = (metrics: VitalsData[]) => void;
+
+let productionReporter: VitalsReporter | null = null;
+
+export function setProductionReporter(reporter: VitalsReporter) {
+	productionReporter = reporter;
+}
+
+function reportToProduction(data: VitalsData) {
+	if (productionReporter && !import.meta.env.DEV) {
+		productionReporter([data]);
+	}
+}
+
 export function initWebVitals(callback?: VitalsCallback) {
-	const handler = createMetricHandler(callback);
+	const handler = createMetricHandler((data) => {
+		callback?.(data);
+		reportToProduction(data);
+	});
 
 	onLCP(handler);
 	onINP(handler);

@@ -17,7 +17,7 @@ interface Props {
 
 export function WalletDialog({ open, onOpenChange }: Props) {
 	const connectors = useConnectors();
-	const { connect, isPending, error } = useConnect();
+	const { mutateAsync: connectAsync, isPending, error } = useConnect();
 	const [connectingId, setConnectingId] = useState<string | null>(null);
 	const [showHelp, setShowHelp] = useState(false);
 	const [lastUsedWallet] = useState(() => getLastUsedWallet());
@@ -55,18 +55,15 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 		return { popular, other, all: regularConnectors };
 	}, [regularConnectors, lastUsedWallet]);
 
-	const handleConnect = (connector: Connector) => {
+	const handleConnect = async (connector: Connector) => {
 		setConnectingId(connector.uid);
 		setLastUsedWallet(connector.id);
-		connect(
-			{ connector },
-			{
-				onSettled: () => {
-					setConnectingId(null);
-					onOpenChange(false);
-				},
-			},
-		);
+		try {
+			await connectAsync({ connector });
+			onOpenChange(false);
+		} finally {
+			setConnectingId(null);
+		}
 	};
 
 	const handleCustomAddressConnect = () => {

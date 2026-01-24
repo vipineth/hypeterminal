@@ -81,8 +81,8 @@ const processed = useMemo(() => heavyProcess(deferredData), [deferredData]);
 **Use for:** Orderbook updates, search results, large lists
 
 **Implementation targets:**
-- [ ] `positions-panel.tsx` - Tab switching
-- [ ] `orderbook-panel.tsx` - Orderbook updates
+- [x] `positions-panel.tsx` - Tab switching
+- [x] `orderbook-panel.tsx` - Orderbook updates
 - [ ] `token-selector.tsx` - Search filtering
 
 📖 [Full documentation](./concurrent-rendering.md)
@@ -127,8 +127,8 @@ function createBatchedUpdater<T>(flush: (items: T[]) => void) {
 - ✅ useSyncExternalStore for concurrent mode
 
 **Implementation targets:**
-- [ ] Create `src/lib/websocket/batch-updater.ts`
-- [ ] Integrate with `src/lib/hyperliquid/store.ts`
+- [x] Create `src/lib/websocket/batch-updater.ts`
+- [x] Integrate with `src/lib/hyperliquid/hooks/utils/useSub.ts`
 
 📖 [Full documentation](./websocket-optimization.md)
 
@@ -167,10 +167,10 @@ useEffect(() => {
 ```
 
 **Audit checklist:**
-- [ ] useEffect cleanup functions
-- [ ] Event listener removal
-- [ ] Timer cleanup
-- [ ] WebSocket unsubscribe
+- [x] useEffect cleanup functions (verified in order-entry, chart components)
+- [x] Event listener removal (no leaks found)
+- [x] Timer cleanup (order-toast, leverage components all have cleanup)
+- [x] WebSocket unsubscribe (useSub.ts has proper cleanup)
 
 📖 [Full documentation](./memory-management.md)
 
@@ -212,11 +212,30 @@ export async function getWalletConnectConnector() {
 In development, access performance tools via `window.perf`:
 
 ```javascript
-window.perf.vitals()    // Core Web Vitals summary
-window.perf.renders()   // Component render analysis
-window.perf.memory()    // Memory trend analysis
-window.perf.network()   // Network & WebSocket metrics
-window.perf.snapshot()  // Take memory snapshot
+window.perf.vitals()        // Core Web Vitals summary
+window.perf.renders()       // Component render analysis
+window.perf.memory()        // Memory trend analysis
+window.perf.network()       // Network & WebSocket metrics
+window.perf.snapshot()      // Take memory snapshot
+
+// Leak detection
+window.perf.leaks.enable()  // Start tracking component mounts/unmounts
+window.perf.leaks.report()  // Show components that mounted but never unmounted
+window.perf.leaks.get()     // Get leak data programmatically
+window.perf.leaks.clear()   // Reset tracking data
+```
+
+### Production Monitoring
+
+Web Vitals are collected in production. To send to analytics:
+
+```typescript
+import { setProductionReporter } from "@/lib/performance/web-vitals";
+
+setProductionReporter((metrics) => {
+  // Send to your analytics service
+  analytics.track("web-vitals", metrics);
+});
 ```
 
 ### Bundle Analysis
@@ -243,18 +262,18 @@ pnpm perf:compare
 
 ### Phase 1: Quick Wins (Low effort, high impact)
 1. ✅ Code splitting with `lazyRouteComponent`
-2. [ ] `useTransition` for tab switching
-3. [ ] `useDeferredValue` for orderbook
+2. ✅ `useTransition` for tab switching
+3. ✅ `useDeferredValue` for orderbook
 
 ### Phase 2: Medium Effort
-4. [ ] Lazy load WalletConnect (~50KB savings)
-5. [ ] rAF message batching for WebSocket
-6. [ ] `useTransition` for token search
+4. 📋 Lazy load WalletConnect (~50KB savings) - requires wagmi config changes
+5. ✅ rAF message batching for WebSocket
+6. ✅ `useTransition` for token search
 
 ### Phase 3: Ongoing
-7. [ ] Memory leak auditing
-8. [ ] Performance monitoring in production
-9. [ ] React Performance Tracks profiling
+7. ✅ Memory leak auditing tools (`window.perf.leaks`)
+8. ✅ Performance monitoring in production (`setProductionReporter`)
+9. 📋 React Performance Tracks profiling (use Chrome DevTools)
 
 ---
 
