@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { ArrowLeftRight, Wallet } from "lucide-react";
+import { ArrowLeftRight, Send, Wallet } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -11,9 +11,10 @@ import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken, formatUSD } from "@/lib/format";
 import { useSpotTokens } from "@/lib/hyperliquid";
-import { type BalanceRow, filterBalanceRowsByUsdValue, getBalanceRows, getTotalUsdValue } from "@/lib/trade/balances";
+import { type BalanceRow, filterBalanceRowsByUsdValue, getBalanceRows, getTotalUsdValue } from "@/domain/trade/balances";
 import { useGlobalSettingsActions, useHideSmallBalances } from "@/stores/use-global-settings-store";
 import { TokenAvatar } from "../components/token-avatar";
+import { SendDialog } from "./send-dialog";
 import { TransferDialog } from "./transfer-dialog";
 
 interface PlaceholderProps {
@@ -40,12 +41,21 @@ const SMALL_BALANCE_THRESHOLD = 1;
 
 export function BalancesTab() {
 	const { isConnected } = useConnection();
-	const { getDisplayName, getDecimals } = useSpotTokens();
+	const { getDisplayName, getTransferDecimals } = useSpotTokens();
 	const hideSmallBalances = useHideSmallBalances();
 	const { setHideSmallBalances } = useGlobalSettingsActions();
 	const [transferState, setTransferState] = useState<{ open: boolean; direction: TransferDirection }>({
 		open: false,
 		direction: "toSpot",
+	});
+	const [sendState, setSendState] = useState<{
+		open: boolean;
+		asset: string;
+		accountType: "perp" | "spot";
+	}>({
+		open: false,
+		asset: "USDC",
+		accountType: "spot",
 	});
 
 	const { perpSummary, spotBalances, isLoading, hasError } = useAccountBalances();
@@ -65,6 +75,14 @@ export function BalancesTab() {
 		setTransferState({
 			open: true,
 			direction,
+		});
+	}
+
+	function handleSendClick(row: BalanceRow) {
+		setSendState({
+			open: true,
+			asset: row.asset,
+			accountType: row.type,
 		});
 	}
 
@@ -128,7 +146,7 @@ export function BalancesTab() {
 							<TableBody>
 								{filteredBalances.map((row) => {
 									const displayName = getDisplayName(row.asset);
-									const decimals = getDecimals(row.asset);
+									const decimals = getTransferDecimals(row.asset);
 									const canTransfer = row.asset === "USDC" && parseFloat(row.available) > 0;
 									const transferLabel = row.type === "perp" ? t`To Spot` : t`To Perp`;
 									return (
@@ -160,17 +178,30 @@ export function BalancesTab() {
 												{formatUSD(row.usdValue, { compact: true })}
 											</TableCell>
 											<TableCell className="text-right py-1.5">
-												{canTransfer && (
-													<Button
-														variant="ghost"
-														size="none"
-														onClick={() => handleTransferClick(row)}
-														className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
-													>
-														<ArrowLeftRight className="size-2.5" />
-														{transferLabel}
-													</Button>
-												)}
+												<div className="flex items-center justify-end gap-1">
+													{canTransfer && (
+														<Button
+															variant="ghost"
+															size="none"
+															onClick={() => handleTransferClick(row)}
+															className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
+														>
+															<ArrowLeftRight className="size-2.5" />
+															{transferLabel}
+														</Button>
+													)}
+													{parseFloat(row.available) > 0 && (
+														<Button
+															variant="ghost"
+															size="none"
+															onClick={() => handleSendClick(row)}
+															className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
+														>
+															<Send className="size-2.5" />
+															{t`Send`}
+														</Button>
+													)}
+												</div>
 											</TableCell>
 										</TableRow>
 									);
@@ -185,7 +216,14 @@ export function BalancesTab() {
 			<TransferDialog
 				open={transferState.open}
 				onOpenChange={(open) => setTransferState((prev) => ({ ...prev, open }))}
-				direction={transferState.direction}
+				initialDirection={transferState.direction}
+			/>
+
+			<SendDialog
+				open={sendState.open}
+				onOpenChange={(open) => setSendState((prev) => ({ ...prev, open }))}
+				initialAsset={sendState.asset}
+				initialAccountType={sendState.accountType}
 			/>
 		</div>
 	);

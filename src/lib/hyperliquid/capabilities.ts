@@ -27,13 +27,13 @@ function checkOnlyIsolated(market: PerpMarket | BuilderPerpMarket): boolean {
 export function getMarketCapabilities(market: UnifiedMarket | null | undefined): MarketCapabilities {
 	if (!market) {
 		return {
-			isLeveraged: true,
-			hasMarginMode: true,
-			hasFunding: true,
-			hasTpSl: true,
-			hasReduceOnly: true,
-			maxLeverage: 50,
-			allowsCrossMargin: true,
+			isLeveraged: false,
+			hasMarginMode: false,
+			hasFunding: false,
+			hasTpSl: false,
+			hasReduceOnly: false,
+			maxLeverage: 1,
+			allowsCrossMargin: false,
 			isOnlyIsolated: false,
 			isCanonical: null,
 		};

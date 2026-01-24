@@ -1,4 +1,4 @@
-import type { SpotBalanceData } from "@/lib/trade/balances";
+import type { SpotBalanceData } from "@/domain/trade/balances";
 import { calc, floorToDecimals, formatDecimalFloor, parseNumberOrZero } from "@/lib/trade/numbers";
 import type { Side } from "@/lib/trade/types";
 
@@ -70,7 +70,8 @@ export function getMaxSizeForOrderEntry(input: OrderEntryMaxSizeInput): number {
 	if (input.isSpotMarket) {
 		if (input.side === "buy") {
 			if (input.price <= 0 || input.spotBalance.quoteAvailable <= 0) return 0;
-			const size = input.spotBalance.quoteAvailable / input.price;
+			const size = calc.divide(input.spotBalance.quoteAvailable, input.price);
+			if (size === null || !Number.isFinite(size)) return 0;
 			const floored = floorToDecimals(size, input.szDecimals);
 			return Number.isFinite(floored) ? floored : 0;
 		}
@@ -105,7 +106,9 @@ export function getSizeValueFromInput(input: SizeValueInput): number {
 
 	if (input.sizeMode === "usd") {
 		if (input.price <= 0) return 0;
-		const converted = floorToDecimals(inputValue / input.price, input.szDecimals);
+		const convertedValue = calc.divide(inputValue, input.price);
+		if (convertedValue === null || !Number.isFinite(convertedValue)) return 0;
+		const converted = floorToDecimals(convertedValue, input.szDecimals);
 		return Number.isFinite(converted) ? converted : 0;
 	}
 

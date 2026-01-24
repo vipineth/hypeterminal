@@ -34,11 +34,28 @@ export function useSpotTokens() {
 		[tokenMap],
 	);
 
-	const getDecimals = useCallback(
+	/**
+	 * Returns the EVM-compatible decimal precision for transfers.
+	 *
+	 * USE THIS FOR: Token transfers (sendAsset, spotSend), balance input validation
+	 * DO NOT USE FOR: Order sizing (use market.szDecimals), price formatting (use szDecimalsToPriceDecimals)
+	 *
+	 * HyperCore uses `weiDecimals` internally, but when transferring to/from HyperEVM,
+	 * the precision must match the linked ERC20 contract. The formula is:
+	 *
+	 *   EVM decimals = weiDecimals + evm_extra_wei_decimals
+	 *
+	 * Example: USDC has weiDecimals=8 on Core, but standard USDC is 6 decimals on EVM,
+	 * so evm_extra_wei_decimals=-2, giving: 8 + (-2) = 6
+	 *
+	 * @see https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/hyperevm/hypercore-less-than-greater-than-hyperevm-transfers
+	 * @see https://hyperliquid.gitbook.io/hyperliquid-docs/hyperliquid-improvement-proposals-hips/hip-1-native-token-standard
+	 */
+	const getTransferDecimals = useCallback(
 		(coin: string): number => {
 			const token = tokenMap.get(coin);
 			if (!token) return 2;
-			return token.szDecimals - (token.evmContract?.evm_extra_wei_decimals ?? 0);
+			return token.weiDecimals + (token.evmContract?.evm_extra_wei_decimals ?? 0);
 		},
 		[tokenMap],
 	);
@@ -67,7 +84,7 @@ export function useSpotTokens() {
 		error,
 		getToken,
 		getDisplayName,
-		getDecimals,
+		getTransferDecimals,
 		getIconUrl,
 		isWrapped,
 	};

@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { isPositive, toNumber } from "@/lib/trade/numbers";
-import { formatPriceForOrder, formatSizeForOrder, throwIfAnyResponseError } from "@/lib/trade/orders";
+import { formatPriceForOrder, formatSizeForOrder, throwIfAnyResponseError } from "@/domain/trade/orders";
 import { validateSlPrice, validateTpPrice } from "@/lib/trade/tpsl";
 import { TokenAvatar } from "../components/token-avatar";
 import { TradingActionButton } from "../components/trading-action-button";

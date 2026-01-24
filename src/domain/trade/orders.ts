@@ -1,6 +1,6 @@
 import { SCALE_LEVELS_MAX, SCALE_LEVELS_MIN } from "@/config/constants";
 import { clampInt, formatDecimalFloor, isPositive, parseNumberOrZero } from "@/lib/trade/numbers";
-import { getExecutedPrice } from "@/lib/trade/order-entry/price";
+import { getExecutedPrice } from "@/domain/trade/order-entry/price";
 import type { ExchangeOrder, LimitTif, OrderType } from "@/lib/trade/order-types";
 import type { Side } from "@/lib/trade/types";
 

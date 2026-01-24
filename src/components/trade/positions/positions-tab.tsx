@@ -13,7 +13,7 @@ import { useMarkets } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useSubAssetCtxs, useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { calc, isPositive, parseNumber } from "@/lib/trade/numbers";
-import { formatPriceForOrder, formatSizeForOrder } from "@/lib/trade/orders";
+import { formatPriceForOrder, formatSizeForOrder } from "@/domain/trade/orders";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useMarketActions } from "@/stores/use-market-store";
 import type { PerpAssetCtxs } from "@/types/hyperliquid";

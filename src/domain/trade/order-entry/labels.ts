@@ -1,4 +1,4 @@
-import type { SpotBalanceData } from "@/lib/trade/balances";
+import type { SpotBalanceData } from "@/domain/trade/balances";
 import type { Side } from "@/lib/trade/types";
 
 export interface SideLabels {

@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from "react";
 import { useConnection } from "wagmi";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
-import { deriveOrderEntry, type OrderEntryDerived } from "@/lib/trade/order-entry/derive";
-import { getSizeForPercent as getSizeForPercentCalc, getSizeValueForModeToggle } from "@/lib/trade/order-entry/size";
+import { deriveOrderEntry, type OrderEntryDerived } from "@/domain/trade/order-entry/derive";
+import { getSizeForPercent as getSizeForPercentCalc, getSizeValueForModeToggle } from "@/domain/trade/order-entry/size";
 import type { Side } from "@/lib/trade/types";
 import { useAccountBalances } from "./use-account-balances";
 import { useAssetLeverage } from "./use-asset-leverage";

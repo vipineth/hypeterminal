@@ -8,9 +8,9 @@ import {
 	type PerpSummaryLike,
 	type SpotBalanceData,
 	type SpotBalanceLike,
-} from "@/lib/trade/balances";
-import { getSideLabels, getSizeModeLabel, type SideLabels } from "@/lib/trade/order-entry/labels";
-import { getMaxSizeForOrderEntry, getOrderValue, getSizeValueFromInput } from "@/lib/trade/order-entry/size";
+} from "@/domain/trade/balances";
+import { getSideLabels, getSizeModeLabel, type SideLabels } from "@/domain/trade/order-entry/labels";
+import { getMaxSizeForOrderEntry, getOrderValue, getSizeValueFromInput } from "@/domain/trade/order-entry/size";
 import type { Side } from "@/lib/trade/types";
 
 export interface OrderEntryInputs {

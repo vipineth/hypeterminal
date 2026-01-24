@@ -26,9 +26,9 @@ import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchan
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import type { MarginMode } from "@/lib/trade/margin-mode";
 import { clampInt, formatDecimalFloor, isPositive, parseNumberOrZero, toFixed, toNumber } from "@/lib/trade/numbers";
-import { getLiquidationInfo, getOrderMetrics } from "@/lib/trade/order-entry/metrics";
-import { getOrderPrice } from "@/lib/trade/order-entry/price";
-import { getSliderValue } from "@/lib/trade/order-entry/size";
+import { getLiquidationInfo, getOrderMetrics } from "@/domain/trade/order-entry/metrics";
+import { getOrderPrice } from "@/domain/trade/order-entry/price";
+import { getSliderValue } from "@/domain/trade/order-entry/size";
 import {
 	canUseTpSl as canUseTpSlForOrder,
 	getTabsOrderType,
@@ -42,7 +42,7 @@ import {
 	usesLimitPrice as usesLimitPriceForOrder,
 	usesTriggerPrice as usesTriggerPriceForOrder,
 } from "@/lib/trade/order-types";
-import { buildOrders, formatSizeForOrder, throwIfResponseError } from "@/lib/trade/orders";
+import { buildOrders, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import type { ActiveDialog, ButtonContent } from "@/lib/trade/types";
 import { useButtonContent } from "@/lib/trade/use-button-content";
 import { useOrderValidation } from "@/lib/trade/use-order-validation";

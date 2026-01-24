@@ -1,16 +1,17 @@
 import { t } from "@lingui/core/macro";
 import Big from "big.js";
-import { ArrowRight, Loader2 } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { ArrowLeftRight, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NumberInput } from "@/components/ui/number-input";
+import { getAvailableFromTotals, getPerpAvailable } from "@/domain/trade/balances";
 import { getSpotBalance, useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken } from "@/lib/format";
+import { useSpotTokens } from "@/lib/hyperliquid";
 import { useExchangeSendAsset } from "@/lib/hyperliquid/hooks/exchange";
-import { getAvailableFromTotals, getPerpAvailable } from "@/lib/trade/balances";
 import { floorToString, limitDecimalInput } from "@/lib/trade/numbers";
 
 type TransferDirection = "toSpot" | "toPerp";
@@ -18,41 +19,59 @@ type TransferDirection = "toSpot" | "toPerp";
 interface Props {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	direction: TransferDirection;
+	initialDirection?: TransferDirection;
 }
 
-const USDC_TOKEN = "USDC:0x6d1e7cde53ba9467b783cb7c530ce054";
-const USDC_DECIMALS = 6;
-
-export function TransferDialog({ open, onOpenChange, direction }: Props) {
+export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot" }: Props) {
+	const [direction, setDirection] = useState<TransferDirection>(initialDirection);
 	const [amount, setAmount] = useState("");
 	const [error, setError] = useState<string | null>(null);
 
 	const { address } = useConnection();
+	const { getToken, getTransferDecimals } = useSpotTokens();
 	const { mutateAsync: sendAsset, isPending } = useExchangeSendAsset();
 	const { perpSummary, spotBalances } = useAccountBalances();
 
-	const spotUsdc = useMemo(() => getSpotBalance(spotBalances, "USDC"), [spotBalances]);
+	useEffect(() => {
+		if (open) {
+			setDirection(initialDirection);
+		}
+	}, [open, initialDirection]);
+
+	const usdcTokenInfo = useMemo(() => getToken("USDC"), [getToken]);
+	const usdcTokenId = useMemo(() => {
+		if (!usdcTokenInfo) return "";
+		const tokenId = usdcTokenInfo.tokenId;
+		return `${usdcTokenInfo.name}:${tokenId}`;
+	}, [usdcTokenInfo]);
+
+	const usdcDecimals = useMemo(() => getTransferDecimals("USDC"), [getTransferDecimals]);
+
+	const spotUsdcBal = useMemo(() => getSpotBalance(spotBalances, "USDC"), [spotBalances]);
 	const availableBalanceValue = useMemo(() => {
 		if (direction === "toSpot") {
 			return getPerpAvailable(perpSummary?.accountValue, perpSummary?.totalMarginUsed);
 		}
 
-		return getAvailableFromTotals(spotUsdc?.total, spotUsdc?.hold);
-	}, [direction, perpSummary, spotUsdc]);
+		return getAvailableFromTotals(spotUsdcBal?.total, spotUsdcBal?.hold);
+	}, [direction, perpSummary, spotUsdcBal]);
 
 	const availableBalance = useMemo(
-		() => floorToString(availableBalanceValue, USDC_DECIMALS),
-		[availableBalanceValue],
+		() => floorToString(availableBalanceValue, usdcDecimals),
+		[availableBalanceValue, usdcDecimals],
 	);
 
 	const amountBig = amount ? Big(amount) : Big(0);
 	const availableBig = Big(availableBalanceValue);
-	const isValidAmount = amountBig.gt(0) && amountBig.lte(availableBig) && !!address;
+	const isValidAmount = amountBig.gt(0) && amountBig.lte(availableBig) && !!address && !!usdcTokenId;
 
 	const fromLabel = direction === "toSpot" ? t`Perp` : t`Spot`;
 	const toLabel = direction === "toSpot" ? t`Spot` : t`Perp`;
-	const title = direction === "toSpot" ? t`Transfer to Spot` : t`Transfer to Perp`;
+
+	function handleFlip() {
+		setDirection((prev) => (prev === "toSpot" ? "toPerp" : "toSpot"));
+		setAmount("");
+	}
 
 	const handleTransfer = useCallback(async () => {
 		if (!isValidAmount || isPending || !address) return;
@@ -63,7 +82,7 @@ export function TransferDialog({ open, onOpenChange, direction }: Props) {
 				destination: address,
 				sourceDex: direction === "toSpot" ? "" : "spot",
 				destinationDex: direction === "toSpot" ? "spot" : "",
-				token: USDC_TOKEN,
+				token: usdcTokenId,
 				amount: amount,
 			});
 			setAmount("");
@@ -72,14 +91,14 @@ export function TransferDialog({ open, onOpenChange, direction }: Props) {
 			const message = err instanceof Error ? err.message : t`Transfer failed`;
 			setError(message);
 		}
-	}, [address, amount, direction, isValidAmount, isPending, onOpenChange, sendAsset]);
+	}, [address, amount, direction, isValidAmount, isPending, onOpenChange, sendAsset, usdcTokenId]);
 
 	function handleAmountChange(value: string) {
-		setAmount(limitDecimalInput(value, USDC_DECIMALS));
+		setAmount(limitDecimalInput(value, usdcDecimals));
 	}
 
 	function handleMaxClick() {
-		setAmount(floorToString(availableBalanceValue, USDC_DECIMALS));
+		setAmount(floorToString(availableBalanceValue, usdcDecimals));
 	}
 
 	function handleOpenChange(newOpen: boolean) {
@@ -94,7 +113,10 @@ export function TransferDialog({ open, onOpenChange, direction }: Props) {
 		<Dialog open={open} onOpenChange={handleOpenChange}>
 			<DialogContent className="max-w-sm">
 				<DialogHeader>
-					<DialogTitle className="text-sm font-medium">{title}</DialogTitle>
+					<DialogTitle className="text-sm font-medium">{t`Transfer USDC`}</DialogTitle>
+					<DialogDescription className="text-3xs text-muted-fg">
+						{t`Move USDC between your Perp and Spot accounts.`}
+					</DialogDescription>
 				</DialogHeader>
 
 				<div className="space-y-4">
@@ -109,7 +131,13 @@ export function TransferDialog({ open, onOpenChange, direction }: Props) {
 								{fromLabel}
 							</span>
 						</div>
-						<ArrowRight className="size-4 text-muted-fg" />
+						<button
+							type="button"
+							onClick={handleFlip}
+							className="p-1.5 rounded-sm hover:bg-accent/50 transition-colors text-muted-fg hover:text-info"
+						>
+							<ArrowLeftRight className="size-4" />
+						</button>
 						<div className="flex flex-col items-center">
 							<span
 								className={cn(

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatPriceForOrder, formatSizeForOrder, getDefaultLeverage } from "@/lib/trade/orders";
+import { formatPriceForOrder, formatSizeForOrder, getDefaultLeverage } from "@/domain/trade/orders";
 
 describe("orders", () => {
 	it("chooses smart leverage defaults", () => {
