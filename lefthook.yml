@@ -1,5 +1,9 @@
 # Pre-commit hooks
-# Translation extraction/compilation handled by CI and build process
+pre-commit:
+  commands:
+    lingui-extract:
+      glob: "src/**/*.{ts,tsx}"
+      run: pnpm i18n:extract && git add src/locales/**/*.po
 
 # Commit message validation
 commit-msg:
