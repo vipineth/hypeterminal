@@ -1,6 +1,8 @@
+type RenderPhase = "mount" | "update" | "nested-update";
+
 type RenderEntry = {
 	componentName: string;
-	phase: "mount" | "update";
+	phase: RenderPhase;
 	actualDuration: number;
 	baseDuration: number;
 	startTime: number;
@@ -12,7 +14,7 @@ const SLOW_RENDER_THRESHOLD_MS = 16; // ~60fps
 
 export function logRender(
 	id: string,
-	phase: "mount" | "update",
+	phase: RenderPhase,
 	actualDuration: number,
 	baseDuration: number,
 	startTime: number,
@@ -61,7 +63,7 @@ export function analyzeRenders() {
 			if (entry.phase === "mount") {
 				acc[entry.componentName].mounts++;
 			} else {
-				acc[entry.componentName].updates++;
+				acc[entry.componentName].updates++; // includes "update" and "nested-update"
 			}
 			return acc;
 		},

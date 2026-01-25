@@ -103,7 +103,7 @@ export function analyzeMemoryTrend() {
 		growthPerMinute,
 		durationMinutes,
 		snapshotCount: memorySnapshots.length,
-		potentialLeak: growthPerMinute > 1024 * 1024, // >1MB/min is suspicious
+		potentialLeak: growthPerMinute > 5 * 1024 * 1024, // >5MB/min is suspicious for real-time apps
 	};
 
 	if (import.meta.env.DEV) {
