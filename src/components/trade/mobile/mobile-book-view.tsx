@@ -71,8 +71,8 @@ interface MobileBookViewProps {
 export function MobileBookView({ className }: MobileBookViewProps) {
 	const [view, setView] = useState<View>("book");
 	const [selectedOption, setSelectedOption] = useState<PriceGroupOption | null>(null);
-	const { showOrderbookInUsd } = useGlobalSettings();
-	const { setShowOrderbookInUsd } = useGlobalSettingsActions();
+	const { showOrderbookInQuote } = useGlobalSettings();
+	const { setShowOrderbookInQuote } = useGlobalSettingsActions();
 
 	const { data: selectedMarket } = useSelectedMarketInfo();
 	const name = selectedMarket?.name ?? "";
@@ -186,7 +186,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 						<Button
 							variant="ghost"
 							size="none"
-							onClick={() => setShowOrderbookInUsd(!showOrderbookInUsd)}
+							onClick={() => setShowOrderbookInQuote(!showOrderbookInQuote)}
 							className={cn(
 								"px-2 py-1.5 text-xs border border-border/60 rounded",
 								"min-h-[36px] flex items-center gap-1",
@@ -195,7 +195,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 							)}
 							aria-label="Toggle display units"
 						>
-							{showOrderbookInUsd ? quoteToken : baseToken}
+							{showOrderbookInQuote ? quoteToken : baseToken}
 							<ArrowRightLeft className="size-3" />
 						</Button>
 
@@ -261,7 +261,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 											level={level}
 											side="ask"
 											maxTotal={maxTotal}
-											showInUsd={showOrderbookInUsd}
+											showInQuote={showOrderbookInQuote}
 											szDecimals={szDecimals}
 										/>
 									))}
@@ -296,15 +296,15 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 							<div className="flex-1 flex flex-col gap-px py-1 overflow-hidden">
 								{bids.slice(0, 12).map((level, index) => (
 									<OrderbookRow
-										key={`bid-${level.price}-${index}`}
-										level={level}
-										side="bid"
-										maxTotal={maxTotal}
-										showInUsd={showOrderbookInUsd}
-										szDecimals={szDecimals}
-									/>
-								))}
-							</div>
+									key={`bid-${level.price}-${index}`}
+									level={level}
+									side="bid"
+									maxTotal={maxTotal}
+									showInQuote={showOrderbookInQuote}
+									szDecimals={szDecimals}
+								/>
+							))}
+						</div>
 						) : null}
 					</div>
 

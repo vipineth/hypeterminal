@@ -18,11 +18,11 @@ const compare = (a: RawTrade, b: RawTrade) => b.time - a.time;
 interface Props {
 	trade: ProcessedTrade;
 	szDecimals: number;
-	showInUsd: boolean;
+	showInQuote: boolean;
 }
 
-const TradeRow = memo(function TradeRow({ trade, szDecimals, showInUsd }: Props) {
-	const sizeDisplay = showInUsd ? formatNumber(trade.price * trade.size, 2) : formatNumber(trade.size, szDecimals);
+const TradeRow = memo(function TradeRow({ trade, szDecimals, showInQuote }: Props) {
+	const sizeDisplay = showInQuote ? formatNumber(trade.price * trade.size, 2) : formatNumber(trade.size, szDecimals);
 
 	return (
 		<a
@@ -57,8 +57,8 @@ export function TradesPanel() {
 	} = useSubTrades(params, {
 		enabled: !!selectedMarket && !!subscriptionCoin,
 	});
-	const { showOrderbookInUsd } = useGlobalSettings();
-	const { setShowOrderbookInUsd } = useGlobalSettingsActions();
+	const { showOrderbookInQuote } = useGlobalSettings();
+	const { setShowOrderbookInQuote } = useGlobalSettingsActions();
 
 	const {
 		items: trades,
@@ -92,7 +92,8 @@ export function TradesPanel() {
 
 	const szDecimals = selectedMarket?.szDecimals ?? 4;
 	const processed = useMemo(() => processTrades(trades), [trades]);
-	const toggleUsdDisplay = () => setShowOrderbookInUsd(!showOrderbookInUsd);
+	const displayAsset = showOrderbookInQuote ? quoteToken : baseToken;
+	const toggleAssetDisplay = () => setShowOrderbookInQuote(!showOrderbookInQuote);
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col">
@@ -102,11 +103,11 @@ export function TradesPanel() {
 				<Button
 					variant="ghost"
 					size="none"
-					onClick={toggleUsdDisplay}
+					onClick={toggleAssetDisplay}
 					className="text-right hover:text-fg hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
 				>
 					{t`Size`}
-					<span className="opacity-60">({showOrderbookInUsd ? quoteToken : baseToken})</span>
+					<span className="opacity-60">({displayAsset})</span>
 					<ArrowRightLeft className="size-2 opacity-40" />
 				</Button>
 			</div>
@@ -123,7 +124,7 @@ export function TradesPanel() {
 				<div className="flex-1 min-h-0 overflow-y-auto">
 					<div className="px-2 py-1 space-y-px">
 						{processed.map((trade) => (
-							<TradeRow key={trade.id} trade={trade} szDecimals={szDecimals} showInUsd={showOrderbookInUsd} />
+							<TradeRow key={trade.id} trade={trade} szDecimals={szDecimals} showInQuote={showOrderbookInQuote} />
 						))}
 					</div>
 				</div>

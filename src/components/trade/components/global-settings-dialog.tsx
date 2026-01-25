@@ -35,7 +35,7 @@ export function GlobalSettingsDialog() {
 		showOrdersOnChart,
 		showPositionsOnChart,
 		showExecutionsOnChart,
-		showOrderbookInUsd,
+		showOrderbookInQuote,
 		showChartScanlines,
 		numberFormatLocale,
 	} = useGlobalSettings();
@@ -43,7 +43,7 @@ export function GlobalSettingsDialog() {
 		setShowOrdersOnChart,
 		setShowPositionsOnChart,
 		setShowExecutionsOnChart,
-		setShowOrderbookInUsd,
+		setShowOrderbookInQuote,
 		setShowChartScanlines,
 		setNumberFormatLocale,
 		setMarketOrderSlippageBps,
@@ -83,7 +83,7 @@ export function GlobalSettingsDialog() {
 	const showPositionsId = useId();
 	const showExecutionsId = useId();
 	const showScanlinesId = useId();
-	const showOrderbookUsdId = useId();
+	const showOrderbookQuoteId = useId();
 
 	function handleLanguageChange(locale: LocaleCode) {
 		dynamicActivate(locale);
@@ -118,10 +118,7 @@ export function GlobalSettingsDialog() {
 					</SettingsSection>
 
 					{/* Number Format Section */}
-					<SettingsSection
-						title={t`Number Format`}
-						description={t`Format for numbers and dates`}
-					>
+					<SettingsSection title={t`Number Format`} description={t`Format for numbers and dates`}>
 						<Select
 							value={numberFormatLocale}
 							onValueChange={(value) => handleNumberFormatChange(value as NumberFormatLocale)}
@@ -147,8 +144,8 @@ export function GlobalSettingsDialog() {
 									type="button"
 									onClick={() => setTheme("light")}
 									className={cn(
-										"flex items-center gap-1.5 rounded-[5px] px-3 py-1.5 text-xs font-medium transition-all",
-										!isDark ? "bg-bg text-fg shadow-sm" : "text-muted-fg hover:text-fg"
+										"flex items-center gap-1.5 rounded-sm px-3 py-1.5 text-xs font-medium transition-all",
+										!isDark ? "bg-bg text-fg shadow-sm" : "text-muted-fg hover:text-fg",
 									)}
 								>
 									<Sun className="size-3.5" />
@@ -159,7 +156,7 @@ export function GlobalSettingsDialog() {
 									onClick={() => setTheme("dark")}
 									className={cn(
 										"flex items-center gap-1.5 rounded-[5px] px-3 py-1.5 text-xs font-medium transition-all",
-										isDark ? "bg-bg text-fg shadow-sm" : "text-muted-fg hover:text-fg"
+										isDark ? "bg-bg text-fg shadow-sm" : "text-muted-fg hover:text-fg",
 									)}
 								>
 									<Moon className="size-3.5" />
@@ -180,7 +177,6 @@ export function GlobalSettingsDialog() {
 						</div>
 					</SettingsSection>
 
-					{/* Slippage Section */}
 					<SettingsSection
 						title={t`Market Order Slippage`}
 						description={t`Maximum slippage tolerance for market orders`}
@@ -214,7 +210,6 @@ export function GlobalSettingsDialog() {
 						</div>
 					</SettingsSection>
 
-					{/* Chart Section */}
 					<SettingsSection title={t`Chart`}>
 						<div className="space-y-3">
 							<SettingsToggle
@@ -244,13 +239,12 @@ export function GlobalSettingsDialog() {
 						</div>
 					</SettingsSection>
 
-					{/* Order Book Section */}
 					<SettingsSection title={t`Order Book`}>
 						<SettingsToggle
-							id={showOrderbookUsdId}
-							label={t`Show Values in USD`}
-							checked={showOrderbookInUsd}
-							onCheckedChange={setShowOrderbookInUsd}
+							id={showOrderbookQuoteId}
+							label={t`Show Values in Quote Asset`}
+							checked={showOrderbookInQuote}
+							onCheckedChange={setShowOrderbookInQuote}
 						/>
 					</SettingsSection>
 				</div>
@@ -302,11 +296,12 @@ interface ColorThemeButtonProps {
 	onClick: () => void;
 }
 
-const themePreviewColors: Record<ColorTheme, { light: string; dark: string; accent: string; positive: string; negative: string }> = {
+const themePreviewColors: Record<
+	ColorTheme,
+	{ light: string; dark: string; accent: string; positive: string; negative: string }
+> = {
 	terminal: { light: "#f5f5f5", dark: "#1e1e1e", accent: "#6366f1", positive: "#10b981", negative: "#ef4444" },
 	midnight: { light: "#eef2ff", dark: "#0f172a", accent: "#818cf8", positive: "#34d399", negative: "#f87171" },
-	forest: { light: "#ecfdf5", dark: "#0f1f14", accent: "#22c55e", positive: "#22c55e", negative: "#f87171" },
-	ember: { light: "#fffbeb", dark: "#1c1310", accent: "#f97316", positive: "#22c55e", negative: "#fb7185" },
 	arctic: { light: "#f0f9ff", dark: "#0c1929", accent: "#0ea5e9", positive: "#14b8a6", negative: "#f87171" },
 };
 
@@ -322,11 +317,11 @@ function ColorThemeButton({ theme, isSelected, isDark, onClick }: ColorThemeButt
 			className={cn(
 				"group relative flex flex-col items-center gap-1 rounded-md p-1.5 transition-all",
 				"hover:bg-muted",
-				isSelected && "bg-muted ring-1 ring-primary"
+				isSelected && "bg-muted ring-1 ring-primary",
 			)}
 		>
 			<div
-				className="relative w-full aspect-[4/3] rounded-sm overflow-hidden border border-border/50"
+				className="relative w-full aspect-4/3 rounded-sm overflow-hidden border border-border/50"
 				style={{ backgroundColor: bgColor }}
 			>
 				<div className="absolute top-0.5 left-0.5 flex gap-px">
@@ -352,10 +347,12 @@ function ColorThemeButton({ theme, isSelected, isDark, onClick }: ColorThemeButt
 					</div>
 				)}
 			</div>
-			<span className={cn(
-				"text-[10px] truncate w-full text-center transition-colors",
-				isSelected ? "text-fg font-medium" : "text-muted-fg group-hover:text-fg"
-			)}>
+			<span
+				className={cn(
+					"text-[10px] truncate w-full text-center transition-colors",
+					isSelected ? "text-fg font-medium" : "text-muted-fg group-hover:text-fg",
+				)}
+			>
 				{theme.name}
 			</span>
 		</button>

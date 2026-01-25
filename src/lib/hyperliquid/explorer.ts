@@ -15,3 +15,11 @@ export function getExplorerTxUrl(hash: string): string {
 export function getExplorerAddressUrl(address: string): string {
 	return `${EXPLORER_BASE_URL}/address/${address}`;
 }
+
+/**
+ * Build Hyperliquid explorer URL for a token
+ * @example getExplorerTokenUrl("0x8f254b...") -> "https://app.hyperliquid.xyz/explorer/token/0x8f254b..."
+ */
+export function getExplorerTokenUrl(tokenId: string): string {
+	return `${EXPLORER_BASE_URL}/token/${tokenId}`;
+}
