@@ -45,6 +45,7 @@ msgstr "Account"
 msgid "Account Balances"
 msgstr "Account Balances"
 
+#: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -101,8 +102,13 @@ msgstr "All cross positions share the same cross margin as collateral. In the ev
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/positions/send-dialog.tsx
 msgid "Amount"
 msgstr "Amount"
+
+#: src/components/trade/positions/transfer-dialog.tsx
+msgid "Amount (USDC)"
+msgstr "Amount (USDC)"
 
 #: src/components/trade/header/top-nav.tsx
 msgid "API"
@@ -198,8 +204,8 @@ msgid "Buy"
 msgstr "Buy"
 
 #: src/components/trade/order-entry/side-toggle.tsx
-msgid "Buy Long"
-msgstr "Buy Long"
+#~ msgid "Buy Long"
+#~ msgstr "Buy Long"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/order-entry/deposit-modal.tsx
@@ -436,6 +442,10 @@ msgstr "Deposit failed"
 #~ msgid "Deposit on Hyperliquid"
 #~ msgstr "Deposit on Hyperliquid"
 
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Destination"
+msgstr "Destination"
+
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Direct"
 #~ msgstr "Direct"
@@ -666,6 +676,10 @@ msgstr "Funding Payments"
 msgid "Go to trading terminal"
 msgstr "Go to trading terminal"
 
+#: src/components/trade/positions/balances-tab.tsx
+msgid "Hide small"
+msgstr "Hide small"
+
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "In Orders"
 msgstr "In Orders"
@@ -798,7 +812,6 @@ msgstr "Loading wallet..."
 msgid "Loading..."
 msgstr "Loading..."
 
-#: src/components/trade/order-entry/side-toggle.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -866,11 +879,13 @@ msgid "markets"
 msgstr "markets"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
 msgid "Max"
 msgstr "Max"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/positions/send-dialog.tsx
 msgid "MAX"
 msgstr "MAX"
 
@@ -922,6 +937,10 @@ msgstr "More options"
 #: src/components/ui/pagination.tsx
 #~ msgid "More pages"
 #~ msgstr "More pages"
+
+#: src/components/trade/positions/transfer-dialog.tsx
+msgid "Move USDC between your Perp and Spot accounts."
+msgstr "Move USDC between your Perp and Spot accounts."
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Must be signed by main wallet (not agent/API wallet)"
@@ -1089,10 +1108,19 @@ msgstr "pending"
 msgid "perp"
 msgstr "perp"
 
+#: src/components/trade/positions/transfer-dialog.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
+msgid "Perp"
+msgstr "Perp"
+
 #: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "Perps"
 msgstr "Perps"
+
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Perps Account"
+msgstr "Perps Account"
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Perps: Max 0.1% (10 basis points)"
@@ -1271,8 +1299,29 @@ msgid "Sell"
 msgstr "Sell"
 
 #: src/components/trade/order-entry/side-toggle.tsx
-msgid "Sell Short"
-msgstr "Sell Short"
+#~ msgid "Sell Short"
+#~ msgstr "Sell Short"
+
+#: src/components/trade/positions/balances-tab.tsx
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Send"
+msgstr "Send"
+
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Send failed"
+msgstr "Send failed"
+
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Send Tokens"
+msgstr "Send Tokens"
+
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Send tokens to another account on the Hyperliquid L1."
+msgstr "Send tokens to another account on the Hyperliquid L1."
+
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Sending..."
+msgstr "Sending..."
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 msgid "sent to Hyperliquid"
@@ -1307,7 +1356,6 @@ msgstr "Set to {p}%"
 msgid "Settings"
 msgstr "Settings"
 
-#: src/components/trade/order-entry/side-toggle.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -1343,8 +1391,12 @@ msgid "Show Scanlines"
 msgstr "Show Scanlines"
 
 #: src/components/trade/components/global-settings-dialog.tsx
-msgid "Show Values in USD"
-msgstr "Show Values in USD"
+msgid "Show Values in Quote Asset"
+msgstr "Show Values in Quote Asset"
+
+#: src/components/trade/components/global-settings-dialog.tsx
+#~ msgid "Show Values in USD"
+#~ msgstr "Show Values in USD"
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #~ msgid "Side"
@@ -1427,8 +1479,14 @@ msgstr "spot"
 
 #: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
 msgid "Spot"
 msgstr "Spot"
+
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Spot Account"
+msgstr "Spot Account"
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Spot: Max 1% (100 basis points)"
@@ -1570,6 +1628,14 @@ msgstr "Time in Force"
 msgid "To"
 msgstr "To"
 
+#: src/components/trade/positions/balances-tab.tsx
+msgid "To Perp"
+msgstr "To Perp"
+
+#: src/components/trade/positions/balances-tab.tsx
+msgid "To Spot"
+msgstr "To Spot"
+
 #: src/components/ui/sidebar.tsx
 #: src/components/ui/sidebar.tsx
 #: src/components/ui/sidebar.tsx
@@ -1643,12 +1709,25 @@ msgstr "Transaction was rejected"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
 msgid "Transfer"
 msgstr "Transfer"
+
+#: src/components/trade/positions/transfer-dialog.tsx
+msgid "Transfer failed"
+msgstr "Transfer failed"
+
+#: src/components/trade/positions/transfer-dialog.tsx
+msgid "Transfer USDC"
+msgstr "Transfer USDC"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #~ msgid "Transfer USDC to your Hyperliquid account to start trading."
 #~ msgstr "Transfer USDC to your Hyperliquid account to start trading."
+
+#: src/components/trade/positions/transfer-dialog.tsx
+msgid "Transferring..."
+msgstr "Transferring..."
 
 #: src/components/trade/order-entry/advanced-order-dropdown.tsx
 #: src/components/trade/positions/orders-tab.tsx

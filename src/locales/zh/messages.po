@@ -45,6 +45,7 @@ msgstr "账户"
 msgid "Account Balances"
 msgstr "账户余额"
 
+#: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -101,7 +102,12 @@ msgstr ""
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/positions/send-dialog.tsx
 msgid "Amount"
+msgstr ""
+
+#: src/components/trade/positions/transfer-dialog.tsx
+msgid "Amount (USDC)"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
@@ -198,8 +204,8 @@ msgid "Buy"
 msgstr "买入"
 
 #: src/components/trade/order-entry/side-toggle.tsx
-msgid "Buy Long"
-msgstr "买入做多"
+#~ msgid "Buy Long"
+#~ msgstr "买入做多"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/order-entry/deposit-modal.tsx
@@ -436,6 +442,10 @@ msgstr ""
 #~ msgid "Deposit on Hyperliquid"
 #~ msgstr "在 Hyperliquid 存款"
 
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Destination"
+msgstr ""
+
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Direct"
 #~ msgstr ""
@@ -666,6 +676,10 @@ msgstr "资金费用"
 msgid "Go to trading terminal"
 msgstr "前往交易终端"
 
+#: src/components/trade/positions/balances-tab.tsx
+msgid "Hide small"
+msgstr ""
+
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "In Orders"
 msgstr ""
@@ -794,7 +808,6 @@ msgstr "加载钱包中..."
 msgid "Loading..."
 msgstr "加载中..."
 
-#: src/components/trade/order-entry/side-toggle.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -862,11 +875,13 @@ msgid "markets"
 msgstr "个市场"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
 msgid "Max"
 msgstr "最大"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/positions/send-dialog.tsx
 msgid "MAX"
 msgstr ""
 
@@ -918,6 +933,10 @@ msgstr "更多选项"
 #: src/components/ui/pagination.tsx
 #~ msgid "More pages"
 #~ msgstr "更多页面"
+
+#: src/components/trade/positions/transfer-dialog.tsx
+msgid "Move USDC between your Perp and Spot accounts."
+msgstr ""
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Must be signed by main wallet (not agent/API wallet)"
@@ -1085,10 +1104,19 @@ msgstr "待处理"
 msgid "perp"
 msgstr "永续"
 
+#: src/components/trade/positions/transfer-dialog.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
+msgid "Perp"
+msgstr ""
+
 #: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "Perps"
 msgstr "永续合约"
+
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Perps Account"
+msgstr ""
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Perps: Max 0.1% (10 basis points)"
@@ -1267,8 +1295,29 @@ msgid "Sell"
 msgstr "卖出"
 
 #: src/components/trade/order-entry/side-toggle.tsx
-msgid "Sell Short"
-msgstr "卖出做空"
+#~ msgid "Sell Short"
+#~ msgstr "卖出做空"
+
+#: src/components/trade/positions/balances-tab.tsx
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Send"
+msgstr ""
+
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Send failed"
+msgstr ""
+
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Send Tokens"
+msgstr ""
+
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Send tokens to another account on the Hyperliquid L1."
+msgstr ""
+
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Sending..."
+msgstr ""
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 msgid "sent to Hyperliquid"
@@ -1303,7 +1352,6 @@ msgstr ""
 msgid "Settings"
 msgstr "设置"
 
-#: src/components/trade/order-entry/side-toggle.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -1339,8 +1387,12 @@ msgid "Show Scanlines"
 msgstr "显示扫描线"
 
 #: src/components/trade/components/global-settings-dialog.tsx
-msgid "Show Values in USD"
-msgstr "以美元显示数值"
+msgid "Show Values in Quote Asset"
+msgstr ""
+
+#: src/components/trade/components/global-settings-dialog.tsx
+#~ msgid "Show Values in USD"
+#~ msgstr "以美元显示数值"
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #~ msgid "Side"
@@ -1423,8 +1475,14 @@ msgstr "现货"
 
 #: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
 msgid "Spot"
 msgstr "现货"
+
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Spot Account"
+msgstr ""
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Spot: Max 1% (100 basis points)"
@@ -1566,6 +1624,14 @@ msgstr ""
 msgid "To"
 msgstr ""
 
+#: src/components/trade/positions/balances-tab.tsx
+msgid "To Perp"
+msgstr ""
+
+#: src/components/trade/positions/balances-tab.tsx
+msgid "To Spot"
+msgstr ""
+
 #: src/components/ui/sidebar.tsx
 #: src/components/ui/sidebar.tsx
 #: src/components/ui/sidebar.tsx
@@ -1635,12 +1701,25 @@ msgstr ""
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
 msgid "Transfer"
+msgstr ""
+
+#: src/components/trade/positions/transfer-dialog.tsx
+msgid "Transfer failed"
+msgstr ""
+
+#: src/components/trade/positions/transfer-dialog.tsx
+msgid "Transfer USDC"
 msgstr ""
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #~ msgid "Transfer USDC to your Hyperliquid account to start trading."
 #~ msgstr "将 USDC 转入您的 Hyperliquid 账户以开始交易。"
+
+#: src/components/trade/positions/transfer-dialog.tsx
+msgid "Transferring..."
+msgstr ""
 
 #: src/components/trade/order-entry/advanced-order-dropdown.tsx
 #: src/components/trade/positions/orders-tab.tsx

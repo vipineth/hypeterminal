@@ -45,6 +45,7 @@ msgstr "खाता"
 msgid "Account Balances"
 msgstr "खाता शेष"
 
+#: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -101,7 +102,12 @@ msgstr ""
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/positions/send-dialog.tsx
 msgid "Amount"
+msgstr ""
+
+#: src/components/trade/positions/transfer-dialog.tsx
+msgid "Amount (USDC)"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
@@ -198,8 +204,8 @@ msgid "Buy"
 msgstr "खरीदें"
 
 #: src/components/trade/order-entry/side-toggle.tsx
-msgid "Buy Long"
-msgstr "लॉन्ग खरीदें"
+#~ msgid "Buy Long"
+#~ msgstr "लॉन्ग खरीदें"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/order-entry/deposit-modal.tsx
@@ -436,6 +442,10 @@ msgstr ""
 #~ msgid "Deposit on Hyperliquid"
 #~ msgstr "Hyperliquid पर जमा करें"
 
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Destination"
+msgstr ""
+
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Direct"
 #~ msgstr ""
@@ -666,6 +676,10 @@ msgstr "फंडिंग भुगतान"
 msgid "Go to trading terminal"
 msgstr "ट्रेडिंग टर्मिनल पर जाएं"
 
+#: src/components/trade/positions/balances-tab.tsx
+msgid "Hide small"
+msgstr ""
+
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "In Orders"
 msgstr ""
@@ -794,7 +808,6 @@ msgstr "वॉलेट लोड हो रहा है..."
 msgid "Loading..."
 msgstr "लोड हो रहा है..."
 
-#: src/components/trade/order-entry/side-toggle.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -862,11 +875,13 @@ msgid "markets"
 msgstr "बाज़ार"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
 msgid "Max"
 msgstr "अधिकतम"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/positions/send-dialog.tsx
 msgid "MAX"
 msgstr ""
 
@@ -918,6 +933,10 @@ msgstr "और विकल्प"
 #: src/components/ui/pagination.tsx
 #~ msgid "More pages"
 #~ msgstr "और पृष्ठ"
+
+#: src/components/trade/positions/transfer-dialog.tsx
+msgid "Move USDC between your Perp and Spot accounts."
+msgstr ""
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Must be signed by main wallet (not agent/API wallet)"
@@ -1085,10 +1104,19 @@ msgstr "लंबित"
 msgid "perp"
 msgstr "परप"
 
+#: src/components/trade/positions/transfer-dialog.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
+msgid "Perp"
+msgstr ""
+
 #: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "Perps"
 msgstr "परप्स"
+
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Perps Account"
+msgstr ""
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Perps: Max 0.1% (10 basis points)"
@@ -1267,8 +1295,29 @@ msgid "Sell"
 msgstr "बेचें"
 
 #: src/components/trade/order-entry/side-toggle.tsx
-msgid "Sell Short"
-msgstr "शॉर्ट बेचें"
+#~ msgid "Sell Short"
+#~ msgstr "शॉर्ट बेचें"
+
+#: src/components/trade/positions/balances-tab.tsx
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Send"
+msgstr ""
+
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Send failed"
+msgstr ""
+
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Send Tokens"
+msgstr ""
+
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Send tokens to another account on the Hyperliquid L1."
+msgstr ""
+
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Sending..."
+msgstr ""
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 msgid "sent to Hyperliquid"
@@ -1303,7 +1352,6 @@ msgstr ""
 msgid "Settings"
 msgstr "सेटिंग्स"
 
-#: src/components/trade/order-entry/side-toggle.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -1339,8 +1387,12 @@ msgid "Show Scanlines"
 msgstr "स्कैनलाइन दिखाएं"
 
 #: src/components/trade/components/global-settings-dialog.tsx
-msgid "Show Values in USD"
-msgstr "USD में मान दिखाएं"
+msgid "Show Values in Quote Asset"
+msgstr ""
+
+#: src/components/trade/components/global-settings-dialog.tsx
+#~ msgid "Show Values in USD"
+#~ msgstr "USD में मान दिखाएं"
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #~ msgid "Side"
@@ -1423,8 +1475,14 @@ msgstr "स्पॉट"
 
 #: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
 msgid "Spot"
 msgstr "स्पॉट"
+
+#: src/components/trade/positions/send-dialog.tsx
+msgid "Spot Account"
+msgstr ""
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Spot: Max 1% (100 basis points)"
@@ -1566,6 +1624,14 @@ msgstr ""
 msgid "To"
 msgstr ""
 
+#: src/components/trade/positions/balances-tab.tsx
+msgid "To Perp"
+msgstr ""
+
+#: src/components/trade/positions/balances-tab.tsx
+msgid "To Spot"
+msgstr ""
+
 #: src/components/ui/sidebar.tsx
 #: src/components/ui/sidebar.tsx
 #: src/components/ui/sidebar.tsx
@@ -1635,12 +1701,25 @@ msgstr ""
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
 msgid "Transfer"
+msgstr ""
+
+#: src/components/trade/positions/transfer-dialog.tsx
+msgid "Transfer failed"
+msgstr ""
+
+#: src/components/trade/positions/transfer-dialog.tsx
+msgid "Transfer USDC"
 msgstr ""
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #~ msgid "Transfer USDC to your Hyperliquid account to start trading."
 #~ msgstr "ट्रेडिंग शुरू करने के लिए अपने Hyperliquid खाते में USDC ट्रांसफर करें।"
+
+#: src/components/trade/positions/transfer-dialog.tsx
+msgid "Transferring..."
+msgstr ""
 
 #: src/components/trade/order-entry/advanced-order-dropdown.tsx
 #: src/components/trade/positions/orders-tab.tsx
