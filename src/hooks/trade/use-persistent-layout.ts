@@ -4,17 +4,17 @@ export const LAYOUT_PRESETS = {
 	MAIN_WORKSPACE: {
 		storageKey: "terminal:layout:main",
 		fallbackSizes: [82, 18] as const,
-		defaultSizes: [78, 22],
+		defaultSizes: [78, 22] as const,
 	},
 	ANALYSIS_STACK: {
 		storageKey: "terminal:layout:vert",
-		fallbackSizes: [50, 50] as const,
-		defaultSizes: [40, 60],
+		fallbackSizes: [51, 49] as const,
+		defaultSizes: [51, 49] as const,
 	},
 	MARKET_INFO: {
 		storageKey: "terminal:layout:chart-book",
-		fallbackSizes: [75, 25] as const,
-		defaultSizes: [75, 25],
+		fallbackSizes: [80, 20] as const,
+		defaultSizes: [80, 20] as const,
 	},
 } as const;
 
