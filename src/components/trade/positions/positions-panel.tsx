@@ -1,22 +1,32 @@
-import { useMemo } from "react";
+import { Suspense, useMemo, useState, useTransition } from "react";
 import { useConnection } from "wagmi";
+import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/cn";
 import { POSITIONS_TABS } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
+import { createLazyComponent } from "@/lib/lazy";
 import { parseNumber, parseNumberOrZero } from "@/lib/trade/numbers";
-import { BalancesTab } from "./balances-tab";
-import { FundingTab } from "./funding-tab";
-import { HistoryTab } from "./history-tab";
-import { OrdersTab } from "./orders-tab";
-import { PositionsTab } from "./positions-tab";
-import { TwapTab } from "./twap-tab";
+
+const BalancesTab = createLazyComponent(() => import("./balances-tab"), "BalancesTab");
+const FundingTab = createLazyComponent(() => import("./funding-tab"), "FundingTab");
+const HistoryTab = createLazyComponent(() => import("./history-tab"), "HistoryTab");
+const OrdersTab = createLazyComponent(() => import("./orders-tab"), "OrdersTab");
+const PositionsTab = createLazyComponent(() => import("./positions-tab"), "PositionsTab");
+const TwapTab = createLazyComponent(() => import("./twap-tab"), "TwapTab");
 
 export function PositionsPanel() {
+	const [activeTab, setActiveTab] = useState("positions");
+	const [isPending, startTransition] = useTransition();
 	const { address, isConnected } = useConnection();
 	const { perpSummary, perpPositions, spotBalances } = useAccountBalances();
 	const { data: ordersEvent } = useSubOpenOrders({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
 	const openOrders = ordersEvent?.orders;
+
+	function handleTabChange(value: string) {
+		startTransition(() => setActiveTab(value));
+	}
 
 	const positionsCount = useMemo(() => {
 		if (!isConnected) return 0;
@@ -51,7 +61,7 @@ export function PositionsPanel() {
 
 	return (
 		<div className="h-full flex flex-col overflow-hidden bg-surface/20">
-			<Tabs defaultValue="positions" className="flex-1 min-h-0 flex flex-col">
+			<Tabs value={activeTab} onValueChange={handleTabChange} className="flex-1 min-h-0 flex flex-col">
 				<div className="px-2 pt-1.5 border-b border-border/40">
 					<TabsList className="pb-1.5">
 						{POSITIONS_TABS.map((tab) => {
@@ -71,25 +81,45 @@ export function PositionsPanel() {
 						})}
 					</TabsList>
 				</div>
-				<TabsContent value="balances" className="flex-1 min-h-0 flex flex-col mt-0">
-					<BalancesTab />
+				<TabsContent value="balances" className={cn("flex-1 min-h-0 flex flex-col mt-0", isPending && "opacity-70")}>
+					<Suspense fallback={<TabLoadingFallback />}>
+						<BalancesTab />
+					</Suspense>
 				</TabsContent>
-				<TabsContent value="positions" className="flex-1 min-h-0 flex flex-col mt-0">
-					<PositionsTab />
+				<TabsContent value="positions" className={cn("flex-1 min-h-0 flex flex-col mt-0", isPending && "opacity-70")}>
+					<Suspense fallback={<TabLoadingFallback />}>
+						<PositionsTab />
+					</Suspense>
 				</TabsContent>
-				<TabsContent value="orders" className="flex-1 min-h-0 flex flex-col mt-0">
-					<OrdersTab />
+				<TabsContent value="orders" className={cn("flex-1 min-h-0 flex flex-col mt-0", isPending && "opacity-70")}>
+					<Suspense fallback={<TabLoadingFallback />}>
+						<OrdersTab />
+					</Suspense>
 				</TabsContent>
-				<TabsContent value="twap" className="flex-1 min-h-0 flex flex-col mt-0">
-					<TwapTab />
+				<TabsContent value="twap" className={cn("flex-1 min-h-0 flex flex-col mt-0", isPending && "opacity-70")}>
+					<Suspense fallback={<TabLoadingFallback />}>
+						<TwapTab />
+					</Suspense>
 				</TabsContent>
-				<TabsContent value="history" className="flex-1 min-h-0 flex flex-col mt-0">
-					<HistoryTab />
+				<TabsContent value="history" className={cn("flex-1 min-h-0 flex flex-col mt-0", isPending && "opacity-70")}>
+					<Suspense fallback={<TabLoadingFallback />}>
+						<HistoryTab />
+					</Suspense>
 				</TabsContent>
-				<TabsContent value="funding" className="flex-1 min-h-0 flex flex-col mt-0">
-					<FundingTab />
+				<TabsContent value="funding" className={cn("flex-1 min-h-0 flex flex-col mt-0", isPending && "opacity-70")}>
+					<Suspense fallback={<TabLoadingFallback />}>
+						<FundingTab />
+					</Suspense>
 				</TabsContent>
 			</Tabs>
+		</div>
+	);
+}
+
+function TabLoadingFallback() {
+	return (
+		<div className="flex-1 flex items-center justify-center">
+			<Spinner className="size-4 text-muted-fg" />
 		</div>
 	);
 }

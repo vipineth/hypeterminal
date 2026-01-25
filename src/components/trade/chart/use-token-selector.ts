@@ -1,6 +1,6 @@
 import { getCoreRowModel, type Row, type SortingState, useReactTable } from "@tanstack/react-table";
 import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useMarketsInfo } from "@/lib/hyperliquid";
 import { isTokenInCategory, type MarketCategory } from "@/lib/tokens";
 import { useFavoriteMarkets, useMarketActions } from "@/stores/use-market-store";
@@ -78,8 +78,15 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 	const [scope, setScope] = useState<MarketScope>("all");
 	const [subcategory, setSubcategory] = useState<string>("all");
 	const [search, setSearch] = useState("");
+	const [deferredSearch, setDeferredSearch] = useState("");
+	const [isPending, startTransition] = useTransition();
 	const [sorting, setSorting] = useState<SortingState>([{ id: "volume", desc: true }]);
 	const containerRef = useRef<HTMLDivElement>(null);
+
+	const handleSearchChange = useCallback((value: string) => {
+		setSearch(value);
+		startTransition(() => setDeferredSearch(value));
+	}, []);
 
 	const { markets, spotMarkets, builderPerpMarkets, isLoading } = useMarketsInfo();
 	const favorites = useFavoriteMarkets();
@@ -119,7 +126,7 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 			if (scope === "perp" && market.kind !== "perp") return false;
 			if (scope === "spot" && market.kind !== "spot") return false;
 			if (scope === "hip3" && market.kind !== "builderPerp") return false;
-			if (search && !market.displayName.toLowerCase().includes(search.toLowerCase())) return false;
+			if (deferredSearch && !market.displayName.toLowerCase().includes(deferredSearch.toLowerCase())) return false;
 
 			if (subcategory === "all") return true;
 
@@ -138,7 +145,7 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 
 			return true;
 		});
-	}, [markets, scope, subcategory, search]);
+	}, [markets, scope, subcategory, deferredSearch]);
 
 	const sortedMarkets = useMemo(() => {
 		const favoriteMarkets = filteredMarkets.filter((m) => isFavorite(m.name));
@@ -197,8 +204,8 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 		subcategory,
 		subcategories,
 		search,
-		setSearch,
-		isLoading: open && isLoading,
+		setSearch: handleSearchChange,
+		isLoading: open && (isLoading || isPending),
 		isFavorite,
 		sorting,
 		handleSelect,

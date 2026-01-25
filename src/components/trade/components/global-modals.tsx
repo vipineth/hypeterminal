@@ -1,11 +1,14 @@
-import { DepositModal } from "../order-entry/deposit-modal";
-import { GlobalSettingsDialog } from "./global-settings-dialog";
+import { Suspense } from "react";
+import { createLazyComponent } from "@/lib/lazy";
+
+const DepositModal = createLazyComponent(() => import("../order-entry/deposit-modal"), "DepositModal");
+const GlobalSettingsDialog = createLazyComponent(() => import("./global-settings-dialog"), "GlobalSettingsDialog");
 
 export function GlobalModals() {
 	return (
-		<>
+		<Suspense fallback={null}>
 			<DepositModal />
 			<GlobalSettingsDialog />
-		</>
+		</Suspense>
 	);
 }

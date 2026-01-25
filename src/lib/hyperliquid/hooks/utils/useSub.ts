@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { useStore } from "zustand";
 import { useHyperliquidStoreApi } from "@/lib/hyperliquid/provider";
 import type { SubscriptionOptions, SubscriptionResult } from "@/lib/hyperliquid/types";
+import { createThrottledUpdater } from "@/lib/websocket/batch-updater";
 
 /**
  * Core subscription hook using the standard WebSocket pattern.
@@ -21,7 +22,7 @@ export function useSub<TData>(
 	subscribe: (listener: (data: TData) => void) => Promise<ISubscription>,
 	options: SubscriptionOptions = {},
 ): SubscriptionResult<TData> {
-	const { enabled = true } = options;
+	const { enabled = true, throttleMs } = options;
 	const store = useHyperliquidStoreApi();
 	const entry = useStore(store, (state) => state.subscriptions[key]);
 
@@ -34,9 +35,20 @@ export function useSub<TData>(
 	useEffect(() => {
 		if (!enabled) return;
 		const state = store.getState();
+
+		if (throttleMs) {
+			const updater = createThrottledUpdater<TData>((data) => state.setSubscriptionData(key, data), throttleMs);
+			state.acquireSubscription(key, () => subscribeRef.current((data) => updater.add(data)));
+			return () => {
+				updater.flush();
+				updater.destroy();
+				store.getState().releaseSubscription(key);
+			};
+		}
+
 		state.acquireSubscription(key, () => subscribeRef.current((data) => state.setSubscriptionData(key, data)));
 		return () => store.getState().releaseSubscription(key);
-	}, [enabled, key, store]);
+	}, [enabled, key, store, throttleMs]);
 
 	return {
 		data: entry?.data as TData | undefined,
