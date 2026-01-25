@@ -60,6 +60,7 @@ interface VitalsData {
 type VitalsCallback = (data: VitalsData) => void;
 
 let collectedMetrics: VitalsData[] = [];
+const MAX_COLLECTED_METRICS = 100;
 
 function createMetricHandler(callback?: VitalsCallback) {
 	return (metric: Metric) => {
@@ -73,6 +74,9 @@ function createMetricHandler(callback?: VitalsCallback) {
 			attribution: (metric as Metric & { attribution?: unknown }).attribution,
 		};
 
+		if (collectedMetrics.length >= MAX_COLLECTED_METRICS) {
+			collectedMetrics.shift();
+		}
 		collectedMetrics.push(data);
 
 		if (import.meta.env.DEV) {
@@ -126,6 +130,8 @@ export function clearMetrics() {
 }
 
 export function reportMetricsSummary() {
+	if (!import.meta.env.DEV) return;
+
 	if (collectedMetrics.length === 0) {
 		console.log("[Web Vitals] No metrics collected yet");
 		return;

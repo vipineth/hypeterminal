@@ -8,6 +8,7 @@ import { config } from "@/config/wagmi";
 import { HyperliquidProvider } from "@/lib/hyperliquid";
 import { MarketsInfoProvider } from "@/lib/hyperliquid/hooks/MarketsInfoProvider";
 import { ThemeProvider } from "./theme";
+import { PerfPanelProvider } from "./perf-panel";
 import "@/lib/i18n";
 
 export function getRootProviderContext() {
@@ -21,11 +22,9 @@ const env = import.meta.env.VITE_HYPERLIQUID_TESTNET === "true" ? "Testnet" : "M
 
 export function RootProvider({ children, queryClient }: { children: React.ReactNode; queryClient: QueryClient }) {
 	useEffect(() => {
-		if (typeof window !== "undefined") {
-			import("@/lib/performance/init").then(({ initPerformanceMonitoring }) => {
-				initPerformanceMonitoring();
-			});
-		}
+		import("@/lib/performance/init").then(({ initPerformanceMonitoring }) => {
+			initPerformanceMonitoring();
+		});
 	}, []);
 
 	return (
@@ -34,7 +33,9 @@ export function RootProvider({ children, queryClient }: { children: React.ReactN
 				<I18nProvider i18n={i18n}>
 					<ThemeProvider>
 						<HyperliquidProvider env={env} builderConfig={DEFAULT_BUILDER_CONFIG} agentName={PROJECT_NAME}>
-							<MarketsInfoProvider>{children}</MarketsInfoProvider>
+							<MarketsInfoProvider>
+								<PerfPanelProvider>{children}</PerfPanelProvider>
+							</MarketsInfoProvider>
 						</HyperliquidProvider>
 					</ThemeProvider>
 				</I18nProvider>

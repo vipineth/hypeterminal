@@ -10,7 +10,8 @@ type RenderEntry = {
 };
 
 const renderLog: RenderEntry[] = [];
-const SLOW_RENDER_THRESHOLD_MS = 16; // ~60fps
+const MAX_RENDER_LOG = 1000;
+const SLOW_RENDER_THRESHOLD_MS = 16;
 
 export function logRender(
 	id: string,
@@ -29,6 +30,9 @@ export function logRender(
 		commitTime,
 	};
 
+	if (renderLog.length >= MAX_RENDER_LOG) {
+		renderLog.shift();
+	}
 	renderLog.push(entry);
 
 	if (import.meta.env.DEV && actualDuration > SLOW_RENDER_THRESHOLD_MS) {
@@ -48,6 +52,8 @@ export function clearRenderLog() {
 }
 
 export function analyzeRenders() {
+	if (!import.meta.env.DEV) return;
+
 	if (renderLog.length === 0) {
 		console.log("[Render Tracker] No renders logged");
 		return;
@@ -63,7 +69,7 @@ export function analyzeRenders() {
 			if (entry.phase === "mount") {
 				acc[entry.componentName].mounts++;
 			} else {
-				acc[entry.componentName].updates++; // includes "update" and "nested-update"
+				acc[entry.componentName].updates++;
 			}
 			return acc;
 		},

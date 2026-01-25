@@ -19,6 +19,14 @@ function formatSize(bytes: number): string {
 	return `${(bytes / (1024 * 1024)).toFixed(2)}MB`;
 }
 
+function getPathname(url: string): string {
+	try {
+		return new URL(url).pathname;
+	} catch {
+		return url;
+	}
+}
+
 export function getResourceEntries(): NetworkEntry[] {
 	const entries = performance.getEntriesByType("resource") as PerformanceResourceTiming[];
 	return entries.map((e) => ({
@@ -33,6 +41,8 @@ export function getResourceEntries(): NetworkEntry[] {
 }
 
 export function analyzeNetworkPerformance() {
+	if (!import.meta.env.DEV) return;
+
 	const entries = getResourceEntries();
 
 	if (entries.length === 0) {
@@ -68,8 +78,7 @@ export function analyzeNetworkPerformance() {
 	if (slowest.length > 0) {
 		console.log("\nSlowest resources:");
 		slowest.forEach((r, i) => {
-			const url = new URL(r.name).pathname;
-			console.log(`  ${i + 1}. ${url}: ${formatDuration(r.duration)}`);
+			console.log(`  ${i + 1}. ${getPathname(r.name)}: ${formatDuration(r.duration)}`);
 		});
 	}
 
@@ -77,8 +86,7 @@ export function analyzeNetworkPerformance() {
 	if (largest.length > 0) {
 		console.log("\nLargest resources:");
 		largest.forEach((r, i) => {
-			const url = new URL(r.name).pathname;
-			console.log(`  ${i + 1}. ${url}: ${formatSize(r.transferSize)}`);
+			console.log(`  ${i + 1}. ${getPathname(r.name)}: ${formatSize(r.transferSize)}`);
 		});
 	}
 
@@ -95,8 +103,14 @@ interface WebSocketMetrics {
 }
 
 const wsMetrics: Map<string, WebSocketMetrics> = new Map();
+const trackedSockets = new WeakSet<WebSocket>();
 
 export function trackWebSocket(ws: WebSocket, label: string) {
+	if (trackedSockets.has(ws)) {
+		return wsMetrics.get(label);
+	}
+	trackedSockets.add(ws);
+
 	const metrics: WebSocketMetrics = {
 		messagesReceived: 0,
 		messagesSent: 0,
@@ -111,8 +125,13 @@ export function trackWebSocket(ws: WebSocket, label: string) {
 	const originalOnMessage = ws.onmessage;
 	ws.onmessage = (event) => {
 		metrics.messagesReceived++;
-		metrics.bytesReceived +=
-			typeof event.data === "string" ? event.data.length : (event.data as ArrayBuffer).byteLength;
+		if (typeof event.data === "string") {
+			metrics.bytesReceived += event.data.length;
+		} else if (event.data instanceof ArrayBuffer) {
+			metrics.bytesReceived += event.data.byteLength;
+		} else if (event.data instanceof Blob) {
+			metrics.bytesReceived += event.data.size;
+		}
 		metrics.messageFrequency.push(Date.now());
 
 		if (metrics.messageFrequency.length > 100) {
@@ -141,6 +160,8 @@ export function getWebSocketMetrics(label: string): WebSocketMetrics | undefined
 }
 
 export function analyzeWebSocketMetrics(label: string) {
+	if (!import.meta.env.DEV) return;
+
 	const metrics = wsMetrics.get(label);
 	if (!metrics) {
 		console.log(`[WebSocket] No metrics found for "${label}"`);

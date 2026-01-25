@@ -6,6 +6,7 @@ interface MemorySnapshot {
 }
 
 const memorySnapshots: MemorySnapshot[] = [];
+const MAX_SNAPSHOTS = 1000;
 let intervalId: number | null = null;
 
 function getMemoryInfo(): MemorySnapshot | null {
@@ -36,6 +37,9 @@ function formatBytes(bytes: number): string {
 export function takeMemorySnapshot(): MemorySnapshot | null {
 	const snapshot = getMemoryInfo();
 	if (snapshot) {
+		if (memorySnapshots.length >= MAX_SNAPSHOTS) {
+			memorySnapshots.shift();
+		}
 		memorySnapshots.push(snapshot);
 		if (import.meta.env.DEV) {
 			console.log(
@@ -49,12 +53,16 @@ export function takeMemorySnapshot(): MemorySnapshot | null {
 
 export function startMemoryMonitoring(intervalMs = 10000) {
 	if (!("memory" in performance)) {
-		console.warn("[Memory] Performance.memory API not available (Chrome only)");
+		if (import.meta.env.DEV) {
+			console.warn("[Memory] Performance.memory API not available (Chrome only)");
+		}
 		return;
 	}
 
 	if (intervalId !== null) {
-		console.warn("[Memory] Monitoring already started");
+		if (import.meta.env.DEV) {
+			console.warn("[Memory] Monitoring already started");
+		}
 		return;
 	}
 
@@ -70,7 +78,9 @@ export function stopMemoryMonitoring() {
 	if (intervalId !== null) {
 		clearInterval(intervalId);
 		intervalId = null;
-		console.log("[Memory] Stopped monitoring");
+		if (import.meta.env.DEV) {
+			console.log("[Memory] Stopped monitoring");
+		}
 	}
 }
 
@@ -84,7 +94,9 @@ export function clearMemorySnapshots() {
 
 export function analyzeMemoryTrend() {
 	if (memorySnapshots.length < 2) {
-		console.log("[Memory] Need at least 2 snapshots for trend analysis");
+		if (import.meta.env.DEV) {
+			console.log("[Memory] Need at least 2 snapshots for trend analysis");
+		}
 		return null;
 	}
 
@@ -123,6 +135,8 @@ export function analyzeMemoryTrend() {
 }
 
 export function logCurrentMemory() {
+	if (!import.meta.env.DEV) return;
+
 	const info = getMemoryInfo();
 	if (!info) {
 		console.log("[Memory] API not available");

@@ -1,16 +1,19 @@
-type ComponentInstance = {
+interface ComponentInstance {
 	name: string;
 	mountedAt: number;
 	unmountedAt?: number;
-};
+}
 
 const instances = new Map<string, ComponentInstance[]>();
+const MAX_INSTANCES_PER_KEY = 100;
 let isEnabled = false;
 
 export function enableLeakDetector() {
 	if (typeof window === "undefined") return;
 	isEnabled = true;
-	console.log("%c[LeakDetector] Enabled", "color: #888;");
+	if (import.meta.env.DEV) {
+		console.log("%c[LeakDetector] Enabled", "color: #888;");
+	}
 }
 
 export function disableLeakDetector() {
@@ -23,6 +26,9 @@ export function trackMount(componentName: string, instanceId: string) {
 
 	const key = `${componentName}:${instanceId}`;
 	const existing = instances.get(key) ?? [];
+	if (existing.length >= MAX_INSTANCES_PER_KEY) {
+		existing.shift();
+	}
 	existing.push({
 		name: componentName,
 		mountedAt: Date.now(),
@@ -67,6 +73,8 @@ export function getLeakedComponents(): { name: string; count: number; oldestMoun
 }
 
 export function reportLeaks() {
+	if (!import.meta.env.DEV) return;
+
 	const leaks = getLeakedComponents();
 
 	if (leaks.length === 0) {
