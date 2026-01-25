@@ -26,7 +26,7 @@ import {
 	startMemoryMonitoring,
 	stopMemoryMonitoring,
 } from "@/lib/performance/memory";
-import { analyzeNetworkPerformance, getResourceEntries } from "@/lib/performance/network";
+import { getResourceEntries } from "@/lib/performance/network";
 import { clearRenderLog, getRenderLog, getSlowRenders } from "@/lib/performance/render-tracker";
 import { getCollectedMetrics, reportMetricsSummary } from "@/lib/performance/web-vitals";
 
@@ -90,13 +90,29 @@ function saveState(state: PerfState) {
 }
 
 function formatBytes(bytes: number): string {
-	const mb = bytes / (1024 * 1024);
-	return `${mb.toFixed(1)}MB`;
+	if (bytes < 1024) return `${bytes}B`;
+	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)}KB`;
+	return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
+}
+
+function formatDuration(ms: number): string {
+	if (ms < 1000) return `${Math.round(ms)}ms`;
+	return `${(ms / 1000).toFixed(2)}s`;
 }
 
 function formatValue(name: string, value: number): string {
 	if (name === "CLS") return value.toFixed(3);
 	return `${Math.round(value)}ms`;
+}
+
+function getPathname(url: string): string {
+	try {
+		const parsed = new URL(url);
+		const path = parsed.pathname;
+		return path.length > 30 ? `...${path.slice(-27)}` : path;
+	} catch {
+		return url.slice(0, 30);
+	}
 }
 
 function getRatingColor(rating: MetricRating): string {
@@ -260,7 +276,7 @@ export function PerfPanel({ onClose }: Props) {
 					onExpand={() => setExpandedSection(expandedSection === "memory" ? null : "memory")}
 				>
 					{!latestMemory ? (
-						<p className="text-xs text-muted-fg">Enable to start monitoring</p>
+						<p className="text-xs text-muted-fg">Enable to start monitoring (Chrome only)</p>
 					) : (
 						<div className="space-y-1">
 							<div className="flex items-center justify-between">
@@ -272,14 +288,55 @@ export function PerfPanel({ onClose }: Props) {
 								<span className="text-xs font-mono">{formatBytes(latestMemory.totalJSHeapSize)}</span>
 							</div>
 							<div className="flex items-center justify-between">
-								<span className="text-xs text-muted-fg">Snapshots</span>
-								<span className="text-xs font-mono">{memorySnapshots.length}</span>
+								<span className="text-xs text-muted-fg">Heap Limit</span>
+								<span className="text-xs font-mono">{formatBytes(latestMemory.jsHeapSizeLimit)}</span>
+							</div>
+							<div className="flex items-center justify-between">
+								<span className="text-xs text-muted-fg">Usage</span>
+								<span className="text-xs font-mono">
+									{((latestMemory.usedJSHeapSize / latestMemory.jsHeapSizeLimit) * 100).toFixed(1)}%
+								</span>
 							</div>
 							{memoryTrend && (
-								<div className={cn("flex items-center justify-between", memoryTrend.potentialLeak && "text-negative")}>
-									<span className="text-xs text-muted-fg">Growth/min</span>
-									<span className="text-xs font-mono">{formatBytes(memoryTrend.growthPerMinute)}</span>
-								</div>
+								<>
+									<div className="h-px bg-border/30 my-1" />
+									<div className="flex items-center justify-between">
+										<span className="text-xs text-muted-fg">Snapshots</span>
+										<span className="text-xs font-mono">{memorySnapshots.length}</span>
+									</div>
+									<div className="flex items-center justify-between">
+										<span className="text-xs text-muted-fg">Start</span>
+										<span className="text-xs font-mono">{formatBytes(memoryTrend.startHeap)}</span>
+									</div>
+									<div className="flex items-center justify-between">
+										<span className="text-xs text-muted-fg">Current</span>
+										<span className="text-xs font-mono">{formatBytes(memoryTrend.endHeap)}</span>
+									</div>
+									<div
+										className={cn(
+											"flex items-center justify-between",
+											memoryTrend.growth > 0 ? "text-warning" : "text-positive",
+										)}
+									>
+										<span className="text-xs">Growth</span>
+										<span className="text-xs font-mono">
+											{memoryTrend.growth > 0 ? "+" : ""}
+											{formatBytes(memoryTrend.growth)}
+										</span>
+									</div>
+									<div
+										className={cn("flex items-center justify-between", memoryTrend.potentialLeak && "text-negative")}
+									>
+										<span className="text-xs text-muted-fg">Growth/min</span>
+										<span className="text-xs font-mono">
+											{memoryTrend.growthPerMinute > 0 ? "+" : ""}
+											{formatBytes(memoryTrend.growthPerMinute)}
+										</span>
+									</div>
+									{memoryTrend.potentialLeak && (
+										<p className="text-2xs text-negative mt-1">Potential memory leak detected!</p>
+									)}
+								</>
 							)}
 						</div>
 					)}
@@ -305,6 +362,37 @@ export function PerfPanel({ onClose }: Props) {
 							</span>
 						</div>
 					</div>
+					{renderLog.length > 0 && (
+						<div className="mt-2 space-y-0.5">
+							<p className="text-2xs text-muted-fg uppercase tracking-wider">Top by Total Time:</p>
+							{Object.entries(
+								renderLog.reduce(
+									(acc, r) => {
+										if (!acc[r.componentName]) {
+											acc[r.componentName] = { total: 0, count: 0 };
+										}
+										acc[r.componentName].total += r.actualDuration;
+										acc[r.componentName].count++;
+										return acc;
+									},
+									{} as Record<string, { total: number; count: number }>,
+								),
+							)
+								.sort((a, b) => b[1].total - a[1].total)
+								.slice(0, 5)
+								.map(([name, data]) => (
+									<div key={name} className="flex items-center justify-between text-2xs">
+										<span className="truncate max-w-[120px]" title={name}>
+											{name}
+										</span>
+										<span className="font-mono text-muted-fg">
+											{data.count}x{" "}
+											<span className={data.total > 50 ? "text-warning" : ""}>{data.total.toFixed(0)}ms</span>
+										</span>
+									</div>
+								))}
+						</div>
+					)}
 					{slowRenders.length > 0 && (
 						<div className="mt-2 space-y-0.5">
 							<p className="text-2xs text-muted-fg uppercase tracking-wider">Recent Slow:</p>
@@ -339,9 +427,38 @@ export function PerfPanel({ onClose }: Props) {
 							<span className="text-xs font-mono">{formatBytes(totalNetworkSize)}</span>
 						</div>
 					</div>
-					<Button variant="ghost" size="xs" onClick={() => analyzeNetworkPerformance()} className="mt-2 text-muted-fg">
-						Analyze in Console
-					</Button>
+					{networkEntries.length > 0 && (
+						<>
+							<div className="mt-2 space-y-0.5">
+								<p className="text-2xs text-muted-fg uppercase tracking-wider">Slowest:</p>
+								{[...networkEntries]
+									.sort((a, b) => b.duration - a.duration)
+									.slice(0, 3)
+									.map((r, i) => (
+										<div key={`slow-${i}`} className="flex items-center justify-between text-2xs">
+											<span className="truncate max-w-[160px]" title={r.name}>
+												{getPathname(r.name)}
+											</span>
+											<span className="text-warning font-mono">{formatDuration(r.duration)}</span>
+										</div>
+									))}
+							</div>
+							<div className="mt-2 space-y-0.5">
+								<p className="text-2xs text-muted-fg uppercase tracking-wider">Largest:</p>
+								{[...networkEntries]
+									.sort((a, b) => b.transferSize - a.transferSize)
+									.slice(0, 3)
+									.map((r, i) => (
+										<div key={`large-${i}`} className="flex items-center justify-between text-2xs">
+											<span className="truncate max-w-[160px]" title={r.name}>
+												{getPathname(r.name)}
+											</span>
+											<span className="font-mono">{formatBytes(r.transferSize)}</span>
+										</div>
+									))}
+							</div>
+						</>
+					)}
 				</Section>
 
 				<Section
