@@ -24,10 +24,9 @@ import { buildOrders, formatSizeForOrder, throwIfResponseError } from "@/domain/
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
-import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo } from "@/lib/hyperliquid";
+import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo, useUserPositions } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeTwapOrder";
-import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import type { MarginMode } from "@/lib/trade/margin-mode";
 import {
 	clampInt,
@@ -109,11 +108,7 @@ export function OrderEntryPanel() {
 
 	const { data: market } = useSelectedMarketInfo();
 
-	const { data: clearinghouseEvent } = useSubClearinghouseState(
-		{ user: address ?? "0x0" },
-		{ enabled: isConnected && !!address },
-	);
-	const clearinghouse = clearinghouseEvent?.clearinghouseState;
+	const userPositions = useUserPositions();
 
 	const { isReady: isAgentReady, isLoading: isAgentLoading } = useAgentStatus();
 	const { register: registerAgent, status: registerStatus } = useAgentRegistration();
@@ -221,11 +216,8 @@ export function OrderEntryPanel() {
 
 	const isSubmitting = isSubmittingOrder || isSubmittingTwap;
 
-	const position =
-		!clearinghouse?.assetPositions || !baseToken
-			? null
-			: (clearinghouse.assetPositions.find((p) => p.position.coin === baseToken) ?? null);
-	const positionSize = parseNumberOrZero(position?.position?.szi);
+	const position = market?.name ? userPositions.getPosition(market.name) : null;
+	const positionSize = parseNumberOrZero(position?.szi);
 
 	const price = getOrderPrice(
 		orderType,

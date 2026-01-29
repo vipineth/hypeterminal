@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useConnection } from "wagmi";
 import { DEFAULT_MAX_LEVERAGE } from "@/config/constants";
-import { getMarketCapabilities, useSelectedMarketInfo } from "@/lib/hyperliquid";
+import { getMarketCapabilities, useSelectedMarketInfo, useUserPositions } from "@/lib/hyperliquid";
 import { useExchangeUpdateLeverage } from "@/lib/hyperliquid/hooks/exchange/useExchangeUpdateLeverage";
-import { useSubActiveAssetData, useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
+import { useSubActiveAssetData } from "@/lib/hyperliquid/hooks/subscription";
 import { getMarginModeFromLeverage, type MarginMode } from "@/lib/trade/margin-mode";
-import { parseNumber, toNumber } from "@/lib/trade/numbers";
+import { parseNumber } from "@/lib/trade/numbers";
 import { useGlobalSettingsActions, useMarginMode } from "@/stores/use-global-settings-store";
 
 type OperationType = "leverage" | "mode" | null;
@@ -58,10 +58,7 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		{ enabled: isConnected && !!address && !!baseToken },
 	);
 
-	const { data: clearinghouseEvent } = useSubClearinghouseState(
-		{ user: address ?? "" },
-		{ enabled: isConnected && !!address },
-	);
+	const userPositions = useUserPositions();
 
 	const { mutateAsync: updateLeverage, isPending, error, reset: resetMutation } = useExchangeUpdateLeverage();
 
@@ -83,12 +80,9 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	}, [isOnlyIsolated, isConnected, activeAssetData?.leverage, onChainMarginMode, storedMarginMode]);
 
 	const hasPosition = useMemo(() => {
-		if (!baseToken || !clearinghouseEvent?.clearinghouseState?.assetPositions) return false;
-		const position = clearinghouseEvent.clearinghouseState.assetPositions.find((p) => p.position.coin === baseToken);
-		if (!position) return false;
-		const size = toNumber(position.position.szi);
-		return size !== null && size !== 0;
-	}, [baseToken, clearinghouseEvent?.clearinghouseState?.assetPositions]);
+		if (!baseToken) return false;
+		return userPositions.hasPosition(baseToken);
+	}, [baseToken, userPositions]);
 
 	const currentLeverage = useMemo(() => {
 		if (isConnected && onChainLeverage !== null) {

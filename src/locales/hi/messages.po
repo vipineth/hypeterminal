@@ -1543,15 +1543,17 @@ msgstr "सहायता"
 
 #. placeholder {0}: markets.displayName(fill.coin)
 #. placeholder {0}: markets.displayName(order.state.coin)
-#. placeholder {0}: markets.displayName(row.coin)
 #: src/components/trade/positions/history-tab.tsx
-#: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Switch to {0} market"
 msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Switch to {displayCoin} market"
+msgstr ""
+
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Switch to {displayName} market"
 msgstr ""
 
 #: src/components/trade/order-entry/deposit-modal.tsx

@@ -32,6 +32,7 @@ export { useHttpTransport, useSubscriptionTransport } from "./hooks/useTransport
 // Legacy exports - deprecated, use useMarkets() instead
 export { getMarketKindFromName } from "./hooks/utils/markets";
 export * from "./market-key";
+export { type Position, type UserPositions, useUserPositions } from "./account";
 export {
 	type BuilderPerpMarket,
 	type Markets,

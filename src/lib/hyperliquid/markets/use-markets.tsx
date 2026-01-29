@@ -44,15 +44,16 @@ export function MarketsProvider({ children }: Props) {
 	return <MarketsContext.Provider value={markets}>{children}</MarketsContext.Provider>;
 }
 
-export function useMarketsContext(): Markets {
+export function useMarkets(): Markets {
 	const context = useContext(MarketsContext);
+
 	if (!context) {
-		throw new Error("useMarketsContext must be used within a MarketsProvider");
+		throw new Error("useMarkets must be used within a MarketsProvider");
 	}
 	return context;
 }
 
-export function useMarketsContextOptional(): Markets {
+export function useMarketsOptional(): Markets {
 	const context = useContext(MarketsContext);
 	return context ?? createEmptyMarkets();
 }

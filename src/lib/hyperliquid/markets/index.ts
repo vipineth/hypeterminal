@@ -1,4 +1,3 @@
-export { MarketsProvider } from "./context";
 export type {
 	BuilderPerpMarket,
 	Markets,
@@ -9,4 +8,4 @@ export type {
 	SpotToken,
 	UnifiedMarket,
 } from "./types";
-export { useMarkets } from "./use-markets";
+export { MarketsProvider, useMarkets, useMarketsOptional } from "./use-markets";

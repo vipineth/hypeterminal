@@ -2,12 +2,12 @@ import { useMemo } from "react";
 import type { MarketCtxNumbers } from "@/lib/market";
 import { toFiniteNumber } from "@/lib/trade/numbers";
 import { useSelectedMarket } from "@/stores/use-market-store";
-import { useMarketsContext } from "../markets/context";
+import { useMarkets } from "../markets/use-markets";
 import type { BuilderPerpMarket, PerpMarket, SpotMarket } from "../markets/types";
 import { useMarketsInfoContext } from "./MarketsInfoProvider";
+import type { AllDexsAssetCtxs } from "./subscription/useSubAllDexsAssetCtxs";
 import { useSubAllDexsAssetCtxs } from "./subscription/useSubAllDexsAssetCtxs";
 import { useSubSpotAssetCtxs } from "./subscription/useSubSpotAssetCtxs";
-import { useThrottledValue } from "./utils/useThrottledValue";
 
 export type PerpMarketInfo = PerpMarket & MarketCtxNumbers;
 export type SpotMarketInfo = SpotMarket & MarketCtxNumbers;
@@ -31,79 +31,70 @@ interface MarketsInfoResult {
 	markets: UnifiedMarketInfo[];
 }
 
+function getDexCtxs(allDexsCtxs: AllDexsAssetCtxs | undefined, dexName: string) {
+	if (!allDexsCtxs) return undefined;
+	const dexEntry = allDexsCtxs.find((entry) => entry[0] === dexName);
+	return dexEntry?.[1];
+}
+
+function getPerpCtxNumbers(ctx: { markPx?: string; prevDayPx?: string; openInterest?: string; oraclePx?: string; dayNtlVlm?: string; funding?: string } | undefined): MarketCtxNumbers {
+	return {
+		markPx: toFiniteNumber(ctx?.markPx),
+		prevDayPx: toFiniteNumber(ctx?.prevDayPx),
+		openInterest: toFiniteNumber(ctx?.openInterest),
+		oraclePx: toFiniteNumber(ctx?.oraclePx),
+		dayNtlVlm: toFiniteNumber(ctx?.dayNtlVlm),
+		funding: toFiniteNumber(ctx?.funding),
+	};
+}
+
+function getSpotCtxNumbers(ctx: { markPx?: string; prevDayPx?: string; dayNtlVlm?: string } | undefined): MarketCtxNumbers {
+	return {
+		markPx: toFiniteNumber(ctx?.markPx),
+		prevDayPx: toFiniteNumber(ctx?.prevDayPx),
+		openInterest: null,
+		oraclePx: null,
+		dayNtlVlm: toFiniteNumber(ctx?.dayNtlVlm),
+		funding: null,
+	};
+}
+
 export function useMarketsInfoInternal(options: UseMarketsInfoOptions = {}) {
 	const { updateInterval = 5000 } = options;
 
-	const markets = useMarketsContext();
-	const perpMarkets = markets.perp;
-	const spotMarkets = markets.spot;
-	const marketsLoading = markets.isLoading;
-	const marketsError = markets.error;
-
-	const { data: allDexsCtxsEvent } = useSubAllDexsAssetCtxs({ enabled: true });
-	const { data: spotCtxsEvent } = useSubSpotAssetCtxs({ enabled: true });
-
-	const throttledAllDexsCtxs = useThrottledValue(allDexsCtxsEvent, updateInterval);
-	const throttledSpotCtxs = useThrottledValue(spotCtxsEvent, updateInterval);
+	const markets = useMarkets();
+	const { data: allDexsCtxsEvent } = useSubAllDexsAssetCtxs({ enabled: true, throttleMs: updateInterval });
+	const { data: spotCtxsEvent } = useSubSpotAssetCtxs({ enabled: true, throttleMs: updateInterval });
 
 	const result = useMemo((): MarketsInfoResult => {
-		const allDexsCtxs = throttledAllDexsCtxs?.ctxs;
-		const perpCtxs = allDexsCtxs?.[0]?.[1];
+		const allDexsCtxs = allDexsCtxsEvent?.ctxs;
+		const perpCtxs = getDexCtxs(allDexsCtxs, "");
 
-		const perpMarketsInfo: PerpMarketInfo[] = perpMarkets.map((market) => {
-			const ctx = perpCtxs?.[market.ctxIndex];
-			return {
-				...market,
-				markPx: toFiniteNumber(ctx?.markPx),
-				prevDayPx: toFiniteNumber(ctx?.prevDayPx),
-				openInterest: toFiniteNumber(ctx?.openInterest),
-				oraclePx: toFiniteNumber(ctx?.oraclePx),
-				dayNtlVlm: toFiniteNumber(ctx?.dayNtlVlm),
-				funding: toFiniteNumber(ctx?.funding),
-			};
-		});
+		const perpMarketsInfo: PerpMarketInfo[] = markets.perp.map((market) => ({
+			...market,
+			...getPerpCtxNumbers(perpCtxs?.[market.ctxIndex]),
+		}));
 
-		const spotMarketsInfo: SpotMarketInfo[] = spotMarkets.map((market) => {
-			const ctx = throttledSpotCtxs?.[market.ctxIndex];
-			return {
-				...market,
-				markPx: toFiniteNumber(ctx?.markPx),
-				prevDayPx: toFiniteNumber(ctx?.prevDayPx),
-				openInterest: null,
-				oraclePx: null,
-				dayNtlVlm: toFiniteNumber(ctx?.dayNtlVlm),
-				funding: null,
-			};
-		});
+		const spotMarketsInfo: SpotMarketInfo[] = markets.spot.map((market) => ({
+			...market,
+			...getSpotCtxNumbers(spotCtxsEvent?.[market.ctxIndex]),
+		}));
 
 		const builderPerpMarketsInfo: BuilderPerpMarketsInfo = { all: [] };
-		const builderPerpsByDex = new Map<string, BuilderPerpMarket[]>();
+
 		for (const market of markets.builderPerp) {
-			const existing = builderPerpsByDex.get(market.dex) ?? [];
-			existing.push(market);
-			builderPerpsByDex.set(market.dex, existing);
-		}
+			const dexCtxs = getDexCtxs(allDexsCtxs, market.dex);
+			const marketInfo: BuilderPerpMarketInfo = {
+				...market,
+				...getPerpCtxNumbers(dexCtxs?.[market.ctxIndex]),
+			};
 
-		for (const [dexName, dexMarkets] of builderPerpsByDex) {
-			if (!dexMarkets.length) continue;
+			builderPerpMarketsInfo.all.push(marketInfo);
 
-			const dexCtxs = allDexsCtxs?.[dexMarkets[0].dexIndex]?.[1];
-
-			const dexMarketsInfo: BuilderPerpMarketInfo[] = dexMarkets.map((market) => {
-				const ctx = dexCtxs?.[market.ctxIndex];
-				return {
-					...market,
-					markPx: toFiniteNumber(ctx?.markPx),
-					prevDayPx: toFiniteNumber(ctx?.prevDayPx),
-					openInterest: toFiniteNumber(ctx?.openInterest),
-					oraclePx: toFiniteNumber(ctx?.oraclePx),
-					dayNtlVlm: toFiniteNumber(ctx?.dayNtlVlm),
-					funding: toFiniteNumber(ctx?.funding),
-				};
-			});
-
-			builderPerpMarketsInfo[dexName] = dexMarketsInfo;
-			builderPerpMarketsInfo.all.push(...dexMarketsInfo);
+			if (!builderPerpMarketsInfo[market.dex]) {
+				builderPerpMarketsInfo[market.dex] = [];
+			}
+			builderPerpMarketsInfo[market.dex].push(marketInfo);
 		}
 
 		return {
@@ -112,7 +103,7 @@ export function useMarketsInfoInternal(options: UseMarketsInfoOptions = {}) {
 			builderPerpMarkets: builderPerpMarketsInfo,
 			markets: [...perpMarketsInfo, ...spotMarketsInfo, ...builderPerpMarketsInfo.all],
 		};
-	}, [perpMarkets, spotMarkets, markets.builderPerp, throttledAllDexsCtxs, throttledSpotCtxs]);
+	}, [markets.perp, markets.spot, markets.builderPerp, allDexsCtxsEvent, spotCtxsEvent]);
 
 	const marketLookup = useMemo(() => {
 		const byName = new Map<string, UnifiedMarketInfo>();
@@ -134,9 +125,8 @@ export function useMarketsInfoInternal(options: UseMarketsInfoOptions = {}) {
 
 	return {
 		...result,
-		perpDexs: undefined,
-		isLoading: marketsLoading,
-		error: marketsError,
+		isLoading: markets.isLoading,
+		error: markets.error,
 		getMarketInfo,
 	};
 }

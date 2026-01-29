@@ -89,6 +89,7 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 	}, []);
 
 	const { markets, spotMarkets, builderPerpMarkets, isLoading } = useMarketsInfo();
+
 	const favorites = useFavoriteMarkets();
 	const { toggleFavoriteMarket } = useMarketActions();
 
