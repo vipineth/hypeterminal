@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
-import { cn } from "@/lib/cn";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
+import { cn } from "@/lib/cn";
 import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { parseNumber } from "@/lib/trade/numbers";
 import { MobileAccountView } from "./mobile-account-view";

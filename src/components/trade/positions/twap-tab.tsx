@@ -148,10 +148,7 @@ export function TwapTab() {
 												<div className="flex items-center gap-2">
 													<div className="flex-1 h-1.5 bg-accent/30 rounded-full overflow-hidden">
 														<div
-															className={cn(
-																"h-full rounded-full",
-																status === "finished" ? "bg-positive" : "bg-info",
-															)}
+															className={cn("h-full rounded-full", status === "finished" ? "bg-positive" : "bg-info")}
 															style={{ width: `${progressPct}%` }}
 														/>
 													</div>

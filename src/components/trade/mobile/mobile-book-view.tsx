@@ -296,15 +296,15 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 							<div className="flex-1 flex flex-col gap-px py-1 overflow-hidden">
 								{bids.slice(0, 12).map((level, index) => (
 									<OrderbookRow
-									key={`bid-${level.price}-${index}`}
-									level={level}
-									side="bid"
-									maxTotal={maxTotal}
-									showInQuote={showOrderbookInQuote}
-									szDecimals={szDecimals}
-								/>
-							))}
-						</div>
+										key={`bid-${level.price}-${index}`}
+										level={level}
+										side="bid"
+										maxTotal={maxTotal}
+										showInQuote={showOrderbookInQuote}
+										szDecimals={szDecimals}
+									/>
+								))}
+							</div>
 						) : null}
 					</div>
 

@@ -7,11 +7,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
+import {
+	type BalanceRow,
+	filterBalanceRowsByUsdValue,
+	getBalanceRows,
+	getTotalUsdValue,
+} from "@/domain/trade/balances";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken, formatUSD } from "@/lib/format";
 import { useMarkets } from "@/lib/hyperliquid";
-import { type BalanceRow, filterBalanceRowsByUsdValue, getBalanceRows, getTotalUsdValue } from "@/domain/trade/balances";
 import { useGlobalSettingsActions, useHideSmallBalances } from "@/stores/use-global-settings-store";
 import { TokenAvatar } from "../components/token-avatar";
 import { SendDialog } from "./send-dialog";

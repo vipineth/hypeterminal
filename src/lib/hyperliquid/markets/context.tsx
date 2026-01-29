@@ -13,23 +13,11 @@ interface Props {
 }
 
 export function MarketsProvider({ children }: Props) {
-	const {
-		data: perpMeta,
-		isLoading: perpLoading,
-		error: perpError,
-	} = useInfoMeta({}, { refetchInterval: Infinity });
+	const { data: perpMeta, isLoading: perpLoading, error: perpError } = useInfoMeta({}, { refetchInterval: Infinity });
 
-	const {
-		data: spotMeta,
-		isLoading: spotLoading,
-		error: spotError,
-	} = useInfoSpotMeta({ refetchInterval: Infinity });
+	const { data: spotMeta, isLoading: spotLoading, error: spotError } = useInfoSpotMeta({ refetchInterval: Infinity });
 
-	const {
-		data: perpDexs,
-		isLoading: dexsLoading,
-		error: dexsError,
-	} = useInfoPerpDexs({ refetchInterval: Infinity });
+	const { data: perpDexs, isLoading: dexsLoading, error: dexsError } = useInfoPerpDexs({ refetchInterval: Infinity });
 
 	const {
 		data: allPerpMetas,

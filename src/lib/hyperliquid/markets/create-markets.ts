@@ -1,13 +1,6 @@
 import type { MetaResponse, PerpDexsResponse, SpotMetaResponse } from "@nktkas/hyperliquid";
 import { getUnderlyingAsset } from "@/lib/tokens";
-import type {
-	BuilderPerpMarket,
-	Markets,
-	PerpMarket,
-	SpotMarket,
-	SpotToken,
-	UnifiedMarket,
-} from "./types";
+import type { BuilderPerpMarket, Markets, PerpMarket, SpotMarket, SpotToken, UnifiedMarket } from "./types";
 
 const PERP_NAME_SEPARATOR = "-";
 const SPOT_NAME_SEPARATOR = "/";
@@ -71,18 +64,13 @@ export function createMarkets(params: CreateMarketsParams): Markets {
 
 	if (spotMeta?.universe && spotMeta?.tokens) {
 		for (const pair of spotMeta.universe) {
-			const tokensInfo = pair.tokens
-				.map((idx) => spotMeta.tokens[idx])
-				.filter((t): t is SpotToken => !!t);
+			const tokensInfo = pair.tokens.map((idx) => spotMeta.tokens[idx]).filter((t): t is SpotToken => !!t);
 
 			if (tokensInfo.length < 2) continue;
 
 			const [baseToken, quoteToken] = tokensInfo;
 			const underlyingBaseToken = getUnderlyingAsset(baseToken);
-			const displayName = getSpotDisplayName(
-				underlyingBaseToken ?? baseToken.name,
-				quoteToken.name,
-			);
+			const displayName = getSpotDisplayName(underlyingBaseToken ?? baseToken.name, quoteToken.name);
 
 			spotMarkets.push({
 				...pair,
