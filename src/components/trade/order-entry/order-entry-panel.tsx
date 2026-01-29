@@ -23,7 +23,7 @@ import { getSliderValue } from "@/domain/trade/order/size";
 import { buildOrders, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import { cn } from "@/lib/cn";
-import { formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
+import { formatPrice, formatToken, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo, useUserPositions } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeTwapOrder";
@@ -446,11 +446,9 @@ export function OrderEntryPanel() {
 
 	function formatAvailableBalance(): string {
 		if (!isConnected) return FALLBACK_VALUE_PLACEHOLDER;
-		if (isSpotMarket) {
-			const decimals = side === "buy" ? 2 : szDecimals;
-			return `${formatToken(availableBalance, decimals)} ${availableBalanceToken}`;
-		}
-		return formatUSD(availableBalance);
+		const isBaseToken = isSpotMarket && side === "sell";
+		const decimals = isBaseToken ? szDecimals : 2;
+		return `${formatToken(availableBalance, decimals)} ${availableBalanceToken}`;
 	}
 
 	return (

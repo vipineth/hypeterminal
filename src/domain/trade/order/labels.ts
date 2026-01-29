@@ -25,13 +25,14 @@ interface SizeModeLabelInput {
 
 export function getSizeModeLabel(input: SizeModeLabelInput): string {
 	const { isSpotMarket, side, sizeMode, baseToken, spotBalance } = input;
+	const quoteToken = spotBalance.quoteToken || "USDC";
 
 	if (isSpotMarket) {
 		if (side === "buy") {
-			return sizeMode === "usd" ? spotBalance.quoteToken || "USDC" : baseToken || "---";
+			return sizeMode === "usd" ? quoteToken : baseToken || "---";
 		}
-		return sizeMode === "asset" ? baseToken || "---" : spotBalance.quoteToken || "USD";
+		return sizeMode === "asset" ? baseToken || "---" : quoteToken;
 	}
 
-	return sizeMode === "asset" ? baseToken || "---" : "USD";
+	return sizeMode === "asset" ? baseToken || "---" : quoteToken;
 }

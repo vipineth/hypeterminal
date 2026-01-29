@@ -85,7 +85,6 @@ export function createMarkets(params: CreateMarketsParams): Markets {
 		}
 	}
 
-	// Build builder perp markets
 	const builderPerpMarkets: BuilderPerpMarket[] = [];
 	if (allPerpMetas && perpDexs && allPerpMetas.length > 1) {
 		for (let dexIndex = 1; dexIndex < allPerpMetas.length; dexIndex++) {

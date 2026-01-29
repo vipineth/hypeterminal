@@ -2,8 +2,8 @@ import { useMemo } from "react";
 import type { MarketCtxNumbers } from "@/lib/market";
 import { toFiniteNumber } from "@/lib/trade/numbers";
 import { useSelectedMarket } from "@/stores/use-market-store";
-import { useMarkets } from "../markets/use-markets";
 import type { BuilderPerpMarket, PerpMarket, SpotMarket } from "../markets/types";
+import { useMarkets } from "../markets/use-markets";
 import { useMarketsInfoContext } from "./MarketsInfoProvider";
 import type { AllDexsAssetCtxs } from "./subscription/useSubAllDexsAssetCtxs";
 import { useSubAllDexsAssetCtxs } from "./subscription/useSubAllDexsAssetCtxs";
@@ -37,7 +37,18 @@ function getDexCtxs(allDexsCtxs: AllDexsAssetCtxs | undefined, dexName: string) 
 	return dexEntry?.[1];
 }
 
-function getPerpCtxNumbers(ctx: { markPx?: string; prevDayPx?: string; openInterest?: string; oraclePx?: string; dayNtlVlm?: string; funding?: string } | undefined): MarketCtxNumbers {
+function getPerpCtxNumbers(
+	ctx:
+		| {
+				markPx?: string;
+				prevDayPx?: string;
+				openInterest?: string;
+				oraclePx?: string;
+				dayNtlVlm?: string;
+				funding?: string;
+		  }
+		| undefined,
+): MarketCtxNumbers {
 	return {
 		markPx: toFiniteNumber(ctx?.markPx),
 		prevDayPx: toFiniteNumber(ctx?.prevDayPx),
@@ -48,7 +59,9 @@ function getPerpCtxNumbers(ctx: { markPx?: string; prevDayPx?: string; openInter
 	};
 }
 
-function getSpotCtxNumbers(ctx: { markPx?: string; prevDayPx?: string; dayNtlVlm?: string } | undefined): MarketCtxNumbers {
+function getSpotCtxNumbers(
+	ctx: { markPx?: string; prevDayPx?: string; dayNtlVlm?: string } | undefined,
+): MarketCtxNumbers {
 	return {
 		markPx: toFiniteNumber(ctx?.markPx),
 		prevDayPx: toFiniteNumber(ctx?.prevDayPx),

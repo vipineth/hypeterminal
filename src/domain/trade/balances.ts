@@ -2,6 +2,22 @@ import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 import { parseNumberOrZero } from "@/lib/trade/numbers";
 import type { Side } from "@/lib/trade/types";
 
+const DEFAULT_QUOTE_TOKEN = "USDC";
+
+export function getMarketQuoteToken(market: UnifiedMarketInfo | undefined): string {
+	if (!market) return DEFAULT_QUOTE_TOKEN;
+
+	if (market.kind === "spot") {
+		return market.tokensInfo?.[1]?.name ?? DEFAULT_QUOTE_TOKEN;
+	}
+
+	if (market.kind === "builderPerp") {
+		return market.quoteToken?.name ?? DEFAULT_QUOTE_TOKEN;
+	}
+
+	return DEFAULT_QUOTE_TOKEN;
+}
+
 export interface SpotBalanceLike {
 	coin: string;
 	total?: string;
@@ -57,37 +73,60 @@ export function getSpotBalanceData(
 	spotBalances: SpotBalanceLike[] | null | undefined,
 	market: UnifiedMarketInfo | undefined,
 ): SpotBalanceData {
-	if (!market || market.kind !== "spot") {
-		return { baseAvailable: 0, quoteAvailable: 0, baseToken: "", quoteToken: "USDC" };
+	const quoteToken = getMarketQuoteToken(market);
+
+	if (!market) {
+		return { baseAvailable: 0, quoteAvailable: 0, baseToken: "", quoteToken };
 	}
 
-	const baseToken = market.tokensInfo?.[0]?.name ?? "";
-	const quoteToken = market.tokensInfo?.[1]?.name ?? "USDC";
+	if (market.kind === "spot") {
+		const baseToken = market.tokensInfo?.[0]?.name ?? "";
+		const baseBalance = getSpotBalance(spotBalances, baseToken);
+		const quoteBalance = getSpotBalance(spotBalances, quoteToken);
 
-	const baseBalance = getSpotBalance(spotBalances, baseToken);
-	const quoteBalance = getSpotBalance(spotBalances, quoteToken);
+		return {
+			baseAvailable: getAvailableFromTotals(baseBalance?.total, baseBalance?.hold),
+			quoteAvailable: getAvailableFromTotals(quoteBalance?.total, quoteBalance?.hold),
+			baseToken,
+			quoteToken,
+		};
+	}
 
-	return {
-		baseAvailable: getAvailableFromTotals(baseBalance?.total, baseBalance?.hold),
-		quoteAvailable: getAvailableFromTotals(quoteBalance?.total, quoteBalance?.hold),
-		baseToken,
-		quoteToken,
-	};
+	if (market.kind === "builderPerp") {
+		const quoteBalance = getSpotBalance(spotBalances, quoteToken);
+		return {
+			baseAvailable: 0,
+			quoteAvailable: getAvailableFromTotals(quoteBalance?.total, quoteBalance?.hold),
+			baseToken: "",
+			quoteToken,
+		};
+	}
+
+	return { baseAvailable: 0, quoteAvailable: 0, baseToken: "", quoteToken };
 }
 
 export function getAvailableBalance(
-	isSpotMarket: boolean,
+	market: UnifiedMarketInfo | undefined,
 	side: Side,
 	spotBalance: SpotBalanceData,
 	perpAvailable: number,
 ): number {
-	if (!isSpotMarket) return perpAvailable;
-	return side === "buy" ? spotBalance.quoteAvailable : spotBalance.baseAvailable;
+	if (market?.kind === "spot") {
+		return side === "buy" ? spotBalance.quoteAvailable : spotBalance.baseAvailable;
+	}
+
+	if (market?.kind === "builderPerp") {
+		return spotBalance.quoteAvailable;
+	}
+
+	return perpAvailable;
 }
 
-export function getAvailableBalanceToken(isSpotMarket: boolean, side: Side, spotBalance: SpotBalanceData): string {
-	if (!isSpotMarket) return "USD";
-	return side === "buy" ? spotBalance.quoteToken : spotBalance.baseToken;
+export function getAvailableBalanceToken(market: UnifiedMarketInfo | undefined, side: Side, spotBalance: SpotBalanceData): string {
+	if (market?.kind === "spot" && side === "sell") {
+		return spotBalance.baseToken;
+	}
+	return spotBalance.quoteToken;
 }
 
 export function getBalanceRows(
@@ -98,7 +137,6 @@ export function getBalanceRows(
 	const balances = spotBalances ?? [];
 
 	const perpAccountValue = parseNumberOrZero(perpSummary?.accountValue);
-	const perpMarginUsed = parseNumberOrZero(perpSummary?.totalMarginUsed);
 	const perpAvailable = getPerpAvailable(perpSummary?.accountValue, perpSummary?.totalMarginUsed);
 
 	if (perpAccountValue > 0) {
