@@ -24,6 +24,7 @@ const globalSettingsSchema = z.object({
 		numberFormatLocale: z.string().optional(),
 		marketOrderSlippageBps: z.number().int().optional(),
 		marginMode: z.enum(["cross", "isolated"]).optional(),
+		positionsActiveTab: z.string().optional(),
 	}),
 });
 
@@ -39,6 +40,7 @@ const DEFAULT_GLOBAL_SETTINGS = {
 	numberFormatLocale: "auto" as NumberFormatLocale,
 	marketOrderSlippageBps: DEFAULT_MARKET_ORDER_SLIPPAGE_BPS,
 	marginMode: "cross" as MarginMode,
+	positionsActiveTab: "positions",
 } as const;
 
 interface GlobalSettingsStore {
@@ -51,6 +53,7 @@ interface GlobalSettingsStore {
 	numberFormatLocale: NumberFormatLocale;
 	marketOrderSlippageBps: number;
 	marginMode: MarginMode;
+	positionsActiveTab: string;
 	actions: {
 		setHideSmallBalances: (next: boolean) => void;
 		setShowOrdersOnChart: (next: boolean) => void;
@@ -61,6 +64,7 @@ interface GlobalSettingsStore {
 		setNumberFormatLocale: (next: NumberFormatLocale) => void;
 		setMarketOrderSlippageBps: (bps: number) => void;
 		setMarginMode: (mode: MarginMode) => void;
+		setPositionsActiveTab: (tab: string) => void;
 	};
 }
 
@@ -82,6 +86,7 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 					set({ marketOrderSlippageBps: next });
 				},
 				setMarginMode: (mode) => set({ marginMode: mode }),
+				setPositionsActiveTab: (tab) => set({ positionsActiveTab: tab }),
 			},
 		}),
 		{
@@ -97,6 +102,7 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 				numberFormatLocale: state.numberFormatLocale,
 				marketOrderSlippageBps: state.marketOrderSlippageBps,
 				marginMode: state.marginMode,
+				positionsActiveTab: state.positionsActiveTab,
 			}),
 			merge: (persisted, current) => {
 				const p = persisted as Partial<GlobalSettingsStore>;
@@ -158,4 +164,8 @@ export function getResolvedFormatLocale(): string {
 
 export function useHideSmallBalances() {
 	return useGlobalSettingsStore((state) => state.hideSmallBalances);
+}
+
+export function usePositionsActiveTab() {
+	return useGlobalSettingsStore((state) => state.positionsActiveTab);
 }

@@ -2,10 +2,11 @@ import { useMemo } from "react";
 import type { MarketCtxNumbers } from "@/lib/market";
 import { toFiniteNumber } from "@/lib/trade/numbers";
 import { useSelectedMarket } from "@/stores/use-market-store";
+import { useMarketsContext } from "../markets/context";
+import type { BuilderPerpMarket, PerpMarket, SpotMarket } from "../markets/types";
 import { useMarketsInfoContext } from "./MarketsInfoProvider";
 import { useSubAllDexsAssetCtxs } from "./subscription/useSubAllDexsAssetCtxs";
 import { useSubSpotAssetCtxs } from "./subscription/useSubSpotAssetCtxs";
-import { type BuilderPerpMarket, type PerpMarket, type SpotMarket, useMarkets } from "./useMarkets";
 import { useThrottledValue } from "./utils/useThrottledValue";
 
 export type PerpMarketInfo = PerpMarket & MarketCtxNumbers;
@@ -20,9 +21,6 @@ export interface BuilderPerpMarketsInfo {
 }
 
 export interface UseMarketsInfoOptions {
-	perp?: boolean;
-	spot?: boolean;
-	builderDexs?: boolean;
 	updateInterval?: number;
 }
 
@@ -34,19 +32,16 @@ interface MarketsInfoResult {
 }
 
 export function useMarketsInfoInternal(options: UseMarketsInfoOptions = {}) {
-	const { perp = true, spot = false, builderDexs = false, updateInterval = 5000 } = options;
+	const { updateInterval = 5000 } = options;
 
-	const {
-		perpMarkets,
-		spotMarkets,
-		builderPerpMarkets,
-		perpDexs,
-		isLoading: marketsLoading,
-		error: marketsError,
-	} = useMarkets({ perp, spot, builderDexs });
+	const markets = useMarketsContext();
+	const perpMarkets = markets.perp;
+	const spotMarkets = markets.spot;
+	const marketsLoading = markets.isLoading;
+	const marketsError = markets.error;
 
-	const { data: allDexsCtxsEvent } = useSubAllDexsAssetCtxs({ enabled: perp || builderDexs });
-	const { data: spotCtxsEvent } = useSubSpotAssetCtxs({ enabled: spot });
+	const { data: allDexsCtxsEvent } = useSubAllDexsAssetCtxs({ enabled: true });
+	const { data: spotCtxsEvent } = useSubSpotAssetCtxs({ enabled: true });
 
 	const throttledAllDexsCtxs = useThrottledValue(allDexsCtxsEvent, updateInterval);
 	const throttledSpotCtxs = useThrottledValue(spotCtxsEvent, updateInterval);
@@ -82,10 +77,14 @@ export function useMarketsInfoInternal(options: UseMarketsInfoOptions = {}) {
 		});
 
 		const builderPerpMarketsInfo: BuilderPerpMarketsInfo = { all: [] };
-		for (const dexName of Object.keys(builderPerpMarkets)) {
-			if (dexName === "all") continue;
+		const builderPerpsByDex = new Map<string, BuilderPerpMarket[]>();
+		for (const market of markets.builderPerp) {
+			const existing = builderPerpsByDex.get(market.dex) ?? [];
+			existing.push(market);
+			builderPerpsByDex.set(market.dex, existing);
+		}
 
-			const dexMarkets = builderPerpMarkets[dexName];
+		for (const [dexName, dexMarkets] of builderPerpsByDex) {
 			if (!dexMarkets.length) continue;
 
 			const dexCtxs = allDexsCtxs?.[dexMarkets[0].dexIndex]?.[1];
@@ -113,7 +112,7 @@ export function useMarketsInfoInternal(options: UseMarketsInfoOptions = {}) {
 			builderPerpMarkets: builderPerpMarketsInfo,
 			markets: [...perpMarketsInfo, ...spotMarketsInfo, ...builderPerpMarketsInfo.all],
 		};
-	}, [perpMarkets, spotMarkets, builderPerpMarkets, throttledAllDexsCtxs, throttledSpotCtxs]);
+	}, [perpMarkets, spotMarkets, markets.builderPerp, throttledAllDexsCtxs, throttledSpotCtxs]);
 
 	const marketLookup = useMemo(() => {
 		const byName = new Map<string, UnifiedMarketInfo>();
@@ -135,7 +134,7 @@ export function useMarketsInfoInternal(options: UseMarketsInfoOptions = {}) {
 
 	return {
 		...result,
-		perpDexs,
+		perpDexs: undefined,
 		isLoading: marketsLoading,
 		error: marketsError,
 		getMarketInfo,

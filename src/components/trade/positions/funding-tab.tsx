@@ -1,15 +1,14 @@
 import { t } from "@lingui/core/macro";
 import { Percent } from "lucide-react";
-import { useMemo } from "react";
 import { useConnection } from "wagmi";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
-import { formatNumber, formatPercent, formatUSD } from "@/lib/format";
+import { formatDateTimeShort, formatPercent, formatToken, formatUSD } from "@/lib/format";
 import { useMarkets } from "@/lib/hyperliquid";
 import { useSubUserFundings } from "@/lib/hyperliquid/hooks/subscription";
-import { parseNumber, toNumberOrZero } from "@/lib/trade/numbers";
+import { getValueColorClass, parseNumber, toNumberOrZero } from "@/lib/trade/numbers";
 
 interface PlaceholderProps {
 	children: React.ReactNode;
@@ -36,44 +35,16 @@ export function FundingTab() {
 		status,
 		error,
 	} = useSubUserFundings({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
-	const data = fundingEvent?.fundings;
-	const { getSzDecimals } = useMarkets();
+	const markets = useMarkets();
 
-	const updates = useMemo(() => {
-		const raw = data ?? [];
-		const sorted = [...raw].sort((a, b) => b.time - a.time);
-		return sorted.slice(0, 200);
-	}, [data]);
-
-	const totalFunding = useMemo(() => {
-		return updates.reduce((acc, f) => acc + toNumberOrZero(f.usdc), 0);
-	}, [updates]);
+	const updates = fundingEvent?.fundings?.slice(0, 200).sort((a, b) => b.time - a.time) ?? [];
+	const totalFunding = updates.reduce((acc, f) => acc + toNumberOrZero(f.usdc), 0);
 
 	const headerTotal =
 		isConnected && status === "active"
 			? formatUSD(totalFunding, { signDisplay: "exceptZero" })
 			: FALLBACK_VALUE_PLACEHOLDER;
-	const headerClass = totalFunding >= 0 ? "text-positive" : "text-negative";
-
-	const tableRows = useMemo(() => {
-		return updates.map((update, index) => {
-			const szi = parseNumber(update.szi);
-			const isLong = Number.isFinite(szi) ? szi > 0 : true;
-			const rate = parseNumber(update.fundingRate);
-			const usdc = parseNumber(update.usdc);
-
-			return {
-				key: `${update.coin}-${update.time}-${index}`,
-				coin: update.coin,
-				isLong,
-				positionSize: Number.isFinite(szi) ? Math.abs(szi) : null,
-				szDecimals: getSzDecimals(update.coin) ?? 4,
-				rate,
-				usdc,
-				time: update.time,
-			};
-		});
-	}, [updates, getSzDecimals]);
+	const headerClass = getValueColorClass(totalFunding);
 
 	function renderPlaceholder() {
 		if (!isConnected) return <Placeholder>{t`Connect your wallet to view funding payments.`}</Placeholder>;
@@ -122,43 +93,44 @@ export function FundingTab() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{tableRows.map((row) => {
-									const sideClass = row.isLong ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
-									const rateClass = row.rate >= 0 ? "text-positive" : "text-negative";
-									const paymentClass = row.usdc >= 0 ? "text-positive" : "text-negative";
-									const date = new Date(row.time);
-									const timeStr = date.toLocaleTimeString("en-US", {
-										hour: "2-digit",
-										minute: "2-digit",
-										hour12: false,
-									});
-									const dateStr = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+								{updates.map((update, index) => {
+									const szi = parseNumber(update.szi);
+									const isLong = Number.isFinite(szi) ? szi > 0 : true;
+									const rate = parseNumber(update.fundingRate);
+									const usdc = parseNumber(update.usdc);
+									const szDecimals = markets.szDecimals(update.coin) ?? 4;
+									const positionSize = Number.isFinite(szi) ? Math.abs(szi) : null;
+
+									const sideClass = isLong ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
 
 									return (
-										<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
+										<TableRow
+											key={`${update.coin}-${update.time}-${index}`}
+											className="border-border/40 hover:bg-accent/30"
+										>
 											<TableCell className="text-2xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">
 													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideClass)}>
-														{row.isLong ? t`Long` : t`Short`}
+														{isLong ? t`Long` : t`Short`}
 													</span>
-													<span>{row.coin}</span>
+													<span>{markets.displayName(update.coin)}</span>
 												</div>
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
-												{formatNumber(row.positionSize, row.szDecimals)}
+												{formatToken(positionSize, { digits: szDecimals, symbol: update.coin })}
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
-												<span className={rateClass}>
-													{formatPercent(row.rate, { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
+												<span className={getValueColorClass(rate)}>
+													{formatPercent(rate, { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
 												</span>
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
-												<span className={paymentClass}>{formatUSD(row.usdc, { signDisplay: "exceptZero" })}</span>
+												<span className={getValueColorClass(usdc)}>{formatToken(usdc, { symbol: "USDC" })}</span>
 											</TableCell>
+
 											<TableCell className="text-2xs text-right tabular-nums text-muted-fg py-1.5">
 												<div className="flex flex-col items-end">
-													<span>{timeStr}</span>
-													<span className="text-4xs">{dateStr}</span>
+													<span>{formatDateTimeShort(update.time)}</span>
 												</div>
 											</TableCell>
 										</TableRow>

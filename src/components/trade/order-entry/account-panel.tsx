@@ -6,7 +6,7 @@ import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatToken, formatUSD } from "@/lib/format";
-import { parseNumberOrZero } from "@/lib/trade/numbers";
+import { getValueColorClass, parseNumberOrZero } from "@/lib/trade/numbers";
 import { useDepositModalActions } from "@/stores/use-deposit-modal-store";
 
 type SummaryRow = {
@@ -112,11 +112,7 @@ export function AccountPanel() {
 			: FALLBACK_VALUE_PLACEHOLDER;
 
 	const headerPnlClass =
-		activeTab === "perps" && hasPerpData
-			? perpMetrics.unrealizedPnl >= 0
-				? "text-positive"
-				: "text-negative"
-			: "text-muted-fg";
+		activeTab === "perps" && hasPerpData ? getValueColorClass(perpMetrics.unrealizedPnl) : "text-muted-fg";
 
 	const perpRows = useMemo((): SummaryRow[] => {
 		if (!perpMetrics) return [];
@@ -129,7 +125,7 @@ export function AccountPanel() {
 			{
 				label: t`Unrealized PNL`,
 				value: formatUSD(perpMetrics.unrealizedPnl, { signDisplay: "exceptZero" }),
-				valueClass: cn("tabular-nums", perpMetrics.unrealizedPnl >= 0 ? "text-positive" : "text-negative"),
+				valueClass: cn("tabular-nums", getValueColorClass(perpMetrics.unrealizedPnl)),
 			},
 			{
 				label: t`Available`,

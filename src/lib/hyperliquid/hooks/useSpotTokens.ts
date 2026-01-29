@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { getIconUrlFromToken, getUnderlyingAsset } from "@/lib/tokens";
+import type { SpotToken } from "../markets/types";
 import { useInfoSpotMeta } from "./info/useInfoSpotMeta";
-import type { SpotToken } from "./useMarkets";
 
 export function useSpotTokens() {
 	const { data: spotMeta, isLoading, error } = useInfoSpotMeta({ refetchInterval: Infinity });

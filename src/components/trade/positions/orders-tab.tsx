@@ -49,7 +49,7 @@ export function OrdersTab() {
 		status,
 		error,
 	} = useSubOpenOrders({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
-	const { getAssetId, getSzDecimals } = useMarkets();
+	const markets = useMarkets();
 	const [selectedOrderIds, setSelectedOrderIds] = useState<Set<number>>(() => new Set());
 
 	const {
@@ -117,7 +117,7 @@ export function OrdersTab() {
 			if (isCancelling || ordersToCancel.length === 0) return;
 
 			const cancels = ordersToCancel.reduce<{ a: number; o: number }[]>((acc, order) => {
-				const assetId = getAssetId(order.coin);
+				const assetId = markets.assetId(order.coin);
 				if (typeof assetId !== "number") return acc;
 				acc.push({ a: assetId, o: order.oid });
 				return acc;
@@ -141,7 +141,7 @@ export function OrdersTab() {
 				},
 			);
 		},
-		[isCancelling, getAssetId, cancelOrders, resetCancelError],
+		[isCancelling, markets, cancelOrders, resetCancelError],
 	);
 
 	const handleCancelSelected = useCallback(() => {
@@ -241,7 +241,8 @@ export function OrdersTab() {
 									<OrderRow
 										key={order.oid}
 										order={order}
-										szDecimals={getSzDecimals(order.coin) ?? 4}
+										displayCoin={markets.displayName(order.coin)}
+										szDecimals={markets.szDecimals(order.coin)}
 										isSelected={selectedOrderIds.has(order.oid)}
 										isCancelling={isCancelling}
 										canCancel={canCancel}
@@ -262,6 +263,7 @@ export function OrdersTab() {
 
 interface OrderRowProps {
 	order: OpenOrder;
+	displayCoin: string;
 	szDecimals: number;
 	isSelected: boolean;
 	isCancelling: boolean;
@@ -273,6 +275,7 @@ interface OrderRowProps {
 
 function OrderRow({
 	order,
+	displayCoin,
 	szDecimals,
 	isSelected,
 	isCancelling,
@@ -291,7 +294,7 @@ function OrderRow({
 				<Checkbox
 					checked={isSelected}
 					onCheckedChange={(value) => onToggle(order.oid, value)}
-					aria-label={`${t`Select order`} ${order.coin}`}
+					aria-label={`${t`Select order`} ${displayCoin}`}
 					disabled={isCancelling}
 				/>
 			</TableCell>
@@ -305,10 +308,10 @@ function OrderRow({
 						size="none"
 						onClick={() => onSelectMarket(order.coin)}
 						className="gap-1.5"
-						aria-label={t`Switch to ${order.coin} market`}
+						aria-label={t`Switch to ${displayCoin} market`}
 					>
-						<TokenAvatar symbol={order.coin} />
-						<span>{order.coin}</span>
+						<TokenAvatar symbol={displayCoin} />
+						<span>{displayCoin}</span>
 					</Button>
 					<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideConfig.class)}>{sideConfig.label}</span>
 				</div>
@@ -320,7 +323,7 @@ function OrderRow({
 				{formatUSD(order.limitPx, { compact: false })}
 			</TableCell>
 			<TableCell className="text-2xs text-right tabular-nums py-1.5">
-				{formatNumber(order.origSz, szDecimals)} {order.coin}{" "}
+				{formatNumber(order.origSz, szDecimals)} {displayCoin}{" "}
 				<span className="text-muted-fg">({formatUSD(getOrderValue(order), { compact: false })})</span>
 			</TableCell>
 			<TableCell className="text-2xs text-right tabular-nums py-1.5">

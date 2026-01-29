@@ -10,7 +10,7 @@ import { getAvailableFromTotals, getPerpAvailable } from "@/domain/trade/balance
 import { getSpotBalance, useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken } from "@/lib/format";
-import { useSpotTokens } from "@/lib/hyperliquid";
+import { useMarkets } from "@/lib/hyperliquid";
 import { useExchangeSendAsset } from "@/lib/hyperliquid/hooks/exchange";
 import { floorToString, limitDecimalInput } from "@/lib/trade/numbers";
 
@@ -28,7 +28,7 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 	const [error, setError] = useState<string | null>(null);
 
 	const { address } = useConnection();
-	const { getToken, getTransferDecimals } = useSpotTokens();
+	const markets = useMarkets();
 	const { mutateAsync: sendAsset, isPending } = useExchangeSendAsset();
 	const { perpSummary, spotBalances } = useAccountBalances();
 
@@ -38,14 +38,14 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 		}
 	}, [open, initialDirection]);
 
-	const usdcTokenInfo = useMemo(() => getToken("USDC"), [getToken]);
+	const usdcTokenInfo = useMemo(() => markets.token("USDC"), [markets]);
 	const usdcTokenId = useMemo(() => {
 		if (!usdcTokenInfo) return "";
 		const tokenId = usdcTokenInfo.tokenId;
 		return `${usdcTokenInfo.name}:${tokenId}`;
 	}, [usdcTokenInfo]);
 
-	const usdcDecimals = useMemo(() => getTransferDecimals("USDC"), [getTransferDecimals]);
+	const usdcDecimals = useMemo(() => markets.transferDecimals("USDC"), [markets]);
 
 	const spotUsdcBal = useMemo(() => getSpotBalance(spotBalances, "USDC"), [spotBalances]);
 	const availableBalanceValue = useMemo(() => {

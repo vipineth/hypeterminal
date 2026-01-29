@@ -1,6 +1,5 @@
 import { t } from "@lingui/core/macro";
 import { Timer } from "lucide-react";
-import { useMemo } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -39,47 +38,12 @@ export function TwapTab() {
 		status,
 		error,
 	} = useSubUserTwapHistory({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
-	const data = twapEvent?.history;
-	const { getSzDecimals } = useMarkets();
+	const markets = useMarkets();
 
-	const orders = useMemo(() => {
-		const raw = data ?? [];
-		const sorted = [...raw].sort((a, b) => b.state.timestamp - a.state.timestamp);
-		return sorted;
-	}, [data]);
+	const orders = twapEvent?.history ?? [];
+	const activeCount = orders.filter((o) => o.status.status === "activated").length;
 
-	const activeOrders = useMemo(() => {
-		return orders.filter((o) => o.status.status === "activated");
-	}, [orders]);
-
-	const headerCount = isConnected ? `${activeOrders.length} ${t`Active`}` : FALLBACK_VALUE_PLACEHOLDER;
-
-	const tableRows = useMemo(() => {
-		return orders.map((order) => {
-			const isBuy = order.state.side === "B";
-			const totalSize = parseNumber(order.state.sz);
-			const executedSize = parseNumber(order.state.executedSz);
-			const avgPrice = calc.divide(order.state.executedNtl, order.state.executedSz);
-			const progressPct = calc.percentOf(executedSize, totalSize) ?? 0;
-			const status = order.status.status;
-
-			return {
-				key:
-					typeof order.twapId === "number"
-						? order.twapId
-						: `${order.state.coin}-${order.state.timestamp}-${order.time}`,
-				coin: order.state.coin,
-				isBuy,
-				totalSize,
-				executedSize,
-				avgPrice,
-				szDecimals: getSzDecimals(order.state.coin) ?? 4,
-				progressPct: Math.max(0, Math.min(100, progressPct)),
-				status,
-				showCancel: status === "activated",
-			};
-		});
-	}, [orders, getSzDecimals]);
+	const headerCount = isConnected ? `${activeCount} ${t`Active`}` : FALLBACK_VALUE_PLACEHOLDER;
 
 	function renderPlaceholder() {
 		if (!isConnected) return <Placeholder>{t`Connect your wallet to view TWAP orders.`}</Placeholder>;
@@ -131,42 +95,54 @@ export function TwapTab() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{tableRows.map((row) => {
-									const sideClass = row.isBuy ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
+								{orders.map((order) => {
+									const isBuy = order.state.side === "B";
+									const sideClass = isBuy ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
+									const totalSize = parseNumber(order.state.sz);
+									const executedSize = parseNumber(order.state.executedSz);
+									const avgPrice = calc.divide(order.state.executedNtl, order.state.executedSz);
+									const rawPct = calc.percentOf(executedSize, totalSize) ?? 0;
+									const progressPct = Math.max(0, Math.min(100, rawPct));
+									const szDecimals = markets.szDecimals(order.state.coin);
+									const status = order.status.status;
 									const statusLabel =
-										row.status === "activated"
+										status === "activated"
 											? t`active`
-											: row.status === "finished"
+											: status === "finished"
 												? t`completed`
-												: row.status === "terminated"
+												: status === "terminated"
 													? t`cancelled`
-													: row.status;
+													: status;
+									const key =
+										typeof order.twapId === "number"
+											? order.twapId
+											: `${order.state.coin}-${order.state.timestamp}-${order.time}`;
 
 									return (
-										<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
+										<TableRow key={key} className="border-border/40 hover:bg-accent/30">
 											<TableCell className="text-2xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">
 													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideClass)}>
-														{row.isBuy ? t`buy` : t`sell`}
+														{isBuy ? t`buy` : t`sell`}
 													</span>
 													<Button
 														variant="link"
 														size="none"
-														onClick={() => setSelectedMarket(row.coin)}
-														aria-label={t`Switch to ${row.coin} market`}
+														onClick={() => setSelectedMarket(order.state.coin)}
+														aria-label={t`Switch to ${markets.displayName(order.state.coin)} market`}
 													>
-														{row.coin}
+														{markets.displayName(order.state.coin)}
 													</Button>
 												</div>
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
-												{formatNumber(row.totalSize, row.szDecimals)}
+												{formatNumber(totalSize, szDecimals)}
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums text-warning py-1.5">
-												{formatNumber(row.executedSize, row.szDecimals)}
+												{formatNumber(executedSize, szDecimals)}
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
-												{formatPrice(row.avgPrice, { szDecimals: row.szDecimals })}
+												{formatPrice(avgPrice, { szDecimals })}
 											</TableCell>
 											<TableCell className="py-1.5">
 												<div className="flex items-center gap-2">
@@ -174,28 +150,28 @@ export function TwapTab() {
 														<div
 															className={cn(
 																"h-full rounded-full",
-																row.status === "finished" ? "bg-positive" : "bg-info",
+																status === "finished" ? "bg-positive" : "bg-info",
 															)}
-															style={{ width: `${row.progressPct}%` }}
+															style={{ width: `${progressPct}%` }}
 														/>
 													</div>
-													<span className="text-4xs tabular-nums text-muted-fg">{row.progressPct.toFixed(0)}%</span>
+													<span className="text-4xs tabular-nums text-muted-fg">{progressPct.toFixed(0)}%</span>
 												</div>
 											</TableCell>
 											<TableCell className="text-2xs py-1.5">
 												<span
 													className={cn(
 														"text-4xs px-1 py-0.5 rounded-sm uppercase",
-														row.status === "activated" && "bg-info/20 text-info",
-														row.status === "finished" && "bg-positive/20 text-positive",
-														(row.status === "terminated" || row.status === "error") && "bg-negative/20 text-negative",
+														status === "activated" && "bg-info/20 text-info",
+														status === "finished" && "bg-positive/20 text-positive",
+														(status === "terminated" || status === "error") && "bg-negative/20 text-negative",
 													)}
 												>
 													{statusLabel}
 												</span>
 											</TableCell>
 											<TableCell className="text-right py-1.5">
-												{row.showCancel && (
+												{status === "activated" && (
 													<Button variant="danger" size="xs" aria-label={t`Cancel TWAP order`}>
 														{t`Cancel`}
 													</Button>

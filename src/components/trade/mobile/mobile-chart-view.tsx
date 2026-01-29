@@ -8,6 +8,7 @@ import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
+import { getValueColorClass } from "@/lib/trade/numbers";
 import { useTheme } from "@/providers/theme";
 import { useMarketActions } from "@/stores/use-market-store";
 import { TokenSelector } from "../chart/token-selector";
@@ -50,12 +51,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 							<>
 								<div className="text-lg font-semibold tabular-nums text-warning">{formatUSD(markPx ?? null)}</div>
 								{typeof change24h === "number" && (
-									<span
-										className={cn(
-											"text-sm tabular-nums font-medium",
-											change24h >= 0 ? "text-positive" : "text-negative",
-										)}
-									>
+									<span className={cn("text-sm tabular-nums font-medium", getValueColorClass(change24h))}>
 										{change24h >= 0 ? "+" : ""}
 										{change24h.toFixed(2)}%
 									</span>
@@ -77,10 +73,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 						</>
 					) : (
 						<>
-							<StatPill
-								label={overviewText.LABEL_ORACLE}
-								value={formatUSD(selectedMarket?.oraclePx)}
-							/>
+							<StatPill label={overviewText.LABEL_ORACLE} value={formatUSD(selectedMarket?.oraclePx)} />
 							<StatPill
 								label={overviewText.LABEL_VOLUME}
 								value={formatUSD(selectedMarket?.dayNtlVlm, {
@@ -90,20 +83,14 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 							/>
 							<StatPill
 								label={overviewText.LABEL_OPEN_INTEREST}
-								value={formatUSD(
-									calculateOpenInterestUSD(
-										selectedMarket?.openInterest,
-										selectedMarket?.markPx,
-									),
-									{
-										notation: "compact",
-										compactDisplay: "short",
-									},
-								)}
+								value={formatUSD(calculateOpenInterestUSD(selectedMarket?.openInterest, selectedMarket?.markPx), {
+									notation: "compact",
+									compactDisplay: "short",
+								})}
 							/>
 							<div className="flex items-center gap-1">
-								<Flame className={cn("size-3", isFundingPositive ? "text-positive" : "text-negative")} />
-								<span className={cn("tabular-nums font-medium", isFundingPositive ? "text-positive" : "text-negative")}>
+								<Flame className={cn("size-3", getValueColorClass(fundingNum))} />
+								<span className={cn("tabular-nums font-medium", getValueColorClass(fundingNum))}>
 									{formatPercent(fundingNum, {
 										minimumFractionDigits: 4,
 										signDisplay: "exceptZero",

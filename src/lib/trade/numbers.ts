@@ -252,3 +252,8 @@ export function limitDecimalInput(input: string, maxDecimals: number): string {
 	if (decimalsInInput <= maxDecimals) return input;
 	return input.slice(0, decimalIndex + maxDecimals + 1);
 }
+
+export function getValueColorClass(value: unknown): "text-positive" | "text-negative" {
+	const num = toNumber(value);
+	return num !== null && num >= 0 ? "text-positive" : "text-negative";
+}

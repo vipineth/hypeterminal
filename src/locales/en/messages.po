@@ -1545,14 +1545,18 @@ msgstr "Submitting..."
 msgid "Support"
 msgstr "Support"
 
-#. placeholder {0}: order.coin
-#. placeholder {0}: row.coin
+#. placeholder {0}: markets.displayName(fill.coin)
+#. placeholder {0}: markets.displayName(order.state.coin)
+#. placeholder {0}: markets.displayName(row.coin)
 #: src/components/trade/positions/history-tab.tsx
-#: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Switch to {0} market"
 msgstr "Switch to {0} market"
+
+#: src/components/trade/positions/orders-tab.tsx
+msgid "Switch to {displayCoin} market"
+msgstr "Switch to {displayCoin} market"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/lib/trade/use-button-content.ts

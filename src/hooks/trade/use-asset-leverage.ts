@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useConnection } from "wagmi";
 import { DEFAULT_MAX_LEVERAGE } from "@/config/constants";
 import { getMarketCapabilities, useSelectedMarketInfo } from "@/lib/hyperliquid";
-import { getBaseToken } from "@/lib/market";
 import { useExchangeUpdateLeverage } from "@/lib/hyperliquid/hooks/exchange/useExchangeUpdateLeverage";
 import { useSubActiveAssetData, useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import { getMarginModeFromLeverage, type MarginMode } from "@/lib/trade/margin-mode";
@@ -51,7 +50,7 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	const { isOnlyIsolated, allowsCrossMargin } = capabilities;
 
 	const maxLeverage = market?.kind === "spot" ? 1 : (market?.maxLeverage ?? DEFAULT_MAX_LEVERAGE);
-	const baseToken = market ? getBaseToken(market.displayName, market.kind) : undefined;
+	const baseToken = market ? market.name : undefined;
 	const assetId = market?.assetId;
 
 	const { data: activeAssetData, status: subscriptionStatus } = useSubActiveAssetData(
@@ -175,7 +174,16 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 
 			setStoredMarginMode(mode);
 		},
-		[assetId, isConnected, isOnlyIsolated, currentLeverage, marginMode, hasPosition, updateLeverage, setStoredMarginMode],
+		[
+			assetId,
+			isConnected,
+			isOnlyIsolated,
+			currentLeverage,
+			marginMode,
+			hasPosition,
+			updateLeverage,
+			setStoredMarginMode,
+		],
 	);
 
 	const availableToSell = useMemo(() => {

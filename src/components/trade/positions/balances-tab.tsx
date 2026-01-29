@@ -10,7 +10,7 @@ import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken, formatUSD } from "@/lib/format";
-import { useSpotTokens } from "@/lib/hyperliquid";
+import { useMarkets } from "@/lib/hyperliquid";
 import { type BalanceRow, filterBalanceRowsByUsdValue, getBalanceRows, getTotalUsdValue } from "@/domain/trade/balances";
 import { useGlobalSettingsActions, useHideSmallBalances } from "@/stores/use-global-settings-store";
 import { TokenAvatar } from "../components/token-avatar";
@@ -41,7 +41,7 @@ const SMALL_BALANCE_THRESHOLD = 1;
 
 export function BalancesTab() {
 	const { isConnected } = useConnection();
-	const { getDisplayName, getTransferDecimals } = useSpotTokens();
+	const markets = useMarkets();
 	const hideSmallBalances = useHideSmallBalances();
 	const { setHideSmallBalances } = useGlobalSettingsActions();
 	const [transferState, setTransferState] = useState<{ open: boolean; direction: TransferDirection }>({
@@ -145,8 +145,8 @@ export function BalancesTab() {
 							</TableHeader>
 							<TableBody>
 								{filteredBalances.map((row) => {
-									const displayName = getDisplayName(row.asset);
-									const decimals = getTransferDecimals(row.asset);
+									const displayName = markets.tokenDisplayName(row.asset);
+									const decimals = markets.transferDecimals(row.asset);
 									const canTransfer = row.asset === "USDC" && parseFloat(row.available) > 0;
 									const transferLabel = row.type === "perp" ? t`To Spot` : t`To Perp`;
 									return (

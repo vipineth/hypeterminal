@@ -29,7 +29,15 @@ import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOr
 import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeTwapOrder";
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import type { MarginMode } from "@/lib/trade/margin-mode";
-import { clampInt, formatDecimalFloor, isPositive, parseNumberOrZero, toFixed, toNumber } from "@/lib/trade/numbers";
+import {
+	clampInt,
+	formatDecimalFloor,
+	getValueColorClass,
+	isPositive,
+	parseNumberOrZero,
+	toFixed,
+	toNumber,
+} from "@/lib/trade/numbers";
 import {
 	canUseTpSl as canUseTpSlForOrder,
 	getTabsOrderType,
@@ -503,7 +511,7 @@ export function OrderEntryPanel() {
 					<div className="flex items-center justify-between text-muted-fg">
 						<span>{t`Available`}</span>
 						<div className="flex items-center gap-2">
-							<span className={cn("tabular-nums", availableBalance > 0 ? "text-positive" : "text-muted-fg")}>
+							<span className={cn("tabular-nums", getValueColorClass(availableBalance))}>
 								{formatAvailableBalance()}
 							</span>
 							{isConnected && (
@@ -521,7 +529,7 @@ export function OrderEntryPanel() {
 					{!isSpotMarket && positionSize !== 0 && (
 						<div className="flex items-center justify-between text-muted-fg">
 							<span>{t`Position`}</span>
-							<span className={cn("tabular-nums", positionSize > 0 ? "text-positive" : "text-negative")}>
+							<span className={cn("tabular-nums", getValueColorClass(positionSize))}>
 								{positionSize > 0 ? "+" : ""}
 								{formatDecimalFloor(positionSize, szDecimals)} {baseToken}
 							</span>

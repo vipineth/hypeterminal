@@ -1,13 +1,14 @@
-import { Suspense, useMemo, useState, useTransition } from "react";
+import { Suspense, useMemo, useTransition } from "react";
 import { useConnection } from "wagmi";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/cn";
 import { POSITIONS_TABS } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
+import { cn } from "@/lib/cn";
 import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { createLazyComponent } from "@/lib/lazy";
 import { parseNumber, parseNumberOrZero } from "@/lib/trade/numbers";
+import { useGlobalSettingsActions, usePositionsActiveTab } from "@/stores/use-global-settings-store";
 
 const BalancesTab = createLazyComponent(() => import("./balances-tab"), "BalancesTab");
 const FundingTab = createLazyComponent(() => import("./funding-tab"), "FundingTab");
@@ -17,7 +18,8 @@ const PositionsTab = createLazyComponent(() => import("./positions-tab"), "Posit
 const TwapTab = createLazyComponent(() => import("./twap-tab"), "TwapTab");
 
 export function PositionsPanel() {
-	const [activeTab, setActiveTab] = useState("positions");
+	const activeTab = usePositionsActiveTab();
+	const { setPositionsActiveTab } = useGlobalSettingsActions();
 	const [isPending, startTransition] = useTransition();
 	const { address, isConnected } = useConnection();
 	const { perpSummary, perpPositions, spotBalances } = useAccountBalances();
@@ -25,7 +27,7 @@ export function PositionsPanel() {
 	const openOrders = ordersEvent?.orders;
 
 	function handleTabChange(value: string) {
-		startTransition(() => setActiveTab(value));
+		startTransition(() => setPositionsActiveTab(value));
 	}
 
 	const positionsCount = useMemo(() => {

@@ -12,7 +12,7 @@ import { getAvailableFromTotals, getPerpAvailable, type BalanceRow } from "@/dom
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken } from "@/lib/format";
-import { useSpotTokens } from "@/lib/hyperliquid";
+import { useMarkets } from "@/lib/hyperliquid";
 import { useExchangeSendAsset } from "@/lib/hyperliquid/hooks/exchange";
 import { useExchangeSpotSend } from "@/lib/hyperliquid/hooks/exchange/useExchangeSpotSend";
 import { floorToString, limitDecimalInput } from "@/lib/trade/numbers";
@@ -33,7 +33,7 @@ export function SendDialog({ open, onOpenChange, initialAsset = "USDC", initialA
 	const [amount, setAmount] = useState("");
 	const [error, setError] = useState<string | null>(null);
 
-	const { getToken, getTransferDecimals, getDisplayName } = useSpotTokens();
+	const markets = useMarkets();
 	const { mutateAsync: sendAsset, isPending: isSendAssetPending } = useExchangeSendAsset();
 	const { mutateAsync: spotSend, isPending: isSpotSendPending } = useExchangeSpotSend();
 	const { perpSummary, spotBalances } = useAccountBalances();
@@ -63,17 +63,17 @@ export function SendDialog({ open, onOpenChange, initialAsset = "USDC", initialA
 		}
 		return availableSpotTokens.map((b) => ({
 			value: b.asset,
-			label: getDisplayName(b.asset),
+			label: markets.tokenDisplayName(b.asset),
 		}));
-	}, [accountType, availableSpotTokens, getDisplayName]);
+	}, [accountType, availableSpotTokens, markets]);
 
-	const tokenInfo = useMemo(() => getToken(selectedToken), [getToken, selectedToken]);
+	const tokenInfo = useMemo(() => markets.token(selectedToken), [markets, selectedToken]);
 	const tokenId = useMemo(() => {
 		if (!tokenInfo) return "";
 		return `${tokenInfo.name}:${tokenInfo.tokenId}`;
 	}, [tokenInfo]);
 
-	const decimals = useMemo(() => getTransferDecimals(selectedToken), [getTransferDecimals, selectedToken]);
+	const decimals = useMemo(() => markets.transferDecimals(selectedToken), [markets, selectedToken]);
 
 	const availableBalance = useMemo(() => {
 		if (accountType === "perp") {

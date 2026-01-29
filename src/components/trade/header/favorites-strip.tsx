@@ -5,6 +5,7 @@ import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice } from "@/lib/format";
 import { useMarketsInfo } from "@/lib/hyperliquid";
 import { calculate24hPriceChange } from "@/lib/market";
+import { getValueColorClass } from "@/lib/trade/numbers";
 import { useFavoriteMarkets, useMarketActions, useSelectedMarket } from "@/stores/use-market-store";
 
 export function FavoritesStrip() {
@@ -18,9 +19,7 @@ export function FavoritesStrip() {
 					{favorites.length === 0 ? (
 						<EmptyState />
 					) : (
-						favorites.map((name) => (
-							<FavoriteChip key={name} name={name} isActive={name === selectedMarket} />
-						))
+						favorites.map((name) => <FavoriteChip key={name} name={name} isActive={name === selectedMarket} />)
 					)}
 				</div>
 			</div>
@@ -49,7 +48,6 @@ function FavoriteChip({ name, isActive }: FavoriteChipProps) {
 	const market = getMarketInfo(name);
 	const displayName = market?.displayName ?? name;
 	const changePct = calculate24hPriceChange(market?.prevDayPx, market?.markPx);
-	const isPositive = (changePct ?? 0) >= 0;
 	const szDecimals = market?.szDecimals ?? 4;
 
 	function handleClick() {
@@ -82,7 +80,7 @@ function FavoriteChip({ name, isActive }: FavoriteChipProps) {
 				<>
 					<span className="tabular-nums text-muted-fg">{formatPrice(market.markPx, { szDecimals })}</span>
 					{changePct != null && (
-						<span className={cn("tabular-nums text-3xs", isPositive ? "text-positive" : "text-negative")}>
+						<span className={cn("tabular-nums text-3xs", getValueColorClass(changePct))}>
 							{formatPercent(changePct / 100)}
 						</span>
 					)}

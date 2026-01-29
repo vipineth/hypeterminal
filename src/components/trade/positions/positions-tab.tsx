@@ -7,13 +7,13 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
+import { formatPriceForOrder, formatSizeForOrder } from "@/domain/trade/orders";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
 import { useMarkets } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useSubAssetCtxs, useSubClearinghouseState, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
-import { calc, isPositive, parseNumber } from "@/lib/trade/numbers";
-import { formatPriceForOrder, formatSizeForOrder } from "@/domain/trade/orders";
+import { calc, getValueColorClass, isPositive, parseNumber } from "@/lib/trade/numbers";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useMarketActions } from "@/stores/use-market-store";
 import type { PerpAssetCtxs } from "@/types/hyperliquid";
@@ -90,7 +90,7 @@ export function PositionsTab() {
 			});
 	}, [state]);
 
-	const { getMarket, getAssetId, getSzDecimals } = useMarkets();
+	const markets = useMarkets();
 	const assetCtxsEnabled = isConnected && positions.length > 0;
 	const assetCtxsParams = useMemo(() => ({ dex: "" as const }), []);
 	const assetCtxsOptions = useMemo(() => ({ enabled: assetCtxsEnabled }), [assetCtxsEnabled]);
@@ -130,9 +130,9 @@ export function PositionsTab() {
 			const isLong = size > 0;
 			const closeSize = Math.abs(size);
 
-			const market = getMarket(p.coin);
-			const assetId = getAssetId(p.coin);
-			const szDecimals = getSzDecimals(p.coin) ?? 4;
+			const market = markets.get(p.coin);
+			const assetId = markets.assetId(p.coin);
+			const szDecimals = markets.szDecimals(p.coin);
 			const markPxRaw = typeof assetId === "number" ? assetCtxs?.[assetId]?.markPx : undefined;
 			const markPx = markPxRaw ? parseNumber(markPxRaw) : Number.NaN;
 			const entryPx = parseNumber(p.entryPx);
@@ -171,7 +171,7 @@ export function PositionsTab() {
 				hasTpSl: !!(tpSlInfo?.tpPrice || tpSlInfo?.slPrice),
 			};
 		});
-	}, [positions, getMarket, getAssetId, getSzDecimals, assetCtxs, tpSlOrdersByCoin]);
+	}, [positions, markets, assetCtxs, tpSlOrdersByCoin]);
 
 	const headerCount = isConnected ? positions.length : FALLBACK_VALUE_PLACEHOLDER;
 
@@ -296,8 +296,8 @@ export function PositionsTab() {
 								{tableRows.map((row) => {
 									const isRowClosing = isClosing && closingKeyRef.current === row.key;
 									const sideClass = row.isLong ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
-									const pnlClass = row.unrealizedPnl >= 0 ? "text-positive" : "text-negative";
-									const fundingClass = row.cumFunding >= 0 ? "text-negative" : "text-positive";
+									const pnlClass = getValueColorClass(row.unrealizedPnl);
+									const fundingClass = getValueColorClass(row.cumFunding);
 
 									return (
 										<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
@@ -311,10 +311,10 @@ export function PositionsTab() {
 														size="none"
 														onClick={() => setSelectedMarket(row.coin)}
 														className="gap-1.5"
-														aria-label={t`Switch to ${row.coin} market`}
+														aria-label={t`Switch to ${markets.displayName(row.coin)} market`}
 													>
-														<TokenAvatar symbol={row.coin} />
-														<span>{row.coin}</span>
+														<TokenAvatar symbol={markets.displayName(row.coin)} />
+														<span>{markets.displayName(row.coin)}</span>
 													</Button>
 												</div>
 											</TableCell>

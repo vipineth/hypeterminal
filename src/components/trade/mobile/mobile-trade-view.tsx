@@ -14,6 +14,7 @@ import {
 	ORDER_SIZE_PERCENT_STEPS,
 	UI_TEXT,
 } from "@/config/constants";
+import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { useAssetLeverage } from "@/hooks/trade/use-asset-leverage";
 import { cn } from "@/lib/cn";
@@ -21,8 +22,7 @@ import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format"
 import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { getBaseToken } from "@/lib/market";
-import { floorToDecimals, formatDecimalFloor, parseNumber } from "@/lib/trade/numbers";
-import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
+import { floorToDecimals, formatDecimalFloor, getValueColorClass, parseNumber } from "@/lib/trade/numbers";
 import { useDepositModalActions } from "@/stores/use-deposit-modal-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
@@ -392,7 +392,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 						</div>
 						<div className="text-right">
 							<span className="text-muted-fg">{ORDER_TEXT.AVAILABLE_LABEL}: </span>
-							<span className={cn("tabular-nums font-medium", availableBalance > 0 ? "text-positive" : "")}>
+							<span className={cn("tabular-nums font-medium", getValueColorClass(availableBalance))}>
 								{isConnected ? formatUSD(availableBalance) : FALLBACK_VALUE_PLACEHOLDER}
 							</span>
 						</div>
