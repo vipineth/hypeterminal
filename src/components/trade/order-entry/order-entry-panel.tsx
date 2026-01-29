@@ -17,6 +17,10 @@ import {
 	TWAP_MINUTES_MAX,
 	TWAP_MINUTES_MIN,
 } from "@/config/constants";
+import { getLiquidationInfo, getOrderMetrics } from "@/domain/trade/order/metrics";
+import { getOrderPrice } from "@/domain/trade/order/price";
+import { getSliderValue } from "@/domain/trade/order/size";
+import { buildOrders, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
@@ -26,9 +30,6 @@ import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchan
 import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import type { MarginMode } from "@/lib/trade/margin-mode";
 import { clampInt, formatDecimalFloor, isPositive, parseNumberOrZero, toFixed, toNumber } from "@/lib/trade/numbers";
-import { getLiquidationInfo, getOrderMetrics } from "@/domain/trade/order-entry/metrics";
-import { getOrderPrice } from "@/domain/trade/order-entry/price";
-import { getSliderValue } from "@/domain/trade/order-entry/size";
 import {
 	canUseTpSl as canUseTpSlForOrder,
 	getTabsOrderType,
@@ -42,7 +43,6 @@ import {
 	usesLimitPrice as usesLimitPriceForOrder,
 	usesTriggerPrice as usesTriggerPriceForOrder,
 } from "@/lib/trade/order-types";
-import { buildOrders, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import type { ActiveDialog, ButtonContent } from "@/lib/trade/types";
 import { useButtonContent } from "@/lib/trade/use-button-content";
 import { useOrderValidation } from "@/lib/trade/use-order-validation";

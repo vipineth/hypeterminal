@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from "react";
 import { useConnection } from "wagmi";
+import { deriveOrderEntry, type OrderEntryDerived } from "@/domain/trade/order/derive";
+import { getSizeForPercent as getSizeForPercentCalc, getSizeValueForModeToggle } from "@/domain/trade/order/size";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
-import { deriveOrderEntry, type OrderEntryDerived } from "@/domain/trade/order-entry/derive";
-import { getSizeForPercent as getSizeForPercentCalc, getSizeValueForModeToggle } from "@/domain/trade/order-entry/size";
 import type { Side } from "@/lib/trade/types";
 import { useAccountBalances } from "./use-account-balances";
 import { useAssetLeverage } from "./use-asset-leverage";
@@ -103,15 +103,7 @@ export function useOrderEntryData({
 				spotBalance: derived.spotBalance,
 				szDecimals: derived.szDecimals,
 			}),
-		[
-			derived.isSpotMarket,
-			derived.maxSize,
-			derived.spotBalance,
-			derived.szDecimals,
-			side,
-			sizeMode,
-			conversionPrice,
-		],
+		[derived.isSpotMarket, derived.maxSize, derived.spotBalance, derived.szDecimals, side, sizeMode, conversionPrice],
 	);
 
 	const convertSizeForModeToggle = useCallback(

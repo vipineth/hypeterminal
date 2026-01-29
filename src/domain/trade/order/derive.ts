@@ -1,5 +1,3 @@
-import { getMarketCapabilities, type MarketCapabilities } from "@/lib/hyperliquid";
-import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 import {
 	getAvailableBalance,
 	getAvailableBalanceToken,
@@ -9,8 +7,10 @@ import {
 	type SpotBalanceData,
 	type SpotBalanceLike,
 } from "@/domain/trade/balances";
-import { getSideLabels, getSizeModeLabel, type SideLabels } from "@/domain/trade/order-entry/labels";
-import { getMaxSizeForOrderEntry, getOrderValue, getSizeValueFromInput } from "@/domain/trade/order-entry/size";
+import { getSideLabels, getSizeModeLabel, type SideLabels } from "@/domain/trade/order/labels";
+import { getMaxSizeForOrderEntry, getOrderValue, getSizeValueFromInput } from "@/domain/trade/order/size";
+import { getMarketCapabilities, type MarketCapabilities } from "@/lib/hyperliquid";
+import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 import type { Side } from "@/lib/trade/types";
 
 export interface OrderEntryInputs {

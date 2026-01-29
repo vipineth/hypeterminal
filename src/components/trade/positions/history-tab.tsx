@@ -42,6 +42,8 @@ export function HistoryTab() {
 	} = useSubUserFills({ user: address ?? "0x0", aggregateByTime: true }, { enabled: isConnected && !!address });
 	const data = fillsEvent?.fills;
 
+	console.log("fillsEvent", { fillsEvent, data });
+
 	const fills = useMemo(() => {
 		const raw = data ?? [];
 		const sorted = [...raw].sort((a, b) => b.time - a.time);
