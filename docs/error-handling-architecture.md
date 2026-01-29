@@ -83,6 +83,296 @@ useOrderValidation hook
 
 ---
 
+## How It Works
+
+### Flow Diagram
+
+```
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│   Component     │────▶│  Validation      │────▶│   Display       │
+│   (context)     │     │  Stack           │     │   (errors)      │
+└─────────────────┘     └──────────────────┘     └─────────────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │  Validators run in   │
+                    │  priority order      │
+                    │                      │
+                    │  ┌────────────────┐  │
+                    │  │ CONN_001 (10)  │  │  ◀── Highest priority
+                    │  │ BAL_001  (30)  │  │
+                    │  │ MKT_001  (40)  │  │
+                    │  │ INP_001  (100) │  │
+                    │  │ TPSL_001 (200) │  │  ◀── Lowest priority
+                    │  └────────────────┘  │
+                    └──────────────────────┘
+```
+
+### Concept
+
+1. **Validators** are small, reusable functions that check one condition
+2. **Stacks** are ordered lists of validators for a specific use case
+3. **Context** is the data validators need to make decisions
+4. **Errors** include code, message, severity, and priority
+
+---
+
+## Usage Examples
+
+### 1. Drop-in Replacement for Existing Hook
+
+```typescript
+// Before (old system)
+import { useOrderValidation } from "@/lib/trade/use-order-validation";
+
+// After (new system) - same interface!
+import { usePerpOrderValidation } from "@/lib/errors";
+
+function OrderEntry() {
+  const validation = usePerpOrderValidation({
+    isConnected,
+    isWalletLoading,
+    availableBalance,
+    // ... same props as before
+  });
+
+  // Same output shape
+  // validation.valid: boolean
+  // validation.errors: string[]
+  // validation.canSubmit: boolean
+  // validation.needsApproval: boolean
+}
+```
+
+### 2. Creating a Custom Validation Stack
+
+```typescript
+import {
+  runValidators,
+  walletNotConnectedValidator,
+  noBalanceValidator,
+  createValidator,
+  type Validator
+} from "@/lib/errors";
+
+// Define context type for your use case
+interface SpotOrderContext {
+  isConnected: boolean;
+  availableBalance: number;
+  tokenBalance: number;
+  orderSize: number;
+}
+
+// Create a custom validator
+const hasTokenBalanceValidator: Validator<SpotOrderContext> = createValidator({
+  id: "has-token-balance",
+  code: "SPOT_001",
+  category: "balance",
+  priority: 35,
+  getMessage: () => t`Insufficient token balance`,
+  validate: (ctx) => ctx.tokenBalance >= ctx.orderSize,
+});
+
+// Build your stack
+const spotOrderValidators: Validator<SpotOrderContext>[] = [
+  walletNotConnectedValidator,  // Reuse from connection
+  noBalanceValidator,           // Reuse from balance
+  hasTokenBalanceValidator,     // Custom for spot
+];
+
+// Use it
+function validateSpotOrder(context: SpotOrderContext) {
+  const errors = runValidators(spotOrderValidators, context);
+  return {
+    valid: errors.length === 0,
+    errors: errors.map(e => e.message),
+    firstError: errors[0]?.message ?? null,
+  };
+}
+```
+
+### 3. Conditional Validators (TP/SL Example)
+
+```typescript
+import { validatePerpOrder, type PerpOrderContext } from "@/lib/errors";
+
+function OrderEntryPanel() {
+  const [tpSlEnabled, setTpSlEnabled] = useState(false);
+
+  const context: PerpOrderContext = {
+    // Connection
+    isConnected: true,
+    isWalletLoading: false,
+    isReadyToTrade: true,
+    needsAgentApproval: false,
+
+    // Balance & Market
+    availableBalance: 1000,
+    hasMarket: true,
+    hasAssetIndex: true,
+    markPx: 50000,
+
+    // Order
+    orderType: "limit",
+    side: "buy",
+    price: 49000,
+    sizeValue: 0.1,
+    orderValue: 4900,
+    maxSize: 10,
+    usesLimitPrice: true,
+    usesTriggerPrice: false,
+    triggerPriceNum: null,
+
+    // TP/SL - validators auto-skip if disabled
+    tpSlEnabled: tpSlEnabled,
+    canUseTpSl: true,
+    tpPriceNum: 55000,  // Only validated if tpSlEnabled
+    slPriceNum: 45000,
+
+    // Scale/TWAP - validators auto-skip if not those order types
+    stopOrder: false,
+    takeProfitOrder: false,
+    scaleOrder: false,
+    twapOrder: false,
+    scaleStartPriceNum: null,
+    scaleEndPriceNum: null,
+    scaleLevelsNum: null,
+    twapMinutesNum: null,
+  };
+
+  const result = validatePerpOrder(context);
+  // result.errors only includes relevant errors based on context
+}
+```
+
+### 4. Deposit Form with Validation
+
+```typescript
+import { validateDeposit } from "@/lib/errors";
+
+function DepositForm() {
+  const [amount, setAmount] = useState(0);
+  const { isConnected } = useAccount();
+  const walletBalance = useWalletBalance();
+
+  const validation = validateDeposit({
+    isConnected,
+    isWalletLoading: false,
+    amount,
+    walletBalance,
+    minDeposit: 5, // 5 USDC minimum
+  });
+
+  return (
+    <form>
+      <Input
+        value={amount}
+        onChange={setAmount}
+        aria-invalid={!validation.valid && validation.error !== null}
+      />
+      {validation.error && (
+        <p className="text-negative text-xs">{validation.error}</p>
+      )}
+      <Button disabled={!validation.valid}>
+        Deposit
+      </Button>
+    </form>
+  );
+}
+```
+
+### 5. Accessing Error Metadata
+
+```typescript
+import { runValidators, perpOrderValidators } from "@/lib/errors";
+
+function OrderEntryWithErrorCodes() {
+  const errors = runValidators(perpOrderValidators, context);
+
+  // errors is ValidationError[] with full metadata
+  errors.forEach(error => {
+    console.log(error.id);        // "wallet-not-connected"
+    console.log(error.code);      // "CONN_001"
+    console.log(error.message);   // "Not connected"
+    console.log(error.severity);  // "error"
+    console.log(error.category);  // "connection"
+    console.log(error.priority);  // 10
+  });
+
+  // Filter by category
+  const inputErrors = errors.filter(e => e.category === "input");
+
+  // Filter by severity
+  const warnings = errors.filter(e => e.severity === "warning");
+
+  // Get blocking errors only (connection/balance)
+  const blockingErrors = errors.filter(e => e.priority < 50);
+}
+```
+
+### 6. Adding a New Validator
+
+```typescript
+// src/lib/errors/definitions/order-input.ts
+
+// Add new validator for a new requirement
+export const maxLeverageValidator: Validator<OrderInputContext> = createValidator({
+  id: "max-leverage-exceeded",
+  code: "INP_006",
+  category: "input",
+  priority: 105,
+  getMessage: () => t`Leverage exceeds maximum`,
+  validate: (ctx) => ctx.leverage <= ctx.maxLeverage,
+});
+
+// Add to the validators array
+export const orderInputValidators: Validator<OrderInputContext>[] = [
+  enterLimitPriceValidator,
+  enterTriggerPriceValidator,
+  enterSizeValidator,
+  minOrderNotionalValidator,
+  exceedsMaxSizeValidator,
+  maxLeverageValidator,  // New!
+];
+```
+
+### 7. Error Display Component
+
+```typescript
+import { type ValidationError } from "@/lib/errors";
+
+interface Props {
+  errors: ValidationError[];
+  showAll?: boolean;
+}
+
+function ValidationErrors({ errors, showAll = false }: Props) {
+  if (errors.length === 0) return null;
+
+  const displayErrors = showAll ? errors : [errors[0]];
+
+  return (
+    <div className="space-y-1">
+      {displayErrors.map(error => (
+        <div
+          key={error.id}
+          className={cn(
+            "text-xs",
+            error.severity === "error" && "text-negative",
+            error.severity === "warning" && "text-warning",
+            error.severity === "info" && "text-muted-foreground",
+          )}
+        >
+          {error.message}
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+---
+
 ## Proposed Architecture
 
 ### Core Concepts
