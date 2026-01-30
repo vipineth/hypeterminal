@@ -1625,9 +1625,9 @@ msgstr ""
 msgid "Swapping..."
 msgstr ""
 
-#. placeholder {0}: markets.getDisplayName(fill.coin)
-#. placeholder {0}: markets.getDisplayName(order.state.coin)
-#. placeholder {0}: order.coin
+#. placeholder {0}: assetInfo.displayName
+#. placeholder {0}: markets.getMarket(fill.coin)?.displayName ?? fill.coin
+#. placeholder {0}: markets.getMarket(order.state.coin)?.displayName ?? order.state.coin
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx

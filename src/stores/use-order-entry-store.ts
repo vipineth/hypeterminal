@@ -61,7 +61,7 @@ interface OrderEntryStore extends OrderEntryState {
 const DEFAULT_PERSISTED: PersistedState = {
 	side: "buy",
 	orderType: "market",
-	sizeMode: "asset",
+	sizeMode: "base",
 };
 
 const DEFAULT_FORM: FormState = {
@@ -84,7 +84,7 @@ const orderEntrySchema = z.object({
 	state: z.object({
 		side: z.enum(["buy", "sell"]).optional(),
 		orderType: z.enum(ORDER_TYPES).optional(),
-		sizeMode: z.enum(["asset", "usd"]).optional(),
+		sizeMode: z.enum(["base", "quote"]).optional(),
 	}),
 });
 
@@ -113,7 +113,7 @@ const useOrderEntryStore = create<OrderEntryStore>()(
 
 					toggleSizeMode: () =>
 						set((state) => ({
-							sizeMode: state.sizeMode === "asset" ? "usd" : "asset",
+							sizeMode: state.sizeMode === "base" ? "quote" : "base",
 						})),
 
 					setSize: (size) => set({ size }),

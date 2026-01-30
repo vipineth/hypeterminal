@@ -7,13 +7,13 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { SwapableToken } from "@/domain/trade/swap";
 import { cn } from "@/lib/cn";
 import { formatToken } from "@/lib/format";
-import { Token } from "./token";
+import type { SpotToken } from "@/lib/hyperliquid/markets/types";
+import { AssetDisplay } from "./asset-display";
 
 interface Props {
-	tokens: SwapableToken[];
+	tokens: SpotToken[];
 	selectedToken: string;
 	onSelect: (token: string) => void;
 	getBalance: (token: string) => number;
@@ -29,6 +29,8 @@ export function TokenSelectorDropdown({
 	disabled,
 	className,
 }: Props) {
+	const selected = tokens.find((t) => t.name === selectedToken);
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild disabled={disabled}>
@@ -41,7 +43,11 @@ export function TokenSelectorDropdown({
 						className,
 					)}
 				>
-					<Token name={selectedToken} showIcon showName iconClassName="size-5" nameClassName="text-sm font-medium" />
+					{selected ? (
+						<AssetDisplay asset={selected} iconClassName="size-5" nameClassName="text-sm font-medium" />
+					) : (
+						<span className="text-sm font-medium">{selectedToken}</span>
+					)}
 					<ChevronDown className="size-3.5 text-muted-fg ml-1" />
 				</Button>
 			</DropdownMenuTrigger>
@@ -62,7 +68,7 @@ export function TokenSelectorDropdown({
 								className="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer"
 							>
 								<div className="flex items-center gap-2">
-									<Token name={token.name} showIcon showName iconClassName="size-5" nameClassName="text-sm font-medium" />
+									<AssetDisplay asset={token} iconClassName="size-5" nameClassName="text-sm font-medium" />
 									{isSelected && <Check className="size-3.5 text-info" />}
 								</div>
 								<span className="text-xs text-muted-fg tabular-nums">

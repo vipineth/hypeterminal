@@ -11,9 +11,10 @@ function getMarketSeparator(kind: MarketKind): string {
 }
 
 export function getBaseQuoteFromDisplayName(
-	displayName: string,
-	kind: MarketKind,
+	displayName?: string | null,
+	kind?: MarketKind | null,
 ): { baseToken: string; quoteToken: string } {
+	if (!displayName || !kind) return { baseToken: "", quoteToken: "" };
 	const separator = getMarketSeparator(kind);
 	const [baseToken, quoteToken] = displayName.split(separator);
 	return { baseToken, quoteToken };

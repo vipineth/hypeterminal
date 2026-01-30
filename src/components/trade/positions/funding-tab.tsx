@@ -98,7 +98,7 @@ export function FundingTab() {
 									const isLong = Number.isFinite(szi) ? szi > 0 : true;
 									const rate = parseNumber(update.fundingRate);
 									const usdc = parseNumber(update.usdc);
-									const szDecimals = markets.szDecimals(update.coin) ?? 4;
+									const szDecimals = markets.getSzDecimals(update.coin);
 									const positionSize = Number.isFinite(szi) ? Math.abs(szi) : null;
 
 									const sideClass = isLong ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
@@ -113,7 +113,7 @@ export function FundingTab() {
 													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideClass)}>
 														{isLong ? t`Long` : t`Short`}
 													</span>
-													<span>{markets.getDisplayName(update.coin)}</span>
+													<span>{markets.getMarket(update.coin)?.displayName ?? update.coin}</span>
 												</div>
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">

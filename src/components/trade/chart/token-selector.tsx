@@ -8,19 +8,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { isTokenInCategory } from "@/domain/market";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatUSD } from "@/lib/format";
+import type { UnifiedMarketInfo } from "@/lib/hyperliquid";
 import { getValueColorClass } from "@/lib/trade/numbers";
-import { TokenAvatar } from "../components/token-avatar";
+import { AssetDisplay } from "../components/asset-display";
 import type { MarketRow, MarketScope } from "./constants";
 import { useTokenSelector } from "./use-token-selector";
 
-interface SelectedMarketProp {
-	name: string;
-	displayName: string;
-	kind: "perp" | "spot" | "builderPerp";
-}
-
 export type TokenSelectorProps = {
-	selectedMarket: SelectedMarketProp | undefined;
+	selectedMarket: UnifiedMarketInfo | undefined;
 	onValueChange: (value: string) => void;
 };
 
@@ -83,8 +78,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 					aria-label={t`Select token`}
 					className="h-6 gap-1.5 text-xs font-semibold px-2"
 				>
-					<TokenAvatar className="size-5 shrink-0" symbol={selectedMarket?.name} />
-					<span className="text-warning truncate">{selectedMarket?.displayName ?? "Select"}</span>
+					{selectedMarket && <AssetDisplay asset={selectedMarket} iconClassName="size-5 shrink-0" />}
 					<ChevronDown className="size-3 text-muted-fg shrink-0" />
 				</Button>
 			</PopoverTrigger>
@@ -254,7 +248,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 											}}
 										>
 											<div className="flex-1 min-w-0 flex items-center gap-2">
-												<TokenAvatar className="size-5 shrink-0" symbol={market.name} />
+												<AssetDisplay asset={market} hideName iconClassName="size-5 shrink-0" />
 												<div className="min-w-0">
 													<div className="flex items-center gap-1">
 														<span className="font-semibold text-2xs">{market.displayName}</span>

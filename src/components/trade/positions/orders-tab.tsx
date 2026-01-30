@@ -21,7 +21,7 @@ import {
 	type OpenOrder,
 } from "@/lib/trade/open-orders";
 import { useMarketActions } from "@/stores/use-market-store";
-import { Token } from "../components/token";
+import { AssetDisplay, type AssetInfo } from "../components/asset-display";
 
 interface PlaceholderProps {
 	children: React.ReactNode;
@@ -117,7 +117,7 @@ export function OrdersTab() {
 			if (isCancelling || ordersToCancel.length === 0) return;
 
 			const cancels = ordersToCancel.reduce<{ a: number; o: number }[]>((acc, order) => {
-				const assetId = markets.assetId(order.coin);
+				const assetId = markets.getAssetId(order.coin);
 				if (typeof assetId !== "number") return acc;
 				acc.push({ a: assetId, o: order.oid });
 				return acc;
@@ -237,11 +237,15 @@ export function OrdersTab() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{openOrders.map((order) => (
+								{openOrders.map((order) => {
+									const market = markets.getMarket(order.coin);
+									const assetInfo = market ?? { displayName: order.coin, iconUrl: undefined };
+									return (
 									<OrderRow
 										key={order.oid}
 										order={order}
-										szDecimals={markets.szDecimals(order.coin)}
+										assetInfo={assetInfo}
+										szDecimals={market?.szDecimals ?? 4}
 										isSelected={selectedOrderIds.has(order.oid)}
 										isCancelling={isCancelling}
 										canCancel={canCancel}
@@ -249,7 +253,8 @@ export function OrdersTab() {
 										onCancel={handleCancelOrders}
 										onSelectMarket={setSelectedMarket}
 									/>
-								))}
+								);
+								})}
 							</TableBody>
 						</Table>
 						<ScrollBar orientation="horizontal" />
@@ -262,6 +267,7 @@ export function OrdersTab() {
 
 interface OrderRowProps {
 	order: OpenOrder;
+	assetInfo: AssetInfo;
 	szDecimals: number;
 	isSelected: boolean;
 	isCancelling: boolean;
@@ -273,6 +279,7 @@ interface OrderRowProps {
 
 function OrderRow({
 	order,
+	assetInfo,
 	szDecimals,
 	isSelected,
 	isCancelling,
@@ -305,9 +312,9 @@ function OrderRow({
 						size="none"
 						onClick={() => onSelectMarket(order.coin)}
 						className="gap-1.5"
-						aria-label={t`Switch to ${order.coin} market`}
+						aria-label={t`Switch to ${assetInfo.displayName} market`}
 					>
-						<Token name={order.coin} showIcon showName />
+						<AssetDisplay asset={assetInfo} />
 					</Button>
 					<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideConfig.class)}>{sideConfig.label}</span>
 				</div>

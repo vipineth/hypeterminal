@@ -26,7 +26,13 @@ import { buildOrders, formatSizeForOrder, throwIfResponseError } from "@/domain/
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatToken, szDecimalsToPriceDecimals } from "@/lib/format";
-import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo, useUserPositions } from "@/lib/hyperliquid";
+import {
+	useAgentRegistration,
+	useAgentStatus,
+	useSelectedMarketInfo,
+	useSpotTokens,
+	useUserPositions,
+} from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeTwapOrder";
 import type { MarginMode } from "@/lib/trade/margin-mode";
@@ -78,7 +84,6 @@ import {
 } from "@/stores/use-order-entry-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
-import { Token } from "../components/token";
 import { WalletDialog } from "../components/wallet-dialog";
 import { AdvancedOrderDropdown } from "./advanced-order-dropdown";
 import { LeverageControl } from "./leverage-control";
@@ -146,6 +151,9 @@ export function OrderEntryPanel() {
 		switchModeError,
 		szDecimals,
 	} = useOrderEntryData({ market, side, markPx, sizeMode, sizeInput });
+
+	const { getToken } = useSpotTokens();
+	const sizeModeToken = getToken(sizeModeLabel);
 
 	const { addOrder, updateOrder } = useOrderQueueActions();
 	const selectedPrice = useSelectedPrice();
@@ -310,7 +318,7 @@ export function OrderEntryPanel() {
 	}
 
 	function handleSizeModeToggle() {
-		const newMode = sizeMode === "asset" ? "usd" : "asset";
+		const newMode = sizeMode === "base" ? "quote" : "base";
 		const convertedSize = convertSizeForModeToggle();
 		if (convertedSize) {
 			setHasUserSized(true);
@@ -574,7 +582,7 @@ export function OrderEntryPanel() {
 							aria-label={t`Toggle size mode`}
 							disabled={isFormDisabled}
 						>
-							<Token name={sizeModeLabel} showIcon showName />
+							<span className="text-4xs">{sizeModeLabel}</span>
 							<ArrowLeftRight className="size-2.5" />
 						</Button>
 						<NumberInput

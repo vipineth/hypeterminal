@@ -17,7 +17,7 @@ import { useSpotTokens } from "@/lib/hyperliquid/markets/use-spot-tokens";
 import { useExchangeSendAsset } from "@/lib/hyperliquid/hooks/exchange";
 import { useExchangeSpotSend } from "@/lib/hyperliquid/hooks/exchange/useExchangeSpotSend";
 import { floorToString, limitDecimalInput } from "@/lib/trade/numbers";
-import { Token } from "../components/token";
+import { AssetDisplay } from "../components/asset-display";
 
 type AccountType = "perp" | "spot";
 
@@ -188,12 +188,12 @@ export function SendDialog({ open, onOpenChange, initialAsset = DEFAULT_QUOTE_TO
 
 						<Select value={selectedToken} onValueChange={handleTokenChange}>
 							<SelectTrigger className="flex-1 h-10 bg-bg/50 border-border/60">
-								<Token name={selectedToken} />
+								<AssetDisplay asset={getToken(selectedToken) ?? { displayName: selectedToken, iconUrl: undefined }} hideIcon />
 							</SelectTrigger>
 							<SelectContent>
-								{tokenOptions.map((token) => (
-									<SelectItem key={token} value={token}>
-										<Token name={token} />
+								{tokenOptions.map((tokenName) => (
+									<SelectItem key={tokenName} value={tokenName}>
+										<AssetDisplay asset={getToken(tokenName) ?? { displayName: tokenName, iconUrl: undefined }} hideIcon />
 									</SelectItem>
 								))}
 							</SelectContent>

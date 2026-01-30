@@ -30,15 +30,15 @@ function createMarkets(params: CreateMarketsParams): Markets {
 	const perpMarkets: PerpMarket[] = [];
 	if (perpMeta?.universe) {
 		for (let i = 0; i < perpMeta.universe.length; i++) {
-			const asset = perpMeta.universe[i];
-			if (asset.isDelisted) continue;
+			const market = perpMeta.universe[i];
+			if (market.isDelisted) continue;
 			perpMarkets.push({
-				...asset,
+				...market,
 				kind: "perp",
-				displayName: getPerpDisplayName(asset.name),
+				displayName: getPerpDisplayName(market.name),
 				assetId: getPerpAssetId(i),
 				ctxIndex: i,
-				iconUrl: getIconUrlFromMarketName(asset.name, "perp"),
+				iconUrl: getIconUrlFromMarketName(market.name, "perp"),
 			});
 		}
 	}
@@ -85,7 +85,7 @@ function createMarkets(params: CreateMarketsParams): Markets {
 			if (!meta || !dexInfo) continue;
 
 			const dexName = dexInfo.name;
-			const quoteToken = spotTokens[meta.collateralToken] ?? null;
+			const quoteToken = spotTokens[meta.collateralToken];
 
 			for (let assetIndex = 0; assetIndex < meta.universe.length; assetIndex++) {
 				const asset = meta.universe[assetIndex];
@@ -109,27 +109,8 @@ function createMarkets(params: CreateMarketsParams): Markets {
 	const allMarkets: UnifiedMarket[] = [...perpMarkets, ...spotMarkets, ...builderPerpMarkets];
 
 	const marketByName = new Map<string, UnifiedMarket>();
-	const assetIdToMarket = new Map<number, UnifiedMarket>();
 	for (const market of allMarkets) {
 		marketByName.set(market.name, market);
-		assetIdToMarket.set(market.assetId, market);
-	}
-
-	const tokenByName = new Map<string, SpotToken>();
-	for (const token of spotTokens) {
-		tokenByName.set(token.name, token);
-	}
-
-	const spotDisplayNameById = new Map<string, string>();
-	if (spotMeta?.universe && spotTokens.length > 0) {
-		for (const pair of spotMeta.universe) {
-			if (pair.tokens.length < 2) continue;
-			const baseToken = spotTokens[pair.tokens[0]];
-			const quoteToken = spotTokens[pair.tokens[1]];
-			if (baseToken && quoteToken) {
-				spotDisplayNameById.set(pair.name, `${baseToken.displayName}/${quoteToken.displayName}`);
-			}
-		}
 	}
 
 	return {
@@ -141,45 +122,16 @@ function createMarkets(params: CreateMarketsParams): Markets {
 		isLoading,
 		error,
 
-		get(coin: string): UnifiedMarket | undefined {
+		getMarket(coin: string): UnifiedMarket | undefined {
 			return marketByName.get(coin);
 		},
 
-		getDisplayName(coin: string): string {
-			if (coin.startsWith("@")) {
-				return spotDisplayNameById.get(coin) ?? coin;
-			}
-			const market = marketByName.get(coin);
-			if (!market) return coin;
-			return market.kind === "spot" ? market.displayName : market.name;
-		},
-
-		szDecimals(coin: string): number {
+		getSzDecimals(coin: string): number {
 			return marketByName.get(coin)?.szDecimals ?? 4;
 		},
 
-		assetId(coin: string): number | undefined {
+		getAssetId(coin: string): number | undefined {
 			return marketByName.get(coin)?.assetId;
-		},
-
-		assetIdToCoin(assetId: number): string | undefined {
-			const market = assetIdToMarket.get(assetId);
-			if (!market) return undefined;
-			return market.kind === "spot" ? market.displayName : market.name;
-		},
-
-		getIconUrl(coin: string): string | undefined {
-			const market = marketByName.get(coin);
-			if (!market) return undefined;
-			if (market.kind === "spot") {
-				const [base] = market.tokensInfo;
-				return getIconUrlFromMarketName(getUnderlyingAsset(base) ?? base.name, market.kind);
-			}
-			return getIconUrlFromMarketName(market.name, market.kind);
-		},
-
-		getToken(coin: string): SpotToken | undefined {
-			return tokenByName.get(coin);
 		},
 	};
 }

@@ -12,6 +12,10 @@ const ASSET_REPLACEMENTS: Record<string, string> = {
 	USDT0: "USDT",
 };
 
+const NO_SPOT_PREFIX_ASSETS: Record<string, string> = {
+	USDC: "USDC",
+};
+
 export function getUnderlyingAsset(token: RawToken): string | undefined {
 	if (ASSET_REPLACEMENTS[token.name]) {
 		return ASSET_REPLACEMENTS[token.name];
@@ -42,6 +46,9 @@ export function getIconUrlFromPair(tokenName: string, kind?: MarketKind) {
 
 export function getIconUrlFromMarketName(tokenName: string, kind?: MarketKind) {
 	if (kind === "spot") {
+		if (NO_SPOT_PREFIX_ASSETS[tokenName]) {
+			return `${TOKEN_ICON_BASE_URL}/${NO_SPOT_PREFIX_ASSETS[tokenName]}.svg`;
+		}
 		return `${TOKEN_ICON_BASE_URL}/${tokenName}_spot.svg`;
 	}
 	return `${TOKEN_ICON_BASE_URL}/${tokenName}.svg`;

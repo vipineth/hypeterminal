@@ -19,7 +19,7 @@ import { formatToken, formatUSD } from "@/lib/format";
 import { useSpotTokens } from "@/lib/hyperliquid/markets/use-spot-tokens";
 import { useSwapModalActions } from "@/stores/use-global-modal-store";
 import { useGlobalSettingsActions, useHideSmallBalances } from "@/stores/use-global-settings-store";
-import { Token } from "../components/token";
+import { AssetDisplay } from "../components/asset-display";
 import { SendDialog } from "./send-dialog";
 import { TransferDialog } from "./transfer-dialog";
 
@@ -152,7 +152,8 @@ export function BalancesTab() {
 							</TableHeader>
 							<TableBody>
 								{filteredBalances.map((row) => {
-									const decimals = getToken(row.asset)?.transferDecimals ?? 2;
+									const token = getToken(row.asset);
+									const decimals = token?.transferDecimals ?? 2;
 									const canTransfer = row.asset === DEFAULT_QUOTE_TOKEN && parseFloat(row.available) > 0;
 									const canSwap = row.type === "spot" && parseFloat(row.available) > 0;
 									const transferLabel = row.type === "perp" ? t`To Spot` : t`To Perp`;
@@ -160,7 +161,7 @@ export function BalancesTab() {
 										<TableRow key={`${row.type}-${row.asset}`} className="border-border/40 hover:bg-accent/30">
 											<TableCell className="text-2xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">
-													<Token name={row.asset} showIcon showName />
+													<AssetDisplay asset={token ?? { displayName: row.asset, iconUrl: undefined }} />
 													<span
 														className={cn(
 															"text-4xs px-1 py-0.5 uppercase",

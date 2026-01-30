@@ -21,7 +21,7 @@ import {
 	useSwapModalOpen,
 	useSwapModalToToken,
 } from "@/stores/use-global-modal-store";
-import { Token } from "./token";
+import { AssetDisplay } from "./asset-display";
 import { TokenSelectorDropdown } from "./token-selector-dropdown";
 import { TradingActionButton } from "./trading-action-button";
 
@@ -99,6 +99,11 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 	const szDecimals = spotMarket?.szDecimals ?? 2;
 	const baseToken = spotMarket?.tokensInfo[0]?.name ?? "";
 	const isBuying = spotMarket ? getSwapSide(fromToken, spotMarket) : false;
+
+	const fromTokenInfo = availableFromTokens.find((t) => t.name === fromToken) ?? spotMarket?.tokensInfo.find((t) => t.name === fromToken);
+	const toTokenInfo = availableToTokens.find((t) => t.name === toToken) ?? spotMarket?.tokensInfo.find((t) => t.name === toToken);
+	const fromAsset = fromTokenInfo ?? { displayName: fromToken, iconUrl: undefined };
+	const toAsset = toTokenInfo ?? { displayName: toToken, iconUrl: undefined };
 
 	const amountValue = toNumber(amount) ?? 0;
 
@@ -282,7 +287,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 						<span className="tabular-nums">
 							{rate > 0 ? (
 								<>
-									1 <Token name={fromToken} /> ≈ {formatToken(rate, 6)} <Token name={toToken} />
+									1 <AssetDisplay asset={fromAsset} hideIcon /> ≈ {formatToken(rate, 6)} <AssetDisplay asset={toAsset} hideIcon />
 								</>
 							) : (
 								"-"
@@ -302,7 +307,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 							<AlertTriangle className="size-3.5 text-warning shrink-0 mt-0.5" />
 							<p className="text-xs text-warning">
 								<Trans>
-									Insufficient <Token name={fromToken} /> balance
+									Insufficient <AssetDisplay asset={fromAsset} hideIcon /> balance
 								</Trans>
 							</p>
 						</div>
@@ -313,7 +318,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 							<AlertTriangle className="size-3.5 text-warning shrink-0 mt-0.5" />
 							<p className="text-xs text-warning">
 								<Trans>
-									No trading pair available for <Token name={fromToken} />/<Token name={toToken} />
+									No trading pair available for <AssetDisplay asset={fromAsset} hideIcon />/<AssetDisplay asset={toAsset} hideIcon />
 								</Trans>
 							</p>
 						</div>

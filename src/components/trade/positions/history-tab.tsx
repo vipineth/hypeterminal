@@ -114,9 +114,9 @@ export function HistoryTab() {
 														variant="link"
 														size="none"
 														onClick={() => setSelectedMarket(fill.coin)}
-														aria-label={t`Switch to ${markets.getDisplayName(fill.coin)} market`}
+														aria-label={t`Switch to ${markets.getMarket(fill.coin)?.displayName ?? fill.coin} market`}
 													>
-														{markets.getDisplayName(fill.coin)}
+														{markets.getMarket(fill.coin)?.displayName ?? fill.coin}
 													</Button>
 												</div>
 											</TableCell>
@@ -125,7 +125,7 @@ export function HistoryTab() {
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">{formatUSD(fill.px)}</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
-												{formatNumber(fill.sz, markets.szDecimals(fill.coin))}
+												{formatNumber(fill.sz, markets.getSzDecimals(fill.coin))}
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
 												<span className={feeClass}>

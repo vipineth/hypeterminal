@@ -21,8 +21,9 @@ import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
-import { getBaseToken } from "@/domain/market";
+import { getBaseQuoteFromDisplayName } from "@/domain/market";
 import { floorToDecimals, formatDecimalFloor, getValueColorClass, parseNumber } from "@/lib/trade/numbers";
+import type { SizeMode } from "@/lib/trade/types";
 import { useDepositModalActions } from "@/stores/use-global-modal-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
@@ -34,7 +35,6 @@ import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
 
 type OrderType = "market" | "limit";
 type Side = "buy" | "sell";
-type SizeMode = "asset" | "usd";
 
 const ORDER_TEXT = UI_TEXT.ORDER_ENTRY;
 
@@ -50,7 +50,9 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const needsChainSwitch = !!walletClientError && walletClientError.message.includes("does not match");
 
 	const { data: market, isLoading: isMarketLoading } = useSelectedMarketInfo();
-	const baseToken = market ? getBaseToken(market.displayName, market.kind) : undefined;
+	const { baseToken, quoteToken } = market
+		? getBaseQuoteFromDisplayName(market.displayName, market.kind)
+		: { baseToken: undefined, quoteToken: undefined };
 
 	const { perpSummary, perpPositions } = useAccountBalances();
 
@@ -71,7 +73,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const [type, setType] = useState<OrderType>("market");
 	const [side, setSide] = useState<Side>("buy");
 	const [sizeInput, setSizeInput] = useState("");
-	const [sizeMode, setSizeMode] = useState<SizeMode>("usd");
+	const [sizeMode, setSizeMode] = useState<SizeMode>("quote");
 	const [limitPriceInput, setLimitPriceInput] = useState("");
 	const [approvalError, setApprovalError] = useState<string | null>(null);
 
@@ -118,7 +120,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	}, [price, side, availableToBuy, availableToSell, leverage, availableBalance, positionSize, market?.szDecimals]);
 
 	const sizeInputValue = parseNumber(sizeInput) || 0;
-	const sizeValue = sizeMode === "usd" && price > 0 ? sizeInputValue / price : sizeInputValue;
+	const sizeValue = sizeMode === "quote" && price > 0 ? sizeInputValue / price : sizeInputValue;
 	const orderValue = sizeValue * price;
 	const marginRequired = leverage ? orderValue / leverage : 0;
 	const feeRate = type === "market" ? ORDER_FEE_RATE_TAKER : ORDER_FEE_RATE_MAKER;
@@ -171,9 +173,9 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const applySizeFromPercent = (pct: number) => {
 		if (maxSize <= 0) return;
 		const newSize = maxSize * (pct / 100);
-		if (sizeMode === "usd" && price > 0) {
-			const usdValue = newSize * price;
-			setSizeInput(usdValue > 0 ? usdValue.toFixed(2) : "");
+		if (sizeMode === "quote" && price > 0) {
+			const quoteValue = newSize * price;
+			setSizeInput(quoteValue > 0 ? quoteValue.toFixed(2) : "");
 		} else {
 			const formatted = formatDecimalFloor(newSize, market?.szDecimals ?? 0);
 			setSizeInput(formatted || "");
@@ -184,14 +186,14 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const handlePercentClick = (pct: number) => applySizeFromPercent(pct);
 
 	const handleSizeModeToggle = () => {
-		if (sizeMode === "asset" && price > 0 && sizeValue > 0) {
+		if (sizeMode === "base" && price > 0 && sizeValue > 0) {
 			setSizeInput((sizeValue * price).toFixed(2));
-			setSizeMode("usd");
-		} else if (sizeMode === "usd" && price > 0 && sizeValue > 0) {
+			setSizeMode("quote");
+		} else if (sizeMode === "quote" && price > 0 && sizeValue > 0) {
 			setSizeInput(formatDecimalFloor(sizeValue, market?.szDecimals ?? 0) || "");
-			setSizeMode("asset");
+			setSizeMode("base");
 		} else {
-			setSizeMode(sizeMode === "asset" ? "usd" : "asset");
+			setSizeMode(sizeMode === "base" ? "quote" : "base");
 		}
 	};
 
@@ -412,7 +414,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 								)}
 								disabled={isFormDisabled}
 							>
-								{sizeMode === "asset" ? baseToken || "—" : "USD"}
+								{sizeMode === "base" ? baseToken || "—" : quoteToken || "—"}
 								<ChevronDown className="size-3" />
 							</Button>
 							<Input

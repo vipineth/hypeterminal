@@ -10,12 +10,14 @@ import { formatPercent, formatPrice, formatToken, formatUSD, szDecimalsToPriceDe
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { getValueColorClass, isPositive, toNumber } from "@/lib/trade/numbers";
 import { validateSlPrice, validateTpPrice } from "@/lib/trade/tpsl";
-import { Token } from "../components/token";
+import { AssetDisplay } from "../components/asset-display";
 import { TradingActionButton } from "../components/trading-action-button";
 import { TpSlSection } from "../order-entry/tp-sl-section";
 
 interface PositionData {
 	coin: string;
+	displayName: string;
+	iconUrl: string | undefined;
 	assetId: number;
 	isLong: boolean;
 	size: number;
@@ -149,7 +151,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 			<DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden">
 				<DialogHeader className="px-5 pt-5 pb-3">
 					<DialogTitle className="flex items-center gap-1">
-						<Token name={position.coin} showIcon showName />
+						<AssetDisplay asset={position} />
 						<Badge variant={position.isLong ? "long" : "short"} size="sm">
 							{position.isLong ? (
 								<>
