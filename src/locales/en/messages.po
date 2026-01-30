@@ -514,7 +514,7 @@ msgid "End Price (USDC)"
 msgstr "End Price (USDC)"
 
 #: src/lib/errors/definitions/order-input.ts
-#: src/lib/errors/stacks/spot-order.ts
+#: src/lib/errors/definitions/spot-input.ts
 msgid "Enter limit price"
 msgstr "Enter limit price"
 
@@ -523,7 +523,7 @@ msgid "Enter price range"
 msgstr "Enter price range"
 
 #: src/lib/errors/definitions/order-input.ts
-#: src/lib/errors/stacks/spot-order.ts
+#: src/lib/errors/definitions/spot-input.ts
 msgid "Enter size"
 msgstr "Enter size"
 
@@ -699,8 +699,8 @@ msgstr "Install a wallet extension to continue"
 
 #. placeholder {0}: ctx.baseToken
 #. placeholder {0}: ctx.quoteToken
-#: src/lib/errors/stacks/spot-order.ts
-#: src/lib/errors/stacks/spot-order.ts
+#: src/lib/errors/definitions/spot-balance.ts
+#: src/lib/errors/definitions/spot-balance.ts
 msgid "Insufficient {0} balance"
 msgstr "Insufficient {0} balance"
 
@@ -923,7 +923,7 @@ msgstr "MAX"
 msgid "Maximum slippage tolerance for market orders"
 msgstr "Maximum slippage tolerance for market orders"
 
-#: src/lib/errors/stacks/spot-order.ts
+#: src/lib/errors/definitions/spot-input.ts
 msgid "Min order ${ORDER_MIN_NOTIONAL_USD}"
 msgstr "Min order ${ORDER_MIN_NOTIONAL_USD}"
 
