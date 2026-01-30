@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+	DEFAULT_QUOTE_TOKEN,
 	FALLBACK_VALUE_PLACEHOLDER,
 	ORDER_MIN_NOTIONAL_USD,
 	ORDER_SIZE_PERCENT_STEPS,
@@ -53,7 +54,7 @@ import {
 } from "@/lib/trade/order-types";
 import type { ActiveDialog, ButtonContent } from "@/lib/trade/types";
 import { useButtonContent } from "@/lib/trade/use-button-content";
-import { useOrderValidation } from "@/lib/trade/use-order-validation";
+import { perpInput, spotInput, useOrderValidation } from "@/lib/trade/use-order-validation";
 import { useDepositModalActions, useSettingsDialogActions, useSwapModalActions } from "@/stores/use-global-modal-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import {
@@ -77,6 +78,7 @@ import {
 } from "@/stores/use-order-entry-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
+import { Token } from "../components/token";
 import { WalletDialog } from "../components/wallet-dialog";
 import { AdvancedOrderDropdown } from "./advanced-order-dropdown";
 import { LeverageControl } from "./leverage-control";
@@ -207,7 +209,7 @@ export function OrderEntryPanel() {
 		if (!market || market.kind !== "builderPerp") return null;
 
 		const quoteToken = getMarketQuoteToken(market);
-		if (quoteToken === "USDC") return null;
+		if (quoteToken === DEFAULT_QUOTE_TOKEN) return null;
 
 		return quoteToken;
 	}, [market]);
@@ -254,44 +256,33 @@ export function OrderEntryPanel() {
 	const isReadyToTrade = isAgentReady;
 	const canApprove = !!walletClient && !!address;
 
+	const baseInput = {
+		isConnected,
+		isWalletLoading,
+		availableBalance,
+		hasMarket: !!market,
+		hasAssetIndex: typeof market?.assetId === "number",
+		needsAgentApproval,
+		isReadyToTrade,
+		price,
+		sizeValue,
+		orderValue,
+		side,
+		usesLimitPrice,
+	};
+
 	const validation = useOrderValidation(
 		isSpotMarket
-			? {
-					isSpotMarket: true,
-					isConnected,
-					isWalletLoading,
-					availableBalance,
-					hasMarket: !!market,
-					hasAssetIndex: typeof market?.assetId === "number",
-					needsAgentApproval,
-					isReadyToTrade,
-					price,
-					sizeValue,
-					orderValue,
-					side,
-					usesLimitPrice,
+			? spotInput(baseInput, {
 					baseAvailable: spotBalance.baseAvailable,
 					quoteAvailable: spotBalance.quoteAvailable,
 					baseToken,
 					quoteToken,
-				}
-			: {
-					isSpotMarket: false,
-					isConnected,
-					isWalletLoading,
-					availableBalance,
-					hasMarket: !!market,
-					hasAssetIndex: typeof market?.assetId === "number",
-					needsAgentApproval,
-					isReadyToTrade,
+				})
+			: perpInput(baseInput, {
 					orderType,
 					markPx,
-					price,
-					sizeValue,
-					orderValue,
 					maxSize,
-					side,
-					usesLimitPrice,
 					usesTriggerPrice,
 					triggerPriceNum,
 					stopOrder,
@@ -306,7 +297,7 @@ export function OrderEntryPanel() {
 					canUseTpSl,
 					tpPriceNum,
 					slPriceNum,
-				},
+				}),
 	);
 
 	const sizeHasError = (sizeValue > maxSize && maxSize > 0) || (orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD);
@@ -483,7 +474,7 @@ export function OrderEntryPanel() {
 		if (!isConnected) return FALLBACK_VALUE_PLACEHOLDER;
 		const isBaseToken = isSpotMarket && side === "sell";
 		const decimals = isBaseToken ? szDecimals : 2;
-		return `${formatToken(availableBalance, decimals)} ${availableBalanceToken}`;
+		return formatToken(availableBalance, decimals);
 	}
 
 	return (
@@ -536,14 +527,14 @@ export function OrderEntryPanel() {
 					<div className="flex items-center justify-between text-muted-fg">
 						<span>{t`Available`}</span>
 						<div className="flex items-center gap-2">
-							<span className={cn("tabular-nums", getValueColorClass(availableBalance))}>
-								{formatAvailableBalance()}
+							<span className={cn("tabular-nums flex items-center gap-1", getValueColorClass(availableBalance))}>
+								{formatAvailableBalance()} {availableBalanceToken}
 							</span>
 							{isConnected && swapTargetToken && (
 								<Button
 									variant="link"
 									size="none"
-									onClick={() => openSwapModal("USDC", swapTargetToken)}
+									onClick={() => openSwapModal(DEFAULT_QUOTE_TOKEN, swapTargetToken)}
 									className="text-info text-4xs uppercase"
 								>
 									{t`Swap`}
@@ -583,7 +574,8 @@ export function OrderEntryPanel() {
 							aria-label={t`Toggle size mode`}
 							disabled={isFormDisabled}
 						>
-							{sizeModeLabel} <ArrowLeftRight className="size-2.5" />
+							<Token name={sizeModeLabel} showIcon showName />
+							<ArrowLeftRight className="size-2.5" />
 						</Button>
 						<NumberInput
 							placeholder="0.00"
@@ -659,7 +651,7 @@ export function OrderEntryPanel() {
 				{usesLimitPrice && (
 					<div className="space-y-1.5">
 						<div className="flex items-center justify-between">
-							<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Limit Price (USDC)`}</div>
+							<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Limit Price`}</div>
 							{markPx > 0 && (
 								<Button
 									variant="ghost"

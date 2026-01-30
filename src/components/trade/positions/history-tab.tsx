@@ -114,9 +114,9 @@ export function HistoryTab() {
 														variant="link"
 														size="none"
 														onClick={() => setSelectedMarket(fill.coin)}
-														aria-label={t`Switch to ${markets.displayName(fill.coin)} market`}
+														aria-label={t`Switch to ${markets.getDisplayName(fill.coin)} market`}
 													>
-														{markets.displayName(fill.coin)}
+														{markets.getDisplayName(fill.coin)}
 													</Button>
 												</div>
 											</TableCell>

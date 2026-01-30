@@ -1,11 +1,11 @@
 import { t } from "@lingui/core/macro";
 import { ExternalLink, Flame } from "lucide-react";
+import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/domain/market";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD, shortenAddress } from "@/lib/format";
 import { type UnifiedMarketInfo, useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { getExplorerTokenUrl } from "@/lib/hyperliquid/explorer";
 import { useSubActiveAssetCtx } from "@/lib/hyperliquid/hooks/subscription/useSubActiveAssetCtx";
-import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/domain/market";
 import { getValueColorClass, toFiniteNumber } from "@/lib/trade/numbers";
 import { Badge } from "../ui/badge";
 import { StatBlock } from "./chart/stat-block";

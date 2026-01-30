@@ -705,7 +705,11 @@ msgid "Insufficient {0} balance"
 msgstr ""
 
 #: src/components/trade/components/spot-swap-modal.tsx
-msgid "Insufficient {fromTokenDisplay} balance"
+#~ msgid "Insufficient {fromTokenDisplay} balance"
+#~ msgstr ""
+
+#: src/components/trade/components/spot-swap-modal.tsx
+msgid "Insufficient <0/> balance"
 msgstr ""
 
 #: src/components/trade/order-entry/deposit-modal.tsx
@@ -764,12 +768,12 @@ msgid "Limit"
 msgstr "محدد"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
-#~ msgid "Limit Price"
-#~ msgstr "السعر المحدد"
+msgid "Limit Price"
+msgstr "السعر المحدد"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
-msgid "Limit Price (USDC)"
-msgstr ""
+#~ msgid "Limit Price (USDC)"
+#~ msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "limit ro"
@@ -1043,7 +1047,11 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/trade/components/spot-swap-modal.tsx
-msgid "No trading pair available for {fromTokenDisplay}/{toTokenDisplay}"
+#~ msgid "No trading pair available for {fromTokenDisplay}/{toTokenDisplay}"
+#~ msgstr ""
+
+#: src/components/trade/components/spot-swap-modal.tsx
+msgid "No trading pair available for <0/>/<1/>"
 msgstr ""
 
 #: src/components/trade/positions/twap-tab.tsx
@@ -1617,16 +1625,18 @@ msgstr ""
 msgid "Swapping..."
 msgstr ""
 
-#. placeholder {0}: markets.displayName(fill.coin)
-#. placeholder {0}: markets.displayName(order.state.coin)
+#. placeholder {0}: markets.getDisplayName(fill.coin)
+#. placeholder {0}: markets.getDisplayName(order.state.coin)
+#. placeholder {0}: order.coin
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Switch to {0} market"
 msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx
-msgid "Switch to {displayCoin} market"
-msgstr ""
+#~ msgid "Switch to {displayCoin} market"
+#~ msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Switch to {displayName} market"

@@ -705,8 +705,12 @@ msgid "Insufficient {0} balance"
 msgstr "Insufficient {0} balance"
 
 #: src/components/trade/components/spot-swap-modal.tsx
-msgid "Insufficient {fromTokenDisplay} balance"
-msgstr "Insufficient {fromTokenDisplay} balance"
+#~ msgid "Insufficient {fromTokenDisplay} balance"
+#~ msgstr "Insufficient {fromTokenDisplay} balance"
+
+#: src/components/trade/components/spot-swap-modal.tsx
+msgid "Insufficient <0/> balance"
+msgstr "Insufficient <0/> balance"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/lib/errors/definitions/deposit.ts
@@ -768,12 +772,12 @@ msgid "Limit"
 msgstr "Limit"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
-#~ msgid "Limit Price"
-#~ msgstr "Limit Price"
+msgid "Limit Price"
+msgstr "Limit Price"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
-msgid "Limit Price (USDC)"
-msgstr "Limit Price (USDC)"
+#~ msgid "Limit Price (USDC)"
+#~ msgstr "Limit Price (USDC)"
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "limit ro"
@@ -1047,8 +1051,12 @@ msgstr "No tokens available"
 #~ msgstr "No trading pair available for {fromToken}/{toToken}"
 
 #: src/components/trade/components/spot-swap-modal.tsx
-msgid "No trading pair available for {fromTokenDisplay}/{toTokenDisplay}"
-msgstr "No trading pair available for {fromTokenDisplay}/{toTokenDisplay}"
+#~ msgid "No trading pair available for {fromTokenDisplay}/{toTokenDisplay}"
+#~ msgstr "No trading pair available for {fromTokenDisplay}/{toTokenDisplay}"
+
+#: src/components/trade/components/spot-swap-modal.tsx
+msgid "No trading pair available for <0/>/<1/>"
+msgstr "No trading pair available for <0/>/<1/>"
 
 #: src/components/trade/positions/twap-tab.tsx
 msgid "No TWAP orders found."
@@ -1621,16 +1629,18 @@ msgstr "Swap submitted"
 msgid "Swapping..."
 msgstr "Swapping..."
 
-#. placeholder {0}: markets.displayName(fill.coin)
-#. placeholder {0}: markets.displayName(order.state.coin)
+#. placeholder {0}: markets.getDisplayName(fill.coin)
+#. placeholder {0}: markets.getDisplayName(order.state.coin)
+#. placeholder {0}: order.coin
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Switch to {0} market"
 msgstr "Switch to {0} market"
 
 #: src/components/trade/positions/orders-tab.tsx
-msgid "Switch to {displayCoin} market"
-msgstr "Switch to {displayCoin} market"
+#~ msgid "Switch to {displayCoin} market"
+#~ msgstr "Switch to {displayCoin} market"
 
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Switch to {displayName} market"

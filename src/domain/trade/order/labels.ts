@@ -1,4 +1,3 @@
-import type { SpotBalanceData } from "@/domain/trade/balances";
 import type { Side } from "@/lib/trade/types";
 
 export interface SideLabels {
@@ -20,12 +19,11 @@ interface SizeModeLabelInput {
 	side: Side;
 	sizeMode: "asset" | "usd";
 	baseToken: string;
-	spotBalance: SpotBalanceData;
+	quoteToken: string;
 }
 
 export function getSizeModeLabel(input: SizeModeLabelInput): string {
-	const { isSpotMarket, side, sizeMode, baseToken, spotBalance } = input;
-	const quoteToken = spotBalance.quoteToken || "USDC";
+	const { isSpotMarket, side, sizeMode, baseToken, quoteToken } = input;
 
 	if (isSpotMarket) {
 		if (side === "buy") {

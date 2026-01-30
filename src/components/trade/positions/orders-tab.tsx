@@ -21,7 +21,7 @@ import {
 	type OpenOrder,
 } from "@/lib/trade/open-orders";
 import { useMarketActions } from "@/stores/use-market-store";
-import { TokenAvatar } from "../components/token-avatar";
+import { Token } from "../components/token";
 
 interface PlaceholderProps {
 	children: React.ReactNode;
@@ -241,7 +241,6 @@ export function OrdersTab() {
 									<OrderRow
 										key={order.oid}
 										order={order}
-										displayCoin={markets.displayName(order.coin)}
 										szDecimals={markets.szDecimals(order.coin)}
 										isSelected={selectedOrderIds.has(order.oid)}
 										isCancelling={isCancelling}
@@ -263,7 +262,6 @@ export function OrdersTab() {
 
 interface OrderRowProps {
 	order: OpenOrder;
-	displayCoin: string;
 	szDecimals: number;
 	isSelected: boolean;
 	isCancelling: boolean;
@@ -275,7 +273,6 @@ interface OrderRowProps {
 
 function OrderRow({
 	order,
-	displayCoin,
 	szDecimals,
 	isSelected,
 	isCancelling,
@@ -294,7 +291,7 @@ function OrderRow({
 				<Checkbox
 					checked={isSelected}
 					onCheckedChange={(value) => onToggle(order.oid, value)}
-					aria-label={`${t`Select order`} ${displayCoin}`}
+					aria-label={`${t`Select order`} ${order.coin}`}
 					disabled={isCancelling}
 				/>
 			</TableCell>
@@ -308,10 +305,9 @@ function OrderRow({
 						size="none"
 						onClick={() => onSelectMarket(order.coin)}
 						className="gap-1.5"
-						aria-label={t`Switch to ${displayCoin} market`}
+						aria-label={t`Switch to ${order.coin} market`}
 					>
-						<TokenAvatar symbol={displayCoin} />
-						<span>{displayCoin}</span>
+						<Token name={order.coin} showIcon showName />
 					</Button>
 					<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideConfig.class)}>{sideConfig.label}</span>
 				</div>
@@ -323,7 +319,7 @@ function OrderRow({
 				{formatUSD(order.limitPx, { compact: false })}
 			</TableCell>
 			<TableCell className="text-2xs text-right tabular-nums py-1.5">
-				{formatNumber(order.origSz, szDecimals)} {displayCoin}{" "}
+				{formatNumber(order.origSz, szDecimals)} {order.coin}{" "}
 				<span className="text-muted-fg">({formatUSD(getOrderValue(order), { compact: false })})</span>
 			</TableCell>
 			<TableCell className="text-2xs text-right tabular-nums py-1.5">

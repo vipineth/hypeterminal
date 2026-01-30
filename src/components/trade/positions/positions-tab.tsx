@@ -18,7 +18,7 @@ import type { Markets } from "@/lib/hyperliquid/markets";
 import { calc, getValueColorClass, isPositive, parseNumber } from "@/lib/trade/numbers";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useMarketActions } from "@/stores/use-market-store";
-import { TokenAvatar } from "../components/token-avatar";
+import { Token } from "../components/token";
 import { TradingActionButton } from "../components/trading-action-button";
 import { PositionTpSlModal } from "./position-tpsl-modal";
 
@@ -92,7 +92,7 @@ function PositionRow({
 	const assetId = markets.assetId(p.coin);
 	const szDecimals = markets.szDecimals(p.coin);
 	const markPx = parseNumber(markPxRaw);
-	const displayName = markets.displayName(p.coin);
+	const displayName = markets.getDisplayName(p.coin);
 
 	const unrealizedPnl = parseNumber(p.unrealizedPnl);
 	const cumFunding = parseNumber(p.cumFunding.sinceOpen);
@@ -138,8 +138,7 @@ function PositionRow({
 						className="gap-1.5"
 						aria-label={t`Switch to ${displayName} market`}
 					>
-						<TokenAvatar symbol={displayName} />
-						<span>{displayName}</span>
+						<Token name={p.coin} showIcon showName />
 					</Button>
 					<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideClass)}>
 						{isLong ? t`Long` : t`Short`}

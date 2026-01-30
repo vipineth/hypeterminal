@@ -5,6 +5,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NumberInput } from "@/components/ui/number-input";
+import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
 import { getAvailableFromTotals, getSpotBalance } from "@/domain/trade/balances";
 import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import { findSpotPair, getAvailablePairTokens, getSwapSide } from "@/domain/trade/swap";
@@ -20,6 +21,7 @@ import {
 	useSwapModalOpen,
 	useSwapModalToToken,
 } from "@/stores/use-global-modal-store";
+import { Token } from "./token";
 import { TokenSelectorDropdown } from "./token-selector-dropdown";
 import { TradingActionButton } from "./trading-action-button";
 
@@ -28,7 +30,7 @@ const DEFAULT_SLIPPAGE_BPS = 100;
 
 export function SpotSwapModal() {
 	const isOpen = useSwapModalOpen();
-	const initialFromToken = useSwapModalFromToken() ?? "USDC";
+	const initialFromToken = useSwapModalFromToken() ?? DEFAULT_QUOTE_TOKEN;
 	const initialToToken = useSwapModalToToken();
 	const { close } = useSwapModalActions();
 
@@ -97,9 +99,6 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 	const szDecimals = spotMarket?.szDecimals ?? 2;
 	const baseToken = spotMarket?.tokensInfo[0]?.name ?? "";
 	const isBuying = spotMarket ? getSwapSide(fromToken, spotMarket) : false;
-
-	const fromTokenDisplay = availableFromTokens.find((t) => t.name === fromToken)?.displayName ?? fromToken;
-	const toTokenDisplay = availableToTokens.find((t) => t.name === toToken)?.displayName ?? toToken;
 
 	const amountValue = toNumber(amount) ?? 0;
 
@@ -281,7 +280,13 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 							<Trans>Rate</Trans>
 						</span>
 						<span className="tabular-nums">
-							{rate > 0 ? `1 ${fromTokenDisplay} ≈ ${formatToken(rate, 6)} ${toTokenDisplay}` : "-"}
+							{rate > 0 ? (
+								<>
+									1 <Token name={fromToken} /> ≈ {formatToken(rate, 6)} <Token name={toToken} />
+								</>
+							) : (
+								"-"
+							)}
 						</span>
 					</div>
 
@@ -296,7 +301,9 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 						<div className="flex items-start gap-2 p-2.5 bg-warning/10 border border-warning/20 rounded-sm">
 							<AlertTriangle className="size-3.5 text-warning shrink-0 mt-0.5" />
 							<p className="text-xs text-warning">
-								<Trans>Insufficient {fromTokenDisplay} balance</Trans>
+								<Trans>
+									Insufficient <Token name={fromToken} /> balance
+								</Trans>
 							</p>
 						</div>
 					)}
@@ -306,7 +313,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 							<AlertTriangle className="size-3.5 text-warning shrink-0 mt-0.5" />
 							<p className="text-xs text-warning">
 								<Trans>
-									No trading pair available for {fromTokenDisplay}/{toTokenDisplay}
+									No trading pair available for <Token name={fromToken} />/<Token name={toToken} />
 								</Trans>
 							</p>
 						</div>

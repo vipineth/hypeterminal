@@ -2,7 +2,7 @@ import { type PerpOrderContext, validatePerpOrder } from "@/lib/errors/stacks/pe
 import { type SpotOrderContext, validateSpotOrder } from "@/lib/errors/stacks/spot-order";
 import type { Side, ValidationResult } from "@/lib/trade/types";
 
-interface BaseValidationInput {
+export interface BaseOrderInput {
 	isConnected: boolean;
 	isWalletLoading: boolean;
 	availableBalance: number;
@@ -17,8 +17,14 @@ interface BaseValidationInput {
 	usesLimitPrice: boolean;
 }
 
-interface PerpValidationInput extends BaseValidationInput {
-	isSpotMarket: false;
+export interface SpotOrderFields {
+	baseAvailable: number;
+	quoteAvailable: number;
+	baseToken: string;
+	quoteToken: string;
+}
+
+export interface PerpOrderFields {
 	orderType: string;
 	markPx: number;
 	maxSize: number;
@@ -38,81 +44,19 @@ interface PerpValidationInput extends BaseValidationInput {
 	slPriceNum: number | null;
 }
 
-interface SpotValidationInput extends BaseValidationInput {
-	isSpotMarket: true;
-	baseAvailable: number;
-	quoteAvailable: number;
-	baseToken: string;
-	quoteToken: string;
+type SpotValidationInput = BaseOrderInput & SpotOrderFields & { isSpotMarket: true };
+type PerpValidationInput = BaseOrderInput & PerpOrderFields & { isSpotMarket: false };
+type ValidationInput = SpotValidationInput | PerpValidationInput;
+
+export function spotInput(base: BaseOrderInput, spot: SpotOrderFields): SpotValidationInput {
+	return { ...base, ...spot, isSpotMarket: true };
 }
 
-type ValidationInput = PerpValidationInput | SpotValidationInput;
-
-function validateSpot(input: SpotValidationInput): ValidationResult {
-	const context: SpotOrderContext = {
-		isConnected: input.isConnected,
-		isWalletLoading: input.isWalletLoading,
-		isReadyToTrade: input.isReadyToTrade,
-		needsAgentApproval: input.needsAgentApproval,
-		availableBalance: input.availableBalance,
-		hasMarket: input.hasMarket,
-		hasAssetIndex: input.hasAssetIndex,
-		usesLimitPrice: input.usesLimitPrice,
-		price: input.price,
-		sizeValue: input.sizeValue,
-		orderValue: input.orderValue,
-		side: input.side,
-		baseAvailable: input.baseAvailable,
-		quoteAvailable: input.quoteAvailable,
-		baseToken: input.baseToken,
-		quoteToken: input.quoteToken,
-	};
-
-	const result = validateSpotOrder(context);
-
-	return {
-		valid: result.valid,
-		errors: result.errors.map((e) => e.message),
-		canSubmit: result.canSubmit,
-		needsApproval: result.needsApproval,
-	};
+export function perpInput(base: BaseOrderInput, perp: PerpOrderFields): PerpValidationInput {
+	return { ...base, ...perp, isSpotMarket: false };
 }
 
-function validatePerp(input: PerpValidationInput): ValidationResult {
-	const context: PerpOrderContext = {
-		isConnected: input.isConnected,
-		isWalletLoading: input.isWalletLoading,
-		isReadyToTrade: input.isReadyToTrade,
-		needsAgentApproval: input.needsAgentApproval,
-		availableBalance: input.availableBalance,
-		hasMarket: input.hasMarket,
-		hasAssetIndex: input.hasAssetIndex,
-		orderType: input.orderType,
-		markPx: input.markPx,
-		price: input.price,
-		sizeValue: input.sizeValue,
-		orderValue: input.orderValue,
-		maxSize: input.maxSize,
-		side: input.side,
-		usesLimitPrice: input.usesLimitPrice,
-		usesTriggerPrice: input.usesTriggerPrice,
-		triggerPriceNum: input.triggerPriceNum,
-		stopOrder: input.stopOrder,
-		takeProfitOrder: input.takeProfitOrder,
-		scaleOrder: input.scaleOrder,
-		twapOrder: input.twapOrder,
-		scaleStartPriceNum: input.scaleStartPriceNum,
-		scaleEndPriceNum: input.scaleEndPriceNum,
-		scaleLevelsNum: input.scaleLevelsNum,
-		twapMinutesNum: input.twapMinutesNum,
-		tpSlEnabled: input.tpSlEnabled,
-		canUseTpSl: input.canUseTpSl,
-		tpPriceNum: input.tpPriceNum,
-		slPriceNum: input.slPriceNum,
-	};
-
-	const result = validatePerpOrder(context);
-
+function toResult(result: { valid: boolean; errors: { message: string }[]; canSubmit: boolean; needsApproval: boolean }): ValidationResult {
 	return {
 		valid: result.valid,
 		errors: result.errors.map((e) => e.message),
@@ -122,7 +66,11 @@ function validatePerp(input: PerpValidationInput): ValidationResult {
 }
 
 export function useOrderValidation(input: ValidationInput): ValidationResult {
-	return input.isSpotMarket ? validateSpot(input) : validatePerp(input);
-}
+	if (input.isSpotMarket) {
+		const context: SpotOrderContext = input;
+		return toResult(validateSpotOrder(context));
+	}
 
-export type { ValidationInput };
+	const context: PerpOrderContext = input;
+	return toResult(validatePerpOrder(context));
+}

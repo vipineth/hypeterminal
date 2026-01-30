@@ -1,3 +1,4 @@
+import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
 import type { SpotMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 
 export interface SwapableToken {
@@ -40,8 +41,8 @@ export function getAvailablePairTokens(
 	}
 
 	return Array.from(tokenMap.values()).sort((a, b) => {
-		if (a.name === "USDC") return -1;
-		if (b.name === "USDC") return 1;
+		if (a.name === DEFAULT_QUOTE_TOKEN) return -1;
+		if (b.name === DEFAULT_QUOTE_TOKEN) return 1;
 		return a.displayName.localeCompare(b.displayName);
 	});
 }

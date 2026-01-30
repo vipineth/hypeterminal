@@ -5,9 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { isTokenInCategory } from "@/domain/market";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatUSD } from "@/lib/format";
-import { isTokenInCategory } from "@/domain/market";
 import { getValueColorClass } from "@/lib/trade/numbers";
 import { TokenAvatar } from "../components/token-avatar";
 import type { MarketRow, MarketScope } from "./constants";
@@ -83,11 +83,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 					aria-label={t`Select token`}
 					className="h-6 gap-1.5 text-xs font-semibold px-2"
 				>
-					<TokenAvatar
-						className="size-5 shrink-0"
-						symbol={selectedMarket?.displayName ?? ""}
-						kind={selectedMarket?.kind}
-					/>
+					<TokenAvatar className="size-5 shrink-0" symbol={selectedMarket?.name} />
 					<span className="text-warning truncate">{selectedMarket?.displayName ?? "Select"}</span>
 					<ChevronDown className="size-3 text-muted-fg shrink-0" />
 				</Button>
@@ -258,7 +254,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 											}}
 										>
 											<div className="flex-1 min-w-0 flex items-center gap-2">
-												<TokenAvatar className="size-5 shrink-0" symbol={market.displayName} kind={market.kind} />
+												<TokenAvatar className="size-5 shrink-0" symbol={market.name} />
 												<div className="min-w-0">
 													<div className="flex items-center gap-1">
 														<span className="font-semibold text-2xs">{market.displayName}</span>

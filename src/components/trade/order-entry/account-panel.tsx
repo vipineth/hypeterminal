@@ -2,7 +2,7 @@ import { t } from "@lingui/core/macro";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
+import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatToken, formatUSD } from "@/lib/format";
@@ -72,11 +72,11 @@ export function AccountPanel() {
 			if (total === 0) continue;
 
 			const available = Math.max(0, total - hold);
-			const usdValue = b.coin === "USDC" ? total : entryNtl;
+			const usdValue = b.coin === DEFAULT_QUOTE_TOKEN ? total : entryNtl;
 
 			totalValue += usdValue;
-			availableValue += b.coin === "USDC" ? available : (available / total) * usdValue;
-			inOrderValue += b.coin === "USDC" ? hold : (hold / total) * usdValue;
+			availableValue += b.coin === DEFAULT_QUOTE_TOKEN ? available : (available / total) * usdValue;
+			inOrderValue += b.coin === DEFAULT_QUOTE_TOKEN ? hold : (hold / total) * usdValue;
 
 			tokens.push({ coin: b.coin, total, available, usdValue });
 		}
@@ -175,7 +175,7 @@ export function AccountPanel() {
 			},
 			...spotMetrics.topTokens.map((token) => ({
 				label: token.coin,
-				value: formatToken(token.total, token.coin === "USDC" ? 2 : 4),
+				value: formatToken(token.total, token.coin === DEFAULT_QUOTE_TOKEN ? 2 : 4),
 				valueClass: "tabular-nums",
 			})),
 		];

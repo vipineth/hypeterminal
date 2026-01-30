@@ -10,7 +10,7 @@ import { formatPercent, formatPrice, formatToken, formatUSD, szDecimalsToPriceDe
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { getValueColorClass, isPositive, toNumber } from "@/lib/trade/numbers";
 import { validateSlPrice, validateTpPrice } from "@/lib/trade/tpsl";
-import { TokenAvatar } from "../components/token-avatar";
+import { Token } from "../components/token";
 import { TradingActionButton } from "../components/trading-action-button";
 import { TpSlSection } from "../order-entry/tp-sl-section";
 
@@ -149,8 +149,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 			<DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden">
 				<DialogHeader className="px-5 pt-5 pb-3">
 					<DialogTitle className="flex items-center gap-1">
-						<TokenAvatar symbol={position.coin} />
-						<span className="text-base font-semibold">{position.coin}</span>
+						<Token name={position.coin} showIcon showName />
 						<Badge variant={position.isLong ? "long" : "short"} size="sm">
 							{position.isLong ? (
 								<>

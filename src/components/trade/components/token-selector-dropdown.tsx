@@ -10,7 +10,7 @@ import {
 import type { SwapableToken } from "@/domain/trade/swap";
 import { cn } from "@/lib/cn";
 import { formatToken } from "@/lib/format";
-import { TokenAvatar } from "./token-avatar";
+import { Token } from "./token";
 
 interface Props {
 	tokens: SwapableToken[];
@@ -29,8 +29,6 @@ export function TokenSelectorDropdown({
 	disabled,
 	className,
 }: Props) {
-	const selectedDisplayName = tokens.find((t) => t.name === selectedToken)?.displayName ?? selectedToken;
-
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild disabled={disabled}>
@@ -43,8 +41,7 @@ export function TokenSelectorDropdown({
 						className,
 					)}
 				>
-					<TokenAvatar symbol={selectedDisplayName} className="size-5" />
-					<span className="text-sm font-medium">{selectedDisplayName}</span>
+					<Token name={selectedToken} showIcon showName iconClassName="size-5" nameClassName="text-sm font-medium" />
 					<ChevronDown className="size-3.5 text-muted-fg ml-1" />
 				</Button>
 			</DropdownMenuTrigger>
@@ -65,8 +62,7 @@ export function TokenSelectorDropdown({
 								className="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer"
 							>
 								<div className="flex items-center gap-2">
-									<TokenAvatar symbol={token.displayName} className="size-5" />
-									<span className="text-sm font-medium">{token.displayName}</span>
+									<Token name={token.name} showIcon showName iconClassName="size-5" nameClassName="text-sm font-medium" />
 									{isSelected && <Check className="size-3.5 text-info" />}
 								</div>
 								<span className="text-xs text-muted-fg tabular-nums">

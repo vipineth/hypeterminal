@@ -129,9 +129,9 @@ export function TwapTab() {
 														variant="link"
 														size="none"
 														onClick={() => setSelectedMarket(order.state.coin)}
-														aria-label={t`Switch to ${markets.displayName(order.state.coin)} market`}
+														aria-label={t`Switch to ${markets.getDisplayName(order.state.coin)} market`}
 													>
-														{markets.displayName(order.state.coin)}
+														{markets.getDisplayName(order.state.coin)}
 													</Button>
 												</div>
 											</TableCell>

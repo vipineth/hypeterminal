@@ -113,7 +113,7 @@ export function FundingTab() {
 													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideClass)}>
 														{isLong ? t`Long` : t`Short`}
 													</span>
-													<span>{markets.displayName(update.coin)}</span>
+													<span>{markets.getDisplayName(update.coin)}</span>
 												</div>
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">

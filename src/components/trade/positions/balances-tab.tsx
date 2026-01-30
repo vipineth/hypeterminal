@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
+import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import {
 	type BalanceRow,
 	filterBalanceRowsByUsdValue,
@@ -16,10 +16,10 @@ import {
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken, formatUSD } from "@/lib/format";
-import { useMarkets } from "@/lib/hyperliquid";
+import { useSpotTokens } from "@/lib/hyperliquid/markets/use-spot-tokens";
 import { useSwapModalActions } from "@/stores/use-global-modal-store";
 import { useGlobalSettingsActions, useHideSmallBalances } from "@/stores/use-global-settings-store";
-import { TokenAvatar } from "../components/token-avatar";
+import { Token } from "../components/token";
 import { SendDialog } from "./send-dialog";
 import { TransferDialog } from "./transfer-dialog";
 
@@ -47,7 +47,7 @@ const SMALL_BALANCE_THRESHOLD = 1;
 
 export function BalancesTab() {
 	const { isConnected } = useConnection();
-	const markets = useMarkets();
+	const { getToken } = useSpotTokens();
 	const hideSmallBalances = useHideSmallBalances();
 	const { setHideSmallBalances } = useGlobalSettingsActions();
 	const { open: openSwapModal } = useSwapModalActions();
@@ -61,7 +61,7 @@ export function BalancesTab() {
 		accountType: "perp" | "spot";
 	}>({
 		open: false,
-		asset: "USDC",
+		asset: DEFAULT_QUOTE_TOKEN,
 		accountType: "spot",
 	});
 
@@ -77,7 +77,7 @@ export function BalancesTab() {
 	const totalValue = useMemo(() => getTotalUsdValue(balances), [balances]);
 
 	function handleTransferClick(row: BalanceRow) {
-		if (row.asset !== "USDC") return;
+		if (row.asset !== DEFAULT_QUOTE_TOKEN) return;
 		const direction: TransferDirection = row.type === "perp" ? "toSpot" : "toPerp";
 		setTransferState({
 			open: true,
@@ -152,17 +152,15 @@ export function BalancesTab() {
 							</TableHeader>
 							<TableBody>
 								{filteredBalances.map((row) => {
-									const displayName = markets.tokenDisplayName(row.asset);
-									const decimals = markets.transferDecimals(row.asset);
-									const canTransfer = row.asset === "USDC" && parseFloat(row.available) > 0;
+									const decimals = getToken(row.asset)?.transferDecimals ?? 2;
+									const canTransfer = row.asset === DEFAULT_QUOTE_TOKEN && parseFloat(row.available) > 0;
 									const canSwap = row.type === "spot" && parseFloat(row.available) > 0;
 									const transferLabel = row.type === "perp" ? t`To Spot` : t`To Perp`;
 									return (
 										<TableRow key={`${row.type}-${row.asset}`} className="border-border/40 hover:bg-accent/30">
 											<TableCell className="text-2xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">
-													<TokenAvatar symbol={displayName} />
-													<span className="text-info">{displayName}</span>
+													<Token name={row.asset} showIcon showName />
 													<span
 														className={cn(
 															"text-4xs px-1 py-0.5 uppercase",

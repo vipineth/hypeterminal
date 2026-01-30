@@ -1,19 +1,17 @@
-export type { MarketKind } from "./types";
-
-export {
-	PERP_NAME_SEPARATOR,
-	SPOT_NAME_SEPARATOR,
-	getBaseQuoteFromDisplayName,
-	getBaseToken,
-} from "./display";
-
 export { calculate24hPriceChange, calculateOpenInterestUSD, type MarketCtxNumbers } from "./calculations";
 
 export {
-	getUnderlyingAsset,
+	getBaseQuoteFromDisplayName,
+	getBaseToken,
+	PERP_MARKET_NAME_SEPARATOR,
+	SPOT_MARKET_NAME_SEPARATOR,
+} from "./display";
+export {
+	getIconUrlFromMarketName,
 	getIconUrlFromPair,
-	getIconUrlFromToken,
+	getUnderlyingAsset,
 	isTokenInCategory,
-	marketCategories,
 	type MarketCategory,
+	marketCategories,
 } from "./tokens";
+export type { MarketKind } from "./types";

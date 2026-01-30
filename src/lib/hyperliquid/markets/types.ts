@@ -4,6 +4,9 @@ export type PerpAsset = MetaResponse["universe"][number];
 export type SpotPair = SpotMetaResponse["universe"][number];
 export type SpotToken = SpotMetaResponse["tokens"][number] & {
 	displayName: string;
+	iconUrl: string | undefined;
+	transferDecimals: number;
+	isWrapped: boolean;
 };
 
 export interface PerpMarket extends PerpAsset {
@@ -11,6 +14,7 @@ export interface PerpMarket extends PerpAsset {
 	displayName: string;
 	assetId: number;
 	ctxIndex: number;
+	iconUrl: string | undefined;
 }
 
 export interface SpotMarket extends SpotPair {
@@ -20,6 +24,7 @@ export interface SpotMarket extends SpotPair {
 	ctxIndex: number;
 	tokensInfo: SpotToken[];
 	szDecimals: number;
+	iconUrl: string | undefined;
 }
 
 export interface BuilderPerpMarket extends PerpAsset {
@@ -30,6 +35,7 @@ export interface BuilderPerpMarket extends PerpAsset {
 	dexIndex: number;
 	ctxIndex: number;
 	quoteToken: SpotToken | null;
+	iconUrl: string | undefined;
 }
 
 export type UnifiedMarket = PerpMarket | SpotMarket | BuilderPerpMarket;
@@ -44,7 +50,7 @@ export interface Markets {
 
 	// Lookups - O(1) access
 	get(coin: string): UnifiedMarket | undefined;
-	displayName(coin: string): string;
+	getDisplayName(coin: string): string;
 	szDecimals(coin: string): number;
 
 	/**
@@ -67,11 +73,8 @@ export interface Markets {
 	 * @example 0 → "BTC", 10107 → "HYPE/USDC", 110000 → "test:ABC"
 	 */
 	assetIdToCoin(assetId: number): string | undefined;
-
-	// Token-specific lookups
-	token(coin: string): SpotToken | undefined;
-	tokenDisplayName(coin: string): string;
-	transferDecimals(coin: string): number;
+	getIconUrl(coin: string): string | undefined;
+	getToken(coin: string): SpotToken | undefined;
 
 	// Status
 	isLoading: boolean;
