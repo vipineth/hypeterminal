@@ -7,7 +7,7 @@ import { createChartName } from "@/lib/chart/candle";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
-import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
+import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/domain/market";
 import { getValueColorClass } from "@/lib/trade/numbers";
 import { useTheme } from "@/providers/theme";
 import { useMarketActions } from "@/stores/use-market-store";

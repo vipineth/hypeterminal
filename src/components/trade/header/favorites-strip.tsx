@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice } from "@/lib/format";
 import { useMarketsInfo } from "@/lib/hyperliquid";
-import { calculate24hPriceChange } from "@/lib/market";
+import { calculate24hPriceChange } from "@/domain/market";
 import { getValueColorClass } from "@/lib/trade/numbers";
 import { useFavoriteMarkets, useMarketActions, useSelectedMarket } from "@/stores/use-market-store";
 

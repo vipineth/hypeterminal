@@ -1,5 +1,5 @@
 import type { MetaResponse, PerpDexsResponse, SpotMetaResponse } from "@nktkas/hyperliquid";
-import { getUnderlyingAsset } from "@/lib/tokens";
+import { getUnderlyingAsset } from "@/domain/market";
 import type { BuilderPerpMarket, Markets, PerpMarket, SpotMarket, SpotToken, UnifiedMarket } from "./types";
 
 const PERP_NAME_SEPARATOR = "-";
@@ -25,9 +25,9 @@ function getSpotDisplayName(baseToken: string, quoteToken: string): string {
 	return `${baseToken}${SPOT_NAME_SEPARATOR}${quoteToken}`;
 }
 
-function getBuilderPerpDisplayName(name: string, quoteToken?: string | null): string {
+function getBuilderPerpDisplayName(name: string, quoteTokenName?: string): string {
 	const baseName = name.includes(":") ? name.split(":")[1] : name;
-	return `${baseName}-${quoteToken ?? "USDC"}`;
+	return `${baseName}-${quoteTokenName ?? "USDC"}`;
 }
 
 export interface CreateMarketsParams {
@@ -42,7 +42,6 @@ export interface CreateMarketsParams {
 export function createMarkets(params: CreateMarketsParams): Markets {
 	const { perpMeta, spotMeta, allPerpMetas, perpDexs, isLoading, error } = params;
 
-	// Build perp markets
 	const perpMarkets: PerpMarket[] = [];
 	if (perpMeta?.universe) {
 		for (let i = 0; i < perpMeta.universe.length; i++) {
@@ -58,19 +57,20 @@ export function createMarkets(params: CreateMarketsParams): Markets {
 		}
 	}
 
-	// Build spot markets
 	const spotMarkets: SpotMarket[] = [];
-	const spotTokens: SpotToken[] = spotMeta?.tokens ?? [];
+	const spotTokens: SpotToken[] = (spotMeta?.tokens ?? []).map((token) => ({
+		...token,
+		displayName: getUnderlyingAsset(token) ?? token.name,
+	}));
 
-	if (spotMeta?.universe && spotMeta?.tokens) {
+	if (spotMeta?.universe && spotTokens.length > 0) {
 		for (const pair of spotMeta.universe) {
-			const tokensInfo = pair.tokens.map((idx) => spotMeta.tokens[idx]).filter((t): t is SpotToken => !!t);
+			const tokensInfo = pair.tokens.map((idx) => spotTokens[idx]).filter((t): t is SpotToken => !!t);
 
 			if (tokensInfo.length < 2) continue;
 
 			const [baseToken, quoteToken] = tokensInfo;
-			const underlyingBaseToken = getUnderlyingAsset(baseToken);
-			const displayName = getSpotDisplayName(underlyingBaseToken ?? baseToken.name, quoteToken.name);
+			const displayName = getSpotDisplayName(baseToken.displayName, quoteToken.displayName);
 
 			spotMarkets.push({
 				...pair,
@@ -79,7 +79,6 @@ export function createMarkets(params: CreateMarketsParams): Markets {
 				assetId: getSpotAssetId(pair.index),
 				ctxIndex: pair.index,
 				tokensInfo,
-				underlyingBaseToken,
 				szDecimals: baseToken.szDecimals,
 			});
 		}
@@ -93,7 +92,7 @@ export function createMarkets(params: CreateMarketsParams): Markets {
 			if (!meta || !dexInfo) continue;
 
 			const dexName = dexInfo.name;
-			const quoteToken = spotMeta?.tokens[meta.collateralToken] ?? null;
+			const quoteToken = spotTokens[meta.collateralToken] ?? null;
 
 			for (let assetIndex = 0; assetIndex < meta.universe.length; assetIndex++) {
 				const asset = meta.universe[assetIndex];
@@ -102,7 +101,7 @@ export function createMarkets(params: CreateMarketsParams): Markets {
 				builderPerpMarkets.push({
 					...asset,
 					kind: "builderPerp",
-					displayName: getBuilderPerpDisplayName(asset.name, quoteToken?.name),
+					displayName: getBuilderPerpDisplayName(asset.name, quoteToken?.displayName),
 					assetId: getBuilderPerpAssetId(dexIndex, assetIndex),
 					dex: dexName,
 					dexIndex,
@@ -131,18 +130,13 @@ export function createMarkets(params: CreateMarketsParams): Markets {
 
 	// Build spot display name map (@107 -> HYPE/USDC)
 	const spotDisplayNameById = new Map<string, string>();
-	if (spotMeta?.universe && spotMeta?.tokens) {
-		const tokenNames = new Map<number, string>();
-		for (const token of spotMeta.tokens) {
-			tokenNames.set(token.index, getUnderlyingAsset(token) ?? token.name);
-		}
-
+	if (spotMeta?.universe && spotTokens.length > 0) {
 		for (const pair of spotMeta.universe) {
 			if (pair.tokens.length < 2) continue;
-			const baseName = tokenNames.get(pair.tokens[0]);
-			const quoteName = tokenNames.get(pair.tokens[1]);
-			if (baseName && quoteName) {
-				spotDisplayNameById.set(pair.name, `${baseName}/${quoteName}`);
+			const baseToken = spotTokens[pair.tokens[0]];
+			const quoteToken = spotTokens[pair.tokens[1]];
+			if (baseToken && quoteToken) {
+				spotDisplayNameById.set(pair.name, `${baseToken.displayName}/${quoteToken.displayName}`);
 			}
 		}
 	}
@@ -192,9 +186,7 @@ export function createMarkets(params: CreateMarketsParams): Markets {
 		},
 
 		tokenDisplayName(coin: string): string {
-			const token = tokenByName.get(coin);
-			if (!token) return coin;
-			return getUnderlyingAsset(token) ?? token.name;
+			return tokenByName.get(coin)?.displayName ?? coin;
 		},
 
 		transferDecimals(coin: string): number {

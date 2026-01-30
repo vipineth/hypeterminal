@@ -2,38 +2,8 @@ import type { SpotMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 
 export interface SwapableToken {
 	name: string;
+	displayName: string;
 	szDecimals: number;
-}
-
-export function getSwappableTokens(spotMarkets: SpotMarketInfo[]): SwapableToken[] {
-	const tokenMap = new Map<string, SwapableToken>();
-
-	for (const market of spotMarkets) {
-		if (market.tokensInfo.length < 2) continue;
-
-		const baseToken = market.tokensInfo[0];
-		const quoteToken = market.tokensInfo[1];
-
-		if (baseToken?.name && !tokenMap.has(baseToken.name)) {
-			tokenMap.set(baseToken.name, {
-				name: baseToken.name,
-				szDecimals: baseToken.szDecimals,
-			});
-		}
-
-		if (quoteToken?.name && !tokenMap.has(quoteToken.name)) {
-			tokenMap.set(quoteToken.name, {
-				name: quoteToken.name,
-				szDecimals: quoteToken.szDecimals,
-			});
-		}
-	}
-
-	return Array.from(tokenMap.values()).sort((a, b) => {
-		if (a.name === "USDC") return -1;
-		if (b.name === "USDC") return 1;
-		return a.name.localeCompare(b.name);
-	});
 }
 
 export function getAvailablePairTokens(
@@ -52,6 +22,7 @@ export function getAvailablePairTokens(
 			if (!tokenMap.has(quoteToken.name)) {
 				tokenMap.set(quoteToken.name, {
 					name: quoteToken.name,
+					displayName: quoteToken.displayName,
 					szDecimals: quoteToken.szDecimals,
 				});
 			}
@@ -61,6 +32,7 @@ export function getAvailablePairTokens(
 			if (!tokenMap.has(baseToken.name)) {
 				tokenMap.set(baseToken.name, {
 					name: baseToken.name,
+					displayName: baseToken.displayName,
 					szDecimals: baseToken.szDecimals,
 				});
 			}
@@ -70,7 +42,7 @@ export function getAvailablePairTokens(
 	return Array.from(tokenMap.values()).sort((a, b) => {
 		if (a.name === "USDC") return -1;
 		if (b.name === "USDC") return 1;
-		return a.name.localeCompare(b.name);
+		return a.displayName.localeCompare(b.displayName);
 	});
 }
 

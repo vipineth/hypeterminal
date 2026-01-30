@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { MarketCtxNumbers } from "@/lib/market";
+import type { MarketCtxNumbers } from "@/domain/market";
 import { toFiniteNumber } from "@/lib/trade/numbers";
 import { useSelectedMarket } from "@/stores/use-market-store";
 import type { BuilderPerpMarket, PerpMarket, SpotMarket } from "../markets/types";

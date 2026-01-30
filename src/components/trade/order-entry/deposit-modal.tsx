@@ -25,7 +25,7 @@ import { formatNumber } from "@/lib/format";
 import { useDeposit, useExchangeWithdraw3, useUserPositions } from "@/lib/hyperliquid";
 import { isPositive, parseNumber } from "@/lib/trade/numbers";
 import { formatTransferError } from "@/lib/transfer/errors";
-import { useDepositModalActions, useDepositModalOpen, useDepositModalTab } from "@/stores/use-deposit-modal-store";
+import { useDepositModalActions, useDepositModalOpen, useDepositModalTab } from "@/stores/use-global-modal-store";
 
 const NETWORKS = [{ id: "arbitrum", name: "Arbitrum", shortName: "ARB" }] as const;
 

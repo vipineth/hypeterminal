@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatUSD } from "@/lib/format";
-import { isTokenInCategory } from "@/lib/tokens";
+import { isTokenInCategory } from "@/domain/market";
 import { getValueColorClass } from "@/lib/trade/numbers";
 import { TokenAvatar } from "../components/token-avatar";
 import type { MarketRow, MarketScope } from "./constants";

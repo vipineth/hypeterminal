@@ -1,24 +1,22 @@
 import { TrendingUp, Zap } from "lucide-react";
 import { MARKET_CATEGORY_LABELS, TOKEN_ICON_BASE_URL } from "@/config/constants";
-import type { MarketKind } from "@/lib/hyperliquid/market-key";
-import type { SpotToken } from "./hyperliquid";
+import type { MarketKind } from "./types";
+import { PERP_NAME_SEPARATOR, SPOT_NAME_SEPARATOR } from "./display";
 
-export const PERP_NAME_SEPARATOR = "-";
-export const SPOT_NAME_SEPARATOR = "/";
+interface RawToken {
+	name: string;
+	fullName?: string | null;
+}
 
-export function getUnderlyingAsset(token: SpotToken): string | undefined {
-	// Unit Protocol tokens
+const ASSET_REPLACEMENTS: Record<string, string> = {
+	USDT0: "USDT",
+};
+
+export function getUnderlyingAsset(token: RawToken): string | undefined {
 	if (token.fullName?.startsWith("Unit")) {
 		return token.name.replace("U", "");
 	}
-}
-
-export function isMarketSpot(marketName: string) {
-	return marketName.startsWith("@");
-}
-
-export function isMarketBuilderPerp(marketName: string) {
-	return marketName.includes(":");
+	return ASSET_REPLACEMENTS[token.name] ?? token.name;
 }
 
 export function getIconUrlFromPair(tokenName: string, kind?: MarketKind) {
@@ -39,7 +37,6 @@ export function getIconUrlFromToken(tokenName: string, kind?: MarketKind) {
 	if (kind === "spot") {
 		return `${TOKEN_ICON_BASE_URL}/${tokenName}_spot.svg`;
 	}
-
 	return `${TOKEN_ICON_BASE_URL}/${tokenName}.svg`;
 }
 
@@ -55,7 +52,7 @@ export const marketCategories: { value: MarketCategory; label: string; icon: Rea
 	{ value: "meme", label: MARKET_CATEGORY_LABELS.meme, icon: null },
 ];
 
-export const categoryMapping: Record<string, MarketCategory[]> = {
+const categoryMapping: Record<string, MarketCategory[]> = {
 	BTC: ["layer1", "trending"],
 	ETH: ["layer1", "defi", "trending"],
 	SOL: ["layer1", "trending"],

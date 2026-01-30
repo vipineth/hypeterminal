@@ -2,7 +2,9 @@ import type { MetaResponse, SpotMetaResponse } from "@nktkas/hyperliquid";
 
 export type PerpAsset = MetaResponse["universe"][number];
 export type SpotPair = SpotMetaResponse["universe"][number];
-export type SpotToken = SpotMetaResponse["tokens"][number];
+export type SpotToken = SpotMetaResponse["tokens"][number] & {
+	displayName: string;
+};
 
 export interface PerpMarket extends PerpAsset {
 	kind: "perp";
@@ -17,7 +19,6 @@ export interface SpotMarket extends SpotPair {
 	assetId: number;
 	ctxIndex: number;
 	tokensInfo: SpotToken[];
-	underlyingBaseToken?: string;
 	szDecimals: number;
 }
 

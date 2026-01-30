@@ -29,6 +29,8 @@ export function TokenSelectorDropdown({
 	disabled,
 	className,
 }: Props) {
+	const selectedDisplayName = tokens.find((t) => t.name === selectedToken)?.displayName ?? selectedToken;
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild disabled={disabled}>
@@ -41,8 +43,8 @@ export function TokenSelectorDropdown({
 						className,
 					)}
 				>
-					<TokenAvatar symbol={selectedToken} className="size-5" />
-					<span className="text-sm font-medium">{selectedToken}</span>
+					<TokenAvatar symbol={selectedDisplayName} className="size-5" />
+					<span className="text-sm font-medium">{selectedDisplayName}</span>
 					<ChevronDown className="size-3.5 text-muted-fg ml-1" />
 				</Button>
 			</DropdownMenuTrigger>
@@ -63,8 +65,8 @@ export function TokenSelectorDropdown({
 								className="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer"
 							>
 								<div className="flex items-center gap-2">
-									<TokenAvatar symbol={token.name} className="size-5" />
-									<span className="text-sm font-medium">{token.name}</span>
+									<TokenAvatar symbol={token.displayName} className="size-5" />
+									<span className="text-sm font-medium">{token.displayName}</span>
 									{isSelected && <Check className="size-3.5 text-info" />}
 								</div>
 								<span className="text-xs text-muted-fg tabular-nums">

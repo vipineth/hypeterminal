@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { getIconUrlFromToken, getUnderlyingAsset } from "@/lib/tokens";
+import { getIconUrlFromToken, getUnderlyingAsset } from "@/domain/market";
 import type { SpotToken } from "../markets/types";
 import { useInfoSpotMeta } from "./info/useInfoSpotMeta";
 
@@ -7,7 +7,10 @@ export function useSpotTokens() {
 	const { data: spotMeta, isLoading, error } = useInfoSpotMeta({ refetchInterval: Infinity });
 
 	const tokens = useMemo((): SpotToken[] => {
-		return spotMeta?.tokens ?? [];
+		return (spotMeta?.tokens ?? []).map((token) => ({
+			...token,
+			displayName: getUnderlyingAsset(token) ?? token.name,
+		}));
 	}, [spotMeta?.tokens]);
 
 	const tokenMap = useMemo((): Map<string, SpotToken> => {
@@ -27,9 +30,7 @@ export function useSpotTokens() {
 
 	const getDisplayName = useCallback(
 		(coin: string): string => {
-			const token = tokenMap.get(coin);
-			if (!token) return coin;
-			return getUnderlyingAsset(token) ?? token.name;
+			return tokenMap.get(coin)?.displayName ?? coin;
 		},
 		[tokenMap],
 	);
@@ -72,7 +73,7 @@ export function useSpotTokens() {
 		(coin: string): boolean => {
 			const token = tokenMap.get(coin);
 			if (!token) return false;
-			return !!getUnderlyingAsset(token);
+			return token.displayName !== token.name;
 		},
 		[tokenMap],
 	);

@@ -14,21 +14,42 @@ import { formatToken } from "@/lib/format";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useMarketsInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 import { toNumber } from "@/lib/trade/numbers";
-import { TokenSelectorDropdown } from "../components/token-selector-dropdown";
-import { TradingActionButton } from "../components/trading-action-button";
+import {
+	useSwapModalActions,
+	useSwapModalFromToken,
+	useSwapModalOpen,
+	useSwapModalToToken,
+} from "@/stores/use-global-modal-store";
+import { TokenSelectorDropdown } from "./token-selector-dropdown";
+import { TradingActionButton } from "./trading-action-button";
 
 const SUCCESS_DISPLAY_DURATION_MS = 1500;
 const DEFAULT_SLIPPAGE_BPS = 100;
 
-interface Props {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
-	initialFromToken?: string;
-	initialToToken?: string;
-	onSuccess?: () => void;
+export function SpotSwapModal() {
+	const isOpen = useSwapModalOpen();
+	const initialFromToken = useSwapModalFromToken() ?? "USDC";
+	const initialToToken = useSwapModalToToken();
+	const { close } = useSwapModalActions();
+
+	if (!isOpen) return null;
+
+	return (
+		<SpotSwapModalContent
+			initialFromToken={initialFromToken}
+			initialToToken={initialToToken}
+			onClose={close}
+		/>
+	);
 }
 
-export function SwapAssetModal({ open, onOpenChange, initialFromToken = "USDC", initialToToken, onSuccess }: Props) {
+interface Props {
+	initialFromToken: string;
+	initialToToken?: string;
+	onClose: () => void;
+}
+
+function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Props) {
 	const { spotMarkets } = useMarketsInfo();
 	const { spotBalances } = useAccountBalances();
 	const { mutateAsync: placeOrder, isPending: isSubmitting } = useExchangeOrder();
@@ -76,6 +97,9 @@ export function SwapAssetModal({ open, onOpenChange, initialFromToken = "USDC", 
 	const szDecimals = spotMarket?.szDecimals ?? 2;
 	const baseToken = spotMarket?.tokensInfo[0]?.name ?? "";
 	const isBuying = spotMarket ? getSwapSide(fromToken, spotMarket) : false;
+
+	const fromTokenDisplay = availableFromTokens.find((t) => t.name === fromToken)?.displayName ?? fromToken;
+	const toTokenDisplay = availableToTokens.find((t) => t.name === toToken)?.displayName ?? toToken;
 
 	const amountValue = toNumber(amount) ?? 0;
 
@@ -141,13 +165,8 @@ export function SwapAssetModal({ open, onOpenChange, initialFromToken = "USDC", 
 				clearTimeout(autoCloseTimerRef.current);
 				autoCloseTimerRef.current = null;
 			}
-			setFromToken(initialFromToken);
-			setToToken(defaultToToken);
-			setAmount("");
-			setShowSuccess(false);
-			setError(null);
+			onClose();
 		}
-		onOpenChange(open);
 	}
 
 	const handleSubmit = useCallback(async () => {
@@ -172,7 +191,6 @@ export function SwapAssetModal({ open, onOpenChange, initialFromToken = "USDC", 
 			throwIfResponseError(result.response?.data?.statuses?.[0]);
 
 			setShowSuccess(true);
-			onSuccess?.();
 			autoCloseTimerRef.current = setTimeout(() => {
 				handleClose(false);
 			}, SUCCESS_DISPLAY_DURATION_MS);
@@ -180,7 +198,7 @@ export function SwapAssetModal({ open, onOpenChange, initialFromToken = "USDC", 
 			const message = err instanceof Error ? err.message : t`Swap failed`;
 			setError(message);
 		}
-	}, [spotMarket, orderSize, isSubmitting, isBuying, markPx, szDecimals, placeOrder, onSuccess]);
+	}, [spotMarket, orderSize, isSubmitting, isBuying, markPx, szDecimals, placeOrder]);
 
 	const insufficientBalance = amountValue > fromBalance;
 	const noPairAvailable = fromToken && toToken && !spotMarket;
@@ -188,7 +206,7 @@ export function SwapAssetModal({ open, onOpenChange, initialFromToken = "USDC", 
 	const isDisabled = isSubmitting || showSuccess;
 
 	return (
-		<Dialog open={open} onOpenChange={handleClose}>
+		<Dialog open onOpenChange={handleClose}>
 			<DialogContent className="sm:max-w-[400px] gap-0 p-0 overflow-hidden">
 				<DialogHeader className="p-4 pb-3 border-b border-border/40">
 					<DialogTitle className="text-sm font-medium">
@@ -263,7 +281,7 @@ export function SwapAssetModal({ open, onOpenChange, initialFromToken = "USDC", 
 							<Trans>Rate</Trans>
 						</span>
 						<span className="tabular-nums">
-							{rate > 0 ? `1 ${fromToken} ≈ ${formatToken(rate, 6)} ${toToken}` : "-"}
+							{rate > 0 ? `1 ${fromTokenDisplay} ≈ ${formatToken(rate, 6)} ${toTokenDisplay}` : "-"}
 						</span>
 					</div>
 
@@ -278,7 +296,7 @@ export function SwapAssetModal({ open, onOpenChange, initialFromToken = "USDC", 
 						<div className="flex items-start gap-2 p-2.5 bg-warning/10 border border-warning/20 rounded-sm">
 							<AlertTriangle className="size-3.5 text-warning shrink-0 mt-0.5" />
 							<p className="text-xs text-warning">
-								<Trans>Insufficient {fromToken} balance</Trans>
+								<Trans>Insufficient {fromTokenDisplay} balance</Trans>
 							</p>
 						</div>
 					)}
@@ -288,7 +306,7 @@ export function SwapAssetModal({ open, onOpenChange, initialFromToken = "USDC", 
 							<AlertTriangle className="size-3.5 text-warning shrink-0 mt-0.5" />
 							<p className="text-xs text-warning">
 								<Trans>
-									No trading pair available for {fromToken}/{toToken}
+									No trading pair available for {fromTokenDisplay}/{toTokenDisplay}
 								</Trans>
 							</p>
 						</div>

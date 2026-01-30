@@ -7,7 +7,7 @@ import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatToken, formatUSD } from "@/lib/format";
 import { getValueColorClass, parseNumberOrZero } from "@/lib/trade/numbers";
-import { useDepositModalActions } from "@/stores/use-deposit-modal-store";
+import { useDepositModalActions } from "@/stores/use-global-modal-store";
 
 type SummaryRow = {
 	label: string;

@@ -12,7 +12,7 @@ import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { useSubL2Book } from "@/lib/hyperliquid/hooks/subscription";
-import { getBaseQuoteFromDisplayName } from "@/lib/market";
+import { getBaseQuoteFromDisplayName } from "@/domain/market";
 import { processLevels } from "@/lib/trade/orderbook";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
 import { OrderbookRow } from "../orderbook/orderbook-row";
