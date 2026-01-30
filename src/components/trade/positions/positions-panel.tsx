@@ -5,9 +5,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { POSITIONS_TABS } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
+import { useUserPositions } from "@/lib/hyperliquid";
 import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { createLazyComponent } from "@/lib/lazy";
-import { parseNumber, parseNumberOrZero } from "@/lib/trade/numbers";
+import { parseNumberOrZero } from "@/lib/trade/numbers";
 import { useGlobalSettingsActions, usePositionsActiveTab } from "@/stores/use-global-settings-store";
 
 const BalancesTab = createLazyComponent(() => import("./balances-tab"), "BalancesTab");
@@ -22,7 +23,8 @@ export function PositionsPanel() {
 	const { setPositionsActiveTab } = useGlobalSettingsActions();
 	const [isPending, startTransition] = useTransition();
 	const { address, isConnected } = useConnection();
-	const { perpSummary, perpPositions, spotBalances } = useAccountBalances();
+	const { perpSummary, spotBalances } = useAccountBalances();
+	const { positions } = useUserPositions();
 	const { data: ordersEvent } = useSubOpenOrders({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
 	const openOrders = ordersEvent?.orders;
 
@@ -30,14 +32,7 @@ export function PositionsPanel() {
 		startTransition(() => setPositionsActiveTab(value));
 	}
 
-	const positionsCount = useMemo(() => {
-		if (!isConnected) return 0;
-		return perpPositions.reduce((count, entry) => {
-			const size = parseNumber(entry.position.szi);
-			if (!Number.isFinite(size) || size === 0) return count;
-			return count + 1;
-		}, 0);
-	}, [isConnected, perpPositions]);
+	const positionsCount = isConnected ? positions.length : 0;
 
 	const ordersCount = isConnected ? (openOrders?.length ?? 0) : 0;
 

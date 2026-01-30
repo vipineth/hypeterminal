@@ -32,11 +32,20 @@ export interface UserPositions {
 }
 
 function normalizePositions(event: AllDexsClearinghouseStateWsEvent | undefined): Position[] {
-	if (!event?.clearinghouseStates) return [];
+	const clearinghouseStates = event?.clearinghouseStates;
+	if (!clearinghouseStates?.length) return [];
 
 	const positions: Position[] = [];
-	for (const [dex, state] of event.clearinghouseStates) {
-		for (const { position } of state.assetPositions) {
+	for (const entry of clearinghouseStates) {
+		const dex = entry[0];
+		const state = entry[1];
+		const assetPositions = state?.assetPositions;
+		if (!assetPositions?.length) continue;
+
+		for (const assetPosition of assetPositions) {
+			const position = assetPosition?.position;
+			if (!position) continue;
+
 			const size = toNumber(position.szi);
 			if (size === null || size === 0) continue;
 

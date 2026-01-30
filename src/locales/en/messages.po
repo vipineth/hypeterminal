@@ -151,6 +151,8 @@ msgid "Avg Price"
 msgstr "Avg Price"
 
 #: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+#: src/components/trade/order-entry/swap-asset-modal.tsx
 msgid "Balance"
 msgstr "Balance"
 
@@ -647,6 +649,7 @@ msgid "Format for numbers and dates"
 msgstr "Format for numbers and dates"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/order-entry/swap-asset-modal.tsx
 msgid "From"
 msgstr "From"
 
@@ -691,6 +694,10 @@ msgstr "In Use"
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Install a wallet extension to continue"
 msgstr "Install a wallet extension to continue"
+
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "Insufficient {fromToken} balance"
+msgstr "Insufficient {fromToken} balance"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/lib/hyperliquid/use-deposit.ts
@@ -1006,6 +1013,14 @@ msgstr "No markets found."
 msgid "No open orders."
 msgstr "No open orders."
 
+#: src/components/trade/components/token-selector-dropdown.tsx
+msgid "No tokens available"
+msgstr "No tokens available"
+
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "No trading pair available for {fromToken}/{toToken}"
+msgstr "No trading pair available for {fromToken}/{toToken}"
+
 #: src/components/trade/positions/twap-tab.tsx
 msgid "No TWAP orders found."
 msgstr "No TWAP orders found."
@@ -1184,6 +1199,7 @@ msgstr "Progress"
 msgid "Randomize timing"
 msgstr "Randomize timing"
 
+#: src/components/trade/order-entry/swap-asset-modal.tsx
 #: src/components/trade/positions/funding-tab.tsx
 msgid "Rate"
 msgstr "Rate"
@@ -1288,6 +1304,10 @@ msgstr "Select order book aggregation"
 #: src/components/trade/chart/token-selector.tsx
 msgid "Select token"
 msgstr "Select token"
+
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "Select tokens to swap"
+msgstr "Select tokens to swap"
 
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -1455,6 +1475,10 @@ msgstr "SL Price"
 msgid "Slippage"
 msgstr "Slippage"
 
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "Slippage tolerance"
+msgstr "Slippage tolerance"
+
 #: src/lib/errors.ts
 msgid "Something went wrong"
 msgstr "Something went wrong"
@@ -1545,6 +1569,28 @@ msgstr "Submitting..."
 msgid "Support"
 msgstr "Support"
 
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "Swap"
+msgstr "Swap"
+
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "Swap direction"
+msgstr "Swap direction"
+
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "Swap failed"
+msgstr "Swap failed"
+
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "Swap submitted"
+msgstr "Swap submitted"
+
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "Swapping..."
+msgstr "Swapping..."
+
 #. placeholder {0}: markets.displayName(fill.coin)
 #. placeholder {0}: markets.displayName(order.state.coin)
 #: src/components/trade/positions/history-tab.tsx
@@ -1631,6 +1677,7 @@ msgid "Time in Force"
 msgstr "Time in Force"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/order-entry/swap-asset-modal.tsx
 msgid "To"
 msgstr "To"
 
@@ -1699,6 +1746,11 @@ msgstr "Trade"
 #: src/components/trade/positions/history-tab.tsx
 msgid "Trade History"
 msgstr "Trade History"
+
+#. placeholder {0}: spotMarket.displayName
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "Trade via {0} spot market"
+msgstr "Trade via {0} spot market"
 
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/positions/history-tab.tsx

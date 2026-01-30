@@ -17,6 +17,7 @@ import {
 	TWAP_MINUTES_MAX,
 	TWAP_MINUTES_MIN,
 } from "@/config/constants";
+import { getMarketQuoteToken } from "@/domain/trade/balances";
 import { getLiquidationInfo, getOrderMetrics } from "@/domain/trade/order/metrics";
 import { getOrderPrice } from "@/domain/trade/order/price";
 import { getSliderValue } from "@/domain/trade/order/size";
@@ -85,6 +86,7 @@ import { MarginModeToggle } from "./margin-mode-toggle";
 import { OrderSummary } from "./order-summary";
 import { OrderToast } from "./order-toast";
 import { SideToggle } from "./side-toggle";
+import { SwapAssetModal } from "./swap-asset-modal";
 import { TpSlSection } from "./tp-sl-section";
 
 function getActionButtonClass(variant: ButtonContent["variant"]): string {
@@ -199,6 +201,15 @@ export function OrderEntryPanel() {
 
 	const { open: openDepositModal } = useDepositModalActions();
 	const { open: openSettingsDialog } = useSettingsDialogActions();
+
+	const swapTargetToken = useMemo(() => {
+		if (!market || market.kind !== "builderPerp") return null;
+
+		const quoteToken = getMarketQuoteToken(market);
+		if (quoteToken === "USDC") return null;
+
+		return quoteToken;
+	}, [market]);
 
 	useEffect(() => {
 		if (selectedPrice !== null) {
@@ -504,6 +515,16 @@ export function OrderEntryPanel() {
 							<span className={cn("tabular-nums", getValueColorClass(availableBalance))}>
 								{formatAvailableBalance()}
 							</span>
+							{isConnected && swapTargetToken && (
+								<Button
+									variant="link"
+									size="none"
+									onClick={() => setActiveDialog("spotSwap")}
+									className="text-info text-4xs uppercase"
+								>
+									{t`Swap`}
+								</Button>
+							)}
 							{isConnected && (
 								<Button
 									variant="link"
@@ -815,6 +836,14 @@ export function OrderEntryPanel() {
 			</div>
 
 			<WalletDialog open={activeDialog === "wallet"} onOpenChange={(open) => setActiveDialog(open ? "wallet" : null)} />
+
+			{swapTargetToken && (
+				<SwapAssetModal
+					open={activeDialog === "spotSwap"}
+					onOpenChange={(open) => setActiveDialog(open ? "spotSwap" : null)}
+					initialToToken={swapTargetToken}
+				/>
+			)}
 
 			<OrderToast />
 		</div>

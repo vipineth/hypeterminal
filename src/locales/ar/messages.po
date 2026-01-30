@@ -151,6 +151,8 @@ msgid "Avg Price"
 msgstr "متوسط السعر"
 
 #: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+#: src/components/trade/order-entry/swap-asset-modal.tsx
 msgid "Balance"
 msgstr "الرصيد"
 
@@ -647,6 +649,7 @@ msgid "Format for numbers and dates"
 msgstr ""
 
 #: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/order-entry/swap-asset-modal.tsx
 msgid "From"
 msgstr ""
 
@@ -690,6 +693,10 @@ msgstr "قيد الاستخدام"
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Install a wallet extension to continue"
+msgstr ""
+
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "Insufficient {fromToken} balance"
 msgstr ""
 
 #: src/components/trade/order-entry/deposit-modal.tsx
@@ -1002,6 +1009,14 @@ msgstr "لم يتم العثور على أسواق."
 msgid "No open orders."
 msgstr "لا توجد أوامر مفتوحة."
 
+#: src/components/trade/components/token-selector-dropdown.tsx
+msgid "No tokens available"
+msgstr ""
+
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "No trading pair available for {fromToken}/{toToken}"
+msgstr ""
+
 #: src/components/trade/positions/twap-tab.tsx
 msgid "No TWAP orders found."
 msgstr "لم يتم العثور على أوامر TWAP."
@@ -1180,6 +1195,7 @@ msgstr "التقدم"
 msgid "Randomize timing"
 msgstr ""
 
+#: src/components/trade/order-entry/swap-asset-modal.tsx
 #: src/components/trade/positions/funding-tab.tsx
 msgid "Rate"
 msgstr "المعدل"
@@ -1284,6 +1300,10 @@ msgstr "اختر تجميع دفتر الأوامر"
 #: src/components/trade/chart/token-selector.tsx
 msgid "Select token"
 msgstr "اختر الرمز"
+
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "Select tokens to swap"
+msgstr ""
 
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -1451,6 +1471,10 @@ msgstr ""
 msgid "Slippage"
 msgstr "الانزلاق"
 
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "Slippage tolerance"
+msgstr ""
+
 #: src/lib/errors.ts
 msgid "Something went wrong"
 msgstr "حدث خطأ ما"
@@ -1541,6 +1565,28 @@ msgstr ""
 msgid "Support"
 msgstr "الدعم"
 
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "Swap"
+msgstr ""
+
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "Swap direction"
+msgstr ""
+
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "Swap failed"
+msgstr ""
+
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "Swap submitted"
+msgstr ""
+
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "Swapping..."
+msgstr ""
+
 #. placeholder {0}: markets.displayName(fill.coin)
 #. placeholder {0}: markets.displayName(order.state.coin)
 #: src/components/trade/positions/history-tab.tsx
@@ -1627,6 +1673,7 @@ msgid "Time in Force"
 msgstr ""
 
 #: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/order-entry/swap-asset-modal.tsx
 msgid "To"
 msgstr ""
 
@@ -1695,6 +1742,11 @@ msgstr "تداول"
 #: src/components/trade/positions/history-tab.tsx
 msgid "Trade History"
 msgstr "سجل التداول"
+
+#. placeholder {0}: spotMarket.displayName
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+msgid "Trade via {0} spot market"
+msgstr ""
 
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
