@@ -130,8 +130,6 @@ export function getSizeValues(input: SizeValuesInput): SizeValueResult {
 }
 
 export function getSizeForPercent(input: SizeForPercentInput): string {
-	if (input.price <= 0) return "";
-
 	if (input.isSpotMarket) {
 		if (input.side === "buy") {
 			if (input.sizeMode === "usd") {
@@ -143,6 +141,7 @@ export function getSizeForPercent(input: SizeForPercentInput): string {
 		}
 
 		if (input.sizeMode === "usd") {
+			if (input.price <= 0) return "";
 			const tokenAmount = (input.spotBalance.baseAvailable * input.pct) / 100;
 			const usdAmount = tokenAmount * input.price;
 			return usdAmount.toFixed(2);
@@ -155,6 +154,7 @@ export function getSizeForPercent(input: SizeForPercentInput): string {
 	const size = (input.maxSize * input.pct) / 100;
 
 	if (input.sizeMode === "usd") {
+		if (input.price <= 0) return "";
 		return (size * input.price).toFixed(2);
 	}
 	return formatSizeValue(size, input.szDecimals);

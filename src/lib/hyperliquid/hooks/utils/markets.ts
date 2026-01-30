@@ -1,5 +1,5 @@
-import { PERP_NAME_SEPARATOR, SPOT_NAME_SEPARATOR } from "@/lib/tokens";
-import type { MarketKind } from "../../market-key";
+import { PERP_NAME_SEPARATOR, SPOT_NAME_SEPARATOR } from "@/domain/market";
+import type { MarketKind } from "@/domain/market";
 
 // Perp: 0-9999
 export function getPerpAssetId(index: number): number {

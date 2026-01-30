@@ -17,19 +17,27 @@ import {
 	TWAP_MINUTES_MAX,
 	TWAP_MINUTES_MIN,
 } from "@/config/constants";
+import { getMarketQuoteToken } from "@/domain/trade/balances";
 import { getLiquidationInfo, getOrderMetrics } from "@/domain/trade/order/metrics";
 import { getOrderPrice } from "@/domain/trade/order/price";
 import { getSliderValue } from "@/domain/trade/order/size";
 import { buildOrders, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import { cn } from "@/lib/cn";
-import { formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
-import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo } from "@/lib/hyperliquid";
+import { formatPrice, formatToken, szDecimalsToPriceDecimals } from "@/lib/format";
+import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo, useUserPositions } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeTwapOrder";
-import { useSubClearinghouseState } from "@/lib/hyperliquid/hooks/subscription";
 import type { MarginMode } from "@/lib/trade/margin-mode";
-import { clampInt, formatDecimalFloor, isPositive, parseNumberOrZero, toFixed, toNumber } from "@/lib/trade/numbers";
+import {
+	clampInt,
+	formatDecimalFloor,
+	getValueColorClass,
+	isPositive,
+	parseNumberOrZero,
+	toFixed,
+	toNumber,
+} from "@/lib/trade/numbers";
 import {
 	canUseTpSl as canUseTpSlForOrder,
 	getTabsOrderType,
@@ -46,7 +54,7 @@ import {
 import type { ActiveDialog, ButtonContent } from "@/lib/trade/types";
 import { useButtonContent } from "@/lib/trade/use-button-content";
 import { useOrderValidation } from "@/lib/trade/use-order-validation";
-import { useDepositModalActions } from "@/stores/use-deposit-modal-store";
+import { useDepositModalActions, useSettingsDialogActions, useSwapModalActions } from "@/stores/use-global-modal-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import {
 	useLimitPrice,
@@ -69,7 +77,6 @@ import {
 } from "@/stores/use-order-entry-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
-import { useSettingsDialogActions } from "@/stores/use-settings-dialog-store";
 import { WalletDialog } from "../components/wallet-dialog";
 import { AdvancedOrderDropdown } from "./advanced-order-dropdown";
 import { LeverageControl } from "./leverage-control";
@@ -101,11 +108,7 @@ export function OrderEntryPanel() {
 
 	const { data: market } = useSelectedMarketInfo();
 
-	const { data: clearinghouseEvent } = useSubClearinghouseState(
-		{ user: address ?? "0x0" },
-		{ enabled: isConnected && !!address },
-	);
-	const clearinghouse = clearinghouseEvent?.clearinghouseState;
+	const userPositions = useUserPositions();
 
 	const { isReady: isAgentReady, isLoading: isAgentLoading } = useAgentStatus();
 	const { register: registerAgent, status: registerStatus } = useAgentRegistration();
@@ -198,6 +201,16 @@ export function OrderEntryPanel() {
 
 	const { open: openDepositModal } = useDepositModalActions();
 	const { open: openSettingsDialog } = useSettingsDialogActions();
+	const { open: openSwapModal } = useSwapModalActions();
+
+	const swapTargetToken = useMemo(() => {
+		if (!market || market.kind !== "builderPerp") return null;
+
+		const quoteToken = getMarketQuoteToken(market);
+		if (quoteToken === "USDC") return null;
+
+		return quoteToken;
+	}, [market]);
 
 	useEffect(() => {
 		if (selectedPrice !== null) {
@@ -215,11 +228,8 @@ export function OrderEntryPanel() {
 
 	const isSubmitting = isSubmittingOrder || isSubmittingTwap;
 
-	const position =
-		!clearinghouse?.assetPositions || !baseToken
-			? null
-			: (clearinghouse.assetPositions.find((p) => p.position.coin === baseToken) ?? null);
-	const positionSize = parseNumberOrZero(position?.position?.szi);
+	const position = market?.name ? userPositions.getPosition(market.name) : null;
+	const positionSize = parseNumberOrZero(position?.szi);
 
 	const price = getOrderPrice(
 		orderType,
@@ -471,11 +481,9 @@ export function OrderEntryPanel() {
 
 	function formatAvailableBalance(): string {
 		if (!isConnected) return FALLBACK_VALUE_PLACEHOLDER;
-		if (isSpotMarket) {
-			const decimals = side === "buy" ? 2 : szDecimals;
-			return `${formatToken(availableBalance, decimals)} ${availableBalanceToken}`;
-		}
-		return formatUSD(availableBalance);
+		const isBaseToken = isSpotMarket && side === "sell";
+		const decimals = isBaseToken ? szDecimals : 2;
+		return `${formatToken(availableBalance, decimals)} ${availableBalanceToken}`;
 	}
 
 	return (
@@ -528,9 +536,19 @@ export function OrderEntryPanel() {
 					<div className="flex items-center justify-between text-muted-fg">
 						<span>{t`Available`}</span>
 						<div className="flex items-center gap-2">
-							<span className={cn("tabular-nums", availableBalance > 0 ? "text-positive" : "text-muted-fg")}>
+							<span className={cn("tabular-nums", getValueColorClass(availableBalance))}>
 								{formatAvailableBalance()}
 							</span>
+							{isConnected && swapTargetToken && (
+								<Button
+									variant="link"
+									size="none"
+									onClick={() => openSwapModal("USDC", swapTargetToken)}
+									className="text-info text-4xs uppercase"
+								>
+									{t`Swap`}
+								</Button>
+							)}
 							{isConnected && (
 								<Button
 									variant="link"
@@ -546,7 +564,7 @@ export function OrderEntryPanel() {
 					{!isSpotMarket && positionSize !== 0 && (
 						<div className="flex items-center justify-between text-muted-fg">
 							<span>{t`Position`}</span>
-							<span className={cn("tabular-nums", positionSize > 0 ? "text-positive" : "text-negative")}>
+							<span className={cn("tabular-nums", getValueColorClass(positionSize))}>
 								{positionSize > 0 ? "+" : ""}
 								{formatDecimalFloor(positionSize, szDecimals)} {baseToken}
 							</span>

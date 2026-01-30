@@ -11,7 +11,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatNumber } from "@/lib/format";
 import { useSelectedMarketInfo, useSubL2Book } from "@/lib/hyperliquid";
-import { getBaseQuoteFromDisplayName } from "@/lib/market";
+import { getBaseQuoteFromDisplayName } from "@/domain/market";
 import {
 	getMaxTotal,
 	getPriceGroupingOptions,

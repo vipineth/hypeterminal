@@ -2,7 +2,7 @@ import { Bell, Cog, Terminal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UI_TEXT } from "@/config/constants";
 import { cn } from "@/lib/cn";
-import { useSettingsDialogActions } from "@/stores/use-settings-dialog-store";
+import { useSettingsDialogActions } from "@/stores/use-global-modal-store";
 import { ThemeToggle } from "../header/theme-toggle";
 import { UserMenu } from "../header/user-menu";
 

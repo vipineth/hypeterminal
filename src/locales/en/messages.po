@@ -150,6 +150,8 @@ msgstr "Available:"
 msgid "Avg Price"
 msgstr "Avg Price"
 
+#: src/components/trade/components/spot-swap-modal.tsx
+#: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/order-entry/account-panel.tsx
 msgid "Balance"
 msgstr "Balance"
@@ -648,6 +650,7 @@ msgstr "Filter by {0}"
 msgid "Format for numbers and dates"
 msgstr "Format for numbers and dates"
 
+#: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/order-entry/deposit-modal.tsx
 msgid "From"
 msgstr "From"
@@ -700,6 +703,10 @@ msgstr "Install a wallet extension to continue"
 #: src/lib/errors/stacks/spot-order.ts
 msgid "Insufficient {0} balance"
 msgstr "Insufficient {0} balance"
+
+#: src/components/trade/components/spot-swap-modal.tsx
+msgid "Insufficient {fromTokenDisplay} balance"
+msgstr "Insufficient {fromTokenDisplay} balance"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/lib/errors/definitions/deposit.ts
@@ -1031,6 +1038,18 @@ msgstr "No markets found."
 msgid "No open orders."
 msgstr "No open orders."
 
+#: src/components/trade/components/token-selector-dropdown.tsx
+msgid "No tokens available"
+msgstr "No tokens available"
+
+#: src/components/trade/order-entry/swap-asset-modal.tsx
+#~ msgid "No trading pair available for {fromToken}/{toToken}"
+#~ msgstr "No trading pair available for {fromToken}/{toToken}"
+
+#: src/components/trade/components/spot-swap-modal.tsx
+msgid "No trading pair available for {fromTokenDisplay}/{toTokenDisplay}"
+msgstr "No trading pair available for {fromTokenDisplay}/{toTokenDisplay}"
+
 #: src/components/trade/positions/twap-tab.tsx
 msgid "No TWAP orders found."
 msgstr "No TWAP orders found."
@@ -1209,6 +1228,7 @@ msgstr "Progress"
 msgid "Randomize timing"
 msgstr "Randomize timing"
 
+#: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/positions/funding-tab.tsx
 msgid "Rate"
 msgstr "Rate"
@@ -1313,6 +1333,10 @@ msgstr "Select order book aggregation"
 #: src/components/trade/chart/token-selector.tsx
 msgid "Select token"
 msgstr "Select token"
+
+#: src/components/trade/components/spot-swap-modal.tsx
+msgid "Select tokens to swap"
+msgstr "Select tokens to swap"
 
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -1480,6 +1504,10 @@ msgstr "SL Price"
 msgid "Slippage"
 msgstr "Slippage"
 
+#: src/components/trade/components/spot-swap-modal.tsx
+msgid "Slippage tolerance"
+msgstr "Slippage tolerance"
+
 #: src/lib/errors.ts
 msgid "Something went wrong"
 msgstr "Something went wrong"
@@ -1570,14 +1598,43 @@ msgstr "Submitting..."
 msgid "Support"
 msgstr "Support"
 
-#. placeholder {0}: order.coin
-#. placeholder {0}: row.coin
+#: src/components/trade/components/spot-swap-modal.tsx
+#: src/components/trade/components/spot-swap-modal.tsx
+#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/positions/balances-tab.tsx
+msgid "Swap"
+msgstr "Swap"
+
+#: src/components/trade/components/spot-swap-modal.tsx
+msgid "Swap direction"
+msgstr "Swap direction"
+
+#: src/components/trade/components/spot-swap-modal.tsx
+msgid "Swap failed"
+msgstr "Swap failed"
+
+#: src/components/trade/components/spot-swap-modal.tsx
+msgid "Swap submitted"
+msgstr "Swap submitted"
+
+#: src/components/trade/components/spot-swap-modal.tsx
+msgid "Swapping..."
+msgstr "Swapping..."
+
+#. placeholder {0}: markets.displayName(fill.coin)
+#. placeholder {0}: markets.displayName(order.state.coin)
 #: src/components/trade/positions/history-tab.tsx
-#: src/components/trade/positions/orders-tab.tsx
-#: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Switch to {0} market"
 msgstr "Switch to {0} market"
+
+#: src/components/trade/positions/orders-tab.tsx
+msgid "Switch to {displayCoin} market"
+msgstr "Switch to {displayCoin} market"
+
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Switch to {displayName} market"
+msgstr "Switch to {displayName} market"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/lib/trade/use-button-content.ts
@@ -1649,6 +1706,7 @@ msgstr "Time"
 msgid "Time in Force"
 msgstr "Time in Force"
 
+#: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/order-entry/deposit-modal.tsx
 msgid "To"
 msgstr "To"
@@ -1718,6 +1776,11 @@ msgstr "Trade"
 #: src/components/trade/positions/history-tab.tsx
 msgid "Trade History"
 msgstr "Trade History"
+
+#. placeholder {0}: spotMarket.displayName
+#: src/components/trade/components/spot-swap-modal.tsx
+msgid "Trade via {0} spot market"
+msgstr "Trade via {0} spot market"
 
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/positions/history-tab.tsx

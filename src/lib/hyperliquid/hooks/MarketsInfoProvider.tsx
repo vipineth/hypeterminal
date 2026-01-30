@@ -9,9 +9,6 @@ interface MarketsInfoProviderProps {
 
 export function MarketsInfoProvider({ children }: MarketsInfoProviderProps) {
 	const marketsInfo = useMarketsInfoInternal({
-		perp: true,
-		spot: true,
-		builderDexs: true,
 		updateInterval: 5000,
 	});
 

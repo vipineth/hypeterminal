@@ -9,8 +9,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/cn";
-import { useDepositModalActions } from "@/stores/use-deposit-modal-store";
-import { useSettingsDialogActions } from "@/stores/use-settings-dialog-store";
+import { useDepositModalActions, useSettingsDialogActions } from "@/stores/use-global-modal-store";
 import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
 

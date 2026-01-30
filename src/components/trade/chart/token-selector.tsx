@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatUSD } from "@/lib/format";
-import { isTokenInCategory } from "@/lib/tokens";
+import { isTokenInCategory } from "@/domain/market";
+import { getValueColorClass } from "@/lib/trade/numbers";
 import { TokenAvatar } from "../components/token-avatar";
 import type { MarketRow, MarketScope } from "./constants";
 import { useTokenSelector } from "./use-token-selector";
@@ -223,7 +224,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 									const changeIsPositive = (changeDecimal ?? 0) >= 0;
 									const changeClass = cn(
 										"text-2xs font-medium tabular-nums",
-										changeDecimal === null ? "text-muted-fg" : changeIsPositive ? "text-positive" : "text-negative",
+										changeDecimal === null ? "text-muted-fg" : getValueColorClass(changeIsPositive),
 									);
 									const changeText = formatPercent(changeDecimal);
 
@@ -311,18 +312,12 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 												<div className="w-16 sm:w-20 text-right hidden sm:block">
 													<div className="flex items-center justify-end gap-1">
 														{market.funding !== null && (
-															<Flame
-																className={cn("size-2.5", isFundingPositive ? "text-positive" : "text-negative")}
-															/>
+															<Flame className={cn("size-2.5", getValueColorClass(market.funding))} />
 														)}
 														<span
 															className={cn(
 																"text-2xs tabular-nums font-medium",
-																market.funding === null
-																	? "text-muted-fg"
-																	: isFundingPositive
-																		? "text-positive"
-																		: "text-negative",
+																market.funding === null ? "text-muted-fg" : getValueColorClass(market.funding),
 															)}
 														>
 															{formatPercent(market.funding, {

@@ -2,7 +2,7 @@ import { getCoreRowModel, type Row, type SortingState, useReactTable } from "@ta
 import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useMarketsInfo } from "@/lib/hyperliquid";
-import { isTokenInCategory, type MarketCategory } from "@/lib/tokens";
+import { isTokenInCategory, type MarketCategory } from "@/domain/market";
 import { useFavoriteMarkets, useMarketActions } from "@/stores/use-market-store";
 import { type MarketRow, type MarketScope, TOKEN_SELECTOR_COLUMNS } from "./constants";
 
@@ -89,6 +89,7 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 	}, []);
 
 	const { markets, spotMarkets, builderPerpMarkets, isLoading } = useMarketsInfo();
+
 	const favorites = useFavoriteMarkets();
 	const { toggleFavoriteMarket } = useMarketActions();
 
@@ -100,12 +101,14 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 		if (scope === "perp") return PERP_CATEGORIES;
 
 		if (scope === "spot") {
-			const quoteTokens = new Set<string>();
+			const quoteTokens = new Map<string, string>();
 			for (const market of spotMarkets) {
-				const quoteToken = market.tokensInfo[1]?.name;
-				if (quoteToken) quoteTokens.add(quoteToken);
+				const quoteToken = market.tokensInfo[1];
+				if (quoteToken?.name && !quoteTokens.has(quoteToken.name)) {
+					quoteTokens.set(quoteToken.name, quoteToken.displayName);
+				}
 			}
-			return [{ value: "all", label: "All" }, ...Array.from(quoteTokens).map((t) => ({ value: t, label: t }))];
+			return [{ value: "all", label: "All" }, ...Array.from(quoteTokens.entries()).map(([name, displayName]) => ({ value: name, label: displayName }))];
 		}
 
 		if (scope === "hip3") {

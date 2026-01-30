@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/cn";
-import type { MarketKind } from "@/lib/hyperliquid/market-key";
-import { getIconUrlFromPair } from "@/lib/tokens";
+import type { MarketKind } from "@/domain/market";
+import { getIconUrlFromPair } from "@/domain/market";
 
 interface Props {
 	symbol: string;

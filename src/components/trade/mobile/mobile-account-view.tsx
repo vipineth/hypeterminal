@@ -9,7 +9,7 @@ import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { parseNumber } from "@/lib/trade/numbers";
-import { useDepositModalActions } from "@/stores/use-deposit-modal-store";
+import { useDepositModalActions } from "@/stores/use-global-modal-store";
 import { WalletDialog } from "../components/wallet-dialog";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
 

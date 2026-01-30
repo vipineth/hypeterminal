@@ -13,20 +13,17 @@ function useAutoRemove(order: OrderQueueItem, onRemove: () => void) {
 		const elapsed = Date.now() - order.completedAt;
 		const remaining = ORDER_TOAST_SUCCESS_DURATION_MS - elapsed;
 
-		// Already expired, remove immediately
 		if (remaining <= 0) {
 			onRemove();
 			return;
 		}
 
-		// Schedule removal
 		const timer = setTimeout(onRemove, remaining);
 		return () => clearTimeout(timer);
 	}, [order.status, order.completedAt, onRemove]);
 }
 
 function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () => void }) {
-	// Auto-remove successful orders after duration
 	useAutoRemove(order, onRemove);
 
 	const sideColor = order.side === "buy" ? "text-positive" : "text-negative";
@@ -39,7 +36,6 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 				order.status === "pending" && "animate-pulse",
 			)}
 		>
-			{/* Status Icon */}
 			<div
 				className={cn(
 					"flex items-center justify-center size-7 rounded-md shrink-0",
@@ -53,7 +49,6 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 				{order.status === "failed" && <X className="size-4 text-negative" />}
 			</div>
 
-			{/* Order Details */}
 			<div className="flex-1 min-w-0 space-y-0.5">
 				<div className="flex items-center gap-2">
 					<span className={cn("px-1.5 py-0.5 rounded text-2xs font-bold uppercase tracking-wide", sideBg, sideColor)}>
@@ -73,7 +68,6 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 				{order.error && <div className="text-2xs text-negative truncate">{order.error}</div>}
 			</div>
 
-			{/* Dismiss Button for Failed Orders */}
 			{order.status === "failed" && (
 				<Button
 					variant="ghost"
@@ -138,17 +132,11 @@ export function OrderToast() {
 				"shadow-2xl shadow-black/20 dark:shadow-black/50",
 				"font-mono",
 
-				pendingCount > 0 && "ring-1 ring-info/30 dark:shadow-[0_0_30px_-5px_oklch(0.78_0.12_195_/_0.2)]",
-				failedCount > 0 &&
-					pendingCount === 0 &&
-					"ring-1 ring-negative/30 dark:shadow-[0_0_30px_-5px_oklch(0.65_0.22_25_/_0.2)]",
-				successCount > 0 &&
-					pendingCount === 0 &&
-					failedCount === 0 &&
-					"ring-1 ring-positive/30 dark:shadow-[0_0_30px_-5px_oklch(0.75_0.18_145_/_0.2)]",
+				pendingCount > 0 && "ring-1 ring-info/30",
+				failedCount > 0 && pendingCount === 0 && "ring-1 ring-negative/30",
+				successCount > 0 && pendingCount === 0 && failedCount === 0 && "ring-1 ring-positive/30",
 			)}
 		>
-			{/* Header */}
 			<div className="px-3 py-2 border-b border-border/40 bg-muted/30 flex items-center justify-between">
 				<div className="flex items-center gap-2">
 					<Zap className="size-4 text-info" />
@@ -168,7 +156,6 @@ export function OrderToast() {
 				</div>
 			</div>
 
-			{/* Orders List */}
 			<div className="divide-y divide-border/30 max-h-72 overflow-y-auto">
 				{orders.map((order) => (
 					<div key={order.id} className="relative">
@@ -178,7 +165,6 @@ export function OrderToast() {
 				))}
 			</div>
 
-			{/* Terminal Scanlines Overlay */}
 			<div className="absolute inset-0 pointer-events-none terminal-scanlines opacity-30" />
 		</div>
 	);

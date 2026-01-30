@@ -1,4 +1,4 @@
-import type { MarketKind } from "./market-key";
+import type { MarketKind } from "@/domain/market";
 
 export type ParsedAssetId =
 	| { kind: "perp"; index: number }

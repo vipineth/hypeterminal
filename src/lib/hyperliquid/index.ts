@@ -7,28 +7,15 @@ export {
 	type WebSocketTransportOptions,
 } from "@nktkas/hyperliquid";
 export * from "./asset-id";
-export { type MarketCapabilities, getMarketCapabilities } from "./capabilities";
+export { getMarketCapabilities, type MarketCapabilities } from "./capabilities";
 export { createExchangeClient, getInfoClient, getSubscriptionClient, initializeClients } from "./clients";
 export * from "./errors";
 export * from "./hooks/exchange";
 export * from "./hooks/info";
+export { MarketsInfoProvider } from "./hooks/MarketsInfoProvider";
 export * from "./hooks/subscription";
 export { type ApiStatus, type ApiStatusResult, useApiStatus } from "./hooks/useApiStatus";
 export { type HyperliquidClients, useHyperliquidClients } from "./hooks/useClients";
-export {
-	type BuilderPerpMarket,
-	type PerpAsset,
-	type PerpMarket,
-	type SpotMarket,
-	type SpotPair,
-	type SpotToken,
-	type UnifiedMarket,
-	type UseMarketsOptions,
-	type UseMarketsReturn,
-	getMarketKindFromName,
-	useMarkets,
-} from "./hooks/useMarkets";
-export { MarketsInfoProvider } from "./hooks/MarketsInfoProvider";
 export {
 	type BuilderPerpMarketInfo,
 	type BuilderPerpMarketsInfo,
@@ -42,7 +29,22 @@ export {
 export { type UseSpotTokensReturn, useSpotTokens } from "./hooks/useSpotTokens";
 export { useTradingGuard } from "./hooks/useTradingGuard";
 export { useHttpTransport, useSubscriptionTransport } from "./hooks/useTransport";
-export * from "./market-key";
+// Legacy exports - deprecated, use useMarkets() instead
+export { getMarketKindFromName } from "./hooks/utils/markets";
+export type { MarketKind } from "@/domain/market";
+export { type Position, type UserPositions, useUserPositions } from "./account";
+export {
+	type BuilderPerpMarket,
+	type Markets,
+	MarketsProvider,
+	type PerpAsset,
+	type PerpMarket,
+	type SpotMarket,
+	type SpotPair,
+	type SpotToken,
+	type UnifiedMarket,
+	useMarkets,
+} from "./markets";
 export type { HyperliquidContextValue, HyperliquidProviderProps } from "./provider";
 export { HyperliquidProvider, useConfig, useHyperliquid, useHyperliquidOptional } from "./provider";
 export { infoKeys } from "./query/keys";

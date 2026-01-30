@@ -1,16 +1,16 @@
 import { t } from "@lingui/core/macro";
-import { History } from "lucide-react";
-import { useMemo } from "react";
+import { ExternalLink, History } from "lucide-react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
-import { formatNumber, formatUSD } from "@/lib/format";
+import { getExplorerTxUrl } from "@/lib/explorer";
+import { formatDateTimeShort, formatNumber, formatToken, formatUSD } from "@/lib/format";
+import { useMarkets } from "@/lib/hyperliquid";
 import { useSubUserFills } from "@/lib/hyperliquid/hooks/subscription";
-import { useMarkets } from "@/lib/hyperliquid/hooks/useMarkets";
-import { parseNumber } from "@/lib/trade/numbers";
+import { getValueColorClass, parseNumber } from "@/lib/trade/numbers";
 import { useMarketActions } from "@/stores/use-market-store";
 
 interface PlaceholderProps {
@@ -34,43 +34,16 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 export function HistoryTab() {
 	const { address, isConnected } = useConnection();
 	const { setSelectedMarket } = useMarketActions();
-	const { getSzDecimals } = useMarkets();
+	const markets = useMarkets();
 	const {
 		data: fillsEvent,
 		status,
 		error,
 	} = useSubUserFills({ user: address ?? "0x0", aggregateByTime: true }, { enabled: isConnected && !!address });
-	const data = fillsEvent?.fills;
 
-	console.log("fillsEvent", { fillsEvent, data });
-
-	const fills = useMemo(() => {
-		const raw = data ?? [];
-		const sorted = [...raw].sort((a, b) => b.time - a.time);
-		return sorted.slice(0, 200);
-	}, [data]);
+	const fills = fillsEvent?.fills?.slice(0, 200).sort((a, b) => b.time - a.time) ?? [];
 
 	const headerCount = isConnected ? `${fills.length} ${t`Trades`}` : FALLBACK_VALUE_PLACEHOLDER;
-
-	const tableRows = useMemo(() => {
-		return fills.map((fill) => {
-			const fee = parseNumber(fill.fee);
-			const closedPnl = parseNumber(fill.closedPnl);
-
-			return {
-				key: `${fill.hash}-${fill.tid}`,
-				coin: fill.coin,
-				isBuy: fill.side === "B",
-				dir: fill.dir,
-				px: fill.px,
-				sz: fill.sz,
-				szDecimals: getSzDecimals(fill.coin) ?? 4,
-				fee,
-				closedPnl,
-				time: fill.time,
-			};
-		});
-	}, [fills, getSzDecimals]);
 
 	function renderPlaceholder() {
 		if (!isConnected) return <Placeholder>{t`Connect your wallet to view trade history.`}</Placeholder>;
@@ -122,57 +95,65 @@ export function HistoryTab() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{tableRows.map((row) => {
-									const sideClass = row.isBuy ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
-									const feeClass = row.fee < 0 ? "text-positive" : "text-muted-fg";
-									const showPnl = Number.isFinite(row.closedPnl) && row.closedPnl !== 0;
-									const pnlClass = row.closedPnl >= 0 ? "text-positive" : "text-negative";
-									const date = new Date(row.time);
-									const timeStr = date.toLocaleTimeString("en-US", {
-										hour: "2-digit",
-										minute: "2-digit",
-										hour12: false,
-									});
-									const dateStr = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+								{fills.map((fill) => {
+									const isBuy = fill.side === "B";
+									const sideClass = isBuy ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
+									const fee = parseNumber(fill.fee);
+									const feeClass = getValueColorClass(fee);
+									const closedPnl = parseNumber(fill.closedPnl);
+									const showPnl = Number.isFinite(closedPnl) && closedPnl !== 0;
 
 									return (
-										<TableRow key={row.key} className="border-border/40 hover:bg-accent/30">
+										<TableRow key={`${fill.hash}-${fill.tid}`} className="border-border/40 hover:bg-accent/30">
 											<TableCell className="text-2xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">
 													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideClass)}>
-														{row.isBuy ? t`buy` : t`sell`}
+														{isBuy ? t`buy` : t`sell`}
 													</span>
 													<Button
 														variant="link"
 														size="none"
-														onClick={() => setSelectedMarket(row.coin)}
-														aria-label={t`Switch to ${row.coin} market`}
+														onClick={() => setSelectedMarket(fill.coin)}
+														aria-label={t`Switch to ${markets.displayName(fill.coin)} market`}
 													>
-														{row.coin}
+														{markets.displayName(fill.coin)}
 													</Button>
 												</div>
 											</TableCell>
 											<TableCell className="text-2xs py-1.5">
-												<span className="text-4xs px-1 py-0.5 rounded-sm uppercase bg-accent/50">{row.dir}</span>
+												<span className="text-4xs px-1 py-0.5 rounded-sm uppercase bg-accent/50">{fill.dir}</span>
 											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums py-1.5">{formatUSD(row.px)}</TableCell>
+											<TableCell className="text-2xs text-right tabular-nums py-1.5">{formatUSD(fill.px)}</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
-												{formatNumber(row.sz, row.szDecimals)}
+												{formatNumber(fill.sz, markets.szDecimals(fill.coin))}
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
-												<span className={feeClass}>{formatUSD(row.fee, { signDisplay: "exceptZero" })}</span>
+												<span className={feeClass}>
+													{formatToken(fill.fee, {
+														symbol: fill.feeToken,
+													})}
+												</span>
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
 												{showPnl ? (
-													<span className={pnlClass}>{formatUSD(row.closedPnl, { signDisplay: "exceptZero" })}</span>
+													<span className={getValueColorClass(closedPnl)}>
+														{formatUSD(closedPnl, { signDisplay: "exceptZero" })}
+													</span>
 												) : (
 													<span className="text-muted-fg">{FALLBACK_VALUE_PLACEHOLDER}</span>
 												)}
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums text-muted-fg py-1.5">
-												<div className="flex flex-col items-end">
-													<span>{timeStr}</span>
-													<span className="text-4xs">{dateStr}</span>
+												<div className="flex flex-col items-end underline decoration-dashed decoration-muted-fg/30">
+													<a
+														className="flex items-center gap-1"
+														href={getExplorerTxUrl(fill.hash) ?? ""}
+														target="_blank"
+														rel="noopener noreferrer"
+													>
+														<span>{formatDateTimeShort(fill.time)}</span>
+														<ExternalLink className="size-2.5 opacity-100 hover:opacity-80" />
+													</a>
 												</div>
 											</TableCell>
 										</TableRow>

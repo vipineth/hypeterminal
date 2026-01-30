@@ -80,9 +80,10 @@ function mergeOptions(defaults: Intl.NumberFormatOptions, opts: FormatOptions): 
 	return merged;
 }
 
-function parseNumberInput(
-	value: string | number | null | undefined,
-): { value: number | null | undefined; stringDecimals?: number } {
+function parseNumberInput(value: string | number | null | undefined): {
+	value: number | null | undefined;
+	stringDecimals?: number;
+} {
 	if (typeof value === "string") {
 		const trimmed = value.trim();
 		const num = toNumber(trimmed);
@@ -104,7 +105,7 @@ function buildNumberFormatOptions(
 	const shouldCompact = (compact ?? compactDefault) && Math.abs(value) >= FORMAT_COMPACT_THRESHOLD;
 	const compactOptions = shouldCompact ? { notation: "compact", compactDisplay: "short" } : {};
 
-	return mergeOptions({ ...defaults, ...compactOptions }, rest);
+	return mergeOptions({ ...defaults, ...compactOptions } as Intl.NumberFormatOptions, rest);
 }
 
 /**
@@ -310,6 +311,24 @@ export function formatDateTime(value: DateInput, opts?: FormatDateOptions): stri
 	const defaults: Intl.DateTimeFormatOptions = {
 		dateStyle: "medium",
 		timeStyle: "short",
+		...rest,
+	};
+
+	return getFormatter("date", locale ?? getResolvedFormatLocale(), defaults).format(toDate(value));
+}
+
+export function formatDateTimeShort(value: DateInput, opts?: FormatDateOptions): string {
+	if (!isValidDate(value)) return FALLBACK_VALUE_PLACEHOLDER;
+
+	const { locale, ...rest } = opts ?? {};
+
+	// MM/DD HH:mm │ 01/29 14:35
+	const defaults: Intl.DateTimeFormatOptions = {
+		month: "2-digit",
+		day: "2-digit",
+		hour: "2-digit",
+		minute: "2-digit",
+		hour12: false,
 		...rest,
 	};
 

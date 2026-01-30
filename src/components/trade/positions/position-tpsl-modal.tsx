@@ -4,11 +4,11 @@ import { useCallback, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { formatPriceForOrder, formatSizeForOrder, throwIfAnyResponseError } from "@/domain/trade/orders";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
-import { isPositive, toNumber } from "@/lib/trade/numbers";
-import { formatPriceForOrder, formatSizeForOrder, throwIfAnyResponseError } from "@/domain/trade/orders";
+import { getValueColorClass, isPositive, toNumber } from "@/lib/trade/numbers";
 import { validateSlPrice, validateTpPrice } from "@/lib/trade/tpsl";
 import { TokenAvatar } from "../components/token-avatar";
 import { TradingActionButton } from "../components/trading-action-button";
@@ -189,9 +189,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 						</div>
 						<div className="border-t border-border/50 pt-3 flex items-center justify-between">
 							<span className="text-2xs text-muted-fg">{t`Unrealized P&L`}</span>
-							<span
-								className={cn("text-2xs tabular-nums font-semibold", isProfitable ? "text-positive" : "text-negative")}
-							>
+							<span className={cn("text-2xs tabular-nums font-semibold", getValueColorClass(position.unrealizedPnl))}>
 								{formatUSD(position.unrealizedPnl, { signDisplay: "exceptZero" })}
 								<span className="font-normal text-muted-fg ml-1">({formatPercent(position.roe, 1)})</span>
 							</span>

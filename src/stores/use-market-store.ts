@@ -57,9 +57,7 @@ const useMarketStore = create<MarketStore>()(
 					...current,
 					...DEFAULT_MARKET_STORE,
 					selectedMarket: p?.selectedMarket ?? DEFAULT_MARKET_STORE.selectedMarket,
-					favoriteMarkets: Array.isArray(p?.favoriteMarkets)
-						? p.favoriteMarkets
-						: DEFAULT_MARKET_STORE.favoriteMarkets,
+					favoriteMarkets: Array.isArray(p?.favoriteMarkets) ? p.favoriteMarkets : DEFAULT_MARKET_STORE.favoriteMarkets,
 				};
 			},
 		},

@@ -12,7 +12,7 @@ import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { useSubL2Book } from "@/lib/hyperliquid/hooks/subscription";
-import { getBaseQuoteFromDisplayName } from "@/lib/market";
+import { getBaseQuoteFromDisplayName } from "@/domain/market";
 import { processLevels } from "@/lib/trade/orderbook";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
 import { OrderbookRow } from "../orderbook/orderbook-row";
@@ -296,15 +296,15 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 							<div className="flex-1 flex flex-col gap-px py-1 overflow-hidden">
 								{bids.slice(0, 12).map((level, index) => (
 									<OrderbookRow
-									key={`bid-${level.price}-${index}`}
-									level={level}
-									side="bid"
-									maxTotal={maxTotal}
-									showInQuote={showOrderbookInQuote}
-									szDecimals={szDecimals}
-								/>
-							))}
-						</div>
+										key={`bid-${level.price}-${index}`}
+										level={level}
+										side="bid"
+										maxTotal={maxTotal}
+										showInQuote={showOrderbookInQuote}
+										szDecimals={szDecimals}
+									/>
+								))}
+							</div>
 						) : null}
 					</div>
 

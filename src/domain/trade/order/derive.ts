@@ -30,7 +30,6 @@ export interface OrderEntryInputs {
 export interface OrderEntryDerived {
 	isSpotMarket: boolean;
 	baseToken: string;
-	quoteToken: string;
 	capabilities: MarketCapabilities;
 	szDecimals: number;
 	availableBalance: number;
@@ -51,11 +50,10 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 
 	const spotBalance = getSpotBalanceData(inputs.spotBalances, inputs.market);
 	const baseToken = isSpotMarket ? spotBalance.baseToken : (inputs.market?.displayName?.split("-")[0] ?? "");
-	const quoteToken = isSpotMarket ? spotBalance.quoteToken : "USD";
 
 	const perpAvailable = getPerpAvailable(inputs.perpSummary?.accountValue, inputs.perpSummary?.totalMarginUsed);
-	const availableBalance = getAvailableBalance(isSpotMarket, inputs.side, spotBalance, perpAvailable);
-	const availableBalanceToken = getAvailableBalanceToken(isSpotMarket, inputs.side, spotBalance);
+	const availableBalance = getAvailableBalance(inputs.market, inputs.side, spotBalance, perpAvailable);
+	const availableBalanceToken = getAvailableBalanceToken(inputs.market, inputs.side, spotBalance);
 
 	const maxSize = getMaxSizeForOrderEntry({
 		isConnected: inputs.isConnected,
@@ -89,7 +87,6 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 	return {
 		isSpotMarket,
 		baseToken,
-		quoteToken,
 		capabilities,
 		szDecimals,
 		availableBalance,

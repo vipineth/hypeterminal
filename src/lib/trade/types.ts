@@ -25,7 +25,7 @@ export interface TpSlState {
 	sl: string;
 }
 
-export type ActiveDialog = "wallet" | "deposit" | "settings" | "marginMode" | null;
+export type ActiveDialog = "wallet" | "marginMode" | null;
 
 export interface OrderRequest {
 	a: number;

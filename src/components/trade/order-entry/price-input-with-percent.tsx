@@ -3,7 +3,7 @@ import type { LucideIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/cn";
 import { formatUSD } from "@/lib/format";
-import { isPositive } from "@/lib/trade/numbers";
+import { getValueColorClass, isPositive } from "@/lib/trade/numbers";
 
 interface Props {
 	label: string;
@@ -38,7 +38,7 @@ export function PriceInputWithPercent({
 					<Icon className="size-3" />
 				</div>
 				{pnlValue !== null && (
-					<span className={cn("text-3xs tabular-nums", pnlValue >= 0 ? "text-positive" : "text-negative")}>
+					<span className={cn("text-3xs tabular-nums", getValueColorClass(pnlValue))}>
 						{formatUSD(pnlValue, { signDisplay: "exceptZero" })}
 					</span>
 				)}

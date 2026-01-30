@@ -4,7 +4,9 @@ import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD, shortenAddress } from "@/lib/format";
 import { type UnifiedMarketInfo, useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { getExplorerTokenUrl } from "@/lib/hyperliquid/explorer";
-import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
+import { useSubActiveAssetCtx } from "@/lib/hyperliquid/hooks/subscription/useSubActiveAssetCtx";
+import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/domain/market";
+import { getValueColorClass, toFiniteNumber } from "@/lib/trade/numbers";
 import { Badge } from "../ui/badge";
 import { StatBlock } from "./chart/stat-block";
 
@@ -28,11 +30,21 @@ function getSpotTokenAddress(market: UnifiedMarketInfo | undefined): string | nu
 export function MarketOverview() {
 	const { data: selectedMarketInfo } = useSelectedMarketInfo();
 
+	const coin = selectedMarketInfo?.name ?? "";
+
+	const { data: activeCtxEvent } = useSubActiveAssetCtx({ coin }, { enabled: !!coin });
+	const liveCtx = activeCtxEvent?.ctx;
+
 	const isSpot = selectedMarketInfo?.kind === "spot";
-	const fundingNum = selectedMarketInfo?.funding ?? 0;
-	const isFundingPositive = fundingNum >= 0;
-	const change24h = calculate24hPriceChange(selectedMarketInfo?.prevDayPx, selectedMarketInfo?.markPx);
-	const isChange24hPositive = (change24h ?? 0) >= 0;
+	const markPx = toFiniteNumber(liveCtx?.markPx);
+	const prevDayPx = toFiniteNumber(liveCtx?.prevDayPx);
+	const oraclePx = toFiniteNumber(liveCtx?.oraclePx);
+	const openInterest = toFiniteNumber(liveCtx?.openInterest);
+	const dayNtlVlm = toFiniteNumber(liveCtx?.dayNtlVlm);
+	const funding = toFiniteNumber(liveCtx?.funding);
+
+	const fundingNum = funding ?? 0;
+	const change24h = calculate24hPriceChange(prevDayPx, markPx);
 	const spotTokenAddress = getSpotTokenAddress(selectedMarketInfo);
 
 	return (
@@ -42,27 +54,27 @@ export function MarketOverview() {
 			</Badge>
 			<StatBlock
 				label={isSpot ? t`PRICE` : t`MARK`}
-				value={formatUSD(selectedMarketInfo?.markPx)}
+				value={formatUSD(markPx, { compact: false })}
 				valueClass="text-warning"
 			/>
 			<StatBlock
 				label={t`24H`}
 				value={change24h !== null ? formatPercent(change24h / 100, { signDisplay: "exceptZero" }) : "—"}
-				valueClass={isChange24hPositive ? "text-positive" : "text-negative"}
+				valueClass={getValueColorClass(change24h)}
 			/>
 			{!isSpot && (
 				<>
-					<StatBlock label={t`ORACLE`} value={formatUSD(selectedMarketInfo?.oraclePx)} />
+					<StatBlock label={t`ORACLE`} value={formatUSD(oraclePx)} />
 					<StatBlock
 						label={t`OI`}
-						value={formatUSD(calculateOpenInterestUSD(selectedMarketInfo?.openInterest, selectedMarketInfo?.markPx), {
+						value={formatUSD(calculateOpenInterestUSD(openInterest, markPx), {
 							notation: "compact",
 							compactDisplay: "short",
 						})}
 					/>
 					<div className="flex items-center gap-1">
-						<Flame className={cn("size-3", isFundingPositive ? "text-positive" : "text-negative")} />
-						<span className={cn("text-muted-fg tabular-nums", isFundingPositive ? "text-positive" : "text-negative")}>
+						<Flame className={cn("size-3", getValueColorClass(fundingNum))} />
+						<span className={cn("text-muted-fg tabular-nums", getValueColorClass(fundingNum))}>
 							{formatPercent(fundingNum, {
 								minimumFractionDigits: 4,
 								signDisplay: "exceptZero",
@@ -73,7 +85,7 @@ export function MarketOverview() {
 			)}
 			<StatBlock
 				label={t`VOL`}
-				value={formatUSD(selectedMarketInfo?.dayNtlVlm, {
+				value={formatUSD(dayNtlVlm, {
 					notation: "compact",
 					compactDisplay: "short",
 				})}

@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { ArrowLeftRight, Send, Wallet } from "lucide-react";
+import { ArrowDownUp, ArrowLeftRight, Send, Wallet } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -7,11 +7,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
+import {
+	type BalanceRow,
+	filterBalanceRowsByUsdValue,
+	getBalanceRows,
+	getTotalUsdValue,
+} from "@/domain/trade/balances";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken, formatUSD } from "@/lib/format";
-import { useSpotTokens } from "@/lib/hyperliquid";
-import { type BalanceRow, filterBalanceRowsByUsdValue, getBalanceRows, getTotalUsdValue } from "@/domain/trade/balances";
+import { useMarkets } from "@/lib/hyperliquid";
+import { useSwapModalActions } from "@/stores/use-global-modal-store";
 import { useGlobalSettingsActions, useHideSmallBalances } from "@/stores/use-global-settings-store";
 import { TokenAvatar } from "../components/token-avatar";
 import { SendDialog } from "./send-dialog";
@@ -41,9 +47,10 @@ const SMALL_BALANCE_THRESHOLD = 1;
 
 export function BalancesTab() {
 	const { isConnected } = useConnection();
-	const { getDisplayName, getTransferDecimals } = useSpotTokens();
+	const markets = useMarkets();
 	const hideSmallBalances = useHideSmallBalances();
 	const { setHideSmallBalances } = useGlobalSettingsActions();
+	const { open: openSwapModal } = useSwapModalActions();
 	const [transferState, setTransferState] = useState<{ open: boolean; direction: TransferDirection }>({
 		open: false,
 		direction: "toSpot",
@@ -145,9 +152,10 @@ export function BalancesTab() {
 							</TableHeader>
 							<TableBody>
 								{filteredBalances.map((row) => {
-									const displayName = getDisplayName(row.asset);
-									const decimals = getTransferDecimals(row.asset);
+									const displayName = markets.tokenDisplayName(row.asset);
+									const decimals = markets.transferDecimals(row.asset);
 									const canTransfer = row.asset === "USDC" && parseFloat(row.available) > 0;
+									const canSwap = row.type === "spot" && parseFloat(row.available) > 0;
 									const transferLabel = row.type === "perp" ? t`To Spot` : t`To Perp`;
 									return (
 										<TableRow key={`${row.type}-${row.asset}`} className="border-border/40 hover:bg-accent/30">
@@ -188,6 +196,17 @@ export function BalancesTab() {
 														>
 															<ArrowLeftRight className="size-2.5" />
 															{transferLabel}
+														</Button>
+													)}
+													{canSwap && (
+														<Button
+															variant="ghost"
+															size="none"
+															onClick={() => openSwapModal(row.asset)}
+															className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
+														>
+															<ArrowDownUp className="size-2.5" />
+															{t`Swap`}
 														</Button>
 													)}
 													{parseFloat(row.available) > 0 && (

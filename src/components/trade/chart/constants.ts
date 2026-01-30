@@ -22,7 +22,7 @@ import {
 	CHART_WIDGET_DEFAULTS,
 } from "@/config/constants";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid";
-import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/lib/market";
+import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/domain/market";
 
 export {
 	CHART_LIBRARY_PATH,

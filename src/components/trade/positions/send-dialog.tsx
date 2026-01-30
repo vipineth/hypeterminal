@@ -8,11 +8,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getAvailableFromTotals, getPerpAvailable, type BalanceRow } from "@/domain/trade/balances";
+import { type BalanceRow, getAvailableFromTotals, getPerpAvailable } from "@/domain/trade/balances";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken } from "@/lib/format";
-import { useSpotTokens } from "@/lib/hyperliquid";
+import { useMarkets } from "@/lib/hyperliquid";
 import { useExchangeSendAsset } from "@/lib/hyperliquid/hooks/exchange";
 import { useExchangeSpotSend } from "@/lib/hyperliquid/hooks/exchange/useExchangeSpotSend";
 import { floorToString, limitDecimalInput } from "@/lib/trade/numbers";
@@ -33,7 +33,7 @@ export function SendDialog({ open, onOpenChange, initialAsset = "USDC", initialA
 	const [amount, setAmount] = useState("");
 	const [error, setError] = useState<string | null>(null);
 
-	const { getToken, getTransferDecimals, getDisplayName } = useSpotTokens();
+	const markets = useMarkets();
 	const { mutateAsync: sendAsset, isPending: isSendAssetPending } = useExchangeSendAsset();
 	const { mutateAsync: spotSend, isPending: isSpotSendPending } = useExchangeSpotSend();
 	const { perpSummary, spotBalances } = useAccountBalances();
@@ -63,17 +63,17 @@ export function SendDialog({ open, onOpenChange, initialAsset = "USDC", initialA
 		}
 		return availableSpotTokens.map((b) => ({
 			value: b.asset,
-			label: getDisplayName(b.asset),
+			label: markets.tokenDisplayName(b.asset),
 		}));
-	}, [accountType, availableSpotTokens, getDisplayName]);
+	}, [accountType, availableSpotTokens, markets]);
 
-	const tokenInfo = useMemo(() => getToken(selectedToken), [getToken, selectedToken]);
+	const tokenInfo = useMemo(() => markets.token(selectedToken), [markets, selectedToken]);
 	const tokenId = useMemo(() => {
 		if (!tokenInfo) return "";
 		return `${tokenInfo.name}:${tokenInfo.tokenId}`;
 	}, [tokenInfo]);
 
-	const decimals = useMemo(() => getTransferDecimals(selectedToken), [getTransferDecimals, selectedToken]);
+	const decimals = useMemo(() => markets.transferDecimals(selectedToken), [markets, selectedToken]);
 
 	const availableBalance = useMemo(() => {
 		if (accountType === "perp") {
@@ -83,10 +83,7 @@ export function SendDialog({ open, onOpenChange, initialAsset = "USDC", initialA
 		return getAvailableFromTotals(balance?.total, balance?.hold);
 	}, [accountType, perpSummary, spotBalances, selectedToken]);
 
-	const availableBalanceStr = useMemo(
-		() => floorToString(availableBalance, decimals),
-		[availableBalance, decimals],
-	);
+	const availableBalanceStr = useMemo(() => floorToString(availableBalance, decimals), [availableBalance, decimals]);
 
 	const amountBig = amount ? Big(amount) : Big(0);
 	const availableBig = Big(availableBalance);
@@ -227,11 +224,7 @@ export function SendDialog({ open, onOpenChange, initialAsset = "USDC", initialA
 
 					{error && <div className="text-3xs text-negative">{error}</div>}
 
-					<Button
-						onClick={handleSend}
-						disabled={!canSend}
-						className="w-full h-10 text-xs font-medium"
-					>
+					<Button onClick={handleSend} disabled={!canSend} className="w-full h-10 text-xs font-medium">
 						{isPending && <Loader2 className="size-3.5 animate-spin mr-2" />}
 						<Send className="size-3.5 mr-2" />
 						{isPending ? t`Sending...` : t`Send`}

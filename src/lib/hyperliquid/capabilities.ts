@@ -1,4 +1,4 @@
-import type { BuilderPerpMarket, PerpMarket, SpotMarket, UnifiedMarket } from "./hooks/useMarkets";
+import type { BuilderPerpMarket, PerpMarket, SpotMarket, UnifiedMarket } from "./markets/types";
 
 export interface MarketCapabilities {
 	isLeveraged: boolean;

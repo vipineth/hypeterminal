@@ -23,7 +23,7 @@ import {
 	useGlobalSettingsActions,
 	useMarketOrderSlippageBps,
 } from "@/stores/use-global-settings-store";
-import { useSettingsDialogActions, useSettingsDialogOpen } from "@/stores/use-settings-dialog-store";
+import { useSettingsDialogActions, useSettingsDialogOpen } from "@/stores/use-global-modal-store";
 
 export function GlobalSettingsDialog() {
 	const open = useSettingsDialogOpen();

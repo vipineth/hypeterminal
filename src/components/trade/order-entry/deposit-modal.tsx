@@ -22,10 +22,10 @@ import { MIN_DEPOSIT_USDC, MIN_WITHDRAW_USD, USDC_DECIMALS, WITHDRAWAL_FEE_USD }
 import { cn } from "@/lib/cn";
 import { getExplorerTxUrl } from "@/lib/explorer";
 import { formatNumber } from "@/lib/format";
-import { useDeposit, useExchangeWithdraw3, useSubClearinghouseState } from "@/lib/hyperliquid";
+import { useDeposit, useExchangeWithdraw3, useUserPositions } from "@/lib/hyperliquid";
 import { isPositive, parseNumber } from "@/lib/trade/numbers";
 import { formatTransferError } from "@/lib/errors/format";
-import { useDepositModalActions, useDepositModalOpen, useDepositModalTab } from "@/stores/use-deposit-modal-store";
+import { useDepositModalActions, useDepositModalOpen, useDepositModalTab } from "@/stores/use-global-modal-store";
 
 const NETWORKS = [{ id: "arbitrum", name: "Arbitrum", shortName: "ARB" }] as const;
 
@@ -452,12 +452,10 @@ export function DepositModal() {
 
 	const { address } = useConnection();
 
-	const { data: clearinghouse, status: balanceStatus } = useSubClearinghouseState(
-		{ user: address ?? "0x" },
-		{ enabled: !!address },
-	);
+	const userPositions = useUserPositions();
+	const balanceStatus = userPositions.isLoading ? "subscribing" : "active";
 
-	const withdrawable = clearinghouse?.clearinghouseState?.withdrawable ?? "0";
+	const withdrawable = userPositions.withdrawable;
 	const withdrawableNum = parseNumber(withdrawable);
 
 	const {
