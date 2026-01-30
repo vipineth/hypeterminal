@@ -85,14 +85,6 @@ export function runValidators<TContext>(validators: Validator<TContext>[], conte
 }
 
 export function getFirstError<TContext>(validators: Validator<TContext>[], context: TContext): ValidationError | null {
-	for (const validator of validators) {
-		const isValid = validator.validate(context);
-		if (!isValid) {
-			return {
-				...validator.error,
-				message: validator.getMessage(context),
-			};
-		}
-	}
-	return null;
+	const errors = runValidators(validators, context);
+	return errors.length > 0 ? errors[0] : null;
 }

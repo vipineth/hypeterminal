@@ -3,7 +3,7 @@ import { ORDER_MIN_NOTIONAL_USD } from "@/config/constants";
 import { noBalanceValidator } from "../definitions/balance";
 import { signerNotReadyValidator, walletLoadingValidator, walletNotConnectedValidator } from "../definitions/connection";
 import { marketNotReadyValidator, noMarketValidator } from "../definitions/market";
-import { createValidator, runValidators, type ValidationError } from "../types";
+import { createValidator, runValidators, type ValidationError, type Validator } from "../types";
 
 export interface SpotOrderContext {
 	isConnected: boolean;
@@ -65,8 +65,7 @@ const insufficientQuoteBalanceValidator = createValidator<SpotOrderContext>({
 	priority: 110,
 	getMessage: (ctx) => t`Insufficient ${ctx.quoteToken} balance`,
 	validate: (ctx) => {
-		if (ctx.side !== "buy") return true;
-		if (ctx.orderValue <= 0) return true;
+		if (ctx.side !== "buy" || ctx.orderValue <= 0) return true;
 		return ctx.quoteAvailable >= ctx.orderValue;
 	},
 });
@@ -78,13 +77,12 @@ const insufficientBaseBalanceValidator = createValidator<SpotOrderContext>({
 	priority: 111,
 	getMessage: (ctx) => t`Insufficient ${ctx.baseToken} balance`,
 	validate: (ctx) => {
-		if (ctx.side !== "sell") return true;
-		if (ctx.sizeValue <= 0) return true;
+		if (ctx.side !== "sell" || ctx.sizeValue <= 0) return true;
 		return ctx.baseAvailable >= ctx.sizeValue;
 	},
 });
 
-const spotOrderValidators = [
+const spotOrderValidators: Validator<SpotOrderContext>[] = [
 	walletNotConnectedValidator,
 	walletLoadingValidator,
 	noBalanceValidator,
@@ -99,16 +97,6 @@ const spotOrderValidators = [
 ];
 
 export function validateSpotOrder(context: SpotOrderContext): SpotOrderValidationResult {
-	if (!context.isConnected) {
-		const errors = runValidators([walletNotConnectedValidator], context);
-		return { valid: false, errors, canSubmit: false, needsApproval: false };
-	}
-
-	if (context.isWalletLoading) {
-		const errors = runValidators([walletLoadingValidator], context);
-		return { valid: false, errors, canSubmit: false, needsApproval: false };
-	}
-
 	if (context.needsAgentApproval) {
 		return { valid: false, errors: [], canSubmit: false, needsApproval: true };
 	}
@@ -122,5 +110,3 @@ export function validateSpotOrder(context: SpotOrderContext): SpotOrderValidatio
 		needsApproval: false,
 	};
 }
-
-export { spotOrderValidators };

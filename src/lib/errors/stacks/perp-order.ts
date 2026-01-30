@@ -25,7 +25,7 @@ import {
 	tpTriggerBelowMarkValidator,
 } from "../definitions/trigger";
 import { type TwapContext, twapMinutesRangeValidator } from "../definitions/twap";
-import { runValidators, type ValidationError } from "../types";
+import { runValidators, type ValidationError, type Validator } from "../types";
 
 export interface PerpOrderContext extends OrderInputContext, TpSlContext, TriggerContext, ScaleContext, TwapContext {
 	isConnected: boolean;
@@ -45,7 +45,7 @@ export interface PerpOrderValidationResult {
 	needsApproval: boolean;
 }
 
-const perpOrderValidators = [
+const perpOrderValidators: Validator<PerpOrderContext>[] = [
 	walletNotConnectedValidator,
 	walletLoadingValidator,
 	noBalanceValidator,
@@ -73,16 +73,6 @@ const perpOrderValidators = [
 ];
 
 export function validatePerpOrder(context: PerpOrderContext): PerpOrderValidationResult {
-	if (!context.isConnected) {
-		const errors = runValidators([walletNotConnectedValidator], context);
-		return { valid: false, errors, canSubmit: false, needsApproval: false };
-	}
-
-	if (context.isWalletLoading) {
-		const errors = runValidators([walletLoadingValidator], context);
-		return { valid: false, errors, canSubmit: false, needsApproval: false };
-	}
-
 	if (context.needsAgentApproval) {
 		return { valid: false, errors: [], canSubmit: false, needsApproval: true };
 	}
@@ -96,5 +86,3 @@ export function validatePerpOrder(context: PerpOrderContext): PerpOrderValidatio
 		needsApproval: false,
 	};
 }
-
-export { perpOrderValidators };

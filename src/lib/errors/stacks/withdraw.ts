@@ -1,6 +1,6 @@
 import { walletLoadingValidator, walletNotConnectedValidator } from "../definitions/connection";
 import { type WithdrawContext, withdrawInsufficientBalanceValidator, withdrawMinAmountValidator } from "../definitions/deposit";
-import { runValidators } from "../types";
+import { runValidators, type Validator } from "../types";
 
 export interface WithdrawValidationContext extends WithdrawContext {
 	isConnected: boolean;
@@ -12,7 +12,7 @@ export interface WithdrawValidationResult {
 	error: string | null;
 }
 
-const withdrawValidators = [
+const withdrawValidators: Validator<WithdrawValidationContext>[] = [
 	walletNotConnectedValidator,
 	walletLoadingValidator,
 	withdrawMinAmountValidator,
@@ -25,12 +25,10 @@ export function validateWithdraw(context: WithdrawValidationContext): WithdrawVa
 	}
 
 	const errors = runValidators(withdrawValidators, context);
+	const firstError = errors[0]?.message ?? null;
 
-	if (errors.length === 0) {
-		return { valid: true, error: null };
-	}
-
-	return { valid: false, error: errors[0].message };
+	return {
+		valid: errors.length === 0,
+		error: firstError,
+	};
 }
-
-export { withdrawValidators };

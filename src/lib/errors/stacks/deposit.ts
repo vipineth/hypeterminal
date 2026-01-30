@@ -1,6 +1,6 @@
 import { walletLoadingValidator, walletNotConnectedValidator } from "../definitions/connection";
 import { type DepositContext, depositInsufficientBalanceValidator, depositMinAmountValidator } from "../definitions/deposit";
-import { runValidators } from "../types";
+import { runValidators, type Validator } from "../types";
 
 export interface DepositValidationContext extends DepositContext {
 	isConnected: boolean;
@@ -12,7 +12,7 @@ export interface DepositValidationResult {
 	error: string | null;
 }
 
-const depositValidators = [
+const depositValidators: Validator<DepositValidationContext>[] = [
 	walletNotConnectedValidator,
 	walletLoadingValidator,
 	depositMinAmountValidator,
@@ -25,12 +25,10 @@ export function validateDeposit(context: DepositValidationContext): DepositValid
 	}
 
 	const errors = runValidators(depositValidators, context);
+	const firstError = errors[0]?.message ?? null;
 
-	if (errors.length === 0) {
-		return { valid: true, error: null };
-	}
-
-	return { valid: false, error: errors[0].message };
+	return {
+		valid: errors.length === 0,
+		error: firstError,
+	};
 }
-
-export { depositValidators };
