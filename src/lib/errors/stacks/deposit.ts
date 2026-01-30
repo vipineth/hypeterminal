@@ -1,27 +1,22 @@
-import { type Validator, runValidators, type ValidationError } from "../types";
-import {
-	walletNotConnectedValidator,
-	walletLoadingValidator,
-	type ConnectionContext,
-} from "../definitions/connection";
-import {
-	depositMinAmountValidator,
-	depositInsufficientBalanceValidator,
-	type DepositContext,
-} from "../definitions/deposit";
+import { walletLoadingValidator, walletNotConnectedValidator } from "../definitions/connection";
+import { type DepositContext, depositInsufficientBalanceValidator, depositMinAmountValidator } from "../definitions/deposit";
+import { runValidators } from "../types";
 
-export type DepositValidationContext = Pick<ConnectionContext, "isConnected" | "isWalletLoading"> & DepositContext;
+export interface DepositValidationContext extends DepositContext {
+	isConnected: boolean;
+	isWalletLoading: boolean;
+}
 
 export interface DepositValidationResult {
 	valid: boolean;
 	error: string | null;
 }
 
-const depositValidators: Validator<DepositValidationContext>[] = [
-	walletNotConnectedValidator as Validator<DepositValidationContext>,
-	walletLoadingValidator as Validator<DepositValidationContext>,
-	depositMinAmountValidator as Validator<DepositValidationContext>,
-	depositInsufficientBalanceValidator as Validator<DepositValidationContext>,
+const depositValidators = [
+	walletNotConnectedValidator,
+	walletLoadingValidator,
+	depositMinAmountValidator,
+	depositInsufficientBalanceValidator,
 ];
 
 export function validateDeposit(context: DepositValidationContext): DepositValidationResult {
@@ -37,3 +32,5 @@ export function validateDeposit(context: DepositValidationContext): DepositValid
 
 	return { valid: false, error: errors[0].message };
 }
+
+export { depositValidators };

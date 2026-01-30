@@ -1,17 +1,9 @@
-import { t } from "@lingui/core/macro";
 import { useMemo } from "react";
-import {
-	ORDER_MIN_NOTIONAL_USD,
-	SCALE_LEVELS_MAX,
-	SCALE_LEVELS_MIN,
-	TWAP_MINUTES_MAX,
-	TWAP_MINUTES_MIN,
-} from "@/config/constants";
-import { clampInt, isPositive } from "@/lib/trade/numbers";
-import { validateSlPrice, validateTpPrice } from "@/lib/trade/tpsl";
+import { type PerpOrderContext, validatePerpOrder } from "@/lib/errors/stacks/perp-order";
+import { type SpotOrderContext, validateSpotOrder } from "@/lib/errors/stacks/spot-order";
 import type { Side, ValidationResult } from "@/lib/trade/types";
 
-interface ValidationInput {
+interface BaseValidationInput {
 	isConnected: boolean;
 	isWalletLoading: boolean;
 	availableBalance: number;
@@ -19,14 +11,18 @@ interface ValidationInput {
 	hasAssetIndex: boolean;
 	needsAgentApproval: boolean;
 	isReadyToTrade: boolean;
-	orderType: string;
-	markPx: number;
 	price: number;
 	sizeValue: number;
 	orderValue: number;
-	maxSize: number;
 	side: Side;
 	usesLimitPrice: boolean;
+}
+
+interface PerpValidationInput extends BaseValidationInput {
+	isSpotMarket: false;
+	orderType: string;
+	markPx: number;
+	maxSize: number;
 	usesTriggerPrice: boolean;
 	triggerPriceNum: number | null;
 	stopOrder: boolean;
@@ -43,98 +39,88 @@ interface ValidationInput {
 	slPriceNum: number | null;
 }
 
+interface SpotValidationInput extends BaseValidationInput {
+	isSpotMarket: true;
+	baseAvailable: number;
+	quoteAvailable: number;
+	baseToken: string;
+	quoteToken: string;
+}
+
+type ValidationInput = PerpValidationInput | SpotValidationInput;
+
 export function useOrderValidation(input: ValidationInput): ValidationResult {
 	return useMemo<ValidationResult>(() => {
-		if (!input.isConnected) {
-			return { valid: false, errors: [t`Not connected`], canSubmit: false, needsApproval: false };
-		}
-		if (input.isWalletLoading) {
-			return { valid: false, errors: [t`Loading wallet...`], canSubmit: false, needsApproval: false };
-		}
-		if (input.needsAgentApproval) {
-			return { valid: false, errors: [], canSubmit: false, needsApproval: true };
-		}
-		if (input.availableBalance <= 0) {
-			return { valid: false, errors: [t`No balance`], canSubmit: false, needsApproval: false };
-		}
-		if (!input.hasMarket) {
-			return { valid: false, errors: [t`No market`], canSubmit: false, needsApproval: false };
-		}
-		if (!input.hasAssetIndex) {
-			return { valid: false, errors: [t`Market not ready`], canSubmit: false, needsApproval: false };
-		}
-		if (!input.isReadyToTrade) {
-			return { valid: false, errors: [t`Signer not ready`], canSubmit: false, needsApproval: false };
-		}
-		if (input.orderType === "market" && !input.markPx) {
-			return { valid: false, errors: [t`No mark price`], canSubmit: false, needsApproval: false };
+		if (input.isSpotMarket) {
+			const context: SpotOrderContext = {
+				isConnected: input.isConnected,
+				isWalletLoading: input.isWalletLoading,
+				isReadyToTrade: input.isReadyToTrade,
+				needsAgentApproval: input.needsAgentApproval,
+				availableBalance: input.availableBalance,
+				hasMarket: input.hasMarket,
+				hasAssetIndex: input.hasAssetIndex,
+				usesLimitPrice: input.usesLimitPrice,
+				price: input.price,
+				sizeValue: input.sizeValue,
+				orderValue: input.orderValue,
+				side: input.side,
+				baseAvailable: input.baseAvailable,
+				quoteAvailable: input.quoteAvailable,
+				baseToken: input.baseToken,
+				quoteToken: input.quoteToken,
+			};
+
+			const result = validateSpotOrder(context);
+
+			return {
+				valid: result.valid,
+				errors: result.errors.map((e) => e.message),
+				canSubmit: result.canSubmit,
+				needsApproval: result.needsApproval,
+			};
 		}
 
-		const errors: string[] = [];
+		const context: PerpOrderContext = {
+			isConnected: input.isConnected,
+			isWalletLoading: input.isWalletLoading,
+			isReadyToTrade: input.isReadyToTrade,
+			needsAgentApproval: input.needsAgentApproval,
+			availableBalance: input.availableBalance,
+			hasMarket: input.hasMarket,
+			hasAssetIndex: input.hasAssetIndex,
+			orderType: input.orderType,
+			markPx: input.markPx,
+			price: input.price,
+			sizeValue: input.sizeValue,
+			orderValue: input.orderValue,
+			maxSize: input.maxSize,
+			side: input.side,
+			usesLimitPrice: input.usesLimitPrice,
+			usesTriggerPrice: input.usesTriggerPrice,
+			triggerPriceNum: input.triggerPriceNum,
+			stopOrder: input.stopOrder,
+			takeProfitOrder: input.takeProfitOrder,
+			scaleOrder: input.scaleOrder,
+			twapOrder: input.twapOrder,
+			scaleStartPriceNum: input.scaleStartPriceNum,
+			scaleEndPriceNum: input.scaleEndPriceNum,
+			scaleLevelsNum: input.scaleLevelsNum,
+			twapMinutesNum: input.twapMinutesNum,
+			tpSlEnabled: input.tpSlEnabled,
+			canUseTpSl: input.canUseTpSl,
+			tpPriceNum: input.tpPriceNum,
+			slPriceNum: input.slPriceNum,
+		};
 
-		if (input.usesLimitPrice && !input.price) errors.push(t`Enter limit price`);
-		if (input.usesTriggerPrice && !isPositive(input.triggerPriceNum)) errors.push(t`Enter trigger price`);
-		if (!input.sizeValue || input.sizeValue <= 0) errors.push(t`Enter size`);
-		if (input.orderValue > 0 && input.orderValue < ORDER_MIN_NOTIONAL_USD) errors.push(t`Min order $10`);
-		if (input.sizeValue > input.maxSize && input.maxSize > 0) errors.push(t`Exceeds max size`);
+		const result = validatePerpOrder(context);
 
-		if (input.tpSlEnabled && input.canUseTpSl) {
-			const hasTp = isPositive(input.tpPriceNum);
-			const hasSl = isPositive(input.slPriceNum);
-			if (!hasTp && !hasSl) errors.push(t`Enter TP or SL price`);
-			if (hasTp && !validateTpPrice(input.price, input.tpPriceNum, input.side)) {
-				errors.push(input.side === "buy" ? t`TP must be above entry` : t`TP must be below entry`);
-			}
-			if (hasSl && !validateSlPrice(input.price, input.slPriceNum, input.side)) {
-				errors.push(input.side === "buy" ? t`SL must be below entry` : t`SL must be above entry`);
-			}
-		}
-
-		if (input.usesTriggerPrice && isPositive(input.triggerPriceNum) && input.markPx > 0) {
-			if (input.stopOrder) {
-				const needsAbove = input.side === "buy";
-				if (needsAbove && input.triggerPriceNum <= input.markPx) errors.push(t`Stop trigger must be above mark`);
-				if (!needsAbove && input.triggerPriceNum >= input.markPx) errors.push(t`Stop trigger must be below mark`);
-			}
-			if (input.takeProfitOrder) {
-				const needsAbove = input.side === "sell";
-				if (needsAbove && input.triggerPriceNum <= input.markPx) errors.push(t`Take profit trigger must be above mark`);
-				if (!needsAbove && input.triggerPriceNum >= input.markPx)
-					errors.push(t`Take profit trigger must be below mark`);
-			}
-		}
-
-		if (input.scaleOrder) {
-			const levels = clampInt(Math.round(input.scaleLevelsNum ?? 0), 0, 100);
-			if (!isPositive(input.scaleStartPriceNum) || !isPositive(input.scaleEndPriceNum)) {
-				errors.push(t`Enter price range`);
-			}
-			if (levels < SCALE_LEVELS_MIN || levels > SCALE_LEVELS_MAX)
-				errors.push(t`Scale levels must be ${SCALE_LEVELS_MIN}-${SCALE_LEVELS_MAX}`);
-			if (
-				isPositive(input.scaleStartPriceNum) &&
-				isPositive(input.scaleEndPriceNum) &&
-				input.scaleStartPriceNum === input.scaleEndPriceNum
-			) {
-				errors.push(t`Start and end must differ`);
-			}
-			if (levels >= 2 && input.sizeValue > 0) {
-				const averagePrice = input.price > 0 ? input.price : input.markPx;
-				const perLevelSize = input.sizeValue / levels;
-				const perLevelNotional = averagePrice > 0 ? perLevelSize * averagePrice : 0;
-				if (perLevelNotional > 0 && perLevelNotional < ORDER_MIN_NOTIONAL_USD) {
-					errors.push(t`Scale level below min notional`);
-				}
-			}
-		}
-
-		if (input.twapOrder) {
-			const minutes = Math.round(input.twapMinutesNum ?? 0);
-			if (minutes < TWAP_MINUTES_MIN || minutes > TWAP_MINUTES_MAX)
-				errors.push(t`TWAP minutes must be ${TWAP_MINUTES_MIN}-${TWAP_MINUTES_MAX}`);
-		}
-
-		return { valid: errors.length === 0, errors, canSubmit: errors.length === 0, needsApproval: false };
+		return {
+			valid: result.valid,
+			errors: result.errors.map((e) => e.message),
+			canSubmit: result.canSubmit,
+			needsApproval: result.needsApproval,
+		};
 	}, [input]);
 }
 

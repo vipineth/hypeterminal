@@ -1,58 +1,42 @@
-import type { Side } from "@/lib/trade/types";
-import { type Validator, runValidators, type ValidationError } from "../types";
-import {
-	walletNotConnectedValidator,
-	walletLoadingValidator,
-	signerNotReadyValidator,
-	type ConnectionContext,
-} from "../definitions/connection";
-import { noBalanceValidator, type BalanceContext } from "../definitions/balance";
-import {
-	noMarketValidator,
-	marketNotReadyValidator,
-	noMarkPriceValidator,
-	type MarketContext,
-} from "../definitions/market";
+import { noBalanceValidator } from "../definitions/balance";
+import { signerNotReadyValidator, walletLoadingValidator, walletNotConnectedValidator } from "../definitions/connection";
+import { marketNotReadyValidator, noMarketValidator, noMarkPriceValidator } from "../definitions/market";
 import {
 	enterLimitPriceValidator,
-	enterTriggerPriceValidator,
 	enterSizeValidator,
-	minOrderNotionalValidator,
+	enterTriggerPriceValidator,
 	exceedsMaxSizeValidator,
+	minOrderNotionalValidator,
 	type OrderInputContext,
 } from "../definitions/order-input";
 import {
-	enterTpSlPriceValidator,
-	createTpPriceValidator,
-	createSlPriceValidator,
-	type TpSlContext,
-} from "../definitions/tpsl";
+	enterPriceRangeValidator,
+	type ScaleContext,
+	scaleLevelMinNotionalValidator,
+	scaleLevelsRangeValidator,
+	scaleStartEndDifferValidator,
+} from "../definitions/scale";
+import { enterTpSlPriceValidator, slPriceValidator, type TpSlContext, tpPriceValidator } from "../definitions/tpsl";
 import {
 	stopTriggerAboveMarkValidator,
 	stopTriggerBelowMarkValidator,
+	type TriggerContext,
 	tpTriggerAboveMarkValidator,
 	tpTriggerBelowMarkValidator,
-	type TriggerContext,
 } from "../definitions/trigger";
-import {
-	enterPriceRangeValidator,
-	scaleLevelsRangeValidator,
-	scaleStartEndDifferValidator,
-	scaleLevelMinNotionalValidator,
-	type ScaleContext,
-} from "../definitions/scale";
-import { twapMinutesRangeValidator, type TwapContext } from "../definitions/twap";
+import { type TwapContext, twapMinutesRangeValidator } from "../definitions/twap";
+import { runValidators, type ValidationError } from "../types";
 
-export type PerpOrderContext = ConnectionContext &
-	BalanceContext &
-	MarketContext &
-	OrderInputContext &
-	TpSlContext &
-	TriggerContext &
-	ScaleContext &
-	TwapContext & {
-		needsAgentApproval: boolean;
-	};
+export interface PerpOrderContext extends OrderInputContext, TpSlContext, TriggerContext, ScaleContext, TwapContext {
+	isConnected: boolean;
+	isWalletLoading: boolean;
+	isReadyToTrade: boolean;
+	needsAgentApproval: boolean;
+	availableBalance: number;
+	hasMarket: boolean;
+	hasAssetIndex: boolean;
+	orderType: string;
+}
 
 export interface PerpOrderValidationResult {
 	valid: boolean;
@@ -61,43 +45,41 @@ export interface PerpOrderValidationResult {
 	needsApproval: boolean;
 }
 
-function createPerpOrderValidators(side: Side): Validator<PerpOrderContext>[] {
-	return [
-		walletNotConnectedValidator,
-		walletLoadingValidator,
-		noBalanceValidator,
-		noMarketValidator,
-		marketNotReadyValidator,
-		signerNotReadyValidator,
-		noMarkPriceValidator,
-		enterLimitPriceValidator,
-		enterTriggerPriceValidator,
-		enterSizeValidator,
-		minOrderNotionalValidator,
-		exceedsMaxSizeValidator,
-		enterTpSlPriceValidator,
-		createTpPriceValidator(side),
-		createSlPriceValidator(side),
-		stopTriggerAboveMarkValidator,
-		stopTriggerBelowMarkValidator,
-		tpTriggerAboveMarkValidator,
-		tpTriggerBelowMarkValidator,
-		enterPriceRangeValidator,
-		scaleLevelsRangeValidator,
-		scaleStartEndDifferValidator,
-		scaleLevelMinNotionalValidator,
-		twapMinutesRangeValidator,
-	] as Validator<PerpOrderContext>[];
-}
+const perpOrderValidators = [
+	walletNotConnectedValidator,
+	walletLoadingValidator,
+	noBalanceValidator,
+	noMarketValidator,
+	marketNotReadyValidator,
+	signerNotReadyValidator,
+	noMarkPriceValidator,
+	enterLimitPriceValidator,
+	enterTriggerPriceValidator,
+	enterSizeValidator,
+	minOrderNotionalValidator,
+	exceedsMaxSizeValidator,
+	enterTpSlPriceValidator,
+	tpPriceValidator,
+	slPriceValidator,
+	stopTriggerAboveMarkValidator,
+	stopTriggerBelowMarkValidator,
+	tpTriggerAboveMarkValidator,
+	tpTriggerBelowMarkValidator,
+	enterPriceRangeValidator,
+	scaleLevelsRangeValidator,
+	scaleStartEndDifferValidator,
+	scaleLevelMinNotionalValidator,
+	twapMinutesRangeValidator,
+];
 
 export function validatePerpOrder(context: PerpOrderContext): PerpOrderValidationResult {
 	if (!context.isConnected) {
-		const errors = runValidators([walletNotConnectedValidator] as Validator<PerpOrderContext>[], context);
+		const errors = runValidators([walletNotConnectedValidator], context);
 		return { valid: false, errors, canSubmit: false, needsApproval: false };
 	}
 
 	if (context.isWalletLoading) {
-		const errors = runValidators([walletLoadingValidator] as Validator<PerpOrderContext>[], context);
+		const errors = runValidators([walletLoadingValidator], context);
 		return { valid: false, errors, canSubmit: false, needsApproval: false };
 	}
 
@@ -105,8 +87,7 @@ export function validatePerpOrder(context: PerpOrderContext): PerpOrderValidatio
 		return { valid: false, errors: [], canSubmit: false, needsApproval: true };
 	}
 
-	const validators = createPerpOrderValidators(context.side);
-	const errors = runValidators(validators, context);
+	const errors = runValidators(perpOrderValidators, context);
 
 	return {
 		valid: errors.length === 0,
@@ -115,3 +96,5 @@ export function validatePerpOrder(context: PerpOrderContext): PerpOrderValidatio
 		needsApproval: false,
 	};
 }
+
+export { perpOrderValidators };

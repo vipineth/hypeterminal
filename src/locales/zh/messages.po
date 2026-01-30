@@ -511,23 +511,25 @@ msgstr ""
 msgid "End Price (USDC)"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/order-input.ts
+#: src/lib/errors/stacks/spot-order.ts
 msgid "Enter limit price"
 msgstr "输入限价"
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/scale.ts
 msgid "Enter price range"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/order-input.ts
+#: src/lib/errors/stacks/spot-order.ts
 msgid "Enter size"
 msgstr "输入数量"
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/tpsl.ts
 msgid "Enter TP or SL price"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/order-input.ts
 msgid "Enter trigger price"
 msgstr ""
 
@@ -557,7 +559,7 @@ msgstr "预估费用"
 msgid "Estimated time"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/order-input.ts
 msgid "Exceeds max size"
 msgstr "超过最大数量"
 
@@ -692,12 +694,21 @@ msgstr "使用中"
 msgid "Install a wallet extension to continue"
 msgstr ""
 
+#. placeholder {0}: ctx.baseToken
+#. placeholder {0}: ctx.quoteToken
+#: src/lib/errors/stacks/spot-order.ts
+#: src/lib/errors/stacks/spot-order.ts
+msgid "Insufficient {0} balance"
+msgstr ""
+
 #: src/components/trade/order-entry/deposit-modal.tsx
+#: src/lib/errors/definitions/deposit.ts
+#: src/lib/errors/definitions/deposit.ts
 #: src/lib/hyperliquid/use-deposit.ts
 msgid "Insufficient balance"
 msgstr ""
 
-#: src/lib/transfer/errors.ts
+#: src/lib/errors/format.ts
 msgid "Insufficient funds for gas"
 msgstr ""
 
@@ -797,7 +808,7 @@ msgstr "加载交易历史中..."
 msgid "Loading TWAP orders..."
 msgstr "加载 TWAP 订单中..."
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/connection.ts
 msgid "Loading wallet..."
 msgstr "加载钱包中..."
 
@@ -862,7 +873,7 @@ msgstr "市场"
 #~ msgid "Market metadata unavailable."
 #~ msgstr "市场元数据不可用。"
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/market.ts
 msgid "Market not ready"
 msgstr "市场未就绪"
 
@@ -901,7 +912,11 @@ msgstr ""
 msgid "Maximum slippage tolerance for market orders"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/stacks/spot-order.ts
+msgid "Min order ${ORDER_MIN_NOTIONAL_USD}"
+msgstr ""
+
+#: src/lib/errors/definitions/order-input.ts
 msgid "Min order $10"
 msgstr "最小订单 $10"
 
@@ -910,8 +925,18 @@ msgstr "最小订单 $10"
 msgid "Minimum"
 msgstr ""
 
+#. placeholder {0}: ctx.minDeposit
+#: src/lib/errors/definitions/deposit.ts
+msgid "Minimum deposit is {0} USDC"
+msgstr ""
+
 #: src/lib/hyperliquid/use-deposit.ts
 msgid "Minimum deposit is 5 USDC"
+msgstr ""
+
+#. placeholder {0}: ctx.minWithdraw
+#: src/lib/errors/definitions/deposit.ts
+msgid "Minimum withdrawal is ${0}"
 msgstr ""
 
 #: src/components/trade/order-entry/deposit-modal.tsx
@@ -966,11 +991,11 @@ msgstr ""
 msgid "No active positions."
 msgstr "无活跃仓位。"
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/balance.ts
 msgid "No balance"
 msgstr "无余额"
 
-#: src/lib/transfer/errors.ts
+#: src/lib/errors/format.ts
 msgid "No balance on Hyperliquid. Deposit first."
 msgstr ""
 
@@ -986,11 +1011,11 @@ msgstr "未找到成交记录。"
 msgid "No funding payments found."
 msgstr "未找到资金费用记录。"
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/market.ts
 msgid "No mark price"
 msgstr "无标记价格"
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/market.ts
 msgid "No market"
 msgstr "无市场"
 
@@ -1014,7 +1039,7 @@ msgstr "未找到 TWAP 订单。"
 msgid "No wallets found"
 msgstr "未找到钱包"
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/connection.ts
 msgid "Not connected"
 msgstr "未连接"
 
@@ -1229,11 +1254,11 @@ msgstr ""
 msgid "Scale"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/scale.ts
 msgid "Scale level below min notional"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/scale.ts
 msgid "Scale levels must be {SCALE_LEVELS_MIN}-{SCALE_LEVELS_MAX}"
 msgstr ""
 
@@ -1406,7 +1431,7 @@ msgstr "侧边栏"
 msgid "Sign in wallet..."
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/connection.ts
 msgid "Signer not ready"
 msgstr "签名器未就绪"
 
@@ -1430,12 +1455,12 @@ msgstr "数量"
 #~ msgstr ""
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/tpsl.ts
 msgid "SL must be above entry"
 msgstr ""
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/tpsl.ts
 msgid "SL must be below entry"
 msgstr ""
 
@@ -1496,7 +1521,7 @@ msgstr "价差"
 msgid "Staking"
 msgstr "质押"
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/scale.ts
 msgid "Start and end must differ"
 msgstr ""
 
@@ -1525,11 +1550,11 @@ msgstr ""
 msgid "Stop Market"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/trigger.ts
 msgid "Stop trigger must be above mark"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/trigger.ts
 msgid "Stop trigger must be below mark"
 msgstr ""
 
@@ -1589,11 +1614,11 @@ msgstr ""
 msgid "Take Profit / Stop Loss"
 msgstr "止盈 / 止损"
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/trigger.ts
 msgid "Take profit trigger must be above mark"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/trigger.ts
 msgid "Take profit trigger must be below mark"
 msgstr ""
 
@@ -1660,12 +1685,12 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/tpsl.ts
 msgid "TP must be above entry"
 msgstr ""
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/tpsl.ts
 msgid "TP must be below entry"
 msgstr ""
 
@@ -1695,7 +1720,7 @@ msgstr "交易历史"
 msgid "Trades"
 msgstr "成交"
 
-#: src/lib/transfer/errors.ts
+#: src/lib/errors/format.ts
 msgid "Transaction was rejected"
 msgstr ""
 
@@ -1734,7 +1759,7 @@ msgstr ""
 msgid "TWAP"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/twap.ts
 msgid "TWAP minutes must be {TWAP_MINUTES_MIN}-{TWAP_MINUTES_MAX}"
 msgstr ""
 
@@ -1756,7 +1781,7 @@ msgstr "类型"
 #~ msgid "Unable to close position."
 #~ msgstr "无法平仓。"
 
-#: src/lib/transfer/errors.ts
+#: src/lib/errors/format.ts
 msgid "Unknown error"
 msgstr ""
 

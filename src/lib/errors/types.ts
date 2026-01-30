@@ -1,5 +1,3 @@
-import type { MessageDescriptor } from "@lingui/core";
-
 export type ErrorSeverity = "error" | "warning" | "info";
 
 export type ErrorCategory =
@@ -31,7 +29,7 @@ export interface ValidationError extends ErrorDefinition {
 export interface Validator<TContext> {
 	id: string;
 	error: ErrorDefinition;
-	getMessage: () => string;
+	getMessage: (ctx: TContext) => string;
 	validate: (ctx: TContext) => boolean;
 }
 
@@ -53,7 +51,7 @@ export function createValidator<TContext>(config: {
 	severity?: ErrorSeverity;
 	category: ErrorCategory;
 	priority: number;
-	getMessage: () => string;
+	getMessage: (ctx: TContext) => string;
 	validate: (ctx: TContext) => boolean;
 }): Validator<TContext> {
 	return {
@@ -70,10 +68,7 @@ export function createValidator<TContext>(config: {
 	};
 }
 
-export function runValidators<TContext>(
-	validators: Validator<TContext>[],
-	context: TContext,
-): ValidationError[] {
+export function runValidators<TContext>(validators: Validator<TContext>[], context: TContext): ValidationError[] {
 	const errors: ValidationError[] = [];
 
 	for (const validator of validators) {
@@ -81,7 +76,7 @@ export function runValidators<TContext>(
 		if (!isValid) {
 			errors.push({
 				...validator.error,
-				message: validator.getMessage(),
+				message: validator.getMessage(context),
 			});
 		}
 	}
@@ -89,16 +84,13 @@ export function runValidators<TContext>(
 	return errors.sort((a, b) => a.priority - b.priority);
 }
 
-export function getFirstError<TContext>(
-	validators: Validator<TContext>[],
-	context: TContext,
-): ValidationError | null {
+export function getFirstError<TContext>(validators: Validator<TContext>[], context: TContext): ValidationError | null {
 	for (const validator of validators) {
 		const isValid = validator.validate(context);
 		if (!isValid) {
 			return {
 				...validator.error,
-				message: validator.getMessage(),
+				message: validator.getMessage(context),
 			};
 		}
 	}

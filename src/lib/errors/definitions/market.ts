@@ -1,14 +1,22 @@
 import { t } from "@lingui/core/macro";
 import { createValidator, type Validator } from "../types";
 
-export interface MarketContext {
+interface HasMarket {
 	hasMarket: boolean;
+}
+
+interface HasAssetIndex {
 	hasAssetIndex: boolean;
+}
+
+interface HasMarkPrice {
 	markPx: number;
 	orderType: string;
 }
 
-export const noMarketValidator: Validator<MarketContext> = createValidator({
+export type MarketContext = HasMarket & HasAssetIndex & HasMarkPrice;
+
+export const noMarketValidator: Validator<HasMarket> = createValidator({
 	id: "no-market",
 	code: "MKT_001",
 	category: "market",
@@ -17,7 +25,7 @@ export const noMarketValidator: Validator<MarketContext> = createValidator({
 	validate: (ctx) => ctx.hasMarket,
 });
 
-export const marketNotReadyValidator: Validator<MarketContext> = createValidator({
+export const marketNotReadyValidator: Validator<HasAssetIndex> = createValidator({
 	id: "market-not-ready",
 	code: "MKT_002",
 	category: "market",
@@ -26,7 +34,7 @@ export const marketNotReadyValidator: Validator<MarketContext> = createValidator
 	validate: (ctx) => ctx.hasAssetIndex,
 });
 
-export const noMarkPriceValidator: Validator<MarketContext> = createValidator({
+export const noMarkPriceValidator: Validator<HasMarkPrice> = createValidator({
 	id: "no-mark-price",
 	code: "MKT_003",
 	category: "market",

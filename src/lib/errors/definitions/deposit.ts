@@ -1,29 +1,40 @@
 import { t } from "@lingui/core/macro";
-import { MIN_DEPOSIT_USDC, MIN_WITHDRAW_USD } from "@/config/contracts";
 import { createValidator, type Validator } from "../types";
 
-export interface DepositContext {
+interface HasDepositAmount {
 	amount: number;
-	walletBalance: number;
 	minDeposit: number;
 }
 
-export interface WithdrawContext {
+interface HasWalletBalance {
 	amount: number;
-	withdrawableBalance: number;
+	walletBalance: number;
+}
+
+interface HasWithdrawAmount {
+	amount: number;
 	minWithdraw: number;
 }
 
-export const depositMinAmountValidator: Validator<DepositContext> = createValidator({
+interface HasWithdrawableBalance {
+	amount: number;
+	withdrawableBalance: number;
+}
+
+export type DepositContext = HasDepositAmount & HasWalletBalance;
+
+export type WithdrawContext = HasWithdrawAmount & HasWithdrawableBalance;
+
+export const depositMinAmountValidator: Validator<HasDepositAmount> = createValidator({
 	id: "deposit-min-amount",
 	code: "DEP_001",
 	category: "deposit",
 	priority: 100,
-	getMessage: () => t`Minimum deposit is 5 USDC`,
+	getMessage: (ctx) => t`Minimum deposit is ${ctx.minDeposit} USDC`,
 	validate: (ctx) => ctx.amount === 0 || ctx.amount >= ctx.minDeposit,
 });
 
-export const depositInsufficientBalanceValidator: Validator<DepositContext> = createValidator({
+export const depositInsufficientBalanceValidator: Validator<HasWalletBalance> = createValidator({
 	id: "deposit-insufficient-balance",
 	code: "DEP_002",
 	category: "deposit",
@@ -32,16 +43,16 @@ export const depositInsufficientBalanceValidator: Validator<DepositContext> = cr
 	validate: (ctx) => ctx.amount === 0 || ctx.amount <= ctx.walletBalance,
 });
 
-export const withdrawMinAmountValidator: Validator<WithdrawContext> = createValidator({
+export const withdrawMinAmountValidator: Validator<HasWithdrawAmount> = createValidator({
 	id: "withdraw-min-amount",
 	code: "WDR_001",
 	category: "withdraw",
 	priority: 100,
-	getMessage: () => t`Minimum withdrawal is $${MIN_WITHDRAW_USD}`,
+	getMessage: (ctx) => t`Minimum withdrawal is $${ctx.minWithdraw}`,
 	validate: (ctx) => ctx.amount === 0 || ctx.amount >= ctx.minWithdraw,
 });
 
-export const withdrawInsufficientBalanceValidator: Validator<WithdrawContext> = createValidator({
+export const withdrawInsufficientBalanceValidator: Validator<HasWithdrawableBalance> = createValidator({
 	id: "withdraw-insufficient-balance",
 	code: "WDR_002",
 	category: "withdraw",

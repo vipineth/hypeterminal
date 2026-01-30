@@ -511,23 +511,25 @@ msgstr ""
 msgid "End Price (USDC)"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/order-input.ts
+#: src/lib/errors/stacks/spot-order.ts
 msgid "Enter limit price"
 msgstr "Ingresa precio límite"
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/scale.ts
 msgid "Enter price range"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/order-input.ts
+#: src/lib/errors/stacks/spot-order.ts
 msgid "Enter size"
 msgstr "Ingresa tamaño"
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/tpsl.ts
 msgid "Enter TP or SL price"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/order-input.ts
 msgid "Enter trigger price"
 msgstr ""
 
@@ -557,7 +559,7 @@ msgstr "Comisión est."
 msgid "Estimated time"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/order-input.ts
 msgid "Exceeds max size"
 msgstr "Excede tamaño máximo"
 
@@ -692,12 +694,21 @@ msgstr "En uso"
 msgid "Install a wallet extension to continue"
 msgstr ""
 
+#. placeholder {0}: ctx.baseToken
+#. placeholder {0}: ctx.quoteToken
+#: src/lib/errors/stacks/spot-order.ts
+#: src/lib/errors/stacks/spot-order.ts
+msgid "Insufficient {0} balance"
+msgstr ""
+
 #: src/components/trade/order-entry/deposit-modal.tsx
+#: src/lib/errors/definitions/deposit.ts
+#: src/lib/errors/definitions/deposit.ts
 #: src/lib/hyperliquid/use-deposit.ts
 msgid "Insufficient balance"
 msgstr ""
 
-#: src/lib/transfer/errors.ts
+#: src/lib/errors/format.ts
 msgid "Insufficient funds for gas"
 msgstr ""
 
@@ -797,7 +808,7 @@ msgstr "Cargando historial de operaciones..."
 msgid "Loading TWAP orders..."
 msgstr "Cargando órdenes TWAP..."
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/connection.ts
 msgid "Loading wallet..."
 msgstr "Cargando billetera..."
 
@@ -862,7 +873,7 @@ msgstr "Mercado"
 #~ msgid "Market metadata unavailable."
 #~ msgstr "Metadatos del mercado no disponibles."
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/market.ts
 msgid "Market not ready"
 msgstr "Mercado no listo"
 
@@ -901,7 +912,11 @@ msgstr ""
 msgid "Maximum slippage tolerance for market orders"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/stacks/spot-order.ts
+msgid "Min order ${ORDER_MIN_NOTIONAL_USD}"
+msgstr ""
+
+#: src/lib/errors/definitions/order-input.ts
 msgid "Min order $10"
 msgstr "Orden mín. $10"
 
@@ -910,8 +925,18 @@ msgstr "Orden mín. $10"
 msgid "Minimum"
 msgstr ""
 
+#. placeholder {0}: ctx.minDeposit
+#: src/lib/errors/definitions/deposit.ts
+msgid "Minimum deposit is {0} USDC"
+msgstr ""
+
 #: src/lib/hyperliquid/use-deposit.ts
 msgid "Minimum deposit is 5 USDC"
+msgstr ""
+
+#. placeholder {0}: ctx.minWithdraw
+#: src/lib/errors/definitions/deposit.ts
+msgid "Minimum withdrawal is ${0}"
 msgstr ""
 
 #: src/components/trade/order-entry/deposit-modal.tsx
@@ -966,11 +991,11 @@ msgstr ""
 msgid "No active positions."
 msgstr "Sin posiciones activas."
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/balance.ts
 msgid "No balance"
 msgstr "Sin saldo"
 
-#: src/lib/transfer/errors.ts
+#: src/lib/errors/format.ts
 msgid "No balance on Hyperliquid. Deposit first."
 msgstr ""
 
@@ -986,11 +1011,11 @@ msgstr "No se encontraron ejecuciones."
 msgid "No funding payments found."
 msgstr "No se encontraron pagos de financiamiento."
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/market.ts
 msgid "No mark price"
 msgstr "Sin precio marca"
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/market.ts
 msgid "No market"
 msgstr "Sin mercado"
 
@@ -1014,7 +1039,7 @@ msgstr "No se encontraron órdenes TWAP."
 msgid "No wallets found"
 msgstr "No se encontraron billeteras"
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/connection.ts
 msgid "Not connected"
 msgstr "No conectado"
 
@@ -1229,11 +1254,11 @@ msgstr ""
 msgid "Scale"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/scale.ts
 msgid "Scale level below min notional"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/scale.ts
 msgid "Scale levels must be {SCALE_LEVELS_MIN}-{SCALE_LEVELS_MAX}"
 msgstr ""
 
@@ -1406,7 +1431,7 @@ msgstr "Barra lateral"
 msgid "Sign in wallet..."
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/connection.ts
 msgid "Signer not ready"
 msgstr "Firmante no listo"
 
@@ -1430,12 +1455,12 @@ msgstr "Tamaño"
 #~ msgstr ""
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/tpsl.ts
 msgid "SL must be above entry"
 msgstr ""
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/tpsl.ts
 msgid "SL must be below entry"
 msgstr ""
 
@@ -1496,7 +1521,7 @@ msgstr "Diferencial"
 msgid "Staking"
 msgstr "Staking"
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/scale.ts
 msgid "Start and end must differ"
 msgstr ""
 
@@ -1525,11 +1550,11 @@ msgstr ""
 msgid "Stop Market"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/trigger.ts
 msgid "Stop trigger must be above mark"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/trigger.ts
 msgid "Stop trigger must be below mark"
 msgstr ""
 
@@ -1589,11 +1614,11 @@ msgstr ""
 msgid "Take Profit / Stop Loss"
 msgstr "Tomar ganancia / Stop Loss"
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/trigger.ts
 msgid "Take profit trigger must be above mark"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/trigger.ts
 msgid "Take profit trigger must be below mark"
 msgstr ""
 
@@ -1660,12 +1685,12 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/tpsl.ts
 msgid "TP must be above entry"
 msgstr ""
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/tpsl.ts
 msgid "TP must be below entry"
 msgstr ""
 
@@ -1695,7 +1720,7 @@ msgstr "Historial de operaciones"
 msgid "Trades"
 msgstr "Operaciones"
 
-#: src/lib/transfer/errors.ts
+#: src/lib/errors/format.ts
 msgid "Transaction was rejected"
 msgstr ""
 
@@ -1734,7 +1759,7 @@ msgstr ""
 msgid "TWAP"
 msgstr ""
 
-#: src/lib/trade/use-order-validation.ts
+#: src/lib/errors/definitions/twap.ts
 msgid "TWAP minutes must be {TWAP_MINUTES_MIN}-{TWAP_MINUTES_MAX}"
 msgstr ""
 
@@ -1756,7 +1781,7 @@ msgstr "Tipo"
 #~ msgid "Unable to close position."
 #~ msgstr "No se puede cerrar la posición."
 
-#: src/lib/transfer/errors.ts
+#: src/lib/errors/format.ts
 msgid "Unknown error"
 msgstr ""
 

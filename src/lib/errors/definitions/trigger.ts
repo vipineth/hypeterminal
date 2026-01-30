@@ -22,7 +22,7 @@ export const stopTriggerAboveMarkValidator: Validator<TriggerContext> = createVa
 		if (!ctx.usesTriggerPrice || !isPositive(ctx.triggerPriceNum) || ctx.markPx <= 0) return true;
 		if (!ctx.stopOrder) return true;
 		if (ctx.side !== "buy") return true;
-		return ctx.triggerPriceNum! > ctx.markPx;
+		return ctx.triggerPriceNum > ctx.markPx;
 	},
 });
 
@@ -36,7 +36,7 @@ export const stopTriggerBelowMarkValidator: Validator<TriggerContext> = createVa
 		if (!ctx.usesTriggerPrice || !isPositive(ctx.triggerPriceNum) || ctx.markPx <= 0) return true;
 		if (!ctx.stopOrder) return true;
 		if (ctx.side !== "sell") return true;
-		return ctx.triggerPriceNum! < ctx.markPx;
+		return ctx.triggerPriceNum < ctx.markPx;
 	},
 });
 
@@ -50,7 +50,7 @@ export const tpTriggerAboveMarkValidator: Validator<TriggerContext> = createVali
 		if (!ctx.usesTriggerPrice || !isPositive(ctx.triggerPriceNum) || ctx.markPx <= 0) return true;
 		if (!ctx.takeProfitOrder) return true;
 		if (ctx.side !== "sell") return true;
-		return ctx.triggerPriceNum! > ctx.markPx;
+		return ctx.triggerPriceNum > ctx.markPx;
 	},
 });
 
@@ -64,7 +64,7 @@ export const tpTriggerBelowMarkValidator: Validator<TriggerContext> = createVali
 		if (!ctx.usesTriggerPrice || !isPositive(ctx.triggerPriceNum) || ctx.markPx <= 0) return true;
 		if (!ctx.takeProfitOrder) return true;
 		if (ctx.side !== "buy") return true;
-		return ctx.triggerPriceNum! < ctx.markPx;
+		return ctx.triggerPriceNum < ctx.markPx;
 	},
 });
 

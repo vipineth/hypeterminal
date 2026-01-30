@@ -1,14 +1,23 @@
 import { t } from "@lingui/core/macro";
 import { createValidator, type Validator } from "../types";
 
-export interface ConnectionContext {
+interface HasConnection {
 	isConnected: boolean;
+}
+
+interface HasWalletLoading {
 	isWalletLoading: boolean;
-	needsAgentApproval: boolean;
+}
+
+interface HasReadyToTrade {
 	isReadyToTrade: boolean;
 }
 
-export const walletNotConnectedValidator: Validator<ConnectionContext> = createValidator({
+export type ConnectionContext = HasConnection & HasWalletLoading & HasReadyToTrade & {
+	needsAgentApproval: boolean;
+};
+
+export const walletNotConnectedValidator: Validator<HasConnection> = createValidator({
 	id: "wallet-not-connected",
 	code: "CONN_001",
 	category: "connection",
@@ -17,7 +26,7 @@ export const walletNotConnectedValidator: Validator<ConnectionContext> = createV
 	validate: (ctx) => ctx.isConnected,
 });
 
-export const walletLoadingValidator: Validator<ConnectionContext> = createValidator({
+export const walletLoadingValidator: Validator<HasWalletLoading> = createValidator({
 	id: "wallet-loading",
 	code: "CONN_002",
 	category: "connection",
@@ -26,7 +35,7 @@ export const walletLoadingValidator: Validator<ConnectionContext> = createValida
 	validate: (ctx) => !ctx.isWalletLoading,
 });
 
-export const signerNotReadyValidator: Validator<ConnectionContext> = createValidator({
+export const signerNotReadyValidator: Validator<HasReadyToTrade> = createValidator({
 	id: "signer-not-ready",
 	code: "CONN_003",
 	category: "connection",
