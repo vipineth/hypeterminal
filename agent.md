@@ -139,7 +139,10 @@ const result = Big(price).times(quantity).toFixed(2);
 
 - TypeScript strict mode enabled
 - Biome for linting and formatting
-- Pre-commit hooks via Lefthook
+- Pre-commit hooks via Lefthook:
+  - `biome` - Auto-fixes imports and formatting on staged files
+  - `lingui-extract` - Extracts i18n strings
+  - `commitlint` - Validates commit message format
 - Conventional commits enforced
 
 ## External Integrations
