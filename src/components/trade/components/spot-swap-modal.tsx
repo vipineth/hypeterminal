@@ -302,7 +302,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 						<span className="tabular-nums">{DEFAULT_SLIPPAGE_BPS / 100}%</span>
 					</div>
 
-					{insufficientBalance && (
+					{insufficientBalance && !showSuccess && (
 						<div className="flex items-start gap-2 p-2.5 bg-warning/10 border border-warning/20 rounded-sm">
 							<AlertTriangle className="size-3.5 text-warning shrink-0 mt-0.5" />
 							<p className="text-xs text-warning">
@@ -313,7 +313,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 						</div>
 					)}
 
-					{noPairAvailable && (
+					{noPairAvailable && !showSuccess && (
 						<div className="flex items-start gap-2 p-2.5 bg-warning/10 border border-warning/20 rounded-sm">
 							<AlertTriangle className="size-3.5 text-warning shrink-0 mt-0.5" />
 							<p className="text-xs text-warning">
@@ -324,7 +324,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 						</div>
 					)}
 
-					{error && (
+					{error && !showSuccess && (
 						<div className="flex items-center gap-2 p-2.5 bg-negative/10 border border-negative/20 rounded-sm text-xs text-negative">
 							<AlertTriangle className="size-3.5 shrink-0" />
 							<span className="flex-1">{error}</span>
