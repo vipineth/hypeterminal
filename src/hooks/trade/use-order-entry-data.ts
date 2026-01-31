@@ -10,11 +10,9 @@ import { useAssetLeverage } from "./use-asset-leverage";
 interface OrderEntryData extends OrderEntryDerived {
 	isConnected: boolean;
 
-	// Functions
 	getSizeForPercent: (pct: number) => string;
 	convertSizeForModeToggle: () => string;
 
-	// Leverage & margin
 	leverage: number;
 	marginMode: "cross" | "isolated";
 	hasPosition: boolean;
@@ -24,8 +22,6 @@ interface OrderEntryData extends OrderEntryDerived {
 	isOnlyIsolated: boolean;
 	allowsCrossMargin: boolean;
 	maxTradeSzs: [number, number] | null;
-	availableToBuy: number | null;
-	availableToSell: number | null;
 }
 
 interface UseOrderEntryDataOptions {
@@ -44,12 +40,11 @@ export function useOrderEntryData({
 	sizeInput,
 }: UseOrderEntryDataOptions): OrderEntryData {
 	const { isConnected } = useConnection();
-	const { perpSummary, spotBalances } = useAccountBalances();
+	const { spotBalances } = useAccountBalances();
 	const {
 		displayLeverage: leverage,
-		availableToSell,
-		availableToBuy,
 		maxTradeSzs,
+		availableToTrade,
 		marginMode,
 		hasPosition,
 		switchMarginMode,
@@ -71,24 +66,10 @@ export function useOrderEntryData({
 				sizeMode,
 				sizeInput,
 				spotBalances,
-				perpSummary,
 				maxTradeSzs,
-				availableToBuy,
-				availableToSell,
+				availableToTrade,
 			}),
-		[
-			isConnected,
-			market,
-			side,
-			conversionPrice,
-			sizeMode,
-			sizeInput,
-			spotBalances,
-			perpSummary,
-			maxTradeSzs,
-			availableToBuy,
-			availableToSell,
-		],
+		[isConnected, market, side, conversionPrice, sizeMode, sizeInput, spotBalances, maxTradeSzs, availableToTrade],
 	);
 
 	const getSizeForPercent = useCallback(
@@ -131,7 +112,5 @@ export function useOrderEntryData({
 		isOnlyIsolated,
 		allowsCrossMargin,
 		maxTradeSzs,
-		availableToBuy,
-		availableToSell,
 	};
 }

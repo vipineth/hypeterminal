@@ -13,8 +13,8 @@ export const LAYOUT_PRESETS = {
 	},
 	MARKET_INFO: {
 		storageKey: "terminal:layout:chart-book",
-		fallbackSizes: [80, 20] as const,
-		defaultSizes: [80, 20] as const,
+		fallbackSizes: [76, 24] as const,
+		defaultSizes: [76, 24] as const,
 	},
 } as const;
 

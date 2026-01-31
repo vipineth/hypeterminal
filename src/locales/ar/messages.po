@@ -1153,12 +1153,16 @@ msgid "pending"
 msgstr "قيد الانتظار"
 
 #: src/components/trade/positions/balances-tab.tsx
-msgid "perp"
-msgstr "دائم"
+#~ msgid "perp"
+#~ msgstr "دائم"
 
 #: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
 msgid "Perp"
+msgstr ""
+
+#: src/components/trade/positions/balances-tab.tsx
+msgid "Perpetuals"
 msgstr ""
 
 #: src/components/trade/order-entry/account-panel.tsx
@@ -1175,6 +1179,7 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "PNL"
@@ -1531,11 +1536,12 @@ msgid "Sorted by {0}"
 msgstr "مرتب حسب {0}"
 
 #: src/components/trade/positions/balances-tab.tsx
-msgid "spot"
-msgstr "فوري"
+#~ msgid "spot"
+#~ msgstr "فوري"
 
 #: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
 msgid "Spot"

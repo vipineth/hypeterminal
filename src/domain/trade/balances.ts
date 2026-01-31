@@ -1,4 +1,5 @@
 import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
+import type { SpotBalance } from "@/hooks/trade/use-account-balances";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 import { parseNumberOrZero } from "@/lib/trade/numbers";
 import type { Side } from "@/lib/trade/types";
@@ -17,24 +18,10 @@ export function getMarketQuoteToken(market: UnifiedMarketInfo | undefined): stri
 	return DEFAULT_QUOTE_TOKEN;
 }
 
-export interface SpotBalanceLike {
-	coin: string;
-	total?: string;
-	hold?: string;
-	entryNtl?: string;
-}
-
-export interface PerpSummaryLike {
-	accountValue?: string | number | null;
-	totalMarginUsed?: string | number | null;
-}
-
 export interface SpotBalanceData {
 	baseAvailable: number;
 	quoteAvailable: number;
-	/** Token name (API identifier) - use for balance lookups, e.g., "USDT0", "UBTC" */
 	baseName: string;
-	/** Token name (API identifier) - use for balance lookups */
 	quoteName: string;
 }
 
@@ -45,9 +32,10 @@ export interface BalanceRow {
 	inOrder: string;
 	total: string;
 	usdValue: string;
+	entryNtl: string;
 }
 
-export function getSpotBalance(balances: SpotBalanceLike[] | null | undefined, coin: string): SpotBalanceLike | null {
+export function getSpotBalance(balances: SpotBalance[] | null | undefined, coin: string): SpotBalance | null {
 	if (!balances?.length) return null;
 	return balances.find((balance) => balance.coin === coin) ?? null;
 }
@@ -56,22 +44,18 @@ export function getPerpAvailable(
 	accountValue: string | number | null | undefined,
 	marginUsed: string | number | null | undefined,
 ): number {
-	const account = parseNumberOrZero(accountValue);
-	const margin = parseNumberOrZero(marginUsed);
-	return Math.max(0, account - margin);
+	return Math.max(0, parseNumberOrZero(accountValue) - parseNumberOrZero(marginUsed));
 }
 
 export function getAvailableFromTotals(
 	total: string | number | null | undefined,
 	hold: string | number | null | undefined,
 ): number {
-	const totalValue = parseNumberOrZero(total);
-	const holdValue = parseNumberOrZero(hold);
-	return Math.max(0, totalValue - holdValue);
+	return Math.max(0, parseNumberOrZero(total) - parseNumberOrZero(hold));
 }
 
 export function getSpotBalanceData(
-	spotBalances: SpotBalanceLike[] | null | undefined,
+	spotBalances: SpotBalance[] | null | undefined,
 	market: UnifiedMarketInfo | undefined,
 ): SpotBalanceData {
 	const quoteName = getMarketQuoteToken(market);
@@ -106,23 +90,6 @@ export function getSpotBalanceData(
 	return { baseAvailable: 0, quoteAvailable: 0, baseName: "", quoteName };
 }
 
-export function getAvailableBalance(
-	market: UnifiedMarketInfo | undefined,
-	side: Side,
-	spotBalance: SpotBalanceData,
-	perpAvailable: number,
-): number {
-	if (market?.kind === "spot") {
-		return side === "buy" ? spotBalance.quoteAvailable : spotBalance.baseAvailable;
-	}
-
-	if (market?.kind === "builderPerp") {
-		return spotBalance.quoteAvailable;
-	}
-
-	return perpAvailable;
-}
-
 export function getAvailableBalanceToken(market: UnifiedMarketInfo | undefined, side: Side): string {
 	if (market?.kind === "spot") {
 		const token = side === "sell" ? market.tokensInfo?.[0] : market.tokensInfo?.[1];
@@ -134,43 +101,46 @@ export function getAvailableBalanceToken(market: UnifiedMarketInfo | undefined, 
 	return DEFAULT_QUOTE_TOKEN;
 }
 
+interface PerpSummary {
+	accountValue?: string | number | null;
+	totalMarginUsed?: string | number | null;
+}
+
 export function getBalanceRows(
-	perpSummary: PerpSummaryLike | null | undefined,
-	spotBalances: SpotBalanceLike[] | null | undefined,
+	perpSummary: PerpSummary | null | undefined,
+	spotBalances: SpotBalance[] | null | undefined,
 ): BalanceRow[] {
 	const rows: BalanceRow[] = [];
-	const balances = spotBalances ?? [];
 
 	const perpAccountValue = parseNumberOrZero(perpSummary?.accountValue);
-	const perpAvailable = getPerpAvailable(perpSummary?.accountValue, perpSummary?.totalMarginUsed);
-
 	if (perpAccountValue > 0) {
 		rows.push({
 			asset: DEFAULT_QUOTE_TOKEN,
 			type: "perp",
-			available: String(perpAvailable),
+			available: String(getPerpAvailable(perpSummary?.accountValue, perpSummary?.totalMarginUsed)),
 			inOrder: perpSummary?.totalMarginUsed?.toString() ?? "0",
 			total: perpSummary?.accountValue?.toString() ?? "0",
 			usdValue: perpSummary?.accountValue?.toString() ?? "0",
+			entryNtl: perpSummary?.accountValue?.toString() ?? "0",
 		});
 	}
 
-	for (const balance of balances) {
-		const totalValue = balance.total ?? "0";
-		const holdValue = balance.hold ?? "0";
-		const entryValue = balance.entryNtl ?? "0";
-		const total = parseNumberOrZero(totalValue);
+	for (const balance of spotBalances ?? []) {
+		const total = parseNumberOrZero(balance.total);
 		if (total === 0) continue;
-		const available = getAvailableFromTotals(totalValue, holdValue);
-		const usdValue = balance.coin === DEFAULT_QUOTE_TOKEN ? totalValue : entryValue;
+
+		const available = getAvailableFromTotals(balance.total, balance.hold);
+		const entryNtl = balance.entryNtl ?? "0";
+		const usdValue = balance.coin === DEFAULT_QUOTE_TOKEN ? balance.total : entryNtl;
 
 		rows.push({
 			asset: balance.coin,
 			type: "spot",
 			available: String(available),
-			inOrder: holdValue,
-			total: totalValue,
+			inOrder: balance.hold ?? "0",
+			total: balance.total ?? "0",
 			usdValue,
+			entryNtl,
 		});
 	}
 

@@ -16,7 +16,9 @@ import {
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken, formatUSD } from "@/lib/format";
+import { useSubAllMids } from "@/lib/hyperliquid/hooks/subscription";
 import { useSpotTokens } from "@/lib/hyperliquid/markets/use-spot-tokens";
+import { parseNumberOrZero } from "@/lib/trade/numbers";
 import { useSwapModalActions } from "@/stores/use-global-modal-store";
 import { useGlobalSettingsActions, useHideSmallBalances } from "@/stores/use-global-settings-store";
 import { AssetDisplay } from "../components/asset-display";
@@ -66,13 +68,33 @@ export function BalancesTab() {
 	});
 
 	const { perpSummary, spotBalances, isLoading, hasError } = useAccountBalances();
+	const { data: allMidsEvent } = useSubAllMids({ dex: "ALL_DEXS" }, { enabled: isConnected });
+	const mids = allMidsEvent?.mids;
 
 	const balances = useMemo(() => getBalanceRows(perpSummary, spotBalances), [perpSummary, spotBalances]);
+
+	function getPnl(row: BalanceRow): { pnl: number; pnlPercent: number } | null {
+		if (row.type === "perp") return null;
+		const entryNtl = parseNumberOrZero(row.entryNtl);
+		if (entryNtl === 0) return null;
+
+		const midPx = parseNumberOrZero(mids?.[row.asset]);
+		if (midPx === 0) return null;
+
+		const total = parseNumberOrZero(row.total);
+		const currentValue = total * midPx;
+		const pnl = currentValue - entryNtl;
+		const pnlPercent = (pnl / entryNtl) * 100;
+		return { pnl, pnlPercent };
+	}
 
 	const filteredBalances = useMemo(() => {
 		if (!hideSmallBalances) return balances;
 		return filterBalanceRowsByUsdValue(balances, SMALL_BALANCE_THRESHOLD);
 	}, [balances, hideSmallBalances]);
+
+	const perpBalances = useMemo(() => filteredBalances.filter((row) => row.type === "perp"), [filteredBalances]);
+	const spotBalancesFiltered = useMemo(() => filteredBalances.filter((row) => row.type === "spot"), [filteredBalances]);
 
 	const totalValue = useMemo(() => getTotalUsdValue(balances), [balances]);
 
@@ -91,6 +113,80 @@ export function BalancesTab() {
 			asset: row.asset,
 			accountType: row.type,
 		});
+	}
+
+	function renderBalanceRow(row: BalanceRow) {
+		const token = getToken(row.asset);
+		const decimals = token?.weiDecimals ?? 2;
+		const canTransfer = row.asset === DEFAULT_QUOTE_TOKEN && parseFloat(row.available) > 0;
+		const canSwap = row.type === "spot" && parseFloat(row.available) > 0;
+		const transferLabel = row.type === "perp" ? t`To Spot` : t`To Perp`;
+		const pnlData = getPnl(row);
+		return (
+			<TableRow key={`${row.type}-${row.asset}`} className="border-border/40 hover:bg-accent/30">
+				<TableCell className="text-2xs font-medium py-1.5">
+					<AssetDisplay asset={token ?? { displayName: row.asset, iconUrl: undefined }} />
+				</TableCell>
+				<TableCell className="text-2xs text-right tabular-nums py-1.5">
+					{formatToken(row.available, decimals)}
+				</TableCell>
+				<TableCell className="text-2xs text-right tabular-nums text-warning py-1.5">
+					{formatToken(row.inOrder, decimals)}
+				</TableCell>
+				<TableCell className="text-2xs text-right tabular-nums py-1.5">{formatToken(row.total, decimals)}</TableCell>
+				<TableCell className="text-2xs text-right tabular-nums text-positive py-1.5">
+					{formatUSD(row.usdValue, { compact: true })}
+				</TableCell>
+				<TableCell className="text-2xs text-right tabular-nums py-1.5">
+					{pnlData ? (
+						<span className={pnlData.pnl >= 0 ? "text-positive" : "text-negative"}>
+							{pnlData.pnl >= 0 ? "+" : ""}
+							{formatUSD(pnlData.pnl, { compact: true })} ({pnlData.pnlPercent >= 0 ? "+" : ""}
+							{pnlData.pnlPercent.toFixed(1)}%)
+						</span>
+					) : (
+						<span className="text-muted-fg">—</span>
+					)}
+				</TableCell>
+				<TableCell className="text-right py-1.5">
+					<div className="flex items-center justify-end gap-1">
+						{canTransfer && (
+							<Button
+								variant="ghost"
+								size="none"
+								onClick={() => handleTransferClick(row)}
+								className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
+							>
+								<ArrowLeftRight className="size-2.5" />
+								{transferLabel}
+							</Button>
+						)}
+						{canSwap && (
+							<Button
+								variant="ghost"
+								size="none"
+								onClick={() => openSwapModal(row.asset)}
+								className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
+							>
+								<ArrowDownUp className="size-2.5" />
+								{t`Swap`}
+							</Button>
+						)}
+						{parseFloat(row.available) > 0 && (
+							<Button
+								variant="ghost"
+								size="none"
+								onClick={() => handleSendClick(row)}
+								className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
+							>
+								<Send className="size-2.5" />
+								{t`Send`}
+							</Button>
+						)}
+					</div>
+				</TableCell>
+			</TableRow>
+		);
 	}
 
 	function renderPlaceholder() {
@@ -145,85 +241,41 @@ export function BalancesTab() {
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-[90px]">
 										{t`USD Value`}
 									</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-[100px]">
+										{t`PNL`}
+									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-[80px]">
 										{t`Actions`}
 									</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{filteredBalances.map((row) => {
-									const token = getToken(row.asset);
-									const decimals = token?.transferDecimals ?? 2;
-									const canTransfer = row.asset === DEFAULT_QUOTE_TOKEN && parseFloat(row.available) > 0;
-									const canSwap = row.type === "spot" && parseFloat(row.available) > 0;
-									const transferLabel = row.type === "perp" ? t`To Spot` : t`To Perp`;
-									return (
-										<TableRow key={`${row.type}-${row.asset}`} className="border-border/40 hover:bg-accent/30">
-											<TableCell className="text-2xs font-medium py-1.5">
-												<div className="flex items-center gap-1.5">
-													<AssetDisplay asset={token ?? { displayName: row.asset, iconUrl: undefined }} />
-													<span
-														className={cn(
-															"text-4xs px-1 py-0.5 uppercase",
-															row.type === "perp" ? "bg-highlight/20 text-highlight" : "bg-warning/20 text-warning",
-														)}
-													>
-														{row.type === "perp" ? t`perp` : t`spot`}
-													</span>
-												</div>
-											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums py-1.5">
-												{formatToken(row.available, decimals)}
-											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums text-warning py-1.5">
-												{formatToken(row.inOrder, decimals)}
-											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums py-1.5">
-												{formatToken(row.total, decimals)}
-											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums text-positive py-1.5">
-												{formatUSD(row.usdValue, { compact: true })}
-											</TableCell>
-											<TableCell className="text-right py-1.5">
-												<div className="flex items-center justify-end gap-1">
-													{canTransfer && (
-														<Button
-															variant="ghost"
-															size="none"
-															onClick={() => handleTransferClick(row)}
-															className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
-														>
-															<ArrowLeftRight className="size-2.5" />
-															{transferLabel}
-														</Button>
-													)}
-													{canSwap && (
-														<Button
-															variant="ghost"
-															size="none"
-															onClick={() => openSwapModal(row.asset)}
-															className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
-														>
-															<ArrowDownUp className="size-2.5" />
-															{t`Swap`}
-														</Button>
-													)}
-													{parseFloat(row.available) > 0 && (
-														<Button
-															variant="ghost"
-															size="none"
-															onClick={() => handleSendClick(row)}
-															className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
-														>
-															<Send className="size-2.5" />
-															{t`Send`}
-														</Button>
-													)}
-												</div>
+								{perpBalances.length > 0 && (
+									<>
+										<TableRow className="border-border/40 hover:bg-transparent">
+											<TableCell
+												colSpan={7}
+												className="text-3xs uppercase tracking-wider text-highlight/80 bg-highlight/5 py-1 font-medium"
+											>
+												{t`Perpetuals`}
 											</TableCell>
 										</TableRow>
-									);
-								})}
+										{perpBalances.map((row) => renderBalanceRow(row))}
+									</>
+								)}
+								{spotBalancesFiltered.length > 0 && (
+									<>
+										<TableRow className="border-border/40 hover:bg-transparent">
+											<TableCell
+												colSpan={7}
+												className="text-3xs uppercase tracking-wider text-warning/80 bg-warning/5 py-1 font-medium"
+											>
+												{t`Spot`}
+											</TableCell>
+										</TableRow>
+										{spotBalancesFiltered.map((row) => renderBalanceRow(row))}
+									</>
+								)}
 							</TableBody>
 						</Table>
 						<ScrollBar orientation="horizontal" />
