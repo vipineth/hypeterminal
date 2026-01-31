@@ -2,12 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
 	clampInt,
 	floorToDecimals,
-	formatDecimal,
 	formatDecimalFloor,
 	parseNumber,
-	parseNumberOr,
 	parseNumberOrZero,
-	parsePositiveDecimalInput,
 	toFiniteNumber,
 } from "@/lib/trade/numbers";
 
@@ -22,8 +19,7 @@ describe("trade numbers", () => {
 	});
 
 	it("parses numbers with fallbacks", () => {
-		expect(parseNumberOr("2.5", 0)).toBe(2.5);
-		expect(parseNumberOr("nope", 7)).toBe(7);
+		expect(parseNumberOrZero("2.5")).toBe(2.5);
 		expect(parseNumberOrZero("nope")).toBe(0);
 	});
 
@@ -40,19 +36,8 @@ describe("trade numbers", () => {
 		expect(clampInt(10, 1, 5)).toBe(5);
 	});
 
-	it("formats decimals and floors correctly", () => {
-		expect(formatDecimal(1.23456, 2)).toBe("1.23");
-		expect(formatDecimal(1.0, 2)).toBe("1");
+	it("floors decimals correctly", () => {
 		expect(floorToDecimals(1.239, 2)).toBe(1.23);
 		expect(formatDecimalFloor(1.239, 2)).toBe("1.23");
-	});
-
-	it("parses positive decimal inputs", () => {
-		expect(parsePositiveDecimalInput("1")).toBe(1);
-		expect(parsePositiveDecimalInput("1.25")).toBe(1.25);
-		expect(parsePositiveDecimalInput("1.")).toBe(1);
-		expect(parsePositiveDecimalInput("0")).toBeNull();
-		expect(parsePositiveDecimalInput("-1")).toBeNull();
-		expect(parsePositiveDecimalInput("1e3")).toBeNull();
 	});
 });

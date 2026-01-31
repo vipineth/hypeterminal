@@ -21,23 +21,11 @@ export function toBig(value: unknown): Big | null {
 	}
 }
 
-export function toBigOrZero(value: unknown): Big {
-	return toBig(value) ?? new Big(0);
-}
-
 export function toNumber(value: unknown): number | null {
 	const big = toBig(value);
 	if (!big) return null;
 	const num = big.toNumber();
 	return Number.isFinite(num) ? num : null;
-}
-
-export function toNumberOrNaN(value: unknown): number {
-	return toNumber(value) ?? Number.NaN;
-}
-
-export function toNumberOr(value: unknown, fallback: number): number {
-	return toNumber(value) ?? fallback;
 }
 
 export function toNumberOrZero(value: unknown): number {
@@ -49,25 +37,8 @@ export function isPositive(value: unknown): value is number {
 	return num !== null && num > 0;
 }
 
-export function isNonNegative(value: unknown): value is number {
-	const num = toNumber(value);
-	return num !== null && num >= 0;
-}
-
-export function isValidPrice(value: unknown): value is number {
-	return isPositive(value);
-}
-
-export function isValidSize(value: unknown): value is number {
-	return isPositive(value);
-}
-
 export function parseNumber(value: unknown): number {
-	return toNumberOrNaN(value);
-}
-
-export function parseNumberOr(value: unknown, fallback: number): number {
-	return toNumberOr(value, fallback);
+	return toNumber(value) ?? Number.NaN;
 }
 
 export function parseNumberOrZero(value: unknown): number {
@@ -95,12 +66,6 @@ export function toFixed(value: unknown, decimals: number): string {
 	return big.toFixed(decimals);
 }
 
-export function toFixedTrimmed(value: unknown, maxDecimals: number): string {
-	const big = toBig(value);
-	if (!big) return "0";
-	return big.toFixed(maxDecimals).replace(/\.?0+$/, "");
-}
-
 export function floor(value: unknown, decimals: number): number | null {
 	const big = toBig(value);
 	if (!big) return null;
@@ -109,27 +74,10 @@ export function floor(value: unknown, decimals: number): number | null {
 	return floored.toNumber();
 }
 
-export function ceil(value: unknown, decimals: number): number | null {
-	const big = toBig(value);
-	if (!big) return null;
-	const factor = new Big(10).pow(decimals);
-	const ceiled = big.times(factor).round(0, Big.roundUp).div(factor);
-	return ceiled.toNumber();
-}
-
 export function floorToString(value: unknown, decimals: number): string {
 	const floored = floor(value, decimals);
 	if (floored === null) return "0";
 	return new Big(floored).toFixed(decimals);
-}
-
-export function parsePositiveDecimalInput(input: string): number | null {
-	const trimmed = input.trim();
-	if (!trimmed) return null;
-	if (!/^\d+(?:\.\d*)?$/.test(trimmed)) return null;
-	const big = toBig(trimmed);
-	if (!big || big.lte(0)) return null;
-	return big.toNumber();
 }
 
 export const calc = {
@@ -227,10 +175,6 @@ export const calc = {
 		return bigPrice.times(multiplier).toNumber();
 	},
 };
-
-export function formatDecimal(value: number, maxDecimals: number): string {
-	return toFixedTrimmed(value, maxDecimals);
-}
 
 export function floorToDecimals(value: number, maxDecimals: number): number {
 	return floor(value, maxDecimals) ?? Number.NaN;
