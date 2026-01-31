@@ -1,8 +1,9 @@
 import { getCoreRowModel, type Row, type SortingState, useReactTable } from "@tanstack/react-table";
 import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
+import Big from "big.js";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { useMarketsInfo } from "@/lib/hyperliquid";
 import { isTokenInCategory, type MarketCategory } from "@/domain/market";
+import { useMarketsInfo } from "@/lib/hyperliquid";
 import { useFavoriteMarkets, useMarketActions } from "@/stores/use-market-store";
 import { type MarketRow, type MarketScope, TOKEN_SELECTOR_COLUMNS } from "./constants";
 
@@ -43,23 +44,26 @@ function getBaseCoin(market: MarketRow): string {
 	return market.displayName.split("-")[0] ?? market.displayName;
 }
 
-function getSortValue(market: MarketRow, columnId: string): number {
+function getSortValue(market: MarketRow, columnId: string): string {
 	switch (columnId) {
 		case "price":
-			return market.markPx ?? 0;
+			return market.markPx?.toString() ?? "0";
 		case "24h-change": {
 			const { markPx, prevDayPx } = market;
-			if (!markPx || !prevDayPx || prevDayPx === 0) return 0;
-			return ((markPx - prevDayPx) / prevDayPx) * 100;
+			if (!markPx || !prevDayPx || prevDayPx === 0) return "0";
+			return Big(markPx).minus(prevDayPx).div(prevDayPx).times(100).toString();
 		}
-		case "oi":
-			return (market.openInterest ?? 0) * (market.markPx ?? 0);
+		case "oi": {
+			const oi = market.openInterest ?? 0;
+			const px = market.markPx ?? 0;
+			return Big(oi).times(px).toString();
+		}
 		case "volume":
-			return market.dayNtlVlm ?? 0;
+			return market.dayNtlVlm?.toString() ?? "0";
 		case "funding":
-			return market.funding ?? 0;
+			return market.funding?.toString() ?? "0";
 		default:
-			return 0;
+			return "0";
 	}
 }
 
@@ -108,7 +112,10 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 					quoteTokens.set(quoteToken.name, quoteToken.displayName);
 				}
 			}
-			return [{ value: "all", label: "All" }, ...Array.from(quoteTokens.entries()).map(([name, displayName]) => ({ value: name, label: displayName }))];
+			return [
+				{ value: "all", label: "All" },
+				...Array.from(quoteTokens.entries()).map(([name, displayName]) => ({ value: name, label: displayName })),
+			];
 		}
 
 		if (scope === "hip3") {
@@ -158,8 +165,8 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 			if (sorting.length === 0) return section;
 			const { id, desc } = sorting[0];
 			return [...section].sort((a, b) => {
-				const diff = getSortValue(a, id) - getSortValue(b, id);
-				return desc ? -diff : diff;
+				const cmp = Big(getSortValue(a, id)).cmp(Big(getSortValue(b, id)));
+				return desc ? -cmp : cmp;
 			});
 		}
 

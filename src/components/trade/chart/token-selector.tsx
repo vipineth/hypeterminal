@@ -204,7 +204,6 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 								{virtualItems.map((virtualItem) => {
 									const row = rows[virtualItem.index];
 									const market = row.original;
-									const isFundingPositive = (market.funding ?? 0) >= 0;
 									const isSelected = selectedMarket?.name === market.name;
 									const isFav = isFavorite(market.name);
 
