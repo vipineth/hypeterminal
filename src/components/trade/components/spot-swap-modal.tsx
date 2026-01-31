@@ -36,13 +36,7 @@ export function SpotSwapModal() {
 
 	if (!isOpen) return null;
 
-	return (
-		<SpotSwapModalContent
-			initialFromToken={initialFromToken}
-			initialToToken={initialToToken}
-			onClose={close}
-		/>
-	);
+	return <SpotSwapModalContent initialFromToken={initialFromToken} initialToToken={initialToToken} onClose={close} />;
 }
 
 interface Props {
@@ -100,8 +94,10 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 	const baseToken = spotMarket?.tokensInfo[0]?.name ?? "";
 	const isBuying = spotMarket ? getSwapSide(fromToken, spotMarket) : false;
 
-	const fromTokenInfo = availableFromTokens.find((t) => t.name === fromToken) ?? spotMarket?.tokensInfo.find((t) => t.name === fromToken);
-	const toTokenInfo = availableToTokens.find((t) => t.name === toToken) ?? spotMarket?.tokensInfo.find((t) => t.name === toToken);
+	const fromTokenInfo =
+		availableFromTokens.find((t) => t.name === fromToken) ?? spotMarket?.tokensInfo.find((t) => t.name === fromToken);
+	const toTokenInfo =
+		availableToTokens.find((t) => t.name === toToken) ?? spotMarket?.tokensInfo.find((t) => t.name === toToken);
 	const fromAsset = fromTokenInfo ?? { displayName: fromToken, iconUrl: undefined };
 	const toAsset = toTokenInfo ?? { displayName: toToken, iconUrl: undefined };
 
@@ -287,7 +283,8 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 						<span className="tabular-nums">
 							{rate > 0 ? (
 								<>
-									1 <AssetDisplay asset={fromAsset} hideIcon /> ≈ {formatToken(rate, 6)} <AssetDisplay asset={toAsset} hideIcon />
+									1 <AssetDisplay asset={fromAsset} hideIcon /> ≈ {formatToken(rate, 6)}{" "}
+									<AssetDisplay asset={toAsset} hideIcon />
 								</>
 							) : (
 								"-"
@@ -318,7 +315,8 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 							<AlertTriangle className="size-3.5 text-warning shrink-0 mt-0.5" />
 							<p className="text-xs text-warning">
 								<Trans>
-									No trading pair available for <AssetDisplay asset={fromAsset} hideIcon />/<AssetDisplay asset={toAsset} hideIcon />
+									No trading pair available for <AssetDisplay asset={fromAsset} hideIcon />/
+									<AssetDisplay asset={toAsset} hideIcon />
 								</Trans>
 							</p>
 						</div>
@@ -332,9 +330,15 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 					)}
 
 					{showSuccess && (
-						<div className="flex items-center justify-center gap-2 p-2.5 bg-positive/10 border border-positive/20 rounded-sm text-xs text-positive">
-							<Check className="size-3.5" />
-							<Trans>Swap submitted</Trans>
+						<div className="flex flex-col items-center gap-1.5 p-3 bg-positive/10 border border-positive/20 rounded-sm text-positive">
+							<div className="flex items-center gap-2 text-xs">
+								<Check className="size-3.5" />
+								<Trans>Swap submitted</Trans>
+							</div>
+							<div className="text-sm font-medium tabular-nums">
+								{amount} <AssetDisplay asset={fromAsset} hideIcon /> → ~{formatToken(estimatedReceive, 6)}{" "}
+								<AssetDisplay asset={toAsset} hideIcon />
+							</div>
 						</div>
 					)}
 
