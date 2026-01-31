@@ -8,14 +8,16 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
 import { type BalanceRow, getAvailableFromTotals, getPerpAvailable } from "@/domain/trade/balances";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken } from "@/lib/format";
-import { useMarkets } from "@/lib/hyperliquid";
+import { useSpotTokens } from "@/lib/hyperliquid/markets/use-spot-tokens";
 import { useExchangeSendAsset } from "@/lib/hyperliquid/hooks/exchange";
 import { useExchangeSpotSend } from "@/lib/hyperliquid/hooks/exchange/useExchangeSpotSend";
 import { floorToString, limitDecimalInput } from "@/lib/trade/numbers";
+import { AssetDisplay } from "../components/asset-display";
 
 type AccountType = "perp" | "spot";
 
@@ -26,14 +28,14 @@ interface Props {
 	initialAccountType?: AccountType;
 }
 
-export function SendDialog({ open, onOpenChange, initialAsset = "USDC", initialAccountType = "spot" }: Props) {
+export function SendDialog({ open, onOpenChange, initialAsset = DEFAULT_QUOTE_TOKEN, initialAccountType = "spot" }: Props) {
 	const [destination, setDestination] = useState("");
 	const [accountType, setAccountType] = useState<AccountType>(initialAccountType);
 	const [selectedToken, setSelectedToken] = useState(initialAsset);
 	const [amount, setAmount] = useState("");
 	const [error, setError] = useState<string | null>(null);
 
-	const markets = useMarkets();
+	const { getToken } = useSpotTokens();
 	const { mutateAsync: sendAsset, isPending: isSendAssetPending } = useExchangeSendAsset();
 	const { mutateAsync: spotSend, isPending: isSpotSendPending } = useExchangeSpotSend();
 	const { perpSummary, spotBalances } = useAccountBalances();
@@ -53,27 +55,24 @@ export function SendDialog({ open, onOpenChange, initialAsset = "USDC", initialA
 				available: String(getAvailableFromTotals(b.total, b.hold)),
 				inOrder: b.hold ?? "0",
 				total: b.total ?? "0",
-				usdValue: b.coin === "USDC" ? (b.total ?? "0") : (b.entryNtl ?? "0"),
+				usdValue: b.coin === DEFAULT_QUOTE_TOKEN ? (b.total ?? "0") : (b.entryNtl ?? "0"),
 			}));
 	}, [spotBalances]);
 
 	const tokenOptions = useMemo(() => {
 		if (accountType === "perp") {
-			return [{ value: "USDC", label: "USDC" }];
+			return [DEFAULT_QUOTE_TOKEN];
 		}
-		return availableSpotTokens.map((b) => ({
-			value: b.asset,
-			label: markets.tokenDisplayName(b.asset),
-		}));
-	}, [accountType, availableSpotTokens, markets]);
+		return availableSpotTokens.map((b) => b.asset);
+	}, [accountType, availableSpotTokens]);
 
-	const tokenInfo = useMemo(() => markets.token(selectedToken), [markets, selectedToken]);
+	const tokenInfo = useMemo(() => getToken(selectedToken), [getToken, selectedToken]);
 	const tokenId = useMemo(() => {
 		if (!tokenInfo) return "";
 		return `${tokenInfo.name}:${tokenInfo.tokenId}`;
 	}, [tokenInfo]);
 
-	const decimals = useMemo(() => markets.transferDecimals(selectedToken), [markets, selectedToken]);
+	const decimals = useMemo(() => getToken(selectedToken)?.transferDecimals ?? 2, [getToken, selectedToken]);
 
 	const availableBalance = useMemo(() => {
 		if (accountType === "perp") {
@@ -94,9 +93,9 @@ export function SendDialog({ open, onOpenChange, initialAsset = "USDC", initialA
 	function handleAccountTypeChange(value: AccountType) {
 		setAccountType(value);
 		if (value === "perp") {
-			setSelectedToken("USDC");
+			setSelectedToken(DEFAULT_QUOTE_TOKEN);
 		} else if (!availableSpotTokens.some((t) => t.asset === selectedToken)) {
-			setSelectedToken(availableSpotTokens[0]?.asset ?? "USDC");
+			setSelectedToken(availableSpotTokens[0]?.asset ?? DEFAULT_QUOTE_TOKEN);
 		}
 		setAmount("");
 	}
@@ -189,12 +188,12 @@ export function SendDialog({ open, onOpenChange, initialAsset = "USDC", initialA
 
 						<Select value={selectedToken} onValueChange={handleTokenChange}>
 							<SelectTrigger className="flex-1 h-10 bg-bg/50 border-border/60">
-								<SelectValue />
+								<AssetDisplay asset={getToken(selectedToken) ?? { displayName: selectedToken, iconUrl: undefined }} hideIcon />
 							</SelectTrigger>
 							<SelectContent>
-								{tokenOptions.map((opt) => (
-									<SelectItem key={opt.value} value={opt.value}>
-										{opt.label}
+								{tokenOptions.map((tokenName) => (
+									<SelectItem key={tokenName} value={tokenName}>
+										<AssetDisplay asset={getToken(tokenName) ?? { displayName: tokenName, iconUrl: undefined }} hideIcon />
 									</SelectItem>
 								))}
 							</SelectContent>

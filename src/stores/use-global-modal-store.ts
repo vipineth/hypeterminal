@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
 
 type DepositTab = "deposit" | "withdraw";
 
@@ -47,7 +48,7 @@ const useGlobalModalStore = create<GlobalModalState>((set) => {
 			close,
 		},
 		swapActions: {
-			open: (fromToken = "USDC", toToken) => set({ modal: { type: "swap", fromToken, toToken } }),
+			open: (fromToken = DEFAULT_QUOTE_TOKEN, toToken) => set({ modal: { type: "swap", fromToken, toToken } }),
 			close,
 		},
 	};

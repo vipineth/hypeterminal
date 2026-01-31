@@ -103,7 +103,7 @@ export function TwapTab() {
 									const avgPrice = calc.divide(order.state.executedNtl, order.state.executedSz);
 									const rawPct = calc.percentOf(executedSize, totalSize) ?? 0;
 									const progressPct = Math.max(0, Math.min(100, rawPct));
-									const szDecimals = markets.szDecimals(order.state.coin);
+									const szDecimals = markets.getSzDecimals(order.state.coin);
 									const status = order.status.status;
 									const statusLabel =
 										status === "activated"
@@ -129,9 +129,9 @@ export function TwapTab() {
 														variant="link"
 														size="none"
 														onClick={() => setSelectedMarket(order.state.coin)}
-														aria-label={t`Switch to ${markets.displayName(order.state.coin)} market`}
+														aria-label={t`Switch to ${markets.getMarket(order.state.coin)?.displayName ?? order.state.coin} market`}
 													>
-														{markets.displayName(order.state.coin)}
+														{markets.getMarket(order.state.coin)?.displayName ?? order.state.coin}
 													</Button>
 												</div>
 											</TableCell>

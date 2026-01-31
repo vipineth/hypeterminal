@@ -32,10 +32,11 @@ Only create helpers when logic is reused, complex, or significantly improves rea
 
 ## React Hooks
 
+- **React 19 Compiler**: Project uses React 19 with the compiler enabled. Don't add manual `useMemo`/`useCallback` for performance - the compiler handles memoization automatically.
 - **useEffect**: Only for side effects (subscriptions, DOM, external APIs). Never for derived state.
-- **useMemo**: For expensive calculations or referential equality. Don't over-memoize.
+- **useMemo**: Only for semantic purposes (e.g., referential equality for context values). Not needed for performance.
 - **useState**: Prefer primitives/indices over complex objects.
-- **useCallback**: Only when passing to memoized children.
+- **useCallback**: Only when semantically required. Not needed for performance.
 
 ## hl-react Subscriptions
 

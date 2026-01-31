@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+	DEFAULT_QUOTE_TOKEN,
 	FALLBACK_VALUE_PLACEHOLDER,
 	ORDER_MIN_NOTIONAL_USD,
 	ORDER_SIZE_PERCENT_STEPS,
@@ -25,7 +26,13 @@ import { buildOrders, formatSizeForOrder, throwIfResponseError } from "@/domain/
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatToken, szDecimalsToPriceDecimals } from "@/lib/format";
-import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo, useUserPositions } from "@/lib/hyperliquid";
+import {
+	useAgentRegistration,
+	useAgentStatus,
+	useSelectedMarketInfo,
+	useSpotTokens,
+	useUserPositions,
+} from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeTwapOrder";
 import type { MarginMode } from "@/lib/trade/margin-mode";
@@ -53,7 +60,7 @@ import {
 } from "@/lib/trade/order-types";
 import type { ActiveDialog, ButtonContent } from "@/lib/trade/types";
 import { useButtonContent } from "@/lib/trade/use-button-content";
-import { useOrderValidation } from "@/lib/trade/use-order-validation";
+import { perpInput, spotInput, useOrderValidation } from "@/lib/trade/use-order-validation";
 import { useDepositModalActions, useSettingsDialogActions, useSwapModalActions } from "@/stores/use-global-modal-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import {
@@ -124,6 +131,8 @@ export function OrderEntryPanel() {
 	const {
 		isSpotMarket,
 		baseToken,
+		quoteToken,
+		spotBalance,
 		capabilities,
 		availableBalance,
 		availableBalanceToken,
@@ -142,6 +151,9 @@ export function OrderEntryPanel() {
 		switchModeError,
 		szDecimals,
 	} = useOrderEntryData({ market, side, markPx, sizeMode, sizeInput });
+
+	const { getToken } = useSpotTokens();
+	const sizeModeToken = getToken(sizeModeLabel);
 
 	const { addOrder, updateOrder } = useOrderQueueActions();
 	const selectedPrice = useSelectedPrice();
@@ -205,7 +217,7 @@ export function OrderEntryPanel() {
 		if (!market || market.kind !== "builderPerp") return null;
 
 		const quoteToken = getMarketQuoteToken(market);
-		if (quoteToken === "USDC") return null;
+		if (quoteToken === DEFAULT_QUOTE_TOKEN) return null;
 
 		return quoteToken;
 	}, [market]);
@@ -252,7 +264,7 @@ export function OrderEntryPanel() {
 	const isReadyToTrade = isAgentReady;
 	const canApprove = !!walletClient && !!address;
 
-	const validation = useOrderValidation({
+	const baseInput = {
 		isConnected,
 		isWalletLoading,
 		availableBalance,
@@ -260,29 +272,41 @@ export function OrderEntryPanel() {
 		hasAssetIndex: typeof market?.assetId === "number",
 		needsAgentApproval,
 		isReadyToTrade,
-		orderType,
-		markPx,
 		price,
 		sizeValue,
 		orderValue,
-		maxSize,
 		side,
 		usesLimitPrice,
-		usesTriggerPrice,
-		triggerPriceNum,
-		stopOrder,
-		takeProfitOrder,
-		scaleOrder,
-		twapOrder,
-		scaleStartPriceNum,
-		scaleEndPriceNum,
-		scaleLevelsNum,
-		twapMinutesNum,
-		tpSlEnabled,
-		canUseTpSl,
-		tpPriceNum,
-		slPriceNum,
-	});
+	};
+
+	const validation = useOrderValidation(
+		isSpotMarket
+			? spotInput(baseInput, {
+					baseAvailable: spotBalance.baseAvailable,
+					quoteAvailable: spotBalance.quoteAvailable,
+					baseToken,
+					quoteToken,
+				})
+			: perpInput(baseInput, {
+					orderType,
+					markPx,
+					maxSize,
+					usesTriggerPrice,
+					triggerPriceNum,
+					stopOrder,
+					takeProfitOrder,
+					scaleOrder,
+					twapOrder,
+					scaleStartPriceNum,
+					scaleEndPriceNum,
+					scaleLevelsNum,
+					twapMinutesNum,
+					tpSlEnabled,
+					canUseTpSl,
+					tpPriceNum,
+					slPriceNum,
+				}),
+	);
 
 	const sizeHasError = (sizeValue > maxSize && maxSize > 0) || (orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD);
 
@@ -294,7 +318,7 @@ export function OrderEntryPanel() {
 	}
 
 	function handleSizeModeToggle() {
-		const newMode = sizeMode === "asset" ? "usd" : "asset";
+		const newMode = sizeMode === "base" ? "quote" : "base";
 		const convertedSize = convertSizeForModeToggle();
 		if (convertedSize) {
 			setHasUserSized(true);
@@ -458,7 +482,7 @@ export function OrderEntryPanel() {
 		if (!isConnected) return FALLBACK_VALUE_PLACEHOLDER;
 		const isBaseToken = isSpotMarket && side === "sell";
 		const decimals = isBaseToken ? szDecimals : 2;
-		return `${formatToken(availableBalance, decimals)} ${availableBalanceToken}`;
+		return formatToken(availableBalance, decimals);
 	}
 
 	return (
@@ -511,14 +535,14 @@ export function OrderEntryPanel() {
 					<div className="flex items-center justify-between text-muted-fg">
 						<span>{t`Available`}</span>
 						<div className="flex items-center gap-2">
-							<span className={cn("tabular-nums", getValueColorClass(availableBalance))}>
-								{formatAvailableBalance()}
+							<span className={cn("tabular-nums flex items-center gap-1", getValueColorClass(availableBalance))}>
+								{formatAvailableBalance()} {availableBalanceToken}
 							</span>
 							{isConnected && swapTargetToken && (
 								<Button
 									variant="link"
 									size="none"
-									onClick={() => openSwapModal("USDC", swapTargetToken)}
+									onClick={() => openSwapModal(DEFAULT_QUOTE_TOKEN, swapTargetToken)}
 									className="text-info text-4xs uppercase"
 								>
 									{t`Swap`}
@@ -558,7 +582,8 @@ export function OrderEntryPanel() {
 							aria-label={t`Toggle size mode`}
 							disabled={isFormDisabled}
 						>
-							{sizeModeLabel} <ArrowLeftRight className="size-2.5" />
+							<span className="text-4xs">{sizeModeLabel}</span>
+							<ArrowLeftRight className="size-2.5" />
 						</Button>
 						<NumberInput
 							placeholder="0.00"
@@ -634,7 +659,7 @@ export function OrderEntryPanel() {
 				{usesLimitPrice && (
 					<div className="space-y-1.5">
 						<div className="flex items-center justify-between">
-							<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Limit Price (USDC)`}</div>
+							<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Limit Price`}</div>
 							{markPx > 0 && (
 								<Button
 									variant="ghost"

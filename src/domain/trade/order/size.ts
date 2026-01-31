@@ -1,6 +1,6 @@
 import type { SpotBalanceData } from "@/domain/trade/balances";
 import { calc, floorToDecimals, formatDecimalFloor, parseNumberOrZero } from "@/lib/trade/numbers";
-import type { Side } from "@/lib/trade/types";
+import type { Side, SizeMode } from "@/lib/trade/types";
 
 interface MaxSizeInput {
 	isConnected: boolean;
@@ -25,7 +25,7 @@ interface OrderEntryMaxSizeInput {
 
 interface SizeValueInput {
 	sizeInput: string;
-	sizeMode: "asset" | "usd";
+	sizeMode: SizeMode;
 	price: number;
 	szDecimals: number;
 }
@@ -37,7 +37,7 @@ interface SizeValueResult {
 
 interface SizeValuesInput {
 	sizeInput: string;
-	sizeMode: "asset" | "usd";
+	sizeMode: SizeMode;
 	conversionPx: number;
 }
 
@@ -45,7 +45,7 @@ interface SizeForPercentInput {
 	pct: number;
 	isSpotMarket: boolean;
 	side: Side;
-	sizeMode: "asset" | "usd";
+	sizeMode: SizeMode;
 	price: number;
 	maxSize: number;
 	spotBalance: SpotBalanceData;
@@ -54,7 +54,7 @@ interface SizeForPercentInput {
 
 interface SizeModeToggleInput {
 	sizeValue: number;
-	sizeMode: "asset" | "usd";
+	sizeMode: SizeMode;
 	price: number;
 	szDecimals: number;
 }
@@ -104,7 +104,7 @@ export function getSizeValueFromInput(input: SizeValueInput): number {
 	const inputValue = parseNumberOrZero(input.sizeInput);
 	if (inputValue <= 0) return 0;
 
-	if (input.sizeMode === "usd") {
+	if (input.sizeMode === "quote") {
 		if (input.price <= 0) return 0;
 		const convertedValue = calc.divide(inputValue, input.price);
 		if (convertedValue === null || !Number.isFinite(convertedValue)) return 0;
@@ -123,7 +123,7 @@ export function getOrderValue(sizeValue: number, price: number): number {
 export function getSizeValues(input: SizeValuesInput): SizeValueResult {
 	const sizeInputValue = parseNumberOrZero(input.sizeInput);
 	const sizeValue =
-		input.sizeMode === "usd" && input.conversionPx > 0
+		input.sizeMode === "quote" && input.conversionPx > 0
 			? (calc.divide(sizeInputValue, input.conversionPx) ?? 0)
 			: sizeInputValue;
 	return { sizeInputValue, sizeValue };
@@ -132,19 +132,19 @@ export function getSizeValues(input: SizeValuesInput): SizeValueResult {
 export function getSizeForPercent(input: SizeForPercentInput): string {
 	if (input.isSpotMarket) {
 		if (input.side === "buy") {
-			if (input.sizeMode === "usd") {
-				const usdAmount = (input.spotBalance.quoteAvailable * input.pct) / 100;
-				return usdAmount.toFixed(2);
+			if (input.sizeMode === "quote") {
+				const quoteAmount = (input.spotBalance.quoteAvailable * input.pct) / 100;
+				return quoteAmount.toFixed(2);
 			}
 			const tokenAmount = (input.maxSize * input.pct) / 100;
 			return formatSizeValue(tokenAmount, input.szDecimals);
 		}
 
-		if (input.sizeMode === "usd") {
+		if (input.sizeMode === "quote") {
 			if (input.price <= 0) return "";
 			const tokenAmount = (input.spotBalance.baseAvailable * input.pct) / 100;
-			const usdAmount = tokenAmount * input.price;
-			return usdAmount.toFixed(2);
+			const quoteAmount = tokenAmount * input.price;
+			return quoteAmount.toFixed(2);
 		}
 		const tokenAmount = (input.spotBalance.baseAvailable * input.pct) / 100;
 		return formatSizeValue(tokenAmount, input.szDecimals);
@@ -153,7 +153,7 @@ export function getSizeForPercent(input: SizeForPercentInput): string {
 	if (input.maxSize <= 0) return "";
 	const size = (input.maxSize * input.pct) / 100;
 
-	if (input.sizeMode === "usd") {
+	if (input.sizeMode === "quote") {
 		if (input.price <= 0) return "";
 		return (size * input.price).toFixed(2);
 	}
@@ -163,7 +163,7 @@ export function getSizeForPercent(input: SizeForPercentInput): string {
 export function getSizeValueForModeToggle(input: SizeModeToggleInput): string {
 	if (input.sizeValue <= 0 || input.price <= 0) return "";
 
-	if (input.sizeMode === "asset") {
+	if (input.sizeMode === "base") {
 		return (input.sizeValue * input.price).toFixed(2);
 	}
 	return formatSizeValue(input.sizeValue, input.szDecimals);

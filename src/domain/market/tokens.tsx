@@ -1,7 +1,7 @@
 import { TrendingUp, Zap } from "lucide-react";
 import { MARKET_CATEGORY_LABELS, TOKEN_ICON_BASE_URL } from "@/config/constants";
+import { PERP_MARKET_NAME_SEPARATOR, SPOT_MARKET_NAME_SEPARATOR } from "./display";
 import type { MarketKind } from "./types";
-import { PERP_NAME_SEPARATOR, SPOT_NAME_SEPARATOR } from "./display";
 
 interface RawToken {
 	name: string;
@@ -12,29 +12,43 @@ const ASSET_REPLACEMENTS: Record<string, string> = {
 	USDT0: "USDT",
 };
 
+const NO_SPOT_PREFIX_ASSETS: Record<string, string> = {
+	USDC: "USDC",
+};
+
 export function getUnderlyingAsset(token: RawToken): string | undefined {
-	if (token.fullName?.startsWith("Unit")) {
-		return token.name.replace("U", "");
+	if (ASSET_REPLACEMENTS[token.name]) {
+		return ASSET_REPLACEMENTS[token.name];
 	}
-	return ASSET_REPLACEMENTS[token.name] ?? token.name;
+	if (token.fullName?.startsWith("Unit") && token.name.startsWith("U")) {
+		return token.name.slice(1);
+	}
+	return token.name;
+}
+
+export function getTokenDisplayName(token: RawToken): string {
+	return getUnderlyingAsset(token) ?? token.name;
 }
 
 export function getIconUrlFromPair(tokenName: string, kind?: MarketKind) {
 	if (kind === "spot") {
-		const [base] = tokenName.split(SPOT_NAME_SEPARATOR);
+		const [base] = tokenName.split(SPOT_MARKET_NAME_SEPARATOR);
 		return `${TOKEN_ICON_BASE_URL}/${base}_spot.svg`;
 	}
 
 	if (kind === "perp" || kind === "builderPerp") {
-		const [base] = tokenName.split(PERP_NAME_SEPARATOR);
+		const [base] = tokenName.split(PERP_MARKET_NAME_SEPARATOR);
 		return `${TOKEN_ICON_BASE_URL}/${base}.svg`;
 	}
 
 	return `${TOKEN_ICON_BASE_URL}/${tokenName}.svg`;
 }
 
-export function getIconUrlFromToken(tokenName: string, kind?: MarketKind) {
+export function getIconUrlFromMarketName(tokenName: string, kind?: MarketKind) {
 	if (kind === "spot") {
+		if (NO_SPOT_PREFIX_ASSETS[tokenName]) {
+			return `${TOKEN_ICON_BASE_URL}/${NO_SPOT_PREFIX_ASSETS[tokenName]}.svg`;
+		}
 		return `${TOKEN_ICON_BASE_URL}/${tokenName}_spot.svg`;
 	}
 	return `${TOKEN_ICON_BASE_URL}/${tokenName}.svg`;

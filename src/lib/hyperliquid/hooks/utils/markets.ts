@@ -1,5 +1,6 @@
-import { PERP_NAME_SEPARATOR, SPOT_NAME_SEPARATOR } from "@/domain/market";
+import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
 import type { MarketKind } from "@/domain/market";
+import { PERP_MARKET_NAME_SEPARATOR, SPOT_MARKET_NAME_SEPARATOR } from "@/domain/market";
 
 // Perp: 0-9999
 export function getPerpAssetId(index: number): number {
@@ -24,13 +25,13 @@ export function getBuilderPerpAssetId(dexIndex: number, assetIndex: number): num
 
 export function getBuilderPerpDisplayNameFromName(name: string, quoteToken?: string | null): string {
 	const baseName = name.includes(":") ? name.split(":")[1] : name;
-	return `${baseName}-${quoteToken ?? "USDC"}`;
+	return `${baseName}-${quoteToken ?? DEFAULT_QUOTE_TOKEN}`;
 }
 
 export function getSpotDisplayName(baseToken: string, quoteToken: string): string {
-	return `${baseToken}${SPOT_NAME_SEPARATOR}${quoteToken}`;
+	return `${baseToken}${SPOT_MARKET_NAME_SEPARATOR}${quoteToken}`;
 }
 
 export function getPerpDisplayName(name: string, quoteToken?: string): string {
-	return `${name}${PERP_NAME_SEPARATOR}${quoteToken ?? "USDC"}`;
+	return `${name}${PERP_MARKET_NAME_SEPARATOR}${quoteToken ?? DEFAULT_QUOTE_TOKEN}`;
 }

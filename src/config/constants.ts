@@ -22,6 +22,7 @@ export const ARBITRUM_CHAIN_ID_HEX = "0xa4b1" as const;
 export const DEFAULT_MARKET_KEY = "perp:BTC";
 export const DEFAULT_MARKET_NAME = "BTC";
 export const DEFAULT_MARKET_SCOPE = "perp" as const;
+export const DEFAULT_QUOTE_TOKEN = "USDC";
 
 export const ORDER_MIN_NOTIONAL_USD = 10;
 export const ORDER_FEE_RATE_TAKER = 0.00045;
@@ -113,7 +114,7 @@ export const CHART_DEFAULT_SYMBOL = "AAVE/USDC";
 export const CHART_DEFAULT_INTERVAL = "60";
 export const CHART_DEFAULT_THEME = "dark" as const;
 export const CHART_EXCHANGE = "Hyperliquid";
-export const CHART_QUOTE_ASSET = "USDC";
+export const CHART_QUOTE_ASSET = DEFAULT_QUOTE_TOKEN;
 export const CHART_SESSION = "24x7";
 export const CHART_TIMEZONE = "Etc/UTC";
 export const CHART_DEFAULT_PRICESCALE = 100;

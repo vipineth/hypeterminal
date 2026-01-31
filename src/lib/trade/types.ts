@@ -3,7 +3,7 @@
  */
 
 export type Side = "buy" | "sell";
-export type SizeMode = "asset" | "usd";
+export type SizeMode = "base" | "quote";
 
 export interface ValidationResult {
 	valid: boolean;

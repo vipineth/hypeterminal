@@ -26,7 +26,7 @@ export {
 	useMarketsInfo,
 	useSelectedMarketInfo,
 } from "./hooks/useMarketsInfo";
-export { type UseSpotTokensReturn, useSpotTokens } from "./hooks/useSpotTokens";
+export { type UseSpotTokensReturn, useSpotTokens } from "./markets/use-spot-tokens";
 export { useTradingGuard } from "./hooks/useTradingGuard";
 export { useHttpTransport, useSubscriptionTransport } from "./hooks/useTransport";
 // Legacy exports - deprecated, use useMarkets() instead

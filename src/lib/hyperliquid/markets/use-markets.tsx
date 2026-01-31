@@ -1,10 +1,151 @@
+import type { MetaResponse, PerpDexsResponse, SpotMetaResponse } from "@nktkas/hyperliquid";
 import { createContext, type ReactNode, useContext, useMemo } from "react";
+import { getIconUrlFromMarketName, getTokenDisplayName, getUnderlyingAsset } from "@/domain/market/tokens";
 import { useInfoAllPerpMetas } from "../hooks/info/useInfoAllPerpMetas";
 import { useInfoMeta } from "../hooks/info/useInfoMeta";
 import { useInfoPerpDexs } from "../hooks/info/useInfoPerpDexs";
 import { useInfoSpotMeta } from "../hooks/info/useInfoSpotMeta";
-import { createEmptyMarkets, createMarkets } from "./create-markets";
-import type { Markets } from "./types";
+import {
+	getBuilderPerpAssetId,
+	getBuilderPerpDisplayName,
+	getPerpAssetId,
+	getPerpDisplayName,
+	getSpotAssetId,
+	getSpotDisplayName,
+} from "./helper";
+import type { BuilderPerpMarket, Markets, PerpMarket, SpotMarket, SpotToken, UnifiedMarket } from "./types";
+
+interface CreateMarketsParams {
+	perpMeta: MetaResponse | undefined;
+	spotMeta: SpotMetaResponse | undefined;
+	allPerpMetas: MetaResponse[] | undefined;
+	perpDexs: PerpDexsResponse | undefined;
+	isLoading: boolean;
+	error: Error | null;
+}
+
+function createMarkets(params: CreateMarketsParams): Markets {
+	const { perpMeta, spotMeta, allPerpMetas, perpDexs, isLoading, error } = params;
+
+	const perpMarkets: PerpMarket[] = [];
+	if (perpMeta?.universe) {
+		for (let i = 0; i < perpMeta.universe.length; i++) {
+			const market = perpMeta.universe[i];
+			if (market.isDelisted) continue;
+			perpMarkets.push({
+				...market,
+				kind: "perp",
+				displayName: getPerpDisplayName(market.name),
+				assetId: getPerpAssetId(i),
+				ctxIndex: i,
+				iconUrl: getIconUrlFromMarketName(market.name, "perp"),
+			});
+		}
+	}
+
+	const spotMarkets: SpotMarket[] = [];
+	const spotTokens: SpotToken[] = (spotMeta?.tokens ?? []).map((token) => {
+		const displayName = getTokenDisplayName(token);
+		return {
+			...token,
+			displayName,
+			iconUrl: getIconUrlFromMarketName(getUnderlyingAsset(token) ?? token.name, "spot"),
+			transferDecimals: token.weiDecimals + (token.evmContract?.evm_extra_wei_decimals ?? 0),
+			isWrapped: displayName !== token.name,
+		};
+	});
+
+	if (spotMeta?.universe && spotTokens.length > 0) {
+		for (const pair of spotMeta.universe) {
+			const tokensInfo = pair.tokens.map((idx) => spotTokens[idx]).filter((t): t is SpotToken => !!t);
+
+			if (tokensInfo.length < 2) continue;
+
+			const [baseToken, quoteToken] = tokensInfo;
+			const displayName = getSpotDisplayName(baseToken.displayName, quoteToken.displayName);
+
+			spotMarkets.push({
+				...pair,
+				kind: "spot",
+				displayName,
+				assetId: getSpotAssetId(pair.index),
+				ctxIndex: pair.index,
+				tokensInfo,
+				szDecimals: baseToken.szDecimals,
+				iconUrl: getIconUrlFromMarketName(getUnderlyingAsset(baseToken) ?? baseToken.name, "spot"),
+			});
+		}
+	}
+
+	const builderPerpMarkets: BuilderPerpMarket[] = [];
+	if (allPerpMetas && perpDexs && allPerpMetas.length > 1) {
+		for (let dexIndex = 1; dexIndex < allPerpMetas.length; dexIndex++) {
+			const meta = allPerpMetas[dexIndex];
+			const dexInfo = perpDexs[dexIndex];
+			if (!meta || !dexInfo) continue;
+
+			const dexName = dexInfo.name;
+			const quoteToken = spotTokens[meta.collateralToken];
+
+			for (let assetIndex = 0; assetIndex < meta.universe.length; assetIndex++) {
+				const asset = meta.universe[assetIndex];
+				if (asset.isDelisted) continue;
+
+				builderPerpMarkets.push({
+					...asset,
+					kind: "builderPerp",
+					displayName: getBuilderPerpDisplayName(asset.name, quoteToken?.displayName),
+					assetId: getBuilderPerpAssetId(dexIndex, assetIndex),
+					dex: dexName,
+					dexIndex,
+					ctxIndex: assetIndex,
+					quoteToken,
+					iconUrl: getIconUrlFromMarketName(asset.name, "builderPerp"),
+				});
+			}
+		}
+	}
+
+	const allMarkets: UnifiedMarket[] = [...perpMarkets, ...spotMarkets, ...builderPerpMarkets];
+
+	const marketByName = new Map<string, UnifiedMarket>();
+	for (const market of allMarkets) {
+		marketByName.set(market.name, market);
+	}
+
+	return {
+		all: allMarkets,
+		perp: perpMarkets,
+		spot: spotMarkets,
+		builderPerp: builderPerpMarkets,
+		tokens: spotTokens,
+		isLoading,
+		error,
+
+		getMarket(coin: string): UnifiedMarket | undefined {
+			return marketByName.get(coin);
+		},
+
+		getSzDecimals(coin: string): number {
+			return marketByName.get(coin)?.szDecimals ?? 4;
+		},
+
+		getAssetId(coin: string): number | undefined {
+			return marketByName.get(coin)?.assetId;
+		},
+	};
+}
+
+function createEmptyMarkets(): Markets {
+	return createMarkets({
+		perpMeta: undefined,
+		spotMeta: undefined,
+		allPerpMetas: undefined,
+		perpDexs: undefined,
+		isLoading: true,
+		error: null,
+	});
+}
 
 const MarketsContext = createContext<Markets | null>(null);
 
@@ -53,7 +194,4 @@ export function useMarkets(): Markets {
 	return context;
 }
 
-export function useMarketsOptional(): Markets {
-	const context = useContext(MarketsContext);
-	return context ?? createEmptyMarkets();
-}
+export { createEmptyMarkets };

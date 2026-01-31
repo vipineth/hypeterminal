@@ -18,7 +18,7 @@ import type { Markets } from "@/lib/hyperliquid/markets";
 import { calc, getValueColorClass, isPositive, parseNumber } from "@/lib/trade/numbers";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useMarketActions } from "@/stores/use-market-store";
-import { TokenAvatar } from "../components/token-avatar";
+import { AssetDisplay } from "../components/asset-display";
 import { TradingActionButton } from "../components/trading-action-button";
 import { PositionTpSlModal } from "./position-tpsl-modal";
 
@@ -42,6 +42,8 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 
 interface TpSlPositionData {
 	coin: string;
+	displayName: string;
+	iconUrl: string | undefined;
 	assetId: number;
 	isLong: boolean;
 	size: number;
@@ -89,10 +91,12 @@ function PositionRow({
 	const size = parseNumber(p.szi);
 	const isLong = size > 0;
 	const absSize = Math.abs(size);
-	const assetId = markets.assetId(p.coin);
-	const szDecimals = markets.szDecimals(p.coin);
+	const market = markets.getMarket(p.coin);
+	const assetId = market?.assetId;
+	const szDecimals = market?.szDecimals ?? 4;
 	const markPx = parseNumber(markPxRaw);
-	const displayName = markets.displayName(p.coin);
+	const displayName = market?.displayName ?? p.coin;
+	const assetInfo = market ?? { displayName: p.coin, iconUrl: undefined };
 
 	const unrealizedPnl = parseNumber(p.unrealizedPnl);
 	const cumFunding = parseNumber(p.cumFunding.sinceOpen);
@@ -112,6 +116,8 @@ function PositionRow({
 		if (typeof assetId !== "number") return;
 		onOpenTpSl({
 			coin: p.coin,
+			displayName,
+			iconUrl: assetInfo.iconUrl,
 			assetId,
 			isLong,
 			size: absSize,
@@ -138,8 +144,7 @@ function PositionRow({
 						className="gap-1.5"
 						aria-label={t`Switch to ${displayName} market`}
 					>
-						<TokenAvatar symbol={displayName} />
-						<span>{displayName}</span>
+						<AssetDisplay asset={assetInfo} />
 					</Button>
 					<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideClass)}>
 						{isLong ? t`Long` : t`Short`}
@@ -386,7 +391,7 @@ export function PositionsTab() {
 										markPx={mids?.[p.coin]}
 										tpSlInfo={tpSlOrdersByCoin.get(p.coin)}
 										isClosing={isClosing}
-										isRowClosing={isClosing && closingKeyRef.current === `${markets.assetId(p.coin)}`}
+										isRowClosing={isClosing && closingKeyRef.current === `${markets.getAssetId(p.coin)}`}
 										onClose={handleClosePosition}
 										onOpenTpSl={handleOpenTpSlModal}
 										onSelectMarket={setSelectedMarket}

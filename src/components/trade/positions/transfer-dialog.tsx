@@ -6,11 +6,12 @@ import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NumberInput } from "@/components/ui/number-input";
+import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
 import { getAvailableFromTotals, getPerpAvailable } from "@/domain/trade/balances";
 import { getSpotBalance, useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken } from "@/lib/format";
-import { useMarkets } from "@/lib/hyperliquid";
+import { useSpotTokens } from "@/lib/hyperliquid/markets/use-spot-tokens";
 import { useExchangeSendAsset } from "@/lib/hyperliquid/hooks/exchange";
 import { floorToString, limitDecimalInput } from "@/lib/trade/numbers";
 
@@ -28,7 +29,7 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 	const [error, setError] = useState<string | null>(null);
 
 	const { address } = useConnection();
-	const markets = useMarkets();
+	const { getToken } = useSpotTokens();
 	const { mutateAsync: sendAsset, isPending } = useExchangeSendAsset();
 	const { perpSummary, spotBalances } = useAccountBalances();
 
@@ -38,16 +39,16 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 		}
 	}, [open, initialDirection]);
 
-	const usdcTokenInfo = useMemo(() => markets.token("USDC"), [markets]);
+	const usdcTokenInfo = useMemo(() => getToken(DEFAULT_QUOTE_TOKEN), [getToken]);
 	const usdcTokenId = useMemo(() => {
 		if (!usdcTokenInfo) return "";
 		const tokenId = usdcTokenInfo.tokenId;
 		return `${usdcTokenInfo.name}:${tokenId}`;
 	}, [usdcTokenInfo]);
 
-	const usdcDecimals = useMemo(() => markets.transferDecimals("USDC"), [markets]);
+	const usdcDecimals = useMemo(() => getToken(DEFAULT_QUOTE_TOKEN)?.transferDecimals ?? 2, [getToken]);
 
-	const spotUsdcBal = useMemo(() => getSpotBalance(spotBalances, "USDC"), [spotBalances]);
+	const spotUsdcBal = useMemo(() => getSpotBalance(spotBalances, DEFAULT_QUOTE_TOKEN), [spotBalances]);
 	const availableBalanceValue = useMemo(() => {
 		if (direction === "toSpot") {
 			return getPerpAvailable(perpSummary?.accountValue, perpSummary?.totalMarginUsed);

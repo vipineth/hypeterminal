@@ -21,7 +21,7 @@ import {
 	type OpenOrder,
 } from "@/lib/trade/open-orders";
 import { useMarketActions } from "@/stores/use-market-store";
-import { TokenAvatar } from "../components/token-avatar";
+import { AssetDisplay, type AssetInfo } from "../components/asset-display";
 
 interface PlaceholderProps {
 	children: React.ReactNode;
@@ -117,7 +117,7 @@ export function OrdersTab() {
 			if (isCancelling || ordersToCancel.length === 0) return;
 
 			const cancels = ordersToCancel.reduce<{ a: number; o: number }[]>((acc, order) => {
-				const assetId = markets.assetId(order.coin);
+				const assetId = markets.getAssetId(order.coin);
 				if (typeof assetId !== "number") return acc;
 				acc.push({ a: assetId, o: order.oid });
 				return acc;
@@ -237,12 +237,15 @@ export function OrdersTab() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{openOrders.map((order) => (
+								{openOrders.map((order) => {
+									const market = markets.getMarket(order.coin);
+									const assetInfo = market ?? { displayName: order.coin, iconUrl: undefined };
+									return (
 									<OrderRow
 										key={order.oid}
 										order={order}
-										displayCoin={markets.displayName(order.coin)}
-										szDecimals={markets.szDecimals(order.coin)}
+										assetInfo={assetInfo}
+										szDecimals={market?.szDecimals ?? 4}
 										isSelected={selectedOrderIds.has(order.oid)}
 										isCancelling={isCancelling}
 										canCancel={canCancel}
@@ -250,7 +253,8 @@ export function OrdersTab() {
 										onCancel={handleCancelOrders}
 										onSelectMarket={setSelectedMarket}
 									/>
-								))}
+								);
+								})}
 							</TableBody>
 						</Table>
 						<ScrollBar orientation="horizontal" />
@@ -263,7 +267,7 @@ export function OrdersTab() {
 
 interface OrderRowProps {
 	order: OpenOrder;
-	displayCoin: string;
+	assetInfo: AssetInfo;
 	szDecimals: number;
 	isSelected: boolean;
 	isCancelling: boolean;
@@ -275,7 +279,7 @@ interface OrderRowProps {
 
 function OrderRow({
 	order,
-	displayCoin,
+	assetInfo,
 	szDecimals,
 	isSelected,
 	isCancelling,
@@ -294,7 +298,7 @@ function OrderRow({
 				<Checkbox
 					checked={isSelected}
 					onCheckedChange={(value) => onToggle(order.oid, value)}
-					aria-label={`${t`Select order`} ${displayCoin}`}
+					aria-label={`${t`Select order`} ${order.coin}`}
 					disabled={isCancelling}
 				/>
 			</TableCell>
@@ -308,10 +312,9 @@ function OrderRow({
 						size="none"
 						onClick={() => onSelectMarket(order.coin)}
 						className="gap-1.5"
-						aria-label={t`Switch to ${displayCoin} market`}
+						aria-label={t`Switch to ${assetInfo.displayName} market`}
 					>
-						<TokenAvatar symbol={displayCoin} />
-						<span>{displayCoin}</span>
+						<AssetDisplay asset={assetInfo} />
 					</Button>
 					<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideConfig.class)}>{sideConfig.label}</span>
 				</div>
@@ -323,7 +326,7 @@ function OrderRow({
 				{formatUSD(order.limitPx, { compact: false })}
 			</TableCell>
 			<TableCell className="text-2xs text-right tabular-nums py-1.5">
-				{formatNumber(order.origSz, szDecimals)} {displayCoin}{" "}
+				{formatNumber(order.origSz, szDecimals)} {order.coin}{" "}
 				<span className="text-muted-fg">({formatUSD(getOrderValue(order), { compact: false })})</span>
 			</TableCell>
 			<TableCell className="text-2xs text-right tabular-nums py-1.5">

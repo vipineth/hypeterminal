@@ -1,16 +1,9 @@
+import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
 import type { SpotMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
+import type { SpotToken } from "@/lib/hyperliquid/markets/types";
 
-export interface SwapableToken {
-	name: string;
-	displayName: string;
-	szDecimals: number;
-}
-
-export function getAvailablePairTokens(
-	token: string,
-	spotMarkets: SpotMarketInfo[],
-): SwapableToken[] {
-	const tokenMap = new Map<string, SwapableToken>();
+export function getAvailablePairTokens(token: string, spotMarkets: SpotMarketInfo[]): SpotToken[] {
+	const tokenMap = new Map<string, SpotToken>();
 
 	for (const market of spotMarkets) {
 		if (market.tokensInfo.length < 2) continue;
@@ -18,30 +11,22 @@ export function getAvailablePairTokens(
 		const baseToken = market.tokensInfo[0];
 		const quoteToken = market.tokensInfo[1];
 
-		if (baseToken?.name === token && quoteToken?.name) {
+		if (baseToken?.name === token && quoteToken) {
 			if (!tokenMap.has(quoteToken.name)) {
-				tokenMap.set(quoteToken.name, {
-					name: quoteToken.name,
-					displayName: quoteToken.displayName,
-					szDecimals: quoteToken.szDecimals,
-				});
+				tokenMap.set(quoteToken.name, quoteToken);
 			}
 		}
 
-		if (quoteToken?.name === token && baseToken?.name) {
+		if (quoteToken?.name === token && baseToken) {
 			if (!tokenMap.has(baseToken.name)) {
-				tokenMap.set(baseToken.name, {
-					name: baseToken.name,
-					displayName: baseToken.displayName,
-					szDecimals: baseToken.szDecimals,
-				});
+				tokenMap.set(baseToken.name, baseToken);
 			}
 		}
 	}
 
 	return Array.from(tokenMap.values()).sort((a, b) => {
-		if (a.name === "USDC") return -1;
-		if (b.name === "USDC") return 1;
+		if (a.name === DEFAULT_QUOTE_TOKEN) return -1;
+		if (b.name === DEFAULT_QUOTE_TOKEN) return 1;
 		return a.displayName.localeCompare(b.displayName);
 	});
 }

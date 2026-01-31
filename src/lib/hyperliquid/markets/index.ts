@@ -8,4 +8,5 @@ export type {
 	SpotToken,
 	UnifiedMarket,
 } from "./types";
-export { MarketsProvider, useMarkets, useMarketsOptional } from "./use-markets";
+export { MarketsProvider, useMarkets } from "./use-markets";
+export { type UseSpotTokensReturn, useSpotTokens } from "./use-spot-tokens";

@@ -1,3 +1,4 @@
+import { getBaseQuoteFromDisplayName } from "@/domain/market";
 import {
 	getAvailableBalance,
 	getAvailableBalanceToken,
@@ -7,7 +8,7 @@ import {
 	type SpotBalanceData,
 	type SpotBalanceLike,
 } from "@/domain/trade/balances";
-import { getSideLabels, getSizeModeLabel, type SideLabels } from "@/domain/trade/order/labels";
+import { getSideLabels, getSizeModeLabel, type SideLabels, type SizeMode } from "@/domain/trade/order/labels";
 import { getMaxSizeForOrderEntry, getOrderValue, getSizeValueFromInput } from "@/domain/trade/order/size";
 import { getMarketCapabilities, type MarketCapabilities } from "@/lib/hyperliquid";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
@@ -18,7 +19,7 @@ export interface OrderEntryInputs {
 	market: UnifiedMarketInfo | undefined;
 	side: Side;
 	conversionPrice: number;
-	sizeMode: "asset" | "usd";
+	sizeMode: SizeMode;
 	sizeInput: string;
 	spotBalances: SpotBalanceLike[] | null | undefined;
 	perpSummary: PerpSummaryLike | null | undefined;
@@ -30,6 +31,7 @@ export interface OrderEntryInputs {
 export interface OrderEntryDerived {
 	isSpotMarket: boolean;
 	baseToken: string;
+	quoteToken: string;
 	capabilities: MarketCapabilities;
 	szDecimals: number;
 	availableBalance: number;
@@ -48,12 +50,13 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 	const capabilities = getMarketCapabilities(inputs.market);
 	const szDecimals = inputs.market?.szDecimals ?? 0;
 
+	const { baseToken, quoteToken } = inputs.market
+		? getBaseQuoteFromDisplayName(inputs.market.displayName, inputs.market.kind)
+		: { baseToken: "", quoteToken: "" };
 	const spotBalance = getSpotBalanceData(inputs.spotBalances, inputs.market);
-	const baseToken = isSpotMarket ? spotBalance.baseToken : (inputs.market?.displayName?.split("-")[0] ?? "");
-
 	const perpAvailable = getPerpAvailable(inputs.perpSummary?.accountValue, inputs.perpSummary?.totalMarginUsed);
 	const availableBalance = getAvailableBalance(inputs.market, inputs.side, spotBalance, perpAvailable);
-	const availableBalanceToken = getAvailableBalanceToken(inputs.market, inputs.side, spotBalance);
+	const availableBalanceToken = getAvailableBalanceToken(inputs.market, inputs.side);
 
 	const maxSize = getMaxSizeForOrderEntry({
 		isConnected: inputs.isConnected,
@@ -76,17 +79,12 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 
 	const orderValue = getOrderValue(sizeValue, inputs.conversionPrice);
 	const sideLabels = getSideLabels(isSpotMarket);
-	const sizeModeLabel = getSizeModeLabel({
-		isSpotMarket,
-		side: inputs.side,
-		sizeMode: inputs.sizeMode,
-		baseToken,
-		spotBalance,
-	});
+	const sizeModeLabel = getSizeModeLabel(inputs.sizeMode, baseToken, quoteToken);
 
 	return {
 		isSpotMarket,
 		baseToken,
+		quoteToken,
 		capabilities,
 		szDecimals,
 		availableBalance,
