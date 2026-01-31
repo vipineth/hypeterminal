@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { useMemo } from "react";
-import { ARBITRUM_CHAIN_ID } from "@/config/constants";
+import { ARBITRUM_CHAIN_ID } from "@/config/contracts";
 import type { RegistrationStatus } from "@/lib/hyperliquid/signing/types";
 import type { ButtonContent, Side, ValidationResult } from "@/lib/trade/types";
 

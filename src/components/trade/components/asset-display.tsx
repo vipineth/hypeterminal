@@ -28,10 +28,6 @@ export function AssetDisplay({
 	nameClassName,
 }: Props) {
 	const { displayName, iconUrl } = asset;
-	console.log("asset", {
-		displayName,
-		iconUrl,
-	});
 	const showIcon = !hideIcon;
 	const showName = !hideName;
 	const fallbackText = getFallbackText(displayName);

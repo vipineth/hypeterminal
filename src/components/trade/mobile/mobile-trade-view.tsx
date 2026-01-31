@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
 import {
-	ARBITRUM_CHAIN_ID,
 	FALLBACK_VALUE_PLACEHOLDER,
 	ORDER_FEE_RATE_MAKER,
 	ORDER_FEE_RATE_TAKER,
@@ -14,6 +13,8 @@ import {
 	ORDER_SIZE_PERCENT_STEPS,
 	UI_TEXT,
 } from "@/config/constants";
+import { ARBITRUM_CHAIN_ID } from "@/config/contracts";
+import { getBaseQuoteFromDisplayName } from "@/domain/market";
 import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { useAssetLeverage } from "@/hooks/trade/use-asset-leverage";
@@ -21,7 +22,6 @@ import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
-import { getBaseQuoteFromDisplayName } from "@/domain/market";
 import { floorToDecimals, formatDecimalFloor, getValueColorClass, parseNumber } from "@/lib/trade/numbers";
 import type { SizeMode } from "@/lib/trade/types";
 import { useDepositModalActions } from "@/stores/use-global-modal-store";
