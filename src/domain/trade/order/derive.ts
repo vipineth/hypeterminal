@@ -1,15 +1,8 @@
 import { getBaseQuoteFromDisplayName } from "@/domain/market";
-import {
-	getAvailableBalance,
-	getAvailableBalanceToken,
-	getPerpAvailable,
-	getSpotBalanceData,
-	type PerpSummaryLike,
-	type SpotBalanceData,
-	type SpotBalanceLike,
-} from "@/domain/trade/balances";
+import { getAvailableBalanceToken, getSpotBalanceData, type SpotBalanceData } from "@/domain/trade/balances";
 import { getSideLabels, getSizeModeLabel, type SideLabels, type SizeMode } from "@/domain/trade/order/labels";
 import { getMaxSizeForOrderEntry, getOrderValue, getSizeValueFromInput } from "@/domain/trade/order/size";
+import type { SpotBalance } from "@/hooks/trade/use-account-balances";
 import { getMarketCapabilities, type MarketCapabilities } from "@/lib/hyperliquid";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 import type { Side } from "@/lib/trade/types";
@@ -21,11 +14,11 @@ export interface OrderEntryInputs {
 	conversionPrice: number;
 	sizeMode: SizeMode;
 	sizeInput: string;
-	spotBalances: SpotBalanceLike[] | null | undefined;
-	perpSummary: PerpSummaryLike | null | undefined;
+	spotBalances: SpotBalance[] | null | undefined;
+	/** Max trade sizes in base token: [long, short] */
 	maxTradeSzs: [number, number] | null;
-	availableToBuy: number | null;
-	availableToSell: number | null;
+	/** Available to trade in quote token: [long, short] */
+	availableToTrade: [number, number] | null;
 }
 
 export interface OrderEntryDerived {
@@ -36,7 +29,6 @@ export interface OrderEntryDerived {
 	szDecimals: number;
 	availableBalance: number;
 	availableBalanceToken: string;
-	perpAvailable: number;
 	spotBalance: SpotBalanceData;
 	maxSize: number;
 	sizeValue: number;
@@ -47,6 +39,7 @@ export interface OrderEntryDerived {
 
 export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 	const isSpotMarket = inputs.market?.kind === "spot";
+	const isBuy = inputs.side === "buy";
 	const capabilities = getMarketCapabilities(inputs.market);
 	const szDecimals = inputs.market?.szDecimals ?? 0;
 
@@ -54,9 +47,16 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 		? getBaseQuoteFromDisplayName(inputs.market.displayName, inputs.market.kind)
 		: { baseToken: "", quoteToken: "" };
 	const spotBalance = getSpotBalanceData(inputs.spotBalances, inputs.market);
-	const perpAvailable = getPerpAvailable(inputs.perpSummary?.accountValue, inputs.perpSummary?.totalMarginUsed);
-	const availableBalance = getAvailableBalance(inputs.market, inputs.side, spotBalance, perpAvailable);
 	const availableBalanceToken = getAvailableBalanceToken(inputs.market, inputs.side);
+
+	const [availableLong, availableShort] = inputs.availableToTrade ?? [0, 0];
+	const availableBalance = isSpotMarket
+		? isBuy
+			? spotBalance.quoteAvailable
+			: spotBalance.baseAvailable
+		: isBuy
+			? availableLong
+			: availableShort;
 
 	const maxSize = getMaxSizeForOrderEntry({
 		isConnected: inputs.isConnected,
@@ -66,8 +66,6 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 		spotBalance,
 		szDecimals,
 		maxTradeSzs: inputs.maxTradeSzs,
-		availableToBuy: inputs.availableToBuy,
-		availableToSell: inputs.availableToSell,
 	});
 
 	const sizeValue = getSizeValueFromInput({
@@ -89,7 +87,6 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 		szDecimals,
 		availableBalance,
 		availableBalanceToken,
-		perpAvailable,
 		spotBalance,
 		maxSize,
 		sizeValue,

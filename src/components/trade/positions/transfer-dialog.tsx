@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NumberInput } from "@/components/ui/number-input";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
-import { getAvailableFromTotals, getPerpAvailable } from "@/domain/trade/balances";
-import { getSpotBalance, useAccountBalances } from "@/hooks/trade/use-account-balances";
+import { getAvailableFromTotals, getPerpAvailable, getSpotBalance } from "@/domain/trade/balances";
+import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken } from "@/lib/format";
-import { useSpotTokens } from "@/lib/hyperliquid/markets/use-spot-tokens";
 import { useExchangeSendAsset } from "@/lib/hyperliquid/hooks/exchange";
+import { useSpotTokens } from "@/lib/hyperliquid/markets/use-spot-tokens";
 import { floorToString, limitDecimalInput } from "@/lib/trade/numbers";
 
 type TransferDirection = "toSpot" | "toPerp";
@@ -46,7 +46,7 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 		return `${usdcTokenInfo.name}:${tokenId}`;
 	}, [usdcTokenInfo]);
 
-	const usdcDecimals = useMemo(() => getToken(DEFAULT_QUOTE_TOKEN)?.transferDecimals ?? 2, [getToken]);
+	const usdcDecimals = useMemo(() => getToken(DEFAULT_QUOTE_TOKEN)?.weiDecimals ?? 2, [getToken]);
 
 	const spotUsdcBal = useMemo(() => getSpotBalance(spotBalances, DEFAULT_QUOTE_TOKEN), [spotBalances]);
 	const availableBalanceValue = useMemo(() => {

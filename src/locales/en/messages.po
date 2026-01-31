@@ -1157,13 +1157,17 @@ msgid "pending"
 msgstr "pending"
 
 #: src/components/trade/positions/balances-tab.tsx
-msgid "perp"
-msgstr "perp"
+#~ msgid "perp"
+#~ msgstr "perp"
 
 #: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
 msgid "Perp"
 msgstr "Perp"
+
+#: src/components/trade/positions/balances-tab.tsx
+msgid "Perpetuals"
+msgstr "Perpetuals"
 
 #: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/order-entry/account-panel.tsx
@@ -1179,6 +1183,7 @@ msgstr "Perps Account"
 #~ msgstr "Perps: Max 0.1% (10 basis points)"
 
 #: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "PNL"
@@ -1535,11 +1540,12 @@ msgid "Sorted by {0}"
 msgstr "Sorted by {0}"
 
 #: src/components/trade/positions/balances-tab.tsx
-msgid "spot"
-msgstr "spot"
+#~ msgid "spot"
+#~ msgstr "spot"
 
 #: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
 msgid "Spot"

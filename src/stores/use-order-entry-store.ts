@@ -185,27 +185,3 @@ export const useSlPrice = () => useOrderEntryStore((s) => s.slPrice);
 export const useTif = () => useOrderEntryStore((s) => s.tif);
 
 export const useOrderEntryActions = () => useOrderEntryStore((s) => s.actions);
-
-export function getOrderEntryState(): OrderEntryState {
-	const s = useOrderEntryStore.getState();
-	return {
-		side: s.side,
-		orderType: s.orderType,
-		sizeMode: s.sizeMode,
-		size: s.size,
-		limitPrice: s.limitPrice,
-		triggerPrice: s.triggerPrice,
-		scaleStart: s.scaleStart,
-		scaleEnd: s.scaleEnd,
-		scaleLevels: s.scaleLevels,
-		twapMinutes: s.twapMinutes,
-		twapRandomize: s.twapRandomize,
-		reduceOnly: s.reduceOnly,
-		tpSlEnabled: s.tpSlEnabled,
-		tpPrice: s.tpPrice,
-		slPrice: s.slPrice,
-		tif: s.tif,
-	};
-}
-
-export type { OrderEntryState, FormState, PersistedState };

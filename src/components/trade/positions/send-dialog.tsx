@@ -13,9 +13,9 @@ import { type BalanceRow, getAvailableFromTotals, getPerpAvailable } from "@/dom
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken } from "@/lib/format";
-import { useSpotTokens } from "@/lib/hyperliquid/markets/use-spot-tokens";
 import { useExchangeSendAsset } from "@/lib/hyperliquid/hooks/exchange";
 import { useExchangeSpotSend } from "@/lib/hyperliquid/hooks/exchange/useExchangeSpotSend";
+import { useSpotTokens } from "@/lib/hyperliquid/markets/use-spot-tokens";
 import { floorToString, limitDecimalInput } from "@/lib/trade/numbers";
 import { AssetDisplay } from "../components/asset-display";
 
@@ -28,7 +28,12 @@ interface Props {
 	initialAccountType?: AccountType;
 }
 
-export function SendDialog({ open, onOpenChange, initialAsset = DEFAULT_QUOTE_TOKEN, initialAccountType = "spot" }: Props) {
+export function SendDialog({
+	open,
+	onOpenChange,
+	initialAsset = DEFAULT_QUOTE_TOKEN,
+	initialAccountType = "spot",
+}: Props) {
 	const [destination, setDestination] = useState("");
 	const [accountType, setAccountType] = useState<AccountType>(initialAccountType);
 	const [selectedToken, setSelectedToken] = useState(initialAsset);
@@ -53,9 +58,10 @@ export function SendDialog({ open, onOpenChange, initialAsset = DEFAULT_QUOTE_TO
 				asset: b.coin,
 				type: "spot" as const,
 				available: String(getAvailableFromTotals(b.total, b.hold)),
-				inOrder: b.hold ?? "0",
-				total: b.total ?? "0",
-				usdValue: b.coin === DEFAULT_QUOTE_TOKEN ? (b.total ?? "0") : (b.entryNtl ?? "0"),
+				inOrder: b.hold,
+				total: b.total,
+				usdValue: b.coin === DEFAULT_QUOTE_TOKEN ? b.total : b.entryNtl,
+				entryNtl: b.entryNtl,
 			}));
 	}, [spotBalances]);
 
@@ -72,7 +78,7 @@ export function SendDialog({ open, onOpenChange, initialAsset = DEFAULT_QUOTE_TO
 		return `${tokenInfo.name}:${tokenInfo.tokenId}`;
 	}, [tokenInfo]);
 
-	const decimals = useMemo(() => getToken(selectedToken)?.transferDecimals ?? 2, [getToken, selectedToken]);
+	const decimals = useMemo(() => getToken(selectedToken)?.weiDecimals ?? 2, [getToken, selectedToken]);
 
 	const availableBalance = useMemo(() => {
 		if (accountType === "perp") {
@@ -188,12 +194,18 @@ export function SendDialog({ open, onOpenChange, initialAsset = DEFAULT_QUOTE_TO
 
 						<Select value={selectedToken} onValueChange={handleTokenChange}>
 							<SelectTrigger className="flex-1 h-10 bg-bg/50 border-border/60">
-								<AssetDisplay asset={getToken(selectedToken) ?? { displayName: selectedToken, iconUrl: undefined }} hideIcon />
+								<AssetDisplay
+									asset={getToken(selectedToken) ?? { displayName: selectedToken, iconUrl: undefined }}
+									hideIcon
+								/>
 							</SelectTrigger>
 							<SelectContent>
 								{tokenOptions.map((tokenName) => (
 									<SelectItem key={tokenName} value={tokenName}>
-										<AssetDisplay asset={getToken(tokenName) ?? { displayName: tokenName, iconUrl: undefined }} hideIcon />
+										<AssetDisplay
+											asset={getToken(tokenName) ?? { displayName: tokenName, iconUrl: undefined }}
+											hideIcon
+										/>
 									</SelectItem>
 								))}
 							</SelectContent>

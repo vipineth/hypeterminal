@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
 import {
-	ARBITRUM_CHAIN_ID,
 	FALLBACK_VALUE_PLACEHOLDER,
 	ORDER_FEE_RATE_MAKER,
 	ORDER_FEE_RATE_TAKER,
@@ -14,6 +13,8 @@ import {
 	ORDER_SIZE_PERCENT_STEPS,
 	UI_TEXT,
 } from "@/config/constants";
+import { ARBITRUM_CHAIN_ID } from "@/config/contracts";
+import { getBaseQuoteFromDisplayName } from "@/domain/market";
 import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { useAssetLeverage } from "@/hooks/trade/use-asset-leverage";
@@ -21,7 +22,6 @@ import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
-import { getBaseQuoteFromDisplayName } from "@/domain/market";
 import { floorToDecimals, formatDecimalFloor, getValueColorClass, parseNumber } from "@/lib/trade/numbers";
 import type { SizeMode } from "@/lib/trade/types";
 import { useDepositModalActions } from "@/stores/use-global-modal-store";
@@ -65,7 +65,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 
 	const slippageBps = useMarketOrderSlippageBps();
 
-	const { displayLeverage: leverage, availableToSell, availableToBuy } = useAssetLeverage();
+	const { displayLeverage: leverage, maxTradeSzs } = useAssetLeverage();
 
 	const { addOrder, updateOrder } = useOrderQueueActions();
 	const selectedPrice = useSelectedPrice();
@@ -106,18 +106,19 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const maxSize = useMemo(() => {
 		if (!price || price <= 0) return 0;
 
-		const availableFromSub = side === "buy" ? availableToBuy : availableToSell;
-		if (availableFromSub !== null && availableFromSub > 0) {
-			return floorToDecimals(availableFromSub, market?.szDecimals ?? 0);
+		const isBuy = side === "buy";
+		const maxTradeSize = maxTradeSzs?.[isBuy ? 0 : 1] ?? 0;
+		if (maxTradeSize > 0) {
+			return floorToDecimals(maxTradeSize, market?.szDecimals ?? 0);
 		}
 
 		if (!leverage || availableBalance <= 0) return 0;
 		const maxNotional = availableBalance * leverage;
 		let maxSizeRaw = maxNotional / price;
-		if (side === "sell" && positionSize > 0) maxSizeRaw += positionSize;
-		else if (side === "buy" && positionSize < 0) maxSizeRaw += Math.abs(positionSize);
+		if (!isBuy && positionSize > 0) maxSizeRaw += positionSize;
+		else if (isBuy && positionSize < 0) maxSizeRaw += Math.abs(positionSize);
 		return floorToDecimals(maxSizeRaw, market?.szDecimals ?? 0);
-	}, [price, side, availableToBuy, availableToSell, leverage, availableBalance, positionSize, market?.szDecimals]);
+	}, [price, side, maxTradeSzs, leverage, availableBalance, positionSize, market?.szDecimals]);
 
 	const sizeInputValue = parseNumber(sizeInput) || 0;
 	const sizeValue = sizeMode === "quote" && price > 0 ? sizeInputValue / price : sizeInputValue;

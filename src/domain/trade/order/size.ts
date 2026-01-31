@@ -7,8 +7,6 @@ interface MaxSizeInput {
 	maxTradeSzs: [number, number] | null;
 	szDecimals?: number;
 	side: Side;
-	availableToBuy: number | null;
-	availableToSell: number | null;
 }
 
 interface OrderEntryMaxSizeInput {
@@ -19,8 +17,6 @@ interface OrderEntryMaxSizeInput {
 	spotBalance: SpotBalanceData;
 	szDecimals: number;
 	maxTradeSzs: [number, number] | null;
-	availableToBuy: number | null;
-	availableToSell: number | null;
 }
 
 interface SizeValueInput {
@@ -67,8 +63,10 @@ function formatSizeValue(value: number, decimals: number): string {
 export function getMaxSizeForOrderEntry(input: OrderEntryMaxSizeInput): number {
 	if (!input.isConnected) return 0;
 
+	const isBuy = input.side === "buy";
+
 	if (input.isSpotMarket) {
-		if (input.side === "buy") {
+		if (isBuy) {
 			if (input.price <= 0 || input.spotBalance.quoteAvailable <= 0) return 0;
 			const size = calc.divide(input.spotBalance.quoteAvailable, input.price);
 			if (size === null || !Number.isFinite(size)) return 0;
@@ -79,40 +77,32 @@ export function getMaxSizeForOrderEntry(input: OrderEntryMaxSizeInput): number {
 		return Number.isFinite(floored) ? floored : 0;
 	}
 
-	const maxTradeSize = input.maxTradeSzs?.[1];
-	if (typeof maxTradeSize === "number" && maxTradeSize > 0) {
-		return maxTradeSize;
-	}
-	const available = input.side === "buy" ? input.availableToBuy : input.availableToSell;
-	return available ?? 0;
+	const maxTradeSize = input.maxTradeSzs?.[isBuy ? 0 : 1] ?? 0;
+	return maxTradeSize > 0 ? maxTradeSize : 0;
 }
 
 export function getMaxSize(input: MaxSizeInput): number {
 	if (!input.isConnected) return 0;
-	const maxTradeSize = input.maxTradeSzs?.[1];
-	if (typeof maxTradeSize === "number" && maxTradeSize > 0) {
+
+	const maxTradeSize = input.maxTradeSzs?.[input.side === "buy" ? 0 : 1] ?? 0;
+	if (maxTradeSize > 0) {
 		const floored = floorToDecimals(maxTradeSize, input.szDecimals ?? 0);
 		return Number.isFinite(floored) ? floored : 0;
 	}
-	const available = input.side === "buy" ? input.availableToBuy : input.availableToSell;
-	if (available === null || available <= 0) return 0;
-	const floored = floorToDecimals(available, input.szDecimals ?? 0);
-	return Number.isFinite(floored) ? floored : 0;
+	return 0;
 }
 
 export function getSizeValueFromInput(input: SizeValueInput): number {
 	const inputValue = parseNumberOrZero(input.sizeInput);
 	if (inputValue <= 0) return 0;
 
-	if (input.sizeMode === "quote") {
-		if (input.price <= 0) return 0;
-		const convertedValue = calc.divide(inputValue, input.price);
-		if (convertedValue === null || !Number.isFinite(convertedValue)) return 0;
-		const converted = floorToDecimals(convertedValue, input.szDecimals);
-		return Number.isFinite(converted) ? converted : 0;
-	}
+	if (input.sizeMode === "base") return inputValue;
 
-	return inputValue;
+	if (input.price <= 0) return 0;
+	const convertedValue = calc.divide(inputValue, input.price);
+	if (convertedValue === null || !Number.isFinite(convertedValue)) return 0;
+	const converted = floorToDecimals(convertedValue, input.szDecimals);
+	return Number.isFinite(converted) ? converted : 0;
 }
 
 export function getOrderValue(sizeValue: number, price: number): number {
@@ -130,9 +120,12 @@ export function getSizeValues(input: SizeValuesInput): SizeValueResult {
 }
 
 export function getSizeForPercent(input: SizeForPercentInput): string {
+	const isBuy = input.side === "buy";
+	const isQuoteMode = input.sizeMode === "quote";
+
 	if (input.isSpotMarket) {
-		if (input.side === "buy") {
-			if (input.sizeMode === "quote") {
+		if (isBuy) {
+			if (isQuoteMode) {
 				const quoteAmount = (input.spotBalance.quoteAvailable * input.pct) / 100;
 				return quoteAmount.toFixed(2);
 			}
@@ -140,7 +133,7 @@ export function getSizeForPercent(input: SizeForPercentInput): string {
 			return formatSizeValue(tokenAmount, input.szDecimals);
 		}
 
-		if (input.sizeMode === "quote") {
+		if (isQuoteMode) {
 			if (input.price <= 0) return "";
 			const tokenAmount = (input.spotBalance.baseAvailable * input.pct) / 100;
 			const quoteAmount = tokenAmount * input.price;
@@ -153,7 +146,7 @@ export function getSizeForPercent(input: SizeForPercentInput): string {
 	if (input.maxSize <= 0) return "";
 	const size = (input.maxSize * input.pct) / 100;
 
-	if (input.sizeMode === "quote") {
+	if (isQuoteMode) {
 		if (input.price <= 0) return "";
 		return (size * input.price).toFixed(2);
 	}

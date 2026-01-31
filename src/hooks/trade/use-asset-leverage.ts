@@ -20,9 +20,10 @@ interface UseAssetLeverageReturn {
 	setPendingLeverage: (value: number) => void;
 	confirmLeverage: () => Promise<void>;
 	resetPending: () => void;
-	availableToSell: number | null;
-	availableToBuy: number | null;
+	/** Max trade sizes in base token: [long, short] */
 	maxTradeSzs: [number, number] | null;
+	/** Available to trade in quote token: [long, short] */
+	availableToTrade: [number, number] | null;
 	isUpdating: boolean;
 	updateError: Error | null;
 	subscriptionStatus: "idle" | "loading" | "success" | "error";
@@ -180,23 +181,21 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		],
 	);
 
-	const availableToSell = useMemo(() => {
-		const raw = activeAssetData?.availableToTrade?.[0];
-		return raw !== undefined ? parseNumber(raw) : null;
-	}, [activeAssetData?.availableToTrade]);
-
-	const availableToBuy = useMemo(() => {
-		const raw = activeAssetData?.availableToTrade?.[1];
-		return raw !== undefined ? parseNumber(raw) : null;
-	}, [activeAssetData?.availableToTrade]);
-
-	const maxTradeSzs = useMemo(() => {
+	const maxTradeSzs = useMemo((): [number, number] | null => {
 		const raw = activeAssetData?.maxTradeSzs;
 		if (!raw) return null;
-		const min = parseNumber(raw[0]);
-		const max = parseNumber(raw[1]);
-		return min !== null && max !== null ? ([min, max] as [number, number]) : null;
+		const long = parseNumber(raw[0]);
+		const short = parseNumber(raw[1]);
+		return long !== null && short !== null ? [long, short] : null;
 	}, [activeAssetData?.maxTradeSzs]);
+
+	const availableToTrade = useMemo((): [number, number] | null => {
+		const raw = activeAssetData?.availableToTrade;
+		if (!raw) return null;
+		const long = parseNumber(raw[0]);
+		const short = parseNumber(raw[1]);
+		return long !== null && short !== null ? [long, short] : null;
+	}, [activeAssetData?.availableToTrade]);
 
 	const normalizedStatus = useMemo((): "idle" | "loading" | "success" | "error" => {
 		if (!isConnected || !baseToken) return "idle";
@@ -221,9 +220,8 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		setPendingLeverage,
 		confirmLeverage,
 		resetPending,
-		availableToSell,
-		availableToBuy,
 		maxTradeSzs,
+		availableToTrade,
 		isUpdating,
 		updateError,
 		subscriptionStatus: normalizedStatus,

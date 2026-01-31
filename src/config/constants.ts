@@ -16,8 +16,6 @@ export const ORDER_TOAST_STALE_THRESHOLD_MS = 30_000;
 
 export const MOBILE_BREAKPOINT_PX = 768;
 export const FOOTER_TIME_TICK_MS = 1_000;
-export const ARBITRUM_CHAIN_ID = 42161;
-export const ARBITRUM_CHAIN_ID_HEX = "0xa4b1" as const;
 
 export const DEFAULT_MARKET_KEY = "perp:BTC";
 export const DEFAULT_MARKET_NAME = "BTC";

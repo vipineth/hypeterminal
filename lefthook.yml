@@ -1,6 +1,9 @@
 # Pre-commit hooks
 pre-commit:
   commands:
+    biome:
+      glob: "*.{ts,tsx,js,jsx}"
+      run: npx biome check --write --staged --no-errors-on-unmatched && git add {staged_files}
     lingui-extract:
       glob: "src/**/*.{ts,tsx}"
       run: pnpm i18n:extract && git add src/locales/**/*.po

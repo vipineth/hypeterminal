@@ -54,8 +54,6 @@ const useGlobalModalStore = create<GlobalModalState>((set) => {
 	};
 });
 
-export const useGlobalModal = () => useGlobalModalStore((s) => s.modal);
-
 export const useDepositModalOpen = () => useGlobalModalStore((s) => s.modal?.type === "deposit");
 export const useDepositModalTab = () =>
 	useGlobalModalStore((s) => (s.modal?.type === "deposit" ? s.modal.tab : "deposit"));

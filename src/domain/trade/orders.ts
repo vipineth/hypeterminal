@@ -230,7 +230,7 @@ function buildTpSlOrder(orders: ExchangeOrder[], params: TpSlOrderParams): void 
 	});
 }
 
-export function extractResponseError(status: unknown): string | null {
+function extractResponseError(status: unknown): string | null {
 	if (status && typeof status === "object" && "error" in status && typeof status.error === "string") {
 		return status.error;
 	}

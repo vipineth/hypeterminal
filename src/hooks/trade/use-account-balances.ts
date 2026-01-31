@@ -41,4 +41,3 @@ export function useAccountBalances(): AccountBalances {
 
 	return { perpSummary, perpPositions, spotBalances, isLoading, hasError };
 }
-export { getSpotBalance } from "@/domain/trade/balances";

@@ -17,9 +17,7 @@ export function useCopyToClipboard(resetDelay = 5000) {
 				timeoutRef.current = setTimeout(() => {
 					setCopied(false);
 				}, resetDelay);
-			} catch (error) {
-				console.error("Failed to copy text:", error);
-			}
+			} catch {}
 		},
 		[resetDelay],
 	);
