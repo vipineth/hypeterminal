@@ -37,6 +37,19 @@ export interface OrderEntryDerived {
 	sizeModeLabel: string;
 }
 
+function getAvailableBalance(
+	isSpotMarket: boolean,
+	isBuy: boolean,
+	spotBalance: SpotBalanceData,
+	availableLong: number,
+	availableShort: number,
+): number {
+	if (isSpotMarket) {
+		return isBuy ? spotBalance.quoteAvailable : spotBalance.baseAvailable;
+	}
+	return isBuy ? availableLong : availableShort;
+}
+
 export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 	const isSpotMarket = inputs.market?.kind === "spot";
 	const isBuy = inputs.side === "buy";
@@ -50,13 +63,7 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 	const availableBalanceToken = getAvailableBalanceToken(inputs.market, inputs.side);
 
 	const [availableLong, availableShort] = inputs.availableToTrade ?? [0, 0];
-	const availableBalance = isSpotMarket
-		? isBuy
-			? spotBalance.quoteAvailable
-			: spotBalance.baseAvailable
-		: isBuy
-			? availableLong
-			: availableShort;
+	const availableBalance = getAvailableBalance(isSpotMarket, isBuy, spotBalance, availableLong, availableShort);
 
 	const maxSize = getMaxSizeForOrderEntry({
 		isConnected: inputs.isConnected,
