@@ -9,7 +9,6 @@ export type {
 	ErrorSeverity,
 	ValidationError,
 	ValidationResult,
-	ValidationStackConfig,
 	Validator,
 } from "./types";
 export { createValidator, getFirstError, runValidators } from "./types";

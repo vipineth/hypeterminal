@@ -40,11 +40,6 @@ export interface ValidationResult {
 	needsApproval: boolean;
 }
 
-export interface ValidationStackConfig<TContext> {
-	name: string;
-	validators: Validator<TContext>[];
-}
-
 export function createValidator<TContext>(config: {
 	id: string;
 	code: string;

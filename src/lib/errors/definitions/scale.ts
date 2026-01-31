@@ -61,12 +61,13 @@ export const scaleLevelMinNotionalValidator: Validator<ScaleContext> = createVal
 		if (!ctx.scaleOrder) return true;
 		const levels = clampInt(Math.round(ctx.scaleLevelsNum ?? 0), 0, 100);
 		if (levels < 2 || ctx.sizeValue <= 0) return true;
+		if (!isPositive(ctx.scaleStartPriceNum) || !isPositive(ctx.scaleEndPriceNum)) return true;
 
-		const averagePrice = ctx.price > 0 ? ctx.price : ctx.markPx;
+		const averagePrice = (ctx.scaleStartPriceNum + ctx.scaleEndPriceNum) / 2;
 		const perLevelSize = ctx.sizeValue / levels;
-		const perLevelNotional = averagePrice > 0 ? perLevelSize * averagePrice : 0;
+		const perLevelNotional = perLevelSize * averagePrice;
 
-		return perLevelNotional <= 0 || perLevelNotional >= ORDER_MIN_NOTIONAL_USD;
+		return perLevelNotional >= ORDER_MIN_NOTIONAL_USD;
 	},
 });
 
