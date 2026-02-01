@@ -655,6 +655,10 @@ msgstr ""
 msgid "From"
 msgstr ""
 
+#: src/components/trade/positions/orders-tab.tsx
+#~ msgid "Full Position"
+#~ msgstr ""
+
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Funding"
@@ -712,11 +716,14 @@ msgstr ""
 msgid "Insufficient <0/> balance"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
 #: src/lib/errors/definitions/deposit.ts
 #: src/lib/errors/definitions/deposit.ts
 #: src/lib/hyperliquid/use-deposit.ts
 msgid "Insufficient balance"
+msgstr ""
+
+#: src/components/trade/order-entry/deposit-modal.tsx
+msgid "Insufficient balance (includes ${WITHDRAWAL_FEE_USD} fee)"
 msgstr ""
 
 #: src/lib/errors/format.ts
@@ -979,6 +986,10 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/trade/order-entry/deposit-modal.tsx
+msgid "Net received"
+msgstr ""
+
+#: src/components/trade/order-entry/deposit-modal.tsx
 msgid "Network fee"
 msgstr ""
 
@@ -1037,6 +1048,10 @@ msgstr "لم يتم العثور على أسواق."
 #: src/components/trade/positions/orders-tab.tsx
 msgid "No open orders."
 msgstr "لا توجد أوامر مفتوحة."
+
+#: src/components/trade/order-entry/order-entry-panel.tsx
+msgid "No response from exchange"
+msgstr ""
 
 #: src/components/trade/components/token-selector-dropdown.tsx
 msgid "No tokens available"
@@ -1954,7 +1969,11 @@ msgid "What is a wallet?"
 msgstr ""
 
 #: src/components/trade/order-entry/deposit-modal.tsx
-msgid "will arrive in ~3 min"
+#~ msgid "will arrive in ~3 min"
+#~ msgstr ""
+
+#: src/components/trade/order-entry/deposit-modal.tsx
+msgid "will arrive in ~5 min"
 msgstr ""
 
 #: src/components/trade/order-entry/account-panel.tsx

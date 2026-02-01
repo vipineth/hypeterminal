@@ -1,7 +1,8 @@
+import Big from "big.js";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
 import type { SpotBalance } from "@/hooks/trade/use-account-balances";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
-import { parseNumberOrZero } from "@/lib/trade/numbers";
+import { toBig, toSafeBig } from "@/lib/trade/numbers";
 import type { Side } from "@/lib/trade/types";
 
 export function getMarketQuoteToken(market: UnifiedMarketInfo | undefined): string {
@@ -44,14 +45,18 @@ export function getPerpAvailable(
 	accountValue: string | number | null | undefined,
 	marginUsed: string | number | null | undefined,
 ): number {
-	return Math.max(0, parseNumberOrZero(accountValue) - parseNumberOrZero(marginUsed));
+	const av = toSafeBig(accountValue);
+	const mu = toSafeBig(marginUsed);
+	return Math.max(0, av.minus(mu).toNumber());
 }
 
 export function getAvailableFromTotals(
 	total: string | number | null | undefined,
 	hold: string | number | null | undefined,
 ): number {
-	return Math.max(0, parseNumberOrZero(total) - parseNumberOrZero(hold));
+	const t = toSafeBig(total);
+	const h = toSafeBig(hold);
+	return Math.max(0, t.minus(h).toNumber());
 }
 
 export function getSpotBalanceData(
@@ -112,8 +117,8 @@ export function getBalanceRows(
 ): BalanceRow[] {
 	const rows: BalanceRow[] = [];
 
-	const perpAccountValue = parseNumberOrZero(perpSummary?.accountValue);
-	if (perpAccountValue > 0) {
+	const perpAccountValue = toBig(perpSummary?.accountValue);
+	if (perpAccountValue?.gt(0)) {
 		rows.push({
 			asset: DEFAULT_QUOTE_TOKEN,
 			type: "perp",
@@ -126,8 +131,8 @@ export function getBalanceRows(
 	}
 
 	for (const balance of spotBalances ?? []) {
-		const total = parseNumberOrZero(balance.total);
-		if (total === 0) continue;
+		const total = toBig(balance.total);
+		if (!total || total.eq(0)) continue;
 
 		const available = getAvailableFromTotals(balance.total, balance.hold);
 		const entryNtl = balance.entryNtl ?? "0";
@@ -144,14 +149,14 @@ export function getBalanceRows(
 		});
 	}
 
-	rows.sort((a, b) => parseNumberOrZero(b.usdValue) - parseNumberOrZero(a.usdValue));
+	rows.sort((a, b) => toSafeBig(b.usdValue).cmp(toSafeBig(a.usdValue)));
 	return rows;
 }
 
 export function getTotalUsdValue(rows: BalanceRow[]): number {
-	return rows.reduce((sum, row) => sum + parseNumberOrZero(row.usdValue), 0);
+	return rows.reduce((sum, row) => Big(sum).plus(toSafeBig(row.usdValue)).toNumber(), 0);
 }
 
 export function filterBalanceRowsByUsdValue(rows: BalanceRow[], minUsd: number): BalanceRow[] {
-	return rows.filter((row) => parseNumberOrZero(row.usdValue) >= minUsd);
+	return rows.filter((row) => toSafeBig(row.usdValue).gte(minUsd));
 }

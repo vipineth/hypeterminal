@@ -22,17 +22,12 @@ import { getMarketQuoteToken } from "@/domain/trade/balances";
 import { getLiquidationInfo, getOrderMetrics } from "@/domain/trade/order/metrics";
 import { getOrderPrice } from "@/domain/trade/order/price";
 import { getSliderValue } from "@/domain/trade/order/size";
-import { buildOrders, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
+import { buildOrderPlan } from "@/domain/trade/order-intent";
+import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatToken, szDecimalsToPriceDecimals } from "@/lib/format";
-import {
-	useAgentRegistration,
-	useAgentStatus,
-	useSelectedMarketInfo,
-	useSpotTokens,
-	useUserPositions,
-} from "@/lib/hyperliquid";
+import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo, useUserPositions } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeTwapOrder";
 import type { MarginMode } from "@/lib/trade/margin-mode";
@@ -41,9 +36,9 @@ import {
 	formatDecimalFloor,
 	getValueColorClass,
 	isPositive,
-	parseNumberOrZero,
 	toFixed,
 	toNumber,
+	toNumberOrZero,
 } from "@/lib/trade/numbers";
 import {
 	canUseTpSl as canUseTpSlForOrder,
@@ -152,9 +147,6 @@ export function OrderEntryPanel() {
 		szDecimals,
 	} = useOrderEntryData({ market, side, markPx, sizeMode, sizeInput });
 
-	const { getToken } = useSpotTokens();
-	const sizeModeToken = getToken(sizeModeLabel);
-
 	const { addOrder, updateOrder } = useOrderQueueActions();
 	const selectedPrice = useSelectedPrice();
 	const orderType = useOrderType();
@@ -230,6 +222,12 @@ export function OrderEntryPanel() {
 		}
 	}, [selectedPrice, setOrderType, setLimitPrice]);
 
+	useEffect(() => {
+		if (isSpotMarket && triggerOrder) {
+			setOrderType("market");
+		}
+	}, [isSpotMarket, triggerOrder, setOrderType]);
+
 	const tpPriceNum = toNumber(tpPriceInput);
 	const slPriceNum = toNumber(slPriceInput);
 	const triggerPriceNum = toNumber(triggerPriceInput);
@@ -239,7 +237,7 @@ export function OrderEntryPanel() {
 	const isSubmitting = isSubmittingOrder || isSubmittingTwap;
 
 	const position = market?.name ? userPositions.getPosition(market.name) : null;
-	const positionSize = parseNumberOrZero(position?.szi);
+	const positionSize = toNumberOrZero(position?.szi);
 
 	const price = getOrderPrice(
 		orderType,
@@ -353,11 +351,27 @@ export function OrderEntryPanel() {
 
 		const szDecimals = market.szDecimals ?? 0;
 		const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
+		const formattedPrice = formatPriceForOrder(price);
+
+		const getQueueOrderType = () => {
+			if (twapOrder) return "twap" as const;
+			if (scaleOrder) return "scale" as const;
+			if (triggerOrder) return "trigger" as const;
+			if (orderType === "limit") return "limit" as const;
+			return "market" as const;
+		};
+
+		const hasTp = tpSlEnabled && canUseTpSl && isPositive(tpPriceNum);
+		const hasSl = tpSlEnabled && canUseTpSl && isPositive(slPriceNum);
 
 		const orderId = addOrder({
 			market: baseToken,
 			side,
 			size: formattedSize,
+			price: formattedPrice,
+			orderType: getQueueOrderType(),
+			tpPrice: hasTp ? formatPriceForOrder(tpPriceNum ?? 0) : undefined,
+			slPrice: hasSl ? formatPriceForOrder(slPriceNum ?? 0) : undefined,
 			status: "pending",
 		});
 
@@ -377,7 +391,8 @@ export function OrderEntryPanel() {
 				throwIfResponseError(result.response?.data?.status);
 				updateOrder(orderId, { status: "success", fillPercent: 100 });
 			} else {
-				const { orders, grouping } = buildOrders({
+				const plan = buildOrderPlan({
+					kind: "entry",
 					assetId: market.assetId,
 					side,
 					orderType,
@@ -397,15 +412,30 @@ export function OrderEntryPanel() {
 					canUseTpSl,
 					tpPriceNum,
 					slPriceNum,
-					isStopOrder: stopOrder,
-					isTriggerOrder: triggerOrder,
-					isScaleOrder: scaleOrder,
-					usesLimitPriceForOrder: usesLimitPrice,
 				});
 
-				const result = await placeOrder({ orders, grouping });
-				throwIfResponseError(result.response?.data?.statuses?.[0]);
-				updateOrder(orderId, { status: "success", fillPercent: 100 });
+				if (plan.errors.length > 0) {
+					updateOrder(orderId, { status: "failed", error: plan.errors.join("; ") });
+					return;
+				}
+
+				const result = await placeOrder({ orders: plan.orders, grouping: plan.grouping });
+				const statuses = result.response?.data?.statuses ?? [];
+
+				const errors: string[] = [];
+				for (const status of statuses) {
+					if (status && typeof status === "object" && "error" in status) {
+						errors.push((status as { error: string }).error);
+					}
+				}
+
+				if (errors.length > 0) {
+					updateOrder(orderId, { status: "failed", error: errors.join("; ") });
+				} else if (statuses.length === 0) {
+					updateOrder(orderId, { status: "failed", error: t`No response from exchange` });
+				} else {
+					updateOrder(orderId, { status: "success", fillPercent: 100 });
+				}
 			}
 
 			resetForm();
@@ -776,13 +806,16 @@ export function OrderEntryPanel() {
 									<Checkbox
 										id={reduceOnlyId}
 										aria-label={t`Reduce Only`}
-										checked={reduceOnly}
+										checked={triggerOrder || reduceOnly}
 										onCheckedChange={(checked) => setReduceOnly(checked === true)}
-										disabled={isFormDisabled}
+										disabled={isFormDisabled || triggerOrder}
 									/>
 									<label
 										htmlFor={reduceOnlyId}
-										className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-fg")}
+										className={cn(
+											"cursor-pointer",
+											(isFormDisabled || triggerOrder) && "cursor-not-allowed text-muted-fg",
+										)}
 									>
 										{t`Reduce Only`}
 									</label>

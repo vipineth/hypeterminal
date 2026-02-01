@@ -18,7 +18,7 @@ import { cn } from "@/lib/cn";
 import { formatToken, formatUSD } from "@/lib/format";
 import { useSubAllMids } from "@/lib/hyperliquid/hooks/subscription";
 import { useSpotTokens } from "@/lib/hyperliquid/markets/use-spot-tokens";
-import { parseNumberOrZero } from "@/lib/trade/numbers";
+import { toNumberOrZero } from "@/lib/trade/numbers";
 import { useSwapModalActions } from "@/stores/use-global-modal-store";
 import { useGlobalSettingsActions, useHideSmallBalances } from "@/stores/use-global-settings-store";
 import { AssetDisplay } from "../components/asset-display";
@@ -75,13 +75,13 @@ export function BalancesTab() {
 
 	function getPnl(row: BalanceRow): { pnl: number; pnlPercent: number } | null {
 		if (row.type === "perp") return null;
-		const entryNtl = parseNumberOrZero(row.entryNtl);
+		const entryNtl = toNumberOrZero(row.entryNtl);
 		if (entryNtl === 0) return null;
 
-		const midPx = parseNumberOrZero(mids?.[row.asset]);
+		const midPx = toNumberOrZero(mids?.[row.asset]);
 		if (midPx === 0) return null;
 
-		const total = parseNumberOrZero(row.total);
+		const total = toNumberOrZero(row.total);
 		const currentValue = total * midPx;
 		const pnl = currentValue - entryNtl;
 		const pnlPercent = (pnl / entryNtl) * 100;

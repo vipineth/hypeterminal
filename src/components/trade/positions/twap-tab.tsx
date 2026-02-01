@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
+import { getAvgPrice, getPercent } from "@/domain/market";
 import { cn } from "@/lib/cn";
 import { formatNumber, formatPrice } from "@/lib/format";
 import { useMarkets } from "@/lib/hyperliquid";
 import { useSubUserTwapHistory } from "@/lib/hyperliquid/hooks/subscription";
-import { calc, parseNumber } from "@/lib/trade/numbers";
+import { toBig } from "@/lib/trade/numbers";
 import { useMarketActions } from "@/stores/use-market-store";
 
 interface PlaceholderProps {
@@ -98,11 +99,10 @@ export function TwapTab() {
 								{orders.map((order) => {
 									const isBuy = order.state.side === "B";
 									const sideClass = isBuy ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
-									const totalSize = parseNumber(order.state.sz);
-									const executedSize = parseNumber(order.state.executedSz);
-									const avgPrice = calc.divide(order.state.executedNtl, order.state.executedSz);
-									const rawPct = calc.percentOf(executedSize, totalSize) ?? 0;
-									const progressPct = Math.max(0, Math.min(100, rawPct));
+									const totalSize = toBig(order.state.sz)?.toNumber() ?? Number.NaN;
+									const executedSize = toBig(order.state.executedSz)?.toNumber() ?? Number.NaN;
+									const avgPrice = getAvgPrice(order.state.executedNtl, order.state.executedSz);
+									const progressPct = Math.max(0, Math.min(100, getPercent(executedSize, totalSize)));
 									const szDecimals = markets.getSzDecimals(order.state.coin);
 									const status = order.status.status;
 									const statusLabel =

@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { Check, Loader2, X, Zap } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/constants";
 import { cn } from "@/lib/cn";
@@ -23,16 +23,31 @@ function useAutoRemove(order: OrderQueueItem, onRemove: () => void) {
 	}, [order.status, order.completedAt, onRemove]);
 }
 
+function getOrderTypeLabel(orderType: OrderQueueItem["orderType"]): string | null {
+	switch (orderType) {
+		case "trigger":
+			return "Trigger";
+		case "scale":
+			return "Scale";
+		case "twap":
+			return "TWAP";
+		default:
+			return null;
+	}
+}
+
 function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () => void }) {
 	useAutoRemove(order, onRemove);
 
 	const sideColor = order.side === "buy" ? "text-positive" : "text-negative";
 	const sideBg = order.side === "buy" ? "bg-positive/10" : "bg-negative/10";
+	const orderTypeLabel = getOrderTypeLabel(order.orderType);
+	const hasTpSl = order.tpPrice || order.slPrice;
 
 	return (
 		<div
 			className={cn(
-				"flex items-center gap-3 py-2.5 px-3 transition-all duration-300",
+				"flex gap-3 py-2.5 px-3 transition-all duration-300",
 				order.status === "pending" && "animate-pulse",
 			)}
 		>
@@ -51,6 +66,11 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 
 			<div className="flex-1 min-w-0 space-y-0.5">
 				<div className="flex items-center gap-2">
+					{orderTypeLabel && (
+						<span className="px-1.5 py-0.5 rounded text-2xs font-bold uppercase tracking-wide bg-muted text-muted-fg">
+							{orderTypeLabel}
+						</span>
+					)}
 					<span className={cn("px-1.5 py-0.5 rounded text-2xs font-bold uppercase tracking-wide", sideBg, sideColor)}>
 						{order.side}
 					</span>
@@ -62,10 +82,31 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 						</span>
 					)}
 				</div>
-				<div className="text-2xs text-muted-fg">
-					{t`Size`}: <span className="text-fg/80 font-medium">{order.size}</span>
+				<div className="text-2xs text-muted-fg flex items-center gap-2 flex-wrap">
+					<span>
+						{t`Size`}: <span className="text-fg/80 font-medium">{order.size}</span>
+					</span>
+					{order.price && (
+						<span>
+							@ <span className="text-fg/80 font-medium">{order.price}</span>
+						</span>
+					)}
 				</div>
-				{order.error && <div className="text-2xs text-negative truncate">{order.error}</div>}
+				{hasTpSl && (
+					<div className="text-2xs text-muted-fg flex items-center gap-2">
+						{order.tpPrice && (
+							<span>
+								TP: <span className="text-positive font-medium">{order.tpPrice}</span>
+							</span>
+						)}
+						{order.slPrice && (
+							<span>
+								SL: <span className="text-negative font-medium">{order.slPrice}</span>
+							</span>
+						)}
+					</div>
+				)}
+				{order.error && <div className="text-2xs text-negative">{order.error}</div>}
 			</div>
 
 			{order.status === "failed" && (
@@ -73,7 +114,7 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 					variant="ghost"
 					size="none"
 					onClick={onRemove}
-					className="p-1.5 rounded-md text-muted-fg hover:text-fg hover:bg-muted/50 transition-colors shrink-0"
+					className="p-1.5 rounded-md text-muted-fg hover:text-fg hover:bg-muted/50 transition-colors shrink-0 self-start"
 					aria-label={t`Dismiss`}
 				>
 					<X className="size-4" />
@@ -84,31 +125,14 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 }
 
 function CountdownBar({ order }: { order: OrderQueueItem }) {
-	const [progress, setProgress] = useState(100);
-
-	useEffect(() => {
-		const completedAt = order.completedAt;
-		if (order.status !== "success" || !completedAt) {
-			setProgress(100);
-			return;
-		}
-
-		const updateProgress = () => {
-			const elapsed = Date.now() - completedAt;
-			const remaining = Math.max(0, ORDER_TOAST_SUCCESS_DURATION_MS - elapsed);
-			setProgress((remaining / ORDER_TOAST_SUCCESS_DURATION_MS) * 100);
-		};
-
-		updateProgress();
-		const interval = setInterval(updateProgress, 50);
-		return () => clearInterval(interval);
-	}, [order.status, order.completedAt]);
-
 	if (order.status !== "success") return null;
 
 	return (
 		<div className="absolute bottom-0 left-0 right-0 h-0.5 bg-positive/20 overflow-hidden">
-			<div className="h-full bg-positive/60 transition-all duration-50 ease-linear" style={{ width: `${progress}%` }} />
+			<div
+				className="h-full bg-positive/60 animate-countdown"
+				style={{ animationDuration: `${ORDER_TOAST_SUCCESS_DURATION_MS}ms` }}
+			/>
 		</div>
 	);
 }

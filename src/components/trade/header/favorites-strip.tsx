@@ -1,10 +1,10 @@
 import { t } from "@lingui/core/macro";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { get24hChange } from "@/domain/market";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice } from "@/lib/format";
 import { useMarketsInfo } from "@/lib/hyperliquid";
-import { calculate24hPriceChange } from "@/domain/market";
 import { getValueColorClass } from "@/lib/trade/numbers";
 import { useFavoriteMarkets, useMarketActions, useSelectedMarket } from "@/stores/use-market-store";
 
@@ -47,7 +47,7 @@ function FavoriteChip({ name, isActive }: FavoriteChipProps) {
 
 	const market = getMarketInfo(name);
 	const displayName = market?.displayName ?? name;
-	const changePct = calculate24hPriceChange(market?.prevDayPx, market?.markPx);
+	const changePct = get24hChange(market?.prevDayPx, market?.markPx);
 	const szDecimals = market?.szDecimals ?? 4;
 
 	function handleClick() {

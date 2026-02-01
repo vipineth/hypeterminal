@@ -1,10 +1,8 @@
 import type { FrontendOpenOrdersResponse } from "@nktkas/hyperliquid";
-import { calc, parseNumber } from "@/lib/trade/numbers";
+import { toBig } from "@/lib/trade/numbers";
 
-/** Single open order from SDK type */
 export type OpenOrder = FrontendOpenOrdersResponse[number];
 
-/** Order side from SDK */
 export type OrderSide = OpenOrder["side"];
 
 export const ORDER_SIDE_CONFIG = {
@@ -31,23 +29,24 @@ export function isStopOrder(order: OpenOrder): boolean {
 }
 
 export function getFilledSize(order: OpenOrder): number {
-	const origSz = parseNumber(order.origSz);
-	const remaining = parseNumber(order.sz);
-	if (!Number.isFinite(origSz) || !Number.isFinite(remaining)) return Number.NaN;
-	return Math.max(0, origSz - remaining);
+	const origSz = toBig(order.origSz);
+	const remaining = toBig(order.sz);
+	if (!origSz || !remaining) return Number.NaN;
+	return origSz.minus(remaining).toNumber();
 }
 
 export function getFillPercent(order: OpenOrder): number {
-	const origSz = parseNumber(order.origSz);
+	const origSz = toBig(order.origSz);
 	const filled = getFilledSize(order);
-	if (!Number.isFinite(origSz) || origSz === 0 || !Number.isFinite(filled)) return 0;
-	return (filled / origSz) * 100;
+	if (!origSz || origSz.eq(0) || !Number.isFinite(filled)) return 0;
+	return toBig(filled)?.div(origSz).times(100).toNumber() ?? 0;
 }
 
 export function getOrderValue(order: OpenOrder): number | null {
-	const limitPx = parseNumber(order.limitPx);
-	const origSz = parseNumber(order.origSz);
-	return calc.multiply(limitPx, origSz);
+	const limitPx = toBig(order.limitPx);
+	const origSz = toBig(order.origSz);
+	if (!limitPx || !origSz) return null;
+	return limitPx.times(origSz).toNumber();
 }
 
 export function getSideConfig(order: OpenOrder) {
@@ -55,11 +54,16 @@ export function getSideConfig(order: OpenOrder) {
 }
 
 export function getOrderTypeConfig(order: OpenOrder) {
+	let typeClass: string = ORDER_TYPE_CONFIG.default.class;
 	const label = order.reduceOnly && !order.isTrigger ? `${order.orderType} RO` : order.orderType;
-	const typeClass = isTakeProfitOrder(order)
-		? ORDER_TYPE_CONFIG.takeProfit.class
-		: isStopOrder(order)
-			? ORDER_TYPE_CONFIG.stop.class
-			: ORDER_TYPE_CONFIG.default.class;
+
+	if (isTakeProfitOrder(order)) {
+		typeClass = ORDER_TYPE_CONFIG.takeProfit.class;
+	}
+
+	if (isStopOrder(order)) {
+		typeClass = ORDER_TYPE_CONFIG.stop.class;
+	}
+
 	return { label, class: typeClass };
 }

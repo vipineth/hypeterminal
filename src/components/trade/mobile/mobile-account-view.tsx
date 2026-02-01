@@ -8,7 +8,7 @@ import { UI_TEXT } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
-import { parseNumber } from "@/lib/trade/numbers";
+import { toNumber, toNumberOrZero } from "@/lib/trade/numbers";
 import { useDepositModalActions } from "@/stores/use-global-modal-store";
 import { WalletDialog } from "../components/wallet-dialog";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
@@ -36,17 +36,17 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 		setTimeout(() => setCopied(false), 2000);
 	};
 
-	const accountValue = parseNumber(perpSummary?.accountValue) || 0;
-	const totalMarginUsed = parseNumber(perpSummary?.totalMarginUsed) || 0;
-	const totalNtlPos = parseNumber(perpSummary?.totalNtlPos) || 0;
-	const totalRawUsd = parseNumber(perpSummary?.totalRawUsd) || 0;
+	const accountValue = toNumberOrZero(perpSummary?.accountValue);
+	const totalMarginUsed = toNumberOrZero(perpSummary?.totalMarginUsed);
+	const totalNtlPos = toNumberOrZero(perpSummary?.totalNtlPos);
+	const totalRawUsd = toNumberOrZero(perpSummary?.totalRawUsd);
 
 	const availableBalance = Math.max(0, accountValue - totalMarginUsed);
 	const marginRatio = accountValue > 0 ? totalMarginUsed / accountValue : 0;
 
 	const unrealizedPnl = perpPositions.reduce((sum, pos) => {
-		const pnl = parseNumber(pos.position.unrealizedPnl);
-		return sum + (Number.isFinite(pnl) ? pnl : 0);
+		const pnl = toNumber(pos.position.unrealizedPnl);
+		return sum + (pnl ?? 0);
 	}, 0);
 
 	if (!isConnected) {

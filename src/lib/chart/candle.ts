@@ -1,11 +1,11 @@
 import type { CandleSnapshotResponse, CandleWsEvent } from "@nktkas/hyperliquid";
-import { toFiniteNumber } from "@/lib/trade/numbers";
+import { toNumber } from "@/lib/trade/numbers";
 import type { Bar } from "@/types/charting_library";
 
 const CHART_NAME_SEPARATOR = "::";
 
-function parseDecimal(value: unknown): number {
-	const parsed = toFiniteNumber(value);
+function parseDecimal(value: string | undefined): number {
+	const parsed = toNumber(value);
 	return parsed ?? Number.NaN;
 }
 

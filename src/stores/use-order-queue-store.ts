@@ -5,6 +5,10 @@ export interface OrderQueueItem {
 	market: string;
 	side: "buy" | "sell";
 	size: string;
+	price?: string;
+	orderType?: "market" | "limit" | "trigger" | "scale" | "twap";
+	tpPrice?: string;
+	slPrice?: string;
 	status: "pending" | "success" | "failed";
 	fillPercent?: number;
 	error?: string;

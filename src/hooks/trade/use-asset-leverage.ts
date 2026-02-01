@@ -5,7 +5,7 @@ import { getMarketCapabilities, useSelectedMarketInfo, useUserPositions } from "
 import { useExchangeUpdateLeverage } from "@/lib/hyperliquid/hooks/exchange/useExchangeUpdateLeverage";
 import { useSubActiveAssetData } from "@/lib/hyperliquid/hooks/subscription";
 import { getMarginModeFromLeverage, type MarginMode } from "@/lib/trade/margin-mode";
-import { parseNumber } from "@/lib/trade/numbers";
+import { toNumber } from "@/lib/trade/numbers";
 import { useGlobalSettingsActions, useMarginMode } from "@/stores/use-global-settings-store";
 
 type OperationType = "leverage" | "mode" | null;
@@ -184,16 +184,16 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	const maxTradeSzs = useMemo((): [number, number] | null => {
 		const raw = activeAssetData?.maxTradeSzs;
 		if (!raw) return null;
-		const long = parseNumber(raw[0]);
-		const short = parseNumber(raw[1]);
+		const long = toNumber(raw[0]);
+		const short = toNumber(raw[1]);
 		return long !== null && short !== null ? [long, short] : null;
 	}, [activeAssetData?.maxTradeSzs]);
 
 	const availableToTrade = useMemo((): [number, number] | null => {
 		const raw = activeAssetData?.availableToTrade;
 		if (!raw) return null;
-		const long = parseNumber(raw[0]);
-		const short = parseNumber(raw[1]);
+		const long = toNumber(raw[0]);
+		const short = toNumber(raw[1]);
 		return long !== null && short !== null ? [long, short] : null;
 	}, [activeAssetData?.availableToTrade]);
 

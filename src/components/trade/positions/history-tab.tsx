@@ -10,7 +10,7 @@ import { getExplorerTxUrl } from "@/lib/explorer";
 import { formatDateTimeShort, formatNumber, formatToken, formatUSD } from "@/lib/format";
 import { useMarkets } from "@/lib/hyperliquid";
 import { useSubUserFills } from "@/lib/hyperliquid/hooks/subscription";
-import { getValueColorClass, parseNumber } from "@/lib/trade/numbers";
+import { getValueColorClass, toNumber } from "@/lib/trade/numbers";
 import { useMarketActions } from "@/stores/use-market-store";
 
 interface PlaceholderProps {
@@ -98,10 +98,10 @@ export function HistoryTab() {
 								{fills.map((fill) => {
 									const isBuy = fill.side === "B";
 									const sideClass = isBuy ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
-									const fee = parseNumber(fill.fee);
+									const fee = toNumber(fill.fee);
 									const feeClass = getValueColorClass(fee);
-									const closedPnl = parseNumber(fill.closedPnl);
-									const showPnl = Number.isFinite(closedPnl) && closedPnl !== 0;
+									const closedPnl = toNumber(fill.closedPnl);
+									const showPnl = closedPnl !== null && closedPnl !== 0;
 
 									return (
 										<TableRow key={`${fill.hash}-${fill.tid}`} className="border-border/40 hover:bg-accent/30">

@@ -1,4 +1,5 @@
-import { calc, parseNumberOrZero } from "@/lib/trade/numbers";
+import Big from "big.js";
+import { toBig } from "@/lib/trade/numbers";
 import {
 	isMarketExecutionOrderType,
 	isScaleOrderType,
@@ -26,17 +27,17 @@ export function getOrderPrice(
 		return markPx;
 	}
 	if (isStopOrderType(orderType) || isTakeProfitOrderType(orderType)) {
-		return usesLimitPrice(orderType) ? parseNumberOrZero(limitPriceInput) : parseNumberOrZero(triggerPriceInput);
+		return toBig(usesLimitPrice(orderType) ? limitPriceInput : triggerPriceInput)?.toNumber() ?? 0;
 	}
 	if (isScaleOrderType(orderType)) {
-		const start = parseNumberOrZero(scaleStartPriceInput);
-		const end = parseNumberOrZero(scaleEndPriceInput);
-		if (start > 0 && end > 0) {
-			return calc.divide(calc.add(start, end), 2) ?? start;
+		const start = toBig(scaleStartPriceInput);
+		const end = toBig(scaleEndPriceInput);
+		if (start?.gt(0) && end?.gt(0)) {
+			return start.plus(end).div(2).toNumber();
 		}
-		return start > 0 ? start : end;
+		return start?.gt(0) ? start.toNumber() : (end?.toNumber() ?? 0);
 	}
-	return parseNumberOrZero(limitPriceInput);
+	return toBig(limitPriceInput)?.toNumber() ?? 0;
 }
 
 export function getExecutedPrice(
@@ -47,7 +48,11 @@ export function getExecutedPrice(
 	price: number,
 ): number {
 	if (isMarketExecutionOrderType(orderType)) {
-		return calc.applySlippage(markPx, slippageBps, side === "buy") ?? markPx;
+		const px = toBig(markPx);
+		const slip = toBig(slippageBps);
+		if (!px || !slip) return markPx;
+		const multiplier = side === "buy" ? Big(1).plus(slip.div(10000)) : Big(1).minus(slip.div(10000));
+		return px.times(multiplier).toNumber();
 	}
 	return price;
 }

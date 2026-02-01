@@ -7,6 +7,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
+import { getExecutedPrice } from "@/domain/trade/order/price";
 import { formatPriceForOrder, formatSizeForOrder } from "@/domain/trade/orders";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
@@ -15,7 +16,8 @@ import type { Position } from "@/lib/hyperliquid/account/use-user-positions";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useSubAllMids, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import type { Markets } from "@/lib/hyperliquid/markets";
-import { calc, getValueColorClass, isPositive, parseNumber } from "@/lib/trade/numbers";
+import { getValueColorClass, isPositive, toBig } from "@/lib/trade/numbers";
+import { isStopOrder, isTakeProfitOrder } from "@/lib/trade/open-orders";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useMarketActions } from "@/stores/use-market-store";
 import { AssetDisplay } from "../components/asset-display";
@@ -88,23 +90,23 @@ function PositionRow({
 	onOpenTpSl,
 	onSelectMarket,
 }: PositionRowProps) {
-	const size = parseNumber(p.szi);
+	const size = toBig(p.szi)?.toNumber() ?? Number.NaN;
 	const isLong = size > 0;
 	const absSize = Math.abs(size);
 	const market = markets.getMarket(p.coin);
 	const assetId = market?.assetId;
 	const szDecimals = market?.szDecimals ?? 4;
-	const markPx = parseNumber(markPxRaw);
+	const markPx = toBig(markPxRaw)?.toNumber() ?? Number.NaN;
 	const displayName = market?.displayName ?? p.coin;
 	const assetInfo = market ?? { displayName: p.coin, iconUrl: undefined };
 
-	const unrealizedPnl = parseNumber(p.unrealizedPnl);
-	const cumFunding = parseNumber(p.cumFunding.sinceOpen);
+	const unrealizedPnl = toBig(p.unrealizedPnl)?.toNumber() ?? Number.NaN;
+	const cumFunding = toBig(p.cumFunding.sinceOpen)?.toNumber() ?? Number.NaN;
 	const canClose = isPositive(absSize) && typeof assetId === "number" && isPositive(markPx);
 
 	const sideClass = isLong ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
 	const pnlClass = getValueColorClass(unrealizedPnl);
-	const fundingClass = getValueColorClass(cumFunding);
+	const fundingClass = getValueColorClass(cumFunding ? -cumFunding : null);
 	const hasTpSl = !!(tpSlInfo?.tpPrice || tpSlInfo?.slPrice);
 
 	function handleClose() {
@@ -121,10 +123,10 @@ function PositionRow({
 			assetId,
 			isLong,
 			size: absSize,
-			entryPx: parseNumber(p.entryPx),
+			entryPx: toBig(p.entryPx)?.toNumber() ?? Number.NaN,
 			markPx,
 			unrealizedPnl,
-			roe: parseNumber(p.returnOnEquity),
+			roe: toBig(p.returnOnEquity)?.toNumber() ?? Number.NaN,
 			szDecimals,
 			existingTpPrice: tpSlInfo?.tpPrice,
 			existingSlPrice: tpSlInfo?.slPrice,
@@ -256,25 +258,25 @@ export function PositionsTab() {
 	const { data: allMidsEvent } = useSubAllMids({ dex: "ALL_DEXS" }, { enabled: allMidsEnabled });
 	const mids = allMidsEvent?.mids;
 
-	const { data: openOrdersEvent } = useSubOpenOrders({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
+	const { data: openOrdersEvent } = useSubOpenOrders(
+		{ user: address ?? "0x0", dex: "ALL_DEXS" },
+		{ enabled: isConnected && !!address },
+	);
 	const openOrders = openOrdersEvent?.orders ?? [];
 
 	const tpSlOrdersByCoin = useMemo(() => {
 		const map = new Map<string, TpSlOrderInfo>();
 		for (const order of openOrders) {
-			const orderType = (order as { orderType?: string }).orderType;
-			const isTp = orderType === "Take Profit Market" || orderType === "Take Profit Limit";
-			const isSl = orderType === "Stop Market" || orderType === "Stop Limit";
-			if (!isTp && !isSl) continue;
+			if (!order.isTrigger) continue;
 
-			const triggerPx = parseNumber((order as { triggerPx?: string }).triggerPx);
-			if (!isPositive(triggerPx)) continue;
+			const triggerPx = toBig(order.triggerPx)?.toNumber();
+			if (!triggerPx || triggerPx <= 0) continue;
 
 			const existing = map.get(order.coin) ?? {};
-			if (isTp) {
+			if (isTakeProfitOrder(order) && !existing.tpPrice) {
 				existing.tpPrice = triggerPx;
 				existing.tpOrderId = order.oid;
-			} else {
+			} else if (isStopOrder(order) && !existing.slPrice) {
 				existing.slPrice = triggerPx;
 				existing.slOrderId = order.oid;
 			}
@@ -292,15 +294,15 @@ export function PositionsTab() {
 		resetCloseError();
 		closingKeyRef.current = `${assetId}`;
 
-		const isBuy = !isLong;
-		const orderPrice = calc.applySlippage(markPx, slippageBps, isBuy) ?? markPx;
+		const side = isLong ? "sell" : "buy";
+		const orderPrice = getExecutedPrice("market", side, markPx, slippageBps, markPx);
 
 		placeOrder(
 			{
 				orders: [
 					{
 						a: assetId,
-						b: isBuy,
+						b: side === "buy",
 						p: formatPriceForOrder(orderPrice),
 						s: formatSizeForOrder(size, szDecimals),
 						r: true,

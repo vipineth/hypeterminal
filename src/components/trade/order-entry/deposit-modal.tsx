@@ -20,11 +20,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MIN_DEPOSIT_USDC, MIN_WITHDRAW_USD, USDC_DECIMALS, WITHDRAWAL_FEE_USD } from "@/config/contracts";
 import { cn } from "@/lib/cn";
+import { formatTransferError } from "@/lib/errors/format";
 import { getExplorerTxUrl } from "@/lib/explorer";
 import { formatNumber } from "@/lib/format";
 import { useDeposit, useExchangeWithdraw3, useUserPositions } from "@/lib/hyperliquid";
-import { isPositive, parseNumber } from "@/lib/trade/numbers";
-import { formatTransferError } from "@/lib/errors/format";
+import { toNumber, toNumberOrZero } from "@/lib/trade/numbers";
 import { useDepositModalActions, useDepositModalOpen, useDepositModalTab } from "@/stores/use-global-modal-store";
 
 const NETWORKS = [{ id: "arbitrum", name: "Arbitrum", shortName: "ARB" }] as const;
@@ -270,6 +270,9 @@ function WithdrawForm({
 	isPending,
 	onSubmit,
 }: WithdrawFormProps) {
+	const amountNum = toNumber(amount);
+	const netReceived = amountNum !== null && amountNum > 0 ? Math.max(amountNum - WITHDRAWAL_FEE_USD, 0) : null;
+
 	return (
 		<div className="space-y-4">
 			<NetworkSelect label={<Trans>To</Trans>} value="arbitrum" onChange={() => {}} disabled />
@@ -333,13 +336,24 @@ function WithdrawForm({
 					icon={<Wallet className="size-3" />}
 				/>
 				<InfoRow
+					label={<Trans>Net received</Trans>}
+					value={
+						netReceived === null ? (
+							<span className="tabular-nums text-muted-fg">--</span>
+						) : (
+							<span className="tabular-nums">${formatNumber(netReceived, 2)}</span>
+						)
+					}
+					icon={<ArrowDownToLine className="size-3" />}
+				/>
+				<InfoRow
 					label={<Trans>Minimum</Trans>}
 					value={<span className="tabular-nums">${MIN_WITHDRAW_USD}</span>}
 					icon={<ArrowUpFromLine className="size-3" />}
 				/>
 				<InfoRow
 					label={<Trans>Estimated time</Trans>}
-					value={<span className="tabular-nums">~3 min</span>}
+					value={<span className="tabular-nums">~5 min</span>}
 					icon={<Clock className="size-3" />}
 					highlight
 				/>
@@ -456,7 +470,7 @@ export function DepositModal() {
 	const balanceStatus = userPositions.isLoading ? "subscribing" : "active";
 
 	const withdrawable = userPositions.withdrawable;
-	const withdrawableNum = parseNumber(withdrawable);
+	const withdrawableNum = toNumberOrZero(withdrawable);
 
 	const {
 		mutate: withdraw,
@@ -470,10 +484,11 @@ export function DepositModal() {
 
 	function validateWithdraw(amount: string) {
 		if (!amount || amount === "0") return { valid: false, error: null };
-		const amountNum = parseNumber(amount);
-		if (!isPositive(amountNum)) return { valid: false, error: t`Invalid amount` };
+		const amountNum = toNumber(amount);
+		if (amountNum === null || amountNum <= 0) return { valid: false, error: t`Invalid amount` };
 		if (amountNum < MIN_WITHDRAW_USD) return { valid: false, error: t`Minimum withdrawal is $${MIN_WITHDRAW_USD}` };
-		if (amountNum > withdrawableNum) return { valid: false, error: t`Insufficient balance` };
+		if (amountNum + WITHDRAWAL_FEE_USD > withdrawableNum)
+			return { valid: false, error: t`Insufficient balance (includes $${WITHDRAWAL_FEE_USD} fee)` };
 		return { valid: true, error: null };
 	}
 
@@ -579,7 +594,7 @@ export function DepositModal() {
 				description={
 					<>
 						<span className="tabular-nums font-medium text-positive">${withdrawAmount}</span>{" "}
-						<Trans>will arrive in ~3 min</Trans>
+						<Trans>will arrive in ~5 min</Trans>
 					</>
 				}
 				onClose={handleClose}

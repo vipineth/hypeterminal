@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
 import { formatDateTimeShort, formatPercent, formatToken, formatUSD } from "@/lib/format";
 import { useMarkets } from "@/lib/hyperliquid";
 import { useSubUserFundings } from "@/lib/hyperliquid/hooks/subscription";
-import { getValueColorClass, parseNumber, toNumberOrZero } from "@/lib/trade/numbers";
+import { getValueColorClass, toNumber, toNumberOrZero } from "@/lib/trade/numbers";
 
 interface PlaceholderProps {
 	children: React.ReactNode;
@@ -94,12 +94,12 @@ export function FundingTab() {
 							</TableHeader>
 							<TableBody>
 								{updates.map((update, index) => {
-									const szi = parseNumber(update.szi);
-									const isLong = Number.isFinite(szi) ? szi > 0 : true;
-									const rate = parseNumber(update.fundingRate);
-									const usdc = parseNumber(update.usdc);
+									const szi = toNumber(update.szi);
+									const isLong = szi !== null ? szi > 0 : true;
+									const rate = toNumber(update.fundingRate);
+									const usdc = toNumber(update.usdc);
 									const szDecimals = markets.getSzDecimals(update.coin);
-									const positionSize = Number.isFinite(szi) ? Math.abs(szi) : null;
+									const positionSize = szi !== null ? Math.abs(szi) : null;
 
 									const sideClass = isLong ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
 

@@ -3,7 +3,7 @@ import { useConnection } from "wagmi";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
-import { parseNumber } from "@/lib/trade/numbers";
+import { toNumber } from "@/lib/trade/numbers";
 import { MobileAccountView } from "./mobile-account-view";
 import { MobileBookView } from "./mobile-book-view";
 import { MobileBottomNav, type MobileTab } from "./mobile-bottom-nav";
@@ -28,8 +28,8 @@ export function MobileTerminal({ className }: Props) {
 	const positionsCount = useMemo(() => {
 		if (!isConnected) return 0;
 		return perpPositions.reduce((count, entry) => {
-			const size = parseNumber(entry.position.szi);
-			if (!Number.isFinite(size) || size === 0) return count;
+			const size = toNumber(entry.position.szi);
+			if (!size) return count;
 			return count + 1;
 		}, 0);
 	}, [isConnected, perpPositions]);

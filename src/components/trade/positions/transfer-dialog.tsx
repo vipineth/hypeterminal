@@ -1,5 +1,4 @@
 import { t } from "@lingui/core/macro";
-import Big from "big.js";
 import { ArrowLeftRight, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConnection } from "wagmi";
@@ -7,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NumberInput } from "@/components/ui/number-input";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
+import { exceedsBalance, isAmountWithinBalance } from "@/domain/market";
 import { getAvailableFromTotals, getPerpAvailable, getSpotBalance } from "@/domain/trade/balances";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
@@ -62,9 +62,7 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 		[availableBalanceValue, usdcDecimals],
 	);
 
-	const amountBig = amount ? Big(amount) : Big(0);
-	const availableBig = Big(availableBalanceValue);
-	const isValidAmount = amountBig.gt(0) && amountBig.lte(availableBig) && !!address && !!usdcTokenId;
+	const isValidAmount = isAmountWithinBalance(amount, availableBalanceValue) && !!address && !!usdcTokenId;
 
 	const fromLabel = direction === "toSpot" ? t`Perp` : t`Spot`;
 	const toLabel = direction === "toSpot" ? t`Spot` : t`Perp`;
@@ -168,7 +166,7 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 							onChange={(e) => handleAmountChange(e.target.value)}
 							className={cn(
 								"w-full h-9 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums",
-								amountBig.gt(availableBig) && "border-negative focus:border-negative",
+								exceedsBalance(amount, availableBalanceValue) && "border-negative focus:border-negative",
 							)}
 						/>
 					</div>

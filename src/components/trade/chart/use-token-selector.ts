@@ -2,7 +2,7 @@ import { getCoreRowModel, type Row, type SortingState, useReactTable } from "@ta
 import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
 import Big from "big.js";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { isTokenInCategory, type MarketCategory } from "@/domain/market";
+import { get24hChange, getOiUsd, isTokenInCategory, type MarketCategory } from "@/domain/market";
 import { useMarketsInfo } from "@/lib/hyperliquid";
 import { useFavoriteMarkets, useMarketActions } from "@/stores/use-market-store";
 import { type MarketRow, type MarketScope, TOKEN_SELECTOR_COLUMNS } from "./constants";
@@ -48,16 +48,10 @@ function getSortValue(market: MarketRow, columnId: string): string {
 	switch (columnId) {
 		case "price":
 			return market.markPx?.toString() ?? "0";
-		case "24h-change": {
-			const { markPx, prevDayPx } = market;
-			if (!markPx || !prevDayPx || prevDayPx === 0) return "0";
-			return Big(markPx).minus(prevDayPx).div(prevDayPx).times(100).toString();
-		}
-		case "oi": {
-			const oi = market.openInterest ?? 0;
-			const px = market.markPx ?? 0;
-			return Big(oi).times(px).toString();
-		}
+		case "24h-change":
+			return (get24hChange(market.prevDayPx, market.markPx) ?? 0).toString();
+		case "oi":
+			return (getOiUsd(market.openInterest, market.markPx) ?? 0).toString();
 		case "volume":
 			return market.dayNtlVlm?.toString() ?? "0";
 		case "funding":

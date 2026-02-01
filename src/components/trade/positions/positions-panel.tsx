@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
 import { useUserPositions } from "@/lib/hyperliquid";
 import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { createLazyComponent } from "@/lib/lazy";
-import { parseNumberOrZero } from "@/lib/trade/numbers";
+import { toNumberOrZero } from "@/lib/trade/numbers";
 import { useGlobalSettingsActions, usePositionsActiveTab } from "@/stores/use-global-settings-store";
 
 const BalancesTab = createLazyComponent(() => import("./balances-tab"), "BalancesTab");
@@ -39,11 +39,11 @@ export function PositionsPanel() {
 	const balancesCount = useMemo(() => {
 		if (!isConnected) return 0;
 		let count = 0;
-		const perpAccountValue = parseNumberOrZero(perpSummary?.accountValue);
+		const perpAccountValue = toNumberOrZero(perpSummary?.accountValue);
 		if (perpAccountValue > 0) count++;
 		if (spotBalances.length) {
 			for (const b of spotBalances) {
-				if (parseNumberOrZero(b.total) > 0) count++;
+				if (toNumberOrZero(b.total) > 0) count++;
 			}
 		}
 		return count;

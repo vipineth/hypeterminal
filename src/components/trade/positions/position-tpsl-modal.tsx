@@ -4,7 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { formatPriceForOrder, formatSizeForOrder, throwIfAnyResponseError } from "@/domain/trade/orders";
+import { buildOrderPlan } from "@/domain/trade/order-intent";
+import { throwIfAnyResponseError } from "@/domain/trade/orders";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
@@ -47,8 +48,8 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 	useEffect(() => {
 		if (open && position) {
 			const decimals = szDecimalsToPriceDecimals(position.szDecimals);
-			setTpPriceInput(isPositive(position.existingTpPrice) ? position.existingTpPrice.toFixed(decimals) : "");
-			setSlPriceInput(isPositive(position.existingSlPrice) ? position.existingSlPrice.toFixed(decimals) : "");
+			setTpPriceInput(position.existingTpPrice ? position.existingTpPrice.toFixed(decimals) : "");
+			setSlPriceInput(position.existingSlPrice ? position.existingSlPrice.toFixed(decimals) : "");
 		} else if (!open) {
 			setTpPriceInput("");
 			setSlPriceInput("");
@@ -76,53 +77,20 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 
 		resetError();
 
-		const orders: Array<{
-			a: number;
-			b: boolean;
-			p: string;
-			s: string;
-			r: boolean;
-			t: { trigger: { isMarket: boolean; triggerPx: string; tpsl: "tp" | "sl" } };
-		}> = [];
+		const plan = buildOrderPlan({
+			kind: "positionTpsl",
+			assetId: position.assetId,
+			isLong: position.isLong,
+			tpPriceNum: hasTp ? tpPriceNum : null,
+			slPriceNum: hasSl ? slPriceNum : null,
+		});
 
-		const formattedSize = formatSizeForOrder(position.size, position.szDecimals);
-
-		if (hasTp) {
-			orders.push({
-				a: position.assetId,
-				b: !position.isLong,
-				p: formatPriceForOrder(tpPriceNum),
-				s: formattedSize,
-				r: true,
-				t: {
-					trigger: {
-						isMarket: true,
-						triggerPx: formatPriceForOrder(tpPriceNum),
-						tpsl: "tp",
-					},
-				},
-			});
-		}
-
-		if (hasSl) {
-			orders.push({
-				a: position.assetId,
-				b: !position.isLong,
-				p: formatPriceForOrder(slPriceNum),
-				s: formattedSize,
-				r: true,
-				t: {
-					trigger: {
-						isMarket: true,
-						triggerPx: formatPriceForOrder(slPriceNum),
-						tpsl: "sl",
-					},
-				},
-			});
+		if (plan.errors.length > 0) {
+			return;
 		}
 
 		try {
-			const result = await placeOrder({ orders, grouping: "positionTpsl" });
+			const result = await placeOrder({ orders: plan.orders, grouping: plan.grouping });
 			throwIfAnyResponseError(result.response?.data?.statuses);
 
 			setTpPriceInput("");
@@ -143,8 +111,6 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 	}
 
 	if (!position) return null;
-
-	const isProfitable = position.unrealizedPnl >= 0;
 
 	return (
 		<Dialog open={open} onOpenChange={handleOpenChange}>

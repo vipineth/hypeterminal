@@ -3,9 +3,10 @@ import { TrendingDown, TrendingUp } from "lucide-react";
 import { useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { SL_QUICK_PERCENT_OPTIONS, TP_QUICK_PERCENT_OPTIONS } from "@/config/constants";
+import { getRiskRewardRatio } from "@/domain/market";
 import { cn } from "@/lib/cn";
 import { formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
-import { calc, isPositive, toFixed, toNumber } from "@/lib/trade/numbers";
+import { isPositive, toNumber } from "@/lib/trade/numbers";
 import { calculateEstimatedPnl, calculateSlPrice, calculateTpPrice, formatRiskRewardRatio } from "@/lib/trade/tpsl";
 import { PriceInputWithPercent } from "./price-input-with-percent";
 
@@ -51,12 +52,7 @@ export function TpSlSection({
 		return calculateEstimatedPnl({ referencePrice, side, size }, slPriceNum);
 	}, [slPriceNum, referencePrice, side, size]);
 
-	const riskRewardRatio = useMemo(() => {
-		if (tpPnl === null || slPnl === null || slPnl >= 0) return null;
-		const reward = Math.abs(tpPnl);
-		const risk = Math.abs(slPnl);
-		return calc.divide(reward, risk);
-	}, [tpPnl, slPnl]);
+	const riskRewardRatio = useMemo(() => getRiskRewardRatio(tpPnl, slPnl), [tpPnl, slPnl]);
 
 	const riskRewardDisplay = useMemo(() => {
 		if (riskRewardRatio === null || tpPnl === null || slPnl === null) return null;
@@ -65,20 +61,16 @@ export function TpSlSection({
 		return { rrDisplay, tpPnl, slPnl };
 	}, [riskRewardRatio, tpPnl, slPnl]);
 
+	const priceDecimals = szDecimalsToPriceDecimals(szDecimals ?? 4);
+
 	function handleTpPercentClick(percent: number) {
-		if (!isPositive(referencePrice)) return;
-		const price = calculateTpPrice(referencePrice, side, percent);
-		if (price === null) return;
-		const decimals = szDecimalsToPriceDecimals(szDecimals ?? 4);
-		onTpPriceChange(toFixed(price, decimals));
+		const price = calculateTpPrice(referencePrice, side, percent, priceDecimals);
+		if (price) onTpPriceChange(price);
 	}
 
 	function handleSlPercentClick(percent: number) {
-		if (!isPositive(referencePrice)) return;
-		const price = calculateSlPrice(referencePrice, side, percent);
-		if (price === null) return;
-		const decimals = szDecimalsToPriceDecimals(szDecimals ?? 4);
-		onSlPriceChange(toFixed(price, decimals));
+		const price = calculateSlPrice(referencePrice, side, percent, priceDecimals);
+		if (price) onSlPriceChange(price);
 	}
 
 	if (compact) {

@@ -1,5 +1,6 @@
+import Big from "big.js";
 import { ORDER_FEE_RATE_MAKER, ORDER_FEE_RATE_TAKER } from "@/config/constants";
-import { calc } from "@/lib/trade/numbers";
+import { toBig } from "@/lib/trade/numbers";
 import { isTakerOrderType, type OrderType } from "@/lib/trade/order-types";
 import type { Side } from "@/lib/trade/types";
 
@@ -29,28 +30,24 @@ interface LiquidationResult {
 }
 
 export function getOrderMetrics(input: OrderMetricsInput): OrderMetricsResult {
-	const orderValue = calc.multiply(input.sizeValue, input.price) ?? 0;
+	const sz = toBig(input.sizeValue);
+	const px = toBig(input.price);
+	const orderValue = sz && px ? sz.times(px).toNumber() : 0;
 	const feeRate = isTakerOrderType(input.orderType) ? ORDER_FEE_RATE_TAKER : ORDER_FEE_RATE_MAKER;
-	const estimatedFee = calc.multiply(orderValue, feeRate) ?? 0;
-	const marginRequired = input.leverage ? (calc.divide(orderValue, input.leverage) ?? 0) : 0;
+	const estimatedFee = Big(orderValue).times(feeRate).toNumber();
+	const marginRequired = input.leverage ? Big(orderValue).div(input.leverage).toNumber() : 0;
 	return { orderValue, marginRequired, estimatedFee };
 }
 
 export function getLiquidationInfo(input: LiquidationInput): LiquidationResult {
-	if (!input.price || !input.sizeValue || !input.leverage) {
+	const px = toBig(input.price);
+	const lev = toBig(input.leverage);
+	if (!px || !lev || !input.sizeValue || px.lte(0) || lev.lte(0)) {
 		return { liqPrice: null, liqWarning: false };
 	}
-	const leverageMultiplier = calc.divide(1, input.leverage);
-	const buffer =
-		leverageMultiplier !== null ? calc.multiply(calc.multiply(input.price, leverageMultiplier), 0.9) : null;
-	if (buffer === null) {
-		return { liqPrice: null, liqWarning: false };
-	}
-	const liqPrice = input.side === "buy" ? calc.subtract(input.price, buffer) : calc.add(input.price, buffer);
-	if (liqPrice === null) {
-		return { liqPrice: null, liqWarning: false };
-	}
+	const buffer = px.div(lev).times(0.9);
+	const liqPrice = input.side === "buy" ? px.minus(buffer).toNumber() : px.plus(buffer).toNumber();
 	const priceDiff = Math.abs(liqPrice - input.price);
-	const liqWarning = calc.divide(priceDiff, input.price) !== null && (calc.divide(priceDiff, input.price) ?? 1) < 0.05;
+	const liqWarning = Big(priceDiff).div(input.price).lt(0.05);
 	return { liqPrice, liqWarning };
 }
