@@ -1,12 +1,12 @@
 import { t } from "@lingui/core/macro";
 import { ExternalLink, Flame } from "lucide-react";
-import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/domain/market";
+import { get24hChange, getOiUsd } from "@/domain/market";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD, shortenAddress } from "@/lib/format";
 import { type UnifiedMarketInfo, useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { getExplorerTokenUrl } from "@/lib/hyperliquid/explorer";
 import { useSubActiveAssetCtx } from "@/lib/hyperliquid/hooks/subscription/useSubActiveAssetCtx";
-import { getValueColorClass, toFiniteNumber } from "@/lib/trade/numbers";
+import { getValueColorClass, toBig } from "@/lib/trade/numbers";
 import { Badge } from "../ui/badge";
 import { StatBlock } from "./chart/stat-block";
 
@@ -36,15 +36,14 @@ export function MarketOverview() {
 	const liveCtx = activeCtxEvent?.ctx;
 
 	const isSpot = selectedMarketInfo?.kind === "spot";
-	const markPx = toFiniteNumber(liveCtx?.markPx);
-	const prevDayPx = toFiniteNumber(liveCtx?.prevDayPx);
-	const oraclePx = toFiniteNumber(liveCtx?.oraclePx);
-	const openInterest = toFiniteNumber(liveCtx?.openInterest);
-	const dayNtlVlm = toFiniteNumber(liveCtx?.dayNtlVlm);
-	const funding = toFiniteNumber(liveCtx?.funding);
+	const markPx = liveCtx?.markPx;
+	const oraclePx = liveCtx?.oraclePx;
+	const dayNtlVlm = liveCtx?.dayNtlVlm;
+	const funding = liveCtx?.funding;
 
-	const fundingNum = funding ?? 0;
-	const change24h = calculate24hPriceChange(prevDayPx, markPx);
+	const fundingNum = toBig(funding)?.toNumber() ?? 0;
+	const change24h = get24hChange(liveCtx?.prevDayPx, liveCtx?.markPx);
+	const oiUsd = getOiUsd(liveCtx?.openInterest, liveCtx?.markPx);
 	const spotTokenAddress = getSpotTokenAddress(selectedMarketInfo);
 
 	return (
@@ -67,7 +66,7 @@ export function MarketOverview() {
 					<StatBlock label={t`ORACLE`} value={formatUSD(oraclePx)} />
 					<StatBlock
 						label={t`OI`}
-						value={formatUSD(calculateOpenInterestUSD(openInterest, markPx), {
+						value={formatUSD(oiUsd, {
 							notation: "compact",
 							compactDisplay: "short",
 						})}

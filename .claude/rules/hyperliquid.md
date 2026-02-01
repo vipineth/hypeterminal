@@ -12,7 +12,10 @@
 
 ### Helpers
 
-Only create a helper function when the same Big.js pattern appears 3+ times. Helpers should return strings, not numbers.
+Keep calculations out of components:
+- Place in `src/domain/market/` for market-related calculations
+- Accept values directly: `get24hChange(prevDayPx, markPx)`
+- Use `Numeric` type (`string | number | null | undefined`)
 
 ### Flow
 

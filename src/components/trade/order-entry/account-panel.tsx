@@ -6,7 +6,7 @@ import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER } from "@/config/consta
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatToken, formatUSD } from "@/lib/format";
-import { getValueColorClass, parseNumberOrZero } from "@/lib/trade/numbers";
+import { getValueColorClass, toNumberOrZero } from "@/lib/trade/numbers";
 import { useDepositModalActions } from "@/stores/use-global-modal-store";
 
 type SummaryRow = {
@@ -27,14 +27,14 @@ export function AccountPanel() {
 			return null;
 		}
 
-		const accountValue = parseNumberOrZero(perpSummary.accountValue);
-		const totalNtlPos = parseNumberOrZero(perpSummary.totalNtlPos);
-		const totalMarginUsed = parseNumberOrZero(perpSummary.totalMarginUsed);
-		const totalRawUsd = parseNumberOrZero(perpSummary.totalRawUsd);
+		const accountValue = toNumberOrZero(perpSummary.accountValue);
+		const totalNtlPos = toNumberOrZero(perpSummary.totalNtlPos);
+		const totalMarginUsed = toNumberOrZero(perpSummary.totalMarginUsed);
+		const totalRawUsd = toNumberOrZero(perpSummary.totalRawUsd);
 
 		let unrealizedPnl = 0;
 		for (const pos of perpPositions) {
-			unrealizedPnl += parseNumberOrZero(pos.position.unrealizedPnl);
+			unrealizedPnl += toNumberOrZero(pos.position.unrealizedPnl);
 		}
 
 		const marginRatio = accountValue > 0 ? totalMarginUsed / accountValue : 0;
@@ -65,9 +65,9 @@ export function AccountPanel() {
 		const tokens: Array<{ coin: string; total: number; available: number; usdValue: number }> = [];
 
 		for (const b of spotBalances) {
-			const total = parseNumberOrZero(b.total);
-			const hold = parseNumberOrZero(b.hold);
-			const entryNtl = parseNumberOrZero(b.entryNtl);
+			const total = toNumberOrZero(b.total);
+			const hold = toNumberOrZero(b.hold);
+			const entryNtl = toNumberOrZero(b.entryNtl);
 
 			if (total === 0) continue;
 

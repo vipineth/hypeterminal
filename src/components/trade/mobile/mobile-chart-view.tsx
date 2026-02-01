@@ -3,12 +3,12 @@ import { Flame } from "lucide-react";
 import { useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UI_TEXT } from "@/config/constants";
+import { get24hChange, getOiUsd } from "@/domain/market";
 import { createChartName } from "@/lib/chart/candle";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
-import { calculate24hPriceChange, calculateOpenInterestUSD } from "@/domain/market";
-import { getValueColorClass } from "@/lib/trade/numbers";
+import { getValueColorClass, toBig } from "@/lib/trade/numbers";
 import { useTheme } from "@/providers/theme";
 import { useMarketActions } from "@/stores/use-market-store";
 import { TokenSelector } from "../chart/token-selector";
@@ -33,10 +33,10 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 		[setSelectedMarket],
 	);
 
-	const fundingNum = selectedMarket?.funding ?? 0;
-	const isFundingPositive = fundingNum >= 0;
+	const fundingNum = toBig(selectedMarket?.funding)?.toNumber() ?? 0;
 	const markPx = selectedMarket?.markPx;
-	const change24h = calculate24hPriceChange(selectedMarket?.prevDayPx, selectedMarket?.markPx);
+	const change24h = get24hChange(selectedMarket?.prevDayPx, selectedMarket?.markPx);
+	const oiUsd = getOiUsd(selectedMarket?.openInterest, selectedMarket?.markPx);
 
 	return (
 		<div className={cn("flex flex-col h-full min-h-0", className)}>
@@ -83,7 +83,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 							/>
 							<StatPill
 								label={overviewText.LABEL_OPEN_INTEREST}
-								value={formatUSD(calculateOpenInterestUSD(selectedMarket?.openInterest, selectedMarket?.markPx), {
+								value={formatUSD(oiUsd, {
 									notation: "compact",
 									compactDisplay: "short",
 								})}

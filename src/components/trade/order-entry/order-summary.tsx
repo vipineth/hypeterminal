@@ -1,10 +1,10 @@
 import { t } from "@lingui/core/macro";
 import { PencilIcon } from "lucide-react";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
+import { bpsToPercent } from "@/domain/market";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD } from "@/lib/format";
 import type { MarketKind } from "@/lib/hyperliquid";
-import { calc, toFixed } from "@/lib/trade/numbers";
 
 interface Props {
 	liqPrice: number | null;
@@ -60,7 +60,7 @@ export function OrderSummary({
 					onClick={onSlippageClick}
 					className="flex items-center gap-1 hover:text-fg transition-colors"
 				>
-					<span className="tabular-nums text-warning">{toFixed(calc.divide(slippageBps, 100), 2)}%</span>
+					<span className="tabular-nums text-warning">{bpsToPercent(slippageBps)}%</span>
 					<PencilIcon className="size-2 text-muted-fg" />
 				</button>
 			</div>

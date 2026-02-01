@@ -7,6 +7,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
+import { getExecutedPrice } from "@/domain/trade/order/price";
 import { formatPriceForOrder, formatSizeForOrder } from "@/domain/trade/orders";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
@@ -15,7 +16,7 @@ import type { Position } from "@/lib/hyperliquid/account/use-user-positions";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useSubAllMids, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import type { Markets } from "@/lib/hyperliquid/markets";
-import { calc, getValueColorClass, isPositive, parseNumber } from "@/lib/trade/numbers";
+import { getValueColorClass, isPositive, toBig } from "@/lib/trade/numbers";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useMarketActions } from "@/stores/use-market-store";
 import { AssetDisplay } from "../components/asset-display";
@@ -88,18 +89,18 @@ function PositionRow({
 	onOpenTpSl,
 	onSelectMarket,
 }: PositionRowProps) {
-	const size = parseNumber(p.szi);
+	const size = toBig(p.szi)?.toNumber() ?? Number.NaN;
 	const isLong = size > 0;
 	const absSize = Math.abs(size);
 	const market = markets.getMarket(p.coin);
 	const assetId = market?.assetId;
 	const szDecimals = market?.szDecimals ?? 4;
-	const markPx = parseNumber(markPxRaw);
+	const markPx = toBig(markPxRaw)?.toNumber() ?? Number.NaN;
 	const displayName = market?.displayName ?? p.coin;
 	const assetInfo = market ?? { displayName: p.coin, iconUrl: undefined };
 
-	const unrealizedPnl = parseNumber(p.unrealizedPnl);
-	const cumFunding = parseNumber(p.cumFunding.sinceOpen);
+	const unrealizedPnl = toBig(p.unrealizedPnl)?.toNumber() ?? Number.NaN;
+	const cumFunding = toBig(p.cumFunding.sinceOpen)?.toNumber() ?? Number.NaN;
 	const canClose = isPositive(absSize) && typeof assetId === "number" && isPositive(markPx);
 
 	const sideClass = isLong ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
@@ -121,10 +122,10 @@ function PositionRow({
 			assetId,
 			isLong,
 			size: absSize,
-			entryPx: parseNumber(p.entryPx),
+			entryPx: toBig(p.entryPx)?.toNumber() ?? Number.NaN,
 			markPx,
 			unrealizedPnl,
-			roe: parseNumber(p.returnOnEquity),
+			roe: toBig(p.returnOnEquity)?.toNumber() ?? Number.NaN,
 			szDecimals,
 			existingTpPrice: tpSlInfo?.tpPrice,
 			existingSlPrice: tpSlInfo?.slPrice,
@@ -267,7 +268,7 @@ export function PositionsTab() {
 			const isSl = orderType === "Stop Market" || orderType === "Stop Limit";
 			if (!isTp && !isSl) continue;
 
-			const triggerPx = parseNumber((order as { triggerPx?: string }).triggerPx);
+			const triggerPx = toBig((order as { triggerPx?: string }).triggerPx)?.toNumber() ?? Number.NaN;
 			if (!isPositive(triggerPx)) continue;
 
 			const existing = map.get(order.coin) ?? {};
@@ -292,15 +293,15 @@ export function PositionsTab() {
 		resetCloseError();
 		closingKeyRef.current = `${assetId}`;
 
-		const isBuy = !isLong;
-		const orderPrice = calc.applySlippage(markPx, slippageBps, isBuy) ?? markPx;
+		const side = isLong ? "sell" : "buy";
+		const orderPrice = getExecutedPrice("market", side, markPx, slippageBps, markPx);
 
 		placeOrder(
 			{
 				orders: [
 					{
 						a: assetId,
-						b: isBuy,
+						b: side === "buy",
 						p: formatPriceForOrder(orderPrice),
 						s: formatSizeForOrder(size, szDecimals),
 						r: true,

@@ -1,5 +1,4 @@
 import { t } from "@lingui/core/macro";
-import Big from "big.js";
 import { Loader2, Send } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { isAddress } from "viem";
@@ -9,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
+import { exceedsBalance, isAmountWithinBalance } from "@/domain/market";
 import { type BalanceRow, getAvailableFromTotals, getPerpAvailable } from "@/domain/trade/balances";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
@@ -90,10 +90,8 @@ export function SendDialog({
 
 	const availableBalanceStr = useMemo(() => floorToString(availableBalance, decimals), [availableBalance, decimals]);
 
-	const amountBig = amount ? Big(amount) : Big(0);
-	const availableBig = Big(availableBalance);
 	const isValidDestination = isAddress(destination);
-	const isValidAmount = amountBig.gt(0) && amountBig.lte(availableBig);
+	const isValidAmount = isAmountWithinBalance(amount, availableBalance);
 	const canSend = isValidDestination && isValidAmount && !!tokenId && !isPending;
 
 	function handleAccountTypeChange(value: AccountType) {
@@ -220,7 +218,7 @@ export function SendDialog({
 								onChange={(e) => handleAmountChange(e.target.value)}
 								className={cn(
 									"w-full h-10 text-sm bg-bg/50 border-border/60 pr-24 tabular-nums",
-									amountBig.gt(availableBig) && "border-negative focus:border-negative",
+									exceedsBalance(amount, availableBalance) && "border-negative focus:border-negative",
 								)}
 							/>
 							<button

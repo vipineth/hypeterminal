@@ -1,6 +1,6 @@
 import { SCALE_LEVELS_MAX, SCALE_LEVELS_MIN } from "@/config/constants";
 import { getExecutedPrice } from "@/domain/trade/order/price";
-import { clampInt, formatDecimalFloor, isPositive, parseNumberOrZero } from "@/lib/trade/numbers";
+import { clampInt, formatDecimalFloor, isPositive, toBig, toSafeBig } from "@/lib/trade/numbers";
 import type { ExchangeOrder, LimitTif, OrderType } from "@/lib/trade/order-types";
 import type { Side } from "@/lib/trade/types";
 
@@ -129,18 +129,18 @@ interface ScaleOrderParams {
 
 function buildScaleOrders(orders: ExchangeOrder[], params: ScaleOrderParams): void {
 	const levels = clampInt(Math.round(params.scaleLevelsNum ?? SCALE_LEVELS_MIN), SCALE_LEVELS_MIN, SCALE_LEVELS_MAX);
-	const start = parseNumberOrZero(params.scaleStartPriceInput);
-	const end = parseNumberOrZero(params.scaleEndPriceInput);
-	const step = levels > 1 ? (end - start) / (levels - 1) : 0;
-	const perLevelSize = params.sizeValue / levels;
+	const start = toSafeBig(params.scaleStartPriceInput);
+	const end = toSafeBig(params.scaleEndPriceInput);
+	const step = levels > 1 ? end.minus(start).div(levels - 1) : start.times(0);
+	const perLevelSize = toSafeBig(params.sizeValue).div(levels);
 
 	for (let i = 0; i < levels; i += 1) {
-		const levelPrice = start + step * i;
+		const levelPrice = start.plus(step.times(i)).toNumber();
 		orders.push({
 			a: params.assetId,
 			b: params.isBuy,
 			p: formatPriceForOrder(levelPrice),
-			s: formatSizeForOrder(perLevelSize, params.szDecimals),
+			s: formatSizeForOrder(perLevelSize.toNumber(), params.szDecimals),
 			r: params.reduceOnly,
 			t: { limit: { tif: params.tif } },
 		});
@@ -159,8 +159,8 @@ interface TriggerOrderParams {
 }
 
 function buildTriggerOrder(orders: ExchangeOrder[], params: TriggerOrderParams): void {
-	const triggerPx = formatPriceForOrder(parseNumberOrZero(params.triggerPriceInput));
-	const limitPx = formatPriceForOrder(parseNumberOrZero(params.limitPriceInput));
+	const triggerPx = formatPriceForOrder(toBig(params.triggerPriceInput)?.toNumber() ?? 0);
+	const limitPx = formatPriceForOrder(toBig(params.limitPriceInput)?.toNumber() ?? 0);
 
 	orders.push({
 		a: params.assetId,

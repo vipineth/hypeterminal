@@ -8,7 +8,7 @@ import { POSITIONS_TABS, UI_TEXT } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
-import { parseNumber } from "@/lib/trade/numbers";
+import { toNumber } from "@/lib/trade/numbers";
 import { BalancesTab } from "../positions/balances-tab";
 import { FundingTab } from "../positions/funding-tab";
 import { HistoryTab } from "../positions/history-tab";
@@ -41,8 +41,8 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 	const positionsCount = useMemo(() => {
 		if (!isConnected) return 0;
 		return perpPositions.reduce((count, entry) => {
-			const size = parseNumber(entry.position.szi);
-			if (!Number.isFinite(size) || size === 0) return count;
+			const size = toNumber(entry.position.szi);
+			if (!size) return count;
 			return count + 1;
 		}, 0);
 	}, [isConnected, perpPositions]);

@@ -22,7 +22,7 @@ import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
-import { floorToDecimals, formatDecimalFloor, getValueColorClass, parseNumber } from "@/lib/trade/numbers";
+import { floorToDecimals, formatDecimalFloor, getValueColorClass, toNumberOrZero } from "@/lib/trade/numbers";
 import type { SizeMode } from "@/lib/trade/types";
 import { useDepositModalActions } from "@/stores/use-global-modal-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
@@ -92,16 +92,16 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	}, [selectedPrice]);
 
 	// Derived values
-	const accountValue = parseNumber(perpSummary?.accountValue) || 0;
-	const marginUsed = parseNumber(perpSummary?.totalMarginUsed) || 0;
+	const accountValue = toNumberOrZero(perpSummary?.accountValue);
+	const marginUsed = toNumberOrZero(perpSummary?.totalMarginUsed);
 	const availableBalance = Math.max(0, accountValue - marginUsed);
 
 	const position =
 		!perpPositions.length || !baseToken ? null : (perpPositions.find((p) => p.position.coin === baseToken) ?? null);
-	const positionSize = parseNumber(position?.position?.szi) || 0;
+	const positionSize = toNumberOrZero(position?.position?.szi);
 
 	const markPx = market?.markPx ?? 0;
-	const price = type === "market" ? markPx : parseNumber(limitPriceInput) || 0;
+	const price = type === "market" ? markPx : toNumberOrZero(limitPriceInput);
 
 	const maxSize = useMemo(() => {
 		if (!price || price <= 0) return 0;
@@ -120,7 +120,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 		return floorToDecimals(maxSizeRaw, market?.szDecimals ?? 0);
 	}, [price, side, maxTradeSzs, leverage, availableBalance, positionSize, market?.szDecimals]);
 
-	const sizeInputValue = parseNumber(sizeInput) || 0;
+	const sizeInputValue = toNumberOrZero(sizeInput);
 	const sizeValue = sizeMode === "quote" && price > 0 ? sizeInputValue / price : sizeInputValue;
 	const orderValue = sizeValue * price;
 	const marginRequired = leverage ? orderValue / leverage : 0;

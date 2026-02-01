@@ -47,8 +47,8 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 	useEffect(() => {
 		if (open && position) {
 			const decimals = szDecimalsToPriceDecimals(position.szDecimals);
-			setTpPriceInput(isPositive(position.existingTpPrice) ? position.existingTpPrice.toFixed(decimals) : "");
-			setSlPriceInput(isPositive(position.existingSlPrice) ? position.existingSlPrice.toFixed(decimals) : "");
+			setTpPriceInput(position.existingTpPrice ? position.existingTpPrice.toFixed(decimals) : "");
+			setSlPriceInput(position.existingSlPrice ? position.existingSlPrice.toFixed(decimals) : "");
 		} else if (!open) {
 			setTpPriceInput("");
 			setSlPriceInput("");
@@ -87,37 +87,27 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 
 		const formattedSize = formatSizeForOrder(position.size, position.szDecimals);
 
-		if (hasTp) {
+		if (tpPriceNum !== null && hasTp) {
+			const tpPx = formatPriceForOrder(tpPriceNum);
 			orders.push({
 				a: position.assetId,
 				b: !position.isLong,
-				p: formatPriceForOrder(tpPriceNum),
+				p: tpPx,
 				s: formattedSize,
 				r: true,
-				t: {
-					trigger: {
-						isMarket: true,
-						triggerPx: formatPriceForOrder(tpPriceNum),
-						tpsl: "tp",
-					},
-				},
+				t: { trigger: { isMarket: true, triggerPx: tpPx, tpsl: "tp" } },
 			});
 		}
 
-		if (hasSl) {
+		if (slPriceNum !== null && hasSl) {
+			const slPx = formatPriceForOrder(slPriceNum);
 			orders.push({
 				a: position.assetId,
 				b: !position.isLong,
-				p: formatPriceForOrder(slPriceNum),
+				p: slPx,
 				s: formattedSize,
 				r: true,
-				t: {
-					trigger: {
-						isMarket: true,
-						triggerPx: formatPriceForOrder(slPriceNum),
-						tpsl: "sl",
-					},
-				},
+				t: { trigger: { isMarket: true, triggerPx: slPx, tpsl: "sl" } },
 			});
 		}
 
@@ -143,8 +133,6 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 	}
 
 	if (!position) return null;
-
-	const isProfitable = position.unrealizedPnl >= 0;
 
 	return (
 		<Dialog open={open} onOpenChange={handleOpenChange}>

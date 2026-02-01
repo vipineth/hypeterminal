@@ -41,9 +41,9 @@ import {
 	formatDecimalFloor,
 	getValueColorClass,
 	isPositive,
-	parseNumberOrZero,
 	toFixed,
 	toNumber,
+	toNumberOrZero,
 } from "@/lib/trade/numbers";
 import {
 	canUseTpSl as canUseTpSlForOrder,
@@ -239,7 +239,7 @@ export function OrderEntryPanel() {
 	const isSubmitting = isSubmittingOrder || isSubmittingTwap;
 
 	const position = market?.name ? userPositions.getPosition(market.name) : null;
-	const positionSize = parseNumberOrZero(position?.szi);
+	const positionSize = toNumberOrZero(position?.szi);
 
 	const price = getOrderPrice(
 		orderType,

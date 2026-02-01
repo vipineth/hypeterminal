@@ -1,33 +1,22 @@
 import { describe, expect, it } from "vitest";
-import {
-	clampInt,
-	floorToDecimals,
-	formatDecimalFloor,
-	parseNumber,
-	parseNumberOrZero,
-	toFiniteNumber,
-} from "@/lib/trade/numbers";
+import { clampInt, floorToDecimals, formatDecimalFloor, toNumber, toNumberOrZero } from "@/lib/trade/numbers";
 
 describe("trade numbers", () => {
-	it("parses numbers from strings and returns NaN for invalid input", () => {
-		expect(parseNumber(1.5)).toBe(1.5);
-		expect(parseNumber("2.5")).toBe(2.5);
-		expect(Number.isNaN(parseNumber("nope"))).toBe(true);
-		expect(Number.isNaN(parseNumber(null))).toBe(true);
-		expect(Number.isNaN(parseNumber(Number.POSITIVE_INFINITY))).toBe(true);
-		expect(Number.isNaN(parseNumber(Number.NaN))).toBe(true);
+	it("parses numbers from strings and returns null for invalid input", () => {
+		expect(toNumber(1.5)).toBe(1.5);
+		expect(toNumber("2.5")).toBe(2.5);
+		expect(toNumber("nope")).toBeNull();
+		expect(toNumber(null)).toBeNull();
+		expect(toNumber(Number.POSITIVE_INFINITY)).toBeNull();
+		expect(toNumber(Number.NaN)).toBeNull();
+		expect(toNumber("  ")).toBeNull();
 	});
 
-	it("parses numbers with fallbacks", () => {
-		expect(parseNumberOrZero("2.5")).toBe(2.5);
-		expect(parseNumberOrZero("nope")).toBe(0);
-	});
-
-	it("normalizes to finite numbers", () => {
-		expect(toFiniteNumber("  ")).toBeNull();
-		expect(toFiniteNumber("12.5")).toBe(12.5);
-		expect(toFiniteNumber(Number.NEGATIVE_INFINITY)).toBeNull();
-		expect(toFiniteNumber(Number.NaN)).toBeNull();
+	it("parses numbers with zero fallback", () => {
+		expect(toNumberOrZero("2.5")).toBe(2.5);
+		expect(toNumberOrZero("nope")).toBe(0);
+		expect(toNumberOrZero(null)).toBe(0);
+		expect(toNumberOrZero(undefined)).toBe(0);
 	});
 
 	it("clamps integers to bounds", () => {

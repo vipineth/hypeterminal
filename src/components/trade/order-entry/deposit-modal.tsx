@@ -20,11 +20,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MIN_DEPOSIT_USDC, MIN_WITHDRAW_USD, USDC_DECIMALS, WITHDRAWAL_FEE_USD } from "@/config/contracts";
 import { cn } from "@/lib/cn";
+import { formatTransferError } from "@/lib/errors/format";
 import { getExplorerTxUrl } from "@/lib/explorer";
 import { formatNumber } from "@/lib/format";
 import { useDeposit, useExchangeWithdraw3, useUserPositions } from "@/lib/hyperliquid";
-import { isPositive, parseNumber } from "@/lib/trade/numbers";
-import { formatTransferError } from "@/lib/errors/format";
+import { toNumber, toNumberOrZero } from "@/lib/trade/numbers";
 import { useDepositModalActions, useDepositModalOpen, useDepositModalTab } from "@/stores/use-global-modal-store";
 
 const NETWORKS = [{ id: "arbitrum", name: "Arbitrum", shortName: "ARB" }] as const;
@@ -456,7 +456,7 @@ export function DepositModal() {
 	const balanceStatus = userPositions.isLoading ? "subscribing" : "active";
 
 	const withdrawable = userPositions.withdrawable;
-	const withdrawableNum = parseNumber(withdrawable);
+	const withdrawableNum = toNumberOrZero(withdrawable);
 
 	const {
 		mutate: withdraw,
@@ -470,8 +470,8 @@ export function DepositModal() {
 
 	function validateWithdraw(amount: string) {
 		if (!amount || amount === "0") return { valid: false, error: null };
-		const amountNum = parseNumber(amount);
-		if (!isPositive(amountNum)) return { valid: false, error: t`Invalid amount` };
+		const amountNum = toNumber(amount);
+		if (amountNum === null || amountNum <= 0) return { valid: false, error: t`Invalid amount` };
 		if (amountNum < MIN_WITHDRAW_USD) return { valid: false, error: t`Minimum withdrawal is $${MIN_WITHDRAW_USD}` };
 		if (amountNum > withdrawableNum) return { valid: false, error: t`Insufficient balance` };
 		return { valid: true, error: null };
