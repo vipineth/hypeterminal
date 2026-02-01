@@ -97,12 +97,12 @@ function buildPositionTpSlPlan(intent: PositionTpSlIntent): OrderPlan {
 	const orders: ExchangeOrder[] = [];
 	const isBuy = !intent.isLong;
 
-	if (isPositive(intent.tpPriceNum)) {
-		orders.push(buildPositionTpSlOrder(intent.assetId, isBuy, intent.tpPriceNum ?? 0, "tp"));
+	if (intent.tpPriceNum && isPositive(intent.tpPriceNum)) {
+		orders.push(buildPositionTpSlOrder(intent.assetId, isBuy, intent.tpPriceNum, "tp"));
 	}
 
-	if (isPositive(intent.slPriceNum)) {
-		orders.push(buildPositionTpSlOrder(intent.assetId, isBuy, intent.slPriceNum ?? 0, "sl"));
+	if (intent.slPriceNum && isPositive(intent.slPriceNum)) {
+		orders.push(buildPositionTpSlOrder(intent.assetId, isBuy, intent.slPriceNum, "sl"));
 	}
 
 	return {
