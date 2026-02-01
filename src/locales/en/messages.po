@@ -1042,6 +1042,10 @@ msgstr "No markets found."
 msgid "No open orders."
 msgstr "No open orders."
 
+#: src/components/trade/order-entry/order-entry-panel.tsx
+msgid "No response from exchange"
+msgstr "No response from exchange"
+
 #: src/components/trade/components/token-selector-dropdown.tsx
 msgid "No tokens available"
 msgstr "No tokens available"

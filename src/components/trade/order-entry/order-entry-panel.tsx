@@ -22,7 +22,7 @@ import { getMarketQuoteToken } from "@/domain/trade/balances";
 import { getLiquidationInfo, getOrderMetrics } from "@/domain/trade/order/metrics";
 import { getOrderPrice } from "@/domain/trade/order/price";
 import { getSliderValue } from "@/domain/trade/order/size";
-import { buildOrders, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
+import { buildOrders, formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatToken, szDecimalsToPriceDecimals } from "@/lib/format";
@@ -353,11 +353,27 @@ export function OrderEntryPanel() {
 
 		const szDecimals = market.szDecimals ?? 0;
 		const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
+		const formattedPrice = formatPriceForOrder(price);
+
+		const getQueueOrderType = () => {
+			if (twapOrder) return "twap" as const;
+			if (scaleOrder) return "scale" as const;
+			if (triggerOrder) return "trigger" as const;
+			if (orderType === "limit") return "limit" as const;
+			return "market" as const;
+		};
+
+		const hasTp = tpSlEnabled && canUseTpSl && isPositive(tpPriceNum);
+		const hasSl = tpSlEnabled && canUseTpSl && isPositive(slPriceNum);
 
 		const orderId = addOrder({
 			market: baseToken,
 			side,
 			size: formattedSize,
+			price: formattedPrice,
+			orderType: getQueueOrderType(),
+			tpPrice: hasTp ? formatPriceForOrder(tpPriceNum ?? 0) : undefined,
+			slPrice: hasSl ? formatPriceForOrder(slPriceNum ?? 0) : undefined,
 			status: "pending",
 		});
 
@@ -404,8 +420,22 @@ export function OrderEntryPanel() {
 				});
 
 				const result = await placeOrder({ orders, grouping });
-				throwIfResponseError(result.response?.data?.statuses?.[0]);
-				updateOrder(orderId, { status: "success", fillPercent: 100 });
+				const statuses = result.response?.data?.statuses ?? [];
+
+				const errors: string[] = [];
+				for (const status of statuses) {
+					if (status && typeof status === "object" && "error" in status) {
+						errors.push((status as { error: string }).error);
+					}
+				}
+
+				if (errors.length > 0) {
+					updateOrder(orderId, { status: "failed", error: errors.join("; ") });
+				} else if (statuses.length === 0) {
+					updateOrder(orderId, { status: "failed", error: t`No response from exchange` });
+				} else {
+					updateOrder(orderId, { status: "success", fillPercent: 100 });
+				}
 			}
 
 			resetForm();

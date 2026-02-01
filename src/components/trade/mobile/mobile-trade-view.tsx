@@ -227,7 +227,14 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 		const formattedPrice = formatPriceForOrder(orderPrice);
 		const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
 
-		const orderId = addOrder({ market: baseToken, side, size: formattedSize, status: "pending" });
+		const orderId = addOrder({
+			market: baseToken,
+			side,
+			size: formattedSize,
+			price: formattedPrice,
+			orderType: type === "market" ? "market" : "limit",
+			status: "pending",
+		});
 
 		try {
 			const result = await placeOrder({

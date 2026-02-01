@@ -1038,6 +1038,10 @@ msgstr "未找到市场。"
 msgid "No open orders."
 msgstr "无未成交订单。"
 
+#: src/components/trade/order-entry/order-entry-panel.tsx
+msgid "No response from exchange"
+msgstr ""
+
 #: src/components/trade/components/token-selector-dropdown.tsx
 msgid "No tokens available"
 msgstr ""
