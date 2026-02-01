@@ -2,7 +2,13 @@ import { z } from "zod";
 import { create } from "zustand";
 import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middleware";
 import { STORAGE_KEYS } from "@/config/constants";
-import { isTriggerOrderType, type LimitTif, ORDER_TYPES, type OrderType } from "@/lib/trade/order-types";
+import {
+	isScaleOrderType,
+	isTriggerOrderType,
+	type LimitTif,
+	ORDER_TYPES,
+	type OrderType,
+} from "@/lib/trade/order-types";
 import type { Side, SizeMode } from "@/lib/trade/types";
 import { createValidatedStorage } from "@/stores/validated-storage";
 
@@ -102,11 +108,16 @@ const useOrderEntryStore = create<OrderEntryStore>()(
 
 					setOrderType: (orderType) => {
 						const isTrigger = isTriggerOrderType(orderType);
-						set((state) => ({
-							orderType,
-							reduceOnly: isTrigger ? true : state.reduceOnly,
-							tpSlEnabled: isTrigger ? false : state.tpSlEnabled,
-						}));
+						const isScale = isScaleOrderType(orderType);
+						set((state) => {
+							const needsTifReset = isScale && state.tif === "Ioc";
+							return {
+								orderType,
+								reduceOnly: isTrigger ? true : state.reduceOnly,
+								tpSlEnabled: isTrigger ? false : state.tpSlEnabled,
+								tif: needsTifReset ? "Gtc" : state.tif,
+							};
+						});
 					},
 
 					setSizeMode: (sizeMode) => set({ sizeMode }),

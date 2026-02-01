@@ -32,7 +32,7 @@ export interface OrderBuildParams {
 
 export interface OrderBuildResult {
 	orders: ExchangeOrder[];
-	grouping: "positionTpsl" | "na";
+	grouping: "normalTpsl" | "positionTpsl" | "na";
 }
 
 export function buildOrders(params: OrderBuildParams): OrderBuildResult {
@@ -85,7 +85,6 @@ export function buildOrders(params: OrderBuildParams): OrderBuildResult {
 			assetId,
 			isBuy,
 			formattedSize,
-			reduceOnly,
 			triggerPriceInput,
 			limitPriceInput,
 			isStopOrder,
@@ -112,7 +111,7 @@ export function buildOrders(params: OrderBuildParams): OrderBuildResult {
 		}
 	}
 
-	return { orders, grouping: hasTp || hasSl ? "positionTpsl" : "na" };
+	return { orders, grouping: hasTp || hasSl ? "normalTpsl" : "na" };
 }
 
 interface ScaleOrderParams {
@@ -151,7 +150,6 @@ interface TriggerOrderParams {
 	assetId: number;
 	isBuy: boolean;
 	formattedSize: string;
-	reduceOnly: boolean;
 	triggerPriceInput: string;
 	limitPriceInput: string;
 	isStopOrder: boolean;
@@ -167,7 +165,7 @@ function buildTriggerOrder(orders: ExchangeOrder[], params: TriggerOrderParams):
 		b: params.isBuy,
 		p: params.usesLimitPriceForOrder ? limitPx : triggerPx,
 		s: params.formattedSize,
-		r: params.reduceOnly,
+		r: true,
 		t: {
 			trigger: {
 				isMarket: !params.usesLimitPriceForOrder,

@@ -655,6 +655,10 @@ msgstr "Format for numbers and dates"
 msgid "From"
 msgstr "From"
 
+#: src/components/trade/positions/orders-tab.tsx
+msgid "Full Position"
+msgstr "Full Position"
+
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Funding"

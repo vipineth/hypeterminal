@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { formatPriceForOrder, formatSizeForOrder, throwIfAnyResponseError } from "@/domain/trade/orders";
+import { formatPriceForOrder, throwIfAnyResponseError } from "@/domain/trade/orders";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
@@ -85,15 +85,13 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 			t: { trigger: { isMarket: boolean; triggerPx: string; tpsl: "tp" | "sl" } };
 		}> = [];
 
-		const formattedSize = formatSizeForOrder(position.size, position.szDecimals);
-
 		if (tpPriceNum !== null && hasTp) {
 			const tpPx = formatPriceForOrder(tpPriceNum);
 			orders.push({
 				a: position.assetId,
 				b: !position.isLong,
 				p: tpPx,
-				s: formattedSize,
+				s: "0",
 				r: true,
 				t: { trigger: { isMarket: true, triggerPx: tpPx, tpsl: "tp" } },
 			});
@@ -105,7 +103,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 				a: position.assetId,
 				b: !position.isLong,
 				p: slPx,
-				s: formattedSize,
+				s: "0",
 				r: true,
 				t: { trigger: { isMarket: true, triggerPx: slPx, tpsl: "sl" } },
 			});

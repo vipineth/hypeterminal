@@ -17,6 +17,7 @@ import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOr
 import { useSubAllMids, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import type { Markets } from "@/lib/hyperliquid/markets";
 import { getValueColorClass, isPositive, toBig } from "@/lib/trade/numbers";
+import { isStopOrder, isTakeProfitOrder } from "@/lib/trade/open-orders";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useMarketActions } from "@/stores/use-market-store";
 import { AssetDisplay } from "../components/asset-display";
@@ -257,25 +258,25 @@ export function PositionsTab() {
 	const { data: allMidsEvent } = useSubAllMids({ dex: "ALL_DEXS" }, { enabled: allMidsEnabled });
 	const mids = allMidsEvent?.mids;
 
-	const { data: openOrdersEvent } = useSubOpenOrders({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
+	const { data: openOrdersEvent } = useSubOpenOrders(
+		{ user: address ?? "0x0", dex: "ALL_DEXS" },
+		{ enabled: isConnected && !!address },
+	);
 	const openOrders = openOrdersEvent?.orders ?? [];
 
 	const tpSlOrdersByCoin = useMemo(() => {
 		const map = new Map<string, TpSlOrderInfo>();
 		for (const order of openOrders) {
-			const orderType = (order as { orderType?: string }).orderType;
-			const isTp = orderType === "Take Profit Market" || orderType === "Take Profit Limit";
-			const isSl = orderType === "Stop Market" || orderType === "Stop Limit";
-			if (!isTp && !isSl) continue;
+			if (!order.isTrigger) continue;
 
-			const triggerPx = toBig((order as { triggerPx?: string }).triggerPx)?.toNumber() ?? Number.NaN;
-			if (!isPositive(triggerPx)) continue;
+			const triggerPx = toBig(order.triggerPx)?.toNumber();
+			if (!triggerPx || triggerPx <= 0) continue;
 
 			const existing = map.get(order.coin) ?? {};
-			if (isTp) {
+			if (isTakeProfitOrder(order) && !existing.tpPrice) {
 				existing.tpPrice = triggerPx;
 				existing.tpOrderId = order.oid;
-			} else {
+			} else if (isStopOrder(order) && !existing.slPrice) {
 				existing.slPrice = triggerPx;
 				existing.slOrderId = order.oid;
 			}

@@ -26,13 +26,7 @@ import { buildOrders, formatPriceForOrder, formatSizeForOrder, throwIfResponseEr
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatToken, szDecimalsToPriceDecimals } from "@/lib/format";
-import {
-	useAgentRegistration,
-	useAgentStatus,
-	useSelectedMarketInfo,
-	useSpotTokens,
-	useUserPositions,
-} from "@/lib/hyperliquid";
+import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo, useUserPositions } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useExchangeTwapOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeTwapOrder";
 import type { MarginMode } from "@/lib/trade/margin-mode";
@@ -152,9 +146,6 @@ export function OrderEntryPanel() {
 		szDecimals,
 	} = useOrderEntryData({ market, side, markPx, sizeMode, sizeInput });
 
-	const { getToken } = useSpotTokens();
-	const sizeModeToken = getToken(sizeModeLabel);
-
 	const { addOrder, updateOrder } = useOrderQueueActions();
 	const selectedPrice = useSelectedPrice();
 	const orderType = useOrderType();
@@ -229,6 +220,12 @@ export function OrderEntryPanel() {
 			getOrderbookActionsStore().actions.clearSelectedPrice();
 		}
 	}, [selectedPrice, setOrderType, setLimitPrice]);
+
+	useEffect(() => {
+		if (isSpotMarket && triggerOrder) {
+			setOrderType("market");
+		}
+	}, [isSpotMarket, triggerOrder, setOrderType]);
 
 	const tpPriceNum = toNumber(tpPriceInput);
 	const slPriceNum = toNumber(slPriceInput);
@@ -806,13 +803,16 @@ export function OrderEntryPanel() {
 									<Checkbox
 										id={reduceOnlyId}
 										aria-label={t`Reduce Only`}
-										checked={reduceOnly}
+										checked={triggerOrder || reduceOnly}
 										onCheckedChange={(checked) => setReduceOnly(checked === true)}
-										disabled={isFormDisabled}
+										disabled={isFormDisabled || triggerOrder}
 									/>
 									<label
 										htmlFor={reduceOnlyId}
-										className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-fg")}
+										className={cn(
+											"cursor-pointer",
+											(isFormDisabled || triggerOrder) && "cursor-not-allowed text-muted-fg",
+										)}
 									>
 										{t`Reduce Only`}
 									</label>

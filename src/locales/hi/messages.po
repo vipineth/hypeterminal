@@ -655,6 +655,10 @@ msgstr ""
 msgid "From"
 msgstr ""
 
+#: src/components/trade/positions/orders-tab.tsx
+msgid "Full Position"
+msgstr ""
+
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Funding"

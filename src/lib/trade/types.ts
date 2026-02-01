@@ -37,7 +37,7 @@ export interface OrderRequest {
 }
 
 export interface OrderTimeInForce {
-	limit: { tif: "FrontendMarket" | "Gtc" };
+	limit: { tif: "Gtc" | "Ioc" | "Alo" | "FrontendMarket" | "LiquidationMarket" };
 }
 
 export interface OrderTrigger {
@@ -48,4 +48,4 @@ export interface OrderTrigger {
 	};
 }
 
-export type OrderGrouping = "na" | "positionTpsl";
+export type OrderGrouping = "na" | "normalTpsl" | "positionTpsl";

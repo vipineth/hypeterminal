@@ -241,19 +241,19 @@ export function OrdersTab() {
 									const market = markets.getMarket(order.coin);
 									const assetInfo = market ?? { displayName: order.coin, iconUrl: undefined };
 									return (
-									<OrderRow
-										key={order.oid}
-										order={order}
-										assetInfo={assetInfo}
-										szDecimals={market?.szDecimals ?? 4}
-										isSelected={selectedOrderIds.has(order.oid)}
-										isCancelling={isCancelling}
-										canCancel={canCancel}
-										onToggle={handleToggleOrder}
-										onCancel={handleCancelOrders}
-										onSelectMarket={setSelectedMarket}
-									/>
-								);
+										<OrderRow
+											key={order.oid}
+											order={order}
+											assetInfo={assetInfo}
+											szDecimals={market?.szDecimals ?? 4}
+											isSelected={selectedOrderIds.has(order.oid)}
+											isCancelling={isCancelling}
+											canCancel={canCancel}
+											onToggle={handleToggleOrder}
+											onCancel={handleCancelOrders}
+											onSelectMarket={setSelectedMarket}
+										/>
+									);
 								})}
 							</TableBody>
 						</Table>
@@ -326,13 +326,23 @@ function OrderRow({
 				{formatUSD(order.limitPx, { compact: false })}
 			</TableCell>
 			<TableCell className="text-2xs text-right tabular-nums py-1.5">
-				{formatNumber(order.origSz, szDecimals)} {order.coin}{" "}
-				<span className="text-muted-fg">({formatUSD(getOrderValue(order), { compact: false })})</span>
+				{order.isPositionTpsl ? (
+					<span className="text-muted-fg">{t`Full Position`}</span>
+				) : (
+					<>
+						{formatNumber(order.origSz, szDecimals)} {order.coin}{" "}
+						<span className="text-muted-fg">({formatUSD(getOrderValue(order), { compact: false })})</span>
+					</>
+				)}
 			</TableCell>
 			<TableCell className="text-2xs text-right tabular-nums py-1.5">
-				<span className={cn(fillPct > 0 && "text-warning")}>
-					{formatNumber(getFilledSize(order), szDecimals)} ({fillPct.toFixed(0)}%)
-				</span>
+				{order.isPositionTpsl || fillPct === 0 ? (
+					<span className="text-muted-fg">{FALLBACK_VALUE_PLACEHOLDER}</span>
+				) : (
+					<span className="text-warning">
+						{formatNumber(getFilledSize(order), szDecimals)} ({fillPct.toFixed(2)}%)
+					</span>
+				)}
 			</TableCell>
 			<TableCell className="text-2xs text-muted-fg py-1.5">
 				{order.triggerCondition || FALLBACK_VALUE_PLACEHOLDER}
