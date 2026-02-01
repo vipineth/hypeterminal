@@ -327,7 +327,7 @@ function OrderRow({
 			</TableCell>
 			<TableCell className="text-2xs text-right tabular-nums py-1.5">
 				{order.isPositionTpsl ? (
-					<span className="text-muted-fg">{t`Full Position`}</span>
+					<span className="text-muted-fg">100%</span>
 				) : (
 					<>
 						{formatNumber(order.origSz, szDecimals)} {order.coin}{" "}

@@ -106,7 +106,7 @@ function PositionRow({
 
 	const sideClass = isLong ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
 	const pnlClass = getValueColorClass(unrealizedPnl);
-	const fundingClass = getValueColorClass(cumFunding);
+	const fundingClass = getValueColorClass(cumFunding ? -cumFunding : null);
 	const hasTpSl = !!(tpSlInfo?.tpPrice || tpSlInfo?.slPrice);
 
 	function handleClose() {

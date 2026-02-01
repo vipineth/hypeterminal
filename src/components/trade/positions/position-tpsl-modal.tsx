@@ -4,7 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { formatPriceForOrder, throwIfAnyResponseError } from "@/domain/trade/orders";
+import { buildOrderPlan } from "@/domain/trade/order-intent";
+import { throwIfAnyResponseError } from "@/domain/trade/orders";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
@@ -76,41 +77,20 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 
 		resetError();
 
-		const orders: Array<{
-			a: number;
-			b: boolean;
-			p: string;
-			s: string;
-			r: boolean;
-			t: { trigger: { isMarket: boolean; triggerPx: string; tpsl: "tp" | "sl" } };
-		}> = [];
+		const plan = buildOrderPlan({
+			kind: "positionTpsl",
+			assetId: position.assetId,
+			isLong: position.isLong,
+			tpPriceNum: hasTp ? tpPriceNum : null,
+			slPriceNum: hasSl ? slPriceNum : null,
+		});
 
-		if (tpPriceNum !== null && hasTp) {
-			const tpPx = formatPriceForOrder(tpPriceNum);
-			orders.push({
-				a: position.assetId,
-				b: !position.isLong,
-				p: tpPx,
-				s: "0",
-				r: true,
-				t: { trigger: { isMarket: true, triggerPx: tpPx, tpsl: "tp" } },
-			});
-		}
-
-		if (slPriceNum !== null && hasSl) {
-			const slPx = formatPriceForOrder(slPriceNum);
-			orders.push({
-				a: position.assetId,
-				b: !position.isLong,
-				p: slPx,
-				s: "0",
-				r: true,
-				t: { trigger: { isMarket: true, triggerPx: slPx, tpsl: "sl" } },
-			});
+		if (plan.errors.length > 0) {
+			return;
 		}
 
 		try {
-			const result = await placeOrder({ orders, grouping: "positionTpsl" });
+			const result = await placeOrder({ orders: plan.orders, grouping: plan.grouping });
 			throwIfAnyResponseError(result.response?.data?.statuses);
 
 			setTpPriceInput("");

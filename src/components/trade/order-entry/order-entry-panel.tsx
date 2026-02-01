@@ -22,7 +22,8 @@ import { getMarketQuoteToken } from "@/domain/trade/balances";
 import { getLiquidationInfo, getOrderMetrics } from "@/domain/trade/order/metrics";
 import { getOrderPrice } from "@/domain/trade/order/price";
 import { getSliderValue } from "@/domain/trade/order/size";
-import { buildOrders, formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
+import { buildOrderPlan } from "@/domain/trade/order-intent";
+import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatToken, szDecimalsToPriceDecimals } from "@/lib/format";
@@ -390,7 +391,8 @@ export function OrderEntryPanel() {
 				throwIfResponseError(result.response?.data?.status);
 				updateOrder(orderId, { status: "success", fillPercent: 100 });
 			} else {
-				const { orders, grouping } = buildOrders({
+				const plan = buildOrderPlan({
+					kind: "entry",
 					assetId: market.assetId,
 					side,
 					orderType,
@@ -410,13 +412,14 @@ export function OrderEntryPanel() {
 					canUseTpSl,
 					tpPriceNum,
 					slPriceNum,
-					isStopOrder: stopOrder,
-					isTriggerOrder: triggerOrder,
-					isScaleOrder: scaleOrder,
-					usesLimitPriceForOrder: usesLimitPrice,
 				});
 
-				const result = await placeOrder({ orders, grouping });
+				if (plan.errors.length > 0) {
+					updateOrder(orderId, { status: "failed", error: plan.errors.join("; ") });
+					return;
+				}
+
+				const result = await placeOrder({ orders: plan.orders, grouping: plan.grouping });
 				const statuses = result.response?.data?.statuses ?? [];
 
 				const errors: string[] = [];

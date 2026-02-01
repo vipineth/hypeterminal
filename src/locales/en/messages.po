@@ -656,8 +656,8 @@ msgid "From"
 msgstr "From"
 
 #: src/components/trade/positions/orders-tab.tsx
-msgid "Full Position"
-msgstr "Full Position"
+#~ msgid "Full Position"
+#~ msgstr "Full Position"
 
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/positions/positions-tab.tsx
@@ -716,12 +716,15 @@ msgstr "Insufficient {0} balance"
 msgid "Insufficient <0/> balance"
 msgstr "Insufficient <0/> balance"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
 #: src/lib/errors/definitions/deposit.ts
 #: src/lib/errors/definitions/deposit.ts
 #: src/lib/hyperliquid/use-deposit.ts
 msgid "Insufficient balance"
 msgstr "Insufficient balance"
+
+#: src/components/trade/order-entry/deposit-modal.tsx
+msgid "Insufficient balance (includes ${WITHDRAWAL_FEE_USD} fee)"
+msgstr "Insufficient balance (includes ${WITHDRAWAL_FEE_USD} fee)"
 
 #: src/lib/errors/format.ts
 msgid "Insufficient funds for gas"
@@ -985,6 +988,10 @@ msgstr "Move USDC between your Perp and Spot accounts."
 #: src/components/pages/builder-page.tsx
 #~ msgid "Must be signed by main wallet (not agent/API wallet)"
 #~ msgstr "Must be signed by main wallet (not agent/API wallet)"
+
+#: src/components/trade/order-entry/deposit-modal.tsx
+msgid "Net received"
+msgstr "Net received"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 msgid "Network fee"
@@ -1970,8 +1977,12 @@ msgid "What is a wallet?"
 msgstr "What is a wallet?"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
-msgid "will arrive in ~3 min"
-msgstr "will arrive in ~3 min"
+#~ msgid "will arrive in ~3 min"
+#~ msgstr "will arrive in ~3 min"
+
+#: src/components/trade/order-entry/deposit-modal.tsx
+msgid "will arrive in ~5 min"
+msgstr "will arrive in ~5 min"
 
 #: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/order-entry/account-panel.tsx
