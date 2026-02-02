@@ -213,6 +213,17 @@ export function useTokenSelector({ value, onValueChange }: UseTokenSelectorOptio
 	}, [open, virtualizer]);
 
 	useEffect(() => {
+		if (!open) return;
+
+		function handleWindowBlur() {
+			setOpen(false);
+		}
+
+		window.addEventListener("blur", handleWindowBlur);
+		return () => window.removeEventListener("blur", handleWindowBlur);
+	}, [open]);
+
+	useEffect(() => {
 		if (!open) {
 			hasInitializedRef.current = false;
 			setHighlightedIndex(-1);
