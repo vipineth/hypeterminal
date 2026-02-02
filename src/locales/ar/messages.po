@@ -794,6 +794,10 @@ msgstr "التصفية"
 msgid "Liq. Price"
 msgstr "سعر التصفية"
 
+#: src/components/trade/positions/history-tab.tsx
+msgid "Liquidated"
+msgstr ""
+
 #: src/components/ui/spinner.tsx
 msgid "Loading"
 msgstr "جارٍ التحميل"

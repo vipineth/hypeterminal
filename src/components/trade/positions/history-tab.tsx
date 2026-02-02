@@ -121,7 +121,14 @@ export function HistoryTab() {
 												</div>
 											</TableCell>
 											<TableCell className="text-2xs py-1.5">
-												<span className="text-4xs px-1 py-0.5 rounded-sm uppercase bg-accent/50">{fill.dir}</span>
+												<span
+													className={cn(
+														"text-4xs px-1 py-0.5 rounded-sm uppercase",
+														fill.liquidation ? "bg-negative/20 text-negative" : "bg-accent/50",
+													)}
+												>
+													{fill.liquidation ? t`Liquidated` : fill.dir}
+												</span>
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">{formatUSD(fill.px)}</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
@@ -137,7 +144,9 @@ export function HistoryTab() {
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
 												{showPnl ? (
 													<span className={getValueColorClass(closedPnl)}>
-														{formatUSD(closedPnl, { signDisplay: "exceptZero" })}
+														{formatUSD(closedPnl, {
+															signDisplay: "exceptZero",
+														})}
 													</span>
 												) : (
 													<span className="text-muted-fg">{FALLBACK_VALUE_PLACEHOLDER}</span>

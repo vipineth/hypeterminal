@@ -798,6 +798,10 @@ msgstr "Liq"
 msgid "Liq. Price"
 msgstr "Liq. Price"
 
+#: src/components/trade/positions/history-tab.tsx
+msgid "Liquidated"
+msgstr "Liquidated"
+
 #: src/components/ui/spinner.tsx
 msgid "Loading"
 msgstr "Loading"

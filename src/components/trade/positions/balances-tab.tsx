@@ -53,7 +53,10 @@ export function BalancesTab() {
 	const hideSmallBalances = useHideSmallBalances();
 	const { setHideSmallBalances } = useGlobalSettingsActions();
 	const { open: openSwapModal } = useSwapModalActions();
-	const [transferState, setTransferState] = useState<{ open: boolean; direction: TransferDirection }>({
+	const [transferState, setTransferState] = useState<{
+		open: boolean;
+		direction: TransferDirection;
+	}>({
 		open: false,
 		direction: "toSpot",
 	});
@@ -226,25 +229,25 @@ export function BalancesTab() {
 						<Table className="w-auto min-w-full">
 							<TableHeader>
 								<TableRow className="border-border/40 hover:bg-transparent">
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7 w-[140px]">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7 w-35">
 										{t`Asset`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-[90px]">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-22.5">
 										{t`Available`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-[80px]">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-20">
 										{t`In Use`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-[90px]">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-22.5">
 										{t`Total`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-[90px]">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-22.5">
 										{t`USD Value`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-[100px]">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-25">
 										{t`PNL`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-[80px]">
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-20">
 										{t`Actions`}
 									</TableHead>
 								</TableRow>

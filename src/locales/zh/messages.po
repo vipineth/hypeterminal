@@ -794,6 +794,10 @@ msgstr "清算"
 msgid "Liq. Price"
 msgstr "清算价"
 
+#: src/components/trade/positions/history-tab.tsx
+msgid "Liquidated"
+msgstr ""
+
 #: src/components/ui/spinner.tsx
 msgid "Loading"
 msgstr "加载中"

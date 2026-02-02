@@ -794,6 +794,10 @@ msgstr "लिक्विडेशन"
 msgid "Liq. Price"
 msgstr "लिक्विडेशन प्राइस"
 
+#: src/components/trade/positions/history-tab.tsx
+msgid "Liquidated"
+msgstr ""
+
 #: src/components/ui/spinner.tsx
 msgid "Loading"
 msgstr "लोड हो रहा है"
