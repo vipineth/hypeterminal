@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { ArrowRightLeft, ChevronDown } from "lucide-react";
-import { useDeferredValue, useMemo, useState } from "react";
+import { useDeferredValue, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -9,9 +9,9 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getBaseQuoteFromDisplayName } from "@/domain/market";
 import { formatNumber } from "@/lib/format";
 import { useSelectedMarketInfo, useSubL2Book } from "@/lib/hyperliquid";
-import { getBaseQuoteFromDisplayName } from "@/domain/market";
 import {
 	getMaxTotal,
 	getPriceGroupingOptions,
@@ -22,13 +22,14 @@ import {
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
 import { OrderbookRow } from "./orderbook-row";
 import { TradesPanel } from "./trades-panel";
-
-const VISIBLE_ROWS = 10;
+import { useOrderbookRows } from "./use-orderbook-rows";
 
 export function OrderbookPanel() {
 	const [selectedOption, setSelectedOption] = useState<L2BookPriceGroupOption | null>(null);
 	const { showOrderbookInQuote } = useGlobalSettings();
 	const { setShowOrderbookInQuote } = useGlobalSettingsActions();
+	const orderbookContainerRef = useRef<HTMLDivElement>(null);
+	const visibleRows = useOrderbookRows(orderbookContainerRef);
 
 	const { data: selectedMarket } = useSelectedMarketInfo();
 
@@ -52,8 +53,14 @@ export function OrderbookPanel() {
 		return getBaseQuoteFromDisplayName(selectedMarket.displayName, selectedMarket.kind);
 	}, [selectedMarket]);
 
-	const bids = useMemo(() => processLevels(deferredOrderbook?.levels[0], VISIBLE_ROWS), [deferredOrderbook?.levels]);
-	const asks = useMemo(() => processLevels(deferredOrderbook?.levels[1], VISIBLE_ROWS), [deferredOrderbook?.levels]);
+	const bids = useMemo(
+		() => processLevels(deferredOrderbook?.levels[0], visibleRows),
+		[deferredOrderbook?.levels, visibleRows],
+	);
+	const asks = useMemo(
+		() => processLevels(deferredOrderbook?.levels[1], visibleRows),
+		[deferredOrderbook?.levels, visibleRows],
+	);
 	const maxTotal = getMaxTotal(bids, asks);
 	const spreadInfo = getSpreadInfo(bids, asks);
 	const priceGroupingOptions = getPriceGroupingOptions(spreadInfo.mid);
@@ -129,7 +136,7 @@ export function OrderbookPanel() {
 					</Button>
 				</div>
 
-				<div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+				<div ref={orderbookContainerRef} className="flex-1 min-h-0 flex flex-col overflow-hidden">
 					{orderbookStatus !== "error" && asks.length > 0 ? (
 						<div className="flex-1 flex flex-col justify-end gap-px py-0.5">
 							{[...asks].reverse().map((level, i) => (

@@ -4,6 +4,8 @@ import Big from "big.js";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { get24hChange, getOiUsd, isTokenInCategory, type MarketCategory } from "@/domain/market";
 import { useMarketsInfo } from "@/lib/hyperliquid";
+import { createSearcher } from "@/lib/search";
+import { marketSearchConfig } from "@/lib/search/presets/market";
 import { useFavoriteMarkets, useMarketActions } from "@/stores/use-market-store";
 import { type MarketRow, type MarketScope, TOKEN_SELECTOR_COLUMNS } from "./constants";
 
@@ -37,6 +39,8 @@ export interface UseTokenSelectorReturn {
 	virtualizer: Virtualizer<HTMLDivElement, Element>;
 	containerRef: React.RefObject<HTMLDivElement | null>;
 	filteredMarkets: MarketRow[];
+	highlightedIndex: number;
+	handleKeyDown: (e: React.KeyboardEvent) => void;
 }
 
 function getBaseCoin(market: MarketRow): string {
@@ -71,7 +75,7 @@ const PERP_CATEGORIES: Subcategory[] = [
 	{ value: "meme", label: "Meme" },
 ];
 
-export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): UseTokenSelectorReturn {
+export function useTokenSelector({ value, onValueChange }: UseTokenSelectorOptions): UseTokenSelectorReturn {
 	const [open, setOpen] = useState(false);
 	const [scope, setScope] = useState<MarketScope>("all");
 	const [subcategory, setSubcategory] = useState<string>("all");
@@ -79,7 +83,9 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 	const [deferredSearch, setDeferredSearch] = useState("");
 	const [isPending, startTransition] = useTransition();
 	const [sorting, setSorting] = useState<SortingState>([{ id: "volume", desc: true }]);
+	const [highlightedIndex, setHighlightedIndex] = useState(-1);
 	const containerRef = useRef<HTMLDivElement>(null);
+	const hasInitializedRef = useRef(false);
 
 	const handleSearchChange = useCallback((value: string) => {
 		setSearch(value);
@@ -108,7 +114,10 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 			}
 			return [
 				{ value: "all", label: "All" },
-				...Array.from(quoteTokens.entries()).map(([name, displayName]) => ({ value: name, label: displayName })),
+				...Array.from(quoteTokens.entries()).map(([name, displayName]) => ({
+					value: name,
+					label: displayName,
+				})),
 			];
 		}
 
@@ -125,12 +134,11 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 		setSubcategory("all");
 	}, []);
 
-	const filteredMarkets = useMemo(() => {
+	const scopeFilteredMarkets = useMemo(() => {
 		return markets.filter((market) => {
 			if (scope === "perp" && market.kind !== "perp") return false;
 			if (scope === "spot" && market.kind !== "spot") return false;
 			if (scope === "hip3" && market.kind !== "builderPerp") return false;
-			if (deferredSearch && !market.displayName.toLowerCase().includes(deferredSearch.toLowerCase())) return false;
 
 			if (subcategory === "all") return true;
 
@@ -149,14 +157,23 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 
 			return true;
 		});
-	}, [markets, scope, subcategory, deferredSearch]);
+	}, [markets, scope, subcategory]);
+
+	const searcher = useMemo(() => createSearcher(scopeFilteredMarkets, marketSearchConfig), [scopeFilteredMarkets]);
+
+	const filteredMarkets = useMemo(() => {
+		if (!deferredSearch) return scopeFilteredMarkets;
+		return searcher.search(deferredSearch).map((result) => result.item);
+	}, [scopeFilteredMarkets, searcher, deferredSearch]);
 
 	const sortedMarkets = useMemo(() => {
 		const favoriteMarkets = filteredMarkets.filter((m) => isFavorite(m.name));
 		const nonFavoriteMarkets = filteredMarkets.filter((m) => !isFavorite(m.name));
 
 		function sortSection(section: MarketRow[]): MarketRow[] {
+			if (deferredSearch) return section;
 			if (sorting.length === 0) return section;
+
 			const { id, desc } = sorting[0];
 			return [...section].sort((a, b) => {
 				const cmp = Big(getSortValue(a, id)).cmp(Big(getSortValue(b, id)));
@@ -165,7 +182,7 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 		}
 
 		return [...sortSection(favoriteMarkets), ...sortSection(nonFavoriteMarkets)];
-	}, [filteredMarkets, isFavorite, sorting]);
+	}, [filteredMarkets, isFavorite, sorting, deferredSearch]);
 
 	const table = useReactTable({
 		data: sortedMarkets,
@@ -195,6 +212,74 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 		}
 	}, [open, virtualizer]);
 
+	useEffect(() => {
+		if (!open) return;
+
+		function handleWindowBlur() {
+			setOpen(false);
+		}
+
+		window.addEventListener("blur", handleWindowBlur);
+		return () => window.removeEventListener("blur", handleWindowBlur);
+	}, [open]);
+
+	useEffect(() => {
+		if (!open) {
+			hasInitializedRef.current = false;
+			setHighlightedIndex(-1);
+			return;
+		}
+
+		if (rows.length === 0) return;
+
+		if (!hasInitializedRef.current) {
+			hasInitializedRef.current = true;
+			const index = value ? rows.findIndex((row) => row.original.name === value) : -1;
+			setHighlightedIndex(index >= 0 ? index : 0);
+			if (index > 0) {
+				virtualizer.scrollToIndex(index, { align: "center" });
+			}
+		}
+	}, [open, rows, value, virtualizer]);
+
+	useEffect(() => {
+		if (open && hasInitializedRef.current) {
+			setHighlightedIndex(0);
+		}
+	}, [deferredSearch, scope, subcategory]);
+
+	function handleKeyDown(e: React.KeyboardEvent) {
+		if (rows.length === 0) return;
+
+		switch (e.key) {
+			case "ArrowDown":
+				e.preventDefault();
+				setHighlightedIndex((prev) => {
+					const next = Math.min(prev + 1, rows.length - 1);
+					virtualizer.scrollToIndex(next, { align: "auto" });
+					return next;
+				});
+				break;
+			case "ArrowUp":
+				e.preventDefault();
+				setHighlightedIndex((prev) => {
+					const next = Math.max(prev - 1, 0);
+					virtualizer.scrollToIndex(next, { align: "auto" });
+					return next;
+				});
+				break;
+			case "Enter":
+				e.preventDefault();
+				if (rows[highlightedIndex]) {
+					handleSelect(rows[highlightedIndex].original.name);
+				}
+				break;
+			case "Escape":
+				setOpen(false);
+				break;
+		}
+	}
+
 	function handleSelect(name: string) {
 		onValueChange(name);
 		setOpen(false);
@@ -221,5 +306,7 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 		virtualizer,
 		containerRef,
 		filteredMarkets,
+		highlightedIndex,
+		handleKeyDown,
 	};
 }
