@@ -4,6 +4,8 @@ import Big from "big.js";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { get24hChange, getOiUsd, isTokenInCategory, type MarketCategory } from "@/domain/market";
 import { useMarketsInfo } from "@/lib/hyperliquid";
+import { createSearcher } from "@/lib/search";
+import { marketSearchConfig } from "@/lib/search/presets/market";
 import { useFavoriteMarkets, useMarketActions } from "@/stores/use-market-store";
 import { type MarketRow, type MarketScope, TOKEN_SELECTOR_COLUMNS } from "./constants";
 
@@ -108,7 +110,10 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 			}
 			return [
 				{ value: "all", label: "All" },
-				...Array.from(quoteTokens.entries()).map(([name, displayName]) => ({ value: name, label: displayName })),
+				...Array.from(quoteTokens.entries()).map(([name, displayName]) => ({
+					value: name,
+					label: displayName,
+				})),
 			];
 		}
 
@@ -125,12 +130,11 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 		setSubcategory("all");
 	}, []);
 
-	const filteredMarkets = useMemo(() => {
+	const scopeFilteredMarkets = useMemo(() => {
 		return markets.filter((market) => {
 			if (scope === "perp" && market.kind !== "perp") return false;
 			if (scope === "spot" && market.kind !== "spot") return false;
 			if (scope === "hip3" && market.kind !== "builderPerp") return false;
-			if (deferredSearch && !market.displayName.toLowerCase().includes(deferredSearch.toLowerCase())) return false;
 
 			if (subcategory === "all") return true;
 
@@ -149,14 +153,23 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 
 			return true;
 		});
-	}, [markets, scope, subcategory, deferredSearch]);
+	}, [markets, scope, subcategory]);
+
+	const searcher = useMemo(() => createSearcher(scopeFilteredMarkets, marketSearchConfig), [scopeFilteredMarkets]);
+
+	const filteredMarkets = useMemo(() => {
+		if (!deferredSearch) return scopeFilteredMarkets;
+		return searcher.search(deferredSearch).map((result) => result.item);
+	}, [scopeFilteredMarkets, searcher, deferredSearch]);
 
 	const sortedMarkets = useMemo(() => {
 		const favoriteMarkets = filteredMarkets.filter((m) => isFavorite(m.name));
 		const nonFavoriteMarkets = filteredMarkets.filter((m) => !isFavorite(m.name));
 
 		function sortSection(section: MarketRow[]): MarketRow[] {
+			if (deferredSearch) return section;
 			if (sorting.length === 0) return section;
+
 			const { id, desc } = sorting[0];
 			return [...section].sort((a, b) => {
 				const cmp = Big(getSortValue(a, id)).cmp(Big(getSortValue(b, id)));
@@ -165,7 +178,7 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 		}
 
 		return [...sortSection(favoriteMarkets), ...sortSection(nonFavoriteMarkets)];
-	}, [filteredMarkets, isFavorite, sorting]);
+	}, [filteredMarkets, isFavorite, sorting, deferredSearch]);
 
 	const table = useReactTable({
 		data: sortedMarkets,

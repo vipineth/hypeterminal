@@ -283,7 +283,9 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 											</div>
 											<div className="w-16 sm:w-20 text-right">
 												<span className="text-2xs font-medium tabular-nums">
-													{formatPrice(market.markPx, { szDecimals: getSzDecimals(market) })}
+													{formatPrice(market.markPx, {
+														szDecimals: getSzDecimals(market),
+													})}
 												</span>
 											</div>
 											<div className="w-16 sm:w-20 text-right">

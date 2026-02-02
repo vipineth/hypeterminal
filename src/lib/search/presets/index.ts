@@ -1,0 +1,1 @@
+export { marketSearchConfig } from "./market";
