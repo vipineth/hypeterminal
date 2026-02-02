@@ -214,10 +214,10 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 									const { markPx, prevDayPx } = market;
 									const changeDecimal =
 										markPx && prevDayPx && prevDayPx !== 0 ? (markPx - prevDayPx) / prevDayPx : null;
-									const changeIsPositive = (changeDecimal ?? 0) >= 0;
+
 									const changeClass = cn(
 										"text-2xs font-medium tabular-nums",
-										changeDecimal === null ? "text-muted-fg" : getValueColorClass(changeIsPositive),
+										changeDecimal === null ? "text-muted-fg" : getValueColorClass(changeDecimal),
 									);
 									const changeText = formatPercent(changeDecimal);
 
