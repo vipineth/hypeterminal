@@ -62,6 +62,8 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 		virtualizer,
 		containerRef,
 		filteredMarkets,
+		highlightedIndex,
+		handleKeyDown,
 	} = useTokenSelector({ value: selectedMarket?.name ?? "", onValueChange });
 
 	const virtualItems = virtualizer.getVirtualItems();
@@ -86,6 +88,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 				className="w-[calc(100vw-1rem)] sm:w-2xl max-w-2xl p-0 border-border/60 bg-surface"
 				align="start"
 				sideOffset={8}
+				onKeyDown={handleKeyDown}
 			>
 				<div className="flex flex-col p-2">
 					<div className="border-b border-border/40">
@@ -205,6 +208,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 									const row = rows[virtualItem.index];
 									const market = row.original;
 									const isSelected = selectedMarket?.name === market.name;
+									const isHighlighted = highlightedIndex >= 0 && virtualItem.index === highlightedIndex;
 									const isFav = isFavorite(market.name);
 
 									const { markPx, prevDayPx } = market;
@@ -239,7 +243,8 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 												"flex items-center px-3 py-1.5 cursor-pointer border-b border-border/20",
 												"hover:bg-accent/30 transition-colors",
 												"absolute top-0 left-0 w-full",
-												isSelected && "bg-info/5",
+												isSelected && !isHighlighted && "bg-muted/10",
+												isHighlighted && "bg-accent/40",
 											)}
 											style={{
 												height: `${virtualItem.size}px`,

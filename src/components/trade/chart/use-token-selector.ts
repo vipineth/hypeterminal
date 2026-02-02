@@ -39,6 +39,8 @@ export interface UseTokenSelectorReturn {
 	virtualizer: Virtualizer<HTMLDivElement, Element>;
 	containerRef: React.RefObject<HTMLDivElement | null>;
 	filteredMarkets: MarketRow[];
+	highlightedIndex: number;
+	handleKeyDown: (e: React.KeyboardEvent) => void;
 }
 
 function getBaseCoin(market: MarketRow): string {
@@ -73,7 +75,7 @@ const PERP_CATEGORIES: Subcategory[] = [
 	{ value: "meme", label: "Meme" },
 ];
 
-export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): UseTokenSelectorReturn {
+export function useTokenSelector({ value, onValueChange }: UseTokenSelectorOptions): UseTokenSelectorReturn {
 	const [open, setOpen] = useState(false);
 	const [scope, setScope] = useState<MarketScope>("all");
 	const [subcategory, setSubcategory] = useState<string>("all");
@@ -81,7 +83,9 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 	const [deferredSearch, setDeferredSearch] = useState("");
 	const [isPending, startTransition] = useTransition();
 	const [sorting, setSorting] = useState<SortingState>([{ id: "volume", desc: true }]);
+	const [highlightedIndex, setHighlightedIndex] = useState(-1);
 	const containerRef = useRef<HTMLDivElement>(null);
+	const hasInitializedRef = useRef(false);
 
 	const handleSearchChange = useCallback((value: string) => {
 		setSearch(value);
@@ -208,6 +212,63 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 		}
 	}, [open, virtualizer]);
 
+	useEffect(() => {
+		if (!open) {
+			hasInitializedRef.current = false;
+			setHighlightedIndex(-1);
+			return;
+		}
+
+		if (rows.length === 0) return;
+
+		if (!hasInitializedRef.current) {
+			hasInitializedRef.current = true;
+			const index = value ? rows.findIndex((row) => row.original.name === value) : -1;
+			setHighlightedIndex(index >= 0 ? index : 0);
+			if (index > 0) {
+				virtualizer.scrollToIndex(index, { align: "center" });
+			}
+		}
+	}, [open, rows, value, virtualizer]);
+
+	useEffect(() => {
+		if (open && hasInitializedRef.current) {
+			setHighlightedIndex(0);
+		}
+	}, [deferredSearch, scope, subcategory]);
+
+	function handleKeyDown(e: React.KeyboardEvent) {
+		if (rows.length === 0) return;
+
+		switch (e.key) {
+			case "ArrowDown":
+				e.preventDefault();
+				setHighlightedIndex((prev) => {
+					const next = Math.min(prev + 1, rows.length - 1);
+					virtualizer.scrollToIndex(next, { align: "auto" });
+					return next;
+				});
+				break;
+			case "ArrowUp":
+				e.preventDefault();
+				setHighlightedIndex((prev) => {
+					const next = Math.max(prev - 1, 0);
+					virtualizer.scrollToIndex(next, { align: "auto" });
+					return next;
+				});
+				break;
+			case "Enter":
+				e.preventDefault();
+				if (rows[highlightedIndex]) {
+					handleSelect(rows[highlightedIndex].original.name);
+				}
+				break;
+			case "Escape":
+				setOpen(false);
+				break;
+		}
+	}
+
 	function handleSelect(name: string) {
 		onValueChange(name);
 		setOpen(false);
@@ -234,5 +295,7 @@ export function useTokenSelector({ onValueChange }: UseTokenSelectorOptions): Us
 		virtualizer,
 		containerRef,
 		filteredMarkets,
+		highlightedIndex,
+		handleKeyDown,
 	};
 }
