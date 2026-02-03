@@ -111,8 +111,8 @@ msgid "Amount (USDC)"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-msgid "API"
-msgstr "API"
+#~ msgid "API"
+#~ msgstr "API"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Appearance"
@@ -477,8 +477,8 @@ msgid "Displays the mobile sidebar."
 msgstr "显示移动端侧边栏。"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Docs"
-msgstr "文档"
+#~ msgid "Docs"
+#~ msgstr "文档"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/order-entry/deposit-modal.tsx
@@ -750,8 +750,8 @@ msgstr "逐仓"
 #~ msgstr "延迟:"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Leaderboard"
-msgstr "排行榜"
+#~ msgid "Leaderboard"
+#~ msgstr "排行榜"
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Learn more"
@@ -970,12 +970,12 @@ msgid "Mock Wallet (Testing)"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-msgid "More"
-msgstr "更多"
+#~ msgid "More"
+#~ msgstr "更多"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "More options"
-msgstr "更多选项"
+#~ msgid "More options"
+#~ msgstr "更多选项"
 
 #: src/components/ui/pagination.tsx
 #~ msgid "More pages"
@@ -1209,8 +1209,8 @@ msgid "Popular"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Portfolio"
-msgstr "投资组合"
+#~ msgid "Portfolio"
+#~ msgstr "投资组合"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
@@ -1579,8 +1579,8 @@ msgid "Spread"
 msgstr "价差"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Staking"
-msgstr "质押"
+#~ msgid "Staking"
+#~ msgstr "质押"
 
 #: src/lib/errors/definitions/scale.ts
 msgid "Start and end must differ"
@@ -1624,8 +1624,8 @@ msgid "Submitting..."
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Support"
-msgstr "支持"
+#~ msgid "Support"
+#~ msgstr "支持"
 
 #: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/components/spot-swap-modal.tsx
@@ -1925,8 +1925,8 @@ msgstr "美元价值"
 #~ msgstr "价值"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Vaults"
-msgstr "金库"
+#~ msgid "Vaults"
+#~ msgstr "金库"
 
 #: src/lib/trade/use-button-content.ts
 msgid "Verifying..."
@@ -1965,8 +1965,8 @@ msgid "Wallet not connected"
 msgstr "钱包未连接"
 
 #: src/components/trade/orderbook/orderbook-panel.tsx
-msgid "WebSocket error"
-msgstr "WebSocket 错误"
+#~ msgid "WebSocket error"
+#~ msgstr "WebSocket 错误"
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "What is a wallet?"

@@ -111,8 +111,8 @@ msgid "Amount (USDC)"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-msgid "API"
-msgstr "API"
+#~ msgid "API"
+#~ msgstr "API"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Appearance"
@@ -477,8 +477,8 @@ msgid "Displays the mobile sidebar."
 msgstr "Affiche la barre latérale mobile."
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Docs"
-msgstr "Documentation"
+#~ msgid "Docs"
+#~ msgstr "Documentation"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/order-entry/deposit-modal.tsx
@@ -750,8 +750,8 @@ msgstr "Isolé"
 #~ msgstr "Latence :"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Leaderboard"
-msgstr "Classement"
+#~ msgid "Leaderboard"
+#~ msgstr "Classement"
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Learn more"
@@ -970,12 +970,12 @@ msgid "Mock Wallet (Testing)"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-msgid "More"
-msgstr "Plus"
+#~ msgid "More"
+#~ msgstr "Plus"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "More options"
-msgstr "Plus d'options"
+#~ msgid "More options"
+#~ msgstr "Plus d'options"
 
 #: src/components/ui/pagination.tsx
 #~ msgid "More pages"
@@ -1209,8 +1209,8 @@ msgid "Popular"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Portfolio"
-msgstr "Portefeuille"
+#~ msgid "Portfolio"
+#~ msgstr "Portefeuille"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
@@ -1579,8 +1579,8 @@ msgid "Spread"
 msgstr "Écart"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Staking"
-msgstr "Staking"
+#~ msgid "Staking"
+#~ msgstr "Staking"
 
 #: src/lib/errors/definitions/scale.ts
 msgid "Start and end must differ"
@@ -1624,8 +1624,8 @@ msgid "Submitting..."
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Support"
-msgstr "Support"
+#~ msgid "Support"
+#~ msgstr "Support"
 
 #: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/components/spot-swap-modal.tsx
@@ -1925,8 +1925,8 @@ msgstr "Valeur en USD"
 #~ msgstr "Valeur"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Vaults"
-msgstr "Coffres"
+#~ msgid "Vaults"
+#~ msgstr "Coffres"
 
 #: src/lib/trade/use-button-content.ts
 msgid "Verifying..."
@@ -1965,8 +1965,8 @@ msgid "Wallet not connected"
 msgstr "Portefeuille non connecté"
 
 #: src/components/trade/orderbook/orderbook-panel.tsx
-msgid "WebSocket error"
-msgstr "Erreur WebSocket"
+#~ msgid "WebSocket error"
+#~ msgstr "Erreur WebSocket"
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "What is a wallet?"

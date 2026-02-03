@@ -1,31 +1,19 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { Bell, ChevronDown, Cog, Terminal, Zap } from "lucide-react";
+import { Bell, Cog, Terminal, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/cn";
 import { useDepositModalActions, useSettingsDialogActions } from "@/stores/use-global-modal-store";
 import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
 
-const NAV_ITEMS = [
-	{ key: "trade", label: <Trans>Trade</Trans> },
-	{ key: "vaults", label: <Trans>Vaults</Trans> },
-	{ key: "portfolio", label: <Trans>Portfolio</Trans> },
-	{ key: "staking", label: <Trans>Staking</Trans> },
-	{ key: "leaderboard", label: <Trans>Leaderboard</Trans> },
-] as const;
+const NAV_ITEMS = [{ key: "trade", label: <Trans>Trade</Trans> }] as const;
 
-const MORE_MENU_ITEMS = [
-	{ key: "api", label: <Trans>API</Trans> },
-	{ key: "docs", label: <Trans>Docs</Trans> },
-	{ key: "support", label: <Trans>Support</Trans> },
-] as const;
+// const MORE_MENU_ITEMS = [
+// 	{ key: "api", label: <Trans>API</Trans> },
+// 	{ key: "docs", label: <Trans>Docs</Trans> },
+// 	{ key: "support", label: <Trans>Support</Trans> },
+// ] as const;
 
 export function TopNav() {
 	const { open: openDepositModal } = useDepositModalActions();
@@ -59,7 +47,7 @@ export function TopNav() {
 							{item.label}
 						</Button>
 					))}
-					<DropdownMenu>
+					{/* <DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button
 								variant="ghost"
@@ -76,7 +64,7 @@ export function TopNav() {
 								<DropdownMenuItem key={item.key}>{item.label}</DropdownMenuItem>
 							))}
 						</DropdownMenuContent>
-					</DropdownMenu>
+					</DropdownMenu> */}
 				</nav>
 			</div>
 

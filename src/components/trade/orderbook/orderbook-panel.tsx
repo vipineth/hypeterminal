@@ -33,11 +33,7 @@ export function OrderbookPanel() {
 
 	const { data: selectedMarket } = useSelectedMarketInfo();
 
-	const {
-		data: orderbook,
-		status: orderbookStatus,
-		error: orderbookError,
-	} = useSubL2Book(
+	const { data: orderbook, status: orderbookStatus } = useSubL2Book(
 		{
 			coin: selectedMarket?.name ?? "",
 			nSigFigs: selectedOption?.nSigFigs,
@@ -156,9 +152,10 @@ export function OrderbookPanel() {
 						</div>
 					)}
 
-					<div className="shrink-0 py-1.5 px-2 flex items-center justify-center gap-2 border-y border-border/40 bg-surface/30">
-						<span className="text-sm font-semibold tabular-nums text-warning">
-							{formatNumber(spreadInfo.mid, selectedMarket?.szDecimals)}
+					<div className="mt-auto shrink-0 px-2 py-1.5 border-y border-border/40 flex items-center justify-between text-4xs text-muted-fg">
+						<span>{t`Spread`}</span>
+						<span className="tabular-nums text-warning">
+							{`${formatNumber(spreadInfo.spread, 2)} (${formatNumber(spreadInfo.spreadPct, 3)}%)`}
 						</span>
 					</div>
 
@@ -177,18 +174,6 @@ export function OrderbookPanel() {
 						</div>
 					)}
 				</div>
-
-				<div className="mt-auto shrink-0 px-2 py-1.5 border-t border-border/40 flex items-center justify-between text-4xs text-muted-fg">
-					<span>{t`Spread`}</span>
-					<span className="tabular-nums text-warning">
-						{`${formatNumber(spreadInfo.spread, 2)} (${formatNumber(spreadInfo.spreadPct, 3)}%)`}
-					</span>
-				</div>
-				{orderbookStatus === "error" && (
-					<div className="shrink-0 px-2 pb-1.5 text-4xs text-negative/80">
-						{orderbookError instanceof Error ? orderbookError.message : t`WebSocket error`}
-					</div>
-				)}
 			</TabsContent>
 
 			<TabsContent value="trades" className="flex-1 min-h-0 flex flex-col">
