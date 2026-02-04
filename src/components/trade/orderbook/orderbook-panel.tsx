@@ -9,13 +9,12 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getBaseQuoteFromDisplayName } from "@/domain/market";
+import { getBaseQuoteFromDisplayName, getPercent } from "@/domain/market";
 import { formatNumber } from "@/lib/format";
 import { useSelectedMarketInfo, useSubL2Book } from "@/lib/hyperliquid";
 import {
 	getMaxTotal,
 	getPriceGroupingOptions,
-	getSpreadInfo,
 	type L2BookPriceGroupOption,
 	processLevels,
 } from "@/lib/trade/orderbook";
@@ -36,7 +35,7 @@ export function OrderbookPanel() {
 	const { data: orderbook, status: orderbookStatus } = useSubL2Book(
 		{
 			coin: selectedMarket?.name ?? "",
-			nSigFigs: selectedOption?.nSigFigs,
+			nSigFigs: selectedOption?.nSigFigs ?? 5,
 			mantissa: selectedOption?.mantissa,
 		},
 		{ enabled: !!selectedMarket?.name },
@@ -58,8 +57,9 @@ export function OrderbookPanel() {
 		[deferredOrderbook?.levels, visibleRows],
 	);
 	const maxTotal = getMaxTotal(bids, asks);
-	const spreadInfo = getSpreadInfo(bids, asks);
-	const priceGroupingOptions = getPriceGroupingOptions(spreadInfo.mid);
+	const spread = deferredOrderbook?.spread;
+	const spreadPct = getPercent(spread, selectedMarket?.markPx);
+	const priceGroupingOptions = getPriceGroupingOptions(selectedMarket?.markPx);
 
 	const szDecimals = selectedMarket?.szDecimals ?? 4;
 
@@ -155,7 +155,7 @@ export function OrderbookPanel() {
 					<div className="mt-auto shrink-0 px-2 py-1.5 border-y border-border/40 flex items-center justify-between text-4xs text-muted-fg">
 						<span>{t`Spread`}</span>
 						<span className="tabular-nums text-warning">
-							{`${formatNumber(spreadInfo.spread, 2)} (${formatNumber(spreadInfo.spreadPct, 3)}%)`}
+							{`${formatNumber(spread, 2)} (${formatNumber(spreadPct, 3)}%)`}
 						</span>
 					</div>
 

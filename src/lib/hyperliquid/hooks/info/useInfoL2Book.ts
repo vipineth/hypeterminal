@@ -5,7 +5,7 @@ import { infoKeys } from "@/lib/hyperliquid/query/keys";
 import type { QueryOptions } from "@/lib/hyperliquid/query/options";
 import type { HyperliquidQueryError, QueryParameter } from "@/lib/hyperliquid/types";
 
-type L2BookData = L2BookResponse;
+type L2BookData = (L2BookResponse & { spread?: string }) | null;
 type L2BookParams = L2BookParameters;
 
 export type UseInfoL2BookParameters = L2BookParams;
