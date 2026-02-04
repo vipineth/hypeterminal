@@ -1,5 +1,4 @@
 export {
-	bpsToPercent,
 	exceedsBalance,
 	get24hChange,
 	getAvgPrice,

@@ -8,7 +8,7 @@ import { NumberInput } from "@/components/ui/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { MARKET_ORDER_SLIPPAGE_MAX_BPS, MARKET_ORDER_SLIPPAGE_MIN_BPS } from "@/config/constants";
+import { MARKET_ORDER_SLIPPAGE_MAX_PERCENT, MARKET_ORDER_SLIPPAGE_MIN_PERCENT } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import {
 	dynamicActivate,
@@ -18,19 +18,19 @@ import {
 	numberFormatLocaleList,
 } from "@/lib/i18n";
 import { type ColorTheme, colorThemes, useTheme } from "@/providers/theme";
+import { useSettingsDialogActions, useSettingsDialogOpen } from "@/stores/use-global-modal-store";
 import {
 	useGlobalSettings,
 	useGlobalSettingsActions,
-	useMarketOrderSlippageBps,
+	useMarketOrderSlippagePercent,
 } from "@/stores/use-global-settings-store";
-import { useSettingsDialogActions, useSettingsDialogOpen } from "@/stores/use-global-modal-store";
 
 export function GlobalSettingsDialog() {
 	const open = useSettingsDialogOpen();
 	const { close } = useSettingsDialogActions();
 	const { i18n } = useLingui();
 	const { theme, setTheme, colorTheme, setColorTheme } = useTheme();
-	const slippageBps = useMarketOrderSlippageBps();
+	const slippagePercent = useMarketOrderSlippagePercent();
 	const {
 		showOrdersOnChart,
 		showPositionsOnChart,
@@ -46,7 +46,7 @@ export function GlobalSettingsDialog() {
 		setShowOrderbookInQuote,
 		setShowChartScanlines,
 		setNumberFormatLocale,
-		setMarketOrderSlippageBps,
+		setMarketOrderSlippagePercent,
 	} = useGlobalSettingsActions();
 
 	const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
@@ -54,8 +54,7 @@ export function GlobalSettingsDialog() {
 	const [localSlippageInput, setLocalSlippageInput] = useState<string | null>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	const slippagePercent = (slippageBps / 100).toFixed(2);
-	const slippageInputValue = localSlippageInput ?? String(slippageBps);
+	const slippageInputValue = localSlippageInput ?? String(slippagePercent);
 
 	function handleSlippageInputChange(event: ChangeEvent<HTMLInputElement>) {
 		const nextValue = event.target.value;
@@ -64,7 +63,7 @@ export function GlobalSettingsDialog() {
 		if (nextValue.trim() === "") return;
 		const parsed = Number(nextValue);
 		if (Number.isFinite(parsed)) {
-			setMarketOrderSlippageBps(parsed);
+			setMarketOrderSlippagePercent(parsed);
 		}
 	}
 
@@ -74,8 +73,8 @@ export function GlobalSettingsDialog() {
 
 	function handleSlippageSliderChange(values: number[]) {
 		const nextValue = values[0];
-		if (typeof nextValue === "number" && nextValue !== slippageBps) {
-			setMarketOrderSlippageBps(nextValue);
+		if (typeof nextValue === "number" && nextValue !== slippagePercent) {
+			setMarketOrderSlippagePercent(nextValue);
 		}
 	}
 
@@ -188,24 +187,24 @@ export function GlobalSettingsDialog() {
 									value={slippageInputValue}
 									onChange={handleSlippageInputChange}
 									onBlur={handleSlippageInputBlur}
-									allowDecimals={false}
-									min={MARKET_ORDER_SLIPPAGE_MIN_BPS}
-									max={MARKET_ORDER_SLIPPAGE_MAX_BPS}
+									min={MARKET_ORDER_SLIPPAGE_MIN_PERCENT}
+									max={MARKET_ORDER_SLIPPAGE_MAX_PERCENT}
 									inputSize="sm"
 									className="flex-1 text-right tabular-nums"
 								/>
-								<span className="text-xs text-muted-fg min-w-8">{t`bps`}</span>
+								<span className="text-xs text-muted-fg min-w-8">%</span>
 							</div>
 							<Slider
-								value={[slippageBps]}
+								value={[slippagePercent]}
 								onValueChange={handleSlippageSliderChange}
-								min={MARKET_ORDER_SLIPPAGE_MIN_BPS}
-								max={MARKET_ORDER_SLIPPAGE_MAX_BPS}
+								min={MARKET_ORDER_SLIPPAGE_MIN_PERCENT}
+								max={MARKET_ORDER_SLIPPAGE_MAX_PERCENT}
+								step={0.1}
 							/>
 							<div className="flex items-center justify-between text-[10px] text-muted-fg">
-								<span>{MARKET_ORDER_SLIPPAGE_MIN_BPS}</span>
+								<span>{MARKET_ORDER_SLIPPAGE_MIN_PERCENT}%</span>
 								<span className="font-medium text-fg tabular-nums">{slippagePercent}%</span>
-								<span>{MARKET_ORDER_SLIPPAGE_MAX_BPS}</span>
+								<span>{MARKET_ORDER_SLIPPAGE_MAX_PERCENT}%</span>
 							</div>
 						</div>
 					</SettingsSection>

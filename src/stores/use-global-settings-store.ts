@@ -3,14 +3,13 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useShallow } from "zustand/react/shallow";
 import {
-	DEFAULT_MARKET_ORDER_SLIPPAGE_BPS,
-	MARKET_ORDER_SLIPPAGE_MAX_BPS,
-	MARKET_ORDER_SLIPPAGE_MIN_BPS,
+	DEFAULT_MARKET_ORDER_SLIPPAGE_PERCENT,
+	MARKET_ORDER_SLIPPAGE_MAX_PERCENT,
+	MARKET_ORDER_SLIPPAGE_MIN_PERCENT,
 	STORAGE_KEYS,
 } from "@/config/constants";
 import { type NumberFormatLocale, resolveNumberFormatLocale } from "@/lib/i18n";
 import type { MarginMode } from "@/lib/trade/margin-mode";
-import { clampInt } from "@/lib/trade/numbers";
 import { createValidatedStorage } from "@/stores/validated-storage";
 
 const globalSettingsSchema = z.object({
@@ -22,7 +21,7 @@ const globalSettingsSchema = z.object({
 		showOrderbookInQuote: z.boolean().optional(),
 		showChartScanlines: z.boolean().optional(),
 		numberFormatLocale: z.string().optional(),
-		marketOrderSlippageBps: z.number().int().optional(),
+		marketOrderSlippagePercent: z.number().optional(),
 		marginMode: z.enum(["cross", "isolated"]).optional(),
 		positionsActiveTab: z.string().optional(),
 	}),
@@ -38,7 +37,7 @@ const DEFAULT_GLOBAL_SETTINGS = {
 	showOrderbookInQuote: false,
 	showChartScanlines: true,
 	numberFormatLocale: "auto" as NumberFormatLocale,
-	marketOrderSlippageBps: DEFAULT_MARKET_ORDER_SLIPPAGE_BPS,
+	marketOrderSlippagePercent: DEFAULT_MARKET_ORDER_SLIPPAGE_PERCENT,
 	marginMode: "cross" as MarginMode,
 	positionsActiveTab: "positions",
 } as const;
@@ -51,7 +50,7 @@ interface GlobalSettingsStore {
 	showOrderbookInQuote: boolean;
 	showChartScanlines: boolean;
 	numberFormatLocale: NumberFormatLocale;
-	marketOrderSlippageBps: number;
+	marketOrderSlippagePercent: number;
 	marginMode: MarginMode;
 	positionsActiveTab: string;
 	actions: {
@@ -62,7 +61,7 @@ interface GlobalSettingsStore {
 		setShowOrderbookInQuote: (next: boolean) => void;
 		setShowChartScanlines: (next: boolean) => void;
 		setNumberFormatLocale: (next: NumberFormatLocale) => void;
-		setMarketOrderSlippageBps: (bps: number) => void;
+		setMarketOrderSlippagePercent: (percent: number) => void;
 		setMarginMode: (mode: MarginMode) => void;
 		setPositionsActiveTab: (tab: string) => void;
 	};
@@ -80,10 +79,13 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 				setShowOrderbookInQuote: (next) => set({ showOrderbookInQuote: next }),
 				setShowChartScanlines: (next) => set({ showChartScanlines: next }),
 				setNumberFormatLocale: (next) => set({ numberFormatLocale: next }),
-				setMarketOrderSlippageBps: (bps) => {
-					const next = clampInt(bps, MARKET_ORDER_SLIPPAGE_MIN_BPS, MARKET_ORDER_SLIPPAGE_MAX_BPS);
-					if (get().marketOrderSlippageBps === next) return;
-					set({ marketOrderSlippageBps: next });
+				setMarketOrderSlippagePercent: (percent) => {
+					const next = Math.min(
+						Math.max(percent, MARKET_ORDER_SLIPPAGE_MIN_PERCENT),
+						MARKET_ORDER_SLIPPAGE_MAX_PERCENT,
+					);
+					if (get().marketOrderSlippagePercent === next) return;
+					set({ marketOrderSlippagePercent: next });
 				},
 				setMarginMode: (mode) => set({ marginMode: mode }),
 				setPositionsActiveTab: (tab) => set({ positionsActiveTab: tab }),
@@ -100,7 +102,7 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 				showOrderbookInQuote: state.showOrderbookInQuote,
 				showChartScanlines: state.showChartScanlines,
 				numberFormatLocale: state.numberFormatLocale,
-				marketOrderSlippageBps: state.marketOrderSlippageBps,
+				marketOrderSlippagePercent: state.marketOrderSlippagePercent,
 				marginMode: state.marginMode,
 				positionsActiveTab: state.positionsActiveTab,
 			}),
@@ -110,16 +112,19 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 					typeof p.showOrderbookInQuote === "boolean"
 						? p.showOrderbookInQuote
 						: DEFAULT_GLOBAL_SETTINGS.showOrderbookInQuote;
+				const slippagePercent = Math.min(
+					Math.max(
+						p?.marketOrderSlippagePercent ?? DEFAULT_MARKET_ORDER_SLIPPAGE_PERCENT,
+						MARKET_ORDER_SLIPPAGE_MIN_PERCENT,
+					),
+					MARKET_ORDER_SLIPPAGE_MAX_PERCENT,
+				);
 				return {
 					...current,
 					...DEFAULT_GLOBAL_SETTINGS,
 					...p,
 					showOrderbookInQuote,
-					marketOrderSlippageBps: clampInt(
-						p?.marketOrderSlippageBps ?? DEFAULT_MARKET_ORDER_SLIPPAGE_BPS,
-						MARKET_ORDER_SLIPPAGE_MIN_BPS,
-						MARKET_ORDER_SLIPPAGE_MAX_BPS,
-					),
+					marketOrderSlippagePercent: slippagePercent,
 					marginMode: p?.marginMode === "isolated" ? "isolated" : "cross",
 				};
 			},
@@ -145,8 +150,12 @@ export function useGlobalSettingsActions() {
 	return useGlobalSettingsStore((state) => state.actions);
 }
 
+export function useMarketOrderSlippagePercent() {
+	return useGlobalSettingsStore((state) => state.marketOrderSlippagePercent);
+}
+
 export function useMarketOrderSlippageBps() {
-	return useGlobalSettingsStore((state) => state.marketOrderSlippageBps);
+	return useGlobalSettingsStore((state) => state.marketOrderSlippagePercent * 100);
 }
 
 export function useMarginMode() {

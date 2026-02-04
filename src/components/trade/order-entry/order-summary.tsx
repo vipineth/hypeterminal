@@ -1,9 +1,9 @@
 import { t } from "@lingui/core/macro";
 import { PencilIcon } from "lucide-react";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
-import { bpsToPercent } from "@/domain/market";
+import { DEFAULT_BUILDER_CONFIG } from "@/config/hyperliquid";
 import { cn } from "@/lib/cn";
-import { formatPrice, formatUSD } from "@/lib/format";
+import { bpsToPercentage, formatPrice, formatUSD } from "@/lib/format";
 import type { MarketKind } from "@/lib/hyperliquid";
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
 	orderValue: number;
 	marginRequired: number;
 	estimatedFee: number;
-	slippageBps: number;
+	slippagePercent: number;
 	szDecimals: number | undefined;
 	onSlippageClick: () => void;
 	marketKind?: MarketKind;
@@ -24,7 +24,7 @@ export function OrderSummary({
 	orderValue,
 	marginRequired,
 	estimatedFee,
-	slippageBps,
+	slippagePercent,
 	szDecimals,
 	onSlippageClick,
 	marketKind = "perp",
@@ -60,7 +60,7 @@ export function OrderSummary({
 					onClick={onSlippageClick}
 					className="flex items-center gap-1 hover:text-fg transition-colors"
 				>
-					<span className="tabular-nums text-warning">{bpsToPercent(slippageBps)}%</span>
+					<span className="tabular-nums text-warning">{slippagePercent}%</span>
 					<PencilIcon className="size-2 text-muted-fg" />
 				</button>
 			</div>
@@ -70,6 +70,12 @@ export function OrderSummary({
 					{estimatedFee > 0 ? formatUSD(estimatedFee) : FALLBACK_VALUE_PLACEHOLDER}
 				</span>
 			</div>
+			{DEFAULT_BUILDER_CONFIG?.f && (
+				<div className="flex items-center justify-between px-2 py-1.5">
+					<span className="text-muted-fg">{t`Builder Fee`}</span>
+					<span className="tabular-nums text-muted-fg">{bpsToPercentage(DEFAULT_BUILDER_CONFIG?.f)}%</span>
+				</div>
+			)}
 		</div>
 	);
 }

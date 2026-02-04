@@ -34,12 +34,6 @@ export function getRiskRewardRatio(tpPnl: number | null, slPnl: number | null): 
 	return reward.div(risk).toNumber();
 }
 
-export function bpsToPercent(bps: Numeric, decimals = 2): string {
-	const val = toBig(bps);
-	if (!val) return "0";
-	return val.div(100).toFixed(decimals);
-}
-
 export function get24hChange(prevDayPx: Numeric, markPx: Numeric): number | null {
 	const prev = toBig(prevDayPx);
 	const mark = toBig(markPx);

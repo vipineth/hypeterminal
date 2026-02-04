@@ -165,8 +165,8 @@ msgstr ""
 #~ msgstr "ब्लॉक:"
 
 #: src/components/trade/components/global-settings-dialog.tsx
-msgid "bps"
-msgstr "बीपीएस"
+#~ msgid "bps"
+#~ msgstr "बीपीएस"
 
 #: src/components/ui/breadcrumb.tsx
 #~ msgid "Breadcrumb"
@@ -187,6 +187,10 @@ msgstr "बीपीएस"
 #: src/components/pages/builder-page.tsx
 #~ msgid "Builder codes allow DeFi builders to receive a fee on fills they send on behalf of users. They are set per-order for maximal flexibility."
 #~ msgstr ""
+
+#: src/components/trade/order-entry/order-summary.tsx
+msgid "Builder Fee"
+msgstr ""
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Builder Fee Approval"

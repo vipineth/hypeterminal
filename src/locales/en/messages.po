@@ -165,8 +165,8 @@ msgstr "Balance:"
 #~ msgstr "Block:"
 
 #: src/components/trade/components/global-settings-dialog.tsx
-msgid "bps"
-msgstr "bps"
+#~ msgid "bps"
+#~ msgstr "bps"
 
 #: src/components/ui/breadcrumb.tsx
 #~ msgid "Breadcrumb"
@@ -187,6 +187,10 @@ msgstr "bps"
 #: src/components/pages/builder-page.tsx
 #~ msgid "Builder codes allow DeFi builders to receive a fee on fills they send on behalf of users. They are set per-order for maximal flexibility."
 #~ msgstr "Builder codes allow DeFi builders to receive a fee on fills they send on behalf of users. They are set per-order for maximal flexibility."
+
+#: src/components/trade/order-entry/order-summary.tsx
+msgid "Builder Fee"
+msgstr "Builder Fee"
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Builder Fee Approval"

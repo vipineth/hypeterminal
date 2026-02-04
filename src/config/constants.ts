@@ -35,9 +35,9 @@ export const SCALE_LEVELS_MAX = 20;
 
 export const DEFAULT_MAX_LEVERAGE = 50;
 export const MARKET_LEVERAGE_HARD_MAX = 100;
-export const DEFAULT_MARKET_ORDER_SLIPPAGE_BPS = 25;
-export const MARKET_ORDER_SLIPPAGE_MIN_BPS = 10;
-export const MARKET_ORDER_SLIPPAGE_MAX_BPS = 500;
+export const DEFAULT_MARKET_ORDER_SLIPPAGE_PERCENT = 2.5;
+export const MARKET_ORDER_SLIPPAGE_MIN_PERCENT = 0.1;
+export const MARKET_ORDER_SLIPPAGE_MAX_PERCENT = 100;
 export const DEFAULT_LEVERAGE_BY_MODE = { cross: 10, isolated: 10 } as const;
 
 export const STORAGE_KEYS = {

@@ -57,7 +57,7 @@ import type { ActiveDialog, ButtonContent } from "@/lib/trade/types";
 import { useButtonContent } from "@/lib/trade/use-button-content";
 import { perpInput, spotInput, useOrderValidation } from "@/lib/trade/use-order-validation";
 import { useDepositModalActions, useSettingsDialogActions, useSwapModalActions } from "@/stores/use-global-modal-store";
-import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
+import { useMarketOrderSlippageBps, useMarketOrderSlippagePercent } from "@/stores/use-global-settings-store";
 import {
 	useLimitPrice,
 	useOrderEntryActions,
@@ -118,6 +118,7 @@ export function OrderEntryPanel() {
 	const { mutateAsync: placeTwapOrder, isPending: isSubmittingTwap } = useExchangeTwapOrder();
 
 	const slippageBps = useMarketOrderSlippageBps();
+	const slippagePercent = useMarketOrderSlippagePercent();
 	const side = useOrderSide();
 	const markPx = market?.markPx ?? 0;
 	const sizeMode = useSizeMode();
@@ -622,6 +623,7 @@ export function OrderEntryPanel() {
 								setHasUserSized(true);
 								setSize(e.target.value);
 							}}
+							maxAllowedDecimals={szDecimals}
 							className={cn(
 								"flex-1 h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums",
 								sizeHasError && "border-negative focus:border-negative",
@@ -885,7 +887,7 @@ export function OrderEntryPanel() {
 					orderValue={orderValue}
 					marginRequired={marginRequired}
 					estimatedFee={estimatedFee}
-					slippageBps={slippageBps}
+					slippagePercent={slippagePercent}
 					szDecimals={market?.szDecimals}
 					onSlippageClick={openSettingsDialog}
 					marketKind={market?.kind}
