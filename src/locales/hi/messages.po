@@ -53,8 +53,8 @@ msgid "Actions"
 msgstr "कार्रवाई"
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "active"
-msgstr "सक्रिय"
+#~ msgid "active"
+#~ msgstr "सक्रिय"
 
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Active"
@@ -255,8 +255,8 @@ msgid "Canceling..."
 msgstr "रद्द हो रहा है..."
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "cancelled"
-msgstr "रद्द"
+#~ msgid "cancelled"
+#~ msgstr "रद्द"
 
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Cannot switch to Isolated mode with an open position. Close your position first."
@@ -293,8 +293,8 @@ msgstr "बंद हो रहा है..."
 #~ msgstr "जल्द आ रहा है"
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "completed"
-msgstr "पूर्ण"
+#~ msgid "completed"
+#~ msgstr "पूर्ण"
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/tradebox/leverage-popover.tsx
@@ -388,6 +388,10 @@ msgstr "पता कॉपी करें"
 #: src/hooks/hyperliquid/use-trading-agent.ts
 #~ msgid "Could not create wallet"
 #~ msgstr "वॉलेट नहीं बना सका"
+
+#: src/components/trade/positions/twap-tab.tsx
+msgid "Created"
+msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
@@ -618,8 +622,8 @@ msgid "Failed to load trades."
 msgstr "ट्रेड लोड करने में विफल।"
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "Failed to load TWAP history."
-msgstr "TWAP इतिहास लोड करने में विफल।"
+#~ msgid "Failed to load TWAP history."
+#~ msgstr "TWAP इतिहास लोड करने में विफल।"
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Failed to register builder code"
@@ -1014,12 +1018,17 @@ msgstr ""
 #~ msgstr "अगला"
 
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/twap-tab.tsx
 msgid "No"
 msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 msgid "No active positions."
 msgstr "कोई सक्रिय पोजीशन नहीं।"
+
+#: src/components/trade/positions/twap-tab.tsx
+msgid "No active TWAP orders."
+msgstr ""
 
 #: src/lib/errors/definitions/balance.ts
 msgid "No balance"
@@ -1078,8 +1087,8 @@ msgid "No trading pair available for <0/>/<1/>"
 msgstr ""
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "No TWAP orders found."
-msgstr "कोई TWAP ऑर्डर नहीं मिला।"
+#~ msgid "No TWAP orders found."
+#~ msgstr "कोई TWAP ऑर्डर नहीं मिला।"
 
 #: src/hooks/hyperliquid/use-trading-agent.ts
 #~ msgid "No user address"
@@ -1253,8 +1262,8 @@ msgid "Processing..."
 msgstr ""
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "Progress"
-msgstr "प्रगति"
+#~ msgid "Progress"
+#~ msgstr "प्रगति"
 
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Randomize timing"
@@ -1273,6 +1282,7 @@ msgstr "हाल के ट्रेड"
 msgid "Reduce"
 msgstr ""
 
+#: src/components/trade/positions/twap-tab.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Reduce Only"
@@ -1505,6 +1515,7 @@ msgstr "साइनर तैयार नहीं"
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/positions/twap-tab.tsx
 #: src/components/trade/tradebox/order-toast.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Size"
@@ -1595,8 +1606,8 @@ msgid "Start Price (USDC)"
 msgstr ""
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "Status"
-msgstr "स्थिति"
+#~ msgid "Status"
+#~ msgstr "स्थिति"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Stop"
@@ -1656,7 +1667,7 @@ msgstr ""
 
 #. placeholder {0}: assetInfo.displayName
 #. placeholder {0}: markets.getMarket(fill.coin)?.displayName ?? fill.coin
-#. placeholder {0}: markets.getMarket(order.state.coin)?.displayName ?? order.state.coin
+#. placeholder {0}: markets.getMarket(state.coin)?.displayName ?? state.coin
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -1737,6 +1748,10 @@ msgstr "आप जो पृष्ठ ढूंढ रहे हैं वह �
 msgid "Time"
 msgstr "समय"
 
+#: src/components/trade/positions/twap-tab.tsx
+msgid "Time / Total"
+msgstr ""
+
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Time in Force"
 msgstr ""
@@ -1770,8 +1785,8 @@ msgid "Total"
 msgstr "कुल"
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "Total Size"
-msgstr "कुल आकार"
+#~ msgid "Total Size"
+#~ msgstr "कुल आकार"
 
 #: src/components/trade/tradebox/account-panel.tsx
 msgid "Total Value"
@@ -2010,6 +2025,7 @@ msgid "Wrong network"
 msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/twap-tab.tsx
 msgid "Yes"
 msgstr ""
 

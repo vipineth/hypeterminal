@@ -9,8 +9,10 @@ import {
 	WarningCircleIcon,
 } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
+import type { Address } from "viem";
 import { isAddress } from "viem";
 import { type Connector, useConnect, useConnectors } from "wagmi";
+import { mock } from "wagmi/connectors";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -33,18 +35,18 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 	const [customAddressError, setCustomAddressError] = useState<string | null>(null);
 
 	const { mockConnectors, regularConnectors } = useMemo(() => {
-		const mock: Connector[] = [];
+		const mocks: Connector[] = [];
 		const regular: Connector[] = [];
 
 		for (const connector of connectors) {
 			if (isMockConnector(connector)) {
-				mock.push(connector);
+				mocks.push(connector);
 			} else {
 				regular.push(connector);
 			}
 		}
 
-		return { mockConnectors: mock, regularConnectors: regular };
+		return { mockConnectors: mocks, regularConnectors: regular };
 	}, [connectors]);
 
 	const availableConnectors = useMemo(() => {
@@ -74,7 +76,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 		}
 	};
 
-	const handleCustomAddressConnect = () => {
+	const handleCustomAddressConnect = async () => {
 		const trimmed = customAddress.trim();
 		if (!trimmed) {
 			setCustomAddressError("Please enter an address");
@@ -90,10 +92,20 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 
 		if (mockWalletIndex !== -1 && mockConnectors[mockWalletIndex]) {
 			handleConnect(mockConnectors[mockWalletIndex]);
-		} else if (mockConnectors.length > 0) {
-			handleConnect(mockConnectors[0]);
 		} else {
-			setCustomAddressError("No mock connector available");
+			const customMockConnector = mock({
+				accounts: [trimmed as Address],
+				features: { reconnect: true },
+			});
+			setConnectingId("custom-mock");
+			try {
+				await connectAsync({ connector: customMockConnector });
+				onOpenChange(false);
+			} catch {
+				setCustomAddressError("Failed to connect with custom address");
+			} finally {
+				setConnectingId(null);
+			}
 		}
 	};
 

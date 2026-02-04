@@ -53,8 +53,8 @@ msgid "Actions"
 msgstr "إجراءات"
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "active"
-msgstr "نشط"
+#~ msgid "active"
+#~ msgstr "نشط"
 
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Active"
@@ -255,8 +255,8 @@ msgid "Canceling..."
 msgstr "جارٍ الإلغاء..."
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "cancelled"
-msgstr "ملغى"
+#~ msgid "cancelled"
+#~ msgstr "ملغى"
 
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Cannot switch to Isolated mode with an open position. Close your position first."
@@ -293,8 +293,8 @@ msgstr "جاري الإغلاق..."
 #~ msgstr "قريباً"
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "completed"
-msgstr "مكتمل"
+#~ msgid "completed"
+#~ msgstr "مكتمل"
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/tradebox/leverage-popover.tsx
@@ -388,6 +388,10 @@ msgstr "نسخ العنوان"
 #: src/hooks/hyperliquid/use-trading-agent.ts
 #~ msgid "Could not create wallet"
 #~ msgstr "تعذر إنشاء المحفظة"
+
+#: src/components/trade/positions/twap-tab.tsx
+msgid "Created"
+msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
@@ -618,8 +622,8 @@ msgid "Failed to load trades."
 msgstr "فشل في تحميل الصفقات."
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "Failed to load TWAP history."
-msgstr "فشل في تحميل سجل TWAP."
+#~ msgid "Failed to load TWAP history."
+#~ msgstr "فشل في تحميل سجل TWAP."
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Failed to register builder code"
@@ -1014,12 +1018,17 @@ msgstr ""
 #~ msgstr "التالي"
 
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/twap-tab.tsx
 msgid "No"
 msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 msgid "No active positions."
 msgstr "لا توجد مراكز نشطة."
+
+#: src/components/trade/positions/twap-tab.tsx
+msgid "No active TWAP orders."
+msgstr ""
 
 #: src/lib/errors/definitions/balance.ts
 msgid "No balance"
@@ -1078,8 +1087,8 @@ msgid "No trading pair available for <0/>/<1/>"
 msgstr ""
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "No TWAP orders found."
-msgstr "لم يتم العثور على أوامر TWAP."
+#~ msgid "No TWAP orders found."
+#~ msgstr "لم يتم العثور على أوامر TWAP."
 
 #: src/hooks/hyperliquid/use-trading-agent.ts
 #~ msgid "No user address"
@@ -1253,8 +1262,8 @@ msgid "Processing..."
 msgstr ""
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "Progress"
-msgstr "التقدم"
+#~ msgid "Progress"
+#~ msgstr "التقدم"
 
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Randomize timing"
@@ -1273,6 +1282,7 @@ msgstr "الصفقات الأخيرة"
 msgid "Reduce"
 msgstr ""
 
+#: src/components/trade/positions/twap-tab.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Reduce Only"
@@ -1505,6 +1515,7 @@ msgstr "المُوقِّع غير جاهز"
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/positions/twap-tab.tsx
 #: src/components/trade/tradebox/order-toast.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Size"
@@ -1595,8 +1606,8 @@ msgid "Start Price (USDC)"
 msgstr ""
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "Status"
-msgstr "الحالة"
+#~ msgid "Status"
+#~ msgstr "الحالة"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Stop"
@@ -1656,7 +1667,7 @@ msgstr ""
 
 #. placeholder {0}: assetInfo.displayName
 #. placeholder {0}: markets.getMarket(fill.coin)?.displayName ?? fill.coin
-#. placeholder {0}: markets.getMarket(order.state.coin)?.displayName ?? order.state.coin
+#. placeholder {0}: markets.getMarket(state.coin)?.displayName ?? state.coin
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -1737,6 +1748,10 @@ msgstr "الصفحة التي تبحث عنها غير موجودة."
 msgid "Time"
 msgstr "الوقت"
 
+#: src/components/trade/positions/twap-tab.tsx
+msgid "Time / Total"
+msgstr ""
+
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Time in Force"
 msgstr ""
@@ -1770,8 +1785,8 @@ msgid "Total"
 msgstr "الإجمالي"
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "Total Size"
-msgstr "الحجم الإجمالي"
+#~ msgid "Total Size"
+#~ msgstr "الحجم الإجمالي"
 
 #: src/components/trade/tradebox/account-panel.tsx
 msgid "Total Value"
@@ -2010,6 +2025,7 @@ msgid "Wrong network"
 msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/twap-tab.tsx
 msgid "Yes"
 msgstr ""
 

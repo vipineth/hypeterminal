@@ -53,8 +53,8 @@ msgid "Actions"
 msgstr "Acciones"
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "active"
-msgstr "activo"
+#~ msgid "active"
+#~ msgstr "activo"
 
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Active"
@@ -255,8 +255,8 @@ msgid "Canceling..."
 msgstr "Cancelando..."
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "cancelled"
-msgstr "cancelado"
+#~ msgid "cancelled"
+#~ msgstr "cancelado"
 
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Cannot switch to Isolated mode with an open position. Close your position first."
@@ -293,8 +293,8 @@ msgstr "Cerrando..."
 #~ msgstr "Próximamente"
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "completed"
-msgstr "completado"
+#~ msgid "completed"
+#~ msgstr "completado"
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/tradebox/leverage-popover.tsx
@@ -388,6 +388,10 @@ msgstr "Copiar dirección"
 #: src/hooks/hyperliquid/use-trading-agent.ts
 #~ msgid "Could not create wallet"
 #~ msgstr "No se pudo crear la billetera"
+
+#: src/components/trade/positions/twap-tab.tsx
+msgid "Created"
+msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
@@ -618,8 +622,8 @@ msgid "Failed to load trades."
 msgstr "Error al cargar operaciones."
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "Failed to load TWAP history."
-msgstr "Error al cargar historial TWAP."
+#~ msgid "Failed to load TWAP history."
+#~ msgstr "Error al cargar historial TWAP."
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Failed to register builder code"
@@ -1014,12 +1018,17 @@ msgstr ""
 #~ msgstr "Siguiente"
 
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/twap-tab.tsx
 msgid "No"
 msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 msgid "No active positions."
 msgstr "Sin posiciones activas."
+
+#: src/components/trade/positions/twap-tab.tsx
+msgid "No active TWAP orders."
+msgstr ""
 
 #: src/lib/errors/definitions/balance.ts
 msgid "No balance"
@@ -1078,8 +1087,8 @@ msgid "No trading pair available for <0/>/<1/>"
 msgstr ""
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "No TWAP orders found."
-msgstr "No se encontraron órdenes TWAP."
+#~ msgid "No TWAP orders found."
+#~ msgstr "No se encontraron órdenes TWAP."
 
 #: src/hooks/hyperliquid/use-trading-agent.ts
 #~ msgid "No user address"
@@ -1253,8 +1262,8 @@ msgid "Processing..."
 msgstr ""
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "Progress"
-msgstr "Progreso"
+#~ msgid "Progress"
+#~ msgstr "Progreso"
 
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Randomize timing"
@@ -1273,6 +1282,7 @@ msgstr "Operaciones recientes"
 msgid "Reduce"
 msgstr ""
 
+#: src/components/trade/positions/twap-tab.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Reduce Only"
@@ -1505,6 +1515,7 @@ msgstr "Firmante no listo"
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/positions/twap-tab.tsx
 #: src/components/trade/tradebox/order-toast.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Size"
@@ -1595,8 +1606,8 @@ msgid "Start Price (USDC)"
 msgstr ""
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "Status"
-msgstr "Estado"
+#~ msgid "Status"
+#~ msgstr "Estado"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Stop"
@@ -1656,7 +1667,7 @@ msgstr ""
 
 #. placeholder {0}: assetInfo.displayName
 #. placeholder {0}: markets.getMarket(fill.coin)?.displayName ?? fill.coin
-#. placeholder {0}: markets.getMarket(order.state.coin)?.displayName ?? order.state.coin
+#. placeholder {0}: markets.getMarket(state.coin)?.displayName ?? state.coin
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -1737,6 +1748,10 @@ msgstr "La página que buscas no existe."
 msgid "Time"
 msgstr "Hora"
 
+#: src/components/trade/positions/twap-tab.tsx
+msgid "Time / Total"
+msgstr ""
+
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Time in Force"
 msgstr ""
@@ -1770,8 +1785,8 @@ msgid "Total"
 msgstr "Total"
 
 #: src/components/trade/positions/twap-tab.tsx
-msgid "Total Size"
-msgstr "Tamaño total"
+#~ msgid "Total Size"
+#~ msgstr "Tamaño total"
 
 #: src/components/trade/tradebox/account-panel.tsx
 msgid "Total Value"
@@ -2010,6 +2025,7 @@ msgid "Wrong network"
 msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/twap-tab.tsx
 msgid "Yes"
 msgstr ""
 
