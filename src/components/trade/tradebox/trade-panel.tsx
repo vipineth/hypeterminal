@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Loader2 } from "lucide-react";
+import { SpinnerGap } from "@phosphor-icons/react";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -143,25 +143,7 @@ export function TradePanel() {
 	const usesLimitPrice = usesLimitPriceForOrder(orderType);
 	const canUseTpSl = canUseTpSlForOrder(orderType);
 
-	const {
-		setSide,
-		setOrderType,
-		setSizeMode,
-		setReduceOnly,
-		setSize,
-		setLimitPrice,
-		setTriggerPrice,
-		setScaleStart,
-		setScaleEnd,
-		setScaleLevels,
-		setTwapMinutes,
-		setTwapRandomize,
-		setTpSlEnabled,
-		setTpPrice,
-		setSlPrice,
-		setTif,
-		resetForm,
-	} = useOrderEntryActions();
+	const { setSide, setOrderType, setSizeMode, setSize, setLimitPrice, resetForm } = useOrderEntryActions();
 
 	const [approvalError, setApprovalError] = useState<string | null>(null);
 	const [activeDialog, setActiveDialog] = useState<ActiveDialog>(null);
@@ -501,21 +483,7 @@ export function TradePanel() {
 					isConnected={isConnected}
 					isFormDisabled={isFormDisabled}
 					isSpotMarket={isSpotMarket}
-					orderType={orderType}
 					side={side}
-					sizeInput={sizeInput}
-					limitPriceInput={limitPriceInput}
-					triggerPriceInput={triggerPriceInput}
-					scaleStartPriceInput={scaleStartPriceInput}
-					scaleEndPriceInput={scaleEndPriceInput}
-					scaleLevelsNum={scaleLevelsNum}
-					twapMinutesNum={twapMinutesNum}
-					twapRandomize={twapRandomize}
-					tif={tif}
-					reduceOnly={reduceOnly}
-					tpSlEnabled={tpSlEnabled}
-					tpPriceInput={tpPriceInput}
-					slPriceInput={slPriceInput}
 					price={price}
 					markPx={markPx}
 					maxSize={maxSize}
@@ -534,21 +502,8 @@ export function TradePanel() {
 					}}
 					reduceOnlyId={reduceOnlyId}
 					tpSlId={tpSlId}
-					onSizeChange={setSize}
 					onSizeModeToggle={handleSizeModeToggle}
 					onSizePercentApply={handleSizePercentApply}
-					onLimitPriceChange={setLimitPrice}
-					onTriggerPriceChange={setTriggerPrice}
-					onScaleStartChange={setScaleStart}
-					onScaleEndChange={setScaleEnd}
-					onScaleLevelsChange={setScaleLevels}
-					onTwapMinutesChange={setTwapMinutes}
-					onTwapRandomizeChange={setTwapRandomize}
-					onTifChange={setTif}
-					onReduceOnlyChange={setReduceOnly}
-					onTpSlEnabledChange={setTpSlEnabled}
-					onTpPriceChange={setTpPrice}
-					onSlPriceChange={setSlPrice}
 					onDepositClick={() => openDepositModal("deposit")}
 					onSwapClick={() => swapTargetToken && openSwapModal(DEFAULT_QUOTE_TOKEN, swapTargetToken)}
 				/>
@@ -571,7 +526,7 @@ export function TradePanel() {
 						)}
 						aria-label={buttonContent.text}
 					>
-						{(isSubmitting || isRegistering) && <Loader2 className="size-3 animate-spin" />}
+						{(isSubmitting || isRegistering) && <SpinnerGap className="size-3 animate-spin" />}
 						{buttonContent.text}
 					</Button>
 				</div>

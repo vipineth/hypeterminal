@@ -1,5 +1,5 @@
 import { Trans } from "@lingui/react/macro";
-import { ChevronDown, Copy, CopyCheck, Loader2, LogOut, PlusCircle, Zap } from "lucide-react";
+import { CaretDown, Check, Copy, Lightning, PlusCircle, SignOut, SpinnerGap } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { useConnection, useDisconnect, useEnsName } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ function CopyAddressMenuItem({ address }: { address: string }) {
 
 	return (
 		<DropdownMenuItem className="flex items-center gap-2" onClick={handleClick}>
-			{copied ? <CopyCheck className="size-3.5" /> : <Copy className="size-3.5" />}
+			{copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
 			<span>
 				<Trans>Copy Address</Trans>
 			</span>
@@ -46,7 +46,7 @@ export function UserMenu() {
 	if (!mounted || isConnecting) {
 		return (
 			<Button variant="ghost" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider" disabled>
-				<Loader2 className="size-3 animate-spin" />
+				<SpinnerGap className="size-3 animate-spin" />
 				<Trans>Connecting...</Trans>
 			</Button>
 		);
@@ -61,7 +61,7 @@ export function UserMenu() {
 					className="h-7 text-3xs uppercase tracking-wider border-positive/40 text-positive hover:bg-positive/10 hover:text-positive"
 					onClick={() => setIsOpen(true)}
 				>
-					<Zap className="size-3 mr-1" />
+					<Lightning className="size-3 mr-1" />
 					<Trans>Connect Wallet</Trans>
 				</Button>
 				<WalletDialog open={isOpen} onOpenChange={setIsOpen} />
@@ -76,7 +76,7 @@ export function UserMenu() {
 					<Button variant="ghost" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider">
 						<div className="size-1.5 rounded-full bg-positive animate-pulse" />
 						{ensName ?? (address ? shortenAddress(address) : "")}
-						<ChevronDown className="size-2.5" />
+						<CaretDown className="size-2.5" />
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end" className="min-w-40 text-xs font-mono">
@@ -93,7 +93,7 @@ export function UserMenu() {
 						className="flex items-center gap-2"
 						onClick={() => disconnect.mutate()}
 					>
-						<LogOut className="size-3.5" />
+						<SignOut className="size-3.5" />
 						<span>
 							<Trans>Disconnect</Trans>
 						</span>

@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { ArrowLeftRight } from "lucide-react";
+import { ArrowsLeftRight } from "@phosphor-icons/react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -25,33 +25,35 @@ import {
 	isTriggerOrderType,
 	isTwapOrderType,
 	type LimitTif,
-	type OrderType,
 	TIF_OPTIONS,
 	usesLimitPrice as usesLimitPriceForOrder,
 	usesTriggerPrice as usesTriggerPriceForOrder,
 } from "@/lib/trade/order-types";
 import type { Side } from "@/lib/trade/types";
+import {
+	useLimitPrice,
+	useOrderEntryActions,
+	useOrderSize,
+	useOrderType,
+	useReduceOnly,
+	useScaleEnd,
+	useScaleLevels,
+	useScaleStart,
+	useSlPrice,
+	useTif,
+	useTpPrice,
+	useTpSlEnabled,
+	useTriggerPrice,
+	useTwapMinutes,
+	useTwapRandomize,
+} from "@/stores/use-order-entry-store";
 import { TpSlSection } from "./tp-sl-section";
 
 interface Props {
 	isConnected: boolean;
 	isFormDisabled: boolean;
 	isSpotMarket: boolean;
-	orderType: OrderType;
 	side: Side;
-	sizeInput: string;
-	limitPriceInput: string;
-	triggerPriceInput: string;
-	scaleStartPriceInput: string;
-	scaleEndPriceInput: string;
-	scaleLevelsNum: number;
-	twapMinutesNum: number;
-	twapRandomize: boolean;
-	tif: LimitTif;
-	reduceOnly: boolean;
-	tpSlEnabled: boolean;
-	tpPriceInput: string;
-	slPriceInput: string;
 	price: number;
 	markPx: number;
 	maxSize: number;
@@ -70,21 +72,8 @@ interface Props {
 	};
 	reduceOnlyId: string;
 	tpSlId: string;
-	onSizeChange: (size: string) => void;
 	onSizeModeToggle: () => void;
 	onSizePercentApply: (pct: number) => void;
-	onLimitPriceChange: (price: string) => void;
-	onTriggerPriceChange: (price: string) => void;
-	onScaleStartChange: (price: string) => void;
-	onScaleEndChange: (price: string) => void;
-	onScaleLevelsChange: (levels: number) => void;
-	onTwapMinutesChange: (minutes: number) => void;
-	onTwapRandomizeChange: (randomize: boolean) => void;
-	onTifChange: (tif: LimitTif) => void;
-	onReduceOnlyChange: (reduceOnly: boolean) => void;
-	onTpSlEnabledChange: (enabled: boolean) => void;
-	onTpPriceChange: (price: string) => void;
-	onSlPriceChange: (price: string) => void;
 	onDepositClick: () => void;
 	onSwapClick: () => void;
 }
@@ -93,21 +82,7 @@ export function TradeFormFields({
 	isConnected,
 	isFormDisabled,
 	isSpotMarket,
-	orderType,
 	side,
-	sizeInput,
-	limitPriceInput,
-	triggerPriceInput,
-	scaleStartPriceInput,
-	scaleEndPriceInput,
-	scaleLevelsNum,
-	twapMinutesNum,
-	twapRandomize,
-	tif,
-	reduceOnly,
-	tpSlEnabled,
-	tpPriceInput,
-	slPriceInput,
 	price,
 	markPx,
 	maxSize,
@@ -123,27 +98,45 @@ export function TradeFormFields({
 	capabilities,
 	reduceOnlyId,
 	tpSlId,
-	onSizeChange,
 	onSizeModeToggle,
 	onSizePercentApply,
-	onLimitPriceChange,
-	onTriggerPriceChange,
-	onScaleStartChange,
-	onScaleEndChange,
-	onScaleLevelsChange,
-	onTwapMinutesChange,
-	onTwapRandomizeChange,
-	onTifChange,
-	onReduceOnlyChange,
-	onTpSlEnabledChange,
-	onTpPriceChange,
-	onSlPriceChange,
 	onDepositClick,
 	onSwapClick,
 }: Props) {
 	const [isDraggingSlider, setIsDraggingSlider] = useState(false);
 	const [dragSliderValue, setDragSliderValue] = useState(25);
 	const [hasUserSized, setHasUserSized] = useState(false);
+
+	const orderType = useOrderType();
+	const sizeInput = useOrderSize();
+	const limitPriceInput = useLimitPrice();
+	const triggerPriceInput = useTriggerPrice();
+	const scaleStartPriceInput = useScaleStart();
+	const scaleEndPriceInput = useScaleEnd();
+	const scaleLevelsNum = useScaleLevels();
+	const twapMinutesNum = useTwapMinutes();
+	const twapRandomize = useTwapRandomize();
+	const tif = useTif();
+	const reduceOnly = useReduceOnly();
+	const tpSlEnabled = useTpSlEnabled();
+	const tpPriceInput = useTpPrice();
+	const slPriceInput = useSlPrice();
+
+	const {
+		setSize,
+		setLimitPrice,
+		setTriggerPrice,
+		setScaleStart,
+		setScaleEnd,
+		setScaleLevels,
+		setTwapMinutes,
+		setTwapRandomize,
+		setTif,
+		setReduceOnly,
+		setTpSlEnabled,
+		setTpPrice,
+		setSlPrice,
+	} = useOrderEntryActions();
 
 	const triggerOrder = isTriggerOrderType(orderType);
 	const twapOrder = isTwapOrderType(orderType);
@@ -165,7 +158,7 @@ export function TradeFormFields({
 
 	function handleSizeChange(value: string) {
 		setHasUserSized(true);
-		onSizeChange(value);
+		setSize(value);
 	}
 
 	function handleSizePercentApply(pct: number) {
@@ -230,7 +223,7 @@ export function TradeFormFields({
 						disabled={isFormDisabled}
 					>
 						<span className="text-4xs">{sizeModeLabel}</span>
-						<ArrowLeftRight className="size-2.5" />
+						<ArrowsLeftRight className="size-2.5" />
 					</Button>
 					<NumberInput
 						placeholder="0.00"
@@ -284,7 +277,7 @@ export function TradeFormFields({
 							<Button
 								variant="ghost"
 								size="none"
-								onClick={() => onTriggerPriceChange(toFixed(markPx, szDecimalsToPriceDecimals(szDecimals)))}
+								onClick={() => setTriggerPrice(toFixed(markPx, szDecimalsToPriceDecimals(szDecimals)))}
 								className="text-4xs text-muted-fg hover:text-info hover:bg-transparent tabular-nums"
 							>
 								{t`Mark`}: {formatPrice(markPx, { szDecimals })}
@@ -294,7 +287,7 @@ export function TradeFormFields({
 					<NumberInput
 						placeholder="0.00"
 						value={triggerPriceInput}
-						onChange={(e) => onTriggerPriceChange(e.target.value)}
+						onChange={(e) => setTriggerPrice(e.target.value)}
 						className={cn(
 							"w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums",
 							usesTriggerPrice &&
@@ -315,7 +308,7 @@ export function TradeFormFields({
 							<Button
 								variant="ghost"
 								size="none"
-								onClick={() => onLimitPriceChange(toFixed(markPx, szDecimalsToPriceDecimals(szDecimals)))}
+								onClick={() => setLimitPrice(toFixed(markPx, szDecimalsToPriceDecimals(szDecimals)))}
 								className="text-4xs text-muted-fg hover:text-info hover:bg-transparent tabular-nums"
 							>
 								{t`Mark`}: {formatPrice(markPx, { szDecimals })}
@@ -325,7 +318,7 @@ export function TradeFormFields({
 					<NumberInput
 						placeholder="0.00"
 						value={limitPriceInput}
-						onChange={(e) => onLimitPriceChange(e.target.value)}
+						onChange={(e) => setLimitPrice(e.target.value)}
 						className={cn(
 							"w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums",
 							usesLimitPrice && !price && sizeValue > 0 && "border-negative focus:border-negative",
@@ -338,7 +331,7 @@ export function TradeFormFields({
 			{showTif && (
 				<div className="space-y-1.5">
 					<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Time in Force`}</div>
-					<Select value={tif} onValueChange={(value) => onTifChange(value as LimitTif)} disabled={isFormDisabled}>
+					<Select value={tif} onValueChange={(value) => setTif(value as LimitTif)} disabled={isFormDisabled}>
 						<SelectTrigger className="w-full h-8 text-sm bg-bg/50 border-border/60">
 							<SelectValue />
 						</SelectTrigger>
@@ -360,7 +353,7 @@ export function TradeFormFields({
 						<NumberInput
 							placeholder="0.00"
 							value={scaleStartPriceInput}
-							onChange={(e) => onScaleStartChange(e.target.value)}
+							onChange={(e) => setScaleStart(e.target.value)}
 							className="w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums"
 							disabled={isFormDisabled}
 						/>
@@ -370,7 +363,7 @@ export function TradeFormFields({
 						<NumberInput
 							placeholder="0.00"
 							value={scaleEndPriceInput}
-							onChange={(e) => onScaleEndChange(e.target.value)}
+							onChange={(e) => setScaleEnd(e.target.value)}
 							className="w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums"
 							disabled={isFormDisabled}
 						/>
@@ -383,7 +376,7 @@ export function TradeFormFields({
 						<NumberInput
 							placeholder="4"
 							value={String(scaleLevelsNum)}
-							onChange={(e) => onScaleLevelsChange(Number(e.target.value) || 4)}
+							onChange={(e) => setScaleLevels(Number(e.target.value) || 4)}
 							allowDecimals={false}
 							className="w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums"
 							disabled={isFormDisabled}
@@ -402,7 +395,7 @@ export function TradeFormFields({
 						<NumberInput
 							placeholder="30"
 							value={String(twapMinutesNum)}
-							onChange={(e) => onTwapMinutesChange(Number(e.target.value) || 30)}
+							onChange={(e) => setTwapMinutes(Number(e.target.value) || 30)}
 							allowDecimals={false}
 							className="w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums"
 							disabled={isFormDisabled}
@@ -411,7 +404,7 @@ export function TradeFormFields({
 					<div className="flex items-center gap-2 text-3xs">
 						<Checkbox
 							checked={twapRandomize}
-							onCheckedChange={(checked) => onTwapRandomizeChange(checked === true)}
+							onCheckedChange={(checked) => setTwapRandomize(checked === true)}
 							disabled={isFormDisabled}
 						/>
 						<span className={cn(isFormDisabled && "text-muted-fg")}>{t`Randomize timing`}</span>
@@ -428,7 +421,7 @@ export function TradeFormFields({
 									id={reduceOnlyId}
 									aria-label={t`Reduce Only`}
 									checked={triggerOrder || reduceOnly}
-									onCheckedChange={(checked) => onReduceOnlyChange(checked === true)}
+									onCheckedChange={(checked) => setReduceOnly(checked === true)}
 									disabled={isFormDisabled || triggerOrder}
 								/>
 								<label
@@ -448,7 +441,7 @@ export function TradeFormFields({
 									id={tpSlId}
 									aria-label={t`Take Profit / Stop Loss`}
 									checked={tpSlEnabled}
-									onCheckedChange={(checked) => onTpSlEnabledChange(checked === true)}
+									onCheckedChange={(checked) => setTpSlEnabled(checked === true)}
 									disabled={isFormDisabled}
 								/>
 								<label
@@ -469,8 +462,8 @@ export function TradeFormFields({
 							szDecimals={szDecimals}
 							tpPrice={tpPriceInput}
 							slPrice={slPriceInput}
-							onTpPriceChange={onTpPriceChange}
-							onSlPriceChange={onSlPriceChange}
+							onTpPriceChange={setTpPrice}
+							onSlPriceChange={setSlPrice}
 							disabled={isFormDisabled}
 						/>
 					)}

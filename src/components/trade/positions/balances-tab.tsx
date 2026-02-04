@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { ArrowDownUp, ArrowLeftRight, Send, Wallet } from "lucide-react";
+import { ArrowsDownUp, ArrowsLeftRight, PaperPlaneTilt, Wallet } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -160,7 +160,7 @@ export function BalancesTab() {
 								onClick={() => handleTransferClick(row)}
 								className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
 							>
-								<ArrowLeftRight className="size-2.5" />
+								<ArrowsLeftRight className="size-2.5" />
 								{transferLabel}
 							</Button>
 						)}
@@ -171,7 +171,7 @@ export function BalancesTab() {
 								onClick={() => openSwapModal(row.asset)}
 								className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
 							>
-								<ArrowDownUp className="size-2.5" />
+								<ArrowsDownUp className="size-2.5" />
 								{t`Swap`}
 							</Button>
 						)}
@@ -182,7 +182,7 @@ export function BalancesTab() {
 								onClick={() => handleSendClick(row)}
 								className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
 							>
-								<Send className="size-2.5" />
+								<PaperPlaneTilt className="size-2.5" />
 								{t`Send`}
 							</Button>
 						)}

@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Percent } from "lucide-react";
+import { Percent } from "@phosphor-icons/react";
 import { useConnection } from "wagmi";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";

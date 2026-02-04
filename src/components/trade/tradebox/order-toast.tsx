@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Check, Loader2, X, Zap } from "lucide-react";
+import { Check, Lightning, SpinnerGap, X } from "@phosphor-icons/react";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/constants";
@@ -59,7 +59,7 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 					order.status === "failed" && "bg-negative/15 border border-negative/30",
 				)}
 			>
-				{order.status === "pending" && <Loader2 className="size-4 animate-spin text-info" />}
+				{order.status === "pending" && <SpinnerGap className="size-4 animate-spin text-info" />}
 				{order.status === "success" && <Check className="size-4 text-positive" />}
 				{order.status === "failed" && <X className="size-4 text-negative" />}
 			</div>
@@ -163,7 +163,7 @@ export function OrderToast() {
 		>
 			<div className="px-3 py-2 border-b border-border/40 bg-muted/30 flex items-center justify-between">
 				<div className="flex items-center gap-2">
-					<Zap className="size-4 text-info" />
+					<Lightning className="size-4 text-info" />
 					<span className="text-xs font-semibold uppercase tracking-wider text-fg">{t`Order Queue`}</span>
 				</div>
 				<div className="flex items-center gap-1.5">

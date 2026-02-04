@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Loader2, Send } from "lucide-react";
+import { PaperPlaneTilt, SpinnerGap } from "@phosphor-icons/react";
 import { useCallback, useMemo, useState } from "react";
 import { isAddress } from "viem";
 import { Button } from "@/components/ui/button";
@@ -234,8 +234,8 @@ export function SendDialog({
 					{error && <div className="text-3xs text-negative">{error}</div>}
 
 					<Button onClick={handleSend} disabled={!canSend} className="w-full h-10 text-xs font-medium">
-						{isPending && <Loader2 className="size-3.5 animate-spin mr-2" />}
-						<Send className="size-3.5 mr-2" />
+						{isPending && <SpinnerGap className="size-3.5 animate-spin mr-2" />}
+						<PaperPlaneTilt className="size-3.5 mr-2" />
 						{isPending ? t`Sending...` : t`Send`}
 					</Button>
 				</div>

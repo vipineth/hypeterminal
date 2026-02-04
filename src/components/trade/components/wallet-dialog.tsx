@@ -1,5 +1,5 @@
 import { Trans } from "@lingui/react/macro";
-import { AlertCircle, ExternalLink, FlaskConical, HelpCircle, Loader2, Shield, Wallet } from "lucide-react";
+import { ArrowSquareOut, Flask, Question, Shield, SpinnerGap, Wallet, WarningCircle } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { isAddress } from "viem";
 import { type Connector, useConnect, useConnectors } from "wagmi";
@@ -139,7 +139,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 												<p className="text-xs text-muted-fg truncate">{walletInfo.description}</p>
 											</div>
 											{isConnecting ? (
-												<Loader2 className="size-4 animate-spin text-info flex-shrink-0" />
+												<SpinnerGap className="size-4 animate-spin text-info flex-shrink-0" />
 											) : (
 												<div className="size-4 rounded-full border border-border group-hover:border-info/50 flex-shrink-0 transition-colors" />
 											)}
@@ -182,7 +182,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 												<p className="text-xs text-muted-fg truncate">{walletInfo.description}</p>
 											</div>
 											{isConnecting ? (
-												<Loader2 className="size-4 animate-spin text-info flex-shrink-0" />
+												<SpinnerGap className="size-4 animate-spin text-info flex-shrink-0" />
 											) : (
 												<div className="size-4 rounded-full border border-border group-hover:border-info/50 flex-shrink-0 transition-colors" />
 											)}
@@ -217,7 +217,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 											)}
 										>
 											<div className="size-10 rounded-lg overflow-hidden flex-shrink-0 shadow-sm bg-warning/20 flex items-center justify-center">
-												<FlaskConical className="size-5 text-warning" />
+												<Flask className="size-5 text-warning" />
 											</div>
 											<div className="flex-1 text-left min-w-0">
 												<p className="font-medium text-sm group-hover:text-warning transition-colors">
@@ -226,7 +226,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 												<p className="text-xs text-muted-fg truncate font-mono">{config?.address ?? "Mock wallet"}</p>
 											</div>
 											{isConnecting ? (
-												<Loader2 className="size-4 animate-spin text-warning flex-shrink-0" />
+												<SpinnerGap className="size-4 animate-spin text-warning flex-shrink-0" />
 											) : (
 												<div className="size-4 rounded-full border border-warning/50 flex-shrink-0 transition-colors" />
 											)}
@@ -263,7 +263,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 					{!hasConnectors && (
 						<div className="py-8 text-center space-y-3">
 							<div className="size-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto">
-								<AlertCircle className="size-6 text-muted-fg" />
+								<WarningCircle className="size-6 text-muted-fg" />
 							</div>
 							<div>
 								<p className="text-sm font-medium">
@@ -278,7 +278,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 
 					{error && (
 						<div className="flex items-start gap-2 p-3 rounded-lg bg-danger/10 border border-danger/20">
-							<AlertCircle className="size-4 text-danger shrink-0 mt-0.5" />
+							<WarningCircle className="size-4 text-danger shrink-0 mt-0.5" />
 							<p className="text-xs text-danger">{error.message}</p>
 						</div>
 					)}
@@ -292,7 +292,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 						className="w-full justify-between p-4 text-sm text-muted-fg hover:text-fg hover:bg-transparent"
 					>
 						<span className="flex items-center gap-2">
-							<HelpCircle className="size-4" />
+							<Question className="size-4" />
 							<Trans>New to wallets?</Trans>
 						</span>
 						<span className={cn("transition-transform", showHelp && "rotate-180")}>
@@ -335,7 +335,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 							<Button variant="outline" size="sm" className="w-full mt-2" asChild>
 								<a href="https://ethereum.org/en/wallets/" target="_blank" rel="noopener noreferrer">
 									<Trans>Learn more</Trans>
-									<ExternalLink className="size-3 ml-1.5" />
+									<ArrowSquareOut className="size-3 ml-1.5" />
 								</a>
 							</Button>
 						</div>

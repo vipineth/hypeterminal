@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
+import { ArrowDown, ArrowsDownUp, ArrowUp, CaretDown, Fire, MagnifyingGlass, Star } from "@phosphor-icons/react";
 import { flexRender } from "@tanstack/react-table";
-import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown, Flame, Search, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,7 +81,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 					className="h-6 gap-1.5 text-xs font-semibold px-2"
 				>
 					{selectedMarket && <AssetDisplay asset={selectedMarket} iconClassName="size-5 shrink-0" />}
-					<ChevronDown className="size-3 text-muted-fg shrink-0" />
+					<CaretDown className="size-3 text-muted-fg shrink-0" />
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent
@@ -93,7 +93,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 				<div className="flex flex-col p-2">
 					<div className="border-b border-border/40">
 						<div className="relative">
-							<Search className="absolute left-2 top-1/2 -translate-y-1/2 size-3 text-muted-fg" />
+							<MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 size-3 text-muted-fg" />
 							<Input
 								placeholder={t`Search markets...`}
 								value={search}
@@ -181,7 +181,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 											) : sortState === "desc" ? (
 												<ArrowDown className="size-2.5" />
 											) : (
-												<ArrowUpDown className="size-2.5 opacity-40" />
+												<ArrowsDownUp className="size-2.5 opacity-40" />
 											)}
 										</span>
 									</Button>
@@ -308,7 +308,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 												<div className="w-16 sm:w-20 text-right hidden sm:block">
 													<div className="flex items-center justify-end gap-1">
 														{market.funding !== null && (
-															<Flame className={cn("size-2.5", getValueColorClass(market.funding))} />
+															<Fire className={cn("size-2.5", getValueColorClass(market.funding))} />
 														)}
 														<span
 															className={cn(

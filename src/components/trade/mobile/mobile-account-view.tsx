@@ -1,4 +1,4 @@
-import { Copy, ExternalLink, LogOut, Wallet, Zap } from "lucide-react";
+import { ArrowSquareOut, Copy, Lightning, SignOut, Wallet } from "@phosphor-icons/react";
 import { useState } from "react";
 import { useConnection, useDisconnect } from "wagmi";
 import { Badge } from "@/components/ui/badge";
@@ -122,7 +122,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						)}
 						aria-label="Disconnect wallet"
 					>
-						<LogOut className="size-5" />
+						<SignOut className="size-5" />
 					</Button>
 				</div>
 			</div>
@@ -184,7 +184,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 								"min-h-[56px]",
 							)}
 						>
-							<Zap className="size-5" />
+							<Lightning className="size-5" />
 							{ACCOUNT_TEXT.DEPOSIT_LABEL}
 						</Button>
 						<Button
@@ -199,7 +199,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 							)}
 							disabled
 						>
-							<ExternalLink className="size-5" />
+							<ArrowSquareOut className="size-5" />
 							{ACCOUNT_TEXT.WITHDRAW_LABEL}
 						</Button>
 					</div>

@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
+import { Moon, Sun } from "@phosphor-icons/react";
 import { ClientOnly } from "@tanstack/react-router";
-import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { useTheme } from "@/providers/theme";

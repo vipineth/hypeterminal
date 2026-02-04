@@ -1,15 +1,5 @@
 import { t } from "@lingui/core/macro";
-import {
-	AlignVerticalDistributeCenter,
-	Check,
-	ChevronDown,
-	Crosshair,
-	type LucideIcon,
-	Octagon,
-	OctagonX,
-	Target,
-	Timer,
-} from "lucide-react";
+import { CaretDown, Check, Crosshair, type Icon, Octagon, Rows, Target, Timer, XCircle } from "@phosphor-icons/react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -39,17 +29,17 @@ interface Props {
 type AdvancedOrderOption = {
 	value: AdvancedOrderType;
 	label: string;
-	icon: LucideIcon;
+	icon: Icon;
 	group: "trigger" | "execution";
 };
 
-const ADVANCED_ORDER_ICONS: Record<AdvancedOrderType, LucideIcon> = {
+const ADVANCED_ORDER_ICONS: Record<AdvancedOrderType, Icon> = {
 	stopMarket: Octagon,
-	stopLimit: OctagonX,
+	stopLimit: XCircle,
 	takeProfitMarket: Target,
 	takeProfitLimit: Crosshair,
 	twap: Timer,
-	scale: AlignVerticalDistributeCenter,
+	scale: Rows,
 };
 
 const ADVANCED_ORDER_OPTIONS: AdvancedOrderOption[] = ADVANCED_ORDER_TYPES.map((value) => ({
@@ -94,7 +84,7 @@ export function AdvancedOrderDropdown({ orderType, onOrderTypeChange, marketKind
 				>
 					<span className="inline-flex items-center gap-1">
 						{isAdvanced ? label : t`Pro`}
-						<ChevronDown className={cn("size-3", isAdvanced ? "text-info" : "text-muted-fg")} />
+						<CaretDown className={cn("size-3", isAdvanced ? "text-info" : "text-muted-fg")} />
 					</span>
 				</button>
 			</DropdownMenuTrigger>

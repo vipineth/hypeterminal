@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, CircleDollarSign, LayoutList, TrendingUp } from "lucide-react";
+import { BookOpen, ChartBar, CurrencyCircleDollar, List, TrendUp } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
@@ -12,11 +12,11 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-	{ id: "chart", label: "Chart", icon: <BarChart3 className="size-5" /> },
+	{ id: "chart", label: "Chart", icon: <ChartBar className="size-5" /> },
 	{ id: "book", label: "Book", icon: <BookOpen className="size-5" /> },
-	{ id: "trade", label: "Trade", icon: <TrendingUp className="size-5" /> },
-	{ id: "positions", label: "Positions", icon: <LayoutList className="size-5" /> },
-	{ id: "account", label: "Account", icon: <CircleDollarSign className="size-5" /> },
+	{ id: "trade", label: "Trade", icon: <TrendUp className="size-5" /> },
+	{ id: "positions", label: "Positions", icon: <List className="size-5" /> },
+	{ id: "account", label: "Account", icon: <CurrencyCircleDollar className="size-5" /> },
 ];
 
 interface Props {

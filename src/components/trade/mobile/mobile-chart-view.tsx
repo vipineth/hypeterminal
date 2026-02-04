@@ -1,5 +1,5 @@
+import { Fire } from "@phosphor-icons/react";
 import { ClientOnly } from "@tanstack/react-router";
-import { Flame } from "lucide-react";
 import { useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UI_TEXT } from "@/config/constants";
@@ -89,7 +89,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 								})}
 							/>
 							<div className="flex items-center gap-1">
-								<Flame className={cn("size-3", getValueColorClass(fundingNum))} />
+								<Fire className={cn("size-3", getValueColorClass(fundingNum))} />
 								<span className={cn("tabular-nums font-medium", getValueColorClass(fundingNum))}>
 									{formatPercent(fundingNum, {
 										minimumFractionDigits: 4,

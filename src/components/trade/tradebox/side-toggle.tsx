@@ -1,4 +1,4 @@
-import { TrendingDown, TrendingUp } from "lucide-react";
+import { TrendDown, TrendUp } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import type { Side } from "@/lib/trade/types";
@@ -31,7 +31,7 @@ export function SideToggle({ side, onSideChange, labels }: Props) {
 				)}
 				aria-label={labels.buyAria}
 			>
-				<TrendingUp className="size-3 inline mr-1" />
+				<TrendUp className="size-3 inline mr-1" />
 				{labels.buy}
 			</Button>
 			<Button
@@ -46,7 +46,7 @@ export function SideToggle({ side, onSideChange, labels }: Props) {
 				)}
 				aria-label={labels.sellAria}
 			>
-				<TrendingDown className="size-3 inline mr-1" />
+				<TrendDown className="size-3 inline mr-1" />
 				{labels.sell}
 			</Button>
 		</div>

@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { AlertTriangle, Check, Loader2 } from "lucide-react";
+import { Check, SpinnerGap, Warning } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NumberInput } from "@/components/ui/number-input";
@@ -119,7 +119,7 @@ export function LeverageSheet({
 
 					{updateError && (
 						<div className="flex items-center gap-2 p-2.5 bg-negative/10 border border-negative/20 rounded-md text-sm text-negative">
-							<AlertTriangle className="size-4 shrink-0" />
+							<Warning className="size-4 shrink-0" />
 							<span>{updateError.message || t`Update failed`}</span>
 						</div>
 					)}
@@ -147,7 +147,7 @@ export function LeverageSheet({
 									"hover:bg-info/30",
 								)}
 							>
-								{isUpdating && <Loader2 className="size-4 animate-spin" />}
+								{isUpdating && <SpinnerGap className="size-4 animate-spin" />}
 								<Trans>Retry</Trans>
 							</Button>
 						</div>
@@ -164,7 +164,7 @@ export function LeverageSheet({
 									: "bg-info/10 border-info/30 text-info/50",
 							)}
 						>
-							{isUpdating && <Loader2 className="size-4 animate-spin" />}
+							{isUpdating && <SpinnerGap className="size-4 animate-spin" />}
 							<Trans>Confirm</Trans>
 						</Button>
 					)}

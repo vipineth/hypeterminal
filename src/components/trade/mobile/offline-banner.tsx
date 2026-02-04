@@ -1,4 +1,4 @@
-import { WifiOff, X } from "lucide-react";
+import { WifiSlash, X } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useOnlineStatus } from "@/hooks/use-mobile";
@@ -59,7 +59,7 @@ export function OfflineBanner({ className }: Props) {
 					</>
 				) : (
 					<>
-						<WifiOff className="size-4" />
+						<WifiSlash className="size-4" />
 						<span>You're offline. Some features may be limited.</span>
 					</>
 				)}

@@ -1,15 +1,15 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import {
-	AlertCircle,
-	ArrowDownToLine,
-	ArrowUpFromLine,
-	CheckCircle2,
+	ArrowLineDown,
+	ArrowLineUp,
+	ArrowSquareOut,
+	CheckCircle,
 	Clock,
-	ExternalLink,
-	Loader2,
+	SpinnerGap,
 	Wallet,
-} from "lucide-react";
+	WarningCircle,
+} from "@phosphor-icons/react";
 import { useState } from "react";
 import { formatUnits } from "viem";
 import { useConnection } from "wagmi";
@@ -125,7 +125,7 @@ function StatusScreen({
 						<div className="relative">
 							<div className="absolute inset-0 animate-ping rounded-full bg-info/20" />
 							<div className="relative flex size-14 items-center justify-center rounded-full bg-info/10 border border-info/30">
-								<Loader2 className="size-7 animate-spin text-info" />
+								<SpinnerGap className="size-7 animate-spin text-info" />
 							</div>
 						</div>
 					) : (
@@ -136,9 +136,9 @@ function StatusScreen({
 							)}
 						>
 							{icon === "success" ? (
-								<CheckCircle2 className="size-7 text-positive" />
+								<CheckCircle className="size-7 text-positive" />
 							) : (
-								<AlertCircle className="size-7 text-negative" />
+								<WarningCircle className="size-7 text-negative" />
 							)}
 						</div>
 					)}
@@ -151,7 +151,7 @@ function StatusScreen({
 							<a href={explorerUrl} target="_blank" rel="noopener noreferrer">
 								<span className="inline-flex items-center gap-1.5">
 									<Trans>View on explorer</Trans>
-									<ExternalLink className="size-3" />
+									<ArrowSquareOut className="size-3" />
 								</span>
 							</a>
 						</Button>
@@ -214,7 +214,7 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 				</div>
 				{validation.error && (
 					<p className="text-4xs text-negative flex items-center gap-1">
-						<AlertCircle className="size-3" />
+						<WarningCircle className="size-3" />
 						{validation.error}
 					</p>
 				)}
@@ -237,12 +237,12 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 			<Button variant="terminal" onClick={onSubmit} disabled={!validation.valid || isPending} className="w-full">
 				{isPending ? (
 					<>
-						<Loader2 className="size-4 animate-spin" />
+						<SpinnerGap className="size-4 animate-spin" />
 						<Trans>Processing...</Trans>
 					</>
 				) : (
 					<>
-						<ArrowDownToLine className="size-4" />
+						<ArrowLineDown className="size-4" />
 						<Trans>Deposit</Trans>
 					</>
 				)}
@@ -323,7 +323,7 @@ function WithdrawForm({
 				</div>
 				{validation.error && (
 					<p className="text-4xs text-negative flex items-center gap-1">
-						<AlertCircle className="size-3" />
+						<WarningCircle className="size-3" />
 						{validation.error}
 					</p>
 				)}
@@ -344,12 +344,12 @@ function WithdrawForm({
 							<span className="tabular-nums">${formatNumber(netReceived, 2)}</span>
 						)
 					}
-					icon={<ArrowDownToLine className="size-3" />}
+					icon={<ArrowLineDown className="size-3" />}
 				/>
 				<InfoRow
 					label={<Trans>Minimum</Trans>}
 					value={<span className="tabular-nums">${MIN_WITHDRAW_USD}</span>}
-					icon={<ArrowUpFromLine className="size-3" />}
+					icon={<ArrowLineUp className="size-3" />}
 				/>
 				<InfoRow
 					label={<Trans>Estimated time</Trans>}
@@ -362,12 +362,12 @@ function WithdrawForm({
 			<Button variant="terminal" onClick={onSubmit} disabled={!validation.valid || isPending} className="w-full">
 				{isPending ? (
 					<>
-						<Loader2 className="size-4 animate-spin" />
+						<SpinnerGap className="size-4 animate-spin" />
 						<Trans>Processing...</Trans>
 					</>
 				) : (
 					<>
-						<ArrowUpFromLine className="size-4" />
+						<ArrowLineUp className="size-4" />
 						<Trans>Withdraw</Trans>
 					</>
 				)}
@@ -414,7 +414,7 @@ function WrongNetworkScreen({ open, onClose, onSwitch, isSwitching, error }: Wro
 				<div className="space-y-4 py-2">
 					<div className="flex items-start gap-3 rounded-lg border border-warning/40 bg-warning/5 p-4">
 						<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-warning/20">
-							<AlertCircle className="size-4 text-warning" />
+							<WarningCircle className="size-4 text-warning" />
 						</div>
 						<div className="space-y-1">
 							<p className="text-sm font-medium">
@@ -429,7 +429,7 @@ function WrongNetworkScreen({ open, onClose, onSwitch, isSwitching, error }: Wro
 					<Button onClick={onSwitch} disabled={isSwitching} className="w-full">
 						{isSwitching ? (
 							<>
-								<Loader2 className="size-4 animate-spin" />
+								<SpinnerGap className="size-4 animate-spin" />
 								<Trans>Switching...</Trans>
 							</>
 						) : (
@@ -648,7 +648,7 @@ export function DepositModal() {
 									: "text-muted-fg hover:text-fg",
 							)}
 						>
-							<ArrowDownToLine className="size-3" />
+							<ArrowLineDown className="size-3" />
 							<Trans>Deposit</Trans>
 						</TabsTrigger>
 						<TabsTrigger
@@ -660,7 +660,7 @@ export function DepositModal() {
 									: "text-muted-fg hover:text-fg",
 							)}
 						>
-							<ArrowUpFromLine className="size-3" />
+							<ArrowLineUp className="size-3" />
 							<Trans>Withdraw</Trans>
 						</TabsTrigger>
 					</TabsList>

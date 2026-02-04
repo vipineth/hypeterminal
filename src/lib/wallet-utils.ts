@@ -1,4 +1,4 @@
-import { FlaskConical, Wallet } from "lucide-react";
+import { Flask, Wallet } from "@phosphor-icons/react";
 import type { Address } from "viem";
 import type { Connector } from "wagmi";
 import { CoinbaseIcon } from "@/components/icons/coinbase-icon";
@@ -93,13 +93,13 @@ export const WALLET_INFO: Record<string, WalletInfo> = {
 		priority: 10,
 	},
 	mock: {
-		icon: FlaskConical,
+		icon: Flask,
 		description: "Mock wallet for testing",
 		popular: false,
 		priority: 0,
 	},
 	Mock: {
-		icon: FlaskConical,
+		icon: Flask,
 		description: "Mock wallet for testing",
 		popular: false,
 		priority: 0,
@@ -131,7 +131,7 @@ function getMockWalletInfo(connector: Connector): WalletInfo {
 	const config = mockWalletRegistry.get(connector.name);
 	const address = config?.address;
 	return {
-		icon: FlaskConical,
+		icon: Flask,
 		description: address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "Mock wallet for testing",
 		popular: false,
 		priority: 0,

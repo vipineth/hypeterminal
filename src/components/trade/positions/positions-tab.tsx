@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Circle, Pencil, Plus } from "lucide-react";
+import { Circle, Pencil, Plus } from "@phosphor-icons/react";
 import { useMemo, useRef, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -343,7 +343,7 @@ export function PositionsTab() {
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
-				<Circle className="size-1.5 fill-positive text-positive" />
+				<Circle weight="fill" className="size-1.5 text-positive" />
 				{t`Active Positions`}
 				<span className="text-info ml-auto tabular-nums">{headerCount}</span>
 			</div>

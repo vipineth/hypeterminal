@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
-import { Check, Moon, Sun } from "lucide-react";
+import { Check, Moon, Sun } from "@phosphor-icons/react";
 import type { ChangeEvent } from "react";
 import { useId, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";

@@ -1,4 +1,4 @@
-import { TrendingUp, Zap } from "lucide-react";
+import { Lightning, TrendUp } from "@phosphor-icons/react";
 import { MARKET_CATEGORY_LABELS, TOKEN_ICON_BASE_URL } from "@/config/constants";
 import { PERP_MARKET_NAME_SEPARATOR, SPOT_MARKET_NAME_SEPARATOR } from "./display";
 import type { MarketKind } from "./types";
@@ -58,8 +58,8 @@ export type MarketCategory = "all" | "trending" | "new" | "defi" | "layer1" | "l
 
 export const marketCategories: { value: MarketCategory; label: string; icon: React.ReactNode }[] = [
 	{ value: "all", label: MARKET_CATEGORY_LABELS.all, icon: null },
-	{ value: "trending", label: MARKET_CATEGORY_LABELS.trending, icon: <TrendingUp className="size-2.5" /> },
-	{ value: "new", label: MARKET_CATEGORY_LABELS.new, icon: <Zap className="size-2.5" /> },
+	{ value: "trending", label: MARKET_CATEGORY_LABELS.trending, icon: <TrendUp className="size-2.5" /> },
+	{ value: "new", label: MARKET_CATEGORY_LABELS.new, icon: <Lightning className="size-2.5" /> },
 	{ value: "defi", label: MARKET_CATEGORY_LABELS.defi, icon: null },
 	{ value: "layer1", label: MARKET_CATEGORY_LABELS.layer1, icon: null },
 	{ value: "layer2", label: MARKET_CATEGORY_LABELS.layer2, icon: null },

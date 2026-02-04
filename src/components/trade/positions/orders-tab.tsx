@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { ListOrdered } from "lucide-react";
+import { ListNumbers } from "@phosphor-icons/react";
 import { useCallback, useEffect, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -178,7 +178,7 @@ export function OrdersTab() {
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
-				<ListOrdered className="size-3" />
+				<ListNumbers className="size-3" />
 				{t`Open Orders`}
 				<div className="ml-auto flex items-center gap-2">
 					<span className="text-info tabular-nums">{headerCount}</span>

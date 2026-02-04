@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Star } from "lucide-react";
+import { Star } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { get24hChange } from "@/domain/market";
 import { cn } from "@/lib/cn";

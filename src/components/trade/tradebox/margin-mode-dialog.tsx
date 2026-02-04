@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { AlertTriangle, Check, Layers, Loader2, Shield } from "lucide-react";
+import { Check, Shield, SpinnerGap, Stack, Warning } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,14 +31,14 @@ const MODE_OPTIONS: Array<{
 	id: MarginMode;
 	label: () => string;
 	description: () => string;
-	icon: typeof Layers;
+	icon: typeof Stack;
 }> = [
 	{
 		id: "cross",
 		label: () => t`Cross`,
 		description: () =>
 			t`All cross positions share the same cross margin as collateral. In the event of liquidation, your cross margin balance and any remaining open positions under assets in this mode may be forfeited.`,
-		icon: Layers,
+		icon: Stack,
 	},
 	{
 		id: "isolated",
@@ -168,7 +168,7 @@ export function MarginModeDialog({
 
 				{cannotSwitch && (
 					<div className="flex items-start gap-2 p-2.5 bg-warning/10 border border-warning/20 rounded-sm">
-						<AlertTriangle className="size-3.5 text-warning shrink-0 mt-0.5" />
+						<Warning className="size-3.5 text-warning shrink-0 mt-0.5" />
 						<p className="text-xs text-warning leading-relaxed">
 							<Trans>Cannot switch to Isolated mode with an open position. Close your position first.</Trans>
 						</p>
@@ -177,7 +177,7 @@ export function MarginModeDialog({
 
 				{updateError && (
 					<div className="flex items-center gap-2 p-2.5 bg-negative/10 border border-negative/20 rounded-sm text-xs text-negative">
-						<AlertTriangle className="size-3.5 shrink-0" />
+						<Warning className="size-3.5 shrink-0" />
 						<span className="flex-1 truncate">{updateError.message || t`Update failed`}</span>
 					</div>
 				)}
@@ -200,7 +200,7 @@ export function MarginModeDialog({
 						disabled={!isDirty || isUpdating || cannotSwitch || showSuccess}
 						className="gap-1.5"
 					>
-						{isUpdating && <Loader2 className="size-3.5 animate-spin" />}
+						{isUpdating && <SpinnerGap className="size-3.5 animate-spin" />}
 						<Trans>Confirm</Trans>
 					</TradingActionButton>
 				</DialogFooter>

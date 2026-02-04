@@ -1,4 +1,4 @@
-import { Bell, Cog, Terminal } from "lucide-react";
+import { Bell, Gear, Terminal } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { UI_TEXT } from "@/config/constants";
 import { cn } from "@/lib/cn";
@@ -53,7 +53,7 @@ export function MobileHeader({ className }: Props) {
 						aria-label={TOP_NAV_TEXT.SETTINGS_ARIA}
 						onClick={openSettingsDialog}
 					>
-						<Cog className="size-4" />
+						<Gear className="size-4" />
 					</Button>
 				</div>
 			</div>

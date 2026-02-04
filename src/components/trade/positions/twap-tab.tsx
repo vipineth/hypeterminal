@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Timer } from "lucide-react";
+import { Timer } from "@phosphor-icons/react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";

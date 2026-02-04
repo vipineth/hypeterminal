@@ -1,13 +1,13 @@
 import { t } from "@lingui/core/macro";
-import { ArrowRightLeft, ExternalLink } from "lucide-react";
+import { ArrowSquareOut, ArrowsLeftRight } from "@phosphor-icons/react";
 import { memo, useEffect, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { getBaseQuoteFromDisplayName } from "@/domain/market";
 import { useRingBuffer } from "@/lib/circular-buffer";
 import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
 import { useSelectedMarketInfo, useSubTrades } from "@/lib/hyperliquid";
 import { getExplorerTxUrl } from "@/lib/hyperliquid/explorer";
-import { getBaseQuoteFromDisplayName } from "@/domain/market";
 import { getTradeKey, type ProcessedTrade, processTrades, type RawTrade } from "@/lib/trade/trades";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
 
@@ -36,7 +36,7 @@ const TradeRow = memo(function TradeRow({ trade, szDecimals, showInQuote }: Prop
 		>
 			<div className="text-muted-fg/70 flex items-center gap-1">
 				{trade.time}
-				<ExternalLink className="size-2.5 opacity-100 hover:opacity-80" />
+				<ArrowSquareOut className="size-2.5 opacity-100 hover:opacity-80" />
 			</div>
 			<div className={cn("text-right", trade.side === "buy" ? "text-positive" : "text-negative")}>
 				{formatNumber(trade.price, 2)}
@@ -108,7 +108,7 @@ export function TradesPanel() {
 				>
 					{t`Size`}
 					<span className="opacity-60">({displayAsset})</span>
-					<ArrowRightLeft className="size-2 opacity-40" />
+					<ArrowsLeftRight className="size-2 opacity-40" />
 				</Button>
 			</div>
 

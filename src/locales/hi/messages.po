@@ -1809,8 +1809,12 @@ msgid "Trade"
 msgstr "ट्रेड"
 
 #: src/components/trade/positions/history-tab.tsx
-msgid "Trade History"
-msgstr "ट्रेड इतिहास"
+msgid "Trade ClockCounterClockwise"
+msgstr ""
+
+#: src/components/trade/positions/history-tab.tsx
+#~ msgid "Trade History"
+#~ msgstr "ट्रेड इतिहास"
 
 #. placeholder {0}: spotMarket.displayName
 #: src/components/trade/components/spot-swap-modal.tsx
