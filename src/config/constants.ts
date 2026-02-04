@@ -134,7 +134,7 @@ export const CHART_SUPPORTED_RESOLUTIONS = [
 	"1M",
 ] as unknown as ResolutionString[];
 export const CHART_LOCALE = "en";
-export const CHART_CUSTOM_FONT_FAMILY = "'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif";
+export const CHART_CUSTOM_FONT_FAMILY = "'IBM Plex Sans Variable', ui-sans-serif, system-ui, sans-serif";
 export const CHART_ENABLED_FEATURES = [
 	"side_toolbar_in_fullscreen_mode",
 	"header_in_fullscreen_mode",

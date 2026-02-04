@@ -19,6 +19,7 @@
 		"perf:compare": "node scripts/compare-bundle.js"
 	},
 	"dependencies": {
+		"@fontsource-variable/ibm-plex-sans": "^5.2.8",
 		"@hookform/resolvers": "^5.2.2",
 		"@lingui/core": "^5.7.0",
 		"@lingui/react": "^5.7.0",

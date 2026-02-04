@@ -10,7 +10,7 @@ html, body,
 [class*="legend-"],
 [class*="value-"],
 .apply-common-tooltip {
-	font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif !important;
+	font-family: 'IBM Plex Sans Variable', ui-sans-serif, system-ui, sans-serif !important;
 	font-size: 12px !important;
 	font-weight: 400 !important;
 	-webkit-font-smoothing: antialiased;
