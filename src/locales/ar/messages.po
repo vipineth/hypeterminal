@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/components/trade/order-entry/order-toast.tsx
+#: src/components/trade/tradebox/order-toast.tsx
 msgid "% filled"
 msgstr "% مكتمل"
 
@@ -37,7 +37,7 @@ msgstr ""
 #~ msgid "About Builder Codes"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Account"
 msgstr "الحساب"
 
@@ -80,7 +80,7 @@ msgstr "إضافة إلى المفضلة"
 msgid "Add TP/SL"
 msgstr ""
 
-#: src/components/trade/order-entry/advanced-order-dropdown.tsx
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
 msgid "Advanced order types"
 msgstr ""
 
@@ -96,13 +96,13 @@ msgstr ""
 #~ msgid "Agent verification failed"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "All cross positions share the same cross margin as collateral. In the event of liquidation, your cross margin balance and any remaining open positions under assets in this mode may be forfeited."
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/positions/send-dialog.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Amount"
 msgstr ""
 
@@ -131,18 +131,18 @@ msgstr ""
 msgid "Asset"
 msgstr "الأصل"
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Assets"
 msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx
-#: src/components/trade/order-entry/account-panel.tsx
-#: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/balances-tab.tsx
+#: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Available"
 msgstr "متاح"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Available:"
 msgstr ""
 
@@ -152,11 +152,11 @@ msgstr "متوسط السعر"
 
 #: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/components/spot-swap-modal.tsx
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Balance"
 msgstr "الرصيد"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Balance:"
 msgstr ""
 
@@ -188,7 +188,7 @@ msgstr ""
 #~ msgid "Builder codes allow DeFi builders to receive a fee on fills they send on behalf of users. They are set per-order for maximal flexibility."
 #~ msgstr ""
 
-#: src/components/trade/order-entry/order-summary.tsx
+#: src/components/trade/tradebox/order-summary.tsx
 msgid "Builder Fee"
 msgstr ""
 
@@ -213,14 +213,14 @@ msgstr "شراء"
 #~ msgid "Buy Long"
 #~ msgstr "شراء طويل"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/leverage-popover.tsx
-#: src/components/trade/order-entry/leverage-sheet.tsx
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/twap-tab.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/leverage-popover.tsx
+#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Cancel"
 msgstr "إلغاء"
 
@@ -258,11 +258,11 @@ msgstr "جارٍ الإلغاء..."
 msgid "cancelled"
 msgstr "ملغى"
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Cannot switch to Isolated mode with an open position. Close your position first."
 msgstr ""
 
-#: src/components/trade/order-entry/leverage-badge.tsx
+#: src/components/trade/tradebox/leverage-badge.tsx
 msgid "Change leverage"
 msgstr ""
 
@@ -296,14 +296,14 @@ msgstr "جاري الإغلاق..."
 msgid "completed"
 msgstr "مكتمل"
 
-#: src/components/trade/order-entry/leverage-popover.tsx
-#: src/components/trade/order-entry/leverage-sheet.tsx
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
+#: src/components/trade/tradebox/leverage-popover.tsx
+#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Confirm"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Confirm in wallet"
 msgstr ""
 
@@ -325,7 +325,7 @@ msgstr ""
 msgid "Connect Wallet"
 msgstr "ربط المحفظة"
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Connect wallet to view account"
 msgstr "اربط المحفظة لعرض الحساب"
 
@@ -361,7 +361,7 @@ msgstr "اربط محفظتك لعرض سجل التداول."
 msgid "Connect your wallet to view TWAP orders."
 msgstr "اربط محفظتك لعرض أوامر TWAP."
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Connect your wallet to withdraw funds"
 msgstr ""
 
@@ -389,17 +389,17 @@ msgstr "نسخ العنوان"
 #~ msgid "Could not create wallet"
 #~ msgstr "تعذر إنشاء المحفظة"
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
-#: src/components/trade/order-entry/margin-mode-toggle.tsx
 #: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/margin-mode-toggle.tsx
 msgid "Cross"
 msgstr "متقاطع"
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Cross Leverage"
 msgstr "الرافعة المتقاطعة"
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Current"
 msgstr ""
 
@@ -420,23 +420,23 @@ msgid "Dark"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#: src/components/trade/order-entry/account-panel.tsx
-#: src/components/trade/order-entry/account-panel.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 #: src/lib/trade/use-button-content.ts
 msgid "Deposit"
 msgstr "إيداع"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Deposit complete"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Deposit failed"
 msgstr ""
 
@@ -468,7 +468,7 @@ msgstr "قطع الاتصال"
 msgid "Disconnected"
 msgstr ""
 
-#: src/components/trade/order-entry/order-toast.tsx
+#: src/components/trade/tradebox/order-toast.tsx
 msgid "Dismiss"
 msgstr "تجاهل"
 
@@ -484,12 +484,12 @@ msgstr "يعرض الشريط الجانبي للجوال."
 #~ msgid "Docs"
 #~ msgstr "المستندات"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Done"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Duration (Minutes)"
 msgstr ""
 
@@ -513,7 +513,7 @@ msgstr ""
 #~ msgid "Enabling..."
 #~ msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "End Price (USDC)"
 msgstr ""
 
@@ -547,11 +547,11 @@ msgstr "الدخول"
 msgid "Entry Price"
 msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Equity"
 msgstr "حقوق الملكية"
 
-#: src/components/trade/order-entry/order-summary.tsx
+#: src/components/trade/tradebox/order-summary.tsx
 msgid "Est. Fee"
 msgstr "الرسوم المقدرة"
 
@@ -560,8 +560,8 @@ msgstr "الرسوم المقدرة"
 #~ msgid "Est. P&L"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Estimated time"
 msgstr ""
 
@@ -573,7 +573,7 @@ msgstr "يتجاوز الحد الأقصى"
 msgid "Executed"
 msgstr "منفذ"
 
-#: src/components/trade/order-entry/advanced-order-dropdown.tsx
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
 msgid "Execution"
 msgstr ""
 
@@ -581,11 +581,11 @@ msgstr ""
 #~ msgid "Expand account panel"
 #~ msgstr "توسيع لوحة الحساب"
 
-#: src/components/trade/order-entry/order-toast.tsx
+#: src/components/trade/tradebox/order-toast.tsx
 msgid "failed"
 msgstr "فشل"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-panel.tsx
 msgid "Failed to enable trading"
 msgstr "فشل تفعيل التداول"
 
@@ -655,7 +655,7 @@ msgid "Format for numbers and dates"
 msgstr ""
 
 #: src/components/trade/components/spot-swap-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "From"
 msgstr ""
 
@@ -693,7 +693,7 @@ msgstr "الذهاب إلى منصة التداول"
 msgid "Hide small"
 msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "In Orders"
 msgstr ""
 
@@ -726,7 +726,7 @@ msgstr ""
 msgid "Insufficient balance"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Insufficient balance (includes ${WITHDRAWAL_FEE_USD} fee)"
 msgstr ""
 
@@ -734,7 +734,7 @@ msgstr ""
 msgid "Insufficient funds for gas"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 #: src/lib/hyperliquid/use-deposit.ts
 msgid "Invalid amount"
 msgstr ""
@@ -743,9 +743,9 @@ msgstr ""
 #~ msgid "Invalid Ethereum address"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
-#: src/components/trade/order-entry/margin-mode-toggle.tsx
 #: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/margin-mode-toggle.tsx
 msgid "Isolated"
 msgstr "معزول"
 
@@ -761,8 +761,8 @@ msgstr "معزول"
 msgid "Learn more"
 msgstr ""
 
-#: src/components/trade/order-entry/leverage-popover.tsx
-#: src/components/trade/order-entry/leverage-sheet.tsx
+#: src/components/trade/tradebox/leverage-popover.tsx
+#: src/components/trade/tradebox/leverage-sheet.tsx
 msgid "Leverage"
 msgstr ""
 
@@ -774,11 +774,11 @@ msgstr ""
 #~ msgid "limit"
 #~ msgstr "محدد"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-header.tsx
 msgid "Limit"
 msgstr "محدد"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Limit Price"
 msgstr "السعر المحدد"
 
@@ -794,7 +794,7 @@ msgstr "السعر المحدد"
 msgid "Liq"
 msgstr "التصفية"
 
-#: src/components/trade/order-entry/order-summary.tsx
+#: src/components/trade/tradebox/order-summary.tsx
 msgid "Liq. Price"
 msgstr "سعر التصفية"
 
@@ -838,8 +838,8 @@ msgstr "جارٍ تحميل أوامر TWAP..."
 msgid "Loading wallet..."
 msgstr "جاري تحميل المحفظة..."
 
-#: src/components/trade/order-entry/account-panel.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 #: src/lib/trade/use-button-content.ts
 #: src/lib/trade/use-button-content.ts
 msgid "Loading..."
@@ -851,7 +851,7 @@ msgstr "جارٍ التحميل..."
 msgid "Long"
 msgstr "شراء"
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Manage your risk on individual positions by restricting the amount of margin allocated to each. If the margin ratio of an isolated position reaches 100%, the position will be liquidated. Margin can be added or removed to individual positions in this mode."
 msgstr ""
 
@@ -859,25 +859,25 @@ msgstr ""
 msgid "Margin"
 msgstr ""
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Margin Mode"
 msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Margin Ratio"
 msgstr "نسبة الهامش"
 
-#: src/components/trade/order-entry/order-summary.tsx
+#: src/components/trade/tradebox/order-summary.tsx
 msgid "Margin Req."
 msgstr "الهامش المطلوب"
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Margin Used"
 msgstr "الهامش المستخدم"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
-#: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Mark"
 msgstr "السعر المرجعي"
 
@@ -891,7 +891,7 @@ msgstr ""
 
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/chart/token-selector.tsx
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-header.tsx
 msgid "Market"
 msgstr "السوق"
 
@@ -911,14 +911,14 @@ msgstr "انزلاق أمر السوق"
 msgid "markets"
 msgstr "أسواق"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Max"
 msgstr "الأقصى"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/positions/send-dialog.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "MAX"
 msgstr ""
 
@@ -946,8 +946,8 @@ msgstr ""
 msgid "Min order $10"
 msgstr "الحد الأدنى $10"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Minimum"
 msgstr ""
 
@@ -965,7 +965,7 @@ msgstr ""
 msgid "Minimum withdrawal is ${0}"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Minimum withdrawal is ${MIN_WITHDRAW_USD}"
 msgstr ""
 
@@ -993,11 +993,11 @@ msgstr ""
 #~ msgid "Must be signed by main wallet (not agent/API wallet)"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Net received"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Network fee"
 msgstr ""
 
@@ -1057,7 +1057,7 @@ msgstr "لم يتم العثور على أسواق."
 msgid "No open orders."
 msgstr "لا توجد أوامر مفتوحة."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-panel.tsx
 msgid "No response from exchange"
 msgstr ""
 
@@ -1101,7 +1101,7 @@ msgstr "الإشعارات"
 msgid "Number Format"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Number of Orders"
 msgstr ""
 
@@ -1139,15 +1139,15 @@ msgstr "أوراكل"
 msgid "Order Book"
 msgstr "دفتر الأوامر"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-panel.tsx
 msgid "Order failed"
 msgstr "فشل الطلب"
 
-#: src/components/trade/order-entry/order-toast.tsx
+#: src/components/trade/tradebox/order-toast.tsx
 msgid "Order Queue"
 msgstr "قائمة الأوامر"
 
-#: src/components/trade/order-entry/order-summary.tsx
+#: src/components/trade/tradebox/order-summary.tsx
 msgid "Order Value"
 msgstr "قيمة الطلب"
 
@@ -1171,7 +1171,7 @@ msgstr "الصفحة غير موجودة"
 msgid "Payment"
 msgstr "الدفعة"
 
-#: src/components/trade/order-entry/order-toast.tsx
+#: src/components/trade/tradebox/order-toast.tsx
 msgid "pending"
 msgstr "قيد الانتظار"
 
@@ -1188,8 +1188,8 @@ msgstr ""
 msgid "Perpetuals"
 msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Perps"
 msgstr "العقود الدائمة"
 
@@ -1201,10 +1201,10 @@ msgstr ""
 #~ msgid "Perps: Max 0.1% (10 basis points)"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "PNL"
 msgstr "الربح والخسارة"
 
@@ -1216,8 +1216,8 @@ msgstr ""
 #~ msgid "Portfolio"
 #~ msgstr "المحفظة"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Position"
 msgstr "المركز"
 
@@ -1226,11 +1226,11 @@ msgstr "المركز"
 #~ msgstr "السابق"
 
 #: src/components/trade/chart/constants.ts
-#: src/components/trade/order-entry/price-input-with-percent.tsx
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/tradebox/price-input-with-percent.tsx
 msgid "Price"
 msgstr "السعر"
 
@@ -1238,17 +1238,17 @@ msgstr "السعر"
 msgid "PRICE"
 msgstr ""
 
-#: src/components/trade/order-entry/advanced-order-dropdown.tsx
-#: src/components/trade/order-entry/advanced-order-dropdown.tsx
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
 msgid "Pro"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Processing deposit"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Processing..."
 msgstr ""
 
@@ -1256,7 +1256,7 @@ msgstr ""
 msgid "Progress"
 msgstr "التقدم"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Randomize timing"
 msgstr ""
 
@@ -1273,8 +1273,8 @@ msgstr "الصفقات الأخيرة"
 msgid "Reduce"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Reduce Only"
 msgstr "تقليل فقط"
 
@@ -1295,14 +1295,14 @@ msgstr "إزالة من المفضلة"
 #~ msgid "Requirements:"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/leverage-popover.tsx
-#: src/components/trade/order-entry/leverage-sheet.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/leverage-popover.tsx
+#: src/components/trade/tradebox/leverage-sheet.tsx
 msgid "Retry"
 msgstr ""
 
-#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/tradebox/tp-sl-section.tsx
 msgid "Risk/Reward"
 msgstr ""
 
@@ -1342,7 +1342,7 @@ msgstr "تحديد جميع الأوامر"
 msgid "Select favorite markets"
 msgstr "اختر الأسواق المفضلة"
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Select how margin is allocated for your positions"
 msgstr ""
 
@@ -1404,11 +1404,11 @@ msgstr ""
 msgid "Sending..."
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "sent to Hyperliquid"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Set {p}%"
 msgstr "تعيين {p}%"
 
@@ -1416,7 +1416,7 @@ msgstr "تعيين {p}%"
 #~ msgid "Set SL to {p}%"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/price-input-with-percent.tsx
+#: src/components/trade/tradebox/price-input-with-percent.tsx
 msgid "Set to {p}%"
 msgstr ""
 
@@ -1499,14 +1499,14 @@ msgstr "المُوقِّع غير جاهز"
 #~ msgid "Signing..."
 #~ msgstr "جاري التوقيع..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
-#: src/components/trade/order-entry/order-toast.tsx
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/tradebox/order-toast.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Size"
 msgstr "الحجم"
 
@@ -1524,7 +1524,7 @@ msgstr ""
 msgid "SL must be below entry"
 msgstr ""
 
-#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/tradebox/tp-sl-section.tsx
 msgid "SL Price"
 msgstr ""
 
@@ -1532,7 +1532,7 @@ msgstr ""
 #~ msgid "SL trigger price"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/order-summary.tsx
+#: src/components/trade/tradebox/order-summary.tsx
 msgid "Slippage"
 msgstr "الانزلاق"
 
@@ -1562,11 +1562,11 @@ msgstr "مرتب حسب {0}"
 #~ msgid "spot"
 #~ msgstr "فوري"
 
-#: src/components/trade/order-entry/account-panel.tsx
-#: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
+#: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Spot"
 msgstr "فوري"
 
@@ -1590,7 +1590,7 @@ msgstr "الفارق"
 msgid "Start and end must differ"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Start Price (USDC)"
 msgstr ""
 
@@ -1606,8 +1606,8 @@ msgstr "الحالة"
 msgid "Stop Limit"
 msgstr ""
 
-#: src/components/trade/order-entry/tp-sl-section.tsx
-#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/tradebox/tp-sl-section.tsx
+#: src/components/trade/tradebox/tp-sl-section.tsx
 msgid "Stop Loss"
 msgstr ""
 
@@ -1633,8 +1633,8 @@ msgstr ""
 
 #: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/components/spot-swap-modal.tsx
-#: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/balances-tab.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Swap"
 msgstr ""
 
@@ -1671,12 +1671,12 @@ msgstr ""
 msgid "Switch to {displayName} market"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 #: src/lib/trade/use-button-content.ts
 msgid "Switch to Arbitrum"
 msgstr "التبديل إلى Arbitrum"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Switch to Arbitrum to deposit USDC to Hyperliquid"
 msgstr ""
 
@@ -1688,7 +1688,7 @@ msgstr "التبديل إلى الوضع الداكن"
 msgid "Switch to light mode"
 msgstr "التبديل إلى الوضع الفاتح"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 #: src/lib/trade/use-button-content.ts
 msgid "Switching..."
 msgstr "جاري التبديل..."
@@ -1701,12 +1701,12 @@ msgstr ""
 msgid "Take Market"
 msgstr ""
 
-#: src/components/trade/order-entry/tp-sl-section.tsx
-#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/tradebox/tp-sl-section.tsx
+#: src/components/trade/tradebox/tp-sl-section.tsx
 msgid "Take Profit"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Take Profit / Stop Loss"
 msgstr "جني الأرباح / وقف الخسارة"
 
@@ -1737,12 +1737,12 @@ msgstr "الصفحة التي تبحث عنها غير موجودة."
 msgid "Time"
 msgstr "الوقت"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Time in Force"
 msgstr ""
 
 #: src/components/trade/components/spot-swap-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "To"
 msgstr ""
 
@@ -1760,7 +1760,7 @@ msgstr ""
 msgid "Toggle Sidebar"
 msgstr "تبديل الشريط الجانبي"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Toggle size mode"
 msgstr "تبديل وضع الحجم"
 
@@ -1773,7 +1773,7 @@ msgstr "الإجمالي"
 msgid "Total Size"
 msgstr "الحجم الإجمالي"
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Total Value"
 msgstr ""
 
@@ -1791,7 +1791,7 @@ msgstr ""
 msgid "TP must be below entry"
 msgstr ""
 
-#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/tradebox/tp-sl-section.tsx
 msgid "TP Price"
 msgstr ""
 
@@ -1799,8 +1799,8 @@ msgstr ""
 #~ msgid "TP trigger price"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "TP/SL"
 msgstr "TP/SL"
 
@@ -1826,9 +1826,9 @@ msgstr "الصفقات"
 msgid "Transaction was rejected"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Transfer"
 msgstr ""
 
@@ -1848,12 +1848,12 @@ msgstr ""
 msgid "Transferring..."
 msgstr ""
 
-#: src/components/trade/order-entry/advanced-order-dropdown.tsx
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
 msgid "Trigger"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Trigger Price (USDC)"
 msgstr ""
 
@@ -1895,7 +1895,7 @@ msgstr "رمز غير معروف: {symbolName}"
 msgid "Unrealized P&L"
 msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Unrealized PNL"
 msgstr "الربح والخسارة غير المحققة"
 
@@ -1904,15 +1904,15 @@ msgstr "الربح والخسارة غير المحققة"
 msgid "Unsupported resolution: {0}"
 msgstr "دقة غير مدعومة: {0}"
 
-#: src/components/trade/order-entry/leverage-popover.tsx
-#: src/components/trade/order-entry/leverage-sheet.tsx
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/leverage-popover.tsx
+#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Update failed"
 msgstr ""
 
-#: src/components/trade/order-entry/leverage-popover.tsx
-#: src/components/trade/order-entry/leverage-sheet.tsx
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/leverage-popover.tsx
+#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Updated"
 msgstr ""
 
@@ -1936,7 +1936,7 @@ msgstr "القيمة بالدولار"
 msgid "Verifying..."
 msgstr "جارٍ التحقق..."
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "View on explorer"
 msgstr ""
 
@@ -1964,7 +1964,7 @@ msgstr "في انتظار الصفقات..."
 #~ msgid "Wallet client not ready"
 #~ msgstr "عميل المحفظة غير جاهز"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Wallet not connected"
 msgstr "المحفظة غير متصلة"
 
@@ -1980,28 +1980,28 @@ msgstr ""
 #~ msgid "will arrive in ~3 min"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "will arrive in ~5 min"
 msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx
-#: src/components/trade/order-entry/account-panel.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Withdraw"
 msgstr "سحب"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Withdrawal failed"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Withdrawal submitted"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Wrong network"
 msgstr ""
 

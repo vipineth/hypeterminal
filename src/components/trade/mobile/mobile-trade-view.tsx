@@ -29,8 +29,8 @@ import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
 import { WalletDialog } from "../components/wallet-dialog";
-import { LeverageControl } from "../order-entry/leverage-control";
-import { OrderToast } from "../order-entry/order-toast";
+import { LeverageControl } from "../tradebox/leverage-control";
+import { OrderToast } from "../tradebox/order-toast";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
 
 type OrderType = "market" | "limit";

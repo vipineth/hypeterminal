@@ -27,6 +27,7 @@ type SubscriptionRuntime = {
 	refCount: number;
 	subscription?: ISubscription;
 	promise?: Promise<ISubscription>;
+	isTerminated?: boolean;
 };
 
 type SubscriptionMap = Record<string, SubscriptionEntry>;
@@ -79,7 +80,7 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 
 			set((state) => {
 				const existing = state.subscriptions[key];
-				if (existing) {
+				if (existing && existing.status !== "error") {
 					return state;
 				}
 
@@ -92,7 +93,10 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 
 			const startSubscription = () => {
 				const runtime = subscriptionRuntime.get(key);
-				if (!runtime || runtime.promise || runtime.subscription) return;
+				if (!runtime || runtime.promise || runtime.isTerminated) return;
+				if (runtime.subscription && !runtime.subscription.failureSignal.aborted) return;
+
+				runtime.subscription = undefined;
 
 				runtime.promise = subscribe()
 					.then((subscription) => {
@@ -115,6 +119,8 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 							"abort",
 							() => {
 								const reason = subscription.failureSignal.reason ?? new Error("Subscription failed");
+								runtime.subscription = undefined;
+								runtime.isTerminated = true;
 								set((state) => {
 									const current = state.subscriptions[key];
 									if (!current) return state;
@@ -129,6 +135,7 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 					})
 					.catch((error) => {
 						runtime.promise = undefined;
+						runtime.subscription = undefined;
 						set((state) => {
 							const current = state.subscriptions[key];
 							if (!current) return state;
@@ -162,7 +169,7 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 			subscriptionRuntime.delete(key);
 
 			const runUnsubscribe = async (subscription?: ISubscription) => {
-				if (!subscription) return;
+				if (!subscription || subscription.failureSignal.aborted) return;
 				await subscription.unsubscribe();
 			};
 

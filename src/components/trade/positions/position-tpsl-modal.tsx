@@ -13,7 +13,7 @@ import { getValueColorClass, isPositive, toNumber } from "@/lib/trade/numbers";
 import { validateSlPrice, validateTpPrice } from "@/lib/trade/tpsl";
 import { AssetDisplay } from "../components/asset-display";
 import { TradingActionButton } from "../components/trading-action-button";
-import { TpSlSection } from "../order-entry/tp-sl-section";
+import { TpSlSection } from "../tradebox/tp-sl-section";
 
 interface PositionData {
 	coin: string;

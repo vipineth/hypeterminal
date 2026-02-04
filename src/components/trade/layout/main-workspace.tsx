@@ -2,7 +2,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { usePersistentPanelSizes } from "@/hooks/trade/use-persistent-layout";
 import { FavoritesStrip } from "../header/favorites-strip";
 import { AnalysisSection } from "./analysis-section";
-import { OrderSidebar } from "./order-sidebar";
+import { TradeSidebar } from "./trade-sidebar";
 
 export function MainWorkspace() {
 	const { sizes, onSizesChange } = usePersistentPanelSizes("CHART_WITH_SWAPBOX");
@@ -23,7 +23,7 @@ export function MainWorkspace() {
 					className="bg-border/40 data-[resize-handle-state=hover]:bg-info/30 data-[resize-handle-state=drag]:bg-info/50"
 				/>
 				<ResizablePanel defaultSize={sizes[1]}>
-					<OrderSidebar />
+					<TradeSidebar />
 				</ResizablePanel>
 			</ResizablePanelGroup>
 		</div>

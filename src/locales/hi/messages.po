@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/components/trade/order-entry/order-toast.tsx
+#: src/components/trade/tradebox/order-toast.tsx
 msgid "% filled"
 msgstr "% पूर्ण"
 
@@ -37,7 +37,7 @@ msgstr ""
 #~ msgid "About Builder Codes"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Account"
 msgstr "खाता"
 
@@ -80,7 +80,7 @@ msgstr "पसंदीदा में जोड़ें"
 msgid "Add TP/SL"
 msgstr ""
 
-#: src/components/trade/order-entry/advanced-order-dropdown.tsx
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
 msgid "Advanced order types"
 msgstr ""
 
@@ -96,13 +96,13 @@ msgstr ""
 #~ msgid "Agent verification failed"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "All cross positions share the same cross margin as collateral. In the event of liquidation, your cross margin balance and any remaining open positions under assets in this mode may be forfeited."
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/positions/send-dialog.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Amount"
 msgstr ""
 
@@ -131,18 +131,18 @@ msgstr ""
 msgid "Asset"
 msgstr "संपत्ति"
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Assets"
 msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx
-#: src/components/trade/order-entry/account-panel.tsx
-#: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/balances-tab.tsx
+#: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Available"
 msgstr "उपलब्ध"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Available:"
 msgstr ""
 
@@ -152,11 +152,11 @@ msgstr "औसत मूल्य"
 
 #: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/components/spot-swap-modal.tsx
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Balance"
 msgstr "शेष"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Balance:"
 msgstr ""
 
@@ -188,7 +188,7 @@ msgstr ""
 #~ msgid "Builder codes allow DeFi builders to receive a fee on fills they send on behalf of users. They are set per-order for maximal flexibility."
 #~ msgstr ""
 
-#: src/components/trade/order-entry/order-summary.tsx
+#: src/components/trade/tradebox/order-summary.tsx
 msgid "Builder Fee"
 msgstr ""
 
@@ -213,14 +213,14 @@ msgstr "खरीदें"
 #~ msgid "Buy Long"
 #~ msgstr "लॉन्ग खरीदें"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/leverage-popover.tsx
-#: src/components/trade/order-entry/leverage-sheet.tsx
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/twap-tab.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/leverage-popover.tsx
+#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Cancel"
 msgstr "रद्द करें"
 
@@ -258,11 +258,11 @@ msgstr "रद्द हो रहा है..."
 msgid "cancelled"
 msgstr "रद्द"
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Cannot switch to Isolated mode with an open position. Close your position first."
 msgstr ""
 
-#: src/components/trade/order-entry/leverage-badge.tsx
+#: src/components/trade/tradebox/leverage-badge.tsx
 msgid "Change leverage"
 msgstr ""
 
@@ -296,14 +296,14 @@ msgstr "बंद हो रहा है..."
 msgid "completed"
 msgstr "पूर्ण"
 
-#: src/components/trade/order-entry/leverage-popover.tsx
-#: src/components/trade/order-entry/leverage-sheet.tsx
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
+#: src/components/trade/tradebox/leverage-popover.tsx
+#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Confirm"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Confirm in wallet"
 msgstr ""
 
@@ -325,7 +325,7 @@ msgstr ""
 msgid "Connect Wallet"
 msgstr "वॉलेट कनेक्ट करें"
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Connect wallet to view account"
 msgstr "खाता देखने के लिए वॉलेट कनेक्ट करें"
 
@@ -361,7 +361,7 @@ msgstr "ट्रेड इतिहास देखने के लिए अ�
 msgid "Connect your wallet to view TWAP orders."
 msgstr "TWAP ऑर्डर देखने के लिए अपना वॉलेट कनेक्ट करें।"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Connect your wallet to withdraw funds"
 msgstr ""
 
@@ -389,17 +389,17 @@ msgstr "पता कॉपी करें"
 #~ msgid "Could not create wallet"
 #~ msgstr "वॉलेट नहीं बना सका"
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
-#: src/components/trade/order-entry/margin-mode-toggle.tsx
 #: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/margin-mode-toggle.tsx
 msgid "Cross"
 msgstr "क्रॉस"
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Cross Leverage"
 msgstr "क्रॉस लीवरेज"
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Current"
 msgstr ""
 
@@ -420,23 +420,23 @@ msgid "Dark"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#: src/components/trade/order-entry/account-panel.tsx
-#: src/components/trade/order-entry/account-panel.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 #: src/lib/trade/use-button-content.ts
 msgid "Deposit"
 msgstr "जमा करें"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Deposit complete"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Deposit failed"
 msgstr ""
 
@@ -468,7 +468,7 @@ msgstr "डिस्कनेक्ट करें"
 msgid "Disconnected"
 msgstr ""
 
-#: src/components/trade/order-entry/order-toast.tsx
+#: src/components/trade/tradebox/order-toast.tsx
 msgid "Dismiss"
 msgstr "खारिज करें"
 
@@ -484,12 +484,12 @@ msgstr "मोबाइल साइडबार दिखाता है।"
 #~ msgid "Docs"
 #~ msgstr "दस्तावेज़"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Done"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Duration (Minutes)"
 msgstr ""
 
@@ -513,7 +513,7 @@ msgstr ""
 #~ msgid "Enabling..."
 #~ msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "End Price (USDC)"
 msgstr ""
 
@@ -547,11 +547,11 @@ msgstr "प्रवेश"
 msgid "Entry Price"
 msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Equity"
 msgstr "इक्विटी"
 
-#: src/components/trade/order-entry/order-summary.tsx
+#: src/components/trade/tradebox/order-summary.tsx
 msgid "Est. Fee"
 msgstr "अनु. शुल्क"
 
@@ -560,8 +560,8 @@ msgstr "अनु. शुल्क"
 #~ msgid "Est. P&L"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Estimated time"
 msgstr ""
 
@@ -573,7 +573,7 @@ msgstr "अधिकतम साइज से अधिक"
 msgid "Executed"
 msgstr "निष्पादित"
 
-#: src/components/trade/order-entry/advanced-order-dropdown.tsx
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
 msgid "Execution"
 msgstr ""
 
@@ -581,11 +581,11 @@ msgstr ""
 #~ msgid "Expand account panel"
 #~ msgstr "खाता पैनल विस्तृत करें"
 
-#: src/components/trade/order-entry/order-toast.tsx
+#: src/components/trade/tradebox/order-toast.tsx
 msgid "failed"
 msgstr "विफल"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-panel.tsx
 msgid "Failed to enable trading"
 msgstr "ट्रेडिंग सक्षम करने में विफल"
 
@@ -655,7 +655,7 @@ msgid "Format for numbers and dates"
 msgstr ""
 
 #: src/components/trade/components/spot-swap-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "From"
 msgstr ""
 
@@ -693,7 +693,7 @@ msgstr "ट्रेडिंग टर्मिनल पर जाएं"
 msgid "Hide small"
 msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "In Orders"
 msgstr ""
 
@@ -726,7 +726,7 @@ msgstr ""
 msgid "Insufficient balance"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Insufficient balance (includes ${WITHDRAWAL_FEE_USD} fee)"
 msgstr ""
 
@@ -734,7 +734,7 @@ msgstr ""
 msgid "Insufficient funds for gas"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 #: src/lib/hyperliquid/use-deposit.ts
 msgid "Invalid amount"
 msgstr ""
@@ -743,9 +743,9 @@ msgstr ""
 #~ msgid "Invalid Ethereum address"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
-#: src/components/trade/order-entry/margin-mode-toggle.tsx
 #: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/margin-mode-toggle.tsx
 msgid "Isolated"
 msgstr "आइसोलेटेड"
 
@@ -761,8 +761,8 @@ msgstr "आइसोलेटेड"
 msgid "Learn more"
 msgstr ""
 
-#: src/components/trade/order-entry/leverage-popover.tsx
-#: src/components/trade/order-entry/leverage-sheet.tsx
+#: src/components/trade/tradebox/leverage-popover.tsx
+#: src/components/trade/tradebox/leverage-sheet.tsx
 msgid "Leverage"
 msgstr ""
 
@@ -774,11 +774,11 @@ msgstr ""
 #~ msgid "limit"
 #~ msgstr "लिमिट"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-header.tsx
 msgid "Limit"
 msgstr "लिमिट"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Limit Price"
 msgstr "लिमिट प्राइस"
 
@@ -794,7 +794,7 @@ msgstr "लिमिट प्राइस"
 msgid "Liq"
 msgstr "लिक्विडेशन"
 
-#: src/components/trade/order-entry/order-summary.tsx
+#: src/components/trade/tradebox/order-summary.tsx
 msgid "Liq. Price"
 msgstr "लिक्विडेशन प्राइस"
 
@@ -838,8 +838,8 @@ msgstr "TWAP ऑर्डर लोड हो रहे हैं..."
 msgid "Loading wallet..."
 msgstr "वॉलेट लोड हो रहा है..."
 
-#: src/components/trade/order-entry/account-panel.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 #: src/lib/trade/use-button-content.ts
 #: src/lib/trade/use-button-content.ts
 msgid "Loading..."
@@ -851,7 +851,7 @@ msgstr "लोड हो रहा है..."
 msgid "Long"
 msgstr "लॉन्ग"
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Manage your risk on individual positions by restricting the amount of margin allocated to each. If the margin ratio of an isolated position reaches 100%, the position will be liquidated. Margin can be added or removed to individual positions in this mode."
 msgstr ""
 
@@ -859,25 +859,25 @@ msgstr ""
 msgid "Margin"
 msgstr ""
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Margin Mode"
 msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Margin Ratio"
 msgstr "मार्जिन अनुपात"
 
-#: src/components/trade/order-entry/order-summary.tsx
+#: src/components/trade/tradebox/order-summary.tsx
 msgid "Margin Req."
 msgstr "मार्जिन आवश्यक"
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Margin Used"
 msgstr "उपयोग किया गया मार्जिन"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
-#: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Mark"
 msgstr "मार्क"
 
@@ -891,7 +891,7 @@ msgstr ""
 
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/chart/token-selector.tsx
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-header.tsx
 msgid "Market"
 msgstr "बाज़ार"
 
@@ -911,14 +911,14 @@ msgstr "मार्केट ऑर्डर स्लिपेज"
 msgid "markets"
 msgstr "बाज़ार"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Max"
 msgstr "अधिकतम"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/positions/send-dialog.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "MAX"
 msgstr ""
 
@@ -946,8 +946,8 @@ msgstr ""
 msgid "Min order $10"
 msgstr "न्यूनतम ऑर्डर $10"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Minimum"
 msgstr ""
 
@@ -965,7 +965,7 @@ msgstr ""
 msgid "Minimum withdrawal is ${0}"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Minimum withdrawal is ${MIN_WITHDRAW_USD}"
 msgstr ""
 
@@ -993,11 +993,11 @@ msgstr ""
 #~ msgid "Must be signed by main wallet (not agent/API wallet)"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Net received"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Network fee"
 msgstr ""
 
@@ -1057,7 +1057,7 @@ msgstr "कोई बाज़ार नहीं मिला।"
 msgid "No open orders."
 msgstr "कोई खुला ऑर्डर नहीं।"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-panel.tsx
 msgid "No response from exchange"
 msgstr ""
 
@@ -1101,7 +1101,7 @@ msgstr "सूचनाएं"
 msgid "Number Format"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Number of Orders"
 msgstr ""
 
@@ -1139,15 +1139,15 @@ msgstr "ऑरेकल"
 msgid "Order Book"
 msgstr "ऑर्डर बुक"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-panel.tsx
 msgid "Order failed"
 msgstr "ऑर्डर विफल"
 
-#: src/components/trade/order-entry/order-toast.tsx
+#: src/components/trade/tradebox/order-toast.tsx
 msgid "Order Queue"
 msgstr "ऑर्डर कतार"
 
-#: src/components/trade/order-entry/order-summary.tsx
+#: src/components/trade/tradebox/order-summary.tsx
 msgid "Order Value"
 msgstr "ऑर्डर वैल्यू"
 
@@ -1171,7 +1171,7 @@ msgstr "पृष्ठ नहीं मिला"
 msgid "Payment"
 msgstr "भुगतान"
 
-#: src/components/trade/order-entry/order-toast.tsx
+#: src/components/trade/tradebox/order-toast.tsx
 msgid "pending"
 msgstr "लंबित"
 
@@ -1188,8 +1188,8 @@ msgstr ""
 msgid "Perpetuals"
 msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Perps"
 msgstr "परप्स"
 
@@ -1201,10 +1201,10 @@ msgstr ""
 #~ msgid "Perps: Max 0.1% (10 basis points)"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "PNL"
 msgstr "PNL"
 
@@ -1216,8 +1216,8 @@ msgstr ""
 #~ msgid "Portfolio"
 #~ msgstr "पोर्टफोलियो"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Position"
 msgstr "पोजीशन"
 
@@ -1226,11 +1226,11 @@ msgstr "पोजीशन"
 #~ msgstr "पिछला"
 
 #: src/components/trade/chart/constants.ts
-#: src/components/trade/order-entry/price-input-with-percent.tsx
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/tradebox/price-input-with-percent.tsx
 msgid "Price"
 msgstr "मूल्य"
 
@@ -1238,17 +1238,17 @@ msgstr "मूल्य"
 msgid "PRICE"
 msgstr ""
 
-#: src/components/trade/order-entry/advanced-order-dropdown.tsx
-#: src/components/trade/order-entry/advanced-order-dropdown.tsx
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
 msgid "Pro"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Processing deposit"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Processing..."
 msgstr ""
 
@@ -1256,7 +1256,7 @@ msgstr ""
 msgid "Progress"
 msgstr "प्रगति"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Randomize timing"
 msgstr ""
 
@@ -1273,8 +1273,8 @@ msgstr "हाल के ट्रेड"
 msgid "Reduce"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Reduce Only"
 msgstr "केवल कम करें"
 
@@ -1295,14 +1295,14 @@ msgstr "पसंदीदा से हटाएं"
 #~ msgid "Requirements:"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/leverage-popover.tsx
-#: src/components/trade/order-entry/leverage-sheet.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/leverage-popover.tsx
+#: src/components/trade/tradebox/leverage-sheet.tsx
 msgid "Retry"
 msgstr ""
 
-#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/tradebox/tp-sl-section.tsx
 msgid "Risk/Reward"
 msgstr ""
 
@@ -1342,7 +1342,7 @@ msgstr "सभी ऑर्डर चुनें"
 msgid "Select favorite markets"
 msgstr "पसंदीदा बाज़ार चुनें"
 
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Select how margin is allocated for your positions"
 msgstr ""
 
@@ -1404,11 +1404,11 @@ msgstr ""
 msgid "Sending..."
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "sent to Hyperliquid"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Set {p}%"
 msgstr "{p}% सेट करें"
 
@@ -1416,7 +1416,7 @@ msgstr "{p}% सेट करें"
 #~ msgid "Set SL to {p}%"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/price-input-with-percent.tsx
+#: src/components/trade/tradebox/price-input-with-percent.tsx
 msgid "Set to {p}%"
 msgstr ""
 
@@ -1499,14 +1499,14 @@ msgstr "साइनर तैयार नहीं"
 #~ msgid "Signing..."
 #~ msgstr "साइन हो रहा है..."
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
-#: src/components/trade/order-entry/order-toast.tsx
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/tradebox/order-toast.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Size"
 msgstr "आकार"
 
@@ -1524,7 +1524,7 @@ msgstr ""
 msgid "SL must be below entry"
 msgstr ""
 
-#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/tradebox/tp-sl-section.tsx
 msgid "SL Price"
 msgstr ""
 
@@ -1532,7 +1532,7 @@ msgstr ""
 #~ msgid "SL trigger price"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/order-summary.tsx
+#: src/components/trade/tradebox/order-summary.tsx
 msgid "Slippage"
 msgstr "स्लिपेज"
 
@@ -1562,11 +1562,11 @@ msgstr "{0} से क्रमबद्ध"
 #~ msgid "spot"
 #~ msgstr "स्पॉट"
 
-#: src/components/trade/order-entry/account-panel.tsx
-#: src/components/trade/order-entry/account-panel.tsx
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
+#: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Spot"
 msgstr "स्पॉट"
 
@@ -1590,7 +1590,7 @@ msgstr "स्प्रेड"
 msgid "Start and end must differ"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Start Price (USDC)"
 msgstr ""
 
@@ -1606,8 +1606,8 @@ msgstr "स्थिति"
 msgid "Stop Limit"
 msgstr ""
 
-#: src/components/trade/order-entry/tp-sl-section.tsx
-#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/tradebox/tp-sl-section.tsx
+#: src/components/trade/tradebox/tp-sl-section.tsx
 msgid "Stop Loss"
 msgstr ""
 
@@ -1633,8 +1633,8 @@ msgstr ""
 
 #: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/components/spot-swap-modal.tsx
-#: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/balances-tab.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Swap"
 msgstr ""
 
@@ -1671,12 +1671,12 @@ msgstr ""
 msgid "Switch to {displayName} market"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 #: src/lib/trade/use-button-content.ts
 msgid "Switch to Arbitrum"
 msgstr "Arbitrum पर स्विच करें"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Switch to Arbitrum to deposit USDC to Hyperliquid"
 msgstr ""
 
@@ -1688,7 +1688,7 @@ msgstr "डार्क मोड में बदलें"
 msgid "Switch to light mode"
 msgstr "लाइट मोड में बदलें"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 #: src/lib/trade/use-button-content.ts
 msgid "Switching..."
 msgstr "स्विच हो रहा है..."
@@ -1701,12 +1701,12 @@ msgstr ""
 msgid "Take Market"
 msgstr ""
 
-#: src/components/trade/order-entry/tp-sl-section.tsx
-#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/tradebox/tp-sl-section.tsx
+#: src/components/trade/tradebox/tp-sl-section.tsx
 msgid "Take Profit"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Take Profit / Stop Loss"
 msgstr "प्रॉफिट लें / स्टॉप लॉस"
 
@@ -1737,12 +1737,12 @@ msgstr "आप जो पृष्ठ ढूंढ रहे हैं वह �
 msgid "Time"
 msgstr "समय"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Time in Force"
 msgstr ""
 
 #: src/components/trade/components/spot-swap-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "To"
 msgstr ""
 
@@ -1760,7 +1760,7 @@ msgstr ""
 msgid "Toggle Sidebar"
 msgstr "साइडबार टॉगल करें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Toggle size mode"
 msgstr "साइज मोड टॉगल करें"
 
@@ -1773,7 +1773,7 @@ msgstr "कुल"
 msgid "Total Size"
 msgstr "कुल आकार"
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Total Value"
 msgstr ""
 
@@ -1791,7 +1791,7 @@ msgstr ""
 msgid "TP must be below entry"
 msgstr ""
 
-#: src/components/trade/order-entry/tp-sl-section.tsx
+#: src/components/trade/tradebox/tp-sl-section.tsx
 msgid "TP Price"
 msgstr ""
 
@@ -1799,8 +1799,8 @@ msgstr ""
 #~ msgid "TP trigger price"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
 #: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "TP/SL"
 msgstr "TP/SL"
 
@@ -1826,9 +1826,9 @@ msgstr "ट्रेड्स"
 msgid "Transaction was rejected"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Transfer"
 msgstr ""
 
@@ -1848,12 +1848,12 @@ msgstr ""
 msgid "Transferring..."
 msgstr ""
 
-#: src/components/trade/order-entry/advanced-order-dropdown.tsx
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
 msgid "Trigger"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
+#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Trigger Price (USDC)"
 msgstr ""
 
@@ -1895,7 +1895,7 @@ msgstr "अज्ञात प्रतीक: {symbolName}"
 msgid "Unrealized P&L"
 msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 msgid "Unrealized PNL"
 msgstr "अवास्तविक PNL"
 
@@ -1904,15 +1904,15 @@ msgstr "अवास्तविक PNL"
 msgid "Unsupported resolution: {0}"
 msgstr "असमर्थित रेजोल्यूशन: {0}"
 
-#: src/components/trade/order-entry/leverage-popover.tsx
-#: src/components/trade/order-entry/leverage-sheet.tsx
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/leverage-popover.tsx
+#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Update failed"
 msgstr ""
 
-#: src/components/trade/order-entry/leverage-popover.tsx
-#: src/components/trade/order-entry/leverage-sheet.tsx
-#: src/components/trade/order-entry/margin-mode-dialog.tsx
+#: src/components/trade/tradebox/leverage-popover.tsx
+#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Updated"
 msgstr ""
 
@@ -1936,7 +1936,7 @@ msgstr "USD मूल्य"
 msgid "Verifying..."
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "View on explorer"
 msgstr ""
 
@@ -1964,7 +1964,7 @@ msgstr "ट्रेड की प्रतीक्षा..."
 #~ msgid "Wallet client not ready"
 #~ msgstr "वॉलेट क्लाइंट तैयार नहीं है"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Wallet not connected"
 msgstr "वॉलेट कनेक्ट नहीं है"
 
@@ -1980,28 +1980,28 @@ msgstr ""
 #~ msgid "will arrive in ~3 min"
 #~ msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "will arrive in ~5 min"
 msgstr ""
 
-#: src/components/trade/order-entry/account-panel.tsx
-#: src/components/trade/order-entry/account-panel.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Withdraw"
 msgstr "निकासी"
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Withdrawal failed"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Withdrawal submitted"
 msgstr ""
 
-#: src/components/trade/order-entry/deposit-modal.tsx
+#: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Wrong network"
 msgstr ""
 
