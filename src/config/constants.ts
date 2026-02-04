@@ -22,6 +22,8 @@ export const DEFAULT_MARKET_NAME = "BTC";
 export const DEFAULT_MARKET_SCOPE = "perp" as const;
 export const DEFAULT_QUOTE_TOKEN = "USDC";
 
+export const HL_ALL_DEXS = "ALL_DEXS" as const;
+
 export const ORDER_MIN_NOTIONAL_USD = 10;
 export const ORDER_FEE_RATE_TAKER = 0.00045;
 export const ORDER_FEE_RATE_MAKER = 0.00015;
@@ -132,7 +134,7 @@ export const CHART_SUPPORTED_RESOLUTIONS = [
 	"1M",
 ] as unknown as ResolutionString[];
 export const CHART_LOCALE = "en";
-export const CHART_CUSTOM_FONT_FAMILY = "'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, monospace";
+export const CHART_CUSTOM_FONT_FAMILY = "'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif";
 export const CHART_ENABLED_FEATURES = [
 	"side_toolbar_in_fullscreen_mode",
 	"header_in_fullscreen_mode",

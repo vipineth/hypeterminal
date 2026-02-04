@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
+import { FALLBACK_VALUE_PLACEHOLDER, HL_ALL_DEXS } from "@/config/constants";
 import { getExecutedPrice } from "@/domain/trade/order/price";
 import { formatPriceForOrder, formatSizeForOrder } from "@/domain/trade/orders";
 import { cn } from "@/lib/cn";
@@ -255,11 +255,11 @@ export function PositionsTab() {
 
 	const markets = useMarkets();
 	const allMidsEnabled = isConnected && positions.length > 0;
-	const { data: allMidsEvent } = useSubAllMids({ dex: "ALL_DEXS" }, { enabled: allMidsEnabled });
+	const { data: allMidsEvent } = useSubAllMids({ dex: HL_ALL_DEXS }, { enabled: allMidsEnabled });
 	const mids = allMidsEvent?.mids;
 
 	const { data: openOrdersEvent } = useSubOpenOrders(
-		{ user: address ?? "0x0", dex: "ALL_DEXS" },
+		{ user: address ?? "0x0", dex: HL_ALL_DEXS },
 		{ enabled: isConnected && !!address },
 	);
 	const openOrders = openOrdersEvent?.orders ?? [];

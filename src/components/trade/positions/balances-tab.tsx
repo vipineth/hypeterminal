@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
+import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER, HL_ALL_DEXS } from "@/config/constants";
 import {
 	type BalanceRow,
 	filterBalanceRowsByUsdValue,
@@ -71,7 +71,7 @@ export function BalancesTab() {
 	});
 
 	const { perpSummary, spotBalances, isLoading, hasError } = useAccountBalances();
-	const { data: allMidsEvent } = useSubAllMids({ dex: "ALL_DEXS" }, { enabled: isConnected });
+	const { data: allMidsEvent } = useSubAllMids({ dex: HL_ALL_DEXS }, { enabled: isConnected });
 	const mids = allMidsEvent?.mids;
 
 	const balances = useMemo(() => getBalanceRows(perpSummary, spotBalances), [perpSummary, spotBalances]);

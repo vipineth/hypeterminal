@@ -333,3 +333,176 @@ await exchangeClient.cancel({cancels: orders.filter(o => o.coin === "BTC").map(o
 const sub = await subscriptionClient.l2Book({coin: "BTC"}, (book) => console.log(book.levels[0][0]));
 await sub.unsubscribe();
 ```
+
+---
+
+## TWAP Order Subscriptions
+
+TWAP (Time-Weighted Average Price) orders require multiple subscriptions to display complete information.
+
+### Available Subscriptions
+
+| Subscription | Purpose | Returns | Supports `dex` |
+|--------------|---------|---------|----------------|
+| `userTwapHistory` | Complete order history with status | All orders (active + historical) | No |
+| `twapStates` | Real-time execution data | Active orders only | Yes |
+| `userTwapSliceFills` | Individual fill events | Fill details per slice | No |
+
+### Data Structures
+
+**`userTwapHistory`** - Status change events (multiple entries per TWAP):
+```typescript
+{
+  user: Address,
+  history: Array<{
+    time: number,                    // When status changed (seconds)
+    twapId?: number,                 // TWAP identifier
+    state: TwapState,                // Snapshot at status change time
+    status: { status: "activated" | "finished" | "terminated" | "error" }
+  }>
+}
+```
+
+**`twapStates`** - Live execution state (tuples array):
+```typescript
+{
+  dex: string,
+  user: Address,
+  states: Array<[twapId: number, TwapState]>  // Only ACTIVE orders
+}
+```
+
+**`TwapState`** structure:
+```typescript
+{
+  coin: string,           // Asset symbol
+  side: "B" | "A",        // Buy or Ask/Sell
+  sz: string,             // Total order size
+  executedSz: string,     // Executed size (real-time in twapStates)
+  executedNtl: string,    // Executed notional (for avg price calc)
+  minutes: number,        // Duration in minutes
+  reduceOnly: boolean,
+  randomize: boolean,
+  timestamp: number,      // Creation time (ms since epoch)
+  user: Address
+}
+```
+
+### Flow Diagram: Active TWAP Orders Display
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      TWAP Tab Data Flow (Active Only)                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                    ┌──────────────────────┐
+                    │     twapStates       │
+                    │   (WebSocket Sub)    │
+                    │   dex: "ALL_DEXS"    │
+                    └──────────┬───────────┘
+                               │
+                               │ Returns: states[]
+                               │ Array<[twapId, TwapState]>
+                               │ (ONLY active TWAPs)
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │  Map to objects:     │
+                    │  { twapId, state }   │
+                    └──────────┬───────────┘
+                               │
+                               │ Live data:
+                               │ - executedSz (real-time)
+                               │ - executedNtl (real-time)
+                               │ - All order details
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │  Sort by timestamp   │
+                    │  (newest first)      │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │  Display Table       │
+                    │  - Asset, Size       │
+                    │  - Executed, Avg Px  │
+                    │  - Time, Created     │
+                    │  - Cancel button     │
+                    └──────────────────────┘
+```
+
+### Choosing the Right Subscription
+
+| Use Case | Subscription | Why |
+|----------|--------------|-----|
+| **Active orders only** | `twapStates` | Real-time data, auto-removes finished orders |
+| **Full history** | `userTwapHistory` | Includes completed/cancelled, needs deduplication |
+| **Both active + history** | Both | Merge for complete view with live updates |
+
+### Implementation Pattern (Active Only)
+
+```typescript
+// Subscribe to twapStates - contains only active TWAPs with live data
+const { data: twapStatesEvent } = useSubTwapStates(
+  { user, dex: "ALL_DEXS" },
+  { enabled: isConnected }
+);
+
+// Map tuples to objects and sort
+const activeOrders = useMemo(
+  () =>
+    (twapStatesEvent?.states ?? [])
+      .map(([twapId, state]) => ({ twapId, state }))
+      .sort((a, b) => b.state.timestamp - a.state.timestamp),
+  [twapStatesEvent?.states]
+);
+
+// Display - all data comes from state (live)
+activeOrders.map(({ twapId, state }) => {
+  // state.executedSz, state.executedNtl are real-time
+  // When TWAP finishes, it automatically disappears from twapStates
+});
+```
+
+### Implementation Pattern (With History)
+
+```typescript
+// For showing both active and historical orders:
+const { data: historyEvent } = useSubUserTwapHistory({ user });
+const { data: statesEvent } = useSubTwapStates({ user, dex: "ALL_DEXS" });
+
+// Create lookup for live state
+const statesByTwapId = useMemo(
+  () => new Map(statesEvent?.states ?? []),
+  [statesEvent?.states]
+);
+
+// Deduplicate history (multiple entries per twapId for status changes)
+const orders = useMemo(() => {
+  const latestByTwapId = new Map();
+  for (const entry of historyEvent?.history ?? []) {
+    const existing = latestByTwapId.get(entry.twapId);
+    if (!existing || entry.time > existing.time) {
+      latestByTwapId.set(entry.twapId, entry);
+    }
+  }
+  return Array.from(latestByTwapId.values());
+}, [historyEvent?.history]);
+
+// Merge live state for active orders
+orders.map((order) => {
+  const liveState = statesByTwapId.get(order.twapId);
+  const state = liveState ?? order.state;
+  const status = order.status.status; // "activated" | "finished" | "terminated"
+});
+```
+
+### When to Use `userTwapSliceFills`
+
+Only needed for detailed fill information:
+- Individual slice fill prices
+- Fill-by-fill history table
+- Fee breakdown per fill
+
+Not needed for basic TWAP display (order list, progress, avg price).

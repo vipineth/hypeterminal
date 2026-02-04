@@ -281,6 +281,24 @@ export interface FormatDateOptions extends Intl.DateTimeFormatOptions {
 	locale?: string;
 }
 
+const DATE_COMPONENT_KEYS = [
+	"weekday",
+	"era",
+	"year",
+	"month",
+	"day",
+	"dayPeriod",
+	"hour",
+	"minute",
+	"second",
+	"fractionalSecondDigits",
+	"timeZoneName",
+] as const;
+
+function hasDateComponentOptions(opts: Intl.DateTimeFormatOptions): boolean {
+	return DATE_COMPONENT_KEYS.some((key) => key in opts);
+}
+
 /**
  * Format time only
  * @example formatTime(new Date()) -> "2:30 PM"
@@ -291,12 +309,9 @@ export function formatTime(value: DateInput, opts?: FormatDateOptions): string {
 	if (!isValidDate(value)) return FALLBACK_VALUE_PLACEHOLDER;
 
 	const { locale, ...rest } = opts ?? {};
-	const defaults: Intl.DateTimeFormatOptions = {
-		timeStyle: "short",
-		...rest,
-	};
+	const formatOpts: Intl.DateTimeFormatOptions = hasDateComponentOptions(rest) ? rest : { timeStyle: "short", ...rest };
 
-	return getFormatter("date", locale ?? getResolvedFormatLocale(), defaults).format(toDate(value));
+	return getFormatter("date", locale ?? getResolvedFormatLocale(), formatOpts).format(toDate(value));
 }
 
 /**
@@ -308,13 +323,11 @@ export function formatDateTime(value: DateInput, opts?: FormatDateOptions): stri
 	if (!isValidDate(value)) return FALLBACK_VALUE_PLACEHOLDER;
 
 	const { locale, ...rest } = opts ?? {};
-	const defaults: Intl.DateTimeFormatOptions = {
-		dateStyle: "medium",
-		timeStyle: "short",
-		...rest,
-	};
+	const formatOpts: Intl.DateTimeFormatOptions = hasDateComponentOptions(rest)
+		? rest
+		: { dateStyle: "medium", timeStyle: "short", ...rest };
 
-	return getFormatter("date", locale ?? getResolvedFormatLocale(), defaults).format(toDate(value));
+	return getFormatter("date", locale ?? getResolvedFormatLocale(), formatOpts).format(toDate(value));
 }
 
 export function formatDateTimeShort(value: DateInput, opts?: FormatDateOptions): string {
@@ -346,4 +359,25 @@ export function bpsToPercentage(bps: string | number | null | undefined, decimal
 	const parsed = parseNumberInput(bps);
 	if (!isValidNumber(parsed.value)) return "0";
 	return (parsed.value / 1000).toFixed(decimals);
+}
+
+/**
+ * Format duration in minutes to human-readable string
+ * @example formatDuration(5) -> "5m"
+ * @example formatDuration(60) -> "1h"
+ * @example formatDuration(90) -> "1h 30m"
+ * @example formatDuration(1440) -> "24h"
+ * @example formatDuration(1500) -> "1d 1h"
+ * @example formatDuration(2880) -> "2d"
+ */
+export function formatDuration(minutes: number): string {
+	if (minutes < 60) return `${minutes}m`;
+	if (minutes < 1440) {
+		const hours = Math.floor(minutes / 60);
+		const mins = minutes % 60;
+		return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+	}
+	const days = Math.floor(minutes / 1440);
+	const remainingHours = Math.floor((minutes % 1440) / 60);
+	return remainingHours > 0 ? `${days}d ${remainingHours}h` : `${days}d`;
 }

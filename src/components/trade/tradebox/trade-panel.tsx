@@ -480,26 +480,9 @@ export function TradePanel() {
 				/>
 
 				<TradeFormFields
-					isConnected={isConnected}
-					isFormDisabled={isFormDisabled}
-					isSpotMarket={isSpotMarket}
-					side={side}
 					price={price}
-					markPx={markPx}
-					maxSize={maxSize}
-					sizeValue={sizeValue}
-					orderValue={orderValue}
-					szDecimals={szDecimals}
-					availableBalance={availableBalance}
-					availableBalanceToken={availableBalanceToken}
 					positionSize={positionSize}
-					baseToken={baseToken}
-					sizeModeLabel={sizeModeLabel}
 					swapTargetToken={swapTargetToken}
-					capabilities={{
-						hasReduceOnly: capabilities.hasReduceOnly,
-						hasTpSl: capabilities.hasTpSl,
-					}}
 					reduceOnlyId={reduceOnlyId}
 					tpSlId={tpSlId}
 					onSizeModeToggle={handleSizeModeToggle}

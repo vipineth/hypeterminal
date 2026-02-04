@@ -1,6 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { ArrowsLeftRightIcon } from "@phosphor-icons/react";
 import { useState } from "react";
+import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { NumberInput } from "@/components/ui/number-input";
@@ -16,8 +17,10 @@ import {
 	TWAP_MINUTES_MIN,
 } from "@/config/constants";
 import { getSliderValue } from "@/domain/trade/order/size";
+import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatToken, szDecimalsToPriceDecimals } from "@/lib/format";
+import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { formatDecimalFloor, getValueColorClass, isPositive, toFixed, toNumber } from "@/lib/trade/numbers";
 import {
 	canUseTpSl as canUseTpSlForOrder,
@@ -29,16 +32,17 @@ import {
 	usesLimitPrice as usesLimitPriceForOrder,
 	usesTriggerPrice as usesTriggerPriceForOrder,
 } from "@/lib/trade/order-types";
-import type { Side } from "@/lib/trade/types";
 import {
 	useLimitPrice,
 	useOrderEntryActions,
+	useOrderSide,
 	useOrderSize,
 	useOrderType,
 	useReduceOnly,
 	useScaleEnd,
 	useScaleLevels,
 	useScaleStart,
+	useSizeMode,
 	useSlPrice,
 	useTif,
 	useTpPrice,
@@ -50,26 +54,9 @@ import {
 import { TpSlSection } from "./tp-sl-section";
 
 interface Props {
-	isConnected: boolean;
-	isFormDisabled: boolean;
-	isSpotMarket: boolean;
-	side: Side;
 	price: number;
-	markPx: number;
-	maxSize: number;
-	sizeValue: number;
-	orderValue: number;
-	szDecimals: number;
-	availableBalance: number;
-	availableBalanceToken: string;
 	positionSize: number;
-	baseToken: string | undefined;
-	sizeModeLabel: string;
 	swapTargetToken: string | null;
-	capabilities: {
-		hasReduceOnly: boolean;
-		hasTpSl: boolean;
-	};
 	reduceOnlyId: string;
 	tpSlId: string;
 	onSizeModeToggle: () => void;
@@ -79,23 +66,9 @@ interface Props {
 }
 
 export function TradeFormFields({
-	isConnected,
-	isFormDisabled,
-	isSpotMarket,
-	side,
 	price,
-	markPx,
-	maxSize,
-	sizeValue,
-	orderValue,
-	szDecimals,
-	availableBalance,
-	availableBalanceToken,
 	positionSize,
-	baseToken,
-	sizeModeLabel,
 	swapTargetToken,
-	capabilities,
 	reduceOnlyId,
 	tpSlId,
 	onSizeModeToggle,
@@ -107,8 +80,13 @@ export function TradeFormFields({
 	const [dragSliderValue, setDragSliderValue] = useState(25);
 	const [hasUserSized, setHasUserSized] = useState(false);
 
-	const orderType = useOrderType();
+	const { isConnected } = useConnection();
+	const { data: market } = useSelectedMarketInfo();
+
+	const side = useOrderSide();
+	const sizeMode = useSizeMode();
 	const sizeInput = useOrderSize();
+	const orderType = useOrderType();
 	const limitPriceInput = useLimitPrice();
 	const triggerPriceInput = useTriggerPrice();
 	const scaleStartPriceInput = useScaleStart();
@@ -121,6 +99,21 @@ export function TradeFormFields({
 	const tpSlEnabled = useTpSlEnabled();
 	const tpPriceInput = useTpPrice();
 	const slPriceInput = useSlPrice();
+
+	const markPx = market?.markPx ?? 0;
+
+	const {
+		isSpotMarket,
+		baseToken,
+		capabilities,
+		availableBalance,
+		availableBalanceToken,
+		maxSize,
+		sizeValue,
+		orderValue,
+		sizeModeLabel,
+		szDecimals,
+	} = useOrderEntryData({ market, side, markPx, sizeMode, sizeInput });
 
 	const {
 		setSize,
@@ -137,6 +130,8 @@ export function TradeFormFields({
 		setTpPrice,
 		setSlPrice,
 	} = useOrderEntryActions();
+
+	const isFormDisabled = !isConnected || availableBalance <= 0;
 
 	const triggerOrder = isTriggerOrderType(orderType);
 	const twapOrder = isTwapOrderType(orderType);

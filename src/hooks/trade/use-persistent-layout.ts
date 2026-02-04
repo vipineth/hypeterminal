@@ -26,7 +26,7 @@ function readSizes(key: string, defaults: readonly number[]): number[] {
 
 export function usePersistentPanelSizes(groupKey: PanelGroupKey) {
 	const { storageKey, defaults } = PANEL_PRESETS[groupKey];
-	const [sizes, setSizes] = useState<number[]>(() => readSizes(storageKey, defaults));
+	const [sizes, setSizes] = useState<number[]>([...defaults]);
 
 	useEffect(() => {
 		setSizes(readSizes(storageKey, defaults));
