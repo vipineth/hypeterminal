@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { ArrowSquareOut, Fire } from "@phosphor-icons/react";
+import { ArrowSquareOutIcon, FireIcon } from "@phosphor-icons/react";
 import { get24hChange, getOiUsd } from "@/domain/market";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD, shortenAddress } from "@/lib/format";
@@ -83,7 +83,7 @@ export function MarketOverview() {
 						})}
 					/>
 					<div className="flex items-center gap-1">
-						<Fire className={cn("size-3", getValueColorClass(fundingNum))} />
+						<FireIcon className={cn("size-3", getValueColorClass(fundingNum))} />
 						<span className={cn("text-muted-fg tabular-nums", getValueColorClass(fundingNum))}>
 							{formatPercent(fundingNum, {
 								minimumFractionDigits: 4,
@@ -108,7 +108,7 @@ export function MarketOverview() {
 					className="flex items-center gap-1 text-muted-fg hover:text-fg transition-colors"
 				>
 					<span className="font-mono">{shortenAddress(spotTokenAddress, 4, 4)}</span>
-					<ArrowSquareOut className="size-3" />
+					<ArrowSquareOutIcon className="size-3" />
 				</a>
 			)}
 		</div>

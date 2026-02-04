@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Star } from "@phosphor-icons/react";
+import { StarIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { get24hChange } from "@/domain/market";
 import { cn } from "@/lib/cn";
@@ -30,7 +30,7 @@ export function FavoritesStrip() {
 function EmptyState() {
 	return (
 		<div className="flex items-center gap-2 text-3xs text-muted-fg">
-			<Star className="size-3" />
+			<StarIcon className="size-3" />
 			<span>{t`Select favorite markets`}</span>
 		</div>
 	);

@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { Check, SpinnerGap, Warning } from "@phosphor-icons/react";
+import { CheckIcon, SpinnerGapIcon, WarningIcon } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NumberInput } from "@/components/ui/number-input";
@@ -122,14 +122,14 @@ export function LeveragePopover({
 
 					{updateError && (
 						<div className="flex items-center gap-1.5 p-1.5 bg-negative/10 border border-negative/20 rounded-md text-3xs text-negative">
-							<Warning className="size-3 shrink-0" />
+							<WarningIcon className="size-3 shrink-0" />
 							<span className="truncate">{updateError.message || t`Update failed`}</span>
 						</div>
 					)}
 
 					{showSuccess && (
 						<div className="flex items-center justify-center gap-1.5 p-1.5 bg-positive/10 border border-positive/20 rounded-md text-3xs text-positive">
-							<Check className="size-3" />
+							<CheckIcon className="size-3" />
 							<Trans>Updated</Trans>
 						</div>
 					)}
@@ -150,7 +150,7 @@ export function LeveragePopover({
 									"hover:bg-info/30",
 								)}
 							>
-								{isUpdating && <SpinnerGap className="size-3 animate-spin" />}
+								{isUpdating && <SpinnerGapIcon className="size-3 animate-spin" />}
 								<Trans>Retry</Trans>
 							</Button>
 						</div>
@@ -162,7 +162,7 @@ export function LeveragePopover({
 							disabled={!isDirty || isUpdating || showSuccess}
 							className={cn("w-full py-2 uppercase tracking-wider gap-1.5")}
 						>
-							{isUpdating && <SpinnerGap className="size-3 animate-spin" />}
+							{isUpdating && <SpinnerGapIcon className="size-3 animate-spin" />}
 							<Trans>Confirm</Trans>
 						</Button>
 					)}

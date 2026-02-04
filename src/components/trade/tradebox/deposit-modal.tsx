@@ -1,14 +1,14 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import {
-	ArrowLineDown,
-	ArrowLineUp,
-	ArrowSquareOut,
-	CheckCircle,
-	Clock,
-	SpinnerGap,
-	Wallet,
-	WarningCircle,
+	ArrowLineDownIcon,
+	ArrowLineUpIcon,
+	ArrowSquareOutIcon,
+	CheckCircleIcon,
+	ClockIcon,
+	SpinnerGapIcon,
+	WalletIcon,
+	WarningCircleIcon,
 } from "@phosphor-icons/react";
 import { useState } from "react";
 import { formatUnits } from "viem";
@@ -125,7 +125,7 @@ function StatusScreen({
 						<div className="relative">
 							<div className="absolute inset-0 animate-ping rounded-full bg-info/20" />
 							<div className="relative flex size-14 items-center justify-center rounded-full bg-info/10 border border-info/30">
-								<SpinnerGap className="size-7 animate-spin text-info" />
+								<SpinnerGapIcon className="size-7 animate-spin text-info" />
 							</div>
 						</div>
 					) : (
@@ -136,9 +136,9 @@ function StatusScreen({
 							)}
 						>
 							{icon === "success" ? (
-								<CheckCircle className="size-7 text-positive" />
+								<CheckCircleIcon className="size-7 text-positive" />
 							) : (
-								<WarningCircle className="size-7 text-negative" />
+								<WarningCircleIcon className="size-7 text-negative" />
 							)}
 						</div>
 					)}
@@ -151,7 +151,7 @@ function StatusScreen({
 							<a href={explorerUrl} target="_blank" rel="noopener noreferrer">
 								<span className="inline-flex items-center gap-1.5">
 									<Trans>View on explorer</Trans>
-									<ArrowSquareOut className="size-3" />
+									<ArrowSquareOutIcon className="size-3" />
 								</span>
 							</a>
 						</Button>
@@ -214,7 +214,7 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 				</div>
 				{validation.error && (
 					<p className="text-4xs text-negative flex items-center gap-1">
-						<WarningCircle className="size-3" />
+						<WarningCircleIcon className="size-3" />
 						{validation.error}
 					</p>
 				)}
@@ -224,12 +224,12 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 				<InfoRow
 					label={<Trans>Minimum</Trans>}
 					value={<span className="tabular-nums">{formatUnits(MIN_DEPOSIT_USDC, USDC_DECIMALS)} USDC</span>}
-					icon={<Wallet className="size-3" />}
+					icon={<WalletIcon className="size-3" />}
 				/>
 				<InfoRow
 					label={<Trans>Estimated time</Trans>}
 					value={<span className="tabular-nums">~1 min</span>}
-					icon={<Clock className="size-3" />}
+					icon={<ClockIcon className="size-3" />}
 					highlight
 				/>
 			</div>
@@ -237,12 +237,12 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 			<Button variant="terminal" onClick={onSubmit} disabled={!validation.valid || isPending} className="w-full">
 				{isPending ? (
 					<>
-						<SpinnerGap className="size-4 animate-spin" />
+						<SpinnerGapIcon className="size-4 animate-spin" />
 						<Trans>Processing...</Trans>
 					</>
 				) : (
 					<>
-						<ArrowLineDown className="size-4" />
+						<ArrowLineDownIcon className="size-4" />
 						<Trans>Deposit</Trans>
 					</>
 				)}
@@ -323,7 +323,7 @@ function WithdrawForm({
 				</div>
 				{validation.error && (
 					<p className="text-4xs text-negative flex items-center gap-1">
-						<WarningCircle className="size-3" />
+						<WarningCircleIcon className="size-3" />
 						{validation.error}
 					</p>
 				)}
@@ -333,7 +333,7 @@ function WithdrawForm({
 				<InfoRow
 					label={<Trans>Network fee</Trans>}
 					value={<span className="tabular-nums">${WITHDRAWAL_FEE_USD}</span>}
-					icon={<Wallet className="size-3" />}
+					icon={<WalletIcon className="size-3" />}
 				/>
 				<InfoRow
 					label={<Trans>Net received</Trans>}
@@ -344,17 +344,17 @@ function WithdrawForm({
 							<span className="tabular-nums">${formatNumber(netReceived, 2)}</span>
 						)
 					}
-					icon={<ArrowLineDown className="size-3" />}
+					icon={<ArrowLineDownIcon className="size-3" />}
 				/>
 				<InfoRow
 					label={<Trans>Minimum</Trans>}
 					value={<span className="tabular-nums">${MIN_WITHDRAW_USD}</span>}
-					icon={<ArrowLineUp className="size-3" />}
+					icon={<ArrowLineUpIcon className="size-3" />}
 				/>
 				<InfoRow
 					label={<Trans>Estimated time</Trans>}
 					value={<span className="tabular-nums">~5 min</span>}
-					icon={<Clock className="size-3" />}
+					icon={<ClockIcon className="size-3" />}
 					highlight
 				/>
 			</div>
@@ -362,12 +362,12 @@ function WithdrawForm({
 			<Button variant="terminal" onClick={onSubmit} disabled={!validation.valid || isPending} className="w-full">
 				{isPending ? (
 					<>
-						<SpinnerGap className="size-4 animate-spin" />
+						<SpinnerGapIcon className="size-4 animate-spin" />
 						<Trans>Processing...</Trans>
 					</>
 				) : (
 					<>
-						<ArrowLineUp className="size-4" />
+						<ArrowLineUpIcon className="size-4" />
 						<Trans>Withdraw</Trans>
 					</>
 				)}
@@ -380,7 +380,7 @@ function WalletNotConnected() {
 	return (
 		<div className="flex flex-col items-center gap-4 py-8">
 			<div className="flex size-12 items-center justify-center rounded-full bg-muted/30 border border-border/40">
-				<Wallet className="size-6 text-muted-fg" />
+				<WalletIcon className="size-6 text-muted-fg" />
 			</div>
 			<div className="text-center space-y-1">
 				<p className="text-sm font-medium">
@@ -414,7 +414,7 @@ function WrongNetworkScreen({ open, onClose, onSwitch, isSwitching, error }: Wro
 				<div className="space-y-4 py-2">
 					<div className="flex items-start gap-3 rounded-lg border border-warning/40 bg-warning/5 p-4">
 						<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-warning/20">
-							<WarningCircle className="size-4 text-warning" />
+							<WarningCircleIcon className="size-4 text-warning" />
 						</div>
 						<div className="space-y-1">
 							<p className="text-sm font-medium">
@@ -429,7 +429,7 @@ function WrongNetworkScreen({ open, onClose, onSwitch, isSwitching, error }: Wro
 					<Button onClick={onSwitch} disabled={isSwitching} className="w-full">
 						{isSwitching ? (
 							<>
-								<SpinnerGap className="size-4 animate-spin" />
+								<SpinnerGapIcon className="size-4 animate-spin" />
 								<Trans>Switching...</Trans>
 							</>
 						) : (
@@ -648,7 +648,7 @@ export function DepositModal() {
 									: "text-muted-fg hover:text-fg",
 							)}
 						>
-							<ArrowLineDown className="size-3" />
+							<ArrowLineDownIcon className="size-3" />
 							<Trans>Deposit</Trans>
 						</TabsTrigger>
 						<TabsTrigger
@@ -660,7 +660,7 @@ export function DepositModal() {
 									: "text-muted-fg hover:text-fg",
 							)}
 						>
-							<ArrowLineUp className="size-3" />
+							<ArrowLineUpIcon className="size-3" />
 							<Trans>Withdraw</Trans>
 						</TabsTrigger>
 					</TabsList>

@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { SpinnerGap } from "@phosphor-icons/react";
+import { SpinnerGapIcon } from "@phosphor-icons/react";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -526,7 +526,7 @@ export function TradePanel() {
 						)}
 						aria-label={buttonContent.text}
 					>
-						{(isSubmitting || isRegistering) && <SpinnerGap className="size-3 animate-spin" />}
+						{(isSubmitting || isRegistering) && <SpinnerGapIcon className="size-3 animate-spin" />}
 						{buttonContent.text}
 					</Button>
 				</div>

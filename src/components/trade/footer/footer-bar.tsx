@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Pulse, SpinnerGap, WifiHigh, WifiSlash } from "@phosphor-icons/react";
+import { PulseIcon, SpinnerGapIcon, WifiHighIcon, WifiSlashIcon } from "@phosphor-icons/react";
 import { ClientOnly } from "@tanstack/react-router";
 import { APP_VERSION } from "@/config/constants";
 import { formatTime } from "@/lib/format";
@@ -10,25 +10,25 @@ function getStatusDisplay(status: ApiStatus) {
 	switch (status) {
 		case "connected":
 			return {
-				icon: <WifiHigh className="size-3 text-positive" />,
+				icon: <WifiHighIcon className="size-3 text-positive" />,
 				text: t`Connected`,
 				className: "text-positive",
 			};
 		case "connecting":
 			return {
-				icon: <SpinnerGap className="size-3 text-warning animate-spin" />,
+				icon: <SpinnerGapIcon className="size-3 text-warning animate-spin" />,
 				text: t`Connecting`,
 				className: "text-warning",
 			};
 		case "error":
 			return {
-				icon: <WifiSlash className="size-3 text-negative" />,
+				icon: <WifiSlashIcon className="size-3 text-negative" />,
 				text: t`Disconnected`,
 				className: "text-negative",
 			};
 		default:
 			return {
-				icon: <WifiHigh className="size-3 text-muted-fg" />,
+				icon: <WifiHighIcon className="size-3 text-muted-fg" />,
 				text: t`Offline`,
 				className: "text-muted-fg",
 			};
@@ -54,7 +54,7 @@ function PerfToggle() {
 			className="flex items-center gap-1 hover:text-info transition-colors"
 			title="Toggle Performance Panel"
 		>
-			<Pulse className={`size-3 ${isVisible ? "text-info" : "text-muted-fg"}`} />
+			<PulseIcon className={`size-3 ${isVisible ? "text-info" : "text-muted-fg"}`} />
 			<span className={isVisible ? "text-info" : "text-muted-fg"}>Perf</span>
 		</button>
 	);

@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Circle, Pencil, Plus } from "@phosphor-icons/react";
+import { CircleIcon, PencilIcon, PlusIcon } from "@phosphor-icons/react";
 import { useMemo, useRef, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -200,7 +200,7 @@ function PositionRow({
 										<span className="text-muted-fg/50">/</span>
 										<span className="text-negative">{formatPrice(tpSlInfo.slPrice, { szDecimals })}</span>
 									</div>
-									<Pencil className="size-3 text-muted-fg/60 group-hover:text-fg transition-colors" />
+									<PencilIcon className="size-3 text-muted-fg/60 group-hover:text-fg transition-colors" />
 								</>
 							) : hasTpSl ? (
 								<>
@@ -211,11 +211,11 @@ function PositionRow({
 											<span className="text-negative">{formatPrice(tpSlInfo?.slPrice, { szDecimals })}</span>
 										)}
 									</div>
-									<Plus className="size-3 text-muted-fg/60 group-hover:text-fg transition-colors" />
+									<PlusIcon className="size-3 text-muted-fg/60 group-hover:text-fg transition-colors" />
 								</>
 							) : (
 								<div className="flex items-center gap-0.5 text-3xs">
-									<Plus className="size-3 group-hover:text-fg transition-colors" />
+									<PlusIcon className="size-3 group-hover:text-fg transition-colors" />
 									<span>{t`Add`}</span>
 								</div>
 							)}
@@ -343,7 +343,7 @@ export function PositionsTab() {
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
-				<Circle weight="fill" className="size-1.5 text-positive" />
+				<CircleIcon weight="fill" className="size-1.5 text-positive" />
 				{t`Active Positions`}
 				<span className="text-info ml-auto tabular-nums">{headerCount}</span>
 			</div>

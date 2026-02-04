@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { SpinnerGap, TrendDown, TrendUp } from "@phosphor-icons/react";
+import { SpinnerGapIcon, TrendDownIcon, TrendUpIcon } from "@phosphor-icons/react";
 import { useCallback, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -121,12 +121,12 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 						<Badge variant={position.isLong ? "long" : "short"} size="sm">
 							{position.isLong ? (
 								<>
-									<TrendUp className="size-3" />
+									<TrendUpIcon className="size-3" />
 									{t`Long`}
 								</>
 							) : (
 								<>
-									<TrendDown className="size-3" />
+									<TrendDownIcon className="size-3" />
 									{t`Short`}
 								</>
 							)}
@@ -204,7 +204,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 					>
 						{isSubmitting ? (
 							<>
-								<SpinnerGap className="size-3.5 animate-spin" />
+								<SpinnerGapIcon className="size-3.5 animate-spin" />
 								{t`Submitting...`}
 							</>
 						) : (

@@ -1,4 +1,4 @@
-import { Flask, Wallet } from "@phosphor-icons/react";
+import { FlaskIcon, WalletIcon } from "@phosphor-icons/react";
 import type { Address } from "viem";
 import type { Connector } from "wagmi";
 import { CoinbaseIcon } from "@/components/icons/coinbase-icon";
@@ -75,31 +75,31 @@ export const WALLET_INFO: Record<string, WalletInfo> = {
 		priority: 4,
 	},
 	injected: {
-		icon: Wallet,
+		icon: WalletIcon,
 		description: "Use your browser's built-in wallet",
 		popular: false,
 		priority: 10,
 	},
 	Injected: {
-		icon: Wallet,
+		icon: WalletIcon,
 		description: "Use your browser's built-in wallet",
 		popular: false,
 		priority: 10,
 	},
 	"Browser Wallet": {
-		icon: Wallet,
+		icon: WalletIcon,
 		description: "Use your browser's built-in wallet",
 		popular: false,
 		priority: 10,
 	},
 	mock: {
-		icon: Flask,
+		icon: FlaskIcon,
 		description: "Mock wallet for testing",
 		popular: false,
 		priority: 0,
 	},
 	Mock: {
-		icon: Flask,
+		icon: FlaskIcon,
 		description: "Mock wallet for testing",
 		popular: false,
 		priority: 0,
@@ -107,7 +107,7 @@ export const WALLET_INFO: Record<string, WalletInfo> = {
 };
 
 const DEFAULT_WALLET_INFO: WalletInfo = {
-	icon: Wallet,
+	icon: WalletIcon,
 	description: "Connect using this wallet",
 	popular: false,
 	priority: 99,
@@ -131,7 +131,7 @@ function getMockWalletInfo(connector: Connector): WalletInfo {
 	const config = mockWalletRegistry.get(connector.name);
 	const address = config?.address;
 	return {
-		icon: Flask,
+		icon: FlaskIcon,
 		description: address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "Mock wallet for testing",
 		popular: false,
 		priority: 0,

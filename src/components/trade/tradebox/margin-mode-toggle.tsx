@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { ArrowsLeftRight } from "@phosphor-icons/react";
+import { ArrowsLeftRightIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/cn";
 import type { MarginMode } from "@/lib/trade/margin-mode";
 
@@ -29,7 +29,7 @@ export function MarginModeToggle({ mode, disabled, onClick, className }: Props) 
 			)}
 		>
 			<span>{label}</span>
-			<ArrowsLeftRight className="size-3" />
+			<ArrowsLeftRightIcon className="size-3" />
 		</button>
 	);
 }

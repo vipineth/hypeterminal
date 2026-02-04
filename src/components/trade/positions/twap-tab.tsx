@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Timer } from "@phosphor-icons/react";
+import { TimerIcon } from "@phosphor-icons/react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -66,7 +66,7 @@ export function TwapTab() {
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
-				<Timer className="size-3" />
+				<TimerIcon className="size-3" />
 				{t`TWAP Orders`}
 				<span className="text-info ml-auto tabular-nums">{headerCount}</span>
 			</div>

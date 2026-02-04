@@ -1,4 +1,4 @@
-import { ArrowSquareOut, Copy, Lightning, SignOut, Wallet } from "@phosphor-icons/react";
+import { ArrowSquareOutIcon, CopyIcon, LightningIcon, SignOutIcon, WalletIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import { useConnection, useDisconnect } from "wagmi";
 import { Badge } from "@/components/ui/badge";
@@ -54,7 +54,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 			<div className={cn("flex flex-col h-full min-h-0 bg-surface/20", className)}>
 				<div className="flex-1 flex flex-col items-center justify-center gap-6 p-6">
 					<div className="size-20 rounded-full bg-muted/50 flex items-center justify-center">
-						<Wallet className="size-10 text-muted-fg" />
+						<WalletIcon className="size-10 text-muted-fg" />
 					</div>
 					<div className="text-center space-y-2">
 						<h2 className="text-lg font-semibold">Connect Wallet</h2>
@@ -103,7 +103,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 									className="p-1.5 text-muted-fg hover:text-fg hover:bg-transparent transition-colors"
 									aria-label="Copy address"
 								>
-									<Copy className={cn("size-3.5", copied && "text-positive")} />
+									<CopyIcon className={cn("size-3.5", copied && "text-positive")} />
 								</Button>
 							</div>
 							<Badge variant="outline" className="text-xs mt-0.5">
@@ -122,7 +122,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						)}
 						aria-label="Disconnect wallet"
 					>
-						<SignOut className="size-5" />
+						<SignOutIcon className="size-5" />
 					</Button>
 				</div>
 			</div>
@@ -184,7 +184,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 								"min-h-[56px]",
 							)}
 						>
-							<Lightning className="size-5" />
+							<LightningIcon className="size-5" />
 							{ACCOUNT_TEXT.DEPOSIT_LABEL}
 						</Button>
 						<Button
@@ -199,7 +199,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 							)}
 							disabled
 						>
-							<ArrowSquareOut className="size-5" />
+							<ArrowSquareOutIcon className="size-5" />
 							{ACCOUNT_TEXT.WITHDRAW_LABEL}
 						</Button>
 					</div>

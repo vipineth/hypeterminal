@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Moon, Sun } from "@phosphor-icons/react";
+import { MoonIcon, SunIcon } from "@phosphor-icons/react";
 import { ClientOnly } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
@@ -30,7 +30,7 @@ function ThemeToggleButton() {
 			onClick={handleToggle}
 			aria-label={isDark ? t`Switch to light mode` : t`Switch to dark mode`}
 		>
-			{isDark ? <Sun className="size-3.5" /> : <Moon className="size-3.5" />}
+			{isDark ? <SunIcon className="size-3.5" /> : <MoonIcon className="size-3.5" />}
 		</Button>
 	);
 }

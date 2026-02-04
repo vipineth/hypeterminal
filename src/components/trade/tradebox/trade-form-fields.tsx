@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { ArrowsLeftRight } from "@phosphor-icons/react";
+import { ArrowsLeftRightIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -223,7 +223,7 @@ export function TradeFormFields({
 						disabled={isFormDisabled}
 					>
 						<span className="text-4xs">{sizeModeLabel}</span>
-						<ArrowsLeftRight className="size-2.5" />
+						<ArrowsLeftRightIcon className="size-2.5" />
 					</Button>
 					<NumberInput
 						placeholder="0.00"

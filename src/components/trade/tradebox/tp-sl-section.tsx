@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { TrendDown, TrendUp } from "@phosphor-icons/react";
+import { TrendDownIcon, TrendUpIcon } from "@phosphor-icons/react";
 import { useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { SL_QUICK_PERCENT_OPTIONS, TP_QUICK_PERCENT_OPTIONS } from "@/config/constants";
@@ -108,7 +108,7 @@ export function TpSlSection({
 		<div className="space-y-3">
 			<PriceInputWithPercent
 				label={t`Take Profit`}
-				icon={TrendUp}
+				icon={TrendUpIcon}
 				value={tpPrice}
 				onChange={onTpPriceChange}
 				percentOptions={TP_QUICK_PERCENT_OPTIONS}
@@ -121,7 +121,7 @@ export function TpSlSection({
 
 			<PriceInputWithPercent
 				label={t`Stop Loss`}
-				icon={TrendDown}
+				icon={TrendDownIcon}
 				value={slPrice}
 				onChange={onSlPriceChange}
 				percentOptions={SL_QUICK_PERCENT_OPTIONS}

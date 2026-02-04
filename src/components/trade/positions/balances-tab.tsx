@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { ArrowsDownUp, ArrowsLeftRight, PaperPlaneTilt, Wallet } from "@phosphor-icons/react";
+import { ArrowsDownUpIcon, ArrowsLeftRightIcon, PaperPlaneTiltIcon, WalletIcon } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -160,7 +160,7 @@ export function BalancesTab() {
 								onClick={() => handleTransferClick(row)}
 								className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
 							>
-								<ArrowsLeftRight className="size-2.5" />
+								<ArrowsLeftRightIcon className="size-2.5" />
 								{transferLabel}
 							</Button>
 						)}
@@ -171,7 +171,7 @@ export function BalancesTab() {
 								onClick={() => openSwapModal(row.asset)}
 								className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
 							>
-								<ArrowsDownUp className="size-2.5" />
+								<ArrowsDownUpIcon className="size-2.5" />
 								{t`Swap`}
 							</Button>
 						)}
@@ -182,7 +182,7 @@ export function BalancesTab() {
 								onClick={() => handleSendClick(row)}
 								className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
 							>
-								<PaperPlaneTilt className="size-2.5" />
+								<PaperPlaneTiltIcon className="size-2.5" />
 								{t`Send`}
 							</Button>
 						)}
@@ -206,7 +206,7 @@ export function BalancesTab() {
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
-				<Wallet className="size-3" />
+				<WalletIcon className="size-3" />
 				{t`Account Balances`}
 				<label
 					htmlFor="hideSmallBalances"

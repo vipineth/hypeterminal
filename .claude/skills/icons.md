@@ -8,10 +8,13 @@ Use `@phosphor-icons/react` for all icons. Do NOT use `lucide-react`.
 
 ## Usage
 
-```tsx
-import { Bell, Gear } from "@phosphor-icons/react";
+All icons have an `Icon` suffix (e.g., `BellIcon`, `GearIcon`):
 
-<Bell size={20} weight="bold" />
+```tsx
+import { BellIcon, GearIcon } from "@phosphor-icons/react";
+
+<BellIcon size={20} weight="bold" />
+<GearIcon className="size-4" />
 ```
 
 ## Weights
@@ -21,13 +24,13 @@ import { Bell, Gear } from "@phosphor-icons/react";
 ## Finding Icons
 
 ```bash
-grep -i "<keyword>" node_modules/@phosphor-icons/react/dist/index.d.ts
+grep -i "<keyword>.*Icon" node_modules/@phosphor-icons/react/dist/index.d.ts
 ```
 
 Browse: https://phosphoricons.com
 
 ## Instructions
 
-1. Search the package for matching icon names using grep
+1. Search the package for matching icon names using grep (all end with `Icon`)
 2. Suggest the most appropriate Phosphor icon(s)
-3. Show import and usage example
+3. Show import and usage example with the `Icon` suffix

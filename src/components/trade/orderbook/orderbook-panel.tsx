@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { ArrowsLeftRight, CaretDown } from "@phosphor-icons/react";
+import { ArrowsLeftRightIcon, CaretDownIcon } from "@phosphor-icons/react";
 import { useDeferredValue, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -92,7 +92,7 @@ export function OrderbookPanel() {
 									aria-label={t`Select order book aggregation`}
 								>
 									{selectedOption?.label ?? priceGroupingOptions[0]?.label ?? "—"}
-									<CaretDown className="size-2.5" />
+									<CaretDownIcon className="size-2.5" />
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end" className="min-w-20 font-mono text-xs">
@@ -118,7 +118,7 @@ export function OrderbookPanel() {
 					>
 						{t`Size`}
 						<span className="opacity-60">({displayAsset})</span>
-						<ArrowsLeftRight className="size-2 opacity-40" />
+						<ArrowsLeftRightIcon className="size-2 opacity-40" />
 					</Button>
 					<Button
 						variant="ghost"
@@ -128,7 +128,7 @@ export function OrderbookPanel() {
 					>
 						{t`Total`}
 						<span className="opacity-60">({displayAsset})</span>
-						<ArrowsLeftRight className="size-2 opacity-40" />
+						<ArrowsLeftRightIcon className="size-2 opacity-40" />
 					</Button>
 				</div>
 

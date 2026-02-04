@@ -1,5 +1,5 @@
 import { Trans } from "@lingui/react/macro";
-import { CaretDown, Check } from "@phosphor-icons/react";
+import { CaretDownIcon, CheckIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -41,7 +41,7 @@ export function TokenSelectorDropdown({ tokens, selectedToken, onSelect, getBala
 					) : (
 						<span className="text-sm font-medium">{selectedToken}</span>
 					)}
-					<CaretDown className="size-3.5 text-muted-fg ml-1" />
+					<CaretDownIcon className="size-3.5 text-muted-fg ml-1" />
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" className="w-56">
@@ -62,7 +62,7 @@ export function TokenSelectorDropdown({ tokens, selectedToken, onSelect, getBala
 							>
 								<div className="flex items-center gap-2">
 									<AssetDisplay asset={token} iconClassName="size-5" nameClassName="text-sm font-medium" />
-									{isSelected && <Check className="size-3.5 text-info" />}
+									{isSelected && <CheckIcon className="size-3.5 text-info" />}
 								</div>
 								<span className="text-xs text-muted-fg tabular-nums">{formatToken(balance, 4)}</span>
 							</DropdownMenuItem>

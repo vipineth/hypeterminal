@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { ArrowsLeftRight, SpinnerGap } from "@phosphor-icons/react";
+import { ArrowsLeftRightIcon, SpinnerGapIcon } from "@phosphor-icons/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -135,7 +135,7 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 							onClick={handleFlip}
 							className="p-1.5 rounded-sm hover:bg-accent/50 transition-colors text-muted-fg hover:text-info"
 						>
-							<ArrowsLeftRight className="size-4" />
+							<ArrowsLeftRightIcon className="size-4" />
 						</button>
 						<div className="flex flex-col items-center">
 							<span
@@ -178,7 +178,7 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 						disabled={!isValidAmount || isPending}
 						className="w-full h-9 text-xs font-medium"
 					>
-						{isPending && <SpinnerGap className="size-3.5 animate-spin mr-2" />}
+						{isPending && <SpinnerGapIcon className="size-3.5 animate-spin mr-2" />}
 						{isPending ? t`Transferring...` : t`Transfer`}
 					</Button>
 				</div>

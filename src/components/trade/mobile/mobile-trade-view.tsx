@@ -1,4 +1,4 @@
-import { CaretDown, SpinnerGap, TrendDown, TrendUp } from "@phosphor-icons/react";
+import { CaretDownIcon, SpinnerGapIcon, TrendDownIcon, TrendUpIcon } from "@phosphor-icons/react";
 import { useEffect, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -348,7 +348,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 									: "border-border/60 text-muted-fg hover:border-positive/40",
 							)}
 						>
-							<TrendUp className="size-5" />
+							<TrendUpIcon className="size-5" />
 							{ORDER_TEXT.BUY_LABEL}
 						</Button>
 						<Button
@@ -363,7 +363,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 									: "border-border/60 text-muted-fg hover:border-negative/40",
 							)}
 						>
-							<TrendDown className="size-5" />
+							<TrendDownIcon className="size-5" />
 							{ORDER_TEXT.SELL_LABEL}
 						</Button>
 					</div>
@@ -423,7 +423,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 								disabled={isFormDisabled}
 							>
 								{sizeMode === "base" ? baseToken || "—" : quoteToken || "—"}
-								<CaretDown className="size-3" />
+								<CaretDownIcon className="size-3" />
 							</Button>
 							<Input
 								type="text"
@@ -537,7 +537,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 								: "bg-negative/20 border-negative text-negative hover:bg-negative/30",
 					)}
 				>
-					{(isSubmitting || isRegistering) && <SpinnerGap className="size-5 animate-spin" />}
+					{(isSubmitting || isRegistering) && <SpinnerGapIcon className="size-5 animate-spin" />}
 					{buttonContent.text}
 				</Button>
 			</div>

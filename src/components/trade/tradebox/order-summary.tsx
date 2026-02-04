@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Pencil } from "@phosphor-icons/react";
+import { PencilIcon } from "@phosphor-icons/react";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { DEFAULT_BUILDER_CONFIG } from "@/config/hyperliquid";
 import { cn } from "@/lib/cn";
@@ -61,7 +61,7 @@ export function OrderSummary({
 					className="flex items-center gap-1 hover:text-fg transition-colors"
 				>
 					<span className="tabular-nums text-warning">{slippagePercent}%</span>
-					<Pencil className="size-2 text-muted-fg" />
+					<PencilIcon className="size-2 text-muted-fg" />
 				</button>
 			</div>
 			<div className="flex items-center justify-between px-2 py-1.5">

@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { ArrowSquareOut, ArrowsLeftRight } from "@phosphor-icons/react";
+import { ArrowSquareOutIcon, ArrowsLeftRightIcon } from "@phosphor-icons/react";
 import { memo, useEffect, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { getBaseQuoteFromDisplayName } from "@/domain/market";
@@ -36,7 +36,7 @@ const TradeRow = memo(function TradeRow({ trade, szDecimals, showInQuote }: Prop
 		>
 			<div className="text-muted-fg/70 flex items-center gap-1">
 				{trade.time}
-				<ArrowSquareOut className="size-2.5 opacity-100 hover:opacity-80" />
+				<ArrowSquareOutIcon className="size-2.5 opacity-100 hover:opacity-80" />
 			</div>
 			<div className={cn("text-right", trade.side === "buy" ? "text-positive" : "text-negative")}>
 				{formatNumber(trade.price, 2)}
@@ -108,7 +108,7 @@ export function TradesPanel() {
 				>
 					{t`Size`}
 					<span className="opacity-60">({displayAsset})</span>
-					<ArrowsLeftRight className="size-2 opacity-40" />
+					<ArrowsLeftRightIcon className="size-2 opacity-40" />
 				</Button>
 			</div>
 

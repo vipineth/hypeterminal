@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { ArrowSquareOut, ClockCounterClockwise } from "@phosphor-icons/react";
+import { ArrowSquareOutIcon, ClockCounterClockwiseIcon } from "@phosphor-icons/react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -65,7 +65,7 @@ export function HistoryTab() {
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
-				<ClockCounterClockwise className="size-3" />
+				<ClockCounterClockwiseIcon className="size-3" />
 				{t`Trade ClockCounterClockwise`}
 				<span className="text-info ml-auto tabular-nums">{headerCount}</span>
 			</div>
@@ -161,7 +161,7 @@ export function HistoryTab() {
 														rel="noopener noreferrer"
 													>
 														<span>{formatDateTimeShort(fill.time)}</span>
-														<ArrowSquareOut className="size-2.5 opacity-100 hover:opacity-80" />
+														<ArrowSquareOutIcon className="size-2.5 opacity-100 hover:opacity-80" />
 													</a>
 												</div>
 											</TableCell>

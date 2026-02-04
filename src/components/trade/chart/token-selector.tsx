@@ -1,5 +1,13 @@
 import { t } from "@lingui/core/macro";
-import { ArrowDown, ArrowsDownUp, ArrowUp, CaretDown, Fire, MagnifyingGlass, Star } from "@phosphor-icons/react";
+import {
+	ArrowDownIcon,
+	ArrowsDownUpIcon,
+	ArrowUpIcon,
+	CaretDownIcon,
+	FireIcon,
+	MagnifyingGlassIcon,
+	StarIcon,
+} from "@phosphor-icons/react";
 import { flexRender } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -81,7 +89,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 					className="h-6 gap-1.5 text-xs font-semibold px-2"
 				>
 					{selectedMarket && <AssetDisplay asset={selectedMarket} iconClassName="size-5 shrink-0" />}
-					<CaretDown className="size-3 text-muted-fg shrink-0" />
+					<CaretDownIcon className="size-3 text-muted-fg shrink-0" />
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent
@@ -93,7 +101,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 				<div className="flex flex-col p-2">
 					<div className="border-b border-border/40">
 						<div className="relative">
-							<MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 size-3 text-muted-fg" />
+							<MagnifyingGlassIcon className="absolute left-2 top-1/2 -translate-y-1/2 size-3 text-muted-fg" />
 							<Input
 								placeholder={t`Search markets...`}
 								value={search}
@@ -177,11 +185,11 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 										<span className="truncate">{flexRender(header.column.columnDef.header, header.getContext())}</span>
 										<span className="shrink-0">
 											{sortState === "asc" ? (
-												<ArrowUp className="size-2.5" />
+												<ArrowUpIcon className="size-2.5" />
 											) : sortState === "desc" ? (
-												<ArrowDown className="size-2.5" />
+												<ArrowDownIcon className="size-2.5" />
 											) : (
-												<ArrowsDownUp className="size-2.5 opacity-40" />
+												<ArrowsDownUpIcon className="size-2.5 opacity-40" />
 											)}
 										</span>
 									</Button>
@@ -266,7 +274,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 															className="hover:scale-110 hover:bg-transparent"
 															aria-label={isFav ? t`Remove from favorites` : t`Add to favorites`}
 														>
-															<Star
+															<StarIcon
 																className={cn(
 																	"size-2.5 transition-colors",
 																	isFav ? "fill-warning text-warning" : "text-muted-fg hover:text-warning",
@@ -308,7 +316,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 												<div className="w-16 sm:w-20 text-right hidden sm:block">
 													<div className="flex items-center justify-end gap-1">
 														{market.funding !== null && (
-															<Fire className={cn("size-2.5", getValueColorClass(market.funding))} />
+															<FireIcon className={cn("size-2.5", getValueColorClass(market.funding))} />
 														)}
 														<span
 															className={cn(

@@ -1,14 +1,14 @@
 import {
-	ArrowsClockwise,
-	CaretDown,
-	CaretUp,
-	Gauge,
-	HardDrive,
-	Minus,
-	Pulse,
-	Warning,
-	WifiHigh,
-	X,
+	ArrowsClockwiseIcon,
+	CaretDownIcon,
+	CaretUpIcon,
+	GaugeIcon,
+	HardDriveIcon,
+	MinusIcon,
+	PulseIcon,
+	WarningIcon,
+	WifiHighIcon,
+	XIcon,
 } from "@phosphor-icons/react";
 import { useCallback, useState, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
@@ -211,7 +211,7 @@ export function PerfPanel({ onClose }: Props) {
 					onClick={() => setIsMinimized(false)}
 					className="bg-bg/95 backdrop-blur border-border/60 shadow-lg"
 				>
-					<Pulse className="size-4" />
+					<PulseIcon className="size-4" />
 				</Button>
 			</div>
 		);
@@ -221,19 +221,19 @@ export function PerfPanel({ onClose }: Props) {
 		<div className="fixed bottom-4 right-4 z-9999 w-80 max-h-[80vh] overflow-hidden rounded-lg border border-border/60 bg-orange-50 backdrop-blur shadow-xl">
 			<div className="flex items-center justify-between px-3 py-2 border-b border-border/40 bg-muted/30">
 				<div className="flex items-center gap-2">
-					<Pulse className="size-4 text-info" />
+					<PulseIcon className="size-4 text-info" />
 					<span className="text-sm font-medium">Performance</span>
 				</div>
 				<div className="flex items-center gap-1">
 					<Button variant="ghost" size="icon-sm" onClick={handleRefresh} className="size-6">
-						<ArrowsClockwise className="size-3" />
+						<ArrowsClockwiseIcon className="size-3" />
 					</Button>
 					<Button variant="ghost" size="icon-sm" onClick={() => setIsMinimized(true)} className="size-6">
-						<Minus className="size-3" />
+						<MinusIcon className="size-3" />
 					</Button>
 					{onClose && (
 						<Button variant="ghost" size="icon-sm" onClick={onClose} className="size-6">
-							<X className="size-3" />
+							<XIcon className="size-3" />
 						</Button>
 					)}
 				</div>
@@ -242,7 +242,7 @@ export function PerfPanel({ onClose }: Props) {
 			<div className="overflow-y-auto max-h-[calc(80vh-44px)]">
 				<Section
 					title="Web Vitals"
-					icon={<Gauge className="size-3.5" />}
+					icon={<GaugeIcon className="size-3.5" />}
 					enabled={state.vitalsEnabled}
 					onToggle={(v) => updateState({ vitalsEnabled: v })}
 					expanded={expandedSection === "vitals"}
@@ -269,7 +269,7 @@ export function PerfPanel({ onClose }: Props) {
 
 				<Section
 					title="Memory"
-					icon={<HardDrive className="size-3.5" />}
+					icon={<HardDriveIcon className="size-3.5" />}
 					enabled={state.memoryEnabled}
 					onToggle={handleMemoryToggle}
 					expanded={expandedSection === "memory"}
@@ -344,7 +344,7 @@ export function PerfPanel({ onClose }: Props) {
 
 				<Section
 					title="Renders"
-					icon={<Pulse className="size-3.5" />}
+					icon={<PulseIcon className="size-3.5" />}
 					enabled={state.rendersEnabled}
 					onToggle={(v) => updateState({ rendersEnabled: v })}
 					expanded={expandedSection === "renders"}
@@ -411,7 +411,7 @@ export function PerfPanel({ onClose }: Props) {
 
 				<Section
 					title="WifiHigh"
-					icon={<WifiHigh className="size-3.5" />}
+					icon={<WifiHighIcon className="size-3.5" />}
 					enabled={state.networkEnabled}
 					onToggle={(v) => updateState({ networkEnabled: v })}
 					expanded={expandedSection === "network"}
@@ -463,7 +463,7 @@ export function PerfPanel({ onClose }: Props) {
 
 				<Section
 					title="Leak Detector"
-					icon={<Warning className="size-3.5" />}
+					icon={<WarningIcon className="size-3.5" />}
 					enabled={state.leaksEnabled}
 					onToggle={handleLeaksToggle}
 					expanded={expandedSection === "leaks"}
@@ -519,7 +519,7 @@ function Section({ title, icon, enabled, onToggle, expanded, onExpand, children 
 				<button type="button" onClick={onExpand} className="flex items-center gap-2 text-sm hover:text-fg/80">
 					{icon}
 					<span>{title}</span>
-					{expanded ? <CaretUp className="size-3" /> : <CaretDown className="size-3" />}
+					{expanded ? <CaretUpIcon className="size-3" /> : <CaretDownIcon className="size-3" />}
 				</button>
 				<Switch checked={enabled} onCheckedChange={onToggle} />
 			</div>

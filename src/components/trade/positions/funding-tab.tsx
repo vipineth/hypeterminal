@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Percent } from "@phosphor-icons/react";
+import { PercentIcon } from "@phosphor-icons/react";
 import { useConnection } from "wagmi";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -67,7 +67,7 @@ export function FundingTab() {
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
-				<Percent className="size-3" />
+				<PercentIcon className="size-3" />
 				{t`Funding Payments`}
 				<span className={cn("ml-auto tabular-nums", headerClass)}>{headerTotal}</span>
 			</div>

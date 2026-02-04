@@ -1,4 +1,4 @@
-import { Circle } from "@phosphor-icons/react";
+import { CircleIcon } from "@phosphor-icons/react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import type * as React from "react";
 import { cn } from "@/lib/cn";
@@ -21,7 +21,7 @@ function RadioGroupItem({ className, ...props }: React.ComponentProps<typeof Rad
 				data-slot="radio-group-indicator"
 				className="relative flex items-center justify-center"
 			>
-				<Circle
+				<CircleIcon
 					weight="fill"
 					className="text-primary absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2"
 				/>

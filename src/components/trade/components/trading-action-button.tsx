@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { SpinnerGap } from "@phosphor-icons/react";
+import { SpinnerGapIcon } from "@phosphor-icons/react";
 import { type ComponentProps, type ReactNode, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
@@ -35,7 +35,7 @@ export function TradingActionButton({ onClick, children, disabled, className, ..
 			>
 				{isEnabling ? (
 					<>
-						<SpinnerGap className="size-3 animate-spin" />
+						<SpinnerGapIcon className="size-3 animate-spin" />
 						{t`Enabling`}
 					</>
 				) : showEnableTrading ? (

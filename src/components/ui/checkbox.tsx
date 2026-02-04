@@ -1,4 +1,4 @@
-import { Check } from "@phosphor-icons/react";
+import { CheckIcon } from "@phosphor-icons/react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import type * as React from "react";
 import { cn } from "@/lib/cn";
@@ -17,7 +17,7 @@ function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxP
 				data-slot="checkbox-indicator"
 				className="grid place-content-center text-current transition-none"
 			>
-				<Check className="size-3" />
+				<CheckIcon className="size-3" />
 			</CheckboxPrimitive.Indicator>
 		</CheckboxPrimitive.Root>
 	);

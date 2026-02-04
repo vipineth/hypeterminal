@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { ArrowsDownUp, Check, SpinnerGap, Warning } from "@phosphor-icons/react";
+import { ArrowsDownUpIcon, CheckIcon, SpinnerGapIcon, WarningIcon } from "@phosphor-icons/react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -254,7 +254,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 									className="size-8 rounded-full bg-bg border-border/60 hover:border-info hover:bg-info/10 transition-colors disabled:opacity-50"
 									aria-label={t`Swap direction`}
 								>
-									<ArrowsDownUp className="size-3.5" />
+									<ArrowsDownUpIcon className="size-3.5" />
 								</Button>
 							</div>
 
@@ -302,7 +302,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 
 					{insufficientBalance && !showSuccess && (
 						<div className="flex items-start gap-2 p-2.5 bg-warning/10 border border-warning/20 rounded-sm">
-							<Warning className="size-3.5 text-warning shrink-0 mt-0.5" />
+							<WarningIcon className="size-3.5 text-warning shrink-0 mt-0.5" />
 							<p className="text-xs text-warning">
 								<Trans>
 									Insufficient <AssetDisplay asset={fromAsset} hideIcon /> balance
@@ -313,7 +313,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 
 					{noPairAvailable && !showSuccess && (
 						<div className="flex items-start gap-2 p-2.5 bg-warning/10 border border-warning/20 rounded-sm">
-							<Warning className="size-3.5 text-warning shrink-0 mt-0.5" />
+							<WarningIcon className="size-3.5 text-warning shrink-0 mt-0.5" />
 							<p className="text-xs text-warning">
 								<Trans>
 									No trading pair available for <AssetDisplay asset={fromAsset} hideIcon />/
@@ -325,7 +325,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 
 					{error && !showSuccess && (
 						<div className="flex items-center gap-2 p-2.5 bg-negative/10 border border-negative/20 rounded-sm text-xs text-negative">
-							<Warning className="size-3.5 shrink-0" />
+							<WarningIcon className="size-3.5 shrink-0" />
 							<span className="flex-1">{error}</span>
 						</div>
 					)}
@@ -333,7 +333,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 					{showSuccess && (
 						<div className="flex flex-col items-center gap-1.5 p-3 bg-positive/10 border border-positive/20 rounded-sm text-positive">
 							<div className="flex items-center gap-2 text-xs">
-								<Check className="size-3.5" />
+								<CheckIcon className="size-3.5" />
 								<Trans>Swap submitted</Trans>
 							</div>
 							<div className="text-sm font-medium tabular-nums">
@@ -352,7 +352,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 					>
 						{isSubmitting ? (
 							<>
-								<SpinnerGap className="size-3.5 animate-spin" />
+								<SpinnerGapIcon className="size-3.5 animate-spin" />
 								<Trans>Swapping...</Trans>
 							</>
 						) : (

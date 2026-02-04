@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { CaretDown } from "@phosphor-icons/react";
+import { CaretDownIcon } from "@phosphor-icons/react";
 import { forwardRef } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
@@ -29,7 +29,7 @@ export const LeverageBadge = forwardRef<HTMLButtonElement, Props>(
 				aria-label={t`Change leverage`}
 			>
 				<span className="tabular-nums font-medium">{leverage}x</span>
-				<CaretDown className="size-2.5" />
+				<CaretDownIcon className="size-2.5" />
 			</Button>
 		);
 	},

@@ -1,4 +1,4 @@
-import { CaretDown, CaretUp, Check } from "@phosphor-icons/react";
+import { CaretDownIcon, CaretUpIcon, CheckIcon } from "@phosphor-icons/react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import type * as React from "react";
 import { cn } from "@/lib/cn";
@@ -39,7 +39,7 @@ function SelectTrigger({
 		>
 			{children}
 			<SelectPrimitive.Icon asChild>
-				<CaretDown className="size-4 opacity-50" />
+				<CaretDownIcon className="size-4 opacity-50" />
 			</SelectPrimitive.Icon>
 		</SelectPrimitive.Trigger>
 	);
@@ -104,7 +104,7 @@ function SelectItem({ className, children, ...props }: React.ComponentProps<type
 		>
 			<span className="absolute right-2 flex size-3.5 items-center justify-center">
 				<SelectPrimitive.ItemIndicator>
-					<Check className="size-4" />
+					<CheckIcon className="size-4" />
 				</SelectPrimitive.ItemIndicator>
 			</span>
 			<SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
@@ -129,7 +129,7 @@ function SelectScrollUpButton({ className, ...props }: React.ComponentProps<type
 			className={cn("flex cursor-default items-center justify-center py-1", className)}
 			{...props}
 		>
-			<CaretUp className="size-4" />
+			<CaretUpIcon className="size-4" />
 		</SelectPrimitive.ScrollUpButton>
 	);
 }
@@ -144,7 +144,7 @@ function SelectScrollDownButton({
 			className={cn("flex cursor-default items-center justify-center py-1", className)}
 			{...props}
 		>
-			<CaretDown className="size-4" />
+			<CaretDownIcon className="size-4" />
 		</SelectPrimitive.ScrollDownButton>
 	);
 }

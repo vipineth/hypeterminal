@@ -1,4 +1,4 @@
-import { Fire } from "@phosphor-icons/react";
+import { FireIcon } from "@phosphor-icons/react";
 import { ClientOnly } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -89,7 +89,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 								})}
 							/>
 							<div className="flex items-center gap-1">
-								<Fire className={cn("size-3", getValueColorClass(fundingNum))} />
+								<FireIcon className={cn("size-3", getValueColorClass(fundingNum))} />
 								<span className={cn("tabular-nums font-medium", getValueColorClass(fundingNum))}>
 									{formatPercent(fundingNum, {
 										minimumFractionDigits: 4,

@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
-import { Check, Moon, Sun } from "@phosphor-icons/react";
+import { CheckIcon, MoonIcon, SunIcon } from "@phosphor-icons/react";
 import type { ChangeEvent } from "react";
 import { useId, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -147,7 +147,7 @@ export function GlobalSettingsDialog() {
 										!isDark ? "bg-bg text-fg shadow-sm" : "text-muted-fg hover:text-fg",
 									)}
 								>
-									<Sun className="size-3.5" />
+									<SunIcon className="size-3.5" />
 									{t`Light`}
 								</button>
 								<button
@@ -158,7 +158,7 @@ export function GlobalSettingsDialog() {
 										isDark ? "bg-bg text-fg shadow-sm" : "text-muted-fg hover:text-fg",
 									)}
 								>
-									<Moon className="size-3.5" />
+									<MoonIcon className="size-3.5" />
 									{t`Dark`}
 								</button>
 							</div>
@@ -341,7 +341,7 @@ function ColorThemeButton({ theme, isSelected, isDark, onClick }: ColorThemeButt
 				{isSelected && (
 					<div className="absolute inset-0 flex items-center justify-center bg-black/20">
 						<div className="rounded-full bg-primary p-0.5">
-							<Check className="size-2 text-primary-fg" strokeWidth={3} />
+							<CheckIcon className="size-2 text-primary-fg" strokeWidth={3} />
 						</div>
 					</div>
 				)}

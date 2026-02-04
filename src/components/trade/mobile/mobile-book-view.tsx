@@ -1,4 +1,10 @@
-import { ArrowsClockwise, ArrowsLeftRight, CaretDown, TrendDown, TrendUp } from "@phosphor-icons/react";
+import {
+	ArrowsClockwiseIcon,
+	ArrowsLeftRightIcon,
+	CaretDownIcon,
+	TrendDownIcon,
+	TrendUpIcon,
+} from "@phosphor-icons/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -196,7 +202,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 							aria-label="Toggle display units"
 						>
 							{showOrderbookInQuote ? quoteToken : baseToken}
-							<ArrowsLeftRight className="size-3" />
+							<ArrowsLeftRightIcon className="size-3" />
 						</Button>
 
 						{view === "book" && (
@@ -212,7 +218,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 										)}
 									>
 										{selectedOption?.label ?? "—"}
-										<CaretDown className="size-3" />
+										<CaretDownIcon className="size-3" />
 									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end" className="min-w-20 font-mono text-xs">
@@ -272,7 +278,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 									<div className="text-sm text-negative">{ORDERBOOK_TEXT.FAILED}</div>
 								) : (
 									<div className="flex flex-col items-center gap-2 text-muted-fg">
-										<ArrowsClockwise className="size-5 animate-spin" />
+										<ArrowsClockwiseIcon className="size-5 animate-spin" />
 										<span className="text-sm">{ORDERBOOK_TEXT.WAITING}</span>
 									</div>
 								)}
@@ -285,9 +291,9 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 								{typeof mid === "number" && Number.isFinite(mid) ? formatNumber(mid, 2) : FALLBACK_VALUE_PLACEHOLDER}
 							</span>
 							{midDirection === "up" ? (
-								<TrendUp className="size-5 text-positive" />
+								<TrendUpIcon className="size-5 text-positive" />
 							) : midDirection === "down" ? (
-								<TrendDown className="size-5 text-negative" />
+								<TrendDownIcon className="size-5 text-negative" />
 							) : null}
 						</div>
 
