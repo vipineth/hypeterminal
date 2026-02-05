@@ -115,8 +115,8 @@ msgstr "Amount (USDC)"
 #~ msgstr "API"
 
 #: src/components/trade/components/global-settings-dialog.tsx
-msgid "Appearance"
-msgstr "Appearance"
+#~ msgid "Appearance"
+#~ msgstr "Appearance"
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Approve a builder to charge fees on orders placed on your behalf. Builder codes allow DeFi applications to receive a portion of trading fees."
@@ -420,8 +420,8 @@ msgstr "Current"
 #~ msgstr "Customize your trading experience."
 
 #: src/components/trade/components/global-settings-dialog.tsx
-msgid "Dark"
-msgstr "Dark"
+#~ msgid "Dark"
+#~ msgstr "Dark"
 
 #: src/components/trade/header/top-nav.tsx
 #: src/components/trade/tradebox/account-panel.tsx
@@ -775,8 +775,8 @@ msgid "Leverage"
 msgstr "Leverage"
 
 #: src/components/trade/components/global-settings-dialog.tsx
-msgid "Light"
-msgstr "Light"
+#~ msgid "Light"
+#~ msgstr "Light"
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "limit"
