@@ -12,7 +12,7 @@ import { getValueColorClass, toBig } from "@/lib/trade/numbers";
 import { useTheme } from "@/providers/theme";
 import { useMarketActions } from "@/stores/use-market-store";
 import { TokenSelector } from "../chart/token-selector";
-import { TradingViewChart } from "../chart/trading-view-chart";
+import { TradingViewChart } from "../chart/tradingview-chart";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
 
 const overviewText = UI_TEXT.MARKET_OVERVIEW;

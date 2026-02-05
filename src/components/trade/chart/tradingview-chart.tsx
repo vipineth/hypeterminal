@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { ColorTheme } from "@/providers/theme";
-import type { IBasicDataFeed, IChartingLibraryWidget, ResolutionString } from "@/types/charting_library";
+import type { IChartingLibraryWidget, ResolutionString } from "@/types/charting_library";
 import {
 	CHART_CUSTOM_FONT_FAMILY,
 	CHART_DISABLED_FEATURES,
@@ -128,9 +128,7 @@ export function TradingViewChart({
 				widgetRef.current = new window.TradingView.widget({
 					container: containerRef.current,
 					library_path: CHART_LIBRARY_PATH,
-					// Type assertion needed due to TradingView library type definitions mismatch
-					// createDatafeed() correctly implements IBasicDataFeed interface
-					datafeed: createDatafeed() as unknown as IBasicDataFeed,
+					datafeed: createDatafeed(),
 					symbol: symbol,
 					interval: interval as ResolutionString,
 					locale: CHART_LOCALE,
