@@ -110,7 +110,7 @@ export function OrderbookPanel() {
 						</DropdownMenu>
 					</div>
 					<Button
-						variant="ghost"
+						variant="text"
 						size="none"
 						onClick={toggleAssetDisplay}
 						className="text-right hover:text-fg hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
@@ -120,7 +120,7 @@ export function OrderbookPanel() {
 						<ArrowsLeftRightIcon className="size-2 opacity-40" />
 					</Button>
 					<Button
-						variant="ghost"
+						variant="text"
 						size="none"
 						onClick={toggleAssetDisplay}
 						className="text-right hover:text-fg hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
@@ -133,7 +133,7 @@ export function OrderbookPanel() {
 
 				<div ref={orderbookContainerRef} className="flex-1 min-h-0 flex flex-col overflow-hidden">
 					{orderbookStatus !== "error" && asks.length > 0 ? (
-						<div className="flex-1 flex flex-col justify-end gap-px py-0.5">
+						<div className="flex-1 min-h-0 flex flex-col justify-end gap-px py-0.5 overflow-hidden">
 							{[...asks].reverse().map((level, i) => (
 								<OrderbookRow
 									key={`ask-${level.price}-${i}`}
@@ -159,7 +159,7 @@ export function OrderbookPanel() {
 					</div>
 
 					{orderbookStatus !== "error" && bids.length > 0 && (
-						<div className="flex-1 flex flex-col gap-px py-0.5">
+						<div className="flex-1 min-h-0 flex flex-col gap-px py-0.5 overflow-hidden">
 							{bids.map((level, i) => (
 								<OrderbookRow
 									key={`bid-${level.price}-${i}`}

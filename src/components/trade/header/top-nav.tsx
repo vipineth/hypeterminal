@@ -36,7 +36,7 @@ export function TopNav() {
 					{NAV_ITEMS.map((item, idx) => (
 						<Button
 							key={item.key}
-							variant="ghost"
+							variant="text"
 							size="none"
 							className={cn(
 								"px-2.5 py-1.5 transition-colors hover:bg-transparent",
@@ -50,7 +50,7 @@ export function TopNav() {
 					{/* <DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button
-								variant="ghost"
+								variant="text"
 								size="none"
 								className="px-2.5 py-1.5 text-muted-fg hover:text-fg hover:bg-transparent inline-flex items-center gap-1"
 								tabIndex={0}
@@ -71,19 +71,20 @@ export function TopNav() {
 			<div className="flex items-center gap-1.5">
 				<Button
 					size="sm"
-					variant="outline"
-					className="h-7 text-3xs uppercase tracking-wider border-positive/40 text-positive hover:bg-positive/10 hover:text-positive"
+					variant="outlined"
+					color="accent"
+					className="h-7 text-3xs uppercase tracking-wider"
 					onClick={() => openDepositModal("deposit")}
 				>
 					<LightningIcon className="size-3 mr-1" />
 					<Trans>Deposit</Trans>
 				</Button>
 				<UserMenu />
-				<Button variant="ghost" size="icon-sm" className="size-7" aria-label={t`Notifications`}>
+				<Button variant="text" size="none" className="size-7" aria-label={t`Notifications`}>
 					<BellIcon className="size-3.5" />
 				</Button>
 				<ThemeToggle />
-				<Button variant="ghost" size="icon-sm" className="size-7" aria-label={t`Settings`} onClick={openSettingsDialog}>
+				<Button variant="text" size="none" className="size-7" aria-label={t`Settings`} onClick={openSettingsDialog}>
 					<GearIcon className="size-3.5" />
 				</Button>
 			</div>

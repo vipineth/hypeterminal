@@ -184,12 +184,12 @@ export function TradeFormFields({
 							{formatAvailableBalance()} {availableBalanceToken}
 						</span>
 						{isConnected && swapTargetToken && (
-							<Button variant="link" size="none" onClick={onSwapClick} className="text-info text-4xs uppercase">
+							<Button variant="text" size="none" onClick={onSwapClick} className="text-info text-4xs uppercase">
 								{t`Swap`}
 							</Button>
 						)}
 						{isConnected && (
-							<Button variant="link" size="none" onClick={onDepositClick} className="text-info text-4xs uppercase">
+							<Button variant="text" size="none" onClick={onDepositClick} className="text-info text-4xs uppercase">
 								{t`Deposit`}
 							</Button>
 						)}
@@ -210,7 +210,7 @@ export function TradeFormFields({
 				<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Size`}</div>
 				<div className="flex items-center gap-1">
 					<Button
-						variant="ghost"
+						variant="text"
 						size="none"
 						onClick={handleSizeModeToggle}
 						className="px-2 py-1.5 text-3xs border border-border/60 hover:border-fg/30 hover:bg-transparent gap-1"
@@ -254,8 +254,8 @@ export function TradeFormFields({
 						<Button
 							key={p}
 							onClick={() => handleSizePercentApply(p)}
-							variant="outline"
-							size="xs"
+							variant="outlined"
+							size="sm"
 							aria-label={t`Set ${p}%`}
 						>
 							{p === 100 ? t`Max` : `${p}%`}
@@ -270,7 +270,7 @@ export function TradeFormFields({
 						<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Trigger Price (USDC)`}</div>
 						{markPx > 0 && (
 							<Button
-								variant="ghost"
+								variant="text"
 								size="none"
 								onClick={() => setTriggerPrice(toFixed(markPx, szDecimalsToPriceDecimals(szDecimals)))}
 								className="text-4xs text-muted-fg hover:text-info hover:bg-transparent tabular-nums"
@@ -301,7 +301,7 @@ export function TradeFormFields({
 						<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Limit Price`}</div>
 						{markPx > 0 && (
 							<Button
-								variant="ghost"
+								variant="text"
 								size="none"
 								onClick={() => setLimitPrice(toFixed(markPx, szDecimalsToPriceDecimals(szDecimals)))}
 								className="text-4xs text-muted-fg hover:text-info hover:bg-transparent tabular-nums"

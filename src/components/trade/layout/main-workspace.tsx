@@ -5,17 +5,18 @@ import { AnalysisSection } from "./analysis-section";
 import { TradeSidebar } from "./trade-sidebar";
 
 export function MainWorkspace() {
-	const { defaultLayout, onLayoutChanged } = usePersistentLayout("CHART_WITH_SWAPBOX");
+	const { config, defaultLayout, onLayoutChanged } = usePersistentLayout("CHART_WITH_SWAPBOX");
+	const [first, second] = config.panels;
 
 	return (
 		<div className="flex-1 min-h-0">
 			<ResizablePanelGroup
-				orientation="horizontal"
+				orientation={config.orientation}
 				className="h-full min-h-0"
 				defaultLayout={defaultLayout}
 				onLayoutChanged={onLayoutChanged}
 			>
-				<ResizablePanel defaultSize="76" minSize="500px">
+				<ResizablePanel id={first.id} defaultSize={first.defaultSize} minSize={first.minSize}>
 					<div className="h-full flex flex-col">
 						<FavoritesStrip />
 						<div className="flex-1 min-h-0">
@@ -23,8 +24,13 @@ export function MainWorkspace() {
 						</div>
 					</div>
 				</ResizablePanel>
-				<ResizableHandle withHandle className="w-px bg-border/40 hover:bg-info/30 active:bg-info/50" />
-				<ResizablePanel defaultSize="24" minSize="280px" maxSize="440px">
+				<ResizableHandle withHandle className="w-px bg-border/40" />
+				<ResizablePanel
+					id={second.id}
+					defaultSize={second.defaultSize}
+					minSize={second.minSize}
+					maxSize={second.maxSize}
+				>
 					<TradeSidebar />
 				</ResizablePanel>
 			</ResizablePanelGroup>

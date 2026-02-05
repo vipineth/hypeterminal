@@ -111,7 +111,7 @@ export function HistoryTab() {
 														{isBuy ? t`buy` : t`sell`}
 													</span>
 													<Button
-														variant="link"
+														variant="text"
 														size="none"
 														onClick={() => setSelectedMarket(fill.coin)}
 														aria-label={t`Switch to ${markets.getMarket(fill.coin)?.displayName ?? fill.coin} market`}

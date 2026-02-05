@@ -4,21 +4,22 @@ import { PositionsPanel } from "../positions/positions-panel";
 import { MarketInfo } from "./market-info";
 
 export function AnalysisSection() {
-	const { defaultLayout, onLayoutChanged } = usePersistentLayout("CHART_WITH_POSITIONS");
+	const { config, defaultLayout, onLayoutChanged } = usePersistentLayout("CHART_WITH_POSITIONS");
+	const [first, second] = config.panels;
 
 	return (
 		<div className="h-full min-h-0">
 			<ResizablePanelGroup
-				orientation="vertical"
+				orientation={config.orientation}
 				className="h-full min-h-0"
 				defaultLayout={defaultLayout}
 				onLayoutChanged={onLayoutChanged}
 			>
-				<ResizablePanel defaultSize="60" minSize="200px">
+				<ResizablePanel id={first.id} defaultSize={first.defaultSize} minSize={first.minSize}>
 					<MarketInfo />
 				</ResizablePanel>
-				<ResizableHandle withHandle className="h-px bg-border/40 hover:bg-info/30 active:bg-info/50" />
-				<ResizablePanel defaultSize="40" minSize="150px">
+				<ResizableHandle withHandle />
+				<ResizablePanel id={second.id} defaultSize={second.defaultSize} minSize={second.minSize}>
 					<PositionsPanel />
 				</ResizablePanel>
 			</ResizablePanelGroup>

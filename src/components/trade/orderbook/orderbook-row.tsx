@@ -32,7 +32,7 @@ export function OrderbookRow({ level, side, maxTotal, showInQuote = false, szDec
 			/>
 			<div className="grid grid-cols-3 gap-2 text-2xs tabular-nums py-0.5 px-2 relative z-10">
 				<Button
-					variant="link"
+					variant="text"
 					size="none"
 					onClick={() => setSelectedPrice(level.price)}
 					className={cn(

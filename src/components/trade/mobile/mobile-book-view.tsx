@@ -161,7 +161,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-1 bg-muted/50 rounded-md p-0.5">
 						<Button
-							variant="ghost"
+							variant="text"
 							size="none"
 							onClick={() => setView("book")}
 							className={cn(
@@ -174,7 +174,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 							{ORDERBOOK_TEXT.BOOK_LABEL}
 						</Button>
 						<Button
-							variant="ghost"
+							variant="text"
 							size="none"
 							onClick={() => setView("trades")}
 							className={cn(
@@ -190,7 +190,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 
 					<div className="flex items-center gap-2">
 						<Button
-							variant="ghost"
+							variant="text"
 							size="none"
 							onClick={() => setShowOrderbookInQuote(!showOrderbookInQuote)}
 							className={cn(
@@ -209,7 +209,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
 									<Button
-										variant="ghost"
+										variant="text"
 										size="none"
 										className={cn(
 											"px-2 py-1.5 text-xs border border-border/60 rounded",

@@ -81,7 +81,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
 				<Button
-					variant="ghost"
+					variant="text"
 					size="sm"
 					role="combobox"
 					aria-expanded={open}
@@ -118,7 +118,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 								return (
 									<Button
 										key={s.value}
-										variant="ghost"
+										variant="text"
 										size="none"
 										onClick={() => handleScopeSelect(s.value)}
 										className={cn(
@@ -140,7 +140,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 									return (
 										<Button
 											key={sub.value}
-											variant="ghost"
+											variant="text"
 											size="none"
 											onClick={() => handleSubcategorySelect(sub.value)}
 											className={cn(
@@ -173,7 +173,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 								return (
 									<Button
 										key={header.id}
-										variant="ghost"
+										variant="text"
 										size="none"
 										onClick={header.column.getToggleSortingHandler()}
 										className={cn(
@@ -265,7 +265,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 													<div className="flex items-center gap-1">
 														<span className="font-semibold text-2xs">{market.displayName}</span>
 														<Button
-															variant="ghost"
+															variant="text"
 															size="none"
 															onClick={(e) => {
 																e.stopPropagation();

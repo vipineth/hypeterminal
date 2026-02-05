@@ -337,7 +337,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					{/* Buy/Sell toggle */}
 					<div className="grid grid-cols-2 gap-2">
 						<Button
-							variant="ghost"
+							variant="text"
 							size="none"
 							onClick={() => setSide("buy")}
 							className={cn(
@@ -352,7 +352,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							{ORDER_TEXT.BUY_LABEL}
 						</Button>
 						<Button
-							variant="ghost"
+							variant="text"
 							size="none"
 							onClick={() => setSide("sell")}
 							className={cn(
@@ -371,7 +371,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					{/* Order type tabs */}
 					<div className="flex items-center gap-1 bg-muted/50 rounded-md p-1">
 						<Button
-							variant="ghost"
+							variant="text"
 							size="none"
 							onClick={() => setType("market")}
 							className={cn(
@@ -382,7 +382,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							{ORDER_TEXT.ORDER_TYPE_MARKET}
 						</Button>
 						<Button
-							variant="ghost"
+							variant="text"
 							size="none"
 							onClick={() => setType("limit")}
 							className={cn(
@@ -413,7 +413,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 						<p className="text-sm text-muted-fg">{ORDER_TEXT.SIZE_LABEL}</p>
 						<div className="flex items-center gap-2">
 							<Button
-								variant="ghost"
+								variant="text"
 								size="none"
 								onClick={handleSizeModeToggle}
 								className={cn(
@@ -455,7 +455,8 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							{ORDER_SIZE_PERCENT_STEPS.map((p) => (
 								<Button
 									key={p}
-									variant="terminal"
+									variant="outlined"
+									color="accent"
 									size="none"
 									onClick={() => handlePercentClick(p)}
 									className="py-2.5 text-sm font-medium rounded-md min-h-[44px]"
@@ -473,7 +474,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							<div className="flex items-center justify-between">
 								<p className="text-sm text-muted-fg">{ORDER_TEXT.LIMIT_PRICE_LABEL}</p>
 								{markPx > 0 && (
-									<Button variant="link" size="none" onClick={handleMarkPriceClick} className="text-xs text-info">
+									<Button variant="text" size="none" onClick={handleMarkPriceClick} className="text-xs text-info">
 										{ORDER_TEXT.MARK_PRICE_LABEL}: {formatPrice(markPx, { szDecimals: market?.szDecimals })}
 									</Button>
 								)}
@@ -523,7 +524,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 			{/* Sticky submit button */}
 			<div className="shrink-0 p-4 border-t border-border/60 bg-bg/95 backdrop-blur-sm">
 				<Button
-					variant="ghost"
+					variant="text"
 					size="none"
 					onClick={buttonContent.action}
 					disabled={buttonContent.disabled}

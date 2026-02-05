@@ -495,14 +495,11 @@ export function TradePanel() {
 					{approvalError && <div className="text-4xs text-negative">{approvalError}</div>}
 
 					<Button
-						variant="ghost"
-						size="none"
+						variant="outlined"
+						size="lg"
 						onClick={buttonContent.action}
 						disabled={buttonContent.disabled}
-						className={cn(
-							"w-full py-2.5 text-2xs font-semibold uppercase tracking-wider border gap-2 hover:bg-transparent",
-							actionButtonClass,
-						)}
+						className={cn("w-full", actionButtonClass)}
 						aria-label={buttonContent.text}
 					>
 						{(isSubmitting || isRegistering) && <SpinnerGapIcon className="size-3 animate-spin" />}
