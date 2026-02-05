@@ -56,6 +56,24 @@ export const META_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 export const TOKEN_ICON_BASE_URL = "https://app.hyperliquid.xyz/coins";
 
+export const PANEL_LAYOUT = {
+	MAIN: {
+		id: "CHART_WITH_SWAPBOX",
+		analysis: { defaultSize: 75 },
+		sidebar: { defaultSize: 25 },
+	},
+	ANALYSIS: {
+		id: "CHART_WITH_POSITIONS",
+		chart: { defaultSize: 52, minSize: 30 },
+		positions: { defaultSize: 48, minSize: 20 },
+	},
+	MARKET: {
+		id: "CHART_WITH_ORDERBOOK",
+		chart: { defaultSize: 76, minSize: 40 },
+		orderbook: { defaultSize: 24, minSize: 20 },
+	},
+} as const;
+
 export const SIDEBAR_LAYOUT = {
 	WIDTH: "16rem",
 	WIDTH_MOBILE: "18rem",

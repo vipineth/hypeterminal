@@ -3,6 +3,7 @@ import { TradeTerminalPage } from "@/components/trade/trade-terminal-page";
 import { buildPageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
+	ssr: false,
 	head: () =>
 		buildPageHead({
 			title: "Trade",

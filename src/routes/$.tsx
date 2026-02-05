@@ -4,6 +4,7 @@ import { ROUTE_SEO } from "@/config/constants";
 import { buildPageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/$")({
+	ssr: false,
 	head: () => buildPageHead(ROUTE_SEO.NOT_FOUND),
 	component: NotFoundPage,
 });
