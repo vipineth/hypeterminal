@@ -1,5 +1,5 @@
+import { FireIcon } from "@phosphor-icons/react";
 import { ClientOnly } from "@tanstack/react-router";
-import { Flame } from "lucide-react";
 import { useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UI_TEXT } from "@/config/constants";
@@ -12,7 +12,7 @@ import { getValueColorClass, toBig } from "@/lib/trade/numbers";
 import { useTheme } from "@/providers/theme";
 import { useMarketActions } from "@/stores/use-market-store";
 import { TokenSelector } from "../chart/token-selector";
-import { TradingViewChart } from "../chart/trading-view-chart";
+import { TradingViewChart } from "../chart/tradingview-chart";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
 
 const overviewText = UI_TEXT.MARKET_OVERVIEW;
@@ -89,7 +89,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 								})}
 							/>
 							<div className="flex items-center gap-1">
-								<Flame className={cn("size-3", getValueColorClass(fundingNum))} />
+								<FireIcon className={cn("size-3", getValueColorClass(fundingNum))} />
 								<span className={cn("tabular-nums font-medium", getValueColorClass(fundingNum))}>
 									{formatPercent(fundingNum, {
 										minimumFractionDigits: 4,

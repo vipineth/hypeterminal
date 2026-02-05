@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Loader2, TrendingDown, TrendingUp } from "lucide-react";
+import { SpinnerGapIcon, TrendDownIcon, TrendUpIcon } from "@phosphor-icons/react";
 import { useCallback, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { getValueColorClass, isPositive, toNumber } from "@/lib/trade/numbers";
 import { validateSlPrice, validateTpPrice } from "@/lib/trade/tpsl";
 import { AssetDisplay } from "../components/asset-display";
 import { TradingActionButton } from "../components/trading-action-button";
-import { TpSlSection } from "../order-entry/tp-sl-section";
+import { TpSlSection } from "../tradebox/tp-sl-section";
 
 interface PositionData {
 	coin: string;
@@ -121,12 +121,12 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 						<Badge variant={position.isLong ? "long" : "short"} size="sm">
 							{position.isLong ? (
 								<>
-									<TrendingUp className="size-3" />
+									<TrendUpIcon className="size-3" />
 									{t`Long`}
 								</>
 							) : (
 								<>
-									<TrendingDown className="size-3" />
+									<TrendDownIcon className="size-3" />
 									{t`Short`}
 								</>
 							)}
@@ -204,7 +204,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 					>
 						{isSubmitting ? (
 							<>
-								<Loader2 className="size-3.5 animate-spin" />
+								<SpinnerGapIcon className="size-3.5 animate-spin" />
 								{t`Submitting...`}
 							</>
 						) : (

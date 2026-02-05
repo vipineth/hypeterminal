@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
+import { CaretDownIcon, CaretUpDownIcon, CaretUpIcon } from "@phosphor-icons/react";
 import { flexRender, type Header, type RowData } from "@tanstack/react-table";
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { UseVirtualTableReturn } from "@/hooks/ui/use-virtual-table";
 import { cn } from "@/lib/cn";
@@ -28,14 +28,14 @@ function SortingIndicator<TData extends RowData>({ header }: { header: Header<TD
 	const sorted = header.column.getIsSorted();
 
 	if (sorted === "asc") {
-		return <ArrowUp className="ml-1 size-3" />;
+		return <CaretUpIcon className="ml-1 size-3" />;
 	}
 
 	if (sorted === "desc") {
-		return <ArrowDown className="ml-1 size-3" />;
+		return <CaretDownIcon className="ml-1 size-3" />;
 	}
 
-	return <ArrowUpDown className="ml-1 size-3 opacity-50" />;
+	return <CaretUpDownIcon className="ml-1 size-3 opacity-50" />;
 }
 
 /**

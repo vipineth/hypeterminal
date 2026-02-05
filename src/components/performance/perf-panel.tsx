@@ -1,15 +1,15 @@
 import {
-	Activity,
-	AlertTriangle,
-	ChevronDown,
-	ChevronUp,
-	Gauge,
-	MemoryStick,
-	Minus,
-	Network,
-	RefreshCw,
-	X,
-} from "lucide-react";
+	ArrowsClockwiseIcon,
+	CaretDownIcon,
+	CaretUpIcon,
+	GaugeIcon,
+	HardDriveIcon,
+	MinusIcon,
+	PulseIcon,
+	WarningIcon,
+	WifiHighIcon,
+	XIcon,
+} from "@phosphor-icons/react";
 import { useCallback, useState, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -198,7 +198,7 @@ export function PerfPanel({ onClose }: Props) {
 	const slowRenders = getSlowRenders();
 
 	const networkEntries = getResourceEntries();
-	const totalNetworkSize = networkEntries.reduce((sum, e) => sum + e.transferSize, 0);
+	const totalWifiHighSize = networkEntries.reduce((sum, e) => sum + e.transferSize, 0);
 
 	const leaks = state.leaksEnabled ? getLeakedComponents() : [];
 
@@ -211,7 +211,7 @@ export function PerfPanel({ onClose }: Props) {
 					onClick={() => setIsMinimized(false)}
 					className="bg-bg/95 backdrop-blur border-border/60 shadow-lg"
 				>
-					<Activity className="size-4" />
+					<PulseIcon className="size-4" />
 				</Button>
 			</div>
 		);
@@ -221,19 +221,19 @@ export function PerfPanel({ onClose }: Props) {
 		<div className="fixed bottom-4 right-4 z-9999 w-80 max-h-[80vh] overflow-hidden rounded-lg border border-border/60 bg-orange-50 backdrop-blur shadow-xl">
 			<div className="flex items-center justify-between px-3 py-2 border-b border-border/40 bg-muted/30">
 				<div className="flex items-center gap-2">
-					<Activity className="size-4 text-info" />
+					<PulseIcon className="size-4 text-info" />
 					<span className="text-sm font-medium">Performance</span>
 				</div>
 				<div className="flex items-center gap-1">
 					<Button variant="ghost" size="icon-sm" onClick={handleRefresh} className="size-6">
-						<RefreshCw className="size-3" />
+						<ArrowsClockwiseIcon className="size-3" />
 					</Button>
 					<Button variant="ghost" size="icon-sm" onClick={() => setIsMinimized(true)} className="size-6">
-						<Minus className="size-3" />
+						<MinusIcon className="size-3" />
 					</Button>
 					{onClose && (
 						<Button variant="ghost" size="icon-sm" onClick={onClose} className="size-6">
-							<X className="size-3" />
+							<XIcon className="size-3" />
 						</Button>
 					)}
 				</div>
@@ -242,7 +242,7 @@ export function PerfPanel({ onClose }: Props) {
 			<div className="overflow-y-auto max-h-[calc(80vh-44px)]">
 				<Section
 					title="Web Vitals"
-					icon={<Gauge className="size-3.5" />}
+					icon={<GaugeIcon className="size-3.5" />}
 					enabled={state.vitalsEnabled}
 					onToggle={(v) => updateState({ vitalsEnabled: v })}
 					expanded={expandedSection === "vitals"}
@@ -269,7 +269,7 @@ export function PerfPanel({ onClose }: Props) {
 
 				<Section
 					title="Memory"
-					icon={<MemoryStick className="size-3.5" />}
+					icon={<HardDriveIcon className="size-3.5" />}
 					enabled={state.memoryEnabled}
 					onToggle={handleMemoryToggle}
 					expanded={expandedSection === "memory"}
@@ -344,7 +344,7 @@ export function PerfPanel({ onClose }: Props) {
 
 				<Section
 					title="Renders"
-					icon={<Activity className="size-3.5" />}
+					icon={<PulseIcon className="size-3.5" />}
 					enabled={state.rendersEnabled}
 					onToggle={(v) => updateState({ rendersEnabled: v })}
 					expanded={expandedSection === "renders"}
@@ -410,8 +410,8 @@ export function PerfPanel({ onClose }: Props) {
 				</Section>
 
 				<Section
-					title="Network"
-					icon={<Network className="size-3.5" />}
+					title="WifiHigh"
+					icon={<WifiHighIcon className="size-3.5" />}
 					enabled={state.networkEnabled}
 					onToggle={(v) => updateState({ networkEnabled: v })}
 					expanded={expandedSection === "network"}
@@ -424,7 +424,7 @@ export function PerfPanel({ onClose }: Props) {
 						</div>
 						<div className="flex items-center justify-between">
 							<span className="text-xs text-muted-fg">Total Size</span>
-							<span className="text-xs font-mono">{formatBytes(totalNetworkSize)}</span>
+							<span className="text-xs font-mono">{formatBytes(totalWifiHighSize)}</span>
 						</div>
 					</div>
 					{networkEntries.length > 0 && (
@@ -435,7 +435,7 @@ export function PerfPanel({ onClose }: Props) {
 									.sort((a, b) => b.duration - a.duration)
 									.slice(0, 3)
 									.map((r, i) => (
-										<div key={`slow-${i}`} className="flex items-center justify-between text-2xs">
+										<div key={`slow-${i + 1}`} className="flex items-center justify-between text-2xs">
 											<span className="truncate max-w-[160px]" title={r.name}>
 												{getPathname(r.name)}
 											</span>
@@ -449,7 +449,7 @@ export function PerfPanel({ onClose }: Props) {
 									.sort((a, b) => b.transferSize - a.transferSize)
 									.slice(0, 3)
 									.map((r, i) => (
-										<div key={`large-${i}`} className="flex items-center justify-between text-2xs">
+										<div key={`large-${i + 1}`} className="flex items-center justify-between text-2xs">
 											<span className="truncate max-w-[160px]" title={r.name}>
 												{getPathname(r.name)}
 											</span>
@@ -463,7 +463,7 @@ export function PerfPanel({ onClose }: Props) {
 
 				<Section
 					title="Leak Detector"
-					icon={<AlertTriangle className="size-3.5" />}
+					icon={<WarningIcon className="size-3.5" />}
 					enabled={state.leaksEnabled}
 					onToggle={handleLeaksToggle}
 					expanded={expandedSection === "leaks"}
@@ -519,7 +519,7 @@ function Section({ title, icon, enabled, onToggle, expanded, onExpand, children 
 				<button type="button" onClick={onExpand} className="flex items-center gap-2 text-sm hover:text-fg/80">
 					{icon}
 					<span>{title}</span>
-					{expanded ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
+					{expanded ? <CaretUpIcon className="size-3" /> : <CaretDownIcon className="size-3" />}
 				</button>
 				<Switch checked={enabled} onCheckedChange={onToggle} />
 			</div>

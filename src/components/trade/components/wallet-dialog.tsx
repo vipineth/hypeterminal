@@ -1,8 +1,18 @@
 import { Trans } from "@lingui/react/macro";
-import { AlertCircle, ExternalLink, FlaskConical, HelpCircle, Loader2, Shield, Wallet } from "lucide-react";
+import {
+	ArrowSquareOutIcon,
+	FlaskIcon,
+	QuestionIcon,
+	ShieldIcon,
+	SpinnerGapIcon,
+	WalletIcon,
+	WarningCircleIcon,
+} from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
+import type { Address } from "viem";
 import { isAddress } from "viem";
 import { type Connector, useConnect, useConnectors } from "wagmi";
+import { mock } from "wagmi/connectors";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -25,18 +35,18 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 	const [customAddressError, setCustomAddressError] = useState<string | null>(null);
 
 	const { mockConnectors, regularConnectors } = useMemo(() => {
-		const mock: Connector[] = [];
+		const mocks: Connector[] = [];
 		const regular: Connector[] = [];
 
 		for (const connector of connectors) {
 			if (isMockConnector(connector)) {
-				mock.push(connector);
+				mocks.push(connector);
 			} else {
 				regular.push(connector);
 			}
 		}
 
-		return { mockConnectors: mock, regularConnectors: regular };
+		return { mockConnectors: mocks, regularConnectors: regular };
 	}, [connectors]);
 
 	const availableConnectors = useMemo(() => {
@@ -66,7 +76,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 		}
 	};
 
-	const handleCustomAddressConnect = () => {
+	const handleCustomAddressConnect = async () => {
 		const trimmed = customAddress.trim();
 		if (!trimmed) {
 			setCustomAddressError("Please enter an address");
@@ -82,10 +92,20 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 
 		if (mockWalletIndex !== -1 && mockConnectors[mockWalletIndex]) {
 			handleConnect(mockConnectors[mockWalletIndex]);
-		} else if (mockConnectors.length > 0) {
-			handleConnect(mockConnectors[0]);
 		} else {
-			setCustomAddressError("No mock connector available");
+			const customMockConnector = mock({
+				accounts: [trimmed as Address],
+				features: { reconnect: true },
+			});
+			setConnectingId("custom-mock");
+			try {
+				await connectAsync({ connector: customMockConnector });
+				onOpenChange(false);
+			} catch {
+				setCustomAddressError("Failed to connect with custom address");
+			} finally {
+				setConnectingId(null);
+			}
 		}
 	};
 
@@ -97,7 +117,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 				<div className="p-6 pb-4 border-b border-border/50">
 					<DialogHeader className="space-y-2">
 						<DialogTitle className="flex items-center gap-2 text-lg">
-							<Wallet className="size-5 text-info" />
+							<WalletIcon className="size-5 text-info" />
 							<Trans>Connect Wallet</Trans>
 						</DialogTitle>
 						<DialogDescription className="text-sm">
@@ -139,7 +159,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 												<p className="text-xs text-muted-fg truncate">{walletInfo.description}</p>
 											</div>
 											{isConnecting ? (
-												<Loader2 className="size-4 animate-spin text-info flex-shrink-0" />
+												<SpinnerGapIcon className="size-4 animate-spin text-info flex-shrink-0" />
 											) : (
 												<div className="size-4 rounded-full border border-border group-hover:border-info/50 flex-shrink-0 transition-colors" />
 											)}
@@ -182,7 +202,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 												<p className="text-xs text-muted-fg truncate">{walletInfo.description}</p>
 											</div>
 											{isConnecting ? (
-												<Loader2 className="size-4 animate-spin text-info flex-shrink-0" />
+												<SpinnerGapIcon className="size-4 animate-spin text-info flex-shrink-0" />
 											) : (
 												<div className="size-4 rounded-full border border-border group-hover:border-info/50 flex-shrink-0 transition-colors" />
 											)}
@@ -217,7 +237,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 											)}
 										>
 											<div className="size-10 rounded-lg overflow-hidden flex-shrink-0 shadow-sm bg-warning/20 flex items-center justify-center">
-												<FlaskConical className="size-5 text-warning" />
+												<FlaskIcon className="size-5 text-warning" />
 											</div>
 											<div className="flex-1 text-left min-w-0">
 												<p className="font-medium text-sm group-hover:text-warning transition-colors">
@@ -226,7 +246,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 												<p className="text-xs text-muted-fg truncate font-mono">{config?.address ?? "Mock wallet"}</p>
 											</div>
 											{isConnecting ? (
-												<Loader2 className="size-4 animate-spin text-warning flex-shrink-0" />
+												<SpinnerGapIcon className="size-4 animate-spin text-warning flex-shrink-0" />
 											) : (
 												<div className="size-4 rounded-full border border-warning/50 flex-shrink-0 transition-colors" />
 											)}
@@ -263,7 +283,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 					{!hasConnectors && (
 						<div className="py-8 text-center space-y-3">
 							<div className="size-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto">
-								<AlertCircle className="size-6 text-muted-fg" />
+								<WarningCircleIcon className="size-6 text-muted-fg" />
 							</div>
 							<div>
 								<p className="text-sm font-medium">
@@ -278,7 +298,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 
 					{error && (
 						<div className="flex items-start gap-2 p-3 rounded-lg bg-danger/10 border border-danger/20">
-							<AlertCircle className="size-4 text-danger shrink-0 mt-0.5" />
+							<WarningCircleIcon className="size-4 text-danger shrink-0 mt-0.5" />
 							<p className="text-xs text-danger">{error.message}</p>
 						</div>
 					)}
@@ -292,7 +312,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 						className="w-full justify-between p-4 text-sm text-muted-fg hover:text-fg hover:bg-transparent"
 					>
 						<span className="flex items-center gap-2">
-							<HelpCircle className="size-4" />
+							<QuestionIcon className="size-4" />
 							<Trans>New to wallets?</Trans>
 						</span>
 						<span className={cn("transition-transform", showHelp && "rotate-180")}>
@@ -311,7 +331,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 					{showHelp && (
 						<div className="px-4 pb-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
 							<div className="flex items-start gap-3 text-xs">
-								<Shield className="size-4 text-positive flex-shrink-0 mt-0.5" />
+								<ShieldIcon className="size-4 text-positive flex-shrink-0 mt-0.5" />
 								<div>
 									<p className="font-medium text-fg">
 										<Trans>Secure & Private</Trans>
@@ -322,7 +342,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 								</div>
 							</div>
 							<div className="flex items-start gap-3 text-xs">
-								<Wallet className="size-4 text-info flex-shrink-0 mt-0.5" />
+								<WalletIcon className="size-4 text-info flex-shrink-0 mt-0.5" />
 								<div>
 									<p className="font-medium text-fg">
 										<Trans>What is a wallet?</Trans>
@@ -335,7 +355,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 							<Button variant="outline" size="sm" className="w-full mt-2" asChild>
 								<a href="https://ethereum.org/en/wallets/" target="_blank" rel="noopener noreferrer">
 									<Trans>Learn more</Trans>
-									<ExternalLink className="size-3 ml-1.5" />
+									<ArrowSquareOutIcon className="size-3 ml-1.5" />
 								</a>
 							</Button>
 						</div>

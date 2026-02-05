@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { ArrowRightLeft, ChevronDown } from "lucide-react";
+import { ArrowsLeftRightIcon, CaretDownIcon } from "@phosphor-icons/react";
 import { useDeferredValue, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,13 +9,12 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getBaseQuoteFromDisplayName } from "@/domain/market";
+import { getBaseQuoteFromDisplayName, getPercent } from "@/domain/market";
 import { formatNumber } from "@/lib/format";
 import { useSelectedMarketInfo, useSubL2Book } from "@/lib/hyperliquid";
 import {
 	getMaxTotal,
 	getPriceGroupingOptions,
-	getSpreadInfo,
 	type L2BookPriceGroupOption,
 	processLevels,
 } from "@/lib/trade/orderbook";
@@ -36,7 +35,7 @@ export function OrderbookPanel() {
 	const { data: orderbook, status: orderbookStatus } = useSubL2Book(
 		{
 			coin: selectedMarket?.name ?? "",
-			nSigFigs: selectedOption?.nSigFigs,
+			nSigFigs: selectedOption?.nSigFigs ?? 5,
 			mantissa: selectedOption?.mantissa,
 		},
 		{ enabled: !!selectedMarket?.name },
@@ -58,8 +57,9 @@ export function OrderbookPanel() {
 		[deferredOrderbook?.levels, visibleRows],
 	);
 	const maxTotal = getMaxTotal(bids, asks);
-	const spreadInfo = getSpreadInfo(bids, asks);
-	const priceGroupingOptions = getPriceGroupingOptions(spreadInfo.mid);
+	const spread = deferredOrderbook?.spread;
+	const spreadPct = getPercent(spread, selectedMarket?.markPx);
+	const priceGroupingOptions = getPriceGroupingOptions(selectedMarket?.markPx);
 
 	const szDecimals = selectedMarket?.szDecimals ?? 4;
 
@@ -68,7 +68,7 @@ export function OrderbookPanel() {
 
 	return (
 		<Tabs defaultValue="book" className="h-full min-h-0 flex flex-col overflow-hidden border-l border-border/40">
-			<div className="flex items-center justify-between px-2 py-1.5 border-b border-border/40 bg-surface/30">
+			<div className="h-9 flex items-center justify-between px-2 py-1.5 border-b border-border/40 bg-surface/30">
 				<TabsList>
 					<TabsTrigger value="book" aria-label={t`Order Book`}>
 						{t`Order Book`}
@@ -80,20 +80,19 @@ export function OrderbookPanel() {
 			</div>
 
 			<TabsContent value="book" className="flex-1 min-h-0 flex flex-col">
-				<div className="grid grid-cols-3 gap-2 px-2 py-1 text-4xs uppercase tracking-wider border-b border-border/40 shrink-0">
+				<div className="grid grid-cols-3 gap-2 px-2 h-9 items-center text-4xs uppercase tracking-wider border-b border-border/40 shrink-0">
 					<div className="flex items-center gap-1">
 						{t`Price`}
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
-								<Button
-									variant="ghost"
-									size="none"
-									className="px-1.5 py-0.5 text-4xs border border-border/60 hover:border-fg/30 hover:bg-transparent inline-flex items-center gap-1"
+								<button
+									type="button"
+									className="px-1.5 text-4xs hover:bg-transparent inline-flex items-center gap-1"
 									aria-label={t`Select order book aggregation`}
 								>
 									{selectedOption?.label ?? priceGroupingOptions[0]?.label ?? "—"}
-									<ChevronDown className="size-2.5" />
-								</Button>
+									<CaretDownIcon className="size-2.5" />
+								</button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end" className="min-w-20 font-mono text-xs">
 								{priceGroupingOptions.map((option) => (
@@ -118,7 +117,7 @@ export function OrderbookPanel() {
 					>
 						{t`Size`}
 						<span className="opacity-60">({displayAsset})</span>
-						<ArrowRightLeft className="size-2 opacity-40" />
+						<ArrowsLeftRightIcon className="size-2 opacity-40" />
 					</Button>
 					<Button
 						variant="ghost"
@@ -128,7 +127,7 @@ export function OrderbookPanel() {
 					>
 						{t`Total`}
 						<span className="opacity-60">({displayAsset})</span>
-						<ArrowRightLeft className="size-2 opacity-40" />
+						<ArrowsLeftRightIcon className="size-2 opacity-40" />
 					</Button>
 				</div>
 
@@ -155,7 +154,7 @@ export function OrderbookPanel() {
 					<div className="mt-auto shrink-0 px-2 py-1.5 border-y border-border/40 flex items-center justify-between text-4xs text-muted-fg">
 						<span>{t`Spread`}</span>
 						<span className="tabular-nums text-warning">
-							{`${formatNumber(spreadInfo.spread, 2)} (${formatNumber(spreadInfo.spreadPct, 3)}%)`}
+							{`${formatNumber(spread, 2)} (${formatNumber(spreadPct, 3)}%)`}
 						</span>
 					</div>
 

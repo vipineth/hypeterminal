@@ -73,7 +73,7 @@
 - Avoid adding new animation styles.
 
 **Iconography**
-- Use `lucide-react` icons.
+- Use `@phosphor-icons/react` icons.
 - Standard sizes: `size-2.5` to `size-4`.
 - Icons should not introduce new colors; follow text color of the label.
 

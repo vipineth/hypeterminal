@@ -1,10 +1,10 @@
 import { t } from "@lingui/core/macro";
-import { Loader2Icon } from "lucide-react";
+import { SpinnerGapIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/cn";
 
 function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
 	return (
-		<Loader2Icon role="status" aria-label={t`Loading`} className={cn("size-4 animate-spin", className)} {...props} />
+		<SpinnerGapIcon role="status" aria-label={t`Loading`} className={cn("size-4 animate-spin", className)} {...props} />
 	);
 }
 

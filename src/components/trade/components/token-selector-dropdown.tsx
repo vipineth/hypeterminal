@@ -1,5 +1,5 @@
 import { Trans } from "@lingui/react/macro";
-import { Check, ChevronDown } from "lucide-react";
+import { CaretDownIcon, CheckIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -21,14 +21,7 @@ interface Props {
 	className?: string;
 }
 
-export function TokenSelectorDropdown({
-	tokens,
-	selectedToken,
-	onSelect,
-	getBalance,
-	disabled,
-	className,
-}: Props) {
+export function TokenSelectorDropdown({ tokens, selectedToken, onSelect, getBalance, disabled, className }: Props) {
 	const selected = tokens.find((t) => t.name === selectedToken);
 
 	return (
@@ -48,7 +41,7 @@ export function TokenSelectorDropdown({
 					) : (
 						<span className="text-sm font-medium">{selectedToken}</span>
 					)}
-					<ChevronDown className="size-3.5 text-muted-fg ml-1" />
+					<CaretDownIcon className="size-3.5 text-muted-fg ml-1" />
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" className="w-56">
@@ -69,11 +62,9 @@ export function TokenSelectorDropdown({
 							>
 								<div className="flex items-center gap-2">
 									<AssetDisplay asset={token} iconClassName="size-5" nameClassName="text-sm font-medium" />
-									{isSelected && <Check className="size-3.5 text-info" />}
+									{isSelected && <CheckIcon className="size-3.5 text-info" />}
 								</div>
-								<span className="text-xs text-muted-fg tabular-nums">
-									{formatToken(balance, 4)}
-								</span>
+								<span className="text-xs text-muted-fg tabular-nums">{formatToken(balance, 4)}</span>
 							</DropdownMenuItem>
 						);
 					})

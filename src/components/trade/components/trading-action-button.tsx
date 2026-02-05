@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Loader2 } from "lucide-react";
+import { SpinnerGapIcon } from "@phosphor-icons/react";
 import { type ComponentProps, type ReactNode, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
@@ -25,6 +25,7 @@ export function TradingActionButton({ onClick, children, disabled, className, ..
 		<div className="flex flex-col gap-1">
 			<Button
 				{...buttonProps}
+				variant="link"
 				onClick={handleClick}
 				disabled={disabled || isEnabling || (!isReady && !needsTrading)}
 				className={cn(
@@ -35,7 +36,7 @@ export function TradingActionButton({ onClick, children, disabled, className, ..
 			>
 				{isEnabling ? (
 					<>
-						<Loader2 className="size-3 animate-spin" />
+						<SpinnerGapIcon className="size-3 animate-spin" />
 						{t`Enabling`}
 					</>
 				) : showEnableTrading ? (

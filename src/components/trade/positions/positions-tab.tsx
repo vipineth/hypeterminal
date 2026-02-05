@@ -1,12 +1,12 @@
 import { t } from "@lingui/core/macro";
-import { Circle, Pencil, Plus } from "lucide-react";
+import { CircleIcon, PencilIcon, PlusIcon } from "@phosphor-icons/react";
 import { useMemo, useRef, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
+import { FALLBACK_VALUE_PLACEHOLDER, HL_ALL_DEXS } from "@/config/constants";
 import { getExecutedPrice } from "@/domain/trade/order/price";
 import { formatPriceForOrder, formatSizeForOrder } from "@/domain/trade/orders";
 import { cn } from "@/lib/cn";
@@ -200,7 +200,7 @@ function PositionRow({
 										<span className="text-muted-fg/50">/</span>
 										<span className="text-negative">{formatPrice(tpSlInfo.slPrice, { szDecimals })}</span>
 									</div>
-									<Pencil className="size-3 text-muted-fg/60 group-hover:text-fg transition-colors" />
+									<PencilIcon className="size-3 text-muted-fg/60 group-hover:text-fg transition-colors" />
 								</>
 							) : hasTpSl ? (
 								<>
@@ -211,11 +211,11 @@ function PositionRow({
 											<span className="text-negative">{formatPrice(tpSlInfo?.slPrice, { szDecimals })}</span>
 										)}
 									</div>
-									<Plus className="size-3 text-muted-fg/60 group-hover:text-fg transition-colors" />
+									<PlusIcon className="size-3 text-muted-fg/60 group-hover:text-fg transition-colors" />
 								</>
 							) : (
 								<div className="flex items-center gap-0.5 text-3xs">
-									<Plus className="size-3 group-hover:text-fg transition-colors" />
+									<PlusIcon className="size-3 group-hover:text-fg transition-colors" />
 									<span>{t`Add`}</span>
 								</div>
 							)}
@@ -255,11 +255,11 @@ export function PositionsTab() {
 
 	const markets = useMarkets();
 	const allMidsEnabled = isConnected && positions.length > 0;
-	const { data: allMidsEvent } = useSubAllMids({ dex: "ALL_DEXS" }, { enabled: allMidsEnabled });
+	const { data: allMidsEvent } = useSubAllMids({ dex: HL_ALL_DEXS }, { enabled: allMidsEnabled });
 	const mids = allMidsEvent?.mids;
 
 	const { data: openOrdersEvent } = useSubOpenOrders(
-		{ user: address ?? "0x0", dex: "ALL_DEXS" },
+		{ user: address ?? "0x0", dex: HL_ALL_DEXS },
 		{ enabled: isConnected && !!address },
 	);
 	const openOrders = openOrdersEvent?.orders ?? [];
@@ -343,7 +343,7 @@ export function PositionsTab() {
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
-				<Circle className="size-1.5 fill-positive text-positive" />
+				<CircleIcon weight="fill" className="size-1.5 text-positive" />
 				{t`Active Positions`}
 				<span className="text-info ml-auto tabular-nums">{headerCount}</span>
 			</div>

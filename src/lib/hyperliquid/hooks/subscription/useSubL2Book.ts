@@ -4,7 +4,7 @@ import { useHyperliquid } from "@/lib/hyperliquid/provider";
 import { serializeKey, subscriptionKeys } from "@/lib/hyperliquid/query/keys";
 import type { SubscriptionOptions, SubscriptionResult } from "@/lib/hyperliquid/types";
 
-type L2BookEvent = L2BookWsEvent;
+type L2BookEvent = L2BookWsEvent & { spread?: string };
 type L2BookParams = L2BookWsParameters;
 
 export type UseSubL2BookParameters = L2BookParams;

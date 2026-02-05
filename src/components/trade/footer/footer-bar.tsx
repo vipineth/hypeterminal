@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
+import { PulseIcon, SpinnerGapIcon, WifiHighIcon, WifiSlashIcon } from "@phosphor-icons/react";
 import { ClientOnly } from "@tanstack/react-router";
-import { Activity, Loader2, Wifi, WifiOff } from "lucide-react";
 import { APP_VERSION } from "@/config/constants";
 import { formatTime } from "@/lib/format";
 import { type ApiStatus, useApiStatus } from "@/lib/hyperliquid";
@@ -10,25 +10,25 @@ function getStatusDisplay(status: ApiStatus) {
 	switch (status) {
 		case "connected":
 			return {
-				icon: <Wifi className="size-3 text-positive" />,
+				icon: <WifiHighIcon className="size-3 text-positive" />,
 				text: t`Connected`,
 				className: "text-positive",
 			};
 		case "connecting":
 			return {
-				icon: <Loader2 className="size-3 text-warning animate-spin" />,
+				icon: <SpinnerGapIcon className="size-3 text-warning animate-spin" />,
 				text: t`Connecting`,
 				className: "text-warning",
 			};
 		case "error":
 			return {
-				icon: <WifiOff className="size-3 text-negative" />,
+				icon: <WifiSlashIcon className="size-3 text-negative" />,
 				text: t`Disconnected`,
 				className: "text-negative",
 			};
 		default:
 			return {
-				icon: <Wifi className="size-3 text-muted-fg" />,
+				icon: <WifiHighIcon className="size-3 text-muted-fg" />,
 				text: t`Offline`,
 				className: "text-muted-fg",
 			};
@@ -54,7 +54,7 @@ function PerfToggle() {
 			className="flex items-center gap-1 hover:text-info transition-colors"
 			title="Toggle Performance Panel"
 		>
-			<Activity className={`size-3 ${isVisible ? "text-info" : "text-muted-fg"}`} />
+			<PulseIcon className={`size-3 ${isVisible ? "text-info" : "text-muted-fg"}`} />
 			<span className={isVisible ? "text-info" : "text-muted-fg"}>Perf</span>
 		</button>
 	);
@@ -71,10 +71,8 @@ export function FooterBar() {
 					{icon}
 					<span className={className}>{text}</span>
 				</div>
-				<>
-					<div className="h-3 w-px bg-border/60" />
-					<PerfToggle />
-				</>
+				<div className="h-3 w-px bg-border/60" />
+				<PerfToggle />
 			</div>
 			<div className="flex items-center gap-3">
 				<div className="h-3 w-px bg-border/60" />

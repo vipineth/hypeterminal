@@ -1,4 +1,4 @@
-import { Inbox, Wallet } from "lucide-react";
+import { TrayIcon, WalletIcon } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Badge } from "@/components/ui/badge";
@@ -134,7 +134,11 @@ function EmptyState({ title, icon = "empty" }: EmptyStateProps) {
 	return (
 		<div className="h-full flex flex-col items-center justify-center gap-4 p-6 text-center">
 			<div className={cn("size-16 rounded-full flex items-center justify-center", "bg-muted/50")}>
-				{icon === "wallet" ? <Wallet className="size-8 text-muted-fg" /> : <Inbox className="size-8 text-muted-fg" />}
+				{icon === "wallet" ? (
+					<WalletIcon className="size-8 text-muted-fg" />
+				) : (
+					<TrayIcon className="size-8 text-muted-fg" />
+				)}
 			</div>
 			<p className="text-sm text-muted-fg max-w-xs">{title}</p>
 		</div>

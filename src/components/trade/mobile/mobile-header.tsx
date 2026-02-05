@@ -1,4 +1,4 @@
-import { Bell, Cog, Terminal } from "lucide-react";
+import { BellIcon, GearIcon, TerminalIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { UI_TEXT } from "@/config/constants";
 import { cn } from "@/lib/cn";
@@ -27,7 +27,7 @@ export function MobileHeader({ className }: Props) {
 			<div className="h-12 px-3 flex items-center justify-between">
 				<div className="flex items-center gap-1.5">
 					<div className="size-6 rounded bg-positive/20 border border-positive/40 flex items-center justify-center">
-						<Terminal className="size-3.5 text-positive" />
+						<TerminalIcon className="size-3.5 text-positive" />
 					</div>
 					<span className="text-xs font-semibold tracking-tight text-info">
 						{TOP_NAV_TEXT.BRAND_PREFIX}
@@ -43,7 +43,7 @@ export function MobileHeader({ className }: Props) {
 						className="size-11 active:bg-accent/50"
 						aria-label={TOP_NAV_TEXT.NOTIFICATIONS_ARIA}
 					>
-						<Bell className="size-4" />
+						<BellIcon className="size-4" />
 					</Button>
 					<ThemeToggle />
 					<Button
@@ -53,7 +53,7 @@ export function MobileHeader({ className }: Props) {
 						aria-label={TOP_NAV_TEXT.SETTINGS_ARIA}
 						onClick={openSettingsDialog}
 					>
-						<Cog className="size-4" />
+						<GearIcon className="size-4" />
 					</Button>
 				</div>
 			</div>

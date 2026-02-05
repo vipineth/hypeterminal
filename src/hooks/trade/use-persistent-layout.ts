@@ -1,53 +1,44 @@
-import { useCallback, useState } from "react";
+import { useEffect, useState } from "react";
 
-export const LAYOUT_PRESETS = {
-	MAIN_WORKSPACE: {
-		storageKey: "terminal:layout:main",
-		fallbackSizes: [82, 18] as const,
-		defaultSizes: [78, 22] as const,
-	},
-	ANALYSIS_STACK: {
-		storageKey: "terminal:layout:vert",
-		fallbackSizes: [51, 49] as const,
-		defaultSizes: [51, 49] as const,
-	},
-	MARKET_INFO: {
-		storageKey: "terminal:layout:chart-book",
-		fallbackSizes: [76, 24] as const,
-		defaultSizes: [76, 24] as const,
-	},
-} as const;
+export type PanelGroupKey = "CHART_WITH_SWAPBOX" | "CHART_WITH_POSITIONS" | "CHART_WITH_ORDERBOOK";
 
-function readStoredLayout(key: string, fallback: readonly number[]): number[] {
-	if (typeof window === "undefined") return [...fallback];
-	try {
-		const stored = localStorage.getItem(key);
-		if (!stored) return [...fallback];
-		const arr = JSON.parse(stored);
-		if (Array.isArray(arr) && arr.every((n) => typeof n === "number")) {
-			return arr;
-		}
-	} catch {
-		// Ignore localStorage errors
-	}
-	return [...fallback];
+export const PANEL_PRESETS: Record<PanelGroupKey, { storageKey: string; defaults: readonly number[] }> = {
+	CHART_WITH_SWAPBOX: { storageKey: "terminal:layout:main", defaults: [76, 24] },
+	CHART_WITH_POSITIONS: { storageKey: "terminal:layout:vert", defaults: [60, 40] },
+	CHART_WITH_ORDERBOOK: { storageKey: "terminal:layout:chart-book", defaults: [76, 24] },
+};
+
+function isValidSizes(value: unknown, length: number): value is number[] {
+	if (!Array.isArray(value) || value.length !== length) return false;
+	return value.every((size) => typeof size === "number" && Number.isFinite(size));
 }
 
-export function usePersistentLayout(key: string, fallback: readonly number[]) {
-	const [sizes, setSizes] = useState<number[]>(() => readStoredLayout(key, fallback));
+function readSizes(key: string, defaults: readonly number[]): number[] {
+	if (typeof window === "undefined") return [...defaults];
+	try {
+		const stored = localStorage.getItem(key);
+		if (!stored) return [...defaults];
+		const parsed = JSON.parse(stored);
+		if (isValidSizes(parsed, defaults.length)) return parsed;
+	} catch {}
+	return [...defaults];
+}
 
-	const handleLayoutChange = useCallback(
-		function handleLayoutChange(nextSizes: number[]) {
-			setSizes(nextSizes);
-			try {
-				if (typeof window === "undefined") return;
-				localStorage.setItem(key, JSON.stringify(nextSizes));
-			} catch {
-				// Ignore storage errors
-			}
-		},
-		[key],
-	);
+export function usePersistentPanelSizes(groupKey: PanelGroupKey) {
+	const { storageKey, defaults } = PANEL_PRESETS[groupKey];
+	const [sizes, setSizes] = useState<number[]>([...defaults]);
 
-	return { sizes, handleLayoutChange } as const;
+	useEffect(() => {
+		setSizes(readSizes(storageKey, defaults));
+	}, [storageKey, defaults]);
+
+	function handleSizesChange(next: number[]): void {
+		if (!isValidSizes(next, defaults.length)) return;
+		setSizes(next);
+		try {
+			localStorage.setItem(storageKey, JSON.stringify(next));
+		} catch {}
+	}
+
+	return { sizes, onSizesChange: handleSizesChange } as const;
 }

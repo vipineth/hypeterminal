@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { Bell, Cog, Terminal, Zap } from "lucide-react";
+import { BellIcon, GearIcon, LightningIcon, TerminalIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { useDepositModalActions, useSettingsDialogActions } from "@/stores/use-global-modal-store";
@@ -24,7 +24,7 @@ export function TopNav() {
 			<div className="flex items-center gap-2 min-w-0">
 				<div className="flex items-center gap-1.5">
 					<div className="size-5 rounded bg-positive/20 border border-positive/40 flex items-center justify-center">
-						<Terminal className="size-3 text-positive" />
+						<TerminalIcon className="size-3 text-positive" />
 					</div>
 					<span className="text-xs font-semibold tracking-tight text-info">
 						HYPE
@@ -75,16 +75,16 @@ export function TopNav() {
 					className="h-7 text-3xs uppercase tracking-wider border-positive/40 text-positive hover:bg-positive/10 hover:text-positive"
 					onClick={() => openDepositModal("deposit")}
 				>
-					<Zap className="size-3 mr-1" />
+					<LightningIcon className="size-3 mr-1" />
 					<Trans>Deposit</Trans>
 				</Button>
 				<UserMenu />
 				<Button variant="ghost" size="icon-sm" className="size-7" aria-label={t`Notifications`}>
-					<Bell className="size-3.5" />
+					<BellIcon className="size-3.5" />
 				</Button>
 				<ThemeToggle />
 				<Button variant="ghost" size="icon-sm" className="size-7" aria-label={t`Settings`} onClick={openSettingsDialog}>
-					<Cog className="size-3.5" />
+					<GearIcon className="size-3.5" />
 				</Button>
 			</div>
 		</header>

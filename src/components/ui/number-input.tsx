@@ -2,21 +2,50 @@ import type * as React from "react";
 import { useCallback } from "react";
 import { cn } from "@/lib/cn";
 
+/**
+ * Validates numeric input string format.
+ * Pattern breakdown:
+ *   ^        - start of string
+ *   -?       - optional minus sign (only if allowNegative)
+ *   \d*      - zero or more digits before decimal
+ *   \.?      - optional decimal point (only if allowDecimals)
+ *   \d*      - zero or more digits after decimal
+ *   $        - end of string
+ */
+function isValidNumberFormat(value: string, allowDecimals: boolean, allowNegative: boolean): boolean {
+	const pattern = allowDecimals
+		? allowNegative
+			? /^-?\d*\.?\d*$/
+			: /^\d*\.?\d*$/
+		: allowNegative
+			? /^-?\d*$/
+			: /^\d*$/;
+	return pattern.test(value);
+}
+
+function exceedsDecimalLimit(value: string, maxDecimals: number | undefined): boolean {
+	if (maxDecimals === undefined) return false;
+	const dotIndex = value.indexOf(".");
+	return dotIndex !== -1 && value.length - dotIndex - 1 > maxDecimals;
+}
+
 interface Props extends Omit<React.ComponentProps<"input">, "type" | "onChange" | "min" | "max" | "step"> {
 	inputSize?: "sm" | "default" | "lg";
 	allowDecimals?: boolean;
 	allowNegative?: boolean;
+	maxAllowedDecimals?: number;
 	min?: number;
 	max?: number;
 	step?: number;
 	onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-function NumberInput({
+export function NumberInput({
 	className,
 	inputSize = "default",
 	allowDecimals = true,
 	allowNegative = false,
+	maxAllowedDecimals,
 	min,
 	max,
 	step = 1,
@@ -25,6 +54,8 @@ function NumberInput({
 	onKeyDown,
 	...props
 }: Props) {
+	const effectiveAllowDecimals = allowDecimals && (maxAllowedDecimals === undefined || maxAllowedDecimals > 0);
+
 	const createSyntheticEvent = useCallback(
 		(input: HTMLInputElement, newValue: string): React.ChangeEvent<HTMLInputElement> => {
 			const nativeEvent = new Event("change", { bubbles: true });
@@ -55,7 +86,7 @@ function NumberInput({
 				if (max !== undefined && newValue > max) newValue = max;
 				if (!allowNegative && newValue < 0) newValue = 0;
 
-				const newValueStr = allowDecimals ? String(newValue) : String(Math.round(newValue));
+				const newValueStr = effectiveAllowDecimals ? String(newValue) : String(Math.round(newValue));
 				const syntheticEvent = createSyntheticEvent(input, newValueStr);
 				onChange?.(syntheticEvent);
 				onKeyDown?.(e);
@@ -75,7 +106,7 @@ function NumberInput({
 			}
 
 			const isDigit = /^[0-9]$/.test(e.key);
-			const isDecimal = e.key === "." && allowDecimals;
+			const isDecimal = e.key === "." && effectiveAllowDecimals;
 			const isMinus = e.key === "-" && allowNegative;
 
 			if (!isDigit && !isDecimal && !isMinus) {
@@ -83,9 +114,8 @@ function NumberInput({
 				return;
 			}
 
-			const input = e.currentTarget;
-			const inputValue = input.value;
-			const selectionStart = input.selectionStart ?? 0;
+			const inputValue = e.currentTarget.value;
+			const selectionStart = e.currentTarget.selectionStart ?? 0;
 
 			if (isDecimal && inputValue.includes(".")) {
 				e.preventDefault();
@@ -99,55 +129,35 @@ function NumberInput({
 
 			onKeyDown?.(e);
 		},
-		[allowDecimals, allowNegative, min, max, step, onChange, onKeyDown, createSyntheticEvent],
-	);
-
-	const handlePaste = useCallback(
-		(e: React.ClipboardEvent<HTMLInputElement>) => {
-			const pastedText = e.clipboardData.getData("text");
-			const pattern = allowDecimals
-				? allowNegative
-					? /^-?\d*\.?\d*$/
-					: /^\d*\.?\d*$/
-				: allowNegative
-					? /^-?\d*$/
-					: /^\d*$/;
-
-			if (!pattern.test(pastedText)) {
-				e.preventDefault();
-			}
-		},
-		[allowDecimals, allowNegative],
+		[effectiveAllowDecimals, allowNegative, min, max, step, onChange, onKeyDown, createSyntheticEvent],
 	);
 
 	const handleChange = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			const inputValue = e.target.value;
 
-			if (inputValue === "" || inputValue === "-" || (allowDecimals && (inputValue === "." || inputValue === "-."))) {
+			const isIntermediateState =
+				inputValue === "" ||
+				inputValue === "-" ||
+				(effectiveAllowDecimals && (inputValue === "." || inputValue === "-."));
+
+			if (isIntermediateState) {
 				onChange?.(e);
 				return;
 			}
 
-			const pattern = allowDecimals
-				? allowNegative
-					? /^-?\d*\.?\d*$/
-					: /^\d*\.?\d*$/
-				: allowNegative
-					? /^-?\d*$/
-					: /^\d*$/;
+			if (!isValidNumberFormat(inputValue, effectiveAllowDecimals, allowNegative)) return;
+			if (exceedsDecimalLimit(inputValue, maxAllowedDecimals)) return;
 
-			if (pattern.test(inputValue)) {
-				onChange?.(e);
-			}
+			onChange?.(e);
 		},
-		[allowDecimals, allowNegative, onChange],
+		[effectiveAllowDecimals, allowNegative, maxAllowedDecimals, onChange],
 	);
 
 	return (
 		<input
 			type="text"
-			inputMode={allowDecimals ? "decimal" : "numeric"}
+			inputMode={effectiveAllowDecimals ? "decimal" : "numeric"}
 			data-slot="input"
 			data-size={inputSize}
 			value={value}
@@ -161,11 +171,8 @@ function NumberInput({
 				className,
 			)}
 			onKeyDown={handleKeyDown}
-			onPaste={handlePaste}
 			onChange={handleChange}
 			{...props}
 		/>
 	);
 }
-
-export { NumberInput };

@@ -1,12 +1,12 @@
 import { t } from "@lingui/core/macro";
-import { ArrowDownUp, ArrowLeftRight, Send, Wallet } from "lucide-react";
+import { ArrowsDownUpIcon, ArrowsLeftRightIcon, PaperPlaneTiltIcon, WalletIcon } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
+import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER, HL_ALL_DEXS } from "@/config/constants";
 import {
 	type BalanceRow,
 	filterBalanceRowsByUsdValue,
@@ -71,7 +71,7 @@ export function BalancesTab() {
 	});
 
 	const { perpSummary, spotBalances, isLoading, hasError } = useAccountBalances();
-	const { data: allMidsEvent } = useSubAllMids({ dex: "ALL_DEXS" }, { enabled: isConnected });
+	const { data: allMidsEvent } = useSubAllMids({ dex: HL_ALL_DEXS }, { enabled: isConnected });
 	const mids = allMidsEvent?.mids;
 
 	const balances = useMemo(() => getBalanceRows(perpSummary, spotBalances), [perpSummary, spotBalances]);
@@ -160,7 +160,7 @@ export function BalancesTab() {
 								onClick={() => handleTransferClick(row)}
 								className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
 							>
-								<ArrowLeftRight className="size-2.5" />
+								<ArrowsLeftRightIcon className="size-2.5" />
 								{transferLabel}
 							</Button>
 						)}
@@ -171,7 +171,7 @@ export function BalancesTab() {
 								onClick={() => openSwapModal(row.asset)}
 								className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
 							>
-								<ArrowDownUp className="size-2.5" />
+								<ArrowsDownUpIcon className="size-2.5" />
 								{t`Swap`}
 							</Button>
 						)}
@@ -182,7 +182,7 @@ export function BalancesTab() {
 								onClick={() => handleSendClick(row)}
 								className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
 							>
-								<Send className="size-2.5" />
+								<PaperPlaneTiltIcon className="size-2.5" />
 								{t`Send`}
 							</Button>
 						)}
@@ -206,7 +206,7 @@ export function BalancesTab() {
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
-				<Wallet className="size-3" />
+				<WalletIcon className="size-3" />
 				{t`Account Balances`}
 				<label
 					htmlFor="hideSmallBalances"

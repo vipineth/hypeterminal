@@ -1,15 +1,17 @@
 import { t } from "@lingui/core/macro";
-import { Timer } from "lucide-react";
+import { TimerIcon } from "@phosphor-icons/react";
+import { useMemo } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
-import { getAvgPrice, getPercent } from "@/domain/market";
+import { TimeTicker } from "@/components/ui/time-ticker";
+import { FALLBACK_VALUE_PLACEHOLDER, HL_ALL_DEXS } from "@/config/constants";
+import { getAvgPrice } from "@/domain/market";
 import { cn } from "@/lib/cn";
-import { formatNumber, formatPrice } from "@/lib/format";
+import { formatDateTime, formatDuration, formatNumber, formatPrice } from "@/lib/format";
 import { useMarkets } from "@/lib/hyperliquid";
-import { useSubUserTwapHistory } from "@/lib/hyperliquid/hooks/subscription";
+import { useSubTwapStates } from "@/lib/hyperliquid/hooks/subscription";
 import { toBig } from "@/lib/trade/numbers";
 import { useMarketActions } from "@/stores/use-market-store";
 
@@ -34,30 +36,30 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 export function TwapTab() {
 	const { address, isConnected } = useConnection();
 	const { setSelectedMarket } = useMarketActions();
-	const {
-		data: twapEvent,
-		status,
-		error,
-	} = useSubUserTwapHistory({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
+	const { data: twapStatesEvent } = useSubTwapStates(
+		{ user: address ?? "0x0", dex: HL_ALL_DEXS },
+		{ enabled: isConnected && !!address },
+	);
 	const markets = useMarkets();
 
-	const orders = twapEvent?.history ?? [];
-	const activeCount = orders.filter((o) => o.status.status === "activated").length;
+	const twapStates = twapStatesEvent?.states ?? [];
+
+	const activeOrders = useMemo(
+		() =>
+			twapStates.map(([twapId, state]) => ({ twapId, state })).sort((a, b) => b.state.timestamp - a.state.timestamp),
+		[twapStates],
+	);
+
+	const activeCount = activeOrders.length;
 
 	const headerCount = isConnected ? `${activeCount} ${t`Active`}` : FALLBACK_VALUE_PLACEHOLDER;
 
+	const twapStatesStatus = twapStatesEvent ? "active" : "loading";
+
 	function renderPlaceholder() {
 		if (!isConnected) return <Placeholder>{t`Connect your wallet to view TWAP orders.`}</Placeholder>;
-		if (status === "subscribing" || status === "idle") return <Placeholder>{t`Loading TWAP orders...`}</Placeholder>;
-		if (status === "error") {
-			return (
-				<Placeholder variant="error">
-					<span>{t`Failed to load TWAP history.`}</span>
-					{error instanceof Error && <span className="mt-1 text-4xs text-muted-fg">{error.message}</span>}
-				</Placeholder>
-			);
-		}
-		if (orders.length === 0) return <Placeholder>{t`No TWAP orders found.`}</Placeholder>;
+		if (twapStatesStatus === "loading") return <Placeholder>{t`Loading TWAP orders...`}</Placeholder>;
+		if (activeOrders.length === 0) return <Placeholder>{t`No active TWAP orders.`}</Placeholder>;
 		return null;
 	}
 
@@ -66,7 +68,7 @@ export function TwapTab() {
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
-				<Timer className="size-3" />
+				<TimerIcon className="size-3" />
 				{t`TWAP Orders`}
 				<span className="text-info ml-auto tabular-nums">{headerCount}</span>
 			</div>
@@ -78,7 +80,7 @@ export function TwapTab() {
 								<TableRow className="border-border/40 hover:bg-transparent">
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Asset`}</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
-										{t`Total Size`}
+										{t`Size`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Executed`}
@@ -87,39 +89,30 @@ export function TwapTab() {
 										{t`Avg Price`}
 									</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
-										{t`Progress`}
+										{t`Time / Total`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Status`}</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
+										{t`Reduce Only`}
+									</TableHead>
+									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Created`}</TableHead>
 									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
 										{t`Actions`}
 									</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{orders.map((order) => {
-									const isBuy = order.state.side === "B";
+								{activeOrders.map(({ twapId, state }) => {
+									const isBuy = state.side === "B";
 									const sideClass = isBuy ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
-									const totalSize = toBig(order.state.sz)?.toNumber() ?? Number.NaN;
-									const executedSize = toBig(order.state.executedSz)?.toNumber() ?? Number.NaN;
-									const avgPrice = getAvgPrice(order.state.executedNtl, order.state.executedSz);
-									const progressPct = Math.max(0, Math.min(100, getPercent(executedSize, totalSize)));
-									const szDecimals = markets.getSzDecimals(order.state.coin);
-									const status = order.status.status;
-									const statusLabel =
-										status === "activated"
-											? t`active`
-											: status === "finished"
-												? t`completed`
-												: status === "terminated"
-													? t`cancelled`
-													: status;
-									const key =
-										typeof order.twapId === "number"
-											? order.twapId
-											: `${order.state.coin}-${order.state.timestamp}-${order.time}`;
+									const totalSize = toBig(state.sz)?.toNumber() ?? Number.NaN;
+									const executedSize = toBig(state.executedSz)?.toNumber() ?? 0;
+									const avgPrice = getAvgPrice(state.executedNtl, state.executedSz);
+									const szDecimals = markets.getSzDecimals(state.coin);
+									const creationTime = state.timestamp;
+									const totalMinutes = state.minutes;
 
 									return (
-										<TableRow key={key} className="border-border/40 hover:bg-accent/30">
+										<TableRow key={twapId} className="border-border/40 hover:bg-accent/30">
 											<TableCell className="text-2xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">
 													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideClass)}>
@@ -128,51 +121,44 @@ export function TwapTab() {
 													<Button
 														variant="link"
 														size="none"
-														onClick={() => setSelectedMarket(order.state.coin)}
-														aria-label={t`Switch to ${markets.getMarket(order.state.coin)?.displayName ?? order.state.coin} market`}
+														onClick={() => setSelectedMarket(state.coin)}
+														aria-label={t`Switch to ${markets.getMarket(state.coin)?.displayName ?? state.coin} market`}
 													>
-														{markets.getMarket(order.state.coin)?.displayName ?? order.state.coin}
+														{markets.getMarket(state.coin)?.displayName ?? state.coin}
 													</Button>
 												</div>
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
 												{formatNumber(totalSize, szDecimals)}
 											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums text-warning py-1.5">
-												{formatNumber(executedSize, szDecimals)}
+											<TableCell className="text-2xs text-right tabular-nums py-1.5">
+												<span className={cn(isBuy ? "text-positive" : "text-negative")}>
+													{formatNumber(executedSize, szDecimals)}
+												</span>
 											</TableCell>
 											<TableCell className="text-2xs text-right tabular-nums py-1.5">
 												{formatPrice(avgPrice, { szDecimals })}
 											</TableCell>
-											<TableCell className="py-1.5">
-												<div className="flex items-center gap-2">
-													<div className="flex-1 h-1.5 bg-accent/30 rounded-full overflow-hidden">
-														<div
-															className={cn("h-full rounded-full", status === "finished" ? "bg-positive" : "bg-info")}
-															style={{ width: `${progressPct}%` }}
-														/>
-													</div>
-													<span className="text-4xs tabular-nums text-muted-fg">{progressPct.toFixed(0)}%</span>
-												</div>
+											<TableCell className="text-2xs tabular-nums py-1.5">
+												<TimeTicker startTime={creationTime} durationMs={totalMinutes * 60 * 1000} isActive={true} /> /{" "}
+												{formatDuration(totalMinutes)}
 											</TableCell>
-											<TableCell className="text-2xs py-1.5">
-												<span
-													className={cn(
-														"text-4xs px-1 py-0.5 rounded-sm uppercase",
-														status === "activated" && "bg-info/20 text-info",
-														status === "finished" && "bg-positive/20 text-positive",
-														(status === "terminated" || status === "error") && "bg-negative/20 text-negative",
-													)}
-												>
-													{statusLabel}
-												</span>
+											<TableCell className="text-2xs py-1.5">{state.reduceOnly ? t`Yes` : t`No`}</TableCell>
+											<TableCell className="text-2xs tabular-nums py-1.5">
+												{formatDateTime(creationTime, {
+													day: "2-digit",
+													month: "2-digit",
+													year: "numeric",
+													hour: "2-digit",
+													minute: "2-digit",
+													second: "2-digit",
+													hour12: false,
+												})}
 											</TableCell>
 											<TableCell className="text-right py-1.5">
-												{status === "activated" && (
-													<Button variant="danger" size="xs" aria-label={t`Cancel TWAP order`}>
-														{t`Cancel`}
-													</Button>
-												)}
+												<Button variant="danger" size="xs" aria-label={t`Cancel TWAP order`}>
+													{t`Cancel`}
+												</Button>
 											</TableCell>
 										</TableRow>
 									);

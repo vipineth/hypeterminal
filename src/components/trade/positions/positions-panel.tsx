@@ -2,11 +2,11 @@ import { Suspense, useMemo, useTransition } from "react";
 import { useConnection } from "wagmi";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { POSITIONS_TABS } from "@/config/constants";
+import { HL_ALL_DEXS, POSITIONS_TABS } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { useUserPositions } from "@/lib/hyperliquid";
-import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
+import { useSubOpenOrders, useSubTwapStates } from "@/lib/hyperliquid/hooks/subscription";
 import { createLazyComponent } from "@/lib/lazy";
 import { toNumberOrZero } from "@/lib/trade/numbers";
 import { useGlobalSettingsActions, usePositionsActiveTab } from "@/stores/use-global-settings-store";
@@ -26,7 +26,12 @@ export function PositionsPanel() {
 	const { perpSummary, spotBalances } = useAccountBalances();
 	const { positions } = useUserPositions();
 	const { data: ordersEvent } = useSubOpenOrders({ user: address ?? "0x0" }, { enabled: isConnected && !!address });
+	const { data: twapStatesEvent } = useSubTwapStates(
+		{ user: address ?? "0x0", dex: HL_ALL_DEXS },
+		{ enabled: isConnected && !!address },
+	);
 	const openOrders = ordersEvent?.orders;
+	const twapCount = isConnected ? (twapStatesEvent?.states?.length ?? 0) : 0;
 
 	function handleTabChange(value: string) {
 		startTransition(() => setPositionsActiveTab(value));
@@ -53,6 +58,7 @@ export function PositionsPanel() {
 		if (tabValue === "balances") return balancesCount;
 		if (tabValue === "positions") return positionsCount;
 		if (tabValue === "orders") return ordersCount;
+		if (tabValue === "twap") return twapCount;
 		return null;
 	}
 

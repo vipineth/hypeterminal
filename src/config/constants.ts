@@ -22,6 +22,8 @@ export const DEFAULT_MARKET_NAME = "BTC";
 export const DEFAULT_MARKET_SCOPE = "perp" as const;
 export const DEFAULT_QUOTE_TOKEN = "USDC";
 
+export const HL_ALL_DEXS = "ALL_DEXS" as const;
+
 export const ORDER_MIN_NOTIONAL_USD = 10;
 export const ORDER_FEE_RATE_TAKER = 0.00045;
 export const ORDER_FEE_RATE_MAKER = 0.00015;
@@ -35,9 +37,9 @@ export const SCALE_LEVELS_MAX = 20;
 
 export const DEFAULT_MAX_LEVERAGE = 50;
 export const MARKET_LEVERAGE_HARD_MAX = 100;
-export const DEFAULT_MARKET_ORDER_SLIPPAGE_BPS = 25;
-export const MARKET_ORDER_SLIPPAGE_MIN_BPS = 10;
-export const MARKET_ORDER_SLIPPAGE_MAX_BPS = 500;
+export const DEFAULT_MARKET_ORDER_SLIPPAGE_PERCENT = 2.5;
+export const MARKET_ORDER_SLIPPAGE_MIN_PERCENT = 0.1;
+export const MARKET_ORDER_SLIPPAGE_MAX_PERCENT = 100;
 export const DEFAULT_LEVERAGE_BY_MODE = { cross: 10, isolated: 10 } as const;
 
 export const STORAGE_KEYS = {
@@ -98,7 +100,7 @@ export const ROUTE_SEO = {
 	},
 } as const;
 
-export const CHART_LIBRARY_PATH = "https://cdn.asgard.finance/charting_library-28.3.0/";
+export const CHART_LIBRARY_PATH = "/charting_library/";
 export const CHART_TIME_FRAMES: TimeFrameItem[] = [
 	{ text: "5y", resolution: "1W" as ResolutionString, description: "5 Years" },
 	{ text: "1y", resolution: "1D" as ResolutionString, description: "1 Year" },
@@ -132,7 +134,7 @@ export const CHART_SUPPORTED_RESOLUTIONS = [
 	"1M",
 ] as unknown as ResolutionString[];
 export const CHART_LOCALE = "en";
-export const CHART_CUSTOM_FONT_FAMILY = "'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, monospace";
+export const CHART_CUSTOM_FONT_FAMILY = "'IBM Plex Sans Variable', ui-sans-serif, system-ui, sans-serif";
 export const CHART_ENABLED_FEATURES = [
 	"side_toolbar_in_fullscreen_mode",
 	"header_in_fullscreen_mode",
@@ -145,6 +147,7 @@ export const CHART_ENABLED_FEATURES = [
 ] as ChartingLibraryFeatureset[];
 export const CHART_DISABLED_FEATURES = [
 	"header_symbol_search",
+	"header_quick_search",
 	"header_compare",
 	"display_market_status",
 	"popup_hints",

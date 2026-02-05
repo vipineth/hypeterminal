@@ -1,4 +1,4 @@
-import { ChevronDown, Loader2, TrendingDown, TrendingUp } from "lucide-react";
+import { CaretDownIcon, SpinnerGapIcon, TrendDownIcon, TrendUpIcon } from "@phosphor-icons/react";
 import { useEffect, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -29,8 +29,8 @@ import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
 import { WalletDialog } from "../components/wallet-dialog";
-import { LeverageControl } from "../order-entry/leverage-control";
-import { OrderToast } from "../order-entry/order-toast";
+import { LeverageControl } from "../tradebox/leverage-control";
+import { OrderToast } from "../tradebox/order-toast";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
 
 type OrderType = "market" | "limit";
@@ -348,7 +348,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 									: "border-border/60 text-muted-fg hover:border-positive/40",
 							)}
 						>
-							<TrendingUp className="size-5" />
+							<TrendUpIcon className="size-5" />
 							{ORDER_TEXT.BUY_LABEL}
 						</Button>
 						<Button
@@ -363,7 +363,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 									: "border-border/60 text-muted-fg hover:border-negative/40",
 							)}
 						>
-							<TrendingDown className="size-5" />
+							<TrendDownIcon className="size-5" />
 							{ORDER_TEXT.SELL_LABEL}
 						</Button>
 					</div>
@@ -423,7 +423,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 								disabled={isFormDisabled}
 							>
 								{sizeMode === "base" ? baseToken || "—" : quoteToken || "—"}
-								<ChevronDown className="size-3" />
+								<CaretDownIcon className="size-3" />
 							</Button>
 							<Input
 								type="text"
@@ -537,7 +537,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 								: "bg-negative/20 border-negative text-negative hover:bg-negative/30",
 					)}
 				>
-					{(isSubmitting || isRegistering) && <Loader2 className="size-5 animate-spin" />}
+					{(isSubmitting || isRegistering) && <SpinnerGapIcon className="size-5 animate-spin" />}
 					{buttonContent.text}
 				</Button>
 			</div>
