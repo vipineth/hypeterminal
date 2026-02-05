@@ -315,31 +315,227 @@ export async function generateChartCssUrl(): Promise<string> {
 
 	const bg = colorToHex(colors.background);
 	const fg = colorToHex(colors.foreground);
+	const surface = colorToHex(colors.surface);
 	const mutedFg = colorToHex(colors.mutedForeground);
-	const border = colorToHex(colors.border);
+	const border = colorToRgba(colors.border, 0.4);
 	const accent = colorToHex(colors.accent);
-	const hoverBg = colorToRgba(colors.foreground, 0.06);
-	const borderSoft = colorToRgba(colors.border, 0.6);
-	const accentSoft = colorToRgba(colors.accent, 0.18);
 
-	// Fetch and inline the static CSS
+	const hoverBg = colorToRgba(colors.foreground, 0.06);
+	const activeBg = colorToRgba(colors.foreground, 0.1);
+	const accentSoft = colorToRgba(colors.accent, 0.15);
+
 	const staticCss = await fetchStaticCss();
 
-	// Combine static styles with dynamic CSS variable overrides
 	const css = `
-/* Static theme styles */
 ${staticCss}
 
-/* Dynamic color overrides */
 :root {
 	--tv-bg: ${bg};
 	--tv-fg: ${fg};
 	--tv-muted-fg: ${mutedFg};
 	--tv-border: ${border};
-	--tv-hover: ${hoverBg};
 	--tv-accent: ${accent};
-	--tv-color-toolbar-button-background-hover: ${borderSoft};
-	--tv-color-toolbar-divider-background: ${accentSoft};
+
+	--tv-color-platform-background: ${bg};
+	--tv-color-pane-background: ${bg};
+
+	--tv-color-toolbar-button-background-hover: ${hoverBg};
+	--tv-color-toolbar-button-background-expanded: ${colorToRgba(colors.foreground, 0.08)};
+	--tv-color-toolbar-button-background-active: ${activeBg};
+	--tv-color-toolbar-button-background-active-hover: ${colorToRgba(colors.foreground, 0.12)};
+	--tv-color-toolbar-button-background-clicked: ${activeBg};
+	--tv-color-toolbar-button-text: ${mutedFg};
+	--tv-color-toolbar-button-text-hover: ${fg};
+	--tv-color-toolbar-button-text-active: ${fg};
+	--tv-color-toolbar-button-text-active-hover: ${fg};
+	--tv-color-toolbar-button-text-clicked: ${fg};
+
+	--tv-color-item-active-text: ${accent};
+	--tv-color-toolbar-toggle-button-background-active: ${accentSoft};
+	--tv-color-toolbar-toggle-button-background-active-hover: ${colorToRgba(colors.accent, 0.2)};
+
+	--tv-color-toolbar-divider-background: ${colorToRgba(colors.border, 0.6)};
+	--tv-color-toolbar-save-layout-loader: ${accent};
+	--tv-color-bar-mark-background-color: ${surface};
+
+	--tv-color-popup-background: ${surface};
+	--tv-color-popup-element-text: ${fg};
+	--tv-color-popup-element-text-hover: ${fg};
+	--tv-color-popup-element-background-hover: ${hoverBg};
+	--tv-color-popup-element-divider-background: ${border};
+	--tv-color-popup-element-secondary-text: ${mutedFg};
+	--tv-color-popup-element-hint-text: ${colorToRgba(colors.mutedForeground, 0.7)};
+	--tv-color-popup-element-text-active: ${accent};
+	--tv-color-popup-element-background-active: ${accentSoft};
+	--tv-color-popup-element-toolbox-text: ${mutedFg};
+	--tv-color-popup-element-toolbox-text-hover: ${fg};
+	--tv-color-popup-element-toolbox-text-active-hover: ${accent};
+	--tv-color-popup-element-toolbox-background-hover: ${hoverBg};
+	--tv-color-popup-element-toolbox-background-active-hover: ${accentSoft};
+
+	--tv-color-dialog-header-text: ${fg};
+	--tv-color-dialog-header-separator: ${border};
+	--tv-color-scrollbar-thumb-background: ${border};
+
+	--themed-color-bg: ${bg};
+	--themed-color-body-bg: ${bg};
+	--themed-color-main-background: ${bg};
+	--themed-color-chart-page-bg: ${bg};
+	--themed-color-pane-bg: ${bg};
+	--themed-color-dialog-background: ${surface};
+	--themed-color-popup-background: ${surface};
+	--themed-color-primary-popup: ${surface};
+	--themed-color-tree-bg: ${surface};
+	--themed-color-content-item-bg: ${surface};
+	--themed-color-properties-dialog-tab-bg: ${surface};
+	--themed-color-rename-input-background: ${surface};
+	--themed-color-indicators-hint-background: ${surface};
+
+	--themed-color-text: ${fg};
+	--themed-color-text-primary: ${fg};
+	--themed-color-text-regular: ${fg};
+	--themed-color-primary-text: ${fg};
+	--themed-color-title: ${fg};
+	--themed-color-indicators-text: ${fg};
+	--themed-color-item-text: ${fg};
+	--themed-color-item-row-text: ${fg};
+	--themed-color-add-dialog-text: ${fg};
+	--themed-color-load-chart-dialog-text: ${fg};
+	--themed-color-button-text: ${fg};
+	--themed-color-button-text-color: ${fg};
+	--themed-color-arrow-text: ${fg};
+
+	--themed-color-text-secondary: ${mutedFg};
+	--themed-color-default-gray: ${mutedFg};
+	--themed-color-gray: ${mutedFg};
+	--themed-color-grayed-text: ${mutedFg};
+	--themed-color-placeholder: ${mutedFg};
+	--themed-color-icon: ${mutedFg};
+	--themed-color-icons: ${mutedFg};
+	--themed-color-primary-icon: ${mutedFg};
+	--themed-color-sort-button: ${mutedFg};
+	--themed-color-drag-icon: ${mutedFg};
+	--themed-color-disabled-title: ${colorToRgba(colors.mutedForeground, 0.5)};
+
+	--themed-color-border: ${border};
+	--themed-color-separator: ${border};
+	--themed-color-divider: ${border};
+	--themed-color-search-border: ${border};
+	--themed-color-header-border: ${border};
+	--themed-color-header-separator-border: ${border};
+	--themed-color-section-separator-border: ${border};
+	--themed-color-container-border: ${border};
+	--themed-color-properties-dialog-borders: ${border};
+	--themed-color-tab-switcher-border: ${border};
+	--themed-color-templates-dialog-body-border: ${border};
+	--themed-color-popup-menu-separator: ${border};
+	--themed-color-item-row-border: ${border};
+	--themed-color-white-border: ${border};
+
+	--themed-color-input-bg: ${surface};
+	--themed-color-input-border: ${border};
+	--themed-color-input-text: ${fg};
+	--themed-color-input-placeholder-text: ${mutedFg};
+	--themed-color-input-border-hover: ${mutedFg};
+	--themed-color-input-disabled-bg: ${bg};
+	--themed-color-input-disabled-border: ${colorToRgba(colors.border, 0.5)};
+	--themed-color-input-disabled-text: ${mutedFg};
+
+	--themed-color-hovered-background: ${hoverBg};
+	--themed-color-background-hover: ${hoverBg};
+	--themed-color-hovered-button-background: ${hoverBg};
+	--themed-color-item-row-bg-hover: ${hoverBg};
+	--themed-color-container-hover-bg: ${hoverBg};
+	--themed-color-button-bg: ${surface};
+	--themed-color-button-bg-hover: ${hoverBg};
+	--themed-color-button-hover-bg: ${hoverBg};
+	--themed-color-button-hover: ${hoverBg};
+	--themed-color-button-bg-selected: ${activeBg};
+	--themed-color-edit-button-background-hover: ${hoverBg};
+
+	--themed-color-item-active-text: ${accent};
+	--themed-color-item-active-bg: ${accentSoft};
+	--themed-color-item-selected: ${accentSoft};
+	--themed-color-item-selected-blue: ${accentSoft};
+	--themed-color-item-bg-selected: ${accentSoft};
+	--themed-color-list-item-bg-selected: ${accentSoft};
+	--themed-color-selection-bg: ${accentSoft};
+	--themed-color-selected-border: ${accent};
+	--themed-color-background-selected: ${accentSoft};
+	--themed-color-active-tab-text-color: ${fg};
+
+	--themed-color-brand: ${accent};
+	--themed-color-brand-hover: ${accent};
+	--themed-color-brand-active: ${accent};
+	--themed-color-favorite-checked: ${accent};
+
+	--themed-color-scrollbar-default: ${border};
+	--themed-color-scrollbar-hover: ${mutedFg};
+	--themed-color-scrollbar-active: ${mutedFg};
+	--themed-color-scroll-bg: ${bg};
+	--themed-color-overlay-scroll-bar: ${border};
+
+	--themed-color-common-tooltip-bg: ${surface};
+	--themed-color-common-tooltip-text: ${fg};
+	--themed-color-tooltip-background: ${surface};
+	--themed-color-tooltip-text: ${fg};
+
+	--themed-color-checkbox: ${border};
+	--themed-color-checkbox-hover: ${mutedFg};
+	--themed-color-checkbox-checked: ${accent};
+	--themed-color-checkbox-checked-hover: ${accent};
+	--themed-color-checkbox-icon: ${fg};
+	--themed-color-radio: ${border};
+	--themed-color-radio-hover: ${mutedFg};
+	--themed-color-radio-checked: ${accent};
+	--themed-color-radio-checked-hover: ${accent};
+
+	--themed-color-switch-bg: ${border};
+	--themed-color-switch-border: ${border};
+	--themed-color-active-switch-bg: ${accent};
+
+	--themed-color-link: ${accent};
+	--themed-color-link-primary-default: ${accent};
+	--themed-color-link-primary-hover: ${accent};
+	--themed-color-link-primary-active: ${accent};
+	--themed-color-highlight-search: ${colorToRgba(colors.accent, 0.3)};
+
+	--themed-color-icon-hover: ${fg};
+	--themed-color-icon-hover-color: ${fg};
+	--themed-color-icon-selected: ${accent};
+	--themed-color-icon-selected-hover: ${accent};
+	--themed-color-arrow-text-hover: ${fg};
+	--themed-color-arrow-stroke: ${mutedFg};
+	--themed-color-caret-hover: ${fg};
+	--themed-color-close-button-hover-bg: ${hoverBg};
+	--themed-color-close-button-hover-text: ${fg};
+	--themed-color-close-button-active-bg: ${activeBg};
+	--themed-color-close-button-active-text: ${fg};
+
+	--themed-color-modal-backdrop: rgba(0, 0, 0, 0.5);
+	--themed-color-drawer-backdrop: rgba(0, 0, 0, 0.5);
+	--themed-color-floating-toolbar-shadow: rgba(0, 0, 0, 0.2);
+
+	--themed-color-content-primary-neutral: ${fg};
+	--themed-color-content-primary-neutral-bold: ${fg};
+	--themed-color-content-primary-neutral-semi-bold: ${fg};
+	--themed-color-content-primary-neutral-normal: ${fg};
+	--themed-color-content-primary-neutral-light: ${mutedFg};
+	--themed-color-content-primary-neutral-extra-light: ${colorToRgba(colors.mutedForeground, 0.6)};
+	--themed-color-content-secondary-neutral: ${mutedFg};
+	--themed-color-content-secondary-neutral-medium: ${mutedFg};
+	--themed-color-content-secondary-neutral-semi-bold: ${mutedFg};
+	--themed-color-content-disabled: ${colorToRgba(colors.mutedForeground, 0.5)};
+
+	--themed-color-container-fill-primary-neutral: ${bg};
+	--themed-color-container-fill-primary-neutral-light: ${surface};
+	--themed-color-container-fill-primary-neutral-extra-light: ${surface};
+	--themed-color-container-fill-secondary-neutral: ${surface};
+	--themed-color-container-fill-secondary-neutral-normal: ${surface};
+	--themed-color-container-fill-secondary-neutral-semi-bold: ${border};
+	--themed-color-container-fill-primary-accent: ${accentSoft};
+	--themed-color-container-fill-primary-accent-bold: ${accent};
+	--themed-color-container-fill-primary-accent-semi-bold: ${colorToRgba(colors.accent, 0.3)};
 }
 `;
 

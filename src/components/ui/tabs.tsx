@@ -3,7 +3,7 @@ import type * as React from "react";
 import { cn } from "@/lib/cn";
 
 function Tabs({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Root>) {
-	return <TabsPrimitive.Root data-slot="tabs" className={cn("flex flex-col gap-1", className)} {...props} />;
+	return <TabsPrimitive.Root data-slot="tabs" className={cn("flex flex-col", className)} {...props} />;
 }
 
 function TabsList({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.List>) {

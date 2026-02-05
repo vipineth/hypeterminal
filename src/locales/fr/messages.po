@@ -1820,8 +1820,8 @@ msgid "TP/SL"
 msgstr "TP/SL"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Trade"
-msgstr "Trader"
+#~ msgid "Trade"
+#~ msgstr "Trader"
 
 #: src/components/trade/positions/history-tab.tsx
 msgid "Trade ClockCounterClockwise"

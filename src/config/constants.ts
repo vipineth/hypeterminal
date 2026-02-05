@@ -100,7 +100,7 @@ export const ROUTE_SEO = {
 	},
 } as const;
 
-export const CHART_LIBRARY_PATH = "https://cdn.asgard.finance/charting_library-28.3.0/";
+export const CHART_LIBRARY_PATH = "/charting_library/";
 export const CHART_TIME_FRAMES: TimeFrameItem[] = [
 	{ text: "5y", resolution: "1W" as ResolutionString, description: "5 Years" },
 	{ text: "1y", resolution: "1D" as ResolutionString, description: "1 Year" },
@@ -147,6 +147,7 @@ export const CHART_ENABLED_FEATURES = [
 ] as ChartingLibraryFeatureset[];
 export const CHART_DISABLED_FEATURES = [
 	"header_symbol_search",
+	"header_quick_search",
 	"header_compare",
 	"display_market_status",
 	"popup_hints",

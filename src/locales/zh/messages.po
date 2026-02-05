@@ -1820,8 +1820,8 @@ msgid "TP/SL"
 msgstr "止盈止损"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Trade"
-msgstr "交易"
+#~ msgid "Trade"
+#~ msgstr "交易"
 
 #: src/components/trade/positions/history-tab.tsx
 msgid "Trade ClockCounterClockwise"

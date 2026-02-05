@@ -54,6 +54,29 @@ body,
 	border-bottom: 1px solid var(--tv-border) !important;
 }
 
-/* button [class*="icon-"] > svg {
-	width: 24px !important;
-} */
+/* ========== DIALOGS & POPUPS ========== */
+[class*="dialog-"],
+[class*="popup-"],
+[class*="modal-"] {
+	background-color: var(--themed-color-dialog-background, var(--tv-bg)) !important;
+	color: var(--tv-fg) !important;
+}
+
+/* ========== SEARCH INPUT ========== */
+[class*="search"] input,
+[class*="Search"] input {
+	background-color: var(--tv-bg) !important;
+	color: var(--tv-fg) !important;
+	border-color: var(--tv-border) !important;
+	caret-color: var(--tv-fg) !important;
+}
+
+[class*="search"] input::placeholder,
+[class*="Search"] input::placeholder {
+	color: var(--tv-muted-fg) !important;
+}
+
+[class*="search"] input:focus,
+[class*="Search"] input:focus {
+	border-color: var(--tv-accent) !important;
+}

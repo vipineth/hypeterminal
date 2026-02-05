@@ -33,6 +33,7 @@ export function createWagmiConfig(options: WagmiConfigOptions = {}) {
 		transports: {
 			[arbitrum.id]: http(),
 		},
+		ssr: true,
 	});
 }
 

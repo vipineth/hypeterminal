@@ -16,13 +16,25 @@ import {
 	TIMEZONE,
 } from "./constants";
 import { createDatafeed } from "./datafeed";
-import {
-	buildChartOverrides,
-	generateChartCssUrl,
-	getCustomThemeColors,
-	getLoadingScreenColors,
-	getToolbarBgColor,
-} from "./theme-colors";
+import { buildChartOverrides, generateChartCssUrl, getLoadingScreenColors, getToolbarBgColor } from "./theme-colors";
+
+const TOOLBAR_HEIGHT_PX = 35;
+
+function patchToolbarHeight(container: HTMLElement | null) {
+	if (!container) return;
+
+	const iframe = container.querySelector("iframe");
+	const doc = iframe?.contentDocument ?? document;
+
+	const style = doc.createElement("style");
+	style.textContent = `
+		.layout__area--top [class*="innerWrap-"] { height: ${TOOLBAR_HEIGHT_PX}px !important; }
+	`;
+	doc.head.appendChild(style);
+
+	const topArea = doc.querySelector<HTMLElement>(".layout__area--top");
+	if (topArea) topArea.style.height = `${TOOLBAR_HEIGHT_PX}px`;
+}
 
 interface Props {
 	symbol?: string;
@@ -35,7 +47,6 @@ export function TradingViewChart({
 	symbol = DEFAULT_CHART_SYMBOL,
 	interval = DEFAULT_CHART_INTERVAL,
 	theme = DEFAULT_CHART_THEME,
-	colorTheme = "terminal",
 }: Props) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const widgetRef = useRef<IChartingLibraryWidget | null>(null);
@@ -112,7 +123,6 @@ export function TradingViewChart({
 				const loadingColors = getLoadingScreenColors();
 				const toolbarBg = getToolbarBgColor();
 				const customCssUrl = await generateChartCssUrl();
-				const themeColors = getCustomThemeColors();
 				cssUrlRef.current = customCssUrl;
 
 				widgetRef.current = new window.TradingView.widget({
@@ -137,10 +147,6 @@ export function TradingViewChart({
 					loading_screen: loadingColors,
 					toolbar_bg: toolbarBg,
 					custom_css_url: customCssUrl,
-					custom_themes: {
-						dark: themeColors,
-						light: themeColors,
-					},
 					studies_overrides: {},
 					favorites: {
 						intervals: CHART_FAVORITE_INTERVALS,
@@ -149,6 +155,7 @@ export function TradingViewChart({
 
 				widgetRef.current.onChartReady(() => {
 					chartReadyRef.current = true;
+					patchToolbarHeight(containerRef.current);
 				});
 			} catch (error) {
 				console.error("Error initializing TradingView widget:", error);
@@ -168,7 +175,7 @@ export function TradingViewChart({
 				cssUrlRef.current = null;
 			}
 		};
-	}, [symbol, interval, theme, colorTheme]);
+	}, [symbol, interval, theme]);
 
 	return (
 		<div className="relative w-full h-full" style={{ minHeight: "300px" }}>

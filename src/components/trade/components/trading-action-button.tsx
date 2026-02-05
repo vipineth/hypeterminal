@@ -25,6 +25,7 @@ export function TradingActionButton({ onClick, children, disabled, className, ..
 		<div className="flex flex-col gap-1">
 			<Button
 				{...buttonProps}
+				variant="link"
 				onClick={handleClick}
 				disabled={disabled || isEnabling || (!isReady && !needsTrading)}
 				className={cn(

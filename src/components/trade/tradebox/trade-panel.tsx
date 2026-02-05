@@ -102,12 +102,10 @@ export function TradePanel() {
 		spotBalance,
 		capabilities,
 		availableBalance,
-		availableBalanceToken,
 		maxSize,
 		sizeValue,
 		orderValue,
 		sideLabels,
-		sizeModeLabel,
 		getSizeForPercent,
 		convertSizeForModeToggle,
 		leverage,
@@ -116,7 +114,6 @@ export function TradePanel() {
 		switchMarginMode,
 		isSwitchingMode,
 		switchModeError,
-		szDecimals,
 	} = useOrderEntryData({ market, side, markPx, sizeMode, sizeInput });
 
 	const { addOrder, updateOrder } = useOrderQueueActions();
@@ -439,13 +436,12 @@ export function TradePanel() {
 		onSubmit: handleSubmit,
 	});
 
-	const isFormDisabled = !isConnected || availableBalance <= 0;
 	const actionButtonClass = getActionButtonClass(buttonContent.variant);
 
 	return (
 		<div className="h-full flex flex-col overflow-hidden bg-surface/20">
 			{capabilities.isLeveraged && (
-				<div className="px-2 py-1.5 border-b border-border/40 flex items-center justify-between">
+				<div className="h-9 px-2 border-b border-border/60 flex items-center justify-between">
 					{capabilities.hasMarginMode ? (
 						<MarginModeToggle
 							mode={marginMode}

@@ -68,7 +68,7 @@ export function OrderbookPanel() {
 
 	return (
 		<Tabs defaultValue="book" className="h-full min-h-0 flex flex-col overflow-hidden border-l border-border/40">
-			<div className="flex items-center justify-between px-2 py-1.5 border-b border-border/40 bg-surface/30">
+			<div className="h-9 flex items-center justify-between px-2 py-1.5 border-b border-border/40 bg-surface/30">
 				<TabsList>
 					<TabsTrigger value="book" aria-label={t`Order Book`}>
 						{t`Order Book`}
@@ -80,20 +80,19 @@ export function OrderbookPanel() {
 			</div>
 
 			<TabsContent value="book" className="flex-1 min-h-0 flex flex-col">
-				<div className="grid grid-cols-3 gap-2 px-2 py-1 text-4xs uppercase tracking-wider border-b border-border/40 shrink-0">
+				<div className="grid grid-cols-3 gap-2 px-2 h-9 items-center text-4xs uppercase tracking-wider border-b border-border/40 shrink-0">
 					<div className="flex items-center gap-1">
 						{t`Price`}
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
-								<Button
-									variant="ghost"
-									size="none"
-									className="px-1.5 py-0.5 text-4xs border border-border/60 hover:border-fg/30 hover:bg-transparent inline-flex items-center gap-1"
+								<button
+									type="button"
+									className="px-1.5 text-4xs hover:bg-transparent inline-flex items-center gap-1"
 									aria-label={t`Select order book aggregation`}
 								>
 									{selectedOption?.label ?? priceGroupingOptions[0]?.label ?? "—"}
 									<CaretDownIcon className="size-2.5" />
-								</Button>
+								</button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end" className="min-w-20 font-mono text-xs">
 								{priceGroupingOptions.map((option) => (
