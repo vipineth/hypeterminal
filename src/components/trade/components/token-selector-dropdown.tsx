@@ -28,7 +28,7 @@ export function TokenSelectorDropdown({ tokens, selectedToken, onSelect, getBala
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild disabled={disabled}>
 				<Button
-					variant="ghost"
+					variant="text"
 					size="none"
 					className={cn(
 						"flex items-center gap-2 px-2.5 py-1.5 border border-border/40 bg-surface/30 hover:bg-surface/50 hover:border-border/60 transition-colors",

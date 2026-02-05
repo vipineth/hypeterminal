@@ -16,7 +16,7 @@ export function NotFoundPage() {
 						<Trans>The page you are looking for does not exist.</Trans>
 					</p>
 				</div>
-				<Button asChild size="xs" variant="terminal">
+				<Button asChild size="sm" variant="outlined" color="accent">
 					<a href="/" aria-label={t`Go to trading terminal`}>
 						<Trans>Go to trading terminal</Trans>
 					</a>

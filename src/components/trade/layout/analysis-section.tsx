@@ -1,22 +1,25 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { usePersistentPanelSizes } from "@/hooks/trade/use-persistent-layout";
+import { usePersistentLayout } from "@/hooks/trade/use-persistent-layout";
 import { PositionsPanel } from "../positions/positions-panel";
 import { MarketInfo } from "./market-info";
 
 export function AnalysisSection() {
-	const { sizes, onSizesChange } = usePersistentPanelSizes("CHART_WITH_POSITIONS");
+	const { config, defaultLayout, onLayoutChanged } = usePersistentLayout("CHART_WITH_POSITIONS");
+	const [first, second] = config.panels;
 
 	return (
 		<div className="h-full min-h-0">
-			<ResizablePanelGroup direction="vertical" className="h-full min-h-0" onLayout={onSizesChange}>
-				<ResizablePanel defaultSize={sizes[0]} minSize={30}>
+			<ResizablePanelGroup
+				orientation={config.orientation}
+				className="h-full min-h-0"
+				defaultLayout={defaultLayout}
+				onLayoutChanged={onLayoutChanged}
+			>
+				<ResizablePanel id={first.id} defaultSize={first.defaultSize} minSize={first.minSize}>
 					<MarketInfo />
 				</ResizablePanel>
-				<ResizableHandle
-					withHandle
-					className="bg-border/40 data-[resize-handle-state=hover]:bg-info/30 data-[resize-handle-state=drag]:bg-info/50"
-				/>
-				<ResizablePanel defaultSize={sizes[1]} minSize={20}>
+				<ResizableHandle withHandle />
+				<ResizablePanel id={second.id} defaultSize={second.defaultSize} minSize={second.minSize}>
 					<PositionsPanel />
 				</ResizablePanel>
 			</ResizablePanelGroup>

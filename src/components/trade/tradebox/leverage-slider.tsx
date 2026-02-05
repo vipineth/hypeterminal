@@ -90,7 +90,7 @@ export function LeverageSlider({ value, onChange, max, disabled, className }: Pr
 					return (
 						<Button
 							key={mark}
-							variant="ghost"
+							variant="text"
 							size="none"
 							onClick={() => !disabled && onChange(mark)}
 							disabled={disabled}

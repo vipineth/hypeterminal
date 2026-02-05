@@ -53,7 +53,7 @@ export function UserMenu() {
 
 	if (!mounted || isConnecting) {
 		return (
-			<Button variant="ghost" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider" disabled>
+			<Button variant="text" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider" disabled>
 				<SpinnerGapIcon className="size-3 animate-spin" />
 				<Trans>Connecting...</Trans>
 			</Button>
@@ -65,8 +65,9 @@ export function UserMenu() {
 			<>
 				<Button
 					size="sm"
-					variant="outline"
-					className="h-7 text-3xs uppercase tracking-wider border-positive/40 text-positive hover:bg-positive/10 hover:text-positive"
+					variant="outlined"
+					color="accent"
+					className="h-7 text-3xs uppercase tracking-wider"
 					onClick={() => setIsOpen(true)}
 				>
 					<LightningIcon className="size-3 mr-1" />
@@ -81,7 +82,7 @@ export function UserMenu() {
 		<div className="flex items-center gap-1.5">
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<Button variant="ghost" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider">
+					<Button variant="text" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider">
 						<div className="size-1.5 rounded-full bg-positive animate-pulse" />
 						{ensName ?? (address ? shortenAddress(address) : "")}
 						<CaretDownIcon className="size-2.5" />

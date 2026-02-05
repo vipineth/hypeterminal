@@ -140,7 +140,7 @@ function PositionRow({
 			<TableCell className="text-2xs font-medium py-1.5">
 				<div className="flex items-center gap-1.5">
 					<Button
-						variant="link"
+						variant="text"
 						size="none"
 						onClick={() => onSelectMarket(p.coin)}
 						className="gap-1.5"
@@ -228,8 +228,7 @@ function PositionRow({
 			</TableCell>
 			<TableCell className="text-right py-1.5">
 				<TradingActionButton
-					variant="danger"
-					size="xs"
+					size="sm"
 					aria-label={t`Close position`}
 					onClick={handleClose}
 					disabled={!canClose || isClosing}

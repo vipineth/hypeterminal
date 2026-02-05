@@ -63,7 +63,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						</p>
 					</div>
 					<Button
-						variant="ghost"
+						variant="text"
 						size="none"
 						onClick={() => setWalletDialogOpen(true)}
 						className={cn(
@@ -97,7 +97,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 									{address?.slice(0, 6)}...{address?.slice(-4)}
 								</span>
 								<Button
-									variant="ghost"
+									variant="text"
 									size="none"
 									onClick={handleCopyAddress}
 									className="p-1.5 text-muted-fg hover:text-fg hover:bg-transparent transition-colors"
@@ -112,7 +112,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						</div>
 					</div>
 					<Button
-						variant="ghost"
+						variant="text"
 						size="none"
 						onClick={() => disconnect.mutate()}
 						className={cn(
@@ -173,7 +173,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 					{/* Actions */}
 					<div className="grid grid-cols-2 gap-3 pt-2">
 						<Button
-							variant="ghost"
+							variant="text"
 							size="none"
 							onClick={() => openDepositModal("deposit")}
 							className={cn(
@@ -188,7 +188,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 							{ACCOUNT_TEXT.DEPOSIT_LABEL}
 						</Button>
 						<Button
-							variant="ghost"
+							variant="text"
 							size="none"
 							className={cn(
 								"py-4 text-base font-semibold rounded-md",

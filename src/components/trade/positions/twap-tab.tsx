@@ -119,7 +119,7 @@ export function TwapTab() {
 														{isBuy ? t`buy` : t`sell`}
 													</span>
 													<Button
-														variant="link"
+														variant="text"
 														size="none"
 														onClick={() => setSelectedMarket(state.coin)}
 														aria-label={t`Switch to ${markets.getMarket(state.coin)?.displayName ?? state.coin} market`}
@@ -156,7 +156,7 @@ export function TwapTab() {
 												})}
 											</TableCell>
 											<TableCell className="text-right py-1.5">
-												<Button variant="danger" size="xs" aria-label={t`Cancel TWAP order`}>
+												<Button variant="outlined" color="danger" size="sm" aria-label={t`Cancel TWAP order`}>
 													{t`Cancel`}
 												</Button>
 											</TableCell>

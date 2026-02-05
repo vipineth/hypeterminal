@@ -188,7 +188,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 				<DialogFooter className="px-5 py-3 border-t border-border/50">
 					<Button
 						size="sm"
-						variant="ghost"
+						variant="text"
 						onClick={() => handleOpenChange(false)}
 						disabled={isSubmitting}
 						className="text-muted-fg hover:text-fg"
@@ -197,7 +197,8 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 					</Button>
 					<TradingActionButton
 						size="sm"
-						variant="terminal"
+						variant="outlined"
+						color="accent"
 						onClick={handleSubmit}
 						disabled={!canSubmit}
 						className="min-w-24"

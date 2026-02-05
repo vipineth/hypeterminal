@@ -67,7 +67,7 @@ export function OfflineBanner({ className }: Props) {
 
 			{!isOnline && (
 				<Button
-					variant="ghost"
+					variant="text"
 					size="none"
 					onClick={() => setDismissed(true)}
 					className={cn(

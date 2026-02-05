@@ -207,7 +207,7 @@ export function AccountPanel() {
 
 			<div className="px-2 py-1 flex items-center gap-0.5 border-b border-border/40">
 				<Button
-					variant="ghost"
+					variant="text"
 					size="none"
 					onClick={() => setActiveTab("perps")}
 					className={cn(
@@ -219,7 +219,7 @@ export function AccountPanel() {
 					{t`Perps`}
 				</Button>
 				<Button
-					variant="ghost"
+					variant="text"
 					size="none"
 					onClick={() => setActiveTab("spot")}
 					className={cn(
@@ -250,7 +250,7 @@ export function AccountPanel() {
 
 						<div className="grid grid-cols-2 gap-1">
 							<Button
-								variant="ghost"
+								variant="text"
 								size="none"
 								onClick={() => openDepositModal("deposit")}
 								className="py-1.5 text-3xs uppercase tracking-wider border border-positive/40 text-positive hover:bg-positive/10"
@@ -259,7 +259,7 @@ export function AccountPanel() {
 								{t`Deposit`}
 							</Button>
 							<Button
-								variant="ghost"
+								variant="text"
 								size="none"
 								onClick={() => openDepositModal("withdraw")}
 								className="py-1.5 text-3xs uppercase tracking-wider border border-border/60 text-muted-fg hover:text-fg hover:border-fg/30 hover:bg-transparent"

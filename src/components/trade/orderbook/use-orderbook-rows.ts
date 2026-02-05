@@ -1,6 +1,7 @@
 import { type RefObject, useLayoutEffect, useState } from "react";
 
 const ROW_HEIGHT = 22;
+const SPREAD_BAR_HEIGHT = 28;
 const MIN_ROWS_PER_SIDE = 3;
 const MAX_ROWS_PER_SIDE = 20;
 
@@ -13,7 +14,11 @@ export function useOrderbookRows(containerRef: RefObject<HTMLDivElement | null>)
 
 		function calculateRows() {
 			const height = container!.clientHeight;
-			const rowsPerSide = Math.min(MAX_ROWS_PER_SIDE, Math.max(MIN_ROWS_PER_SIDE, Math.floor(height / 2 / ROW_HEIGHT)));
+			const availableHeight = height - SPREAD_BAR_HEIGHT;
+			const rowsPerSide = Math.min(
+				MAX_ROWS_PER_SIDE,
+				Math.max(MIN_ROWS_PER_SIDE, Math.floor(availableHeight / 2 / ROW_HEIGHT)),
+			);
 			setVisibleRows(rowsPerSide);
 		}
 

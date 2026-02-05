@@ -63,7 +63,7 @@ function FavoriteChip({ name, isActive }: FavoriteChipProps) {
 
 	return (
 		<Button
-			variant="ghost"
+			variant="text"
 			size="none"
 			onClick={handleClick}
 			onKeyDown={handleKeyDown}

@@ -20,7 +20,7 @@ export function SideToggle({ side, onSideChange, labels }: Props) {
 	return (
 		<div className="grid grid-cols-2 gap-1">
 			<Button
-				variant="ghost"
+				variant="text"
 				size="none"
 				onClick={() => onSideChange("buy")}
 				className={cn(
@@ -35,7 +35,7 @@ export function SideToggle({ side, onSideChange, labels }: Props) {
 				{labels.buy}
 			</Button>
 			<Button
-				variant="ghost"
+				variant="text"
 				size="none"
 				onClick={() => onSideChange("sell")}
 				className={cn(
