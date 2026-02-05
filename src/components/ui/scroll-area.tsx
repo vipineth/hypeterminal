@@ -1,4 +1,4 @@
-import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
+import { ScrollArea as ScrollAreaPrimitive } from "radix-ui";
 import { type ComponentPropsWithoutRef, type ElementRef, forwardRef } from "react";
 import { cn } from "@/lib/cn";
 
