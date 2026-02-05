@@ -97,7 +97,7 @@ export function TradesPanel() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col">
-			<div className="grid grid-cols-3 gap-2 px-2 py-1 text-4xs uppercase tracking-wider text-muted-fg/70 border-b border-border/40">
+			<div className="grid grid-cols-3 gap-2 px-2 py-1 h-9 items-center text-4xs uppercase tracking-wider text-muted-fg/70 border-b border-border/40">
 				<div>{t`Time`}</div>
 				<div className="text-right">{t`Price`}</div>
 				<Button
