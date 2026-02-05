@@ -1,16 +1,16 @@
+import { useDefaultLayout } from "react-resizable-panels";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { usePersistentPanelSizes } from "@/hooks/trade/use-persistent-layout";
 import { FavoritesStrip } from "../header/favorites-strip";
 import { AnalysisSection } from "./analysis-section";
 import { TradeSidebar } from "./trade-sidebar";
 
 export function MainWorkspace() {
-	const { sizes, onSizesChange } = usePersistentPanelSizes("CHART_WITH_SWAPBOX");
+	const { defaultLayout, onLayoutChanged } = useDefaultLayout({ id: "CHART_WITH_SWAPBOX" });
 
 	return (
 		<div className="flex-1 min-h-0">
-			<ResizablePanelGroup direction="horizontal" className="h-full min-h-0" onLayout={onSizesChange}>
-				<ResizablePanel defaultSize={sizes[0]}>
+			<ResizablePanelGroup className="h-full min-h-0" defaultLayout={defaultLayout} onLayoutChanged={onLayoutChanged}>
+				<ResizablePanel defaultSize={75}>
 					<div className="h-full flex flex-col">
 						<FavoritesStrip />
 						<div className="flex-1 min-h-0">
@@ -22,7 +22,7 @@ export function MainWorkspace() {
 					withHandle
 					className="bg-border/40 data-[resize-handle-state=hover]:bg-info/30 data-[resize-handle-state=drag]:bg-info/50"
 				/>
-				<ResizablePanel defaultSize={sizes[1]}>
+				<ResizablePanel defaultSize={25}>
 					<TradeSidebar />
 				</ResizablePanel>
 			</ResizablePanelGroup>
