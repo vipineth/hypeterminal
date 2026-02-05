@@ -13,7 +13,7 @@ export function FavoritesStrip() {
 	const selectedMarket = useSelectedMarket();
 
 	return (
-		<div className="py-1.5 border-b border-border/60 bg-surface/20">
+		<div className="h-9 py-1.5 border-b border-border/60 bg-surface/20">
 			<div className="w-full whitespace-nowrap overflow-x-auto scrollbar-none">
 				<div className="flex items-center gap-0.5 px-2 min-w-full divide-x">
 					{favorites.length === 0 ? (
