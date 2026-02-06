@@ -190,12 +190,10 @@ export function MarginModeDialog({
 				)}
 
 				<DialogFooter>
-					<Button variant="outline" size="sm" onClick={handleCancel} disabled={isUpdating}>
+					<Button variant="text" size="sm" onClick={handleCancel} disabled={isUpdating}>
 						<Trans>Cancel</Trans>
 					</Button>
 					<TradingActionButton
-						variant="terminal"
-						size="sm"
 						onClick={handleConfirm}
 						disabled={!isDirty || isUpdating || cannotSwitch || showSuccess}
 						className="gap-1.5"

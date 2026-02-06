@@ -16,7 +16,7 @@ export const LeverageBadge = forwardRef<HTMLButtonElement, Props>(
 		return (
 			<Button
 				ref={ref}
-				variant="terminal"
+				variant="contained"
 				size="none"
 				onClick={onClick}
 				className={cn(

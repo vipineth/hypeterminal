@@ -1,6 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { BellIcon, GearIcon, LightningIcon, TerminalIcon } from "@phosphor-icons/react";
+import { DownloadSimpleIcon, GearIcon, TerminalIcon } from "@phosphor-icons/react";
+import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { useDepositModalActions, useSettingsDialogActions } from "@/stores/use-global-modal-store";
@@ -18,6 +19,7 @@ const NAV_ITEMS = [{ key: "trade", label: <Trans>Trade</Trans> }] as const;
 export function TopNav() {
 	const { open: openDepositModal } = useDepositModalActions();
 	const { open: openSettingsDialog } = useSettingsDialogActions();
+	const { isConnected } = useConnection();
 
 	return (
 		<header className="fixed top-0 left-0 right-0 z-40 h-11 border-b border-border/60 px-2 flex items-center justify-between bg-surface">
@@ -36,7 +38,7 @@ export function TopNav() {
 					{NAV_ITEMS.map((item, idx) => (
 						<Button
 							key={item.key}
-							variant="ghost"
+							variant="text"
 							size="none"
 							className={cn(
 								"px-2.5 py-1.5 transition-colors hover:bg-transparent",
@@ -68,24 +70,20 @@ export function TopNav() {
 				</nav>
 			</div>
 
-			<div className="flex items-center gap-1.5">
-				<Button
-					size="sm"
-					variant="outline"
-					className="h-7 text-3xs uppercase tracking-wider border-positive/40 text-positive hover:bg-positive/10 hover:text-positive"
-					onClick={() => openDepositModal("deposit")}
-				>
-					<LightningIcon className="size-3 mr-1" />
-					<Trans>Deposit</Trans>
-				</Button>
+			<div className="flex items-center gap-2">
+				{isConnected && (
+					<Button variant="outlined" size="md" onClick={() => openDepositModal("deposit")}>
+						<DownloadSimpleIcon className="size-4" />
+						<Trans>Deposit</Trans>
+					</Button>
+				)}
 				<UserMenu />
-				<Button variant="ghost" size="icon-sm" className="size-7" aria-label={t`Notifications`}>
-					<BellIcon className="size-3.5" />
-				</Button>
-				<ThemeToggle />
-				<Button variant="ghost" size="icon-sm" className="size-7" aria-label={t`Settings`} onClick={openSettingsDialog}>
-					<GearIcon className="size-3.5" />
-				</Button>
+				<div className="flex items-center gap-1">
+					<ThemeToggle />
+					<Button variant="text" size="sm" aria-label={t`Settings`} onClick={openSettingsDialog}>
+						<GearIcon className="size-3.5" />
+					</Button>
+				</div>
 			</div>
 		</header>
 	);

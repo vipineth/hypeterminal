@@ -23,13 +23,9 @@ export function TradeHeader({ orderType, side, sideLabels, marketKind, onOrderTy
 		<div className="space-y-2">
 			<div className="flex items-center justify-between gap-2">
 				<Tabs value={tabsOrderType} onValueChange={(v) => onOrderTypeChange(v as "market" | "limit")}>
-					<TabsList>
-						<TabsTrigger value="market" variant="underline">
-							{t`Market`}
-						</TabsTrigger>
-						<TabsTrigger value="limit" variant="underline">
-							{t`Limit`}
-						</TabsTrigger>
+					<TabsList variant="underline">
+						<TabsTrigger value="market">{t`Market`}</TabsTrigger>
+						<TabsTrigger value="limit">{t`Limit`}</TabsTrigger>
 					</TabsList>
 				</Tabs>
 				<AdvancedOrderDropdown orderType={orderType} onOrderTypeChange={onOrderTypeChange} marketKind={marketKind} />

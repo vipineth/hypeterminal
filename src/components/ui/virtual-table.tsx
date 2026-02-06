@@ -83,7 +83,7 @@ export function VirtualTable<TData extends RowData>({
 								return (
 									<Button
 										key={header.id}
-										variant="ghost"
+										variant="text"
 										size="none"
 										className={cn(headerClassName, "hover:bg-transparent")}
 										style={headerStyle}

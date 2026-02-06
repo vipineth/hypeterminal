@@ -206,8 +206,8 @@ export function PerfPanel({ onClose }: Props) {
 		return (
 			<div className="fixed bottom-4 right-4 z-9999">
 				<Button
-					variant="outline"
-					size="icon-sm"
+					variant="outlined"
+					size="sm"
 					onClick={() => setIsMinimized(false)}
 					className="bg-bg/95 backdrop-blur border-border/60 shadow-lg"
 				>
@@ -225,14 +225,14 @@ export function PerfPanel({ onClose }: Props) {
 					<span className="text-sm font-medium">Performance</span>
 				</div>
 				<div className="flex items-center gap-1">
-					<Button variant="ghost" size="icon-sm" onClick={handleRefresh} className="size-6">
+					<Button variant="text" size="sm" onClick={handleRefresh} className="size-6">
 						<ArrowsClockwiseIcon className="size-3" />
 					</Button>
-					<Button variant="ghost" size="icon-sm" onClick={() => setIsMinimized(true)} className="size-6">
+					<Button variant="text" size="sm" onClick={() => setIsMinimized(true)} className="size-6">
 						<MinusIcon className="size-3" />
 					</Button>
 					{onClose && (
-						<Button variant="ghost" size="icon-sm" onClick={onClose} className="size-6">
+						<Button variant="text" size="sm" onClick={onClose} className="size-6">
 							<XIcon className="size-3" />
 						</Button>
 					)}
@@ -262,7 +262,7 @@ export function PerfPanel({ onClose }: Props) {
 							))}
 						</div>
 					)}
-					<Button variant="ghost" size="xs" onClick={() => reportMetricsSummary()} className="mt-2 text-muted-fg">
+					<Button variant="text" size="sm" onClick={() => reportMetricsSummary()} className="mt-2 text-muted-fg">
 						Log to Console
 					</Button>
 				</Section>
@@ -404,7 +404,7 @@ export function PerfPanel({ onClose }: Props) {
 							))}
 						</div>
 					)}
-					<Button variant="ghost" size="xs" onClick={() => clearRenderLog()} className="mt-2 text-muted-fg">
+					<Button variant="text" size="sm" onClick={() => clearRenderLog()} className="mt-2 text-muted-fg">
 						Clear Log
 					</Button>
 				</Section>
@@ -485,8 +485,8 @@ export function PerfPanel({ onClose }: Props) {
 					)}
 					{state.leaksEnabled && (
 						<Button
-							variant="ghost"
-							size="xs"
+							variant="text"
+							size="sm"
 							onClick={() => {
 								clearLeakData();
 								triggerRefresh();

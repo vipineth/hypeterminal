@@ -916,7 +916,6 @@ msgid "markets"
 msgstr "个市场"
 
 #: src/components/trade/positions/transfer-dialog.tsx
-#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Max"
 msgstr "最大"
 
@@ -1103,8 +1102,8 @@ msgid "Not connected"
 msgstr "未连接"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Notifications"
-msgstr "通知"
+#~ msgid "Notifications"
+#~ msgstr "通知"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Number Format"
@@ -1419,8 +1418,8 @@ msgid "sent to Hyperliquid"
 msgstr ""
 
 #: src/components/trade/tradebox/trade-form-fields.tsx
-msgid "Set {p}%"
-msgstr "设置 {p}%"
+#~ msgid "Set {p}%"
+#~ msgstr "设置 {p}%"
 
 #: src/components/trade/order-entry/tp-sl-section.tsx
 #~ msgid "Set SL to {p}%"

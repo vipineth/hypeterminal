@@ -56,7 +56,7 @@ export function MarketOverview() {
 	const spotTokenAddress = getSpotTokenAddress(selectedMarketInfo);
 
 	return (
-		<div className="hidden md:flex items-center gap-4 text-3xs">
+		<div className="hidden md:flex items-center gap-4 text-3xs ">
 			{getLabelForMarketKind(selectedMarketInfo) ? (
 				<Badge className="uppercase text-4xs" variant="neutral">
 					{getLabelForMarketKind(selectedMarketInfo)}

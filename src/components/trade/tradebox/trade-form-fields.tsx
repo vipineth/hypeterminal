@@ -10,7 +10,6 @@ import { Slider } from "@/components/ui/slider";
 import {
 	FALLBACK_VALUE_PLACEHOLDER,
 	ORDER_MIN_NOTIONAL_USD,
-	ORDER_SIZE_PERCENT_STEPS,
 	SCALE_LEVELS_MAX,
 	SCALE_LEVELS_MIN,
 	TWAP_MINUTES_MAX,
@@ -184,12 +183,12 @@ export function TradeFormFields({
 							{formatAvailableBalance()} {availableBalanceToken}
 						</span>
 						{isConnected && swapTargetToken && (
-							<Button variant="link" size="none" onClick={onSwapClick} className="text-info text-4xs uppercase">
+							<Button variant="text" size="none" onClick={onSwapClick} className="text-info text-4xs uppercase">
 								{t`Swap`}
 							</Button>
 						)}
 						{isConnected && (
-							<Button variant="link" size="none" onClick={onDepositClick} className="text-info text-4xs uppercase">
+							<Button variant="text" size="none" onClick={onDepositClick} className="text-info text-4xs uppercase">
 								{t`Deposit`}
 							</Button>
 						)}
@@ -210,7 +209,7 @@ export function TradeFormFields({
 				<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Size`}</div>
 				<div className="flex items-center gap-1">
 					<Button
-						variant="ghost"
+						variant="text"
 						size="none"
 						onClick={handleSizeModeToggle}
 						className="px-2 py-1.5 text-3xs border border-border/60 hover:border-fg/30 hover:bg-transparent gap-1"
@@ -233,34 +232,37 @@ export function TradeFormFields({
 					/>
 				</div>
 
-				<Slider
-					value={[sliderValue]}
-					onValueChange={(v) => {
-						setIsDraggingSlider(true);
-						setDragSliderValue(v[0]);
-					}}
-					onValueCommit={(v) => {
-						setIsDraggingSlider(false);
-						handleSizePercentApply(v[0]);
-					}}
-					max={100}
-					step={0.1}
-					className="py-5"
-					disabled={isFormDisabled || maxSize <= 0}
-				/>
-
-				<div className="grid grid-cols-4 gap-1">
-					{ORDER_SIZE_PERCENT_STEPS.map((p) => (
-						<Button
-							key={p}
-							onClick={() => handleSizePercentApply(p)}
-							variant="outline"
-							size="xs"
-							aria-label={t`Set ${p}%`}
-						>
-							{p === 100 ? t`Max` : `${p}%`}
-						</Button>
-					))}
+				<div className="flex items-center gap-2">
+					<Slider
+						value={[sliderValue]}
+						onValueChange={(v) => {
+							setIsDraggingSlider(true);
+							setDragSliderValue(v[0]);
+						}}
+						onValueCommit={(v) => {
+							setIsDraggingSlider(false);
+							handleSizePercentApply(v[0]);
+						}}
+						max={100}
+						step={0.1}
+						className="flex-1 py-5"
+						disabled={isFormDisabled || maxSize <= 0}
+					/>
+					<div className="relative">
+						<NumberInput
+							value={String(Math.round(sliderValue))}
+							onChange={(e) => {
+								const pct = Number(e.target.value);
+								if (pct >= 0 && pct <= 100) handleSizePercentApply(pct);
+							}}
+							allowDecimals={false}
+							className="w-14 h-7 text-xs text-right pr-5 bg-bg/50 border-border/60 tabular-nums"
+							disabled={isFormDisabled || maxSize <= 0}
+						/>
+						<span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-xs text-muted-fg pointer-events-none">
+							%
+						</span>
+					</div>
 				</div>
 			</div>
 
@@ -270,7 +272,7 @@ export function TradeFormFields({
 						<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Trigger Price (USDC)`}</div>
 						{markPx > 0 && (
 							<Button
-								variant="ghost"
+								variant="text"
 								size="none"
 								onClick={() => setTriggerPrice(toFixed(markPx, szDecimalsToPriceDecimals(szDecimals)))}
 								className="text-4xs text-muted-fg hover:text-info hover:bg-transparent tabular-nums"
@@ -301,7 +303,7 @@ export function TradeFormFields({
 						<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Limit Price`}</div>
 						{markPx > 0 && (
 							<Button
-								variant="ghost"
+								variant="text"
 								size="none"
 								onClick={() => setLimitPrice(toFixed(markPx, szDecimalsToPriceDecimals(szDecimals)))}
 								className="text-4xs text-muted-fg hover:text-info hover:bg-transparent tabular-nums"

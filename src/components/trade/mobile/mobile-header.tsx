@@ -38,8 +38,8 @@ export function MobileHeader({ className }: Props) {
 				<div className="flex items-center gap-1">
 					<UserMenu />
 					<Button
-						variant="ghost"
-						size="icon-lg"
+						variant="text"
+						size="md"
 						className="size-11 active:bg-accent/50"
 						aria-label={TOP_NAV_TEXT.NOTIFICATIONS_ARIA}
 					>
@@ -47,8 +47,8 @@ export function MobileHeader({ className }: Props) {
 					</Button>
 					<ThemeToggle />
 					<Button
-						variant="ghost"
-						size="icon-lg"
+						variant="text"
+						size="md"
 						className="size-11 active:bg-accent/50"
 						aria-label={TOP_NAV_TEXT.SETTINGS_ARIA}
 						onClick={openSettingsDialog}

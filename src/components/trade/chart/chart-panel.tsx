@@ -1,38 +1,23 @@
 import { ClientOnly } from "@tanstack/react-router";
-import { Suspense, useCallback } from "react";
-import { Separator } from "@/components/ui/separator";
+import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createChartName } from "@/lib/chart/candle";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { createLazyComponent } from "@/lib/lazy";
 import { useTheme } from "@/providers/theme";
-import { useMarketActions } from "@/stores/use-market-store";
 import { MarketOverview } from "../market-overview";
-import { TokenSelector } from "./token-selector";
 
 const TradingViewChart = createLazyComponent(() => import("./tradingview-chart"), "TradingViewChart");
 
 export function ChartPanel() {
 	const { theme } = useTheme();
 	const { data: selectedMarket } = useSelectedMarketInfo();
-	const { setSelectedMarket } = useMarketActions();
-
-	const handleMarketChange = useCallback(
-		(marketName: string) => {
-			setSelectedMarket(marketName);
-		},
-		[setSelectedMarket],
-	);
 
 	return (
 		<div className="h-full flex flex-col overflow-hidden">
-			<div className="h-9 px-2 py-1.5 border-b border-border/60 bg-surface/30">
+			<div className="px-2 py-2.5 border-b border-border/60 bg-surface/30">
 				<div className="flex items-center justify-between gap-2">
-					<div className="flex items-center gap-0.5 min-w-0">
-						<TokenSelector selectedMarket={selectedMarket} onValueChange={handleMarketChange} />
-						<Separator orientation="vertical" className="mx-1 h-4" />
-						<MarketOverview />
-					</div>
+					<MarketOverview />
 				</div>
 			</div>
 

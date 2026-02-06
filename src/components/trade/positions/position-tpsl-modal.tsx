@@ -188,20 +188,14 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 				<DialogFooter className="px-5 py-3 border-t border-border/50">
 					<Button
 						size="sm"
-						variant="ghost"
+						variant="text"
 						onClick={() => handleOpenChange(false)}
 						disabled={isSubmitting}
 						className="text-muted-fg hover:text-fg"
 					>
 						{t`Cancel`}
 					</Button>
-					<TradingActionButton
-						size="sm"
-						variant="terminal"
-						onClick={handleSubmit}
-						disabled={!canSubmit}
-						className="min-w-24"
-					>
+					<TradingActionButton onClick={handleSubmit} disabled={!canSubmit} className="min-w-24">
 						{isSubmitting ? (
 							<>
 								<SpinnerGapIcon className="size-3.5 animate-spin" />

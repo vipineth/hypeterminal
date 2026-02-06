@@ -247,7 +247,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 
 							<div className="relative h-0 flex items-center justify-center z-10">
 								<Button
-									variant="outline"
+									variant="outlined"
 									size="none"
 									onClick={handleFlip}
 									disabled={isDisabled}
@@ -344,11 +344,11 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 					)}
 
 					<TradingActionButton
-						variant="terminal"
-						size="sm"
+						variant="contained"
+						size="lg"
 						onClick={handleSubmit}
 						disabled={!canSubmit || isSubmitting}
-						className="w-full h-10 gap-1.5"
+						className="w-full"
 					>
 						{isSubmitting ? (
 							<>

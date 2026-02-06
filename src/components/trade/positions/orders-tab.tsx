@@ -183,8 +183,9 @@ export function OrdersTab() {
 				<div className="ml-auto flex items-center gap-2">
 					<span className="text-info tabular-nums">{headerCount}</span>
 					<Button
-						variant="danger"
-						size="xs"
+						variant="outlined"
+						size="sm"
+						className="border-negative text-negative hover:border-negative/80 hover:bg-negative/10"
 						aria-label={t`Cancel selected orders`}
 						onClick={handleCancelSelected}
 						disabled={disableCancelSelected}
@@ -192,8 +193,9 @@ export function OrdersTab() {
 						{isCancelling ? t`Canceling...` : t`Cancel selected`}
 					</Button>
 					<Button
-						variant="danger"
-						size="xs"
+						variant="outlined"
+						size="sm"
+						className="border-negative text-negative hover:border-negative/80 hover:bg-negative/10"
 						aria-label={t`Cancel all orders`}
 						onClick={handleCancelAll}
 						disabled={disableCancelAll}
@@ -308,7 +310,7 @@ function OrderRow({
 			<TableCell className="text-2xs font-medium py-1.5">
 				<div className="flex items-center gap-1.5">
 					<Button
-						variant="link"
+						variant="text"
 						size="none"
 						onClick={() => onSelectMarket(order.coin)}
 						className="gap-1.5"
@@ -356,8 +358,9 @@ function OrderRow({
 			</TableCell>
 			<TableCell className="text-right py-1.5">
 				<Button
-					variant="danger"
-					size="xs"
+					variant="outlined"
+					size="sm"
+					className="border-negative text-negative hover:border-negative/80 hover:bg-negative/10"
 					aria-label={t`Cancel order`}
 					onClick={() => onCancel([order])}
 					disabled={!canCancel}

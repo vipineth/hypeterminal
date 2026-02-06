@@ -45,7 +45,7 @@ export function MobileBottomNav({ activeTab, onTabChange, badges, className }: P
 					return (
 						<Button
 							key={item.id}
-							variant="ghost"
+							variant="text"
 							size="none"
 							onClick={() => onTabChange(item.id)}
 							className={cn(

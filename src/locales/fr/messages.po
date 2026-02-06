@@ -916,7 +916,6 @@ msgid "markets"
 msgstr "marchés"
 
 #: src/components/trade/positions/transfer-dialog.tsx
-#: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Max"
 msgstr "Max"
 
@@ -1103,8 +1102,8 @@ msgid "Not connected"
 msgstr "Non connecté"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Notifications"
-msgstr "Notifications"
+#~ msgid "Notifications"
+#~ msgstr "Notifications"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Number Format"
@@ -1419,8 +1418,8 @@ msgid "sent to Hyperliquid"
 msgstr ""
 
 #: src/components/trade/tradebox/trade-form-fields.tsx
-msgid "Set {p}%"
-msgstr "Définir {p}%"
+#~ msgid "Set {p}%"
+#~ msgstr "Définir {p}%"
 
 #: src/components/trade/order-entry/tp-sl-section.tsx
 #~ msgid "Set SL to {p}%"

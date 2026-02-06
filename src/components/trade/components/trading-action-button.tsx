@@ -25,14 +25,9 @@ export function TradingActionButton({ onClick, children, disabled, className, ..
 		<div className="flex flex-col gap-1">
 			<Button
 				{...buttonProps}
-				variant="link"
 				onClick={handleClick}
 				disabled={disabled || isEnabling || (!isReady && !needsTrading)}
-				className={cn(
-					showEnableTrading &&
-						"bg-info/20 border-info text-info hover:border-negative hover:text-negative hover:bg-info/30",
-					className,
-				)}
+				className={cn(showEnableTrading && className)}
 			>
 				{isEnabling ? (
 					<>

@@ -147,7 +147,7 @@ function StatusScreen({
 						{description && <p className="text-xs text-muted-fg">{description}</p>}
 					</div>
 					{explorerUrl && (
-						<Button asChild variant="link" size="none" className="h-auto p-0 text-3xs text-info hover:underline">
+						<Button asChild variant="text" size="none" className="h-auto p-0 text-3xs text-info hover:underline">
 							<a href={explorerUrl} target="_blank" rel="noopener noreferrer">
 								<span className="inline-flex items-center gap-1.5">
 									<Trans>View on explorer</Trans>
@@ -184,7 +184,7 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 					</span>
 					<Button
 						type="button"
-						variant="link"
+						variant="text"
 						size="none"
 						onClick={() => onAmountChange(balance)}
 						className="h-auto p-0 text-3xs text-muted-fg hover:text-fg"
@@ -204,7 +204,7 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 						)}
 					/>
 					<Button
-						variant="ghost"
+						variant="text"
 						size="none"
 						onClick={() => onAmountChange(balance)}
 						className="h-10 px-3 text-3xs border border-border/60 hover:border-info/40 hover:bg-info/5 hover:text-info transition-colors"
@@ -234,7 +234,7 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 				/>
 			</div>
 
-			<Button variant="terminal" onClick={onSubmit} disabled={!validation.valid || isPending} className="w-full">
+			<Button variant="contained" onClick={onSubmit} disabled={!validation.valid || isPending} className="w-full">
 				{isPending ? (
 					<>
 						<SpinnerGapIcon className="size-4 animate-spin" />
@@ -284,7 +284,7 @@ function WithdrawForm({
 					</span>
 					<Button
 						type="button"
-						variant="link"
+						variant="text"
 						size="none"
 						onClick={() => !isPending && onAmountChange(available)}
 						disabled={isPending}
@@ -312,7 +312,7 @@ function WithdrawForm({
 						)}
 					/>
 					<Button
-						variant="ghost"
+						variant="text"
 						size="none"
 						onClick={() => !isPending && onAmountChange(available)}
 						disabled={isPending}
@@ -359,7 +359,7 @@ function WithdrawForm({
 				/>
 			</div>
 
-			<Button variant="terminal" onClick={onSubmit} disabled={!validation.valid || isPending} className="w-full">
+			<Button variant="contained" onClick={onSubmit} disabled={!validation.valid || isPending} className="w-full">
 				{isPending ? (
 					<>
 						<SpinnerGapIcon className="size-4 animate-spin" />
@@ -560,7 +560,7 @@ export function DepositModal() {
 				onClose={handleClose}
 			>
 				<div className="flex w-full gap-2">
-					<Button variant="outline" onClick={handleClose} className="flex-1">
+					<Button variant="outlined" onClick={handleClose} className="flex-1">
 						<Trans>Cancel</Trans>
 					</Button>
 					<Button onClick={resetDeposit} className="flex-1">
@@ -616,7 +616,7 @@ export function DepositModal() {
 				onClose={handleClose}
 			>
 				<div className="flex w-full gap-2">
-					<Button variant="outline" onClick={handleClose} className="flex-1">
+					<Button variant="outlined" onClick={handleClose} className="flex-1">
 						<Trans>Cancel</Trans>
 					</Button>
 					<Button onClick={resetWithdraw} className="flex-1">

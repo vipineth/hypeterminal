@@ -133,11 +133,11 @@ export function LeverageSheet({
 
 					{updateError ? (
 						<div className="flex gap-3">
-							<Button variant="outline" size="lg" className="flex-1" onClick={handleCancel}>
+							<Button variant="outlined" size="lg" className="flex-1" onClick={handleCancel}>
 								<Trans>Cancel</Trans>
 							</Button>
 							<Button
-								variant="ghost"
+								variant="text"
 								size="none"
 								onClick={handleConfirm}
 								disabled={isUpdating}
@@ -153,7 +153,7 @@ export function LeverageSheet({
 						</div>
 					) : (
 						<Button
-							variant="ghost"
+							variant="text"
 							size="none"
 							onClick={handleConfirm}
 							disabled={!isDirty || isUpdating || showSuccess}

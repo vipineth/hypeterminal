@@ -495,7 +495,7 @@ export function TradePanel() {
 					{approvalError && <div className="text-4xs text-negative">{approvalError}</div>}
 
 					<Button
-						variant="ghost"
+						variant="text"
 						size="none"
 						onClick={buttonContent.action}
 						disabled={buttonContent.disabled}

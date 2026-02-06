@@ -88,7 +88,7 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 							return (
 								<Button
 									key={tab.value}
-									variant="ghost"
+									variant="text"
 									size="none"
 									onClick={() => setActiveTab(tab.value)}
 									className={cn(

@@ -110,7 +110,7 @@ export function OrderbookPanel() {
 						</DropdownMenu>
 					</div>
 					<Button
-						variant="ghost"
+						variant="text"
 						size="none"
 						onClick={toggleAssetDisplay}
 						className="text-right hover:text-fg hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
@@ -120,7 +120,7 @@ export function OrderbookPanel() {
 						<ArrowsLeftRightIcon className="size-2 opacity-40" />
 					</Button>
 					<Button
-						variant="ghost"
+						variant="text"
 						size="none"
 						onClick={toggleAssetDisplay}
 						className="text-right hover:text-fg hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"

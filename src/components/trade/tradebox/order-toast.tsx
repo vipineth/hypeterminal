@@ -111,7 +111,7 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 
 			{order.status === "failed" && (
 				<Button
-					variant="ghost"
+					variant="text"
 					size="none"
 					onClick={onRemove}
 					className="p-1.5 rounded-md text-muted-fg hover:text-fg hover:bg-muted/50 transition-colors shrink-0 self-start"

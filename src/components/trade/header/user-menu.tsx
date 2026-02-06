@@ -3,10 +3,10 @@ import {
 	CaretDownIcon,
 	CheckIcon,
 	CopyIcon,
-	LightningIcon,
 	PlusCircleIcon,
 	SignOutIcon,
 	SpinnerGapIcon,
+	WalletIcon,
 } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { useConnection, useDisconnect, useEnsName } from "wagmi";
@@ -53,7 +53,7 @@ export function UserMenu() {
 
 	if (!mounted || isConnecting) {
 		return (
-			<Button variant="ghost" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider" disabled>
+			<Button variant="text" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider" disabled>
 				<SpinnerGapIcon className="size-3 animate-spin" />
 				<Trans>Connecting...</Trans>
 			</Button>
@@ -63,13 +63,8 @@ export function UserMenu() {
 	if (!isConnected) {
 		return (
 			<>
-				<Button
-					size="sm"
-					variant="outline"
-					className="h-7 text-3xs uppercase tracking-wider border-positive/40 text-positive hover:bg-positive/10 hover:text-positive"
-					onClick={() => setIsOpen(true)}
-				>
-					<LightningIcon className="size-3 mr-1" />
+				<Button size="md" variant="outlined" onClick={() => setIsOpen(true)}>
+					<WalletIcon className="size-4" />
 					<Trans>Connect Wallet</Trans>
 				</Button>
 				<WalletDialog open={isOpen} onOpenChange={setIsOpen} />
@@ -81,7 +76,7 @@ export function UserMenu() {
 		<div className="flex items-center gap-1.5">
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<Button variant="ghost" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider">
+					<Button variant="text" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider">
 						<div className="size-1.5 rounded-full bg-positive animate-pulse" />
 						{ensName ?? (address ? shortenAddress(address) : "")}
 						<CaretDownIcon className="size-2.5" />

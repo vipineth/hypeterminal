@@ -136,11 +136,11 @@ export function LeveragePopover({
 
 					{updateError ? (
 						<div className="flex gap-2">
-							<Button variant="outline" size="xs" className="flex-1" onClick={handleCancel}>
+							<Button variant="outlined" size="sm" className="flex-1" onClick={handleCancel}>
 								<Trans>Cancel</Trans>
 							</Button>
 							<Button
-								variant="ghost"
+								variant="text"
 								size="none"
 								onClick={handleConfirm}
 								disabled={isUpdating}
@@ -156,8 +156,8 @@ export function LeveragePopover({
 						</div>
 					) : (
 						<Button
-							variant="terminal"
-							size="xs"
+							variant="contained"
+							size="sm"
 							onClick={handleConfirm}
 							disabled={!isDirty || isUpdating || showSuccess}
 							className={cn("w-full py-2 uppercase tracking-wider gap-1.5")}
