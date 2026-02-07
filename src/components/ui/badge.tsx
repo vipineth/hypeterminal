@@ -4,19 +4,19 @@ import type * as React from "react";
 import { cn } from "@/lib/cn";
 
 const badgeVariants = cva(
-	"inline-flex items-center justify-center rounded-full border w-fit whitespace-nowrap shrink-0 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-danger/20 dark:aria-invalid:ring-danger/40 aria-invalid:border-danger transition-[color,box-shadow] overflow-hidden",
+	"inline-flex items-center justify-center rounded-full border w-fit whitespace-nowrap shrink-0 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-status-error/20 dark:aria-invalid:ring-status-error/40 aria-invalid:border-status-error transition-[color,box-shadow] overflow-hidden",
 	{
 		variants: {
 			variant: {
-				default: "border-transparent bg-primary text-primary-fg [a&]:hover:bg-primary/90",
-				secondary: "border-transparent bg-secondary text-secondary-fg [a&]:hover:bg-secondary/90",
+				default: "border-transparent bg-action-primary text-white [a&]:hover:bg-action-primary-hover",
+				secondary: "border-transparent bg-surface-200 text-fg-700 [a&]:hover:bg-surface-200/90",
 				destructive:
-					"border-transparent bg-danger text-danger-fg [a&]:hover:bg-danger/90 focus-visible:ring-danger/20 dark:focus-visible:ring-danger/40 dark:bg-danger/60",
-				outline: "text-fg [a&]:hover:bg-accent [a&]:hover:text-accent-fg",
+					"border-transparent bg-status-error text-white [a&]:hover:bg-status-error/90 focus-visible:ring-status-error/20 dark:focus-visible:ring-status-error/40 dark:bg-status-error/60",
+				outline: "text-fg-900 [a&]:hover:bg-surface-500 [a&]:hover:text-fg-900",
 				// Trading variants
-				long: "border-positive/40 bg-positive/10 text-positive",
-				short: "border-negative/40 bg-negative/10 text-negative",
-				neutral: "border-border/60 bg-muted/30 text-muted-fg",
+				long: "border-market-up-primary/40 bg-market-up-subtle text-market-up-primary",
+				short: "border-market-down-primary/40 bg-market-down-subtle text-market-down-primary",
+				neutral: "border-border/60 bg-surface-alt/30 text-fg-700",
 			},
 			size: {
 				default: "px-2 py-0.5 text-xs font-medium gap-1 [&>svg]:size-3",

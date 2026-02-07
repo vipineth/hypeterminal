@@ -10,27 +10,27 @@ function getStatusDisplay(status: ApiStatus) {
 	switch (status) {
 		case "connected":
 			return {
-				icon: <WifiHighIcon className="size-3 text-positive" />,
+				icon: <WifiHighIcon className="size-3 text-market-up-primary" />,
 				text: t`Connected`,
-				className: "text-positive",
+				className: "text-market-up-primary",
 			};
 		case "connecting":
 			return {
-				icon: <SpinnerGapIcon className="size-3 text-warning animate-spin" />,
+				icon: <SpinnerGapIcon className="size-3 text-status-warning animate-spin" />,
 				text: t`Connecting`,
-				className: "text-warning",
+				className: "text-status-warning",
 			};
 		case "error":
 			return {
-				icon: <WifiSlashIcon className="size-3 text-negative" />,
+				icon: <WifiSlashIcon className="size-3 text-market-down-primary" />,
 				text: t`Disconnected`,
-				className: "text-negative",
+				className: "text-market-down-primary",
 			};
 		default:
 			return {
-				icon: <WifiHighIcon className="size-3 text-muted-fg" />,
+				icon: <WifiHighIcon className="size-3 text-fg-700" />,
 				text: t`Offline`,
-				className: "text-muted-fg",
+				className: "text-fg-700",
 			};
 	}
 }
@@ -51,11 +51,11 @@ function PerfToggle() {
 		<button
 			type="button"
 			onClick={handleClick}
-			className="flex items-center gap-1 hover:text-info transition-colors"
+			className="flex items-center gap-1 hover:text-status-info transition-colors"
 			title="Toggle Performance Panel"
 		>
-			<PulseIcon className={`size-3 ${isVisible ? "text-info" : "text-muted-fg"}`} />
-			<span className={isVisible ? "text-info" : "text-muted-fg"}>Perf</span>
+			<PulseIcon className={`size-3 ${isVisible ? "text-status-info" : "text-fg-700"}`} />
+			<span className={isVisible ? "text-status-info" : "text-fg-700"}>Perf</span>
 		</button>
 	);
 }
@@ -65,7 +65,7 @@ export function FooterBar() {
 	const { icon, text, className } = getStatusDisplay(status);
 
 	return (
-		<footer className="fixed bottom-0 left-0 right-0 z-40 h-6 border-t border-border/60 px-2 text-4xs uppercase tracking-wider flex items-center justify-between bg-surface">
+		<footer className="fixed bottom-0 left-0 right-0 z-40 h-6 border-t border-border/60 px-2 text-4xs uppercase tracking-wider flex items-center justify-between bg-surface-800">
 			<div className="flex items-center gap-3">
 				<div className="flex items-center gap-1.5">
 					{icon}
@@ -77,10 +77,10 @@ export function FooterBar() {
 			<div className="flex items-center gap-3">
 				<div className="h-3 w-px bg-border/60" />
 				<ClientOnly>
-					<span className="text-muted-fg tabular-nums">{formatTime(new Date())}</span>
+					<span className="text-fg-700 tabular-nums">{formatTime(new Date())}</span>
 				</ClientOnly>
 				<div className="h-3 w-px bg-border/60" />
-				<span className="text-muted-fg">{APP_VERSION}</span>
+				<span className="text-fg-700">{APP_VERSION}</span>
 			</div>
 		</footer>
 	);

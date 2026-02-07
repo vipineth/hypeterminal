@@ -111,8 +111,8 @@ msgid "Amount (USDC)"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "API"
-#~ msgstr "API"
+msgid "API"
+msgstr "API"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #~ msgid "Appearance"
@@ -395,7 +395,7 @@ msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
-#: src/components/trade/tradebox/margin-mode-toggle.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Cross"
 msgstr "متقاطع"
 
@@ -485,8 +485,8 @@ msgid "Displays the mobile sidebar."
 msgstr "يعرض الشريط الجانبي للجوال."
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Docs"
-#~ msgstr "المستندات"
+msgid "Docs"
+msgstr "المستندات"
 
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
@@ -749,7 +749,7 @@ msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
-#: src/components/trade/tradebox/margin-mode-toggle.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Isolated"
 msgstr "معزول"
 
@@ -758,13 +758,14 @@ msgstr "معزول"
 #~ msgstr "التأخير:"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Leaderboard"
-#~ msgstr "لوحة المتصدرين"
+msgid "Leaderboard"
+msgstr "لوحة المتصدرين"
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Learn more"
 msgstr ""
 
+#: src/components/trade/tradebox/leverage-badge.tsx
 #: src/components/trade/tradebox/leverage-popover.tsx
 #: src/components/trade/tradebox/leverage-sheet.tsx
 msgid "Leverage"
@@ -977,12 +978,12 @@ msgid "Mock Wallet (Testing)"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "More"
-#~ msgstr "المزيد"
+msgid "More"
+msgstr "المزيد"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "More options"
-#~ msgstr "المزيد من الخيارات"
+msgid "More options"
+msgstr "المزيد من الخيارات"
 
 #: src/components/ui/pagination.tsx
 #~ msgid "More pages"
@@ -1102,8 +1103,8 @@ msgid "Not connected"
 msgstr "غير متصل"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Notifications"
-#~ msgstr "الإشعارات"
+msgid "Notifications"
+msgstr "الإشعارات"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Number Format"
@@ -1158,6 +1159,11 @@ msgstr "قائمة الأوامر"
 #: src/components/trade/tradebox/order-summary.tsx
 msgid "Order Value"
 msgstr "قيمة الطلب"
+
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
+msgid "Other"
+msgstr ""
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Other Options"
@@ -1221,8 +1227,8 @@ msgid "Popular"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Portfolio"
-#~ msgstr "المحفظة"
+msgid "Portfolio"
+msgstr "المحفظة"
 
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
@@ -1248,8 +1254,8 @@ msgstr ""
 
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
-msgid "Pro"
-msgstr ""
+#~ msgid "Pro"
+#~ msgstr ""
 
 #: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Processing deposit"
@@ -1295,6 +1301,10 @@ msgstr "تقليل فقط"
 #: src/components/pages/builder-page.tsx
 #~ msgid "Register Builder Code"
 #~ msgstr ""
+
+#: src/components/trade/header/favorites-strip.tsx
+msgid "Remove {displayName} from favorites"
+msgstr ""
 
 #: src/components/trade/chart/token-selector.tsx
 msgid "Remove from favorites"
@@ -1593,8 +1603,8 @@ msgid "Spread"
 msgstr "الفارق"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Staking"
-#~ msgstr "التخزين"
+msgid "Staking"
+msgstr "التخزين"
 
 #: src/lib/errors/definitions/scale.ts
 msgid "Start and end must differ"
@@ -1638,8 +1648,8 @@ msgid "Submitting..."
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Support"
-#~ msgstr "الدعم"
+msgid "Support"
+msgstr "الدعم"
 
 #: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/components/spot-swap-modal.tsx
@@ -1947,8 +1957,8 @@ msgstr "القيمة بالدولار"
 #~ msgstr "القيمة"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Vaults"
-#~ msgstr "الخزائن"
+msgid "Vaults"
+msgstr "الخزائن"
 
 #: src/lib/trade/use-button-content.ts
 msgid "Verifying..."

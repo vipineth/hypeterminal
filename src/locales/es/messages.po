@@ -111,8 +111,8 @@ msgid "Amount (USDC)"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "API"
-#~ msgstr "API"
+msgid "API"
+msgstr "API"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #~ msgid "Appearance"
@@ -395,7 +395,7 @@ msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
-#: src/components/trade/tradebox/margin-mode-toggle.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Cross"
 msgstr "Cruzado"
 
@@ -485,8 +485,8 @@ msgid "Displays the mobile sidebar."
 msgstr "Muestra la barra lateral móvil."
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Docs"
-#~ msgstr "Documentación"
+msgid "Docs"
+msgstr "Documentación"
 
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
@@ -749,7 +749,7 @@ msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
-#: src/components/trade/tradebox/margin-mode-toggle.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Isolated"
 msgstr "Aislado"
 
@@ -758,13 +758,14 @@ msgstr "Aislado"
 #~ msgstr "Latencia:"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Leaderboard"
-#~ msgstr "Clasificación"
+msgid "Leaderboard"
+msgstr "Clasificación"
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Learn more"
 msgstr ""
 
+#: src/components/trade/tradebox/leverage-badge.tsx
 #: src/components/trade/tradebox/leverage-popover.tsx
 #: src/components/trade/tradebox/leverage-sheet.tsx
 msgid "Leverage"
@@ -977,12 +978,12 @@ msgid "Mock Wallet (Testing)"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "More"
-#~ msgstr "Más"
+msgid "More"
+msgstr "Más"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "More options"
-#~ msgstr "Más opciones"
+msgid "More options"
+msgstr "Más opciones"
 
 #: src/components/ui/pagination.tsx
 #~ msgid "More pages"
@@ -1102,8 +1103,8 @@ msgid "Not connected"
 msgstr "No conectado"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Notifications"
-#~ msgstr "Notificaciones"
+msgid "Notifications"
+msgstr "Notificaciones"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Number Format"
@@ -1158,6 +1159,11 @@ msgstr "Cola de órdenes"
 #: src/components/trade/tradebox/order-summary.tsx
 msgid "Order Value"
 msgstr "Valor orden"
+
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
+msgid "Other"
+msgstr ""
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Other Options"
@@ -1221,8 +1227,8 @@ msgid "Popular"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Portfolio"
-#~ msgstr "Portafolio"
+msgid "Portfolio"
+msgstr "Portafolio"
 
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
@@ -1248,8 +1254,8 @@ msgstr ""
 
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
-msgid "Pro"
-msgstr ""
+#~ msgid "Pro"
+#~ msgstr ""
 
 #: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Processing deposit"
@@ -1295,6 +1301,10 @@ msgstr "Solo reducir"
 #: src/components/pages/builder-page.tsx
 #~ msgid "Register Builder Code"
 #~ msgstr ""
+
+#: src/components/trade/header/favorites-strip.tsx
+msgid "Remove {displayName} from favorites"
+msgstr ""
 
 #: src/components/trade/chart/token-selector.tsx
 msgid "Remove from favorites"
@@ -1593,8 +1603,8 @@ msgid "Spread"
 msgstr "Diferencial"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Staking"
-#~ msgstr "Staking"
+msgid "Staking"
+msgstr "Staking"
 
 #: src/lib/errors/definitions/scale.ts
 msgid "Start and end must differ"
@@ -1638,8 +1648,8 @@ msgid "Submitting..."
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Support"
-#~ msgstr "Soporte"
+msgid "Support"
+msgstr "Soporte"
 
 #: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/components/spot-swap-modal.tsx
@@ -1947,8 +1957,8 @@ msgstr "Valor en USD"
 #~ msgstr "Valor"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Vaults"
-#~ msgstr "Bóvedas"
+msgid "Vaults"
+msgstr "Bóvedas"
 
 #: src/lib/trade/use-button-content.ts
 msgid "Verifying..."

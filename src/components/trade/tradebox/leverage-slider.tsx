@@ -1,6 +1,5 @@
 import { useMemo } from "react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/cn";
+import { Slider, type SliderMark } from "@/components/ui/slider";
 
 interface Props {
 	value: number;
@@ -10,101 +9,45 @@ interface Props {
 	className?: string;
 }
 
-function generateMarks(max: number): number[] {
+function generateMarks(max: number): SliderMark[] {
+	const values: number[] = [];
+
 	if (max <= 5) {
-		return Array.from({ length: max }, (_, i) => i + 1);
-	}
+		for (let i = 1; i <= max; i++) values.push(i);
+	} else {
+		const targetCount = 5;
+		values.push(1);
 
-	const targetCount = 5;
-	const marks: number[] = [1];
+		const step = (max - 1) / (targetCount - 1);
+		const roundTo = max <= 10 ? 1 : max <= 50 ? 5 : 10;
 
-	const step = (max - 1) / (targetCount - 1);
-	const roundTo = max <= 10 ? 1 : max <= 50 ? 5 : 10;
-
-	for (let i = 1; i < targetCount - 1; i++) {
-		const raw = 1 + step * i;
-		const rounded = Math.round(raw / roundTo) * roundTo;
-		if (rounded > 1 && rounded < max && rounded !== marks[marks.length - 1]) {
-			marks.push(rounded);
+		for (let i = 1; i < targetCount - 1; i++) {
+			const raw = 1 + step * i;
+			const rounded = Math.round(raw / roundTo) * roundTo;
+			if (rounded > 1 && rounded < max && rounded !== values[values.length - 1]) {
+				values.push(rounded);
+			}
 		}
+
+		values.push(max);
 	}
 
-	marks.push(max);
-	return marks;
+	return values.map((v) => ({ value: v, label: `${v}×` }));
 }
 
 export function LeverageSlider({ value, onChange, max, disabled, className }: Props) {
 	const marks = useMemo(() => generateMarks(max), [max]);
-	const percentage = ((value - 1) / (max - 1)) * 100;
-
-	const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		onChange(Number(e.target.value));
-	};
 
 	return (
-		<div className={cn("space-y-1", disabled && "opacity-50 pointer-events-none", className)}>
-			<div className="relative h-5 flex items-center">
-				<div className="absolute inset-x-0 h-1.5 bg-border rounded-full">
-					<div
-						className="absolute inset-y-0 left-0 bg-info rounded-full transition-all duration-75"
-						style={{ width: `${percentage}%` }}
-					/>
-				</div>
-
-				{marks.map((mark) => {
-					const markPosition = ((mark - 1) / (max - 1)) * 100;
-					const isActive = value >= mark;
-					return (
-						<div
-							key={mark}
-							className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 pointer-events-none"
-							style={{ left: `${markPosition}%` }}
-						>
-							<div className={cn("size-2 rounded-full transition-colors", isActive ? "bg-info" : "bg-muted-fg/60")} />
-						</div>
-					);
-				})}
-
-				<input
-					type="range"
-					min={1}
-					max={max}
-					value={value}
-					onChange={handleSliderChange}
-					disabled={disabled}
-					className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10"
-				/>
-
-				<div
-					className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 pointer-events-none transition-all duration-75"
-					style={{ left: `${percentage}%` }}
-				>
-					<div className="size-3.5 rounded-full bg-info border-2 border-bg shadow-sm" />
-				</div>
-			</div>
-
-			<div className="relative h-5">
-				{marks.map((mark) => {
-					const markPosition = ((mark - 1) / (max - 1)) * 100;
-					const isSelected = value === mark;
-					return (
-						<Button
-							key={mark}
-							variant="text"
-							size="none"
-							onClick={() => !disabled && onChange(mark)}
-							disabled={disabled}
-							className={cn(
-								"absolute -translate-x-1/2 text-3xs tabular-nums hover:bg-transparent",
-								isSelected ? "text-info font-medium" : "text-muted-fg hover:text-fg",
-							)}
-							style={{ left: `${markPosition}%` }}
-						>
-							{mark}×
-						</Button>
-					);
-				})}
-			</div>
-		</div>
+		<Slider
+			value={[value]}
+			onValueChange={(v) => onChange(v[0])}
+			min={1}
+			max={max}
+			step={1}
+			marks={marks}
+			disabled={disabled}
+			className={className}
+		/>
 	);
 }

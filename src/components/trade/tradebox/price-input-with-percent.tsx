@@ -33,7 +33,7 @@ export function PriceInputWithPercent({
 	return (
 		<div className="space-y-1.5">
 			<div className="flex items-center justify-between">
-				<div className="flex items-center gap-1.5 text-muted-fg">
+				<div className="flex items-center gap-1.5 text-fg-700">
 					<span className="text-3xs font-medium uppercase tracking-wide">{label}</span>
 					<Icon className="size-3" />
 				</div>
@@ -45,8 +45,8 @@ export function PriceInputWithPercent({
 			</div>
 			<div
 				className={cn(
-					"flex items-center rounded-md border bg-bg overflow-hidden",
-					error ? "border-negative" : "border-border/60 focus-within:border-fg/30",
+					"flex items-center rounded-md border bg-surface-200 overflow-hidden",
+					error ? "border-market-down-primary" : "border-border/60 focus-within:border-fg-400",
 				)}
 			>
 				<Input
@@ -63,7 +63,7 @@ export function PriceInputWithPercent({
 							type="button"
 							onClick={() => onPercentClick(p)}
 							disabled={disabled || !isPositive(referencePrice)}
-							className="px-1.5 py-1 text-4xs font-medium text-muted-fg bg-muted hover:text-fg hover:bg-info/20 rounded-xs transition-colors disabled:opacity-50"
+							className="px-1.5 py-1 text-4xs font-medium text-fg-700 bg-surface-alt hover:text-fg-900 hover:bg-status-info/20 rounded-xs transition-colors disabled:opacity-50"
 							aria-label={t`Set to ${p}%`}
 						>
 							{p}%
@@ -71,7 +71,7 @@ export function PriceInputWithPercent({
 					))}
 				</div>
 			</div>
-			{error && <div className="text-4xs text-negative">{error}</div>}
+			{error && <div className="text-4xs text-market-down-primary">{error}</div>}
 		</div>
 	);
 }

@@ -9,13 +9,17 @@
   --font-sans: "IBM Plex Sans Variable", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   --font-mono: "IBM Plex Sans Variable", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
 
-  /* Typography - Custom smaller text sizes for dense UI */
+  /* Typography - Custom text sizes for dense UI */
+  --text-nav: 0.8125rem; /* 13px - top nav links */
+  --text-nav--line-height: 1.38;
   --text-2xs: 0.6875rem; /* 11px */
   --text-2xs--line-height: 1.45;
   --text-3xs: 0.625rem; /* 10px */
   --text-3xs--line-height: 1.5;
   --text-4xs: 0.5625rem; /* 9px */
   --text-4xs--line-height: 1.55;
+  --text-5xs: 0.5rem; /* 8px - badges */
+  --text-5xs--line-height: 1.5;
 
   /* Border Radius */
   --radius-sm: calc(0.125rem - 4px);
@@ -78,68 +82,131 @@
 }
 
 /* =============================================================================
-   LIGHT/DARK MODE CSS VARIABLES
-   Using :root and .dark for values that change between modes
+   LIGHT MODE - Default theme
    ============================================================================= */
 
-:root,
-:root[data-color-theme="terminal"] {
-  /* Core UI - Light Mode */
-  --bg: oklch(0.97 0.005 240);
-  --fg: oklch(0.2 0.02 250);
-  --surface: oklch(0.99 0.003 240);
-  --surface-fg: oklch(0.2 0.02 250);
-  --primary: oklch(0.45 0.15 250);
-  --primary-fg: oklch(0.98 0 0);
-  --secondary: oklch(0.94 0.01 240);
-  --secondary-fg: oklch(0.3 0.02 250);
-  --muted: oklch(0.95 0.008 240);
-  --muted-fg: oklch(0.5 0.02 250);
-  --accent: oklch(0.92 0.015 240);
-  --accent-fg: oklch(0.2 0.02 250);
-  --danger: oklch(0.55 0.22 25);
-  --danger-fg: oklch(0.98 0 0);
-  --border: oklch(0.82 0.02 240);
-  --input: oklch(0.94 0.01 240);
-  --ring: oklch(0.45 0.15 250);
-  --sel: oklch(0.85 0.01 240 / 0.3);
+:root {
+  /* Foreground — ink intensity scale (higher = more prominent) */
+  --fg-950: #111827; /* new — max contrast */
+  --fg-900: #2B2E48; /* text-primary */
+  --fg-800: #3D4255; /* new — between primary/secondary */
+  --fg-700: #5A6370; /* text-secondary */
+  --fg-600: #6B7380; /* new — between secondary/tertiary */
+  --fg-500: #727B87; /* text-tertiary */
+  --fg-400: #8B939D; /* text-placeholder */
+  --fg-300: #B3B8BF; /* text-disabled */
+  --fg-200: #CCD1D7; /* new — very faint */
+  --fg-100: #E2E5E9; /* new — barely visible */
 
-  /* Signals - Light Mode */
-  --positive: oklch(0.45 0.18 145);
-  --negative: oklch(0.5 0.2 25);
-  --info: oklch(0.45 0.12 230);
-  --warning: oklch(0.55 0.16 70);
-  --highlight: oklch(0.5 0.18 290);
+  /* Action */
+  --action-primary: #2563EB;
+  --action-primary-hover: #1D4ED8;
+  --action-primary-active: #1E40AF;
+  --action-primary-disabled: #A5B4FC;
+
+  /* Market */
+  --market-up-primary: #056E05;
+  --market-up-muted: #4FA14F;
+  --market-up-subtle: #E6F4E6;
+  --market-down-primary: #C8241B;
+  --market-down-muted: #E06A63;
+  --market-down-subtle: #FCE9E8;
+  --market-neutral: #8A919A;
+
+  /* Status */
+  --status-success: #1F7A3F;
+  --status-success-subtle: #E4F3EA;
+  --status-warning: #FFAD0D;
+  --status-warning-subtle: #FFF3D6;
+  --status-error: #A63A2B;
+  --status-error-subtle: #FBEAE7;
+  --status-info: #2563EB;
+  --status-info-subtle: #EAF0FF;
+
+  /* Surface — elevation scale (higher = more elevated) */
+  --surface-100: #EDF0F1; /* inset/sunken */
+  --surface-200: #F1F3F4; /* surface-base */
+  --surface-300: #F5F6F7; /* subtle elevation */
+  --surface-400: #F9FAFA; /* between base & panels */
+  --surface-500: #FDFDFD; /* surface-analysis */
+  --surface-600: #FEFEFE; /* near elevated */
+  --surface-700: #FEFEFE; /* near elevated */
+  --surface-800: #FFFFFF; /* surface-execution */
+  --surface-900: #FFFFFF; /* above elevated */
+  --surface-alt: #F9F9FA; /* subtle contrast (alternating rows, pills, badges) */
+
+  /* Highlight */
+  --highlight: #F7931A;
+
+  /* Structural */
+  --border: #CFD9E1;
+  --input: #F1F3F4;
+  --ring: #2563EB;
+  --sel: rgba(37, 99, 235, 0.15);
 }
 
-.dark,
-:root[data-color-theme="terminal"].dark {
-  /* Core UI - Dark Mode */
-  --bg: oklch(0.05 0 0);
-  --fg: oklch(0.85 0 0);
-  --surface: oklch(0.08 0 0);
-  --surface-fg: oklch(0.85 0 0);
-  --primary: oklch(0.75 0.18 160);
-  --primary-fg: oklch(0.05 0 0);
-  --secondary: oklch(0.15 0 0);
-  --secondary-fg: oklch(0.75 0 0);
-  --muted: oklch(0.12 0 0);
-  --muted-fg: oklch(0.55 0 0);
-  --accent: oklch(0.18 0 0);
-  --accent-fg: oklch(0.85 0 0);
-  --danger: oklch(0.65 0.25 25);
-  --danger-fg: oklch(0.98 0 0);
-  --border: oklch(0.2 0 0);
-  --input: oklch(0.12 0 0);
-  --ring: oklch(0.75 0.18 160);
-  --sel: oklch(0.7 0.01 240 / 0.3);
+/* =============================================================================
+   DARK MODE (Inverse)
+   ============================================================================= */
 
-  /* Signals - Dark Mode */
-  --positive: oklch(0.75 0.18 145);
-  --negative: oklch(0.65 0.22 25);
-  --info: oklch(0.78 0.12 195);
-  --warning: oklch(0.8 0.16 85);
-  --highlight: oklch(0.7 0.15 300);
+.dark {
+  /* Foreground — ink intensity scale (higher = more prominent) */
+  --fg-950: #F4F5F7; /* new — max contrast */
+  --fg-900: #E6E9EF; /* text-primary */
+  --fg-800: #CDD2DC; /* new — between primary/secondary */
+  --fg-700: #A9B0BC; /* text-secondary */
+  --fg-600: #939BAA; /* new — between secondary/tertiary */
+  --fg-500: #7F8896; /* text-tertiary */
+  --fg-400: #6A7280; /* text-placeholder */
+  --fg-300: #4E5563; /* text-disabled */
+  --fg-200: #3A4150; /* new — very faint */
+  --fg-100: #2A3040; /* new — barely visible */
+
+  /* Action */
+  --action-primary: #4F7DFF;
+  --action-primary-hover: #3B6CF6;
+  --action-primary-active: #2F5CE0;
+  --action-primary-disabled: #2A3A5F;
+
+  /* Market */
+  --market-up-primary: #4CAF6A;
+  --market-up-muted: #2E8B4F;
+  --market-up-subtle: #123524;
+  --market-down-primary: #E26D63;
+  --market-down-muted: #C94B44;
+  --market-down-subtle: #3A1C1C;
+  --market-neutral: #9AA4B2;
+
+  /* Status */
+  --status-success: #4CAF6A;
+  --status-success-subtle: #123524;
+  --status-warning: #FFAD0D;
+  --status-warning-subtle: #4A3A12;
+  --status-error: #E26D63;
+  --status-error-subtle: #3A1C1C;
+  --status-info: #4F7DFF;
+  --status-info-subtle: #1B2A4A;
+
+  /* Surface — elevation scale (higher = more elevated) */
+  --surface-100: #090A0B; /* inset/sunken */
+  --surface-200: #0D0F11; /* surface-base */
+  --surface-300: #111417; /* subtle elevation */
+  --surface-400: #15181D; /* between base & panels */
+  --surface-500: #191D23; /* surface-analysis */
+  --surface-600: #1D2229; /* between panels & elevated */
+  --surface-700: #222730; /* near elevated */
+  --surface-800: #262C36; /* surface-execution */
+  --surface-900: #2A313C; /* above elevated */
+  --surface-alt: #262C36; /* subtle contrast (alternating rows, pills, badges) */
+
+  /* Structural */
+  --border: #2D3748;
+  --input: #1A1F28;
+  --ring: #4F7DFF;
+  --sel: rgba(79, 125, 255, 0.15);
+
+  /* Highlight */
+  --highlight: #F7931A;
 
   /* Override shadows for dark mode */
   --shadow-xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.09);
@@ -151,151 +218,69 @@
 }
 
 /* =============================================================================
-   MIDNIGHT THEME - Deep blues, saturated accents
-   ============================================================================= */
-
-:root[data-color-theme="midnight"] {
-  --bg: oklch(0.96 0.008 240);
-  --fg: oklch(0.18 0.02 240);
-  --surface: oklch(0.98 0.005 240);
-  --surface-fg: oklch(0.18 0.02 240);
-  --primary: oklch(0.50 0.18 260);
-  --primary-fg: oklch(0.98 0 0);
-  --secondary: oklch(0.92 0.01 240);
-  --secondary-fg: oklch(0.28 0.02 240);
-  --muted: oklch(0.93 0.008 240);
-  --muted-fg: oklch(0.48 0.015 240);
-  --accent: oklch(0.93 0.04 260);
-  --accent-fg: oklch(0.40 0.15 260);
-  --danger: oklch(0.55 0.20 15);
-  --danger-fg: oklch(0.98 0 0);
-  --border: oklch(0.80 0.02 240);
-  --input: oklch(0.95 0.008 240);
-  --ring: oklch(0.50 0.18 260);
-  --sel: oklch(0.50 0.12 260 / 0.15);
-  --positive: oklch(0.50 0.20 160);
-  --negative: oklch(0.52 0.22 15);
-  --info: oklch(0.50 0.18 260);
-  --warning: oklch(0.56 0.20 70);
-  --highlight: oklch(0.50 0.22 280);
-}
-
-:root[data-color-theme="midnight"].dark {
-  --bg: oklch(0.10 0.02 250);
-  --fg: oklch(0.88 0.01 240);
-  --surface: oklch(0.13 0.02 250);
-  --surface-fg: oklch(0.88 0.01 240);
-  --primary: oklch(0.68 0.18 260);
-  --primary-fg: oklch(0.10 0 0);
-  --secondary: oklch(0.18 0.02 250);
-  --secondary-fg: oklch(0.75 0.01 240);
-  --muted: oklch(0.16 0.015 250);
-  --muted-fg: oklch(0.55 0.01 240);
-  --accent: oklch(0.20 0.04 260);
-  --accent-fg: oklch(0.75 0.15 260);
-  --danger: oklch(0.62 0.22 15);
-  --danger-fg: oklch(0.98 0 0);
-  --border: oklch(0.24 0.02 250);
-  --input: oklch(0.14 0.015 250);
-  --ring: oklch(0.68 0.18 260);
-  --sel: oklch(0.68 0.12 260 / 0.15);
-  --positive: oklch(0.70 0.22 160);
-  --negative: oklch(0.68 0.24 15);
-  --info: oklch(0.68 0.18 260);
-  --warning: oklch(0.76 0.20 80);
-  --highlight: oklch(0.68 0.20 280);
-}
-
-/* =============================================================================
-   ARCTIC THEME - Cool cyan and frost blues
-   ============================================================================= */
-
-:root[data-color-theme="arctic"] {
-  --bg: oklch(0.97 0.006 210);
-  --fg: oklch(0.16 0.015 210);
-  --surface: oklch(0.99 0.004 210);
-  --surface-fg: oklch(0.16 0.015 210);
-  --primary: oklch(0.55 0.14 200);
-  --primary-fg: oklch(0.98 0 0);
-  --secondary: oklch(0.93 0.01 210);
-  --secondary-fg: oklch(0.26 0.015 210);
-  --muted: oklch(0.94 0.006 210);
-  --muted-fg: oklch(0.46 0.012 210);
-  --accent: oklch(0.93 0.03 200);
-  --accent-fg: oklch(0.45 0.12 200);
-  --danger: oklch(0.55 0.18 15);
-  --danger-fg: oklch(0.98 0 0);
-  --border: oklch(0.80 0.015 210);
-  --input: oklch(0.96 0.006 210);
-  --ring: oklch(0.55 0.14 200);
-  --sel: oklch(0.55 0.10 200 / 0.15);
-  --positive: oklch(0.50 0.18 165);
-  --negative: oklch(0.52 0.20 15);
-  --info: oklch(0.55 0.14 200);
-  --warning: oklch(0.56 0.18 80);
-  --highlight: oklch(0.50 0.18 280);
-}
-
-:root[data-color-theme="arctic"].dark {
-  --bg: oklch(0.10 0.012 210);
-  --fg: oklch(0.90 0.008 210);
-  --surface: oklch(0.13 0.012 210);
-  --surface-fg: oklch(0.90 0.008 210);
-  --primary: oklch(0.72 0.14 195);
-  --primary-fg: oklch(0.10 0 0);
-  --secondary: oklch(0.17 0.012 210);
-  --secondary-fg: oklch(0.76 0.008 210);
-  --muted: oklch(0.15 0.010 210);
-  --muted-fg: oklch(0.56 0.008 210);
-  --accent: oklch(0.19 0.03 195);
-  --accent-fg: oklch(0.78 0.12 195);
-  --danger: oklch(0.62 0.20 15);
-  --danger-fg: oklch(0.98 0 0);
-  --border: oklch(0.23 0.012 210);
-  --input: oklch(0.13 0.010 210);
-  --ring: oklch(0.72 0.14 195);
-  --sel: oklch(0.72 0.10 195 / 0.15);
-  --positive: oklch(0.72 0.20 165);
-  --negative: oklch(0.68 0.22 15);
-  --info: oklch(0.72 0.14 195);
-  --warning: oklch(0.76 0.18 85);
-  --highlight: oklch(0.70 0.18 280);
-}
-
-/* =============================================================================
    THEME INLINE - Map CSS variables to Tailwind utilities
-   Use @theme inline for variables that reference other CSS variables
    ============================================================================= */
 
 @theme inline {
-  /* Semantic Colors - Core UI */
-  --color-bg: var(--bg);
-  --color-fg: var(--fg);
-  --color-surface: var(--surface);
-  --color-surface-fg: var(--surface-fg);
-  --color-primary: var(--primary);
-  --color-primary-fg: var(--primary-fg);
-  --color-secondary: var(--secondary);
-  --color-secondary-fg: var(--secondary-fg);
-  --color-muted: var(--muted);
-  --color-muted-fg: var(--muted-fg);
-  --color-accent: var(--accent);
-  --color-accent-fg: var(--accent-fg);
-  --color-danger: var(--danger);
-  --color-danger-fg: var(--danger-fg);
+  /* Foreground */
+  --color-fg-950: var(--fg-950);
+  --color-fg-900: var(--fg-900);
+  --color-fg-800: var(--fg-800);
+  --color-fg-700: var(--fg-700);
+  --color-fg-600: var(--fg-600);
+  --color-fg-500: var(--fg-500);
+  --color-fg-400: var(--fg-400);
+  --color-fg-300: var(--fg-300);
+  --color-fg-200: var(--fg-200);
+  --color-fg-100: var(--fg-100);
+
+  /* Action */
+  --color-action-primary: var(--action-primary);
+  --color-action-primary-hover: var(--action-primary-hover);
+  --color-action-primary-active: var(--action-primary-active);
+  --color-action-primary-disabled: var(--action-primary-disabled);
+
+  /* Market */
+  --color-market-up-primary: var(--market-up-primary);
+  --color-market-up-muted: var(--market-up-muted);
+  --color-market-up-subtle: var(--market-up-subtle);
+  --color-market-down-primary: var(--market-down-primary);
+  --color-market-down-muted: var(--market-down-muted);
+  --color-market-down-subtle: var(--market-down-subtle);
+  --color-market-neutral: var(--market-neutral);
+
+  /* Status */
+  --color-status-success: var(--status-success);
+  --color-status-success-subtle: var(--status-success-subtle);
+  --color-status-warning: var(--status-warning);
+  --color-status-warning-subtle: var(--status-warning-subtle);
+  --color-status-error: var(--status-error);
+  --color-status-error-subtle: var(--status-error-subtle);
+  --color-status-info: var(--status-info);
+  --color-status-info-subtle: var(--status-info-subtle);
+
+  /* Surface */
+  --color-surface-100: var(--surface-100);
+  --color-surface-200: var(--surface-200);
+  --color-surface-300: var(--surface-300);
+  --color-surface-400: var(--surface-400);
+  --color-surface-500: var(--surface-500);
+  --color-surface-600: var(--surface-600);
+  --color-surface-700: var(--surface-700);
+  --color-surface-800: var(--surface-800);
+  --color-surface-900: var(--surface-900);
+  --color-surface-alt: var(--surface-alt);
+
+  /* Highlight */
+  --color-highlight: var(--highlight);
+
+  /* Structural */
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-sel: var(--sel);
 
-  /* Signals - Trading semantics */
-  --color-positive: var(--positive);
-  --color-negative: var(--negative);
-  --color-info: var(--info);
-  --color-warning: var(--warning);
-  --color-highlight: var(--highlight);
-
-  /* Shadows (for dark mode override support) */
+  /* Shadows */
   --shadow-xs: var(--shadow-xs);
   --shadow-sm: var(--shadow-sm);
   --shadow-md: var(--shadow-md);
@@ -313,7 +298,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-bg text-fg font-mono;
+    @apply bg-surface-200 text-fg-900 font-mono;
   }
   ::selection {
     background: var(--sel);
@@ -326,7 +311,6 @@
    ============================================================================= */
 
 @layer base {
-  /* Safe area insets for notched devices */
   :root {
     --sat: env(safe-area-inset-top);
     --sar: env(safe-area-inset-right);
@@ -334,35 +318,29 @@
     --sal: env(safe-area-inset-left);
   }
 
-  /* Mobile viewport height fix - use 100dvh instead of 100vh */
   html {
     height: 100%;
   }
 
-  /* Prevent pull-to-refresh on mobile when at top of page */
   body {
     overscroll-behavior-y: contain;
   }
 
-  /* Touch action optimizations */
   button, a, [role="button"] {
     touch-action: manipulation;
   }
 
-  /* Prevent text selection on interactive elements for better touch UX */
   button, [role="button"], nav {
     -webkit-user-select: none;
     user-select: none;
   }
 
-  /* Smooth scrolling with reduced motion respect */
   @media (prefers-reduced-motion: no-preference) {
     html {
       scroll-behavior: smooth;
     }
   }
 
-  /* Disable animations for reduced motion preference */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
@@ -374,7 +352,6 @@
 }
 
 @layer components {
-  /* Active scale effect for touch feedback */
   .active\:scale-98:active {
     transform: scale(0.98);
   }
@@ -383,7 +360,6 @@
     transform: scale(0.95);
   }
 
-  /* Mobile-specific touch targets - ensure minimum 44px */
   .touch-target {
     min-height: 44px;
     min-width: 44px;
@@ -394,18 +370,16 @@
     min-width: 48px;
   }
 
-  /* Terminal Scanlines */
   .terminal-scanlines {
     background-image: repeating-linear-gradient(
       0deg,
       transparent,
       transparent 2px,
-      oklch(from var(--fg) l c h / 0.01) 2px,
-      oklch(from var(--fg) l c h / 0.01) 3px
+      oklch(from var(--fg-900) l c h / 0.01) 2px,
+      oklch(from var(--fg-900) l c h / 0.01) 3px
     );
   }
 
-  /* Terminal Grid */
   .terminal-grid {
     background-image:
       linear-gradient(oklch(from var(--border) l c h / 0.08) 1px, transparent 1px),
@@ -419,21 +393,19 @@
     background-size: 50px 50px;
   }
 
-  /* Depth Bars */
   .depth-bar-ask {
-    background: linear-gradient(90deg, transparent 0%, oklch(from var(--negative) l c h / 0.12) 100%);
+    background: linear-gradient(90deg, transparent 0%, oklch(from var(--market-down-primary) l c h / 0.12) 100%);
   }
   .depth-bar-bid {
-    background: linear-gradient(90deg, oklch(from var(--positive) l c h / 0.12) 0%, transparent 100%);
+    background: linear-gradient(90deg, oklch(from var(--market-up-primary) l c h / 0.12) 0%, transparent 100%);
   }
   .dark .depth-bar-ask {
-    background: linear-gradient(90deg, transparent 0%, oklch(from var(--negative) l c h / 0.15) 100%);
+    background: linear-gradient(90deg, transparent 0%, oklch(from var(--market-down-primary) l c h / 0.15) 100%);
   }
   .dark .depth-bar-bid {
-    background: linear-gradient(90deg, oklch(from var(--positive) l c h / 0.15) 0%, transparent 100%);
+    background: linear-gradient(90deg, oklch(from var(--market-up-primary) l c h / 0.15) 0%, transparent 100%);
   }
 
-  /* Trade row flash on appear - subtle, full-width */
   .trade-row-buy,
   .trade-row-sell {
     margin-inline: -0.5rem;
@@ -443,12 +415,12 @@
   }
   .trade-row-buy {
     @starting-style {
-      background-color: oklch(from var(--positive) l c h / 0.12);
+      background-color: oklch(from var(--market-up-primary) l c h / 0.12);
     }
   }
   .trade-row-sell {
     @starting-style {
-      background-color: oklch(from var(--negative) l c h / 0.12);
+      background-color: oklch(from var(--market-down-primary) l c h / 0.12);
     }
   }
 }

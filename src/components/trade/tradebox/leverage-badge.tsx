@@ -16,20 +16,14 @@ export const LeverageBadge = forwardRef<HTMLButtonElement, Props>(
 		return (
 			<Button
 				ref={ref}
-				variant="contained"
-				size="none"
+				variant="outlined"
 				onClick={onClick}
-				className={cn(
-					"px-2 py-0.5 text-3xs gap-1",
-					"hover:bg-info/10",
-					"focus-visible:ring-1 focus-visible:ring-info",
-					isLoading && "opacity-70",
-					className,
-				)}
+				className={cn(isLoading && "opacity-70", className)}
 				aria-label={t`Change leverage`}
 			>
-				<span className="tabular-nums font-medium">{leverage}x</span>
-				<CaretDownIcon className="size-2.5" />
+				<span className="text-fg-700">{t`Leverage`}</span>
+				<span className="tabular-nums font-medium text-fg-900">{leverage}x</span>
+				<CaretDownIcon className="size-2.5 text-fg-700" />
 			</Button>
 		);
 	},

@@ -157,9 +157,9 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 
 	return (
 		<div className={cn("flex flex-col h-full min-h-0", className)}>
-			<div className="shrink-0 px-3 py-2 border-b border-border/60 bg-surface/30">
+			<div className="shrink-0 px-3 py-2 border-b border-border/60 bg-surface-800/30">
 				<div className="flex items-center justify-between">
-					<div className="flex items-center gap-1 bg-muted/50 rounded-md p-0.5">
+					<div className="flex items-center gap-1 bg-surface-alt/50 rounded-md p-0.5">
 						<Button
 							variant="text"
 							size="none"
@@ -168,7 +168,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 								"px-3 py-1.5 text-xs font-medium rounded transition-colors",
 								"min-h-[36px]",
 								"hover:bg-transparent",
-								view === "book" ? "bg-bg text-info shadow-sm" : "text-muted-fg hover:text-fg",
+								view === "book" ? "bg-surface-200 text-status-info shadow-sm" : "text-fg-700 hover:text-fg-900",
 							)}
 						>
 							{ORDERBOOK_TEXT.BOOK_LABEL}
@@ -181,7 +181,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 								"px-3 py-1.5 text-xs font-medium rounded transition-colors",
 								"min-h-[36px]",
 								"hover:bg-transparent",
-								view === "trades" ? "bg-bg text-info shadow-sm" : "text-muted-fg hover:text-fg",
+								view === "trades" ? "bg-surface-200 text-status-info shadow-sm" : "text-fg-700 hover:text-fg-900",
 							)}
 						>
 							{ORDERBOOK_TEXT.TRADES_LABEL}
@@ -196,7 +196,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 							className={cn(
 								"px-2 py-1.5 text-xs border border-border/60 rounded",
 								"min-h-[36px] flex items-center gap-1",
-								"text-muted-fg hover:text-fg hover:border-fg/30",
+								"text-fg-700 hover:text-fg-900 hover:border-fg-400",
 								"hover:bg-transparent transition-colors",
 							)}
 							aria-label="Toggle display units"
@@ -214,7 +214,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 										className={cn(
 											"px-2 py-1.5 text-xs border border-border/60 rounded",
 											"min-h-[36px] flex items-center gap-1",
-											"hover:border-fg/30 hover:bg-transparent transition-colors",
+											"hover:border-fg-400 hover:bg-transparent transition-colors",
 										)}
 									>
 										{selectedOption?.label ?? "—"}
@@ -247,7 +247,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 			{view === "book" ? (
 				<div className="flex-1 min-h-0 flex flex-col overflow-hidden">
 					{/* Column headers */}
-					<div className="shrink-0 grid grid-cols-3 gap-2 px-3 py-2 text-xs uppercase tracking-wider text-muted-fg/70 border-b border-border/40">
+					<div className="shrink-0 grid grid-cols-3 gap-2 px-3 py-2 text-xs uppercase tracking-wider text-fg-700/70 border-b border-border/40">
 						<div>{ORDERBOOK_TEXT.HEADER_PRICE}</div>
 						<div className="text-right">{ORDERBOOK_TEXT.HEADER_SIZE}</div>
 						<div className="text-right">{ORDERBOOK_TEXT.HEADER_TOTAL}</div>
@@ -275,9 +275,9 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 						) : (
 							<div className="flex-1 flex items-center justify-center">
 								{bookStatus === "error" ? (
-									<div className="text-sm text-negative">{ORDERBOOK_TEXT.FAILED}</div>
+									<div className="text-sm text-market-down-primary">{ORDERBOOK_TEXT.FAILED}</div>
 								) : (
-									<div className="flex flex-col items-center gap-2 text-muted-fg">
+									<div className="flex flex-col items-center gap-2 text-fg-700">
 										<ArrowsClockwiseIcon className="size-5 animate-spin" />
 										<span className="text-sm">{ORDERBOOK_TEXT.WAITING}</span>
 									</div>
@@ -286,14 +286,14 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 						)}
 
 						{/* Mid price */}
-						<div className="shrink-0 py-2 px-3 flex items-center justify-center gap-3 border-y border-border/40 bg-surface/30">
-							<span className="text-xl font-bold tabular-nums text-warning">
+						<div className="shrink-0 py-2 px-3 flex items-center justify-center gap-3 border-y border-border/40 bg-surface-800/30">
+							<span className="text-xl font-bold tabular-nums text-status-warning">
 								{typeof mid === "number" && Number.isFinite(mid) ? formatNumber(mid, 2) : FALLBACK_VALUE_PLACEHOLDER}
 							</span>
 							{midDirection === "up" ? (
-								<TrendUpIcon className="size-5 text-positive" />
+								<TrendUpIcon className="size-5 text-market-up-primary" />
 							) : midDirection === "down" ? (
-								<TrendDownIcon className="size-5 text-negative" />
+								<TrendDownIcon className="size-5 text-market-down-primary" />
 							) : null}
 						</div>
 
@@ -315,9 +315,9 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 					</div>
 
 					{/* Spread */}
-					<div className="shrink-0 px-3 py-2 border-t border-border/40 flex items-center justify-between text-xs text-muted-fg">
+					<div className="shrink-0 px-3 py-2 border-t border-border/40 flex items-center justify-between text-xs text-fg-700">
 						<span>{ORDERBOOK_TEXT.SPREAD_LABEL}</span>
-						<span className="tabular-nums text-warning">
+						<span className="tabular-nums text-status-warning">
 							{typeof spread === "number" &&
 							Number.isFinite(spread) &&
 							typeof spreadPct === "number" &&

@@ -77,7 +77,7 @@ export function UserMenu() {
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Button variant="text" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider">
-						<div className="size-1.5 rounded-full bg-positive animate-pulse" />
+						<div className="size-1.5 rounded-full bg-market-up-primary animate-pulse" />
 						{ensName ?? (address ? shortenAddress(address) : "")}
 						<CaretDownIcon className="size-2.5" />
 					</Button>
@@ -85,7 +85,7 @@ export function UserMenu() {
 				<DropdownMenuContent align="end" className="min-w-40 text-xs font-mono">
 					{address && <CopyAddressMenuItem address={address} />}
 					<DropdownMenuItem className="flex items-center gap-2">
-						<PlusCircleIcon className="size-3.5 text-muted-fg" />
+						<PlusCircleIcon className="size-3.5 text-fg-700" />
 						<span>
 							<Trans>Add funds</Trans>
 						</span>

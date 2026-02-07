@@ -160,7 +160,7 @@ export function SendDialog({
 			<DialogContent className="max-w-sm">
 				<DialogHeader>
 					<DialogTitle className="text-sm font-medium">{t`Send Tokens`}</DialogTitle>
-					<DialogDescription className="text-3xs text-muted-fg">
+					<DialogDescription className="text-3xs text-fg-700">
 						{t`Send tokens to another account on the Hyperliquid L1.`}
 					</DialogDescription>
 				</DialogHeader>
@@ -173,15 +173,17 @@ export function SendDialog({
 							onChange={(e) => setDestination(e.target.value)}
 							inputSize="lg"
 							className={cn(
-								"w-full bg-bg/50 border-border/60",
-								destination && !isValidDestination && "border-negative focus-visible:border-negative",
+								"w-full bg-surface-200/50 border-border/60",
+								destination &&
+									!isValidDestination &&
+									"border-market-down-primary focus-visible:border-market-down-primary",
 							)}
 						/>
 					</div>
 
 					<div className="flex gap-2">
 						<Select value={accountType} onValueChange={(v) => handleAccountTypeChange(v as AccountType)}>
-							<SelectTrigger className="flex-1 h-10 bg-bg/50 border-border/60">
+							<SelectTrigger className="flex-1 h-10 bg-surface-200/50 border-border/60">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
@@ -191,7 +193,7 @@ export function SendDialog({
 						</Select>
 
 						<Select value={selectedToken} onValueChange={handleTokenChange}>
-							<SelectTrigger className="flex-1 h-10 bg-bg/50 border-border/60">
+							<SelectTrigger className="flex-1 h-10 bg-surface-200/50 border-border/60">
 								<AssetDisplay
 									asset={getToken(selectedToken) ?? { displayName: selectedToken, iconUrl: undefined }}
 									hideIcon
@@ -217,23 +219,24 @@ export function SendDialog({
 								value={amount}
 								onChange={(e) => handleAmountChange(e.target.value)}
 								className={cn(
-									"w-full h-10 text-sm bg-bg/50 border-border/60 pr-24 tabular-nums",
-									exceedsBalance(amount, availableBalance) && "border-negative focus:border-negative",
+									"w-full h-10 text-sm bg-surface-200/50 border-border/60 pr-24 tabular-nums",
+									exceedsBalance(amount, availableBalance) &&
+										"border-market-down-primary focus:border-market-down-primary",
 								)}
 							/>
 							<button
 								type="button"
 								onClick={handleMaxClick}
-								className="absolute right-2 top-1/2 -translate-y-1/2 text-3xs text-info hover:text-info/80 transition-colors"
+								className="absolute right-2 top-1/2 -translate-y-1/2 text-3xs text-status-info hover:text-status-info/80 transition-colors"
 							>
 								{t`MAX`}: {formatToken(availableBalanceStr, 2)}
 							</button>
 						</div>
 					</div>
 
-					{error && <div className="text-3xs text-negative">{error}</div>}
+					{error && <div className="text-3xs text-market-down-primary">{error}</div>}
 
-					<Button onClick={handleSend} disabled={!canSend} className="w-full h-10 text-xs font-medium">
+					<Button onClick={handleSend} disabled={!canSend} size="lg" className="w-full">
 						{isPending && <SpinnerGapIcon className="size-3.5 animate-spin mr-2" />}
 						<PaperPlaneTiltIcon className="size-3.5 mr-2" />
 						{isPending ? t`Sending...` : t`Send`}

@@ -1,6 +1,5 @@
 import { TrendDownIcon, TrendUpIcon } from "@phosphor-icons/react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/cn";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Side } from "@/lib/trade/types";
 
 interface SideLabels {
@@ -18,37 +17,25 @@ interface Props {
 
 export function SideToggle({ side, onSideChange, labels }: Props) {
 	return (
-		<div className="grid grid-cols-2 gap-1">
-			<Button
-				variant="text"
-				size="none"
-				onClick={() => onSideChange("buy")}
-				className={cn(
-					"py-2 text-2xs font-semibold uppercase tracking-wider border hover:bg-transparent",
-					side === "buy"
-						? "bg-positive/20 border-positive text-positive"
-						: "border-border/60 text-muted-fg hover:border-positive/40 hover:text-positive",
-				)}
-				aria-label={labels.buyAria}
-			>
-				<TrendUpIcon className="size-3 inline mr-1" />
-				{labels.buy}
-			</Button>
-			<Button
-				variant="text"
-				size="none"
-				onClick={() => onSideChange("sell")}
-				className={cn(
-					"py-2 text-2xs font-semibold uppercase tracking-wider border hover:bg-transparent",
-					side === "sell"
-						? "bg-negative/20 border-negative text-negative"
-						: "border-border/60 text-muted-fg hover:border-negative/40 hover:text-negative",
-				)}
-				aria-label={labels.sellAria}
-			>
-				<TrendDownIcon className="size-3 inline mr-1" />
-				{labels.sell}
-			</Button>
-		</div>
+		<Tabs value={side} onValueChange={(v) => onSideChange(v as Side)}>
+			<TabsList variant="pill" className="w-full">
+				<TabsTrigger
+					value="buy"
+					className="flex-1 p-2 text-sm data-[state=active]:text-market-up-primary"
+					aria-label={labels.buyAria}
+				>
+					<TrendUpIcon className="size-4" />
+					{labels.buy}
+				</TabsTrigger>
+				<TabsTrigger
+					value="sell"
+					className="flex-1 p-2 text-sm data-[state=active]:text-market-down-primary"
+					aria-label={labels.sellAria}
+				>
+					<TrendDownIcon className="size-4" />
+					{labels.sell}
+				</TabsTrigger>
+			</TabsList>
+		</Tabs>
 	);
 }

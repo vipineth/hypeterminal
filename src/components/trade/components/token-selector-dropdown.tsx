@@ -31,7 +31,7 @@ export function TokenSelectorDropdown({ tokens, selectedToken, onSelect, getBala
 					variant="text"
 					size="none"
 					className={cn(
-						"flex items-center gap-2 px-2.5 py-1.5 border border-border/40 bg-surface/30 hover:bg-surface/50 hover:border-border/60 transition-colors",
+						"flex items-center gap-2 px-2.5 py-1.5 border border-border/40 bg-surface-800/30 hover:bg-surface-800/50 hover:border-border/60 transition-colors",
 						disabled && "opacity-50 cursor-not-allowed",
 						className,
 					)}
@@ -41,12 +41,12 @@ export function TokenSelectorDropdown({ tokens, selectedToken, onSelect, getBala
 					) : (
 						<span className="text-sm font-medium">{selectedToken}</span>
 					)}
-					<CaretDownIcon className="size-3.5 text-muted-fg ml-1" />
+					<CaretDownIcon className="size-3.5 text-fg-700 ml-1" />
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" className="w-56">
 				{tokens.length === 0 ? (
-					<div className="px-3 py-2 text-xs text-muted-fg">
+					<div className="px-3 py-2 text-xs text-fg-700">
 						<Trans>No tokens available</Trans>
 					</div>
 				) : (
@@ -62,9 +62,9 @@ export function TokenSelectorDropdown({ tokens, selectedToken, onSelect, getBala
 							>
 								<div className="flex items-center gap-2">
 									<AssetDisplay asset={token} iconClassName="size-5" nameClassName="text-sm font-medium" />
-									{isSelected && <CheckIcon className="size-3.5 text-info" />}
+									{isSelected && <CheckIcon className="size-3.5 text-status-info" />}
 								</div>
-								<span className="text-xs text-muted-fg tabular-nums">{formatToken(balance, 4)}</span>
+								<span className="text-xs text-fg-700 tabular-nums">{formatToken(balance, 4)}</span>
 							</DropdownMenuItem>
 						);
 					})

@@ -99,7 +99,7 @@ export function LeveragePopover({
 			<PopoverContent align="end" className="w-56 p-3">
 				<div className="space-y-3">
 					<div className="flex items-center justify-between">
-						<span className="text-3xs font-medium uppercase tracking-wide text-muted-fg">
+						<span className="text-2xs font-normal uppercase tracking-wide text-fg-700">
 							<Trans>Leverage</Trans>
 						</span>
 						<div className="flex items-center gap-1">
@@ -114,21 +114,21 @@ export function LeveragePopover({
 								inputSize="sm"
 								className="w-12 text-center font-medium tabular-nums"
 							/>
-							<span className="text-xs text-muted-fg">x</span>
+							<span className="text-xs text-fg-700">x</span>
 						</div>
 					</div>
 
 					<LeverageSlider value={displayValue} onChange={onLeverageChange} max={maxLeverage} disabled={isUpdating} />
 
 					{updateError && (
-						<div className="flex items-center gap-1.5 p-1.5 bg-negative/10 border border-negative/20 rounded-md text-3xs text-negative">
+						<div className="flex items-center gap-1.5 p-1.5 bg-market-down-subtle border border-market-down-primary/20 rounded-md text-3xs text-market-down-primary">
 							<WarningIcon className="size-3 shrink-0" />
 							<span className="truncate">{updateError.message || t`Update failed`}</span>
 						</div>
 					)}
 
 					{showSuccess && (
-						<div className="flex items-center justify-center gap-1.5 p-1.5 bg-positive/10 border border-positive/20 rounded-md text-3xs text-positive">
+						<div className="flex items-center justify-center gap-1.5 p-1.5 bg-market-up-subtle border border-market-up-primary/20 rounded-md text-3xs text-market-up-primary">
 							<CheckIcon className="size-3" />
 							<Trans>Updated</Trans>
 						</div>
@@ -146,8 +146,8 @@ export function LeveragePopover({
 								disabled={isUpdating}
 								className={cn(
 									"flex-1 py-2 text-2xs font-semibold uppercase tracking-wider gap-1.5 hover:bg-transparent",
-									"bg-info/20 border border-info text-info",
-									"hover:bg-info/30",
+									"bg-status-info/20 border border-status-info text-status-info",
+									"hover:bg-status-info/30",
 								)}
 							>
 								{isUpdating && <SpinnerGapIcon className="size-3 animate-spin" />}

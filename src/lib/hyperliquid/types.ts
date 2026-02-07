@@ -37,6 +37,8 @@ export type WebSocketStatus = "idle" | "connecting" | "open" | "error";
 export interface SubscriptionOptions {
 	enabled?: boolean;
 	throttleMs?: number;
+	maxPayloadBytes?: number;
+	dropOversizedPayload?: boolean;
 }
 
 export type SubscriptionResult<TData> = {

@@ -73,7 +73,7 @@ function getFilteredOptions(options: AdvancedOrderOption[], marketKind: MarketKi
 
 export function AdvancedOrderDropdown({ orderType, onOrderTypeChange, marketKind = "perp" }: Props) {
 	const isAdvanced = isAdvancedOrderType(orderType);
-	const label = getAdvancedOrderLabel(orderType, t`Pro`);
+	const label = getAdvancedOrderLabel(orderType, t`Other`);
 
 	const triggerOptions = getFilteredOptions(TRIGGER_OPTIONS, marketKind);
 	const executionOptions = getFilteredOptions(EXECUTION_OPTIONS, marketKind);
@@ -84,24 +84,17 @@ export function AdvancedOrderDropdown({ orderType, onOrderTypeChange, marketKind
 			<DropdownMenuTrigger asChild>
 				<button
 					type="button"
-					className={cn(
-						"text-3xs uppercase tracking-wider transition-colors outline-none",
-						"text-muted-fg hover:text-fg",
-						"border-b border-transparent",
-						isAdvanced && "text-info border-info",
-					)}
+					className="inline-flex items-center gap-1 outline-none hover:text-fg-950 transition-colors"
 					aria-label={t`Advanced order types`}
 				>
-					<span className="inline-flex items-center gap-1">
-						{isAdvanced ? label : t`Pro`}
-						<CaretDownIcon className={cn("size-3", isAdvanced ? "text-info" : "text-muted-fg")} />
-					</span>
+					{isAdvanced ? label : t`Other`}
+					<CaretDownIcon className="size-3 text-fg-500" />
 				</button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="min-w-44">
 				{hasTriggerOptions && (
 					<>
-						<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-muted-fg/70">
+						<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-fg-700/70">
 							{t`Trigger`}
 						</DropdownMenuLabel>
 						{triggerOptions.map((option) => (
@@ -115,7 +108,7 @@ export function AdvancedOrderDropdown({ orderType, onOrderTypeChange, marketKind
 						<DropdownMenuSeparator />
 					</>
 				)}
-				<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-muted-fg/70">
+				<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-fg-700/70">
 					{t`Execution`}
 				</DropdownMenuLabel>
 				{executionOptions.map((option) => (
@@ -144,13 +137,15 @@ function AdvancedOrderItem({ option, isSelected, onSelect }: AdvancedOrderItemPr
 			<span
 				className={cn(
 					"flex size-5 items-center justify-center rounded transition-colors",
-					isSelected ? "bg-info/15 text-info" : "bg-muted/40 text-muted-fg",
+					isSelected ? "bg-status-info/15 text-status-info" : "bg-surface-alt/40 text-fg-700",
 				)}
 			>
 				<Icon className="size-3" />
 			</span>
-			<span className={cn("flex-1 text-xs", isSelected ? "text-fg font-medium" : "text-muted-fg")}>{option.label}</span>
-			{isSelected && <CheckIcon className="size-3.5 text-info" />}
+			<span className={cn("flex-1 text-xs", isSelected ? "text-fg-900 font-medium" : "text-fg-700")}>
+				{option.label}
+			</span>
+			{isSelected && <CheckIcon className="size-3.5 text-status-info" />}
 		</DropdownMenuItem>
 	);
 }

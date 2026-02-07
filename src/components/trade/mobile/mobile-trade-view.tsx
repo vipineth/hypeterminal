@@ -4,7 +4,7 @@ import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Slider } from "@/components/ui/slider";
+import { Slider, type SliderMark } from "@/components/ui/slider";
 import {
 	FALLBACK_VALUE_PLACEHOLDER,
 	ORDER_FEE_RATE_MAKER,
@@ -37,6 +37,7 @@ type OrderType = "market" | "limit";
 type Side = "buy" | "sell";
 
 const ORDER_TEXT = UI_TEXT.ORDER_ENTRY;
+const SIZE_MARKS: SliderMark[] = [{ value: 0 }, { value: 25 }, { value: 50 }, { value: 75 }, { value: 100 }];
 
 interface MobileTradeViewProps {
 	className?: string;
@@ -310,9 +311,9 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const isFormDisabled = !isConnected || availableBalance <= 0;
 
 	return (
-		<div className={cn("flex flex-col h-full min-h-0 bg-surface/20", className)}>
+		<div className={cn("flex flex-col h-full min-h-0 bg-surface-800/20", className)}>
 			{/* Market info header */}
-			<div className="shrink-0 px-4 py-3 border-b border-border/60 bg-surface/30">
+			<div className="shrink-0 px-4 py-3 border-b border-border/60 bg-surface-800/30">
 				{isMarketLoading ? (
 					<div className="flex items-center justify-between">
 						<Skeleton className="h-8 w-24" />
@@ -322,10 +323,10 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-2">
 							<span className="text-lg font-semibold">{baseToken ?? "—"}</span>
-							<span className="text-xs text-muted-fg">PERP</span>
+							<span className="text-xs text-fg-700">PERP</span>
 						</div>
 						<div className="text-right">
-							<div className="text-lg font-semibold tabular-nums text-warning">{formatUSD(markPx || null)}</div>
+							<div className="text-lg font-semibold tabular-nums text-status-warning">{formatUSD(markPx || null)}</div>
 						</div>
 					</div>
 				)}
@@ -344,8 +345,8 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 								"py-4 text-base font-semibold uppercase tracking-wider border rounded-md gap-2 hover:bg-transparent",
 								"active:scale-98",
 								side === "buy"
-									? "bg-positive/20 border-positive text-positive"
-									: "border-border/60 text-muted-fg hover:border-positive/40",
+									? "bg-market-up-subtle border-market-up-primary text-market-up-primary"
+									: "border-border/60 text-fg-700 hover:border-market-up-primary/40",
 							)}
 						>
 							<TrendUpIcon className="size-5" />
@@ -359,8 +360,8 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 								"py-4 text-base font-semibold uppercase tracking-wider border rounded-md gap-2 hover:bg-transparent",
 								"active:scale-98",
 								side === "sell"
-									? "bg-negative/20 border-negative text-negative"
-									: "border-border/60 text-muted-fg hover:border-negative/40",
+									? "bg-market-down-subtle border-market-down-primary text-market-down-primary"
+									: "border-border/60 text-fg-700 hover:border-market-down-primary/40",
 							)}
 						>
 							<TrendDownIcon className="size-5" />
@@ -369,14 +370,14 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					</div>
 
 					{/* Order type tabs */}
-					<div className="flex items-center gap-1 bg-muted/50 rounded-md p-1">
+					<div className="flex items-center gap-1 bg-surface-alt/50 rounded-md p-1">
 						<Button
 							variant="text"
 							size="none"
 							onClick={() => setType("market")}
 							className={cn(
 								"flex-1 py-2.5 text-sm font-medium rounded hover:bg-transparent",
-								type === "market" ? "bg-bg text-info shadow-sm" : "text-muted-fg",
+								type === "market" ? "bg-surface-200 text-status-info shadow-sm" : "text-fg-700",
 							)}
 						>
 							{ORDER_TEXT.ORDER_TYPE_MARKET}
@@ -387,7 +388,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							onClick={() => setType("limit")}
 							className={cn(
 								"flex-1 py-2.5 text-sm font-medium rounded hover:bg-transparent",
-								type === "limit" ? "bg-bg text-info shadow-sm" : "text-muted-fg",
+								type === "limit" ? "bg-surface-200 text-status-info shadow-sm" : "text-fg-700",
 							)}
 						>
 							{ORDER_TEXT.ORDER_TYPE_LIMIT}
@@ -397,11 +398,11 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					{/* Leverage and balance */}
 					<div className="flex items-center justify-between text-sm">
 						<div className="flex items-center gap-2">
-							<span className="text-muted-fg">Leverage</span>
+							<span className="text-fg-700">Leverage</span>
 							<LeverageControl key={market?.name} />
 						</div>
 						<div className="text-right">
-							<span className="text-muted-fg">{ORDER_TEXT.AVAILABLE_LABEL}: </span>
+							<span className="text-fg-700">{ORDER_TEXT.AVAILABLE_LABEL}: </span>
 							<span className={cn("tabular-nums font-medium", getValueColorClass(availableBalance))}>
 								{isConnected ? formatUSD(availableBalance) : FALLBACK_VALUE_PLACEHOLDER}
 							</span>
@@ -410,7 +411,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 
 					{/* Size input */}
 					<div className="space-y-2">
-						<p className="text-sm text-muted-fg">{ORDER_TEXT.SIZE_LABEL}</p>
+						<p className="text-sm text-fg-700">{ORDER_TEXT.SIZE_LABEL}</p>
 						<div className="flex items-center gap-2">
 							<Button
 								variant="text"
@@ -418,7 +419,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 								onClick={handleSizeModeToggle}
 								className={cn(
 									"px-3 py-3 text-sm border border-border/60 rounded-md gap-1 min-h-[48px] hover:bg-transparent",
-									"hover:border-fg/30",
+									"hover:border-fg-400",
 								)}
 								disabled={isFormDisabled}
 							>
@@ -433,8 +434,8 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 								onChange={(e) => setSizeInput(e.target.value)}
 								className={cn(
 									"flex-1 h-12 text-base tabular-nums",
-									"bg-bg/50 border-border/60",
-									"focus:border-info/60",
+									"bg-surface-200/50 border-border/60",
+									"focus:border-status-info/60",
 								)}
 								disabled={isFormDisabled}
 							/>
@@ -446,6 +447,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							onValueChange={handleSliderChange}
 							max={100}
 							step={1}
+							marks={SIZE_MARKS}
 							className="py-2"
 							disabled={isFormDisabled || maxSize <= 0}
 						/>
@@ -471,9 +473,14 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					{type === "limit" && (
 						<div className="space-y-2">
 							<div className="flex items-center justify-between">
-								<p className="text-sm text-muted-fg">{ORDER_TEXT.LIMIT_PRICE_LABEL}</p>
+								<p className="text-sm text-fg-700">{ORDER_TEXT.LIMIT_PRICE_LABEL}</p>
 								{markPx > 0 && (
-									<Button variant="text" size="none" onClick={handleMarkPriceClick} className="text-xs text-info">
+									<Button
+										variant="text"
+										size="none"
+										onClick={handleMarkPriceClick}
+										className="text-xs text-status-info"
+									>
 										{ORDER_TEXT.MARK_PRICE_LABEL}: {formatPrice(markPx, { szDecimals: market?.szDecimals })}
 									</Button>
 								)}
@@ -484,7 +491,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 								placeholder={ORDER_TEXT.INPUT_PLACEHOLDER}
 								value={limitPriceInput}
 								onChange={(e) => setLimitPriceInput(e.target.value)}
-								className="h-12 text-base tabular-nums bg-bg/50"
+								className="h-12 text-base tabular-nums bg-surface-200/50"
 								disabled={isFormDisabled}
 							/>
 						</div>
@@ -492,9 +499,9 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 
 					{/* Error messages */}
 					{validation.errors.length > 0 && isConnected && availableBalance > 0 && !validation.needsApproval && (
-						<div className="text-sm text-negative">{validation.errors.join(" • ")}</div>
+						<div className="text-sm text-market-down-primary">{validation.errors.join(" • ")}</div>
 					)}
-					{approvalError && <div className="text-sm text-negative">{approvalError}</div>}
+					{approvalError && <div className="text-sm text-market-down-primary">{approvalError}</div>}
 
 					{/* Order summary */}
 					<div className="border border-border/40 rounded-md divide-y divide-border/40 text-sm">
@@ -509,19 +516,19 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 						<SummaryRow
 							label={ORDER_TEXT.SUMMARY_LIQ}
 							value={liqPrice ? formatPrice(liqPrice, { szDecimals: market?.szDecimals }) : FALLBACK_VALUE_PLACEHOLDER}
-							valueClass="text-negative/70"
+							valueClass="text-market-down-primary/70"
 						/>
 						<SummaryRow
 							label={ORDER_TEXT.SUMMARY_FEE}
 							value={estimatedFee > 0 ? formatUSD(estimatedFee) : FALLBACK_VALUE_PLACEHOLDER}
-							valueClass="text-muted-fg"
+							valueClass="text-fg-700"
 						/>
 					</div>
 				</div>
 			</div>
 
 			{/* Sticky submit button */}
-			<div className="shrink-0 p-4 border-t border-border/60 bg-bg/95 backdrop-blur-sm">
+			<div className="shrink-0 p-4 border-t border-border/60 bg-surface-200/95 backdrop-blur-sm">
 				<Button
 					variant="text"
 					size="none"
@@ -531,10 +538,10 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 						"w-full py-4 text-base font-semibold uppercase tracking-wider border rounded-md gap-2 hover:bg-transparent",
 						"active:scale-98",
 						buttonContent.variant === "cyan"
-							? "bg-info/20 border-info text-info hover:bg-info/30"
+							? "bg-status-info/20 border-status-info text-status-info hover:bg-status-info/30"
 							: buttonContent.variant === "buy"
-								? "bg-positive/20 border-positive text-positive hover:bg-positive/30"
-								: "bg-negative/20 border-negative text-negative hover:bg-negative/30",
+								? "bg-market-up-subtle border-market-up-primary text-market-up-primary hover:bg-market-up-subtle/30"
+								: "bg-market-down-subtle border-market-down-primary text-market-down-primary hover:bg-market-down-primary/30",
 					)}
 				>
 					{(isSubmitting || isRegistering) && <SpinnerGapIcon className="size-5 animate-spin" />}
@@ -553,7 +560,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 function SummaryRow({ label, value, valueClass }: { label: string; value: string; valueClass?: string }) {
 	return (
 		<div className="flex items-center justify-between px-3 py-2.5">
-			<span className="text-muted-fg">{label}</span>
+			<span className="text-fg-700">{label}</span>
 			<span className={cn("tabular-nums", valueClass)}>{value}</span>
 		</div>
 	);

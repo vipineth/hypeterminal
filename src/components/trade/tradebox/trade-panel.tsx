@@ -53,8 +53,7 @@ import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
 import { WalletDialog } from "../components/wallet-dialog";
 import { LeverageControl } from "./leverage-control";
-import { MarginModeDialog } from "./margin-mode-dialog";
-import { MarginModeToggle } from "./margin-mode-toggle";
+import { MarginModeDialog, MarginModeToggle } from "./margin-mode-dialog";
 import { OrderSummary } from "./order-summary";
 import { OrderToast } from "./order-toast";
 import { TradeFormFields } from "./trade-form-fields";
@@ -62,12 +61,12 @@ import { TradeHeader } from "./trade-header";
 
 function getActionButtonClass(variant: ButtonContent["variant"]): string {
 	if (variant === "cyan") {
-		return "bg-info/20 border-info text-info hover:bg-info/30";
+		return "bg-action-primary border-action-primary text-white hover:bg-action-primary-hover text-sm font-medium normal-case";
 	}
 	if (variant === "buy") {
-		return "bg-positive/20 border-positive text-positive hover:bg-positive/30";
+		return "bg-market-up-subtle border-market-up-primary text-market-up-primary hover:bg-market-up-subtle/30";
 	}
-	return "bg-negative/20 border-negative text-negative hover:bg-negative/30";
+	return "bg-market-down-subtle border-market-down-primary text-market-down-primary hover:bg-market-down-primary/30";
 }
 
 export function TradePanel() {
@@ -439,9 +438,9 @@ export function TradePanel() {
 	const actionButtonClass = getActionButtonClass(buttonContent.variant);
 
 	return (
-		<div className="h-full flex flex-col overflow-hidden bg-surface/20">
+		<div className="h-full flex flex-col overflow-hidden bg-surface-800">
 			{capabilities.isLeveraged && (
-				<div className="h-9 px-2 border-b border-border/60 flex items-center justify-between">
+				<div className="p-2 border-b border-border/60 flex items-center justify-between">
 					{capabilities.hasMarginMode ? (
 						<MarginModeToggle
 							mode={marginMode}
@@ -489,20 +488,16 @@ export function TradePanel() {
 
 				<div className="space-y-2">
 					{validation.errors.length > 0 && isConnected && availableBalance > 0 && (
-						<div className="text-4xs text-negative">{validation.errors.join(" • ")}</div>
+						<div className="text-4xs text-market-down-primary">{validation.errors.join(" • ")}</div>
 					)}
 
-					{approvalError && <div className="text-4xs text-negative">{approvalError}</div>}
+					{approvalError && <div className="text-4xs text-market-down-primary">{approvalError}</div>}
 
 					<Button
 						variant="text"
-						size="none"
 						onClick={buttonContent.action}
 						disabled={buttonContent.disabled}
-						className={cn(
-							"w-full py-2.5 text-2xs font-semibold uppercase tracking-wider border gap-2 hover:bg-transparent",
-							actionButtonClass,
-						)}
+						className={cn("w-full", actionButtonClass)}
 						aria-label={buttonContent.text}
 					>
 						{(isSubmitting || isRegistering) && <SpinnerGapIcon className="size-3 animate-spin" />}

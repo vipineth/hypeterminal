@@ -51,14 +51,14 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 
 	if (!isConnected) {
 		return (
-			<div className={cn("flex flex-col h-full min-h-0 bg-surface/20", className)}>
+			<div className={cn("flex flex-col h-full min-h-0 bg-surface-800/20", className)}>
 				<div className="flex-1 flex flex-col items-center justify-center gap-6 p-6">
-					<div className="size-20 rounded-full bg-muted/50 flex items-center justify-center">
-						<WalletIcon className="size-10 text-muted-fg" />
+					<div className="size-20 rounded-full bg-surface-alt/50 flex items-center justify-center">
+						<WalletIcon className="size-10 text-fg-700" />
 					</div>
 					<div className="text-center space-y-2">
 						<h2 className="text-lg font-semibold">Connect Wallet</h2>
-						<p className="text-sm text-muted-fg max-w-xs">
+						<p className="text-sm text-fg-700 max-w-xs">
 							Connect your wallet to view your account, positions, and start trading.
 						</p>
 					</div>
@@ -68,8 +68,8 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						onClick={() => setWalletDialogOpen(true)}
 						className={cn(
 							"px-6 py-3 text-base font-semibold rounded-md",
-							"bg-info/20 border border-info text-info",
-							"hover:bg-info/30 transition-colors",
+							"bg-status-info/20 border border-status-info text-status-info",
+							"hover:bg-status-info/30 transition-colors",
 							"min-h-[48px]",
 						)}
 					>
@@ -83,13 +83,13 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 	}
 
 	return (
-		<div className={cn("flex flex-col h-full min-h-0 bg-surface/20", className)}>
+		<div className={cn("flex flex-col h-full min-h-0 bg-surface-800/20", className)}>
 			{/* Account header */}
-			<div className="shrink-0 px-4 py-4 border-b border-border/60 bg-surface/30">
+			<div className="shrink-0 px-4 py-4 border-b border-border/60 bg-surface-800/30">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3">
-						<div className="size-10 rounded-full bg-info/20 flex items-center justify-center">
-							<span className="text-info font-bold">{address?.slice(2, 4).toUpperCase()}</span>
+						<div className="size-10 rounded-full bg-status-info/20 flex items-center justify-center">
+							<span className="text-status-info font-bold">{address?.slice(2, 4).toUpperCase()}</span>
 						</div>
 						<div>
 							<div className="flex items-center gap-2">
@@ -100,10 +100,10 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 									variant="text"
 									size="none"
 									onClick={handleCopyAddress}
-									className="p-1.5 text-muted-fg hover:text-fg hover:bg-transparent transition-colors"
+									className="p-1.5 text-fg-700 hover:text-fg-900 hover:bg-transparent transition-colors"
 									aria-label="Copy address"
 								>
-									<CopyIcon className={cn("size-3.5", copied && "text-positive")} />
+									<CopyIcon className={cn("size-3.5", copied && "text-market-up-primary")} />
 								</Button>
 							</div>
 							<Badge variant="outline" className="text-xs mt-0.5">
@@ -116,7 +116,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						size="none"
 						onClick={() => disconnect.mutate()}
 						className={cn(
-							"p-2.5 text-muted-fg hover:text-negative",
+							"p-2.5 text-fg-700 hover:text-market-down-primary",
 							"transition-colors rounded-md hover:bg-transparent",
 							"min-h-[44px] min-w-[44px] flex items-center justify-center",
 						)}
@@ -131,7 +131,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 			<div className="flex-1 min-h-0 overflow-y-auto">
 				<div className="p-4 space-y-4">
 					{/* Main balance card */}
-					<div className="p-4 rounded-lg border border-border/60 bg-surface/30">
+					<div className="p-4 rounded-lg border border-border/60 bg-surface-800/30">
 						{isLoading ? (
 							<div className="space-y-3">
 								<Skeleton className="h-4 w-20" />
@@ -140,10 +140,13 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 							</div>
 						) : (
 							<>
-								<div className="text-sm text-muted-fg mb-1">{ACCOUNT_TEXT.EQUITY_LABEL}</div>
+								<div className="text-sm text-fg-700 mb-1">{ACCOUNT_TEXT.EQUITY_LABEL}</div>
 								<div className="text-3xl font-bold tabular-nums">{formatUSD(accountValue)}</div>
 								<div
-									className={cn("text-sm tabular-nums mt-1", unrealizedPnl >= 0 ? "text-positive" : "text-negative")}
+									className={cn(
+										"text-sm tabular-nums mt-1",
+										unrealizedPnl >= 0 ? "text-market-up-primary" : "text-market-down-primary",
+									)}
 								>
 									{unrealizedPnl >= 0 ? "+" : ""}
 									{formatUSD(unrealizedPnl)} {ACCOUNT_TEXT.UNREALIZED_LABEL}
@@ -157,14 +160,16 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						<StatCard
 							label={ACCOUNT_TEXT.AVAILABLE_LABEL}
 							value={formatUSD(availableBalance)}
-							valueClass="text-positive"
+							valueClass="text-market-up-primary"
 							isLoading={isLoading}
 						/>
 						<StatCard label={ACCOUNT_TEXT.MARGIN_USED_LABEL} value={formatUSD(totalMarginUsed)} isLoading={isLoading} />
 						<StatCard
 							label={ACCOUNT_TEXT.MARGIN_RATIO_LABEL}
 							value={formatPercent(marginRatio)}
-							valueClass={marginRatio > 0.8 ? "text-negative" : marginRatio > 0.5 ? "text-warning" : ""}
+							valueClass={
+								marginRatio > 0.8 ? "text-market-down-primary" : marginRatio > 0.5 ? "text-status-warning" : ""
+							}
 							isLoading={isLoading}
 						/>
 						<StatCard label="Total Position" value={formatUSD(Math.abs(totalNtlPos))} isLoading={isLoading} />
@@ -178,8 +183,8 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 							onClick={() => openDepositModal("deposit")}
 							className={cn(
 								"py-4 text-base font-semibold rounded-md",
-								"bg-positive/20 border border-positive text-positive",
-								"hover:bg-positive/30 transition-colors",
+								"bg-market-up-subtle border border-market-up-primary text-market-up-primary",
+								"hover:bg-market-up-subtle/30 transition-colors",
 								"flex items-center justify-center gap-2",
 								"min-h-[56px]",
 							)}
@@ -192,8 +197,8 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 							size="none"
 							className={cn(
 								"py-4 text-base font-semibold rounded-md",
-								"bg-muted/50 border border-border/60 text-muted-fg",
-								"hover:bg-muted transition-colors",
+								"bg-surface-alt/50 border border-border/60 text-fg-700",
+								"hover:bg-surface-alt transition-colors",
 								"flex items-center justify-center gap-2",
 								"min-h-[56px]",
 							)}
@@ -206,7 +211,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 
 					{/* Additional info */}
 					<div className="pt-4 space-y-3">
-						<h3 className="text-sm font-medium text-muted-fg uppercase tracking-wider">Account Details</h3>
+						<h3 className="text-sm font-medium text-fg-700 uppercase tracking-wider">Account Details</h3>
 						<div className="space-y-2 text-sm">
 							<DetailRow label="Account Value" value={formatUSD(accountValue)} isLoading={isLoading} />
 							<DetailRow label="Total Raw USD" value={formatUSD(totalRawUsd)} isLoading={isLoading} />
@@ -236,8 +241,8 @@ interface StatCardProps {
 
 function StatCard({ label, value, valueClass, isLoading }: StatCardProps) {
 	return (
-		<div className="p-3 rounded-lg border border-border/40 bg-surface/20">
-			<div className="text-xs text-muted-fg mb-1">{label}</div>
+		<div className="p-3 rounded-lg border border-border/40 bg-surface-800/20">
+			<div className="text-xs text-fg-700 mb-1">{label}</div>
 			{isLoading ? (
 				<Skeleton className="h-6 w-20" />
 			) : (
@@ -256,7 +261,7 @@ interface DetailRowProps {
 function DetailRow({ label, value, isLoading }: DetailRowProps) {
 	return (
 		<div className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
-			<span className="text-muted-fg">{label}</span>
+			<span className="text-fg-700">{label}</span>
 			{isLoading ? <Skeleton className="h-4 w-16" /> : <span className="tabular-nums font-medium">{value}</span>}
 		</div>
 	);

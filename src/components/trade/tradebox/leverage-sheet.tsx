@@ -96,7 +96,7 @@ export function LeverageSheet({
 			<SheetContent side="bottom" className="px-4 pb-8 pt-6">
 				<div className="space-y-5">
 					<div className="flex items-center justify-between">
-						<span className="text-xs font-medium uppercase tracking-wide text-muted-fg">
+						<span className="text-xs font-medium uppercase tracking-wide text-fg-700">
 							<Trans>Leverage</Trans>
 						</span>
 						<div className="flex items-center gap-1.5">
@@ -111,21 +111,21 @@ export function LeverageSheet({
 								inputSize="lg"
 								className="w-16 text-center font-medium tabular-nums"
 							/>
-							<span className="text-base text-muted-fg">x</span>
+							<span className="text-base text-fg-700">x</span>
 						</div>
 					</div>
 
 					<LeverageSlider value={displayValue} onChange={onLeverageChange} max={maxLeverage} disabled={isUpdating} />
 
 					{updateError && (
-						<div className="flex items-center gap-2 p-2.5 bg-negative/10 border border-negative/20 rounded-md text-sm text-negative">
+						<div className="flex items-center gap-2 p-2.5 bg-market-down-subtle border border-market-down-primary/20 rounded-md text-sm text-market-down-primary">
 							<WarningIcon className="size-4 shrink-0" />
 							<span>{updateError.message || t`Update failed`}</span>
 						</div>
 					)}
 
 					{showSuccess && (
-						<div className="flex items-center justify-center gap-2 p-2.5 bg-positive/10 border border-positive/20 rounded-md text-sm text-positive">
+						<div className="flex items-center justify-center gap-2 p-2.5 bg-market-up-subtle border border-market-up-primary/20 rounded-md text-sm text-market-up-primary">
 							<CheckIcon className="size-4" />
 							<Trans>Updated</Trans>
 						</div>
@@ -138,13 +138,12 @@ export function LeverageSheet({
 							</Button>
 							<Button
 								variant="text"
-								size="none"
 								onClick={handleConfirm}
 								disabled={isUpdating}
 								className={cn(
 									"flex-1 py-3 text-xs font-semibold uppercase tracking-wider gap-2 hover:bg-transparent",
-									"bg-info/20 border border-info text-info",
-									"hover:bg-info/30",
+									"bg-status-info/20 border border-status-info text-status-info",
+									"hover:bg-status-info/30",
 								)}
 							>
 								{isUpdating && <SpinnerGapIcon className="size-4 animate-spin" />}
@@ -154,14 +153,13 @@ export function LeverageSheet({
 					) : (
 						<Button
 							variant="text"
-							size="none"
 							onClick={handleConfirm}
 							disabled={!isDirty || isUpdating || showSuccess}
 							className={cn(
 								"w-full py-3 text-xs font-semibold uppercase tracking-wider gap-2 border hover:bg-transparent",
 								isDirty && !isUpdating && !showSuccess
-									? "bg-info/20 border-info text-info hover:bg-info/30"
-									: "bg-info/10 border-info/30 text-info/50",
+									? "bg-status-info/20 border-status-info text-status-info hover:bg-status-info/30"
+									: "bg-status-info/10 border-status-info/30 text-status-info/50",
 							)}
 						>
 							{isUpdating && <SpinnerGapIcon className="size-4 animate-spin" />}

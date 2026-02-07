@@ -113,7 +113,7 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 			<DialogContent className="max-w-sm">
 				<DialogHeader>
 					<DialogTitle className="text-sm font-medium">{t`Transfer USDC`}</DialogTitle>
-					<DialogDescription className="text-3xs text-muted-fg">
+					<DialogDescription className="text-3xs text-fg-700">
 						{t`Move USDC between your Perp and Spot accounts.`}
 					</DialogDescription>
 				</DialogHeader>
@@ -124,7 +124,9 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 							<span
 								className={cn(
 									"text-3xs px-2 py-1 uppercase font-medium",
-									direction === "toSpot" ? "bg-highlight/20 text-highlight" : "bg-warning/20 text-warning",
+									direction === "toSpot"
+										? "bg-action-primary/20 text-action-primary"
+										: "bg-status-warning/20 text-status-warning",
 								)}
 							>
 								{fromLabel}
@@ -133,7 +135,7 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 						<button
 							type="button"
 							onClick={handleFlip}
-							className="p-1.5 rounded-sm hover:bg-accent/50 transition-colors text-muted-fg hover:text-info"
+							className="p-1.5 rounded-sm hover:bg-surface-500/50 transition-colors text-fg-700 hover:text-status-info"
 						>
 							<ArrowsLeftRightIcon className="size-4" />
 						</button>
@@ -141,7 +143,9 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 							<span
 								className={cn(
 									"text-3xs px-2 py-1 uppercase font-medium",
-									direction === "toPerp" ? "bg-highlight/20 text-highlight" : "bg-warning/20 text-warning",
+									direction === "toPerp"
+										? "bg-action-primary/20 text-action-primary"
+										: "bg-status-warning/20 text-status-warning",
 								)}
 							>
 								{toLabel}
@@ -151,11 +155,11 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 
 					<div className="space-y-1.5">
 						<div className="flex items-center justify-between">
-							<span className="text-4xs uppercase tracking-wider text-muted-fg">{t`Amount (USDC)`}</span>
+							<span className="text-4xs uppercase tracking-wider text-fg-700">{t`Amount (USDC)`}</span>
 							<button
 								type="button"
 								onClick={handleMaxClick}
-								className="text-4xs text-info hover:text-info/80 transition-colors"
+								className="text-4xs text-status-info hover:text-status-info/80 transition-colors"
 							>
 								{t`Max`}: {formatToken(availableBalance, 2)}
 							</button>
@@ -165,19 +169,16 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 							value={amount}
 							onChange={(e) => handleAmountChange(e.target.value)}
 							className={cn(
-								"w-full h-9 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums",
-								exceedsBalance(amount, availableBalanceValue) && "border-negative focus:border-negative",
+								"w-full h-9 text-sm bg-surface-200/50 border-border/60 focus:border-status-info/60 tabular-nums",
+								exceedsBalance(amount, availableBalanceValue) &&
+									"border-market-down-primary focus:border-market-down-primary",
 							)}
 						/>
 					</div>
 
-					{error && <div className="text-3xs text-negative">{error}</div>}
+					{error && <div className="text-3xs text-market-down-primary">{error}</div>}
 
-					<Button
-						onClick={handleTransfer}
-						disabled={!isValidAmount || isPending}
-						className="w-full h-9 text-xs font-medium"
-					>
+					<Button onClick={handleTransfer} disabled={!isValidAmount || isPending} size="lg" className="w-full">
 						{isPending && <SpinnerGapIcon className="size-3.5 animate-spin mr-2" />}
 						{isPending ? t`Transferring...` : t`Transfer`}
 					</Button>

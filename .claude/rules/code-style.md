@@ -53,6 +53,12 @@ Only create helpers when logic is reused, complex, or significantly improves rea
 Pass API values directly to formatters - they accept `string | number | null | undefined`:
 
 
+## Icons
+
+- Use `@phosphor-icons/react` for all icons
+- Import convention: append `Icon` to the icon name, e.g. `CrossIcon`, `CaretDownIcon`, `BellIcon`
+- Example: `import { CrossIcon } from "@phosphor-icons/react"`
+
 ## Comment Policy
 
 ### Unacceptable Comments

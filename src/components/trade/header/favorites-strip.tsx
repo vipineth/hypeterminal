@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { StarIcon } from "@phosphor-icons/react";
+import { StarIcon, XIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { get24hChange } from "@/domain/market";
 import { cn } from "@/lib/cn";
@@ -12,26 +12,21 @@ export function FavoritesStrip() {
 	const favorites = useFavoriteMarkets();
 	const selectedMarket = useSelectedMarket();
 
-	return (
-		<div className="py-1.5">
-			<div className="w-full whitespace-nowrap overflow-x-auto scrollbar-none">
-				<div className="flex items-center gap-0.5 min-w-full divide-x">
-					{favorites.length === 0 ? (
-						<EmptyState />
-					) : (
-						favorites.map((name) => <FavoriteChip key={name} name={name} isActive={name === selectedMarket} />)
-					)}
-				</div>
+	if (favorites.length === 0) {
+		return (
+			<div className="flex items-center gap-2 text-3xs text-fg-700">
+				<StarIcon className="size-3" />
+				<span>{t`Select favorite markets`}</span>
 			</div>
-		</div>
-	);
-}
+		);
+	}
 
-function EmptyState() {
 	return (
-		<div className="flex items-center gap-2 text-3xs text-muted-fg">
-			<StarIcon className="size-3" />
-			<span>{t`Select favorite markets`}</span>
+		<div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+			<StarIcon weight="fill" className="size-3 shrink-0 text-highlight" />
+			{favorites.map((name) => (
+				<FavoriteChip key={name} name={name} isActive={name === selectedMarket} />
+			))}
 		</div>
 	);
 }
@@ -42,7 +37,7 @@ interface FavoriteChipProps {
 }
 
 function FavoriteChip({ name, isActive }: FavoriteChipProps) {
-	const { setSelectedMarket } = useMarketActions();
+	const { setSelectedMarket, toggleFavoriteMarket } = useMarketActions();
 	const { getMarketInfo } = useMarketsInfo();
 
 	const market = getMarketInfo(name);
@@ -61,31 +56,44 @@ function FavoriteChip({ name, isActive }: FavoriteChipProps) {
 		}
 	}
 
+	function handleRemove(e: React.MouseEvent) {
+		e.stopPropagation();
+		toggleFavoriteMarket(name);
+	}
+
 	return (
-		<Button
-			variant="text"
-			size="none"
-			onClick={handleClick}
-			onKeyDown={handleKeyDown}
-			tabIndex={0}
-			aria-label={t`Select ${displayName} market`}
-			className={cn(
-				"flex items-center gap-1.5 px-2 py-1 text-2xs cursor-pointer rounded-none first:rounded-l last:rounded-r",
-				"hover:bg-accent/40 transition-colors border-border/30",
-				isActive && "bg-info/5 text-info",
-			)}
-		>
-			<span className="font-semibold">{displayName}</span>
-			{market?.markPx != null && (
-				<>
-					<span className="tabular-nums text-muted-fg">{formatPrice(market.markPx, { szDecimals })}</span>
-					{changePct != null && (
-						<span className={cn("tabular-nums text-3xs", getValueColorClass(changePct))}>
-							{formatPercent(changePct / 100)}
-						</span>
-					)}
-				</>
-			)}
-		</Button>
+		<div className="group/fav relative shrink-0">
+			<Button
+				variant="text"
+				onClick={handleClick}
+				onKeyDown={handleKeyDown}
+				tabIndex={0}
+				aria-label={t`Select ${displayName} market`}
+				className={cn(
+					"flex items-center gap-1 shrink-0 px-2 h-7 text-3xs rounded-sm bg-surface-800 border transition-colors",
+					isActive ? "border-border" : "border-transparent hover:border-border/60",
+				)}
+			>
+				<span className="font-medium text-fg-900 uppercase">{displayName}</span>
+				{market?.markPx != null && (
+					<>
+						<span className="tabular-nums text-fg-500">{formatPrice(market.markPx, { szDecimals })}</span>
+						{changePct != null && (
+							<span className={cn("tabular-nums", getValueColorClass(changePct))}>
+								{formatPercent(changePct / 100)}
+							</span>
+						)}
+					</>
+				)}
+			</Button>
+			<button
+				type="button"
+				onClick={handleRemove}
+				aria-label={t`Remove ${displayName} from favorites`}
+				className="absolute -top-0.5 -right-0.5 hidden size-4 cursor-pointer items-center justify-center rounded-full bg-surface-800 border border-border text-fg-500 hover:text-fg-900 group-hover/fav:flex"
+			>
+				<XIcon className="size-2.5" weight="bold" />
+			</button>
+		</div>
 	);
 }

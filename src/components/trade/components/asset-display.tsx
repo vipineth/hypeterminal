@@ -35,7 +35,7 @@ export function AssetDisplay({
 	const icon = (
 		<Avatar className={cn("size-4", iconClassName)}>
 			<AvatarImage src={iconUrl} alt={displayName} />
-			<AvatarFallback className="text-4xs bg-muted">{fallbackText}</AvatarFallback>
+			<AvatarFallback className="text-4xs bg-surface-alt">{fallbackText}</AvatarFallback>
 		</Avatar>
 	);
 

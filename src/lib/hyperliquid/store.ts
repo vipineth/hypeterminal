@@ -1,5 +1,6 @@
 import type { ISubscription } from "@nktkas/hyperliquid";
 import { createStore, type StoreApi } from "zustand/vanilla";
+import { getReconnectDelayMs, WS_RELIABILITY_LIMITS } from "@/lib/websocket/reliability";
 import type { HyperliquidConfig, SubscriptionStatus, WebSocketStatus } from "./types";
 
 export type HyperliquidStoreState = {
@@ -26,8 +27,11 @@ type SubscriptionEntry = {
 type SubscriptionRuntime = {
 	refCount: number;
 	subscription?: ISubscription;
-	promise?: Promise<ISubscription>;
-	isTerminated?: boolean;
+	promise?: Promise<ISubscription | undefined>;
+	reconnectTimer?: ReturnType<typeof setTimeout>;
+	cooldownTimer?: ReturnType<typeof setTimeout>;
+	reconnectAttempts: number;
+	detachFailureListener?: () => void;
 };
 
 type SubscriptionMap = Record<string, SubscriptionEntry>;
@@ -61,6 +65,25 @@ function setSubscriptionEntry(
 	return { subscriptions: nextSubscriptions, ...deriveWsState(nextSubscriptions) };
 }
 
+function clearReconnectTimer(runtime: SubscriptionRuntime): void {
+	if (runtime.reconnectTimer) {
+		clearTimeout(runtime.reconnectTimer);
+		runtime.reconnectTimer = undefined;
+	}
+}
+
+function clearCooldownTimer(runtime: SubscriptionRuntime): void {
+	if (runtime.cooldownTimer) {
+		clearTimeout(runtime.cooldownTimer);
+		runtime.cooldownTimer = undefined;
+	}
+}
+
+function detachFailureListener(runtime: SubscriptionRuntime): void {
+	runtime.detachFailureListener?.();
+	runtime.detachFailureListener = undefined;
+}
+
 export function createHyperliquidStore(initialConfig: HyperliquidConfig): HyperliquidStore {
 	const subscriptionRuntime = new Map<string, SubscriptionRuntime>();
 
@@ -73,14 +96,26 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 		acquireSubscription: (key, subscribe) => {
 			let runtime = subscriptionRuntime.get(key);
 			if (!runtime) {
-				runtime = { refCount: 0 };
+				if (subscriptionRuntime.size >= WS_RELIABILITY_LIMITS.subscriptions.maxTrackedKeys) {
+					set((state) => {
+						const entry: SubscriptionEntry = {
+							status: "error",
+							error: new Error("Subscription limit reached"),
+						};
+						return setSubscriptionEntry(state, key, entry);
+					});
+					return;
+				}
+				runtime = { refCount: 0, reconnectAttempts: 0 };
 				subscriptionRuntime.set(key, runtime);
 			}
 			runtime.refCount += 1;
+			clearReconnectTimer(runtime);
+			clearCooldownTimer(runtime);
 
 			set((state) => {
 				const existing = state.subscriptions[key];
-				if (existing && existing.status !== "error") {
+				if (existing && existing.status !== "error" && existing.status !== "idle") {
 					return state;
 				}
 
@@ -91,21 +126,135 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 				return setSubscriptionEntry(state, key, entry);
 			});
 
-			const startSubscription = () => {
+			const scheduleReconnect = () => {
 				const runtime = subscriptionRuntime.get(key);
-				if (!runtime || runtime.promise || runtime.isTerminated) return;
-				if (runtime.subscription && !runtime.subscription.failureSignal.aborted) return;
+				if (!runtime || runtime.refCount <= 0 || runtime.reconnectTimer || runtime.promise || runtime.subscription) {
+					return;
+				}
 
-				runtime.subscription = undefined;
+				runtime.reconnectAttempts += 1;
+				if (runtime.reconnectAttempts > WS_RELIABILITY_LIMITS.reconnect.maxAttemptsBeforeCooldown) {
+					if (runtime.cooldownTimer) {
+						return;
+					}
 
-				runtime.promise = subscribe()
-					.then((subscription) => {
-						runtime.subscription = subscription;
-						runtime.promise = undefined;
+					set((state) => {
+						const current = state.subscriptions[key];
+						if (!current) return state;
+						const nextEntry: SubscriptionEntry = {
+							...current,
+							status: "error",
+							error: new Error("Reconnect cooldown active"),
+							failureSignal: undefined,
+						};
+						return setSubscriptionEntry(state, key, nextEntry);
+					});
+
+					runtime.cooldownTimer = setTimeout(() => {
+						const runtime = subscriptionRuntime.get(key);
+						if (!runtime) return;
+						runtime.cooldownTimer = undefined;
+						runtime.reconnectAttempts = 0;
+						if (runtime.refCount <= 0) return;
 
 						set((state) => {
 							const current = state.subscriptions[key];
 							if (!current) return state;
+							const nextEntry: SubscriptionEntry = {
+								...current,
+								status: "subscribing",
+								error: undefined,
+							};
+							return setSubscriptionEntry(state, key, nextEntry);
+						});
+
+						startSubscription();
+					}, WS_RELIABILITY_LIMITS.reconnect.cooldownMs);
+					return;
+				}
+
+				const delay = getReconnectDelayMs(runtime.reconnectAttempts);
+				runtime.reconnectTimer = setTimeout(() => {
+					const runtime = subscriptionRuntime.get(key);
+					if (!runtime) return;
+					runtime.reconnectTimer = undefined;
+					if (runtime.refCount <= 0) return;
+
+					set((state) => {
+						const current = state.subscriptions[key];
+						if (!current) return state;
+						const nextEntry: SubscriptionEntry = {
+							...current,
+							status: "subscribing",
+							error: undefined,
+						};
+						return setSubscriptionEntry(state, key, nextEntry);
+					});
+
+					startSubscription();
+				}, delay);
+			};
+
+			const startSubscription = () => {
+				const runtime = subscriptionRuntime.get(key);
+				if (!runtime || runtime.refCount <= 0 || runtime.promise || runtime.subscription) return;
+
+				runtime.promise = subscribe()
+					.then((subscription) => {
+						const runtime = subscriptionRuntime.get(key);
+						if (!runtime) {
+							void subscription.unsubscribe().catch(() => {});
+							return subscription;
+						}
+
+						runtime.promise = undefined;
+
+						if (runtime.refCount <= 0) {
+							void subscription.unsubscribe().catch(() => {});
+							return subscription;
+						}
+
+						runtime.subscription = subscription;
+						runtime.reconnectAttempts = 0;
+						detachFailureListener(runtime);
+
+						const onFailure = () => {
+							const runtime = subscriptionRuntime.get(key);
+							if (!runtime) return;
+							runtime.subscription = undefined;
+							detachFailureListener(runtime);
+
+							const reason = subscription.failureSignal.reason ?? new Error("Subscription failed");
+							set((state) => {
+								const current = state.subscriptions[key];
+								if (!current) return state;
+								const nextEntry: SubscriptionEntry = {
+									...current,
+									status: "error",
+									error: reason,
+									failureSignal: undefined,
+								};
+								return setSubscriptionEntry(state, key, nextEntry);
+							});
+
+							scheduleReconnect();
+						};
+
+						subscription.failureSignal.addEventListener("abort", onFailure, { once: true });
+						runtime.detachFailureListener = () => {
+							subscription.failureSignal.removeEventListener("abort", onFailure);
+						};
+
+						set((state) => {
+							const current = state.subscriptions[key];
+							if (!current) return state;
+							if (
+								current.status === "active" &&
+								current.error === undefined &&
+								current.failureSignal === subscription.failureSignal
+							) {
+								return state;
+							}
 							const nextEntry: SubscriptionEntry = {
 								...current,
 								status: "active",
@@ -115,34 +264,32 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 							return setSubscriptionEntry(state, key, nextEntry);
 						});
 
-						subscription.failureSignal.addEventListener(
-							"abort",
-							() => {
-								const reason = subscription.failureSignal.reason ?? new Error("Subscription failed");
-								runtime.subscription = undefined;
-								runtime.isTerminated = true;
-								set((state) => {
-									const current = state.subscriptions[key];
-									if (!current) return state;
-									const nextEntry: SubscriptionEntry = { ...current, status: "error", error: reason };
-									return setSubscriptionEntry(state, key, nextEntry);
-								});
-							},
-							{ once: true },
-						);
-
 						return subscription;
 					})
 					.catch((error) => {
+						const runtime = subscriptionRuntime.get(key);
+						if (!runtime) {
+							return undefined;
+						}
+
 						runtime.promise = undefined;
 						runtime.subscription = undefined;
+						detachFailureListener(runtime);
+
 						set((state) => {
 							const current = state.subscriptions[key];
 							if (!current) return state;
-							const nextEntry: SubscriptionEntry = { ...current, status: "error", error };
+							const nextEntry: SubscriptionEntry = {
+								...current,
+								status: "error",
+								error,
+								failureSignal: undefined,
+							};
 							return setSubscriptionEntry(state, key, nextEntry);
 						});
-						throw error;
+
+						scheduleReconnect();
+						return undefined;
 					});
 			};
 
@@ -154,10 +301,14 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 				return;
 			}
 
-			runtime.refCount -= 1;
+			runtime.refCount = Math.max(0, runtime.refCount - 1);
 			if (runtime.refCount > 0) {
 				return;
 			}
+
+			clearReconnectTimer(runtime);
+			clearCooldownTimer(runtime);
+			detachFailureListener(runtime);
 
 			set((state) => {
 				if (!state.subscriptions[key]) return state;
@@ -167,22 +318,29 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 			});
 
 			subscriptionRuntime.delete(key);
+			const subscription = runtime.subscription;
+			const pending = runtime.promise;
+			runtime.subscription = undefined;
+			runtime.promise = undefined;
 
 			const runUnsubscribe = async (subscription?: ISubscription) => {
 				if (!subscription || subscription.failureSignal.aborted) return;
-				await subscription.unsubscribe();
+				await subscription.unsubscribe().catch(() => {});
 			};
 
-			if (runtime.subscription) {
-				void runUnsubscribe(runtime.subscription);
-			} else if (runtime.promise) {
-				runtime.promise.then(runUnsubscribe).catch(() => {});
+			if (subscription) {
+				void runUnsubscribe(subscription);
+			} else if (pending) {
+				void pending.then(runUnsubscribe).catch(() => {});
 			}
 		},
 		setSubscriptionData: (key, data) => {
 			set((state) => {
 				const current = state.subscriptions[key];
 				if (!current) return state;
+				if (current.status === "active" && current.error === undefined && Object.is(current.data, data)) {
+					return state;
+				}
 				const nextEntry: SubscriptionEntry = {
 					...current,
 					data,

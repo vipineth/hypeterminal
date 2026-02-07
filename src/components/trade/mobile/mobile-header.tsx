@@ -19,19 +19,19 @@ export function MobileHeader({ className }: Props) {
 		<header
 			className={cn(
 				"pt-[env(safe-area-inset-top)]",
-				"sticky top-0 z-40 bg-bg/95 backdrop-blur-sm",
+				"sticky top-0 z-40 bg-surface-200/95 backdrop-blur-sm",
 				"border-b border-border/60",
 				className,
 			)}
 		>
 			<div className="h-12 px-3 flex items-center justify-between">
 				<div className="flex items-center gap-1.5">
-					<div className="size-6 rounded bg-positive/20 border border-positive/40 flex items-center justify-center">
-						<TerminalIcon className="size-3.5 text-positive" />
+					<div className="size-6 rounded bg-market-up-subtle border border-market-up-primary/40 flex items-center justify-center">
+						<TerminalIcon className="size-3.5 text-market-up-primary" />
 					</div>
-					<span className="text-xs font-semibold tracking-tight text-info">
+					<span className="text-xs font-semibold tracking-tight text-status-info">
 						{TOP_NAV_TEXT.BRAND_PREFIX}
-						<span className="text-fg">{TOP_NAV_TEXT.BRAND_SUFFIX}</span>
+						<span className="text-fg-900">{TOP_NAV_TEXT.BRAND_SUFFIX}</span>
 					</span>
 				</div>
 
@@ -40,7 +40,7 @@ export function MobileHeader({ className }: Props) {
 					<Button
 						variant="text"
 						size="md"
-						className="size-11 active:bg-accent/50"
+						className="size-11 active:bg-surface-500/50"
 						aria-label={TOP_NAV_TEXT.NOTIFICATIONS_ARIA}
 					>
 						<BellIcon className="size-4" />
@@ -49,7 +49,7 @@ export function MobileHeader({ className }: Props) {
 					<Button
 						variant="text"
 						size="md"
-						className="size-11 active:bg-accent/50"
+						className="size-11 active:bg-surface-500/50"
 						aria-label={TOP_NAV_TEXT.SETTINGS_ARIA}
 						onClick={openSettingsDialog}
 					>

@@ -1,4 +1,5 @@
 import { t } from "@lingui/core/macro";
+import { DownloadSimpleIcon, UploadSimpleIcon } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -112,7 +113,7 @@ export function AccountPanel() {
 			: FALLBACK_VALUE_PLACEHOLDER;
 
 	const headerPnlClass =
-		activeTab === "perps" && hasPerpData ? getValueColorClass(perpMetrics.unrealizedPnl) : "text-muted-fg";
+		activeTab === "perps" && hasPerpData ? getValueColorClass(perpMetrics.unrealizedPnl) : "text-fg-700";
 
 	const perpRows = useMemo((): SummaryRow[] => {
 		if (!perpMetrics) return [];
@@ -120,7 +121,7 @@ export function AccountPanel() {
 			{
 				label: t`Balance`,
 				value: formatUSD(perpMetrics.totalRawUsd),
-				valueClass: "tabular-nums",
+				valueClass: "tabular-nums text-market-down-primary",
 			},
 			{
 				label: t`Unrealized PNL`,
@@ -145,7 +146,7 @@ export function AccountPanel() {
 			{
 				label: t`Cross Leverage`,
 				value: `${perpMetrics.crossLeverage.toFixed(2)}x`,
-				valueClass: "tabular-nums font-medium",
+				valueClass: "tabular-nums",
 			},
 		];
 	}, [perpMetrics]);
@@ -166,7 +167,7 @@ export function AccountPanel() {
 			{
 				label: t`In Orders`,
 				value: formatUSD(spotMetrics.inOrderValue),
-				valueClass: "tabular-nums text-warning",
+				valueClass: "tabular-nums text-status-warning",
 			},
 			{
 				label: t`Assets`,
@@ -185,34 +186,37 @@ export function AccountPanel() {
 	const hasData = activeTab === "perps" ? hasPerpData : hasSpotData;
 
 	return (
-		<div className="shrink-0 flex flex-col relative bg-linear-to-b from-surface to-bg border-t border-info/20">
-			<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-info/40 to-transparent" />
-			<div className="px-2 py-2 border-b border-border/40 flex items-center justify-between backdrop-blur-sm">
-				<span className="text-3xs uppercase tracking-wider text-info/70">{t`Account`}</span>
-				<div className="flex items-center gap-3">
-					<div className="flex items-center gap-1.5">
-						<span className="text-4xs text-muted-fg uppercase">{t`Equity`}</span>
-						<span className={cn("text-sm font-semibold tabular-nums", hasData ? "text-positive" : "text-muted-fg")}>
+		<div className="shrink-0 flex flex-col bg-surface-800 border-t border-border/10">
+			<div className="px-2 py-2 border-b border-border/10 flex items-center justify-between">
+				<span className="text-3xs text-fg-900">{t`Account`}</span>
+				<div className="flex items-center gap-2">
+					<div className="flex items-center gap-1">
+						<span className="text-3xs text-fg-900">{t`Equity`}</span>
+						<span
+							className={cn("text-3xs font-medium tabular-nums", hasData ? "text-market-up-primary" : "text-fg-700")}
+						>
 							{headerEquity}
 						</span>
 					</div>
 					{activeTab === "perps" && (
-						<div className="flex items-center gap-1.5">
-							<span className="text-4xs text-muted-fg uppercase">{t`PNL`}</span>
-							<span className={cn("text-2xs font-medium tabular-nums", headerPnlClass)}>{headerPnl}</span>
+						<div className="flex items-center gap-1">
+							<span className="text-3xs text-fg-900">{t`PNL`}</span>
+							<span className={cn("text-3xs font-medium tabular-nums", headerPnlClass)}>{headerPnl}</span>
 						</div>
 					)}
 				</div>
 			</div>
 
-			<div className="px-2 py-1 flex items-center gap-0.5 border-b border-border/40">
+			<div className="px-2 py-1 flex items-center gap-0.5 border-b border-border/10">
 				<Button
 					variant="text"
 					size="none"
 					onClick={() => setActiveTab("perps")}
 					className={cn(
-						"px-2 py-1 text-4xs uppercase tracking-wider hover:bg-transparent",
-						activeTab === "perps" ? "text-fg border-b border-fg" : "text-muted-fg hover:text-fg",
+						"px-2 py-1 text-xs tracking-[0.5px] hover:bg-transparent",
+						activeTab === "perps"
+							? "font-semibold text-fg-900 border-b border-fg-900"
+							: "text-fg-700 hover:text-fg-900",
 					)}
 					aria-label={t`Perps`}
 				>
@@ -223,8 +227,8 @@ export function AccountPanel() {
 					size="none"
 					onClick={() => setActiveTab("spot")}
 					className={cn(
-						"px-2 py-1 text-4xs uppercase tracking-wider hover:bg-transparent",
-						activeTab === "spot" ? "text-fg border-b border-fg" : "text-muted-fg hover:text-fg",
+						"px-2 py-1 text-xs tracking-[0.5px] hover:bg-transparent",
+						activeTab === "spot" ? "font-semibold text-fg-900 border-b border-fg-900" : "text-fg-700 hover:text-fg-900",
 					)}
 					aria-label={t`Spot`}
 				>
@@ -234,16 +238,16 @@ export function AccountPanel() {
 
 			<div className="p-2 space-y-2 overflow-y-auto">
 				{!isConnected ? (
-					<div className="text-3xs text-muted-fg text-center py-4">{t`Connect wallet to view account`}</div>
+					<div className="text-2xs text-fg-700 text-center py-4">{t`Connect wallet to view account`}</div>
 				) : !hasData ? (
-					<div className="text-3xs text-muted-fg text-center py-4">{t`Loading...`}</div>
+					<div className="text-2xs text-fg-700 text-center py-4">{t`Loading...`}</div>
 				) : (
 					<>
-						<div className="border border-info/10 bg-bg divide-y divide-border/30 text-3xs">
+						<div className="divide-y divide-border/5 text-2xs tracking-[0.5px]">
 							{summaryRows.map((row) => (
-								<div key={row.label} className="flex items-center justify-between px-2 py-1.5">
-									<span className="text-muted-fg">{row.label}</span>
-									<span className={row.valueClass}>{row.value}</span>
+								<div key={row.label} className="flex items-center justify-between px-2 h-5">
+									<span className="text-fg-500">{row.label}</span>
+									<span className={cn("text-fg-900", row.valueClass)}>{row.value}</span>
 								</div>
 							))}
 						</div>
@@ -252,20 +256,22 @@ export function AccountPanel() {
 							<Button
 								variant="text"
 								size="none"
-								onClick={() => openDepositModal("deposit")}
-								className="py-1.5 text-3xs uppercase tracking-wider border border-positive/40 text-positive hover:bg-positive/10"
-								aria-label={t`Deposit`}
+								onClick={() => openDepositModal("withdraw")}
+								className="py-0.5 text-xs font-medium border border-border text-fg-700 rounded-[2px] hover:text-fg-900 hover:border-fg-400 hover:bg-transparent"
+								aria-label={t`Withdraw`}
 							>
-								{t`Deposit`}
+								<UploadSimpleIcon className="size-4" />
+								{t`Withdraw`}
 							</Button>
 							<Button
 								variant="text"
 								size="none"
-								onClick={() => openDepositModal("withdraw")}
-								className="py-1.5 text-3xs uppercase tracking-wider border border-border/60 text-muted-fg hover:text-fg hover:border-fg/30 hover:bg-transparent"
-								aria-label={t`Withdraw`}
+								onClick={() => openDepositModal("deposit")}
+								className="py-0.5 text-xs font-medium border border-status-success text-status-success rounded-[2px] hover:bg-status-success-subtle"
+								aria-label={t`Deposit`}
 							>
-								{t`Withdraw`}
+								<DownloadSimpleIcon className="size-4" />
+								{t`Deposit`}
 							</Button>
 						</div>
 					</>

@@ -1,7 +1,6 @@
 import { t } from "@lingui/core/macro";
-import { ArrowsLeftRightIcon, CaretDownIcon } from "@phosphor-icons/react";
-import { useDeferredValue, useMemo, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { ArrowsLeftRightIcon, BookBookmarkIcon, CaretDownIcon, ListDashesIcon } from "@phosphor-icons/react";
+import { useDeferredValue, useMemo, useState } from "react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -27,19 +26,21 @@ export function OrderbookPanel() {
 	const [selectedOption, setSelectedOption] = useState<L2BookPriceGroupOption | null>(null);
 	const { showOrderbookInQuote } = useGlobalSettings();
 	const { setShowOrderbookInQuote } = useGlobalSettingsActions();
-	const orderbookContainerRef = useRef<HTMLDivElement>(null);
-	const visibleRows = useOrderbookRows(orderbookContainerRef);
+	const [visibleRows, orderbookContainerRef] = useOrderbookRows();
 
 	const { data: selectedMarket } = useSelectedMarketInfo();
-
-	const { data: orderbook, status: orderbookStatus } = useSubL2Book(
-		{
+	const subscriptionParams = useMemo(
+		() => ({
 			coin: selectedMarket?.name ?? "",
 			nSigFigs: selectedOption?.nSigFigs ?? 5,
 			mantissa: selectedOption?.mantissa,
-		},
-		{ enabled: !!selectedMarket?.name },
+		}),
+		[selectedMarket?.name, selectedOption?.mantissa, selectedOption?.nSigFigs],
 	);
+
+	const { data: orderbook, status: orderbookStatus } = useSubL2Book(subscriptionParams, {
+		enabled: !!selectedMarket?.name,
+	});
 
 	const deferredOrderbook = useDeferredValue(orderbook);
 
@@ -56,38 +57,49 @@ export function OrderbookPanel() {
 		() => processLevels(deferredOrderbook?.levels[1], visibleRows),
 		[deferredOrderbook?.levels, visibleRows],
 	);
-	const maxTotal = getMaxTotal(bids, asks);
+	const asksReversed = useMemo(() => {
+		const reversed = new Array(asks.length);
+		for (let i = 0; i < asks.length; i += 1) {
+			reversed[i] = asks[asks.length - 1 - i];
+		}
+		return reversed;
+	}, [asks]);
+	const maxTotal = useMemo(() => getMaxTotal(bids, asks), [asks, bids]);
 	const spread = deferredOrderbook?.spread;
 	const spreadPct = getPercent(spread, selectedMarket?.markPx);
-	const priceGroupingOptions = getPriceGroupingOptions(selectedMarket?.markPx);
+	const priceGroupingOptions = useMemo(() => getPriceGroupingOptions(selectedMarket?.markPx), [selectedMarket?.markPx]);
 
 	const szDecimals = selectedMarket?.szDecimals ?? 4;
 
 	const displayAsset = showOrderbookInQuote ? quoteToken : baseToken;
 	const toggleAssetDisplay = () => setShowOrderbookInQuote(!showOrderbookInQuote);
 
+	const hasData = orderbookStatus !== "error";
+
 	return (
-		<Tabs defaultValue="book" className="h-full min-h-0 flex flex-col overflow-hidden border-l border-border/40">
-			<div className="h-9 flex items-center justify-between px-2 py-1.5 border-b border-border/40 bg-surface/30">
+		<Tabs defaultValue="book" className="h-full min-h-0 flex flex-col overflow-hidden bg-surface-500">
+			<div className="flex items-center justify-between px-1.5 py-1.5">
 				<TabsList>
 					<TabsTrigger value="book" aria-label={t`Order Book`}>
+						<BookBookmarkIcon className="size-3.5" />
 						{t`Order Book`}
 					</TabsTrigger>
 					<TabsTrigger value="trades" aria-label={t`Recent Trades`}>
+						<ListDashesIcon className="size-3.5" />
 						{t`Trades`}
 					</TabsTrigger>
 				</TabsList>
 			</div>
 
 			<TabsContent value="book" className="flex-1 min-h-0 flex flex-col">
-				<div className="grid grid-cols-3 gap-2 px-2 h-9 items-center text-4xs uppercase tracking-wider border-b border-border/40 shrink-0">
+				<div className="grid grid-cols-3 gap-2 px-2 py-1.5 items-center text-3xs text-fg-900 uppercase tracking-wider border-b border-border/40 shrink-0">
 					<div className="flex items-center gap-1">
 						{t`Price`}
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<button
 									type="button"
-									className="px-1.5 text-4xs hover:bg-transparent inline-flex items-center gap-1"
+									className="px-1.5 text-3xs hover:bg-transparent inline-flex items-center gap-1"
 									aria-label={t`Select order book aggregation`}
 								>
 									{selectedOption?.label ?? priceGroupingOptions[0]?.label ?? "—"}
@@ -109,60 +121,61 @@ export function OrderbookPanel() {
 							</DropdownMenuContent>
 						</DropdownMenu>
 					</div>
-					<Button
-						variant="text"
-						size="none"
+					<button
+						className="inline-flex items-center justify-end gap-0.5 hover:text-fg-800"
+						type="button"
 						onClick={toggleAssetDisplay}
-						className="text-right hover:text-fg hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
 					>
 						{t`Size`}
-						<span className="opacity-60">({displayAsset})</span>
+						<span className="text-fg-500">({displayAsset})</span>
 						<ArrowsLeftRightIcon className="size-2 opacity-40" />
-					</Button>
-					<Button
-						variant="text"
-						size="none"
+					</button>
+					<button
+						className="inline-flex items-center justify-end gap-0.5 hover:text-fg-800"
+						type="button"
 						onClick={toggleAssetDisplay}
-						className="text-right hover:text-fg hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
 					>
 						{t`Total`}
-						<span className="opacity-60">({displayAsset})</span>
+						<span className="text-fg-500">({displayAsset})</span>
 						<ArrowsLeftRightIcon className="size-2 opacity-40" />
-					</Button>
+					</button>
 				</div>
 
 				<div ref={orderbookContainerRef} className="flex-1 min-h-0 flex flex-col overflow-hidden">
-					{orderbookStatus !== "error" && asks.length > 0 ? (
-						<div className="flex-1 flex flex-col justify-end gap-px py-0.5">
-							{[...asks].reverse().map((level, i) => (
+					<div className="flex-1 min-h-0 flex flex-col justify-end">
+						{hasData && asks.length > 0 ? (
+							asksReversed.map((level) => (
 								<OrderbookRow
-									key={`ask-${level.price}-${i}`}
+									key={`ask-${level.price}`}
 									level={level}
 									side="ask"
 									maxTotal={maxTotal}
 									showInQuote={showOrderbookInQuote}
 									szDecimals={szDecimals}
 								/>
-							))}
-						</div>
-					) : (
-						<div className="flex-1 flex items-center justify-center px-2 py-6 text-3xs text-muted-fg">
-							{orderbookStatus === "error" ? t`Failed to load order book.` : t`Waiting for order book...`}
-						</div>
-					)}
+							))
+						) : (
+							<div className="flex items-center justify-center px-2 py-6 text-3xs text-fg-700">
+								{orderbookStatus === "error" ? t`Failed to load order book.` : t`Waiting for order book...`}
+							</div>
+						)}
+					</div>
 
-					<div className="mt-auto shrink-0 px-2 py-1.5 border-y border-border/40 flex items-center justify-between text-4xs text-muted-fg">
+					<div
+						data-slot="orderbook-spread"
+						className="shrink-0 px-2 py-1.5 border-y border-border/40 flex items-center justify-between text-3xs text-fg-900"
+					>
 						<span>{t`Spread`}</span>
-						<span className="tabular-nums text-warning">
+						<span className="tabular-nums font-medium text-market-down-muted">
 							{`${formatNumber(spread, 2)} (${formatNumber(spreadPct, 3)}%)`}
 						</span>
 					</div>
 
-					{orderbookStatus !== "error" && bids.length > 0 && (
-						<div className="flex-1 flex flex-col gap-px py-0.5">
-							{bids.map((level, i) => (
+					<div className="flex-1 min-h-0 flex flex-col">
+						{hasData &&
+							bids.map((level) => (
 								<OrderbookRow
-									key={`bid-${level.price}-${i}`}
+									key={`bid-${level.price}`}
 									level={level}
 									side="bid"
 									maxTotal={maxTotal}
@@ -170,8 +183,7 @@ export function OrderbookPanel() {
 									szDecimals={szDecimals}
 								/>
 							))}
-						</div>
-					)}
+					</div>
 				</div>
 			</TabsContent>
 

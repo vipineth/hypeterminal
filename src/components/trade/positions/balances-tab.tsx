@@ -35,7 +35,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 		<div
 			className={cn(
 				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-negative/80" : "text-muted-fg",
+				variant === "error" ? "text-market-down-primary/80" : "text-fg-700",
 			)}
 		>
 			{children}
@@ -118,7 +118,7 @@ export function BalancesTab() {
 		});
 	}
 
-	function renderBalanceRow(row: BalanceRow) {
+	function renderBalanceRow(row: BalanceRow, index: number) {
 		const token = getToken(row.asset);
 		const decimals = token?.weiDecimals ?? 2;
 		const canTransfer = row.asset === DEFAULT_QUOTE_TOKEN && parseFloat(row.available) > 0;
@@ -126,29 +126,32 @@ export function BalancesTab() {
 		const transferLabel = row.type === "perp" ? t`To Spot` : t`To Perp`;
 		const pnlData = getPnl(row);
 		return (
-			<TableRow key={`${row.type}-${row.asset}`} className="border-border/40 hover:bg-accent/30">
-				<TableCell className="text-2xs font-medium py-1.5">
+			<TableRow
+				key={`${row.type}-${row.asset}`}
+				className={cn("border-border/40 hover:bg-surface-500/30", index % 2 === 1 && "bg-surface-alt")}
+			>
+				<TableCell className="text-3xs font-medium py-1.5">
 					<AssetDisplay asset={token ?? { displayName: row.asset, iconUrl: undefined }} />
 				</TableCell>
-				<TableCell className="text-2xs text-right tabular-nums py-1.5">
+				<TableCell className="text-3xs text-right tabular-nums py-1.5">
 					{formatToken(row.available, decimals)}
 				</TableCell>
-				<TableCell className="text-2xs text-right tabular-nums text-warning py-1.5">
+				<TableCell className="text-3xs text-right tabular-nums text-fg-500 py-1.5">
 					{formatToken(row.inOrder, decimals)}
 				</TableCell>
-				<TableCell className="text-2xs text-right tabular-nums py-1.5">{formatToken(row.total, decimals)}</TableCell>
-				<TableCell className="text-2xs text-right tabular-nums text-positive py-1.5">
+				<TableCell className="text-3xs text-right tabular-nums py-1.5">{formatToken(row.total, decimals)}</TableCell>
+				<TableCell className="text-3xs text-right tabular-nums text-market-up-primary py-1.5">
 					{formatUSD(row.usdValue, { compact: true })}
 				</TableCell>
-				<TableCell className="text-2xs text-right tabular-nums py-1.5">
+				<TableCell className="text-3xs text-right tabular-nums py-1.5">
 					{pnlData ? (
-						<span className={pnlData.pnl >= 0 ? "text-positive" : "text-negative"}>
+						<span className={pnlData.pnl >= 0 ? "text-market-up-primary" : "text-market-down-primary"}>
 							{pnlData.pnl >= 0 ? "+" : ""}
 							{formatUSD(pnlData.pnl, { compact: true })} ({pnlData.pnlPercent >= 0 ? "+" : ""}
 							{pnlData.pnlPercent.toFixed(1)}%)
 						</span>
 					) : (
-						<span className="text-muted-fg">—</span>
+						<span className="text-fg-700">—</span>
 					)}
 				</TableCell>
 				<TableCell className="text-right py-1.5">
@@ -158,7 +161,7 @@ export function BalancesTab() {
 								variant="text"
 								size="none"
 								onClick={() => handleTransferClick(row)}
-								className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
+								className="text-4xs text-status-info hover:text-status-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
 							>
 								<ArrowsLeftRightIcon className="size-2.5" />
 								{transferLabel}
@@ -169,7 +172,7 @@ export function BalancesTab() {
 								variant="text"
 								size="none"
 								onClick={() => openSwapModal(row.asset)}
-								className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
+								className="text-4xs text-status-info hover:text-status-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
 							>
 								<ArrowsDownUpIcon className="size-2.5" />
 								{t`Swap`}
@@ -180,7 +183,7 @@ export function BalancesTab() {
 								variant="text"
 								size="none"
 								onClick={() => handleSendClick(row)}
-								className="text-4xs text-info hover:text-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
+								className="text-4xs text-status-info hover:text-status-info/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
 							>
 								<PaperPlaneTiltIcon className="size-2.5" />
 								{t`Send`}
@@ -205,7 +208,7 @@ export function BalancesTab() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
-			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
+			<div className="text-3xs uppercase tracking-wider text-fg-700 mb-1.5 flex items-center gap-2">
 				<WalletIcon className="size-3" />
 				{t`Account Balances`}
 				<label
@@ -219,35 +222,35 @@ export function BalancesTab() {
 					/>
 					{t`Hide small`}
 				</label>
-				<span className="text-positive tabular-nums">
+				<span className="text-market-up-primary tabular-nums">
 					{isConnected && !isLoading ? formatUSD(totalValue, { compact: true }) : FALLBACK_VALUE_PLACEHOLDER}
 				</span>
 			</div>
-			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-bg/50">
+			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-surface-200/50">
 				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table className="w-auto min-w-full">
 							<TableHeader>
-								<TableRow className="border-border/40 hover:bg-transparent">
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7 w-35">
+								<TableRow className="border-border/40 bg-surface-alt hover:bg-surface-alt">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 h-7 w-35">
 										{t`Asset`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-22.5">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7 w-22.5">
 										{t`Available`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-20">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7 w-20">
 										{t`In Use`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-22.5">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7 w-22.5">
 										{t`Total`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-22.5">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7 w-22.5">
 										{t`USD Value`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-25">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7 w-25">
 										{t`PNL`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7 w-20">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7 w-20">
 										{t`Actions`}
 									</TableHead>
 								</TableRow>
@@ -258,12 +261,12 @@ export function BalancesTab() {
 										<TableRow className="border-border/40 hover:bg-transparent">
 											<TableCell
 												colSpan={7}
-												className="text-3xs uppercase tracking-wider text-highlight/80 bg-highlight/5 py-1 font-medium"
+												className="text-3xs uppercase tracking-wider text-action-primary/80 bg-action-primary/5 py-1 font-medium"
 											>
 												{t`Perpetuals`}
 											</TableCell>
 										</TableRow>
-										{perpBalances.map((row) => renderBalanceRow(row))}
+										{perpBalances.map((row, i) => renderBalanceRow(row, i))}
 									</>
 								)}
 								{spotBalancesFiltered.length > 0 && (
@@ -271,12 +274,12 @@ export function BalancesTab() {
 										<TableRow className="border-border/40 hover:bg-transparent">
 											<TableCell
 												colSpan={7}
-												className="text-3xs uppercase tracking-wider text-warning/80 bg-warning/5 py-1 font-medium"
+												className="text-3xs uppercase tracking-wider text-status-warning/80 bg-status-warning/5 py-1 font-medium"
 											>
 												{t`Spot`}
 											</TableCell>
 										</TableRow>
-										{spotBalancesFiltered.map((row) => renderBalanceRow(row))}
+										{spotBalancesFiltered.map((row, i) => renderBalanceRow(row, i))}
 									</>
 								)}
 							</TableBody>

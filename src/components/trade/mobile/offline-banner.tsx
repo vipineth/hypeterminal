@@ -46,15 +46,15 @@ export function OfflineBanner({ className }: Props) {
 				"text-sm font-medium",
 				"animate-in slide-in-from-top-2 duration-300",
 				isOnline
-					? "bg-positive/20 text-positive border-b border-positive/30"
-					: "bg-warning/20 text-warning border-b border-warning/30",
+					? "bg-market-up-subtle text-market-up-primary border-b border-market-up-primary/30"
+					: "bg-status-warning/20 text-status-warning border-b border-status-warning/30",
 				className,
 			)}
 		>
 			<div className="flex items-center gap-2">
 				{isOnline ? (
 					<>
-						<span className="size-2 rounded-full bg-positive animate-pulse" />
+						<span className="size-2 rounded-full bg-market-up-primary animate-pulse" />
 						<span>Back online - syncing data...</span>
 					</>
 				) : (
@@ -72,7 +72,7 @@ export function OfflineBanner({ className }: Props) {
 					onClick={() => setDismissed(true)}
 					className={cn(
 						"size-8 flex items-center justify-center",
-						"rounded-md hover:bg-warning/20",
+						"rounded-md hover:bg-status-warning/20",
 						"transition-colors",
 					)}
 					aria-label="Dismiss offline notification"

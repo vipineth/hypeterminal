@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import type { ColorTheme } from "@/providers/theme";
 import type { IChartingLibraryWidget, ResolutionString } from "@/types/charting_library";
 import {
 	CHART_CUSTOM_FONT_FAMILY,
@@ -18,29 +17,28 @@ import {
 import { createDatafeed } from "./datafeed";
 import { buildChartOverrides, generateChartCssUrl, getLoadingScreenColors, getToolbarBgColor } from "./theme-colors";
 
-const TOOLBAR_HEIGHT_PX = 35;
+// const TOOLBAR_HEIGHT_PX = 35;
 
-function patchToolbarHeight(container: HTMLElement | null) {
-	if (!container) return;
+// function patchToolbarHeight(container: HTMLElement | null) {
+// 	if (!container) return;
 
-	const iframe = container.querySelector("iframe");
-	const doc = iframe?.contentDocument ?? document;
+// 	const iframe = container.querySelector("iframe");
+// 	const doc = iframe?.contentDocument ?? document;
 
-	const style = doc.createElement("style");
-	style.textContent = `
-		.layout__area--top [class*="innerWrap-"] { height: ${TOOLBAR_HEIGHT_PX}px !important; }
-	`;
-	doc.head.appendChild(style);
+// 	const style = doc.createElement("style");
+// 	style.textContent = `
+// 		.layout__area--top [class*="innerWrap-"] { height: ${TOOLBAR_HEIGHT_PX}px !important; }
+// 	`;
+// 	doc.head.appendChild(style);
 
-	const topArea = doc.querySelector<HTMLElement>(".layout__area--top");
-	if (topArea) topArea.style.height = `${TOOLBAR_HEIGHT_PX}px`;
-}
+// 	const topArea = doc.querySelector<HTMLElement>(".layout__area--top");
+// 	if (topArea) topArea.style.height = `${TOOLBAR_HEIGHT_PX}px`;
+// }
 
 interface Props {
 	symbol?: string;
 	interval?: string;
 	theme?: "light" | "dark";
-	colorTheme?: ColorTheme;
 }
 
 export function TradingViewChart({
@@ -153,7 +151,6 @@ export function TradingViewChart({
 
 				widgetRef.current.onChartReady(() => {
 					chartReadyRef.current = true;
-					patchToolbarHeight(containerRef.current);
 				});
 			} catch (error) {
 				console.error("Error initializing TradingView widget:", error);

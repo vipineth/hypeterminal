@@ -135,30 +135,30 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 				</DialogHeader>
 
 				<div className="px-5 pb-4">
-					<div className="rounded-lg border border-border/50 bg-muted/20 p-3 space-y-1">
+					<div className="rounded-lg border border-border/50 bg-surface-alt/20 p-3 space-y-1">
 						<div className="flex items-center justify-between">
-							<span className="text-2xs text-muted-fg">{t`Size`}</span>
+							<span className="text-2xs text-fg-700">{t`Size`}</span>
 							<span className="text-2xs tabular-nums font-medium">
 								{formatToken(position.size, position.szDecimals)} {position.coin}
 							</span>
 						</div>
 						<div className="flex items-center justify-between">
-							<span className="text-2xs text-muted-fg">{t`Entry Price`}</span>
+							<span className="text-2xs text-fg-700">{t`Entry Price`}</span>
 							<span className="text-2xs tabular-nums font-medium">
 								{formatPrice(position.entryPx, { szDecimals: position.szDecimals })}
 							</span>
 						</div>
 						<div className="flex items-center justify-between">
-							<span className="text-2xs text-muted-fg">{t`Mark Price`}</span>
-							<span className="text-2xs tabular-nums font-medium text-warning">
+							<span className="text-2xs text-fg-700">{t`Mark Price`}</span>
+							<span className="text-2xs tabular-nums font-medium text-status-warning">
 								{formatPrice(position.markPx, { szDecimals: position.szDecimals })}
 							</span>
 						</div>
 						<div className="border-t border-border/50 pt-3 flex items-center justify-between">
-							<span className="text-2xs text-muted-fg">{t`Unrealized P&L`}</span>
+							<span className="text-2xs text-fg-700">{t`Unrealized P&L`}</span>
 							<span className={cn("text-2xs tabular-nums font-semibold", getValueColorClass(position.unrealizedPnl))}>
 								{formatUSD(position.unrealizedPnl, { signDisplay: "exceptZero" })}
-								<span className="font-normal text-muted-fg ml-1">({formatPercent(position.roe, 1)})</span>
+								<span className="font-normal text-fg-700 ml-1">({formatPercent(position.roe, 1)})</span>
 							</span>
 						</div>
 					</div>
@@ -179,20 +179,14 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 					/>
 
 					{error && (
-						<div className="mt-3 px-2 py-1.5 rounded-md bg-negative/10 border border-negative/20 text-3xs text-negative">
+						<div className="mt-3 px-2 py-1.5 rounded-md bg-market-down-subtle border border-market-down-primary/20 text-3xs text-market-down-primary">
 							{error.message}
 						</div>
 					)}
 				</div>
 
 				<DialogFooter className="px-5 py-3 border-t border-border/50">
-					<Button
-						size="sm"
-						variant="text"
-						onClick={() => handleOpenChange(false)}
-						disabled={isSubmitting}
-						className="text-muted-fg hover:text-fg"
-					>
+					<Button size="sm" variant="text" onClick={() => handleOpenChange(false)} disabled={isSubmitting}>
 						{t`Cancel`}
 					</Button>
 					<TradingActionButton onClick={handleSubmit} disabled={!canSubmit} className="min-w-24">

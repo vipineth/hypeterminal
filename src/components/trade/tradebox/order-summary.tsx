@@ -2,7 +2,6 @@ import { t } from "@lingui/core/macro";
 import { PencilIcon } from "@phosphor-icons/react";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { DEFAULT_BUILDER_CONFIG } from "@/config/hyperliquid";
-import { cn } from "@/lib/cn";
 import { bpsToPercentage, formatPrice, formatUSD } from "@/lib/format";
 import type { MarketKind } from "@/lib/hyperliquid";
 
@@ -20,7 +19,7 @@ interface Props {
 
 export function OrderSummary({
 	liqPrice,
-	liqWarning,
+	liqWarning: _liqWarning,
 	orderValue,
 	marginRequired,
 	estimatedFee,
@@ -32,48 +31,50 @@ export function OrderSummary({
 	const isLeveraged = marketKind !== "spot";
 
 	return (
-		<div className="border border-border/40 divide-y divide-border/40 text-3xs">
+		<div className="divide-y divide-border/30 text-2xs tracking-[0.5px]">
 			{isLeveraged && (
 				<div className="flex items-center justify-between px-2 py-1.5">
-					<span className="text-muted-fg">{t`Liq. Price`}</span>
-					<span className={cn("tabular-nums", liqWarning ? "text-negative" : "text-negative/70")}>
+					<span className="text-fg-500">{t`Liq. Price`}</span>
+					<span className="tabular-nums text-market-down-primary">
 						{liqPrice ? formatPrice(liqPrice, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER}
 					</span>
 				</div>
 			)}
 			<div className="flex items-center justify-between px-2 py-1.5">
-				<span className="text-muted-fg">{t`Order Value`}</span>
-				<span className="tabular-nums">{orderValue > 0 ? formatUSD(orderValue) : FALLBACK_VALUE_PLACEHOLDER}</span>
+				<span className="text-fg-500">{t`Order Value`}</span>
+				<span className="tabular-nums text-fg-700">
+					{orderValue > 0 ? formatUSD(orderValue) : FALLBACK_VALUE_PLACEHOLDER}
+				</span>
 			</div>
 			{isLeveraged && (
 				<div className="flex items-center justify-between px-2 py-1.5">
-					<span className="text-muted-fg">{t`Margin Req.`}</span>
-					<span className="tabular-nums">
+					<span className="text-fg-500">{t`Margin Req.`}</span>
+					<span className="tabular-nums text-fg-700">
 						{marginRequired > 0 ? formatUSD(marginRequired) : FALLBACK_VALUE_PLACEHOLDER}
 					</span>
 				</div>
 			)}
 			<div className="flex items-center justify-between px-2 py-1.5">
-				<span className="text-muted-fg">{t`Slippage`}</span>
+				<span className="text-fg-500">{t`Slippage`}</span>
 				<button
 					type="button"
 					onClick={onSlippageClick}
-					className="flex items-center gap-1 hover:text-fg transition-colors"
+					className="flex items-center gap-1 hover:text-fg-900 transition-colors"
 				>
-					<span className="tabular-nums text-warning">{slippagePercent}%</span>
-					<PencilIcon className="size-2 text-muted-fg" />
+					<span className="tabular-nums text-market-down-primary">{slippagePercent}%</span>
+					<PencilIcon className="size-2 text-fg-500" />
 				</button>
 			</div>
 			<div className="flex items-center justify-between px-2 py-1.5">
-				<span className="text-muted-fg">{t`Est. Fee`}</span>
-				<span className="tabular-nums text-muted-fg">
+				<span className="text-fg-500">{t`Est. Fee`}</span>
+				<span className="tabular-nums text-fg-700">
 					{estimatedFee > 0 ? formatUSD(estimatedFee) : FALLBACK_VALUE_PLACEHOLDER}
 				</span>
 			</div>
 			{DEFAULT_BUILDER_CONFIG?.f && (
 				<div className="flex items-center justify-between px-2 py-1.5">
-					<span className="text-muted-fg">{t`Builder Fee`}</span>
-					<span className="tabular-nums text-muted-fg">{bpsToPercentage(DEFAULT_BUILDER_CONFIG?.f)}%</span>
+					<span className="text-fg-500">{t`Builder Fee`}</span>
+					<span className="tabular-nums text-fg-700">{bpsToPercentage(DEFAULT_BUILDER_CONFIG?.f)}%</span>
 				</div>
 			)}
 		</div>

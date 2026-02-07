@@ -1,88 +1,38 @@
+import { cva, type VariantProps } from "class-variance-authority";
 import { Tabs as TabsPrimitive } from "radix-ui";
 import type * as React from "react";
-import { type CSSProperties, type RefObject, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 
 function Tabs({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Root>) {
 	return <TabsPrimitive.Root data-slot="tabs" className={cn("flex flex-col", className)} {...props} />;
 }
 
-type TabsListVariant = "pill" | "underline";
+const tabsListVariants = cva("inline-flex items-center", {
+	variants: {
+		variant: {
+			pill: "gap-1 rounded-xs bg-surface-100 text-3xs p-0.5",
+			underline: "gap-1 text-xs border-b border-border",
+		},
+	},
+	defaultVariants: {
+		variant: "pill",
+	},
+});
 
-interface TabsListProps extends React.ComponentProps<typeof TabsPrimitive.List> {
-	variant?: TabsListVariant;
-}
+type TabsListVariant = NonNullable<VariantProps<typeof tabsListVariants>["variant"]>;
 
-function useTabIndicator(listRef: RefObject<HTMLDivElement | null>, variant: TabsListVariant) {
-	const [style, setStyle] = useState<CSSProperties>({ opacity: 0 });
-	const hasMounted = useRef(false);
-
-	useEffect(() => {
-		const list = listRef.current;
-		if (!list) return;
-
-		function measure() {
-			const list = listRef.current;
-			if (!list) return;
-			const active = list.querySelector<HTMLElement>('[data-state="active"]');
-			if (!active) {
-				setStyle((s) => ({ ...s, opacity: 0 }));
-				return;
-			}
-
-			const next: CSSProperties = {
-				width: active.offsetWidth,
-				transform: `translateX(${active.offsetLeft}px)`,
-				opacity: 1,
-			};
-
-			if (!hasMounted.current) {
-				next.transition = "none";
-				hasMounted.current = true;
-			}
-
-			setStyle(next);
-		}
-
-		measure();
-
-		const mo = new MutationObserver(measure);
-		mo.observe(list, { attributes: true, attributeFilter: ["data-state"], subtree: true });
-
-		const ro = new ResizeObserver(measure);
-		ro.observe(list);
-
-		return () => {
-			mo.disconnect();
-			ro.disconnect();
-		};
-	}, [listRef, variant]);
-
-	return style;
-}
+interface TabsListProps
+	extends React.ComponentProps<typeof TabsPrimitive.List>,
+		VariantProps<typeof tabsListVariants> {}
 
 function TabsList({ className, variant = "pill", ...props }: TabsListProps) {
-	const listRef = useRef<HTMLDivElement>(null);
-	const indicatorStyle = useTabIndicator(listRef, variant);
-
 	return (
 		<TabsPrimitive.List
-			ref={listRef}
 			data-slot="tabs-list"
-			className={cn("relative inline-flex items-center gap-1", className)}
+			data-variant={variant}
+			className={cn(tabsListVariants({ variant }), className)}
 			{...props}
-		>
-			<span
-				aria-hidden
-				className={cn(
-					"absolute transition-[transform,width] duration-200 ease-out",
-					variant === "pill" && "inset-y-0 rounded bg-bg shadow-sm",
-					variant === "underline" && "bottom-0 h-0.5 bg-fg rounded-full",
-				)}
-				style={indicatorStyle}
-			/>
-			{props.children}
-		</TabsPrimitive.List>
+		/>
 	);
 }
 
@@ -91,12 +41,14 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
 		<TabsPrimitive.Trigger
 			data-slot="tabs-trigger"
 			className={cn(
-				"relative z-10 px-2 py-0.5 text-3xs uppercase tracking-wider transition-colors",
-				"text-muted-fg hover:text-fg",
-				"data-[state=active]:text-fg",
-				"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-info/50",
-				"disabled:pointer-events-none disabled:opacity-50",
+				"relative inline-flex items-center justify-center whitespace-nowrap select-none gap-1.5 px-2 py-1.5 uppercase tracking-wider transition-colors",
+				"text-fg-800 cursor-pointer hover:text-fg-950",
+				"data-[state=active]:font-semibold data-[state=active]:text-fg-950",
+				"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+				"disabled:pointer-events-none disabled:text-fg-300",
 				"[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3",
+				"[[data-variant=pill]_&]:rounded-xs [[data-variant=pill]_&]:data-[state=active]:bg-surface-800 [[data-variant=pill]_&_svg:not([class*='size-'])]:size-2.5",
+				"[[data-variant=underline]_&]:-mb-px [[data-variant=underline]_&]:border-b-2 [[data-variant=underline]_&]:border-transparent [[data-variant=underline]_&]:pb-2 [[data-variant=underline]_&]:data-[state=active]:border-action-primary",
 				className,
 			)}
 			{...props}
@@ -108,4 +60,5 @@ function TabsContent({ className, ...props }: React.ComponentProps<typeof TabsPr
 	return <TabsPrimitive.Content data-slot="tabs-content" className={cn("flex-1 outline-none", className)} {...props} />;
 }
 
-export { Tabs, TabsList, TabsTrigger, TabsContent };
+export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants };
+export type { TabsListVariant };

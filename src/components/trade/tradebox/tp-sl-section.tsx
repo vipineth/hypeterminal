@@ -75,29 +75,35 @@ export function TpSlSection({
 
 	if (compact) {
 		return (
-			<div className="rounded-md border border-border/50 bg-muted/20 p-2.5">
+			<div className="rounded-md border border-border/50 bg-surface-alt/20 p-2.5">
 				<div className="grid grid-cols-2 gap-2">
 					<div className="space-y-1">
-						<span className="text-3xs text-muted-fg">{t`Take Profit`}</span>
+						<span className="text-3xs text-fg-700">{t`Take Profit`}</span>
 						<Input
 							placeholder={t`TP Price`}
 							value={tpPrice}
 							onChange={(e) => onTpPriceChange(e.target.value)}
-							className={cn("h-7 text-2xs bg-bg tabular-nums", tpError && "border-negative focus:border-negative")}
+							className={cn(
+								"text-2xs bg-surface-200 tabular-nums",
+								tpError && "border-market-down-primary focus:border-market-down-primary",
+							)}
 							disabled={disabled}
 						/>
-						{tpError && <div className="text-4xs text-negative">{tpError}</div>}
+						{tpError && <div className="text-4xs text-market-down-primary">{tpError}</div>}
 					</div>
 					<div className="space-y-1">
-						<span className="text-3xs text-muted-fg">{t`Stop Loss`}</span>
+						<span className="text-3xs text-fg-700">{t`Stop Loss`}</span>
 						<Input
 							placeholder={t`SL Price`}
 							value={slPrice}
 							onChange={(e) => onSlPriceChange(e.target.value)}
-							className={cn("h-7 text-2xs bg-bg tabular-nums", slError && "border-negative focus:border-negative")}
+							className={cn(
+								"text-2xs bg-surface-200 tabular-nums",
+								slError && "border-market-down-primary focus:border-market-down-primary",
+							)}
 							disabled={disabled}
 						/>
-						{slError && <div className="text-4xs text-negative">{slError}</div>}
+						{slError && <div className="text-4xs text-market-down-primary">{slError}</div>}
 					</div>
 				</div>
 			</div>
@@ -133,37 +139,37 @@ export function TpSlSection({
 			/>
 
 			{riskRewardDisplay && (
-				<div className="rounded-md border border-border/40 bg-muted/20 p-2.5 space-y-2">
+				<div className="rounded-md border border-border/40 bg-surface-alt/20 p-2.5 space-y-2">
 					<div className="flex items-center justify-between">
-						<span className="text-3xs text-muted-fg">{t`Risk/Reward`}</span>
+						<span className="text-3xs text-fg-700">{t`Risk/Reward`}</span>
 						<span
 							className={cn(
 								"text-3xs font-semibold tabular-nums",
-								riskRewardDisplay.rrDisplay.isFavorable ? "text-positive" : "text-warning",
+								riskRewardDisplay.rrDisplay.isFavorable ? "text-market-up-primary" : "text-status-warning",
 							)}
 						>
 							{riskRewardDisplay.rrDisplay.label}
 						</span>
 					</div>
-					<div className="flex h-1.5 rounded-full overflow-hidden bg-muted/50">
+					<div className="flex h-1.5 rounded-full overflow-hidden bg-surface-alt/50">
 						<div
-							className="bg-negative"
+							className="bg-market-down-primary"
 							style={{
 								width: `${(riskRewardDisplay.rrDisplay.risk / (riskRewardDisplay.rrDisplay.risk + riskRewardDisplay.rrDisplay.reward)) * 100}%`,
 							}}
 						/>
 						<div
-							className="bg-positive"
+							className="bg-market-up-primary"
 							style={{
 								width: `${(riskRewardDisplay.rrDisplay.reward / (riskRewardDisplay.rrDisplay.risk + riskRewardDisplay.rrDisplay.reward)) * 100}%`,
 							}}
 						/>
 					</div>
 					<div className="flex items-center justify-between text-3xs">
-						<span className="tabular-nums text-negative">
+						<span className="tabular-nums text-market-down-primary">
 							{formatUSD(riskRewardDisplay.slPnl, { signDisplay: "exceptZero" })}
 						</span>
-						<span className="tabular-nums text-positive">
+						<span className="tabular-nums text-market-up-primary">
 							{formatUSD(riskRewardDisplay.tpPnl, { signDisplay: "exceptZero" })}
 						</span>
 					</div>

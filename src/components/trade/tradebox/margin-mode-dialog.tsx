@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { CheckIcon, ShieldIcon, SpinnerGapIcon, StackIcon, WarningIcon } from "@phosphor-icons/react";
+import { CaretDownIcon, CheckIcon, ShieldIcon, SpinnerGapIcon, StackIcon, WarningIcon } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +14,27 @@ import {
 import { cn } from "@/lib/cn";
 import type { MarginMode } from "@/lib/trade/margin-mode";
 import { TradingActionButton } from "../components/trading-action-button";
+
+const MODE_ICONS = { cross: StackIcon, isolated: ShieldIcon } as const;
+
+interface MarginModeToggleProps {
+	mode: MarginMode;
+	disabled?: boolean;
+	onClick?: () => void;
+}
+
+export function MarginModeToggle({ mode, disabled, onClick }: MarginModeToggleProps) {
+	const label = mode === "cross" ? t`Cross` : t`Isolated`;
+	const Icon = MODE_ICONS[mode];
+
+	return (
+		<Button variant="outlined" size="md" onClick={onClick} disabled={disabled}>
+			<Icon className="size-3" />
+			<span>{label}</span>
+			<CaretDownIcon className="size-3" />
+		</Button>
+	);
+}
 
 const SUCCESS_DISPLAY_DURATION_MS = 1000;
 
@@ -126,17 +147,19 @@ export function MarginModeDialog({
 								disabled={isUpdating}
 								className={cn(
 									"w-full text-left p-3 rounded-sm border transition-colors",
-									isSelected ? "border-info/50 bg-info/5" : "border-border/60 hover:border-border",
+									isSelected ? "border-status-info/50 bg-action-primary/5" : "border-border/60 hover:border-border",
 								)}
 							>
 								<div className="flex gap-3">
 									<div
 										className={cn(
 											"flex items-center justify-center size-8 rounded-sm shrink-0 transition-colors",
-											isSelected ? "bg-info/10 border border-info/30" : "bg-surface border border-border/60",
+											isSelected
+												? "bg-status-info/10 border border-status-info/30"
+												: "bg-surface-800 border border-border/60",
 										)}
 									>
-										<Icon className={cn("size-4 transition-colors", isSelected ? "text-info" : "text-muted-fg")} />
+										<Icon className={cn("size-4 transition-colors", isSelected ? "text-status-info" : "text-fg-700")} />
 									</div>
 
 									<div className="flex-1 min-w-0">
@@ -144,21 +167,21 @@ export function MarginModeDialog({
 											<span
 												className={cn(
 													"text-xs font-medium uppercase tracking-wider",
-													isSelected ? "text-info" : "text-fg",
+													isSelected ? "text-status-info" : "text-fg-900",
 												)}
 											>
 												{option.label()}
 											</span>
 											<div className="flex items-center gap-2">
 												{isCurrent && (
-													<span className="text-3xs text-muted-fg uppercase tracking-wider">
+													<span className="text-3xs text-fg-700 uppercase tracking-wider">
 														<Trans>Current</Trans>
 													</span>
 												)}
-												{isSelected && !isCurrent && <CheckIcon className="size-3.5 text-info" />}
+												{isSelected && !isCurrent && <CheckIcon className="size-3.5 text-status-info" />}
 											</div>
 										</div>
-										<p className="text-3xs text-muted-fg leading-relaxed">{option.description()}</p>
+										<p className="text-3xs text-fg-700 leading-relaxed">{option.description()}</p>
 									</div>
 								</div>
 							</button>
@@ -167,23 +190,23 @@ export function MarginModeDialog({
 				</div>
 
 				{cannotSwitch && (
-					<div className="flex items-start gap-2 p-2.5 bg-warning/10 border border-warning/20 rounded-sm">
-						<WarningIcon className="size-3.5 text-warning shrink-0 mt-0.5" />
-						<p className="text-xs text-warning leading-relaxed">
+					<div className="flex items-start gap-2 p-2.5 bg-status-warning/10 border border-status-warning/20 rounded-sm">
+						<WarningIcon className="size-3.5 text-status-warning shrink-0 mt-0.5" />
+						<p className="text-xs text-status-warning leading-relaxed">
 							<Trans>Cannot switch to Isolated mode with an open position. Close your position first.</Trans>
 						</p>
 					</div>
 				)}
 
 				{updateError && (
-					<div className="flex items-center gap-2 p-2.5 bg-negative/10 border border-negative/20 rounded-sm text-xs text-negative">
+					<div className="flex items-center gap-2 p-2.5 bg-market-down-subtle border border-market-down-primary/20 rounded-sm text-xs text-market-down-primary">
 						<WarningIcon className="size-3.5 shrink-0" />
 						<span className="flex-1 truncate">{updateError.message || t`Update failed`}</span>
 					</div>
 				)}
 
 				{showSuccess && (
-					<div className="flex items-center justify-center gap-2 p-2.5 bg-positive/10 border border-positive/20 rounded-sm text-xs text-positive">
+					<div className="flex items-center justify-center gap-2 p-2.5 bg-market-up-subtle border border-market-up-primary/20 rounded-sm text-xs text-market-up-primary">
 						<CheckIcon className="size-3.5" />
 						<Trans>Updated</Trans>
 					</div>
