@@ -7,7 +7,7 @@ export function TradeSidebar() {
 	const formKey = market?.name ?? "default";
 
 	return (
-		<div className="h-full min-h-0 flex flex-col overflow-y-auto gap-32 bg-surface-alt">
+		<div className="h-full min-h-0 flex flex-col overflow-y-auto gap-32 bg-surface-800">
 			<div className="flex-1 min-h-0">
 				<TradePanel key={formKey} />
 			</div>

@@ -32,7 +32,7 @@ export function MainWorkspace() {
 			</div>
 			<ResizablePanelGroup className="h-full min-h-0" defaultLayout={defaultLayout} onLayoutChanged={onLayoutChanged}>
 				<ResizablePanel defaultSize={analysis.defaultSize}>
-					<div className="h-full flex flex-col">
+					<div className="h-full flex flex-col bg-surface-500">
 						<div className="flex-1 min-h-0">
 							<AnalysisSection />
 						</div>

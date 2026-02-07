@@ -186,8 +186,8 @@ export function AccountPanel() {
 	const hasData = activeTab === "perps" ? hasPerpData : hasSpotData;
 
 	return (
-		<div className="shrink-0 flex flex-col bg-surface-800 border-t border-border/10">
-			<div className="px-2 py-2 border-b border-border/10 flex items-center justify-between">
+		<div className="shrink-0 flex flex-col bg-surface-800 border-t border-border">
+			<div className="px-2 py-2 border-b border-border flex items-center justify-between">
 				<span className="text-3xs text-fg-900">{t`Account`}</span>
 				<div className="flex items-center gap-2">
 					<div className="flex items-center gap-1">
@@ -207,33 +207,31 @@ export function AccountPanel() {
 				</div>
 			</div>
 
-			<div className="px-2 py-1 flex items-center gap-0.5 border-b border-border/10">
-				<Button
-					variant="text"
-					size="none"
+			<div className="px-2 flex items-center gap-0.5 border-b border-border">
+				<button
+					type="button"
 					onClick={() => setActiveTab("perps")}
 					className={cn(
-						"px-2 py-1 text-xs tracking-[0.5px] hover:bg-transparent",
+						"px-2 py-1.5 -mb-px text-xs tracking-[0.5px] border-b",
 						activeTab === "perps"
-							? "font-semibold text-fg-900 border-b border-fg-900"
-							: "text-fg-700 hover:text-fg-900",
+							? "font-semibold text-fg-900 border-fg-900"
+							: "text-fg-700 border-transparent hover:text-fg-900",
 					)}
-					aria-label={t`Perps`}
 				>
 					{t`Perps`}
-				</Button>
-				<Button
-					variant="text"
-					size="none"
+				</button>
+				<button
+					type="button"
 					onClick={() => setActiveTab("spot")}
 					className={cn(
-						"px-2 py-1 text-xs tracking-[0.5px] hover:bg-transparent",
-						activeTab === "spot" ? "font-semibold text-fg-900 border-b border-fg-900" : "text-fg-700 hover:text-fg-900",
+						"px-2 py-1.5 -mb-px text-xs tracking-[0.5px] border-b",
+						activeTab === "spot"
+							? "font-semibold text-fg-900 border-fg-900"
+							: "text-fg-700 border-transparent hover:text-fg-900",
 					)}
-					aria-label={t`Spot`}
 				>
 					{t`Spot`}
-				</Button>
+				</button>
 			</div>
 
 			<div className="p-2 space-y-2 overflow-y-auto">
@@ -243,7 +241,7 @@ export function AccountPanel() {
 					<div className="text-2xs text-fg-700 text-center py-4">{t`Loading...`}</div>
 				) : (
 					<>
-						<div className="divide-y divide-border/5 text-2xs tracking-[0.5px]">
+						<div className="divide-y divide-border text-2xs tracking-[0.5px]">
 							{summaryRows.map((row) => (
 								<div key={row.label} className="flex items-center justify-between px-2 h-5">
 									<span className="text-fg-500">{row.label}</span>
@@ -253,23 +251,11 @@ export function AccountPanel() {
 						</div>
 
 						<div className="grid grid-cols-2 gap-1">
-							<Button
-								variant="text"
-								size="none"
-								onClick={() => openDepositModal("withdraw")}
-								className="py-0.5 text-xs font-medium border border-border text-fg-700 rounded-[2px] hover:text-fg-900 hover:border-fg-400 hover:bg-transparent"
-								aria-label={t`Withdraw`}
-							>
+							<Button variant="outlined" onClick={() => openDepositModal("withdraw")} aria-label={t`Withdraw`}>
 								<UploadSimpleIcon className="size-4" />
 								{t`Withdraw`}
 							</Button>
-							<Button
-								variant="text"
-								size="none"
-								onClick={() => openDepositModal("deposit")}
-								className="py-0.5 text-xs font-medium border border-status-success text-status-success rounded-[2px] hover:bg-status-success-subtle"
-								aria-label={t`Deposit`}
-							>
+							<Button variant="outlined" onClick={() => openDepositModal("deposit")} aria-label={t`Deposit`}>
 								<DownloadSimpleIcon className="size-4" />
 								{t`Deposit`}
 							</Button>

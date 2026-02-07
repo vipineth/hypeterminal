@@ -124,23 +124,23 @@
   --status-info-subtle: #EAF0FF;
 
   /* Surface — elevation scale (higher = more elevated) */
-  --surface-100: #EDF0F1; /* inset/sunken */
-  --surface-200: #F1F3F4; /* surface-base */
-  --surface-300: #F5F6F7; /* subtle elevation */
-  --surface-400: #F9FAFA; /* between base & panels */
-  --surface-500: #FDFDFD; /* surface-analysis */
-  --surface-600: #FEFEFE; /* near elevated */
-  --surface-700: #FEFEFE; /* near elevated */
-  --surface-800: #FFFFFF; /* surface-execution */
-  --surface-900: #FFFFFF; /* above elevated */
-  --surface-alt: #F9F9FA; /* subtle contrast (alternating rows, pills, badges) */
+  --surface-100: #DDE1E6; /* inset/sunken */
+  --surface-200: #EAECF0; /* surface-base */
+  --surface-300: #EFF1F3; /* subtle elevation */
+  --surface-400: #F4F5F7; /* between base & panels */
+  --surface-500: #F8F9FA; /* surface-analysis */
+  --surface-600: #FBFBFC; /* near elevated */
+  --surface-700: #FDFDFE; /* elevated */
+  --surface-800: #FEFEFF; /* surface-execution */
+  --surface-900: #FFFFFF; /* popover/modal */
+  --surface-alt: #EDEEF1; /* subtle contrast (alternating rows, pills, badges) */
 
   /* Highlight */
   --highlight: #F7931A;
 
   /* Structural */
   --border: #CFD9E1;
-  --input: #F1F3F4;
+  --input: #EAECF0;
   --ring: #2563EB;
   --sel: rgba(37, 99, 235, 0.15);
 }
@@ -188,19 +188,19 @@
   --status-info-subtle: #1B2A4A;
 
   /* Surface — elevation scale (higher = more elevated) */
-  --surface-100: #090A0B; /* inset/sunken */
-  --surface-200: #0D0F11; /* surface-base */
+  --surface-100: #0A0C0F; /* inset/sunken */
+  --surface-200: #0C0E11; /* surface-base */
   --surface-300: #111417; /* subtle elevation */
-  --surface-400: #15181D; /* between base & panels */
-  --surface-500: #191D23; /* surface-analysis */
-  --surface-600: #1D2229; /* between panels & elevated */
-  --surface-700: #222730; /* near elevated */
-  --surface-800: #262C36; /* surface-execution */
-  --surface-900: #2A313C; /* above elevated */
-  --surface-alt: #262C36; /* subtle contrast (alternating rows, pills, badges) */
+  --surface-400: #161A1F; /* between base & panels */
+  --surface-500: #1B2027; /* surface-analysis */
+  --surface-600: #21272F; /* near elevated */
+  --surface-700: #272E38; /* elevated */
+  --surface-800: #2D3541; /* surface-execution */
+  --surface-900: #333D4B; /* popover/modal */
+  --surface-alt: #1A2030; /* subtle contrast (alternating rows, pills, badges) */
 
   /* Structural */
-  --border: #2D3748;
+  --border: #384558;
   --input: #1A1F28;
   --ring: #4F7DFF;
   --sel: rgba(79, 125, 255, 0.15);
@@ -320,6 +320,7 @@
 
   html {
     height: 100%;
+    scrollbar-gutter: stable;
   }
 
   body {

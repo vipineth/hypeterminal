@@ -494,10 +494,12 @@ export function TradePanel() {
 					{approvalError && <div className="text-4xs text-market-down-primary">{approvalError}</div>}
 
 					<Button
-						variant="text"
+						variant="contained"
+						tone="accent"
+						size="lg"
 						onClick={buttonContent.action}
 						disabled={buttonContent.disabled}
-						className={cn("w-full", actionButtonClass)}
+						className={cn("w-full")}
 						aria-label={buttonContent.text}
 					>
 						{(isSubmitting || isRegistering) && <SpinnerGapIcon className="size-3 animate-spin" />}

@@ -10,7 +10,7 @@ function Tabs({ className, ...props }: React.ComponentProps<typeof TabsPrimitive
 const tabsListVariants = cva("inline-flex items-center", {
 	variants: {
 		variant: {
-			pill: "gap-1 rounded-xs bg-surface-100 text-3xs p-0.5",
+			pill: "gap-1 rounded-xs bg-surface-200 text-3xs p-0.5",
 			underline: "gap-1 text-xs border-b border-border",
 		},
 	},
@@ -47,8 +47,8 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
 				"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
 				"disabled:pointer-events-none disabled:text-fg-300",
 				"[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3",
-				"[[data-variant=pill]_&]:rounded-xs [[data-variant=pill]_&]:data-[state=active]:bg-surface-800 [[data-variant=pill]_&_svg:not([class*='size-'])]:size-2.5",
-				"[[data-variant=underline]_&]:-mb-px [[data-variant=underline]_&]:border-b-2 [[data-variant=underline]_&]:border-transparent [[data-variant=underline]_&]:pb-2 [[data-variant=underline]_&]:data-[state=active]:border-action-primary",
+				"in-data-[variant=pill]:rounded-xs in-data-[variant=pill]:data-[state=active]:bg-surface-900 [[data-variant=pill]_&_svg:not([class*='size-'])]:size-2.5",
+				"in-data-[variant=underline]:-mb-px in-data-[variant=underline]:border-b-2 in-data-[variant=underline]:border-transparent in-data-[variant=underline]:pb-2 in-data-[variant=underline]:data-[state=active]:border-action-primary",
 				className,
 			)}
 			{...props}
