@@ -136,7 +136,7 @@ interface EmptyStateProps {
 function EmptyState({ title, icon = "empty" }: EmptyStateProps) {
 	return (
 		<div className="h-full flex flex-col items-center justify-center gap-4 p-6 text-center">
-			<div className={cn("size-16 rounded-full flex items-center justify-center", "bg-surface-alt/50")}>
+			<div className={cn("size-16 rounded-full flex items-center justify-center", "bg-surface-300")}>
 				{icon === "wallet" ? (
 					<WalletIcon className="size-8 text-fg-700" />
 				) : (

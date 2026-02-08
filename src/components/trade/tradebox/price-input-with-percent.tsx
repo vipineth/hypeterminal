@@ -63,7 +63,7 @@ export function PriceInputWithPercent({
 							type="button"
 							onClick={() => onPercentClick(p)}
 							disabled={disabled || !isPositive(referencePrice)}
-							className="px-1.5 py-1 text-4xs font-medium text-fg-700 bg-surface-alt hover:text-fg-900 hover:bg-status-info/20 rounded-xs transition-colors disabled:opacity-50"
+							className="px-1.5 py-1 text-4xs font-medium text-fg-700 bg-surface-300 hover:text-fg-900 hover:bg-status-info/20 rounded-xs transition-colors disabled:opacity-50"
 							aria-label={t`Set to ${p}%`}
 						>
 							{p}%

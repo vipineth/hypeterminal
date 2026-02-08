@@ -370,7 +370,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					</div>
 
 					{/* Order type tabs */}
-					<div className="flex items-center gap-1 bg-surface-alt/50 rounded-md p-1">
+					<div className="flex items-center gap-1 bg-surface-300 rounded-md p-1">
 						<Button
 							variant="text"
 							size="none"

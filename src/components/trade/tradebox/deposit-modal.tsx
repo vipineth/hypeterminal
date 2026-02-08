@@ -67,7 +67,7 @@ function NetworkSelect({ label, value, onChange, disabled }: NetworkSelectProps)
 				<SelectTrigger className="w-full h-9 bg-surface-200/50 border-border/60">
 					<SelectValue>
 						<span className="flex items-center gap-2">
-							<span className="flex size-5 items-center justify-center rounded bg-surface-alt/50 text-4xs font-medium">
+							<span className="flex size-5 items-center justify-center rounded bg-surface-300 text-4xs font-medium">
 								{selectedNetwork.shortName}
 							</span>
 							<span>{selectedNetwork.name}</span>
@@ -78,7 +78,7 @@ function NetworkSelect({ label, value, onChange, disabled }: NetworkSelectProps)
 					{NETWORKS.map((network) => (
 						<SelectItem key={network.id} value={network.id}>
 							<span className="flex items-center gap-2">
-								<span className="flex size-5 items-center justify-center rounded bg-surface-alt/50 text-4xs font-medium">
+								<span className="flex size-5 items-center justify-center rounded bg-surface-300 text-4xs font-medium">
 									{network.shortName}
 								</span>
 								<span>{network.name}</span>
@@ -223,7 +223,7 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 				)}
 			</div>
 
-			<div className="rounded-lg border border-border/40 bg-surface-alt/10 p-3 space-y-2">
+			<div className="rounded-lg border border-border/40 bg-surface-400 p-3 space-y-2">
 				<InfoRow
 					label={<Trans>Minimum</Trans>}
 					value={<span className="tabular-nums">{formatUnits(MIN_DEPOSIT_USDC, USDC_DECIMALS)} USDC</span>}
@@ -332,7 +332,7 @@ function WithdrawForm({
 				)}
 			</div>
 
-			<div className="rounded-lg border border-border/40 bg-surface-alt/10 p-3 space-y-2">
+			<div className="rounded-lg border border-border/40 bg-surface-400 p-3 space-y-2">
 				<InfoRow
 					label={<Trans>Network fee</Trans>}
 					value={<span className="tabular-nums">${WITHDRAWAL_FEE_USD}</span>}
@@ -382,7 +382,7 @@ function WithdrawForm({
 function WalletNotConnected() {
 	return (
 		<div className="flex flex-col items-center gap-4 py-8">
-			<div className="flex size-12 items-center justify-center rounded-full bg-surface-alt/30 border border-border/40">
+			<div className="flex size-12 items-center justify-center rounded-full bg-surface-300 border border-border/40">
 				<WalletIcon className="size-6 text-fg-700" />
 			</div>
 			<div className="text-center space-y-1">
@@ -641,7 +641,7 @@ export function DepositModal() {
 				</DialogHeader>
 
 				<Tabs value={activeTab} onValueChange={(v) => setTab(v as "deposit" | "withdraw")} className="space-y-4">
-					<TabsList className="w-full grid grid-cols-2 p-1 bg-surface-alt/30 rounded-lg border border-border/40">
+					<TabsList className="w-full grid grid-cols-2 p-1 bg-surface-300 rounded-lg border border-border/40">
 						<TabsTrigger
 							value="deposit"
 							className={cn(

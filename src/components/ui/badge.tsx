@@ -16,7 +16,7 @@ const badgeVariants = cva(
 				// Trading variants
 				long: "border-market-up-primary/40 bg-market-up-subtle text-market-up-primary",
 				short: "border-market-down-primary/40 bg-market-down-subtle text-market-down-primary",
-				neutral: "border-border/60 bg-surface-alt/30 text-fg-700",
+				neutral: "border-border/60 bg-surface-300 text-fg-700",
 			},
 			size: {
 				default: "px-2 py-0.5 text-xs font-medium gap-1 [&>svg]:size-3",

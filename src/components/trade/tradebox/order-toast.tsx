@@ -67,7 +67,7 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 			<div className="flex-1 min-w-0 space-y-0.5">
 				<div className="flex items-center gap-2">
 					{orderTypeLabel && (
-						<span className="px-1.5 py-0.5 rounded text-2xs font-bold uppercase tracking-wide bg-surface-alt text-fg-700">
+						<span className="px-1.5 py-0.5 rounded text-2xs font-bold uppercase tracking-wide bg-surface-300 text-fg-700">
 							{orderTypeLabel}
 						</span>
 					)}
@@ -114,7 +114,7 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 					variant="text"
 					size="none"
 					onClick={onRemove}
-					className="p-1.5 rounded-md text-fg-700 hover:text-fg-900 hover:bg-surface-alt/50 transition-colors shrink-0 self-start"
+					className="p-1.5 rounded-md text-fg-700 hover:text-fg-900 hover:bg-surface-300 transition-colors shrink-0 self-start"
 					aria-label={t`Dismiss`}
 				>
 					<XIcon className="size-4" />
@@ -161,7 +161,7 @@ export function OrderToast() {
 				successCount > 0 && pendingCount === 0 && failedCount === 0 && "ring-1 ring-market-up-primary/30",
 			)}
 		>
-			<div className="px-3 py-2 border-b border-border/40 bg-surface-alt/30 flex items-center justify-between">
+			<div className="px-3 py-2 border-b border-border/40 bg-surface-300 flex items-center justify-between">
 				<div className="flex items-center gap-2">
 					<LightningIcon className="size-4 text-status-info" />
 					<span className="text-xs font-semibold uppercase tracking-wider text-fg-900">{t`Order Queue`}</span>

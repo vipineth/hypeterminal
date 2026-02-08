@@ -137,7 +137,7 @@ function AdvancedOrderItem({ option, isSelected, onSelect }: AdvancedOrderItemPr
 			<span
 				className={cn(
 					"flex size-5 items-center justify-center rounded transition-colors",
-					isSelected ? "bg-status-info/15 text-status-info" : "bg-surface-alt/40 text-fg-700",
+					isSelected ? "bg-status-info/15 text-status-info" : "bg-surface-300 text-fg-700",
 				)}
 			>
 				<Icon className="size-3" />

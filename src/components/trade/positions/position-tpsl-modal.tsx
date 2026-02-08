@@ -135,7 +135,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 				</DialogHeader>
 
 				<div className="px-5 pb-4">
-					<div className="rounded-lg border border-border/50 bg-surface-alt/20 p-3 space-y-1">
+					<div className="rounded-lg border border-border/50 bg-surface-400 p-3 space-y-1">
 						<div className="flex items-center justify-between">
 							<span className="text-2xs text-fg-700">{t`Size`}</span>
 							<span className="text-2xs tabular-nums font-medium">

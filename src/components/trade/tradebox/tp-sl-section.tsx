@@ -75,7 +75,7 @@ export function TpSlSection({
 
 	if (compact) {
 		return (
-			<div className="rounded-md border border-border/50 bg-surface-alt/20 p-2.5">
+			<div className="rounded-md border border-border/50 bg-surface-400 p-2.5">
 				<div className="grid grid-cols-2 gap-2">
 					<div className="space-y-1">
 						<span className="text-3xs text-fg-700">{t`Take Profit`}</span>
@@ -139,7 +139,7 @@ export function TpSlSection({
 			/>
 
 			{riskRewardDisplay && (
-				<div className="rounded-md border border-border/40 bg-surface-alt/20 p-2.5 space-y-2">
+				<div className="rounded-md border border-border/40 bg-surface-400 p-2.5 space-y-2">
 					<div className="flex items-center justify-between">
 						<span className="text-3xs text-fg-700">{t`Risk/Reward`}</span>
 						<span
@@ -151,7 +151,7 @@ export function TpSlSection({
 							{riskRewardDisplay.rrDisplay.label}
 						</span>
 					</div>
-					<div className="flex h-1.5 rounded-full overflow-hidden bg-surface-alt/50">
+					<div className="flex h-1.5 rounded-full overflow-hidden bg-surface-300">
 						<div
 							className="bg-market-down-primary"
 							style={{

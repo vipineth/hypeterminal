@@ -286,7 +286,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 
 					{!hasConnectors && (
 						<div className="py-8 text-center space-y-3">
-							<div className="size-12 rounded-full bg-surface-alt/50 flex items-center justify-center mx-auto">
+							<div className="size-12 rounded-full bg-surface-300 flex items-center justify-center mx-auto">
 								<WarningCircleIcon className="size-6 text-fg-700" />
 							</div>
 							<div>
@@ -308,7 +308,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 					)}
 				</div>
 
-				<div className="border-t border-border/50 bg-surface-alt/30">
+				<div className="border-t border-border/50 bg-surface-300">
 					<Button
 						variant="text"
 						size="none"

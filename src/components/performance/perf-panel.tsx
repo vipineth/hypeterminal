@@ -219,7 +219,7 @@ export function PerfPanel({ onClose }: Props) {
 
 	return (
 		<div className="fixed bottom-4 right-4 z-9999 w-80 max-h-[80vh] overflow-hidden rounded-lg border border-border/60 bg-orange-50 backdrop-blur shadow-xl">
-			<div className="flex items-center justify-between px-3 py-2 border-b border-border/40 bg-surface-alt/30">
+			<div className="flex items-center justify-between px-3 py-2 border-b border-border/40 bg-surface-300">
 				<div className="flex items-center gap-2">
 					<PulseIcon className="size-4 text-status-info" />
 					<span className="text-sm font-medium">Performance</span>

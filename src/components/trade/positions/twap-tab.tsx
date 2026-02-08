@@ -77,7 +77,7 @@ export function TwapTab() {
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
-								<TableRow className="border-border/40 bg-surface-alt hover:bg-surface-alt">
+								<TableRow className="border-border/40 bg-surface-300 hover:bg-surface-300">
 									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 h-7">{t`Asset`}</TableHead>
 									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
 										{t`Size`}
@@ -116,7 +116,7 @@ export function TwapTab() {
 									return (
 										<TableRow
 											key={twapId}
-											className={cn("border-border/40 hover:bg-surface-500/30", i % 2 === 1 && "bg-surface-alt")}
+											className={cn("border-border/40 hover:bg-surface-500/30", i % 2 === 1 && "bg-surface-300")}
 										>
 											<TableCell className="text-3xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">

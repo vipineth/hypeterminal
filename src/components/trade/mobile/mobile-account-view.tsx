@@ -53,7 +53,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 		return (
 			<div className={cn("flex flex-col h-full min-h-0 bg-surface-800/20", className)}>
 				<div className="flex-1 flex flex-col items-center justify-center gap-6 p-6">
-					<div className="size-20 rounded-full bg-surface-alt/50 flex items-center justify-center">
+					<div className="size-20 rounded-full bg-surface-300 flex items-center justify-center">
 						<WalletIcon className="size-10 text-fg-700" />
 					</div>
 					<div className="text-center space-y-2">
@@ -197,8 +197,8 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 							size="none"
 							className={cn(
 								"py-4 text-base font-semibold rounded-md",
-								"bg-surface-alt/50 border border-border/60 text-fg-700",
-								"hover:bg-surface-alt transition-colors",
+								"bg-surface-300 border border-border/60 text-fg-700",
+								"hover:bg-surface-400 transition-colors",
 								"flex items-center justify-center gap-2",
 								"min-h-[56px]",
 							)}

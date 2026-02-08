@@ -210,7 +210,7 @@ export function OrdersTab() {
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
-								<TableRow className="border-border/40 bg-surface-alt hover:bg-surface-alt">
+								<TableRow className="border-border/40 bg-surface-300 hover:bg-surface-300">
 									<TableHead className="w-7">
 										<Checkbox
 											checked={allSelected ? true : someSelected ? "indeterminate" : false}
@@ -298,7 +298,7 @@ function OrderRow({
 	const typeConfig = getOrderTypeConfig(order);
 
 	return (
-		<TableRow className={cn("border-border/40 hover:bg-surface-500/30", isEven && "bg-surface-alt")}>
+		<TableRow className={cn("border-border/40 hover:bg-surface-500/30", isEven && "bg-surface-300")}>
 			<TableCell className="py-1.5">
 				<Checkbox
 					checked={isSelected}

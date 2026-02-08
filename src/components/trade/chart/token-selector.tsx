@@ -251,7 +251,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 												"flex items-center px-3 py-1.5 cursor-pointer border-b border-border/20",
 												"hover:bg-action-primary/10 transition-colors",
 												"absolute top-0 left-0 w-full",
-												isSelected && !isHighlighted && "bg-surface-alt",
+												isSelected && !isHighlighted && "bg-surface-300",
 												isHighlighted && "bg-action-primary/15",
 											)}
 											style={{

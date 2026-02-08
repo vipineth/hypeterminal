@@ -159,7 +159,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 		<div className={cn("flex flex-col h-full min-h-0", className)}>
 			<div className="shrink-0 px-3 py-2 border-b border-border/60 bg-surface-800/30">
 				<div className="flex items-center justify-between">
-					<div className="flex items-center gap-1 bg-surface-alt/50 rounded-md p-0.5">
+					<div className="flex items-center gap-1 bg-surface-300 rounded-md p-0.5">
 						<Button
 							variant="text"
 							size="none"
