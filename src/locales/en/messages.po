@@ -653,8 +653,8 @@ msgstr "Fee"
 #~ msgstr "Fee rate must be between 0.001% and 1%"
 
 #: src/components/trade/positions/orders-tab.tsx
-msgid "Filled"
-msgstr "Filled"
+#~ msgid "Filled"
+#~ msgstr "Filled"
 
 #. placeholder {0}: sub.label
 #: src/components/trade/chart/token-selector.tsx

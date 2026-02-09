@@ -156,13 +156,20 @@ function PositionRow({
 				</div>
 			</TableCell>
 			<TableCell className="text-3xs text-right tabular-nums py-1.5">
-				{formatToken(absSize, szDecimals)}{" "}
-				<span className="text-text-600">({formatUSD(p.positionValue, { compact: true })})</span>
+				<div className="flex flex-col items-end">
+					<span className="tabular-nums">
+						{formatToken(absSize, {
+							decimals: szDecimals,
+							symbol: p.coin,
+						})}
+					</span>
+					<span className="text-text-500 text-4xs">({formatUSD(p.positionValue, { compact: true })})</span>
+				</div>
 			</TableCell>
 			<TableCell className="text-3xs text-right py-1.5">
 				<div className="flex flex-col items-end">
 					<span className="tabular-nums">{formatUSD(p.marginUsed)}</span>
-					<span className="text-3xs text-text-600">{p.leverage.type === "isolated" ? t`Isolated` : t`Cross`}</span>
+					<span className="text-text-500 text-4xs">{p.leverage.type === "isolated" ? t`Isolated` : t`Cross`}</span>
 				</div>
 			</TableCell>
 			<TableCell className="text-3xs text-right tabular-nums text-text-600 py-1.5">
@@ -176,9 +183,9 @@ function PositionRow({
 				{formatUSD(cumFunding ? -cumFunding : null, { signDisplay: "exceptZero" })}
 			</TableCell>
 			<TableCell className="text-right py-1.5">
-				<div className={cn("text-3xs tabular-nums", pnlClass)}>
-					{formatUSD(unrealizedPnl, { signDisplay: "exceptZero" })}
-					<span className="text-text-600 ml-1">({formatPercent(p.returnOnEquity, 1)})</span>
+				<div className={cn("text-3xs tabular-nums flex flex-col items-end", pnlClass)}>
+					<span className="tabular-nums">{formatUSD(unrealizedPnl, { signDisplay: "exceptZero" })}</span>
+					<span className="text-text-500 text-4xs">({formatPercent(p.returnOnEquity, 1)})</span>
 				</div>
 			</TableCell>
 			<TableCell className="text-right py-1.5">

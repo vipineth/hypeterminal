@@ -8,18 +8,11 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
-import { formatDateTime, formatNumber, formatUSD } from "@/lib/format";
+import { formatDateTime, formatToken, formatUSD } from "@/lib/format";
 import { useMarkets } from "@/lib/hyperliquid";
 import { useExchangeCancel } from "@/lib/hyperliquid/hooks/exchange/useExchangeCancel";
 import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
-import {
-	getFilledSize,
-	getFillPercent,
-	getOrderTypeConfig,
-	getOrderValue,
-	getSideConfig,
-	type OpenOrder,
-} from "@/lib/trade/open-orders";
+import { getOrderTypeConfig, getOrderValue, getSideConfig, type OpenOrder } from "@/lib/trade/open-orders";
 import { useMarketActions } from "@/stores/use-market-store";
 import { AssetDisplay, type AssetInfo } from "../components/asset-display";
 
@@ -226,9 +219,6 @@ export function OrdersTab() {
 									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Size`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
-										{t`Filled`}
-									</TableHead>
 									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Trigger`}</TableHead>
 									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Reduce`}</TableHead>
 									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
@@ -291,7 +281,6 @@ function OrderRow({
 	onCancel,
 	onSelectMarket,
 }: OrderRowProps) {
-	const fillPct = getFillPercent(order);
 	const sideConfig = getSideConfig(order);
 	const typeConfig = getOrderTypeConfig(order);
 
@@ -329,23 +318,12 @@ function OrderRow({
 				{formatUSD(order.limitPx, { compact: false })}
 			</TableCell>
 			<TableCell className="text-3xs text-right tabular-nums py-1.5">
-				{order.isPositionTpsl ? (
-					<span className="text-text-600">100%</span>
-				) : (
-					<>
-						{formatNumber(order.origSz, szDecimals)} {order.coin}{" "}
-						<span className="text-text-600">({formatUSD(getOrderValue(order), { compact: false })})</span>
-					</>
-				)}
-			</TableCell>
-			<TableCell className="text-3xs text-right tabular-nums py-1.5">
-				{order.isPositionTpsl || fillPct === 0 ? (
-					<span className="text-text-600">{FALLBACK_VALUE_PLACEHOLDER}</span>
-				) : (
-					<span className="text-warning-700">
-						{formatNumber(getFilledSize(order), szDecimals)} ({fillPct.toFixed(2)}%)
+				<div className="flex flex-col items-end">
+					<span className="tabular-nums">
+						{formatToken(order.origSz, { decimals: szDecimals, symbol: order.coin })}
 					</span>
-				)}
+					<span className="text-text-500">({formatUSD(getOrderValue(order), { compact: false })})</span>
+				</div>
 			</TableCell>
 			<TableCell className="text-3xs text-text-600 py-1.5">
 				{order.triggerCondition || FALLBACK_VALUE_PLACEHOLDER}

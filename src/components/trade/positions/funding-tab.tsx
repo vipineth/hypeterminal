@@ -122,7 +122,7 @@ export function FundingTab() {
 												</div>
 											</TableCell>
 											<TableCell className="text-3xs text-right tabular-nums py-1.5">
-												{formatToken(positionSize, { digits: szDecimals, symbol: update.coin })}
+												{formatToken(positionSize, { decimals: szDecimals, symbol: update.coin })}
 											</TableCell>
 											<TableCell className="text-3xs text-right tabular-nums py-1.5">
 												<span className={getValueColorClass(rate)}>

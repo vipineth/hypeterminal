@@ -22,8 +22,8 @@ function OrderbookRowComponent({ level, side, maxTotal, showInQuote = false, szD
 	const totalValue = showInQuote ? level.total * level.price : level.total;
 
 	const displayDecimals = showInQuote ? 2 : szDecimals;
-	const sizeText = formatNumber(sizeValue, { digits: displayDecimals, compact: true });
-	const totalText = formatNumber(totalValue, { digits: displayDecimals, compact: true });
+	const sizeText = formatNumber(sizeValue, { decimals: displayDecimals, compact: true });
+	const totalText = formatNumber(totalValue, { decimals: displayDecimals, compact: true });
 
 	return (
 		<div className="relative hover:bg-surface-analysis/30 cursor-pointer group">

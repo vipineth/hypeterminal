@@ -653,8 +653,8 @@ msgstr "Frais"
 #~ msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx
-msgid "Filled"
-msgstr "Exécuté"
+#~ msgid "Filled"
+#~ msgstr "Exécuté"
 
 #. placeholder {0}: sub.label
 #: src/components/trade/chart/token-selector.tsx

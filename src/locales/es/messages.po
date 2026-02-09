@@ -653,8 +653,8 @@ msgstr "Comisión"
 #~ msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx
-msgid "Filled"
-msgstr "Ejecutado"
+#~ msgid "Filled"
+#~ msgstr "Ejecutado"
 
 #. placeholder {0}: sub.label
 #: src/components/trade/chart/token-selector.tsx
