@@ -120,7 +120,7 @@ export function BalancesTab() {
 
 	function renderBalanceRow(row: BalanceRow, index: number) {
 		const token = getToken(row.asset);
-		const decimals = token?.weiDecimals ?? 2;
+		const decimals = row.type === "perp" ? 2 : (token?.szDecimals ?? 2);
 		const canTransfer = row.asset === DEFAULT_QUOTE_TOKEN && parseFloat(row.available) > 0;
 		const canSwap = row.type === "spot" && parseFloat(row.available) > 0;
 		const transferLabel = row.type === "perp" ? t`To Spot` : t`To Perp`;
@@ -135,9 +135,6 @@ export function BalancesTab() {
 				</TableCell>
 				<TableCell className="text-3xs text-right tabular-nums py-1.5">
 					{formatToken(row.available, decimals)}
-				</TableCell>
-				<TableCell className="text-3xs text-right tabular-nums text-text-950 py-1.5">
-					{formatToken(row.inOrder, decimals)}
 				</TableCell>
 				<TableCell className="text-3xs text-right tabular-nums py-1.5">{formatToken(row.total, decimals)}</TableCell>
 				<TableCell className="text-3xs text-right tabular-nums text-market-up-600 py-1.5">
@@ -238,9 +235,6 @@ export function BalancesTab() {
 									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7 w-22.5">
 										{t`Available`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7 w-20">
-										{t`In Use`}
-									</TableHead>
 									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7 w-22.5">
 										{t`Total`}
 									</TableHead>
@@ -260,7 +254,7 @@ export function BalancesTab() {
 									<>
 										<TableRow className="border-border-200/40 hover:bg-transparent">
 											<TableCell
-												colSpan={7}
+												colSpan={6}
 												className="text-3xs uppercase tracking-wider text-primary-default bg-primary-default/5 py-1 font-medium"
 											>
 												{t`Perpetuals`}
@@ -273,7 +267,7 @@ export function BalancesTab() {
 									<>
 										<TableRow className="border-border-200/40 hover:bg-transparent">
 											<TableCell
-												colSpan={7}
+												colSpan={6}
 												className="text-3xs uppercase tracking-wider text-warning-700 bg-warning-700/5 py-1 font-medium"
 											>
 												{t`Spot`}

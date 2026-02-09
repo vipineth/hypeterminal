@@ -713,8 +713,8 @@ msgid "In Orders"
 msgstr "In Orders"
 
 #: src/components/trade/positions/balances-tab.tsx
-msgid "In Use"
-msgstr "In Use"
+#~ msgid "In Use"
+#~ msgstr "In Use"
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Install a wallet extension to continue"
