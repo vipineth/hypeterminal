@@ -9,7 +9,6 @@ import { HyperliquidProvider } from "@/lib/hyperliquid";
 import { MarketsInfoProvider } from "@/lib/hyperliquid/hooks/MarketsInfoProvider";
 import { MarketsProvider } from "@/lib/hyperliquid/markets";
 import { PerfPanelProvider } from "./perf-panel";
-import { ThemeProvider } from "./theme";
 import "@/lib/i18n";
 
 export function getRootProviderContext() {
@@ -32,15 +31,13 @@ export function RootProvider({ children, queryClient }: { children: React.ReactN
 		<WagmiProvider config={config}>
 			<QueryClientProvider client={queryClient}>
 				<I18nProvider i18n={i18n}>
-					<ThemeProvider>
-						<HyperliquidProvider env={env} builderConfig={DEFAULT_BUILDER_CONFIG} agentName={PROJECT_NAME}>
-							<MarketsProvider>
-								<MarketsInfoProvider>
-									<PerfPanelProvider>{children}</PerfPanelProvider>
-								</MarketsInfoProvider>
-							</MarketsProvider>
-						</HyperliquidProvider>
-					</ThemeProvider>
+					<HyperliquidProvider env={env} builderConfig={DEFAULT_BUILDER_CONFIG} agentName={PROJECT_NAME}>
+						<MarketsProvider>
+							<MarketsInfoProvider>
+								<PerfPanelProvider>{children}</PerfPanelProvider>
+							</MarketsInfoProvider>
+						</MarketsProvider>
+					</HyperliquidProvider>
 				</I18nProvider>
 			</QueryClientProvider>
 		</WagmiProvider>

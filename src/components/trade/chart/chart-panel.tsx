@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { createChartName } from "@/lib/chart/candle";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { createLazyComponent } from "@/lib/lazy";
-import { useTheme } from "@/providers/theme";
+import { useTheme } from "@/stores/use-global-settings-store";
 import { MarketOverview } from "../market-overview";
 
 const TradingViewChart = createLazyComponent(() => import("./tradingview-chart"), "TradingViewChart");

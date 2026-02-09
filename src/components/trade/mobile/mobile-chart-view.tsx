@@ -9,7 +9,7 @@ import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { getValueColorClass, toBig } from "@/lib/trade/numbers";
-import { useTheme } from "@/providers/theme";
+import { useTheme } from "@/stores/use-global-settings-store";
 import { useMarketActions } from "@/stores/use-market-store";
 import { TokenSelector } from "../chart/token-selector";
 import { TradingViewChart } from "../chart/tradingview-chart";
