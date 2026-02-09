@@ -17,8 +17,8 @@ const buttonVariants = cva(
 			size: {
 				none: "",
 				sm: "p-1 gap-1 text-2xs",
-				md: "p-1.5 gap-1 text-xs font-medium",
-				lg: "p-2.5 gap-1.5 text-sm font-medium",
+				md: "p-1 gap-1 text-xs",
+				lg: "p-1.5 gap-1.5 text-sm font-medium",
 				icon: "size-7 p-0",
 			},
 			tone: {

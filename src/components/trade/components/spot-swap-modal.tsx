@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NumberInput } from "@/components/ui/number-input";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
+import { SWAP_SUCCESS_DURATION_MS } from "@/config/time";
 import { getAvailableFromTotals, getSpotBalance } from "@/domain/trade/balances";
 import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import { findSpotPair, getAvailablePairTokens, getSwapSide } from "@/domain/trade/swap";
@@ -25,7 +26,6 @@ import { AssetDisplay } from "./asset-display";
 import { TokenSelectorDropdown } from "./token-selector-dropdown";
 import { TradingActionButton } from "./trading-action-button";
 
-const SUCCESS_DISPLAY_DURATION_MS = 1500;
 const DEFAULT_SLIPPAGE_BPS = 100;
 
 export function SpotSwapModal() {
@@ -194,7 +194,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 			setShowSuccess(true);
 			autoCloseTimerRef.current = setTimeout(() => {
 				handleClose(false);
-			}, SUCCESS_DISPLAY_DURATION_MS);
+			}, SWAP_SUCCESS_DURATION_MS);
 		} catch (err) {
 			const message = err instanceof Error ? err.message : t`Swap failed`;
 			setError(message);
@@ -277,7 +277,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 						</div>
 					</div>
 
-					<div className="flex items-center justify-between text-3xs text-text-600 px-1">
+					<div className="flex items-center justify-between text-3xs text-text-950 px-1">
 						<span>
 							<Trans>Rate</Trans>
 						</span>
@@ -293,7 +293,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 						</span>
 					</div>
 
-					<div className="flex items-center justify-between text-3xs text-text-600 px-1">
+					<div className="flex items-center justify-between text-3xs text-text-950 px-1">
 						<span>
 							<Trans>Slippage tolerance</Trans>
 						</span>
@@ -396,8 +396,8 @@ function TokenPanel({
 			)}
 		>
 			<div className="flex items-center justify-between mb-2">
-				<span className="text-3xs text-text-600 uppercase tracking-wider">{label}</span>
-				<span className="text-3xs text-text-600 tabular-nums">
+				<span className="text-3xs text-text-950 uppercase tracking-wider">{label}</span>
+				<span className="text-3xs text-text-950 tabular-nums">
 					<Trans>Balance</Trans>: {formatToken(balance, 4)}
 				</span>
 			</div>

@@ -25,7 +25,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 		<div
 			className={cn(
 				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-market-down-600/80" : "text-text-600",
+				variant === "error" ? "text-market-down-600" : "text-text-600",
 			)}
 		>
 			{children}
@@ -78,24 +78,24 @@ export function TwapTab() {
 						<Table>
 							<TableHeader>
 								<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">{t`Asset`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Asset`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Size`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Executed`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Avg Price`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">
 										{t`Time / Total`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">
 										{t`Reduce Only`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">{t`Created`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Created`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Actions`}
 									</TableHead>
 								</TableRow>

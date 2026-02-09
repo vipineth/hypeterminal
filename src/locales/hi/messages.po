@@ -671,8 +671,12 @@ msgid "Funding"
 msgstr "फंडिंग"
 
 #: src/components/trade/positions/funding-tab.tsx
-msgid "Funding Payments"
-msgstr "फंडिंग भुगतान"
+msgid "Funding History"
+msgstr ""
+
+#: src/components/trade/positions/funding-tab.tsx
+#~ msgid "Funding Payments"
+#~ msgstr "फंडिंग भुगतान"
 
 #: src/components/trade/footer/footer-bar.tsx
 #~ msgid "Gas:"
@@ -1829,12 +1833,12 @@ msgid "Trade"
 msgstr "ट्रेड"
 
 #: src/components/trade/positions/history-tab.tsx
-msgid "Trade ClockCounterClockwise"
-msgstr ""
+#~ msgid "Trade ClockCounterClockwise"
+#~ msgstr ""
 
 #: src/components/trade/positions/history-tab.tsx
-#~ msgid "Trade History"
-#~ msgstr "ट्रेड इतिहास"
+msgid "Trade History"
+msgstr "ट्रेड इतिहास"
 
 #. placeholder {0}: spotMarket.displayName
 #: src/components/trade/components/spot-swap-modal.tsx

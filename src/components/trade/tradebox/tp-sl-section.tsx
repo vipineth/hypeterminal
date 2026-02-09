@@ -78,7 +78,7 @@ export function TpSlSection({
 			<div className="rounded-md border border-border-200/50 bg-surface-analysis p-2.5">
 				<div className="grid grid-cols-2 gap-2">
 					<div className="space-y-1">
-						<span className="text-3xs text-text-600">{t`Take Profit`}</span>
+						<span className="text-3xs text-text-950">{t`Take Profit`}</span>
 						<Input
 							placeholder={t`TP Price`}
 							value={tpPrice}
@@ -92,7 +92,7 @@ export function TpSlSection({
 						{tpError && <div className="text-4xs text-market-down-600">{tpError}</div>}
 					</div>
 					<div className="space-y-1">
-						<span className="text-3xs text-text-600">{t`Stop Loss`}</span>
+						<span className="text-3xs text-text-950">{t`Stop Loss`}</span>
 						<Input
 							placeholder={t`SL Price`}
 							value={slPrice}
@@ -141,7 +141,7 @@ export function TpSlSection({
 			{riskRewardDisplay && (
 				<div className="rounded-md border border-border-200/40 bg-surface-analysis p-2.5 space-y-2">
 					<div className="flex items-center justify-between">
-						<span className="text-3xs text-text-600">{t`Risk/Reward`}</span>
+						<span className="text-3xs text-text-950">{t`Risk/Reward`}</span>
 						<span
 							className={cn(
 								"text-3xs font-semibold tabular-nums",

@@ -14,7 +14,7 @@ export function FavoritesStrip() {
 
 	if (favorites.length === 0) {
 		return (
-			<div className="flex items-center gap-2 text-3xs text-text-600">
+			<div className="flex items-center gap-2 text-3xs text-text-950">
 				<StarIcon className="size-3" />
 				<span>{t`Select favorite markets`}</span>
 			</div>
@@ -77,7 +77,7 @@ function FavoriteChip({ name, isActive }: FavoriteChipProps) {
 				<span className="font-medium text-text-950 uppercase">{displayName}</span>
 				{market?.markPx != null && (
 					<>
-						<span className="tabular-nums text-text-500">{formatPrice(market.markPx, { szDecimals })}</span>
+						<span className="tabular-nums text-text-950">{formatPrice(market.markPx, { szDecimals })}</span>
 						{changePct != null && (
 							<span className={cn("tabular-nums", getValueColorClass(changePct))}>
 								{formatPercent(changePct / 100)}
@@ -90,7 +90,7 @@ function FavoriteChip({ name, isActive }: FavoriteChipProps) {
 				type="button"
 				onClick={handleRemove}
 				aria-label={t`Remove ${displayName} from favorites`}
-				className="absolute -top-0.5 -right-0.5 hidden size-4 cursor-pointer items-center justify-center rounded-full bg-surface-execution border border-border-200 text-text-500 hover:text-text-950 group-hover/fav:flex"
+				className="absolute -top-0.5 -right-0.5 hidden size-4 cursor-pointer items-center justify-center rounded-full bg-surface-execution border border-border-200 text-text-600 hover:text-text-950 group-hover/fav:flex"
 			>
 				<XIcon className="size-2.5" weight="bold" />
 			</button>

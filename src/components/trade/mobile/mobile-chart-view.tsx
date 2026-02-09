@@ -127,7 +127,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 function StatPill({ label, value }: { label: string; value: string }) {
 	return (
 		<div className="flex items-center gap-1.5">
-			<span className="text-text-600 uppercase tracking-wider text-3xs">{label}</span>
+			<span className="text-text-950 uppercase tracking-wider text-3xs">{label}</span>
 			<span className="tabular-nums text-text-950">{value}</span>
 		</div>
 	);

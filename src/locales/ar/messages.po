@@ -671,8 +671,12 @@ msgid "Funding"
 msgstr "التمويل"
 
 #: src/components/trade/positions/funding-tab.tsx
-msgid "Funding Payments"
-msgstr "مدفوعات التمويل"
+msgid "Funding History"
+msgstr ""
+
+#: src/components/trade/positions/funding-tab.tsx
+#~ msgid "Funding Payments"
+#~ msgstr "مدفوعات التمويل"
 
 #: src/components/trade/footer/footer-bar.tsx
 #~ msgid "Gas:"
@@ -1829,12 +1833,12 @@ msgid "Trade"
 msgstr "تداول"
 
 #: src/components/trade/positions/history-tab.tsx
-msgid "Trade ClockCounterClockwise"
-msgstr ""
+#~ msgid "Trade ClockCounterClockwise"
+#~ msgstr ""
 
 #: src/components/trade/positions/history-tab.tsx
-#~ msgid "Trade History"
-#~ msgstr "سجل التداول"
+msgid "Trade History"
+msgstr "سجل التداول"
 
 #. placeholder {0}: spotMarket.displayName
 #: src/components/trade/components/spot-swap-modal.tsx

@@ -35,7 +35,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 		<div
 			className={cn(
 				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-market-down-600/80" : "text-text-600",
+				variant === "error" ? "text-market-down-600" : "text-text-950",
 			)}
 		>
 			{children}
@@ -136,7 +136,7 @@ export function BalancesTab() {
 				<TableCell className="text-3xs text-right tabular-nums py-1.5">
 					{formatToken(row.available, decimals)}
 				</TableCell>
-				<TableCell className="text-3xs text-right tabular-nums text-text-500 py-1.5">
+				<TableCell className="text-3xs text-right tabular-nums text-text-950 py-1.5">
 					{formatToken(row.inOrder, decimals)}
 				</TableCell>
 				<TableCell className="text-3xs text-right tabular-nums py-1.5">{formatToken(row.total, decimals)}</TableCell>
@@ -232,25 +232,25 @@ export function BalancesTab() {
 						<Table className="w-auto min-w-full">
 							<TableHeader>
 								<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7 w-35">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7 w-35">
 										{t`Asset`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7 w-22.5">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7 w-22.5">
 										{t`Available`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7 w-20">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7 w-20">
 										{t`In Use`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7 w-22.5">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7 w-22.5">
 										{t`Total`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7 w-22.5">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7 w-22.5">
 										{t`USD Value`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7 w-25">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7 w-25">
 										{t`PNL`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7 w-20">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7 w-20">
 										{t`Actions`}
 									</TableHead>
 								</TableRow>
@@ -261,7 +261,7 @@ export function BalancesTab() {
 										<TableRow className="border-border-200/40 hover:bg-transparent">
 											<TableCell
 												colSpan={7}
-												className="text-3xs uppercase tracking-wider text-primary-default/80 bg-primary-default/5 py-1 font-medium"
+												className="text-3xs uppercase tracking-wider text-primary-default bg-primary-default/5 py-1 font-medium"
 											>
 												{t`Perpetuals`}
 											</TableCell>
@@ -274,7 +274,7 @@ export function BalancesTab() {
 										<TableRow className="border-border-200/40 hover:bg-transparent">
 											<TableCell
 												colSpan={7}
-												className="text-3xs uppercase tracking-wider text-warning-700/80 bg-warning-700/5 py-1 font-medium"
+												className="text-3xs uppercase tracking-wider text-warning-700 bg-warning-700/5 py-1 font-medium"
 											>
 												{t`Spot`}
 											</TableCell>

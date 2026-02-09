@@ -4,7 +4,12 @@ import { cn } from "@/lib/cn";
 
 function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
 	return (
-		<SpinnerGapIcon role="status" aria-label={t`Loading`} className={cn("size-4 animate-spin", className)} {...props} />
+		<SpinnerGapIcon
+			role="status"
+			aria-label={t`Loading`}
+			className={cn("size-4 animate-spin will-change-transform", className)}
+			{...props}
+		/>
 	);
 }
 

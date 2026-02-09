@@ -28,9 +28,9 @@ function getStatusDisplay(status: ApiStatus) {
 			};
 		default:
 			return {
-				icon: <WifiHighIcon className="size-3 text-text-600" />,
+				icon: <WifiHighIcon className="size-3 text-text-950" />,
 				text: t`Offline`,
-				className: "text-text-600",
+				className: "text-text-950",
 			};
 	}
 }
@@ -54,8 +54,8 @@ function PerfToggle() {
 			className="flex items-center gap-1 hover:text-primary-default transition-colors"
 			title="Toggle Performance Panel"
 		>
-			<PulseIcon className={`size-3 ${isVisible ? "text-primary-default" : "text-text-600"}`} />
-			<span className={isVisible ? "text-primary-default" : "text-text-600"}>Perf</span>
+			<PulseIcon className={`size-3 ${isVisible ? "text-primary-default" : "text-text-950"}`} />
+			<span className={isVisible ? "text-primary-default" : "text-text-950"}>Perf</span>
 		</button>
 	);
 }
@@ -77,10 +77,10 @@ export function FooterBar() {
 			<div className="flex items-center gap-3">
 				<div className="h-3 w-px bg-border-200/60" />
 				<ClientOnly>
-					<span className="text-text-600 tabular-nums">{formatTime(new Date())}</span>
+					<span className="text-text-950 tabular-nums">{formatTime(new Date())}</span>
 				</ClientOnly>
 				<div className="h-3 w-px bg-border-200/60" />
-				<span className="text-text-600">{APP_VERSION}</span>
+				<span className="text-text-950">{APP_VERSION}</span>
 			</div>
 		</footer>
 	);

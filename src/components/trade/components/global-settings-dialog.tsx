@@ -152,7 +152,7 @@ export function GlobalSettingsDialog() {
 								max={MARKET_ORDER_SLIPPAGE_MAX_PERCENT}
 								step={0.1}
 							/>
-							<div className="flex items-center justify-between text-3xs text-text-600">
+							<div className="flex items-center justify-between text-3xs text-text-950">
 								<span>{MARKET_ORDER_SLIPPAGE_MIN_PERCENT}%</span>
 								<span className="font-medium text-text-950 tabular-nums">{slippagePercent}%</span>
 								<span>{MARKET_ORDER_SLIPPAGE_MAX_PERCENT}%</span>

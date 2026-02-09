@@ -251,7 +251,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 			{view === "book" ? (
 				<div className="flex-1 min-h-0 flex flex-col overflow-hidden">
 					{/* Column headers */}
-					<div className="shrink-0 grid grid-cols-3 gap-2 px-3 py-2 text-xs uppercase tracking-wider text-text-600/70 border-b border-border-200/40">
+					<div className="shrink-0 grid grid-cols-3 gap-2 px-3 py-2 text-xs uppercase tracking-wider text-text-600 border-b border-border-200/40">
 						<div>{ORDERBOOK_TEXT.HEADER_PRICE}</div>
 						<div className="text-right">{ORDERBOOK_TEXT.HEADER_SIZE}</div>
 						<div className="text-right">{ORDERBOOK_TEXT.HEADER_TOTAL}</div>

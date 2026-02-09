@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { CircleIcon, PencilIcon, PlusIcon } from "@phosphor-icons/react";
+import { ListChecksIcon, PencilIcon, PlusIcon } from "@phosphor-icons/react";
 import { useMemo, useRef, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 		<div
 			className={cn(
 				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-market-down-600/80" : "text-text-600",
+				variant === "error" ? "text-market-down-600" : "text-text-600",
 			)}
 		>
 			{children}
@@ -107,7 +107,7 @@ function PositionRow({
 	const canClose = isPositive(absSize) && typeof assetId === "number" && isPositive(markPx);
 
 	const sideClass = isLong ? "bg-market-up-100 text-market-up-600" : "bg-market-down-100 text-market-down-600";
-	const pnlClass = unrealizedPnl >= 0 ? "text-market-up-500" : "text-market-down-600";
+	const pnlClass = unrealizedPnl >= 0 ? "text-market-up-600" : "text-market-down-600";
 	const fundingClass = getValueColorClass(cumFunding ? -cumFunding : null);
 	const hasTpSl = !!(tpSlInfo?.tpPrice || tpSlInfo?.slPrice);
 
@@ -162,10 +162,10 @@ function PositionRow({
 			<TableCell className="text-3xs text-right py-1.5">
 				<div className="flex flex-col items-end">
 					<span className="tabular-nums">{formatUSD(p.marginUsed)}</span>
-					<span className="text-3xs text-text-500">{p.leverage.type === "isolated" ? t`Isolated` : t`Cross`}</span>
+					<span className="text-3xs text-text-600">{p.leverage.type === "isolated" ? t`Isolated` : t`Cross`}</span>
 				</div>
 			</TableCell>
-			<TableCell className="text-3xs text-right tabular-nums text-text-500 py-1.5">
+			<TableCell className="text-3xs text-right tabular-nums text-text-600 py-1.5">
 				{formatPrice(p.entryPx, { szDecimals })}
 			</TableCell>
 			<TableCell className="text-3xs text-right tabular-nums py-1.5">{formatPrice(markPx, { szDecimals })}</TableCell>
@@ -178,7 +178,7 @@ function PositionRow({
 			<TableCell className="text-right py-1.5">
 				<div className={cn("text-3xs tabular-nums", pnlClass)}>
 					{formatUSD(unrealizedPnl, { signDisplay: "exceptZero" })}
-					<span className="text-text-500 ml-1">({formatPercent(p.returnOnEquity, 1)})</span>
+					<span className="text-text-600 ml-1">({formatPercent(p.returnOnEquity, 1)})</span>
 				</div>
 			</TableCell>
 			<TableCell className="text-right py-1.5">
@@ -197,10 +197,10 @@ function PositionRow({
 								<>
 									<div className="flex items-center gap-1 text-3xs tabular-nums">
 										<span className="text-market-up-600">{formatPrice(tpSlInfo.tpPrice, { szDecimals })}</span>
-										<span className="text-text-600/50">/</span>
+										<span className="text-text-600">/</span>
 										<span className="text-market-down-600">{formatPrice(tpSlInfo.slPrice, { szDecimals })}</span>
 									</div>
-									<PencilIcon className="size-3 text-text-400 group-hover:text-text-950 transition-colors" />
+									<PencilIcon className="size-3 text-text-400 group-hover:text-text-600 transition-colors" />
 								</>
 							) : hasTpSl ? (
 								<>
@@ -211,11 +211,11 @@ function PositionRow({
 											<span className="text-market-down-600">{formatPrice(tpSlInfo?.slPrice, { szDecimals })}</span>
 										)}
 									</div>
-									<PlusIcon className="size-3 text-text-400 group-hover:text-text-950 transition-colors" />
+									<PlusIcon className="size-3 text-text-400 group-hover:text-text-600 transition-colors" />
 								</>
 							) : (
 								<div className="flex items-center gap-0.5 text-xs font-medium text-text-600">
-									<PlusIcon className="size-3 group-hover:text-text-950 transition-colors" />
+									<PlusIcon className="size-3 group-hover:text-text-600 transition-colors" />
 									<span>{t`Add`}</span>
 								</div>
 							)}
@@ -342,44 +342,44 @@ export function PositionsTab() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
-			<div className="text-3xs tracking-wider text-text-950 mb-1.5 flex items-center gap-2">
-				<CircleIcon weight="fill" className="size-1.5 text-market-up-600" />
+			<div className="text-3xs uppercase tracking-wider text-text-600 mb-1.5 flex items-center gap-2">
+				<ListChecksIcon className="size-3" />
 				{t`Active Positions`}
 				<span className="font-semibold text-market-up-600 ml-auto tabular-nums">{headerCount}</span>
 			</div>
-			{actionError ? <div className="mb-1 text-4xs text-market-down-600/80">{actionError}</div> : null}
+			{actionError ? <div className="mb-1 text-4xs text-market-down-600">{actionError}</div> : null}
 			<div className="flex-1 min-h-0 overflow-hidden border border-border-200/40 rounded-sm bg-surface-base/50">
 				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
 								<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">{t`Asset`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Asset`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Size`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Margin`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Entry`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Mark`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Liq`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Funding`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`PNL`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`TP/SL`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Actions`}
 									</TableHead>
 								</TableRow>

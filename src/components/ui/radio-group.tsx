@@ -20,7 +20,7 @@ function RadioGroupItem({ className, ...props }: React.ComponentProps<typeof Rad
 			<RadioGroupPrimitive.Indicator
 				data-slot="radio-group-indicator"
 				forceMount
-				className="relative flex items-center justify-center transition-[scale,opacity] duration-150 ease-out data-[state=unchecked]:scale-0 data-[state=unchecked]:opacity-0"
+				className="relative flex items-center justify-center transition-[scale,opacity] duration-150 ease-out data-[state=unchecked]:scale-50 data-[state=unchecked]:opacity-0"
 			>
 				<CircleIcon
 					weight="fill"

@@ -23,7 +23,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 		<div
 			className={cn(
 				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-market-down-600/80" : "text-text-600",
+				variant === "error" ? "text-market-down-600" : "text-text-600",
 			)}
 		>
 			{children}
@@ -66,7 +66,7 @@ export function HistoryTab() {
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-text-600 mb-1.5 flex items-center gap-2">
 				<ClockCounterClockwiseIcon className="size-3" />
-				{t`Trade ClockCounterClockwise`}
+				{t`Trade History`}
 				<span className="text-primary-default ml-auto tabular-nums">{headerCount}</span>
 			</div>
 			<div className="flex-1 min-h-0 overflow-hidden border border-border-200/40 rounded-sm bg-surface-base/50">
@@ -75,21 +75,21 @@ export function HistoryTab() {
 						<Table>
 							<TableHeader>
 								<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">{t`Asset`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">{t`Type`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Asset`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Type`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Price`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Size`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Fee`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`PNL`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Time`}
 									</TableHead>
 								</TableRow>

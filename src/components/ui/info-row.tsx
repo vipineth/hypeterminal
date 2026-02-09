@@ -10,7 +10,7 @@ interface Props {
 export function InfoRow({ label, value, valueClassName }: Props) {
 	return (
 		<div className="flex items-center justify-between px-2 py-1.5">
-			<span className="text-text-500">{label}</span>
+			<span className="text-text-600">{label}</span>
 			<span className={cn("tabular-nums text-text-950", valueClassName)}>{value}</span>
 		</div>
 	);

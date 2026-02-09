@@ -34,12 +34,12 @@ const TradeRow = memo(function TradeRow({ trade, szDecimals, showInQuote }: Prop
 				trade.side === "buy" ? "trade-row-buy" : "trade-row-sell",
 			)}
 		>
-			<div className="text-text-500 flex items-center gap-1">
+			<div className="text-text-950 flex items-center gap-1">
 				{trade.time}
 				<ArrowSquareOutIcon className="size-2.5 opacity-100 hover:opacity-80" />
 			</div>
 			<div
-				className={cn("text-right font-medium", trade.side === "buy" ? "text-market-up-500" : "text-market-down-500")}
+				className={cn("text-right font-medium", trade.side === "buy" ? "text-market-up-600" : "text-market-down-600")}
 			>
 				{formatNumber(trade.price, 2)}
 			</div>
@@ -109,17 +109,17 @@ export function TradesPanel() {
 					className="text-right hover:text-text-950 hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
 				>
 					{t`Size`}
-					<span className="text-text-500">({displayAsset})</span>
+					<span className="text-text-950">({displayAsset})</span>
 					<ArrowsLeftRightIcon className="size-2 opacity-40" />
 				</Button>
 			</div>
 
 			{status === "error" ? (
-				<div className="flex-1 flex items-center justify-center px-2 py-6 text-3xs text-text-600">
+				<div className="flex-1 flex items-center justify-center px-2 py-6 text-3xs text-text-950">
 					{error instanceof Error ? error.message : t`Failed to load trades.`}
 				</div>
 			) : processed.length === 0 ? (
-				<div className="flex-1 flex items-center justify-center px-2 py-6 text-3xs text-text-600">
+				<div className="flex-1 flex items-center justify-center px-2 py-6 text-3xs text-text-950">
 					{t`Waiting for trades...`}
 				</div>
 			) : (

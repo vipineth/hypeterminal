@@ -516,7 +516,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 						<SummaryRow
 							label={ORDER_TEXT.SUMMARY_LIQ}
 							value={liqPrice ? formatPrice(liqPrice, { szDecimals: market?.szDecimals }) : FALLBACK_VALUE_PLACEHOLDER}
-							valueClass="text-market-down-600/70"
+							valueClass="text-market-down-600"
 						/>
 						<SummaryRow
 							label={ORDER_TEXT.SUMMARY_FEE}

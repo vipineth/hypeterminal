@@ -11,11 +11,7 @@ export const FALLBACK_VALUE_PLACEHOLDER = "-";
 export const FORMAT_COMPACT_THRESHOLD = 10_000;
 export const FORMAT_COMPACT_DEFAULT = true;
 
-export const ORDER_TOAST_SUCCESS_DURATION_MS = 5_000;
-export const ORDER_TOAST_STALE_THRESHOLD_MS = 30_000;
-
 export const MOBILE_BREAKPOINT_PX = 768;
-export const FOOTER_TIME_TICK_MS = 1_000;
 
 export const DEFAULT_MARKET_KEY = "perp:BTC";
 export const DEFAULT_MARKET_NAME = "BTC";
@@ -52,15 +48,13 @@ export const STORAGE_KEYS = {
 	ORDER_ENTRY: "order-entry-v1",
 } as const;
 
-export const META_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
-
 export const TOKEN_ICON_BASE_URL = "https://app.hyperliquid.xyz/coins";
 
 export const PANEL_LAYOUT = {
 	MAIN: {
 		id: "CHART_WITH_SWAPBOX",
-		analysis: { defaultSize: 75 },
-		sidebar: { defaultSize: 25 },
+		analysis: { defaultSize: 76 },
+		sidebar: { defaultSize: 24 },
 	},
 	ANALYSIS: {
 		id: "CHART_WITH_POSITIONS",
@@ -195,7 +189,6 @@ export const CHART_WIDGET_DEFAULTS = {
 	DEBUG: false,
 } as const;
 
-export const CHART_ALL_MIDS_TTL_MS = 10_000;
 export const CHART_DATAFEED_CONFIG = {
 	SYMBOL_TYPE: "crypto",
 	SYMBOL_TYPES: [{ name: "crypto", value: "crypto" }],
@@ -219,10 +212,11 @@ export const MARKET_CATEGORY_LABELS = {
 export const POSITIONS_TABS = [
 	{ value: "balances", label: "Balances" },
 	{ value: "positions", label: "Positions" },
-	{ value: "orders", label: "Orders" },
+	{ value: "orders", label: "Open Orders" },
 	{ value: "twap", label: "TWAP" },
-	{ value: "history", label: "History" },
-	{ value: "funding", label: "Funding" },
+	{ value: "history", label: "Trade History" },
+	{ value: "funding", label: "Funding History" },
+	{ value: "orders-history", label: "Order History" },
 ] as const;
 
 export const UI_TEXT = {

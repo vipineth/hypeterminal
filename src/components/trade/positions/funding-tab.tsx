@@ -20,7 +20,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 		<div
 			className={cn(
 				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-market-down-600/80" : "text-text-600",
+				variant === "error" ? "text-market-down-600" : "text-text-600",
 			)}
 		>
 			{children}
@@ -68,7 +68,7 @@ export function FundingTab() {
 		<div className="flex-1 min-h-0 flex flex-col p-2">
 			<div className="text-3xs uppercase tracking-wider text-text-600 mb-1.5 flex items-center gap-2">
 				<PercentIcon className="size-3" />
-				{t`Funding Payments`}
+				{t`Funding History`}
 				<span className={cn("ml-auto tabular-nums", headerClass)}>{headerTotal}</span>
 			</div>
 			<div className="flex-1 min-h-0 overflow-hidden border border-border-200/40 rounded-sm bg-surface-base/50">
@@ -77,17 +77,17 @@ export function FundingTab() {
 						<Table>
 							<TableHeader>
 								<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">{t`Asset`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Asset`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Position`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Rate`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Payment`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Time`}
 									</TableHead>
 								</TableRow>

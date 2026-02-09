@@ -4,6 +4,7 @@ import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_QUOTE_TOKEN, TWAP_MINUTES_MAX, TWAP_MINUTES_MIN } from "@/config/constants";
+import { APPROVAL_ERROR_DISMISS_MS } from "@/config/time";
 import { getMarketQuoteToken } from "@/domain/trade/balances";
 import { getLiquidationInfo, getOrderMetrics } from "@/domain/trade/order/metrics";
 import { getOrderPrice } from "@/domain/trade/order/price";
@@ -25,7 +26,7 @@ import {
 	isTwapOrderType,
 	usesLimitPrice as usesLimitPriceForOrder,
 } from "@/lib/trade/order-types";
-import type { ActiveDialog, ButtonContent } from "@/lib/trade/types";
+import type { ActiveDialog } from "@/lib/trade/types";
 import { useButtonContent } from "@/lib/trade/use-button-content";
 import { perpInput, spotInput, useOrderValidation } from "@/lib/trade/use-order-validation";
 import { useDepositModalActions, useSettingsDialogActions, useSwapModalActions } from "@/stores/use-global-modal-store";
@@ -59,15 +60,15 @@ import { OrderToast } from "./order-toast";
 import { TradeFormFields } from "./trade-form-fields";
 import { TradeHeader } from "./trade-header";
 
-function getActionButtonClass(variant: ButtonContent["variant"]): string {
-	if (variant === "cyan") {
-		return "bg-primary-default border-primary-default text-white hover:bg-primary-hover text-sm font-medium normal-case";
-	}
-	if (variant === "buy") {
-		return "bg-market-up-100 border-market-up-600 text-market-up-600 hover:bg-market-up-100/30";
-	}
-	return "bg-market-down-100 border-market-down-600 text-market-down-600 hover:bg-market-down-600/30";
-}
+// function getActionButtonClass(variant: ButtonContent["variant"]): string {
+// 	if (variant === "cyan") {
+// 		return "bg-primary-default border-primary-default text-white hover:bg-primary-hover text-sm font-medium normal-case";
+// 	}
+// 	if (variant === "buy") {
+// 		return "bg-market-up-100 border-market-up-600 text-market-up-600 hover:bg-market-up-100/30";
+// 	}
+// 	return "bg-market-down-100 border-market-down-600 text-market-down-600 hover:bg-market-down-600/30";
+// }
 
 export function TradePanel() {
 	const reduceOnlyId = useId();
@@ -281,6 +282,7 @@ export function TradePanel() {
 		registerAgent().catch((error: unknown) => {
 			const message = error instanceof Error ? error.message : t`Failed to enable trading`;
 			setApprovalError(message);
+			setTimeout(() => setApprovalError(null), APPROVAL_ERROR_DISMISS_MS);
 		});
 	}, [isRegistering, registerAgent]);
 
@@ -435,7 +437,7 @@ export function TradePanel() {
 		onSubmit: handleSubmit,
 	});
 
-	const actionButtonClass = getActionButtonClass(buttonContent.variant);
+	// const actionButtonClass = getActionButtonClass(buttonContent.variant);
 
 	return (
 		<div className="h-full flex flex-col overflow-hidden bg-surface-execution">

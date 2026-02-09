@@ -17,11 +17,11 @@ interface Props {
 
 export function SideToggle({ side, onSideChange, labels }: Props) {
 	return (
-		<Tabs value={side} onValueChange={(v) => onSideChange(v as Side)}>
+		<Tabs value={side} onValueChange={(v) => onSideChange(v as Side)} className="mb-2">
 			<TabsList variant="pill" className="w-full">
 				<TabsTrigger
 					value="buy"
-					className="flex-1 p-2 text-sm data-[state=active]:text-market-up-600"
+					className="flex-1 text-sm data-[state=active]:text-market-up-600"
 					aria-label={labels.buyAria}
 				>
 					<TrendUpIcon className="size-4" />
@@ -29,7 +29,7 @@ export function SideToggle({ side, onSideChange, labels }: Props) {
 				</TabsTrigger>
 				<TabsTrigger
 					value="sell"
-					className="flex-1 p-2 text-sm data-[state=active]:text-market-down-600"
+					className="flex-1 text-sm data-[state=active]:text-market-down-600"
 					aria-label={labels.sellAria}
 				>
 					<TrendDownIcon className="size-4" />

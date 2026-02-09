@@ -34,46 +34,46 @@ export function OrderSummary({
 		<div className="divide-y divide-border-200/30 text-2xs tracking-[0.5px]">
 			{isLeveraged && (
 				<div className="flex items-center justify-between px-2 py-1.5">
-					<span className="text-text-500">{t`Liq. Price`}</span>
+					<span className="text-text-600">{t`Liq. Price`}</span>
 					<span className="tabular-nums text-market-down-600">
 						{liqPrice ? formatPrice(liqPrice, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER}
 					</span>
 				</div>
 			)}
 			<div className="flex items-center justify-between px-2 py-1.5">
-				<span className="text-text-500">{t`Order Value`}</span>
+				<span className="text-text-600">{t`Order Value`}</span>
 				<span className="tabular-nums text-text-600">
 					{orderValue > 0 ? formatUSD(orderValue) : FALLBACK_VALUE_PLACEHOLDER}
 				</span>
 			</div>
 			{isLeveraged && (
 				<div className="flex items-center justify-between px-2 py-1.5">
-					<span className="text-text-500">{t`Margin Req.`}</span>
+					<span className="text-text-600">{t`Margin Req.`}</span>
 					<span className="tabular-nums text-text-600">
 						{marginRequired > 0 ? formatUSD(marginRequired) : FALLBACK_VALUE_PLACEHOLDER}
 					</span>
 				</div>
 			)}
 			<div className="flex items-center justify-between px-2 py-1.5">
-				<span className="text-text-500">{t`Slippage`}</span>
+				<span className="text-text-600">{t`Slippage`}</span>
 				<button
 					type="button"
 					onClick={onSlippageClick}
 					className="flex items-center gap-1 hover:text-text-950 transition-colors"
 				>
 					<span className="tabular-nums text-market-down-600">{slippagePercent}%</span>
-					<PencilIcon className="size-2 text-text-500" />
+					<PencilIcon className="size-2 text-text-600" />
 				</button>
 			</div>
 			<div className="flex items-center justify-between px-2 py-1.5">
-				<span className="text-text-500">{t`Est. Fee`}</span>
+				<span className="text-text-600">{t`Est. Fee`}</span>
 				<span className="tabular-nums text-text-600">
 					{estimatedFee > 0 ? formatUSD(estimatedFee) : FALLBACK_VALUE_PLACEHOLDER}
 				</span>
 			</div>
 			{DEFAULT_BUILDER_CONFIG?.f && (
 				<div className="flex items-center justify-between px-2 py-1.5">
-					<span className="text-text-500">{t`Builder Fee`}</span>
+					<span className="text-text-600">{t`Builder Fee`}</span>
 					<span className="tabular-nums text-text-600">{bpsToPercentage(DEFAULT_BUILDER_CONFIG?.f)}%</span>
 				</div>
 			)}

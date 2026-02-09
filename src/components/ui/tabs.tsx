@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { Tabs as TabsPrimitive } from "radix-ui";
 import type * as React from "react";
 import { createContext, useContext, useId, useState } from "react";
@@ -41,7 +41,7 @@ const tabsListVariants = cva("inline-flex items-center", {
 	variants: {
 		variant: {
 			pill: "gap-1 rounded-xs bg-surface-base text-3xs p-0.5",
-			underline: "gap-1 text-xs border-b border-border-200",
+			underline: "gap-1 text-xs shadow-[inset_0_-1px_0_0_var(--color-border-200)]",
 		},
 	},
 	defaultVariants: {
@@ -51,11 +51,11 @@ const tabsListVariants = cva("inline-flex items-center", {
 
 type TabsListVariant = NonNullable<VariantProps<typeof tabsListVariants>["variant"]>;
 
-interface TabsListProps
-	extends React.ComponentProps<typeof TabsPrimitive.List>,
-		VariantProps<typeof tabsListVariants> {}
+interface TabsListProps extends React.ComponentProps<typeof TabsPrimitive.List>, VariantProps<typeof tabsListVariants> {
+	fullWidth?: boolean;
+}
 
-function TabsList({ className, variant = "pill", children, ...props }: TabsListProps) {
+function TabsList({ className, variant = "pill", fullWidth, children, ...props }: TabsListProps) {
 	const layoutId = useId();
 
 	return (
@@ -63,7 +63,7 @@ function TabsList({ className, variant = "pill", children, ...props }: TabsListP
 			<TabsPrimitive.List
 				data-slot="tabs-list"
 				data-variant={variant}
-				className={cn(tabsListVariants({ variant }), className)}
+				className={cn(tabsListVariants({ variant }), fullWidth && "w-full", className)}
 				{...props}
 			>
 				{children}
@@ -76,6 +76,7 @@ function TabsTrigger({ className, value, children, ...props }: React.ComponentPr
 	const activeValue = useContext(TabsValueContext);
 	const { variant, layoutId } = useContext(TabsListContext);
 	const isActive = value !== undefined && activeValue === value;
+	const prefersReducedMotion = useReducedMotion();
 
 	return (
 		<TabsPrimitive.Trigger
@@ -89,7 +90,7 @@ function TabsTrigger({ className, value, children, ...props }: React.ComponentPr
 				"disabled:pointer-events-none disabled:text-text-400",
 				"[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3",
 				"in-data-[variant=pill]:rounded-xs [[data-variant=pill]_&_svg:not([class*='size-'])]:size-2.5",
-				"in-data-[variant=underline]:-mb-px in-data-[variant=underline]:pb-2",
+				"in-data-[variant=underline]:pb-2",
 				className,
 			)}
 			{...props}
@@ -97,13 +98,17 @@ function TabsTrigger({ className, value, children, ...props }: React.ComponentPr
 			<span className="relative z-10 inline-flex items-center gap-[inherit]">{children}</span>
 			{isActive && (
 				<motion.span
-					layoutId={layoutId}
+					layoutId={prefersReducedMotion ? undefined : layoutId}
 					className={cn(
 						"absolute",
 						variant === "pill" && "inset-0 rounded-xs bg-surface-execution",
-						variant === "underline" && "-bottom-px inset-x-0 h-0.5 bg-primary-default",
+						variant === "underline" && "bottom-0 inset-x-0 h-0.5 bg-primary-default",
 					)}
-					transition={{ type: "spring", bounce: 0.15, duration: 0.25 }}
+					transition={
+						variant === "underline"
+							? { type: "spring", bounce: 0, duration: 0.2 }
+							: { type: "spring", bounce: 0.15, duration: 0.25 }
+					}
 				/>
 			)}
 		</TabsPrimitive.Trigger>

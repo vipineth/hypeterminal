@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { InfoRow } from "@/components/ui/info-row";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
@@ -18,7 +19,7 @@ type SummaryRow = {
 };
 
 export function AccountPanel() {
-	const [activeTab, setActiveTab] = useState<"perps" | "spot">("perps");
+	const [activeTab, setActiveTab] = useState("perps");
 	const { open: openDepositModal } = useDepositModalActions();
 
 	const { isConnected } = useConnection();
@@ -114,7 +115,7 @@ export function AccountPanel() {
 			: FALLBACK_VALUE_PLACEHOLDER;
 
 	const headerPnlClass =
-		activeTab === "perps" && hasPerpData ? getValueColorClass(perpMetrics.unrealizedPnl) : "text-text-600";
+		activeTab === "perps" && hasPerpData ? getValueColorClass(perpMetrics.unrealizedPnl) : "text-text-950";
 
 	const perpRows = useMemo((): SummaryRow[] => {
 		if (!perpMetrics) return [];
@@ -193,7 +194,7 @@ export function AccountPanel() {
 				<div className="flex items-center gap-2">
 					<div className="flex items-center gap-1">
 						<span className="text-3xs text-text-950">{t`Equity`}</span>
-						<span className={cn("text-3xs font-medium tabular-nums", hasData ? "text-market-up-600" : "text-text-600")}>
+						<span className={cn("text-3xs font-medium tabular-nums", hasData ? "text-market-up-600" : "text-text-950")}>
 							{headerEquity}
 						</span>
 					</div>
@@ -206,59 +207,41 @@ export function AccountPanel() {
 				</div>
 			</div>
 
-			<div className="px-2 flex items-center gap-0.5 border-b border-border-200">
-				<button
-					type="button"
-					onClick={() => setActiveTab("perps")}
-					className={cn(
-						"px-2 py-1.5 -mb-px text-xs tracking-[0.5px] border-b",
-						activeTab === "perps"
-							? "font-semibold text-text-950 border-text-950"
-							: "text-text-600 border-transparent hover:text-text-950",
-					)}
-				>
-					{t`Perps`}
-				</button>
-				<button
-					type="button"
-					onClick={() => setActiveTab("spot")}
-					className={cn(
-						"px-2 py-1.5 -mb-px text-xs tracking-[0.5px] border-b",
-						activeTab === "spot"
-							? "font-semibold text-text-950 border-text-950"
-							: "text-text-600 border-transparent hover:text-text-950",
-					)}
-				>
-					{t`Spot`}
-				</button>
-			</div>
+			<Tabs value={activeTab} onValueChange={setActiveTab}>
+				<div className="px-2 border-b border-border-200">
+					<TabsList variant="underline">
+						<TabsTrigger value="perps">{t`Perps`}</TabsTrigger>
+						<TabsTrigger value="spot">{t`Spot`}</TabsTrigger>
+					</TabsList>
+				</div>
 
-			<div className="p-2 space-y-2 overflow-y-auto">
-				{!isConnected ? (
-					<div className="text-2xs text-text-600 text-center py-4">{t`Connect wallet to view account`}</div>
-				) : !hasData ? (
-					<div className="text-2xs text-text-600 text-center py-4">{t`Loading...`}</div>
-				) : (
-					<>
-						<div className="divide-y divide-border-200 text-2xs tracking-[0.5px]">
-							{summaryRows.map((row) => (
-								<InfoRow key={row.label} label={row.label} value={row.value} valueClassName={row.valueClassName} />
-							))}
-						</div>
+				<div className="p-2 space-y-2 overflow-y-auto">
+					{!isConnected ? (
+						<div className="text-2xs text-text-600 text-center py-4">{t`Connect wallet to view account`}</div>
+					) : !hasData ? (
+						<div className="text-2xs text-text-600 text-center py-4">{t`Loading...`}</div>
+					) : (
+						<>
+							<div className="divide-y divide-border-200 text-2xs tracking-[0.5px]">
+								{summaryRows.map((row) => (
+									<InfoRow key={row.label} label={row.label} value={row.value} valueClassName={row.valueClassName} />
+								))}
+							</div>
 
-						<div className="grid grid-cols-2 gap-1">
-							<Button variant="outlined" onClick={() => openDepositModal("withdraw")} aria-label={t`Withdraw`}>
-								<UploadSimpleIcon className="size-4" />
-								{t`Withdraw`}
-							</Button>
-							<Button variant="outlined" onClick={() => openDepositModal("deposit")} aria-label={t`Deposit`}>
-								<DownloadSimpleIcon className="size-4" />
-								{t`Deposit`}
-							</Button>
-						</div>
-					</>
-				)}
-			</div>
+							<div className="grid grid-cols-2 gap-1">
+								<Button variant="outlined" onClick={() => openDepositModal("withdraw")} aria-label={t`Withdraw`}>
+									<UploadSimpleIcon className="size-4" />
+									{t`Withdraw`}
+								</Button>
+								<Button variant="outlined" onClick={() => openDepositModal("deposit")} aria-label={t`Deposit`}>
+									<DownloadSimpleIcon className="size-4" />
+									{t`Deposit`}
+								</Button>
+							</div>
+						</>
+					)}
+				</div>
+			</Tabs>
 		</div>
 	);
 }

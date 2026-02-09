@@ -2,7 +2,7 @@ import { t } from "@lingui/core/macro";
 import { CheckIcon, LightningIcon, SpinnerGapIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/constants";
+import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/time";
 import { cn } from "@/lib/cn";
 import { type OrderQueueItem, useOrderQueue, useOrderQueueActions } from "@/stores/use-order-queue-store";
 
@@ -84,11 +84,11 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 				</div>
 				<div className="text-2xs text-text-600 flex items-center gap-2 flex-wrap">
 					<span>
-						{t`Size`}: <span className="text-text-950/80 font-medium">{order.size}</span>
+						{t`Size`}: <span className="text-text-950 font-medium">{order.size}</span>
 					</span>
 					{order.price && (
 						<span>
-							@ <span className="text-text-950/80 font-medium">{order.price}</span>
+							@ <span className="text-text-950 font-medium">{order.price}</span>
 						</span>
 					)}
 				</div>

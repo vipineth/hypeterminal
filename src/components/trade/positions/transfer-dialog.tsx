@@ -152,7 +152,7 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 					</div>
 
 					<div className="space-y-1.5">
-						<span className="text-4xs uppercase tracking-wider text-text-600">{t`Amount (USDC)`}</span>
+						<span className="text-4xs uppercase tracking-wider text-text-950">{t`Amount (USDC)`}</span>
 						<NumberInput
 							placeholder="0.00"
 							value={amount}

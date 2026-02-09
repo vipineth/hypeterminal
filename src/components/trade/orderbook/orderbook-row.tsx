@@ -38,13 +38,13 @@ function OrderbookRowComponent({ level, side, maxTotal, showInQuote = false, szD
 					onClick={() => setSelectedPrice(level.price)}
 					className={cn(
 						"text-left justify-start font-medium",
-						isAsk ? "text-market-down-500 hover:text-market-down-500" : "text-market-up-500 hover:text-market-up-500",
+						isAsk ? "text-market-down-600 hover:text-market-down-600" : "text-market-up-600 hover:text-market-up-600",
 					)}
 				>
 					{formatNumber(level.price)}
 				</Button>
 				<div className="text-right text-text-950 group-hover:text-text-950">{sizeText}</div>
-				<div className="text-right text-text-500 group-hover:text-text-600">{totalText}</div>
+				<div className="text-right text-text-950 group-hover:text-text-950">{totalText}</div>
 			</div>
 		</div>
 	);

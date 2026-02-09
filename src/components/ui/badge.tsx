@@ -9,14 +9,14 @@ const badgeVariants = cva(
 		variants: {
 			variant: {
 				default: "border-transparent bg-primary-default text-white [a&]:hover:bg-primary-hover",
-				secondary: "border-transparent bg-surface-base text-text-600 [a&]:hover:bg-surface-base/90",
+				secondary: "border-transparent bg-surface-base text-text-800 [a&]:hover:bg-surface-base/90",
 				destructive:
 					"border-transparent bg-error-700 text-white [a&]:hover:bg-error-700/90 focus-visible:ring-error-700/20 dark:focus-visible:ring-error-700/40 dark:bg-error-700/60",
 				outline: "text-text-950 [a&]:hover:bg-surface-analysis [a&]:hover:text-text-950",
 				// Trading variants
 				long: "border-market-up-600/40 bg-market-up-100 text-market-up-600",
 				short: "border-market-down-600/40 bg-market-down-100 text-market-down-600",
-				neutral: "border-border-200/60 bg-surface-analysis text-text-600",
+				neutral: "border-border-200/60 bg-surface-analysis text-text-800",
 			},
 			size: {
 				default: "px-2 py-0.5 text-xs font-medium gap-1 [&>svg]:size-3",

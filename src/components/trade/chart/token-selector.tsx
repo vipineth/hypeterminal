@@ -125,7 +125,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 											"px-2 py-1 text-3xs uppercase tracking-wider cursor-pointer",
 											isSelected
 												? "bg-warning-700/10 text-warning-700 hover:bg-warning-700/10 hover:text-warning-700"
-												: "text-text-600 hover:bg-transparent",
+												: "text-text-950 hover:bg-transparent",
 										)}
 									>
 										{s.label}
@@ -147,7 +147,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 												"px-2 py-0.5 text-4xs tracking-wider cursor-pointer",
 												isSelected
 													? "bg-primary-default/10 text-primary-default hover:bg-primary-default/10 hover:text-primary-default"
-													: "text-text-600/80 hover:bg-transparent hover:text-text-600",
+													: "text-text-950 hover:bg-transparent hover:text-text-950",
 											)}
 											aria-label={t`Filter by ${sub.label}`}
 											aria-pressed={isSelected}
@@ -159,7 +159,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 							</div>
 						)}
 					</div>
-					<div className="flex items-center px-3 py-1.5 text-4xs uppercase tracking-wider text-text-600/70 border-b border-border-200/40 bg-surface-base/30">
+					<div className="flex items-center px-3 py-1.5 text-4xs uppercase tracking-wider text-text-950 border-b border-border-200/40 bg-surface-base/30">
 						<div className="flex-1 min-w-0">{t`Market`}</div>
 						{headerGroup?.headers
 							.filter((h) => h.id !== "displayName")
@@ -200,10 +200,10 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 					<div ref={containerRef} className="h-72 overflow-auto">
 						{isLoading ? (
 							<div className="flex items-center justify-center py-8">
-								<span className="text-3xs text-text-600">{t`Loading markets...`}</span>
+								<span className="text-3xs text-text-950">{t`Loading markets...`}</span>
 							</div>
 						) : rows.length === 0 ? (
-							<div className="py-8 text-center text-3xs text-text-600">{t`No markets found.`}</div>
+							<div className="py-8 text-center text-3xs text-text-950">{t`No markets found.`}</div>
 						) : (
 							<div
 								style={{
@@ -287,7 +287,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 															</Badge>
 														)}
 													</div>
-													<div className="flex items-center gap-1.5 text-4xs text-text-600">
+													<div className="flex items-center gap-1.5 text-4xs text-text-950">
 														{getMaxLeverage(market) && <span>{getMaxLeverage(market)}x</span>}
 														{isSpot && <span className="text-primary-default">Spot</span>}
 														{isHip3 && <span className="text-warning-700">{getDex(market)}</span>}
@@ -339,7 +339,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 						)}
 					</div>
 
-					<div className="px-3 py-1.5 bg-surface-base/30 flex items-center justify-between text-4xs text-text-600">
+					<div className="px-3 py-1.5 bg-surface-base/30 flex items-center justify-between text-4xs text-text-950">
 						<span>
 							{filteredMarkets.length} {t`markets`}
 						</span>

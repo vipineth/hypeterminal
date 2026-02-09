@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UI_TEXT } from "@/config/constants";
+import { COPY_FEEDBACK_DURATION_MS } from "@/config/time";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
@@ -33,7 +34,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 		if (!address) return;
 		await navigator.clipboard.writeText(address);
 		setCopied(true);
-		setTimeout(() => setCopied(false), 2000);
+		setTimeout(() => setCopied(false), COPY_FEEDBACK_DURATION_MS);
 	};
 
 	const accountValue = toNumberOrZero(perpSummary?.accountValue);

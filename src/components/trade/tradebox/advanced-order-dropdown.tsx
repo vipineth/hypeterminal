@@ -88,13 +88,13 @@ export function AdvancedOrderDropdown({ orderType, onOrderTypeChange, marketKind
 					aria-label={t`Advanced order types`}
 				>
 					{isAdvanced ? label : t`Other`}
-					<CaretDownIcon className="size-3 text-text-500" />
+					<CaretDownIcon className="size-3 text-text-600" />
 				</button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="min-w-44">
 				{hasTriggerOptions && (
 					<>
-						<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-text-600/70">
+						<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-text-950">
 							{t`Trigger`}
 						</DropdownMenuLabel>
 						{triggerOptions.map((option) => (
@@ -108,7 +108,7 @@ export function AdvancedOrderDropdown({ orderType, onOrderTypeChange, marketKind
 						<DropdownMenuSeparator />
 					</>
 				)}
-				<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-text-600/70">
+				<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-text-950">
 					{t`Execution`}
 				</DropdownMenuLabel>
 				{executionOptions.map((option) => (

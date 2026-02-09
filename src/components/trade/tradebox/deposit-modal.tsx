@@ -41,8 +41,8 @@ interface InfoRowProps {
 function InfoRow({ label, value, icon, highlight }: InfoRowProps) {
 	return (
 		<div className="flex items-center justify-between text-3xs">
-			<span className="flex items-center gap-1.5 text-text-600">
-				{icon && <span className="text-text-400">{icon}</span>}
+			<span className="flex items-center gap-1.5 text-text-950">
+				{icon && <span className="text-text-950">{icon}</span>}
 				{label}
 			</span>
 			<span className={cn(highlight && "text-text-950 font-medium")}>{value}</span>
@@ -62,7 +62,7 @@ function NetworkSelect({ label, value, onChange, disabled }: NetworkSelectProps)
 
 	return (
 		<div className="space-y-1.5">
-			<span className="text-4xs uppercase tracking-wider text-text-600">{label}</span>
+			<span className="text-4xs uppercase tracking-wider text-text-950">{label}</span>
 			<Select value={value} onValueChange={(v) => onChange(v as NetworkId)} disabled={disabled}>
 				<SelectTrigger className="w-full h-9 bg-surface-base/50 border-border-200/60">
 					<SelectValue>
@@ -185,7 +185,7 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 			<NetworkSelect label={<Trans>From</Trans>} value="arbitrum" onChange={() => {}} disabled />
 
 			<div className="space-y-1.5">
-				<span className="text-4xs uppercase tracking-wider text-text-600">
+				<span className="text-4xs uppercase tracking-wider text-text-950">
 					<Trans>Amount</Trans>
 				</span>
 				<NumberInput
@@ -269,7 +269,7 @@ function WithdrawForm({
 			<NetworkSelect label={<Trans>To</Trans>} value="arbitrum" onChange={() => {}} disabled />
 
 			<div className="space-y-1.5">
-				<span className="text-4xs uppercase tracking-wider text-text-600">
+				<span className="text-4xs uppercase tracking-wider text-text-950">
 					<Trans>Amount</Trans>
 				</span>
 				<NumberInput
@@ -310,7 +310,7 @@ function WithdrawForm({
 					label={<Trans>Net received</Trans>}
 					value={
 						netReceived === null ? (
-							<span className="tabular-nums text-text-600">--</span>
+							<span className="tabular-nums text-text-950">--</span>
 						) : (
 							<span className="tabular-nums">${formatNumber(netReceived, 2)}</span>
 						)
@@ -351,13 +351,13 @@ function WalletNotConnected() {
 	return (
 		<div className="flex flex-col items-center gap-4 py-8">
 			<div className="flex size-12 items-center justify-center rounded-full bg-surface-analysis border border-border-200/40">
-				<WalletIcon className="size-6 text-text-600" />
+				<WalletIcon className="size-6 text-text-950" />
 			</div>
 			<div className="text-center space-y-1">
 				<p className="text-sm font-medium">
 					<Trans>Wallet not connected</Trans>
 				</p>
-				<p className="text-3xs text-text-600">
+				<p className="text-3xs text-text-950">
 					<Trans>Connect your wallet to withdraw funds</Trans>
 				</p>
 			</div>
@@ -391,7 +391,7 @@ function WrongNetworkScreen({ open, onClose, onSwitch, isSwitching, error }: Wro
 							<p className="text-sm font-medium">
 								<Trans>Wrong network</Trans>
 							</p>
-							<p className="text-3xs text-text-600">
+							<p className="text-3xs text-text-950">
 								<Trans>Switch to Arbitrum to deposit USDC to Hyperliquid</Trans>
 							</p>
 						</div>

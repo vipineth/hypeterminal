@@ -3,22 +3,40 @@
 - **No hardcoded colors** - Never use hex values like `text-[#2b2e48]` or `bg-[#f1f3f4]`. Always use token utilities from `src/styles.css`.
 - **No arbitrary font sizes** - Never use `text-[10px]` etc. Use the named scale: `text-5xs` (8px), `text-4xs` (9px), `text-3xs` (10px), `text-2xs` (11px), `text-xs` (12px), `text-nav` (13px), `text-sm` (14px), `text-base`+.
 
-### Foreground (fg) — ink intensity, higher = more prominent
-- `text-fg-900` primary text, `text-fg-700` secondary, `text-fg-500` tertiary, `text-fg-400` placeholder, `text-fg-300` disabled
-- `fg-950` max contrast, `fg-800`/`fg-600` intermediates, `fg-200`/`fg-100` very faint
-- **Small text rule**: 8-10px use fg-800+, 11-13px use fg-700+, 14px+ use fg-600+
+### Text — ink intensity, higher number = more prominent
+- `text-text-950` primary text (max contrast)
+- `text-text-600` secondary text
+- `text-text-500` tertiary text
+- `text-text-400` placeholder text
+- `text-text-10` inverse/white text
+- **Small text rule**: 8-10px use `text-text-950`, 11-13px use `text-text-600`+, 14px+ use `text-text-500`+
 
-### Surface — elevation scale, higher = more elevated
-- `bg-surface-200` page background, `bg-surface-500` panels, `bg-surface-800` cards/execution
-- `bg-surface-alt` alternating rows, subtle contrast
-- Full range: `surface-100` (sunken) through `surface-900` (most elevated)
+### Surface — named elevation levels
+- `bg-surface-base` page background
+- `bg-surface-analysis` panels
+- `bg-surface-execution` cards/elevated
+- `bg-surface-monitoring-row-a` table row A
+- `bg-surface-monitoring-row-b` table row B (alternating)
+
+### Border — structural borders, higher number = stronger
+- `border-border-200` default border (set in base layer)
+- `border-border-100` subtle border
+- `border-border-300` medium border
+- `border-border-500` strong border
+- `border-border-50` very faint border
+
+### Primary — interactive accent (blue)
+- `primary-default` default, `primary-hover` hover, `primary-active` pressed, `primary-muted` disabled/muted
+- Works with all prefixes: `bg-primary-default`, `text-primary-default`, `border-primary-default`
 
 ### Other token groups
-- **Market** (`market-*`) - Trading data: PnL, prices, %. Use `market-up-*`, `market-down-*`, `market-neutral`
-- **Status** (`status-*`) - System feedback: `status-success`, `status-warning`, `status-error`, `status-info` + `-subtle` variants
-- **Action** (`action-primary`, `-hover`, `-active`, `-disabled`)
-- **Structural** - `border`, `input`, `ring`, `sel`
-- **Full token reference** in `design-tokens.md` at project root.
+- **Market** — Trading data: PnL, prices, %. `market-up-600` (primary green), `market-up-500` (muted), `market-up-100`/`market-up-50` (subtle bg). Same pattern for `market-down-*`. `market-neutral` for unchanged.
+- **Success** — `success-700` text, `success-100` subtle background
+- **Warning** — `warning-700` text, `warning-100` subtle background
+- **Error** — `error-700` text, `error-100` subtle background
+- **Fill** — `fill-900` (black), `fill-300` (muted), `fill-100`/`fill-50` (light)
+- **Highlight** — `highlight` (orange accent, #F7931A)
+- **Structural** — `sel` (selection highlight)
 
 ### Border Radius
 - **Always use `rounded-xs`** as the default radius for buttons, inputs, cards, badges, and all interactive elements.

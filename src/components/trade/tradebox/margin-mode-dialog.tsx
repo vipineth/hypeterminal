@@ -11,6 +11,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { MARGIN_MODE_SUCCESS_DURATION_MS } from "@/config/time";
 import { cn } from "@/lib/cn";
 import type { MarginMode } from "@/lib/trade/margin-mode";
 import { TradingActionButton } from "../components/trading-action-button";
@@ -35,8 +36,6 @@ export function MarginModeToggle({ mode, disabled, onClick }: MarginModeTogglePr
 		</Button>
 	);
 }
-
-const SUCCESS_DISPLAY_DURATION_MS = 1000;
 
 interface Props {
 	open: boolean;
@@ -110,7 +109,7 @@ export function MarginModeDialog({
 			autoCloseTimerRef.current = setTimeout(() => {
 				onOpenChange(false);
 				setShowSuccess(false);
-			}, SUCCESS_DISPLAY_DURATION_MS);
+			}, MARGIN_MODE_SUCCESS_DURATION_MS);
 		} catch {
 			// Error handled by hook
 		}
@@ -178,14 +177,14 @@ export function MarginModeDialog({
 											</span>
 											<div className="flex items-center gap-2">
 												{isCurrent && (
-													<span className="text-3xs text-text-600 uppercase tracking-wider">
+													<span className="text-3xs text-text-950 uppercase tracking-wider">
 														<Trans>Current</Trans>
 													</span>
 												)}
 												{isSelected && !isCurrent && <CheckIcon className="size-3.5 text-primary-default" />}
 											</div>
 										</div>
-										<p className="text-3xs text-text-600 leading-relaxed">{option.description()}</p>
+										<p className="text-3xs text-text-950 leading-relaxed">{option.description()}</p>
 									</div>
 								</div>
 							</button>

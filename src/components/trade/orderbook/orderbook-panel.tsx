@@ -127,7 +127,7 @@ export function OrderbookPanel() {
 						onClick={toggleAssetDisplay}
 					>
 						{t`Size`}
-						<span className="text-text-500">({displayAsset})</span>
+						<span className="text-text-950">({displayAsset})</span>
 						<ArrowsLeftRightIcon className="size-2 opacity-40" />
 					</button>
 					<button
@@ -136,7 +136,7 @@ export function OrderbookPanel() {
 						onClick={toggleAssetDisplay}
 					>
 						{t`Total`}
-						<span className="text-text-500">({displayAsset})</span>
+						<span className="text-text-950">({displayAsset})</span>
 						<ArrowsLeftRightIcon className="size-2 opacity-40" />
 					</button>
 				</div>
@@ -155,7 +155,7 @@ export function OrderbookPanel() {
 								/>
 							))
 						) : (
-							<div className="flex items-center justify-center px-2 py-6 text-3xs text-text-600">
+							<div className="flex items-center justify-center px-2 py-6 text-3xs text-text-950">
 								{orderbookStatus === "error" ? t`Failed to load order book.` : t`Waiting for order book...`}
 							</div>
 						)}
@@ -166,7 +166,7 @@ export function OrderbookPanel() {
 						className="shrink-0 px-2 py-1.5 border-y border-border-200/40 flex items-center justify-between text-3xs text-text-950"
 					>
 						<span>{t`Spread`}</span>
-						<span className="tabular-nums font-medium text-market-down-500">
+						<span className="tabular-nums font-medium text-market-down-600">
 							{`${formatNumber(spread, 2)} (${formatNumber(spreadPct, 3)}%)`}
 						</span>
 					</div>

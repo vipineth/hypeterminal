@@ -119,8 +119,8 @@ function Slider({
 							onClick={() => handleMarkClick(mark.value)}
 							disabled={disabled}
 							className={cn(
-								"absolute -translate-x-1/2 text-3xs tabular-nums",
-								isSelected ? "text-primary-default font-medium" : "text-text-600 hover:text-text-950",
+								"absolute -translate-x-1/2 text-3xs tabular-nums transition-colors",
+								isSelected ? "text-primary-default font-medium" : "text-text-950",
 							)}
 							style={{ left: `${position}%` }}
 						>

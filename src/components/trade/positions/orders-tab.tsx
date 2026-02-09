@@ -33,7 +33,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 		<div
 			className={cn(
 				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-market-down-600/80" : "text-text-600",
+				variant === "error" ? "text-market-down-600" : "text-text-600",
 			)}
 		>
 			{children}
@@ -60,7 +60,7 @@ export function OrdersTab() {
 	} = useExchangeCancel();
 
 	const openOrders = openOrdersEvent?.orders ?? [];
-	const headerCount = isConnected ? openOrders.length : FALLBACK_VALUE_PLACEHOLDER;
+	const headerCount = isConnected ? selectedOrderIds.size : FALLBACK_VALUE_PLACEHOLDER;
 
 	useEffect(() => {
 		if (selectedOrderIds.size === 0) return;
@@ -183,9 +183,8 @@ export function OrdersTab() {
 				<div className="ml-auto flex items-center gap-2">
 					<span className="text-primary-default tabular-nums">{headerCount}</span>
 					<Button
-						variant="outlined"
+						variant="text"
 						size="sm"
-						className="border-market-down-600 text-market-down-600 hover:border-market-down-600/80 hover:bg-market-down-100"
 						aria-label={t`Cancel selected orders`}
 						onClick={handleCancelSelected}
 						disabled={disableCancelSelected}
@@ -193,9 +192,8 @@ export function OrdersTab() {
 						{isCancelling ? t`Canceling...` : t`Cancel selected`}
 					</Button>
 					<Button
-						variant="outlined"
+						variant="text"
 						size="sm"
-						className="border-market-down-600 text-market-down-600 hover:border-market-down-600/80 hover:bg-market-down-100"
 						aria-label={t`Cancel all orders`}
 						onClick={handleCancelAll}
 						disabled={disableCancelAll}
@@ -204,7 +202,7 @@ export function OrdersTab() {
 					</Button>
 				</div>
 			</div>
-			{actionError ? <div className="mb-1 text-4xs text-market-down-600/80">{actionError}</div> : null}
+			{actionError ? <div className="mb-1 text-4xs text-market-down-600">{actionError}</div> : null}
 			<div className="flex-1 min-h-0 overflow-hidden border border-border-200/40 rounded-sm bg-surface-base/50">
 				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
@@ -219,21 +217,21 @@ export function OrdersTab() {
 											disabled={openOrders.length === 0 || isCancelling}
 										/>
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">{t`Time`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">{t`Asset`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">{t`Type`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Time`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Asset`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Type`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Price`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Size`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Filled`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">{t`Trigger`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">{t`Reduce`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Trigger`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Reduce`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Actions`}
 									</TableHead>
 								</TableRow>
@@ -361,9 +359,8 @@ function OrderRow({
 			</TableCell>
 			<TableCell className="text-right py-1.5">
 				<Button
-					variant="outlined"
+					variant="text"
 					size="sm"
-					className="border-market-down-600 text-market-down-600 hover:border-market-down-600/80 hover:bg-market-down-100"
 					aria-label={t`Cancel order`}
 					onClick={() => onCancel([order])}
 					disabled={!canCancel}

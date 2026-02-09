@@ -392,12 +392,21 @@
   }
 
   .terminal-scanlines {
+    position: relative;
+  }
+
+  .terminal-scanlines::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
     background-image: repeating-linear-gradient(
       0deg,
       transparent,
       transparent 2px,
-      oklch(from var(--text-950) l c h / 0.01) 2px,
-      oklch(from var(--text-950) l c h / 0.01) 3px
+      oklch(from var(--text-950) l c h / 0.01) 3px,
+      oklch(from var(--text-950) l c h / 0.01) 1px
     );
   }
 

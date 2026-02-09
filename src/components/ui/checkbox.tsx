@@ -16,7 +16,7 @@ function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxP
 			<CheckboxPrimitive.Indicator
 				data-slot="checkbox-indicator"
 				forceMount
-				className="grid place-content-center text-current transition-[scale,opacity] duration-150 ease-out data-[state=unchecked]:scale-0 data-[state=unchecked]:opacity-0"
+				className="grid place-content-center text-current transition-[scale,opacity] duration-150 ease-out data-[state=unchecked]:scale-50 data-[state=unchecked]:opacity-0"
 			>
 				<CheckIcon className="size-3" />
 			</CheckboxPrimitive.Indicator>

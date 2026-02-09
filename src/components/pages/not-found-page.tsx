@@ -8,7 +8,7 @@ export function NotFoundPage() {
 		<div className="min-h-screen bg-surface-base text-text-950 flex items-center justify-center p-6">
 			<div className="text-center space-y-3">
 				<div className="space-y-1">
-					<p className="text-3xs uppercase tracking-wider text-text-600">404</p>
+					<p className="text-3xs uppercase tracking-wider text-text-950">404</p>
 					<h1 className="text-sm font-semibold">
 						<Trans>Page not found</Trans>
 					</h1>

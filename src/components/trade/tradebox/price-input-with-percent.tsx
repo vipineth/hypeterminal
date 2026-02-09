@@ -33,7 +33,7 @@ export function PriceInputWithPercent({
 	return (
 		<div className="space-y-1.5">
 			<div className="flex items-center justify-between">
-				<div className="flex items-center gap-1.5 text-text-600">
+				<div className="flex items-center gap-1.5 text-text-950">
 					<span className="text-3xs font-medium uppercase tracking-wide">{label}</span>
 					<Icon className="size-3" />
 				</div>
@@ -63,7 +63,7 @@ export function PriceInputWithPercent({
 							type="button"
 							onClick={() => onPercentClick(p)}
 							disabled={disabled || !isPositive(referencePrice)}
-							className="px-1.5 py-1 text-4xs font-medium text-text-600 bg-surface-analysis hover:text-text-950 hover:bg-primary-default/20 rounded-xs transition-colors disabled:opacity-50"
+							className="px-1.5 py-1 text-4xs font-medium text-text-950 bg-surface-analysis hover:bg-primary-default/20 rounded-xs transition-colors disabled:opacity-50"
 							aria-label={t`Set to ${p}%`}
 						>
 							{p}%

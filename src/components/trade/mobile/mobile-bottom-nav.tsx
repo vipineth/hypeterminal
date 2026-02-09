@@ -54,7 +54,7 @@ export function MobileBottomNav({ activeTab, onTabChange, badges, className }: P
 								"transition-colors duration-150 ease-out",
 								"active:bg-surface-analysis/50 active:scale-95",
 								"hover:bg-transparent",
-								isActive ? "text-primary-default" : "text-text-600 hover:text-text-950",
+								isActive ? "text-primary-default" : "text-text-950 hover:text-text-950",
 							)}
 							aria-current={isActive ? "page" : undefined}
 							aria-label={item.label}
