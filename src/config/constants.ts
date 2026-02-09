@@ -39,13 +39,11 @@ export const MARKET_ORDER_SLIPPAGE_MAX_PERCENT = 100;
 export const DEFAULT_LEVERAGE_BY_MODE = { cross: 10, isolated: 10 } as const;
 
 export const STORAGE_KEYS = {
-	MARKET_PREFS: "market-prefs-v1",
-	GLOBAL_SETTINGS: "global-settings-v1",
-	API_WALLET: "hyperliquid-api-wallet-v1",
-	LEGACY_FAVORITES: "favorites-storage-v0.2",
-	META_CACHE: "hyperliquid-meta-cache-v1",
-	SIDEBAR_STATE: "sidebar_state",
-	ORDER_ENTRY: "order-entry-v1",
+	MARKET_PREFS: "market-prefs-v2",
+	GLOBAL_SETTINGS: "global-settings-v2",
+	META_CACHE: "hyperliquid-meta-cache-v2",
+	SIDEBAR_STATE: "sidebar_state-v2",
+	ORDER_ENTRY: "order-entry-v2",
 } as const;
 
 export const TOKEN_ICON_BASE_URL = "https://app.hyperliquid.xyz/coins";

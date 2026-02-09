@@ -98,21 +98,22 @@ export function AccountPanel() {
 	const hasPerpData = isConnected && perpMetrics !== null;
 	const hasSpotData = isConnected && spotMetrics !== null;
 
-	const headerEquity =
-		activeTab === "perps"
-			? hasPerpData
-				? formatUSD(perpMetrics.accountValue)
-				: FALLBACK_VALUE_PLACEHOLDER
-			: hasSpotData
-				? formatUSD(spotMetrics.totalValue)
-				: FALLBACK_VALUE_PLACEHOLDER;
+	function getHeaderEquity() {
+		if (activeTab === "perps") {
+			return hasPerpData ? formatUSD(perpMetrics.accountValue) : FALLBACK_VALUE_PLACEHOLDER;
+		}
+		return hasSpotData ? formatUSD(spotMetrics.totalValue) : FALLBACK_VALUE_PLACEHOLDER;
+	}
 
-	const headerPnl =
-		activeTab === "perps"
-			? hasPerpData
-				? formatUSD(perpMetrics.unrealizedPnl, { signDisplay: "exceptZero" })
-				: FALLBACK_VALUE_PLACEHOLDER
-			: FALLBACK_VALUE_PLACEHOLDER;
+	function getHeaderPnl() {
+		if (activeTab === "perps" && hasPerpData) {
+			return formatUSD(perpMetrics.unrealizedPnl, { signDisplay: "exceptZero" });
+		}
+		return FALLBACK_VALUE_PLACEHOLDER;
+	}
+
+	const headerEquity = getHeaderEquity();
+	const headerPnl = getHeaderPnl();
 
 	const headerPnlClass =
 		activeTab === "perps" && hasPerpData ? getValueColorClass(perpMetrics.unrealizedPnl) : "text-text-950";

@@ -342,7 +342,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							size="none"
 							onClick={() => setSide("buy")}
 							className={cn(
-								"py-4 text-base font-semibold uppercase tracking-wider border rounded-md gap-2 hover:bg-transparent",
+								"py-4 text-base font-semibold uppercase tracking-wider border rounded-xs gap-2 hover:bg-transparent",
 								"active:scale-98",
 								side === "buy"
 									? "bg-market-up-100 border-market-up-600 text-market-up-600"
@@ -357,7 +357,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							size="none"
 							onClick={() => setSide("sell")}
 							className={cn(
-								"py-4 text-base font-semibold uppercase tracking-wider border rounded-md gap-2 hover:bg-transparent",
+								"py-4 text-base font-semibold uppercase tracking-wider border rounded-xs gap-2 hover:bg-transparent",
 								"active:scale-98",
 								side === "sell"
 									? "bg-market-down-100 border-market-down-600 text-market-down-600"
@@ -370,7 +370,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					</div>
 
 					{/* Order type tabs */}
-					<div className="flex items-center gap-1 bg-surface-analysis rounded-md p-1">
+					<div className="flex items-center gap-1 bg-surface-analysis rounded-xs p-1">
 						<Button
 							variant="text"
 							size="none"
@@ -418,7 +418,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 								size="none"
 								onClick={handleSizeModeToggle}
 								className={cn(
-									"px-3 py-3 text-sm border border-border-200/60 rounded-md gap-1 min-h-[48px] hover:bg-transparent",
+									"px-3 py-3 text-sm border border-border-200/60 rounded-xs gap-1 min-h-[48px] hover:bg-transparent",
 									"hover:border-text-400",
 								)}
 								disabled={isFormDisabled}
@@ -460,7 +460,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 									variant="contained"
 									size="none"
 									onClick={() => handlePercentClick(p)}
-									className="py-2.5 text-sm font-medium rounded-md min-h-[44px]"
+									className="py-2.5 text-sm font-medium rounded-xs min-h-[44px]"
 									disabled={isFormDisabled || maxSize <= 0}
 								>
 									{p === 100 ? ORDER_TEXT.SIZE_MAX_LABEL : `${p}%`}
@@ -504,7 +504,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					{approvalError && <div className="text-sm text-market-down-600">{approvalError}</div>}
 
 					{/* Order summary */}
-					<div className="border border-border-200/40 rounded-md divide-y divide-border/40 text-sm">
+					<div className="border border-border-200/40 rounded-xs divide-y divide-border/40 text-sm">
 						<SummaryRow
 							label={ORDER_TEXT.SUMMARY_ORDER_VALUE}
 							value={orderValue > 0 ? formatUSD(orderValue) : FALLBACK_VALUE_PLACEHOLDER}
@@ -535,7 +535,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					onClick={buttonContent.action}
 					disabled={buttonContent.disabled}
 					className={cn(
-						"w-full py-4 text-base font-semibold uppercase tracking-wider border rounded-md gap-2 hover:bg-transparent",
+						"w-full py-4 text-base font-semibold uppercase tracking-wider border rounded-xs gap-2 hover:bg-transparent",
 						"active:scale-98",
 						buttonContent.variant === "cyan"
 							? "bg-primary-default/20 border-primary-default text-primary-default hover:bg-primary-default/30"

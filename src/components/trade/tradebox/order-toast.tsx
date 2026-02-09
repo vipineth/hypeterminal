@@ -53,7 +53,7 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 		>
 			<div
 				className={cn(
-					"flex items-center justify-center size-7 rounded-md shrink-0",
+					"flex items-center justify-center size-7 rounded-xs shrink-0",
 					order.status === "pending" && "bg-primary-default/15 border border-primary-default/30",
 					order.status === "success" && "bg-market-up-100 border border-market-up-600/30",
 					order.status === "failed" && "bg-market-down-100 border border-market-down-600/30",
@@ -114,7 +114,7 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 					variant="text"
 					size="none"
 					onClick={onRemove}
-					className="p-1.5 rounded-md text-text-600 hover:text-text-950 hover:bg-surface-analysis transition-colors shrink-0 self-start"
+					className="p-1.5 rounded-xs text-text-600 hover:text-text-950 hover:bg-surface-analysis transition-colors shrink-0 self-start"
 					aria-label={t`Dismiss`}
 				>
 					<XIcon className="size-4" />
@@ -152,7 +152,7 @@ export function OrderToast() {
 			className={cn(
 				"fixed bottom-6 right-6 z-50 w-80",
 				"bg-surface-execution/95 backdrop-blur-sm",
-				"border border-border-200/60 rounded-lg overflow-hidden",
+				"border border-border-200/60 rounded-xs overflow-hidden",
 				"shadow-2xl shadow-black/20 dark:shadow-black/50",
 				"font-mono",
 

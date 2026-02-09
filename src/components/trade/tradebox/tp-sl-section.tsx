@@ -75,7 +75,7 @@ export function TpSlSection({
 
 	if (compact) {
 		return (
-			<div className="rounded-md border border-border-200/50 bg-surface-analysis p-2.5">
+			<div className="rounded-xs border border-border-200/50 bg-surface-analysis p-2.5">
 				<div className="grid grid-cols-2 gap-2">
 					<div className="space-y-1">
 						<span className="text-3xs text-text-950">{t`Take Profit`}</span>
@@ -139,7 +139,7 @@ export function TpSlSection({
 			/>
 
 			{riskRewardDisplay && (
-				<div className="rounded-md border border-border-200/40 bg-surface-analysis p-2.5 space-y-2">
+				<div className="rounded-xs border border-border-200/40 bg-surface-analysis p-2.5 space-y-2">
 					<div className="flex items-center justify-between">
 						<span className="text-3xs text-text-950">{t`Risk/Reward`}</span>
 						<span

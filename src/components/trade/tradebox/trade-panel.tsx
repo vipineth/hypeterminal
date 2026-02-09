@@ -60,16 +60,6 @@ import { OrderToast } from "./order-toast";
 import { TradeFormFields } from "./trade-form-fields";
 import { TradeHeader } from "./trade-header";
 
-// function getActionButtonClass(variant: ButtonContent["variant"]): string {
-// 	if (variant === "cyan") {
-// 		return "bg-primary-default border-primary-default text-white hover:bg-primary-hover text-sm font-medium normal-case";
-// 	}
-// 	if (variant === "buy") {
-// 		return "bg-market-up-100 border-market-up-600 text-market-up-600 hover:bg-market-up-100/30";
-// 	}
-// 	return "bg-market-down-100 border-market-down-600 text-market-down-600 hover:bg-market-down-600/30";
-// }
-
 export function TradePanel() {
 	const reduceOnlyId = useId();
 	const tpSlId = useId();

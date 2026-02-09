@@ -153,7 +153,7 @@ function LeverageEditor({
 			{updateError && (
 				<div
 					className={cn(
-						"flex items-center bg-market-down-100 border border-market-down-600/20 rounded-md text-market-down-600",
+						"flex items-center bg-market-down-100 border border-market-down-600/20 rounded-xs text-market-down-600",
 						compact ? "gap-1.5 p-1.5 text-3xs" : "gap-2 p-2.5 text-sm",
 					)}
 				>
@@ -165,7 +165,7 @@ function LeverageEditor({
 			{showSuccess && (
 				<div
 					className={cn(
-						"flex items-center justify-center bg-market-up-100 border border-market-up-600/20 rounded-md text-market-up-600",
+						"flex items-center justify-center bg-market-up-100 border border-market-up-600/20 rounded-xs text-market-up-600",
 						compact ? "gap-1.5 p-1.5 text-3xs" : "gap-2 p-2.5 text-sm",
 					)}
 				>

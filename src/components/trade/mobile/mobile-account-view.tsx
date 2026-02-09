@@ -68,7 +68,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						size="none"
 						onClick={() => setWalletDialogOpen(true)}
 						className={cn(
-							"px-6 py-3 text-base font-semibold rounded-md",
+							"px-6 py-3 text-base font-semibold rounded-xs",
 							"bg-primary-default/20 border border-primary-default text-primary-default",
 							"hover:bg-primary-default/30 transition-colors",
 							"min-h-[48px]",
@@ -118,7 +118,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						onClick={() => disconnect.mutate()}
 						className={cn(
 							"p-2.5 text-text-600 hover:text-market-down-600",
-							"transition-colors rounded-md hover:bg-transparent",
+							"transition-colors rounded-xs hover:bg-transparent",
 							"min-h-[44px] min-w-[44px] flex items-center justify-center",
 						)}
 						aria-label="Disconnect wallet"
@@ -132,7 +132,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 			<div className="flex-1 min-h-0 overflow-y-auto">
 				<div className="p-4 space-y-4">
 					{/* Main balance card */}
-					<div className="p-4 rounded-lg border border-border-200/60 bg-surface-execution/30">
+					<div className="p-4 rounded-xs border border-border-200/60 bg-surface-execution/30">
 						{isLoading ? (
 							<div className="space-y-3">
 								<Skeleton className="h-4 w-20" />
@@ -181,7 +181,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 							size="none"
 							onClick={() => openDepositModal("deposit")}
 							className={cn(
-								"py-4 text-base font-semibold rounded-md",
+								"py-4 text-base font-semibold rounded-xs",
 								"bg-market-up-100 border border-market-up-600 text-market-up-600",
 								"hover:bg-market-up-100/30 transition-colors",
 								"flex items-center justify-center gap-2",
@@ -195,7 +195,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 							variant="text"
 							size="none"
 							className={cn(
-								"py-4 text-base font-semibold rounded-md",
+								"py-4 text-base font-semibold rounded-xs",
 								"bg-surface-analysis border border-border-200/60 text-text-600",
 								"hover:bg-surface-analysis transition-colors",
 								"flex items-center justify-center gap-2",
@@ -240,7 +240,7 @@ interface StatCardProps {
 
 function StatCard({ label, value, valueClass, isLoading }: StatCardProps) {
 	return (
-		<div className="p-3 rounded-lg border border-border-200/40 bg-surface-execution/20">
+		<div className="p-3 rounded-xs border border-border-200/40 bg-surface-execution/20">
 			<div className="text-xs text-text-600 mb-1">{label}</div>
 			{isLoading ? (
 				<Skeleton className="h-6 w-20" />
