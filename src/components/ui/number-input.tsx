@@ -37,6 +37,8 @@ interface Props extends Omit<React.ComponentProps<"input">, "type" | "onChange" 
 	min?: number;
 	max?: number;
 	step?: number;
+	maxLabel?: React.ReactNode;
+	onMaxClick?: () => void;
 	onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -49,12 +51,16 @@ export function NumberInput({
 	min,
 	max,
 	step = 1,
+	maxLabel,
+	onMaxClick,
 	value,
 	onChange,
 	onKeyDown,
+	disabled,
 	...props
 }: Props) {
 	const effectiveAllowDecimals = allowDecimals && (maxAllowedDecimals === undefined || maxAllowedDecimals > 0);
+	const hasMax = maxLabel != null && onMaxClick != null;
 
 	const createSyntheticEvent = useCallback(
 		(input: HTMLInputElement, newValue: string): React.ChangeEvent<HTMLInputElement> => {
@@ -154,25 +160,43 @@ export function NumberInput({
 		[effectiveAllowDecimals, allowNegative, maxAllowedDecimals, onChange],
 	);
 
-	return (
+	const inputEl = (
 		<input
 			type="text"
 			inputMode={effectiveAllowDecimals ? "decimal" : "numeric"}
 			data-slot="input"
 			data-size={inputSize}
 			value={value}
+			disabled={disabled}
 			className={cn(
-				"file:text-fg placeholder:text-muted-fg selection:bg-primary selection:text-primary-fg dark:bg-input/30 border-border min-w-0 rounded-sm border bg-transparent px-2 py-1 shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
-				"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-				"aria-invalid:ring-danger/20 dark:aria-invalid:ring-danger/40 aria-invalid:border-danger",
+				"file:text-text-950 placeholder:text-text-400 selection:bg-primary-default selection:text-white dark:bg-fill-100/30 border-border-200 min-w-0 rounded-sm border bg-transparent px-2 py-1 shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+				"focus-visible:border-primary-default/50 focus-visible:ring-primary-default/50 focus-visible:ring-[3px]",
+				"aria-invalid:ring-error-700/20 dark:aria-invalid:ring-error-700/40 aria-invalid:border-error-700",
 				inputSize === "sm" && "h-6 text-2xs px-1.5",
 				inputSize === "default" && "h-7 text-xs",
 				inputSize === "lg" && "h-9 text-sm px-3",
+				hasMax && "pr-20",
 				className,
 			)}
 			onKeyDown={handleKeyDown}
 			onChange={handleChange}
 			{...props}
 		/>
+	);
+
+	if (!hasMax) return inputEl;
+
+	return (
+		<div className="relative">
+			{inputEl}
+			<button
+				type="button"
+				onClick={onMaxClick}
+				disabled={disabled}
+				className="absolute right-2 top-1/2 -translate-y-1/2 text-3xs text-primary-default hover:text-primary-default/80 transition-colors whitespace-nowrap tabular-nums disabled:opacity-50 disabled:pointer-events-none"
+			>
+				{maxLabel}
+			</button>
+		</div>
 	);
 }

@@ -14,6 +14,7 @@ import { useGlobalSettingsActions, usePositionsActiveTab } from "@/stores/use-gl
 const BalancesTab = createLazyComponent(() => import("./balances-tab"), "BalancesTab");
 const FundingTab = createLazyComponent(() => import("./funding-tab"), "FundingTab");
 const HistoryTab = createLazyComponent(() => import("./history-tab"), "HistoryTab");
+const OrdersHistoryTab = createLazyComponent(() => import("./orders-history-tab"), "OrdersHistoryTab");
 const OrdersTab = createLazyComponent(() => import("./orders-tab"), "OrdersTab");
 const PositionsTab = createLazyComponent(() => import("./positions-tab"), "PositionsTab");
 const TwapTab = createLazyComponent(() => import("./twap-tab"), "TwapTab");
@@ -63,10 +64,10 @@ export function PositionsPanel() {
 	}
 
 	return (
-		<div className="h-full flex flex-col overflow-hidden bg-surface/20">
+		<div className="h-full flex flex-col overflow-hidden bg-surface-execution">
 			<Tabs value={activeTab} onValueChange={handleTabChange} className="flex-1 min-h-0 flex flex-col">
-				<div className="px-2 pt-1.5 border-b border-border/40">
-					<TabsList variant="underline" className="pb-1.5">
+				<div className="p-2">
+					<TabsList variant="underline" fullWidth>
 						{POSITIONS_TABS.map((tab) => {
 							const count = getTabCount(tab.value);
 
@@ -99,6 +100,14 @@ export function PositionsPanel() {
 						<TwapTab />
 					</Suspense>
 				</TabsContent>
+				<TabsContent
+					value="orders-history"
+					className={cn("flex-1 min-h-0 flex flex-col mt-0", isPending && "opacity-70")}
+				>
+					<Suspense fallback={<TabLoadingFallback />}>
+						<OrdersHistoryTab />
+					</Suspense>
+				</TabsContent>
 				<TabsContent value="history" className={cn("flex-1 min-h-0 flex flex-col mt-0", isPending && "opacity-70")}>
 					<Suspense fallback={<TabLoadingFallback />}>
 						<HistoryTab />
@@ -117,7 +126,7 @@ export function PositionsPanel() {
 function TabLoadingFallback() {
 	return (
 		<div className="flex-1 flex items-center justify-center">
-			<Spinner className="size-4 text-muted-fg" />
+			<Spinner className="size-4 text-text-600" />
 		</div>
 	);
 }

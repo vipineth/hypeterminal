@@ -25,7 +25,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 		<div
 			className={cn(
 				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-negative/80" : "text-muted-fg",
+				variant === "error" ? "text-market-down-600" : "text-text-600",
 			)}
 		>
 			{children}
@@ -67,43 +67,45 @@ export function TwapTab() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
-			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
+			<div className="text-3xs uppercase tracking-wider text-text-600 mb-1.5 flex items-center gap-2">
 				<TimerIcon className="size-3" />
 				{t`TWAP Orders`}
-				<span className="text-info ml-auto tabular-nums">{headerCount}</span>
+				<span className="text-primary-default ml-auto tabular-nums">{headerCount}</span>
 			</div>
-			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-bg/50">
+			<div className="flex-1 min-h-0 overflow-hidden border border-border-200/40 rounded-sm bg-surface-base/50">
 				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
-								<TableRow className="border-border/40 hover:bg-transparent">
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Asset`}</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
+								<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Asset`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Size`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Executed`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Avg Price`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">
 										{t`Time / Total`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">
 										{t`Reduce Only`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Created`}</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Created`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Actions`}
 									</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{activeOrders.map(({ twapId, state }) => {
+								{activeOrders.map(({ twapId, state }, i) => {
 									const isBuy = state.side === "B";
-									const sideClass = isBuy ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
+									const sideClass = isBuy
+										? "bg-market-up-100 text-market-up-600"
+										: "bg-market-down-100 text-market-down-600";
 									const totalSize = toBig(state.sz)?.toNumber() ?? Number.NaN;
 									const executedSize = toBig(state.executedSz)?.toNumber() ?? 0;
 									const avgPrice = getAvgPrice(state.executedNtl, state.executedSz);
@@ -112,8 +114,14 @@ export function TwapTab() {
 									const totalMinutes = state.minutes;
 
 									return (
-										<TableRow key={twapId} className="border-border/40 hover:bg-accent/30">
-											<TableCell className="text-2xs font-medium py-1.5">
+										<TableRow
+											key={twapId}
+											className={cn(
+												"border-border-200/40 hover:bg-surface-analysis/30",
+												i % 2 === 1 && "bg-surface-analysis",
+											)}
+										>
+											<TableCell className="text-3xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">
 													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideClass)}>
 														{isBuy ? t`buy` : t`sell`}
@@ -128,23 +136,23 @@ export function TwapTab() {
 													</Button>
 												</div>
 											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums py-1.5">
+											<TableCell className="text-3xs text-right tabular-nums py-1.5">
 												{formatNumber(totalSize, szDecimals)}
 											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums py-1.5">
-												<span className={cn(isBuy ? "text-positive" : "text-negative")}>
+											<TableCell className="text-3xs text-right tabular-nums py-1.5">
+												<span className={cn(isBuy ? "text-market-up-600" : "text-market-down-600")}>
 													{formatNumber(executedSize, szDecimals)}
 												</span>
 											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums py-1.5">
+											<TableCell className="text-3xs text-right tabular-nums py-1.5">
 												{formatPrice(avgPrice, { szDecimals })}
 											</TableCell>
-											<TableCell className="text-2xs tabular-nums py-1.5">
+											<TableCell className="text-3xs tabular-nums py-1.5">
 												<TimeTicker startTime={creationTime} durationMs={totalMinutes * 60 * 1000} isActive={true} /> /{" "}
 												{formatDuration(totalMinutes)}
 											</TableCell>
-											<TableCell className="text-2xs py-1.5">{state.reduceOnly ? t`Yes` : t`No`}</TableCell>
-											<TableCell className="text-2xs tabular-nums py-1.5">
+											<TableCell className="text-3xs py-1.5">{state.reduceOnly ? t`Yes` : t`No`}</TableCell>
+											<TableCell className="text-3xs tabular-nums py-1.5">
 												{formatDateTime(creationTime, {
 													day: "2-digit",
 													month: "2-digit",
@@ -159,7 +167,7 @@ export function TwapTab() {
 												<Button
 													variant="outlined"
 													size="sm"
-													className="border-negative text-negative hover:border-negative/80 hover:bg-negative/10"
+													className="border-market-down-600 text-market-down-600 hover:border-market-down-600/80 hover:bg-market-down-100"
 													aria-label={t`Cancel TWAP order`}
 												>
 													{t`Cancel`}

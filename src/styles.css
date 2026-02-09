@@ -9,13 +9,17 @@
   --font-sans: "IBM Plex Sans Variable", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   --font-mono: "IBM Plex Sans Variable", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
 
-  /* Typography - Custom smaller text sizes for dense UI */
+  /* Typography - Custom text sizes for dense UI */
+  --text-nav: 0.8125rem; /* 13px - top nav links */
+  --text-nav--line-height: 1.38;
   --text-2xs: 0.6875rem; /* 11px */
   --text-2xs--line-height: 1.45;
   --text-3xs: 0.625rem; /* 10px */
   --text-3xs--line-height: 1.5;
   --text-4xs: 0.5625rem; /* 9px */
   --text-4xs--line-height: 1.55;
+  --text-5xs: 0.5rem; /* 8px - badges */
+  --text-5xs--line-height: 1.5;
 
   /* Border Radius */
   --radius-sm: calc(0.125rem - 4px);
@@ -78,68 +82,147 @@
 }
 
 /* =============================================================================
-   LIGHT/DARK MODE CSS VARIABLES
-   Using :root and .dark for values that change between modes
+   LIGHT MODE - Default theme
    ============================================================================= */
 
-:root,
-:root[data-color-theme="terminal"] {
-  /* Core UI - Light Mode */
-  --bg: oklch(0.97 0.005 240);
-  --fg: oklch(0.2 0.02 250);
-  --surface: oklch(0.99 0.003 240);
-  --surface-fg: oklch(0.2 0.02 250);
-  --primary: oklch(0.45 0.15 250);
-  --primary-fg: oklch(0.98 0 0);
-  --secondary: oklch(0.94 0.01 240);
-  --secondary-fg: oklch(0.3 0.02 250);
-  --muted: oklch(0.95 0.008 240);
-  --muted-fg: oklch(0.5 0.02 250);
-  --accent: oklch(0.92 0.015 240);
-  --accent-fg: oklch(0.2 0.02 250);
-  --danger: oklch(0.55 0.22 25);
-  --danger-fg: oklch(0.98 0 0);
-  --border: oklch(0.82 0.02 240);
-  --input: oklch(0.94 0.01 240);
-  --ring: oklch(0.45 0.15 250);
-  --sel: oklch(0.85 0.01 240 / 0.3);
+:root {
+  /* Text */
+  --text-950: #232529;
+  --text-600: #555C65;
+  --text-500: #626B75;
+  --text-400: #7E8792;
+  --text-10: #FFFFFF;
 
-  /* Signals - Light Mode */
-  --positive: oklch(0.45 0.18 145);
-  --negative: oklch(0.5 0.2 25);
-  --info: oklch(0.45 0.12 230);
-  --warning: oklch(0.55 0.16 70);
-  --highlight: oklch(0.5 0.18 290);
+  /* Border */
+  --border-500: #A6ACB3;
+  --border-300: #D2D6DA;
+  --border-200: #E0E3E6;
+  --border-100: #ECEEEF;
+  --border-50: #F6F7F8;
+
+  /* Primary */
+  --primary-default: #2563EB;
+  --primary-hover: #1D4ED8;
+  --primary-active: #1E40AF;
+  --primary-muted: #92B1F5;
+
+  /* Market Up */
+  --market-up-600: #3C7D3E;
+  --market-up-500: #4E9950;
+  --market-up-100: #E6F4E6;
+  --market-up-50: #F3FAF3;
+
+  /* Market Down */
+  --market-down-600: #C94139;
+  --market-down-500: #E06A63;
+  --market-down-100: #FBE6E5;
+  --market-down-50: #FDF4F3;
+
+  /* Market Neutral (no Figma token yet) */
+  --market-neutral: #8A919A;
+
+  /* Success */
+  --success-700: #1F7A3F;
+  --success-100: #F1FCF4;
+
+  /* Warning */
+  --warning-700: #FBAC3C;
+  --warning-100: #FFF9ED;
+
+  /* Error */
+  --error-700: #A63A2B;
+  --error-100: #FDF4F3;
+
+  /* Surface */
+  --surface-base: #F1F3F4;
+  --surface-analysis: #FDFDFD;
+  --surface-execution: #FFFFFF;
+  --surface-monitoring-row-a: #FFFFFF;
+  --surface-monitoring-row-b: #F9F9FA;
+
+  /* Fill */
+  --fill-900: #000000;
+  --fill-300: #ECEEEF;
+  --fill-100: #FFFFFF;
+  --fill-50: #FFFFFF;
+
+  /* Highlight */
+  --highlight: #F7931A;
+
+  /* Structural */
+  --sel: rgba(37, 99, 235, 0.15);
 }
 
-.dark,
-:root[data-color-theme="terminal"].dark {
-  /* Core UI - Dark Mode */
-  --bg: oklch(0.05 0 0);
-  --fg: oklch(0.85 0 0);
-  --surface: oklch(0.08 0 0);
-  --surface-fg: oklch(0.85 0 0);
-  --primary: oklch(0.75 0.18 160);
-  --primary-fg: oklch(0.05 0 0);
-  --secondary: oklch(0.15 0 0);
-  --secondary-fg: oklch(0.75 0 0);
-  --muted: oklch(0.12 0 0);
-  --muted-fg: oklch(0.55 0 0);
-  --accent: oklch(0.18 0 0);
-  --accent-fg: oklch(0.85 0 0);
-  --danger: oklch(0.65 0.25 25);
-  --danger-fg: oklch(0.98 0 0);
-  --border: oklch(0.2 0 0);
-  --input: oklch(0.12 0 0);
-  --ring: oklch(0.75 0.18 160);
-  --sel: oklch(0.7 0.01 240 / 0.3);
+/* =============================================================================
+   DARK MODE (Inverse)
+   ============================================================================= */
 
-  /* Signals - Dark Mode */
-  --positive: oklch(0.75 0.18 145);
-  --negative: oklch(0.65 0.22 25);
-  --info: oklch(0.78 0.12 195);
-  --warning: oklch(0.8 0.16 85);
-  --highlight: oklch(0.7 0.15 300);
+.dark {
+  /* Text */
+  --text-950: #E6E9EE;
+  --text-600: #B8BEC7;
+  --text-500: #9AA1AB;
+  --text-400: #555D68;
+  --text-10: #131619;
+
+  /* Border */
+  --border-500: #7F8792;
+  --border-300: #6A727E;
+  --border-200: #343B45;
+  --border-100: #242A33;
+  --border-50: #222833;
+
+  /* Primary */
+  --primary-default: #4F7DFF;
+  --primary-hover: #3B6CF6;
+  --primary-active: #2F5CE0;
+  --primary-muted: #385194;
+
+  /* Market Up */
+  --market-up-600: #4CAF6A;
+  --market-up-500: #2F854E;
+  --market-up-100: #122B1D;
+  --market-up-50: #0E2318;
+
+  /* Market Down */
+  --market-down-600: #E26D63;
+  --market-down-500: #C94B44;
+  --market-down-100: #3A1C1C;
+  --market-down-50: #32282E;
+
+  /* Market Neutral (no Figma token yet) */
+  --market-neutral: #9AA4B2;
+
+  /* Success */
+  --success-700: #1F7A3F;
+  --success-100: #123524;
+
+  /* Warning */
+  --warning-700: #FFAD0D;
+  --warning-100: #4A3A12;
+
+  /* Error */
+  --error-700: #A63A2B;
+  --error-100: #3A1C1C;
+
+  /* Surface */
+  --surface-base: #0D0F11;
+  --surface-analysis: #191D23;
+  --surface-execution: #20242A;
+  --surface-monitoring-row-a: #20242A;
+  --surface-monitoring-row-b: #191D23;
+
+  /* Fill */
+  --fill-900: #000000;
+  --fill-300: #2A303A;
+  --fill-100: #262C36;
+  --fill-50: #404754;
+
+  /* Highlight */
+  --highlight: #F7931A;
+
+  /* Structural */
+  --sel: rgba(79, 125, 255, 0.15);
 
   /* Override shadows for dark mode */
   --shadow-xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.09);
@@ -151,151 +234,73 @@
 }
 
 /* =============================================================================
-   MIDNIGHT THEME - Deep blues, saturated accents
-   ============================================================================= */
-
-:root[data-color-theme="midnight"] {
-  --bg: oklch(0.96 0.008 240);
-  --fg: oklch(0.18 0.02 240);
-  --surface: oklch(0.98 0.005 240);
-  --surface-fg: oklch(0.18 0.02 240);
-  --primary: oklch(0.50 0.18 260);
-  --primary-fg: oklch(0.98 0 0);
-  --secondary: oklch(0.92 0.01 240);
-  --secondary-fg: oklch(0.28 0.02 240);
-  --muted: oklch(0.93 0.008 240);
-  --muted-fg: oklch(0.48 0.015 240);
-  --accent: oklch(0.93 0.04 260);
-  --accent-fg: oklch(0.40 0.15 260);
-  --danger: oklch(0.55 0.20 15);
-  --danger-fg: oklch(0.98 0 0);
-  --border: oklch(0.80 0.02 240);
-  --input: oklch(0.95 0.008 240);
-  --ring: oklch(0.50 0.18 260);
-  --sel: oklch(0.50 0.12 260 / 0.15);
-  --positive: oklch(0.50 0.20 160);
-  --negative: oklch(0.52 0.22 15);
-  --info: oklch(0.50 0.18 260);
-  --warning: oklch(0.56 0.20 70);
-  --highlight: oklch(0.50 0.22 280);
-}
-
-:root[data-color-theme="midnight"].dark {
-  --bg: oklch(0.10 0.02 250);
-  --fg: oklch(0.88 0.01 240);
-  --surface: oklch(0.13 0.02 250);
-  --surface-fg: oklch(0.88 0.01 240);
-  --primary: oklch(0.68 0.18 260);
-  --primary-fg: oklch(0.10 0 0);
-  --secondary: oklch(0.18 0.02 250);
-  --secondary-fg: oklch(0.75 0.01 240);
-  --muted: oklch(0.16 0.015 250);
-  --muted-fg: oklch(0.55 0.01 240);
-  --accent: oklch(0.20 0.04 260);
-  --accent-fg: oklch(0.75 0.15 260);
-  --danger: oklch(0.62 0.22 15);
-  --danger-fg: oklch(0.98 0 0);
-  --border: oklch(0.24 0.02 250);
-  --input: oklch(0.14 0.015 250);
-  --ring: oklch(0.68 0.18 260);
-  --sel: oklch(0.68 0.12 260 / 0.15);
-  --positive: oklch(0.70 0.22 160);
-  --negative: oklch(0.68 0.24 15);
-  --info: oklch(0.68 0.18 260);
-  --warning: oklch(0.76 0.20 80);
-  --highlight: oklch(0.68 0.20 280);
-}
-
-/* =============================================================================
-   ARCTIC THEME - Cool cyan and frost blues
-   ============================================================================= */
-
-:root[data-color-theme="arctic"] {
-  --bg: oklch(0.97 0.006 210);
-  --fg: oklch(0.16 0.015 210);
-  --surface: oklch(0.99 0.004 210);
-  --surface-fg: oklch(0.16 0.015 210);
-  --primary: oklch(0.55 0.14 200);
-  --primary-fg: oklch(0.98 0 0);
-  --secondary: oklch(0.93 0.01 210);
-  --secondary-fg: oklch(0.26 0.015 210);
-  --muted: oklch(0.94 0.006 210);
-  --muted-fg: oklch(0.46 0.012 210);
-  --accent: oklch(0.93 0.03 200);
-  --accent-fg: oklch(0.45 0.12 200);
-  --danger: oklch(0.55 0.18 15);
-  --danger-fg: oklch(0.98 0 0);
-  --border: oklch(0.80 0.015 210);
-  --input: oklch(0.96 0.006 210);
-  --ring: oklch(0.55 0.14 200);
-  --sel: oklch(0.55 0.10 200 / 0.15);
-  --positive: oklch(0.50 0.18 165);
-  --negative: oklch(0.52 0.20 15);
-  --info: oklch(0.55 0.14 200);
-  --warning: oklch(0.56 0.18 80);
-  --highlight: oklch(0.50 0.18 280);
-}
-
-:root[data-color-theme="arctic"].dark {
-  --bg: oklch(0.10 0.012 210);
-  --fg: oklch(0.90 0.008 210);
-  --surface: oklch(0.13 0.012 210);
-  --surface-fg: oklch(0.90 0.008 210);
-  --primary: oklch(0.72 0.14 195);
-  --primary-fg: oklch(0.10 0 0);
-  --secondary: oklch(0.17 0.012 210);
-  --secondary-fg: oklch(0.76 0.008 210);
-  --muted: oklch(0.15 0.010 210);
-  --muted-fg: oklch(0.56 0.008 210);
-  --accent: oklch(0.19 0.03 195);
-  --accent-fg: oklch(0.78 0.12 195);
-  --danger: oklch(0.62 0.20 15);
-  --danger-fg: oklch(0.98 0 0);
-  --border: oklch(0.23 0.012 210);
-  --input: oklch(0.13 0.010 210);
-  --ring: oklch(0.72 0.14 195);
-  --sel: oklch(0.72 0.10 195 / 0.15);
-  --positive: oklch(0.72 0.20 165);
-  --negative: oklch(0.68 0.22 15);
-  --info: oklch(0.72 0.14 195);
-  --warning: oklch(0.76 0.18 85);
-  --highlight: oklch(0.70 0.18 280);
-}
-
-/* =============================================================================
    THEME INLINE - Map CSS variables to Tailwind utilities
-   Use @theme inline for variables that reference other CSS variables
    ============================================================================= */
 
 @theme inline {
-  /* Semantic Colors - Core UI */
-  --color-bg: var(--bg);
-  --color-fg: var(--fg);
-  --color-surface: var(--surface);
-  --color-surface-fg: var(--surface-fg);
-  --color-primary: var(--primary);
-  --color-primary-fg: var(--primary-fg);
-  --color-secondary: var(--secondary);
-  --color-secondary-fg: var(--secondary-fg);
-  --color-muted: var(--muted);
-  --color-muted-fg: var(--muted-fg);
-  --color-accent: var(--accent);
-  --color-accent-fg: var(--accent-fg);
-  --color-danger: var(--danger);
-  --color-danger-fg: var(--danger-fg);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-sel: var(--sel);
+  /* Text */
+  --color-text-950: var(--text-950);
+  --color-text-600: var(--text-600);
+  --color-text-500: var(--text-500);
+  --color-text-400: var(--text-400);
+  --color-text-10: var(--text-10);
 
-  /* Signals - Trading semantics */
-  --color-positive: var(--positive);
-  --color-negative: var(--negative);
-  --color-info: var(--info);
-  --color-warning: var(--warning);
+  /* Border */
+  --color-border-500: var(--border-500);
+  --color-border-300: var(--border-300);
+  --color-border-200: var(--border-200);
+  --color-border-100: var(--border-100);
+  --color-border-50: var(--border-50);
+
+  /* Primary */
+  --color-primary-default: var(--primary-default);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+  --color-primary-muted: var(--primary-muted);
+
+  /* Market */
+  --color-market-up-600: var(--market-up-600);
+  --color-market-up-500: var(--market-up-500);
+  --color-market-up-100: var(--market-up-100);
+  --color-market-up-50: var(--market-up-50);
+  --color-market-down-600: var(--market-down-600);
+  --color-market-down-500: var(--market-down-500);
+  --color-market-down-100: var(--market-down-100);
+  --color-market-down-50: var(--market-down-50);
+  --color-market-neutral: var(--market-neutral);
+
+  /* Success */
+  --color-success-700: var(--success-700);
+  --color-success-100: var(--success-100);
+
+  /* Warning */
+  --color-warning-700: var(--warning-700);
+  --color-warning-100: var(--warning-100);
+
+  /* Error */
+  --color-error-700: var(--error-700);
+  --color-error-100: var(--error-100);
+
+  /* Surface */
+  --color-surface-base: var(--surface-base);
+  --color-surface-analysis: var(--surface-analysis);
+  --color-surface-execution: var(--surface-execution);
+  --color-surface-monitoring-row-a: var(--surface-monitoring-row-a);
+  --color-surface-monitoring-row-b: var(--surface-monitoring-row-b);
+
+  /* Fill */
+  --color-fill-900: var(--fill-900);
+  --color-fill-300: var(--fill-300);
+  --color-fill-100: var(--fill-100);
+  --color-fill-50: var(--fill-50);
+
+  /* Highlight */
   --color-highlight: var(--highlight);
 
-  /* Shadows (for dark mode override support) */
+  /* Structural */
+  --color-sel: var(--sel);
+
+  /* Shadows */
   --shadow-xs: var(--shadow-xs);
   --shadow-sm: var(--shadow-sm);
   --shadow-md: var(--shadow-md);
@@ -310,10 +315,10 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border-200 outline-primary-default/50;
   }
   body {
-    @apply bg-bg text-fg font-mono;
+    @apply bg-surface-base text-text-950 font-mono;
   }
   ::selection {
     background: var(--sel);
@@ -326,7 +331,6 @@
    ============================================================================= */
 
 @layer base {
-  /* Safe area insets for notched devices */
   :root {
     --sat: env(safe-area-inset-top);
     --sar: env(safe-area-inset-right);
@@ -334,35 +338,30 @@
     --sal: env(safe-area-inset-left);
   }
 
-  /* Mobile viewport height fix - use 100dvh instead of 100vh */
   html {
     height: 100%;
+    scrollbar-gutter: stable;
   }
 
-  /* Prevent pull-to-refresh on mobile when at top of page */
   body {
     overscroll-behavior-y: contain;
   }
 
-  /* Touch action optimizations */
   button, a, [role="button"] {
     touch-action: manipulation;
   }
 
-  /* Prevent text selection on interactive elements for better touch UX */
   button, [role="button"], nav {
     -webkit-user-select: none;
     user-select: none;
   }
 
-  /* Smooth scrolling with reduced motion respect */
   @media (prefers-reduced-motion: no-preference) {
     html {
       scroll-behavior: smooth;
     }
   }
 
-  /* Disable animations for reduced motion preference */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
@@ -374,7 +373,6 @@
 }
 
 @layer components {
-  /* Active scale effect for touch feedback */
   .active\:scale-98:active {
     transform: scale(0.98);
   }
@@ -383,7 +381,6 @@
     transform: scale(0.95);
   }
 
-  /* Mobile-specific touch targets - ensure minimum 44px */
   .touch-target {
     min-height: 44px;
     min-width: 44px;
@@ -394,46 +391,51 @@
     min-width: 48px;
   }
 
-  /* Terminal Scanlines */
   .terminal-scanlines {
+    position: relative;
+  }
+
+  .terminal-scanlines::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
     background-image: repeating-linear-gradient(
       0deg,
       transparent,
       transparent 2px,
-      oklch(from var(--fg) l c h / 0.01) 2px,
-      oklch(from var(--fg) l c h / 0.01) 3px
+      oklch(from var(--text-950) l c h / 0.01) 3px,
+      oklch(from var(--text-950) l c h / 0.01) 1px
     );
   }
 
-  /* Terminal Grid */
   .terminal-grid {
     background-image:
-      linear-gradient(oklch(from var(--border) l c h / 0.08) 1px, transparent 1px),
-      linear-gradient(90deg, oklch(from var(--border) l c h / 0.08) 1px, transparent 1px);
+      linear-gradient(oklch(from var(--border-200) l c h / 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(from var(--border-200) l c h / 0.08) 1px, transparent 1px);
     background-size: 50px 50px;
   }
   .dark .terminal-grid {
     background-image:
-      linear-gradient(oklch(from var(--border) l c h / 0.15) 1px, transparent 1px),
-      linear-gradient(90deg, oklch(from var(--border) l c h / 0.15) 1px, transparent 1px);
+      linear-gradient(oklch(from var(--border-200) l c h / 0.15) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(from var(--border-200) l c h / 0.15) 1px, transparent 1px);
     background-size: 50px 50px;
   }
 
-  /* Depth Bars */
   .depth-bar-ask {
-    background: linear-gradient(90deg, transparent 0%, oklch(from var(--negative) l c h / 0.12) 100%);
+    background: linear-gradient(90deg, transparent 0%, oklch(from var(--market-down-600) l c h / 0.12) 100%);
   }
   .depth-bar-bid {
-    background: linear-gradient(90deg, oklch(from var(--positive) l c h / 0.12) 0%, transparent 100%);
+    background: linear-gradient(90deg, oklch(from var(--market-up-600) l c h / 0.12) 0%, transparent 100%);
   }
   .dark .depth-bar-ask {
-    background: linear-gradient(90deg, transparent 0%, oklch(from var(--negative) l c h / 0.15) 100%);
+    background: linear-gradient(90deg, transparent 0%, oklch(from var(--market-down-600) l c h / 0.15) 100%);
   }
   .dark .depth-bar-bid {
-    background: linear-gradient(90deg, oklch(from var(--positive) l c h / 0.15) 0%, transparent 100%);
+    background: linear-gradient(90deg, oklch(from var(--market-up-600) l c h / 0.15) 0%, transparent 100%);
   }
 
-  /* Trade row flash on appear - subtle, full-width */
   .trade-row-buy,
   .trade-row-sell {
     margin-inline: -0.5rem;
@@ -443,12 +445,12 @@
   }
   .trade-row-buy {
     @starting-style {
-      background-color: oklch(from var(--positive) l c h / 0.12);
+      background-color: oklch(from var(--market-up-600) l c h / 0.12);
     }
   }
   .trade-row-sell {
     @starting-style {
-      background-color: oklch(from var(--negative) l c h / 0.12);
+      background-color: oklch(from var(--market-down-600) l c h / 0.12);
     }
   }
 }

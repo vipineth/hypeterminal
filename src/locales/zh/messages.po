@@ -111,8 +111,8 @@ msgid "Amount (USDC)"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "API"
-#~ msgstr "API"
+msgid "API"
+msgstr "API"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #~ msgid "Appearance"
@@ -125,6 +125,7 @@ msgstr ""
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -143,22 +144,21 @@ msgid "Available"
 msgstr "可用"
 
 #: src/components/trade/tradebox/deposit-modal.tsx
-msgid "Available:"
-msgstr ""
+#~ msgid "Available:"
+#~ msgstr ""
 
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Avg Price"
 msgstr "均价"
 
 #: src/components/trade/components/spot-swap-modal.tsx
-#: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 msgid "Balance"
 msgstr "余额"
 
 #: src/components/trade/tradebox/deposit-modal.tsx
-msgid "Balance:"
-msgstr ""
+#~ msgid "Balance:"
+#~ msgstr ""
 
 #: src/components/trade/footer/footer-bar.tsx
 #~ msgid "Block:"
@@ -218,8 +218,7 @@ msgstr "买入"
 #: src/components/trade/positions/twap-tab.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
-#: src/components/trade/tradebox/leverage-popover.tsx
-#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Cancel"
 msgstr "取消"
@@ -262,7 +261,7 @@ msgstr "取消中..."
 msgid "Cannot switch to Isolated mode with an open position. Close your position first."
 msgstr ""
 
-#: src/components/trade/tradebox/leverage-badge.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 msgid "Change leverage"
 msgstr ""
 
@@ -297,8 +296,8 @@ msgstr "平仓中..."
 #~ msgstr "已完成"
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
-#: src/components/trade/tradebox/leverage-popover.tsx
-#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Confirm"
 msgstr ""
@@ -349,6 +348,10 @@ msgstr "连接钱包查看资金费用。"
 msgid "Connect your wallet to view open orders."
 msgstr "连接钱包查看未成交订单。"
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Connect your wallet to view order history."
+msgstr ""
+
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Connect your wallet to view positions."
 msgstr "连接钱包查看仓位。"
@@ -395,7 +398,7 @@ msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
-#: src/components/trade/tradebox/margin-mode-toggle.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Cross"
 msgstr "全仓"
 
@@ -485,8 +488,8 @@ msgid "Displays the mobile sidebar."
 msgstr "显示移动端侧边栏。"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Docs"
-#~ msgstr "文档"
+msgid "Docs"
+msgstr "文档"
 
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
@@ -609,6 +612,10 @@ msgstr "加载未成交订单失败。"
 msgid "Failed to load order book."
 msgstr "加载订单簿失败。"
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Failed to load order history."
+msgstr ""
+
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Failed to load positions."
 msgstr "加载仓位失败。"
@@ -646,8 +653,8 @@ msgstr "手续费"
 #~ msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx
-msgid "Filled"
-msgstr "已成交"
+#~ msgid "Filled"
+#~ msgstr "已成交"
 
 #. placeholder {0}: sub.label
 #: src/components/trade/chart/token-selector.tsx
@@ -673,8 +680,12 @@ msgid "Funding"
 msgstr "资金费率"
 
 #: src/components/trade/positions/funding-tab.tsx
-msgid "Funding Payments"
-msgstr "资金费用"
+msgid "Funding History"
+msgstr ""
+
+#: src/components/trade/positions/funding-tab.tsx
+#~ msgid "Funding Payments"
+#~ msgstr "资金费用"
 
 #: src/components/trade/footer/footer-bar.tsx
 #~ msgid "Gas:"
@@ -702,8 +713,8 @@ msgid "In Orders"
 msgstr ""
 
 #: src/components/trade/positions/balances-tab.tsx
-msgid "In Use"
-msgstr "使用中"
+#~ msgid "In Use"
+#~ msgstr "使用中"
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Install a wallet extension to continue"
@@ -749,7 +760,7 @@ msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
-#: src/components/trade/tradebox/margin-mode-toggle.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Isolated"
 msgstr "逐仓"
 
@@ -758,15 +769,15 @@ msgstr "逐仓"
 #~ msgstr "延迟:"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Leaderboard"
-#~ msgstr "排行榜"
+msgid "Leaderboard"
+msgstr "排行榜"
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Learn more"
 msgstr ""
 
-#: src/components/trade/tradebox/leverage-popover.tsx
-#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 msgid "Leverage"
 msgstr ""
 
@@ -826,6 +837,10 @@ msgstr "加载市场中..."
 msgid "Loading open orders..."
 msgstr "加载未成交订单中..."
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Loading order history..."
+msgstr ""
+
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Loading positions..."
 msgstr "加载仓位中..."
@@ -842,6 +857,7 @@ msgstr "加载 TWAP 订单中..."
 msgid "Loading wallet..."
 msgstr "加载钱包中..."
 
+#: src/components/trade/tradebox/account-panel.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/lib/trade/use-button-content.ts
@@ -916,10 +932,12 @@ msgid "markets"
 msgstr "个市场"
 
 #: src/components/trade/positions/transfer-dialog.tsx
-msgid "Max"
-msgstr "最大"
+#~ msgid "Max"
+#~ msgstr "最大"
 
+#: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/positions/send-dialog.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
 msgid "MAX"
@@ -977,12 +995,12 @@ msgid "Mock Wallet (Testing)"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "More"
-#~ msgstr "更多"
+msgid "More"
+msgstr "更多"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "More options"
-#~ msgstr "更多选项"
+msgid "More options"
+msgstr "更多选项"
 
 #: src/components/ui/pagination.tsx
 #~ msgid "More pages"
@@ -1065,6 +1083,10 @@ msgstr "未找到市场。"
 msgid "No open orders."
 msgstr "无未成交订单。"
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "No order history found."
+msgstr ""
+
 #: src/components/trade/tradebox/trade-panel.tsx
 msgid "No response from exchange"
 msgstr ""
@@ -1102,8 +1124,8 @@ msgid "Not connected"
 msgstr "未连接"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Notifications"
-#~ msgstr "通知"
+msgid "Notifications"
+msgstr "通知"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Number Format"
@@ -1151,6 +1173,10 @@ msgstr "订单簿"
 msgid "Order failed"
 msgstr "下单失败"
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Order History"
+msgstr ""
+
 #: src/components/trade/tradebox/order-toast.tsx
 msgid "Order Queue"
 msgstr "订单队列"
@@ -1158,6 +1184,15 @@ msgstr "订单队列"
 #: src/components/trade/tradebox/order-summary.tsx
 msgid "Order Value"
 msgstr "订单价值"
+
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Orders"
+msgstr ""
+
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
+msgid "Other"
+msgstr ""
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Other Options"
@@ -1197,7 +1232,6 @@ msgid "Perpetuals"
 msgstr ""
 
 #: src/components/trade/tradebox/account-panel.tsx
-#: src/components/trade/tradebox/account-panel.tsx
 msgid "Perps"
 msgstr "永续合约"
 
@@ -1221,8 +1255,8 @@ msgid "Popular"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Portfolio"
-#~ msgstr "投资组合"
+msgid "Portfolio"
+msgstr "投资组合"
 
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
@@ -1237,6 +1271,7 @@ msgstr "仓位"
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/tradebox/price-input-with-percent.tsx
 msgid "Price"
@@ -1248,8 +1283,8 @@ msgstr ""
 
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
-msgid "Pro"
-msgstr ""
+#~ msgid "Pro"
+#~ msgstr ""
 
 #: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Processing deposit"
@@ -1296,6 +1331,10 @@ msgstr "只减仓"
 #~ msgid "Register Builder Code"
 #~ msgstr ""
 
+#: src/components/trade/header/favorites-strip.tsx
+msgid "Remove {displayName} from favorites"
+msgstr ""
+
 #: src/components/trade/chart/token-selector.tsx
 msgid "Remove from favorites"
 msgstr "从收藏中移除"
@@ -1306,8 +1345,7 @@ msgstr "从收藏中移除"
 
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
-#: src/components/trade/tradebox/leverage-popover.tsx
-#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 msgid "Retry"
 msgstr ""
 
@@ -1511,6 +1549,7 @@ msgstr "签名器未就绪"
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -1576,7 +1615,6 @@ msgstr "已按 {0} 排序"
 #: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/tradebox/account-panel.tsx
-#: src/components/trade/tradebox/account-panel.tsx
 msgid "Spot"
 msgstr "现货"
 
@@ -1593,8 +1631,8 @@ msgid "Spread"
 msgstr "价差"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Staking"
-#~ msgstr "质押"
+msgid "Staking"
+msgstr "质押"
 
 #: src/lib/errors/definitions/scale.ts
 msgid "Start and end must differ"
@@ -1604,9 +1642,9 @@ msgstr ""
 msgid "Start Price (USDC)"
 msgstr ""
 
-#: src/components/trade/positions/twap-tab.tsx
-#~ msgid "Status"
-#~ msgstr "状态"
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Status"
+msgstr "状态"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Stop"
@@ -1638,8 +1676,8 @@ msgid "Submitting..."
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Support"
-#~ msgstr "支持"
+msgid "Support"
+msgstr "支持"
 
 #: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/components/spot-swap-modal.tsx
@@ -1668,6 +1706,7 @@ msgstr ""
 #. placeholder {0}: markets.getMarket(fill.coin)?.displayName ?? fill.coin
 #. placeholder {0}: markets.getMarket(state.coin)?.displayName ?? state.coin
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Switch to {0} market"
@@ -1743,6 +1782,7 @@ msgstr "您查找的页面不存在。"
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Time"
 msgstr "时间"
@@ -1823,12 +1863,12 @@ msgid "Trade"
 msgstr "交易"
 
 #: src/components/trade/positions/history-tab.tsx
-msgid "Trade ClockCounterClockwise"
-msgstr ""
+#~ msgid "Trade ClockCounterClockwise"
+#~ msgstr ""
 
 #: src/components/trade/positions/history-tab.tsx
-#~ msgid "Trade History"
-#~ msgstr "交易历史"
+msgid "Trade History"
+msgstr "交易历史"
 
 #. placeholder {0}: spotMarket.displayName
 #: src/components/trade/components/spot-swap-modal.tsx
@@ -1888,6 +1928,7 @@ msgid "TWAP Orders"
 msgstr "TWAP 订单"
 
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Type"
 msgstr "类型"
@@ -1922,14 +1963,13 @@ msgstr "未实现盈亏"
 msgid "Unsupported resolution: {0}"
 msgstr "不支持的分辨率: {0}"
 
-#: src/components/trade/tradebox/leverage-popover.tsx
-#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Update failed"
 msgstr ""
 
-#: src/components/trade/tradebox/leverage-popover.tsx
-#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Updated"
 msgstr ""
@@ -1947,8 +1987,8 @@ msgstr "美元价值"
 #~ msgstr "价值"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Vaults"
-#~ msgstr "金库"
+msgid "Vaults"
+msgstr "金库"
 
 #: src/lib/trade/use-button-content.ts
 msgid "Verifying..."

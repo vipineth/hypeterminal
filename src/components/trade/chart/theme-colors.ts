@@ -8,8 +8,8 @@ import type { ColorGradient, CustomThemeColors } from "@/types/charting_library"
 type ChartColors = {
 	background: string;
 	foreground: string;
-	muted: string;
-	mutedForeground: string;
+	textSecondary: string;
+	textTertiary: string;
 	border: string;
 	green: string;
 	red: string;
@@ -17,17 +17,11 @@ type ChartColors = {
 	surface: string;
 };
 
-/**
- * Reads a CSS variable value from the document
- */
 function getCssVar(name: string): string {
 	if (typeof window === "undefined") return "";
 	return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
-/**
- * Converts any CSS color (including oklch) to hex via canvas
- */
 function colorToHex(cssColor: string): string {
 	if (!cssColor || typeof document === "undefined") return "#000000";
 
@@ -44,9 +38,6 @@ function colorToHex(cssColor: string): string {
 	return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
 }
 
-/**
- * Converts CSS color to rgba string with specified alpha
- */
 function colorToRgba(cssColor: string, alpha: number): string {
 	if (!cssColor || typeof document === "undefined") return `rgba(0, 0, 0, ${alpha})`;
 
@@ -63,31 +54,25 @@ function colorToRgba(cssColor: string, alpha: number): string {
 	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-/**
- * Reads current theme colors from CSS variables
- */
 export function getChartColors(): ChartColors {
 	return {
-		background: getCssVar("--bg"),
-		foreground: getCssVar("--fg"),
-		muted: getCssVar("--muted"),
-		mutedForeground: getCssVar("--muted-fg"),
-		border: getCssVar("--border"),
-		green: getCssVar("--positive"),
-		red: getCssVar("--negative"),
-		accent: getCssVar("--info"),
-		surface: getCssVar("--surface"),
+		background: getCssVar("--surface-analysis"),
+		foreground: getCssVar("--text-950"),
+		textSecondary: getCssVar("--text-600"),
+		textTertiary: getCssVar("--text-500"),
+		border: getCssVar("--border-200"),
+		green: getCssVar("--market-up-600"),
+		red: getCssVar("--market-down-600"),
+		accent: getCssVar("--primary-default"),
+		surface: getCssVar("--surface-execution"),
 	};
 }
 
-/**
- * Builds TradingView widget overrides from current CSS theme colors
- */
 export function buildChartOverrides(): Record<string, string | number | boolean> {
 	const colors = getChartColors();
 
 	const bg = colorToHex(colors.background);
-	const mutedFg = colorToHex(colors.mutedForeground);
+	const textSecondary = colorToHex(colors.textSecondary);
 	const green = colorToHex(colors.green);
 	const red = colorToHex(colors.red);
 	const accent = colorToHex(colors.accent);
@@ -96,7 +81,6 @@ export function buildChartOverrides(): Record<string, string | number | boolean>
 	const crosshairColor = accent;
 
 	return {
-		// Pane (chart area)
 		"paneProperties.background": bg,
 		"paneProperties.backgroundType": "solid",
 		"paneProperties.vertGridProperties.color": gridColor,
@@ -105,7 +89,6 @@ export function buildChartOverrides(): Record<string, string | number | boolean>
 		"paneProperties.crossHairProperties.style": 2,
 		"paneProperties.crossHairProperties.width": 1,
 
-		// Legend
 		"paneProperties.legendProperties.showStudyArguments": true,
 		"paneProperties.legendProperties.showStudyTitles": true,
 		"paneProperties.legendProperties.showStudyValues": true,
@@ -115,14 +98,12 @@ export function buildChartOverrides(): Record<string, string | number | boolean>
 		"paneProperties.legendProperties.showBarChange": true,
 		"paneProperties.legendProperties.showVolume": false,
 
-		// Scales (price/time axis)
 		"scalesProperties.backgroundColor": bg,
 		"scalesProperties.lineColor": colorToRgba(colors.border, 0.5),
-		"scalesProperties.textColor": mutedFg,
+		"scalesProperties.textColor": textSecondary,
 		"scalesProperties.fontSize": 10,
 		"scalesProperties.scaleSeriesOnly": false,
 
-		// Candles
 		"mainSeriesProperties.candleStyle.upColor": green,
 		"mainSeriesProperties.candleStyle.downColor": red,
 		"mainSeriesProperties.candleStyle.borderUpColor": green,
@@ -132,7 +113,6 @@ export function buildChartOverrides(): Record<string, string | number | boolean>
 		"mainSeriesProperties.candleStyle.drawBorder": true,
 		"mainSeriesProperties.candleStyle.drawWick": true,
 
-		// Hollow candles
 		"mainSeriesProperties.hollowCandleStyle.upColor": green,
 		"mainSeriesProperties.hollowCandleStyle.downColor": red,
 		"mainSeriesProperties.hollowCandleStyle.borderUpColor": green,
@@ -140,7 +120,6 @@ export function buildChartOverrides(): Record<string, string | number | boolean>
 		"mainSeriesProperties.hollowCandleStyle.wickUpColor": green,
 		"mainSeriesProperties.hollowCandleStyle.wickDownColor": red,
 
-		// Heikin Ashi
 		"mainSeriesProperties.haStyle.upColor": green,
 		"mainSeriesProperties.haStyle.downColor": red,
 		"mainSeriesProperties.haStyle.borderUpColor": green,
@@ -148,21 +127,17 @@ export function buildChartOverrides(): Record<string, string | number | boolean>
 		"mainSeriesProperties.haStyle.wickUpColor": green,
 		"mainSeriesProperties.haStyle.wickDownColor": red,
 
-		// Bar style
 		"mainSeriesProperties.barStyle.upColor": green,
 		"mainSeriesProperties.barStyle.downColor": red,
 
-		// Line style
 		"mainSeriesProperties.lineStyle.color": accent,
 		"mainSeriesProperties.lineStyle.linewidth": 2,
 
-		// Area style
 		"mainSeriesProperties.areaStyle.color1": colorToRgba(colors.accent, 0.28),
 		"mainSeriesProperties.areaStyle.color2": colorToRgba(colors.accent, 0.02),
 		"mainSeriesProperties.areaStyle.linecolor": accent,
 		"mainSeriesProperties.areaStyle.linewidth": 2,
 
-		// Baseline style
 		"mainSeriesProperties.baselineStyle.topFillColor1": colorToRgba(colors.green, 0.28),
 		"mainSeriesProperties.baselineStyle.topFillColor2": colorToRgba(colors.green, 0.02),
 		"mainSeriesProperties.baselineStyle.bottomFillColor1": colorToRgba(colors.red, 0.02),
@@ -170,80 +145,58 @@ export function buildChartOverrides(): Record<string, string | number | boolean>
 		"mainSeriesProperties.baselineStyle.topLineColor": green,
 		"mainSeriesProperties.baselineStyle.bottomLineColor": red,
 
-		// Price line
 		"mainSeriesProperties.priceLineColor": accent,
 		"mainSeriesProperties.priceLineWidth": 1,
 		"mainSeriesProperties.showPriceLine": true,
 		"mainSeriesProperties.showCountdown": true,
 
-		// Status view
 		"mainSeriesProperties.statusViewStyle.fontSize": 10,
 		"mainSeriesProperties.statusViewStyle.showExchange": false,
 		"mainSeriesProperties.statusViewStyle.showInterval": true,
 		"mainSeriesProperties.statusViewStyle.symbolTextSource": "description",
 
-		// Watermark
 		"symbolWatermarkProperties.transparency": 96,
 		"symbolWatermarkProperties.color": colorToRgba(colors.foreground, 0.03),
 
-		// Volume
 		volumePaneSize: "small",
 	};
 }
 
-/**
- * Gets the loading screen colors for TradingView widget
- */
 export function getLoadingScreenColors(): { backgroundColor: string; foregroundColor: string } {
 	const colors = getChartColors();
 	return {
 		backgroundColor: colorToHex(colors.background),
-		foregroundColor: colorToHex(colors.background), // Use same as bg to hide loading indicator
+		foregroundColor: colorToHex(colors.background),
 	};
 }
 
-/**
- * Gets the toolbar background color
- */
 export function getToolbarBgColor(): string {
 	const colors = getChartColors();
 	return colorToHex(colors.background);
 }
 
-/**
- * Generates a gradient array of 19 shades from a base color
- * TradingView custom_themes requires 19 shades from lightest to darkest
- */
 function generateColorGradient(baseHex: string): ColorGradient {
-	// Parse hex to RGB
 	const r = Number.parseInt(baseHex.slice(1, 3), 16);
 	const g = Number.parseInt(baseHex.slice(3, 5), 16);
 	const b = Number.parseInt(baseHex.slice(5, 7), 16);
 
 	const shades = new Array<string>(19);
 
-	// Generate 19 shades from light (index 0) to dark (index 18)
-	// The base color is typically around index 9-10
 	for (let i = 0; i < 19; i++) {
-		// Lighter shades: blend towards white
-		// Darker shades: blend towards black
 		let newR: number;
 		let newG: number;
 		let newB: number;
 
 		if (i < 9) {
-			// Lighter: blend with white
 			const lightFactor = 1 - i / 9;
 			newR = Math.round(r + (255 - r) * lightFactor);
 			newG = Math.round(g + (255 - g) * lightFactor);
 			newB = Math.round(b + (255 - b) * lightFactor);
 		} else if (i === 9) {
-			// Base color
 			newR = r;
 			newG = g;
 			newB = b;
 		} else {
-			// Darker: blend with black
 			const darkFactor = 1 - (i - 9) / 9;
 			newR = Math.round(r * darkFactor);
 			newG = Math.round(g * darkFactor);
@@ -257,41 +210,33 @@ function generateColorGradient(baseHex: string): ColorGradient {
 	return shades as ColorGradient;
 }
 
-/**
- * Generates custom theme colors for TradingView widget
- * This provides a complete color palette that matches the app theme
- */
 export function getCustomThemeColors(): CustomThemeColors {
 	const colors = getChartColors();
 
 	const accent = colorToHex(colors.accent);
-	const muted = colorToHex(colors.muted);
+	const textTertiary = colorToHex(colors.textTertiary);
 	const red = colorToHex(colors.red);
 	const green = colorToHex(colors.green);
-	const amber = colorToHex(getCssVar("--warning") || colors.accent);
-	const purple = colorToHex(getCssVar("--highlight") || colors.accent);
+	const amber = colorToHex(getCssVar("--warning-700") || colors.accent);
+	const purple = colorToHex(getCssVar("--primary-default") || colors.accent);
 	const bg = colorToHex(colors.background);
 	const fg = colorToHex(colors.foreground);
 
 	return {
-		color1: generateColorGradient(accent), // Blue replacement (accent)
-		color2: generateColorGradient(muted), // Grey replacement
-		color3: generateColorGradient(red), // Red
-		color4: generateColorGradient(green), // Green
-		color5: generateColorGradient(amber), // Orange replacement (amber)
-		color6: generateColorGradient(purple), // Purple
-		color7: generateColorGradient(accent), // Yellow replacement (use accent)
+		color1: generateColorGradient(accent),
+		color2: generateColorGradient(textTertiary),
+		color3: generateColorGradient(red),
+		color4: generateColorGradient(green),
+		color5: generateColorGradient(amber),
+		color6: generateColorGradient(purple),
+		color7: generateColorGradient(accent),
 		white: bg,
 		black: fg,
 	};
 }
 
-// Cache for the fetched static CSS
 let staticCssCache: string | null = null;
 
-/**
- * Fetches the static TradingView theme CSS file
- */
 async function fetchStaticCss(): Promise<string> {
 	if (staticCssCache) return staticCssCache;
 
@@ -306,17 +251,13 @@ async function fetchStaticCss(): Promise<string> {
 	}
 }
 
-/**
- * Generates a blob URL containing the complete CSS (static + dynamic variables)
- * This inlines the static CSS to avoid @import issues in blob URLs
- */
 export async function generateChartCssUrl(): Promise<string> {
 	const colors = getChartColors();
 
 	const bg = colorToHex(colors.background);
 	const fg = colorToHex(colors.foreground);
 	const surface = colorToHex(colors.surface);
-	const mutedFg = colorToHex(colors.mutedForeground);
+	const textSecondary = colorToHex(colors.textSecondary);
 	const border = colorToRgba(colors.border, 0.4);
 	const accent = colorToHex(colors.accent);
 
@@ -332,7 +273,7 @@ ${staticCss}
 :root {
 	--tv-bg: ${bg};
 	--tv-fg: ${fg};
-	--tv-muted-fg: ${mutedFg};
+	--tv-muted-fg: ${textSecondary};
 	--tv-border: ${border};
 	--tv-accent: ${accent};
 
@@ -344,7 +285,7 @@ ${staticCss}
 	--tv-color-toolbar-button-background-active: ${activeBg};
 	--tv-color-toolbar-button-background-active-hover: ${colorToRgba(colors.foreground, 0.12)};
 	--tv-color-toolbar-button-background-clicked: ${activeBg};
-	--tv-color-toolbar-button-text: ${mutedFg};
+	--tv-color-toolbar-button-text: ${textSecondary};
 	--tv-color-toolbar-button-text-hover: ${fg};
 	--tv-color-toolbar-button-text-active: ${fg};
 	--tv-color-toolbar-button-text-active-hover: ${fg};
@@ -363,11 +304,11 @@ ${staticCss}
 	--tv-color-popup-element-text-hover: ${fg};
 	--tv-color-popup-element-background-hover: ${hoverBg};
 	--tv-color-popup-element-divider-background: ${border};
-	--tv-color-popup-element-secondary-text: ${mutedFg};
-	--tv-color-popup-element-hint-text: ${colorToRgba(colors.mutedForeground, 0.7)};
+	--tv-color-popup-element-secondary-text: ${textSecondary};
+	--tv-color-popup-element-hint-text: ${colorToRgba(colors.textSecondary, 0.7)};
 	--tv-color-popup-element-text-active: ${accent};
 	--tv-color-popup-element-background-active: ${accentSoft};
-	--tv-color-popup-element-toolbox-text: ${mutedFg};
+	--tv-color-popup-element-toolbox-text: ${textSecondary};
 	--tv-color-popup-element-toolbox-text-hover: ${fg};
 	--tv-color-popup-element-toolbox-text-active-hover: ${accent};
 	--tv-color-popup-element-toolbox-background-hover: ${hoverBg};
@@ -405,17 +346,17 @@ ${staticCss}
 	--themed-color-button-text-color: ${fg};
 	--themed-color-arrow-text: ${fg};
 
-	--themed-color-text-secondary: ${mutedFg};
-	--themed-color-default-gray: ${mutedFg};
-	--themed-color-gray: ${mutedFg};
-	--themed-color-grayed-text: ${mutedFg};
-	--themed-color-placeholder: ${mutedFg};
-	--themed-color-icon: ${mutedFg};
-	--themed-color-icons: ${mutedFg};
-	--themed-color-primary-icon: ${mutedFg};
-	--themed-color-sort-button: ${mutedFg};
-	--themed-color-drag-icon: ${mutedFg};
-	--themed-color-disabled-title: ${colorToRgba(colors.mutedForeground, 0.5)};
+	--themed-color-text-secondary: ${textSecondary};
+	--themed-color-default-gray: ${textSecondary};
+	--themed-color-gray: ${textSecondary};
+	--themed-color-grayed-text: ${textSecondary};
+	--themed-color-placeholder: ${textSecondary};
+	--themed-color-icon: ${textSecondary};
+	--themed-color-icons: ${textSecondary};
+	--themed-color-primary-icon: ${textSecondary};
+	--themed-color-sort-button: ${textSecondary};
+	--themed-color-drag-icon: ${textSecondary};
+	--themed-color-disabled-title: ${colorToRgba(colors.textSecondary, 0.5)};
 
 	--themed-color-border: ${border};
 	--themed-color-separator: ${border};
@@ -435,11 +376,11 @@ ${staticCss}
 	--themed-color-input-bg: ${surface};
 	--themed-color-input-border: ${border};
 	--themed-color-input-text: ${fg};
-	--themed-color-input-placeholder-text: ${mutedFg};
-	--themed-color-input-border-hover: ${mutedFg};
+	--themed-color-input-placeholder-text: ${textSecondary};
+	--themed-color-input-border-hover: ${textSecondary};
 	--themed-color-input-disabled-bg: ${bg};
 	--themed-color-input-disabled-border: ${colorToRgba(colors.border, 0.5)};
-	--themed-color-input-disabled-text: ${mutedFg};
+	--themed-color-input-disabled-text: ${textSecondary};
 
 	--themed-color-hovered-background: ${hoverBg};
 	--themed-color-background-hover: ${hoverBg};
@@ -470,8 +411,8 @@ ${staticCss}
 	--themed-color-favorite-checked: ${accent};
 
 	--themed-color-scrollbar-default: ${border};
-	--themed-color-scrollbar-hover: ${mutedFg};
-	--themed-color-scrollbar-active: ${mutedFg};
+	--themed-color-scrollbar-hover: ${textSecondary};
+	--themed-color-scrollbar-active: ${textSecondary};
 	--themed-color-scroll-bg: ${bg};
 	--themed-color-overlay-scroll-bar: ${border};
 
@@ -481,12 +422,12 @@ ${staticCss}
 	--themed-color-tooltip-text: ${fg};
 
 	--themed-color-checkbox: ${border};
-	--themed-color-checkbox-hover: ${mutedFg};
+	--themed-color-checkbox-hover: ${textSecondary};
 	--themed-color-checkbox-checked: ${accent};
 	--themed-color-checkbox-checked-hover: ${accent};
 	--themed-color-checkbox-icon: ${fg};
 	--themed-color-radio: ${border};
-	--themed-color-radio-hover: ${mutedFg};
+	--themed-color-radio-hover: ${textSecondary};
 	--themed-color-radio-checked: ${accent};
 	--themed-color-radio-checked-hover: ${accent};
 
@@ -505,7 +446,7 @@ ${staticCss}
 	--themed-color-icon-selected: ${accent};
 	--themed-color-icon-selected-hover: ${accent};
 	--themed-color-arrow-text-hover: ${fg};
-	--themed-color-arrow-stroke: ${mutedFg};
+	--themed-color-arrow-stroke: ${textSecondary};
 	--themed-color-caret-hover: ${fg};
 	--themed-color-close-button-hover-bg: ${hoverBg};
 	--themed-color-close-button-hover-text: ${fg};
@@ -520,12 +461,12 @@ ${staticCss}
 	--themed-color-content-primary-neutral-bold: ${fg};
 	--themed-color-content-primary-neutral-semi-bold: ${fg};
 	--themed-color-content-primary-neutral-normal: ${fg};
-	--themed-color-content-primary-neutral-light: ${mutedFg};
-	--themed-color-content-primary-neutral-extra-light: ${colorToRgba(colors.mutedForeground, 0.6)};
-	--themed-color-content-secondary-neutral: ${mutedFg};
-	--themed-color-content-secondary-neutral-medium: ${mutedFg};
-	--themed-color-content-secondary-neutral-semi-bold: ${mutedFg};
-	--themed-color-content-disabled: ${colorToRgba(colors.mutedForeground, 0.5)};
+	--themed-color-content-primary-neutral-light: ${textSecondary};
+	--themed-color-content-primary-neutral-extra-light: ${colorToRgba(colors.textSecondary, 0.6)};
+	--themed-color-content-secondary-neutral: ${textSecondary};
+	--themed-color-content-secondary-neutral-medium: ${textSecondary};
+	--themed-color-content-secondary-neutral-semi-bold: ${textSecondary};
+	--themed-color-content-disabled: ${colorToRgba(colors.textSecondary, 0.5)};
 
 	--themed-color-container-fill-primary-neutral: ${bg};
 	--themed-color-container-fill-primary-neutral-light: ${surface};

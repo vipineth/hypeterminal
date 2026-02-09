@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { NumberInput } from "@/components/ui/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
+import { Slider, type SliderMark } from "@/components/ui/slider";
 import {
 	FALLBACK_VALUE_PLACEHOLDER,
 	ORDER_MIN_NOTIONAL_USD,
@@ -141,6 +141,8 @@ export function TradeFormFields({
 	const showTif = orderType === "limit" || orderType === "scale";
 	const availableTifOptions = orderType === "limit" ? (["Gtc", "Ioc", "Alo"] as const) : (["Gtc", "Alo"] as const);
 
+	const sizeMarks: SliderMark[] = [{ value: 0 }, { value: 25 }, { value: 50 }, { value: 75 }, { value: 100 }];
+
 	const triggerPriceNum = toNumber(triggerPriceInput);
 	const sizeHasError = (sizeValue > maxSize && maxSize > 0) || (orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD);
 
@@ -176,26 +178,26 @@ export function TradeFormFields({
 	return (
 		<>
 			<div className="space-y-0.5 text-3xs">
-				<div className="flex items-center justify-between text-muted-fg">
+				<div className="flex items-center justify-between text-text-950">
 					<span>{t`Available`}</span>
 					<div className="flex items-center gap-2">
 						<span className={cn("tabular-nums flex items-center gap-1", getValueColorClass(availableBalance))}>
 							{formatAvailableBalance()} {availableBalanceToken}
 						</span>
 						{isConnected && swapTargetToken && (
-							<Button variant="text" size="none" onClick={onSwapClick} className="text-info text-4xs uppercase">
+							<Button variant="text" size="sm" onClick={onSwapClick}>
 								{t`Swap`}
 							</Button>
 						)}
 						{isConnected && (
-							<Button variant="text" size="none" onClick={onDepositClick} className="text-info text-4xs uppercase">
+							<Button variant="text" size="sm" onClick={onDepositClick}>
 								{t`Deposit`}
 							</Button>
 						)}
 					</div>
 				</div>
 				{!isSpotMarket && positionSize !== 0 && (
-					<div className="flex items-center justify-between text-muted-fg">
+					<div className="flex items-center justify-between text-text-950">
 						<span>{t`Position`}</span>
 						<span className={cn("tabular-nums", getValueColorClass(positionSize))}>
 							{positionSize > 0 ? "+" : ""}
@@ -206,13 +208,12 @@ export function TradeFormFields({
 			</div>
 
 			<div className="space-y-1.5">
-				<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Size`}</div>
+				<div className="text-4xs uppercase tracking-wider text-text-950">{t`Size`}</div>
 				<div className="flex items-center gap-1">
 					<Button
 						variant="text"
-						size="none"
 						onClick={handleSizeModeToggle}
-						className="px-2 py-1.5 text-3xs border border-border/60 hover:border-fg/30 hover:bg-transparent gap-1"
+						className="px-2 py-1.5 text-3xs border border-border-200/60 hover:border-text-400 hover:bg-transparent gap-1"
 						aria-label={t`Toggle size mode`}
 						disabled={isFormDisabled}
 					>
@@ -225,8 +226,8 @@ export function TradeFormFields({
 						onChange={(e) => handleSizeChange(e.target.value)}
 						maxAllowedDecimals={szDecimals}
 						className={cn(
-							"flex-1 h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums",
-							sizeHasError && "border-negative focus:border-negative",
+							"flex-1 text-2xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums",
+							sizeHasError && "border-market-down-600 focus:border-market-down-600",
 						)}
 						disabled={isFormDisabled}
 					/>
@@ -245,6 +246,7 @@ export function TradeFormFields({
 						}}
 						max={100}
 						step={0.1}
+						marks={sizeMarks}
 						className="flex-1 py-5"
 						disabled={isFormDisabled || maxSize <= 0}
 					/>
@@ -256,10 +258,11 @@ export function TradeFormFields({
 								if (pct >= 0 && pct <= 100) handleSizePercentApply(pct);
 							}}
 							allowDecimals={false}
-							className="w-14 h-7 text-xs text-right pr-5 bg-bg/50 border-border/60 tabular-nums"
+							inputSize="sm"
+							className="w-14 text-2xs text-right pr-5 bg-surface-base/50 border-border-200/60 tabular-nums"
 							disabled={isFormDisabled || maxSize <= 0}
 						/>
-						<span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-xs text-muted-fg pointer-events-none">
+						<span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-2xs text-text-600 pointer-events-none">
 							%
 						</span>
 					</div>
@@ -269,13 +272,12 @@ export function TradeFormFields({
 			{usesTriggerPrice && (
 				<div className="space-y-1.5">
 					<div className="flex items-center justify-between">
-						<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Trigger Price (USDC)`}</div>
+						<div className="text-4xs uppercase tracking-wider text-text-950">{t`Trigger Price (USDC)`}</div>
 						{markPx > 0 && (
 							<Button
 								variant="text"
-								size="none"
 								onClick={() => setTriggerPrice(toFixed(markPx, szDecimalsToPriceDecimals(szDecimals)))}
-								className="text-4xs text-muted-fg hover:text-info hover:bg-transparent tabular-nums"
+								className="text-4xs text-text-950 hover:text-primary-default hover:bg-transparent tabular-nums"
 							>
 								{t`Mark`}: {formatPrice(markPx, { szDecimals })}
 							</Button>
@@ -286,11 +288,11 @@ export function TradeFormFields({
 						value={triggerPriceInput}
 						onChange={(e) => setTriggerPrice(e.target.value)}
 						className={cn(
-							"w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums",
+							"w-full text-2xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums",
 							usesTriggerPrice &&
 								!isPositive(triggerPriceNum) &&
 								sizeValue > 0 &&
-								"border-negative focus:border-negative",
+								"border-market-down-600 focus:border-market-down-600",
 						)}
 						disabled={isFormDisabled}
 					/>
@@ -300,13 +302,12 @@ export function TradeFormFields({
 			{usesLimitPrice && (
 				<div className="space-y-1.5">
 					<div className="flex items-center justify-between">
-						<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Limit Price`}</div>
+						<div className="text-4xs uppercase tracking-wider text-text-950">{t`Limit Price`}</div>
 						{markPx > 0 && (
 							<Button
 								variant="text"
-								size="none"
 								onClick={() => setLimitPrice(toFixed(markPx, szDecimalsToPriceDecimals(szDecimals)))}
-								className="text-4xs text-muted-fg hover:text-info hover:bg-transparent tabular-nums"
+								className="text-4xs text-text-950 hover:text-primary-default hover:bg-transparent tabular-nums"
 							>
 								{t`Mark`}: {formatPrice(markPx, { szDecimals })}
 							</Button>
@@ -317,8 +318,8 @@ export function TradeFormFields({
 						value={limitPriceInput}
 						onChange={(e) => setLimitPrice(e.target.value)}
 						className={cn(
-							"w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums",
-							usesLimitPrice && !price && sizeValue > 0 && "border-negative focus:border-negative",
+							"w-full text-2xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums",
+							usesLimitPrice && !price && sizeValue > 0 && "border-market-down-600 focus:border-market-down-600",
 						)}
 						disabled={isFormDisabled}
 					/>
@@ -327,9 +328,9 @@ export function TradeFormFields({
 
 			{showTif && (
 				<div className="space-y-1.5">
-					<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Time in Force`}</div>
+					<div className="text-4xs uppercase tracking-wider text-text-950">{t`Time in Force`}</div>
 					<Select value={tif} onValueChange={(value) => setTif(value as LimitTif)} disabled={isFormDisabled}>
-						<SelectTrigger className="w-full h-8 text-sm bg-bg/50 border-border/60">
+						<SelectTrigger size="sm" className="w-full text-2xs bg-surface-base/50 border-border-200/60">
 							<SelectValue />
 						</SelectTrigger>
 						<SelectContent>
@@ -346,36 +347,36 @@ export function TradeFormFields({
 			{scaleOrder && (
 				<>
 					<div className="space-y-1.5">
-						<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Start Price (USDC)`}</div>
+						<div className="text-4xs uppercase tracking-wider text-text-950">{t`Start Price (USDC)`}</div>
 						<NumberInput
 							placeholder="0.00"
 							value={scaleStartPriceInput}
 							onChange={(e) => setScaleStart(e.target.value)}
-							className="w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums"
+							className="w-full text-2xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums"
 							disabled={isFormDisabled}
 						/>
 					</div>
 					<div className="space-y-1.5">
-						<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`End Price (USDC)`}</div>
+						<div className="text-4xs uppercase tracking-wider text-text-950">{t`End Price (USDC)`}</div>
 						<NumberInput
 							placeholder="0.00"
 							value={scaleEndPriceInput}
 							onChange={(e) => setScaleEnd(e.target.value)}
-							className="w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums"
+							className="w-full text-2xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums"
 							disabled={isFormDisabled}
 						/>
 					</div>
 					<div className="space-y-1.5">
 						<div className="flex items-center justify-between">
-							<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Number of Orders`}</div>
-							<span className="text-4xs text-muted-fg">{`${SCALE_LEVELS_MIN}-${SCALE_LEVELS_MAX}`}</span>
+							<div className="text-4xs uppercase tracking-wider text-text-950">{t`Number of Orders`}</div>
+							<span className="text-4xs text-text-950">{`${SCALE_LEVELS_MIN}-${SCALE_LEVELS_MAX}`}</span>
 						</div>
 						<NumberInput
 							placeholder="4"
 							value={String(scaleLevelsNum)}
 							onChange={(e) => setScaleLevels(Number(e.target.value) || 4)}
 							allowDecimals={false}
-							className="w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums"
+							className="w-full text-2xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums"
 							disabled={isFormDisabled}
 						/>
 					</div>
@@ -386,15 +387,15 @@ export function TradeFormFields({
 				<>
 					<div className="space-y-1.5">
 						<div className="flex items-center justify-between">
-							<div className="text-4xs uppercase tracking-wider text-muted-fg">{t`Duration (Minutes)`}</div>
-							<span className="text-4xs text-muted-fg">{`${TWAP_MINUTES_MIN}-${TWAP_MINUTES_MAX}`}</span>
+							<div className="text-4xs uppercase tracking-wider text-text-950">{t`Duration (Minutes)`}</div>
+							<span className="text-4xs text-text-950">{`${TWAP_MINUTES_MIN}-${TWAP_MINUTES_MAX}`}</span>
 						</div>
 						<NumberInput
 							placeholder="30"
 							value={String(twapMinutesNum)}
 							onChange={(e) => setTwapMinutes(Number(e.target.value) || 30)}
 							allowDecimals={false}
-							className="w-full h-8 text-sm bg-bg/50 border-border/60 focus:border-info/60 tabular-nums"
+							className="w-full text-2xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums"
 							disabled={isFormDisabled}
 						/>
 					</div>
@@ -404,7 +405,7 @@ export function TradeFormFields({
 							onCheckedChange={(checked) => setTwapRandomize(checked === true)}
 							disabled={isFormDisabled}
 						/>
-						<span className={cn(isFormDisabled && "text-muted-fg")}>{t`Randomize timing`}</span>
+						<span className={cn(isFormDisabled && "text-text-600")}>{t`Randomize timing`}</span>
 					</div>
 				</>
 			)}
@@ -425,7 +426,7 @@ export function TradeFormFields({
 									htmlFor={reduceOnlyId}
 									className={cn(
 										"cursor-pointer",
-										(isFormDisabled || triggerOrder) && "cursor-not-allowed text-muted-fg",
+										(isFormDisabled || triggerOrder) && "cursor-not-allowed text-text-600",
 									)}
 								>
 									{t`Reduce Only`}
@@ -443,7 +444,7 @@ export function TradeFormFields({
 								/>
 								<label
 									htmlFor={tpSlId}
-									className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-muted-fg")}
+									className={cn("cursor-pointer", isFormDisabled && "cursor-not-allowed text-text-600")}
 								>
 									{t`TP/SL`}
 								</label>

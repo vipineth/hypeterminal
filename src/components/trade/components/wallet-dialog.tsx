@@ -113,14 +113,14 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-[420px] gap-0 p-0 overflow-hidden">
-				<div className="p-6 pb-4 border-b border-border/50">
+			<DialogContent className="sm:max-w-md gap-0 p-0 overflow-hidden">
+				<div className="p-6 pb-4 border-b border-border-200/50">
 					<DialogHeader className="space-y-2">
 						<DialogTitle className="flex items-center gap-2 text-lg">
-							<WalletIcon className="size-5 text-info" />
+							<WalletIcon className="size-5 text-primary-default" />
 							<Trans>Connect Wallet</Trans>
 						</DialogTitle>
-						<DialogDescription className="text-sm">
+						<DialogDescription>
 							<Trans>Connect your wallet to start trading on Hyperliquid</Trans>
 						</DialogDescription>
 					</DialogHeader>
@@ -129,7 +129,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 				<div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
 					{availableConnectors.popular.length > 0 && (
 						<div className="space-y-2">
-							<p className="text-xs font-medium text-muted-fg uppercase tracking-wider px-1">
+							<p className="text-xs font-medium text-text-600 uppercase tracking-wider px-1">
 								<Trans>Popular</Trans>
 							</p>
 							<div className="space-y-2">
@@ -147,21 +147,23 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 											disabled={isPending}
 											className={cn(
 												"w-full gap-3 p-3 rounded-lg border",
-												"bg-bg hover:bg-accent/50 hover:border-info/30",
-												"group focus:ring-2 focus:ring-info/50",
+												"bg-surface-base hover:bg-surface-analysis/50 hover:border-primary-default/30",
+												"group focus:ring-2 focus:ring-primary-default/50",
 											)}
 										>
 											<div className="size-10 rounded-lg overflow-hidden flex-shrink-0 shadow-sm">
 												<Icon className="size-full" />
 											</div>
 											<div className="flex-1 text-left min-w-0">
-												<p className="font-medium text-sm group-hover:text-info transition-colors">{connector.name}</p>
-												<p className="text-xs text-muted-fg truncate">{walletInfo.description}</p>
+												<p className="font-medium text-sm group-hover:text-primary-default transition-colors">
+													{connector.name}
+												</p>
+												<p className="text-xs text-text-600 truncate">{walletInfo.description}</p>
 											</div>
 											{isConnecting ? (
-												<SpinnerGapIcon className="size-4 animate-spin text-info flex-shrink-0" />
+												<SpinnerGapIcon className="size-4 animate-spin text-primary-default flex-shrink-0" />
 											) : (
-												<div className="size-4 rounded-full border border-border group-hover:border-info/50 flex-shrink-0 transition-colors" />
+												<div className="size-4 rounded-full border border-border-200 group-hover:border-primary-default/50 flex-shrink-0 transition-colors" />
 											)}
 										</Button>
 									);
@@ -172,7 +174,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 
 					{availableConnectors.other.length > 0 && (
 						<div className="space-y-2">
-							<p className="text-xs font-medium text-muted-fg uppercase tracking-wider px-1">
+							<p className="text-xs font-medium text-text-600 uppercase tracking-wider px-1">
 								<Trans>Other Options</Trans>
 							</p>
 							<div className="space-y-2">
@@ -190,21 +192,23 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 											disabled={isPending}
 											className={cn(
 												"w-full gap-3 p-3 rounded-lg border",
-												"bg-bg hover:bg-accent/50 hover:border-info/30",
-												"group focus:ring-2 focus:ring-info/50",
+												"bg-surface-base hover:bg-surface-analysis/50 hover:border-primary-default/30",
+												"group focus:ring-2 focus:ring-primary-default/50",
 											)}
 										>
 											<div className="size-10 rounded-lg overflow-hidden flex-shrink-0 shadow-sm">
 												<Icon className="size-full" />
 											</div>
 											<div className="flex-1 text-left min-w-0">
-												<p className="font-medium text-sm group-hover:text-info transition-colors">{connector.name}</p>
-												<p className="text-xs text-muted-fg truncate">{walletInfo.description}</p>
+												<p className="font-medium text-sm group-hover:text-primary-default transition-colors">
+													{connector.name}
+												</p>
+												<p className="text-xs text-text-600 truncate">{walletInfo.description}</p>
 											</div>
 											{isConnecting ? (
-												<SpinnerGapIcon className="size-4 animate-spin text-info flex-shrink-0" />
+												<SpinnerGapIcon className="size-4 animate-spin text-primary-default flex-shrink-0" />
 											) : (
-												<div className="size-4 rounded-full border border-border group-hover:border-info/50 flex-shrink-0 transition-colors" />
+												<div className="size-4 rounded-full border border-border-200 group-hover:border-primary-default/50 flex-shrink-0 transition-colors" />
 											)}
 										</Button>
 									);
@@ -215,7 +219,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 
 					{mockConnectors.length > 0 && (
 						<div className="space-y-2">
-							<p className="text-xs font-medium text-warning uppercase tracking-wider px-1">
+							<p className="text-xs font-medium text-warning-700 uppercase tracking-wider px-1">
 								<Trans>Mock Wallet (Testing)</Trans>
 							</p>
 							<div className="space-y-2">
@@ -231,24 +235,24 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 											onClick={() => handleConnect(connector)}
 											disabled={isPending}
 											className={cn(
-												"w-full gap-3 p-3 rounded-lg border border-warning/30",
-												"bg-warning/5 hover:bg-warning/10 hover:border-warning/50",
-												"group focus:ring-2 focus:ring-warning/50",
+												"w-full gap-3 p-3 rounded-lg border border-warning-700/30",
+												"bg-warning-700/5 hover:bg-warning-700/10 hover:border-warning-700/50",
+												"group focus:ring-2 focus:ring-warning-700/50",
 											)}
 										>
-											<div className="size-10 rounded-lg overflow-hidden flex-shrink-0 shadow-sm bg-warning/20 flex items-center justify-center">
-												<FlaskIcon className="size-5 text-warning" />
+											<div className="size-10 rounded-lg overflow-hidden flex-shrink-0 shadow-sm bg-warning-700/20 flex items-center justify-center">
+												<FlaskIcon className="size-5 text-warning-700" />
 											</div>
 											<div className="flex-1 text-left min-w-0">
-												<p className="font-medium text-sm group-hover:text-warning transition-colors">
+												<p className="font-medium text-sm group-hover:text-warning-700 transition-colors">
 													{config?.name ?? connector.name}
 												</p>
-												<p className="text-xs text-muted-fg truncate font-mono">{config?.address ?? "Mock wallet"}</p>
+												<p className="text-xs text-text-600 truncate font-mono">{config?.address ?? "Mock wallet"}</p>
 											</div>
 											{isConnecting ? (
-												<SpinnerGapIcon className="size-4 animate-spin text-warning flex-shrink-0" />
+												<SpinnerGapIcon className="size-4 animate-spin text-warning-700 flex-shrink-0" />
 											) : (
-												<div className="size-4 rounded-full border border-warning/50 flex-shrink-0 transition-colors" />
+												<div className="size-4 rounded-full border border-warning-700/50 flex-shrink-0 transition-colors" />
 											)}
 										</Button>
 									);
@@ -275,21 +279,21 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 										<Trans>Connect</Trans>
 									</Button>
 								</div>
-								{customAddressError && <p className="text-xs text-danger px-1">{customAddressError}</p>}
+								{customAddressError && <p className="text-xs text-error-700 px-1">{customAddressError}</p>}
 							</div>
 						</div>
 					)}
 
 					{!hasConnectors && (
 						<div className="py-8 text-center space-y-3">
-							<div className="size-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto">
-								<WarningCircleIcon className="size-6 text-muted-fg" />
+							<div className="size-12 rounded-full bg-surface-analysis flex items-center justify-center mx-auto">
+								<WarningCircleIcon className="size-6 text-text-600" />
 							</div>
 							<div>
 								<p className="text-sm font-medium">
 									<Trans>No wallets found</Trans>
 								</p>
-								<p className="text-xs text-muted-fg mt-1">
+								<p className="text-xs text-text-600 mt-1">
 									<Trans>Install a wallet extension to continue</Trans>
 								</p>
 							</div>
@@ -297,19 +301,19 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 					)}
 
 					{error && (
-						<div className="flex items-start gap-2 p-3 rounded-lg bg-danger/10 border border-danger/20">
-							<WarningCircleIcon className="size-4 text-danger shrink-0 mt-0.5" />
-							<p className="text-xs text-danger">{error.message}</p>
+						<div className="flex items-start gap-2 p-3 rounded-xs bg-error-700/10 border border-error-700/20">
+							<WarningCircleIcon className="size-4 text-error-700 shrink-0 mt-0.5" />
+							<p className="text-xs text-error-700">{error.message}</p>
 						</div>
 					)}
 				</div>
 
-				<div className="border-t border-border/50 bg-muted/30">
+				<div className="border-t border-border-200/50 bg-surface-analysis">
 					<Button
 						variant="text"
 						size="none"
 						onClick={() => setShowHelp(!showHelp)}
-						className="w-full justify-between p-4 text-sm text-muted-fg hover:text-fg hover:bg-transparent"
+						className="w-full justify-between p-4 text-sm text-text-600 hover:text-text-950 hover:bg-transparent"
 					>
 						<span className="flex items-center gap-2">
 							<QuestionIcon className="size-4" />
@@ -331,23 +335,23 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 					{showHelp && (
 						<div className="px-4 pb-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
 							<div className="flex items-start gap-3 text-xs">
-								<ShieldIcon className="size-4 text-positive flex-shrink-0 mt-0.5" />
+								<ShieldIcon className="size-4 text-market-up-600 flex-shrink-0 mt-0.5" />
 								<div>
-									<p className="font-medium text-fg">
+									<p className="font-medium text-text-950">
 										<Trans>Secure & Private</Trans>
 									</p>
-									<p className="text-muted-fg mt-0.5">
+									<p className="text-text-600 mt-0.5">
 										<Trans>Only you control your funds. No email or password required.</Trans>
 									</p>
 								</div>
 							</div>
 							<div className="flex items-start gap-3 text-xs">
-								<WalletIcon className="size-4 text-info flex-shrink-0 mt-0.5" />
+								<WalletIcon className="size-4 text-primary-default flex-shrink-0 mt-0.5" />
 								<div>
-									<p className="font-medium text-fg">
+									<p className="font-medium text-text-950">
 										<Trans>What is a wallet?</Trans>
 									</p>
-									<p className="text-muted-fg mt-0.5">
+									<p className="text-text-600 mt-0.5">
 										<Trans>A crypto wallet lets you store and manage your digital assets securely.</Trans>
 									</p>
 								</div>

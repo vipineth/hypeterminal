@@ -111,8 +111,8 @@ msgid "Amount (USDC)"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "API"
-#~ msgstr "API"
+msgid "API"
+msgstr "API"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #~ msgid "Appearance"
@@ -125,6 +125,7 @@ msgstr ""
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -143,22 +144,21 @@ msgid "Available"
 msgstr "متاح"
 
 #: src/components/trade/tradebox/deposit-modal.tsx
-msgid "Available:"
-msgstr ""
+#~ msgid "Available:"
+#~ msgstr ""
 
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Avg Price"
 msgstr "متوسط السعر"
 
 #: src/components/trade/components/spot-swap-modal.tsx
-#: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 msgid "Balance"
 msgstr "الرصيد"
 
 #: src/components/trade/tradebox/deposit-modal.tsx
-msgid "Balance:"
-msgstr ""
+#~ msgid "Balance:"
+#~ msgstr ""
 
 #: src/components/trade/footer/footer-bar.tsx
 #~ msgid "Block:"
@@ -218,8 +218,7 @@ msgstr "شراء"
 #: src/components/trade/positions/twap-tab.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
-#: src/components/trade/tradebox/leverage-popover.tsx
-#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Cancel"
 msgstr "إلغاء"
@@ -262,7 +261,7 @@ msgstr "جارٍ الإلغاء..."
 msgid "Cannot switch to Isolated mode with an open position. Close your position first."
 msgstr ""
 
-#: src/components/trade/tradebox/leverage-badge.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 msgid "Change leverage"
 msgstr ""
 
@@ -297,8 +296,8 @@ msgstr "جاري الإغلاق..."
 #~ msgstr "مكتمل"
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
-#: src/components/trade/tradebox/leverage-popover.tsx
-#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Confirm"
 msgstr ""
@@ -349,6 +348,10 @@ msgstr "اربط محفظتك لعرض مدفوعات التمويل."
 msgid "Connect your wallet to view open orders."
 msgstr "اربط محفظتك لعرض الأوامر المفتوحة."
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Connect your wallet to view order history."
+msgstr ""
+
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Connect your wallet to view positions."
 msgstr "قم بتوصيل محفظتك لعرض المراكز."
@@ -395,7 +398,7 @@ msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
-#: src/components/trade/tradebox/margin-mode-toggle.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Cross"
 msgstr "متقاطع"
 
@@ -485,8 +488,8 @@ msgid "Displays the mobile sidebar."
 msgstr "يعرض الشريط الجانبي للجوال."
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Docs"
-#~ msgstr "المستندات"
+msgid "Docs"
+msgstr "المستندات"
 
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
@@ -609,6 +612,10 @@ msgstr "فشل في تحميل الأوامر المفتوحة."
 msgid "Failed to load order book."
 msgstr "فشل في تحميل دفتر الأوامر."
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Failed to load order history."
+msgstr ""
+
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Failed to load positions."
 msgstr "فشل تحميل المراكز."
@@ -646,8 +653,8 @@ msgstr "الرسوم"
 #~ msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx
-msgid "Filled"
-msgstr "منفذ"
+#~ msgid "Filled"
+#~ msgstr "منفذ"
 
 #. placeholder {0}: sub.label
 #: src/components/trade/chart/token-selector.tsx
@@ -673,8 +680,12 @@ msgid "Funding"
 msgstr "التمويل"
 
 #: src/components/trade/positions/funding-tab.tsx
-msgid "Funding Payments"
-msgstr "مدفوعات التمويل"
+msgid "Funding History"
+msgstr ""
+
+#: src/components/trade/positions/funding-tab.tsx
+#~ msgid "Funding Payments"
+#~ msgstr "مدفوعات التمويل"
 
 #: src/components/trade/footer/footer-bar.tsx
 #~ msgid "Gas:"
@@ -702,8 +713,8 @@ msgid "In Orders"
 msgstr ""
 
 #: src/components/trade/positions/balances-tab.tsx
-msgid "In Use"
-msgstr "قيد الاستخدام"
+#~ msgid "In Use"
+#~ msgstr "قيد الاستخدام"
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Install a wallet extension to continue"
@@ -749,7 +760,7 @@ msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
-#: src/components/trade/tradebox/margin-mode-toggle.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Isolated"
 msgstr "معزول"
 
@@ -758,15 +769,15 @@ msgstr "معزول"
 #~ msgstr "التأخير:"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Leaderboard"
-#~ msgstr "لوحة المتصدرين"
+msgid "Leaderboard"
+msgstr "لوحة المتصدرين"
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Learn more"
 msgstr ""
 
-#: src/components/trade/tradebox/leverage-popover.tsx
-#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 msgid "Leverage"
 msgstr ""
 
@@ -826,6 +837,10 @@ msgstr "جارٍ تحميل الأسواق..."
 msgid "Loading open orders..."
 msgstr "جارٍ تحميل الأوامر المفتوحة..."
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Loading order history..."
+msgstr ""
+
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Loading positions..."
 msgstr "جاري تحميل المراكز..."
@@ -842,6 +857,7 @@ msgstr "جارٍ تحميل أوامر TWAP..."
 msgid "Loading wallet..."
 msgstr "جاري تحميل المحفظة..."
 
+#: src/components/trade/tradebox/account-panel.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/lib/trade/use-button-content.ts
@@ -916,10 +932,12 @@ msgid "markets"
 msgstr "أسواق"
 
 #: src/components/trade/positions/transfer-dialog.tsx
-msgid "Max"
-msgstr "الأقصى"
+#~ msgid "Max"
+#~ msgstr "الأقصى"
 
+#: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/positions/send-dialog.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
 msgid "MAX"
@@ -977,12 +995,12 @@ msgid "Mock Wallet (Testing)"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "More"
-#~ msgstr "المزيد"
+msgid "More"
+msgstr "المزيد"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "More options"
-#~ msgstr "المزيد من الخيارات"
+msgid "More options"
+msgstr "المزيد من الخيارات"
 
 #: src/components/ui/pagination.tsx
 #~ msgid "More pages"
@@ -1065,6 +1083,10 @@ msgstr "لم يتم العثور على أسواق."
 msgid "No open orders."
 msgstr "لا توجد أوامر مفتوحة."
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "No order history found."
+msgstr ""
+
 #: src/components/trade/tradebox/trade-panel.tsx
 msgid "No response from exchange"
 msgstr ""
@@ -1102,8 +1124,8 @@ msgid "Not connected"
 msgstr "غير متصل"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Notifications"
-#~ msgstr "الإشعارات"
+msgid "Notifications"
+msgstr "الإشعارات"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Number Format"
@@ -1151,6 +1173,10 @@ msgstr "دفتر الأوامر"
 msgid "Order failed"
 msgstr "فشل الطلب"
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Order History"
+msgstr ""
+
 #: src/components/trade/tradebox/order-toast.tsx
 msgid "Order Queue"
 msgstr "قائمة الأوامر"
@@ -1158,6 +1184,15 @@ msgstr "قائمة الأوامر"
 #: src/components/trade/tradebox/order-summary.tsx
 msgid "Order Value"
 msgstr "قيمة الطلب"
+
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Orders"
+msgstr ""
+
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
+msgid "Other"
+msgstr ""
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Other Options"
@@ -1197,7 +1232,6 @@ msgid "Perpetuals"
 msgstr ""
 
 #: src/components/trade/tradebox/account-panel.tsx
-#: src/components/trade/tradebox/account-panel.tsx
 msgid "Perps"
 msgstr "العقود الدائمة"
 
@@ -1221,8 +1255,8 @@ msgid "Popular"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Portfolio"
-#~ msgstr "المحفظة"
+msgid "Portfolio"
+msgstr "المحفظة"
 
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
@@ -1237,6 +1271,7 @@ msgstr "المركز"
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/tradebox/price-input-with-percent.tsx
 msgid "Price"
@@ -1248,8 +1283,8 @@ msgstr ""
 
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
-msgid "Pro"
-msgstr ""
+#~ msgid "Pro"
+#~ msgstr ""
 
 #: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Processing deposit"
@@ -1296,6 +1331,10 @@ msgstr "تقليل فقط"
 #~ msgid "Register Builder Code"
 #~ msgstr ""
 
+#: src/components/trade/header/favorites-strip.tsx
+msgid "Remove {displayName} from favorites"
+msgstr ""
+
 #: src/components/trade/chart/token-selector.tsx
 msgid "Remove from favorites"
 msgstr "إزالة من المفضلة"
@@ -1306,8 +1345,7 @@ msgstr "إزالة من المفضلة"
 
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
-#: src/components/trade/tradebox/leverage-popover.tsx
-#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 msgid "Retry"
 msgstr ""
 
@@ -1511,6 +1549,7 @@ msgstr "المُوقِّع غير جاهز"
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -1576,7 +1615,6 @@ msgstr "مرتب حسب {0}"
 #: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/tradebox/account-panel.tsx
-#: src/components/trade/tradebox/account-panel.tsx
 msgid "Spot"
 msgstr "فوري"
 
@@ -1593,8 +1631,8 @@ msgid "Spread"
 msgstr "الفارق"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Staking"
-#~ msgstr "التخزين"
+msgid "Staking"
+msgstr "التخزين"
 
 #: src/lib/errors/definitions/scale.ts
 msgid "Start and end must differ"
@@ -1604,9 +1642,9 @@ msgstr ""
 msgid "Start Price (USDC)"
 msgstr ""
 
-#: src/components/trade/positions/twap-tab.tsx
-#~ msgid "Status"
-#~ msgstr "الحالة"
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Status"
+msgstr "الحالة"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Stop"
@@ -1638,8 +1676,8 @@ msgid "Submitting..."
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Support"
-#~ msgstr "الدعم"
+msgid "Support"
+msgstr "الدعم"
 
 #: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/components/spot-swap-modal.tsx
@@ -1668,6 +1706,7 @@ msgstr ""
 #. placeholder {0}: markets.getMarket(fill.coin)?.displayName ?? fill.coin
 #. placeholder {0}: markets.getMarket(state.coin)?.displayName ?? state.coin
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Switch to {0} market"
@@ -1743,6 +1782,7 @@ msgstr "الصفحة التي تبحث عنها غير موجودة."
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Time"
 msgstr "الوقت"
@@ -1823,12 +1863,12 @@ msgid "Trade"
 msgstr "تداول"
 
 #: src/components/trade/positions/history-tab.tsx
-msgid "Trade ClockCounterClockwise"
-msgstr ""
+#~ msgid "Trade ClockCounterClockwise"
+#~ msgstr ""
 
 #: src/components/trade/positions/history-tab.tsx
-#~ msgid "Trade History"
-#~ msgstr "سجل التداول"
+msgid "Trade History"
+msgstr "سجل التداول"
 
 #. placeholder {0}: spotMarket.displayName
 #: src/components/trade/components/spot-swap-modal.tsx
@@ -1888,6 +1928,7 @@ msgid "TWAP Orders"
 msgstr "أوامر TWAP"
 
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Type"
 msgstr "النوع"
@@ -1922,14 +1963,13 @@ msgstr "الربح والخسارة غير المحققة"
 msgid "Unsupported resolution: {0}"
 msgstr "دقة غير مدعومة: {0}"
 
-#: src/components/trade/tradebox/leverage-popover.tsx
-#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Update failed"
 msgstr ""
 
-#: src/components/trade/tradebox/leverage-popover.tsx
-#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Updated"
 msgstr ""
@@ -1947,8 +1987,8 @@ msgstr "القيمة بالدولار"
 #~ msgstr "القيمة"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Vaults"
-#~ msgstr "الخزائن"
+msgid "Vaults"
+msgstr "الخزائن"
 
 #: src/lib/trade/use-button-content.ts
 msgid "Verifying..."

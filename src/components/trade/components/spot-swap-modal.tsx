@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NumberInput } from "@/components/ui/number-input";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
+import { SWAP_SUCCESS_DURATION_MS } from "@/config/time";
 import { getAvailableFromTotals, getSpotBalance } from "@/domain/trade/balances";
 import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import { findSpotPair, getAvailablePairTokens, getSwapSide } from "@/domain/trade/swap";
@@ -25,7 +26,6 @@ import { AssetDisplay } from "./asset-display";
 import { TokenSelectorDropdown } from "./token-selector-dropdown";
 import { TradingActionButton } from "./trading-action-button";
 
-const SUCCESS_DISPLAY_DURATION_MS = 1500;
 const DEFAULT_SLIPPAGE_BPS = 100;
 
 export function SpotSwapModal() {
@@ -194,7 +194,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 			setShowSuccess(true);
 			autoCloseTimerRef.current = setTimeout(() => {
 				handleClose(false);
-			}, SUCCESS_DISPLAY_DURATION_MS);
+			}, SWAP_SUCCESS_DURATION_MS);
 		} catch (err) {
 			const message = err instanceof Error ? err.message : t`Swap failed`;
 			setError(message);
@@ -208,12 +208,12 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 
 	return (
 		<Dialog open onOpenChange={handleClose}>
-			<DialogContent className="sm:max-w-[400px] gap-0 p-0 overflow-hidden">
-				<DialogHeader className="p-4 pb-3 border-b border-border/40">
-					<DialogTitle className="text-sm font-medium">
+			<DialogContent className="sm:max-w-md gap-0 p-0 overflow-hidden">
+				<DialogHeader className="px-5 pt-5 pb-3 border-b border-border-200/50">
+					<DialogTitle>
 						<Trans>Swap</Trans>
 					</DialogTitle>
-					<DialogDescription className="text-3xs">
+					<DialogDescription>
 						{spotMarket ? (
 							<Trans>Trade via {spotMarket.displayName} spot market</Trans>
 						) : (
@@ -222,7 +222,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 					</DialogDescription>
 				</DialogHeader>
 
-				<div className="p-4 space-y-3">
+				<div className="px-5 py-4 space-y-3">
 					<div className="relative">
 						<div className="space-y-1">
 							<TokenPanel
@@ -251,7 +251,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 									size="none"
 									onClick={handleFlip}
 									disabled={isDisabled}
-									className="size-8 rounded-full bg-bg border-border/60 hover:border-info hover:bg-info/10 transition-colors disabled:opacity-50"
+									className="size-8 rounded-full bg-surface-base border-border-200/60 hover:border-primary-default hover:bg-primary-default/10 transition-colors disabled:opacity-50"
 									aria-label={t`Swap direction`}
 								>
 									<ArrowsDownUpIcon className="size-3.5" />
@@ -277,7 +277,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 						</div>
 					</div>
 
-					<div className="flex items-center justify-between text-3xs text-muted-fg px-1">
+					<div className="flex items-center justify-between text-3xs text-text-950 px-1">
 						<span>
 							<Trans>Rate</Trans>
 						</span>
@@ -293,7 +293,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 						</span>
 					</div>
 
-					<div className="flex items-center justify-between text-3xs text-muted-fg px-1">
+					<div className="flex items-center justify-between text-3xs text-text-950 px-1">
 						<span>
 							<Trans>Slippage tolerance</Trans>
 						</span>
@@ -301,9 +301,9 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 					</div>
 
 					{insufficientBalance && !showSuccess && (
-						<div className="flex items-start gap-2 p-2.5 bg-warning/10 border border-warning/20 rounded-sm">
-							<WarningIcon className="size-3.5 text-warning shrink-0 mt-0.5" />
-							<p className="text-xs text-warning">
+						<div className="flex items-start gap-2 p-2.5 bg-warning-700/10 border border-warning-700/20 rounded-xs">
+							<WarningIcon className="size-3.5 text-warning-700 shrink-0 mt-0.5" />
+							<p className="text-xs text-warning-700">
 								<Trans>
 									Insufficient <AssetDisplay asset={fromAsset} hideIcon /> balance
 								</Trans>
@@ -312,9 +312,9 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 					)}
 
 					{noPairAvailable && !showSuccess && (
-						<div className="flex items-start gap-2 p-2.5 bg-warning/10 border border-warning/20 rounded-sm">
-							<WarningIcon className="size-3.5 text-warning shrink-0 mt-0.5" />
-							<p className="text-xs text-warning">
+						<div className="flex items-start gap-2 p-2.5 bg-warning-700/10 border border-warning-700/20 rounded-xs">
+							<WarningIcon className="size-3.5 text-warning-700 shrink-0 mt-0.5" />
+							<p className="text-xs text-warning-700">
 								<Trans>
 									No trading pair available for <AssetDisplay asset={fromAsset} hideIcon />/
 									<AssetDisplay asset={toAsset} hideIcon />
@@ -324,14 +324,14 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 					)}
 
 					{error && !showSuccess && (
-						<div className="flex items-center gap-2 p-2.5 bg-negative/10 border border-negative/20 rounded-sm text-xs text-negative">
+						<div className="flex items-center gap-2 p-2.5 bg-market-down-100 border border-market-down-600/20 rounded-xs text-xs text-market-down-600">
 							<WarningIcon className="size-3.5 shrink-0" />
 							<span className="flex-1">{error}</span>
 						</div>
 					)}
 
 					{showSuccess && (
-						<div className="flex flex-col items-center gap-1.5 p-3 bg-positive/10 border border-positive/20 rounded-sm text-positive">
+						<div className="flex flex-col items-center gap-1.5 p-3 bg-market-up-100 border border-market-up-600/20 rounded-xs text-market-up-600">
 							<div className="flex items-center gap-2 text-xs">
 								<CheckIcon className="size-3.5" />
 								<Trans>Swap submitted</Trans>
@@ -391,29 +391,15 @@ function TokenPanel({
 	return (
 		<div
 			className={cn(
-				"p-3 rounded-sm border transition-colors",
-				hasError ? "border-warning/40 bg-warning/5" : "border-border/40 bg-surface/30",
+				"p-3 rounded-xs border transition-colors",
+				hasError ? "border-warning-700/40 bg-warning-700/5" : "border-border-200/40 bg-surface-execution/30",
 			)}
 		>
 			<div className="flex items-center justify-between mb-2">
-				<span className="text-3xs text-muted-fg uppercase tracking-wider">{label}</span>
-				{editable ? (
-					<button
-						type="button"
-						onClick={onMaxClick}
-						disabled={disabled}
-						className={cn(
-							"text-3xs text-muted-fg tabular-nums transition-colors",
-							!disabled && "hover:text-info cursor-pointer",
-						)}
-					>
-						<Trans>Balance</Trans>: {formatToken(balance, 4)}
-					</button>
-				) : (
-					<span className="text-3xs text-muted-fg tabular-nums">
-						<Trans>Balance</Trans>: {formatToken(balance, 4)}
-					</span>
-				)}
+				<span className="text-3xs text-text-950 uppercase tracking-wider">{label}</span>
+				<span className="text-3xs text-text-950 tabular-nums">
+					<Trans>Balance</Trans>: {formatToken(balance, 4)}
+				</span>
 			</div>
 
 			<div className="flex items-center gap-3">
@@ -425,14 +411,20 @@ function TokenPanel({
 							placeholder="0.00"
 							value={amount}
 							onChange={(e) => onAmountChange?.(e.target.value)}
+							maxLabel={
+								<>
+									{t`MAX`}: {formatToken(balance, 4)}
+								</>
+							}
+							onMaxClick={onMaxClick}
 							className={cn(
-								"w-full h-9 text-base font-medium bg-transparent border-border/40 focus:border-info/60 tabular-nums text-right",
-								hasError && "text-warning border-warning/40 focus:border-warning",
+								"w-full h-9 text-base font-medium bg-transparent border-border-200/40 focus:border-primary-default/60 tabular-nums text-right",
+								hasError && "text-warning-700 border-warning-700/40 focus:border-warning-700",
 							)}
 							disabled={disabled}
 						/>
 					) : (
-						<div className="h-9 flex items-center justify-end text-base font-medium text-muted-fg tabular-nums pr-2">
+						<div className="h-9 flex items-center justify-end text-base font-medium text-text-600 tabular-nums pr-2">
 							{amount || "0.00"}
 						</div>
 					)}

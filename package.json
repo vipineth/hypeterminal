@@ -16,7 +16,9 @@
 		"i18n:compile": "lingui compile",
 		"prepare": "lefthook install",
 		"perf:bundle": "npx vite-bundle-visualizer",
-		"perf:compare": "node scripts/compare-bundle.js"
+		"perf:compare": "node scripts/compare-bundle.js",
+		"perf:ws-soak:30m": "WS_SOAK_RUN=true WS_SOAK_DURATION_MS=1800000 WS_SOAK_SAMPLE_MS=1000 WS_SOAK_OP_MS=10 vitest run src/lib/tests/websocket-soak.test.ts",
+		"perf:ws-soak:60m": "WS_SOAK_RUN=true WS_SOAK_DURATION_MS=3600000 WS_SOAK_SAMPLE_MS=1000 WS_SOAK_OP_MS=10 vitest run src/lib/tests/websocket-soak.test.ts"
 	},
 	"dependencies": {
 		"@fontsource-variable/ibm-plex-sans": "^5.2.8",
@@ -38,6 +40,7 @@
 		"date-fns": "^4.1.0",
 		"embla-carousel-react": "^8.6.0",
 		"input-otp": "^1.4.2",
+		"motion": "^12.33.0",
 		"next-themes": "^0.4.6",
 		"radix-ui": "^1.4.3",
 		"react": "^19.2.0",

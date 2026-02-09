@@ -111,8 +111,8 @@ msgid "Amount (USDC)"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "API"
-#~ msgstr "API"
+msgid "API"
+msgstr "API"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #~ msgid "Appearance"
@@ -125,6 +125,7 @@ msgstr ""
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -143,22 +144,21 @@ msgid "Available"
 msgstr "Disponible"
 
 #: src/components/trade/tradebox/deposit-modal.tsx
-msgid "Available:"
-msgstr ""
+#~ msgid "Available:"
+#~ msgstr ""
 
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Avg Price"
 msgstr "Precio prom."
 
 #: src/components/trade/components/spot-swap-modal.tsx
-#: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 msgid "Balance"
 msgstr "Saldo"
 
 #: src/components/trade/tradebox/deposit-modal.tsx
-msgid "Balance:"
-msgstr ""
+#~ msgid "Balance:"
+#~ msgstr ""
 
 #: src/components/trade/footer/footer-bar.tsx
 #~ msgid "Block:"
@@ -218,8 +218,7 @@ msgstr "Comprar"
 #: src/components/trade/positions/twap-tab.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
-#: src/components/trade/tradebox/leverage-popover.tsx
-#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Cancel"
 msgstr "Cancelar"
@@ -262,7 +261,7 @@ msgstr "Cancelando..."
 msgid "Cannot switch to Isolated mode with an open position. Close your position first."
 msgstr ""
 
-#: src/components/trade/tradebox/leverage-badge.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 msgid "Change leverage"
 msgstr ""
 
@@ -297,8 +296,8 @@ msgstr "Cerrando..."
 #~ msgstr "completado"
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
-#: src/components/trade/tradebox/leverage-popover.tsx
-#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Confirm"
 msgstr ""
@@ -349,6 +348,10 @@ msgstr "Conecta tu billetera para ver pagos de financiamiento."
 msgid "Connect your wallet to view open orders."
 msgstr "Conecta tu billetera para ver órdenes abiertas."
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Connect your wallet to view order history."
+msgstr ""
+
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Connect your wallet to view positions."
 msgstr "Conecta tu billetera para ver posiciones."
@@ -395,7 +398,7 @@ msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
-#: src/components/trade/tradebox/margin-mode-toggle.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Cross"
 msgstr "Cruzado"
 
@@ -485,8 +488,8 @@ msgid "Displays the mobile sidebar."
 msgstr "Muestra la barra lateral móvil."
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Docs"
-#~ msgstr "Documentación"
+msgid "Docs"
+msgstr "Documentación"
 
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
@@ -609,6 +612,10 @@ msgstr "Error al cargar órdenes abiertas."
 msgid "Failed to load order book."
 msgstr "Error al cargar libro de órdenes."
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Failed to load order history."
+msgstr ""
+
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Failed to load positions."
 msgstr "Error al cargar posiciones."
@@ -646,8 +653,8 @@ msgstr "Comisión"
 #~ msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx
-msgid "Filled"
-msgstr "Ejecutado"
+#~ msgid "Filled"
+#~ msgstr "Ejecutado"
 
 #. placeholder {0}: sub.label
 #: src/components/trade/chart/token-selector.tsx
@@ -673,8 +680,12 @@ msgid "Funding"
 msgstr "Financiamiento"
 
 #: src/components/trade/positions/funding-tab.tsx
-msgid "Funding Payments"
-msgstr "Pagos de financiamiento"
+msgid "Funding History"
+msgstr ""
+
+#: src/components/trade/positions/funding-tab.tsx
+#~ msgid "Funding Payments"
+#~ msgstr "Pagos de financiamiento"
 
 #: src/components/trade/footer/footer-bar.tsx
 #~ msgid "Gas:"
@@ -702,8 +713,8 @@ msgid "In Orders"
 msgstr ""
 
 #: src/components/trade/positions/balances-tab.tsx
-msgid "In Use"
-msgstr "En uso"
+#~ msgid "In Use"
+#~ msgstr "En uso"
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Install a wallet extension to continue"
@@ -749,7 +760,7 @@ msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
-#: src/components/trade/tradebox/margin-mode-toggle.tsx
+#: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Isolated"
 msgstr "Aislado"
 
@@ -758,15 +769,15 @@ msgstr "Aislado"
 #~ msgstr "Latencia:"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Leaderboard"
-#~ msgstr "Clasificación"
+msgid "Leaderboard"
+msgstr "Clasificación"
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Learn more"
 msgstr ""
 
-#: src/components/trade/tradebox/leverage-popover.tsx
-#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 msgid "Leverage"
 msgstr ""
 
@@ -826,6 +837,10 @@ msgstr "Cargando mercados..."
 msgid "Loading open orders..."
 msgstr "Cargando órdenes abiertas..."
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Loading order history..."
+msgstr ""
+
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Loading positions..."
 msgstr "Cargando posiciones..."
@@ -842,6 +857,7 @@ msgstr "Cargando órdenes TWAP..."
 msgid "Loading wallet..."
 msgstr "Cargando billetera..."
 
+#: src/components/trade/tradebox/account-panel.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/lib/trade/use-button-content.ts
@@ -916,10 +932,12 @@ msgid "markets"
 msgstr "mercados"
 
 #: src/components/trade/positions/transfer-dialog.tsx
-msgid "Max"
-msgstr "Máx"
+#~ msgid "Max"
+#~ msgstr "Máx"
 
+#: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/positions/send-dialog.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
 msgid "MAX"
@@ -977,12 +995,12 @@ msgid "Mock Wallet (Testing)"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "More"
-#~ msgstr "Más"
+msgid "More"
+msgstr "Más"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "More options"
-#~ msgstr "Más opciones"
+msgid "More options"
+msgstr "Más opciones"
 
 #: src/components/ui/pagination.tsx
 #~ msgid "More pages"
@@ -1065,6 +1083,10 @@ msgstr "No se encontraron mercados."
 msgid "No open orders."
 msgstr "Sin órdenes abiertas."
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "No order history found."
+msgstr ""
+
 #: src/components/trade/tradebox/trade-panel.tsx
 msgid "No response from exchange"
 msgstr ""
@@ -1102,8 +1124,8 @@ msgid "Not connected"
 msgstr "No conectado"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Notifications"
-#~ msgstr "Notificaciones"
+msgid "Notifications"
+msgstr "Notificaciones"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Number Format"
@@ -1151,6 +1173,10 @@ msgstr "Libro de órdenes"
 msgid "Order failed"
 msgstr "Orden fallida"
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Order History"
+msgstr ""
+
 #: src/components/trade/tradebox/order-toast.tsx
 msgid "Order Queue"
 msgstr "Cola de órdenes"
@@ -1158,6 +1184,15 @@ msgstr "Cola de órdenes"
 #: src/components/trade/tradebox/order-summary.tsx
 msgid "Order Value"
 msgstr "Valor orden"
+
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Orders"
+msgstr ""
+
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
+#: src/components/trade/tradebox/advanced-order-dropdown.tsx
+msgid "Other"
+msgstr ""
 
 #: src/components/trade/components/wallet-dialog.tsx
 msgid "Other Options"
@@ -1197,7 +1232,6 @@ msgid "Perpetuals"
 msgstr ""
 
 #: src/components/trade/tradebox/account-panel.tsx
-#: src/components/trade/tradebox/account-panel.tsx
 msgid "Perps"
 msgstr "Perpetuos"
 
@@ -1221,8 +1255,8 @@ msgid "Popular"
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Portfolio"
-#~ msgstr "Portafolio"
+msgid "Portfolio"
+msgstr "Portafolio"
 
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
@@ -1237,6 +1271,7 @@ msgstr "Posición"
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/tradebox/price-input-with-percent.tsx
 msgid "Price"
@@ -1248,8 +1283,8 @@ msgstr ""
 
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
-msgid "Pro"
-msgstr ""
+#~ msgid "Pro"
+#~ msgstr ""
 
 #: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Processing deposit"
@@ -1296,6 +1331,10 @@ msgstr "Solo reducir"
 #~ msgid "Register Builder Code"
 #~ msgstr ""
 
+#: src/components/trade/header/favorites-strip.tsx
+msgid "Remove {displayName} from favorites"
+msgstr ""
+
 #: src/components/trade/chart/token-selector.tsx
 msgid "Remove from favorites"
 msgstr "Quitar de favoritos"
@@ -1306,8 +1345,7 @@ msgstr "Quitar de favoritos"
 
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
-#: src/components/trade/tradebox/leverage-popover.tsx
-#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 msgid "Retry"
 msgstr ""
 
@@ -1511,6 +1549,7 @@ msgstr "Firmante no listo"
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -1576,7 +1615,6 @@ msgstr "Ordenado por {0}"
 #: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/tradebox/account-panel.tsx
-#: src/components/trade/tradebox/account-panel.tsx
 msgid "Spot"
 msgstr "Spot"
 
@@ -1593,8 +1631,8 @@ msgid "Spread"
 msgstr "Diferencial"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Staking"
-#~ msgstr "Staking"
+msgid "Staking"
+msgstr "Staking"
 
 #: src/lib/errors/definitions/scale.ts
 msgid "Start and end must differ"
@@ -1604,9 +1642,9 @@ msgstr ""
 msgid "Start Price (USDC)"
 msgstr ""
 
-#: src/components/trade/positions/twap-tab.tsx
-#~ msgid "Status"
-#~ msgstr "Estado"
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Status"
+msgstr "Estado"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Stop"
@@ -1638,8 +1676,8 @@ msgid "Submitting..."
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Support"
-#~ msgstr "Soporte"
+msgid "Support"
+msgstr "Soporte"
 
 #: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/components/spot-swap-modal.tsx
@@ -1668,6 +1706,7 @@ msgstr ""
 #. placeholder {0}: markets.getMarket(fill.coin)?.displayName ?? fill.coin
 #. placeholder {0}: markets.getMarket(state.coin)?.displayName ?? state.coin
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Switch to {0} market"
@@ -1743,6 +1782,7 @@ msgstr "La página que buscas no existe."
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Time"
 msgstr "Hora"
@@ -1823,12 +1863,12 @@ msgid "Trade"
 msgstr "Operar"
 
 #: src/components/trade/positions/history-tab.tsx
-msgid "Trade ClockCounterClockwise"
-msgstr ""
+#~ msgid "Trade ClockCounterClockwise"
+#~ msgstr ""
 
 #: src/components/trade/positions/history-tab.tsx
-#~ msgid "Trade History"
-#~ msgstr "Historial de operaciones"
+msgid "Trade History"
+msgstr "Historial de operaciones"
 
 #. placeholder {0}: spotMarket.displayName
 #: src/components/trade/components/spot-swap-modal.tsx
@@ -1888,6 +1928,7 @@ msgid "TWAP Orders"
 msgstr "Órdenes TWAP"
 
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Type"
 msgstr "Tipo"
@@ -1922,14 +1963,13 @@ msgstr "PNL no realizado"
 msgid "Unsupported resolution: {0}"
 msgstr "Resolución no soportada: {0}"
 
-#: src/components/trade/tradebox/leverage-popover.tsx
-#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Update failed"
 msgstr ""
 
-#: src/components/trade/tradebox/leverage-popover.tsx
-#: src/components/trade/tradebox/leverage-sheet.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
+#: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Updated"
 msgstr ""
@@ -1947,8 +1987,8 @@ msgstr "Valor en USD"
 #~ msgstr "Valor"
 
 #: src/components/trade/header/top-nav.tsx
-#~ msgid "Vaults"
-#~ msgstr "Bóvedas"
+msgid "Vaults"
+msgstr "Bóvedas"
 
 #: src/lib/trade/use-button-content.ts
 msgid "Verifying..."

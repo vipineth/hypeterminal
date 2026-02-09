@@ -11,11 +11,7 @@ export const FALLBACK_VALUE_PLACEHOLDER = "-";
 export const FORMAT_COMPACT_THRESHOLD = 10_000;
 export const FORMAT_COMPACT_DEFAULT = true;
 
-export const ORDER_TOAST_SUCCESS_DURATION_MS = 5_000;
-export const ORDER_TOAST_STALE_THRESHOLD_MS = 30_000;
-
 export const MOBILE_BREAKPOINT_PX = 768;
-export const FOOTER_TIME_TICK_MS = 1_000;
 
 export const DEFAULT_MARKET_KEY = "perp:BTC";
 export const DEFAULT_MARKET_NAME = "BTC";
@@ -43,29 +39,25 @@ export const MARKET_ORDER_SLIPPAGE_MAX_PERCENT = 100;
 export const DEFAULT_LEVERAGE_BY_MODE = { cross: 10, isolated: 10 } as const;
 
 export const STORAGE_KEYS = {
-	MARKET_PREFS: "market-prefs-v1",
-	GLOBAL_SETTINGS: "global-settings-v1",
-	API_WALLET: "hyperliquid-api-wallet-v1",
-	LEGACY_FAVORITES: "favorites-storage-v0.2",
-	META_CACHE: "hyperliquid-meta-cache-v1",
-	SIDEBAR_STATE: "sidebar_state",
-	ORDER_ENTRY: "order-entry-v1",
+	MARKET_PREFS: "market-prefs-v2",
+	GLOBAL_SETTINGS: "global-settings-v2",
+	META_CACHE: "hyperliquid-meta-cache-v2",
+	SIDEBAR_STATE: "sidebar_state-v2",
+	ORDER_ENTRY: "order-entry-v2",
 } as const;
-
-export const META_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 export const TOKEN_ICON_BASE_URL = "https://app.hyperliquid.xyz/coins";
 
 export const PANEL_LAYOUT = {
 	MAIN: {
 		id: "CHART_WITH_SWAPBOX",
-		analysis: { defaultSize: 75 },
-		sidebar: { defaultSize: 25 },
+		analysis: { defaultSize: 77 },
+		sidebar: { defaultSize: 23 },
 	},
 	ANALYSIS: {
 		id: "CHART_WITH_POSITIONS",
-		chart: { defaultSize: 52, minSize: 30 },
-		positions: { defaultSize: 48, minSize: 20 },
+		chart: { defaultSize: 64, minSize: 40 },
+		positions: { defaultSize: 36, minSize: 20 },
 	},
 	MARKET: {
 		id: "CHART_WITH_ORDERBOOK",
@@ -195,7 +187,6 @@ export const CHART_WIDGET_DEFAULTS = {
 	DEBUG: false,
 } as const;
 
-export const CHART_ALL_MIDS_TTL_MS = 10_000;
 export const CHART_DATAFEED_CONFIG = {
 	SYMBOL_TYPE: "crypto",
 	SYMBOL_TYPES: [{ name: "crypto", value: "crypto" }],
@@ -219,10 +210,11 @@ export const MARKET_CATEGORY_LABELS = {
 export const POSITIONS_TABS = [
 	{ value: "balances", label: "Balances" },
 	{ value: "positions", label: "Positions" },
-	{ value: "orders", label: "Orders" },
+	{ value: "orders", label: "Open Orders" },
 	{ value: "twap", label: "TWAP" },
-	{ value: "history", label: "History" },
-	{ value: "funding", label: "Funding" },
+	{ value: "history", label: "Trade History" },
+	{ value: "funding", label: "Funding History" },
+	{ value: "orders-history", label: "Order History" },
 ] as const;
 
 export const UI_TEXT = {

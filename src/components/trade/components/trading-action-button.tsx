@@ -22,7 +22,7 @@ export function TradingActionButton({ onClick, children, disabled, className, ..
 	const showEnableTrading = needsTrading && !isEnabling;
 
 	return (
-		<div className="flex flex-col gap-1">
+		<div className="flex flex-col gap-1 items-end">
 			<Button
 				{...buttonProps}
 				onClick={handleClick}

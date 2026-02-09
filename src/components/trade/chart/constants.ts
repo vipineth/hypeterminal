@@ -1,7 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { createColumnHelper } from "@tanstack/react-table";
 import {
-	CHART_ALL_MIDS_TTL_MS,
 	CHART_CUSTOM_FONT_FAMILY,
 	CHART_DATAFEED_CONFIG,
 	CHART_DEFAULT_INTERVAL,
@@ -21,6 +20,7 @@ import {
 	CHART_TIMEZONE,
 	CHART_WIDGET_DEFAULTS,
 } from "@/config/constants";
+import { CHART_ALL_MIDS_TTL_MS } from "@/config/time";
 import { get24hChange, getOiUsd } from "@/domain/market";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid";
 

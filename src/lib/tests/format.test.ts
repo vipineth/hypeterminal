@@ -22,7 +22,7 @@ describe("format", () => {
 
 	it("formats token amounts and percentages", () => {
 		expect(formatToken(1.23456, 2)).toBe("1.23");
-		expect(formatToken(1.23456, { digits: 3, symbol: "ETH" })).toBe("1.235 ETH");
+		expect(formatToken(1.23456, { decimals: 3, symbol: "ETH" })).toBe("1.235 ETH");
 		expect(formatPercent(0.125, 2)).toBe("+12.50%");
 	});
 

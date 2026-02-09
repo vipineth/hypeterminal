@@ -12,6 +12,8 @@ import { type NumberFormatLocale, resolveNumberFormatLocale } from "@/lib/i18n";
 import type { MarginMode } from "@/lib/trade/margin-mode";
 import { createValidatedStorage } from "@/stores/validated-storage";
 
+type Theme = "dark" | "light";
+
 const globalSettingsSchema = z.object({
 	state: z.object({
 		hideSmallBalances: z.boolean().optional(),
@@ -24,6 +26,7 @@ const globalSettingsSchema = z.object({
 		marketOrderSlippagePercent: z.number().optional(),
 		marginMode: z.enum(["cross", "isolated"]).optional(),
 		positionsActiveTab: z.string().optional(),
+		theme: z.enum(["dark", "light"]).optional(),
 	}),
 });
 
@@ -40,6 +43,7 @@ const DEFAULT_GLOBAL_SETTINGS = {
 	marketOrderSlippagePercent: DEFAULT_MARKET_ORDER_SLIPPAGE_PERCENT,
 	marginMode: "cross" as MarginMode,
 	positionsActiveTab: "positions",
+	theme: "dark" as Theme,
 } as const;
 
 interface GlobalSettingsStore {
@@ -53,6 +57,7 @@ interface GlobalSettingsStore {
 	marketOrderSlippagePercent: number;
 	marginMode: MarginMode;
 	positionsActiveTab: string;
+	theme: Theme;
 	actions: {
 		setHideSmallBalances: (next: boolean) => void;
 		setShowOrdersOnChart: (next: boolean) => void;
@@ -64,6 +69,7 @@ interface GlobalSettingsStore {
 		setMarketOrderSlippagePercent: (percent: number) => void;
 		setMarginMode: (mode: MarginMode) => void;
 		setPositionsActiveTab: (tab: string) => void;
+		setTheme: (theme: Theme) => void;
 	};
 }
 
@@ -89,6 +95,7 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 				},
 				setMarginMode: (mode) => set({ marginMode: mode }),
 				setPositionsActiveTab: (tab) => set({ positionsActiveTab: tab }),
+				setTheme: (theme) => set({ theme }),
 			},
 		}),
 		{
@@ -105,6 +112,7 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 				marketOrderSlippagePercent: state.marketOrderSlippagePercent,
 				marginMode: state.marginMode,
 				positionsActiveTab: state.positionsActiveTab,
+				theme: state.theme,
 			}),
 			merge: (persisted, current) => {
 				const p = persisted as Partial<GlobalSettingsStore>;
@@ -126,11 +134,29 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 					showOrderbookInQuote,
 					marketOrderSlippagePercent: slippagePercent,
 					marginMode: p?.marginMode === "isolated" ? "isolated" : "cross",
+					theme: p?.theme === "light" ? "light" : "dark",
 				};
 			},
 		},
 	),
 );
+
+function applyThemeClass(theme: Theme) {
+	const root = document.documentElement;
+	root.classList.remove("light", "dark");
+	root.classList.add(theme);
+}
+
+applyThemeClass(useGlobalSettingsStore.getState().theme);
+useGlobalSettingsStore.subscribe((state, prev) => {
+	if (state.theme !== prev.theme) applyThemeClass(state.theme);
+});
+
+export function useTheme() {
+	const theme = useGlobalSettingsStore((state) => state.theme);
+	const setTheme = useGlobalSettingsStore((state) => state.actions.setTheme);
+	return { theme, setTheme };
+}
 
 export function useGlobalSettings() {
 	return useGlobalSettingsStore(

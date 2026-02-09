@@ -1,9 +1,9 @@
 import { CheckCircleIcon, InfoIcon, SpinnerGapIcon, WarningIcon, WarningOctagonIcon } from "@phosphor-icons/react";
-import { useTheme } from "next-themes";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
+import { useTheme } from "@/stores/use-global-settings-store";
 
 const Toaster = ({ ...props }: ToasterProps) => {
-	const { theme = "system" } = useTheme();
+	const { theme } = useTheme();
 
 	return (
 		<Sonner
@@ -18,9 +18,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
 			}}
 			style={
 				{
-					"--normal-bg": "var(--surface)",
-					"--normal-text": "var(--surface-fg)",
-					"--normal-border": "var(--border)",
+					"--normal-bg": "var(--surface-execution)",
+					"--normal-text": "var(--text-950)",
+					"--normal-border": "var(--border-200)",
 					"--border-radius": "var(--radius)",
 				} as React.CSSProperties
 			}

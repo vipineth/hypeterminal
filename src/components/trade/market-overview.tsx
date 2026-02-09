@@ -56,7 +56,7 @@ export function MarketOverview() {
 	const spotTokenAddress = getSpotTokenAddress(selectedMarketInfo);
 
 	return (
-		<div className="hidden md:flex items-center gap-4 text-3xs ">
+		<div className="hidden md:flex items-center gap-4 text-3xs">
 			{getLabelForMarketKind(selectedMarketInfo) ? (
 				<Badge className="uppercase text-4xs" variant="neutral">
 					{getLabelForMarketKind(selectedMarketInfo)}
@@ -65,7 +65,7 @@ export function MarketOverview() {
 			<StatBlock
 				label={isSpot ? t`PRICE` : t`MARK`}
 				value={formatUSD(markPx, { compact: false })}
-				valueClass="text-warning"
+				valueClass={getValueColorClass(change24h)}
 			/>
 			<StatBlock
 				label={t`24H`}
@@ -84,7 +84,7 @@ export function MarketOverview() {
 					/>
 					<div className="flex items-center gap-1">
 						<FireIcon className={cn("size-3", getValueColorClass(fundingNum))} />
-						<span className={cn("text-muted-fg tabular-nums", getValueColorClass(fundingNum))}>
+						<span className={cn("tabular-nums", getValueColorClass(fundingNum))}>
 							{formatPercent(fundingNum, {
 								minimumFractionDigits: 4,
 								signDisplay: "exceptZero",
@@ -105,7 +105,7 @@ export function MarketOverview() {
 					href={getExplorerTokenUrl(spotTokenAddress)}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="flex items-center gap-1 text-muted-fg hover:text-fg transition-colors"
+					className="flex items-center gap-1 text-text-950 hover:text-text-950 transition-colors"
 				>
 					<span className="font-mono">{shortenAddress(spotTokenAddress, 4, 4)}</span>
 					<ArrowSquareOutIcon className="size-3" />

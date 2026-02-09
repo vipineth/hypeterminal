@@ -1,29 +1,32 @@
-import { type RefObject, useLayoutEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
-const ROW_HEIGHT = 22;
+const ROW_HEIGHT = 19;
 const MIN_ROWS_PER_SIDE = 3;
 const MAX_ROWS_PER_SIDE = 20;
+const SPREAD_SELECTOR = "[data-slot='orderbook-spread']";
 
-export function useOrderbookRows(containerRef: RefObject<HTMLDivElement | null>): number {
-	const [visibleRows, setVisibleRows] = useState(MIN_ROWS_PER_SIDE);
+export function useOrderbookRows() {
+	const [visibleRows, setVisibleRows] = useState(MAX_ROWS_PER_SIDE);
 
-	useLayoutEffect(() => {
-		const container = containerRef.current;
-		if (!container) return;
+	const containerRef = useCallback((node: HTMLDivElement | null) => {
+		if (!node) return;
 
-		function calculateRows() {
-			const height = container!.clientHeight;
-			const rowsPerSide = Math.min(MAX_ROWS_PER_SIDE, Math.max(MIN_ROWS_PER_SIDE, Math.floor(height / 2 / ROW_HEIGHT)));
-			setVisibleRows(rowsPerSide);
+		function calculate(el: HTMLDivElement) {
+			const height = el.clientHeight;
+			if (height === 0) return;
+			const spreadHeight = el.querySelector(SPREAD_SELECTOR)?.clientHeight ?? 0;
+			const availablePerSide = (height - spreadHeight) / 2;
+			const rows = Math.floor(availablePerSide / ROW_HEIGHT);
+			setVisibleRows(Math.min(MAX_ROWS_PER_SIDE, Math.max(MIN_ROWS_PER_SIDE, rows)));
 		}
 
-		calculateRows();
+		calculate(node);
 
-		const observer = new ResizeObserver(calculateRows);
-		observer.observe(container);
+		const observer = new ResizeObserver(() => calculate(node));
+		observer.observe(node);
 
 		return () => observer.disconnect();
-	}, [containerRef]);
+	}, []);
 
-	return visibleRows;
+	return [visibleRows, containerRef] as const;
 }

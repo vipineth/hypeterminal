@@ -8,7 +8,7 @@ type DateInput = Date | number | string | null | undefined;
 const formatterCache = new Map<string, Formatter>();
 
 export interface FormatOptions extends Intl.NumberFormatOptions {
-	digits?: number;
+	decimals?: number;
 	compact?: boolean;
 }
 
@@ -60,7 +60,7 @@ function getFormatter(
 
 // Helper to normalize options
 function resolveOptions(opts?: number | FormatOptions): FormatOptions {
-	if (typeof opts === "number") return { digits: opts };
+	if (typeof opts === "number") return { decimals: opts };
 	return opts || {};
 }
 
@@ -120,13 +120,13 @@ export function formatUSD(value: string | number | null | undefined, opts?: numb
 	const parsed = parseNumberInput(value);
 	if (!isValidNumber(parsed.value)) return FALLBACK_VALUE_PLACEHOLDER;
 
-	const { digits, compact, ...rest } = resolveOptions(opts);
+	const { decimals, compact, ...rest } = resolveOptions(opts);
 
 	const defaults: Intl.NumberFormatOptions = {
 		style: "currency",
 		currency: "USD",
-		minimumFractionDigits: digits ?? 2,
-		maximumFractionDigits: digits ?? 2,
+		minimumFractionDigits: decimals ?? 2,
+		maximumFractionDigits: decimals ?? 2,
 	};
 	const formatOptions = buildNumberFormatOptions(parsed.value, { compact, ...rest }, defaults, FORMAT_COMPACT_DEFAULT);
 	return getFormatter("number", getResolvedFormatLocale(), formatOptions).format(parsed.value);
@@ -163,15 +163,15 @@ export function formatPrice(value: string | number | null | undefined, opts?: Fo
 	const parsed = parseNumberInput(value);
 	if (!isValidNumber(parsed.value)) return FALLBACK_VALUE_PLACEHOLDER;
 
-	// Derive decimals from szDecimals if provided, otherwise use explicit digits or default to 2
-	const { digits, compact, szDecimals, trimZeros, ...rest } = opts ?? {};
-	const decimals = digits ?? (szDecimals !== undefined ? szDecimalsToPriceDecimals(szDecimals) : 2);
+	// Derive decimals from szDecimals if provided, otherwise use explicit decimals or default to 2
+	const { decimals: decOpt, compact, szDecimals, trimZeros, ...rest } = opts ?? {};
+	const resolvedDecimals = decOpt ?? (szDecimals !== undefined ? szDecimalsToPriceDecimals(szDecimals) : 2);
 
 	const defaults: Intl.NumberFormatOptions = {
 		style: "currency",
 		currency: "USD",
-		minimumFractionDigits: trimZeros === false ? decimals : 0,
-		maximumFractionDigits: decimals,
+		minimumFractionDigits: trimZeros === false ? resolvedDecimals : 0,
+		maximumFractionDigits: resolvedDecimals,
 	};
 
 	const formatOptions = buildNumberFormatOptions(parsed.value, { compact, ...rest }, defaults, false);
@@ -183,7 +183,7 @@ export function formatPrice(value: string | number | null | undefined, opts?: Fo
  * @example formatToken(1.234567) -> "1.23457"
  * @example formatToken("1.234567", 2) -> "1.23"
  * @example formatToken(1.234567, "ETH") -> "1.23457 ETH"
- * @example formatToken(1.234567, { digits: 2, symbol: "ETH" }) -> "1.23 ETH"
+ * @example formatToken(1.234567, { decimals: 2, symbol: "ETH" }) -> "1.23 ETH"
  */
 export function formatToken(value: string | number | null | undefined, opts?: number | string | FormatTokenOptions) {
 	const parsed = parseNumberInput(value);
@@ -192,19 +192,19 @@ export function formatToken(value: string | number | null | undefined, opts?: nu
 	let options: FormatTokenOptions = {};
 
 	if (typeof opts === "number") {
-		options = { digits: opts };
+		options = { decimals: opts };
 	} else if (typeof opts === "string") {
 		options = { symbol: opts };
 	} else {
 		options = opts || {};
 	}
 
-	const { digits, symbol, compact, ...rest } = options;
+	const { decimals, symbol, compact, ...rest } = options;
 
 	const defaults: Intl.NumberFormatOptions = {
 		style: "decimal",
-		minimumFractionDigits: digits ?? 5,
-		maximumFractionDigits: digits ?? 5,
+		minimumFractionDigits: decimals ?? 5,
+		maximumFractionDigits: decimals ?? 5,
 	};
 
 	const formatOptions = buildNumberFormatOptions(parsed.value, { compact, ...rest }, defaults, false);
@@ -222,11 +222,11 @@ export function formatPercent(value: string | number | null | undefined, opts?: 
 	const parsed = parseNumberInput(value);
 	if (!isValidNumber(parsed.value)) return FALLBACK_VALUE_PLACEHOLDER;
 
-	const { digits, compact, ...rest } = resolveOptions(opts);
+	const { decimals, compact, ...rest } = resolveOptions(opts);
 	const defaults: Intl.NumberFormatOptions = {
 		style: "percent",
-		minimumFractionDigits: digits ?? 2,
-		maximumFractionDigits: digits ?? 2,
+		minimumFractionDigits: decimals ?? 2,
+		maximumFractionDigits: decimals ?? 2,
 		signDisplay: "exceptZero",
 	};
 	const formatOptions = buildNumberFormatOptions(parsed.value, { compact, ...rest }, defaults, false);
@@ -236,9 +236,9 @@ export function formatPercent(value: string | number | null | undefined, opts?: 
 /**
  * Format a number with commas and decimal precision.
  *
- * - If value is a string and digits are not provided, preserves its original decimal precision (for API values)
- * - If value is a number with digits specified, uses those
- * - If value is a number without digits, uses 0-3 decimals
+ * - If value is a string and decimals are not provided, preserves its original decimal precision (for API values)
+ * - If value is a number with decimals specified, uses those
+ * - If value is a number without decimals, uses 0-3 decimals
  *
  * @example formatNumber("95001.5") -> "95,001.5" (string: preserves precision)
  * @example formatNumber("2.0001") -> "2.0001" (string: preserves precision)
@@ -249,13 +249,13 @@ export function formatNumber(value: string | number | null | undefined, opts?: n
 	const parsed = parseNumberInput(value);
 	if (!isValidNumber(parsed.value)) return FALLBACK_VALUE_PLACEHOLDER;
 
-	const { digits, compact, ...rest } = resolveOptions(opts);
+	const { decimals, compact, ...rest } = resolveOptions(opts);
 	const stringDecimals = parsed.stringDecimals;
-	const resolvedDigits = digits ?? (typeof stringDecimals === "number" ? stringDecimals : undefined);
+	const resolvedDecimals = decimals ?? (typeof stringDecimals === "number" ? stringDecimals : undefined);
 	const defaults: Intl.NumberFormatOptions = {
 		style: "decimal",
-		minimumFractionDigits: resolvedDigits ?? 0,
-		maximumFractionDigits: resolvedDigits ?? 3,
+		minimumFractionDigits: resolvedDecimals ?? 0,
+		maximumFractionDigits: resolvedDecimals ?? 3,
 	};
 	const formatOptions = buildNumberFormatOptions(parsed.value, { compact, ...rest }, defaults, false);
 	return getFormatter("number", getResolvedFormatLocale(), formatOptions).format(parsed.value);

@@ -82,36 +82,36 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 			<PopoverTrigger asChild>
 				<Button
 					variant="text"
-					size="sm"
+					size="none"
 					role="combobox"
 					aria-expanded={open}
 					aria-label={t`Select token`}
-					className="gap-1.5 text-xs font-medium"
+					className="gap-2 px-2 h-7 min-w-36 bg-surface-execution border border-border-200/40 rounded-sm text-2xs font-bold uppercase tracking-wider hover:bg-surface-execution"
 				>
-					{selectedMarket && <AssetDisplay asset={selectedMarket} iconClassName="size-5 shrink-0" />}
-					<CaretDownIcon className="size-3" />
+					{selectedMarket && <AssetDisplay asset={selectedMarket} iconClassName="size-6 shrink-0" />}
+					<CaretDownIcon className="size-4 text-text-600" />
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent
-				className="w-[calc(100vw-1rem)] sm:w-2xl max-w-2xl p-0 border-border/60 bg-surface"
+				className="w-[calc(100vw-1rem)] sm:w-2xl max-w-2xl p-0 border-border-200/60 bg-surface-execution"
 				align="start"
 				sideOffset={8}
 				onKeyDown={handleKeyDown}
 			>
 				<div className="flex flex-col p-2">
-					<div className="border-b border-border/40">
+					<div className="border-b border-border-200/40">
 						<div className="relative">
-							<MagnifyingGlassIcon className="absolute left-2 top-1/2 -translate-y-1/2 size-3 text-muted-fg" />
+							<MagnifyingGlassIcon className="absolute left-2 top-1/2 -translate-y-1/2 size-3 text-text-600" />
 							<Input
 								placeholder={t`Search markets...`}
 								value={search}
 								onChange={(e) => setSearch(e.target.value)}
-								className="pl-7 h-7 text-xs bg-bg/50 border-border/60 focus:border-info/40"
+								className="pl-7 h-7 text-xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/40"
 							/>
 						</div>
 					</div>
 
-					<div className="py-2 border-b border-border/40 bg-surface/50">
+					<div className="py-2 border-b border-border-200/40 bg-surface-base/50">
 						<div className="flex items-center gap-0.5 flex-wrap">
 							{marketScopes.map((s) => {
 								const isSelected = scope === s.value;
@@ -124,8 +124,8 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 										className={cn(
 											"px-2 py-1 text-3xs uppercase tracking-wider cursor-pointer",
 											isSelected
-												? "bg-warning/10 text-warning hover:bg-warning/10 hover:text-warning"
-												: "text-muted-fg hover:bg-transparent",
+												? "bg-warning-700/10 text-warning-700 hover:bg-warning-700/10 hover:text-warning-700"
+												: "text-text-950 hover:bg-transparent",
 										)}
 									>
 										{s.label}
@@ -146,8 +146,8 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 											className={cn(
 												"px-2 py-0.5 text-4xs tracking-wider cursor-pointer",
 												isSelected
-													? "bg-info/10 text-info hover:bg-info/10 hover:text-info"
-													: "text-muted-fg/80 hover:bg-transparent hover:text-muted-fg",
+													? "bg-primary-default/10 text-primary-default hover:bg-primary-default/10 hover:text-primary-default"
+													: "text-text-950 hover:bg-transparent hover:text-text-950",
 											)}
 											aria-label={t`Filter by ${sub.label}`}
 											aria-pressed={isSelected}
@@ -159,7 +159,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 							</div>
 						)}
 					</div>
-					<div className="flex items-center px-3 py-1.5 text-4xs uppercase tracking-wider text-muted-fg/70 border-b border-border/40 bg-surface/30">
+					<div className="flex items-center px-3 py-1.5 text-4xs uppercase tracking-wider text-text-950 border-b border-border-200/40 bg-surface-base/30">
 						<div className="flex-1 min-w-0">{t`Market`}</div>
 						{headerGroup?.headers
 							.filter((h) => h.id !== "displayName")
@@ -177,7 +177,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 										size="none"
 										onClick={header.column.getToggleSortingHandler()}
 										className={cn(
-											"w-16 sm:w-20 justify-end gap-1 hover:text-fg hover:bg-transparent",
+											"w-16 sm:w-20 justify-end gap-1 hover:text-text-950 hover:bg-transparent",
 											hiddenOnMobile && "hidden sm:flex",
 										)}
 										aria-label={t`Sort by ${String(header.column.columnDef.header ?? "")}`}
@@ -200,10 +200,10 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 					<div ref={containerRef} className="h-72 overflow-auto">
 						{isLoading ? (
 							<div className="flex items-center justify-center py-8">
-								<span className="text-3xs text-muted-fg">{t`Loading markets...`}</span>
+								<span className="text-3xs text-text-950">{t`Loading markets...`}</span>
 							</div>
 						) : rows.length === 0 ? (
-							<div className="py-8 text-center text-3xs text-muted-fg">{t`No markets found.`}</div>
+							<div className="py-8 text-center text-3xs text-text-950">{t`No markets found.`}</div>
 						) : (
 							<div
 								style={{
@@ -225,7 +225,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 
 									const changeClass = cn(
 										"text-2xs font-medium tabular-nums",
-										changeDecimal === null ? "text-muted-fg" : getValueColorClass(changeDecimal),
+										changeDecimal === null ? "text-text-600" : getValueColorClass(changeDecimal),
 									);
 									const changeText = formatPercent(changeDecimal);
 
@@ -248,11 +248,11 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 											aria-selected={isSelected}
 											tabIndex={0}
 											className={cn(
-												"flex items-center px-3 py-1.5 cursor-pointer border-b border-border/20",
-												"hover:bg-accent/30 transition-colors",
+												"flex items-center px-3 py-1.5 cursor-pointer border-b border-border-200/20",
+												"hover:bg-primary-default/10 transition-colors",
 												"absolute top-0 left-0 w-full",
-												isSelected && !isHighlighted && "bg-muted/10",
-												isHighlighted && "bg-accent/40",
+												isSelected && !isHighlighted && "bg-surface-analysis",
+												isHighlighted && "bg-primary-default/15",
 											)}
 											style={{
 												height: `${virtualItem.size}px`,
@@ -277,7 +277,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 															<StarIcon
 																className={cn(
 																	"size-2.5 transition-colors",
-																	isFav ? "fill-warning text-warning" : "text-muted-fg hover:text-warning",
+																	isFav ? "fill-warning-700 text-warning-700" : "text-text-600 hover:text-warning-700",
 																)}
 															/>
 														</Button>
@@ -287,10 +287,10 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 															</Badge>
 														)}
 													</div>
-													<div className="flex items-center gap-1.5 text-4xs text-muted-fg">
+													<div className="flex items-center gap-1.5 text-4xs text-text-950">
 														{getMaxLeverage(market) && <span>{getMaxLeverage(market)}x</span>}
-														{isSpot && <span className="text-info">Spot</span>}
-														{isHip3 && <span className="text-warning">{getDex(market)}</span>}
+														{isSpot && <span className="text-primary-default">Spot</span>}
+														{isHip3 && <span className="text-warning-700">{getDex(market)}</span>}
 													</div>
 												</div>
 											</div>
@@ -321,7 +321,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 														<span
 															className={cn(
 																"text-2xs tabular-nums font-medium",
-																market.funding === null ? "text-muted-fg" : getValueColorClass(market.funding),
+																market.funding === null ? "text-text-600" : getValueColorClass(market.funding),
 															)}
 														>
 															{formatPercent(market.funding, {
@@ -339,7 +339,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 						)}
 					</div>
 
-					<div className="px-3 py-1.5 bg-surface/30 flex items-center justify-between text-4xs text-muted-fg">
+					<div className="px-3 py-1.5 bg-surface-base/30 flex items-center justify-between text-4xs text-text-950">
 						<span>
 							{filteredMarkets.length} {t`markets`}
 						</span>

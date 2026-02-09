@@ -7,8 +7,9 @@ const alertVariants = cva(
 	{
 		variants: {
 			variant: {
-				default: "bg-surface text-surface-fg",
-				destructive: "text-danger bg-surface [&>svg]:text-current *:data-[slot=alert-description]:text-danger/90",
+				default: "bg-surface-execution text-text-950",
+				destructive:
+					"text-error-700 bg-surface-execution [&>svg]:text-current *:data-[slot=alert-description]:text-error-700/90",
 			},
 		},
 		defaultVariants: {
@@ -36,7 +37,7 @@ function AlertDescription({ className, ...props }: React.ComponentProps<"div">) 
 		<div
 			data-slot="alert-description"
 			className={cn(
-				"text-muted-fg col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed",
+				"text-text-600 col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed",
 				className,
 			)}
 			{...props}

@@ -4,19 +4,19 @@ import type * as React from "react";
 import { cn } from "@/lib/cn";
 
 const badgeVariants = cva(
-	"inline-flex items-center justify-center rounded-full border w-fit whitespace-nowrap shrink-0 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-danger/20 dark:aria-invalid:ring-danger/40 aria-invalid:border-danger transition-[color,box-shadow] overflow-hidden",
+	"inline-flex items-center justify-center rounded-full border w-fit whitespace-nowrap shrink-0 [&>svg]:pointer-events-none focus-visible:border-primary-default/50 focus-visible:ring-primary-default/50 focus-visible:ring-[3px] aria-invalid:ring-error-700/20 dark:aria-invalid:ring-error-700/40 aria-invalid:border-error-700 transition-[color,box-shadow] overflow-hidden",
 	{
 		variants: {
 			variant: {
-				default: "border-transparent bg-primary text-primary-fg [a&]:hover:bg-primary/90",
-				secondary: "border-transparent bg-secondary text-secondary-fg [a&]:hover:bg-secondary/90",
+				default: "border-transparent bg-primary-default text-white [a&]:hover:bg-primary-hover",
+				secondary: "border-transparent bg-surface-base text-text-800 [a&]:hover:bg-surface-base/90",
 				destructive:
-					"border-transparent bg-danger text-danger-fg [a&]:hover:bg-danger/90 focus-visible:ring-danger/20 dark:focus-visible:ring-danger/40 dark:bg-danger/60",
-				outline: "text-fg [a&]:hover:bg-accent [a&]:hover:text-accent-fg",
+					"border-transparent bg-error-700 text-white [a&]:hover:bg-error-700/90 focus-visible:ring-error-700/20 dark:focus-visible:ring-error-700/40 dark:bg-error-700/60",
+				outline: "text-text-950 [a&]:hover:bg-surface-analysis [a&]:hover:text-text-950",
 				// Trading variants
-				long: "border-positive/40 bg-positive/10 text-positive",
-				short: "border-negative/40 bg-negative/10 text-negative",
-				neutral: "border-border/60 bg-muted/30 text-muted-fg",
+				long: "border-market-up-600/40 bg-market-up-100 text-market-up-600",
+				short: "border-market-down-600/40 bg-market-down-100 text-market-down-600",
+				neutral: "border-border-200/60 bg-surface-analysis text-text-800",
 			},
 			size: {
 				default: "px-2 py-0.5 text-xs font-medium gap-1 [&>svg]:size-3",

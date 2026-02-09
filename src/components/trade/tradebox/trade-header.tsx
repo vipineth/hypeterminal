@@ -20,16 +20,26 @@ export function TradeHeader({ orderType, side, sideLabels, marketKind, onOrderTy
 	const tabsOrderType = getTabsOrderType(orderType);
 
 	return (
-		<div className="space-y-2">
-			<div className="flex items-center justify-between gap-2">
-				<Tabs value={tabsOrderType} onValueChange={(v) => onOrderTypeChange(v as "market" | "limit")}>
-					<TabsList variant="underline">
-						<TabsTrigger value="market">{t`Market`}</TabsTrigger>
-						<TabsTrigger value="limit">{t`Limit`}</TabsTrigger>
-					</TabsList>
-				</Tabs>
-				<AdvancedOrderDropdown orderType={orderType} onOrderTypeChange={onOrderTypeChange} marketKind={marketKind} />
-			</div>
+		<div className="space-y-4">
+			<Tabs
+				value={tabsOrderType}
+				onValueChange={(v) => {
+					if (v === "market") onOrderTypeChange("market");
+					else if (v === "limit") onOrderTypeChange("limit");
+				}}
+			>
+				<TabsList variant="underline" className="w-full">
+					<TabsTrigger value="market" className="flex-1 text-xs normal-case">{t`Market`}</TabsTrigger>
+					<TabsTrigger value="limit" className="flex-1 text-xs normal-case">{t`Limit`}</TabsTrigger>
+					<TabsTrigger value="advanced" className="flex-1 text-xs normal-case">
+						<AdvancedOrderDropdown
+							orderType={orderType}
+							onOrderTypeChange={onOrderTypeChange}
+							marketKind={marketKind}
+						/>
+					</TabsTrigger>
+				</TabsList>
+			</Tabs>
 
 			<SideToggle side={side} onSideChange={onSideChange} labels={sideLabels} />
 		</div>

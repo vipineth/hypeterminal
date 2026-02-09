@@ -8,18 +8,11 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
-import { formatDateTime, formatNumber, formatUSD } from "@/lib/format";
+import { formatDateTime, formatToken, formatUSD } from "@/lib/format";
 import { useMarkets } from "@/lib/hyperliquid";
 import { useExchangeCancel } from "@/lib/hyperliquid/hooks/exchange/useExchangeCancel";
 import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
-import {
-	getFilledSize,
-	getFillPercent,
-	getOrderTypeConfig,
-	getOrderValue,
-	getSideConfig,
-	type OpenOrder,
-} from "@/lib/trade/open-orders";
+import { getOrderTypeConfig, getOrderValue, getSideConfig, type OpenOrder } from "@/lib/trade/open-orders";
 import { useMarketActions } from "@/stores/use-market-store";
 import { AssetDisplay, type AssetInfo } from "../components/asset-display";
 
@@ -33,7 +26,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 		<div
 			className={cn(
 				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-negative/80" : "text-muted-fg",
+				variant === "error" ? "text-market-down-600" : "text-text-600",
 			)}
 		>
 			{children}
@@ -60,7 +53,7 @@ export function OrdersTab() {
 	} = useExchangeCancel();
 
 	const openOrders = openOrdersEvent?.orders ?? [];
-	const headerCount = isConnected ? openOrders.length : FALLBACK_VALUE_PLACEHOLDER;
+	const headerCount = isConnected ? selectedOrderIds.size : FALLBACK_VALUE_PLACEHOLDER;
 
 	useEffect(() => {
 		if (selectedOrderIds.size === 0) return;
@@ -165,7 +158,7 @@ export function OrdersTab() {
 			return (
 				<Placeholder variant="error">
 					<span>{t`Failed to load open orders.`}</span>
-					{error instanceof Error && <span className="mt-1 text-4xs text-muted-fg">{error.message}</span>}
+					{error instanceof Error && <span className="mt-1 text-4xs text-text-600">{error.message}</span>}
 				</Placeholder>
 			);
 		}
@@ -177,15 +170,14 @@ export function OrdersTab() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
-			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
+			<div className="text-3xs uppercase tracking-wider text-text-600 mb-1.5 flex items-center gap-2">
 				<ListNumbersIcon className="size-3" />
 				{t`Open Orders`}
 				<div className="ml-auto flex items-center gap-2">
-					<span className="text-info tabular-nums">{headerCount}</span>
+					<span className="text-primary-default tabular-nums">{headerCount}</span>
 					<Button
-						variant="outlined"
+						variant="text"
 						size="sm"
-						className="border-negative text-negative hover:border-negative/80 hover:bg-negative/10"
 						aria-label={t`Cancel selected orders`}
 						onClick={handleCancelSelected}
 						disabled={disableCancelSelected}
@@ -193,9 +185,8 @@ export function OrdersTab() {
 						{isCancelling ? t`Canceling...` : t`Cancel selected`}
 					</Button>
 					<Button
-						variant="outlined"
+						variant="text"
 						size="sm"
-						className="border-negative text-negative hover:border-negative/80 hover:bg-negative/10"
 						aria-label={t`Cancel all orders`}
 						onClick={handleCancelAll}
 						disabled={disableCancelAll}
@@ -204,13 +195,13 @@ export function OrdersTab() {
 					</Button>
 				</div>
 			</div>
-			{actionError ? <div className="mb-1 text-4xs text-negative/80">{actionError}</div> : null}
-			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-bg/50">
+			{actionError ? <div className="mb-1 text-4xs text-market-down-600">{actionError}</div> : null}
+			<div className="flex-1 min-h-0 overflow-hidden border border-border-200/40 rounded-sm bg-surface-base/50">
 				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
-								<TableRow className="border-border/40 hover:bg-transparent">
+								<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
 									<TableHead className="w-7">
 										<Checkbox
 											checked={allSelected ? true : someSelected ? "indeterminate" : false}
@@ -219,27 +210,24 @@ export function OrdersTab() {
 											disabled={openOrders.length === 0 || isCancelling}
 										/>
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Time`}</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Asset`}</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Type`}</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Time`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Asset`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Type`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Price`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Size`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
-										{t`Filled`}
-									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Trigger`}</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Reduce`}</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Trigger`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Reduce`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Actions`}
 									</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{openOrders.map((order) => {
+								{openOrders.map((order, i) => {
 									const market = markets.getMarket(order.coin);
 									const assetInfo = market ?? { displayName: order.coin, iconUrl: undefined };
 									return (
@@ -251,6 +239,7 @@ export function OrdersTab() {
 											isSelected={selectedOrderIds.has(order.oid)}
 											isCancelling={isCancelling}
 											canCancel={canCancel}
+											isEven={i % 2 === 1}
 											onToggle={handleToggleOrder}
 											onCancel={handleCancelOrders}
 											onSelectMarket={setSelectedMarket}
@@ -274,6 +263,7 @@ interface OrderRowProps {
 	isSelected: boolean;
 	isCancelling: boolean;
 	canCancel: boolean;
+	isEven: boolean;
 	onToggle: (orderId: number, value: boolean | "indeterminate") => void;
 	onCancel: (orders: OpenOrder[]) => void;
 	onSelectMarket: (marketName: string) => void;
@@ -286,16 +276,16 @@ function OrderRow({
 	isSelected,
 	isCancelling,
 	canCancel,
+	isEven,
 	onToggle,
 	onCancel,
 	onSelectMarket,
 }: OrderRowProps) {
-	const fillPct = getFillPercent(order);
 	const sideConfig = getSideConfig(order);
 	const typeConfig = getOrderTypeConfig(order);
 
 	return (
-		<TableRow className="border-border/40 hover:bg-accent/30">
+		<TableRow className={cn("border-border-200/40 hover:bg-surface-analysis/30", isEven && "bg-surface-analysis")}>
 			<TableCell className="py-1.5">
 				<Checkbox
 					checked={isSelected}
@@ -304,10 +294,10 @@ function OrderRow({
 					disabled={isCancelling}
 				/>
 			</TableCell>
-			<TableCell className="text-2xs text-muted-fg py-1.5 whitespace-nowrap">
+			<TableCell className="text-3xs text-text-600 py-1.5 whitespace-nowrap">
 				{formatDateTime(order.timestamp, { dateStyle: "short", timeStyle: "short" })}
 			</TableCell>
-			<TableCell className="text-2xs font-medium py-1.5">
+			<TableCell className="text-3xs font-medium py-1.5">
 				<div className="flex items-center gap-1.5">
 					<Button
 						variant="text"
@@ -321,46 +311,34 @@ function OrderRow({
 					<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideConfig.class)}>{sideConfig.label}</span>
 				</div>
 			</TableCell>
-			<TableCell className="text-2xs py-1.5">
+			<TableCell className="text-3xs py-1.5">
 				<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", typeConfig.class)}>{typeConfig.label}</span>
 			</TableCell>
-			<TableCell className="text-2xs text-right tabular-nums py-1.5">
+			<TableCell className="text-3xs text-right tabular-nums py-1.5">
 				{formatUSD(order.limitPx, { compact: false })}
 			</TableCell>
-			<TableCell className="text-2xs text-right tabular-nums py-1.5">
-				{order.isPositionTpsl ? (
-					<span className="text-muted-fg">100%</span>
-				) : (
-					<>
-						{formatNumber(order.origSz, szDecimals)} {order.coin}{" "}
-						<span className="text-muted-fg">({formatUSD(getOrderValue(order), { compact: false })})</span>
-					</>
-				)}
-			</TableCell>
-			<TableCell className="text-2xs text-right tabular-nums py-1.5">
-				{order.isPositionTpsl || fillPct === 0 ? (
-					<span className="text-muted-fg">{FALLBACK_VALUE_PLACEHOLDER}</span>
-				) : (
-					<span className="text-warning">
-						{formatNumber(getFilledSize(order), szDecimals)} ({fillPct.toFixed(2)}%)
+			<TableCell className="text-3xs text-right tabular-nums py-1.5">
+				<div className="flex flex-col items-end">
+					<span className="tabular-nums">
+						{formatToken(order.origSz, { decimals: szDecimals, symbol: order.coin })}
 					</span>
-				)}
+					<span className="text-text-500">({formatUSD(getOrderValue(order), { compact: false })})</span>
+				</div>
 			</TableCell>
-			<TableCell className="text-2xs text-muted-fg py-1.5">
+			<TableCell className="text-3xs text-text-600 py-1.5">
 				{order.triggerCondition || FALLBACK_VALUE_PLACEHOLDER}
 			</TableCell>
-			<TableCell className="text-2xs py-1.5">
+			<TableCell className="text-3xs py-1.5">
 				{order.reduceOnly ? (
-					<span className="text-info">{t`Yes`}</span>
+					<span className="text-primary-default">{t`Yes`}</span>
 				) : (
-					<span className="text-muted-fg">{t`No`}</span>
+					<span className="text-text-600">{t`No`}</span>
 				)}
 			</TableCell>
 			<TableCell className="text-right py-1.5">
 				<Button
-					variant="outlined"
+					variant="text"
 					size="sm"
-					className="border-negative text-negative hover:border-negative/80 hover:bg-negative/10"
 					aria-label={t`Cancel order`}
 					onClick={() => onCancel([order])}
 					disabled={!canCancel}

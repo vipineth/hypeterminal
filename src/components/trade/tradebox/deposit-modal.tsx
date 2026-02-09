@@ -15,6 +15,7 @@ import { formatUnits } from "viem";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { InfoRow } from "@/components/ui/info-row";
 import { NumberInput } from "@/components/ui/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -31,25 +32,6 @@ const NETWORKS = [{ id: "arbitrum", name: "Arbitrum", shortName: "ARB" }] as con
 
 type NetworkId = (typeof NETWORKS)[number]["id"];
 
-interface InfoRowProps {
-	label: React.ReactNode;
-	value: React.ReactNode;
-	icon?: React.ReactNode;
-	highlight?: boolean;
-}
-
-function InfoRow({ label, value, icon, highlight }: InfoRowProps) {
-	return (
-		<div className="flex items-center justify-between text-3xs">
-			<span className="flex items-center gap-1.5 text-muted-fg">
-				{icon && <span className="text-muted-fg/60">{icon}</span>}
-				{label}
-			</span>
-			<span className={cn(highlight && "text-fg font-medium")}>{value}</span>
-		</div>
-	);
-}
-
 interface NetworkSelectProps {
 	label: React.ReactNode;
 	value: NetworkId;
@@ -62,12 +44,12 @@ function NetworkSelect({ label, value, onChange, disabled }: NetworkSelectProps)
 
 	return (
 		<div className="space-y-1.5">
-			<span className="text-4xs uppercase tracking-wider text-muted-fg">{label}</span>
+			<span className="text-4xs uppercase tracking-wider text-text-950">{label}</span>
 			<Select value={value} onValueChange={(v) => onChange(v as NetworkId)} disabled={disabled}>
-				<SelectTrigger className="w-full h-9 bg-bg/50 border-border/60">
+				<SelectTrigger className="w-full h-9 bg-surface-base/50 border-border-200/60">
 					<SelectValue>
 						<span className="flex items-center gap-2">
-							<span className="flex size-5 items-center justify-center rounded bg-muted/50 text-4xs font-medium">
+							<span className="flex size-5 items-center justify-center rounded bg-surface-analysis text-4xs font-medium">
 								{selectedNetwork.shortName}
 							</span>
 							<span>{selectedNetwork.name}</span>
@@ -78,7 +60,7 @@ function NetworkSelect({ label, value, onChange, disabled }: NetworkSelectProps)
 					{NETWORKS.map((network) => (
 						<SelectItem key={network.id} value={network.id}>
 							<span className="flex items-center gap-2">
-								<span className="flex size-5 items-center justify-center rounded bg-muted/50 text-4xs font-medium">
+								<span className="flex size-5 items-center justify-center rounded bg-surface-analysis text-4xs font-medium">
 									{network.shortName}
 								</span>
 								<span>{network.name}</span>
@@ -123,31 +105,38 @@ function StatusScreen({
 				<div className="flex flex-col items-center gap-4 py-6">
 					{icon === "loading" ? (
 						<div className="relative">
-							<div className="absolute inset-0 animate-ping rounded-full bg-info/20" />
-							<div className="relative flex size-14 items-center justify-center rounded-full bg-info/10 border border-info/30">
-								<SpinnerGapIcon className="size-7 animate-spin text-info" />
+							<div className="absolute inset-0 animate-ping rounded-full bg-primary-default/20" />
+							<div className="relative flex size-14 items-center justify-center rounded-full bg-primary-default/10 border border-primary-default/30">
+								<SpinnerGapIcon className="size-7 animate-spin text-primary-default" />
 							</div>
 						</div>
 					) : (
 						<div
 							className={cn(
 								"flex size-14 items-center justify-center rounded-full border",
-								icon === "success" ? "bg-positive/10 border-positive/30" : "bg-negative/10 border-negative/30",
+								icon === "success"
+									? "bg-market-up-100 border-market-up-600/30"
+									: "bg-market-down-100 border-market-down-600/30",
 							)}
 						>
 							{icon === "success" ? (
-								<CheckCircleIcon className="size-7 text-positive" />
+								<CheckCircleIcon className="size-7 text-market-up-600" />
 							) : (
-								<WarningCircleIcon className="size-7 text-negative" />
+								<WarningCircleIcon className="size-7 text-market-down-600" />
 							)}
 						</div>
 					)}
 					<div className="text-center space-y-1.5">
 						<p className="text-sm font-medium">{heading}</p>
-						{description && <p className="text-xs text-muted-fg">{description}</p>}
+						{description && <p className="text-xs text-text-600">{description}</p>}
 					</div>
 					{explorerUrl && (
-						<Button asChild variant="text" size="none" className="h-auto p-0 text-3xs text-info hover:underline">
+						<Button
+							asChild
+							variant="text"
+							size="none"
+							className="h-auto p-0 text-3xs text-primary-default hover:underline"
+						>
 							<a href={explorerUrl} target="_blank" rel="noopener noreferrer">
 								<span className="inline-flex items-center gap-1.5">
 									<Trans>View on explorer</Trans>
@@ -174,67 +163,66 @@ interface DepositFormProps {
 
 function DepositForm({ amount, onAmountChange, balance, validation, isPending, onSubmit }: DepositFormProps) {
 	return (
-		<div className="space-y-4">
+		<div className="flex flex-1 flex-col gap-4">
 			<NetworkSelect label={<Trans>From</Trans>} value="arbitrum" onChange={() => {}} disabled />
 
 			<div className="space-y-1.5">
-				<div className="flex items-center justify-between">
-					<span className="text-4xs uppercase tracking-wider text-muted-fg">
-						<Trans>Amount</Trans>
-					</span>
-					<Button
-						type="button"
-						variant="text"
-						size="none"
-						onClick={() => onAmountChange(balance)}
-						className="h-auto p-0 text-3xs text-muted-fg hover:text-fg"
-					>
-						<Trans>Balance:</Trans> <span className="tabular-nums text-fg font-medium">{formatNumber(balance, 2)}</span>{" "}
-						<span className="text-info">USDC</span>
-					</Button>
-				</div>
-				<div className="flex items-center gap-1">
-					<NumberInput
-						placeholder="0.00"
-						value={amount}
-						onChange={(e) => onAmountChange(e.target.value)}
-						className={cn(
-							"flex-1 h-10 text-base bg-bg/50 border-border/60 focus:border-info/60 tabular-nums font-medium",
-							validation.error && "border-negative focus:border-negative",
-						)}
-					/>
-					<Button
-						variant="text"
-						size="none"
-						onClick={() => onAmountChange(balance)}
-						className="h-10 px-3 text-3xs border border-border/60 hover:border-info/40 hover:bg-info/5 hover:text-info transition-colors"
-					>
-						{t`MAX`}
-					</Button>
-				</div>
-				{validation.error && (
-					<p className="text-4xs text-negative flex items-center gap-1">
-						<WarningCircleIcon className="size-3" />
-						{validation.error}
-					</p>
-				)}
+				<span className="text-4xs uppercase tracking-wider text-text-950">
+					<Trans>Amount</Trans>
+				</span>
+				<NumberInput
+					placeholder="0.00"
+					value={amount}
+					onChange={(e) => onAmountChange(e.target.value)}
+					maxLabel={
+						<>
+							{t`MAX`}: {formatNumber(balance, 2)}
+						</>
+					}
+					onMaxClick={() => onAmountChange(balance)}
+					className={cn(
+						"w-full h-10 text-base bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums font-medium",
+						validation.error && "border-market-down-600 focus:border-market-down-600",
+					)}
+				/>
+				<p className={cn("text-4xs flex items-center gap-1", validation.error ? "text-market-down-600" : "invisible")}>
+					<WarningCircleIcon className="size-3" />
+					{validation.error || "\u00A0"}
+				</p>
 			</div>
 
-			<div className="rounded-lg border border-border/40 bg-muted/10 p-3 space-y-2">
+			<div className="rounded-xs border border-border-200/40 bg-surface-analysis p-3 space-y-2 text-3xs">
 				<InfoRow
-					label={<Trans>Minimum</Trans>}
-					value={<span className="tabular-nums">{formatUnits(MIN_DEPOSIT_USDC, USDC_DECIMALS)} USDC</span>}
-					icon={<WalletIcon className="size-3" />}
+					className="p-0"
+					labelClassName="flex items-center gap-1.5 text-text-950"
+					label={
+						<>
+							<WalletIcon className="size-3" />
+							<Trans>Minimum</Trans>
+						</>
+					}
+					value={`${formatUnits(MIN_DEPOSIT_USDC, USDC_DECIMALS)} USDC`}
 				/>
 				<InfoRow
-					label={<Trans>Estimated time</Trans>}
-					value={<span className="tabular-nums">~1 min</span>}
-					icon={<ClockIcon className="size-3" />}
-					highlight
+					className="p-0"
+					labelClassName="flex items-center gap-1.5 text-text-950"
+					label={
+						<>
+							<ClockIcon className="size-3" />
+							<Trans>Estimated time</Trans>
+						</>
+					}
+					value="~1 min"
+					valueClassName="font-medium"
 				/>
 			</div>
 
-			<Button variant="contained" onClick={onSubmit} disabled={!validation.valid || isPending} className="w-full">
+			<Button
+				variant="contained"
+				onClick={onSubmit}
+				disabled={!validation.valid || isPending}
+				className="mt-auto w-full"
+			>
 				{isPending ? (
 					<>
 						<SpinnerGapIcon className="size-4 animate-spin" />
@@ -270,96 +258,99 @@ function WithdrawForm({
 	isPending,
 	onSubmit,
 }: WithdrawFormProps) {
+	const availableNum = toNumberOrZero(available);
+	const maxWithdraw = formatNumber(Math.max(availableNum - WITHDRAWAL_FEE_USD, 0), 2);
 	const amountNum = toNumber(amount);
 	const netReceived = amountNum !== null && amountNum > 0 ? Math.max(amountNum - WITHDRAWAL_FEE_USD, 0) : null;
 
 	return (
-		<div className="space-y-4">
+		<div className="flex flex-1 flex-col gap-4">
 			<NetworkSelect label={<Trans>To</Trans>} value="arbitrum" onChange={() => {}} disabled />
 
 			<div className="space-y-1.5">
-				<div className="flex items-center justify-between">
-					<span className="text-4xs uppercase tracking-wider text-muted-fg">
-						<Trans>Amount</Trans>
-					</span>
-					<Button
-						type="button"
-						variant="text"
-						size="none"
-						onClick={() => !isPending && onAmountChange(available)}
-						disabled={isPending}
-						className="h-auto p-0 text-3xs text-muted-fg hover:text-fg disabled:opacity-50"
-					>
-						{balanceStatus === "subscribing" ? (
+				<span className="text-4xs uppercase tracking-wider text-text-950">
+					<Trans>Amount</Trans>
+				</span>
+				<NumberInput
+					placeholder="0.00"
+					value={amount}
+					onChange={(e) => onAmountChange(e.target.value)}
+					disabled={isPending}
+					maxLabel={
+						balanceStatus === "subscribing" ? (
 							<Trans>Loading...</Trans>
 						) : (
 							<>
-								<Trans>Available:</Trans>{" "}
-								<span className="tabular-nums text-fg font-medium">${formatNumber(available, 2)}</span>
+								{t`MAX`}: ${maxWithdraw}
 							</>
-						)}
-					</Button>
-				</div>
-				<div className="flex items-center gap-1">
-					<NumberInput
-						placeholder="0.00"
-						value={amount}
-						onChange={(e) => onAmountChange(e.target.value)}
-						disabled={isPending}
-						className={cn(
-							"flex-1 h-10 text-base bg-bg/50 border-border/60 focus:border-info/60 tabular-nums font-medium",
-							validation.error && "border-negative focus:border-negative",
-						)}
-					/>
-					<Button
-						variant="text"
-						size="none"
-						onClick={() => !isPending && onAmountChange(available)}
-						disabled={isPending}
-						className="h-10 px-3 text-3xs border border-border/60 hover:border-info/40 hover:bg-info/5 hover:text-info transition-colors disabled:opacity-50"
-					>
-						{t`MAX`}
-					</Button>
-				</div>
-				{validation.error && (
-					<p className="text-4xs text-negative flex items-center gap-1">
-						<WarningCircleIcon className="size-3" />
-						{validation.error}
-					</p>
-				)}
-			</div>
-
-			<div className="rounded-lg border border-border/40 bg-muted/10 p-3 space-y-2">
-				<InfoRow
-					label={<Trans>Network fee</Trans>}
-					value={<span className="tabular-nums">${WITHDRAWAL_FEE_USD}</span>}
-					icon={<WalletIcon className="size-3" />}
-				/>
-				<InfoRow
-					label={<Trans>Net received</Trans>}
-					value={
-						netReceived === null ? (
-							<span className="tabular-nums text-muted-fg">--</span>
-						) : (
-							<span className="tabular-nums">${formatNumber(netReceived, 2)}</span>
 						)
 					}
-					icon={<ArrowLineDownIcon className="size-3" />}
+					onMaxClick={() => !isPending && onAmountChange(maxWithdraw)}
+					className={cn(
+						"w-full h-10 text-base bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums font-medium",
+						validation.error && "border-market-down-600 focus:border-market-down-600",
+					)}
+				/>
+				<p className={cn("text-4xs flex items-center gap-1", validation.error ? "text-market-down-600" : "invisible")}>
+					<WarningCircleIcon className="size-3" />
+					{validation.error || "\u00A0"}
+				</p>
+			</div>
+
+			<div className="rounded-xs border border-border-200/40 bg-surface-analysis p-3 space-y-2 text-3xs">
+				<InfoRow
+					className="p-0"
+					labelClassName="flex items-center gap-1.5 text-text-950"
+					label={
+						<>
+							<WalletIcon className="size-3" />
+							<Trans>Network fee</Trans>
+						</>
+					}
+					value={`$${WITHDRAWAL_FEE_USD}`}
 				/>
 				<InfoRow
-					label={<Trans>Minimum</Trans>}
-					value={<span className="tabular-nums">${MIN_WITHDRAW_USD}</span>}
-					icon={<ArrowLineUpIcon className="size-3" />}
+					className="p-0"
+					labelClassName="flex items-center gap-1.5 text-text-950"
+					label={
+						<>
+							<ArrowLineDownIcon className="size-3" />
+							<Trans>Net received</Trans>
+						</>
+					}
+					value={netReceived === null ? "--" : `$${formatNumber(netReceived, 2)}`}
 				/>
 				<InfoRow
-					label={<Trans>Estimated time</Trans>}
-					value={<span className="tabular-nums">~5 min</span>}
-					icon={<ClockIcon className="size-3" />}
-					highlight
+					className="p-0"
+					labelClassName="flex items-center gap-1.5 text-text-950"
+					label={
+						<>
+							<ArrowLineUpIcon className="size-3" />
+							<Trans>Minimum</Trans>
+						</>
+					}
+					value={`$${MIN_WITHDRAW_USD}`}
+				/>
+				<InfoRow
+					className="p-0"
+					labelClassName="flex items-center gap-1.5 text-text-950"
+					label={
+						<>
+							<ClockIcon className="size-3" />
+							<Trans>Estimated time</Trans>
+						</>
+					}
+					value="~5 min"
+					valueClassName="font-medium"
 				/>
 			</div>
 
-			<Button variant="contained" onClick={onSubmit} disabled={!validation.valid || isPending} className="w-full">
+			<Button
+				variant="contained"
+				onClick={onSubmit}
+				disabled={!validation.valid || isPending}
+				className="mt-auto w-full"
+			>
 				{isPending ? (
 					<>
 						<SpinnerGapIcon className="size-4 animate-spin" />
@@ -379,14 +370,14 @@ function WithdrawForm({
 function WalletNotConnected() {
 	return (
 		<div className="flex flex-col items-center gap-4 py-8">
-			<div className="flex size-12 items-center justify-center rounded-full bg-muted/30 border border-border/40">
-				<WalletIcon className="size-6 text-muted-fg" />
+			<div className="flex size-12 items-center justify-center rounded-full bg-surface-analysis border border-border-200/40">
+				<WalletIcon className="size-6 text-text-950" />
 			</div>
 			<div className="text-center space-y-1">
 				<p className="text-sm font-medium">
 					<Trans>Wallet not connected</Trans>
 				</p>
-				<p className="text-3xs text-muted-fg">
+				<p className="text-3xs text-text-950">
 					<Trans>Connect your wallet to withdraw funds</Trans>
 				</p>
 			</div>
@@ -412,20 +403,20 @@ function WrongNetworkScreen({ open, onClose, onSwitch, isSwitching, error }: Wro
 					</DialogTitle>
 				</DialogHeader>
 				<div className="space-y-4 py-2">
-					<div className="flex items-start gap-3 rounded-lg border border-warning/40 bg-warning/5 p-4">
-						<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-warning/20">
-							<WarningCircleIcon className="size-4 text-warning" />
+					<div className="flex items-start gap-3 rounded-xs border border-warning-700/40 bg-warning-700/5 p-4">
+						<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-warning-700/20">
+							<WarningCircleIcon className="size-4 text-warning-700" />
 						</div>
 						<div className="space-y-1">
 							<p className="text-sm font-medium">
 								<Trans>Wrong network</Trans>
 							</p>
-							<p className="text-3xs text-muted-fg">
+							<p className="text-3xs text-text-950">
 								<Trans>Switch to Arbitrum to deposit USDC to Hyperliquid</Trans>
 							</p>
 						</div>
 					</div>
-					{error && <p className="text-3xs text-negative px-1">{error.message}</p>}
+					{error && <p className="text-3xs text-market-down-600 px-1">{error.message}</p>}
 					<Button onClick={onSwitch} disabled={isSwitching} className="w-full">
 						{isSwitching ? (
 							<>
@@ -536,7 +527,7 @@ export function DepositModal() {
 				heading={<Trans>Deposit complete</Trans>}
 				description={
 					<>
-						<span className="tabular-nums font-medium text-positive">{depositAmount} USDC</span>{" "}
+						<span className="tabular-nums font-medium text-market-up-600">{depositAmount} USDC</span>{" "}
 						<Trans>sent to Hyperliquid</Trans>
 					</>
 				}
@@ -593,7 +584,7 @@ export function DepositModal() {
 				heading={<Trans>Withdrawal submitted</Trans>}
 				description={
 					<>
-						<span className="tabular-nums font-medium text-positive">${withdrawAmount}</span>{" "}
+						<span className="tabular-nums font-medium text-market-up-600">${withdrawAmount}</span>{" "}
 						<Trans>will arrive in ~5 min</Trans>
 					</>
 				}
@@ -638,59 +629,45 @@ export function DepositModal() {
 				</DialogHeader>
 
 				<Tabs value={activeTab} onValueChange={(v) => setTab(v as "deposit" | "withdraw")} className="space-y-4">
-					<TabsList className="w-full grid grid-cols-2 p-1 bg-muted/30 rounded-lg border border-border/40">
-						<TabsTrigger
-							value="deposit"
-							className={cn(
-								"flex items-center justify-center gap-1.5 py-2 rounded-md text-3xs font-medium transition-all",
-								activeTab === "deposit"
-									? "bg-bg text-info shadow-sm border border-border/60"
-									: "text-muted-fg hover:text-fg",
-							)}
-						>
+					<TabsList variant="pill" className="w-full grid grid-cols-2">
+						<TabsTrigger value="deposit">
 							<ArrowLineDownIcon className="size-3" />
 							<Trans>Deposit</Trans>
 						</TabsTrigger>
-						<TabsTrigger
-							value="withdraw"
-							className={cn(
-								"flex items-center justify-center gap-1.5 py-2 rounded-md text-3xs font-medium transition-all",
-								activeTab === "withdraw"
-									? "bg-bg text-info shadow-sm border border-border/60"
-									: "text-muted-fg hover:text-fg",
-							)}
-						>
+						<TabsTrigger value="withdraw">
 							<ArrowLineUpIcon className="size-3" />
 							<Trans>Withdraw</Trans>
 						</TabsTrigger>
 					</TabsList>
 
-					<TabsContent value="deposit">
-						<DepositForm
-							amount={depositAmount}
-							onAmountChange={setDepositAmount}
-							balance={depositBalance}
-							validation={depositValidation}
-							isPending={depositStatus === "pending"}
-							onSubmit={handleDepositSubmit}
-						/>
-					</TabsContent>
-
-					<TabsContent value="withdraw">
-						{!address ? (
-							<WalletNotConnected />
-						) : (
-							<WithdrawForm
-								amount={withdrawAmount}
-								onAmountChange={setWithdrawAmount}
-								available={withdrawable}
-								balanceStatus={balanceStatus}
-								validation={withdrawValidation}
-								isPending={isWithdrawPending}
-								onSubmit={handleWithdrawSubmit}
+					<div className="grid [&>*]:col-start-1 [&>*]:row-start-1">
+						<TabsContent value="deposit" forceMount className="flex flex-col data-[state=inactive]:invisible">
+							<DepositForm
+								amount={depositAmount}
+								onAmountChange={setDepositAmount}
+								balance={depositBalance}
+								validation={depositValidation}
+								isPending={false}
+								onSubmit={handleDepositSubmit}
 							/>
-						)}
-					</TabsContent>
+						</TabsContent>
+
+						<TabsContent value="withdraw" forceMount className="flex flex-col data-[state=inactive]:invisible">
+							{!address ? (
+								<WalletNotConnected />
+							) : (
+								<WithdrawForm
+									amount={withdrawAmount}
+									onAmountChange={setWithdrawAmount}
+									available={withdrawable}
+									balanceStatus={balanceStatus}
+									validation={withdrawValidation}
+									isPending={isWithdrawPending}
+									onSubmit={handleWithdrawSubmit}
+								/>
+							)}
+						</TabsContent>
+					</div>
 				</Tabs>
 			</DialogContent>
 		</Dialog>

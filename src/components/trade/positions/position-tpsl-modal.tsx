@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { InfoRow } from "@/components/ui/info-row";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { throwIfAnyResponseError } from "@/domain/trade/orders";
 import { cn } from "@/lib/cn";
@@ -135,32 +136,36 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 				</DialogHeader>
 
 				<div className="px-5 pb-4">
-					<div className="rounded-lg border border-border/50 bg-muted/20 p-3 space-y-1">
-						<div className="flex items-center justify-between">
-							<span className="text-2xs text-muted-fg">{t`Size`}</span>
-							<span className="text-2xs tabular-nums font-medium">
-								{formatToken(position.size, position.szDecimals)} {position.coin}
-							</span>
-						</div>
-						<div className="flex items-center justify-between">
-							<span className="text-2xs text-muted-fg">{t`Entry Price`}</span>
-							<span className="text-2xs tabular-nums font-medium">
-								{formatPrice(position.entryPx, { szDecimals: position.szDecimals })}
-							</span>
-						</div>
-						<div className="flex items-center justify-between">
-							<span className="text-2xs text-muted-fg">{t`Mark Price`}</span>
-							<span className="text-2xs tabular-nums font-medium text-warning">
-								{formatPrice(position.markPx, { szDecimals: position.szDecimals })}
-							</span>
-						</div>
-						<div className="border-t border-border/50 pt-3 flex items-center justify-between">
-							<span className="text-2xs text-muted-fg">{t`Unrealized P&L`}</span>
-							<span className={cn("text-2xs tabular-nums font-semibold", getValueColorClass(position.unrealizedPnl))}>
-								{formatUSD(position.unrealizedPnl, { signDisplay: "exceptZero" })}
-								<span className="font-normal text-muted-fg ml-1">({formatPercent(position.roe, 1)})</span>
-							</span>
-						</div>
+					<div className="rounded-xs border border-border-200/50 bg-surface-analysis p-3 space-y-1 text-2xs">
+						<InfoRow
+							className="p-0"
+							label={t`Size`}
+							value={`${formatToken(position.size, position.szDecimals)} ${position.coin}`}
+							valueClassName="font-medium"
+						/>
+						<InfoRow
+							className="p-0"
+							label={t`Entry Price`}
+							value={formatPrice(position.entryPx, { szDecimals: position.szDecimals })}
+							valueClassName="font-medium"
+						/>
+						<InfoRow
+							className="p-0"
+							label={t`Mark Price`}
+							value={formatPrice(position.markPx, { szDecimals: position.szDecimals })}
+							valueClassName="font-medium text-warning-700"
+						/>
+						<InfoRow
+							className="p-0 border-t border-border-200/50 pt-3"
+							label={t`Unrealized P&L`}
+							value={
+								<>
+									{formatUSD(position.unrealizedPnl, { signDisplay: "exceptZero" })}
+									<span className="font-normal text-text-600 ml-1">({formatPercent(position.roe, 1)})</span>
+								</>
+							}
+							valueClassName={cn("font-semibold", getValueColorClass(position.unrealizedPnl))}
+						/>
 					</div>
 				</div>
 
@@ -179,20 +184,14 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 					/>
 
 					{error && (
-						<div className="mt-3 px-2 py-1.5 rounded-md bg-negative/10 border border-negative/20 text-3xs text-negative">
+						<div className="mt-3 px-2 py-1.5 rounded-xs bg-market-down-100 border border-market-down-600/20 text-3xs text-market-down-600">
 							{error.message}
 						</div>
 					)}
 				</div>
 
-				<DialogFooter className="px-5 py-3 border-t border-border/50">
-					<Button
-						size="sm"
-						variant="text"
-						onClick={() => handleOpenChange(false)}
-						disabled={isSubmitting}
-						className="text-muted-fg hover:text-fg"
-					>
+				<DialogFooter className="px-5 py-3 border-t border-border-200/50">
+					<Button size="sm" variant="text" onClick={() => handleOpenChange(false)} disabled={isSubmitting}>
 						{t`Cancel`}
 					</Button>
 					<TradingActionButton onClick={handleSubmit} disabled={!canSubmit} className="min-w-24">

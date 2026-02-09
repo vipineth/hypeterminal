@@ -20,7 +20,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 		<div
 			className={cn(
 				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-negative/80" : "text-muted-fg",
+				variant === "error" ? "text-market-down-600" : "text-text-600",
 			)}
 		>
 			{children}
@@ -54,7 +54,7 @@ export function FundingTab() {
 			return (
 				<Placeholder variant="error">
 					<span>{t`Failed to load funding history.`}</span>
-					{error instanceof Error && <span className="mt-1 text-4xs text-muted-fg">{error.message}</span>}
+					{error instanceof Error && <span className="mt-1 text-4xs text-text-600">{error.message}</span>}
 				</Placeholder>
 			);
 		}
@@ -66,28 +66,28 @@ export function FundingTab() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
-			<div className="text-3xs uppercase tracking-wider text-muted-fg mb-1.5 flex items-center gap-2">
+			<div className="text-3xs uppercase tracking-wider text-text-600 mb-1.5 flex items-center gap-2">
 				<PercentIcon className="size-3" />
-				{t`Funding Payments`}
+				{t`Funding History`}
 				<span className={cn("ml-auto tabular-nums", headerClass)}>{headerTotal}</span>
 			</div>
-			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-bg/50">
+			<div className="flex-1 min-h-0 overflow-hidden border border-border-200/40 rounded-sm bg-surface-base/50">
 				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
-								<TableRow className="border-border/40 hover:bg-transparent">
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 h-7">{t`Asset`}</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
+								<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Asset`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Position`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Rate`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Payment`}
 									</TableHead>
-									<TableHead className="text-4xs uppercase tracking-wider text-muted-fg/70 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
 										{t`Time`}
 									</TableHead>
 								</TableRow>
@@ -101,14 +101,19 @@ export function FundingTab() {
 									const szDecimals = markets.getSzDecimals(update.coin);
 									const positionSize = szi !== null ? Math.abs(szi) : null;
 
-									const sideClass = isLong ? "bg-positive/20 text-positive" : "bg-negative/20 text-negative";
+									const sideClass = isLong
+										? "bg-market-up-100 text-market-up-600"
+										: "bg-market-down-100 text-market-down-600";
 
 									return (
 										<TableRow
 											key={`${update.coin}-${update.time}-${index}`}
-											className="border-border/40 hover:bg-accent/30"
+											className={cn(
+												"border-border-200/40 hover:bg-surface-analysis/30",
+												index % 2 === 1 && "bg-surface-analysis",
+											)}
 										>
-											<TableCell className="text-2xs font-medium py-1.5">
+											<TableCell className="text-3xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">
 													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideClass)}>
 														{isLong ? t`Long` : t`Short`}
@@ -116,19 +121,19 @@ export function FundingTab() {
 													<span>{markets.getMarket(update.coin)?.displayName ?? update.coin}</span>
 												</div>
 											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums py-1.5">
-												{formatToken(positionSize, { digits: szDecimals, symbol: update.coin })}
+											<TableCell className="text-3xs text-right tabular-nums py-1.5">
+												{formatToken(positionSize, { decimals: szDecimals, symbol: update.coin })}
 											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums py-1.5">
+											<TableCell className="text-3xs text-right tabular-nums py-1.5">
 												<span className={getValueColorClass(rate)}>
 													{formatPercent(rate, { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
 												</span>
 											</TableCell>
-											<TableCell className="text-2xs text-right tabular-nums py-1.5">
+											<TableCell className="text-3xs text-right tabular-nums py-1.5">
 												<span className={getValueColorClass(usdc)}>{formatToken(usdc, { symbol: "USDC" })}</span>
 											</TableCell>
 
-											<TableCell className="text-2xs text-right tabular-nums text-muted-fg py-1.5">
+											<TableCell className="text-3xs text-right tabular-nums text-text-600 py-1.5">
 												<div className="flex flex-col items-end">
 													<span>{formatDateTimeShort(update.time)}</span>
 												</div>

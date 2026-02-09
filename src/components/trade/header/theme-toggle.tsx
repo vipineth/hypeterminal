@@ -3,7 +3,7 @@ import { MoonIcon, SunIcon } from "@phosphor-icons/react";
 import { ClientOnly } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
-import { useTheme } from "@/providers/theme";
+import { useTheme } from "@/stores/use-global-settings-store";
 
 export function ThemeToggle() {
 	return (
@@ -16,21 +16,20 @@ export function ThemeToggle() {
 function ThemeToggleButton() {
 	const { theme, setTheme } = useTheme();
 
-	const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-
-	const handleToggle = () => {
-		setTheme(isDark ? "light" : "dark");
-	};
+	const isDark = theme === "dark";
 
 	return (
 		<Button
 			variant="text"
 			size="sm"
-			className={cn("size-7", isDark ? "text-warning hover:text-warning/80" : "text-highlight hover:text-highlight/80")}
-			onClick={handleToggle}
+			className={cn(
+				"size-7",
+				isDark ? "text-warning-700 hover:text-warning-700/80" : "text-primary-default hover:text-primary-default/80",
+			)}
+			onClick={() => setTheme(isDark ? "light" : "dark")}
 			aria-label={isDark ? t`Switch to light mode` : t`Switch to dark mode`}
 		>
-			{isDark ? <SunIcon className="size-3.5" /> : <MoonIcon className="size-3.5" />}
+			{isDark ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
 		</Button>
 	);
 }

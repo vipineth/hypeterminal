@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { CheckIcon, ShieldIcon, SpinnerGapIcon, StackIcon, WarningIcon } from "@phosphor-icons/react";
+import { CaretDownIcon, CheckIcon, ShieldIcon, SpinnerGapIcon, StackIcon, WarningIcon } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,11 +11,31 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { MARGIN_MODE_SUCCESS_DURATION_MS } from "@/config/time";
 import { cn } from "@/lib/cn";
 import type { MarginMode } from "@/lib/trade/margin-mode";
 import { TradingActionButton } from "../components/trading-action-button";
 
-const SUCCESS_DISPLAY_DURATION_MS = 1000;
+const MODE_ICONS = { cross: StackIcon, isolated: ShieldIcon } as const;
+
+interface MarginModeToggleProps {
+	mode: MarginMode;
+	disabled?: boolean;
+	onClick?: () => void;
+}
+
+export function MarginModeToggle({ mode, disabled, onClick }: MarginModeToggleProps) {
+	const label = mode === "cross" ? t`Cross` : t`Isolated`;
+	const Icon = MODE_ICONS[mode];
+
+	return (
+		<Button variant="outlined" size="md" onClick={onClick} disabled={disabled}>
+			<Icon className="size-3" />
+			<span>{label}</span>
+			<CaretDownIcon className="size-3" />
+		</Button>
+	);
+}
 
 interface Props {
 	open: boolean;
@@ -89,7 +109,7 @@ export function MarginModeDialog({
 			autoCloseTimerRef.current = setTimeout(() => {
 				onOpenChange(false);
 				setShowSuccess(false);
-			}, SUCCESS_DISPLAY_DURATION_MS);
+			}, MARGIN_MODE_SUCCESS_DURATION_MS);
 		} catch {
 			// Error handled by hook
 		}
@@ -104,7 +124,7 @@ export function MarginModeDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-sm gap-4">
 				<DialogHeader>
-					<DialogTitle className="font-medium">
+					<DialogTitle>
 						<Trans>Margin Mode</Trans>
 					</DialogTitle>
 					<DialogDescription>
@@ -125,18 +145,24 @@ export function MarginModeDialog({
 								onClick={() => setSelectedMode(option.id)}
 								disabled={isUpdating}
 								className={cn(
-									"w-full text-left p-3 rounded-sm border transition-colors",
-									isSelected ? "border-info/50 bg-info/5" : "border-border/60 hover:border-border",
+									"w-full text-left p-3 rounded-xs border transition-colors",
+									isSelected
+										? "border-primary-default/50 bg-primary-default/5"
+										: "border-border-200/60 hover:border-border-200",
 								)}
 							>
 								<div className="flex gap-3">
 									<div
 										className={cn(
-											"flex items-center justify-center size-8 rounded-sm shrink-0 transition-colors",
-											isSelected ? "bg-info/10 border border-info/30" : "bg-surface border border-border/60",
+											"flex items-center justify-center size-8 rounded-xs shrink-0 transition-colors",
+											isSelected
+												? "bg-primary-default/10 border border-primary-default/30"
+												: "bg-surface-execution border border-border-200/60",
 										)}
 									>
-										<Icon className={cn("size-4 transition-colors", isSelected ? "text-info" : "text-muted-fg")} />
+										<Icon
+											className={cn("size-4 transition-colors", isSelected ? "text-primary-default" : "text-text-600")}
+										/>
 									</div>
 
 									<div className="flex-1 min-w-0">
@@ -144,21 +170,21 @@ export function MarginModeDialog({
 											<span
 												className={cn(
 													"text-xs font-medium uppercase tracking-wider",
-													isSelected ? "text-info" : "text-fg",
+													isSelected ? "text-primary-default" : "text-text-950",
 												)}
 											>
 												{option.label()}
 											</span>
 											<div className="flex items-center gap-2">
 												{isCurrent && (
-													<span className="text-3xs text-muted-fg uppercase tracking-wider">
+													<span className="text-3xs text-text-950 uppercase tracking-wider">
 														<Trans>Current</Trans>
 													</span>
 												)}
-												{isSelected && !isCurrent && <CheckIcon className="size-3.5 text-info" />}
+												{isSelected && !isCurrent && <CheckIcon className="size-3.5 text-primary-default" />}
 											</div>
 										</div>
-										<p className="text-3xs text-muted-fg leading-relaxed">{option.description()}</p>
+										<p className="text-3xs text-text-950 leading-relaxed">{option.description()}</p>
 									</div>
 								</div>
 							</button>
@@ -167,23 +193,23 @@ export function MarginModeDialog({
 				</div>
 
 				{cannotSwitch && (
-					<div className="flex items-start gap-2 p-2.5 bg-warning/10 border border-warning/20 rounded-sm">
-						<WarningIcon className="size-3.5 text-warning shrink-0 mt-0.5" />
-						<p className="text-xs text-warning leading-relaxed">
+					<div className="flex items-start gap-2 p-2.5 bg-warning-700/10 border border-warning-700/20 rounded-xs">
+						<WarningIcon className="size-3.5 text-warning-700 shrink-0 mt-0.5" />
+						<p className="text-xs text-warning-700 leading-relaxed">
 							<Trans>Cannot switch to Isolated mode with an open position. Close your position first.</Trans>
 						</p>
 					</div>
 				)}
 
 				{updateError && (
-					<div className="flex items-center gap-2 p-2.5 bg-negative/10 border border-negative/20 rounded-sm text-xs text-negative">
+					<div className="flex items-center gap-2 p-2.5 bg-market-down-100 border border-market-down-600/20 rounded-xs text-xs text-market-down-600">
 						<WarningIcon className="size-3.5 shrink-0" />
 						<span className="flex-1 truncate">{updateError.message || t`Update failed`}</span>
 					</div>
 				)}
 
 				{showSuccess && (
-					<div className="flex items-center justify-center gap-2 p-2.5 bg-positive/10 border border-positive/20 rounded-sm text-xs text-positive">
+					<div className="flex items-center justify-center gap-2 p-2.5 bg-market-up-100 border border-market-up-600/20 rounded-xs text-xs text-market-up-600">
 						<CheckIcon className="size-3.5" />
 						<Trans>Updated</Trans>
 					</div>

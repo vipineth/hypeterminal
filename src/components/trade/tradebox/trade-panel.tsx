@@ -4,6 +4,7 @@ import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_QUOTE_TOKEN, TWAP_MINUTES_MAX, TWAP_MINUTES_MIN } from "@/config/constants";
+import { APPROVAL_ERROR_DISMISS_MS } from "@/config/time";
 import { getMarketQuoteToken } from "@/domain/trade/balances";
 import { getLiquidationInfo, getOrderMetrics } from "@/domain/trade/order/metrics";
 import { getOrderPrice } from "@/domain/trade/order/price";
@@ -25,7 +26,7 @@ import {
 	isTwapOrderType,
 	usesLimitPrice as usesLimitPriceForOrder,
 } from "@/lib/trade/order-types";
-import type { ActiveDialog, ButtonContent } from "@/lib/trade/types";
+import type { ActiveDialog } from "@/lib/trade/types";
 import { useButtonContent } from "@/lib/trade/use-button-content";
 import { perpInput, spotInput, useOrderValidation } from "@/lib/trade/use-order-validation";
 import { useDepositModalActions, useSettingsDialogActions, useSwapModalActions } from "@/stores/use-global-modal-store";
@@ -53,22 +54,11 @@ import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
 import { WalletDialog } from "../components/wallet-dialog";
 import { LeverageControl } from "./leverage-control";
-import { MarginModeDialog } from "./margin-mode-dialog";
-import { MarginModeToggle } from "./margin-mode-toggle";
+import { MarginModeDialog, MarginModeToggle } from "./margin-mode-dialog";
 import { OrderSummary } from "./order-summary";
 import { OrderToast } from "./order-toast";
 import { TradeFormFields } from "./trade-form-fields";
 import { TradeHeader } from "./trade-header";
-
-function getActionButtonClass(variant: ButtonContent["variant"]): string {
-	if (variant === "cyan") {
-		return "bg-info/20 border-info text-info hover:bg-info/30";
-	}
-	if (variant === "buy") {
-		return "bg-positive/20 border-positive text-positive hover:bg-positive/30";
-	}
-	return "bg-negative/20 border-negative text-negative hover:bg-negative/30";
-}
 
 export function TradePanel() {
 	const reduceOnlyId = useId();
@@ -282,6 +272,7 @@ export function TradePanel() {
 		registerAgent().catch((error: unknown) => {
 			const message = error instanceof Error ? error.message : t`Failed to enable trading`;
 			setApprovalError(message);
+			setTimeout(() => setApprovalError(null), APPROVAL_ERROR_DISMISS_MS);
 		});
 	}, [isRegistering, registerAgent]);
 
@@ -436,12 +427,12 @@ export function TradePanel() {
 		onSubmit: handleSubmit,
 	});
 
-	const actionButtonClass = getActionButtonClass(buttonContent.variant);
+	// const actionButtonClass = getActionButtonClass(buttonContent.variant);
 
 	return (
-		<div className="h-full flex flex-col overflow-hidden bg-surface/20">
+		<div className="h-full flex flex-col overflow-hidden bg-surface-execution">
 			{capabilities.isLeveraged && (
-				<div className="h-9 px-2 border-b border-border/60 flex items-center justify-between">
+				<div className="p-2 border-b border-border-200/60 flex items-center justify-between">
 					{capabilities.hasMarginMode ? (
 						<MarginModeToggle
 							mode={marginMode}
@@ -489,20 +480,18 @@ export function TradePanel() {
 
 				<div className="space-y-2">
 					{validation.errors.length > 0 && isConnected && availableBalance > 0 && (
-						<div className="text-4xs text-negative">{validation.errors.join(" • ")}</div>
+						<div className="text-4xs text-market-down-600">{validation.errors.join(" • ")}</div>
 					)}
 
-					{approvalError && <div className="text-4xs text-negative">{approvalError}</div>}
+					{approvalError && <div className="text-4xs text-market-down-600">{approvalError}</div>}
 
 					<Button
-						variant="text"
-						size="none"
+						variant="contained"
+						tone="accent"
+						size="lg"
 						onClick={buttonContent.action}
 						disabled={buttonContent.disabled}
-						className={cn(
-							"w-full py-2.5 text-2xs font-semibold uppercase tracking-wider border gap-2 hover:bg-transparent",
-							actionButtonClass,
-						)}
+						className={cn("w-full")}
 						aria-label={buttonContent.text}
 					>
 						{(isSubmitting || isRegistering) && <SpinnerGapIcon className="size-3 animate-spin" />}

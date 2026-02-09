@@ -10,27 +10,27 @@ function getStatusDisplay(status: ApiStatus) {
 	switch (status) {
 		case "connected":
 			return {
-				icon: <WifiHighIcon className="size-3 text-positive" />,
+				icon: <WifiHighIcon className="size-3 text-market-up-600" />,
 				text: t`Connected`,
-				className: "text-positive",
+				className: "text-market-up-600",
 			};
 		case "connecting":
 			return {
-				icon: <SpinnerGapIcon className="size-3 text-warning animate-spin" />,
+				icon: <SpinnerGapIcon className="size-3 text-warning-700 animate-spin" />,
 				text: t`Connecting`,
-				className: "text-warning",
+				className: "text-warning-700",
 			};
 		case "error":
 			return {
-				icon: <WifiSlashIcon className="size-3 text-negative" />,
+				icon: <WifiSlashIcon className="size-3 text-market-down-600" />,
 				text: t`Disconnected`,
-				className: "text-negative",
+				className: "text-market-down-600",
 			};
 		default:
 			return {
-				icon: <WifiHighIcon className="size-3 text-muted-fg" />,
+				icon: <WifiHighIcon className="size-3 text-text-950" />,
 				text: t`Offline`,
-				className: "text-muted-fg",
+				className: "text-text-950",
 			};
 	}
 }
@@ -51,11 +51,11 @@ function PerfToggle() {
 		<button
 			type="button"
 			onClick={handleClick}
-			className="flex items-center gap-1 hover:text-info transition-colors"
+			className="flex items-center gap-1 hover:text-primary-default transition-colors"
 			title="Toggle Performance Panel"
 		>
-			<PulseIcon className={`size-3 ${isVisible ? "text-info" : "text-muted-fg"}`} />
-			<span className={isVisible ? "text-info" : "text-muted-fg"}>Perf</span>
+			<PulseIcon className={`size-3 ${isVisible ? "text-primary-default" : "text-text-950"}`} />
+			<span className={isVisible ? "text-primary-default" : "text-text-950"}>Perf</span>
 		</button>
 	);
 }
@@ -65,22 +65,22 @@ export function FooterBar() {
 	const { icon, text, className } = getStatusDisplay(status);
 
 	return (
-		<footer className="fixed bottom-0 left-0 right-0 z-40 h-6 border-t border-border/60 px-2 text-4xs uppercase tracking-wider flex items-center justify-between bg-surface">
+		<footer className="fixed bottom-0 left-0 right-0 z-40 h-6 border-t border-border-200/60 px-2 text-4xs uppercase tracking-wider flex items-center justify-between bg-surface-execution">
 			<div className="flex items-center gap-3">
 				<div className="flex items-center gap-1.5">
 					{icon}
 					<span className={className}>{text}</span>
 				</div>
-				<div className="h-3 w-px bg-border/60" />
+				<div className="h-3 w-px bg-border-200/60" />
 				<PerfToggle />
 			</div>
 			<div className="flex items-center gap-3">
-				<div className="h-3 w-px bg-border/60" />
+				<div className="h-3 w-px bg-border-200/60" />
 				<ClientOnly>
-					<span className="text-muted-fg tabular-nums">{formatTime(new Date())}</span>
+					<span className="text-text-950 tabular-nums">{formatTime(new Date())}</span>
 				</ClientOnly>
-				<div className="h-3 w-px bg-border/60" />
-				<span className="text-muted-fg">{APP_VERSION}</span>
+				<div className="h-3 w-px bg-border-200/60" />
+				<span className="text-text-950">{APP_VERSION}</span>
 			</div>
 		</footer>
 	);

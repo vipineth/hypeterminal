@@ -9,7 +9,7 @@ import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { getValueColorClass, toBig } from "@/lib/trade/numbers";
-import { useTheme } from "@/providers/theme";
+import { useTheme } from "@/stores/use-global-settings-store";
 import { useMarketActions } from "@/stores/use-market-store";
 import { TokenSelector } from "../chart/token-selector";
 import { TradingViewChart } from "../chart/tradingview-chart";
@@ -22,7 +22,7 @@ interface MobileChartViewProps {
 }
 
 export function MobileChartView({ className }: MobileChartViewProps) {
-	const { theme, colorTheme } = useTheme();
+	const { theme } = useTheme();
 	const { data: selectedMarket, isLoading } = useSelectedMarketInfo();
 	const { setSelectedMarket } = useMarketActions();
 
@@ -40,7 +40,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 
 	return (
 		<div className={cn("flex flex-col h-full min-h-0", className)}>
-			<div className="shrink-0 px-3 py-2 border-b border-border/60 bg-surface/30">
+			<div className="shrink-0 px-3 py-2 border-b border-border-200/60 bg-surface-execution/30">
 				<div className="flex items-center justify-between gap-3">
 					<TokenSelector selectedMarket={selectedMarket} onValueChange={handleMarketChange} />
 
@@ -49,7 +49,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 							<Skeleton className="h-6 w-24" />
 						) : (
 							<>
-								<div className="text-lg font-semibold tabular-nums text-warning">{formatUSD(markPx ?? null)}</div>
+								<div className="text-lg font-semibold tabular-nums text-warning-700">{formatUSD(markPx ?? null)}</div>
 								{typeof change24h === "number" && (
 									<span className={cn("text-sm tabular-nums font-medium", getValueColorClass(change24h))}>
 										{change24h >= 0 ? "+" : ""}
@@ -62,7 +62,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 				</div>
 			</div>
 
-			<div className="shrink-0 px-3 py-1.5 border-b border-border/40 bg-surface/20 overflow-x-auto">
+			<div className="shrink-0 px-3 py-1.5 border-b border-border-200/40 bg-surface-execution/20 overflow-x-auto">
 				<div className="flex items-center gap-4 text-xs min-w-max">
 					{isLoading ? (
 						<>
@@ -114,7 +114,6 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 						<TradingViewChart
 							symbol={createChartName(selectedMarket.displayName, selectedMarket.name)}
 							theme={theme === "dark" ? "dark" : "light"}
-							colorTheme={colorTheme}
 						/>
 					)}
 				</ClientOnly>
@@ -128,8 +127,8 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 function StatPill({ label, value }: { label: string; value: string }) {
 	return (
 		<div className="flex items-center gap-1.5">
-			<span className="text-muted-fg uppercase tracking-wider text-[10px]">{label}</span>
-			<span className="tabular-nums text-fg">{value}</span>
+			<span className="text-text-950 uppercase tracking-wider text-3xs">{label}</span>
+			<span className="tabular-nums text-text-950">{value}</span>
 		</div>
 	);
 }

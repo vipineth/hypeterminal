@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { PaperPlaneTiltIcon, SpinnerGapIcon } from "@phosphor-icons/react";
+import { PaperPlaneTiltIcon, SpinnerGapIcon, WarningCircleIcon } from "@phosphor-icons/react";
 import { useCallback, useMemo, useState } from "react";
 import { isAddress } from "viem";
 import { Button } from "@/components/ui/button";
@@ -157,12 +157,10 @@ export function SendDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={handleOpenChange}>
-			<DialogContent className="max-w-sm">
+			<DialogContent className="sm:max-w-sm">
 				<DialogHeader>
-					<DialogTitle className="text-sm font-medium">{t`Send Tokens`}</DialogTitle>
-					<DialogDescription className="text-3xs text-muted-fg">
-						{t`Send tokens to another account on the Hyperliquid L1.`}
-					</DialogDescription>
+					<DialogTitle>{t`Send Tokens`}</DialogTitle>
+					<DialogDescription>{t`Send tokens to another account on the Hyperliquid L1.`}</DialogDescription>
 				</DialogHeader>
 
 				<div className="space-y-4">
@@ -173,15 +171,15 @@ export function SendDialog({
 							onChange={(e) => setDestination(e.target.value)}
 							inputSize="lg"
 							className={cn(
-								"w-full bg-bg/50 border-border/60",
-								destination && !isValidDestination && "border-negative focus-visible:border-negative",
+								"w-full bg-surface-base/50 border-border-200/60",
+								destination && !isValidDestination && "border-market-down-600 focus-visible:border-market-down-600",
 							)}
 						/>
 					</div>
 
 					<div className="flex gap-2">
 						<Select value={accountType} onValueChange={(v) => handleAccountTypeChange(v as AccountType)}>
-							<SelectTrigger className="flex-1 h-10 bg-bg/50 border-border/60">
+							<SelectTrigger className="flex-1 h-10 bg-surface-base/50 border-border-200/60">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
@@ -191,7 +189,7 @@ export function SendDialog({
 						</Select>
 
 						<Select value={selectedToken} onValueChange={handleTokenChange}>
-							<SelectTrigger className="flex-1 h-10 bg-bg/50 border-border/60">
+							<SelectTrigger className="flex-1 h-10 bg-surface-base/50 border-border-200/60">
 								<AssetDisplay
 									asset={getToken(selectedToken) ?? { displayName: selectedToken, iconUrl: undefined }}
 									hideIcon
@@ -210,30 +208,30 @@ export function SendDialog({
 						</Select>
 					</div>
 
-					<div className="space-y-1.5">
-						<div className="relative">
-							<NumberInput
-								placeholder={t`Amount`}
-								value={amount}
-								onChange={(e) => handleAmountChange(e.target.value)}
-								className={cn(
-									"w-full h-10 text-sm bg-bg/50 border-border/60 pr-24 tabular-nums",
-									exceedsBalance(amount, availableBalance) && "border-negative focus:border-negative",
-								)}
-							/>
-							<button
-								type="button"
-								onClick={handleMaxClick}
-								className="absolute right-2 top-1/2 -translate-y-1/2 text-3xs text-info hover:text-info/80 transition-colors"
-							>
+					<NumberInput
+						placeholder={t`Amount`}
+						value={amount}
+						onChange={(e) => handleAmountChange(e.target.value)}
+						maxLabel={
+							<>
 								{t`MAX`}: {formatToken(availableBalanceStr, 2)}
-							</button>
+							</>
+						}
+						onMaxClick={handleMaxClick}
+						className={cn(
+							"w-full h-10 text-sm bg-surface-base/50 border-border-200/60 tabular-nums",
+							exceedsBalance(amount, availableBalance) && "border-market-down-600 focus:border-market-down-600",
+						)}
+					/>
+
+					{error && (
+						<div className="flex items-center gap-2 p-2.5 rounded-xs bg-market-down-100 border border-market-down-600/20 text-3xs text-market-down-600">
+							<WarningCircleIcon className="size-3.5 shrink-0" />
+							<span className="flex-1">{error}</span>
 						</div>
-					</div>
+					)}
 
-					{error && <div className="text-3xs text-negative">{error}</div>}
-
-					<Button onClick={handleSend} disabled={!canSend} className="w-full h-10 text-xs font-medium">
+					<Button onClick={handleSend} disabled={!canSend} size="lg" className="w-full">
 						{isPending && <SpinnerGapIcon className="size-3.5 animate-spin mr-2" />}
 						<PaperPlaneTiltIcon className="size-3.5 mr-2" />
 						{isPending ? t`Sending...` : t`Send`}

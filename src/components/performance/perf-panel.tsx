@@ -116,9 +116,9 @@ function getPathname(url: string): string {
 }
 
 function getRatingColor(rating: MetricRating): string {
-	if (rating === "good") return "text-positive";
-	if (rating === "needs-improvement") return "text-warning";
-	return "text-negative";
+	if (rating === "good") return "text-success-700";
+	if (rating === "needs-improvement") return "text-warning-700";
+	return "text-error-700";
 }
 
 const listeners: Set<() => void> = new Set();
@@ -209,7 +209,7 @@ export function PerfPanel({ onClose }: Props) {
 					variant="outlined"
 					size="sm"
 					onClick={() => setIsMinimized(false)}
-					className="bg-bg/95 backdrop-blur border-border/60 shadow-lg"
+					className="bg-surface-base/95 backdrop-blur border-border-200/60 shadow-lg"
 				>
 					<PulseIcon className="size-4" />
 				</Button>
@@ -218,10 +218,10 @@ export function PerfPanel({ onClose }: Props) {
 	}
 
 	return (
-		<div className="fixed bottom-4 right-4 z-9999 w-80 max-h-[80vh] overflow-hidden rounded-lg border border-border/60 bg-orange-50 backdrop-blur shadow-xl">
-			<div className="flex items-center justify-between px-3 py-2 border-b border-border/40 bg-muted/30">
+		<div className="fixed bottom-4 right-4 z-9999 w-80 max-h-[80vh] overflow-hidden rounded-lg border border-border-200/60 bg-surface-execution backdrop-blur shadow-xl">
+			<div className="flex items-center justify-between px-3 py-2 border-b border-border-200/40 bg-surface-analysis">
 				<div className="flex items-center gap-2">
-					<PulseIcon className="size-4 text-info" />
+					<PulseIcon className="size-4 text-primary-default" />
 					<span className="text-sm font-medium">Performance</span>
 				</div>
 				<div className="flex items-center gap-1">
@@ -249,12 +249,12 @@ export function PerfPanel({ onClose }: Props) {
 					onExpand={() => setExpandedSection(expandedSection === "vitals" ? null : "vitals")}
 				>
 					{Object.keys(latestVitals).length === 0 ? (
-						<p className="text-xs text-muted-fg">Waiting for metrics...</p>
+						<p className="text-xs text-text-600">Waiting for metrics...</p>
 					) : (
 						<div className="grid grid-cols-2 gap-2">
 							{Object.entries(latestVitals).map(([name, data]) => (
 								<div key={name} className="flex items-center justify-between">
-									<span className="text-xs text-muted-fg">{name}</span>
+									<span className="text-xs text-text-600">{name}</span>
 									<span className={cn("text-xs font-mono", getRatingColor(data.rating))}>
 										{formatValue(name, data.value)}
 									</span>
@@ -262,7 +262,7 @@ export function PerfPanel({ onClose }: Props) {
 							))}
 						</div>
 					)}
-					<Button variant="text" size="sm" onClick={() => reportMetricsSummary()} className="mt-2 text-muted-fg">
+					<Button variant="text" size="sm" onClick={() => reportMetricsSummary()} className="mt-2">
 						Log to Console
 					</Button>
 				</Section>
@@ -276,23 +276,23 @@ export function PerfPanel({ onClose }: Props) {
 					onExpand={() => setExpandedSection(expandedSection === "memory" ? null : "memory")}
 				>
 					{!latestMemory ? (
-						<p className="text-xs text-muted-fg">Enable to start monitoring (Chrome only)</p>
+						<p className="text-xs text-text-600">Enable to start monitoring (Chrome only)</p>
 					) : (
 						<div className="space-y-1">
 							<div className="flex items-center justify-between">
-								<span className="text-xs text-muted-fg">Used Heap</span>
+								<span className="text-xs text-text-600">Used Heap</span>
 								<span className="text-xs font-mono">{formatBytes(latestMemory.usedJSHeapSize)}</span>
 							</div>
 							<div className="flex items-center justify-between">
-								<span className="text-xs text-muted-fg">Total Heap</span>
+								<span className="text-xs text-text-600">Total Heap</span>
 								<span className="text-xs font-mono">{formatBytes(latestMemory.totalJSHeapSize)}</span>
 							</div>
 							<div className="flex items-center justify-between">
-								<span className="text-xs text-muted-fg">Heap Limit</span>
+								<span className="text-xs text-text-600">Heap Limit</span>
 								<span className="text-xs font-mono">{formatBytes(latestMemory.jsHeapSizeLimit)}</span>
 							</div>
 							<div className="flex items-center justify-between">
-								<span className="text-xs text-muted-fg">Usage</span>
+								<span className="text-xs text-text-600">Usage</span>
 								<span className="text-xs font-mono">
 									{((latestMemory.usedJSHeapSize / latestMemory.jsHeapSizeLimit) * 100).toFixed(1)}%
 								</span>
@@ -301,21 +301,21 @@ export function PerfPanel({ onClose }: Props) {
 								<>
 									<div className="h-px bg-border/30 my-1" />
 									<div className="flex items-center justify-between">
-										<span className="text-xs text-muted-fg">Snapshots</span>
+										<span className="text-xs text-text-600">Snapshots</span>
 										<span className="text-xs font-mono">{memorySnapshots.length}</span>
 									</div>
 									<div className="flex items-center justify-between">
-										<span className="text-xs text-muted-fg">Start</span>
+										<span className="text-xs text-text-600">Start</span>
 										<span className="text-xs font-mono">{formatBytes(memoryTrend.startHeap)}</span>
 									</div>
 									<div className="flex items-center justify-between">
-										<span className="text-xs text-muted-fg">Current</span>
+										<span className="text-xs text-text-600">Current</span>
 										<span className="text-xs font-mono">{formatBytes(memoryTrend.endHeap)}</span>
 									</div>
 									<div
 										className={cn(
 											"flex items-center justify-between",
-											memoryTrend.growth > 0 ? "text-warning" : "text-positive",
+											memoryTrend.growth > 0 ? "text-warning-700" : "text-success-700",
 										)}
 									>
 										<span className="text-xs">Growth</span>
@@ -325,16 +325,16 @@ export function PerfPanel({ onClose }: Props) {
 										</span>
 									</div>
 									<div
-										className={cn("flex items-center justify-between", memoryTrend.potentialLeak && "text-negative")}
+										className={cn("flex items-center justify-between", memoryTrend.potentialLeak && "text-error-700")}
 									>
-										<span className="text-xs text-muted-fg">Growth/min</span>
+										<span className="text-xs text-text-600">Growth/min</span>
 										<span className="text-xs font-mono">
 											{memoryTrend.growthPerMinute > 0 ? "+" : ""}
 											{formatBytes(memoryTrend.growthPerMinute)}
 										</span>
 									</div>
 									{memoryTrend.potentialLeak && (
-										<p className="text-2xs text-negative mt-1">Potential memory leak detected!</p>
+										<p className="text-2xs text-error-700 mt-1">Potential memory leak detected!</p>
 									)}
 								</>
 							)}
@@ -352,19 +352,19 @@ export function PerfPanel({ onClose }: Props) {
 				>
 					<div className="space-y-1">
 						<div className="flex items-center justify-between">
-							<span className="text-xs text-muted-fg">Total Renders</span>
+							<span className="text-xs text-text-600">Total Renders</span>
 							<span className="text-xs font-mono">{renderLog.length}</span>
 						</div>
 						<div className="flex items-center justify-between">
-							<span className="text-xs text-muted-fg">Slow ({">"}16ms)</span>
-							<span className={cn("text-xs font-mono", slowRenders.length > 0 && "text-warning")}>
+							<span className="text-xs text-text-600">Slow ({">"}16ms)</span>
+							<span className={cn("text-xs font-mono", slowRenders.length > 0 && "text-warning-700")}>
 								{slowRenders.length}
 							</span>
 						</div>
 					</div>
 					{renderLog.length > 0 && (
 						<div className="mt-2 space-y-0.5">
-							<p className="text-2xs text-muted-fg uppercase tracking-wider">Top by Total Time:</p>
+							<p className="text-2xs text-text-600 uppercase tracking-wider">Top by Total Time:</p>
 							{Object.entries(
 								renderLog.reduce(
 									(acc, r) => {
@@ -385,9 +385,9 @@ export function PerfPanel({ onClose }: Props) {
 										<span className="truncate max-w-[120px]" title={name}>
 											{name}
 										</span>
-										<span className="font-mono text-muted-fg">
+										<span className="font-mono text-text-600">
 											{data.count}x{" "}
-											<span className={data.total > 50 ? "text-warning" : ""}>{data.total.toFixed(0)}ms</span>
+											<span className={data.total > 50 ? "text-warning-700" : ""}>{data.total.toFixed(0)}ms</span>
 										</span>
 									</div>
 								))}
@@ -395,16 +395,16 @@ export function PerfPanel({ onClose }: Props) {
 					)}
 					{slowRenders.length > 0 && (
 						<div className="mt-2 space-y-0.5">
-							<p className="text-2xs text-muted-fg uppercase tracking-wider">Recent Slow:</p>
+							<p className="text-2xs text-text-600 uppercase tracking-wider">Recent Slow:</p>
 							{slowRenders.slice(-3).map((r, i) => (
 								<div key={`${r.componentName}-${i}`} className="flex items-center justify-between text-2xs">
 									<span className="truncate max-w-[140px]">{r.componentName}</span>
-									<span className="text-warning font-mono">{r.actualDuration.toFixed(1)}ms</span>
+									<span className="text-warning-700 font-mono">{r.actualDuration.toFixed(1)}ms</span>
 								</div>
 							))}
 						</div>
 					)}
-					<Button variant="text" size="sm" onClick={() => clearRenderLog()} className="mt-2 text-muted-fg">
+					<Button variant="text" size="sm" onClick={() => clearRenderLog()} className="mt-2">
 						Clear Log
 					</Button>
 				</Section>
@@ -419,18 +419,18 @@ export function PerfPanel({ onClose }: Props) {
 				>
 					<div className="space-y-1">
 						<div className="flex items-center justify-between">
-							<span className="text-xs text-muted-fg">Requests</span>
+							<span className="text-xs text-text-600">Requests</span>
 							<span className="text-xs font-mono">{networkEntries.length}</span>
 						</div>
 						<div className="flex items-center justify-between">
-							<span className="text-xs text-muted-fg">Total Size</span>
+							<span className="text-xs text-text-600">Total Size</span>
 							<span className="text-xs font-mono">{formatBytes(totalWifiHighSize)}</span>
 						</div>
 					</div>
 					{networkEntries.length > 0 && (
 						<>
 							<div className="mt-2 space-y-0.5">
-								<p className="text-2xs text-muted-fg uppercase tracking-wider">Slowest:</p>
+								<p className="text-2xs text-text-600 uppercase tracking-wider">Slowest:</p>
 								{[...networkEntries]
 									.sort((a, b) => b.duration - a.duration)
 									.slice(0, 3)
@@ -439,12 +439,12 @@ export function PerfPanel({ onClose }: Props) {
 											<span className="truncate max-w-[160px]" title={r.name}>
 												{getPathname(r.name)}
 											</span>
-											<span className="text-warning font-mono">{formatDuration(r.duration)}</span>
+											<span className="text-warning-700 font-mono">{formatDuration(r.duration)}</span>
 										</div>
 									))}
 							</div>
 							<div className="mt-2 space-y-0.5">
-								<p className="text-2xs text-muted-fg uppercase tracking-wider">Largest:</p>
+								<p className="text-2xs text-text-600 uppercase tracking-wider">Largest:</p>
 								{[...networkEntries]
 									.sort((a, b) => b.transferSize - a.transferSize)
 									.slice(0, 3)
@@ -470,15 +470,15 @@ export function PerfPanel({ onClose }: Props) {
 					onExpand={() => setExpandedSection(expandedSection === "leaks" ? null : "leaks")}
 				>
 					{!state.leaksEnabled ? (
-						<p className="text-xs text-muted-fg">Enable to track component lifecycles</p>
+						<p className="text-xs text-text-600">Enable to track component lifecycles</p>
 					) : leaks.length === 0 ? (
-						<p className="text-xs text-positive">No leaks detected</p>
+						<p className="text-xs text-success-700">No leaks detected</p>
 					) : (
 						<div className="space-y-1">
 							{leaks.slice(0, 5).map((leak) => (
 								<div key={leak.name} className="flex items-center justify-between text-xs">
 									<span className="truncate max-w-[160px]">{leak.name}</span>
-									<span className="text-negative font-mono">{leak.count}</span>
+									<span className="text-error-700 font-mono">{leak.count}</span>
 								</div>
 							))}
 						</div>
@@ -491,7 +491,7 @@ export function PerfPanel({ onClose }: Props) {
 								clearLeakData();
 								triggerRefresh();
 							}}
-							className="mt-2 text-muted-fg"
+							className="mt-2 text-text-600"
 						>
 							Clear Data
 						</Button>
@@ -514,9 +514,9 @@ interface SectionProps {
 
 function Section({ title, icon, enabled, onToggle, expanded, onExpand, children }: SectionProps) {
 	return (
-		<div className="border-b border-border/30 last:border-b-0">
+		<div className="border-b border-border-200/30 last:border-b-0">
 			<div className="flex items-center justify-between px-3 py-2">
-				<button type="button" onClick={onExpand} className="flex items-center gap-2 text-sm hover:text-fg/80">
+				<button type="button" onClick={onExpand} className="flex items-center gap-2 text-sm hover:text-text-950/80">
 					{icon}
 					<span>{title}</span>
 					{expanded ? <CaretUpIcon className="size-3" /> : <CaretDownIcon className="size-3" />}
