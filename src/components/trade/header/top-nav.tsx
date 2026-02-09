@@ -1,13 +1,8 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { BellIcon, CaretDownIcon, DownloadSimpleIcon, GearIcon, TerminalIcon } from "@phosphor-icons/react";
+import { BellIcon, DownloadSimpleIcon, GearIcon, TerminalIcon } from "@phosphor-icons/react";
 import { useConnection } from "wagmi";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { useDepositModalActions, useSettingsDialogActions } from "@/stores/use-global-modal-store";
 import { ThemeToggle } from "./theme-toggle";
@@ -19,12 +14,6 @@ const NAV_ITEMS = [
 	{ key: "portfolio", label: <Trans>Portfolio</Trans>, active: false },
 	{ key: "staking", label: <Trans>Staking</Trans>, active: false },
 	{ key: "leaderboard", label: <Trans>Leaderboard</Trans>, active: false },
-] as const;
-
-const MORE_ITEMS = [
-	{ key: "api", label: <Trans>API</Trans> },
-	{ key: "docs", label: <Trans>Docs</Trans> },
-	{ key: "support", label: <Trans>Support</Trans> },
 ] as const;
 
 export function TopNav() {
@@ -59,36 +48,19 @@ export function TopNav() {
 							{item.label}
 						</button>
 					))}
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<button
-								type="button"
-								className="px-2.5 py-1.5 text-text-950 hover:text-primary-default transition-colors inline-flex items-center gap-1 font-normal"
-								aria-label={t`More options`}
-							>
-								<Trans>More</Trans>
-								<CaretDownIcon className="size-2.5" />
-							</button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="start" className="min-w-32 text-xs font-mono">
-							{MORE_ITEMS.map((item) => (
-								<DropdownMenuItem key={item.key}>{item.label}</DropdownMenuItem>
-							))}
-						</DropdownMenuContent>
-					</DropdownMenu>
 				</nav>
 			</div>
 
 			<div className="flex items-center gap-2">
 				{isConnected && (
-					<button
-						type="button"
+					<Button
+						variant="outlined"
 						onClick={() => openDepositModal("deposit")}
 						className="h-6 px-2 text-xs font-medium rounded-xs bg-fill-100 border border-border-300 text-text-950 hover:border-border-500 transition-colors inline-flex items-center gap-1 shadow-xs"
 					>
 						<DownloadSimpleIcon className="size-4" />
 						<Trans>Deposit</Trans>
-					</button>
+					</Button>
 				)}
 				<UserMenu />
 				<div className="flex items-center gap-1">

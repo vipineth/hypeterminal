@@ -111,8 +111,8 @@ msgid "Amount (USDC)"
 msgstr "Amount (USDC)"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "API"
-msgstr "API"
+#~ msgid "API"
+#~ msgstr "API"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #~ msgid "Appearance"
@@ -488,8 +488,8 @@ msgid "Displays the mobile sidebar."
 msgstr "Displays the mobile sidebar."
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Docs"
-msgstr "Docs"
+#~ msgid "Docs"
+#~ msgstr "Docs"
 
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
@@ -999,12 +999,12 @@ msgid "Mock Wallet (Testing)"
 msgstr "Mock Wallet (Testing)"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "More"
-msgstr "More"
+#~ msgid "More"
+#~ msgstr "More"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "More options"
-msgstr "More options"
+#~ msgid "More options"
+#~ msgstr "More options"
 
 #: src/components/ui/pagination.tsx
 #~ msgid "More pages"
@@ -1680,8 +1680,8 @@ msgid "Submitting..."
 msgstr "Submitting..."
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Support"
-msgstr "Support"
+#~ msgid "Support"
+#~ msgstr "Support"
 
 #: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/components/spot-swap-modal.tsx
