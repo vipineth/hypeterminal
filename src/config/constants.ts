@@ -57,8 +57,8 @@ export const PANEL_LAYOUT = {
 	},
 	ANALYSIS: {
 		id: "CHART_WITH_POSITIONS",
-		chart: { defaultSize: 50, minSize: 40 },
-		positions: { defaultSize: 50, minSize: 35 },
+		chart: { defaultSize: 60, minSize: 40 },
+		positions: { defaultSize: 40, minSize: 30 },
 	},
 	MARKET: {
 		id: "CHART_WITH_ORDERBOOK",

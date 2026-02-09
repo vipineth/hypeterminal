@@ -9,8 +9,6 @@ const { id, chart, positions } = PANEL_LAYOUT.ANALYSIS;
 export function AnalysisSection() {
 	const { defaultLayout, onLayoutChanged } = useDefaultLayout({ id });
 
-	console.log("chart.defaultSize", defaultLayout);
-
 	return (
 		<div className="h-full min-h-0">
 			<ResizablePanelGroup
