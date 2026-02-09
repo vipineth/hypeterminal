@@ -50,18 +50,18 @@ function Slider({
 			<SliderPrimitive.Track
 				data-slot="slider-track"
 				className={cn(
-					"bg-border/40 relative grow overflow-hidden rounded-full",
+					"bg-border-200 relative grow overflow-hidden rounded-full",
 					"data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full",
 					"data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5",
-					"data-[disabled]:bg-border/20",
+					"data-[disabled]:bg-border-200/50",
 				)}
 			>
 				<SliderPrimitive.Range
 					data-slot="slider-range"
 					className={cn(
-						"bg-action-primary absolute",
+						"bg-primary-default absolute",
 						"data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full",
-						"data-[disabled]:bg-fg-300",
+						"data-[disabled]:bg-text-400",
 					)}
 				/>
 			</SliderPrimitive.Track>
@@ -76,7 +76,12 @@ function Slider({
 						style={{ left: `${position}%` }}
 					>
 						<div
-							className={cn("size-2 rounded-full transition-colors", isActive ? "bg-action-primary" : "bg-border")}
+							className={cn(
+								"size-2 rounded-full transition-colors",
+								!isActive && "bg-border-200",
+								isActive && !disabled && "bg-primary-default",
+								isActive && disabled && "bg-text-400",
+							)}
 						/>
 					</div>
 				);
@@ -88,9 +93,9 @@ function Slider({
 					key={index}
 					className={cn(
 						"block size-4 shrink-0 rounded-full border shadow-sm transition-[color,box-shadow] z-10",
-						"border-action-primary bg-action-primary",
-						"ring-ring/50 hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden",
-						"data-[disabled]:pointer-events-none data-[disabled]:bg-fg-300 data-[disabled]:border-fg-300/40",
+						"border-primary-default bg-primary-default",
+						"ring-primary-default/50 hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden",
+						"data-[disabled]:pointer-events-none data-[disabled]:bg-text-400 data-[disabled]:border-text-400/40",
 					)}
 				/>
 			))}
@@ -115,7 +120,7 @@ function Slider({
 							disabled={disabled}
 							className={cn(
 								"absolute -translate-x-1/2 text-3xs tabular-nums",
-								isSelected ? "text-action-primary font-medium" : "text-fg-700 hover:text-fg-900",
+								isSelected ? "text-primary-default font-medium" : "text-text-600 hover:text-text-950",
 							)}
 							style={{ left: `${position}%` }}
 						>

@@ -3,6 +3,7 @@ import { DownloadSimpleIcon, UploadSimpleIcon } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
+import { InfoRow } from "@/components/ui/info-row";
 import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
@@ -13,7 +14,7 @@ import { useDepositModalActions } from "@/stores/use-global-modal-store";
 type SummaryRow = {
 	label: string;
 	value: string;
-	valueClass: string;
+	valueClassName?: string;
 };
 
 export function AccountPanel() {
@@ -113,7 +114,7 @@ export function AccountPanel() {
 			: FALLBACK_VALUE_PLACEHOLDER;
 
 	const headerPnlClass =
-		activeTab === "perps" && hasPerpData ? getValueColorClass(perpMetrics.unrealizedPnl) : "text-fg-700";
+		activeTab === "perps" && hasPerpData ? getValueColorClass(perpMetrics.unrealizedPnl) : "text-text-600";
 
 	const perpRows = useMemo((): SummaryRow[] => {
 		if (!perpMetrics) return [];
@@ -121,32 +122,32 @@ export function AccountPanel() {
 			{
 				label: t`Balance`,
 				value: formatUSD(perpMetrics.totalRawUsd),
-				valueClass: "tabular-nums text-market-down-primary",
+				valueClassName: "tabular-nums text-market-up-600",
 			},
 			{
 				label: t`Unrealized PNL`,
 				value: formatUSD(perpMetrics.unrealizedPnl, { signDisplay: "exceptZero" }),
-				valueClass: cn("tabular-nums", getValueColorClass(perpMetrics.unrealizedPnl)),
+				valueClassName: cn("tabular-nums", getValueColorClass(perpMetrics.unrealizedPnl)),
 			},
 			{
 				label: t`Available`,
 				value: formatUSD(perpMetrics.availableBalance),
-				valueClass: "tabular-nums",
+				valueClassName: "tabular-nums",
 			},
 			{
 				label: t`Margin Used`,
 				value: formatUSD(perpMetrics.totalMarginUsed),
-				valueClass: "tabular-nums",
+				valueClassName: "tabular-nums",
 			},
 			{
 				label: t`Margin Ratio`,
 				value: formatPercent(perpMetrics.marginRatio, { maximumFractionDigits: 1 }),
-				valueClass: "tabular-nums",
+				valueClassName: "tabular-nums",
 			},
 			{
 				label: t`Cross Leverage`,
 				value: `${perpMetrics.crossLeverage.toFixed(2)}x`,
-				valueClass: "tabular-nums",
+				valueClassName: "tabular-nums",
 			},
 		];
 	}, [perpMetrics]);
@@ -157,27 +158,27 @@ export function AccountPanel() {
 			{
 				label: t`Total Value`,
 				value: formatUSD(spotMetrics.totalValue),
-				valueClass: "tabular-nums",
+				valueClassName: "tabular-nums",
 			},
 			{
 				label: t`Available`,
 				value: formatUSD(spotMetrics.availableValue),
-				valueClass: "tabular-nums",
+				valueClassName: "tabular-nums",
 			},
 			{
 				label: t`In Orders`,
 				value: formatUSD(spotMetrics.inOrderValue),
-				valueClass: "tabular-nums text-status-warning",
+				valueClassName: "tabular-nums text-warning-700",
 			},
 			{
 				label: t`Assets`,
 				value: `${spotMetrics.tokenCount}`,
-				valueClass: "tabular-nums",
+				valueClassName: "tabular-nums",
 			},
 			...spotMetrics.topTokens.map((token) => ({
 				label: token.coin,
 				value: formatToken(token.total, token.coin === DEFAULT_QUOTE_TOKEN ? 2 : 4),
-				valueClass: "tabular-nums",
+				valueClassName: "tabular-nums",
 			})),
 		];
 	}, [spotMetrics]);
@@ -186,36 +187,34 @@ export function AccountPanel() {
 	const hasData = activeTab === "perps" ? hasPerpData : hasSpotData;
 
 	return (
-		<div className="shrink-0 flex flex-col bg-surface-800 border-t border-border">
-			<div className="px-2 py-2 border-b border-border flex items-center justify-between">
-				<span className="text-3xs text-fg-900">{t`Account`}</span>
+		<div className="shrink-0 flex flex-col bg-surface-execution border-t border-border-200">
+			<div className="px-2 py-2 border-b border-border-200 flex items-center justify-between">
+				<span className="text-3xs text-text-950">{t`Account`}</span>
 				<div className="flex items-center gap-2">
 					<div className="flex items-center gap-1">
-						<span className="text-3xs text-fg-900">{t`Equity`}</span>
-						<span
-							className={cn("text-3xs font-medium tabular-nums", hasData ? "text-market-up-primary" : "text-fg-700")}
-						>
+						<span className="text-3xs text-text-950">{t`Equity`}</span>
+						<span className={cn("text-3xs font-medium tabular-nums", hasData ? "text-market-up-600" : "text-text-600")}>
 							{headerEquity}
 						</span>
 					</div>
 					{activeTab === "perps" && (
 						<div className="flex items-center gap-1">
-							<span className="text-3xs text-fg-900">{t`PNL`}</span>
+							<span className="text-3xs text-text-950">{t`PNL`}</span>
 							<span className={cn("text-3xs font-medium tabular-nums", headerPnlClass)}>{headerPnl}</span>
 						</div>
 					)}
 				</div>
 			</div>
 
-			<div className="px-2 flex items-center gap-0.5 border-b border-border">
+			<div className="px-2 flex items-center gap-0.5 border-b border-border-200">
 				<button
 					type="button"
 					onClick={() => setActiveTab("perps")}
 					className={cn(
 						"px-2 py-1.5 -mb-px text-xs tracking-[0.5px] border-b",
 						activeTab === "perps"
-							? "font-semibold text-fg-900 border-fg-900"
-							: "text-fg-700 border-transparent hover:text-fg-900",
+							? "font-semibold text-text-950 border-text-950"
+							: "text-text-600 border-transparent hover:text-text-950",
 					)}
 				>
 					{t`Perps`}
@@ -226,8 +225,8 @@ export function AccountPanel() {
 					className={cn(
 						"px-2 py-1.5 -mb-px text-xs tracking-[0.5px] border-b",
 						activeTab === "spot"
-							? "font-semibold text-fg-900 border-fg-900"
-							: "text-fg-700 border-transparent hover:text-fg-900",
+							? "font-semibold text-text-950 border-text-950"
+							: "text-text-600 border-transparent hover:text-text-950",
 					)}
 				>
 					{t`Spot`}
@@ -236,17 +235,14 @@ export function AccountPanel() {
 
 			<div className="p-2 space-y-2 overflow-y-auto">
 				{!isConnected ? (
-					<div className="text-2xs text-fg-700 text-center py-4">{t`Connect wallet to view account`}</div>
+					<div className="text-2xs text-text-600 text-center py-4">{t`Connect wallet to view account`}</div>
 				) : !hasData ? (
-					<div className="text-2xs text-fg-700 text-center py-4">{t`Loading...`}</div>
+					<div className="text-2xs text-text-600 text-center py-4">{t`Loading...`}</div>
 				) : (
 					<>
-						<div className="divide-y divide-border text-2xs tracking-[0.5px]">
+						<div className="divide-y divide-border-200 text-2xs tracking-[0.5px]">
 							{summaryRows.map((row) => (
-								<div key={row.label} className="flex items-center justify-between px-2 h-5">
-									<span className="text-fg-500">{row.label}</span>
-									<span className={cn("text-fg-900", row.valueClass)}>{row.value}</span>
-								</div>
+								<InfoRow key={row.label} label={row.label} value={row.value} valueClassName={row.valueClassName} />
 							))}
 						</div>
 

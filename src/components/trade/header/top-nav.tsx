@@ -33,18 +33,18 @@ export function TopNav() {
 	const { isConnected } = useConnection();
 
 	return (
-		<header className="fixed top-0 left-0 right-0 z-40 h-11 border-b border-border/20 px-3 flex items-center justify-between bg-surface-800">
+		<header className="fixed top-0 left-0 right-0 z-40 h-11 border-b border-border-100 px-3 flex items-center justify-between bg-surface-execution">
 			<div className="flex items-center gap-3 min-w-0">
 				<div className="flex items-center gap-1.5">
-					<div className="size-5 rounded bg-action-primary/10 border border-action-primary/30 flex items-center justify-center">
-						<TerminalIcon className="size-3 text-action-primary" />
+					<div className="size-5 rounded bg-primary-default/10 border border-primary-default/30 flex items-center justify-center">
+						<TerminalIcon className="size-3 text-primary-default" />
 					</div>
 					<span className="text-xs font-bold tracking-tight">
-						<span className="text-action-primary">HYPE</span>
-						<span className="text-fg-900">TERMINAL</span>
+						<span className="text-primary-default">HYPE</span>
+						<span className="text-text-950">TERMINAL</span>
 					</span>
 				</div>
-				<div className="h-4 w-px bg-border/60 hidden md:block" />
+				<div className="h-4 w-px bg-border-200 hidden md:block" />
 				<nav className="hidden lg:flex items-center text-nav tracking-wide">
 					{NAV_ITEMS.map((item) => (
 						<button
@@ -52,7 +52,7 @@ export function TopNav() {
 							type="button"
 							className={cn(
 								"px-2.5 py-1.5 transition-colors",
-								item.active ? "text-action-primary font-medium" : "text-fg-900 hover:text-action-primary",
+								item.active ? "text-primary-default font-medium" : "text-text-950 hover:text-primary-default",
 							)}
 							tabIndex={0}
 						>
@@ -63,7 +63,7 @@ export function TopNav() {
 						<DropdownMenuTrigger asChild>
 							<button
 								type="button"
-								className="px-2.5 py-1.5 text-fg-900 hover:text-action-primary transition-colors inline-flex items-center gap-1 font-normal"
+								className="px-2.5 py-1.5 text-text-950 hover:text-primary-default transition-colors inline-flex items-center gap-1 font-normal"
 								aria-label={t`More options`}
 							>
 								<Trans>More</Trans>
@@ -84,9 +84,9 @@ export function TopNav() {
 					<button
 						type="button"
 						onClick={() => openDepositModal("deposit")}
-						className="h-7 px-3 text-xs font-medium rounded border border-border text-fg-900 hover:border-fg-400 transition-colors inline-flex items-center gap-1.5"
+						className="h-6 px-2 text-xs font-medium rounded-xs bg-fill-100 border border-border-300 text-text-950 hover:border-border-500 transition-colors inline-flex items-center gap-1 shadow-xs"
 					>
-						<DownloadSimpleIcon className="size-3.5" />
+						<DownloadSimpleIcon className="size-4" />
 						<Trans>Deposit</Trans>
 					</button>
 				)}
@@ -94,19 +94,19 @@ export function TopNav() {
 				<div className="flex items-center gap-1">
 					<button
 						type="button"
-						className="size-7 inline-flex items-center justify-center rounded text-fg-700 hover:text-action-primary transition-colors"
+						className="size-7 inline-flex items-center justify-center rounded text-text-600 hover:text-primary-default transition-colors"
 						aria-label={t`Notifications`}
 					>
-						<BellIcon className="size-3.5" />
+						<BellIcon className="size-4" />
 					</button>
 					<ThemeToggle />
 					<button
 						type="button"
-						className="size-7 inline-flex items-center justify-center rounded text-fg-700 hover:text-action-primary transition-colors"
+						className="size-7 inline-flex items-center justify-center rounded text-text-600 hover:text-primary-default transition-colors"
 						onClick={openSettingsDialog}
 						aria-label={t`Settings`}
 					>
-						<GearIcon className="size-3.5" />
+						<GearIcon className="size-4" />
 					</button>
 				</div>
 			</div>

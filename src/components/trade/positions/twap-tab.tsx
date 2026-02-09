@@ -25,7 +25,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 		<div
 			className={cn(
 				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-market-down-primary/80" : "text-fg-700",
+				variant === "error" ? "text-market-down-600/80" : "text-text-600",
 			)}
 		>
 			{children}
@@ -67,35 +67,35 @@ export function TwapTab() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
-			<div className="text-3xs uppercase tracking-wider text-fg-700 mb-1.5 flex items-center gap-2">
+			<div className="text-3xs uppercase tracking-wider text-text-600 mb-1.5 flex items-center gap-2">
 				<TimerIcon className="size-3" />
 				{t`TWAP Orders`}
-				<span className="text-status-info ml-auto tabular-nums">{headerCount}</span>
+				<span className="text-primary-default ml-auto tabular-nums">{headerCount}</span>
 			</div>
-			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-surface-200/50">
+			<div className="flex-1 min-h-0 overflow-hidden border border-border-200/40 rounded-sm bg-surface-base/50">
 				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
-								<TableRow className="border-border/40 bg-surface-300 hover:bg-surface-300">
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 h-7">{t`Asset`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
+								<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">{t`Asset`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
 										{t`Size`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
 										{t`Executed`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
 										{t`Avg Price`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">
 										{t`Time / Total`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">
 										{t`Reduce Only`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 h-7">{t`Created`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">{t`Created`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
 										{t`Actions`}
 									</TableHead>
 								</TableRow>
@@ -104,8 +104,8 @@ export function TwapTab() {
 								{activeOrders.map(({ twapId, state }, i) => {
 									const isBuy = state.side === "B";
 									const sideClass = isBuy
-										? "bg-market-up-subtle text-market-up-primary"
-										: "bg-market-down-subtle text-market-down-primary";
+										? "bg-market-up-100 text-market-up-600"
+										: "bg-market-down-100 text-market-down-600";
 									const totalSize = toBig(state.sz)?.toNumber() ?? Number.NaN;
 									const executedSize = toBig(state.executedSz)?.toNumber() ?? 0;
 									const avgPrice = getAvgPrice(state.executedNtl, state.executedSz);
@@ -116,7 +116,10 @@ export function TwapTab() {
 									return (
 										<TableRow
 											key={twapId}
-											className={cn("border-border/40 hover:bg-surface-500/30", i % 2 === 1 && "bg-surface-300")}
+											className={cn(
+												"border-border-200/40 hover:bg-surface-analysis/30",
+												i % 2 === 1 && "bg-surface-analysis",
+											)}
 										>
 											<TableCell className="text-3xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">
@@ -137,7 +140,7 @@ export function TwapTab() {
 												{formatNumber(totalSize, szDecimals)}
 											</TableCell>
 											<TableCell className="text-3xs text-right tabular-nums py-1.5">
-												<span className={cn(isBuy ? "text-market-up-primary" : "text-market-down-primary")}>
+												<span className={cn(isBuy ? "text-market-up-600" : "text-market-down-600")}>
 													{formatNumber(executedSize, szDecimals)}
 												</span>
 											</TableCell>
@@ -164,7 +167,7 @@ export function TwapTab() {
 												<Button
 													variant="outlined"
 													size="sm"
-													className="border-market-down-primary text-market-down-primary hover:border-market-down-primary/80 hover:bg-market-down-subtle"
+													className="border-market-down-600 text-market-down-600 hover:border-market-down-600/80 hover:bg-market-down-100"
 													aria-label={t`Cancel TWAP order`}
 												>
 													{t`Cancel`}

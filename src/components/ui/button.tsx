@@ -4,7 +4,7 @@ import { Slot as SlotPrimitive } from "radix-ui";
 import { cn } from "@/lib/cn";
 
 const buttonVariants = cva(
-	"inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-xs transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed",
+	"inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-xs transition outline-none focus-visible:ring-2 focus-visible:ring-primary-default/50 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed",
 	{
 		variants: {
 			variant: {
@@ -12,7 +12,7 @@ const buttonVariants = cva(
 				outlined: "border bg-transparent",
 				ghost: "",
 				text: "p-0",
-				destructive: "bg-status-error text-white shadow-xs hover:bg-status-error/90 active:bg-status-error/80",
+				destructive: "bg-error-700 text-white shadow-xs hover:bg-error-700/90 active:bg-error-700/80",
 			},
 			size: {
 				none: "",
@@ -27,39 +27,43 @@ const buttonVariants = cva(
 			},
 		},
 		compoundVariants: [
-			{ variant: "contained", tone: "base", class: "bg-fg-900 text-surface-200 hover:bg-fg-800 active:bg-fg-700" },
+			{
+				variant: "contained",
+				tone: "base",
+				class: "bg-text-950 text-text-10 hover:bg-text-950/90 active:bg-text-950/80",
+			},
 			{
 				variant: "contained",
 				tone: "accent",
-				class: "bg-action-primary text-white hover:bg-action-primary-hover active:bg-action-primary-active",
+				class: "bg-primary-default text-white hover:bg-primary-hover active:bg-primary-active",
 			},
 			{
 				variant: "outlined",
 				tone: "base",
-				class: "border-border text-fg-800 hover:border-fg-400 hover:bg-fg-900/5 active:bg-fg-900/10",
+				class: "border-border-300 text-text-950 hover:border-text-400 hover:bg-text-950/5 active:bg-text-950/10",
 			},
 			{
 				variant: "outlined",
 				tone: "accent",
 				class:
-					"border-action-primary text-action-primary hover:border-action-primary-hover hover:bg-action-primary/5 active:bg-action-primary/10",
+					"border-primary-default text-primary-default hover:border-primary-hover hover:bg-primary-default/5 active:bg-primary-default/10",
 			},
 			{
 				variant: "ghost",
 				tone: "base",
-				class: "text-fg-700 hover:bg-fg-900/5 hover:text-fg-800 active:bg-fg-900/10 active:text-fg-900",
+				class: "text-text-600 hover:bg-text-950/5 hover:text-text-950 active:bg-text-950/10 active:text-text-950",
 			},
 			{
 				variant: "ghost",
 				tone: "accent",
 				class:
-					"text-action-primary hover:bg-action-primary/5 hover:text-action-primary-hover active:bg-action-primary/10 active:text-action-primary-active",
+					"text-primary-default hover:bg-primary-default/5 hover:text-primary-hover active:bg-primary-default/10 active:text-primary-active",
 			},
-			{ variant: "text", tone: "base", class: "text-fg-700 hover:text-fg-800 active:text-fg-900" },
+			{ variant: "text", tone: "base", class: "text-text-600 hover:text-text-950 active:text-text-950" },
 			{
 				variant: "text",
 				tone: "accent",
-				class: "text-action-primary hover:text-action-primary-hover active:text-action-primary-active",
+				class: "text-primary-default hover:text-primary-hover active:text-primary-active",
 			},
 		],
 		defaultVariants: {

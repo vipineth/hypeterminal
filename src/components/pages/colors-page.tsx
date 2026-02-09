@@ -103,8 +103,8 @@ function ColorRow({ color }: { color: ColorDef }) {
 	return (
 		<div className="flex items-center gap-4 py-2">
 			<div className="w-36 shrink-0 sm:w-44">
-				<span className="text-xs font-medium text-fg-900">{color.name}</span>
-				<p className="text-3xs text-fg-500">{color.usage}</p>
+				<span className="text-xs font-medium text-text-950">{color.name}</span>
+				<p className="text-3xs text-text-500">{color.usage}</p>
 			</div>
 			<div className="flex flex-1 overflow-hidden rounded-xs" style={{ border: `1px solid ${LIGHT_BORDER}` }}>
 				<div className="flex flex-1 items-center gap-2.5 px-3 py-2" style={{ backgroundColor: LIGHT_BG }}>
@@ -140,8 +140,8 @@ function ColorRowSingle({ color, mode }: { color: ColorDef; mode: "light" | "dar
 	return (
 		<div className="flex items-center gap-4 py-2">
 			<div className="w-36 shrink-0 sm:w-44">
-				<span className="text-xs font-medium text-fg-900">{color.name}</span>
-				<p className="text-3xs text-fg-500">{color.usage}</p>
+				<span className="text-xs font-medium text-text-950">{color.name}</span>
+				<p className="text-3xs text-text-500">{color.usage}</p>
 			</div>
 			<div
 				className="flex flex-1 items-center gap-2.5 overflow-hidden rounded-xs px-3 py-2"
@@ -175,12 +175,12 @@ export function ColorsPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-surface-200 text-fg-900 p-6 md:p-10">
+		<div className="min-h-screen bg-surface-base text-text-950 p-6 md:p-10">
 			<div className="mx-auto max-w-4xl space-y-8">
 				<div className="flex flex-wrap items-start justify-between gap-4">
 					<div>
-						<h1 className="text-base font-semibold text-fg-950">Design Tokens</h1>
-						<p className="text-xs text-fg-700">All color tokens — light and dark side by side.</p>
+						<h1 className="text-base font-semibold text-text-950">Design Tokens</h1>
+						<p className="text-xs text-text-600">All color tokens — light and dark side by side.</p>
 					</div>
 					<div className="flex items-center gap-2">
 						<div className="flex rounded-xs bg-surface-alt p-0.5 text-3xs">
@@ -191,7 +191,9 @@ export function ColorsPage() {
 									onClick={() => setView(v)}
 									className={cn(
 										"px-2.5 py-1 rounded-xs capitalize transition-colors",
-										view === v ? "bg-surface-800 text-fg-950 font-semibold" : "text-fg-800 hover:text-fg-950",
+										view === v
+											? "bg-surface-execution text-text-950 font-semibold"
+											: "text-text-600 hover:text-text-950",
 									)}
 								>
 									{v}
@@ -201,7 +203,7 @@ export function ColorsPage() {
 						<button
 							type="button"
 							onClick={handleThemeToggle}
-							className="flex items-center gap-1.5 rounded-xs bg-surface-alt px-2.5 py-1 text-3xs text-fg-800 transition-colors hover:text-fg-950"
+							className="flex items-center gap-1.5 rounded-xs bg-surface-monitoring-row-b px-2.5 py-1 text-3xs text-text-600 transition-colors hover:text-text-950"
 						>
 							{isDark ? <SunIcon className="size-3" /> : <MoonIcon className="size-3" />}
 							{isDark ? "Light" : "Dark"}
@@ -210,7 +212,7 @@ export function ColorsPage() {
 				</div>
 
 				{view === "both" && (
-					<div className="flex gap-4 text-3xs font-semibold uppercase tracking-wider text-fg-600">
+					<div className="flex gap-4 text-3xs font-semibold uppercase tracking-wider text-text-500">
 						<div className="w-36 shrink-0 sm:w-44" />
 						<div className="flex flex-1 overflow-hidden">
 							<div className="flex flex-1 items-center gap-1.5 px-3">
@@ -228,10 +230,10 @@ export function ColorsPage() {
 				{COLOR_GROUPS.map((group) => (
 					<section key={group.label}>
 						<div className="mb-2">
-							<h2 className="text-sm font-semibold text-fg-950">{group.label}</h2>
-							<p className="text-3xs text-fg-600">{group.description}</p>
+							<h2 className="text-sm font-semibold text-text-950">{group.label}</h2>
+							<p className="text-3xs text-text-500">{group.description}</p>
 						</div>
-						<div className="divide-y divide-border/50">
+						<div className="divide-y divide-border-200/50">
 							{group.colors.map((color) =>
 								view === "both" ? (
 									<ColorRow key={color.name} color={color} />

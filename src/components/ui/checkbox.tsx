@@ -8,14 +8,15 @@ function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxP
 		<CheckboxPrimitive.Root
 			data-slot="checkbox"
 			className={cn(
-				"peer border-border data-[state=checked]:bg-action-primary data-[state=checked]:text-white data-[state=checked]:border-action-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-status-error/20 dark:aria-invalid:ring-status-error/40 aria-invalid:border-status-error size-4 shrink-0 rounded-xs border transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+				"peer border-border-200 data-[state=checked]:bg-primary-default data-[state=checked]:text-white data-[state=checked]:border-primary-default focus-visible:border-primary-default/50 focus-visible:ring-primary-default/50 aria-invalid:ring-error-700/20 dark:aria-invalid:ring-error-700/40 aria-invalid:border-error-700 size-4 shrink-0 rounded-xs border transition outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
 				className,
 			)}
 			{...props}
 		>
 			<CheckboxPrimitive.Indicator
 				data-slot="checkbox-indicator"
-				className="grid place-content-center text-current transition-none"
+				forceMount
+				className="grid place-content-center text-current transition-[scale,opacity] duration-150 ease-out data-[state=unchecked]:scale-0 data-[state=unchecked]:opacity-0"
 			>
 				<CheckIcon className="size-3" />
 			</CheckboxPrimitive.Indicator>

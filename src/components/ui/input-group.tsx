@@ -12,7 +12,7 @@ function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
 			data-slot="input-group"
 			role="group"
 			className={cn(
-				"group/input-group border-border dark:bg-input/30 relative flex w-full items-center rounded-md border shadow-xs transition-[color,box-shadow] outline-none",
+				"group/input-group border-border-200 dark:bg-fill-100/30 relative flex w-full items-center rounded-md border shadow-xs transition-[color,box-shadow] outline-none",
 				"h-9 min-w-0 has-[>textarea]:h-auto",
 
 				// Variants based on alignment.
@@ -22,10 +22,10 @@ function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
 				"has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-end]]:[&>input]:pt-3",
 
 				// Focus state.
-				"has-[[data-slot=input-group-control]:focus-visible]:border-ring has-[[data-slot=input-group-control]:focus-visible]:ring-ring/50 has-[[data-slot=input-group-control]:focus-visible]:ring-[3px]",
+				"has-[[data-slot=input-group-control]:focus-visible]:border-primary-default/50 has-[[data-slot=input-group-control]:focus-visible]:ring-primary-default/50 has-[[data-slot=input-group-control]:focus-visible]:ring-[3px]",
 
 				// Error state.
-				"has-[[data-slot][aria-invalid=true]]:ring-status-error/20 has-[[data-slot][aria-invalid=true]]:border-status-error dark:has-[[data-slot][aria-invalid=true]]:ring-status-error/40",
+				"has-[[data-slot][aria-invalid=true]]:ring-error-700/20 has-[[data-slot][aria-invalid=true]]:border-error-700 dark:has-[[data-slot][aria-invalid=true]]:ring-error-700/40",
 
 				className,
 			)}
@@ -35,7 +35,7 @@ function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 const inputGroupAddonVariants = cva(
-	"text-fg-700 flex h-auto cursor-text items-center justify-center gap-2 py-1.5 text-sm font-medium select-none [&>svg:not([class*='size-'])]:size-4 [&>kbd]:rounded-[calc(var(--radius)-5px)] group-data-[disabled=true]/input-group:opacity-50",
+	"text-text-600 flex h-auto cursor-text items-center justify-center gap-2 py-1.5 text-sm font-medium select-none [&>svg:not([class*='size-'])]:size-4 [&>kbd]:rounded-[calc(var(--radius)-5px)] group-data-[disabled=true]/input-group:opacity-50",
 	{
 		variants: {
 			align: {
@@ -123,7 +123,7 @@ function InputGroupText({ className, ...props }: React.ComponentProps<"span">) {
 	return (
 		<span
 			className={cn(
-				"text-fg-700 flex items-center gap-2 text-sm [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
+				"text-text-600 flex items-center gap-2 text-sm [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
 				className,
 			)}
 			{...props}

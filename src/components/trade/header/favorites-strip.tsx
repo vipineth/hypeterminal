@@ -14,7 +14,7 @@ export function FavoritesStrip() {
 
 	if (favorites.length === 0) {
 		return (
-			<div className="flex items-center gap-2 text-3xs text-fg-700">
+			<div className="flex items-center gap-2 text-3xs text-text-600">
 				<StarIcon className="size-3" />
 				<span>{t`Select favorite markets`}</span>
 			</div>
@@ -70,14 +70,14 @@ function FavoriteChip({ name, isActive }: FavoriteChipProps) {
 				tabIndex={0}
 				aria-label={t`Select ${displayName} market`}
 				className={cn(
-					"flex items-center gap-1 shrink-0 px-2 h-7 text-3xs rounded-sm bg-surface-800 border transition-colors",
-					isActive ? "border-border" : "border-transparent hover:border-border/60",
+					"flex items-center gap-1 shrink-0 px-2 h-7 text-3xs rounded-sm bg-surface-execution border transition-colors",
+					isActive ? "border-border-200" : "border-transparent hover:border-border-100",
 				)}
 			>
-				<span className="font-medium text-fg-900 uppercase">{displayName}</span>
+				<span className="font-medium text-text-950 uppercase">{displayName}</span>
 				{market?.markPx != null && (
 					<>
-						<span className="tabular-nums text-fg-500">{formatPrice(market.markPx, { szDecimals })}</span>
+						<span className="tabular-nums text-text-500">{formatPrice(market.markPx, { szDecimals })}</span>
 						{changePct != null && (
 							<span className={cn("tabular-nums", getValueColorClass(changePct))}>
 								{formatPercent(changePct / 100)}
@@ -90,7 +90,7 @@ function FavoriteChip({ name, isActive }: FavoriteChipProps) {
 				type="button"
 				onClick={handleRemove}
 				aria-label={t`Remove ${displayName} from favorites`}
-				className="absolute -top-0.5 -right-0.5 hidden size-4 cursor-pointer items-center justify-center rounded-full bg-surface-800 border border-border text-fg-500 hover:text-fg-900 group-hover/fav:flex"
+				className="absolute -top-0.5 -right-0.5 hidden size-4 cursor-pointer items-center justify-center rounded-full bg-surface-execution border border-border-200 text-text-500 hover:text-text-950 group-hover/fav:flex"
 			>
 				<XIcon className="size-2.5" weight="bold" />
 			</button>

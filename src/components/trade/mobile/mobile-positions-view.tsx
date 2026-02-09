@@ -73,9 +73,9 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 	};
 
 	return (
-		<div className={cn("flex flex-col h-full min-h-0 bg-surface-800/20", className)}>
+		<div className={cn("flex flex-col h-full min-h-0 bg-surface-execution/20", className)}>
 			{/* Scrollable tabs header */}
-			<div className="shrink-0 border-b border-border/60 bg-surface-800/30">
+			<div className="shrink-0 border-b border-border-200/60 bg-surface-execution/30">
 				<div className="px-3 py-2 overflow-x-auto">
 					<div className="flex items-center gap-1 min-w-max">
 						{POSITIONS_TABS.map((tab) => {
@@ -96,7 +96,7 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 										"min-h-[44px] flex items-center gap-2",
 										"active:scale-98",
 										"hover:bg-transparent",
-										isActive ? "bg-surface-200 text-status-info shadow-sm" : "text-fg-700 hover:text-fg-900",
+										isActive ? "bg-surface-base text-primary-default shadow-sm" : "text-text-600 hover:text-text-950",
 									)}
 								>
 									<span>{tab.label}</span>
@@ -107,7 +107,7 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 											variant="outline"
 											className={cn(
 												"min-w-5 h-5 px-1.5 text-xs tabular-nums",
-												"border-status-info/30 bg-status-info/10 text-status-info",
+												"border-primary-default/30 bg-primary-default/10 text-primary-default",
 											)}
 										>
 											{count}
@@ -136,14 +136,14 @@ interface EmptyStateProps {
 function EmptyState({ title, icon = "empty" }: EmptyStateProps) {
 	return (
 		<div className="h-full flex flex-col items-center justify-center gap-4 p-6 text-center">
-			<div className={cn("size-16 rounded-full flex items-center justify-center", "bg-surface-300")}>
+			<div className={cn("size-16 rounded-full flex items-center justify-center", "bg-surface-analysis")}>
 				{icon === "wallet" ? (
-					<WalletIcon className="size-8 text-fg-700" />
+					<WalletIcon className="size-8 text-text-600" />
 				) : (
-					<TrayIcon className="size-8 text-fg-700" />
+					<TrayIcon className="size-8 text-text-600" />
 				)}
 			</div>
-			<p className="text-sm text-fg-700 max-w-xs">{title}</p>
+			<p className="text-sm text-text-600 max-w-xs">{title}</p>
 		</div>
 	);
 }

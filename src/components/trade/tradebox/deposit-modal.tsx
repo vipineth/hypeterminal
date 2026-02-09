@@ -41,11 +41,11 @@ interface InfoRowProps {
 function InfoRow({ label, value, icon, highlight }: InfoRowProps) {
 	return (
 		<div className="flex items-center justify-between text-3xs">
-			<span className="flex items-center gap-1.5 text-fg-700">
-				{icon && <span className="text-fg-400">{icon}</span>}
+			<span className="flex items-center gap-1.5 text-text-600">
+				{icon && <span className="text-text-400">{icon}</span>}
 				{label}
 			</span>
-			<span className={cn(highlight && "text-fg-900 font-medium")}>{value}</span>
+			<span className={cn(highlight && "text-text-950 font-medium")}>{value}</span>
 		</div>
 	);
 }
@@ -62,12 +62,12 @@ function NetworkSelect({ label, value, onChange, disabled }: NetworkSelectProps)
 
 	return (
 		<div className="space-y-1.5">
-			<span className="text-4xs uppercase tracking-wider text-fg-700">{label}</span>
+			<span className="text-4xs uppercase tracking-wider text-text-600">{label}</span>
 			<Select value={value} onValueChange={(v) => onChange(v as NetworkId)} disabled={disabled}>
-				<SelectTrigger className="w-full h-9 bg-surface-200/50 border-border/60">
+				<SelectTrigger className="w-full h-9 bg-surface-base/50 border-border-200/60">
 					<SelectValue>
 						<span className="flex items-center gap-2">
-							<span className="flex size-5 items-center justify-center rounded bg-surface-300 text-4xs font-medium">
+							<span className="flex size-5 items-center justify-center rounded bg-surface-analysis text-4xs font-medium">
 								{selectedNetwork.shortName}
 							</span>
 							<span>{selectedNetwork.name}</span>
@@ -78,7 +78,7 @@ function NetworkSelect({ label, value, onChange, disabled }: NetworkSelectProps)
 					{NETWORKS.map((network) => (
 						<SelectItem key={network.id} value={network.id}>
 							<span className="flex items-center gap-2">
-								<span className="flex size-5 items-center justify-center rounded bg-surface-300 text-4xs font-medium">
+								<span className="flex size-5 items-center justify-center rounded bg-surface-analysis text-4xs font-medium">
 									{network.shortName}
 								</span>
 								<span>{network.name}</span>
@@ -123,9 +123,9 @@ function StatusScreen({
 				<div className="flex flex-col items-center gap-4 py-6">
 					{icon === "loading" ? (
 						<div className="relative">
-							<div className="absolute inset-0 animate-ping rounded-full bg-status-info/20" />
-							<div className="relative flex size-14 items-center justify-center rounded-full bg-status-info/10 border border-status-info/30">
-								<SpinnerGapIcon className="size-7 animate-spin text-status-info" />
+							<div className="absolute inset-0 animate-ping rounded-full bg-primary-default/20" />
+							<div className="relative flex size-14 items-center justify-center rounded-full bg-primary-default/10 border border-primary-default/30">
+								<SpinnerGapIcon className="size-7 animate-spin text-primary-default" />
 							</div>
 						</div>
 					) : (
@@ -133,23 +133,28 @@ function StatusScreen({
 							className={cn(
 								"flex size-14 items-center justify-center rounded-full border",
 								icon === "success"
-									? "bg-market-up-subtle border-market-up-primary/30"
-									: "bg-market-down-subtle border-market-down-primary/30",
+									? "bg-market-up-100 border-market-up-600/30"
+									: "bg-market-down-100 border-market-down-600/30",
 							)}
 						>
 							{icon === "success" ? (
-								<CheckCircleIcon className="size-7 text-market-up-primary" />
+								<CheckCircleIcon className="size-7 text-market-up-600" />
 							) : (
-								<WarningCircleIcon className="size-7 text-market-down-primary" />
+								<WarningCircleIcon className="size-7 text-market-down-600" />
 							)}
 						</div>
 					)}
 					<div className="text-center space-y-1.5">
 						<p className="text-sm font-medium">{heading}</p>
-						{description && <p className="text-xs text-fg-700">{description}</p>}
+						{description && <p className="text-xs text-text-600">{description}</p>}
 					</div>
 					{explorerUrl && (
-						<Button asChild variant="text" size="none" className="h-auto p-0 text-3xs text-status-info hover:underline">
+						<Button
+							asChild
+							variant="text"
+							size="none"
+							className="h-auto p-0 text-3xs text-primary-default hover:underline"
+						>
 							<a href={explorerUrl} target="_blank" rel="noopener noreferrer">
 								<span className="inline-flex items-center gap-1.5">
 									<Trans>View on explorer</Trans>
@@ -180,50 +185,33 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 			<NetworkSelect label={<Trans>From</Trans>} value="arbitrum" onChange={() => {}} disabled />
 
 			<div className="space-y-1.5">
-				<div className="flex items-center justify-between">
-					<span className="text-4xs uppercase tracking-wider text-fg-700">
-						<Trans>Amount</Trans>
-					</span>
-					<Button
-						type="button"
-						variant="text"
-						size="none"
-						onClick={() => onAmountChange(balance)}
-						className="h-auto p-0 text-3xs text-fg-700 hover:text-fg-900"
-					>
-						<Trans>Balance:</Trans>{" "}
-						<span className="tabular-nums text-fg-900 font-medium">{formatNumber(balance, 2)}</span>{" "}
-						<span className="text-status-info">USDC</span>
-					</Button>
-				</div>
-				<div className="flex items-center gap-1">
-					<NumberInput
-						placeholder="0.00"
-						value={amount}
-						onChange={(e) => onAmountChange(e.target.value)}
-						className={cn(
-							"flex-1 h-10 text-base bg-surface-200/50 border-border/60 focus:border-status-info/60 tabular-nums font-medium",
-							validation.error && "border-market-down-primary focus:border-market-down-primary",
-						)}
-					/>
-					<Button
-						variant="text"
-						size="none"
-						onClick={() => onAmountChange(balance)}
-						className="h-10 px-3 text-3xs border border-border/60 hover:border-status-info/40 hover:bg-action-primary/5 hover:text-status-info transition-colors"
-					>
-						{t`MAX`}
-					</Button>
-				</div>
+				<span className="text-4xs uppercase tracking-wider text-text-600">
+					<Trans>Amount</Trans>
+				</span>
+				<NumberInput
+					placeholder="0.00"
+					value={amount}
+					onChange={(e) => onAmountChange(e.target.value)}
+					maxLabel={
+						<>
+							{t`MAX`}: {formatNumber(balance, 2)}
+						</>
+					}
+					onMaxClick={() => onAmountChange(balance)}
+					className={cn(
+						"w-full h-10 text-base bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums font-medium",
+						validation.error && "border-market-down-600 focus:border-market-down-600",
+					)}
+				/>
 				{validation.error && (
-					<p className="text-4xs text-market-down-primary flex items-center gap-1">
+					<p className="text-4xs text-market-down-600 flex items-center gap-1">
 						<WarningCircleIcon className="size-3" />
 						{validation.error}
 					</p>
 				)}
 			</div>
 
-			<div className="rounded-lg border border-border/40 bg-surface-400 p-3 space-y-2">
+			<div className="rounded-xs border border-border-200/40 bg-surface-analysis p-3 space-y-2">
 				<InfoRow
 					label={<Trans>Minimum</Trans>}
 					value={<span className="tabular-nums">{formatUnits(MIN_DEPOSIT_USDC, USDC_DECIMALS)} USDC</span>}
@@ -281,58 +269,38 @@ function WithdrawForm({
 			<NetworkSelect label={<Trans>To</Trans>} value="arbitrum" onChange={() => {}} disabled />
 
 			<div className="space-y-1.5">
-				<div className="flex items-center justify-between">
-					<span className="text-4xs uppercase tracking-wider text-fg-700">
-						<Trans>Amount</Trans>
-					</span>
-					<Button
-						type="button"
-						variant="text"
-						size="none"
-						onClick={() => !isPending && onAmountChange(available)}
-						disabled={isPending}
-						className="h-auto p-0 text-3xs text-fg-700 hover:text-fg-900 disabled:opacity-50"
-					>
-						{balanceStatus === "subscribing" ? (
+				<span className="text-4xs uppercase tracking-wider text-text-600">
+					<Trans>Amount</Trans>
+				</span>
+				<NumberInput
+					placeholder="0.00"
+					value={amount}
+					onChange={(e) => onAmountChange(e.target.value)}
+					disabled={isPending}
+					maxLabel={
+						balanceStatus === "subscribing" ? (
 							<Trans>Loading...</Trans>
 						) : (
 							<>
-								<Trans>Available:</Trans>{" "}
-								<span className="tabular-nums text-fg-900 font-medium">${formatNumber(available, 2)}</span>
+								{t`MAX`}: ${formatNumber(available, 2)}
 							</>
-						)}
-					</Button>
-				</div>
-				<div className="flex items-center gap-1">
-					<NumberInput
-						placeholder="0.00"
-						value={amount}
-						onChange={(e) => onAmountChange(e.target.value)}
-						disabled={isPending}
-						className={cn(
-							"flex-1 h-10 text-base bg-surface-200/50 border-border/60 focus:border-status-info/60 tabular-nums font-medium",
-							validation.error && "border-market-down-primary focus:border-market-down-primary",
-						)}
-					/>
-					<Button
-						variant="text"
-						size="none"
-						onClick={() => !isPending && onAmountChange(available)}
-						disabled={isPending}
-						className="h-10 px-3 text-3xs border border-border/60 hover:border-status-info/40 hover:bg-action-primary/5 hover:text-status-info transition-colors disabled:opacity-50"
-					>
-						{t`MAX`}
-					</Button>
-				</div>
+						)
+					}
+					onMaxClick={() => !isPending && onAmountChange(available)}
+					className={cn(
+						"w-full h-10 text-base bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums font-medium",
+						validation.error && "border-market-down-600 focus:border-market-down-600",
+					)}
+				/>
 				{validation.error && (
-					<p className="text-4xs text-market-down-primary flex items-center gap-1">
+					<p className="text-4xs text-market-down-600 flex items-center gap-1">
 						<WarningCircleIcon className="size-3" />
 						{validation.error}
 					</p>
 				)}
 			</div>
 
-			<div className="rounded-lg border border-border/40 bg-surface-400 p-3 space-y-2">
+			<div className="rounded-xs border border-border-200/40 bg-surface-analysis p-3 space-y-2">
 				<InfoRow
 					label={<Trans>Network fee</Trans>}
 					value={<span className="tabular-nums">${WITHDRAWAL_FEE_USD}</span>}
@@ -342,7 +310,7 @@ function WithdrawForm({
 					label={<Trans>Net received</Trans>}
 					value={
 						netReceived === null ? (
-							<span className="tabular-nums text-fg-700">--</span>
+							<span className="tabular-nums text-text-600">--</span>
 						) : (
 							<span className="tabular-nums">${formatNumber(netReceived, 2)}</span>
 						)
@@ -382,14 +350,14 @@ function WithdrawForm({
 function WalletNotConnected() {
 	return (
 		<div className="flex flex-col items-center gap-4 py-8">
-			<div className="flex size-12 items-center justify-center rounded-full bg-surface-300 border border-border/40">
-				<WalletIcon className="size-6 text-fg-700" />
+			<div className="flex size-12 items-center justify-center rounded-full bg-surface-analysis border border-border-200/40">
+				<WalletIcon className="size-6 text-text-600" />
 			</div>
 			<div className="text-center space-y-1">
 				<p className="text-sm font-medium">
 					<Trans>Wallet not connected</Trans>
 				</p>
-				<p className="text-3xs text-fg-700">
+				<p className="text-3xs text-text-600">
 					<Trans>Connect your wallet to withdraw funds</Trans>
 				</p>
 			</div>
@@ -415,20 +383,20 @@ function WrongNetworkScreen({ open, onClose, onSwitch, isSwitching, error }: Wro
 					</DialogTitle>
 				</DialogHeader>
 				<div className="space-y-4 py-2">
-					<div className="flex items-start gap-3 rounded-lg border border-status-warning/40 bg-status-warning/5 p-4">
-						<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-status-warning/20">
-							<WarningCircleIcon className="size-4 text-status-warning" />
+					<div className="flex items-start gap-3 rounded-xs border border-warning-700/40 bg-warning-700/5 p-4">
+						<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-warning-700/20">
+							<WarningCircleIcon className="size-4 text-warning-700" />
 						</div>
 						<div className="space-y-1">
 							<p className="text-sm font-medium">
 								<Trans>Wrong network</Trans>
 							</p>
-							<p className="text-3xs text-fg-700">
+							<p className="text-3xs text-text-600">
 								<Trans>Switch to Arbitrum to deposit USDC to Hyperliquid</Trans>
 							</p>
 						</div>
 					</div>
-					{error && <p className="text-3xs text-market-down-primary px-1">{error.message}</p>}
+					{error && <p className="text-3xs text-market-down-600 px-1">{error.message}</p>}
 					<Button onClick={onSwitch} disabled={isSwitching} className="w-full">
 						{isSwitching ? (
 							<>
@@ -539,7 +507,7 @@ export function DepositModal() {
 				heading={<Trans>Deposit complete</Trans>}
 				description={
 					<>
-						<span className="tabular-nums font-medium text-market-up-primary">{depositAmount} USDC</span>{" "}
+						<span className="tabular-nums font-medium text-market-up-600">{depositAmount} USDC</span>{" "}
 						<Trans>sent to Hyperliquid</Trans>
 					</>
 				}
@@ -596,7 +564,7 @@ export function DepositModal() {
 				heading={<Trans>Withdrawal submitted</Trans>}
 				description={
 					<>
-						<span className="tabular-nums font-medium text-market-up-primary">${withdrawAmount}</span>{" "}
+						<span className="tabular-nums font-medium text-market-up-600">${withdrawAmount}</span>{" "}
 						<Trans>will arrive in ~5 min</Trans>
 					</>
 				}
@@ -641,28 +609,12 @@ export function DepositModal() {
 				</DialogHeader>
 
 				<Tabs value={activeTab} onValueChange={(v) => setTab(v as "deposit" | "withdraw")} className="space-y-4">
-					<TabsList className="w-full grid grid-cols-2 p-1 bg-surface-300 rounded-lg border border-border/40">
-						<TabsTrigger
-							value="deposit"
-							className={cn(
-								"flex items-center justify-center gap-1.5 py-2 rounded-md text-3xs font-medium transition-all",
-								activeTab === "deposit"
-									? "bg-surface-200 text-status-info shadow-sm border border-border/60"
-									: "text-fg-700 hover:text-fg-900",
-							)}
-						>
+					<TabsList variant="pill" className="w-full grid grid-cols-2">
+						<TabsTrigger value="deposit">
 							<ArrowLineDownIcon className="size-3" />
 							<Trans>Deposit</Trans>
 						</TabsTrigger>
-						<TabsTrigger
-							value="withdraw"
-							className={cn(
-								"flex items-center justify-center gap-1.5 py-2 rounded-md text-3xs font-medium transition-all",
-								activeTab === "withdraw"
-									? "bg-surface-200 text-status-info shadow-sm border border-border/60"
-									: "text-fg-700 hover:text-fg-900",
-							)}
-						>
+						<TabsTrigger value="withdraw">
 							<ArrowLineUpIcon className="size-3" />
 							<Trans>Withdraw</Trans>
 						</TabsTrigger>

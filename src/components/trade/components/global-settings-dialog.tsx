@@ -88,8 +88,8 @@ export function GlobalSettingsDialog() {
 
 	return (
 		<Dialog open={open} onOpenChange={close}>
-			<DialogContent className="sm:max-w-[400px] gap-0 p-0">
-				<DialogHeader className="px-5 pt-5 pb-4 border-b border-border/50">
+			<DialogContent className="sm:max-w-md gap-0 p-0">
+				<DialogHeader className="px-5 pt-5 pb-4 border-b border-border-200/50">
 					<DialogTitle>{t`Settings`}</DialogTitle>
 				</DialogHeader>
 
@@ -143,7 +143,7 @@ export function GlobalSettingsDialog() {
 									inputSize="sm"
 									className="flex-1 text-right tabular-nums"
 								/>
-								<span className="text-xs text-fg-700 min-w-8">%</span>
+								<span className="text-xs text-text-600 min-w-8">%</span>
 							</div>
 							<Slider
 								value={[slippagePercent]}
@@ -152,9 +152,9 @@ export function GlobalSettingsDialog() {
 								max={MARKET_ORDER_SLIPPAGE_MAX_PERCENT}
 								step={0.1}
 							/>
-							<div className="flex items-center justify-between text-3xs text-fg-700">
+							<div className="flex items-center justify-between text-3xs text-text-600">
 								<span>{MARKET_ORDER_SLIPPAGE_MIN_PERCENT}%</span>
-								<span className="font-medium text-fg-900 tabular-nums">{slippagePercent}%</span>
+								<span className="font-medium text-text-950 tabular-nums">{slippagePercent}%</span>
 								<span>{MARKET_ORDER_SLIPPAGE_MAX_PERCENT}%</span>
 							</div>
 						</div>
@@ -213,8 +213,8 @@ function SettingsSection({ title, description, children }: SettingsSectionProps)
 	return (
 		<div className="space-y-2">
 			<div>
-				<h3 className="text-sm font-medium text-fg-900">{title}</h3>
-				{description && <p className="text-xs text-fg-700 mt-0.5">{description}</p>}
+				<h3 className="text-sm font-medium text-text-950">{title}</h3>
+				{description && <p className="text-xs text-text-600 mt-0.5">{description}</p>}
 			</div>
 			{children}
 		</div>
@@ -231,7 +231,7 @@ interface SettingsToggleProps {
 function SettingsToggle({ id, label, checked, onCheckedChange }: SettingsToggleProps) {
 	return (
 		<div className="flex items-center justify-between">
-			<label htmlFor={id} className="text-xs text-fg-700 cursor-pointer">
+			<label htmlFor={id} className="text-xs text-text-600 cursor-pointer">
 				{label}
 			</label>
 			<Switch id={id} checked={checked} onCheckedChange={onCheckedChange} />

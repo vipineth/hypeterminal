@@ -34,7 +34,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 		<div
 			className={cn(
 				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-market-down-primary/80" : "text-fg-700",
+				variant === "error" ? "text-market-down-600/80" : "text-text-600",
 			)}
 		>
 			{children}
@@ -106,10 +106,8 @@ function PositionRow({
 	const cumFunding = toBig(p.cumFunding.sinceOpen)?.toNumber() ?? Number.NaN;
 	const canClose = isPositive(absSize) && typeof assetId === "number" && isPositive(markPx);
 
-	const sideClass = isLong
-		? "bg-market-up-subtle text-market-up-primary"
-		: "bg-market-down-subtle text-market-down-primary";
-	const pnlClass = unrealizedPnl >= 0 ? "text-market-up-muted" : "text-market-down-primary";
+	const sideClass = isLong ? "bg-market-up-100 text-market-up-600" : "bg-market-down-100 text-market-down-600";
+	const pnlClass = unrealizedPnl >= 0 ? "text-market-up-500" : "text-market-down-600";
 	const fundingClass = getValueColorClass(cumFunding ? -cumFunding : null);
 	const hasTpSl = !!(tpSlInfo?.tpPrice || tpSlInfo?.slPrice);
 
@@ -140,7 +138,7 @@ function PositionRow({
 	}
 
 	return (
-		<TableRow className={cn("border-border/40 hover:bg-surface-500/30", isEven && "bg-surface-300")}>
+		<TableRow className={cn("border-border-200/40 hover:bg-surface-analysis/30", isEven && "bg-surface-analysis")}>
 			<TableCell className="text-3xs font-medium py-1.5">
 				<div className="flex items-center gap-1.5">
 					<Button
@@ -159,19 +157,19 @@ function PositionRow({
 			</TableCell>
 			<TableCell className="text-3xs text-right tabular-nums py-1.5">
 				{formatToken(absSize, szDecimals)}{" "}
-				<span className="text-fg-700">({formatUSD(p.positionValue, { compact: true })})</span>
+				<span className="text-text-600">({formatUSD(p.positionValue, { compact: true })})</span>
 			</TableCell>
 			<TableCell className="text-3xs text-right py-1.5">
 				<div className="flex flex-col items-end">
 					<span className="tabular-nums">{formatUSD(p.marginUsed)}</span>
-					<span className="text-3xs text-fg-500">{p.leverage.type === "isolated" ? t`Isolated` : t`Cross`}</span>
+					<span className="text-3xs text-text-500">{p.leverage.type === "isolated" ? t`Isolated` : t`Cross`}</span>
 				</div>
 			</TableCell>
-			<TableCell className="text-3xs text-right tabular-nums text-fg-500 py-1.5">
+			<TableCell className="text-3xs text-right tabular-nums text-text-500 py-1.5">
 				{formatPrice(p.entryPx, { szDecimals })}
 			</TableCell>
 			<TableCell className="text-3xs text-right tabular-nums py-1.5">{formatPrice(markPx, { szDecimals })}</TableCell>
-			<TableCell className="text-3xs text-right tabular-nums text-market-down-primary py-1.5">
+			<TableCell className="text-3xs text-right tabular-nums text-market-down-600 py-1.5">
 				{formatPrice(p.liquidationPx, { szDecimals })}
 			</TableCell>
 			<TableCell className={cn("text-3xs text-right tabular-nums py-1.5", fundingClass)}>
@@ -180,7 +178,7 @@ function PositionRow({
 			<TableCell className="text-right py-1.5">
 				<div className={cn("text-3xs tabular-nums", pnlClass)}>
 					{formatUSD(unrealizedPnl, { signDisplay: "exceptZero" })}
-					<span className="text-fg-500 ml-1">({formatPercent(p.returnOnEquity, 1)})</span>
+					<span className="text-text-500 ml-1">({formatPercent(p.returnOnEquity, 1)})</span>
 				</div>
 			</TableCell>
 			<TableCell className="text-right py-1.5">
@@ -192,32 +190,32 @@ function PositionRow({
 							disabled={typeof assetId !== "number"}
 							className={cn(
 								"group inline-flex items-center gap-1.5 cursor-pointer transition-opacity disabled:cursor-not-allowed disabled:opacity-50",
-								!hasTpSl && "text-fg-400 hover:text-fg-700",
+								!hasTpSl && "text-text-400 hover:text-text-600",
 							)}
 						>
 							{tpSlInfo?.tpPrice && tpSlInfo?.slPrice ? (
 								<>
 									<div className="flex items-center gap-1 text-3xs tabular-nums">
-										<span className="text-market-up-primary">{formatPrice(tpSlInfo.tpPrice, { szDecimals })}</span>
-										<span className="text-fg-700/50">/</span>
-										<span className="text-market-down-primary">{formatPrice(tpSlInfo.slPrice, { szDecimals })}</span>
+										<span className="text-market-up-600">{formatPrice(tpSlInfo.tpPrice, { szDecimals })}</span>
+										<span className="text-text-600/50">/</span>
+										<span className="text-market-down-600">{formatPrice(tpSlInfo.slPrice, { szDecimals })}</span>
 									</div>
-									<PencilIcon className="size-3 text-fg-400 group-hover:text-fg-900 transition-colors" />
+									<PencilIcon className="size-3 text-text-400 group-hover:text-text-950 transition-colors" />
 								</>
 							) : hasTpSl ? (
 								<>
 									<div className="flex items-center gap-1 text-3xs tabular-nums">
 										{tpSlInfo?.tpPrice ? (
-											<span className="text-market-up-primary">{formatPrice(tpSlInfo.tpPrice, { szDecimals })}</span>
+											<span className="text-market-up-600">{formatPrice(tpSlInfo.tpPrice, { szDecimals })}</span>
 										) : (
-											<span className="text-market-down-primary">{formatPrice(tpSlInfo?.slPrice, { szDecimals })}</span>
+											<span className="text-market-down-600">{formatPrice(tpSlInfo?.slPrice, { szDecimals })}</span>
 										)}
 									</div>
-									<PlusIcon className="size-3 text-fg-400 group-hover:text-fg-900 transition-colors" />
+									<PlusIcon className="size-3 text-text-400 group-hover:text-text-950 transition-colors" />
 								</>
 							) : (
-								<div className="flex items-center gap-0.5 text-xs font-medium text-fg-700">
-									<PlusIcon className="size-3 group-hover:text-fg-900 transition-colors" />
+								<div className="flex items-center gap-0.5 text-xs font-medium text-text-600">
+									<PlusIcon className="size-3 group-hover:text-text-950 transition-colors" />
 									<span>{t`Add`}</span>
 								</div>
 							)}
@@ -344,44 +342,44 @@ export function PositionsTab() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
-			<div className="text-3xs tracking-wider text-fg-900 mb-1.5 flex items-center gap-2">
-				<CircleIcon weight="fill" className="size-1.5 text-market-up-primary" />
+			<div className="text-3xs tracking-wider text-text-950 mb-1.5 flex items-center gap-2">
+				<CircleIcon weight="fill" className="size-1.5 text-market-up-600" />
 				{t`Active Positions`}
-				<span className="font-semibold text-market-up-primary ml-auto tabular-nums">{headerCount}</span>
+				<span className="font-semibold text-market-up-600 ml-auto tabular-nums">{headerCount}</span>
 			</div>
-			{actionError ? <div className="mb-1 text-4xs text-market-down-primary/80">{actionError}</div> : null}
-			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-surface-200/50">
+			{actionError ? <div className="mb-1 text-4xs text-market-down-600/80">{actionError}</div> : null}
+			<div className="flex-1 min-h-0 overflow-hidden border border-border-200/40 rounded-sm bg-surface-base/50">
 				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
-								<TableRow className="border-border/40 bg-surface-300 hover:bg-surface-300">
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 h-7">{t`Asset`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
+								<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">{t`Asset`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
 										{t`Size`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
 										{t`Margin`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
 										{t`Entry`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
 										{t`Mark`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
 										{t`Liq`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
 										{t`Funding`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
 										{t`PNL`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
 										{t`TP/SL`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
 										{t`Actions`}
 									</TableHead>
 								</TableRow>

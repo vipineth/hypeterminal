@@ -28,14 +28,12 @@ function ThemeToggleButton() {
 			size="sm"
 			className={cn(
 				"size-7",
-				isDark
-					? "text-status-warning hover:text-status-warning/80"
-					: "text-action-primary hover:text-action-primary/80",
+				isDark ? "text-warning-700 hover:text-warning-700/80" : "text-primary-default hover:text-primary-default/80",
 			)}
 			onClick={handleToggle}
 			aria-label={isDark ? t`Switch to light mode` : t`Switch to dark mode`}
 		>
-			{isDark ? <SunIcon className="size-3.5" /> : <MoonIcon className="size-3.5" />}
+			{isDark ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
 		</Button>
 	);
 }

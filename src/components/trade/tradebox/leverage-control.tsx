@@ -27,9 +27,9 @@ const LeverageBadge = forwardRef<HTMLButtonElement, BadgeProps>(({ leverage, onC
 			className={cn(isLoading && "opacity-70", className)}
 			aria-label={t`Change leverage`}
 		>
-			<span className="text-fg-700">{t`Leverage`}</span>
-			<span className="tabular-nums font-medium text-fg-900">{leverage}x</span>
-			<CaretDownIcon className="size-2.5 text-fg-700" />
+			<span className="text-text-600">{t`Leverage`}</span>
+			<span className="tabular-nums font-medium text-text-950">{leverage}x</span>
+			<CaretDownIcon className="size-2.5 text-text-600" />
 		</Button>
 	);
 });
@@ -126,7 +126,7 @@ function LeverageEditor({
 			<div className="flex items-center justify-between">
 				<span
 					className={cn(
-						"uppercase tracking-wide text-fg-700",
+						"uppercase tracking-wide text-text-600",
 						compact ? "text-2xs font-normal" : "text-xs font-medium",
 					)}
 				>
@@ -144,7 +144,7 @@ function LeverageEditor({
 						inputSize={compact ? "sm" : "lg"}
 						className={cn("text-center font-medium tabular-nums", compact ? "w-12" : "w-16")}
 					/>
-					<span className={cn("text-fg-700", compact ? "text-xs" : "text-base")}>x</span>
+					<span className={cn("text-text-600", compact ? "text-xs" : "text-base")}>x</span>
 				</div>
 			</div>
 
@@ -153,7 +153,7 @@ function LeverageEditor({
 			{updateError && (
 				<div
 					className={cn(
-						"flex items-center bg-market-down-subtle border border-market-down-primary/20 rounded-md text-market-down-primary",
+						"flex items-center bg-market-down-100 border border-market-down-600/20 rounded-md text-market-down-600",
 						compact ? "gap-1.5 p-1.5 text-3xs" : "gap-2 p-2.5 text-sm",
 					)}
 				>
@@ -165,7 +165,7 @@ function LeverageEditor({
 			{showSuccess && (
 				<div
 					className={cn(
-						"flex items-center justify-center bg-market-up-subtle border border-market-up-primary/20 rounded-md text-market-up-primary",
+						"flex items-center justify-center bg-market-up-100 border border-market-up-600/20 rounded-md text-market-up-600",
 						compact ? "gap-1.5 p-1.5 text-3xs" : "gap-2 p-2.5 text-sm",
 					)}
 				>
@@ -186,7 +186,7 @@ function LeverageEditor({
 						disabled={isUpdating}
 						className={cn(
 							"flex-1 font-semibold uppercase tracking-wider hover:bg-transparent",
-							"bg-status-info/20 border border-status-info text-status-info hover:bg-status-info/30",
+							"bg-primary-default/20 border border-primary-default text-primary-default hover:bg-primary-default/30",
 							compact ? "py-2 text-2xs gap-1.5" : "py-3 text-xs gap-2",
 						)}
 					>
@@ -218,8 +218,8 @@ function LeverageEditor({
 					className={cn(
 						"w-full py-3 text-xs font-semibold uppercase tracking-wider gap-2 border hover:bg-transparent",
 						isDirty && !isUpdating && !showSuccess
-							? "bg-status-info/20 border-status-info text-status-info hover:bg-status-info/30"
-							: "bg-status-info/10 border-status-info/30 text-status-info/50",
+							? "bg-primary-default/20 border-primary-default text-primary-default hover:bg-primary-default/30"
+							: "bg-primary-default/10 border-primary-default/30 text-primary-default/50",
 					)}
 				>
 					{isUpdating && <SpinnerGapIcon className="size-4 animate-spin" />}

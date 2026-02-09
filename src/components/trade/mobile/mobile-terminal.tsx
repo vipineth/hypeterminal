@@ -62,7 +62,7 @@ export function MobileTerminal({ className }: Props) {
 
 	return (
 		<div
-			className={cn("h-dvh w-full flex flex-col bg-surface-200 text-fg-900 font-mono", "overflow-hidden", className)}
+			className={cn("h-dvh w-full flex flex-col bg-surface-base text-text-950 font-mono", "overflow-hidden", className)}
 		>
 			<MobileHeader />
 			<OfflineBanner />

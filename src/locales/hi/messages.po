@@ -143,22 +143,21 @@ msgid "Available"
 msgstr "उपलब्ध"
 
 #: src/components/trade/tradebox/deposit-modal.tsx
-msgid "Available:"
-msgstr ""
+#~ msgid "Available:"
+#~ msgstr ""
 
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Avg Price"
 msgstr "औसत मूल्य"
 
 #: src/components/trade/components/spot-swap-modal.tsx
-#: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 msgid "Balance"
 msgstr "शेष"
 
 #: src/components/trade/tradebox/deposit-modal.tsx
-msgid "Balance:"
-msgstr ""
+#~ msgid "Balance:"
+#~ msgstr ""
 
 #: src/components/trade/footer/footer-bar.tsx
 #~ msgid "Block:"
@@ -915,10 +914,12 @@ msgid "markets"
 msgstr "बाज़ार"
 
 #: src/components/trade/positions/transfer-dialog.tsx
-msgid "Max"
-msgstr "अधिकतम"
+#~ msgid "Max"
+#~ msgstr "अधिकतम"
 
+#: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/positions/send-dialog.tsx
+#: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
 msgid "MAX"

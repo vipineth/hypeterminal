@@ -56,15 +56,15 @@ function colorToRgba(cssColor: string, alpha: number): string {
 
 export function getChartColors(): ChartColors {
 	return {
-		background: getCssVar("--surface-500"),
-		foreground: getCssVar("--fg-900"),
-		textSecondary: getCssVar("--fg-700"),
-		textTertiary: getCssVar("--fg-500"),
-		border: getCssVar("--border"),
-		green: getCssVar("--market-up-primary"),
-		red: getCssVar("--market-down-primary"),
-		accent: getCssVar("--status-info"),
-		surface: getCssVar("--surface-800"),
+		background: getCssVar("--surface-analysis"),
+		foreground: getCssVar("--text-950"),
+		textSecondary: getCssVar("--text-600"),
+		textTertiary: getCssVar("--text-500"),
+		border: getCssVar("--border-200"),
+		green: getCssVar("--market-up-600"),
+		red: getCssVar("--market-down-600"),
+		accent: getCssVar("--primary-default"),
+		surface: getCssVar("--surface-execution"),
 	};
 }
 
@@ -217,8 +217,8 @@ export function getCustomThemeColors(): CustomThemeColors {
 	const textTertiary = colorToHex(colors.textTertiary);
 	const red = colorToHex(colors.red);
 	const green = colorToHex(colors.green);
-	const amber = colorToHex(getCssVar("--status-warning") || colors.accent);
-	const purple = colorToHex(getCssVar("--action-primary") || colors.accent);
+	const amber = colorToHex(getCssVar("--warning-700") || colors.accent);
+	const purple = colorToHex(getCssVar("--primary-default") || colors.accent);
 	const bg = colorToHex(colors.background);
 	const fg = colorToHex(colors.foreground);
 

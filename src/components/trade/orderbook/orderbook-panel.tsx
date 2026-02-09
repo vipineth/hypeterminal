@@ -77,7 +77,7 @@ export function OrderbookPanel() {
 	const hasData = orderbookStatus !== "error";
 
 	return (
-		<Tabs defaultValue="book" className="h-full min-h-0 flex flex-col overflow-hidden bg-surface-500">
+		<Tabs defaultValue="book" className="h-full min-h-0 flex flex-col overflow-hidden bg-surface-analysis">
 			<div className="flex items-center justify-between px-1.5 py-1.5">
 				<TabsList>
 					<TabsTrigger value="book" aria-label={t`Order Book`}>
@@ -92,7 +92,7 @@ export function OrderbookPanel() {
 			</div>
 
 			<TabsContent value="book" className="flex-1 min-h-0 flex flex-col">
-				<div className="grid grid-cols-3 gap-2 px-2 py-1.5 items-center text-3xs text-fg-900 uppercase tracking-wider border-b border-border/40 shrink-0">
+				<div className="grid grid-cols-3 gap-2 px-2 py-1.5 items-center text-3xs text-text-950 uppercase tracking-wider border-b border-border-200/40 shrink-0">
 					<div className="flex items-center gap-1">
 						{t`Price`}
 						<DropdownMenu>
@@ -122,21 +122,21 @@ export function OrderbookPanel() {
 						</DropdownMenu>
 					</div>
 					<button
-						className="inline-flex items-center justify-end gap-0.5 hover:text-fg-800"
+						className="inline-flex items-center justify-end gap-0.5 hover:text-text-950"
 						type="button"
 						onClick={toggleAssetDisplay}
 					>
 						{t`Size`}
-						<span className="text-fg-500">({displayAsset})</span>
+						<span className="text-text-500">({displayAsset})</span>
 						<ArrowsLeftRightIcon className="size-2 opacity-40" />
 					</button>
 					<button
-						className="inline-flex items-center justify-end gap-0.5 hover:text-fg-800"
+						className="inline-flex items-center justify-end gap-0.5 hover:text-text-950"
 						type="button"
 						onClick={toggleAssetDisplay}
 					>
 						{t`Total`}
-						<span className="text-fg-500">({displayAsset})</span>
+						<span className="text-text-500">({displayAsset})</span>
 						<ArrowsLeftRightIcon className="size-2 opacity-40" />
 					</button>
 				</div>
@@ -155,7 +155,7 @@ export function OrderbookPanel() {
 								/>
 							))
 						) : (
-							<div className="flex items-center justify-center px-2 py-6 text-3xs text-fg-700">
+							<div className="flex items-center justify-center px-2 py-6 text-3xs text-text-600">
 								{orderbookStatus === "error" ? t`Failed to load order book.` : t`Waiting for order book...`}
 							</div>
 						)}
@@ -163,10 +163,10 @@ export function OrderbookPanel() {
 
 					<div
 						data-slot="orderbook-spread"
-						className="shrink-0 px-2 py-1.5 border-y border-border/40 flex items-center justify-between text-3xs text-fg-900"
+						className="shrink-0 px-2 py-1.5 border-y border-border-200/40 flex items-center justify-between text-3xs text-text-950"
 					>
 						<span>{t`Spread`}</span>
-						<span className="tabular-nums font-medium text-market-down-muted">
+						<span className="tabular-nums font-medium text-market-down-500">
 							{`${formatNumber(spread, 2)} (${formatNumber(spreadPct, 3)}%)`}
 						</span>
 					</div>

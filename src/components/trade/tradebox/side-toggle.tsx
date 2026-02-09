@@ -21,7 +21,7 @@ export function SideToggle({ side, onSideChange, labels }: Props) {
 			<TabsList variant="pill" className="w-full">
 				<TabsTrigger
 					value="buy"
-					className="flex-1 p-2 text-sm data-[state=active]:text-market-up-primary"
+					className="flex-1 p-2 text-sm data-[state=active]:text-market-up-600"
 					aria-label={labels.buyAria}
 				>
 					<TrendUpIcon className="size-4" />
@@ -29,7 +29,7 @@ export function SideToggle({ side, onSideChange, labels }: Props) {
 				</TabsTrigger>
 				<TabsTrigger
 					value="sell"
-					className="flex-1 p-2 text-sm data-[state=active]:text-market-down-primary"
+					className="flex-1 p-2 text-sm data-[state=active]:text-market-down-600"
 					aria-label={labels.sellAria}
 				>
 					<TrendDownIcon className="size-4" />

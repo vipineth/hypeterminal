@@ -125,7 +125,7 @@ export function MarginModeDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-sm gap-4">
 				<DialogHeader>
-					<DialogTitle className="font-medium">
+					<DialogTitle>
 						<Trans>Margin Mode</Trans>
 					</DialogTitle>
 					<DialogDescription>
@@ -146,20 +146,24 @@ export function MarginModeDialog({
 								onClick={() => setSelectedMode(option.id)}
 								disabled={isUpdating}
 								className={cn(
-									"w-full text-left p-3 rounded-sm border transition-colors",
-									isSelected ? "border-status-info/50 bg-action-primary/5" : "border-border/60 hover:border-border",
+									"w-full text-left p-3 rounded-xs border transition-colors",
+									isSelected
+										? "border-primary-default/50 bg-primary-default/5"
+										: "border-border-200/60 hover:border-border-200",
 								)}
 							>
 								<div className="flex gap-3">
 									<div
 										className={cn(
-											"flex items-center justify-center size-8 rounded-sm shrink-0 transition-colors",
+											"flex items-center justify-center size-8 rounded-xs shrink-0 transition-colors",
 											isSelected
-												? "bg-status-info/10 border border-status-info/30"
-												: "bg-surface-800 border border-border/60",
+												? "bg-primary-default/10 border border-primary-default/30"
+												: "bg-surface-execution border border-border-200/60",
 										)}
 									>
-										<Icon className={cn("size-4 transition-colors", isSelected ? "text-status-info" : "text-fg-700")} />
+										<Icon
+											className={cn("size-4 transition-colors", isSelected ? "text-primary-default" : "text-text-600")}
+										/>
 									</div>
 
 									<div className="flex-1 min-w-0">
@@ -167,21 +171,21 @@ export function MarginModeDialog({
 											<span
 												className={cn(
 													"text-xs font-medium uppercase tracking-wider",
-													isSelected ? "text-status-info" : "text-fg-900",
+													isSelected ? "text-primary-default" : "text-text-950",
 												)}
 											>
 												{option.label()}
 											</span>
 											<div className="flex items-center gap-2">
 												{isCurrent && (
-													<span className="text-3xs text-fg-700 uppercase tracking-wider">
+													<span className="text-3xs text-text-600 uppercase tracking-wider">
 														<Trans>Current</Trans>
 													</span>
 												)}
-												{isSelected && !isCurrent && <CheckIcon className="size-3.5 text-status-info" />}
+												{isSelected && !isCurrent && <CheckIcon className="size-3.5 text-primary-default" />}
 											</div>
 										</div>
-										<p className="text-3xs text-fg-700 leading-relaxed">{option.description()}</p>
+										<p className="text-3xs text-text-600 leading-relaxed">{option.description()}</p>
 									</div>
 								</div>
 							</button>
@@ -190,23 +194,23 @@ export function MarginModeDialog({
 				</div>
 
 				{cannotSwitch && (
-					<div className="flex items-start gap-2 p-2.5 bg-status-warning/10 border border-status-warning/20 rounded-sm">
-						<WarningIcon className="size-3.5 text-status-warning shrink-0 mt-0.5" />
-						<p className="text-xs text-status-warning leading-relaxed">
+					<div className="flex items-start gap-2 p-2.5 bg-warning-700/10 border border-warning-700/20 rounded-xs">
+						<WarningIcon className="size-3.5 text-warning-700 shrink-0 mt-0.5" />
+						<p className="text-xs text-warning-700 leading-relaxed">
 							<Trans>Cannot switch to Isolated mode with an open position. Close your position first.</Trans>
 						</p>
 					</div>
 				)}
 
 				{updateError && (
-					<div className="flex items-center gap-2 p-2.5 bg-market-down-subtle border border-market-down-primary/20 rounded-sm text-xs text-market-down-primary">
+					<div className="flex items-center gap-2 p-2.5 bg-market-down-100 border border-market-down-600/20 rounded-xs text-xs text-market-down-600">
 						<WarningIcon className="size-3.5 shrink-0" />
 						<span className="flex-1 truncate">{updateError.message || t`Update failed`}</span>
 					</div>
 				)}
 
 				{showSuccess && (
-					<div className="flex items-center justify-center gap-2 p-2.5 bg-market-up-subtle border border-market-up-primary/20 rounded-sm text-xs text-market-up-primary">
+					<div className="flex items-center justify-center gap-2 p-2.5 bg-market-up-100 border border-market-up-600/20 rounded-xs text-xs text-market-up-600">
 						<CheckIcon className="size-3.5" />
 						<Trans>Updated</Trans>
 					</div>

@@ -19,7 +19,7 @@ export function TradeTerminalPage() {
 					<MobileTerminal />
 				</Suspense>
 			) : (
-				<div className="bg-surface-200 text-fg-900 min-h-screen w-full flex flex-col font-mono terminal-scanlines pt-11 pb-6">
+				<div className="bg-surface-base text-text-950 min-h-screen w-full flex flex-col font-mono terminal-scanlines pt-11 pb-6">
 					<TopNav />
 					<MainWorkspace />
 					<FooterBar />
@@ -34,8 +34,8 @@ export function TradeTerminalPage() {
 
 function MobileLoadingFallback() {
 	return (
-		<div className="h-dvh w-full flex items-center justify-center bg-surface-200 text-fg-900">
-			<div className="animate-pulse text-fg-700">Loading...</div>
+		<div className="h-dvh w-full flex items-center justify-center bg-surface-base text-text-950">
+			<div className="animate-pulse text-text-600">Loading...</div>
 		</div>
 	);
 }

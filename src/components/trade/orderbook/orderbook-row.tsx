@@ -26,7 +26,7 @@ function OrderbookRowComponent({ level, side, maxTotal, showInQuote = false, szD
 	const totalText = formatNumber(totalValue, { digits: displayDecimals, compact: true });
 
 	return (
-		<div className="relative hover:bg-surface-500/30 cursor-pointer group">
+		<div className="relative hover:bg-surface-analysis/30 cursor-pointer group">
 			<div
 				className={cn("absolute inset-y-0 pointer-events-none", isAsk ? "depth-bar-ask" : "depth-bar-bid")}
 				style={{ width: `${depthPct}%`, [isAsk ? "right" : "left"]: 0, [isAsk ? "left" : "right"]: "auto" }}
@@ -38,15 +38,13 @@ function OrderbookRowComponent({ level, side, maxTotal, showInQuote = false, szD
 					onClick={() => setSelectedPrice(level.price)}
 					className={cn(
 						"text-left justify-start font-medium",
-						isAsk
-							? "text-market-down-muted hover:text-market-down-muted"
-							: "text-market-up-muted hover:text-market-up-muted",
+						isAsk ? "text-market-down-500 hover:text-market-down-500" : "text-market-up-500 hover:text-market-up-500",
 					)}
 				>
 					{formatNumber(level.price)}
 				</Button>
-				<div className="text-right text-fg-900 group-hover:text-fg-900">{sizeText}</div>
-				<div className="text-right text-fg-500 group-hover:text-fg-700">{totalText}</div>
+				<div className="text-right text-text-950 group-hover:text-text-950">{sizeText}</div>
+				<div className="text-right text-text-500 group-hover:text-text-600">{totalText}</div>
 			</div>
 		</div>
 	);

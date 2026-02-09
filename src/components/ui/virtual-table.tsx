@@ -64,7 +64,7 @@ export function VirtualTable<TData extends RowData>({
 
 	return (
 		<div className={cn("relative overflow-hidden", className)}>
-			<div className="sticky top-0 z-10 bg-surface-800 border-b border-border/40">
+			<div className="sticky top-0 z-10 bg-surface-execution border-b border-border-200/40">
 				{headerGroups.map((headerGroup) => (
 					<div key={headerGroup.id} className="flex w-full">
 						{headerGroup.headers.map((header) => {
@@ -72,8 +72,8 @@ export function VirtualTable<TData extends RowData>({
 							const headerContent = flexRender(header.column.columnDef.header, header.getContext());
 
 							const headerClassName = cn(
-								"flex items-center px-3 py-2 text-xs font-medium text-fg-700 uppercase tracking-wider",
-								canSort && "cursor-pointer select-none hover:text-fg-900 transition-colors",
+								"flex items-center px-3 py-2 text-xs font-medium text-text-600 uppercase tracking-wider",
+								canSort && "cursor-pointer select-none hover:text-text-950 transition-colors",
 							);
 
 							const headerStyle = { width: header.getSize() };
@@ -123,7 +123,7 @@ export function VirtualTable<TData extends RowData>({
 							<div
 								key={row.id}
 								data-index={virtualItem.index}
-								className="absolute top-0 left-0 w-full flex items-center border-b border-border/20 hover:bg-surface-500/30 transition-colors"
+								className="absolute top-0 left-0 w-full flex items-center border-b border-border-200/20 hover:bg-surface-analysis/30 transition-colors"
 								style={{
 									height: `${virtualItem.size}px`,
 									transform: `translateY(${virtualItem.start}px)`,

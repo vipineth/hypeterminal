@@ -38,7 +38,7 @@ function DrawerContent({ className, children, ...props }: React.ComponentProps<t
 			<DrawerPrimitive.Content
 				data-slot="drawer-content"
 				className={cn(
-					"group/drawer-content bg-surface-200 fixed z-50 flex h-auto flex-col",
+					"group/drawer-content bg-surface-base fixed z-50 flex h-auto flex-col",
 					"data-[vaul-drawer-direction=top]:inset-x-0 data-[vaul-drawer-direction=top]:top-0 data-[vaul-drawer-direction=top]:mb-24 data-[vaul-drawer-direction=top]:max-h-[80vh] data-[vaul-drawer-direction=top]:rounded-b-lg data-[vaul-drawer-direction=top]:border-b",
 					"data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:mt-24 data-[vaul-drawer-direction=bottom]:max-h-[80vh] data-[vaul-drawer-direction=bottom]:rounded-t-lg data-[vaul-drawer-direction=bottom]:border-t",
 					"data-[vaul-drawer-direction=right]:inset-y-0 data-[vaul-drawer-direction=right]:right-0 data-[vaul-drawer-direction=right]:w-3/4 data-[vaul-drawer-direction=right]:border-l data-[vaul-drawer-direction=right]:sm:max-w-sm",
@@ -47,7 +47,7 @@ function DrawerContent({ className, children, ...props }: React.ComponentProps<t
 				)}
 				{...props}
 			>
-				<div className="bg-fg-300 mx-auto mt-4 hidden h-2 w-[100px] shrink-0 rounded-full group-data-[vaul-drawer-direction=bottom]/drawer-content:block" />
+				<div className="bg-text-400 mx-auto mt-4 hidden h-2 w-[100px] shrink-0 rounded-full group-data-[vaul-drawer-direction=bottom]/drawer-content:block" />
 				{children}
 			</DrawerPrimitive.Content>
 		</DrawerPortal>
@@ -73,7 +73,11 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<"div">) {
 
 function DrawerTitle({ className, ...props }: React.ComponentProps<typeof DrawerPrimitive.Title>) {
 	return (
-		<DrawerPrimitive.Title data-slot="drawer-title" className={cn("text-fg-900 font-semibold", className)} {...props} />
+		<DrawerPrimitive.Title
+			data-slot="drawer-title"
+			className={cn("text-text-950 font-semibold", className)}
+			{...props}
+		/>
 	);
 }
 
@@ -81,7 +85,7 @@ function DrawerDescription({ className, ...props }: React.ComponentProps<typeof 
 	return (
 		<DrawerPrimitive.Description
 			data-slot="drawer-description"
-			className={cn("text-fg-700 text-sm", className)}
+			className={cn("text-text-600 text-sm", className)}
 			{...props}
 		/>
 	);

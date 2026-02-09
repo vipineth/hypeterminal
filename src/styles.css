@@ -86,62 +86,70 @@
    ============================================================================= */
 
 :root {
-  /* Foreground — ink intensity scale (higher = more prominent) */
-  --fg-950: #111827; /* new — max contrast */
-  --fg-900: #2B2E48; /* text-primary */
-  --fg-800: #3D4255; /* new — between primary/secondary */
-  --fg-700: #5A6370; /* text-secondary */
-  --fg-600: #6B7380; /* new — between secondary/tertiary */
-  --fg-500: #727B87; /* text-tertiary */
-  --fg-400: #8B939D; /* text-placeholder */
-  --fg-300: #B3B8BF; /* text-disabled */
-  --fg-200: #CCD1D7; /* new — very faint */
-  --fg-100: #E2E5E9; /* new — barely visible */
+  /* Text */
+  --text-950: #232529;
+  --text-600: #555C65;
+  --text-500: #626B75;
+  --text-400: #7E8792;
+  --text-10: #FFFFFF;
 
-  /* Action */
-  --action-primary: #2563EB;
-  --action-primary-hover: #1D4ED8;
-  --action-primary-active: #1E40AF;
-  --action-primary-disabled: #A5B4FC;
+  /* Border */
+  --border-500: #A6ACB3;
+  --border-300: #D2D6DA;
+  --border-200: #E0E3E6;
+  --border-100: #ECEEEF;
+  --border-50: #F6F7F8;
 
-  /* Market */
-  --market-up-primary: #056E05;
-  --market-up-muted: #4FA14F;
-  --market-up-subtle: #E6F4E6;
-  --market-down-primary: #C8241B;
-  --market-down-muted: #E06A63;
-  --market-down-subtle: #FCE9E8;
+  /* Primary */
+  --primary-default: #2563EB;
+  --primary-hover: #1D4ED8;
+  --primary-active: #1E40AF;
+  --primary-muted: #92B1F5;
+
+  /* Market Up */
+  --market-up-600: #3C7D3E;
+  --market-up-500: #4E9950;
+  --market-up-100: #E6F4E6;
+  --market-up-50: #F3FAF3;
+
+  /* Market Down */
+  --market-down-600: #C94139;
+  --market-down-500: #E06A63;
+  --market-down-100: #FBE6E5;
+  --market-down-50: #FDF4F3;
+
+  /* Market Neutral (no Figma token yet) */
   --market-neutral: #8A919A;
 
-  /* Status */
-  --status-success: #1F7A3F;
-  --status-success-subtle: #E4F3EA;
-  --status-warning: #FFAD0D;
-  --status-warning-subtle: #FFF3D6;
-  --status-error: #A63A2B;
-  --status-error-subtle: #FBEAE7;
-  --status-info: #2563EB;
-  --status-info-subtle: #EAF0FF;
+  /* Success */
+  --success-700: #1F7A3F;
+  --success-100: #F1FCF4;
 
-  /* Surface — elevation scale (higher = more elevated) */
-  --surface-100: #DDE1E6; /* inset/sunken */
-  --surface-200: #EAECF0; /* surface-base */
-  --surface-300: #EFF1F3; /* subtle elevation */
-  --surface-400: #F4F5F7; /* between base & panels */
-  --surface-500: #F8F9FA; /* surface-analysis */
-  --surface-600: #FBFBFC; /* near elevated */
-  --surface-700: #FDFDFE; /* elevated */
-  --surface-800: #FEFEFF; /* surface-execution */
-  --surface-900: #FFFFFF; /* popover/modal */
-  --surface-alt: #EDEEF1; /* subtle contrast (alternating rows, pills, badges) */
+  /* Warning */
+  --warning-700: #FBAC3C;
+  --warning-100: #FFF9ED;
+
+  /* Error */
+  --error-700: #A63A2B;
+  --error-100: #FDF4F3;
+
+  /* Surface */
+  --surface-base: #F1F3F4;
+  --surface-analysis: #FDFDFD;
+  --surface-execution: #FFFFFF;
+  --surface-monitoring-row-a: #FFFFFF;
+  --surface-monitoring-row-b: #F9F9FA;
+
+  /* Fill */
+  --fill-900: #000000;
+  --fill-300: #ECEEEF;
+  --fill-100: #FFFFFF;
+  --fill-50: #FFFFFF;
 
   /* Highlight */
   --highlight: #F7931A;
 
   /* Structural */
-  --border: #CFD9E1;
-  --input: #EAECF0;
-  --ring: #2563EB;
   --sel: rgba(37, 99, 235, 0.15);
 }
 
@@ -150,63 +158,71 @@
    ============================================================================= */
 
 .dark {
-  /* Foreground — ink intensity scale (higher = more prominent) */
-  --fg-950: #F4F5F7; /* new — max contrast */
-  --fg-900: #E6E9EF; /* text-primary */
-  --fg-800: #CDD2DC; /* new — between primary/secondary */
-  --fg-700: #A9B0BC; /* text-secondary */
-  --fg-600: #939BAA; /* new — between secondary/tertiary */
-  --fg-500: #7F8896; /* text-tertiary */
-  --fg-400: #6A7280; /* text-placeholder */
-  --fg-300: #4E5563; /* text-disabled */
-  --fg-200: #3A4150; /* new — very faint */
-  --fg-100: #2A3040; /* new — barely visible */
+  /* Text */
+  --text-950: #E6E9EE;
+  --text-600: #B8BEC7;
+  --text-500: #9AA1AB;
+  --text-400: #555D68;
+  --text-10: #FFFFFF;
 
-  /* Action */
-  --action-primary: #4F7DFF;
-  --action-primary-hover: #3B6CF6;
-  --action-primary-active: #2F5CE0;
-  --action-primary-disabled: #2A3A5F;
+  /* Border */
+  --border-500: #7F8792;
+  --border-300: #6A727E;
+  --border-200: #343B45;
+  --border-100: #242A33;
+  --border-50: #222833;
 
-  /* Market */
-  --market-up-primary: #4CAF6A;
-  --market-up-muted: #2E8B4F;
-  --market-up-subtle: #123524;
-  --market-down-primary: #E26D63;
-  --market-down-muted: #C94B44;
-  --market-down-subtle: #3A1C1C;
+  /* Primary */
+  --primary-default: #4F7DFF;
+  --primary-hover: #3B6CF6;
+  --primary-active: #2F5CE0;
+  --primary-muted: #385194;
+
+  /* Market Up */
+  --market-up-600: #4CAF6A;
+  --market-up-500: #2F854E;
+  --market-up-100: #122B1D;
+  --market-up-50: #0E2318;
+
+  /* Market Down */
+  --market-down-600: #E26D63;
+  --market-down-500: #C94B44;
+  --market-down-100: #3A1C1C;
+  --market-down-50: #32282E;
+
+  /* Market Neutral (no Figma token yet) */
   --market-neutral: #9AA4B2;
 
-  /* Status */
-  --status-success: #4CAF6A;
-  --status-success-subtle: #123524;
-  --status-warning: #FFAD0D;
-  --status-warning-subtle: #4A3A12;
-  --status-error: #E26D63;
-  --status-error-subtle: #3A1C1C;
-  --status-info: #4F7DFF;
-  --status-info-subtle: #1B2A4A;
+  /* Success */
+  --success-700: #1F7A3F;
+  --success-100: #123524;
 
-  /* Surface — elevation scale (higher = more elevated) */
-  --surface-100: #0A0C0F; /* inset/sunken */
-  --surface-200: #0C0E11; /* surface-base */
-  --surface-300: #111417; /* subtle elevation */
-  --surface-400: #161A1F; /* between base & panels */
-  --surface-500: #1B2027; /* surface-analysis */
-  --surface-600: #21272F; /* near elevated */
-  --surface-700: #272E38; /* elevated */
-  --surface-800: #2D3541; /* surface-execution */
-  --surface-900: #333D4B; /* popover/modal */
-  --surface-alt: #1A2030; /* subtle contrast (alternating rows, pills, badges) */
+  /* Warning */
+  --warning-700: #FFAD0D;
+  --warning-100: #4A3A12;
 
-  /* Structural */
-  --border: #384558;
-  --input: #1A1F28;
-  --ring: #4F7DFF;
-  --sel: rgba(79, 125, 255, 0.15);
+  /* Error */
+  --error-700: #A63A2B;
+  --error-100: #3A1C1C;
+
+  /* Surface */
+  --surface-base: #0D0F11;
+  --surface-analysis: #191D23;
+  --surface-execution: #20242A;
+  --surface-monitoring-row-a: #20242A;
+  --surface-monitoring-row-b: #191D23;
+
+  /* Fill */
+  --fill-900: #000000;
+  --fill-300: #2A303A;
+  --fill-100: #262C36;
+  --fill-50: #404754;
 
   /* Highlight */
   --highlight: #F7931A;
+
+  /* Structural */
+  --sel: rgba(79, 125, 255, 0.15);
 
   /* Override shadows for dark mode */
   --shadow-xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.09);
@@ -222,62 +238,66 @@
    ============================================================================= */
 
 @theme inline {
-  /* Foreground */
-  --color-fg-950: var(--fg-950);
-  --color-fg-900: var(--fg-900);
-  --color-fg-800: var(--fg-800);
-  --color-fg-700: var(--fg-700);
-  --color-fg-600: var(--fg-600);
-  --color-fg-500: var(--fg-500);
-  --color-fg-400: var(--fg-400);
-  --color-fg-300: var(--fg-300);
-  --color-fg-200: var(--fg-200);
-  --color-fg-100: var(--fg-100);
+  /* Text */
+  --color-text-950: var(--text-950);
+  --color-text-600: var(--text-600);
+  --color-text-500: var(--text-500);
+  --color-text-400: var(--text-400);
+  --color-text-10: var(--text-10);
 
-  /* Action */
-  --color-action-primary: var(--action-primary);
-  --color-action-primary-hover: var(--action-primary-hover);
-  --color-action-primary-active: var(--action-primary-active);
-  --color-action-primary-disabled: var(--action-primary-disabled);
+  /* Border */
+  --color-border-500: var(--border-500);
+  --color-border-300: var(--border-300);
+  --color-border-200: var(--border-200);
+  --color-border-100: var(--border-100);
+  --color-border-50: var(--border-50);
+
+  /* Primary */
+  --color-primary-default: var(--primary-default);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+  --color-primary-muted: var(--primary-muted);
 
   /* Market */
-  --color-market-up-primary: var(--market-up-primary);
-  --color-market-up-muted: var(--market-up-muted);
-  --color-market-up-subtle: var(--market-up-subtle);
-  --color-market-down-primary: var(--market-down-primary);
-  --color-market-down-muted: var(--market-down-muted);
-  --color-market-down-subtle: var(--market-down-subtle);
+  --color-market-up-600: var(--market-up-600);
+  --color-market-up-500: var(--market-up-500);
+  --color-market-up-100: var(--market-up-100);
+  --color-market-up-50: var(--market-up-50);
+  --color-market-down-600: var(--market-down-600);
+  --color-market-down-500: var(--market-down-500);
+  --color-market-down-100: var(--market-down-100);
+  --color-market-down-50: var(--market-down-50);
   --color-market-neutral: var(--market-neutral);
 
-  /* Status */
-  --color-status-success: var(--status-success);
-  --color-status-success-subtle: var(--status-success-subtle);
-  --color-status-warning: var(--status-warning);
-  --color-status-warning-subtle: var(--status-warning-subtle);
-  --color-status-error: var(--status-error);
-  --color-status-error-subtle: var(--status-error-subtle);
-  --color-status-info: var(--status-info);
-  --color-status-info-subtle: var(--status-info-subtle);
+  /* Success */
+  --color-success-700: var(--success-700);
+  --color-success-100: var(--success-100);
+
+  /* Warning */
+  --color-warning-700: var(--warning-700);
+  --color-warning-100: var(--warning-100);
+
+  /* Error */
+  --color-error-700: var(--error-700);
+  --color-error-100: var(--error-100);
 
   /* Surface */
-  --color-surface-100: var(--surface-100);
-  --color-surface-200: var(--surface-200);
-  --color-surface-300: var(--surface-300);
-  --color-surface-400: var(--surface-400);
-  --color-surface-500: var(--surface-500);
-  --color-surface-600: var(--surface-600);
-  --color-surface-700: var(--surface-700);
-  --color-surface-800: var(--surface-800);
-  --color-surface-900: var(--surface-900);
-  --color-surface-alt: var(--surface-alt);
+  --color-surface-base: var(--surface-base);
+  --color-surface-analysis: var(--surface-analysis);
+  --color-surface-execution: var(--surface-execution);
+  --color-surface-monitoring-row-a: var(--surface-monitoring-row-a);
+  --color-surface-monitoring-row-b: var(--surface-monitoring-row-b);
+
+  /* Fill */
+  --color-fill-900: var(--fill-900);
+  --color-fill-300: var(--fill-300);
+  --color-fill-100: var(--fill-100);
+  --color-fill-50: var(--fill-50);
 
   /* Highlight */
   --color-highlight: var(--highlight);
 
   /* Structural */
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
   --color-sel: var(--sel);
 
   /* Shadows */
@@ -295,10 +315,10 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border-200 outline-primary-default/50;
   }
   body {
-    @apply bg-surface-200 text-fg-900 font-mono;
+    @apply bg-surface-base text-text-950 font-mono;
   }
   ::selection {
     background: var(--sel);
@@ -376,35 +396,35 @@
       0deg,
       transparent,
       transparent 2px,
-      oklch(from var(--fg-900) l c h / 0.01) 2px,
-      oklch(from var(--fg-900) l c h / 0.01) 3px
+      oklch(from var(--text-950) l c h / 0.01) 2px,
+      oklch(from var(--text-950) l c h / 0.01) 3px
     );
   }
 
   .terminal-grid {
     background-image:
-      linear-gradient(oklch(from var(--border) l c h / 0.08) 1px, transparent 1px),
-      linear-gradient(90deg, oklch(from var(--border) l c h / 0.08) 1px, transparent 1px);
+      linear-gradient(oklch(from var(--border-200) l c h / 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(from var(--border-200) l c h / 0.08) 1px, transparent 1px);
     background-size: 50px 50px;
   }
   .dark .terminal-grid {
     background-image:
-      linear-gradient(oklch(from var(--border) l c h / 0.15) 1px, transparent 1px),
-      linear-gradient(90deg, oklch(from var(--border) l c h / 0.15) 1px, transparent 1px);
+      linear-gradient(oklch(from var(--border-200) l c h / 0.15) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(from var(--border-200) l c h / 0.15) 1px, transparent 1px);
     background-size: 50px 50px;
   }
 
   .depth-bar-ask {
-    background: linear-gradient(90deg, transparent 0%, oklch(from var(--market-down-primary) l c h / 0.12) 100%);
+    background: linear-gradient(90deg, transparent 0%, oklch(from var(--market-down-600) l c h / 0.12) 100%);
   }
   .depth-bar-bid {
-    background: linear-gradient(90deg, oklch(from var(--market-up-primary) l c h / 0.12) 0%, transparent 100%);
+    background: linear-gradient(90deg, oklch(from var(--market-up-600) l c h / 0.12) 0%, transparent 100%);
   }
   .dark .depth-bar-ask {
-    background: linear-gradient(90deg, transparent 0%, oklch(from var(--market-down-primary) l c h / 0.15) 100%);
+    background: linear-gradient(90deg, transparent 0%, oklch(from var(--market-down-600) l c h / 0.15) 100%);
   }
   .dark .depth-bar-bid {
-    background: linear-gradient(90deg, oklch(from var(--market-up-primary) l c h / 0.15) 0%, transparent 100%);
+    background: linear-gradient(90deg, oklch(from var(--market-up-600) l c h / 0.15) 0%, transparent 100%);
   }
 
   .trade-row-buy,
@@ -416,12 +436,12 @@
   }
   .trade-row-buy {
     @starting-style {
-      background-color: oklch(from var(--market-up-primary) l c h / 0.12);
+      background-color: oklch(from var(--market-up-600) l c h / 0.12);
     }
   }
   .trade-row-sell {
     @starting-style {
-      background-color: oklch(from var(--market-down-primary) l c h / 0.12);
+      background-color: oklch(from var(--market-down-600) l c h / 0.12);
     }
   }
 }

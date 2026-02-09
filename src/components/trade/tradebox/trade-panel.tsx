@@ -61,12 +61,12 @@ import { TradeHeader } from "./trade-header";
 
 function getActionButtonClass(variant: ButtonContent["variant"]): string {
 	if (variant === "cyan") {
-		return "bg-action-primary border-action-primary text-white hover:bg-action-primary-hover text-sm font-medium normal-case";
+		return "bg-primary-default border-primary-default text-white hover:bg-primary-hover text-sm font-medium normal-case";
 	}
 	if (variant === "buy") {
-		return "bg-market-up-subtle border-market-up-primary text-market-up-primary hover:bg-market-up-subtle/30";
+		return "bg-market-up-100 border-market-up-600 text-market-up-600 hover:bg-market-up-100/30";
 	}
-	return "bg-market-down-subtle border-market-down-primary text-market-down-primary hover:bg-market-down-primary/30";
+	return "bg-market-down-100 border-market-down-600 text-market-down-600 hover:bg-market-down-600/30";
 }
 
 export function TradePanel() {
@@ -438,9 +438,9 @@ export function TradePanel() {
 	const actionButtonClass = getActionButtonClass(buttonContent.variant);
 
 	return (
-		<div className="h-full flex flex-col overflow-hidden bg-surface-800">
+		<div className="h-full flex flex-col overflow-hidden bg-surface-execution">
 			{capabilities.isLeveraged && (
-				<div className="p-2 border-b border-border/60 flex items-center justify-between">
+				<div className="p-2 border-b border-border-200/60 flex items-center justify-between">
 					{capabilities.hasMarginMode ? (
 						<MarginModeToggle
 							mode={marginMode}
@@ -488,10 +488,10 @@ export function TradePanel() {
 
 				<div className="space-y-2">
 					{validation.errors.length > 0 && isConnected && availableBalance > 0 && (
-						<div className="text-4xs text-market-down-primary">{validation.errors.join(" • ")}</div>
+						<div className="text-4xs text-market-down-600">{validation.errors.join(" • ")}</div>
 					)}
 
-					{approvalError && <div className="text-4xs text-market-down-primary">{approvalError}</div>}
+					{approvalError && <div className="text-4xs text-market-down-600">{approvalError}</div>}
 
 					<Button
 						variant="contained"

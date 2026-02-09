@@ -23,7 +23,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 		<div
 			className={cn(
 				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-market-down-primary/80" : "text-fg-700",
+				variant === "error" ? "text-market-down-600/80" : "text-text-600",
 			)}
 		>
 			{children}
@@ -52,7 +52,7 @@ export function HistoryTab() {
 			return (
 				<Placeholder variant="error">
 					<span>{t`Failed to load trade history.`}</span>
-					{error instanceof Error && <span className="mt-1 text-4xs text-fg-700">{error.message}</span>}
+					{error instanceof Error && <span className="mt-1 text-4xs text-text-600">{error.message}</span>}
 				</Placeholder>
 			);
 		}
@@ -64,32 +64,32 @@ export function HistoryTab() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
-			<div className="text-3xs uppercase tracking-wider text-fg-700 mb-1.5 flex items-center gap-2">
+			<div className="text-3xs uppercase tracking-wider text-text-600 mb-1.5 flex items-center gap-2">
 				<ClockCounterClockwiseIcon className="size-3" />
 				{t`Trade ClockCounterClockwise`}
-				<span className="text-status-info ml-auto tabular-nums">{headerCount}</span>
+				<span className="text-primary-default ml-auto tabular-nums">{headerCount}</span>
 			</div>
-			<div className="flex-1 min-h-0 overflow-hidden border border-border/40 rounded-sm bg-surface-200/50">
+			<div className="flex-1 min-h-0 overflow-hidden border border-border-200/40 rounded-sm bg-surface-base/50">
 				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
-								<TableRow className="border-border/40 bg-surface-300 hover:bg-surface-300">
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 h-7">{t`Asset`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 h-7">{t`Type`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
+								<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">{t`Asset`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 h-7">{t`Type`}</TableHead>
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
 										{t`Price`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
 										{t`Size`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
 										{t`Fee`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
 										{t`PNL`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-fg-500 text-right h-7">
+									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-500 text-right h-7">
 										{t`Time`}
 									</TableHead>
 								</TableRow>
@@ -98,8 +98,8 @@ export function HistoryTab() {
 								{fills.map((fill, i) => {
 									const isBuy = fill.side === "B";
 									const sideClass = isBuy
-										? "bg-market-up-subtle text-market-up-primary"
-										: "bg-market-down-subtle text-market-down-primary";
+										? "bg-market-up-100 text-market-up-600"
+										: "bg-market-down-100 text-market-down-600";
 									const fee = toNumber(fill.fee);
 									const feeClass = getValueColorClass(fee);
 									const closedPnl = toNumber(fill.closedPnl);
@@ -108,7 +108,10 @@ export function HistoryTab() {
 									return (
 										<TableRow
 											key={`${fill.hash}-${fill.tid}`}
-											className={cn("border-border/40 hover:bg-surface-500/30", i % 2 === 1 && "bg-surface-300")}
+											className={cn(
+												"border-border-200/40 hover:bg-surface-analysis/30",
+												i % 2 === 1 && "bg-surface-analysis",
+											)}
 										>
 											<TableCell className="text-3xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">
@@ -129,7 +132,7 @@ export function HistoryTab() {
 												<span
 													className={cn(
 														"text-4xs px-1 py-0.5 rounded-sm uppercase",
-														fill.liquidation ? "bg-market-down-subtle text-market-down-primary" : "bg-surface-500/50",
+														fill.liquidation ? "bg-market-down-100 text-market-down-600" : "bg-surface-analysis/50",
 													)}
 												>
 													{fill.liquidation ? t`Liquidated` : fill.dir}
@@ -154,10 +157,10 @@ export function HistoryTab() {
 														})}
 													</span>
 												) : (
-													<span className="text-fg-700">{FALLBACK_VALUE_PLACEHOLDER}</span>
+													<span className="text-text-600">{FALLBACK_VALUE_PLACEHOLDER}</span>
 												)}
 											</TableCell>
-											<TableCell className="text-3xs text-right tabular-nums text-fg-700 py-1.5">
+											<TableCell className="text-3xs text-right tabular-nums text-text-600 py-1.5">
 												<div className="flex flex-col items-end underline decoration-dashed decoration-muted-fg/30">
 													<a
 														className="flex items-center gap-1"

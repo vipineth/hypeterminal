@@ -31,7 +31,7 @@ const emptyMediaVariants = cva(
 		variants: {
 			variant: {
 				default: "bg-transparent",
-				icon: "bg-surface-300 text-fg-900 flex size-10 shrink-0 items-center justify-center rounded-lg [&_svg:not([class*='size-'])]:size-6",
+				icon: "bg-surface-analysis text-text-950 flex size-10 shrink-0 items-center justify-center rounded-lg [&_svg:not([class*='size-'])]:size-6",
 			},
 		},
 		defaultVariants: {
@@ -64,7 +64,7 @@ function EmptyDescription({ className, ...props }: React.ComponentProps<"p">) {
 		<div
 			data-slot="empty-description"
 			className={cn(
-				"text-fg-700 [&>a:hover]:text-action-primary text-sm/relaxed [&>a]:underline [&>a]:underline-offset-4",
+				"text-text-600 [&>a:hover]:text-primary-default text-sm/relaxed [&>a]:underline [&>a]:underline-offset-4",
 				className,
 			)}
 			{...props}

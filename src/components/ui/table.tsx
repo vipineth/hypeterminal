@@ -21,7 +21,7 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
 	return (
 		<tfoot
 			data-slot="table-footer"
-			className={cn("bg-surface-300 border-t font-medium [&>tr]:last:border-b-0", className)}
+			className={cn("bg-surface-analysis border-t font-medium [&>tr]:last:border-b-0", className)}
 			{...props}
 		/>
 	);
@@ -31,7 +31,10 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
 	return (
 		<tr
 			data-slot="table-row"
-			className={cn("hover:bg-surface-300 data-[state=selected]:bg-surface-300 border-b transition-colors", className)}
+			className={cn(
+				"hover:bg-surface-analysis data-[state=selected]:bg-surface-analysis border-b transition-colors",
+				className,
+			)}
 			{...props}
 		/>
 	);
@@ -42,7 +45,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
 		<th
 			data-slot="table-head"
 			className={cn(
-				"text-fg-700 h-7 px-2 text-left align-middle text-3xs font-medium uppercase tracking-wider whitespace-nowrap [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-[2px]",
+				"text-text-600 h-7 px-2 text-left align-middle text-3xs font-medium uppercase tracking-wider whitespace-nowrap [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-[2px]",
 				className,
 			)}
 			{...props}
@@ -64,7 +67,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
 }
 
 function TableCaption({ className, ...props }: React.ComponentProps<"caption">) {
-	return <caption data-slot="table-caption" className={cn("text-fg-700 mt-4 text-sm", className)} {...props} />;
+	return <caption data-slot="table-caption" className={cn("text-text-600 mt-4 text-sm", className)} {...props} />;
 }
 
 export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption };

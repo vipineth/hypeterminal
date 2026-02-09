@@ -105,7 +105,7 @@ export function MarketOverview() {
 					href={getExplorerTokenUrl(spotTokenAddress)}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="flex items-center gap-1 text-fg-700 hover:text-fg-900 transition-colors"
+					className="flex items-center gap-1 text-text-600 hover:text-text-950 transition-colors"
 				>
 					<span className="font-mono">{shortenAddress(spotTokenAddress, 4, 4)}</span>
 					<ArrowSquareOutIcon className="size-3" />
