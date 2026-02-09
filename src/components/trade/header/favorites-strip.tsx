@@ -90,7 +90,7 @@ function FavoriteChip({ name, isActive }: FavoriteChipProps) {
 				type="button"
 				onClick={handleRemove}
 				aria-label={t`Remove ${displayName} from favorites`}
-				className="absolute -top-0.5 -right-0.5 hidden size-4 cursor-pointer items-center justify-center rounded-full bg-surface-execution border border-border-200 text-text-600 hover:text-text-950 group-hover/fav:flex"
+				className="absolute -top-0.5 -right-0.5 hidden size-3 cursor-pointer items-center justify-center bg-surface-execution text-text-600 hover:text-text-950 group-hover/fav:flex"
 			>
 				<XIcon className="size-2.5" weight="bold" />
 			</button>

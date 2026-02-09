@@ -63,7 +63,7 @@ function TabsList({ className, variant = "pill", fullWidth, children, ...props }
 			<TabsPrimitive.List
 				data-slot="tabs-list"
 				data-variant={variant}
-				className={cn(tabsListVariants({ variant }), fullWidth && "w-full", className)}
+				className={cn(tabsListVariants({ variant }), fullWidth ? "w-full" : "w-fit", className)}
 				{...props}
 			>
 				{children}
@@ -115,9 +115,30 @@ function TabsTrigger({ className, value, children, ...props }: React.ComponentPr
 	);
 }
 
-function TabsContent({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Content>) {
-	return <TabsPrimitive.Content data-slot="tabs-content" className={cn("flex-1 outline-none", className)} {...props} />;
+function TabsContent({ className, forceMount, ...props }: React.ComponentProps<typeof TabsPrimitive.Content>) {
+	return (
+		<TabsPrimitive.Content
+			data-slot="tabs-content"
+			forceMount={forceMount}
+			className={cn(
+				"flex-1 outline-none",
+				forceMount && "[&[hidden]]:block data-[state=inactive]:invisible",
+				className,
+			)}
+			{...props}
+		/>
+	);
 }
 
-export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants };
+function TabsContentGroup({ className, ...props }: React.ComponentProps<"div">) {
+	return (
+		<div
+			data-slot="tabs-content-group"
+			className={cn("grid [&>*]:col-start-1 [&>*]:row-start-1", className)}
+			{...props}
+		/>
+	);
+}
+
+export { Tabs, TabsList, TabsTrigger, TabsContent, TabsContentGroup, tabsListVariants };
 export type { TabsListVariant };

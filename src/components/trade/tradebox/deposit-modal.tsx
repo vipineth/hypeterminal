@@ -163,7 +163,7 @@ interface DepositFormProps {
 
 function DepositForm({ amount, onAmountChange, balance, validation, isPending, onSubmit }: DepositFormProps) {
 	return (
-		<div className="space-y-4">
+		<div className="flex flex-1 flex-col gap-4">
 			<NetworkSelect label={<Trans>From</Trans>} value="arbitrum" onChange={() => {}} disabled />
 
 			<div className="space-y-1.5">
@@ -185,12 +185,10 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 						validation.error && "border-market-down-600 focus:border-market-down-600",
 					)}
 				/>
-				{validation.error && (
-					<p className="text-4xs text-market-down-600 flex items-center gap-1">
-						<WarningCircleIcon className="size-3" />
-						{validation.error}
-					</p>
-				)}
+				<p className={cn("text-4xs flex items-center gap-1", validation.error ? "text-market-down-600" : "invisible")}>
+					<WarningCircleIcon className="size-3" />
+					{validation.error || "\u00A0"}
+				</p>
 			</div>
 
 			<div className="rounded-xs border border-border-200/40 bg-surface-analysis p-3 space-y-2 text-3xs">
@@ -219,7 +217,12 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 				/>
 			</div>
 
-			<Button variant="contained" onClick={onSubmit} disabled={!validation.valid || isPending} className="w-full">
+			<Button
+				variant="contained"
+				onClick={onSubmit}
+				disabled={!validation.valid || isPending}
+				className="mt-auto w-full"
+			>
 				{isPending ? (
 					<>
 						<SpinnerGapIcon className="size-4 animate-spin" />
@@ -255,11 +258,13 @@ function WithdrawForm({
 	isPending,
 	onSubmit,
 }: WithdrawFormProps) {
+	const availableNum = toNumberOrZero(available);
+	const maxWithdraw = formatNumber(Math.max(availableNum - WITHDRAWAL_FEE_USD, 0), 2);
 	const amountNum = toNumber(amount);
 	const netReceived = amountNum !== null && amountNum > 0 ? Math.max(amountNum - WITHDRAWAL_FEE_USD, 0) : null;
 
 	return (
-		<div className="space-y-4">
+		<div className="flex flex-1 flex-col gap-4">
 			<NetworkSelect label={<Trans>To</Trans>} value="arbitrum" onChange={() => {}} disabled />
 
 			<div className="space-y-1.5">
@@ -276,22 +281,20 @@ function WithdrawForm({
 							<Trans>Loading...</Trans>
 						) : (
 							<>
-								{t`MAX`}: ${formatNumber(available, 2)}
+								{t`MAX`}: ${maxWithdraw}
 							</>
 						)
 					}
-					onMaxClick={() => !isPending && onAmountChange(available)}
+					onMaxClick={() => !isPending && onAmountChange(maxWithdraw)}
 					className={cn(
 						"w-full h-10 text-base bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums font-medium",
 						validation.error && "border-market-down-600 focus:border-market-down-600",
 					)}
 				/>
-				{validation.error && (
-					<p className="text-4xs text-market-down-600 flex items-center gap-1">
-						<WarningCircleIcon className="size-3" />
-						{validation.error}
-					</p>
-				)}
+				<p className={cn("text-4xs flex items-center gap-1", validation.error ? "text-market-down-600" : "invisible")}>
+					<WarningCircleIcon className="size-3" />
+					{validation.error || "\u00A0"}
+				</p>
 			</div>
 
 			<div className="rounded-xs border border-border-200/40 bg-surface-analysis p-3 space-y-2 text-3xs">
@@ -342,7 +345,12 @@ function WithdrawForm({
 				/>
 			</div>
 
-			<Button variant="contained" onClick={onSubmit} disabled={!validation.valid || isPending} className="w-full">
+			<Button
+				variant="contained"
+				onClick={onSubmit}
+				disabled={!validation.valid || isPending}
+				className="mt-auto w-full"
+			>
 				{isPending ? (
 					<>
 						<SpinnerGapIcon className="size-4 animate-spin" />
@@ -632,32 +640,34 @@ export function DepositModal() {
 						</TabsTrigger>
 					</TabsList>
 
-					<TabsContent value="deposit">
-						<DepositForm
-							amount={depositAmount}
-							onAmountChange={setDepositAmount}
-							balance={depositBalance}
-							validation={depositValidation}
-							isPending={depositStatus === "pending"}
-							onSubmit={handleDepositSubmit}
-						/>
-					</TabsContent>
-
-					<TabsContent value="withdraw">
-						{!address ? (
-							<WalletNotConnected />
-						) : (
-							<WithdrawForm
-								amount={withdrawAmount}
-								onAmountChange={setWithdrawAmount}
-								available={withdrawable}
-								balanceStatus={balanceStatus}
-								validation={withdrawValidation}
-								isPending={isWithdrawPending}
-								onSubmit={handleWithdrawSubmit}
+					<div className="grid [&>*]:col-start-1 [&>*]:row-start-1">
+						<TabsContent value="deposit" forceMount className="flex flex-col data-[state=inactive]:invisible">
+							<DepositForm
+								amount={depositAmount}
+								onAmountChange={setDepositAmount}
+								balance={depositBalance}
+								validation={depositValidation}
+								isPending={false}
+								onSubmit={handleDepositSubmit}
 							/>
-						)}
-					</TabsContent>
+						</TabsContent>
+
+						<TabsContent value="withdraw" forceMount className="flex flex-col data-[state=inactive]:invisible">
+							{!address ? (
+								<WalletNotConnected />
+							) : (
+								<WithdrawForm
+									amount={withdrawAmount}
+									onAmountChange={setWithdrawAmount}
+									available={withdrawable}
+									balanceStatus={balanceStatus}
+									validation={withdrawValidation}
+									isPending={isWithdrawPending}
+									onSubmit={handleWithdrawSubmit}
+								/>
+							)}
+						</TabsContent>
+					</div>
 				</Tabs>
 			</DialogContent>
 		</Dialog>

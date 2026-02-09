@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { InfoRow, InfoRowGroup } from "@/components/ui/info-row";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsContentGroup, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
@@ -184,9 +184,6 @@ export function AccountPanel() {
 		];
 	}, [spotMetrics]);
 
-	const summaryRows = activeTab === "perps" ? perpRows : spotRows;
-	const hasData = activeTab === "perps" ? hasPerpData : hasSpotData;
-
 	return (
 		<div className="shrink-0 flex flex-col bg-surface-execution border-t border-border-200 mb-10">
 			<div className="px-2 py-2 border-b border-border-200 flex items-center justify-between">
@@ -194,7 +191,12 @@ export function AccountPanel() {
 				<div className="flex items-center gap-2">
 					<div className="flex items-center gap-1">
 						<span className="text-3xs text-text-950">{t`Equity`}</span>
-						<span className={cn("text-3xs font-medium tabular-nums", hasData ? "text-market-up-600" : "text-text-950")}>
+						<span
+							className={cn(
+								"text-3xs font-medium tabular-nums",
+								(activeTab === "perps" ? hasPerpData : hasSpotData) ? "text-market-up-600" : "text-text-950",
+							)}
+						>
 							{headerEquity}
 						</span>
 					</div>
@@ -213,19 +215,46 @@ export function AccountPanel() {
 					<TabsTrigger value="spot">{t`Spot`}</TabsTrigger>
 				</TabsList>
 
-				<div className="p-2 overflow-y-auto">
-					{!isConnected ? (
-						<div className="text-2xs text-text-600 text-center py-4">{t`Connect wallet to view account`}</div>
-					) : !hasData ? (
-						<div className="text-2xs text-text-600 text-center py-4">{t`Loading...`}</div>
-					) : (
-						<>
-							<InfoRowGroup className="divide-border-200/30">
-								{summaryRows.map((row) => (
-									<InfoRow key={row.label} label={row.label} value={row.value} valueClassName={row.valueClassName} />
-								))}
-							</InfoRowGroup>
+				{!isConnected ? (
+					<div className="text-2xs text-text-600 text-center py-4">{t`Connect wallet to view account`}</div>
+				) : (
+					<div className="p-2 overflow-y-auto">
+						<TabsContentGroup>
+							<TabsContent value="perps" forceMount>
+								{hasPerpData ? (
+									<InfoRowGroup className="divide-border-200/30">
+										{perpRows.map((row) => (
+											<InfoRow
+												key={row.label}
+												label={row.label}
+												value={row.value}
+												valueClassName={row.valueClassName}
+											/>
+										))}
+									</InfoRowGroup>
+								) : (
+									<div className="text-2xs text-text-600 text-center py-4">{t`Loading...`}</div>
+								)}
+							</TabsContent>
+							<TabsContent value="spot" forceMount>
+								{hasSpotData ? (
+									<InfoRowGroup className="divide-border-200/30">
+										{spotRows.map((row) => (
+											<InfoRow
+												key={row.label}
+												label={row.label}
+												value={row.value}
+												valueClassName={row.valueClassName}
+											/>
+										))}
+									</InfoRowGroup>
+								) : (
+									<div className="text-2xs text-text-600 text-center py-4">{t`Loading...`}</div>
+								)}
+							</TabsContent>
+						</TabsContentGroup>
 
+						{(hasPerpData || hasSpotData) && (
 							<div className="grid grid-cols-2 gap-1 mt-4">
 								<Button variant="outlined" onClick={() => openDepositModal("withdraw")} aria-label={t`Withdraw`}>
 									<UploadSimpleIcon className="size-4" />
@@ -236,9 +265,9 @@ export function AccountPanel() {
 									{t`Deposit`}
 								</Button>
 							</div>
-						</>
-					)}
-				</div>
+						)}
+					</div>
+				)}
 			</Tabs>
 		</div>
 	);

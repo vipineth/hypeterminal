@@ -858,6 +858,7 @@ msgid "Loading wallet..."
 msgstr "جاري تحميل المحفظة..."
 
 #: src/components/trade/tradebox/account-panel.tsx
+#: src/components/trade/tradebox/account-panel.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/lib/trade/use-button-content.ts
 #: src/lib/trade/use-button-content.ts
