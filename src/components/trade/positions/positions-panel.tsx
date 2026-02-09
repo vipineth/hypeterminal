@@ -14,6 +14,7 @@ import { useGlobalSettingsActions, usePositionsActiveTab } from "@/stores/use-gl
 const BalancesTab = createLazyComponent(() => import("./balances-tab"), "BalancesTab");
 const FundingTab = createLazyComponent(() => import("./funding-tab"), "FundingTab");
 const HistoryTab = createLazyComponent(() => import("./history-tab"), "HistoryTab");
+const OrdersHistoryTab = createLazyComponent(() => import("./orders-history-tab"), "OrdersHistoryTab");
 const OrdersTab = createLazyComponent(() => import("./orders-tab"), "OrdersTab");
 const PositionsTab = createLazyComponent(() => import("./positions-tab"), "PositionsTab");
 const TwapTab = createLazyComponent(() => import("./twap-tab"), "TwapTab");
@@ -97,6 +98,14 @@ export function PositionsPanel() {
 				<TabsContent value="twap" className={cn("flex-1 min-h-0 flex flex-col mt-0", isPending && "opacity-70")}>
 					<Suspense fallback={<TabLoadingFallback />}>
 						<TwapTab />
+					</Suspense>
+				</TabsContent>
+				<TabsContent
+					value="orders-history"
+					className={cn("flex-1 min-h-0 flex flex-col mt-0", isPending && "opacity-70")}
+				>
+					<Suspense fallback={<TabLoadingFallback />}>
+						<OrdersHistoryTab />
 					</Suspense>
 				</TabsContent>
 				<TabsContent value="history" className={cn("flex-1 min-h-0 flex flex-col mt-0", isPending && "opacity-70")}>

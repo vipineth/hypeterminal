@@ -125,6 +125,7 @@ msgstr "API"
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -346,6 +347,10 @@ msgstr "اربط محفظتك لعرض مدفوعات التمويل."
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Connect your wallet to view open orders."
 msgstr "اربط محفظتك لعرض الأوامر المفتوحة."
+
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Connect your wallet to view order history."
+msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Connect your wallet to view positions."
@@ -607,6 +612,10 @@ msgstr "فشل في تحميل الأوامر المفتوحة."
 msgid "Failed to load order book."
 msgstr "فشل في تحميل دفتر الأوامر."
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Failed to load order history."
+msgstr ""
+
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Failed to load positions."
 msgstr "فشل تحميل المراكز."
@@ -827,6 +836,10 @@ msgstr "جارٍ تحميل الأسواق..."
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Loading open orders..."
 msgstr "جارٍ تحميل الأوامر المفتوحة..."
+
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Loading order history..."
+msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Loading positions..."
@@ -1069,6 +1082,10 @@ msgstr "لم يتم العثور على أسواق."
 msgid "No open orders."
 msgstr "لا توجد أوامر مفتوحة."
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "No order history found."
+msgstr ""
+
 #: src/components/trade/tradebox/trade-panel.tsx
 msgid "No response from exchange"
 msgstr ""
@@ -1155,6 +1172,10 @@ msgstr "دفتر الأوامر"
 msgid "Order failed"
 msgstr "فشل الطلب"
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Order History"
+msgstr ""
+
 #: src/components/trade/tradebox/order-toast.tsx
 msgid "Order Queue"
 msgstr "قائمة الأوامر"
@@ -1162,6 +1183,10 @@ msgstr "قائمة الأوامر"
 #: src/components/trade/tradebox/order-summary.tsx
 msgid "Order Value"
 msgstr "قيمة الطلب"
+
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Orders"
+msgstr ""
 
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
@@ -1245,6 +1270,7 @@ msgstr "المركز"
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/tradebox/price-input-with-percent.tsx
 msgid "Price"
@@ -1522,6 +1548,7 @@ msgstr "المُوقِّع غير جاهز"
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -1614,9 +1641,9 @@ msgstr ""
 msgid "Start Price (USDC)"
 msgstr ""
 
-#: src/components/trade/positions/twap-tab.tsx
-#~ msgid "Status"
-#~ msgstr "الحالة"
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Status"
+msgstr "الحالة"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Stop"
@@ -1678,6 +1705,7 @@ msgstr ""
 #. placeholder {0}: markets.getMarket(fill.coin)?.displayName ?? fill.coin
 #. placeholder {0}: markets.getMarket(state.coin)?.displayName ?? state.coin
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Switch to {0} market"
@@ -1753,6 +1781,7 @@ msgstr "الصفحة التي تبحث عنها غير موجودة."
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Time"
 msgstr "الوقت"
@@ -1898,6 +1927,7 @@ msgid "TWAP Orders"
 msgstr "أوامر TWAP"
 
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Type"
 msgstr "النوع"
@@ -1937,6 +1967,7 @@ msgstr "دقة غير مدعومة: {0}"
 msgid "Update failed"
 msgstr ""
 
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Updated"

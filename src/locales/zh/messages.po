@@ -125,6 +125,7 @@ msgstr "API"
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -346,6 +347,10 @@ msgstr "连接钱包查看资金费用。"
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Connect your wallet to view open orders."
 msgstr "连接钱包查看未成交订单。"
+
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Connect your wallet to view order history."
+msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Connect your wallet to view positions."
@@ -607,6 +612,10 @@ msgstr "加载未成交订单失败。"
 msgid "Failed to load order book."
 msgstr "加载订单簿失败。"
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Failed to load order history."
+msgstr ""
+
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Failed to load positions."
 msgstr "加载仓位失败。"
@@ -827,6 +836,10 @@ msgstr "加载市场中..."
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Loading open orders..."
 msgstr "加载未成交订单中..."
+
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Loading order history..."
+msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Loading positions..."
@@ -1069,6 +1082,10 @@ msgstr "未找到市场。"
 msgid "No open orders."
 msgstr "无未成交订单。"
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "No order history found."
+msgstr ""
+
 #: src/components/trade/tradebox/trade-panel.tsx
 msgid "No response from exchange"
 msgstr ""
@@ -1155,6 +1172,10 @@ msgstr "订单簿"
 msgid "Order failed"
 msgstr "下单失败"
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Order History"
+msgstr ""
+
 #: src/components/trade/tradebox/order-toast.tsx
 msgid "Order Queue"
 msgstr "订单队列"
@@ -1162,6 +1183,10 @@ msgstr "订单队列"
 #: src/components/trade/tradebox/order-summary.tsx
 msgid "Order Value"
 msgstr "订单价值"
+
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Orders"
+msgstr ""
 
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
@@ -1245,6 +1270,7 @@ msgstr "仓位"
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/tradebox/price-input-with-percent.tsx
 msgid "Price"
@@ -1522,6 +1548,7 @@ msgstr "签名器未就绪"
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -1614,9 +1641,9 @@ msgstr ""
 msgid "Start Price (USDC)"
 msgstr ""
 
-#: src/components/trade/positions/twap-tab.tsx
-#~ msgid "Status"
-#~ msgstr "状态"
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Status"
+msgstr "状态"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Stop"
@@ -1678,6 +1705,7 @@ msgstr ""
 #. placeholder {0}: markets.getMarket(fill.coin)?.displayName ?? fill.coin
 #. placeholder {0}: markets.getMarket(state.coin)?.displayName ?? state.coin
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Switch to {0} market"
@@ -1753,6 +1781,7 @@ msgstr "您查找的页面不存在。"
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Time"
 msgstr "时间"
@@ -1898,6 +1927,7 @@ msgid "TWAP Orders"
 msgstr "TWAP 订单"
 
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Type"
 msgstr "类型"
@@ -1937,6 +1967,7 @@ msgstr "不支持的分辨率: {0}"
 msgid "Update failed"
 msgstr ""
 
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Updated"

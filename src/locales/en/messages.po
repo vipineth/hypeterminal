@@ -125,6 +125,7 @@ msgstr "API"
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -346,6 +347,10 @@ msgstr "Connect your wallet to view funding payments."
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Connect your wallet to view open orders."
 msgstr "Connect your wallet to view open orders."
+
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Connect your wallet to view order history."
+msgstr "Connect your wallet to view order history."
 
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Connect your wallet to view positions."
@@ -607,6 +612,10 @@ msgstr "Failed to load open orders."
 msgid "Failed to load order book."
 msgstr "Failed to load order book."
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Failed to load order history."
+msgstr "Failed to load order history."
+
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Failed to load positions."
 msgstr "Failed to load positions."
@@ -831,6 +840,10 @@ msgstr "Loading markets..."
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Loading open orders..."
 msgstr "Loading open orders..."
+
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Loading order history..."
+msgstr "Loading order history..."
 
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Loading positions..."
@@ -1073,6 +1086,10 @@ msgstr "No markets found."
 msgid "No open orders."
 msgstr "No open orders."
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "No order history found."
+msgstr "No order history found."
+
 #: src/components/trade/tradebox/trade-panel.tsx
 msgid "No response from exchange"
 msgstr "No response from exchange"
@@ -1159,6 +1176,10 @@ msgstr "Order Book"
 msgid "Order failed"
 msgstr "Order failed"
 
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Order History"
+msgstr "Order History"
+
 #: src/components/trade/tradebox/order-toast.tsx
 msgid "Order Queue"
 msgstr "Order Queue"
@@ -1166,6 +1187,10 @@ msgstr "Order Queue"
 #: src/components/trade/tradebox/order-summary.tsx
 msgid "Order Value"
 msgstr "Order Value"
+
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Orders"
+msgstr "Orders"
 
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
@@ -1249,6 +1274,7 @@ msgstr "Position"
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/tradebox/price-input-with-percent.tsx
 msgid "Price"
@@ -1526,6 +1552,7 @@ msgstr "Signer not ready"
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -1618,9 +1645,9 @@ msgstr "Start and end must differ"
 msgid "Start Price (USDC)"
 msgstr "Start Price (USDC)"
 
-#: src/components/trade/positions/twap-tab.tsx
-#~ msgid "Status"
-#~ msgstr "Status"
+#: src/components/trade/positions/orders-history-tab.tsx
+msgid "Status"
+msgstr "Status"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Stop"
@@ -1682,6 +1709,7 @@ msgstr "Swapping..."
 #. placeholder {0}: markets.getMarket(fill.coin)?.displayName ?? fill.coin
 #. placeholder {0}: markets.getMarket(state.coin)?.displayName ?? state.coin
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Switch to {0} market"
@@ -1757,6 +1785,7 @@ msgstr "The page you are looking for does not exist."
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Time"
 msgstr "Time"
@@ -1906,6 +1935,7 @@ msgid "TWAP Orders"
 msgstr "TWAP Orders"
 
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 msgid "Type"
 msgstr "Type"
@@ -1945,6 +1975,7 @@ msgstr "Unsupported resolution: {0}"
 msgid "Update failed"
 msgstr "Update failed"
 
+#: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "Updated"
