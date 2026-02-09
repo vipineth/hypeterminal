@@ -15,6 +15,7 @@ import { formatUnits } from "viem";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { InfoRow } from "@/components/ui/info-row";
 import { NumberInput } from "@/components/ui/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -30,25 +31,6 @@ import { useDepositModalActions, useDepositModalOpen, useDepositModalTab } from 
 const NETWORKS = [{ id: "arbitrum", name: "Arbitrum", shortName: "ARB" }] as const;
 
 type NetworkId = (typeof NETWORKS)[number]["id"];
-
-interface InfoRowProps {
-	label: React.ReactNode;
-	value: React.ReactNode;
-	icon?: React.ReactNode;
-	highlight?: boolean;
-}
-
-function InfoRow({ label, value, icon, highlight }: InfoRowProps) {
-	return (
-		<div className="flex items-center justify-between text-3xs">
-			<span className="flex items-center gap-1.5 text-text-950">
-				{icon && <span className="text-text-950">{icon}</span>}
-				{label}
-			</span>
-			<span className={cn(highlight && "text-text-950 font-medium")}>{value}</span>
-		</div>
-	);
-}
 
 interface NetworkSelectProps {
 	label: React.ReactNode;
@@ -211,17 +193,29 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 				)}
 			</div>
 
-			<div className="rounded-xs border border-border-200/40 bg-surface-analysis p-3 space-y-2">
+			<div className="rounded-xs border border-border-200/40 bg-surface-analysis p-3 space-y-2 text-3xs">
 				<InfoRow
-					label={<Trans>Minimum</Trans>}
-					value={<span className="tabular-nums">{formatUnits(MIN_DEPOSIT_USDC, USDC_DECIMALS)} USDC</span>}
-					icon={<WalletIcon className="size-3" />}
+					className="p-0"
+					labelClassName="flex items-center gap-1.5 text-text-950"
+					label={
+						<>
+							<WalletIcon className="size-3" />
+							<Trans>Minimum</Trans>
+						</>
+					}
+					value={`${formatUnits(MIN_DEPOSIT_USDC, USDC_DECIMALS)} USDC`}
 				/>
 				<InfoRow
-					label={<Trans>Estimated time</Trans>}
-					value={<span className="tabular-nums">~1 min</span>}
-					icon={<ClockIcon className="size-3" />}
-					highlight
+					className="p-0"
+					labelClassName="flex items-center gap-1.5 text-text-950"
+					label={
+						<>
+							<ClockIcon className="size-3" />
+							<Trans>Estimated time</Trans>
+						</>
+					}
+					value="~1 min"
+					valueClassName="font-medium"
 				/>
 			</div>
 
@@ -300,33 +294,51 @@ function WithdrawForm({
 				)}
 			</div>
 
-			<div className="rounded-xs border border-border-200/40 bg-surface-analysis p-3 space-y-2">
+			<div className="rounded-xs border border-border-200/40 bg-surface-analysis p-3 space-y-2 text-3xs">
 				<InfoRow
-					label={<Trans>Network fee</Trans>}
-					value={<span className="tabular-nums">${WITHDRAWAL_FEE_USD}</span>}
-					icon={<WalletIcon className="size-3" />}
-				/>
-				<InfoRow
-					label={<Trans>Net received</Trans>}
-					value={
-						netReceived === null ? (
-							<span className="tabular-nums text-text-950">--</span>
-						) : (
-							<span className="tabular-nums">${formatNumber(netReceived, 2)}</span>
-						)
+					className="p-0"
+					labelClassName="flex items-center gap-1.5 text-text-950"
+					label={
+						<>
+							<WalletIcon className="size-3" />
+							<Trans>Network fee</Trans>
+						</>
 					}
-					icon={<ArrowLineDownIcon className="size-3" />}
+					value={`$${WITHDRAWAL_FEE_USD}`}
 				/>
 				<InfoRow
-					label={<Trans>Minimum</Trans>}
-					value={<span className="tabular-nums">${MIN_WITHDRAW_USD}</span>}
-					icon={<ArrowLineUpIcon className="size-3" />}
+					className="p-0"
+					labelClassName="flex items-center gap-1.5 text-text-950"
+					label={
+						<>
+							<ArrowLineDownIcon className="size-3" />
+							<Trans>Net received</Trans>
+						</>
+					}
+					value={netReceived === null ? "--" : `$${formatNumber(netReceived, 2)}`}
 				/>
 				<InfoRow
-					label={<Trans>Estimated time</Trans>}
-					value={<span className="tabular-nums">~5 min</span>}
-					icon={<ClockIcon className="size-3" />}
-					highlight
+					className="p-0"
+					labelClassName="flex items-center gap-1.5 text-text-950"
+					label={
+						<>
+							<ArrowLineUpIcon className="size-3" />
+							<Trans>Minimum</Trans>
+						</>
+					}
+					value={`$${MIN_WITHDRAW_USD}`}
+				/>
+				<InfoRow
+					className="p-0"
+					labelClassName="flex items-center gap-1.5 text-text-950"
+					label={
+						<>
+							<ClockIcon className="size-3" />
+							<Trans>Estimated time</Trans>
+						</>
+					}
+					value="~5 min"
+					valueClassName="font-medium"
 				/>
 			</div>
 

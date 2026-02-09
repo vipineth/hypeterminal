@@ -1,5 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { PencilIcon } from "@phosphor-icons/react";
+import { InfoRow, InfoRowGroup } from "@/components/ui/info-row";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { DEFAULT_BUILDER_CONFIG } from "@/config/hyperliquid";
 import { bpsToPercentage, formatPrice, formatUSD } from "@/lib/format";
@@ -31,52 +32,51 @@ export function OrderSummary({
 	const isLeveraged = marketKind !== "spot";
 
 	return (
-		<div className="divide-y divide-border-200/30 text-2xs tracking-[0.5px]">
+		<InfoRowGroup className="divide-border-200/30">
 			{isLeveraged && (
-				<div className="flex items-center justify-between px-2 py-1.5">
-					<span className="text-text-600">{t`Liq. Price`}</span>
-					<span className="tabular-nums text-market-down-600">
-						{liqPrice ? formatPrice(liqPrice, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER}
-					</span>
-				</div>
+				<InfoRow
+					label={t`Liq. Price`}
+					value={liqPrice ? formatPrice(liqPrice, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER}
+					valueClassName="text-market-down-600"
+				/>
 			)}
-			<div className="flex items-center justify-between px-2 py-1.5">
-				<span className="text-text-600">{t`Order Value`}</span>
-				<span className="tabular-nums text-text-600">
-					{orderValue > 0 ? formatUSD(orderValue) : FALLBACK_VALUE_PLACEHOLDER}
-				</span>
-			</div>
+			<InfoRow
+				label={t`Order Value`}
+				value={orderValue > 0 ? formatUSD(orderValue) : FALLBACK_VALUE_PLACEHOLDER}
+				valueClassName="text-text-600"
+			/>
 			{isLeveraged && (
-				<div className="flex items-center justify-between px-2 py-1.5">
-					<span className="text-text-600">{t`Margin Req.`}</span>
-					<span className="tabular-nums text-text-600">
-						{marginRequired > 0 ? formatUSD(marginRequired) : FALLBACK_VALUE_PLACEHOLDER}
-					</span>
-				</div>
+				<InfoRow
+					label={t`Margin Req.`}
+					value={marginRequired > 0 ? formatUSD(marginRequired) : FALLBACK_VALUE_PLACEHOLDER}
+					valueClassName="text-text-600"
+				/>
 			)}
-			<div className="flex items-center justify-between px-2 py-1.5">
-				<span className="text-text-600">{t`Slippage`}</span>
-				<button
-					type="button"
-					onClick={onSlippageClick}
-					className="flex items-center gap-1 hover:text-text-950 transition-colors"
-				>
-					<span className="tabular-nums text-market-down-600">{slippagePercent}%</span>
-					<PencilIcon className="size-2 text-text-600" />
-				</button>
-			</div>
-			<div className="flex items-center justify-between px-2 py-1.5">
-				<span className="text-text-600">{t`Est. Fee`}</span>
-				<span className="tabular-nums text-text-600">
-					{estimatedFee > 0 ? formatUSD(estimatedFee) : FALLBACK_VALUE_PLACEHOLDER}
-				</span>
-			</div>
+			<InfoRow
+				label={t`Slippage`}
+				value={
+					<button
+						type="button"
+						onClick={onSlippageClick}
+						className="flex items-center gap-1 hover:text-text-950 transition-colors"
+					>
+						<span className="tabular-nums text-market-down-600">{slippagePercent}%</span>
+						<PencilIcon className="size-2 text-text-600" />
+					</button>
+				}
+			/>
+			<InfoRow
+				label={t`Est. Fee`}
+				value={estimatedFee > 0 ? formatUSD(estimatedFee) : FALLBACK_VALUE_PLACEHOLDER}
+				valueClassName="text-text-600"
+			/>
 			{DEFAULT_BUILDER_CONFIG?.f && (
-				<div className="flex items-center justify-between px-2 py-1.5">
-					<span className="text-text-600">{t`Builder Fee`}</span>
-					<span className="tabular-nums text-text-600">{bpsToPercentage(DEFAULT_BUILDER_CONFIG?.f)}%</span>
-				</div>
+				<InfoRow
+					label={t`Builder Fee`}
+					value={`${bpsToPercentage(DEFAULT_BUILDER_CONFIG?.f)}%`}
+					valueClassName="text-text-600"
+				/>
 			)}
-		</div>
+		</InfoRowGroup>
 	);
 }

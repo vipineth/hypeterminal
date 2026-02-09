@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { InfoRow } from "@/components/ui/info-row";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { throwIfAnyResponseError } from "@/domain/trade/orders";
 import { cn } from "@/lib/cn";
@@ -135,32 +136,36 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 				</DialogHeader>
 
 				<div className="px-5 pb-4">
-					<div className="rounded-xs border border-border-200/50 bg-surface-analysis p-3 space-y-1">
-						<div className="flex items-center justify-between">
-							<span className="text-2xs text-text-600">{t`Size`}</span>
-							<span className="text-2xs tabular-nums font-medium">
-								{formatToken(position.size, position.szDecimals)} {position.coin}
-							</span>
-						</div>
-						<div className="flex items-center justify-between">
-							<span className="text-2xs text-text-600">{t`Entry Price`}</span>
-							<span className="text-2xs tabular-nums font-medium">
-								{formatPrice(position.entryPx, { szDecimals: position.szDecimals })}
-							</span>
-						</div>
-						<div className="flex items-center justify-between">
-							<span className="text-2xs text-text-600">{t`Mark Price`}</span>
-							<span className="text-2xs tabular-nums font-medium text-warning-700">
-								{formatPrice(position.markPx, { szDecimals: position.szDecimals })}
-							</span>
-						</div>
-						<div className="border-t border-border-200/50 pt-3 flex items-center justify-between">
-							<span className="text-2xs text-text-600">{t`Unrealized P&L`}</span>
-							<span className={cn("text-2xs tabular-nums font-semibold", getValueColorClass(position.unrealizedPnl))}>
-								{formatUSD(position.unrealizedPnl, { signDisplay: "exceptZero" })}
-								<span className="font-normal text-text-600 ml-1">({formatPercent(position.roe, 1)})</span>
-							</span>
-						</div>
+					<div className="rounded-xs border border-border-200/50 bg-surface-analysis p-3 space-y-1 text-2xs">
+						<InfoRow
+							className="p-0"
+							label={t`Size`}
+							value={`${formatToken(position.size, position.szDecimals)} ${position.coin}`}
+							valueClassName="font-medium"
+						/>
+						<InfoRow
+							className="p-0"
+							label={t`Entry Price`}
+							value={formatPrice(position.entryPx, { szDecimals: position.szDecimals })}
+							valueClassName="font-medium"
+						/>
+						<InfoRow
+							className="p-0"
+							label={t`Mark Price`}
+							value={formatPrice(position.markPx, { szDecimals: position.szDecimals })}
+							valueClassName="font-medium text-warning-700"
+						/>
+						<InfoRow
+							className="p-0 border-t border-border-200/50 pt-3"
+							label={t`Unrealized P&L`}
+							value={
+								<>
+									{formatUSD(position.unrealizedPnl, { signDisplay: "exceptZero" })}
+									<span className="font-normal text-text-600 ml-1">({formatPercent(position.roe, 1)})</span>
+								</>
+							}
+							valueClassName={cn("font-semibold", getValueColorClass(position.unrealizedPnl))}
+						/>
 					</div>
 				</div>
 

@@ -3,7 +3,7 @@ import { DownloadSimpleIcon, UploadSimpleIcon } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { InfoRow } from "@/components/ui/info-row";
+import { InfoRow, InfoRowGroup } from "@/components/ui/info-row";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
@@ -208,27 +208,25 @@ export function AccountPanel() {
 			</div>
 
 			<Tabs value={activeTab} onValueChange={setActiveTab}>
-				<div className="px-2 border-b border-border-200">
-					<TabsList variant="underline">
-						<TabsTrigger value="perps">{t`Perps`}</TabsTrigger>
-						<TabsTrigger value="spot">{t`Spot`}</TabsTrigger>
-					</TabsList>
-				</div>
+				<TabsList variant="underline">
+					<TabsTrigger value="perps">{t`Perps`}</TabsTrigger>
+					<TabsTrigger value="spot">{t`Spot`}</TabsTrigger>
+				</TabsList>
 
-				<div className="p-2 space-y-2 overflow-y-auto">
+				<div className="p-2 overflow-y-auto">
 					{!isConnected ? (
 						<div className="text-2xs text-text-600 text-center py-4">{t`Connect wallet to view account`}</div>
 					) : !hasData ? (
 						<div className="text-2xs text-text-600 text-center py-4">{t`Loading...`}</div>
 					) : (
 						<>
-							<div className="divide-y divide-border-200 text-2xs tracking-[0.5px]">
+							<InfoRowGroup className="divide-border-200/30">
 								{summaryRows.map((row) => (
 									<InfoRow key={row.label} label={row.label} value={row.value} valueClassName={row.valueClassName} />
 								))}
-							</div>
+							</InfoRowGroup>
 
-							<div className="grid grid-cols-2 gap-1">
+							<div className="grid grid-cols-2 gap-1 mt-4">
 								<Button variant="outlined" onClick={() => openDepositModal("withdraw")} aria-label={t`Withdraw`}>
 									<UploadSimpleIcon className="size-4" />
 									{t`Withdraw`}
