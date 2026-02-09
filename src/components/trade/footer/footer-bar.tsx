@@ -1,7 +1,7 @@
 import { t } from "@lingui/core/macro";
-import { PulseIcon, SpinnerGapIcon, WifiHighIcon, WifiSlashIcon } from "@phosphor-icons/react";
+import { GithubLogoIcon, PulseIcon, SpinnerGapIcon, WifiHighIcon, WifiSlashIcon } from "@phosphor-icons/react";
 import { ClientOnly } from "@tanstack/react-router";
-import { APP_VERSION } from "@/config/constants";
+import { APP_VERSION, GITHUB_URL } from "@/config/constants";
 import { formatTime } from "@/lib/format";
 import { type ApiStatus, useApiStatus } from "@/lib/hyperliquid";
 import { usePerfPanel } from "@/providers/perf-panel";
@@ -75,6 +75,15 @@ export function FooterBar() {
 				<PerfToggle />
 			</div>
 			<div className="flex items-center gap-3">
+				<a
+					href={GITHUB_URL}
+					target="_blank"
+					rel="noopener noreferrer"
+					className="flex items-center text-text-950 hover:text-primary-default transition-colors"
+					aria-label="GitHub"
+				>
+					<GithubLogoIcon className="size-3" />
+				</a>
 				<div className="h-3 w-px bg-border-200/60" />
 				<ClientOnly>
 					<span className="text-text-950 tabular-nums">{formatTime(new Date())}</span>

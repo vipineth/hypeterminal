@@ -46,6 +46,7 @@ export const STORAGE_KEYS = {
 	ORDER_ENTRY: "order-entry-v2",
 } as const;
 
+export const GITHUB_URL = "https://github.com/vipineth/hypeterminal/";
 export const TOKEN_ICON_BASE_URL = "https://app.hyperliquid.xyz/coins";
 
 export const PANEL_LAYOUT = {
