@@ -33,7 +33,7 @@ export function AssetDisplay({
 	const fallbackText = getFallbackText(displayName);
 
 	const icon = (
-		<Avatar className={cn("size-4", iconClassName)}>
+		<Avatar className={cn("size-4 border border-border-200", iconClassName)}>
 			<AvatarImage src={iconUrl} alt={displayName} />
 			<AvatarFallback className="text-4xs text-text-950 bg-surface-analysis">{fallbackText}</AvatarFallback>
 		</Avatar>

@@ -110,10 +110,10 @@ export function OrdersHistoryTab() {
 												i % 2 === 1 && "bg-surface-analysis",
 											)}
 										>
-											<TableCell className="text-3xs text-text-600 py-1.5 whitespace-nowrap">
+											<TableCell className="text-xs text-text-600 py-1.5 whitespace-nowrap">
 												{formatDateTime(order.timestamp, { dateStyle: "short", timeStyle: "short" })}
 											</TableCell>
-											<TableCell className="text-3xs font-medium py-1.5">
+											<TableCell className="text-xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">
 													<Button
 														variant="text"
@@ -129,15 +129,15 @@ export function OrdersHistoryTab() {
 													</span>
 												</div>
 											</TableCell>
-											<TableCell className="text-3xs py-1.5">{order.orderType}</TableCell>
-											<TableCell className="text-3xs text-right tabular-nums py-1.5">
+											<TableCell className="text-xs py-1.5">{order.orderType}</TableCell>
+											<TableCell className="text-xs text-right tabular-nums py-1.5">
 												{formatUSD(order.limitPx, { compact: false })}
 											</TableCell>
-											<TableCell className="text-3xs text-right tabular-nums py-1.5">
+											<TableCell className="text-xs text-right tabular-nums py-1.5">
 												{formatNumber(order.origSz, szDecimals)} {order.coin}
 											</TableCell>
-											<TableCell className="text-3xs py-1.5 capitalize">{entry.status}</TableCell>
-											<TableCell className="text-3xs text-right tabular-nums text-text-600 py-1.5 whitespace-nowrap">
+											<TableCell className="text-xs py-1.5 capitalize">{entry.status}</TableCell>
+											<TableCell className="text-xs text-right tabular-nums text-text-600 py-1.5 whitespace-nowrap">
 												{formatDateTime(entry.statusTimestamp, { dateStyle: "short", timeStyle: "short" })}
 											</TableCell>
 										</TableRow>

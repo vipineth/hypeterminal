@@ -86,9 +86,9 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 					role="combobox"
 					aria-expanded={open}
 					aria-label={t`Select token`}
-					className="gap-2 px-2 h-7 min-w-36 bg-surface-execution border border-border-200/40 rounded-sm text-2xs font-bold uppercase tracking-wider hover:bg-surface-execution"
+					className="gap-2 px-2 py-1.5 bg-surface-execution border border-border-200/40 rounded-sm text-2xs font-bold uppercase tracking-wider hover:bg-surface-execution"
 				>
-					{selectedMarket && <AssetDisplay asset={selectedMarket} iconClassName="size-6 shrink-0" />}
+					{selectedMarket && <AssetDisplay asset={selectedMarket} iconClassName="size-4 shrink-0" />}
 					<CaretDownIcon className="size-4 text-text-600" />
 				</Button>
 			</PopoverTrigger>

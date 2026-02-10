@@ -200,7 +200,6 @@ msgstr "Builder Fee"
 #~ msgid "Builder must have at least 100 USDC in perps account value"
 #~ msgstr "Builder must have at least 100 USDC in perps account value"
 
-#: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "buy"
 msgstr "buy"
@@ -869,7 +868,6 @@ msgstr "Loading wallet..."
 msgid "Loading..."
 msgstr "Loading..."
 
-#: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Long"
@@ -1425,7 +1423,6 @@ msgstr "Select token"
 msgid "Select tokens to swap"
 msgstr "Select tokens to swap"
 
-#: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "sell"
 msgstr "sell"
@@ -1492,7 +1489,6 @@ msgstr "Set to {p}%"
 msgid "Settings"
 msgstr "Settings"
 
-#: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Short"

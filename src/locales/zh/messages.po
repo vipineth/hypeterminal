@@ -200,7 +200,6 @@ msgstr ""
 #~ msgid "Builder must have at least 100 USDC in perps account value"
 #~ msgstr ""
 
-#: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "buy"
 msgstr "买入"
@@ -865,7 +864,6 @@ msgstr "加载钱包中..."
 msgid "Loading..."
 msgstr "加载中..."
 
-#: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Long"
@@ -1421,7 +1419,6 @@ msgstr "选择代币"
 msgid "Select tokens to swap"
 msgstr ""
 
-#: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "sell"
 msgstr "卖出"
@@ -1488,7 +1485,6 @@ msgstr ""
 msgid "Settings"
 msgstr "设置"
 
-#: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Short"

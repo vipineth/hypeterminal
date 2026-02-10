@@ -130,17 +130,15 @@ export function BalancesTab() {
 				key={`${row.type}-${row.asset}`}
 				className={cn("border-border-200/40 hover:bg-surface-analysis/30", index % 2 === 1 && "bg-surface-analysis")}
 			>
-				<TableCell className="text-3xs font-medium py-1.5">
+				<TableCell className="text-xs font-medium py-1.5">
 					<AssetDisplay asset={token ?? { displayName: row.asset, iconUrl: undefined }} />
 				</TableCell>
-				<TableCell className="text-3xs text-right tabular-nums py-1.5">
-					{formatToken(row.available, decimals)}
-				</TableCell>
-				<TableCell className="text-3xs text-right tabular-nums py-1.5">{formatToken(row.total, decimals)}</TableCell>
-				<TableCell className="text-3xs text-right tabular-nums text-market-up-600 py-1.5">
+				<TableCell className="text-xs text-right tabular-nums py-1.5">{formatToken(row.available, decimals)}</TableCell>
+				<TableCell className="text-xs text-right tabular-nums py-1.5">{formatToken(row.total, decimals)}</TableCell>
+				<TableCell className="text-xs text-right tabular-nums text-market-up-600 py-1.5">
 					{formatUSD(row.usdValue, { compact: true })}
 				</TableCell>
-				<TableCell className="text-3xs text-right tabular-nums py-1.5">
+				<TableCell className="text-xs text-right tabular-nums py-1.5">
 					{pnlData ? (
 						<span className={pnlData.pnl >= 0 ? "text-market-up-600" : "text-market-down-600"}>
 							{pnlData.pnl >= 0 ? "+" : ""}

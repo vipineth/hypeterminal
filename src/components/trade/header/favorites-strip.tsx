@@ -70,8 +70,8 @@ function FavoriteChip({ name, isActive }: FavoriteChipProps) {
 				tabIndex={0}
 				aria-label={t`Select ${displayName} market`}
 				className={cn(
-					"flex items-center gap-1 shrink-0 px-2 h-7 text-3xs rounded-sm bg-surface-execution border transition-colors",
-					isActive ? "border-border-200" : "border-transparent hover:border-border-100",
+					"flex items-center gap-1 shrink-0 px-2 py-1.5 text-3xs rounded-sm bg-surface-execution border transition-colors",
+					isActive ? "border-border-300" : "border-transparent hover:border-border-100",
 				)}
 			>
 				<span className="font-medium text-text-950 uppercase">{displayName}</span>

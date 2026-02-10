@@ -200,7 +200,6 @@ msgstr ""
 #~ msgid "Builder must have at least 100 USDC in perps account value"
 #~ msgstr ""
 
-#: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "buy"
 msgstr "खरीदें"
@@ -865,7 +864,6 @@ msgstr "वॉलेट लोड हो रहा है..."
 msgid "Loading..."
 msgstr "लोड हो रहा है..."
 
-#: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Long"
@@ -1421,7 +1419,6 @@ msgstr "टोकन चुनें"
 msgid "Select tokens to swap"
 msgstr ""
 
-#: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "sell"
 msgstr "बेचें"
@@ -1488,7 +1485,6 @@ msgstr ""
 msgid "Settings"
 msgstr "सेटिंग्स"
 
-#: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Short"
