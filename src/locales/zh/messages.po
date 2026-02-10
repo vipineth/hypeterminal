@@ -1365,6 +1365,10 @@ msgstr ""
 msgid "Scale levels must be {SCALE_LEVELS_MIN}-{SCALE_LEVELS_MAX}"
 msgstr ""
 
+#: src/components/trade/footer/footer-bar.tsx
+msgid "Search"
+msgstr ""
+
 #: src/components/trade/chart/token-selector.tsx
 msgid "Search markets..."
 msgstr "搜索市场..."

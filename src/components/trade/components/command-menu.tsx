@@ -68,9 +68,10 @@ export function CommandMenu() {
 			description="Search for a market to trade"
 			showCloseButton={false}
 			shouldFilter={false}
+			className="sm:max-w-[480px]"
 		>
 			<CommandInput placeholder="Search markets..." value={query} onValueChange={setQuery} />
-			<CommandList>
+			<CommandList className="h-[360px] max-h-[360px]">
 				<CommandEmpty>No markets found.</CommandEmpty>
 				{displayItems.map((market) => (
 					<CommandItem

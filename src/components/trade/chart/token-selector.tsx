@@ -98,20 +98,20 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 				sideOffset={8}
 				onKeyDown={handleKeyDown}
 			>
-				<div className="flex flex-col p-2">
+				<div className="flex flex-col">
 					<div className="border-b border-border-200/40">
-						<div className="relative">
-							<MagnifyingGlassIcon className="absolute left-2 top-1/2 -translate-y-1/2 size-3 text-text-600" />
+						<div className="relative p-2">
+							<MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-text-600" />
 							<Input
 								placeholder={t`Search markets...`}
 								value={search}
 								onChange={(e) => setSearch(e.target.value)}
-								className="pl-7 h-7 text-xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/40"
+								className="pl-7 py-4 text-xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/40"
 							/>
 						</div>
 					</div>
 
-					<div className="py-2 border-b border-border-200/40 bg-surface-base/50">
+					<div className="p-2 border-b border-border-200/40 bg-surface-base/50">
 						<div className="flex items-center gap-0.5 flex-wrap">
 							{marketScopes.map((s) => {
 								const isSelected = scope === s.value;
@@ -134,7 +134,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 							})}
 						</div>
 						{subcategories.length > 0 && (
-							<div className="flex items-center gap-0.5 flex-wrap mt-1.5 pt-1.5 pl-2 ml-1">
+							<div className="flex items-center gap-0.5 flex-wrap mt-2">
 								{subcategories.map((sub) => {
 									const isSelected = subcategory === sub.value;
 									return (

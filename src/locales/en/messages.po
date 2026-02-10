@@ -1369,6 +1369,10 @@ msgstr "Scale level below min notional"
 msgid "Scale levels must be {SCALE_LEVELS_MIN}-{SCALE_LEVELS_MAX}"
 msgstr "Scale levels must be {SCALE_LEVELS_MIN}-{SCALE_LEVELS_MAX}"
 
+#: src/components/trade/footer/footer-bar.tsx
+msgid "Search"
+msgstr "Search"
+
 #: src/components/trade/chart/token-selector.tsx
 msgid "Search markets..."
 msgstr "Search markets..."
