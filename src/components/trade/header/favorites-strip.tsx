@@ -41,7 +41,7 @@ function FavoriteChip({ name, isActive }: FavoriteChipProps) {
 	const { getMarketInfo } = useMarketsInfo();
 
 	const market = getMarketInfo(name);
-	const displayName = market?.displayName ?? name;
+	const displayName = market?.pairName ?? name;
 	const changePct = get24hChange(market?.prevDayPx, market?.markPx);
 	const szDecimals = market?.szDecimals ?? 4;
 

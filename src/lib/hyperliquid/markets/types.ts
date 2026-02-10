@@ -14,7 +14,7 @@ export type MarketKind = "perp" | "spot" | "builderPerp";
 interface BaseMarket {
 	kind: MarketKind;
 	shortName: string;
-	displayName: string;
+	pairName: string;
 	assetId: number;
 	ctxIndex: number;
 	iconUrl: string | undefined;

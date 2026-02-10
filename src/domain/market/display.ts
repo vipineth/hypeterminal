@@ -10,16 +10,16 @@ function getMarketSeparator(kind: MarketKind): string {
 	return PERP_MARKET_NAME_SEPARATOR;
 }
 
-export function getBaseQuoteFromDisplayName(
-	displayName?: string | null,
+export function getBaseQuoteFromPairName(
+	pairName?: string | null,
 	kind?: MarketKind | null,
 ): { baseToken: string; quoteToken: string } {
-	if (!displayName || !kind) return { baseToken: "", quoteToken: "" };
+	if (!pairName || !kind) return { baseToken: "", quoteToken: "" };
 	const separator = getMarketSeparator(kind);
-	const [baseToken, quoteToken] = displayName.split(separator);
+	const [baseToken, quoteToken] = pairName.split(separator);
 	return { baseToken, quoteToken };
 }
 
-export function getBaseToken(displayName: string, kind: MarketKind): string {
-	return getBaseQuoteFromDisplayName(displayName, kind).baseToken;
+export function getBaseToken(pairName: string, kind: MarketKind): string {
+	return getBaseQuoteFromPairName(pairName, kind).baseToken;
 }

@@ -53,7 +53,7 @@ export type MarketRow = UnifiedMarketInfo;
 const columnHelper = createColumnHelper<MarketRow>();
 
 export const TOKEN_SELECTOR_COLUMNS = [
-	columnHelper.accessor("displayName", {
+	columnHelper.accessor("pairName", {
 		header: t`Market`,
 		size: 160,
 		enableSorting: false,

@@ -23,9 +23,9 @@ function resolveName(
 	variant: "short" | "full" | undefined,
 ): string {
 	if (market) {
-		if (variant === "full") return market.displayName;
+		if (variant === "full") return market.pairName;
 		if (variant === "short") return market.shortName;
-		return market.kind === "spot" ? market.displayName : market.shortName;
+		return market.kind === "spot" ? market.pairName : market.shortName;
 	}
 	if (token) return token.displayName;
 	return coin;

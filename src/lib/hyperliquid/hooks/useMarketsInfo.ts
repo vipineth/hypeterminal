@@ -120,19 +120,19 @@ export function useMarketsInfoInternal(options: UseMarketsInfoOptions = {}) {
 
 	const marketLookup = useMemo(() => {
 		const byName = new Map<string, UnifiedMarketInfo>();
-		const byDisplayName = new Map<string, UnifiedMarketInfo>();
+		const byPairName = new Map<string, UnifiedMarketInfo>();
 
 		for (const market of result.markets) {
 			byName.set(market.name, market);
-			byDisplayName.set(market.displayName, market);
+			byPairName.set(market.pairName, market);
 		}
 
-		return { byName, byDisplayName };
+		return { byName, byPairName };
 	}, [result.markets]);
 
 	const getMarketInfo = useMemo(() => {
 		return (name: string): UnifiedMarketInfo | undefined => {
-			return marketLookup.byName.get(name) ?? marketLookup.byDisplayName.get(name);
+			return marketLookup.byName.get(name) ?? marketLookup.byPairName.get(name);
 		};
 	}, [marketLookup]);
 

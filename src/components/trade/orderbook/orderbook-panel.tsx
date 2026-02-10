@@ -8,7 +8,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getBaseQuoteFromDisplayName, getPercent } from "@/domain/market";
+import { getBaseQuoteFromPairName, getPercent } from "@/domain/market";
 import { formatNumber } from "@/lib/format";
 import { useSelectedMarketInfo, useSubL2Book } from "@/lib/hyperliquid";
 import {
@@ -46,7 +46,7 @@ export function OrderbookPanel() {
 
 	const { baseToken, quoteToken } = useMemo(() => {
 		if (!selectedMarket) return { baseToken: "", quoteToken: "" };
-		return getBaseQuoteFromDisplayName(selectedMarket.displayName, selectedMarket.kind);
+		return getBaseQuoteFromPairName(selectedMarket.pairName, selectedMarket.kind);
 	}, [selectedMarket]);
 
 	const bids = useMemo(

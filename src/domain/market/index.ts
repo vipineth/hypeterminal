@@ -8,7 +8,7 @@ export {
 	isAmountWithinBalance,
 } from "./calculations";
 export {
-	getBaseQuoteFromDisplayName,
+	getBaseQuoteFromPairName,
 	getBaseToken,
 	PERP_MARKET_NAME_SEPARATOR,
 	SPOT_MARKET_NAME_SEPARATOR,

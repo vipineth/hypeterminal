@@ -1870,7 +1870,7 @@ msgstr "ट्रेड"
 msgid "Trade History"
 msgstr "ट्रेड इतिहास"
 
-#. placeholder {0}: spotMarket.displayName
+#. placeholder {0}: spotMarket.pairName
 #: src/components/trade/components/spot-swap-modal.tsx
 msgid "Trade via {0} spot market"
 msgstr ""

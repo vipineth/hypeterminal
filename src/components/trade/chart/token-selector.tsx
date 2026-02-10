@@ -162,7 +162,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 					<div className="flex items-center px-3 py-1.5 text-4xs uppercase tracking-wider text-text-950 border-b border-border-200/40 bg-surface-base/30">
 						<div className="flex-1 min-w-0">{t`Market`}</div>
 						{headerGroup?.headers
-							.filter((h) => h.id !== "displayName")
+							.filter((h) => h.id !== "pairName")
 							.map((header) => {
 								const sortState = header.column.getIsSorted();
 								const hiddenOnMobile = ["oi", "volume", "funding"].includes(header.id);
@@ -263,7 +263,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 												<AssetDisplay coin={market.name} hideName iconClassName="size-5 shrink-0" />
 												<div className="min-w-0">
 													<div className="flex items-center gap-1">
-														<span className="font-semibold text-2xs">{market.displayName}</span>
+														<span className="font-semibold text-2xs">{market.pairName}</span>
 														<Button
 															variant="text"
 															size="none"

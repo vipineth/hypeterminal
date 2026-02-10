@@ -14,7 +14,7 @@ import {
 	UI_TEXT,
 } from "@/config/constants";
 import { ARBITRUM_CHAIN_ID } from "@/config/contracts";
-import { getBaseQuoteFromDisplayName } from "@/domain/market";
+import { getBaseQuoteFromPairName } from "@/domain/market";
 import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { useAssetLeverage } from "@/hooks/trade/use-asset-leverage";
@@ -52,7 +52,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 
 	const { data: market, isLoading: isMarketLoading } = useSelectedMarketInfo();
 	const { baseToken, quoteToken } = market
-		? getBaseQuoteFromDisplayName(market.displayName, market.kind)
+		? getBaseQuoteFromPairName(market.pairName, market.kind)
 		: { baseToken: undefined, quoteToken: undefined };
 
 	const { perpSummary, perpPositions } = useAccountBalances();

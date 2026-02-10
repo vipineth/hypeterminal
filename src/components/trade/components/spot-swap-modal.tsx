@@ -210,7 +210,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 					</DialogTitle>
 					<DialogDescription>
 						{spotMarket ? (
-							<Trans>Trade via {spotMarket.displayName} spot market</Trans>
+							<Trans>Trade via {spotMarket.pairName} spot market</Trans>
 						) : (
 							<Trans>Select tokens to swap</Trans>
 						)}

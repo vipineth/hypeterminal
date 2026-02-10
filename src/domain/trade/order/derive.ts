@@ -1,4 +1,4 @@
-import { getBaseQuoteFromDisplayName } from "@/domain/market";
+import { getBaseQuoteFromPairName } from "@/domain/market";
 import { getAvailableBalanceToken, getSpotBalanceData, type SpotBalanceData } from "@/domain/trade/balances";
 import { getSideLabels, getSizeModeLabel, type SideLabels, type SizeMode } from "@/domain/trade/order/labels";
 import { getMaxSizeForOrderEntry, getOrderValue, getSizeValueFromInput } from "@/domain/trade/order/size";
@@ -57,7 +57,7 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 	const szDecimals = inputs.market?.szDecimals ?? 0;
 
 	const { baseToken, quoteToken } = inputs.market
-		? getBaseQuoteFromDisplayName(inputs.market.displayName, inputs.market.kind)
+		? getBaseQuoteFromPairName(inputs.market.pairName, inputs.market.kind)
 		: { baseToken: "", quoteToken: "" };
 	const spotBalance = getSpotBalanceData(inputs.spotBalances, inputs.market);
 	const availableBalanceToken = getAvailableBalanceToken(inputs.market, inputs.side);
