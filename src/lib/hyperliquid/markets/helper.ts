@@ -22,7 +22,10 @@ export function getSpotDisplayName(baseToken: string, quoteToken: string): strin
 	return `${baseToken}${SPOT_MARKET_NAME_SEPARATOR}${quoteToken}`;
 }
 
+export function getBuilderPerpShortName(name: string): string {
+	return name.includes(BUILDER_DEX_SEPARATOR) ? name.split(BUILDER_DEX_SEPARATOR)[1] : name;
+}
+
 export function getBuilderPerpDisplayName(name: string, quoteTokenName?: string): string {
-	const baseName = name.includes(BUILDER_DEX_SEPARATOR) ? name.split(BUILDER_DEX_SEPARATOR)[1] : name;
-	return `${baseName}-${quoteTokenName ?? DEFAULT_QUOTE_TOKEN}`;
+	return `${getBuilderPerpShortName(name)}-${quoteTokenName ?? DEFAULT_QUOTE_TOKEN}`;
 }

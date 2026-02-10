@@ -43,11 +43,6 @@ export interface UseTokenSelectorReturn {
 	handleKeyDown: (e: React.KeyboardEvent) => void;
 }
 
-function getBaseCoin(market: MarketRow): string {
-	if (market.kind === "spot") return market.displayName.split("/")[0];
-	return market.displayName.split("-")[0] ?? market.displayName;
-}
-
 function getSortValue(market: MarketRow, columnId: string): string {
 	switch (columnId) {
 		case "price":
@@ -143,7 +138,7 @@ export function useTokenSelector({ value, onValueChange }: UseTokenSelectorOptio
 			if (subcategory === "all") return true;
 
 			if (scope === "perp") {
-				return isTokenInCategory(getBaseCoin(market), subcategory as MarketCategory);
+				return isTokenInCategory(market.shortName, subcategory as MarketCategory);
 			}
 
 			if (scope === "spot" && market.kind === "spot") {

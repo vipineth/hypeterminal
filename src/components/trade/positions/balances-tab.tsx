@@ -131,7 +131,7 @@ export function BalancesTab() {
 				className={cn("border-border-200/40 hover:bg-surface-analysis/30", index % 2 === 1 && "bg-surface-analysis")}
 			>
 				<TableCell className="text-xs font-medium py-1.5">
-					<AssetDisplay asset={token ?? { displayName: row.asset, iconUrl: undefined }} />
+					<AssetDisplay coin={row.asset} />
 				</TableCell>
 				<TableCell className="text-xs text-right tabular-nums py-1.5">{formatToken(row.available, decimals)}</TableCell>
 				<TableCell className="text-xs text-right tabular-nums py-1.5">{formatToken(row.total, decimals)}</TableCell>

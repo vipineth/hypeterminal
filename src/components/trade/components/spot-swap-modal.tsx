@@ -94,11 +94,6 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 	const baseToken = spotMarket?.tokensInfo[0]?.name ?? "";
 	const isBuying = spotMarket ? getSwapSide(fromToken, spotMarket) : false;
 
-	const fromTokenInfo = availableFromTokens.find((t) => t.name === fromToken);
-	const toTokenInfo = availableToTokens.find((t) => t.name === toToken);
-	const fromAsset = fromTokenInfo ?? { displayName: fromToken, iconUrl: undefined };
-	const toAsset = toTokenInfo ?? { displayName: toToken, iconUrl: undefined };
-
 	const amountValue = toNumber(amount) ?? 0;
 
 	const { estimatedReceive, orderSize } = useMemo(() => {
@@ -284,8 +279,8 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 						<span className="tabular-nums">
 							{rate > 0 ? (
 								<>
-									1 <AssetDisplay asset={fromAsset} hideIcon /> ≈ {formatToken(rate, 6)}{" "}
-									<AssetDisplay asset={toAsset} hideIcon />
+									1 <AssetDisplay coin={fromToken} hideIcon /> ≈ {formatToken(rate, 6)}{" "}
+									<AssetDisplay coin={toToken} hideIcon />
 								</>
 							) : (
 								"-"
@@ -305,7 +300,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 							<WarningIcon className="size-3.5 text-warning-700 shrink-0 mt-0.5" />
 							<p className="text-xs text-warning-700">
 								<Trans>
-									Insufficient <AssetDisplay asset={fromAsset} hideIcon /> balance
+									Insufficient <AssetDisplay coin={fromToken} hideIcon /> balance
 								</Trans>
 							</p>
 						</div>
@@ -316,8 +311,8 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 							<WarningIcon className="size-3.5 text-warning-700 shrink-0 mt-0.5" />
 							<p className="text-xs text-warning-700">
 								<Trans>
-									No trading pair available for <AssetDisplay asset={fromAsset} hideIcon />/
-									<AssetDisplay asset={toAsset} hideIcon />
+									No trading pair available for <AssetDisplay coin={fromToken} hideIcon />/
+									<AssetDisplay coin={toToken} hideIcon />
 								</Trans>
 							</p>
 						</div>
@@ -337,8 +332,8 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 								<Trans>Swap submitted</Trans>
 							</div>
 							<div className="text-sm font-medium tabular-nums">
-								{amount} <AssetDisplay asset={fromAsset} hideIcon /> → ~{formatToken(estimatedReceive, 6)}{" "}
-								<AssetDisplay asset={toAsset} hideIcon />
+								{amount} <AssetDisplay coin={fromToken} hideIcon /> → ~{formatToken(estimatedReceive, 6)}{" "}
+								<AssetDisplay coin={toToken} hideIcon />
 							</div>
 						</div>
 					)}

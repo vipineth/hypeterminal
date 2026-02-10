@@ -1368,8 +1368,8 @@ msgid "Scale levels must be {SCALE_LEVELS_MIN}-{SCALE_LEVELS_MAX}"
 msgstr "Scale levels must be {SCALE_LEVELS_MIN}-{SCALE_LEVELS_MAX}"
 
 #: src/components/trade/footer/footer-bar.tsx
-msgid "Search"
-msgstr "Search"
+#~ msgid "Search"
+#~ msgstr "Search"
 
 #: src/components/trade/chart/token-selector.tsx
 msgid "Search markets..."
@@ -1706,9 +1706,9 @@ msgstr "Swap submitted"
 msgid "Swapping..."
 msgstr "Swapping..."
 
-#. placeholder {0}: assetInfo.displayName
-#. placeholder {0}: markets.getMarket(fill.coin)?.displayName ?? fill.coin
-#. placeholder {0}: markets.getMarket(state.coin)?.displayName ?? state.coin
+#. placeholder {0}: fill.coin
+#. placeholder {0}: order.coin
+#. placeholder {0}: state.coin
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx

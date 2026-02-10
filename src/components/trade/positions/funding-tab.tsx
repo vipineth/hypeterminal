@@ -9,6 +9,7 @@ import { formatDateTimeShort, formatPercent, formatToken, formatUSD } from "@/li
 import { useMarkets } from "@/lib/hyperliquid";
 import { useSubUserFundings } from "@/lib/hyperliquid/hooks/subscription";
 import { getValueColorClass, toNumber, toNumberOrZero } from "@/lib/trade/numbers";
+import { AssetDisplay } from "../components/asset-display";
 
 interface PlaceholderProps {
 	children: React.ReactNode;
@@ -94,10 +95,10 @@ export function FundingTab() {
 							</TableHeader>
 							<TableBody>
 								{updates.map((update, index) => {
+									const market = markets.getMarket(update.coin);
 									const szi = toNumber(update.szi);
 									const rate = toNumber(update.fundingRate);
 									const usdc = toNumber(update.usdc);
-									const szDecimals = markets.getSzDecimals(update.coin);
 									const positionSize = szi !== null ? Math.abs(szi) : null;
 
 									return (
@@ -109,12 +110,10 @@ export function FundingTab() {
 											)}
 										>
 											<TableCell className="text-xs font-medium py-1.5">
-												<div className="flex items-center gap-1.5">
-													<span>{markets.getMarket(update.coin)?.displayName ?? update.coin}</span>
-												</div>
+												<AssetDisplay coin={update.coin} />
 											</TableCell>
 											<TableCell className="text-xs text-right tabular-nums py-1.5">
-												{formatToken(positionSize, { decimals: szDecimals, symbol: update.coin })}
+												{formatToken(positionSize, { decimals: market?.szDecimals, symbol: market?.shortName })}
 											</TableCell>
 											<TableCell className="text-xs text-right tabular-nums py-1.5">
 												<span className={getValueColorClass(rate)}>

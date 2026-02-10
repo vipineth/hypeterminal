@@ -1,11 +1,5 @@
 import { t } from "@lingui/core/macro";
-import {
-	GithubLogoIcon,
-	MagnifyingGlassIcon,
-	SpinnerGapIcon,
-	WifiHighIcon,
-	WifiSlashIcon,
-} from "@phosphor-icons/react";
+import { GithubLogoIcon, SpinnerGapIcon, WifiHighIcon, WifiSlashIcon } from "@phosphor-icons/react";
 import { ClientOnly } from "@tanstack/react-router";
 import { APP_VERSION, GITHUB_URL } from "@/config/constants";
 import { formatTime } from "@/lib/format";
@@ -59,8 +53,6 @@ export function FooterBar() {
 				onClick={open}
 				className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 text-text-500 hover:text-text-950 transition-colors"
 			>
-				<MagnifyingGlassIcon className="size-3" />
-				<span className="normal-case tracking-normal text-4xs">{t`Search`}</span>
 				<kbd className="ml-0.5 rounded-xs border border-border-200 bg-surface-analysis px-1 py-px text-4xs text-text-600">
 					{"\u2318K"}
 				</kbd>

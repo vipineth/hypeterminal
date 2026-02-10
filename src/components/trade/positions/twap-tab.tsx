@@ -14,6 +14,7 @@ import { useMarkets } from "@/lib/hyperliquid";
 import { useSubTwapStates } from "@/lib/hyperliquid/hooks/subscription";
 import { toBig } from "@/lib/trade/numbers";
 import { useMarketActions } from "@/stores/use-market-store";
+import { AssetDisplay } from "../components/asset-display";
 
 interface PlaceholderProps {
 	children: React.ReactNode;
@@ -130,9 +131,10 @@ export function TwapTab() {
 														variant="text"
 														size="none"
 														onClick={() => setSelectedMarket(state.coin)}
-														aria-label={t`Switch to ${markets.getMarket(state.coin)?.displayName ?? state.coin} market`}
+														className="gap-1.5"
+														aria-label={t`Switch to ${state.coin} market`}
 													>
-														{markets.getMarket(state.coin)?.displayName ?? state.coin}
+														<AssetDisplay coin={state.coin} />
 													</Button>
 												</div>
 											</TableCell>

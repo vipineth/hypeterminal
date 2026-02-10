@@ -12,6 +12,7 @@ import { useMarkets } from "@/lib/hyperliquid";
 import { useSubUserFills } from "@/lib/hyperliquid/hooks/subscription";
 import { getValueColorClass, toNumber } from "@/lib/trade/numbers";
 import { useMarketActions } from "@/stores/use-market-store";
+import { AssetDisplay } from "../components/asset-display";
 
 interface PlaceholderProps {
 	children: React.ReactNode;
@@ -110,16 +111,15 @@ export function HistoryTab() {
 											)}
 										>
 											<TableCell className="text-xs font-medium py-1.5">
-												<div className="flex items-center gap-1.5">
-													<Button
-														variant="text"
-														size="none"
-														onClick={() => setSelectedMarket(fill.coin)}
-														aria-label={t`Switch to ${markets.getMarket(fill.coin)?.displayName ?? fill.coin} market`}
-													>
-														{markets.getMarket(fill.coin)?.displayName ?? fill.coin}
-													</Button>
-												</div>
+												<Button
+													variant="text"
+													size="none"
+													onClick={() => setSelectedMarket(fill.coin)}
+													className="gap-1.5"
+													aria-label={t`Switch to ${fill.coin} market`}
+												>
+													<AssetDisplay coin={fill.coin} />
+												</Button>
 											</TableCell>
 											<TableCell className="text-xs py-1.5">
 												<span

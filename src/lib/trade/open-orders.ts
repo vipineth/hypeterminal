@@ -1,14 +1,15 @@
 import type { FrontendOpenOrdersResponse } from "@nktkas/hyperliquid";
+import type { MarketKind } from "@/lib/hyperliquid/markets/types";
 import { toBig } from "@/lib/trade/numbers";
 
 export type OpenOrder = FrontendOpenOrdersResponse[number];
 
 export type OrderSide = OpenOrder["side"];
 
-export const ORDER_SIDE_CONFIG = {
-	B: { label: "long", class: "bg-market-up-100 text-market-up-600" },
-	A: { label: "short", class: "bg-market-down-100 text-market-down-600" },
-} as const satisfies Record<OrderSide, { label: string; class: string }>;
+const SIDE_CLASS = {
+	B: "bg-market-up-100 text-market-up-600",
+	A: "bg-market-down-100 text-market-down-600",
+} as const satisfies Record<OrderSide, string>;
 
 export const ORDER_TYPE_CONFIG = {
 	takeProfit: { prefix: "Take Profit", class: "bg-market-up-100 text-market-up-600" },
@@ -49,8 +50,13 @@ export function getOrderValue(order: OpenOrder): number | null {
 	return limitPx.times(origSz).toNumber();
 }
 
-export function getSideConfig(order: OpenOrder) {
-	return ORDER_SIDE_CONFIG[order.side];
+export function getSideLabel(side: OrderSide, kind?: MarketKind): string {
+	if (kind === "spot") return side === "B" ? "buy" : "sell";
+	return side === "B" ? "long" : "short";
+}
+
+export function getSideClass(side: OrderSide): string {
+	return SIDE_CLASS[side];
 }
 
 export function getOrderTypeConfig(order: OpenOrder) {

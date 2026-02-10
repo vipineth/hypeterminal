@@ -88,7 +88,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 					aria-label={t`Select token`}
 					className="gap-2 px-2 py-1.5 bg-surface-execution border border-border-200/40 rounded-sm text-2xs font-bold uppercase tracking-wider hover:bg-surface-execution"
 				>
-					{selectedMarket && <AssetDisplay asset={selectedMarket} iconClassName="size-4 shrink-0" />}
+					{selectedMarket && <AssetDisplay coin={selectedMarket.name} variant="full" iconClassName="size-4 shrink-0" />}
 					<CaretDownIcon className="size-4 text-text-600" />
 				</Button>
 			</PopoverTrigger>
@@ -260,7 +260,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 											}}
 										>
 											<div className="flex-1 min-w-0 flex items-center gap-2">
-												<AssetDisplay asset={market} hideName iconClassName="size-5 shrink-0" />
+												<AssetDisplay coin={market.name} hideName iconClassName="size-5 shrink-0" />
 												<div className="min-w-0">
 													<div className="flex items-center gap-1">
 														<span className="font-semibold text-2xs">{market.displayName}</span>
@@ -281,7 +281,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 																)}
 															/>
 														</Button>
-														{isTokenInCategory(market.displayName, "new") && (
+														{isTokenInCategory(market.shortName, "new") && (
 															<Badge variant="neutral" size="xs" className="px-1 py-0 text-4xs">
 																{t`NEW`}
 															</Badge>

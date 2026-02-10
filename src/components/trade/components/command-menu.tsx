@@ -80,7 +80,7 @@ export function CommandMenu() {
 						onSelect={() => handleSelect(market)}
 						className="flex items-center justify-between"
 					>
-						<AssetDisplay asset={{ displayName: market.displayName, iconUrl: market.iconUrl }} iconClassName="size-5" />
+						<AssetDisplay coin={market.name} iconClassName="size-5" />
 						<div className="ml-auto flex items-center gap-2">
 							<span className="text-text-600 text-2xs">
 								{formatPrice(market.markPx, { szDecimals: market.szDecimals })}

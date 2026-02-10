@@ -13,6 +13,7 @@ export type MarketKind = "perp" | "spot" | "builderPerp";
 
 interface BaseMarket {
 	kind: MarketKind;
+	shortName: string;
 	displayName: string;
 	assetId: number;
 	ctxIndex: number;
@@ -48,6 +49,7 @@ export interface Markets {
 	readonly error: Error | null;
 
 	getMarket(coin: string): UnifiedMarket | undefined;
+	getToken(name: string): SpotToken | undefined;
 	getSzDecimals(coin: string): number;
 	getAssetId(coin: string): number | undefined;
 }

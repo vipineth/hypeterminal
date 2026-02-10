@@ -18,8 +18,6 @@ import { TpSlSection } from "../tradebox/tp-sl-section";
 
 interface PositionData {
 	coin: string;
-	displayName: string;
-	iconUrl: string | undefined;
 	assetId: number;
 	isLong: boolean;
 	size: number;
@@ -118,7 +116,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 			<DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden">
 				<DialogHeader className="px-5 pt-5 pb-3">
 					<DialogTitle className="flex items-center gap-1">
-						<AssetDisplay asset={position} />
+						<AssetDisplay coin={position.coin} />
 						<Badge variant={position.isLong ? "long" : "short"} size="sm">
 							{position.isLong ? (
 								<>

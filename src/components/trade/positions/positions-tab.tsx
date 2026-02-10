@@ -44,8 +44,6 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 
 interface TpSlPositionData {
 	coin: string;
-	displayName: string;
-	iconUrl: string | undefined;
 	assetId: number;
 	isLong: boolean;
 	size: number;
@@ -100,7 +98,6 @@ function PositionRow({
 	const szDecimals = market?.szDecimals ?? 4;
 	const markPx = toBig(markPxRaw)?.toNumber() ?? Number.NaN;
 	const displayName = market?.displayName ?? p.coin;
-	const assetInfo = market ?? { displayName: p.coin, iconUrl: undefined };
 
 	const unrealizedPnl = toBig(p.unrealizedPnl)?.toNumber() ?? Number.NaN;
 	const cumFunding = toBig(p.cumFunding.sinceOpen)?.toNumber() ?? Number.NaN;
@@ -119,8 +116,6 @@ function PositionRow({
 		if (typeof assetId !== "number") return;
 		onOpenTpSl({
 			coin: p.coin,
-			displayName,
-			iconUrl: assetInfo.iconUrl,
 			assetId,
 			isLong,
 			size: absSize,
@@ -151,11 +146,11 @@ function PositionRow({
 					className="gap-1.5"
 					aria-label={t`Switch to ${displayName} market`}
 				>
-					<AssetDisplay asset={assetInfo} nameClassName="flex flex-col" hideName />
-					<div className="flex flex-col items-start">
-						<span className="text-xs">{displayName}</span>
-						<span className="text-5xs text-text-600 uppercase">{isLong ? t`Long` : t`Short`}</span>
-					</div>
+					<AssetDisplay
+						coin={p.coin}
+						nameClassName="text-xs"
+						subtitle={<span className="text-5xs text-text-600 uppercase">{isLong ? t`Long` : t`Short`}</span>}
+					/>
 				</Button>
 			</TableCell>
 			<TableCell className="text-xs text-right tabular-nums py-1.5">
