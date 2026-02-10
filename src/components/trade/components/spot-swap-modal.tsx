@@ -15,7 +15,7 @@ import { cn } from "@/lib/cn";
 import { formatToken } from "@/lib/format";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { useMarketsInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
-import { toNumber } from "@/lib/trade/numbers";
+import { toNumber, toNumberOrZero } from "@/lib/trade/numbers";
 import {
 	useSwapModalActions,
 	useSwapModalFromToken,
@@ -89,7 +89,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 		return findSpotPair(fromToken, toToken, spotMarkets);
 	}, [fromToken, toToken, spotMarkets]);
 
-	const markPx = spotMarket?.markPx ?? 0;
+	const markPx = toNumberOrZero(spotMarket?.markPx);
 	const szDecimals = spotMarket?.szDecimals ?? 2;
 	const baseToken = spotMarket?.tokensInfo[0]?.name ?? "";
 	const isBuying = spotMarket ? getSwapSide(fromToken, spotMarket) : false;

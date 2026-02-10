@@ -1,28 +1,62 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { BellIcon, DownloadSimpleIcon, GearIcon, TerminalIcon } from "@phosphor-icons/react";
+import { Link } from "@tanstack/react-router";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
+import { useExchangeScope } from "@/providers/exchange-scope";
 import { useDepositModalActions, useSettingsDialogActions } from "@/stores/use-global-modal-store";
 import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
 
-const NAV_ITEMS = [
-	{ key: "trade", label: <Trans>Trade</Trans>, active: true },
-	{ key: "vaults", label: <Trans>Vaults</Trans>, active: false },
-	{ key: "portfolio", label: <Trans>Portfolio</Trans>, active: false },
-	{ key: "staking", label: <Trans>Staking</Trans>, active: false },
-	{ key: "leaderboard", label: <Trans>Leaderboard</Trans>, active: false },
+const SCOPE_NAV_ITEMS = [
+	{ scope: "all" as const, label: <Trans>All</Trans>, to: "/", activeClass: "text-text-950 font-medium" },
+	{ scope: "perp" as const, label: <Trans>Perp</Trans>, to: "/perp", activeClass: "text-scope-perp font-medium" },
+	{ scope: "spot" as const, label: <Trans>Spot</Trans>, to: "/spot", activeClass: "text-scope-spot font-medium" },
+	{
+		scope: "builders-perp" as const,
+		label: <Trans>Builders</Trans>,
+		to: "/builders-perp",
+		activeClass: "text-scope-builders font-medium",
+	},
 ] as const;
+
+const STATIC_NAV_ITEMS = [
+	{ key: "vaults", label: <Trans>Vaults</Trans> },
+	{ key: "portfolio", label: <Trans>Portfolio</Trans> },
+	{ key: "staking", label: <Trans>Staking</Trans> },
+	{ key: "leaderboard", label: <Trans>Leaderboard</Trans> },
+] as const;
+
+function getScopeAccentClass(scope: string): string {
+	switch (scope) {
+		case "perp":
+			return "border-scope-perp/40";
+		case "spot":
+			return "border-scope-spot/40";
+		case "builders-perp":
+			return "border-scope-builders/40";
+		default:
+			return "border-border-100";
+	}
+}
 
 export function TopNav() {
 	const { open: openDepositModal } = useDepositModalActions();
 	const { open: openSettingsDialog } = useSettingsDialogActions();
 	const { isConnected } = useConnection();
+	const { scope } = useExchangeScope();
+
+	const accentClass = getScopeAccentClass(scope);
 
 	return (
-		<header className="fixed top-0 left-0 right-0 z-40 h-11 border-b border-border-100 px-3 flex items-center justify-between bg-surface-execution">
+		<header
+			className={cn(
+				"fixed top-0 left-0 right-0 z-40 h-11 border-b px-3 flex items-center justify-between bg-surface-execution transition-colors",
+				accentClass,
+			)}
+		>
 			<div className="flex items-center gap-3 min-w-0">
 				<div className="flex items-center gap-1.5">
 					<div className="size-5 rounded bg-primary-default/10 border border-primary-default/30 flex items-center justify-center">
@@ -35,15 +69,26 @@ export function TopNav() {
 				</div>
 				<div className="h-4 w-px bg-border-200 hidden md:block" />
 				<nav className="hidden lg:flex items-center text-nav tracking-wide">
-					{NAV_ITEMS.map((item) => (
+					{SCOPE_NAV_ITEMS.map((item) => (
+						<Link
+							key={item.scope}
+							to={item.to}
+							className={cn(
+								"px-2.5 py-1.5 transition-colors",
+								scope === item.scope ? item.activeClass : "text-text-950 hover:text-text-600",
+							)}
+						>
+							{item.label}
+						</Link>
+					))}
+					<div className="h-4 w-px bg-border-200 mx-1" />
+					{STATIC_NAV_ITEMS.map((item) => (
 						<button
 							key={item.key}
 							type="button"
-							className={cn(
-								"px-2.5 py-1.5 transition-colors",
-								item.active ? "text-primary-default font-medium" : "text-text-950 hover:text-primary-default",
-							)}
-							tabIndex={0}
+							disabled
+							className="px-2.5 py-1.5 text-text-950/40 cursor-not-allowed"
+							tabIndex={-1}
 						>
 							{item.label}
 						</button>

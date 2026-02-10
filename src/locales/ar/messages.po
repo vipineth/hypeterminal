@@ -96,6 +96,10 @@ msgstr ""
 #~ msgid "Agent verification failed"
 #~ msgstr ""
 
+#: src/components/trade/header/top-nav.tsx
+msgid "All"
+msgstr ""
+
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "All cross positions share the same cross margin as collateral. In the event of liquidation, your cross margin balance and any remaining open positions under assets in this mode may be forfeited."
 msgstr ""
@@ -199,6 +203,10 @@ msgstr ""
 #: src/components/pages/builder-page.tsx
 #~ msgid "Builder must have at least 100 USDC in perps account value"
 #~ msgstr ""
+
+#: src/components/trade/header/top-nav.tsx
+msgid "Builders"
+msgstr ""
 
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -1222,6 +1230,7 @@ msgstr "قيد الانتظار"
 #~ msgid "perp"
 #~ msgstr "دائم"
 
+#: src/components/trade/header/top-nav.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
 msgid "Perp"
@@ -1611,6 +1620,7 @@ msgstr "مرتب حسب {0}"
 #~ msgid "spot"
 #~ msgstr "فوري"
 
+#: src/components/trade/header/top-nav.tsx
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
@@ -1859,8 +1869,8 @@ msgid "TP/SL"
 msgstr "TP/SL"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Trade"
-msgstr "تداول"
+#~ msgid "Trade"
+#~ msgstr "تداول"
 
 #: src/components/trade/positions/history-tab.tsx
 #~ msgid "Trade ClockCounterClockwise"

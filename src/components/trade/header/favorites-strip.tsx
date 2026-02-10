@@ -37,6 +37,7 @@ interface FavoriteChipProps {
 }
 
 function FavoriteChip({ name, isActive }: FavoriteChipProps) {
+	console.log("name", name);
 	const { setSelectedMarket, toggleFavoriteMarket } = useMarketActions();
 	const { getMarketInfo } = useMarketsInfo();
 

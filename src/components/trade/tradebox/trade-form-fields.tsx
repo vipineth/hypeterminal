@@ -20,7 +20,14 @@ import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatToken, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
-import { formatDecimalFloor, getValueColorClass, isPositive, toFixed, toNumber } from "@/lib/trade/numbers";
+import {
+	formatDecimalFloor,
+	getValueColorClass,
+	isPositive,
+	toFixed,
+	toNumber,
+	toNumberOrZero,
+} from "@/lib/trade/numbers";
 import {
 	canUseTpSl as canUseTpSlForOrder,
 	isScaleOrderType,
@@ -99,7 +106,7 @@ export function TradeFormFields({
 	const tpPriceInput = useTpPrice();
 	const slPriceInput = useSlPrice();
 
-	const markPx = market?.markPx ?? 0;
+	const markPx = toNumberOrZero(market?.markPx);
 
 	const {
 		isSpotMarket,

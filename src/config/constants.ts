@@ -95,6 +95,25 @@ export const ROUTE_SEO = {
 		path: "/",
 		keywords: ["trade", "orderbook", "chart", "perpetuals", "spot"],
 	},
+	PERP: {
+		title: "Perpetuals Trading",
+		description:
+			"Trade perpetual futures on Hyperliquid DEX with up to 50x leverage, real-time charts, and advanced order types.",
+		path: "/perp",
+		keywords: ["perpetuals", "futures", "leverage", "trading"],
+	},
+	SPOT: {
+		title: "Spot Trading",
+		description: "Trade spot markets on Hyperliquid DEX with real-time orderbook, charts, and instant execution.",
+		path: "/spot",
+		keywords: ["spot", "trading", "exchange"],
+	},
+	BUILDERS_PERP: {
+		title: "Builder Perpetuals",
+		description: "Trade builder-deployed perpetual markets (HIP-3) on Hyperliquid DEX.",
+		path: "/builders-perp",
+		keywords: ["builders", "hip-3", "perpetuals", "community"],
+	},
 	COMPONENTS: {
 		title: "Components",
 		description:

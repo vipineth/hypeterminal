@@ -81,7 +81,7 @@ export function TradePanel() {
 	const slippageBps = useMarketOrderSlippageBps();
 	const slippagePercent = useMarketOrderSlippagePercent();
 	const side = useOrderSide();
-	const markPx = market?.markPx ?? 0;
+	const markPx = toNumberOrZero(market?.markPx);
 	const sizeMode = useSizeMode();
 	const sizeInput = useOrderSize();
 

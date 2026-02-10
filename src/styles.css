@@ -149,6 +149,11 @@
   /* Highlight */
   --highlight: #F7931A;
 
+  /* Scope Accents */
+  --scope-perp: #2563EB;
+  --scope-spot: #0F766E;
+  --scope-builders: #B45309;
+
   /* Structural */
   --sel: rgba(37, 99, 235, 0.15);
 }
@@ -220,6 +225,11 @@
 
   /* Highlight */
   --highlight: #F7931A;
+
+  /* Scope Accents */
+  --scope-perp: #4F7DFF;
+  --scope-spot: #2DD4BF;
+  --scope-builders: #F59E0B;
 
   /* Structural */
   --sel: rgba(79, 125, 255, 0.15);
@@ -296,6 +306,11 @@
 
   /* Highlight */
   --color-highlight: var(--highlight);
+
+  /* Scope Accents */
+  --color-scope-perp: var(--scope-perp);
+  --color-scope-spot: var(--scope-spot);
+  --color-scope-builders: var(--scope-builders);
 
   /* Structural */
   --color-sel: var(--sel);

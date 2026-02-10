@@ -96,6 +96,10 @@ msgstr "Advanced order types"
 #~ msgid "Agent verification failed"
 #~ msgstr "Agent verification failed"
 
+#: src/components/trade/header/top-nav.tsx
+msgid "All"
+msgstr "All"
+
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 msgid "All cross positions share the same cross margin as collateral. In the event of liquidation, your cross margin balance and any remaining open positions under assets in this mode may be forfeited."
 msgstr "All cross positions share the same cross margin as collateral. In the event of liquidation, your cross margin balance and any remaining open positions under assets in this mode may be forfeited."
@@ -199,6 +203,10 @@ msgstr "Builder Fee"
 #: src/components/pages/builder-page.tsx
 #~ msgid "Builder must have at least 100 USDC in perps account value"
 #~ msgstr "Builder must have at least 100 USDC in perps account value"
+
+#: src/components/trade/header/top-nav.tsx
+msgid "Builders"
+msgstr "Builders"
 
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -1226,6 +1234,7 @@ msgstr "pending"
 #~ msgid "perp"
 #~ msgstr "perp"
 
+#: src/components/trade/header/top-nav.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
 msgid "Perp"
@@ -1615,6 +1624,7 @@ msgstr "Sorted by {0}"
 #~ msgid "spot"
 #~ msgstr "spot"
 
+#: src/components/trade/header/top-nav.tsx
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
 #: src/components/trade/positions/transfer-dialog.tsx
@@ -1863,8 +1873,8 @@ msgid "TP/SL"
 msgstr "TP/SL"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Trade"
-msgstr "Trade"
+#~ msgid "Trade"
+#~ msgstr "Trade"
 
 #: src/components/trade/positions/history-tab.tsx
 #~ msgid "Trade ClockCounterClockwise"

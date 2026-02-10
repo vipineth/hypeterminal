@@ -13,6 +13,7 @@ export {
 	PERP_MARKET_NAME_SEPARATOR,
 	SPOT_MARKET_NAME_SEPARATOR,
 } from "./display";
+export { DEFAULT_SELECTED_MARKETS, EXCHANGE_SCOPES, type ExchangeScope } from "./scope";
 export {
 	getIconUrlFromMarketName,
 	getIconUrlFromPair,

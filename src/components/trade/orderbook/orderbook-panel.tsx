@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getBaseQuoteFromDisplayName, getPercent } from "@/domain/market";
 import { formatNumber } from "@/lib/format";
 import { useSelectedMarketInfo, useSubL2Book } from "@/lib/hyperliquid";
+import { toNumber } from "@/lib/trade/numbers";
 import {
 	getMaxTotal,
 	getPriceGroupingOptions,
@@ -67,7 +68,8 @@ export function OrderbookPanel() {
 	const maxTotal = useMemo(() => getMaxTotal(bids, asks), [asks, bids]);
 	const spread = deferredOrderbook?.spread;
 	const spreadPct = getPercent(spread, selectedMarket?.markPx);
-	const priceGroupingOptions = useMemo(() => getPriceGroupingOptions(selectedMarket?.markPx), [selectedMarket?.markPx]);
+	const markPx = toNumber(selectedMarket?.markPx);
+	const priceGroupingOptions = useMemo(() => getPriceGroupingOptions(markPx ?? undefined), [markPx]);
 
 	const szDecimals = selectedMarket?.szDecimals ?? 4;
 

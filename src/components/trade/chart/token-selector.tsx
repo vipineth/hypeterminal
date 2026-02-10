@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { isTokenInCategory } from "@/domain/market";
+import { get24hChange, getOiUsd, isTokenInCategory } from "@/domain/market";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatUSD } from "@/lib/format";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid";
@@ -54,6 +54,8 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 		open,
 		setOpen,
 		scope,
+		exchangeScope,
+		exchangeDex,
 		subcategory,
 		subcategories,
 		search,
@@ -111,54 +113,58 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 						</div>
 					</div>
 
-					<div className="py-2 border-b border-border-200/40 bg-surface-base/50">
-						<div className="flex items-center gap-0.5 flex-wrap">
-							{marketScopes.map((s) => {
-								const isSelected = scope === s.value;
-								return (
-									<Button
-										key={s.value}
-										variant="text"
-										size="none"
-										onClick={() => handleScopeSelect(s.value)}
-										className={cn(
-											"px-2 py-1 text-3xs uppercase tracking-wider cursor-pointer",
-											isSelected
-												? "bg-warning-700/10 text-warning-700 hover:bg-warning-700/10 hover:text-warning-700"
-												: "text-text-950 hover:bg-transparent",
-										)}
-									>
-										{s.label}
-									</Button>
-								);
-							})}
+					{(exchangeScope === "all" || (!exchangeDex && subcategories.length > 0)) && (
+						<div className="py-2 border-b border-border-200/40 bg-surface-base/50">
+							{exchangeScope === "all" && (
+								<div className="flex items-center gap-0.5 flex-wrap">
+									{marketScopes.map((s) => {
+										const isSelected = scope === s.value;
+										return (
+											<Button
+												key={s.value}
+												variant="text"
+												size="none"
+												onClick={() => handleScopeSelect(s.value)}
+												className={cn(
+													"px-2 py-1 text-3xs uppercase tracking-wider cursor-pointer",
+													isSelected
+														? "bg-warning-700/10 text-warning-700 hover:bg-warning-700/10 hover:text-warning-700"
+														: "text-text-950 hover:bg-transparent",
+												)}
+											>
+												{s.label}
+											</Button>
+										);
+									})}
+								</div>
+							)}
+							{!exchangeDex && subcategories.length > 0 && (
+								<div className="flex items-center gap-0.5 flex-wrap mt-1.5 pt-1.5 pl-2 ml-1">
+									{subcategories.map((sub) => {
+										const isSelected = subcategory === sub.value;
+										return (
+											<Button
+												key={sub.value}
+												variant="text"
+												size="none"
+												onClick={() => handleSubcategorySelect(sub.value)}
+												className={cn(
+													"px-2 py-0.5 text-4xs tracking-wider cursor-pointer",
+													isSelected
+														? "bg-primary-default/10 text-primary-default hover:bg-primary-default/10 hover:text-primary-default"
+														: "text-text-950 hover:bg-transparent hover:text-text-950",
+												)}
+												aria-label={t`Filter by ${sub.label}`}
+												aria-pressed={isSelected}
+											>
+												{sub.label}
+											</Button>
+										);
+									})}
+								</div>
+							)}
 						</div>
-						{subcategories.length > 0 && (
-							<div className="flex items-center gap-0.5 flex-wrap mt-1.5 pt-1.5 pl-2 ml-1">
-								{subcategories.map((sub) => {
-									const isSelected = subcategory === sub.value;
-									return (
-										<Button
-											key={sub.value}
-											variant="text"
-											size="none"
-											onClick={() => handleSubcategorySelect(sub.value)}
-											className={cn(
-												"px-2 py-0.5 text-4xs tracking-wider cursor-pointer",
-												isSelected
-													? "bg-primary-default/10 text-primary-default hover:bg-primary-default/10 hover:text-primary-default"
-													: "text-text-950 hover:bg-transparent hover:text-text-950",
-											)}
-											aria-label={t`Filter by ${sub.label}`}
-											aria-pressed={isSelected}
-										>
-											{sub.label}
-										</Button>
-									);
-								})}
-							</div>
-						)}
-					</div>
+					)}
 					<div className="flex items-center px-3 py-1.5 text-4xs uppercase tracking-wider text-text-950 border-b border-border-200/40 bg-surface-base/30">
 						<div className="flex-1 min-w-0">{t`Market`}</div>
 						{headerGroup?.headers
@@ -219,20 +225,18 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 									const isHighlighted = highlightedIndex >= 0 && virtualItem.index === highlightedIndex;
 									const isFav = isFavorite(market.name);
 
-									const { markPx, prevDayPx } = market;
-									const changeDecimal =
-										markPx && prevDayPx && prevDayPx !== 0 ? (markPx - prevDayPx) / prevDayPx : null;
+									const changePercent = get24hChange(market.prevDayPx, market.markPx);
 
 									const changeClass = cn(
 										"text-2xs font-medium tabular-nums",
-										changeDecimal === null ? "text-text-600" : getValueColorClass(changeDecimal),
+										changePercent === null ? "text-text-600" : getValueColorClass(changePercent),
 									);
-									const changeText = formatPercent(changeDecimal);
+									const changeText = formatPercent(changePercent !== null ? changePercent / 100 : null);
 
 									const isSpot = market.kind === "spot";
 									const isHip3 = market.kind === "builderPerp";
 
-									const oiValue = market.openInterest && market.markPx ? market.openInterest * market.markPx : null;
+									const oiValue = getOiUsd(market.openInterest, market.markPx);
 
 									return (
 										<div
