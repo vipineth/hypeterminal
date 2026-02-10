@@ -282,13 +282,13 @@ ${staticCss}
 
 	--tv-color-toolbar-button-background-hover: ${hoverBg};
 	--tv-color-toolbar-button-background-expanded: ${colorToRgba(colors.foreground, 0.08)};
-	--tv-color-toolbar-button-background-active: ${activeBg};
-	--tv-color-toolbar-button-background-active-hover: ${colorToRgba(colors.foreground, 0.12)};
+	--tv-color-toolbar-button-background-active: ${accentSoft};
+	--tv-color-toolbar-button-background-active-hover: ${colorToRgba(colors.accent, 0.4)};
 	--tv-color-toolbar-button-background-clicked: ${activeBg};
 	--tv-color-toolbar-button-text: ${textSecondary};
 	--tv-color-toolbar-button-text-hover: ${fg};
-	--tv-color-toolbar-button-text-active: ${fg};
-	--tv-color-toolbar-button-text-active-hover: ${fg};
+	--tv-color-toolbar-button-text-active: ${accent};
+	--tv-color-toolbar-button-text-active-hover: ${accent};
 	--tv-color-toolbar-button-text-clicked: ${fg};
 
 	--tv-color-item-active-text: ${accent};
