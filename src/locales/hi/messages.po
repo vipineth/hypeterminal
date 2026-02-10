@@ -1491,24 +1491,24 @@ msgid "Short"
 msgstr "शॉर्ट"
 
 #: src/components/trade/components/global-settings-dialog.tsx
-msgid "Show Executions"
-msgstr ""
+#~ msgid "Show Executions"
+#~ msgstr ""
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #~ msgid "Show Executions on Chart"
 #~ msgstr "चार्ट पर निष्पादन दिखाएं"
 
 #: src/components/trade/components/global-settings-dialog.tsx
-msgid "Show Orders"
-msgstr ""
+#~ msgid "Show Orders"
+#~ msgstr ""
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #~ msgid "Show Orders on Chart"
 #~ msgstr "चार्ट पर ऑर्डर दिखाएं"
 
 #: src/components/trade/components/global-settings-dialog.tsx
-msgid "Show Positions"
-msgstr ""
+#~ msgid "Show Positions"
+#~ msgstr ""
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #~ msgid "Show Positions on Chart"

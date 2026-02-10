@@ -27,23 +27,9 @@ export function GlobalSettingsDialog() {
 	const { close } = useSettingsDialogActions();
 	const { i18n } = useLingui();
 	const slippagePercent = useMarketOrderSlippagePercent();
-	const {
-		showOrdersOnChart,
-		showPositionsOnChart,
-		showExecutionsOnChart,
-		showOrderbookInQuote,
-		showChartScanlines,
-		numberFormatLocale,
-	} = useGlobalSettings();
-	const {
-		setShowOrdersOnChart,
-		setShowPositionsOnChart,
-		setShowExecutionsOnChart,
-		setShowOrderbookInQuote,
-		setShowChartScanlines,
-		setNumberFormatLocale,
-		setMarketOrderSlippagePercent,
-	} = useGlobalSettingsActions();
+	const { showOrderbookInQuote, showChartScanlines, numberFormatLocale } = useGlobalSettings();
+	const { setShowOrderbookInQuote, setShowChartScanlines, setNumberFormatLocale, setMarketOrderSlippagePercent } =
+		useGlobalSettingsActions();
 
 	const [localSlippageInput, setLocalSlippageInput] = useState<string | null>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -72,9 +58,6 @@ export function GlobalSettingsDialog() {
 		}
 	}
 
-	const showOrdersId = useId();
-	const showPositionsId = useId();
-	const showExecutionsId = useId();
 	const showScanlinesId = useId();
 	const showOrderbookQuoteId = useId();
 
@@ -161,32 +144,12 @@ export function GlobalSettingsDialog() {
 					</SettingsSection>
 
 					<SettingsSection title={t`Chart`}>
-						<div className="space-y-3">
-							<SettingsToggle
-								id={showOrdersId}
-								label={t`Show Orders`}
-								checked={showOrdersOnChart}
-								onCheckedChange={setShowOrdersOnChart}
-							/>
-							<SettingsToggle
-								id={showPositionsId}
-								label={t`Show Positions`}
-								checked={showPositionsOnChart}
-								onCheckedChange={setShowPositionsOnChart}
-							/>
-							<SettingsToggle
-								id={showExecutionsId}
-								label={t`Show Executions`}
-								checked={showExecutionsOnChart}
-								onCheckedChange={setShowExecutionsOnChart}
-							/>
-							<SettingsToggle
-								id={showScanlinesId}
-								label={t`Show Scanlines`}
-								checked={showChartScanlines}
-								onCheckedChange={setShowChartScanlines}
-							/>
-						</div>
+						<SettingsToggle
+							id={showScanlinesId}
+							label={t`Show Scanlines`}
+							checked={showChartScanlines}
+							onCheckedChange={setShowChartScanlines}
+						/>
 					</SettingsSection>
 
 					<SettingsSection title={t`Order Book`}>
