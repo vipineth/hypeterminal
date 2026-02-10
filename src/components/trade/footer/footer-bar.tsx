@@ -1,10 +1,9 @@
 import { t } from "@lingui/core/macro";
-import { GithubLogoIcon, PulseIcon, SpinnerGapIcon, WifiHighIcon, WifiSlashIcon } from "@phosphor-icons/react";
+import { GithubLogoIcon, SpinnerGapIcon, WifiHighIcon, WifiSlashIcon } from "@phosphor-icons/react";
 import { ClientOnly } from "@tanstack/react-router";
 import { APP_VERSION, GITHUB_URL } from "@/config/constants";
 import { formatTime } from "@/lib/format";
 import { type ApiStatus, useApiStatus } from "@/lib/hyperliquid";
-import { usePerfPanel } from "@/providers/perf-panel";
 
 function getStatusDisplay(status: ApiStatus) {
 	switch (status) {
@@ -35,31 +34,6 @@ function getStatusDisplay(status: ApiStatus) {
 	}
 }
 
-function PerfToggle() {
-	const { isVisible, isEnabled, toggle, enable, show } = usePerfPanel();
-
-	function handleClick() {
-		if (isEnabled) {
-			toggle();
-		} else {
-			enable();
-			show();
-		}
-	}
-
-	return (
-		<button
-			type="button"
-			onClick={handleClick}
-			className="flex items-center gap-1 hover:text-primary-default transition-colors"
-			title="Toggle Performance Panel"
-		>
-			<PulseIcon className={`size-3 ${isVisible ? "text-primary-default" : "text-text-950"}`} />
-			<span className={isVisible ? "text-primary-default" : "text-text-950"}>Perf</span>
-		</button>
-	);
-}
-
 export function FooterBar() {
 	const { status } = useApiStatus();
 	const { icon, text, className } = getStatusDisplay(status);
@@ -71,8 +45,6 @@ export function FooterBar() {
 					{icon}
 					<span className={className}>{text}</span>
 				</div>
-				<div className="h-3 w-px bg-border-200/60" />
-				<PerfToggle />
 			</div>
 			<div className="flex items-center gap-3">
 				<a

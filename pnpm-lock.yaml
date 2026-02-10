@@ -95,9 +95,6 @@ importers:
       wagmi:
         specifier: 3.1.0
         version: 3.1.0(@tanstack/query-core@5.90.16)(@tanstack/react-query@5.66.5(react@19.2.0))(@types/react@19.2.7)(react@19.2.0)(typescript@5.9.3)(viem@2.42.1(typescript@5.9.3)(zod@4.3.4))
-      web-vitals:
-        specifier: 5.1.0
-        version: 5.1.0
       zod:
         specifier: 4.3.4
         version: 4.3.4
@@ -4980,9 +4977,6 @@ packages:
     resolution: {integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==}
     engines: {node: '>= 8'}
 
-  web-vitals@5.1.0:
-    resolution: {integrity: sha512-ArI3kx5jI0atlTtmV0fWU3fjpLmq/nD3Zr1iFFlJLaqa5wLBkUSzINwBPySCX/8jRyjlmy1Volw1kz1g9XE4Jg==}
-
   webpack-virtual-modules@0.6.2:
     resolution: {integrity: sha512-66/V2i5hQanC51vBQKPH4aI8NMAcBW59FVBs+rC7eGHupMyfn34q7rZIE+ETlJ+XTevqfUhVVBgSUNSW2flEUQ==}
 
@@ -9864,8 +9858,6 @@ snapshots:
       defaults: 1.0.4
 
   web-streams-polyfill@3.3.3: {}
-
-  web-vitals@5.1.0: {}
 
   webpack-virtual-modules@0.6.2: {}
 
