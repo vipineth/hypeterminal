@@ -24,7 +24,7 @@ export function TradeTerminalPage() {
 			) : (
 				<div
 					className={cn(
-						"bg-surface-200 text-fg-950 h-screen w-full flex flex-col font-mono pt-11 pb-6",
+						"bg-surface-200 text-fg-950 min-h-screen w-full flex flex-col font-mono pt-11 pb-6",
 						showChartScanlines && "terminal-scanlines",
 					)}
 				>

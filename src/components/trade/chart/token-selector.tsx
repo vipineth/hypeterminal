@@ -72,7 +72,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 		filteredMarkets,
 		highlightedIndex,
 		handleKeyDown,
-	} = useTokenSelector({ value: selectedMarket?.name ?? "", onValueChange });
+	} = useTokenSelector({ value: selectedMarket?.name, onValueChange });
 
 	const virtualItems = virtualizer.getVirtualItems();
 	const headerGroup = table.getHeaderGroups()[0];
