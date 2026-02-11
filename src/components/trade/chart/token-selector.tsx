@@ -78,6 +78,9 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 
 	const virtualItems = virtualizer.getVirtualItems();
 	const headerGroup = table.getHeaderGroups()[0];
+	const showScopeTabs = exchangeScope === "all";
+	const showSubcategoryTabs = !exchangeDex && subcategories.length > 0;
+	const showSelectorFilters = showScopeTabs || showSubcategoryTabs;
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -113,9 +116,9 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 						</div>
 					</div>
 
-					{(exchangeScope === "all" || (!exchangeDex && subcategories.length > 0)) && (
+					{showSelectorFilters ? (
 						<div className="py-2 border-b border-border-200/40 bg-surface-base/50">
-							{exchangeScope === "all" && (
+							{showScopeTabs ? (
 								<div className="flex items-center gap-0.5 flex-wrap">
 									{marketScopes.map((s) => {
 										const isSelected = scope === s.value;
@@ -137,8 +140,8 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 										);
 									})}
 								</div>
-							)}
-							{!exchangeDex && subcategories.length > 0 && (
+							) : null}
+							{showSubcategoryTabs ? (
 								<div className="flex items-center gap-0.5 flex-wrap mt-1.5 pt-1.5 pl-2 ml-1">
 									{subcategories.map((sub) => {
 										const isSelected = subcategory === sub.value;
@@ -162,9 +165,9 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 										);
 									})}
 								</div>
-							)}
+							) : null}
 						</div>
-					)}
+					) : null}
 					<div className="flex items-center px-3 py-1.5 text-4xs uppercase tracking-wider text-text-950 border-b border-border-200/40 bg-surface-base/30">
 						<div className="flex-1 min-w-0">{t`Market`}</div>
 						{headerGroup?.headers
@@ -319,13 +322,13 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 											{scope !== "spot" && (
 												<div className="w-16 sm:w-20 text-right hidden sm:block">
 													<div className="flex items-center justify-end gap-1">
-														{market.funding !== null && (
+														{market.funding && (
 															<FireIcon className={cn("size-2.5", getValueColorClass(market.funding))} />
 														)}
 														<span
 															className={cn(
 																"text-2xs tabular-nums font-medium",
-																market.funding === null ? "text-text-600" : getValueColorClass(market.funding),
+																market.funding ? getValueColorClass(market.funding) : "text-text-600",
 															)}
 														>
 															{formatPercent(market.funding, {

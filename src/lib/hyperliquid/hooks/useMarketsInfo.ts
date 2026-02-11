@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useExchangeScope } from "@/providers/exchange-scope";
 import { useSelectedMarket } from "@/stores/use-market-store";
 import type { BuilderPerpMarket, PerpMarket, SpotMarket } from "../markets/types";
@@ -22,6 +22,7 @@ export interface BuilderPerpMarketsInfo {
 
 export interface UseMarketsInfoOptions {
 	updateInterval?: number;
+	subscriptionKeepAliveMs?: number;
 }
 
 interface MarketsInfoResult {
@@ -31,6 +32,30 @@ interface MarketsInfoResult {
 	markets: UnifiedMarketInfo[];
 }
 
+function useSubscriptionWarmWindow(enabled: boolean, keepAliveMs: number) {
+	const [isWarm, setIsWarm] = useState(enabled);
+
+	useEffect(() => {
+		if (enabled) {
+			setIsWarm(true);
+			return;
+		}
+
+		if (keepAliveMs <= 0) {
+			setIsWarm(false);
+			return;
+		}
+
+		const timeout = setTimeout(() => {
+			setIsWarm(false);
+		}, keepAliveMs);
+
+		return () => clearTimeout(timeout);
+	}, [enabled, keepAliveMs]);
+
+	return isWarm;
+}
+
 function getDexCtxs(allDexsCtxs: AllDexsAssetCtxs | undefined, dexName: string) {
 	if (!allDexsCtxs) return undefined;
 	const dexEntry = allDexsCtxs.find((entry) => entry[0] === dexName);
@@ -38,15 +63,23 @@ function getDexCtxs(allDexsCtxs: AllDexsAssetCtxs | undefined, dexName: string) 
 }
 
 export function useMarketsInfoInternal(options: UseMarketsInfoOptions = {}) {
-	const { updateInterval = 5000 } = options;
+	const { updateInterval = 5000, subscriptionKeepAliveMs = 10_000 } = options;
 	const { scope } = useExchangeScope();
 
 	const needsPerp = scope === "all" || scope === "perp" || scope === "builders-perp";
 	const needsSpot = scope === "all" || scope === "spot";
+	const perpSubscriptionEnabled = useSubscriptionWarmWindow(needsPerp, subscriptionKeepAliveMs);
+	const spotSubscriptionEnabled = useSubscriptionWarmWindow(needsSpot, subscriptionKeepAliveMs);
 
 	const markets = useMarkets();
-	const { data: allDexsCtxsEvent } = useSubAllDexsAssetCtxs({ enabled: needsPerp, throttleMs: updateInterval });
-	const { data: spotCtxsEvent } = useSubSpotAssetCtxs({ enabled: needsSpot, throttleMs: updateInterval });
+	const { data: allDexsCtxsEvent } = useSubAllDexsAssetCtxs({
+		enabled: perpSubscriptionEnabled,
+		throttleMs: updateInterval,
+	});
+	const { data: spotCtxsEvent } = useSubSpotAssetCtxs({
+		enabled: spotSubscriptionEnabled,
+		throttleMs: updateInterval,
+	});
 
 	const result = useMemo((): MarketsInfoResult => {
 		const allDexsCtxs = allDexsCtxsEvent?.ctxs;
