@@ -11,6 +11,7 @@ import { formatDateTimeShort, formatNumber, formatToken, formatUSD } from "@/lib
 import { useMarkets } from "@/lib/hyperliquid";
 import { useSubUserFills } from "@/lib/hyperliquid/hooks/subscription";
 import { getValueColorClass, toNumber } from "@/lib/trade/numbers";
+import { useExchangeScope } from "@/providers/exchange-scope";
 import { useMarketActions } from "@/stores/use-market-store";
 import { AssetDisplay } from "../components/asset-display";
 
@@ -34,6 +35,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 
 export function HistoryTab() {
 	const { address, isConnected } = useConnection();
+	const { scope } = useExchangeScope();
 	const { setSelectedMarket } = useMarketActions();
 	const markets = useMarkets();
 	const {
@@ -114,7 +116,7 @@ export function HistoryTab() {
 												<Button
 													variant="text"
 													size="none"
-													onClick={() => setSelectedMarket(fill.coin)}
+													onClick={() => setSelectedMarket(scope, fill.coin)}
 													className="gap-1.5"
 													aria-label={t`Switch to ${fill.coin} market`}
 												>

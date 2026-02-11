@@ -39,11 +39,11 @@ export const MARKET_ORDER_SLIPPAGE_MAX_PERCENT = 100;
 export const DEFAULT_LEVERAGE_BY_MODE = { cross: 10, isolated: 10 } as const;
 
 export const STORAGE_KEYS = {
-	MARKET_PREFS: "market-prefs-v2",
-	GLOBAL_SETTINGS: "global-settings-v2",
-	META_CACHE: "hyperliquid-meta-cache-v2",
-	SIDEBAR_STATE: "sidebar_state-v2",
-	ORDER_ENTRY: "order-entry-v2",
+	MARKET_PREFS: "market-prefs",
+	GLOBAL_SETTINGS: "global-settings",
+	META_CACHE: "hyperliquid-meta-cache",
+	SIDEBAR_STATE: "sidebar_state",
+	ORDER_ENTRY: "order-entry",
 } as const;
 
 export const GITHUB_URL = "https://github.com/vipineth/hypeterminal/";

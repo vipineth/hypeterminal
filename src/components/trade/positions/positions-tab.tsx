@@ -18,6 +18,7 @@ import { useSubAllMids, useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscri
 import type { Markets } from "@/lib/hyperliquid/markets";
 import { getValueColorClass, isPositive, toBig } from "@/lib/trade/numbers";
 import { isStopOrder, isTakeProfitOrder } from "@/lib/trade/open-orders";
+import { useExchangeScope } from "@/providers/exchange-scope";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useMarketActions } from "@/stores/use-market-store";
 import { AssetDisplay } from "../components/asset-display";
@@ -250,6 +251,7 @@ export function PositionsTab() {
 	const { address, isConnected } = useConnection();
 	const slippageBps = useMarketOrderSlippageBps();
 	const closingKeyRef = useRef<string | null>(null);
+	const { scope } = useExchangeScope();
 	const { setSelectedMarket } = useMarketActions();
 	const [tpSlModalOpen, setTpSlModalOpen] = useState(false);
 	const [selectedTpSlPosition, setSelectedTpSlPosition] = useState<TpSlPositionData | null>(null);
@@ -402,7 +404,7 @@ export function PositionsTab() {
 										isEven={i % 2 === 1}
 										onClose={handleClosePosition}
 										onOpenTpSl={handleOpenTpSlModal}
-										onSelectMarket={setSelectedMarket}
+										onSelectMarket={(name) => setSelectedMarket(scope, name)}
 									/>
 								))}
 							</TableBody>

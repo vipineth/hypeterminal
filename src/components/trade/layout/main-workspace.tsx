@@ -3,6 +3,7 @@ import { useDefaultLayout } from "react-resizable-panels";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { PANEL_LAYOUT } from "@/config/constants";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
+import { useExchangeScope } from "@/providers/exchange-scope";
 import { useMarketActions } from "@/stores/use-market-store";
 import { TokenSelector } from "../chart/token-selector";
 import { FavoritesStrip } from "../header/favorites-strip";
@@ -14,13 +15,14 @@ const { id, analysis, sidebar } = PANEL_LAYOUT.MAIN;
 export function MainWorkspace() {
 	const { defaultLayout, onLayoutChanged } = useDefaultLayout({ id });
 	const { data: selectedMarket } = useSelectedMarketInfo();
+	const { scope } = useExchangeScope();
 	const { setSelectedMarket } = useMarketActions();
 
 	const handleMarketChange = useCallback(
 		(marketName: string) => {
-			setSelectedMarket(marketName);
+			setSelectedMarket(scope, marketName);
 		},
-		[setSelectedMarket],
+		[scope, setSelectedMarket],
 	);
 
 	return (

@@ -45,10 +45,7 @@ export class RingBuffer<T> {
 				const existingItem = existing as T;
 				if (!this.shouldReplace || !this.shouldReplace(existingItem, item)) continue;
 
-				let existingIndex = this.items.indexOf(existingItem);
-				if (existingIndex === -1) {
-					existingIndex = this.items.findIndex((candidate) => this.getKey(candidate) === key);
-				}
+				const existingIndex = this.items.findIndex((candidate) => this.getKey(candidate) === key);
 				if (existingIndex === -1) {
 					this.items.push(item);
 				} else {

@@ -6,6 +6,7 @@ import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice } from "@/lib/format";
 import { useMarketsInfo } from "@/lib/hyperliquid";
 import { getValueColorClass } from "@/lib/trade/numbers";
+import { useExchangeScope } from "@/providers/exchange-scope";
 import { useFavoriteMarkets, useMarketActions, useSelectedMarket } from "@/stores/use-market-store";
 
 export function FavoritesStrip() {
@@ -37,6 +38,7 @@ interface FavoriteChipProps {
 }
 
 function FavoriteChip({ name, isActive }: FavoriteChipProps) {
+	const { scope } = useExchangeScope();
 	const { setSelectedMarket, toggleFavoriteMarket } = useMarketActions();
 	const { getMarketInfo } = useMarketsInfo();
 
@@ -46,13 +48,13 @@ function FavoriteChip({ name, isActive }: FavoriteChipProps) {
 	const szDecimals = market?.szDecimals ?? 4;
 
 	function handleClick() {
-		setSelectedMarket(name);
+		setSelectedMarket(scope, name);
 	}
 
 	function handleKeyDown(e: React.KeyboardEvent) {
 		if (e.key === "Enter" || e.key === " ") {
 			e.preventDefault();
-			setSelectedMarket(name);
+			setSelectedMarket(scope, name);
 		}
 	}
 

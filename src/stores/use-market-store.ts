@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { DEFAULT_MARKET_NAME } from "@/config/constants";
+import { DEFAULT_MARKET_NAME, STORAGE_KEYS } from "@/config/constants";
 import { DEFAULT_SELECTED_MARKETS, type ExchangeScope } from "@/domain/market";
 import { useExchangeScope } from "@/providers/exchange-scope";
 import { createValidatedStorage } from "@/stores/validated-storage";
@@ -45,7 +45,8 @@ const useMarketStore = create<MarketStore>()(
 			},
 		}),
 		{
-			name: "market-prefs-v3",
+			name: STORAGE_KEYS.MARKET_PREFS,
+			version: 3,
 			storage: createJSONStorage(() => validatedStorage),
 			partialize: (state) => ({
 				selectedMarkets: state.selectedMarkets,
@@ -76,21 +77,10 @@ export function useSelectedMarket(): string {
 	return useMarketStore((state) => state.selectedMarkets[scope] ?? DEFAULT_MARKET_NAME);
 }
 
-export function useSetSelectedMarket(): (marketName: string) => void {
-	const { scope } = useExchangeScope();
-	const setSelectedMarket = useMarketStore((state) => state.actions.setSelectedMarket);
-	return (marketName: string) => setSelectedMarket(scope, marketName);
-}
-
 export function useFavoriteMarkets() {
 	return useMarketStore((state) => state.favoriteMarkets);
 }
 
 export function useMarketActions() {
-	const { scope } = useExchangeScope();
-	const actions = useMarketStore((state) => state.actions);
-	return {
-		setSelectedMarket: (marketName: string) => actions.setSelectedMarket(scope, marketName),
-		toggleFavoriteMarket: actions.toggleFavoriteMarket,
-	};
+	return useMarketStore((state) => state.actions);
 }

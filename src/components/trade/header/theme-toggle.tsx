@@ -3,7 +3,7 @@ import { MoonIcon, SunIcon } from "@phosphor-icons/react";
 import { ClientOnly } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
-import { useTheme } from "@/stores/use-global-settings-store";
+import { useSetTheme, useTheme } from "@/stores/use-global-settings-store";
 
 export function ThemeToggle() {
 	return (
@@ -14,7 +14,8 @@ export function ThemeToggle() {
 }
 
 function ThemeToggleButton() {
-	const { theme, setTheme } = useTheme();
+	const theme = useTheme();
+	const setTheme = useSetTheme();
 
 	const isDark = theme === "dark";
 

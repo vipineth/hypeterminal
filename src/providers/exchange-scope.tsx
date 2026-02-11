@@ -1,5 +1,5 @@
 import { useLocation } from "@tanstack/react-router";
-import { createContext, use } from "react";
+import { createContext, use, useMemo } from "react";
 import type { ExchangeScope } from "@/domain/market";
 
 interface ExchangeScopeContext {
@@ -27,7 +27,8 @@ function deriveScope(pathname: string): ExchangeScopeContext {
 
 export function ExchangeScopeProvider({ children }: { children: React.ReactNode }) {
 	const { pathname } = useLocation();
-	const value = deriveScope(pathname);
+	const { scope, dex } = deriveScope(pathname);
+	const value = useMemo(() => ({ scope, dex }), [scope, dex]);
 
 	return <ExchangeScopeCtx value={value}>{children}</ExchangeScopeCtx>;
 }

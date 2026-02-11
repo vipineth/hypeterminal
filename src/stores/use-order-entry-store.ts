@@ -156,6 +156,7 @@ const useOrderEntryStore = create<OrderEntryStore>()(
 			}),
 			{
 				name: STORAGE_KEYS.ORDER_ENTRY,
+				version: 2,
 				storage: createJSONStorage(() => validatedStorage),
 				partialize: (state) => ({
 					side: state.side,

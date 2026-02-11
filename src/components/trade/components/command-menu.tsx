@@ -5,6 +5,7 @@ import { formatPrice } from "@/lib/format";
 import { type UnifiedMarketInfo, useMarketsInfo } from "@/lib/hyperliquid";
 import { createSearcher } from "@/lib/search";
 import { marketSearchConfig } from "@/lib/search/presets";
+import { useExchangeScope } from "@/providers/exchange-scope";
 import { useCommandMenuActions, useCommandMenuOpen } from "@/stores/use-global-modal-store";
 import { useMarketActions } from "@/stores/use-market-store";
 import { AssetDisplay } from "./asset-display";
@@ -18,6 +19,7 @@ const KIND_LABELS: Record<UnifiedMarketInfo["kind"], string> = {
 export function CommandMenu() {
 	const open = useCommandMenuOpen();
 	const { open: openMenu, close } = useCommandMenuActions();
+	const { scope } = useExchangeScope();
 	const { setSelectedMarket } = useMarketActions();
 	const { markets } = useMarketsInfo();
 
@@ -48,7 +50,7 @@ export function CommandMenu() {
 	const displayItems = query ? results.map((r) => r.item) : markets;
 
 	function handleSelect(market: UnifiedMarketInfo) {
-		setSelectedMarket(market.name);
+		setSelectedMarket(scope, market.name);
 		close();
 		setQuery("");
 	}
