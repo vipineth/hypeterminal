@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { useDefaultLayout } from "react-resizable-panels";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { PANEL_LAYOUT } from "@/config/constants";
@@ -18,12 +17,9 @@ export function MainWorkspace() {
 	const { scope } = useExchangeScope();
 	const { setSelectedMarket } = useMarketActions();
 
-	const handleMarketChange = useCallback(
-		(marketName: string) => {
-			setSelectedMarket(scope, marketName);
-		},
-		[scope, setSelectedMarket],
-	);
+	function handleMarketChange(marketName: string) {
+		setSelectedMarket(scope, marketName);
+	}
 
 	return (
 		<div className="flex-1 min-h-0">

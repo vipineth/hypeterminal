@@ -1,6 +1,5 @@
 import { FireIcon } from "@phosphor-icons/react";
 import { ClientOnly } from "@tanstack/react-router";
-import { useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UI_TEXT } from "@/config/constants";
 import { get24hChange, getOiUsd } from "@/domain/market";
@@ -28,12 +27,9 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 	const { scope } = useExchangeScope();
 	const { setSelectedMarket } = useMarketActions();
 
-	const handleMarketChange = useCallback(
-		(marketName: string) => {
-			setSelectedMarket(scope, marketName);
-		},
-		[scope, setSelectedMarket],
-	);
+	function handleMarketChange(marketName: string) {
+		setSelectedMarket(scope, marketName);
+	}
 
 	const fundingNum = toBig(selectedMarket?.funding)?.toNumber() ?? 0;
 	const markPx = selectedMarket?.markPx;
