@@ -101,7 +101,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 		!perpPositions.length || !baseToken ? null : (perpPositions.find((p) => p.position.coin === baseToken) ?? null);
 	const positionSize = toNumberOrZero(position?.position?.szi);
 
-	const markPx = market?.markPx ?? 0;
+	const markPx = toNumberOrZero(market?.markPx);
 	const price = type === "market" ? markPx : toNumberOrZero(limitPriceInput);
 
 	const maxSize = useMemo(() => {

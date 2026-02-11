@@ -9,9 +9,29 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SpotRouteImport } from './routes/spot'
+import { Route as PerpRouteImport } from './routes/perp'
+import { Route as BuildersPerpRouteImport } from './routes/builders-perp'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BuildersPerpIndexRouteImport } from './routes/builders-perp.index'
+import { Route as BuildersPerpDexRouteImport } from './routes/builders-perp.$dex'
 
+const SpotRoute = SpotRouteImport.update({
+  id: '/spot',
+  path: '/spot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PerpRoute = PerpRouteImport.update({
+  id: '/perp',
+  path: '/perp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BuildersPerpRoute = BuildersPerpRouteImport.update({
+  id: '/builders-perp',
+  path: '/builders-perp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
   path: '/$',
@@ -22,35 +42,98 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BuildersPerpIndexRoute = BuildersPerpIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => BuildersPerpRoute,
+} as any)
+const BuildersPerpDexRoute = BuildersPerpDexRouteImport.update({
+  id: '/$dex',
+  path: '/$dex',
+  getParentRoute: () => BuildersPerpRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/builders-perp': typeof BuildersPerpRouteWithChildren
+  '/perp': typeof PerpRoute
+  '/spot': typeof SpotRoute
+  '/builders-perp/$dex': typeof BuildersPerpDexRoute
+  '/builders-perp/': typeof BuildersPerpIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/perp': typeof PerpRoute
+  '/spot': typeof SpotRoute
+  '/builders-perp/$dex': typeof BuildersPerpDexRoute
+  '/builders-perp': typeof BuildersPerpIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/builders-perp': typeof BuildersPerpRouteWithChildren
+  '/perp': typeof PerpRoute
+  '/spot': typeof SpotRoute
+  '/builders-perp/$dex': typeof BuildersPerpDexRoute
+  '/builders-perp/': typeof BuildersPerpIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$'
+  fullPaths:
+    | '/'
+    | '/$'
+    | '/builders-perp'
+    | '/perp'
+    | '/spot'
+    | '/builders-perp/$dex'
+    | '/builders-perp/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$'
-  id: '__root__' | '/' | '/$'
+  to: '/' | '/$' | '/perp' | '/spot' | '/builders-perp/$dex' | '/builders-perp'
+  id:
+    | '__root__'
+    | '/'
+    | '/$'
+    | '/builders-perp'
+    | '/perp'
+    | '/spot'
+    | '/builders-perp/$dex'
+    | '/builders-perp/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
+  BuildersPerpRoute: typeof BuildersPerpRouteWithChildren
+  PerpRoute: typeof PerpRoute
+  SpotRoute: typeof SpotRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/spot': {
+      id: '/spot'
+      path: '/spot'
+      fullPath: '/spot'
+      preLoaderRoute: typeof SpotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/perp': {
+      id: '/perp'
+      path: '/perp'
+      fullPath: '/perp'
+      preLoaderRoute: typeof PerpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/builders-perp': {
+      id: '/builders-perp'
+      path: '/builders-perp'
+      fullPath: '/builders-perp'
+      preLoaderRoute: typeof BuildersPerpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$': {
       id: '/$'
       path: '/$'
@@ -65,12 +148,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/builders-perp/': {
+      id: '/builders-perp/'
+      path: '/'
+      fullPath: '/builders-perp/'
+      preLoaderRoute: typeof BuildersPerpIndexRouteImport
+      parentRoute: typeof BuildersPerpRoute
+    }
+    '/builders-perp/$dex': {
+      id: '/builders-perp/$dex'
+      path: '/$dex'
+      fullPath: '/builders-perp/$dex'
+      preLoaderRoute: typeof BuildersPerpDexRouteImport
+      parentRoute: typeof BuildersPerpRoute
+    }
   }
 }
+
+interface BuildersPerpRouteChildren {
+  BuildersPerpDexRoute: typeof BuildersPerpDexRoute
+  BuildersPerpIndexRoute: typeof BuildersPerpIndexRoute
+}
+
+const BuildersPerpRouteChildren: BuildersPerpRouteChildren = {
+  BuildersPerpDexRoute: BuildersPerpDexRoute,
+  BuildersPerpIndexRoute: BuildersPerpIndexRoute,
+}
+
+const BuildersPerpRouteWithChildren = BuildersPerpRoute._addFileChildren(
+  BuildersPerpRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
+  BuildersPerpRoute: BuildersPerpRouteWithChildren,
+  PerpRoute: PerpRoute,
+  SpotRoute: SpotRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

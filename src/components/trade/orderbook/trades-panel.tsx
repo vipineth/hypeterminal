@@ -1,19 +1,14 @@
 import { t } from "@lingui/core/macro";
 import { ArrowSquareOutIcon, ArrowsLeftRightIcon } from "@phosphor-icons/react";
-import { memo, useEffect, useMemo, useRef } from "react";
+import { memo, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { getBaseQuoteFromPairName } from "@/domain/market";
-import { useRingBuffer } from "@/lib/circular-buffer";
 import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
 import { useSelectedMarketInfo, useSubTrades } from "@/lib/hyperliquid";
 import { getExplorerTxUrl } from "@/lib/hyperliquid/explorer";
-import { getTradeKey, type ProcessedTrade, processTrades, type RawTrade } from "@/lib/trade/trades";
+import { type ProcessedTrade, processTrades } from "@/lib/trade/trades";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
-
-const MAX_TRADES = 100;
-const getKey = (t: RawTrade) => getTradeKey(t.hash, t.tid);
-const compare = (a: RawTrade, b: RawTrade) => b.time - a.time;
 
 interface Props {
 	trade: ProcessedTrade;
@@ -53,7 +48,7 @@ export function TradesPanel() {
 	const subscriptionCoin = selectedMarket?.name ?? "";
 	const params = useMemo(() => ({ coin: subscriptionCoin }), [subscriptionCoin]);
 	const {
-		data: tradesBatch,
+		data: trades,
 		status,
 		error,
 	} = useSubTrades(params, {
@@ -62,38 +57,13 @@ export function TradesPanel() {
 	const { showOrderbookInQuote } = useGlobalSettings();
 	const { setShowOrderbookInQuote } = useGlobalSettingsActions();
 
-	const {
-		items: trades,
-		add,
-		clear,
-	} = useRingBuffer<RawTrade>({
-		maxSize: MAX_TRADES,
-		getKey,
-		compare,
-	});
-
-	const lastBatchRef = useRef<RawTrade[] | undefined>(undefined);
-	const lastCoinRef = useRef<string | undefined>(undefined);
-
-	useEffect(() => {
-		if (subscriptionCoin !== lastCoinRef.current) {
-			lastCoinRef.current = subscriptionCoin;
-			lastBatchRef.current = undefined;
-			clear();
-		}
-		if (tradesBatch?.length && tradesBatch !== lastBatchRef.current) {
-			lastBatchRef.current = tradesBatch;
-			add(tradesBatch);
-		}
-	}, [subscriptionCoin, tradesBatch, add, clear]);
-
 	const { baseToken, quoteToken } = useMemo(() => {
 		if (!selectedMarket) return { baseToken: "", quoteToken: "" };
 		return getBaseQuoteFromPairName(selectedMarket.pairName, selectedMarket.kind);
 	}, [selectedMarket]);
 
 	const szDecimals = selectedMarket?.szDecimals ?? 4;
-	const processed = useMemo(() => processTrades(trades), [trades]);
+	const processed = useMemo(() => processTrades(trades ?? []), [trades]);
 	const displayAsset = showOrderbookInQuote ? quoteToken : baseToken;
 	const toggleAssetDisplay = () => setShowOrderbookInQuote(!showOrderbookInQuote);
 

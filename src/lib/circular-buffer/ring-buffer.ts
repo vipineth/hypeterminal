@@ -2,6 +2,7 @@ export type RingBufferOptions<T> = {
 	maxSize: number;
 	getKey: (item: T) => string;
 	compare: (a: T, b: T) => number;
+	shouldReplace?: (existing: T, incoming: T) => boolean;
 };
 
 /**
@@ -16,6 +17,7 @@ export class RingBuffer<T> {
 	private readonly maxSize: number;
 	private readonly getKey: (item: T) => string;
 	private readonly compare: (a: T, b: T) => number;
+	private readonly shouldReplace?: (existing: T, incoming: T) => boolean;
 	private dirty = false;
 	private snapshot: T[] | null = null;
 
@@ -23,6 +25,7 @@ export class RingBuffer<T> {
 		this.maxSize = options.maxSize;
 		this.getKey = options.getKey;
 		this.compare = options.compare;
+		this.shouldReplace = options.shouldReplace;
 		this.items = [];
 		this.keyMap = new Map();
 	}
@@ -30,20 +33,35 @@ export class RingBuffer<T> {
 	add(newItems: T[]): boolean {
 		if (newItems.length === 0) return false;
 
-		let added = false;
+		let changed = false;
 
 		for (let i = 0; i < newItems.length; i++) {
 			const item = newItems[i];
 			const key = this.getKey(item);
+			const hasExisting = this.keyMap.has(key);
+			const existing = this.keyMap.get(key);
 
-			if (this.keyMap.has(key)) continue;
+			if (hasExisting) {
+				const existingItem = existing as T;
+				if (!this.shouldReplace || !this.shouldReplace(existingItem, item)) continue;
+
+				const existingIndex = this.items.findIndex((candidate) => this.getKey(candidate) === key);
+				if (existingIndex === -1) {
+					this.items.push(item);
+				} else {
+					this.items[existingIndex] = item;
+				}
+				this.keyMap.set(key, item);
+				changed = true;
+				continue;
+			}
 
 			this.keyMap.set(key, item);
 			this.items.push(item);
-			added = true;
+			changed = true;
 		}
 
-		if (!added) return false;
+		if (!changed) return false;
 
 		this.items.sort(this.compare);
 

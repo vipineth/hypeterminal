@@ -10,6 +10,7 @@ import { formatDateTime, formatToken, formatUSD } from "@/lib/format";
 import { useMarkets } from "@/lib/hyperliquid";
 import { useSubUserHistoricalOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { getSideClass, getSideLabel } from "@/lib/trade/open-orders";
+import { useExchangeScope } from "@/providers/exchange-scope";
 import { useMarketActions } from "@/stores/use-market-store";
 import { AssetDisplay } from "../components/asset-display";
 
@@ -33,6 +34,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 
 export function OrdersHistoryTab() {
 	const { address, isConnected } = useConnection();
+	const { scope } = useExchangeScope();
 	const { setSelectedMarket } = useMarketActions();
 	const markets = useMarkets();
 	const {
@@ -115,7 +117,7 @@ export function OrdersHistoryTab() {
 													<Button
 														variant="text"
 														size="none"
-														onClick={() => setSelectedMarket(order.coin)}
+														onClick={() => setSelectedMarket(scope, order.coin)}
 														className="gap-1.5"
 														aria-label={t`Switch to ${order.coin} market`}
 													>

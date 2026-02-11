@@ -78,7 +78,7 @@ export function SendDialog({
 		return `${tokenInfo.name}:${tokenInfo.tokenId}`;
 	}, [tokenInfo]);
 
-	const decimals = useMemo(() => getToken(selectedToken)?.weiDecimals ?? 2, [getToken, selectedToken]);
+	const decimals = useMemo(() => getToken(selectedToken)?.transferDecimals ?? 2, [getToken, selectedToken]);
 
 	const availableBalance = useMemo(() => {
 		if (accountType === "perp") {

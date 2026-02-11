@@ -31,6 +31,7 @@ export function useSubUserTwapHistory(
 				maxSize: MAX_TWAP_HISTORY,
 				getKey: (h) => (h.twapId != null ? String(h.twapId) : `${h.time}-${h.state.coin}`),
 				compare: (a, b) => b.time - a.time,
+				shouldReplace: (existing, incoming) => incoming.time >= existing.time,
 			},
 		},
 		options,

@@ -13,6 +13,7 @@ import { formatDateTime, formatDuration, formatNumber, formatPrice } from "@/lib
 import { useMarkets } from "@/lib/hyperliquid";
 import { useSubTwapStates } from "@/lib/hyperliquid/hooks/subscription";
 import { toBig } from "@/lib/trade/numbers";
+import { useExchangeScope } from "@/providers/exchange-scope";
 import { useMarketActions } from "@/stores/use-market-store";
 import { AssetDisplay } from "../components/asset-display";
 
@@ -36,6 +37,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 
 export function TwapTab() {
 	const { address, isConnected } = useConnection();
+	const { scope } = useExchangeScope();
 	const { setSelectedMarket } = useMarketActions();
 	const { data: twapStatesEvent } = useSubTwapStates(
 		{ user: address ?? "0x0", dex: HL_ALL_DEXS },
@@ -130,7 +132,7 @@ export function TwapTab() {
 													<Button
 														variant="text"
 														size="none"
-														onClick={() => setSelectedMarket(state.coin)}
+														onClick={() => setSelectedMarket(scope, state.coin)}
 														className="gap-1.5"
 														aria-label={t`Switch to ${state.coin} market`}
 													>

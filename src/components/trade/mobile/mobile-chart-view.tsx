@@ -1,6 +1,5 @@
 import { FireIcon } from "@phosphor-icons/react";
 import { ClientOnly } from "@tanstack/react-router";
-import { useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UI_TEXT } from "@/config/constants";
 import { get24hChange, getOiUsd } from "@/domain/market";
@@ -9,6 +8,7 @@ import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { getValueColorClass, toBig } from "@/lib/trade/numbers";
+import { useExchangeScope } from "@/providers/exchange-scope";
 import { useTheme } from "@/stores/use-global-settings-store";
 import { useMarketActions } from "@/stores/use-market-store";
 import { TokenSelector } from "../chart/token-selector";
@@ -22,16 +22,14 @@ interface MobileChartViewProps {
 }
 
 export function MobileChartView({ className }: MobileChartViewProps) {
-	const { theme } = useTheme();
+	const theme = useTheme();
 	const { data: selectedMarket, isLoading } = useSelectedMarketInfo();
+	const { scope } = useExchangeScope();
 	const { setSelectedMarket } = useMarketActions();
 
-	const handleMarketChange = useCallback(
-		(marketName: string) => {
-			setSelectedMarket(marketName);
-		},
-		[setSelectedMarket],
-	);
+	function handleMarketChange(marketName: string) {
+		setSelectedMarket(scope, marketName);
+	}
 
 	const fundingNum = toBig(selectedMarket?.funding)?.toNumber() ?? 0;
 	const markPx = selectedMarket?.markPx;

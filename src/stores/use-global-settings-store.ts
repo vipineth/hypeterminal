@@ -85,6 +85,7 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 		}),
 		{
 			name: STORAGE_KEYS.GLOBAL_SETTINGS,
+			version: 2,
 			storage: createJSONStorage(() => validatedStorage),
 			partialize: (state) => ({
 				hideSmallBalances: state.hideSmallBalances,
@@ -135,9 +136,11 @@ useGlobalSettingsStore.subscribe((state, prev) => {
 });
 
 export function useTheme() {
-	const theme = useGlobalSettingsStore((state) => state.theme);
-	const setTheme = useGlobalSettingsStore((state) => state.actions.setTheme);
-	return { theme, setTheme };
+	return useGlobalSettingsStore((state) => state.theme);
+}
+
+export function useSetTheme() {
+	return useGlobalSettingsStore((state) => state.actions.setTheme);
 }
 
 export function useGlobalSettings() {

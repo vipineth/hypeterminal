@@ -38,6 +38,8 @@ export function get24hChange(prevDayPx: Numeric, markPx: Numeric): number | null
 	const prev = toBig(prevDayPx);
 	const mark = toBig(markPx);
 	if (!prev || prev.eq(0) || !mark) return null;
+	// Returns percentage points (e.g. 10 => +10%), not a decimal ratio.
+	// Divide by 100 before passing to `formatPercent`.
 	return mark.minus(prev).div(prev).times(100).toNumber();
 }
 

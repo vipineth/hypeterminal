@@ -34,6 +34,7 @@ interface Props {
 	orderType: OrderType;
 	onOrderTypeChange: (type: OrderType) => void;
 	marketKind?: MarketKind;
+	className?: string;
 }
 
 type AdvancedOrderOption = {
@@ -71,7 +72,7 @@ function getFilteredOptions(options: AdvancedOrderOption[], marketKind: MarketKi
 	return options;
 }
 
-export function AdvancedOrderDropdown({ orderType, onOrderTypeChange, marketKind = "perp" }: Props) {
+export function AdvancedOrderDropdown({ orderType, onOrderTypeChange, marketKind = "perp", className }: Props) {
 	const isAdvanced = isAdvancedOrderType(orderType);
 	const label = getAdvancedOrderLabel(orderType, t`Other`);
 
@@ -84,7 +85,7 @@ export function AdvancedOrderDropdown({ orderType, onOrderTypeChange, marketKind
 			<DropdownMenuTrigger asChild>
 				<button
 					type="button"
-					className="inline-flex items-center gap-1 outline-none hover:text-text-950 transition-colors"
+					className={cn("inline-flex items-center gap-1 outline-none hover:text-text-950 transition-colors", className)}
 					aria-label={t`Advanced order types`}
 				>
 					{isAdvanced ? label : t`Other`}

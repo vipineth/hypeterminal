@@ -14,6 +14,7 @@ import { useExchangeCancel } from "@/lib/hyperliquid/hooks/exchange/useExchangeC
 import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import type { MarketKind } from "@/lib/hyperliquid/markets/types";
 import { getOrderTypeConfig, getOrderValue, getSideClass, getSideLabel, type OpenOrder } from "@/lib/trade/open-orders";
+import { useExchangeScope } from "@/providers/exchange-scope";
 import { useMarketActions } from "@/stores/use-market-store";
 import { AssetDisplay } from "../components/asset-display";
 
@@ -37,6 +38,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 
 export function OrdersTab() {
 	const { address, isConnected } = useConnection();
+	const { scope } = useExchangeScope();
 	const { setSelectedMarket } = useMarketActions();
 	const {
 		data: openOrdersEvent,
@@ -241,7 +243,7 @@ export function OrdersTab() {
 											isEven={i % 2 === 1}
 											onToggle={handleToggleOrder}
 											onCancel={handleCancelOrders}
-											onSelectMarket={setSelectedMarket}
+											onSelectMarket={(name) => setSelectedMarket(scope, name)}
 										/>
 									);
 								})}

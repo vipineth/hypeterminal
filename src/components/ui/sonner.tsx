@@ -3,7 +3,7 @@ import { Toaster as Sonner, type ToasterProps } from "sonner";
 import { useTheme } from "@/stores/use-global-settings-store";
 
 const Toaster = ({ ...props }: ToasterProps) => {
-	const { theme } = useTheme();
+	const theme = useTheme();
 
 	return (
 		<Sonner

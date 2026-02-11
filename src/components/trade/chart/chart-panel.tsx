@@ -10,7 +10,7 @@ import { MarketOverview } from "../market-overview";
 const TradingViewChart = createLazyComponent(() => import("./tradingview-chart"), "TradingViewChart");
 
 export function ChartPanel() {
-	const { theme } = useTheme();
+	const theme = useTheme();
 	const { data: selectedMarket } = useSelectedMarketInfo();
 
 	return (
