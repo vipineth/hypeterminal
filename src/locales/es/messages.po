@@ -1122,8 +1122,8 @@ msgid "Not connected"
 msgstr "No conectado"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Notifications"
-msgstr "Notificaciones"
+#~ msgid "Notifications"
+#~ msgstr "Notificaciones"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Number Format"
