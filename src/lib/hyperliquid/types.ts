@@ -2,14 +2,9 @@ import type { HyperliquidError, IRequestTransport, ISubscriptionTransport } from
 import type { AbstractWallet } from "@nktkas/hyperliquid/signing";
 import type { QueryKey, UseMutationOptions, UseQueryOptions } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import type { BaseIssue, BaseSchema, BaseSchemaAsync, ValiError } from "valibot";
 import type { BuilderConfig, HyperliquidEnv } from "./signing/types";
 
-type AnyValiErrorSchema =
-	| BaseSchema<unknown, unknown, BaseIssue<unknown>>
-	| BaseSchemaAsync<unknown, unknown, BaseIssue<unknown>>;
-
-export type HyperliquidQueryError = HyperliquidError | ValiError<AnyValiErrorSchema>;
+export type HyperliquidQueryError = HyperliquidError;
 
 export type QueryParameter<TQueryFnData, TData = TQueryFnData> = Omit<
 	UseQueryOptions<TQueryFnData, HyperliquidQueryError, TData, QueryKey>,

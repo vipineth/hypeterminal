@@ -26,7 +26,7 @@ export function ChartPanel() {
 					<Suspense fallback={<ChartLoadingFallback />}>
 						{selectedMarket && (
 							<TradingViewChart
-								symbol={createChartName(selectedMarket.displayName, selectedMarket.name)}
+								symbol={createChartName(selectedMarket.pairName, selectedMarket.name)}
 								theme={theme === "dark" ? "dark" : "light"}
 							/>
 						)}

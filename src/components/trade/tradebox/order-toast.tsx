@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/time";
 import { cn } from "@/lib/cn";
+import { useGlobalSettings } from "@/stores/use-global-settings-store";
 import { type OrderQueueItem, useOrderQueue, useOrderQueueActions } from "@/stores/use-order-queue-store";
 
 function useAutoRemove(order: OrderQueueItem, onRemove: () => void) {
@@ -140,6 +141,7 @@ function CountdownBar({ order }: { order: OrderQueueItem }) {
 export function OrderToast() {
 	const orders = useOrderQueue();
 	const { removeOrder } = useOrderQueueActions();
+	const { showChartScanlines } = useGlobalSettings();
 
 	if (orders.length === 0) return null;
 
@@ -189,7 +191,7 @@ export function OrderToast() {
 				))}
 			</div>
 
-			<div className="absolute inset-0 pointer-events-none terminal-scanlines opacity-30" />
+			{showChartScanlines && <div className="absolute inset-0 pointer-events-none terminal-scanlines opacity-30" />}
 		</div>
 	);
 }

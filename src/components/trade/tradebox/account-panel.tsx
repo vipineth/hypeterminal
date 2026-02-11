@@ -194,7 +194,7 @@ export function AccountPanel() {
 						<span className="text-3xs text-text-950">{t`Equity`}</span>
 						<span
 							className={cn(
-								"text-3xs font-medium tabular-nums",
+								"text-xs font-medium tabular-nums",
 								(activeTab === "perps" ? hasPerpData : hasSpotData) ? "text-market-up-600" : "text-text-950",
 							)}
 						>
@@ -204,7 +204,7 @@ export function AccountPanel() {
 					{activeTab === "perps" && (
 						<div className="flex items-center gap-1">
 							<span className="text-3xs text-text-950">{t`PNL`}</span>
-							<span className={cn("text-3xs font-medium tabular-nums", headerPnlClass)}>{headerPnl}</span>
+							<span className={cn("text-xs font-medium tabular-nums", headerPnlClass)}>{headerPnl}</span>
 						</div>
 					)}
 				</div>

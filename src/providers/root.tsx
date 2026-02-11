@@ -1,7 +1,6 @@
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect } from "react";
 import { WagmiProvider } from "wagmi";
 import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/hyperliquid";
 import { config } from "@/config/wagmi";
@@ -20,12 +19,6 @@ export function getRootProviderContext() {
 const env = import.meta.env.VITE_HYPERLIQUID_TESTNET === "true" ? "Testnet" : "Mainnet";
 
 export function RootProvider({ children, queryClient }: { children: React.ReactNode; queryClient: QueryClient }) {
-	useEffect(() => {
-		import("@/lib/performance/init").then(({ initPerformanceMonitoring }) => {
-			initPerformanceMonitoring();
-		});
-	}, []);
-
 	return (
 		<WagmiProvider config={config}>
 			<QueryClientProvider client={queryClient}>

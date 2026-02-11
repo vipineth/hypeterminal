@@ -6,12 +6,12 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
-import { formatDateTime, formatNumber, formatUSD } from "@/lib/format";
+import { formatDateTime, formatToken, formatUSD } from "@/lib/format";
 import { useMarkets } from "@/lib/hyperliquid";
 import { useSubUserHistoricalOrders } from "@/lib/hyperliquid/hooks/subscription";
-import { ORDER_SIDE_CONFIG } from "@/lib/trade/open-orders";
+import { getSideClass, getSideLabel } from "@/lib/trade/open-orders";
 import { useMarketActions } from "@/stores/use-market-store";
-import { AssetDisplay, type AssetInfo } from "../components/asset-display";
+import { AssetDisplay } from "../components/asset-display";
 
 interface PlaceholderProps {
 	children: React.ReactNode;
@@ -98,9 +98,6 @@ export function OrdersHistoryTab() {
 								{orders.map((entry, i) => {
 									const { order } = entry;
 									const market = markets.getMarket(order.coin);
-									const assetInfo: AssetInfo = market ?? { displayName: order.coin, iconUrl: undefined };
-									const sideConfig = ORDER_SIDE_CONFIG[order.side];
-									const szDecimals = market?.szDecimals ?? 4;
 
 									return (
 										<TableRow
@@ -110,34 +107,34 @@ export function OrdersHistoryTab() {
 												i % 2 === 1 && "bg-surface-analysis",
 											)}
 										>
-											<TableCell className="text-3xs text-text-600 py-1.5 whitespace-nowrap">
+											<TableCell className="text-xs text-text-600 py-1.5 whitespace-nowrap">
 												{formatDateTime(order.timestamp, { dateStyle: "short", timeStyle: "short" })}
 											</TableCell>
-											<TableCell className="text-3xs font-medium py-1.5">
+											<TableCell className="text-xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">
 													<Button
 														variant="text"
 														size="none"
 														onClick={() => setSelectedMarket(order.coin)}
 														className="gap-1.5"
-														aria-label={t`Switch to ${assetInfo.displayName} market`}
+														aria-label={t`Switch to ${order.coin} market`}
 													>
-														<AssetDisplay asset={assetInfo} />
+														<AssetDisplay coin={order.coin} />
 													</Button>
-													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideConfig.class)}>
-														{sideConfig.label}
+													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", getSideClass(order.side))}>
+														{getSideLabel(order.side, market?.kind)}
 													</span>
 												</div>
 											</TableCell>
-											<TableCell className="text-3xs py-1.5">{order.orderType}</TableCell>
-											<TableCell className="text-3xs text-right tabular-nums py-1.5">
+											<TableCell className="text-xs py-1.5">{order.orderType}</TableCell>
+											<TableCell className="text-xs text-right tabular-nums py-1.5">
 												{formatUSD(order.limitPx, { compact: false })}
 											</TableCell>
-											<TableCell className="text-3xs text-right tabular-nums py-1.5">
-												{formatNumber(order.origSz, szDecimals)} {order.coin}
+											<TableCell className="text-xs text-right tabular-nums py-1.5">
+												{formatToken(order.origSz, market?.szDecimals)}
 											</TableCell>
-											<TableCell className="text-3xs py-1.5 capitalize">{entry.status}</TableCell>
-											<TableCell className="text-3xs text-right tabular-nums text-text-600 py-1.5 whitespace-nowrap">
+											<TableCell className="text-xs py-1.5 capitalize">{entry.status}</TableCell>
+											<TableCell className="text-xs text-right tabular-nums text-text-600 py-1.5 whitespace-nowrap">
 												{formatDateTime(entry.statusTimestamp, { dateStyle: "short", timeStyle: "short" })}
 											</TableCell>
 										</TableRow>

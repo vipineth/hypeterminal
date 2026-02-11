@@ -112,7 +112,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 				>
 					{selectedMarket && (
 						<TradingViewChart
-							symbol={createChartName(selectedMarket.displayName, selectedMarket.name)}
+							symbol={createChartName(selectedMarket.pairName, selectedMarket.name)}
 							theme={theme === "dark" ? "dark" : "light"}
 						/>
 					)}

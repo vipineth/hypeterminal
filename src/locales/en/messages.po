@@ -208,7 +208,6 @@ msgstr "Builder Fee"
 msgid "Builders"
 msgstr "Builders"
 
-#: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "buy"
 msgstr "buy"
@@ -877,7 +876,6 @@ msgstr "Loading wallet..."
 msgid "Loading..."
 msgstr "Loading..."
 
-#: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Long"
@@ -1136,8 +1134,8 @@ msgid "Not connected"
 msgstr "Not connected"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Notifications"
-msgstr "Notifications"
+#~ msgid "Notifications"
+#~ msgstr "Notifications"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Number Format"
@@ -1378,6 +1376,10 @@ msgstr "Scale level below min notional"
 msgid "Scale levels must be {SCALE_LEVELS_MIN}-{SCALE_LEVELS_MAX}"
 msgstr "Scale levels must be {SCALE_LEVELS_MIN}-{SCALE_LEVELS_MAX}"
 
+#: src/components/trade/footer/footer-bar.tsx
+#~ msgid "Search"
+#~ msgstr "Search"
+
 #: src/components/trade/chart/token-selector.tsx
 msgid "Search markets..."
 msgstr "Search markets..."
@@ -1430,7 +1432,6 @@ msgstr "Select token"
 msgid "Select tokens to swap"
 msgstr "Select tokens to swap"
 
-#: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "sell"
 msgstr "sell"
@@ -1497,31 +1498,30 @@ msgstr "Set to {p}%"
 msgid "Settings"
 msgstr "Settings"
 
-#: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Short"
 msgstr "Short"
 
 #: src/components/trade/components/global-settings-dialog.tsx
-msgid "Show Executions"
-msgstr "Show Executions"
+#~ msgid "Show Executions"
+#~ msgstr "Show Executions"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #~ msgid "Show Executions on Chart"
 #~ msgstr "Show Executions on Chart"
 
 #: src/components/trade/components/global-settings-dialog.tsx
-msgid "Show Orders"
-msgstr "Show Orders"
+#~ msgid "Show Orders"
+#~ msgstr "Show Orders"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #~ msgid "Show Orders on Chart"
 #~ msgstr "Show Orders on Chart"
 
 #: src/components/trade/components/global-settings-dialog.tsx
-msgid "Show Positions"
-msgstr "Show Positions"
+#~ msgid "Show Positions"
+#~ msgstr "Show Positions"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #~ msgid "Show Positions on Chart"
@@ -1716,9 +1716,9 @@ msgstr "Swap submitted"
 msgid "Swapping..."
 msgstr "Swapping..."
 
-#. placeholder {0}: assetInfo.displayName
-#. placeholder {0}: markets.getMarket(fill.coin)?.displayName ?? fill.coin
-#. placeholder {0}: markets.getMarket(state.coin)?.displayName ?? state.coin
+#. placeholder {0}: fill.coin
+#. placeholder {0}: order.coin
+#. placeholder {0}: state.coin
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
@@ -1884,7 +1884,7 @@ msgstr "TP/SL"
 msgid "Trade History"
 msgstr "Trade History"
 
-#. placeholder {0}: spotMarket.displayName
+#. placeholder {0}: spotMarket.pairName
 #: src/components/trade/components/spot-swap-modal.tsx
 msgid "Trade via {0} spot market"
 msgstr "Trade via {0} spot market"

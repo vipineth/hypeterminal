@@ -14,6 +14,7 @@ import { useMarkets } from "@/lib/hyperliquid";
 import { useSubTwapStates } from "@/lib/hyperliquid/hooks/subscription";
 import { toBig } from "@/lib/trade/numbers";
 import { useMarketActions } from "@/stores/use-market-store";
+import { AssetDisplay } from "../components/asset-display";
 
 interface PlaceholderProps {
 	children: React.ReactNode;
@@ -121,7 +122,7 @@ export function TwapTab() {
 												i % 2 === 1 && "bg-surface-analysis",
 											)}
 										>
-											<TableCell className="text-3xs font-medium py-1.5">
+											<TableCell className="text-xs font-medium py-1.5">
 												<div className="flex items-center gap-1.5">
 													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideClass)}>
 														{isBuy ? t`buy` : t`sell`}
@@ -130,29 +131,30 @@ export function TwapTab() {
 														variant="text"
 														size="none"
 														onClick={() => setSelectedMarket(state.coin)}
-														aria-label={t`Switch to ${markets.getMarket(state.coin)?.displayName ?? state.coin} market`}
+														className="gap-1.5"
+														aria-label={t`Switch to ${state.coin} market`}
 													>
-														{markets.getMarket(state.coin)?.displayName ?? state.coin}
+														<AssetDisplay coin={state.coin} />
 													</Button>
 												</div>
 											</TableCell>
-											<TableCell className="text-3xs text-right tabular-nums py-1.5">
+											<TableCell className="text-xs text-right tabular-nums py-1.5">
 												{formatNumber(totalSize, szDecimals)}
 											</TableCell>
-											<TableCell className="text-3xs text-right tabular-nums py-1.5">
+											<TableCell className="text-xs text-right tabular-nums py-1.5">
 												<span className={cn(isBuy ? "text-market-up-600" : "text-market-down-600")}>
 													{formatNumber(executedSize, szDecimals)}
 												</span>
 											</TableCell>
-											<TableCell className="text-3xs text-right tabular-nums py-1.5">
+											<TableCell className="text-xs text-right tabular-nums py-1.5">
 												{formatPrice(avgPrice, { szDecimals })}
 											</TableCell>
-											<TableCell className="text-3xs tabular-nums py-1.5">
+											<TableCell className="text-xs tabular-nums py-1.5">
 												<TimeTicker startTime={creationTime} durationMs={totalMinutes * 60 * 1000} isActive={true} /> /{" "}
 												{formatDuration(totalMinutes)}
 											</TableCell>
-											<TableCell className="text-3xs py-1.5">{state.reduceOnly ? t`Yes` : t`No`}</TableCell>
-											<TableCell className="text-3xs tabular-nums py-1.5">
+											<TableCell className="text-xs py-1.5">{state.reduceOnly ? t`Yes` : t`No`}</TableCell>
+											<TableCell className="text-xs tabular-nums py-1.5">
 												{formatDateTime(creationTime, {
 													day: "2-digit",
 													month: "2-digit",

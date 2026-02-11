@@ -1,10 +1,10 @@
 import { t } from "@lingui/core/macro";
-import { GithubLogoIcon, PulseIcon, SpinnerGapIcon, WifiHighIcon, WifiSlashIcon } from "@phosphor-icons/react";
+import { GithubLogoIcon, SpinnerGapIcon, WifiHighIcon, WifiSlashIcon } from "@phosphor-icons/react";
 import { ClientOnly } from "@tanstack/react-router";
 import { APP_VERSION, GITHUB_URL } from "@/config/constants";
 import { formatTime } from "@/lib/format";
 import { type ApiStatus, useApiStatus } from "@/lib/hyperliquid";
-import { usePerfPanel } from "@/providers/perf-panel";
+import { useCommandMenuActions } from "@/stores/use-global-modal-store";
 
 function getStatusDisplay(status: ApiStatus) {
 	switch (status) {
@@ -35,34 +35,10 @@ function getStatusDisplay(status: ApiStatus) {
 	}
 }
 
-function PerfToggle() {
-	const { isVisible, isEnabled, toggle, enable, show } = usePerfPanel();
-
-	function handleClick() {
-		if (isEnabled) {
-			toggle();
-		} else {
-			enable();
-			show();
-		}
-	}
-
-	return (
-		<button
-			type="button"
-			onClick={handleClick}
-			className="flex items-center gap-1 hover:text-primary-default transition-colors"
-			title="Toggle Performance Panel"
-		>
-			<PulseIcon className={`size-3 ${isVisible ? "text-primary-default" : "text-text-950"}`} />
-			<span className={isVisible ? "text-primary-default" : "text-text-950"}>Perf</span>
-		</button>
-	);
-}
-
 export function FooterBar() {
 	const { status } = useApiStatus();
 	const { icon, text, className } = getStatusDisplay(status);
+	const { open } = useCommandMenuActions();
 
 	return (
 		<footer className="fixed bottom-0 left-0 right-0 z-40 h-6 border-t border-border-200/60 px-2 text-4xs uppercase tracking-wider flex items-center justify-between bg-surface-execution">
@@ -71,9 +47,16 @@ export function FooterBar() {
 					{icon}
 					<span className={className}>{text}</span>
 				</div>
-				<div className="h-3 w-px bg-border-200/60" />
-				<PerfToggle />
 			</div>
+			<button
+				type="button"
+				onClick={open}
+				className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 text-text-500 hover:text-text-950 transition-colors"
+			>
+				<kbd className="ml-0.5 rounded-xs border border-border-200 bg-surface-analysis px-1 py-px text-4xs text-text-600">
+					{"\u2318K"}
+				</kbd>
+			</button>
 			<div className="flex items-center gap-3">
 				<a
 					href={GITHUB_URL}

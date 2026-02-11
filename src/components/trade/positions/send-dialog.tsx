@@ -190,18 +190,12 @@ export function SendDialog({
 
 						<Select value={selectedToken} onValueChange={handleTokenChange}>
 							<SelectTrigger className="flex-1 h-10 bg-surface-base/50 border-border-200/60">
-								<AssetDisplay
-									asset={getToken(selectedToken) ?? { displayName: selectedToken, iconUrl: undefined }}
-									hideIcon
-								/>
+								<AssetDisplay coin={selectedToken} hideIcon />
 							</SelectTrigger>
 							<SelectContent>
 								{tokenOptions.map((tokenName) => (
 									<SelectItem key={tokenName} value={tokenName}>
-										<AssetDisplay
-											asset={getToken(tokenName) ?? { displayName: tokenName, iconUrl: undefined }}
-											hideIcon
-										/>
+										<AssetDisplay coin={tokenName} hideIcon />
 									</SelectItem>
 								))}
 							</SelectContent>

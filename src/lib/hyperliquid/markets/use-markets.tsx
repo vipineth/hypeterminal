@@ -8,6 +8,7 @@ import { useInfoSpotMeta } from "../hooks/info/useInfoSpotMeta";
 import {
 	getBuilderPerpAssetId,
 	getBuilderPerpDisplayName,
+	getBuilderPerpShortName,
 	getPerpAssetId,
 	getPerpDisplayName,
 	getSpotAssetId,
@@ -35,7 +36,8 @@ function createMarkets(params: CreateMarketsParams): Markets {
 			perpMarkets.push({
 				...market,
 				kind: "perp",
-				displayName: getPerpDisplayName(market.name),
+				shortName: market.name,
+				pairName: getPerpDisplayName(market.name),
 				assetId: getPerpAssetId(i),
 				ctxIndex: i,
 				iconUrl: getIconUrlFromMarketName(market.name, "perp"),
@@ -67,7 +69,8 @@ function createMarkets(params: CreateMarketsParams): Markets {
 			spotMarkets.push({
 				...pair,
 				kind: "spot",
-				displayName,
+				shortName: baseToken.displayName,
+				pairName: displayName,
 				assetId: getSpotAssetId(pair.index),
 				ctxIndex: pair.index,
 				tokensInfo,
@@ -94,7 +97,8 @@ function createMarkets(params: CreateMarketsParams): Markets {
 				builderPerpMarkets.push({
 					...asset,
 					kind: "builderPerp",
-					displayName: getBuilderPerpDisplayName(asset.name, quoteToken?.displayName),
+					shortName: getBuilderPerpShortName(asset.name),
+					pairName: getBuilderPerpDisplayName(asset.name, quoteToken?.displayName),
 					assetId: getBuilderPerpAssetId(dexIndex, assetIndex),
 					dex: dexName,
 					dexIndex,
@@ -113,6 +117,14 @@ function createMarkets(params: CreateMarketsParams): Markets {
 		marketByName.set(market.name, market);
 	}
 
+	const tokenByName = new Map<string, SpotToken>();
+	for (const token of spotTokens) {
+		tokenByName.set(token.name, token);
+		if (token.displayName !== token.name) {
+			tokenByName.set(token.displayName, token);
+		}
+	}
+
 	return {
 		all: allMarkets,
 		perp: perpMarkets,
@@ -124,6 +136,10 @@ function createMarkets(params: CreateMarketsParams): Markets {
 
 		getMarket(coin: string): UnifiedMarket | undefined {
 			return marketByName.get(coin);
+		},
+
+		getToken(name: string): SpotToken | undefined {
+			return tokenByName.get(name);
 		},
 
 		getSzDecimals(coin: string): number {

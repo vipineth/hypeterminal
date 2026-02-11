@@ -44,8 +44,6 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 
 interface TpSlPositionData {
 	coin: string;
-	displayName: string;
-	iconUrl: string | undefined;
 	assetId: number;
 	isLong: boolean;
 	size: number;
@@ -99,14 +97,12 @@ function PositionRow({
 	const assetId = market?.assetId;
 	const szDecimals = market?.szDecimals ?? 4;
 	const markPx = toBig(markPxRaw)?.toNumber() ?? Number.NaN;
-	const displayName = market?.displayName ?? p.coin;
-	const assetInfo = market ?? { displayName: p.coin, iconUrl: undefined };
+	const displayName = market?.pairName ?? p.coin;
 
 	const unrealizedPnl = toBig(p.unrealizedPnl)?.toNumber() ?? Number.NaN;
 	const cumFunding = toBig(p.cumFunding.sinceOpen)?.toNumber() ?? Number.NaN;
 	const canClose = isPositive(absSize) && typeof assetId === "number" && isPositive(markPx);
 
-	const sideClass = isLong ? "bg-market-up-100 text-market-up-600" : "bg-market-down-100 text-market-down-600";
 	const pnlClass = unrealizedPnl >= 0 ? "text-market-up-600" : "text-market-down-600";
 	const fundingClass = getValueColorClass(cumFunding ? -cumFunding : null);
 	const hasTpSl = !!(tpSlInfo?.tpPrice || tpSlInfo?.slPrice);
@@ -120,8 +116,6 @@ function PositionRow({
 		if (typeof assetId !== "number") return;
 		onOpenTpSl({
 			coin: p.coin,
-			displayName,
-			iconUrl: assetInfo.iconUrl,
 			assetId,
 			isLong,
 			size: absSize,
@@ -139,23 +133,27 @@ function PositionRow({
 
 	return (
 		<TableRow className={cn("border-border-200/40 hover:bg-surface-analysis/30", isEven && "bg-surface-analysis")}>
-			<TableCell className="text-3xs font-medium py-1.5">
-				<div className="flex items-center gap-1.5">
-					<Button
-						variant="text"
-						size="none"
-						onClick={() => onSelectMarket(p.coin)}
-						className="gap-1.5"
-						aria-label={t`Switch to ${displayName} market`}
-					>
-						<AssetDisplay asset={assetInfo} />
-					</Button>
-					<span className={cn("text-5xs font-bold px-1 py-0.5 rounded-sm uppercase", sideClass)}>
-						{isLong ? t`Long` : t`Short`}
-					</span>
-				</div>
+			<TableCell
+				className={cn(
+					"text-3xs font-medium py-1.5 border-l-2",
+					isLong ? "border-l-market-up-600" : "border-l-market-down-600",
+				)}
+			>
+				<Button
+					variant="text"
+					size="none"
+					onClick={() => onSelectMarket(p.coin)}
+					className="gap-1.5"
+					aria-label={t`Switch to ${displayName} market`}
+				>
+					<AssetDisplay
+						coin={p.coin}
+						nameClassName="text-xs"
+						subtitle={<span className="text-5xs text-text-600 uppercase">{isLong ? t`Long` : t`Short`}</span>}
+					/>
+				</Button>
 			</TableCell>
-			<TableCell className="text-3xs text-right tabular-nums py-1.5">
+			<TableCell className="text-xs text-right tabular-nums py-1.5">
 				<div className="flex flex-col items-end">
 					<span className="tabular-nums">
 						{formatToken(absSize, {
@@ -163,29 +161,29 @@ function PositionRow({
 							symbol: p.coin,
 						})}
 					</span>
-					<span className="text-text-500 text-4xs">({formatUSD(p.positionValue, { compact: true })})</span>
+					<span className="text-text-500 text-2xs">({formatUSD(p.positionValue, { compact: true })})</span>
 				</div>
 			</TableCell>
-			<TableCell className="text-3xs text-right py-1.5">
+			<TableCell className="text-xs text-right py-1.5">
 				<div className="flex flex-col items-end">
 					<span className="tabular-nums">{formatUSD(p.marginUsed)}</span>
-					<span className="text-text-500 text-4xs">{p.leverage.type === "isolated" ? t`Isolated` : t`Cross`}</span>
+					<span className="text-text-500 text-2xs">{p.leverage.type === "isolated" ? t`Isolated` : t`Cross`}</span>
 				</div>
 			</TableCell>
-			<TableCell className="text-3xs text-right tabular-nums text-text-600 py-1.5">
+			<TableCell className="text-xs text-right tabular-nums text-text-600 py-1.5">
 				{formatPrice(p.entryPx, { szDecimals })}
 			</TableCell>
-			<TableCell className="text-3xs text-right tabular-nums py-1.5">{formatPrice(markPx, { szDecimals })}</TableCell>
-			<TableCell className="text-3xs text-right tabular-nums text-market-down-600 py-1.5">
+			<TableCell className="text-xs text-right tabular-nums py-1.5">{formatPrice(markPx, { szDecimals })}</TableCell>
+			<TableCell className="text-xs text-right tabular-nums text-market-down-600 py-1.5">
 				{formatPrice(p.liquidationPx, { szDecimals })}
 			</TableCell>
-			<TableCell className={cn("text-3xs text-right tabular-nums py-1.5", fundingClass)}>
+			<TableCell className={cn("text-xs text-right tabular-nums py-1.5", fundingClass)}>
 				{formatUSD(cumFunding ? -cumFunding : null, { signDisplay: "exceptZero" })}
 			</TableCell>
 			<TableCell className="text-right py-1.5">
-				<div className={cn("text-3xs tabular-nums flex flex-col items-end", pnlClass)}>
+				<div className={cn("text-xs tabular-nums flex flex-col items-end", pnlClass)}>
 					<span className="tabular-nums">{formatUSD(unrealizedPnl, { signDisplay: "exceptZero" })}</span>
-					<span className="text-text-500 text-4xs">({formatPercent(p.returnOnEquity, 1)})</span>
+					<span className="text-text-500 text-2xs">({formatPercent(p.returnOnEquity, 1)})</span>
 				</div>
 			</TableCell>
 			<TableCell className="text-right py-1.5">

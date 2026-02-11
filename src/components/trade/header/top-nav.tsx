@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { BellIcon, DownloadSimpleIcon, GearIcon, TerminalIcon } from "@phosphor-icons/react";
+import { DownloadSimpleIcon, GearIcon, TerminalIcon } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
@@ -109,13 +109,6 @@ export function TopNav() {
 				)}
 				<UserMenu />
 				<div className="flex items-center gap-1">
-					<button
-						type="button"
-						className="size-7 inline-flex items-center justify-center rounded text-text-600 hover:text-primary-default transition-colors"
-						aria-label={t`Notifications`}
-					>
-						<BellIcon className="size-4" />
-					</button>
 					<ThemeToggle />
 					<button
 						type="button"

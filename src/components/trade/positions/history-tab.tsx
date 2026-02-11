@@ -12,6 +12,7 @@ import { useMarkets } from "@/lib/hyperliquid";
 import { useSubUserFills } from "@/lib/hyperliquid/hooks/subscription";
 import { getValueColorClass, toNumber } from "@/lib/trade/numbers";
 import { useMarketActions } from "@/stores/use-market-store";
+import { AssetDisplay } from "../components/asset-display";
 
 interface PlaceholderProps {
 	children: React.ReactNode;
@@ -96,10 +97,6 @@ export function HistoryTab() {
 							</TableHeader>
 							<TableBody>
 								{fills.map((fill, i) => {
-									const isBuy = fill.side === "B";
-									const sideClass = isBuy
-										? "bg-market-up-100 text-market-up-600"
-										: "bg-market-down-100 text-market-down-600";
 									const fee = toNumber(fill.fee);
 									const feeClass = getValueColorClass(fee);
 									const closedPnl = toNumber(fill.closedPnl);
@@ -113,22 +110,18 @@ export function HistoryTab() {
 												i % 2 === 1 && "bg-surface-analysis",
 											)}
 										>
-											<TableCell className="text-3xs font-medium py-1.5">
-												<div className="flex items-center gap-1.5">
-													<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideClass)}>
-														{isBuy ? t`buy` : t`sell`}
-													</span>
-													<Button
-														variant="text"
-														size="none"
-														onClick={() => setSelectedMarket(fill.coin)}
-														aria-label={t`Switch to ${markets.getMarket(fill.coin)?.displayName ?? fill.coin} market`}
-													>
-														{markets.getMarket(fill.coin)?.displayName ?? fill.coin}
-													</Button>
-												</div>
+											<TableCell className="text-xs font-medium py-1.5">
+												<Button
+													variant="text"
+													size="none"
+													onClick={() => setSelectedMarket(fill.coin)}
+													className="gap-1.5"
+													aria-label={t`Switch to ${fill.coin} market`}
+												>
+													<AssetDisplay coin={fill.coin} />
+												</Button>
 											</TableCell>
-											<TableCell className="text-3xs py-1.5">
+											<TableCell className="text-xs py-1.5">
 												<span
 													className={cn(
 														"text-4xs px-1 py-0.5 rounded-sm uppercase",
@@ -138,18 +131,18 @@ export function HistoryTab() {
 													{fill.liquidation ? t`Liquidated` : fill.dir}
 												</span>
 											</TableCell>
-											<TableCell className="text-3xs text-right tabular-nums py-1.5">{formatUSD(fill.px)}</TableCell>
-											<TableCell className="text-3xs text-right tabular-nums py-1.5">
+											<TableCell className="text-xs text-right tabular-nums py-1.5">{formatUSD(fill.px)}</TableCell>
+											<TableCell className="text-xs text-right tabular-nums py-1.5">
 												{formatNumber(fill.sz, markets.getSzDecimals(fill.coin))}
 											</TableCell>
-											<TableCell className="text-3xs text-right tabular-nums py-1.5">
+											<TableCell className="text-xs text-right tabular-nums py-1.5">
 												<span className={feeClass}>
 													{formatToken(fill.fee, {
 														symbol: fill.feeToken,
 													})}
 												</span>
 											</TableCell>
-											<TableCell className="text-3xs text-right tabular-nums py-1.5">
+											<TableCell className="text-xs text-right tabular-nums py-1.5">
 												{showPnl ? (
 													<span className={getValueColorClass(closedPnl)}>
 														{formatUSD(closedPnl, {
@@ -160,7 +153,7 @@ export function HistoryTab() {
 													<span className="text-text-600">{FALLBACK_VALUE_PLACEHOLDER}</span>
 												)}
 											</TableCell>
-											<TableCell className="text-3xs text-right tabular-nums text-text-600 py-1.5">
+											<TableCell className="text-xs text-right tabular-nums text-text-600 py-1.5">
 												<div className="flex flex-col items-end underline decoration-dashed decoration-muted-fg/30">
 													<a
 														className="flex items-center gap-1"

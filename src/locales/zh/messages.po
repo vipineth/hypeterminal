@@ -208,7 +208,6 @@ msgstr ""
 msgid "Builders"
 msgstr ""
 
-#: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "buy"
 msgstr "买入"
@@ -873,7 +872,6 @@ msgstr "加载钱包中..."
 msgid "Loading..."
 msgstr "加载中..."
 
-#: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Long"
@@ -1132,8 +1130,8 @@ msgid "Not connected"
 msgstr "未连接"
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Notifications"
-msgstr "通知"
+#~ msgid "Notifications"
+#~ msgstr "通知"
 
 #: src/components/trade/components/global-settings-dialog.tsx
 msgid "Number Format"
@@ -1374,6 +1372,10 @@ msgstr ""
 msgid "Scale levels must be {SCALE_LEVELS_MIN}-{SCALE_LEVELS_MAX}"
 msgstr ""
 
+#: src/components/trade/footer/footer-bar.tsx
+#~ msgid "Search"
+#~ msgstr ""
+
 #: src/components/trade/chart/token-selector.tsx
 msgid "Search markets..."
 msgstr "搜索市场..."
@@ -1426,7 +1428,6 @@ msgstr "选择代币"
 msgid "Select tokens to swap"
 msgstr ""
 
-#: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
 msgid "sell"
 msgstr "卖出"
@@ -1493,31 +1494,30 @@ msgstr ""
 msgid "Settings"
 msgstr "设置"
 
-#: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Short"
 msgstr "空"
 
 #: src/components/trade/components/global-settings-dialog.tsx
-msgid "Show Executions"
-msgstr ""
+#~ msgid "Show Executions"
+#~ msgstr ""
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #~ msgid "Show Executions on Chart"
 #~ msgstr "在图表上显示成交"
 
 #: src/components/trade/components/global-settings-dialog.tsx
-msgid "Show Orders"
-msgstr ""
+#~ msgid "Show Orders"
+#~ msgstr ""
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #~ msgid "Show Orders on Chart"
 #~ msgstr "在图表上显示订单"
 
 #: src/components/trade/components/global-settings-dialog.tsx
-msgid "Show Positions"
-msgstr ""
+#~ msgid "Show Positions"
+#~ msgstr ""
 
 #: src/components/trade/components/global-settings-dialog.tsx
 #~ msgid "Show Positions on Chart"
@@ -1712,9 +1712,9 @@ msgstr ""
 msgid "Swapping..."
 msgstr ""
 
-#. placeholder {0}: assetInfo.displayName
-#. placeholder {0}: markets.getMarket(fill.coin)?.displayName ?? fill.coin
-#. placeholder {0}: markets.getMarket(state.coin)?.displayName ?? state.coin
+#. placeholder {0}: fill.coin
+#. placeholder {0}: order.coin
+#. placeholder {0}: state.coin
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
@@ -1880,7 +1880,7 @@ msgstr "止盈止损"
 msgid "Trade History"
 msgstr "交易历史"
 
-#. placeholder {0}: spotMarket.displayName
+#. placeholder {0}: spotMarket.pairName
 #: src/components/trade/components/spot-swap-modal.tsx
 msgid "Trade via {0} spot market"
 msgstr ""

@@ -74,7 +74,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 		filteredMarkets,
 		highlightedIndex,
 		handleKeyDown,
-	} = useTokenSelector({ value: selectedMarket?.name ?? "", onValueChange });
+	} = useTokenSelector({ value: selectedMarket?.name, onValueChange });
 
 	const virtualItems = virtualizer.getVirtualItems();
 	const headerGroup = table.getHeaderGroups()[0];
@@ -88,9 +88,9 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 					role="combobox"
 					aria-expanded={open}
 					aria-label={t`Select token`}
-					className="gap-2 px-2 h-7 min-w-36 bg-surface-execution border border-border-200/40 rounded-sm text-2xs font-bold uppercase tracking-wider hover:bg-surface-execution"
+					className="gap-2 px-2 py-1.5 bg-surface-execution border border-border-200/40 rounded-sm text-2xs font-bold uppercase tracking-wider hover:bg-surface-execution"
 				>
-					{selectedMarket && <AssetDisplay asset={selectedMarket} iconClassName="size-6 shrink-0" />}
+					{selectedMarket && <AssetDisplay coin={selectedMarket.name} variant="full" iconClassName="size-4 shrink-0" />}
 					<CaretDownIcon className="size-4 text-text-600" />
 				</Button>
 			</PopoverTrigger>
@@ -100,15 +100,15 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 				sideOffset={8}
 				onKeyDown={handleKeyDown}
 			>
-				<div className="flex flex-col p-2">
+				<div className="flex flex-col">
 					<div className="border-b border-border-200/40">
-						<div className="relative">
-							<MagnifyingGlassIcon className="absolute left-2 top-1/2 -translate-y-1/2 size-3 text-text-600" />
+						<div className="relative p-2">
+							<MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-text-600" />
 							<Input
 								placeholder={t`Search markets...`}
 								value={search}
 								onChange={(e) => setSearch(e.target.value)}
-								className="pl-7 h-7 text-xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/40"
+								className="pl-7 py-4 text-xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/40"
 							/>
 						</div>
 					</div>
@@ -168,7 +168,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 					<div className="flex items-center px-3 py-1.5 text-4xs uppercase tracking-wider text-text-950 border-b border-border-200/40 bg-surface-base/30">
 						<div className="flex-1 min-w-0">{t`Market`}</div>
 						{headerGroup?.headers
-							.filter((h) => h.id !== "displayName")
+							.filter((h) => h.id !== "pairName")
 							.map((header) => {
 								const sortState = header.column.getIsSorted();
 								const hiddenOnMobile = ["oi", "volume", "funding"].includes(header.id);
@@ -264,10 +264,10 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 											}}
 										>
 											<div className="flex-1 min-w-0 flex items-center gap-2">
-												<AssetDisplay asset={market} hideName iconClassName="size-5 shrink-0" />
+												<AssetDisplay coin={market.name} hideName iconClassName="size-5 shrink-0" />
 												<div className="min-w-0">
 													<div className="flex items-center gap-1">
-														<span className="font-semibold text-2xs">{market.displayName}</span>
+														<span className="font-semibold text-2xs">{market.pairName}</span>
 														<Button
 															variant="text"
 															size="none"
@@ -285,7 +285,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 																)}
 															/>
 														</Button>
-														{isTokenInCategory(market.displayName, "new") && (
+														{isTokenInCategory(market.shortName, "new") && (
 															<Badge variant="neutral" size="xs" className="px-1 py-0 text-4xs">
 																{t`NEW`}
 															</Badge>

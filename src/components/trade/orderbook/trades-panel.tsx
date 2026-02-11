@@ -2,7 +2,7 @@ import { t } from "@lingui/core/macro";
 import { ArrowSquareOutIcon, ArrowsLeftRightIcon } from "@phosphor-icons/react";
 import { memo, useEffect, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { getBaseQuoteFromDisplayName } from "@/domain/market";
+import { getBaseQuoteFromPairName } from "@/domain/market";
 import { useRingBuffer } from "@/lib/circular-buffer";
 import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
@@ -89,7 +89,7 @@ export function TradesPanel() {
 
 	const { baseToken, quoteToken } = useMemo(() => {
 		if (!selectedMarket) return { baseToken: "", quoteToken: "" };
-		return getBaseQuoteFromDisplayName(selectedMarket.displayName, selectedMarket.kind);
+		return getBaseQuoteFromPairName(selectedMarket.pairName, selectedMarket.kind);
 	}, [selectedMarket]);
 
 	const szDecimals = selectedMarket?.szDecimals ?? 4;

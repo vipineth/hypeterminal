@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/cn";
 import { createLazyComponent } from "@/lib/lazy";
+import { useGlobalSettings } from "@/stores/use-global-settings-store";
 import { FooterBar } from "./footer/footer-bar";
 import { TopNav } from "./header/top-nav";
 import { MainWorkspace } from "./layout/main-workspace";
@@ -11,6 +13,7 @@ const GlobalModals = createLazyComponent(() => import("./components/global-modal
 
 export function TradeTerminalPage() {
 	const isMobile = useIsMobile();
+	const { showChartScanlines } = useGlobalSettings();
 
 	return (
 		<>
@@ -19,7 +22,12 @@ export function TradeTerminalPage() {
 					<MobileTerminal />
 				</Suspense>
 			) : (
-				<div className="bg-surface-200 text-fg-950 min-h-screen w-full flex flex-col font-mono terminal-scanlines pt-11 pb-6">
+				<div
+					className={cn(
+						"bg-surface-200 text-fg-950 min-h-screen w-full flex flex-col font-mono pt-11 pb-6",
+						showChartScanlines && "terminal-scanlines",
+					)}
+				>
 					<TopNav />
 					<MainWorkspace />
 					<FooterBar />

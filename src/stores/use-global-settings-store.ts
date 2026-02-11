@@ -17,9 +17,6 @@ type Theme = "dark" | "light";
 const globalSettingsSchema = z.object({
 	state: z.object({
 		hideSmallBalances: z.boolean().optional(),
-		showOrdersOnChart: z.boolean().optional(),
-		showPositionsOnChart: z.boolean().optional(),
-		showExecutionsOnChart: z.boolean().optional(),
 		showOrderbookInQuote: z.boolean().optional(),
 		showChartScanlines: z.boolean().optional(),
 		numberFormatLocale: z.string().optional(),
@@ -34,9 +31,6 @@ const validatedStorage = createValidatedStorage(globalSettingsSchema, "global se
 
 const DEFAULT_GLOBAL_SETTINGS = {
 	hideSmallBalances: true,
-	showOrdersOnChart: true,
-	showPositionsOnChart: true,
-	showExecutionsOnChart: false,
 	showOrderbookInQuote: false,
 	showChartScanlines: true,
 	numberFormatLocale: "auto" as NumberFormatLocale,
@@ -48,9 +42,6 @@ const DEFAULT_GLOBAL_SETTINGS = {
 
 interface GlobalSettingsStore {
 	hideSmallBalances: boolean;
-	showOrdersOnChart: boolean;
-	showPositionsOnChart: boolean;
-	showExecutionsOnChart: boolean;
 	showOrderbookInQuote: boolean;
 	showChartScanlines: boolean;
 	numberFormatLocale: NumberFormatLocale;
@@ -60,9 +51,6 @@ interface GlobalSettingsStore {
 	theme: Theme;
 	actions: {
 		setHideSmallBalances: (next: boolean) => void;
-		setShowOrdersOnChart: (next: boolean) => void;
-		setShowPositionsOnChart: (next: boolean) => void;
-		setShowExecutionsOnChart: (next: boolean) => void;
 		setShowOrderbookInQuote: (next: boolean) => void;
 		setShowChartScanlines: (next: boolean) => void;
 		setNumberFormatLocale: (next: NumberFormatLocale) => void;
@@ -79,9 +67,6 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 			...DEFAULT_GLOBAL_SETTINGS,
 			actions: {
 				setHideSmallBalances: (next) => set({ hideSmallBalances: next }),
-				setShowOrdersOnChart: (next) => set({ showOrdersOnChart: next }),
-				setShowPositionsOnChart: (next) => set({ showPositionsOnChart: next }),
-				setShowExecutionsOnChart: (next) => set({ showExecutionsOnChart: next }),
 				setShowOrderbookInQuote: (next) => set({ showOrderbookInQuote: next }),
 				setShowChartScanlines: (next) => set({ showChartScanlines: next }),
 				setNumberFormatLocale: (next) => set({ numberFormatLocale: next }),
@@ -103,9 +88,6 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 			storage: createJSONStorage(() => validatedStorage),
 			partialize: (state) => ({
 				hideSmallBalances: state.hideSmallBalances,
-				showOrdersOnChart: state.showOrdersOnChart,
-				showPositionsOnChart: state.showPositionsOnChart,
-				showExecutionsOnChart: state.showExecutionsOnChart,
 				showOrderbookInQuote: state.showOrderbookInQuote,
 				showChartScanlines: state.showChartScanlines,
 				numberFormatLocale: state.numberFormatLocale,
@@ -162,9 +144,6 @@ export function useGlobalSettings() {
 	return useGlobalSettingsStore(
 		useShallow((state) => ({
 			hideSmallBalances: state.hideSmallBalances,
-			showOrdersOnChart: state.showOrdersOnChart,
-			showPositionsOnChart: state.showPositionsOnChart,
-			showExecutionsOnChart: state.showExecutionsOnChart,
 			showOrderbookInQuote: state.showOrderbookInQuote,
 			showChartScanlines: state.showChartScanlines,
 			numberFormatLocale: state.numberFormatLocale,

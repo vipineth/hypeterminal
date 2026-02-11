@@ -37,7 +37,7 @@ export function TokenSelectorDropdown({ tokens, selectedToken, onSelect, getBala
 					)}
 				>
 					{selected ? (
-						<AssetDisplay asset={selected} iconClassName="size-5" nameClassName="text-sm font-medium" />
+						<AssetDisplay coin={selected.name} iconClassName="size-5" nameClassName="text-sm font-medium" />
 					) : (
 						<span className="text-sm font-medium">{selectedToken}</span>
 					)}
@@ -61,7 +61,7 @@ export function TokenSelectorDropdown({ tokens, selectedToken, onSelect, getBala
 								className="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer"
 							>
 								<div className="flex items-center gap-2">
-									<AssetDisplay asset={token} iconClassName="size-5" nameClassName="text-sm font-medium" />
+									<AssetDisplay coin={token.name} iconClassName="size-5" nameClassName="text-sm font-medium" />
 									{isSelected && <CheckIcon className="size-3.5 text-primary-default" />}
 								</div>
 								<span className="text-xs text-text-600 tabular-nums">{formatToken(balance, 4)}</span>

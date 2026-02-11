@@ -12,9 +12,10 @@ import { formatDateTime, formatToken, formatUSD } from "@/lib/format";
 import { useMarkets } from "@/lib/hyperliquid";
 import { useExchangeCancel } from "@/lib/hyperliquid/hooks/exchange/useExchangeCancel";
 import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
-import { getOrderTypeConfig, getOrderValue, getSideConfig, type OpenOrder } from "@/lib/trade/open-orders";
+import type { MarketKind } from "@/lib/hyperliquid/markets/types";
+import { getOrderTypeConfig, getOrderValue, getSideClass, getSideLabel, type OpenOrder } from "@/lib/trade/open-orders";
 import { useMarketActions } from "@/stores/use-market-store";
-import { AssetDisplay, type AssetInfo } from "../components/asset-display";
+import { AssetDisplay } from "../components/asset-display";
 
 interface PlaceholderProps {
 	children: React.ReactNode;
@@ -228,14 +229,12 @@ export function OrdersTab() {
 							</TableHeader>
 							<TableBody>
 								{openOrders.map((order, i) => {
-									const market = markets.getMarket(order.coin);
-									const assetInfo = market ?? { displayName: order.coin, iconUrl: undefined };
 									return (
 										<OrderRow
 											key={order.oid}
 											order={order}
-											assetInfo={assetInfo}
-											szDecimals={market?.szDecimals ?? 4}
+											kind={markets.getMarket(order.coin)?.kind}
+											szDecimals={markets.getSzDecimals(order.coin)}
 											isSelected={selectedOrderIds.has(order.oid)}
 											isCancelling={isCancelling}
 											canCancel={canCancel}
@@ -258,7 +257,7 @@ export function OrdersTab() {
 
 interface OrderRowProps {
 	order: OpenOrder;
-	assetInfo: AssetInfo;
+	kind: MarketKind | undefined;
 	szDecimals: number;
 	isSelected: boolean;
 	isCancelling: boolean;
@@ -271,7 +270,7 @@ interface OrderRowProps {
 
 function OrderRow({
 	order,
-	assetInfo,
+	kind,
 	szDecimals,
 	isSelected,
 	isCancelling,
@@ -281,7 +280,6 @@ function OrderRow({
 	onCancel,
 	onSelectMarket,
 }: OrderRowProps) {
-	const sideConfig = getSideConfig(order);
 	const typeConfig = getOrderTypeConfig(order);
 
 	return (
@@ -294,41 +292,43 @@ function OrderRow({
 					disabled={isCancelling}
 				/>
 			</TableCell>
-			<TableCell className="text-3xs text-text-600 py-1.5 whitespace-nowrap">
+			<TableCell className="text-xs text-text-600 py-1.5 whitespace-nowrap">
 				{formatDateTime(order.timestamp, { dateStyle: "short", timeStyle: "short" })}
 			</TableCell>
-			<TableCell className="text-3xs font-medium py-1.5">
+			<TableCell className="text-xs font-medium py-1.5">
 				<div className="flex items-center gap-1.5">
 					<Button
 						variant="text"
 						size="none"
 						onClick={() => onSelectMarket(order.coin)}
 						className="gap-1.5"
-						aria-label={t`Switch to ${assetInfo.displayName} market`}
+						aria-label={t`Switch to ${order.coin} market`}
 					>
-						<AssetDisplay asset={assetInfo} />
+						<AssetDisplay coin={order.coin} />
 					</Button>
-					<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", sideConfig.class)}>{sideConfig.label}</span>
+					<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", getSideClass(order.side))}>
+						{getSideLabel(order.side, kind)}
+					</span>
 				</div>
 			</TableCell>
-			<TableCell className="text-3xs py-1.5">
+			<TableCell className="text-xs py-1.5">
 				<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", typeConfig.class)}>{typeConfig.label}</span>
 			</TableCell>
-			<TableCell className="text-3xs text-right tabular-nums py-1.5">
+			<TableCell className="text-xs text-right tabular-nums py-1.5">
 				{formatUSD(order.limitPx, { compact: false })}
 			</TableCell>
-			<TableCell className="text-3xs text-right tabular-nums py-1.5">
+			<TableCell className="text-xs text-right tabular-nums py-1.5">
 				<div className="flex flex-col items-end">
 					<span className="tabular-nums">
 						{formatToken(order.origSz, { decimals: szDecimals, symbol: order.coin })}
 					</span>
-					<span className="text-text-500">({formatUSD(getOrderValue(order), { compact: false })})</span>
+					<span className="text-2xs text-text-500">({formatUSD(getOrderValue(order), { compact: false })})</span>
 				</div>
 			</TableCell>
-			<TableCell className="text-3xs text-text-600 py-1.5">
+			<TableCell className="text-xs text-text-600 py-1.5">
 				{order.triggerCondition || FALLBACK_VALUE_PLACEHOLDER}
 			</TableCell>
-			<TableCell className="text-3xs py-1.5">
+			<TableCell className="text-xs py-1.5">
 				{order.reduceOnly ? (
 					<span className="text-primary-default">{t`Yes`}</span>
 				) : (

@@ -4,16 +4,12 @@ import type { SearchConfig } from "../types";
 export const marketSearchConfig: SearchConfig<UnifiedMarketInfo> = {
 	fields: {
 		baseCoin: {
-			extract: (m) => {
-				if (m.kind === "spot") return m.displayName.split("/")[0];
-				if (m.kind === "builderPerp") return m.displayName.split("-")[0];
-				return m.name;
-			},
+			extract: (m) => m.shortName,
 			weight: 2.0,
 			fuzzy: true,
 		},
-		displayName: {
-			extract: (m) => m.displayName,
+		pairName: {
+			extract: (m) => m.pairName,
 			weight: 1.5,
 		},
 		name: {

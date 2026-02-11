@@ -7,6 +7,7 @@ type GlobalModal =
 	| { type: "deposit"; tab: DepositTab }
 	| { type: "settings" }
 	| { type: "swap"; fromToken: string; toToken?: string }
+	| { type: "commandMenu" }
 	| null;
 
 interface DepositActions {
@@ -25,11 +26,17 @@ interface SwapActions {
 	close: () => void;
 }
 
+interface CommandMenuActions {
+	open: () => void;
+	close: () => void;
+}
+
 interface GlobalModalState {
 	modal: GlobalModal;
 	depositActions: DepositActions;
 	settingsActions: SettingsActions;
 	swapActions: SwapActions;
+	commandMenuActions: CommandMenuActions;
 }
 
 const useGlobalModalStore = create<GlobalModalState>((set) => {
@@ -39,8 +46,7 @@ const useGlobalModalStore = create<GlobalModalState>((set) => {
 		modal: null,
 		depositActions: {
 			open: (tab = "deposit") => set({ modal: { type: "deposit", tab } }),
-			setTab: (tab) =>
-				set((state) => (state.modal?.type === "deposit" ? { modal: { type: "deposit", tab } } : state)),
+			setTab: (tab) => set((state) => (state.modal?.type === "deposit" ? { modal: { type: "deposit", tab } } : state)),
 			close,
 		},
 		settingsActions: {
@@ -49,6 +55,10 @@ const useGlobalModalStore = create<GlobalModalState>((set) => {
 		},
 		swapActions: {
 			open: (fromToken = DEFAULT_QUOTE_TOKEN, toToken) => set({ modal: { type: "swap", fromToken, toToken } }),
+			close,
+		},
+		commandMenuActions: {
+			open: () => set({ modal: { type: "commandMenu" } }),
 			close,
 		},
 	};
@@ -68,3 +78,6 @@ export const useSwapModalFromToken = () =>
 export const useSwapModalToToken = () =>
 	useGlobalModalStore((s) => (s.modal?.type === "swap" ? s.modal.toToken : undefined));
 export const useSwapModalActions = () => useGlobalModalStore((s) => s.swapActions);
+
+export const useCommandMenuOpen = () => useGlobalModalStore((s) => s.modal?.type === "commandMenu");
+export const useCommandMenuActions = () => useGlobalModalStore((s) => s.commandMenuActions);

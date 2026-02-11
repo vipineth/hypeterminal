@@ -14,7 +14,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/config/constants";
-import { getBaseQuoteFromDisplayName } from "@/domain/market";
+import { getBaseQuoteFromPairName } from "@/domain/market";
 import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
@@ -146,7 +146,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 
 	const { baseToken, quoteToken } = useMemo(() => {
 		if (!selectedMarket) return { baseToken: "", quoteToken: "" };
-		return getBaseQuoteFromDisplayName(selectedMarket.displayName, selectedMarket.kind);
+		return getBaseQuoteFromPairName(selectedMarket.pairName, selectedMarket.kind);
 	}, [selectedMarket]);
 
 	useEffect(() => {
