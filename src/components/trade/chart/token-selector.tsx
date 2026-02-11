@@ -98,7 +98,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 							coin={selectedMarket.name}
 							variant="full"
 							iconClassName="size-4 shrink-0"
-							nameClassName="min-w-[15ch]"
+							nameClassName="inline-flex min-w-[13ch]"
 						/>
 					)}
 					<CaretDownIcon className="size-4 text-text-600" />
