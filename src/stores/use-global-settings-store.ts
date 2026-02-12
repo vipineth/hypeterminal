@@ -125,6 +125,7 @@ const useGlobalSettingsStore = create<GlobalSettingsStore>()(
 );
 
 function applyThemeClass(theme: Theme) {
+	if (typeof document === "undefined") return;
 	const root = document.documentElement;
 	root.classList.remove("light", "dark");
 	root.classList.add(theme);

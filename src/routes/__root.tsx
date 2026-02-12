@@ -1,6 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
+import { ClientOnly, createRootRouteWithContext, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { NotFoundPage } from "@/components/pages/not-found-page";
+import { Toaster } from "@/components/ui/sonner";
 import { MarketsInfoProvider } from "@/lib/hyperliquid/hooks/MarketsInfoProvider";
 import { buildPageHead, mergeHead } from "@/lib/seo";
 import { ExchangeScopeProvider } from "@/providers/exchange-scope";
@@ -27,6 +28,9 @@ function RootComponent() {
 		<ExchangeScopeProvider>
 			<MarketsInfoProvider>
 				<Outlet />
+				<ClientOnly fallback={null}>
+					<Toaster />
+				</ClientOnly>
 			</MarketsInfoProvider>
 		</ExchangeScopeProvider>
 	);

@@ -5,8 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UI_TEXT } from "@/config/constants";
-import { COPY_FEEDBACK_DURATION_MS } from "@/config/time";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
+import { useCopyToClipboard } from "@/hooks/ui/use-copy-to-clipboard";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD } from "@/lib/format";
 import { toNumber, toNumberOrZero } from "@/lib/trade/numbers";
@@ -27,15 +27,13 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 	const { perpSummary, perpPositions, isLoading } = useAccountBalances();
 
 	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
-	const [copied, setCopied] = useState(false);
+	const { copied, copy } = useCopyToClipboard();
 	const { open: openDepositModal } = useDepositModalActions();
 
-	const handleCopyAddress = async () => {
+	function handleCopyAddress() {
 		if (!address) return;
-		await navigator.clipboard.writeText(address);
-		setCopied(true);
-		setTimeout(() => setCopied(false), COPY_FEEDBACK_DURATION_MS);
-	};
+		copy(address);
+	}
 
 	const accountValue = toNumberOrZero(perpSummary?.accountValue);
 	const totalMarginUsed = toNumberOrZero(perpSummary?.totalMarginUsed);

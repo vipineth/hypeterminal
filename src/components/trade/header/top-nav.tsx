@@ -53,7 +53,7 @@ export function TopNav() {
 	return (
 		<header
 			className={cn(
-				"fixed top-0 left-0 right-0 z-40 h-11 border-b px-3 flex items-center justify-between bg-surface-execution transition-colors",
+				"fixed top-0 left-0 right-0 z-40 h-11 border-b px-3 flex items-center justify-between bg-surface-execution transition-colors duration-300 ease-in-out",
 				accentClass,
 			)}
 		>
@@ -74,7 +74,7 @@ export function TopNav() {
 							key={item.scope}
 							to={item.to}
 							className={cn(
-								"px-2.5 py-1.5 transition-colors",
+								"px-2.5 py-1.5 transition-colors duration-150",
 								scope === item.scope ? item.activeClass : "text-text-950 hover:text-text-600",
 							)}
 						>
@@ -112,7 +112,7 @@ export function TopNav() {
 					<ThemeToggle />
 					<button
 						type="button"
-						className="size-7 inline-flex items-center justify-center rounded text-text-600 hover:text-primary-default transition-colors"
+						className="size-7 inline-flex items-center justify-center rounded text-text-600 hover:text-primary-default transition-colors duration-150"
 						onClick={openSettingsDialog}
 						aria-label={t`Settings`}
 					>

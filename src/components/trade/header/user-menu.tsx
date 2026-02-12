@@ -32,7 +32,11 @@ function CopyAddressMenuItem({ address }: { address: string }) {
 
 	return (
 		<DropdownMenuItem className="flex items-center gap-2" onClick={handleClick}>
-			{copied ? <CheckIcon className="size-3.5" /> : <CopyIcon className="size-3.5" />}
+			{copied ? (
+				<CheckIcon className="size-3.5 animate-in zoom-in-50 fade-in-0 duration-150 ease-out" />
+			) : (
+				<CopyIcon className="size-3.5" />
+			)}
 			<span>
 				<Trans>Copy Address</Trans>
 			</span>

@@ -1,6 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { ListChecksIcon, PencilIcon, PlusIcon } from "@phosphor-icons/react";
 import { useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -74,7 +75,7 @@ interface PositionRowProps {
 	isClosing: boolean;
 	isRowClosing: boolean;
 	isEven: boolean;
-	onClose: (assetId: number, size: number, markPx: number, szDecimals: number, isLong: boolean) => void;
+	onClose: (assetId: number, size: number, markPx: number, szDecimals: number, isLong: boolean, coin: string) => void;
 	onOpenTpSl: (data: TpSlPositionData) => void;
 	onSelectMarket: (coin: string) => void;
 }
@@ -110,7 +111,7 @@ function PositionRow({
 
 	function handleClose() {
 		if (!canClose || typeof assetId !== "number") return;
-		onClose(assetId, absSize, markPx, szDecimals, isLong);
+		onClose(assetId, absSize, markPx, szDecimals, isLong, p.coin);
 	}
 
 	function handleOpenTpSl() {
@@ -295,7 +296,14 @@ export function PositionsTab() {
 	const headerCount = isConnected ? positions.length : FALLBACK_VALUE_PLACEHOLDER;
 	const actionError = closeError?.message;
 
-	function handleClosePosition(assetId: number, size: number, markPx: number, szDecimals: number, isLong: boolean) {
+	function handleClosePosition(
+		assetId: number,
+		size: number,
+		markPx: number,
+		szDecimals: number,
+		isLong: boolean,
+		coin: string,
+	) {
 		if (isClosing) return;
 
 		resetCloseError();
@@ -319,6 +327,12 @@ export function PositionsTab() {
 				grouping: "na",
 			},
 			{
+				onSuccess: () => {
+					toast.success(t`Position closed` + (coin ? ` — ${coin}` : ""));
+				},
+				onError: (error) => {
+					toast.error(error.message || t`Failed to close position`);
+				},
 				onSettled: () => {
 					closingKeyRef.current = null;
 				},

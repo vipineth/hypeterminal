@@ -391,6 +391,10 @@ msgstr ""
 msgid "Connecting..."
 msgstr "Connexion..."
 
+#: src/hooks/ui/use-copy-to-clipboard.ts
+msgid "Copied to clipboard"
+msgstr ""
+
 #: src/components/trade/header/user-menu.tsx
 msgid "Copy Address"
 msgstr "Copier l'adresse"
@@ -598,6 +602,14 @@ msgstr ""
 #: src/components/trade/tradebox/order-toast.tsx
 msgid "failed"
 msgstr "échoué"
+
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Failed to close position"
+msgstr ""
+
+#: src/hooks/ui/use-copy-to-clipboard.ts
+msgid "Failed to copy"
+msgstr ""
 
 #: src/components/trade/tradebox/trade-panel.tsx
 msgid "Failed to enable trading"
@@ -1269,6 +1281,10 @@ msgstr "Portefeuille"
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Position"
 msgstr "Position"
+
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Position closed"
+msgstr ""
 
 #: src/components/ui/pagination.tsx
 #~ msgid "Previous"
