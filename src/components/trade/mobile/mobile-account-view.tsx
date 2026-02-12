@@ -126,10 +126,8 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 				</div>
 			</div>
 
-			{/* Account stats */}
 			<div className="flex-1 min-h-0 overflow-y-auto">
-				<div className="p-4 space-y-4">
-					{/* Main balance card */}
+				<div className="p-2 space-y-4">
 					<div className="p-4 rounded-xs border border-border-200/60 bg-surface-execution/30">
 						{isLoading ? (
 							<div className="space-y-3">

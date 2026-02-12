@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Slider, type SliderMark } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -30,10 +29,13 @@ import {
 	usesLimitPrice as usesLimitPriceForOrder,
 } from "@/lib/trade/order-types";
 import type { Side, SizeMode } from "@/lib/trade/types";
+import { useExchangeScope } from "@/providers/exchange-scope";
 import { useDepositModalActions } from "@/stores/use-global-modal-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
+import { useMarketActions } from "@/stores/use-market-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
+import { TokenSelector } from "../chart/token-selector";
 import { WalletDialog } from "../components/wallet-dialog";
 import { AdvancedOrderDropdown } from "../tradebox/advanced-order-dropdown";
 import { LeverageControl } from "../tradebox/leverage-control";
@@ -54,10 +56,16 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 
 	const needsChainSwitch = !!walletClientError && walletClientError.message.includes("does not match");
 
-	const { data: market, isLoading: isMarketLoading } = useSelectedMarketInfo();
+	const { data: market } = useSelectedMarketInfo();
+	const { scope } = useExchangeScope();
+	const { setSelectedMarket } = useMarketActions();
 	const { baseToken, quoteToken } = market
 		? getBaseQuoteFromPairName(market.pairName, market.kind)
 		: { baseToken: undefined, quoteToken: undefined };
+
+	function handleMarketChange(marketName: string) {
+		setSelectedMarket(scope, marketName);
+	}
 
 	const { perpSummary, perpPositions } = useAccountBalances();
 
@@ -319,28 +327,18 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 
 	return (
 		<div className={cn("flex flex-col h-full min-h-0 bg-surface-execution/20", className)}>
-			<div className="shrink-0 px-4 py-3 border-b border-border-200/60 bg-surface-execution/30">
-				{isMarketLoading ? (
-					<div className="flex items-center justify-between">
-						<Skeleton className="h-8 w-24" />
-						<Skeleton className="h-6 w-20" />
-					</div>
-				) : (
-					<div className="flex items-center justify-between">
-						<div className="flex items-center gap-2">
-							<span className="text-lg font-semibold">{baseToken ?? "—"}</span>
-							<span className="text-xs text-text-600">PERP</span>
-						</div>
-						<div className="text-right">
-							<div className="text-lg font-semibold tabular-nums text-warning-700">
-								{formatPrice(markPx || null, { szDecimals: market?.szDecimals })}
-							</div>
+			<div className="shrink-0 px-4 py-2 border-b border-border-200/60 bg-surface-execution/30">
+				<div className="flex items-center justify-between">
+					<TokenSelector selectedMarket={market} onValueChange={handleMarketChange} />
+					<div className="text-right">
+						<div className="text-lg font-semibold tabular-nums text-warning-700">
+							{formatPrice(markPx || null, { szDecimals: market?.szDecimals })}
 						</div>
 					</div>
-				)}
+				</div>
 			</div>
 			<div className="flex-1 min-h-0 overflow-y-auto">
-				<div className="p-4 space-y-3">
+				<div className="p-2 space-y-3">
 					<Tabs
 						value={tabsOrderType}
 						onValueChange={(v) => {
@@ -411,7 +409,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 								)}
 								disabled={isFormDisabled}
 							>
-								{sizeMode === "base" ? baseToken || "—" : quoteToken || "—"}
+								{sizeMode === "base" ? baseToken || "\u2014" : quoteToken || "\u2014"}
 								<CaretDownIcon className="size-3" />
 							</Button>
 							<Input
@@ -465,7 +463,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 						</div>
 					)}
 					{validation.errors.length > 0 && isConnected && availableBalance > 0 && !validation.needsApproval && (
-						<div className="text-xs text-market-down-600">{validation.errors.join(" • ")}</div>
+						<div className="text-xs text-market-down-600">{validation.errors.join(" \u2022 ")}</div>
 					)}
 					{approvalError && <div className="text-xs text-market-down-600">{approvalError}</div>}
 					<div className="border border-border-200/40 rounded-xs divide-y divide-border/40 text-xs">
