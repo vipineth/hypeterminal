@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider, type SliderMark } from "@/components/ui/slider";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
 	FALLBACK_VALUE_PLACEHOLDER,
 	ORDER_FEE_RATE_MAKER,
 	ORDER_FEE_RATE_TAKER,
 	ORDER_MIN_NOTIONAL_USD,
-	ORDER_SIZE_PERCENT_STEPS,
 	UI_TEXT,
 } from "@/config/constants";
 import { ARBITRUM_CHAIN_ID } from "@/config/contracts";
@@ -23,18 +23,22 @@ import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format"
 import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
 import { floorToDecimals, formatDecimalFloor, getValueColorClass, toNumberOrZero } from "@/lib/trade/numbers";
-import type { SizeMode } from "@/lib/trade/types";
+import {
+	getTabsOrderType,
+	isTakerOrderType,
+	type OrderType,
+	usesLimitPrice as usesLimitPriceForOrder,
+} from "@/lib/trade/order-types";
+import type { Side, SizeMode } from "@/lib/trade/types";
 import { useDepositModalActions } from "@/stores/use-global-modal-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
 import { WalletDialog } from "../components/wallet-dialog";
+import { AdvancedOrderDropdown } from "../tradebox/advanced-order-dropdown";
 import { LeverageControl } from "../tradebox/leverage-control";
 import { OrderToast } from "../tradebox/order-toast";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
-
-type OrderType = "market" | "limit";
-type Side = "buy" | "sell";
 
 const ORDER_TEXT = UI_TEXT.ORDER_ENTRY;
 const SIZE_MARKS: SliderMark[] = [{ value: 0 }, { value: 25 }, { value: 50 }, { value: 75 }, { value: 100 }];
@@ -71,7 +75,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const { addOrder, updateOrder } = useOrderQueueActions();
 	const selectedPrice = useSelectedPrice();
 
-	const [type, setType] = useState<OrderType>("market");
+	const [orderType, setOrderType] = useState<OrderType>("market");
 	const [side, setSide] = useState<Side>("buy");
 	const [sizeInput, setSizeInput] = useState("");
 	const [sizeMode, setSizeMode] = useState<SizeMode>("quote");
@@ -83,10 +87,15 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 
 	const { mutateAsync: placeOrder, isPending: isSubmitting } = useExchangeOrder();
 
+	const tabsOrderType = getTabsOrderType(orderType);
+	const isAdvancedTab = tabsOrderType === "advanced";
+	const usesLimitPrice = usesLimitPriceForOrder(orderType);
+	const isMarketExecution = orderType === "market" || isTakerOrderType(orderType);
+
 	// Sync orderbook price clicks
 	useEffect(() => {
 		if (selectedPrice !== null) {
-			setType("limit");
+			setOrderType("limit");
 			setLimitPriceInput(String(selectedPrice));
 			getOrderbookActionsStore().actions.clearSelectedPrice();
 		}
@@ -102,7 +111,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const positionSize = toNumberOrZero(position?.position?.szi);
 
 	const markPx = toNumberOrZero(market?.markPx);
-	const price = type === "market" ? markPx : toNumberOrZero(limitPriceInput);
+	const price = isMarketExecution ? markPx : toNumberOrZero(limitPriceInput);
 
 	const maxSize = useMemo(() => {
 		if (!price || price <= 0) return 0;
@@ -125,7 +134,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const sizeValue = sizeMode === "quote" && price > 0 ? sizeInputValue / price : sizeInputValue;
 	const orderValue = sizeValue * price;
 	const marginRequired = leverage ? orderValue / leverage : 0;
-	const feeRate = type === "market" ? ORDER_FEE_RATE_TAKER : ORDER_FEE_RATE_MAKER;
+	const feeRate = isMarketExecution ? ORDER_FEE_RATE_TAKER : ORDER_FEE_RATE_MAKER;
 	const estimatedFee = orderValue * feeRate;
 
 	const liqPrice = (() => {
@@ -150,9 +159,9 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 		if (!isAgentApproved) return { valid: false, errors: [], canSubmit: false, needsApproval: true };
 		if (!canSign)
 			return { valid: false, errors: [ORDER_TEXT.ERROR_SIGNER_NOT_READY], canSubmit: false, needsApproval: false };
-		if (type === "market" && !markPx)
+		if (isMarketExecution && !markPx)
 			return { valid: false, errors: [ORDER_TEXT.ERROR_NO_MARK_PRICE], canSubmit: false, needsApproval: false };
-		if (type === "limit" && !price) errors.push(ORDER_TEXT.ERROR_LIMIT_PRICE);
+		if (usesLimitPrice && !price) errors.push(ORDER_TEXT.ERROR_LIMIT_PRICE);
 		if (!sizeValue || sizeValue <= 0) errors.push(ORDER_TEXT.ERROR_SIZE);
 		if (orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD) errors.push(ORDER_TEXT.ERROR_MIN_NOTIONAL);
 		if (sizeValue > maxSize && maxSize > 0) errors.push(ORDER_TEXT.ERROR_EXCEEDS_MAX);
@@ -162,7 +171,8 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 		isWalletLoading,
 		availableBalance,
 		market,
-		type,
+		isMarketExecution,
+		usesLimitPrice,
 		markPx,
 		price,
 		sizeValue,
@@ -185,7 +195,6 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	};
 
 	const handleSliderChange = (values: number[]) => applySizeFromPercent(values[0]);
-	const handlePercentClick = (pct: number) => applySizeFromPercent(pct);
 
 	const handleSizeModeToggle = () => {
 		if (sizeMode === "base" && price > 0 && sizeValue > 0) {
@@ -220,7 +229,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 		if (!market || !baseToken || typeof market.assetId !== "number") return;
 
 		let orderPrice = price;
-		if (type === "market") {
+		if (isMarketExecution) {
 			orderPrice = side === "buy" ? markPx * (1 + slippageBps / 10000) : markPx * (1 - slippageBps / 10000);
 		}
 
@@ -233,7 +242,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 			side,
 			size: formattedSize,
 			price: formattedPrice,
-			orderType: type === "market" ? "market" : "limit",
+			orderType: isMarketExecution ? "market" : "limit",
 			status: "pending",
 		});
 
@@ -246,7 +255,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 						p: formattedPrice,
 						s: formattedSize,
 						r: false,
-						t: type === "market" ? { limit: { tif: "FrontendMarket" as const } } : { limit: { tif: "Gtc" as const } },
+						t: isMarketExecution ? { limit: { tif: "FrontendMarket" as const } } : { limit: { tif: "Gtc" as const } },
 					},
 				],
 				grouping: "na",
@@ -326,7 +335,9 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							<span className="text-xs text-text-600">PERP</span>
 						</div>
 						<div className="text-right">
-							<div className="text-lg font-semibold tabular-nums text-warning-700">{formatUSD(markPx || null)}</div>
+							<div className="text-lg font-semibold tabular-nums text-warning-700">
+								{formatPrice(markPx || null, { szDecimals: market?.szDecimals })}
+							</div>
 						</div>
 					</div>
 				)}
@@ -334,69 +345,58 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 
 			{/* Order form - scrollable */}
 			<div className="flex-1 min-h-0 overflow-y-auto">
-				<div className="p-4 space-y-4">
-					{/* Buy/Sell toggle */}
-					<div className="grid grid-cols-2 gap-2">
-						<Button
-							variant="text"
-							size="none"
-							onClick={() => setSide("buy")}
-							className={cn(
-								"py-4 text-base font-semibold uppercase tracking-wider border rounded-xs gap-2 hover:bg-transparent",
-								"active:scale-98",
-								side === "buy"
-									? "bg-market-up-100 border-market-up-600 text-market-up-600"
-									: "border-border-200/60 text-text-600 hover:border-market-up-600/40",
-							)}
-						>
-							<TrendUpIcon className="size-5" />
-							{ORDER_TEXT.BUY_LABEL}
-						</Button>
-						<Button
-							variant="text"
-							size="none"
-							onClick={() => setSide("sell")}
-							className={cn(
-								"py-4 text-base font-semibold uppercase tracking-wider border rounded-xs gap-2 hover:bg-transparent",
-								"active:scale-98",
-								side === "sell"
-									? "bg-market-down-100 border-market-down-600 text-market-down-600"
-									: "border-border-200/60 text-text-600 hover:border-market-down-600/40",
-							)}
-						>
-							<TrendDownIcon className="size-5" />
-							{ORDER_TEXT.SELL_LABEL}
-						</Button>
-					</div>
+				<div className="p-4 space-y-3">
+					{/* Order type tabs - underline style like desktop */}
+					<Tabs
+						value={tabsOrderType}
+						onValueChange={(v) => {
+							if (v === "market") setOrderType("market");
+							else if (v === "limit") setOrderType("limit");
+						}}
+					>
+						<TabsList variant="underline" className="w-full">
+							<TabsTrigger value="market" className="flex-1 text-xs normal-case">
+								Market
+							</TabsTrigger>
+							<TabsTrigger value="limit" className="flex-1 text-xs normal-case">
+								Limit
+							</TabsTrigger>
+							<div className="relative inline-flex flex-1 items-center justify-center pb-2">
+								<AdvancedOrderDropdown
+									orderType={orderType}
+									onOrderTypeChange={setOrderType}
+									marketKind={market?.kind}
+									className={cn("text-xs normal-case", isAdvancedTab ? "font-semibold text-text-950" : "text-text-600")}
+								/>
+								{isAdvancedTab && <span aria-hidden className="absolute bottom-0 inset-x-0 h-0.5 bg-primary-default" />}
+							</div>
+						</TabsList>
+					</Tabs>
 
-					{/* Order type tabs */}
-					<div className="flex items-center gap-1 bg-surface-analysis rounded-xs p-1">
-						<Button
-							variant="text"
-							size="none"
-							onClick={() => setType("market")}
-							className={cn(
-								"flex-1 py-2.5 text-sm font-medium rounded hover:bg-transparent",
-								type === "market" ? "bg-surface-base text-primary-default shadow-sm" : "text-text-600",
-							)}
-						>
-							{ORDER_TEXT.ORDER_TYPE_MARKET}
-						</Button>
-						<Button
-							variant="text"
-							size="none"
-							onClick={() => setType("limit")}
-							className={cn(
-								"flex-1 py-2.5 text-sm font-medium rounded hover:bg-transparent",
-								type === "limit" ? "bg-surface-base text-primary-default shadow-sm" : "text-text-600",
-							)}
-						>
-							{ORDER_TEXT.ORDER_TYPE_LIMIT}
-						</Button>
-					</div>
+					{/* Buy/Sell toggle - pill style like desktop */}
+					<Tabs value={side} onValueChange={(v) => setSide(v as Side)}>
+						<TabsList variant="pill" className="w-full">
+							<TabsTrigger
+								value="buy"
+								className="flex-1 text-sm data-[state=active]:text-market-up-600"
+								aria-label="Buy Long"
+							>
+								<TrendUpIcon className="size-4" />
+								Long
+							</TabsTrigger>
+							<TabsTrigger
+								value="sell"
+								className="flex-1 text-sm data-[state=active]:text-market-down-600"
+								aria-label="Sell Short"
+							>
+								<TrendDownIcon className="size-4" />
+								Short
+							</TabsTrigger>
+						</TabsList>
+					</Tabs>
 
 					{/* Leverage and balance */}
-					<div className="flex items-center justify-between text-sm">
+					<div className="flex items-center justify-between text-xs">
 						<div className="flex items-center gap-2">
 							<span className="text-text-600">Leverage</span>
 							<LeverageControl key={market?.name} />
@@ -410,15 +410,15 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					</div>
 
 					{/* Size input */}
-					<div className="space-y-2">
-						<p className="text-sm text-text-600">{ORDER_TEXT.SIZE_LABEL}</p>
+					<div className="space-y-1.5">
+						<p className="text-xs text-text-600">{ORDER_TEXT.SIZE_LABEL}</p>
 						<div className="flex items-center gap-2">
 							<Button
 								variant="text"
 								size="none"
 								onClick={handleSizeModeToggle}
 								className={cn(
-									"px-3 py-3 text-sm border border-border-200/60 rounded-xs gap-1 min-h-[48px] hover:bg-transparent",
+									"px-3 py-2.5 text-xs border border-border-200/60 rounded-xs gap-1 hover:bg-transparent",
 									"hover:border-text-400",
 								)}
 								disabled={isFormDisabled}
@@ -433,7 +433,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 								value={sizeInput}
 								onChange={(e) => setSizeInput(e.target.value)}
 								className={cn(
-									"flex-1 h-12 text-base tabular-nums",
+									"flex-1 h-10 text-sm tabular-nums",
 									"bg-surface-base/50 border-border-200/60",
 									"focus:border-primary-default/60",
 								)}
@@ -448,38 +448,22 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							max={100}
 							step={1}
 							marks={SIZE_MARKS}
-							className="py-2"
+							className="py-3"
 							disabled={isFormDisabled || maxSize <= 0}
 						/>
-
-						{/* Percent buttons */}
-						<div className="grid grid-cols-4 gap-2">
-							{ORDER_SIZE_PERCENT_STEPS.map((p) => (
-								<Button
-									key={p}
-									variant="contained"
-									size="none"
-									onClick={() => handlePercentClick(p)}
-									className="py-2.5 text-sm font-medium rounded-xs min-h-[44px]"
-									disabled={isFormDisabled || maxSize <= 0}
-								>
-									{p === 100 ? ORDER_TEXT.SIZE_MAX_LABEL : `${p}%`}
-								</Button>
-							))}
-						</div>
 					</div>
 
 					{/* Limit price */}
-					{type === "limit" && (
-						<div className="space-y-2">
+					{usesLimitPrice && (
+						<div className="space-y-1.5">
 							<div className="flex items-center justify-between">
-								<p className="text-sm text-text-600">{ORDER_TEXT.LIMIT_PRICE_LABEL}</p>
+								<p className="text-xs text-text-600">{ORDER_TEXT.LIMIT_PRICE_LABEL}</p>
 								{markPx > 0 && (
 									<Button
 										variant="text"
 										size="none"
 										onClick={handleMarkPriceClick}
-										className="text-xs text-primary-default"
+										className="text-3xs text-primary-default"
 									>
 										{ORDER_TEXT.MARK_PRICE_LABEL}: {formatPrice(markPx, { szDecimals: market?.szDecimals })}
 									</Button>
@@ -491,7 +475,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 								placeholder={ORDER_TEXT.INPUT_PLACEHOLDER}
 								value={limitPriceInput}
 								onChange={(e) => setLimitPriceInput(e.target.value)}
-								className="h-12 text-base tabular-nums bg-surface-base/50"
+								className="h-10 text-sm tabular-nums bg-surface-base/50"
 								disabled={isFormDisabled}
 							/>
 						</div>
@@ -499,12 +483,12 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 
 					{/* Error messages */}
 					{validation.errors.length > 0 && isConnected && availableBalance > 0 && !validation.needsApproval && (
-						<div className="text-sm text-market-down-600">{validation.errors.join(" • ")}</div>
+						<div className="text-xs text-market-down-600">{validation.errors.join(" • ")}</div>
 					)}
-					{approvalError && <div className="text-sm text-market-down-600">{approvalError}</div>}
+					{approvalError && <div className="text-xs text-market-down-600">{approvalError}</div>}
 
 					{/* Order summary */}
-					<div className="border border-border-200/40 rounded-xs divide-y divide-border/40 text-sm">
+					<div className="border border-border-200/40 rounded-xs divide-y divide-border/40 text-xs">
 						<SummaryRow
 							label={ORDER_TEXT.SUMMARY_ORDER_VALUE}
 							value={orderValue > 0 ? formatUSD(orderValue) : FALLBACK_VALUE_PLACEHOLDER}
@@ -530,13 +514,12 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 			{/* Sticky submit button */}
 			<div className="shrink-0 p-4 border-t border-border-200/60 bg-surface-base/95 backdrop-blur-sm">
 				<Button
-					variant="text"
-					size="none"
+					variant="outlined"
+					size="lg"
 					onClick={buttonContent.action}
 					disabled={buttonContent.disabled}
 					className={cn(
-						"w-full py-4 text-base font-semibold uppercase tracking-wider border rounded-xs gap-2 hover:bg-transparent",
-						"active:scale-98",
+						"w-full py-2",
 						buttonContent.variant === "cyan"
 							? "bg-primary-default/20 border-primary-default text-primary-default hover:bg-primary-default/30"
 							: buttonContent.variant === "buy"
@@ -559,7 +542,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 
 function SummaryRow({ label, value, valueClass }: { label: string; value: string; valueClass?: string }) {
 	return (
-		<div className="flex items-center justify-between px-3 py-2.5">
+		<div className="flex items-center justify-between px-3 py-2">
 			<span className="text-text-600">{label}</span>
 			<span className={cn("tabular-nums", valueClass)}>{value}</span>
 		</div>

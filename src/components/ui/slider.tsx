@@ -51,8 +51,8 @@ function Slider({
 				data-slot="slider-track"
 				className={cn(
 					"bg-border-200 relative grow overflow-hidden rounded-full",
-					"data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full",
-					"data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5",
+					"data-[orientation=horizontal]:h-2 data-[orientation=horizontal]:w-full",
+					"data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2",
 					"data-[disabled]:bg-border-200/50",
 				)}
 			>
@@ -77,7 +77,7 @@ function Slider({
 					>
 						<div
 							className={cn(
-								"size-2 rounded-full transition-colors",
+								"size-2.5 rounded-full transition-colors",
 								!isActive && "bg-border-200",
 								isActive && !disabled && "bg-primary-default",
 								isActive && disabled && "bg-text-400",
