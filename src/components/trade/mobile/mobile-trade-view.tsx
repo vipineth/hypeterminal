@@ -92,7 +92,6 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const usesLimitPrice = usesLimitPriceForOrder(orderType);
 	const isMarketExecution = orderType === "market" || isTakerOrderType(orderType);
 
-	// Sync orderbook price clicks
 	useEffect(() => {
 		if (selectedPrice !== null) {
 			setOrderType("limit");
@@ -101,7 +100,6 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 		}
 	}, [selectedPrice]);
 
-	// Derived values
 	const accountValue = toNumberOrZero(perpSummary?.accountValue);
 	const marginUsed = toNumberOrZero(perpSummary?.totalMarginUsed);
 	const availableBalance = Math.max(0, accountValue - marginUsed);
@@ -321,7 +319,6 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 
 	return (
 		<div className={cn("flex flex-col h-full min-h-0 bg-surface-execution/20", className)}>
-			{/* Market info header */}
 			<div className="shrink-0 px-4 py-3 border-b border-border-200/60 bg-surface-execution/30">
 				{isMarketLoading ? (
 					<div className="flex items-center justify-between">
@@ -342,11 +339,8 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					</div>
 				)}
 			</div>
-
-			{/* Order form - scrollable */}
 			<div className="flex-1 min-h-0 overflow-y-auto">
 				<div className="p-4 space-y-3">
-					{/* Order type tabs - underline style like desktop */}
 					<Tabs
 						value={tabsOrderType}
 						onValueChange={(v) => {
@@ -372,8 +366,6 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							</div>
 						</TabsList>
 					</Tabs>
-
-					{/* Buy/Sell toggle - pill style like desktop */}
 					<Tabs value={side} onValueChange={(v) => setSide(v as Side)}>
 						<TabsList variant="pill" className="w-full">
 							<TabsTrigger
@@ -394,8 +386,6 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							</TabsTrigger>
 						</TabsList>
 					</Tabs>
-
-					{/* Leverage and balance */}
 					<div className="flex items-center justify-between text-xs">
 						<div className="flex items-center gap-2">
 							<span className="text-text-600">Leverage</span>
@@ -408,8 +398,6 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							</span>
 						</div>
 					</div>
-
-					{/* Size input */}
 					<div className="space-y-1.5">
 						<p className="text-xs text-text-600">{ORDER_TEXT.SIZE_LABEL}</p>
 						<div className="flex items-center gap-2">
@@ -440,8 +428,6 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 								disabled={isFormDisabled}
 							/>
 						</div>
-
-						{/* Slider */}
 						<Slider
 							value={[sliderValue]}
 							onValueChange={handleSliderChange}
@@ -452,8 +438,6 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							disabled={isFormDisabled || maxSize <= 0}
 						/>
 					</div>
-
-					{/* Limit price */}
 					{usesLimitPrice && (
 						<div className="space-y-1.5">
 							<div className="flex items-center justify-between">
@@ -480,14 +464,10 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							/>
 						</div>
 					)}
-
-					{/* Error messages */}
 					{validation.errors.length > 0 && isConnected && availableBalance > 0 && !validation.needsApproval && (
 						<div className="text-xs text-market-down-600">{validation.errors.join(" • ")}</div>
 					)}
 					{approvalError && <div className="text-xs text-market-down-600">{approvalError}</div>}
-
-					{/* Order summary */}
 					<div className="border border-border-200/40 rounded-xs divide-y divide-border/40 text-xs">
 						<SummaryRow
 							label={ORDER_TEXT.SUMMARY_ORDER_VALUE}
@@ -510,8 +490,6 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					</div>
 				</div>
 			</div>
-
-			{/* Sticky submit button */}
 			<div className="shrink-0 p-4 border-t border-border-200/60 bg-surface-base/95 backdrop-blur-sm">
 				<Button
 					variant="outlined"
