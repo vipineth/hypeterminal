@@ -72,9 +72,10 @@ function formatTickLabel(tickSize: number): string {
 
 interface MobileBookViewProps {
 	className?: string;
+	withBottomSpacer?: boolean;
 }
 
-export function MobileBookView({ className }: MobileBookViewProps) {
+export function MobileBookView({ className, withBottomSpacer = true }: MobileBookViewProps) {
 	const [view, setView] = useState<View>("book");
 	const [selectedOption, setSelectedOption] = useState<PriceGroupOption | null>(null);
 	const { showOrderbookInQuote } = useGlobalSettings();
@@ -337,7 +338,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 				</div>
 			)}
 
-			<MobileBottomNavSpacer />
+			{withBottomSpacer && <MobileBottomNavSpacer />}
 		</div>
 	);
 }

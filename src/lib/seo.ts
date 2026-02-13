@@ -80,13 +80,19 @@ export function buildPageHead(options: PageSeoOptions = {}): HeadOutput {
 
 	const meta: MetaTag[] = [
 		{ charSet: "utf-8" },
-		{ name: "viewport", content: "width=device-width, initial-scale=1" },
+		{ name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
 		{ title: pageTitle },
 		{ name: "description", content: description },
 		{ name: "keywords", content: allKeywords.join(", ") },
 		{ name: "theme-color", content: SEO_DEFAULTS.themeColor },
 		{ name: "color-scheme", content: "dark light" },
 		{ name: "author", content: SEO_DEFAULTS.siteName },
+		{ name: "application-name", content: SEO_DEFAULTS.siteName },
+		{ name: "mobile-web-app-capable", content: "yes" },
+		{ name: "apple-mobile-web-app-capable", content: "yes" },
+		{ name: "apple-mobile-web-app-title", content: SEO_DEFAULTS.siteName },
+		{ name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+		{ name: "format-detection", content: "telephone=no" },
 
 		// Open Graph
 		{ property: "og:type", content: ogType },
@@ -111,6 +117,7 @@ export function buildPageHead(options: PageSeoOptions = {}): HeadOutput {
 
 	const links: LinkTag[] = [
 		{ rel: "canonical", href: canonicalUrl },
+		{ rel: "manifest", href: "/manifest.webmanifest" },
 		{ rel: "icon", href: "/favicon.ico", sizes: "32x32" },
 		{ rel: "icon", href: "/icon.svg", type: "image/svg+xml" },
 		{ rel: "apple-touch-icon", href: "/apple-touch-icon.png" },

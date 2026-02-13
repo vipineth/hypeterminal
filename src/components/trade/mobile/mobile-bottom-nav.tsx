@@ -1,9 +1,9 @@
-import { BookOpenIcon, ChartBarIcon, CurrencyCircleDollarIcon, ListIcon, TrendUpIcon } from "@phosphor-icons/react";
+import { ChartBarIcon, CurrencyCircleDollarIcon, ListIcon, TrendUpIcon } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 
-export type MobileTab = "chart" | "book" | "trade" | "positions" | "account";
+export type MobileTab = "market" | "trade" | "positions" | "account";
 
 interface NavItem {
 	id: MobileTab;
@@ -12,8 +12,7 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-	{ id: "chart", label: "Chart", icon: <ChartBarIcon className="size-5" /> },
-	{ id: "book", label: "Book", icon: <BookOpenIcon className="size-5" /> },
+	{ id: "market", label: "Market", icon: <ChartBarIcon className="size-5" /> },
 	{ id: "trade", label: "Trade", icon: <TrendUpIcon className="size-5" /> },
 	{ id: "positions", label: "Positions", icon: <ListIcon className="size-5" /> },
 	{ id: "account", label: "Account", icon: <CurrencyCircleDollarIcon className="size-5" /> },
@@ -26,6 +25,13 @@ interface Props {
 	className?: string;
 }
 
+function getNavAriaLabel(label: string, badgeCount: number | undefined) {
+	if (typeof badgeCount === "number" && badgeCount > 0) {
+		return `${label}, ${badgeCount} pending`;
+	}
+	return label;
+}
+
 export function MobileBottomNav({ activeTab, onTabChange, badges, className }: Props) {
 	return (
 		<nav
@@ -36,7 +42,7 @@ export function MobileBottomNav({ activeTab, onTabChange, badges, className }: P
 			)}
 			aria-label="Primary navigation"
 		>
-			<div className="flex items-stretch">
+			<div className="grid grid-cols-4 items-stretch">
 				{NAV_ITEMS.map((item) => {
 					const isActive = activeTab === item.id;
 					const badgeCount = badges?.[item.id];
@@ -47,21 +53,24 @@ export function MobileBottomNav({ activeTab, onTabChange, badges, className }: P
 							key={item.id}
 							variant="text"
 							size="none"
+							type="button"
 							onClick={() => onTabChange(item.id)}
 							className={cn(
-								"flex-1 flex flex-col items-center justify-center gap-0.5 rounded-none",
-								"min-h-[56px] py-2 px-1",
+								"relative flex flex-col items-center justify-center gap-0.5 rounded-none",
+								"min-h-[60px] py-2 px-1",
 								"transition-colors duration-150 ease-out",
-								"active:bg-surface-analysis/50 active:scale-95",
+								"active:bg-surface-analysis/50 active:scale-98",
 								"hover:bg-transparent",
 								isActive ? "text-primary-default" : "text-text-950 hover:text-text-950",
 							)}
 							aria-current={isActive ? "page" : undefined}
-							aria-label={item.label}
+							aria-label={getNavAriaLabel(item.label, badgeCount)}
 						>
+							{isActive && (
+								<span aria-hidden className="absolute top-0 inset-x-3 h-0.5 rounded-full bg-primary-default" />
+							)}
 							<span className="relative">
-								{item.icon}
-								{isActive && <span className="absolute -top-0.5 -right-0.5 size-1.5 rounded-full bg-primary-default" />}
+								<span aria-hidden>{item.icon}</span>
 								{showBadge && (
 									<span
 										className={cn(
@@ -70,12 +79,13 @@ export function MobileBottomNav({ activeTab, onTabChange, badges, className }: P
 											"rounded-full text-3xs font-medium tabular-nums",
 											"bg-primary-default text-white",
 										)}
+										aria-hidden
 									>
 										{badgeCount > 99 ? "99+" : badgeCount}
 									</span>
 								)}
 							</span>
-							<span className="text-3xs font-medium tracking-wide">{item.label}</span>
+							<span className="text-3xs font-medium">{item.label}</span>
 						</Button>
 					);
 				})}
@@ -85,5 +95,5 @@ export function MobileBottomNav({ activeTab, onTabChange, badges, className }: P
 }
 
 export function MobileBottomNavSpacer({ className }: { className?: string }) {
-	return <div className={cn("h-[calc(56px+env(safe-area-inset-bottom))]", "shrink-0", className)} aria-hidden="true" />;
+	return <div className={cn("h-[calc(60px+env(safe-area-inset-bottom))]", "shrink-0", className)} aria-hidden="true" />;
 }

@@ -15,6 +15,12 @@ describe("seo", () => {
 
 		const canonical = head.links.find((l) => l.rel === "canonical");
 		expect(canonical?.href).toBe(`${SEO_DEFAULTS.siteUrl}/trade`);
+
+		const manifest = head.links.find((l) => l.rel === "manifest");
+		expect(manifest?.href).toBe("/manifest.webmanifest");
+
+		const viewport = head.meta.find((m) => m.name === "viewport");
+		expect(viewport?.content).toContain("viewport-fit=cover");
 	});
 
 	it("adds robots tag when noIndex is set", () => {

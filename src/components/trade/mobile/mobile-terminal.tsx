@@ -5,11 +5,11 @@ import { cn } from "@/lib/cn";
 import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { toNumber } from "@/lib/trade/numbers";
 import { MobileAccountView } from "./mobile-account-view";
-import { MobileBookView } from "./mobile-book-view";
 import { MobileBottomNav, type MobileTab } from "./mobile-bottom-nav";
-import { MobileChartView } from "./mobile-chart-view";
 import { MobileHeader } from "./mobile-header";
+import { MobileMarketView } from "./mobile-market-view";
 import { MobilePositionsView } from "./mobile-positions-view";
+import { MobilePwaBanner } from "./mobile-pwa-banner";
 import { MobileTradeView } from "./mobile-trade-view";
 import { OfflineBanner } from "./offline-banner";
 
@@ -18,7 +18,7 @@ interface Props {
 }
 
 export function MobileTerminal({ className }: Props) {
-	const [activeTab, setActiveTab] = useState<MobileTab>("chart");
+	const [activeTab, setActiveTab] = useState<MobileTab>("market");
 
 	const { address, isConnected } = useConnection();
 	const { perpPositions } = useAccountBalances();
@@ -45,10 +45,8 @@ export function MobileTerminal({ className }: Props) {
 
 	const renderContent = () => {
 		switch (activeTab) {
-			case "chart":
-				return <MobileChartView />;
-			case "book":
-				return <MobileBookView />;
+			case "market":
+				return <MobileMarketView />;
 			case "trade":
 				return <MobileTradeView />;
 			case "positions":
@@ -68,6 +66,7 @@ export function MobileTerminal({ className }: Props) {
 			<OfflineBanner />
 			<main className="flex-1 min-h-0 overflow-hidden">{renderContent()}</main>
 			<MobileBottomNav activeTab={activeTab} onTabChange={setActiveTab} badges={badges} />
+			<MobilePwaBanner />
 		</div>
 	);
 }

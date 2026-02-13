@@ -19,9 +19,10 @@ const overviewText = UI_TEXT.MARKET_OVERVIEW;
 
 interface MobileChartViewProps {
 	className?: string;
+	withBottomSpacer?: boolean;
 }
 
-export function MobileChartView({ className }: MobileChartViewProps) {
+export function MobileChartView({ className, withBottomSpacer = true }: MobileChartViewProps) {
 	const theme = useTheme();
 	const { data: selectedMarket, isLoading } = useSelectedMarketInfo();
 	const { scope } = useExchangeScope();
@@ -117,7 +118,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 				</ClientOnly>
 			</div>
 
-			<MobileBottomNavSpacer />
+			{withBottomSpacer && <MobileBottomNavSpacer />}
 		</div>
 	);
 }
