@@ -1,32 +1,48 @@
-import { ArrowSquareOutIcon, CopyIcon, LightningIcon, SignOutIcon, WalletIcon } from "@phosphor-icons/react";
+import {
+	ArrowSquareOutIcon,
+	CopyIcon,
+	LightningIcon,
+	SignOutIcon,
+	WalletIcon,
+	WarningCircleIcon,
+} from "@phosphor-icons/react";
 import { useState } from "react";
 import { useConnection, useDisconnect } from "wagmi";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { InfoRow, InfoRowGroup } from "@/components/ui/info-row";
 import { Skeleton } from "@/components/ui/skeleton";
-import { UI_TEXT } from "@/config/constants";
+import { Tabs, TabsContent, TabsContentGroup, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { useCopyToClipboard } from "@/hooks/ui/use-copy-to-clipboard";
 import { cn } from "@/lib/cn";
-import { formatPercent, formatUSD } from "@/lib/format";
-import { toNumber, toNumberOrZero } from "@/lib/trade/numbers";
+import { formatPercent, formatToken, formatUSD, shortenAddress } from "@/lib/format";
+import { getValueColorClass, toNumberOrZero } from "@/lib/trade/numbers";
 import { useDepositModalActions } from "@/stores/use-global-modal-store";
 import { WalletDialog } from "../components/wallet-dialog";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
 
 const ACCOUNT_TEXT = UI_TEXT.ACCOUNT_PANEL;
 
-interface MobileAccountViewProps {
+type SummaryRow = {
+	label: string;
+	value: string;
+	valueClassName?: string;
+};
+
+interface Props {
 	className?: string;
 }
 
-export function MobileAccountView({ className }: MobileAccountViewProps) {
+export function MobileAccountView({ className }: Props) {
 	const { address, isConnected } = useConnection();
 	const disconnect = useDisconnect();
 
-	const { perpSummary, perpPositions, isLoading } = useAccountBalances();
+	const { perpSummary, perpPositions, spotBalances, isLoading, hasError } = useAccountBalances();
 
 	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
+	const [activeTab, setActiveTab] = useState("perps");
 	const { copied, copy } = useCopyToClipboard();
 	const { open: openDepositModal } = useDepositModalActions();
 
@@ -35,18 +51,151 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 		copy(address);
 	}
 
-	const accountValue = toNumberOrZero(perpSummary?.accountValue);
-	const totalMarginUsed = toNumberOrZero(perpSummary?.totalMarginUsed);
-	const totalNtlPos = toNumberOrZero(perpSummary?.totalNtlPos);
-	const totalRawUsd = toNumberOrZero(perpSummary?.totalRawUsd);
+	const perpMetrics = (() => {
+		if (!perpSummary) return null;
 
-	const availableBalance = Math.max(0, accountValue - totalMarginUsed);
-	const marginRatio = accountValue > 0 ? totalMarginUsed / accountValue : 0;
+		const accountValue = toNumberOrZero(perpSummary.accountValue);
+		const totalNtlPos = toNumberOrZero(perpSummary.totalNtlPos);
+		const totalMarginUsed = toNumberOrZero(perpSummary.totalMarginUsed);
+		const totalRawUsd = toNumberOrZero(perpSummary.totalRawUsd);
 
-	const unrealizedPnl = perpPositions.reduce((sum, pos) => {
-		const pnl = toNumber(pos.position.unrealizedPnl);
-		return sum + (pnl ?? 0);
-	}, 0);
+		let unrealizedPnl = 0;
+		for (const pos of perpPositions) {
+			unrealizedPnl += toNumberOrZero(pos.position.unrealizedPnl);
+		}
+
+		const marginRatio = accountValue > 0 ? totalMarginUsed / accountValue : 0;
+		const crossLeverage = accountValue > 0 ? Math.abs(totalNtlPos) / accountValue : 0;
+		const availableBalance = Math.max(0, accountValue - totalMarginUsed);
+
+		return {
+			accountValue,
+			totalRawUsd,
+			unrealizedPnl,
+			marginRatio,
+			crossLeverage,
+			availableBalance,
+			totalMarginUsed,
+		};
+	})();
+
+	const spotMetrics = (() => {
+		if (!isConnected) return null;
+
+		let totalValue = 0;
+		let availableValue = 0;
+		let inOrderValue = 0;
+		const tokens: Array<{ coin: string; total: number; available: number; usdValue: number }> = [];
+
+		for (const b of spotBalances) {
+			const total = toNumberOrZero(b.total);
+			const hold = toNumberOrZero(b.hold);
+			const entryNtl = toNumberOrZero(b.entryNtl);
+
+			if (total === 0) continue;
+
+			const available = Math.max(0, total - hold);
+			const usdValue = b.coin === DEFAULT_QUOTE_TOKEN ? total : entryNtl;
+
+			totalValue += usdValue;
+			availableValue += b.coin === DEFAULT_QUOTE_TOKEN ? available : (available / total) * usdValue;
+			inOrderValue += b.coin === DEFAULT_QUOTE_TOKEN ? hold : (hold / total) * usdValue;
+
+			tokens.push({ coin: b.coin, total, available, usdValue });
+		}
+
+		tokens.sort((a, b) => b.usdValue - a.usdValue);
+
+		return {
+			totalValue,
+			availableValue,
+			inOrderValue,
+			tokenCount: tokens.length,
+			topTokens: tokens.slice(0, 3),
+		};
+	})();
+
+	const hasPerpData = isConnected && perpMetrics !== null;
+	const hasSpotData = isConnected && spotMetrics !== null;
+
+	function getHeaderEquity() {
+		if (activeTab === "perps") {
+			return hasPerpData ? formatUSD(perpMetrics.accountValue) : FALLBACK_VALUE_PLACEHOLDER;
+		}
+		return hasSpotData ? formatUSD(spotMetrics.totalValue) : FALLBACK_VALUE_PLACEHOLDER;
+	}
+
+	function getHeaderPnl() {
+		if (activeTab === "perps" && hasPerpData) {
+			return formatUSD(perpMetrics.unrealizedPnl, { signDisplay: "exceptZero" });
+		}
+		return FALLBACK_VALUE_PLACEHOLDER;
+	}
+
+	const perpRows: SummaryRow[] = perpMetrics
+		? [
+				{
+					label: ACCOUNT_TEXT.BALANCE_LABEL,
+					value: formatUSD(perpMetrics.totalRawUsd),
+					valueClassName: "tabular-nums text-market-up-600",
+				},
+				{
+					label: ACCOUNT_TEXT.UNREALIZED_LABEL,
+					value: formatUSD(perpMetrics.unrealizedPnl, { signDisplay: "exceptZero" }),
+					valueClassName: cn("tabular-nums", getValueColorClass(perpMetrics.unrealizedPnl)),
+				},
+				{
+					label: ACCOUNT_TEXT.AVAILABLE_LABEL,
+					value: formatUSD(perpMetrics.availableBalance),
+					valueClassName: "tabular-nums",
+				},
+				{
+					label: ACCOUNT_TEXT.MARGIN_USED_LABEL,
+					value: formatUSD(perpMetrics.totalMarginUsed),
+					valueClassName: "tabular-nums",
+				},
+				{
+					label: ACCOUNT_TEXT.MARGIN_RATIO_LABEL,
+					value: formatPercent(perpMetrics.marginRatio, { maximumFractionDigits: 1 }),
+					valueClassName: "tabular-nums",
+				},
+				{
+					label: ACCOUNT_TEXT.CROSS_LEVERAGE_LABEL,
+					value: `${perpMetrics.crossLeverage.toFixed(2)}x`,
+					valueClassName: "tabular-nums",
+				},
+			]
+		: [];
+
+	const spotRows: SummaryRow[] = spotMetrics
+		? [
+				{
+					label: ACCOUNT_TEXT.SPOT_TOTAL_VALUE_LABEL,
+					value: formatUSD(spotMetrics.totalValue),
+					valueClassName: "tabular-nums",
+				},
+				{
+					label: ACCOUNT_TEXT.SPOT_AVAILABLE_LABEL,
+					value: formatUSD(spotMetrics.availableValue),
+					valueClassName: "tabular-nums",
+				},
+				{
+					label: ACCOUNT_TEXT.SPOT_IN_ORDERS_LABEL,
+					value: formatUSD(spotMetrics.inOrderValue),
+					valueClassName: "tabular-nums text-warning-700",
+				},
+				{
+					label: ACCOUNT_TEXT.SPOT_ASSETS_LABEL,
+					value: `${spotMetrics.tokenCount}`,
+					valueClassName: "tabular-nums",
+				},
+				...spotMetrics.topTokens.map((token) => ({
+					label: token.coin,
+					value: formatToken(token.total, token.coin === DEFAULT_QUOTE_TOKEN ? 2 : 4),
+					valueClassName: "tabular-nums",
+				})),
+			]
+		: [];
 
 	if (!isConnected) {
 		return (
@@ -81,9 +230,13 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 		);
 	}
 
+	const headerEquity = getHeaderEquity();
+	const headerPnl = getHeaderPnl();
+	const headerPnlClass =
+		activeTab === "perps" && hasPerpData ? getValueColorClass(perpMetrics.unrealizedPnl) : "text-text-950";
+
 	return (
 		<div className={cn("flex flex-col h-full min-h-0 bg-surface-execution/20", className)}>
-			{/* Account header */}
 			<div className="shrink-0 px-4 py-4 border-b border-border-200/60 bg-surface-execution/30">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3">
@@ -92,9 +245,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						</div>
 						<div>
 							<div className="flex items-center gap-2">
-								<span className="font-mono text-sm">
-									{address?.slice(0, 6)}...{address?.slice(-4)}
-								</span>
+								<span className="font-mono text-sm">{shortenAddress(address ?? "")}</span>
 								<Button
 									variant="text"
 									size="none"
@@ -138,39 +289,58 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						) : (
 							<>
 								<div className="text-sm text-text-600 mb-1">{ACCOUNT_TEXT.EQUITY_LABEL}</div>
-								<div className="text-3xl font-bold tabular-nums">{formatUSD(accountValue)}</div>
-								<div
-									className={cn(
-										"text-sm tabular-nums mt-1",
-										unrealizedPnl >= 0 ? "text-market-up-600" : "text-market-down-600",
-									)}
-								>
-									{unrealizedPnl >= 0 ? "+" : ""}
-									{formatUSD(unrealizedPnl)} {ACCOUNT_TEXT.UNREALIZED_LABEL}
-								</div>
+								<div className="text-3xl font-bold tabular-nums">{headerEquity}</div>
+								{activeTab === "perps" && (
+									<div className={cn("text-sm tabular-nums mt-1", headerPnlClass)}>
+										{headerPnl} {ACCOUNT_TEXT.UNREALIZED_LABEL}
+									</div>
+								)}
 							</>
 						)}
 					</div>
 
-					{/* Stats grid */}
-					<div className="grid grid-cols-2 gap-3">
-						<StatCard
-							label={ACCOUNT_TEXT.AVAILABLE_LABEL}
-							value={formatUSD(availableBalance)}
-							valueClass="text-market-up-600"
-							isLoading={isLoading}
-						/>
-						<StatCard label={ACCOUNT_TEXT.MARGIN_USED_LABEL} value={formatUSD(totalMarginUsed)} isLoading={isLoading} />
-						<StatCard
-							label={ACCOUNT_TEXT.MARGIN_RATIO_LABEL}
-							value={formatPercent(marginRatio)}
-							valueClass={marginRatio > 0.8 ? "text-market-down-600" : marginRatio > 0.5 ? "text-warning-700" : ""}
-							isLoading={isLoading}
-						/>
-						<StatCard label="Total Position" value={formatUSD(Math.abs(totalNtlPos))} isLoading={isLoading} />
-					</div>
+					<Tabs value={activeTab} onValueChange={setActiveTab}>
+						<TabsList variant="pill" fullWidth>
+							<TabsTrigger value="perps">{ACCOUNT_TEXT.TAB_PERPS}</TabsTrigger>
+							<TabsTrigger value="spot">{ACCOUNT_TEXT.TAB_SPOT}</TabsTrigger>
+						</TabsList>
 
-					{/* Actions */}
+						<TabsContentGroup>
+							<TabsContent value="perps" forceMount>
+								{hasPerpData ? (
+									<InfoRowGroup className="divide-border-200/30 mt-3">
+										{perpRows.map((row) => (
+											<InfoRow
+												key={row.label}
+												label={row.label}
+												value={row.value}
+												valueClassName={row.valueClassName}
+											/>
+										))}
+									</InfoRowGroup>
+								) : (
+									<div className="text-2xs text-text-600 text-center py-4">{ACCOUNT_TEXT.LOADING}</div>
+								)}
+							</TabsContent>
+							<TabsContent value="spot" forceMount>
+								{hasSpotData ? (
+									<InfoRowGroup className="divide-border-200/30 mt-3">
+										{spotRows.map((row) => (
+											<InfoRow
+												key={row.label}
+												label={row.label}
+												value={row.value}
+												valueClassName={row.valueClassName}
+											/>
+										))}
+									</InfoRowGroup>
+								) : (
+									<div className="text-2xs text-text-600 text-center py-4">{ACCOUNT_TEXT.LOADING}</div>
+								)}
+							</TabsContent>
+						</TabsContentGroup>
+					</Tabs>
+
 					<div className="grid grid-cols-2 gap-3 pt-2">
 						<Button
 							variant="text"
@@ -190,74 +360,30 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 						<Button
 							variant="text"
 							size="none"
+							onClick={() => openDepositModal("withdraw")}
 							className={cn(
 								"py-4 text-base font-semibold rounded-xs",
-								"bg-surface-analysis border border-border-200/60 text-text-600",
+								"bg-surface-analysis border border-border-200/60 text-text-950",
 								"hover:bg-surface-analysis transition-colors",
 								"flex items-center justify-center gap-2",
 								"min-h-[56px]",
 							)}
-							disabled
 						>
 							<ArrowSquareOutIcon className="size-5" />
 							{ACCOUNT_TEXT.WITHDRAW_LABEL}
 						</Button>
 					</div>
 
-					{/* Additional info */}
-					<div className="pt-4 space-y-3">
-						<h3 className="text-sm font-medium text-text-600 uppercase tracking-wider">Account Details</h3>
-						<div className="space-y-2 text-sm">
-							<DetailRow label="Account Value" value={formatUSD(accountValue)} isLoading={isLoading} />
-							<DetailRow label="Total Raw USD" value={formatUSD(totalRawUsd)} isLoading={isLoading} />
-							<DetailRow
-								label="Cross Leverage"
-								value={
-									totalMarginUsed > 0 && accountValue > 0 ? `${(totalNtlPos / accountValue).toFixed(2)}x` : "0.00x"
-								}
-								isLoading={isLoading}
-							/>
+					{hasError && (
+						<div className="flex items-center gap-2 px-3 py-2 rounded-xs bg-error-100 border border-error-700/20">
+							<WarningCircleIcon className="size-4 text-error-700 shrink-0" />
+							<span className="text-2xs text-error-700">{ACCOUNT_TEXT.ERROR_LOADING}</span>
 						</div>
-					</div>
+					)}
 				</div>
 			</div>
 
 			<MobileBottomNavSpacer />
-		</div>
-	);
-}
-
-interface StatCardProps {
-	label: string;
-	value: string;
-	valueClass?: string;
-	isLoading?: boolean;
-}
-
-function StatCard({ label, value, valueClass, isLoading }: StatCardProps) {
-	return (
-		<div className="p-3 rounded-xs border border-border-200/40 bg-surface-execution/20">
-			<div className="text-xs text-text-600 mb-1">{label}</div>
-			{isLoading ? (
-				<Skeleton className="h-6 w-20" />
-			) : (
-				<div className={cn("text-lg font-semibold tabular-nums", valueClass)}>{value}</div>
-			)}
-		</div>
-	);
-}
-
-interface DetailRowProps {
-	label: string;
-	value: string;
-	isLoading?: boolean;
-}
-
-function DetailRow({ label, value, isLoading }: DetailRowProps) {
-	return (
-		<div className="flex items-center justify-between py-2 border-b border-border-200/30 last:border-0">
-			<span className="text-text-600">{label}</span>
-			{isLoading ? <Skeleton className="h-4 w-16" /> : <span className="tabular-nums font-medium">{value}</span>}
 		</div>
 	);
 }

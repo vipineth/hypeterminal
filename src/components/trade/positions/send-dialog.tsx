@@ -3,9 +3,15 @@ import { PaperPlaneTiltIcon, SpinnerGapIcon, WarningCircleIcon } from "@phosphor
 import { useCallback, useMemo, useState } from "react";
 import { isAddress } from "viem";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
+import {
+	ResponsiveModal,
+	ResponsiveModalContent,
+	ResponsiveModalDescription,
+	ResponsiveModalHeader,
+	ResponsiveModalTitle,
+} from "@/components/ui/responsive-modal";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
 import { exceedsBalance, isAmountWithinBalance } from "@/domain/market";
@@ -156,12 +162,12 @@ export function SendDialog({
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={handleOpenChange}>
-			<DialogContent className="sm:max-w-sm">
-				<DialogHeader>
-					<DialogTitle>{t`Send Tokens`}</DialogTitle>
-					<DialogDescription>{t`Send tokens to another account on the Hyperliquid L1.`}</DialogDescription>
-				</DialogHeader>
+		<ResponsiveModal open={open} onOpenChange={handleOpenChange}>
+			<ResponsiveModalContent className="sm:max-w-sm">
+				<ResponsiveModalHeader>
+					<ResponsiveModalTitle>{t`Send Tokens`}</ResponsiveModalTitle>
+					<ResponsiveModalDescription>{t`Send tokens to another account on the Hyperliquid L1.`}</ResponsiveModalDescription>
+				</ResponsiveModalHeader>
 
 				<div className="space-y-4">
 					<div className="space-y-1.5">
@@ -231,7 +237,7 @@ export function SendDialog({
 						{isPending ? t`Sending...` : t`Send`}
 					</Button>
 				</div>
-			</DialogContent>
-		</Dialog>
+			</ResponsiveModalContent>
+		</ResponsiveModal>
 	);
 }

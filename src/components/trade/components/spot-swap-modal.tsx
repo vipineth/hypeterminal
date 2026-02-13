@@ -3,8 +3,14 @@ import { Trans } from "@lingui/react/macro";
 import { ArrowsDownUpIcon, CheckIcon, SpinnerGapIcon, WarningIcon } from "@phosphor-icons/react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NumberInput } from "@/components/ui/number-input";
+import {
+	ResponsiveModal,
+	ResponsiveModalContent,
+	ResponsiveModalDescription,
+	ResponsiveModalHeader,
+	ResponsiveModalTitle,
+} from "@/components/ui/responsive-modal";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
 import { SWAP_SUCCESS_DURATION_MS } from "@/config/time";
 import { getAvailableFromTotals, getSpotBalance } from "@/domain/trade/balances";
@@ -202,20 +208,20 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 	const isDisabled = isSubmitting || showSuccess;
 
 	return (
-		<Dialog open onOpenChange={handleClose}>
-			<DialogContent className="sm:max-w-md gap-0 p-0 overflow-hidden">
-				<DialogHeader className="px-5 pt-5 pb-3 border-b border-border-200/50">
-					<DialogTitle>
+		<ResponsiveModal open onOpenChange={handleClose}>
+			<ResponsiveModalContent className="sm:max-w-md gap-0 p-0 overflow-hidden">
+				<ResponsiveModalHeader className="px-5 pt-5 pb-3 border-b border-border-200/50">
+					<ResponsiveModalTitle>
 						<Trans>Swap</Trans>
-					</DialogTitle>
-					<DialogDescription>
+					</ResponsiveModalTitle>
+					<ResponsiveModalDescription>
 						{spotMarket ? (
 							<Trans>Trade via {spotMarket.pairName} spot market</Trans>
 						) : (
 							<Trans>Select tokens to swap</Trans>
 						)}
-					</DialogDescription>
-				</DialogHeader>
+					</ResponsiveModalDescription>
+				</ResponsiveModalHeader>
 
 				<div className="px-5 py-4 space-y-3">
 					<div className="relative">
@@ -355,8 +361,8 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 						)}
 					</TradingActionButton>
 				</div>
-			</DialogContent>
-		</Dialog>
+			</ResponsiveModalContent>
+		</ResponsiveModal>
 	);
 }
 

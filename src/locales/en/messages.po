@@ -64,6 +64,7 @@ msgstr "Active"
 msgid "Active Positions"
 msgstr "Active Positions"
 
+#: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Add"
 msgstr "Add"
@@ -276,16 +277,19 @@ msgstr "Change leverage"
 msgid "Chart"
 msgstr "Chart"
 
+#: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/ui/dialog.tsx
 #: src/components/ui/sheet.tsx
 msgid "Close"
 msgstr "Close"
 
+#: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Close position"
 msgstr "Close position"
 
+#: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Closing..."
 msgstr "Closing..."
@@ -407,6 +411,7 @@ msgstr "Copy Address"
 msgid "Created"
 msgstr "Created"
 
+#: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
@@ -557,6 +562,7 @@ msgstr "Enter TP or SL price"
 msgid "Enter trigger price"
 msgstr "Enter trigger price"
 
+#: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Entry"
 msgstr "Entry"
@@ -694,6 +700,7 @@ msgstr "From"
 #~ msgstr "Full Position"
 
 #: src/components/trade/chart/constants.ts
+#: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Funding"
 msgstr "Funding"
@@ -777,6 +784,10 @@ msgstr "Invalid amount"
 #~ msgid "Invalid Ethereum address"
 #~ msgstr "Invalid Ethereum address"
 
+#: src/components/trade/positions/mobile-position-card.tsx
+msgid "Iso"
+msgstr "Iso"
+
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
 #: src/components/trade/tradebox/margin-mode-dialog.tsx
@@ -828,6 +839,7 @@ msgstr "Limit Price"
 #~ msgid "limit ro"
 #~ msgstr "limit ro"
 
+#: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Liq"
 msgstr "Liq"
@@ -888,6 +900,7 @@ msgstr "Loading wallet..."
 msgid "Loading..."
 msgstr "Loading..."
 
+#: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Long"
@@ -897,6 +910,7 @@ msgstr "Long"
 msgid "Manage your risk on individual positions by restricting the amount of margin allocated to each. If the margin ratio of an isolated position reaches 100%, the position will be liquidated. Margin can be added or removed to individual positions in this mode."
 msgstr "Manage your risk on individual positions by restricting the amount of margin allocated to each. If the margin ratio of an isolated position reaches 100%, the position will be liquidated. Margin can be added or removed to individual positions in this mode."
 
+#: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Margin"
 msgstr "Margin"
@@ -917,6 +931,7 @@ msgstr "Margin Req."
 msgid "Margin Used"
 msgstr "Margin Used"
 
+#: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
@@ -1514,6 +1529,7 @@ msgstr "Set to {p}%"
 msgid "Settings"
 msgstr "Settings"
 
+#: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Short"
@@ -1733,9 +1749,10 @@ msgid "Swapping..."
 msgstr "Swapping..."
 
 #. placeholder {0}: fill.coin
+#. placeholder {0}: market?.pairName ?? p.coin
 #. placeholder {0}: order.coin
-#. placeholder {0}: state.coin
 #: src/components/trade/positions/history-tab.tsx
+#: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -1883,6 +1900,7 @@ msgstr "TP Price"
 #~ msgid "TP trigger price"
 #~ msgstr "TP trigger price"
 
+#: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "TP/SL"

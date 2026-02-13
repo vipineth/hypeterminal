@@ -14,9 +14,14 @@ import { useState } from "react";
 import { formatUnits } from "viem";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { InfoRow } from "@/components/ui/info-row";
 import { NumberInput } from "@/components/ui/number-input";
+import {
+	ResponsiveModal,
+	ResponsiveModalContent,
+	ResponsiveModalHeader,
+	ResponsiveModalTitle,
+} from "@/components/ui/responsive-modal";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MIN_DEPOSIT_USDC, MIN_WITHDRAW_USD, USDC_DECIMALS, WITHDRAWAL_FEE_USD } from "@/config/contracts";
@@ -46,7 +51,7 @@ function NetworkSelect({ label, value, onChange, disabled }: NetworkSelectProps)
 		<div className="space-y-1.5">
 			<span className="text-4xs uppercase tracking-wider text-text-950">{label}</span>
 			<Select value={value} onValueChange={(v) => onChange(v as NetworkId)} disabled={disabled}>
-				<SelectTrigger className="w-full h-9 bg-surface-base/50 border-border-200/60">
+				<SelectTrigger className="w-full h-11 bg-surface-base/50 border-border-200/60">
 					<SelectValue>
 						<span className="flex items-center gap-2">
 							<span className="flex size-5 items-center justify-center rounded bg-surface-analysis text-4xs font-medium">
@@ -97,11 +102,11 @@ function StatusScreen({
 	const explorerUrl = txHash ? getExplorerTxUrl(txHash) : null;
 
 	return (
-		<Dialog open onOpenChange={closable ? onClose : undefined}>
-			<DialogContent className="sm:max-w-md" showCloseButton={closable}>
-				<DialogHeader>
-					<DialogTitle>{title}</DialogTitle>
-				</DialogHeader>
+		<ResponsiveModal open onOpenChange={closable ? onClose : undefined}>
+			<ResponsiveModalContent className="sm:max-w-md" showCloseButton={closable}>
+				<ResponsiveModalHeader>
+					<ResponsiveModalTitle>{title}</ResponsiveModalTitle>
+				</ResponsiveModalHeader>
 				<div className="flex flex-col items-center gap-4 py-6">
 					{icon === "loading" ? (
 						<div className="relative">
@@ -147,8 +152,8 @@ function StatusScreen({
 					)}
 					{children && <div className="w-full pt-2">{children}</div>}
 				</div>
-			</DialogContent>
-		</Dialog>
+			</ResponsiveModalContent>
+		</ResponsiveModal>
 	);
 }
 
@@ -181,7 +186,7 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 					}
 					onMaxClick={() => onAmountChange(balance)}
 					className={cn(
-						"w-full h-10 text-base bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums font-medium",
+						"w-full h-12 text-base bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums font-medium",
 						validation.error && "border-market-down-600 focus:border-market-down-600",
 					)}
 				/>
@@ -219,9 +224,10 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 
 			<Button
 				variant="contained"
+				size="lg"
 				onClick={onSubmit}
 				disabled={!validation.valid || isPending}
-				className="mt-auto w-full"
+				className="mt-auto w-full min-h-[44px]"
 			>
 				{isPending ? (
 					<>
@@ -287,7 +293,7 @@ function WithdrawForm({
 					}
 					onMaxClick={() => !isPending && onAmountChange(maxWithdraw)}
 					className={cn(
-						"w-full h-10 text-base bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums font-medium",
+						"w-full h-12 text-base bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums font-medium",
 						validation.error && "border-market-down-600 focus:border-market-down-600",
 					)}
 				/>
@@ -347,9 +353,10 @@ function WithdrawForm({
 
 			<Button
 				variant="contained"
+				size="lg"
 				onClick={onSubmit}
 				disabled={!validation.valid || isPending}
-				className="mt-auto w-full"
+				className="mt-auto w-full min-h-[44px]"
 			>
 				{isPending ? (
 					<>
@@ -395,13 +402,13 @@ interface WrongNetworkScreenProps {
 
 function WrongNetworkScreen({ open, onClose, onSwitch, isSwitching, error }: WrongNetworkScreenProps) {
 	return (
-		<Dialog open={open} onOpenChange={onClose}>
-			<DialogContent className="sm:max-w-md">
-				<DialogHeader>
-					<DialogTitle>
+		<ResponsiveModal open={open} onOpenChange={onClose}>
+			<ResponsiveModalContent className="sm:max-w-md">
+				<ResponsiveModalHeader>
+					<ResponsiveModalTitle>
 						<Trans>Transfer</Trans>
-					</DialogTitle>
-				</DialogHeader>
+					</ResponsiveModalTitle>
+				</ResponsiveModalHeader>
 				<div className="space-y-4 py-2">
 					<div className="flex items-start gap-3 rounded-xs border border-warning-700/40 bg-warning-700/5 p-4">
 						<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-warning-700/20">
@@ -417,7 +424,7 @@ function WrongNetworkScreen({ open, onClose, onSwitch, isSwitching, error }: Wro
 						</div>
 					</div>
 					{error && <p className="text-3xs text-market-down-600 px-1">{error.message}</p>}
-					<Button onClick={onSwitch} disabled={isSwitching} className="w-full">
+					<Button size="lg" onClick={onSwitch} disabled={isSwitching} className="w-full min-h-[44px]">
 						{isSwitching ? (
 							<>
 								<SpinnerGapIcon className="size-4 animate-spin" />
@@ -428,8 +435,8 @@ function WrongNetworkScreen({ open, onClose, onSwitch, isSwitching, error }: Wro
 						)}
 					</Button>
 				</div>
-			</DialogContent>
-		</Dialog>
+			</ResponsiveModalContent>
+		</ResponsiveModal>
 	);
 }
 
@@ -534,7 +541,7 @@ export function DepositModal() {
 				txHash={depositHash}
 				onClose={handleClose}
 			>
-				<Button onClick={handleClose} className="w-full">
+				<Button size="lg" onClick={handleClose} className="w-full min-h-[44px]">
 					<Trans>Done</Trans>
 				</Button>
 			</StatusScreen>
@@ -551,10 +558,10 @@ export function DepositModal() {
 				onClose={handleClose}
 			>
 				<div className="flex w-full gap-2">
-					<Button variant="outlined" onClick={handleClose} className="flex-1">
+					<Button variant="outlined" size="lg" onClick={handleClose} className="flex-1 min-h-[44px]">
 						<Trans>Cancel</Trans>
 					</Button>
-					<Button onClick={resetDeposit} className="flex-1">
+					<Button size="lg" onClick={resetDeposit} className="flex-1 min-h-[44px]">
 						<Trans>Retry</Trans>
 					</Button>
 				</div>
@@ -590,7 +597,7 @@ export function DepositModal() {
 				}
 				onClose={handleClose}
 			>
-				<Button onClick={handleClose} className="w-full">
+				<Button size="lg" onClick={handleClose} className="w-full min-h-[44px]">
 					<Trans>Done</Trans>
 				</Button>
 			</StatusScreen>
@@ -607,10 +614,10 @@ export function DepositModal() {
 				onClose={handleClose}
 			>
 				<div className="flex w-full gap-2">
-					<Button variant="outlined" onClick={handleClose} className="flex-1">
+					<Button variant="outlined" size="lg" onClick={handleClose} className="flex-1 min-h-[44px]">
 						<Trans>Cancel</Trans>
 					</Button>
-					<Button onClick={resetWithdraw} className="flex-1">
+					<Button size="lg" onClick={resetWithdraw} className="flex-1 min-h-[44px]">
 						<Trans>Retry</Trans>
 					</Button>
 				</div>
@@ -620,15 +627,19 @@ export function DepositModal() {
 
 	// Main form
 	return (
-		<Dialog open={open} onOpenChange={handleClose}>
-			<DialogContent className="sm:max-w-md">
-				<DialogHeader>
-					<DialogTitle>
+		<ResponsiveModal open={open} onOpenChange={handleClose}>
+			<ResponsiveModalContent className="sm:max-w-md">
+				<ResponsiveModalHeader>
+					<ResponsiveModalTitle>
 						<Trans>Transfer</Trans>
-					</DialogTitle>
-				</DialogHeader>
+					</ResponsiveModalTitle>
+				</ResponsiveModalHeader>
 
-				<Tabs value={activeTab} onValueChange={(v) => setTab(v as "deposit" | "withdraw")} className="space-y-4">
+				<Tabs
+					value={activeTab}
+					onValueChange={(v) => setTab(v as "deposit" | "withdraw")}
+					className="space-y-4 px-4 pb-6"
+				>
 					<TabsList variant="pill" className="w-full grid grid-cols-2">
 						<TabsTrigger value="deposit">
 							<ArrowLineDownIcon className="size-3" />
@@ -669,7 +680,7 @@ export function DepositModal() {
 						</TabsContent>
 					</div>
 				</Tabs>
-			</DialogContent>
-		</Dialog>
+			</ResponsiveModalContent>
+		</ResponsiveModal>
 	);
 }

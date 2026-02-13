@@ -10,6 +10,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { FALLBACK_VALUE_PLACEHOLDER, HL_ALL_DEXS } from "@/config/constants";
 import { getExecutedPrice } from "@/domain/trade/order/price";
 import { formatPriceForOrder, formatSizeForOrder } from "@/domain/trade/orders";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
 import { useMarkets, useUserPositions } from "@/lib/hyperliquid";
@@ -24,6 +25,7 @@ import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useMarketActions } from "@/stores/use-market-store";
 import { AssetDisplay } from "../components/asset-display";
 import { TradingActionButton } from "../components/trading-action-button";
+import { MobilePositionCard } from "./mobile-position-card";
 import { PositionTpSlModal } from "./position-tpsl-modal";
 
 interface PlaceholderProps {
@@ -44,7 +46,7 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 	);
 }
 
-interface TpSlPositionData {
+export interface TpSlPositionData {
 	coin: string;
 	assetId: number;
 	isLong: boolean;
@@ -60,7 +62,7 @@ interface TpSlPositionData {
 	existingSlOrderId?: number;
 }
 
-interface TpSlOrderInfo {
+export interface TpSlOrderInfo {
 	tpPrice?: number;
 	slPrice?: number;
 	tpOrderId?: number;
@@ -249,6 +251,7 @@ function PositionRow({
 }
 
 export function PositionsTab() {
+	const isMobile = useIsMobile();
 	const { address, isConnected } = useConnection();
 	const slippageBps = useMarketOrderSlippageBps();
 	const closingKeyRef = useRef<string | null>(null);
@@ -370,44 +373,12 @@ export function PositionsTab() {
 			</div>
 			{actionError ? <div className="mb-1 text-4xs text-market-down-600">{actionError}</div> : null}
 			<div className="flex-1 min-h-0 overflow-hidden border border-border-200/40 rounded-sm bg-surface-base/50">
-				{placeholder ?? (
-					<ScrollArea className="h-full w-full">
-						<Table>
-							<TableHeader>
-								<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Asset`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
-										{t`Size`}
-									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
-										{t`Margin`}
-									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
-										{t`Entry`}
-									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
-										{t`Mark`}
-									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
-										{t`Liq`}
-									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
-										{t`Funding`}
-									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
-										{t`PNL`}
-									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
-										{t`TP/SL`}
-									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
-										{t`Actions`}
-									</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{positions.map((p, i) => (
-									<PositionRow
+				{placeholder ??
+					(isMobile ? (
+						<ScrollArea className="h-full w-full">
+							<div className="flex flex-col gap-2 p-2">
+								{positions.map((p) => (
+									<MobilePositionCard
 										key={`${p.coin}-${p.entryPx}-${p.szi}`}
 										position={p}
 										markets={markets}
@@ -415,17 +386,69 @@ export function PositionsTab() {
 										tpSlInfo={tpSlOrdersByCoin.get(p.coin)}
 										isClosing={isClosing}
 										isRowClosing={isClosing && closingKeyRef.current === `${markets.getAssetId(p.coin)}`}
-										isEven={i % 2 === 1}
 										onClose={handleClosePosition}
 										onOpenTpSl={handleOpenTpSlModal}
 										onSelectMarket={(name) => setSelectedMarket(scope, name)}
 									/>
 								))}
-							</TableBody>
-						</Table>
-						<ScrollBar orientation="horizontal" />
-					</ScrollArea>
-				)}
+							</div>
+						</ScrollArea>
+					) : (
+						<ScrollArea className="h-full w-full">
+							<Table>
+								<TableHeader>
+									<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
+										<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Asset`}</TableHead>
+										<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
+											{t`Size`}
+										</TableHead>
+										<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
+											{t`Margin`}
+										</TableHead>
+										<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
+											{t`Entry`}
+										</TableHead>
+										<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
+											{t`Mark`}
+										</TableHead>
+										<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
+											{t`Liq`}
+										</TableHead>
+										<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
+											{t`Funding`}
+										</TableHead>
+										<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
+											{t`PNL`}
+										</TableHead>
+										<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
+											{t`TP/SL`}
+										</TableHead>
+										<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
+											{t`Actions`}
+										</TableHead>
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{positions.map((p, i) => (
+										<PositionRow
+											key={`${p.coin}-${p.entryPx}-${p.szi}`}
+											position={p}
+											markets={markets}
+											markPx={mids?.[p.coin]}
+											tpSlInfo={tpSlOrdersByCoin.get(p.coin)}
+											isClosing={isClosing}
+											isRowClosing={isClosing && closingKeyRef.current === `${markets.getAssetId(p.coin)}`}
+											isEven={i % 2 === 1}
+											onClose={handleClosePosition}
+											onOpenTpSl={handleOpenTpSlModal}
+											onSelectMarket={(name) => setSelectedMarket(scope, name)}
+										/>
+									))}
+								</TableBody>
+							</Table>
+							<ScrollBar orientation="horizontal" />
+						</ScrollArea>
+					))}
 			</div>
 
 			<PositionTpSlModal open={tpSlModalOpen} onOpenChange={setTpSlModalOpen} position={selectedTpSlPosition} />

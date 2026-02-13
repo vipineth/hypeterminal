@@ -4,13 +4,13 @@ import { CaretDownIcon, CheckIcon, ShieldIcon, SpinnerGapIcon, StackIcon, Warnin
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
+	ResponsiveModal,
+	ResponsiveModalContent,
+	ResponsiveModalDescription,
+	ResponsiveModalFooter,
+	ResponsiveModalHeader,
+	ResponsiveModalTitle,
+} from "@/components/ui/responsive-modal";
 import { MARGIN_MODE_SUCCESS_DURATION_MS } from "@/config/time";
 import { cn } from "@/lib/cn";
 import type { MarginMode } from "@/lib/trade/margin-mode";
@@ -121,16 +121,16 @@ export function MarginModeDialog({
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-sm gap-4">
-				<DialogHeader>
-					<DialogTitle>
+		<ResponsiveModal open={open} onOpenChange={onOpenChange}>
+			<ResponsiveModalContent className="sm:max-w-sm gap-4">
+				<ResponsiveModalHeader>
+					<ResponsiveModalTitle>
 						<Trans>Margin Mode</Trans>
-					</DialogTitle>
-					<DialogDescription>
+					</ResponsiveModalTitle>
+					<ResponsiveModalDescription>
 						<Trans>Select how margin is allocated for your positions</Trans>
-					</DialogDescription>
-				</DialogHeader>
+					</ResponsiveModalDescription>
+				</ResponsiveModalHeader>
 
 				<div className="space-y-2">
 					{MODE_OPTIONS.map((option) => {
@@ -215,7 +215,7 @@ export function MarginModeDialog({
 					</div>
 				)}
 
-				<DialogFooter>
+				<ResponsiveModalFooter>
 					<Button variant="text" size="sm" onClick={handleCancel} disabled={isUpdating}>
 						<Trans>Cancel</Trans>
 					</Button>
@@ -227,8 +227,8 @@ export function MarginModeDialog({
 						{isUpdating && <SpinnerGapIcon className="size-3.5 animate-spin" />}
 						<Trans>Confirm</Trans>
 					</TradingActionButton>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
+				</ResponsiveModalFooter>
+			</ResponsiveModalContent>
+		</ResponsiveModal>
 	);
 }
