@@ -7,7 +7,7 @@ import { FooterBar } from "./footer/footer-bar";
 import { TopNav } from "./header/top-nav";
 import { MainWorkspace } from "./layout/main-workspace";
 
-const MobileTerminal = createLazyComponent(() => import("./mobile/mobile-terminal"), "MobileTerminal");
+const MobileTerminal = createLazyComponent(() => import("./mobile/terminal"), "MobileTerminal");
 
 const GlobalModals = createLazyComponent(() => import("./components/global-modals"), "GlobalModals");
 

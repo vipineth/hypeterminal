@@ -1,5 +1,5 @@
 import { TrayIcon, WalletIcon } from "@phosphor-icons/react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useConnection } from "wagmi";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,23 +9,22 @@ import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { useSubOpenOrders } from "@/lib/hyperliquid/hooks/subscription";
 import { toNumber } from "@/lib/trade/numbers";
-import { BalancesTab } from "../positions/balances-tab";
-import { FundingTab } from "../positions/funding-tab";
-import { HistoryTab } from "../positions/history-tab";
-import { OrdersTab } from "../positions/orders-tab";
-import { PositionsTab } from "../positions/positions-tab";
-import { TwapTab } from "../positions/twap-tab";
-import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
+import { BalancesTab } from "../../positions/balances-tab";
+import { FundingTab } from "../../positions/funding-tab";
+import { HistoryTab } from "../../positions/history-tab";
+import { OrdersTab } from "../../positions/orders-tab";
+import { PositionsTab } from "../../positions/positions-tab";
+import { TwapTab } from "../../positions/twap-tab";
 
 const TABS_TEXT = UI_TEXT.POSITIONS_TAB;
 
 type TabValue = (typeof POSITIONS_TABS)[number]["value"];
 
-interface MobilePositionsViewProps {
+interface Props {
 	className?: string;
 }
 
-export function MobilePositionsView({ className }: MobilePositionsViewProps) {
+export function MobilePositionsView({ className }: Props) {
 	const [activeTab, setActiveTab] = useState<TabValue>("positions");
 
 	const { address, isConnected } = useConnection();
@@ -38,18 +37,17 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 	const openOrders = ordersEvent?.orders;
 	const isLoadingOrders = ordersStatus === "subscribing" || ordersStatus === "idle";
 
-	const positionsCount = useMemo(() => {
-		if (!isConnected) return 0;
-		return perpPositions.reduce((count, entry) => {
-			const size = toNumber(entry.position.szi);
-			if (!size) return count;
-			return count + 1;
-		}, 0);
-	}, [isConnected, perpPositions]);
+	const positionsCount = isConnected
+		? perpPositions.reduce((count, entry) => {
+				const size = toNumber(entry.position.szi);
+				if (!size) return count;
+				return count + 1;
+			}, 0)
+		: 0;
 
 	const ordersCount = isConnected ? (openOrders?.length ?? 0) : 0;
 
-	const renderContent = () => {
+	function renderContent() {
 		if (!isConnected) {
 			return <EmptyState title={TABS_TEXT.CONNECT} icon="wallet" />;
 		}
@@ -70,17 +68,17 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 			default:
 				return null;
 		}
-	};
+	}
 
 	return (
 		<div className={cn("flex flex-col h-full min-h-0 bg-surface-execution/20", className)}>
-			{/* Scrollable tabs header */}
 			<div className="shrink-0 border-b border-border-200/60 bg-surface-execution/30">
-				<div className="px-3 py-2 overflow-x-auto">
-					<div className="flex items-center gap-1 min-w-max">
+				<div className="px-4 py-3 overflow-x-auto">
+					<div className="flex items-center gap-1.5 min-w-max">
 						{POSITIONS_TABS.map((tab) => {
 							const isActive = activeTab === tab.value;
-							const count = tab.value === "positions" ? positionsCount : tab.value === "orders" ? ordersCount : null;
+							const countMap: Record<string, number | null> = { positions: positionsCount, orders: ordersCount };
+							const count = countMap[tab.value] ?? null;
 							const showCount = typeof count === "number" && count > 0;
 							const isLoading =
 								(tab.value === "positions" && isLoadingState) || (tab.value === "orders" && isLoadingOrders);
@@ -92,7 +90,7 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 									size="none"
 									onClick={() => setActiveTab(tab.value)}
 									className={cn(
-										"px-3 py-2.5 text-sm font-medium rounded-md transition-colors",
+										"px-3 py-2.5 text-sm font-medium rounded-xs transition-colors",
 										"min-h-[44px] flex items-center gap-2",
 										"active:scale-98",
 										"hover:bg-transparent",
@@ -120,10 +118,7 @@ export function MobilePositionsView({ className }: MobilePositionsViewProps) {
 				</div>
 			</div>
 
-			{/* Content */}
 			<div className="flex-1 min-h-0 overflow-hidden">{renderContent()}</div>
-
-			<MobileBottomNavSpacer />
 		</div>
 	);
 }

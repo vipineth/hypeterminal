@@ -1,5 +1,5 @@
 import { ArrowClockwiseIcon, DownloadSimpleIcon, XIcon } from "@phosphor-icons/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 
@@ -110,14 +110,12 @@ export function MobilePwaBanner({ className }: Props) {
 		};
 	}, []);
 
-	const shouldShowInstall = useMemo(() => {
-		return Boolean(installPrompt) && !dismissInstall && !isStandalone;
-	}, [dismissInstall, installPrompt, isStandalone]);
+	const shouldShowInstall = Boolean(installPrompt) && !dismissInstall && !isStandalone;
 
 	const shouldShowUpdate = Boolean(registration?.waiting);
 	if (!shouldShowInstall && !shouldShowUpdate) return null;
 
-	const handleInstall = async () => {
+	async function handleInstall() {
 		if (!installPrompt || isPromptingInstall) return;
 
 		setIsPromptingInstall(true);
@@ -131,9 +129,9 @@ export function MobilePwaBanner({ className }: Props) {
 			setInstallPrompt(null);
 			setIsPromptingInstall(false);
 		}
-	};
+	}
 
-	const handleRefresh = () => {
+	function handleRefresh() {
 		const waitingWorker = registration?.waiting;
 		if (!waitingWorker || isRefreshing) return;
 
@@ -146,10 +144,10 @@ export function MobilePwaBanner({ className }: Props) {
 			},
 			{ once: true },
 		);
-	};
+	}
 
 	return (
-		<div className={cn("fixed inset-x-3 md:hidden z-50", "bottom-[calc(68px+env(safe-area-inset-bottom))]", className)}>
+		<div className={cn("fixed inset-x-3 md:hidden z-50", "bottom-[calc(80px+env(safe-area-inset-bottom))]", className)}>
 			<div className="rounded-md border border-border-200/70 bg-surface-analysis shadow-md px-3 py-2">
 				{shouldShowUpdate ? (
 					<div className="flex items-center justify-between gap-3">

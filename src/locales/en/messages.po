@@ -699,6 +699,10 @@ msgstr "From"
 #~ msgid "Full Position"
 #~ msgstr "Full Position"
 
+#: src/components/trade/header/top-nav.tsx
+msgid "Fund"
+msgstr "Fund"
+
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/positions-tab.tsx

@@ -24,10 +24,10 @@ import { AssetDisplay } from "../components/asset-display";
 import type { MarketRow, MarketScope } from "./constants";
 import { useTokenSelector } from "./use-token-selector";
 
-export type TokenSelectorProps = {
+export interface TokenSelectorProps {
 	selectedMarket: UnifiedMarketInfo | undefined;
 	onValueChange: (value: string) => void;
-};
+}
 
 const marketScopes: { value: MarketScope; label: string }[] = [
 	{ value: "all", label: "All" },
@@ -51,7 +51,14 @@ function getDex(market: MarketRow): string | undefined {
 	return undefined;
 }
 
-interface TokenSelectorContentProps {
+function getSortIcon(sortState: false | "asc" | "desc", mobile: boolean) {
+	const sizeClass = mobile ? "size-3" : "size-2.5";
+	if (sortState === "asc") return <ArrowUpIcon className={sizeClass} />;
+	if (sortState === "desc") return <ArrowDownIcon className={sizeClass} />;
+	return <ArrowsDownUpIcon className={cn(sizeClass, "opacity-40")} />;
+}
+
+interface ContentProps {
 	selectedMarket: UnifiedMarketInfo | undefined;
 	scope: MarketScope;
 	exchangeScope: string;
@@ -99,7 +106,7 @@ function TokenSelectorContent({
 	filteredMarkets,
 	highlightedIndex,
 	mobile,
-}: TokenSelectorContentProps) {
+}: ContentProps) {
 	const virtualItems = virtualizer.getVirtualItems();
 	const headerGroup = table.getHeaderGroups()[0];
 	const showScopeTabs = exchangeScope === "all";
@@ -207,15 +214,7 @@ function TokenSelectorContent({
 								aria-label={t`Sort by ${String(header.column.columnDef.header ?? "")}`}
 							>
 								<span className="truncate">{flexRender(header.column.columnDef.header, header.getContext())}</span>
-								<span className="shrink-0">
-									{sortState === "asc" ? (
-										<ArrowUpIcon className={mobile ? "size-3" : "size-2.5"} />
-									) : sortState === "desc" ? (
-										<ArrowDownIcon className={mobile ? "size-3" : "size-2.5"} />
-									) : (
-										<ArrowsDownUpIcon className={cn(mobile ? "size-3" : "size-2.5", "opacity-40")} />
-									)}
-								</span>
+								<span className="shrink-0">{getSortIcon(sortState, !!mobile)}</span>
 							</Button>
 						);
 					})}
@@ -305,10 +304,11 @@ function TokenSelectorContent({
 													aria-label={isFav ? t`Remove from favorites` : t`Add to favorites`}
 												>
 													<StarIcon
+														weight={isFav ? "fill" : "regular"}
 														className={cn(
 															"transition-colors",
 															mobile ? "size-3" : "size-2.5",
-															isFav ? "fill-warning-700 text-warning-700" : "text-text-600 hover:text-warning-700",
+															isFav ? "text-warning-700" : "text-text-600 hover:text-warning-700",
 														)}
 													/>
 												</Button>
@@ -442,14 +442,14 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 			role="combobox"
 			aria-expanded={open}
 			aria-label={t`Select token`}
-			className="gap-2 px-2 py-1.5 bg-surface-execution border border-border-200/40 rounded-sm text-2xs font-bold uppercase tracking-wider hover:bg-surface-execution"
+			className="gap-1.5 px-2.5 py-2 bg-surface-execution border border-border-200/40 rounded-xs text-2xs font-bold uppercase tracking-wider hover:bg-surface-execution"
 		>
 			{selectedMarket && (
 				<AssetDisplay
 					coin={selectedMarket.name}
 					variant="full"
 					iconClassName="size-4 shrink-0"
-					nameClassName="inline-flex min-w-[13ch]"
+					nameClassName="inline-flex"
 				/>
 			)}
 			<CaretDownIcon className="size-4 text-text-600" />

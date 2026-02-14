@@ -1,5 +1,5 @@
 import { CaretDownIcon, SpinnerGapIcon, TrendDownIcon, TrendUpIcon } from "@phosphor-icons/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,27 +29,23 @@ import {
 	usesLimitPrice as usesLimitPriceForOrder,
 } from "@/lib/trade/order-types";
 import type { Side, SizeMode } from "@/lib/trade/types";
-import { useExchangeScope } from "@/providers/exchange-scope";
 import { useDepositModalActions } from "@/stores/use-global-modal-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
-import { useMarketActions } from "@/stores/use-market-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
-import { TokenSelector } from "../chart/token-selector";
-import { WalletDialog } from "../components/wallet-dialog";
-import { AdvancedOrderDropdown } from "../tradebox/advanced-order-dropdown";
-import { LeverageControl } from "../tradebox/leverage-control";
-import { OrderToast } from "../tradebox/order-toast";
-import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
+import { WalletDialog } from "../../components/wallet-dialog";
+import { AdvancedOrderDropdown } from "../../tradebox/advanced-order-dropdown";
+import { LeverageControl } from "../../tradebox/leverage-control";
+import { OrderToast } from "../../tradebox/order-toast";
 
 const ORDER_TEXT = UI_TEXT.ORDER_ENTRY;
 const SIZE_MARKS: SliderMark[] = [{ value: 0 }, { value: 25 }, { value: 50 }, { value: 75 }, { value: 100 }];
 
-interface MobileTradeViewProps {
+interface Props {
 	className?: string;
 }
 
-export function MobileTradeView({ className }: MobileTradeViewProps) {
+export function MobileTradeView({ className }: Props) {
 	const { address, isConnected } = useConnection();
 	const { data: walletClient, isLoading: isWalletLoading, error: walletClientError } = useWalletClient();
 	const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
@@ -57,15 +53,9 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const needsChainSwitch = !!walletClientError && walletClientError.message.includes("does not match");
 
 	const { data: market } = useSelectedMarketInfo();
-	const { scope } = useExchangeScope();
-	const { setSelectedMarket } = useMarketActions();
 	const { baseToken, quoteToken } = market
 		? getBaseQuoteFromPairName(market.pairName, market.kind)
 		: { baseToken: undefined, quoteToken: undefined };
-
-	function handleMarketChange(marketName: string) {
-		setSelectedMarket(scope, marketName);
-	}
 
 	const { perpSummary, perpPositions } = useAccountBalances();
 
@@ -119,22 +109,15 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const markPx = toNumberOrZero(market?.markPx);
 	const price = isMarketExecution ? markPx : toNumberOrZero(limitPriceInput);
 
-	const maxSize = useMemo(() => {
-		if (!price || price <= 0) return 0;
-
-		const isBuy = side === "buy";
-		const maxTradeSize = maxTradeSzs?.[isBuy ? 0 : 1] ?? 0;
-		if (maxTradeSize > 0) {
-			return floorToDecimals(maxTradeSize, market?.szDecimals ?? 0);
-		}
-
-		if (!leverage || availableBalance <= 0) return 0;
-		const maxNotional = availableBalance * leverage;
-		let maxSizeRaw = maxNotional / price;
-		if (!isBuy && positionSize > 0) maxSizeRaw += positionSize;
-		else if (isBuy && positionSize < 0) maxSizeRaw += Math.abs(positionSize);
-		return floorToDecimals(maxSizeRaw, market?.szDecimals ?? 0);
-	}, [price, side, maxTradeSzs, leverage, availableBalance, positionSize, market?.szDecimals]);
+	const maxSize = getMaxSize(
+		price,
+		side,
+		maxTradeSzs,
+		leverage,
+		availableBalance,
+		positionSize,
+		market?.szDecimals ?? 0,
+	);
 
 	const sizeInputValue = toNumberOrZero(sizeInput);
 	const sizeValue = sizeMode === "quote" && price > 0 ? sizeInputValue / price : sizeInputValue;
@@ -151,7 +134,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 
 	const canSign = isAgentApproved || !!walletClient;
 
-	const validation = useMemo(() => {
+	const validation = (() => {
 		const errors: string[] = [];
 		if (!isConnected)
 			return { valid: false, errors: [ORDER_TEXT.ERROR_NOT_CONNECTED], canSubmit: false, needsApproval: false };
@@ -172,23 +155,9 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 		if (orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD) errors.push(ORDER_TEXT.ERROR_MIN_NOTIONAL);
 		if (sizeValue > maxSize && maxSize > 0) errors.push(ORDER_TEXT.ERROR_EXCEEDS_MAX);
 		return { valid: errors.length === 0, errors, canSubmit: errors.length === 0, needsApproval: false };
-	}, [
-		isConnected,
-		isWalletLoading,
-		availableBalance,
-		market,
-		isMarketExecution,
-		usesLimitPrice,
-		markPx,
-		price,
-		sizeValue,
-		orderValue,
-		maxSize,
-		isAgentApproved,
-		canSign,
-	]);
+	})();
 
-	const applySizeFromPercent = (pct: number) => {
+	function applySizeFromPercent(pct: number) {
 		if (maxSize <= 0) return;
 		const newSize = maxSize * (pct / 100);
 		if (sizeMode === "quote" && price > 0) {
@@ -198,11 +167,13 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 			const formatted = formatDecimalFloor(newSize, market?.szDecimals ?? 0);
 			setSizeInput(formatted || "");
 		}
-	};
+	}
 
-	const handleSliderChange = (values: number[]) => applySizeFromPercent(values[0]);
+	function handleSliderChange(values: number[]) {
+		applySizeFromPercent(values[0]);
+	}
 
-	const handleSizeModeToggle = () => {
+	function handleSizeModeToggle() {
 		if (sizeMode === "base" && price > 0 && sizeValue > 0) {
 			setSizeInput((sizeValue * price).toFixed(2));
 			setSizeMode("quote");
@@ -212,15 +183,17 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 		} else {
 			setSizeMode(sizeMode === "base" ? "quote" : "base");
 		}
-	};
+	}
 
-	const handleMarkPriceClick = () => {
+	function handleMarkPriceClick() {
 		if (markPx > 0) setLimitPriceInput(markPx.toFixed(szDecimalsToPriceDecimals(market?.szDecimals ?? 4)));
-	};
+	}
 
-	const handleSwitchChain = () => switchChain({ chainId: ARBITRUM_CHAIN_ID });
+	function handleSwitchChain() {
+		switchChain({ chainId: ARBITRUM_CHAIN_ID });
+	}
 
-	const handleApprove = async () => {
+	async function handleApprove() {
 		if (isRegistering) return;
 		setApprovalError(null);
 		try {
@@ -228,9 +201,9 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 		} catch (error) {
 			setApprovalError(error instanceof Error ? error.message : ORDER_TEXT.APPROVAL_ERROR_FALLBACK);
 		}
-	};
+	}
 
-	const handleSubmit = async () => {
+	async function handleSubmit() {
 		if (!validation.canSubmit || isSubmitting) return;
 		if (!market || !baseToken || typeof market.assetId !== "number") return;
 
@@ -278,7 +251,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 				error: error instanceof Error ? error.message : ORDER_TEXT.ORDER_ERROR_FALLBACK,
 			});
 		}
-	};
+	}
 
 	const sliderValue = !maxSize || maxSize <= 0 ? 0 : Math.min(100, (sizeValue / maxSize) * 100);
 
@@ -306,11 +279,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 			};
 		if (validation.needsApproval)
 			return {
-				text: isRegistering
-					? ORDER_TEXT.BUTTON_SIGNING
-					: !canApprove
-						? ORDER_TEXT.BUTTON_LOADING
-						: ORDER_TEXT.BUTTON_ENABLE_TRADING,
+				text: getApprovalButtonText(isRegistering, canApprove),
 				action: handleApprove,
 				disabled: isRegistering || !canApprove,
 				variant: "cyan" as const,
@@ -327,18 +296,8 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 
 	return (
 		<div className={cn("flex flex-col h-full min-h-0 bg-surface-execution/20", className)}>
-			<div className="shrink-0 px-4 py-2 border-b border-border-200/60 bg-surface-execution/30">
-				<div className="flex items-center justify-between">
-					<TokenSelector selectedMarket={market} onValueChange={handleMarketChange} />
-					<div className="text-right">
-						<div className="text-lg font-semibold tabular-nums text-warning-700">
-							{formatPrice(markPx || null, { szDecimals: market?.szDecimals })}
-						</div>
-					</div>
-				</div>
-			</div>
 			<div className="flex-1 min-h-0 overflow-y-auto">
-				<div className="p-2 space-y-3">
+				<div className="p-3 space-y-4">
 					<Tabs
 						value={tabsOrderType}
 						onValueChange={(v) => {
@@ -494,21 +453,12 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					size="lg"
 					onClick={buttonContent.action}
 					disabled={buttonContent.disabled}
-					className={cn(
-						"w-full py-2",
-						buttonContent.variant === "cyan"
-							? "bg-primary-default/20 border-primary-default text-primary-default hover:bg-primary-default/30"
-							: buttonContent.variant === "buy"
-								? "bg-market-up-100 border-market-up-600 text-market-up-600 hover:bg-market-up-100/30"
-								: "bg-market-down-100 border-market-down-600 text-market-down-600 hover:bg-market-down-600/30",
-					)}
+					className={cn("w-full py-3.5 text-base font-semibold", getButtonVariantClass(buttonContent.variant))}
 				>
 					{(isSubmitting || isRegistering) && <SpinnerGapIcon className="size-5 animate-spin" />}
 					{buttonContent.text}
 				</Button>
 			</div>
-
-			<MobileBottomNavSpacer />
 
 			<WalletDialog open={walletDialogOpen} onOpenChange={setWalletDialogOpen} />
 			<OrderToast />
@@ -516,11 +466,53 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	);
 }
 
-function SummaryRow({ label, value, valueClass }: { label: string; value: string; valueClass?: string }) {
+interface SummaryRowProps {
+	label: string;
+	value: string;
+	valueClass?: string;
+}
+
+function SummaryRow({ label, value, valueClass }: SummaryRowProps) {
 	return (
-		<div className="flex items-center justify-between px-3 py-2">
+		<div className="flex items-center justify-between px-3 py-2.5">
 			<span className="text-text-600">{label}</span>
 			<span className={cn("tabular-nums", valueClass)}>{value}</span>
 		</div>
 	);
+}
+
+function getMaxSize(
+	price: number,
+	side: Side,
+	maxTradeSzs: [number, number] | null | undefined,
+	leverage: number | undefined,
+	availableBalance: number,
+	positionSize: number,
+	szDecimals: number,
+): number {
+	if (!price || price <= 0) return 0;
+
+	const isBuy = side === "buy";
+	const maxTradeSize = maxTradeSzs?.[isBuy ? 0 : 1] ?? 0;
+	if (maxTradeSize > 0) return floorToDecimals(maxTradeSize, szDecimals);
+
+	if (!leverage || availableBalance <= 0) return 0;
+	const maxNotional = availableBalance * leverage;
+	let maxSizeRaw = maxNotional / price;
+	if (!isBuy && positionSize > 0) maxSizeRaw += positionSize;
+	else if (isBuy && positionSize < 0) maxSizeRaw += Math.abs(positionSize);
+	return floorToDecimals(maxSizeRaw, szDecimals);
+}
+
+function getApprovalButtonText(isRegistering: boolean, canApprove: boolean): string {
+	if (isRegistering) return ORDER_TEXT.BUTTON_SIGNING;
+	if (!canApprove) return ORDER_TEXT.BUTTON_LOADING;
+	return ORDER_TEXT.BUTTON_ENABLE_TRADING;
+}
+
+function getButtonVariantClass(variant: "cyan" | "buy" | "sell"): string {
+	if (variant === "cyan")
+		return "bg-primary-default/20 border-primary-default text-primary-default hover:bg-primary-default/30";
+	if (variant === "buy") return "bg-market-up-100 border-market-up-600 text-market-up-600 hover:bg-market-up-100/30";
+	return "bg-market-down-100 border-market-down-600 text-market-down-600 hover:bg-market-down-600/30";
 }

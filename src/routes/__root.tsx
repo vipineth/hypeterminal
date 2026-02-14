@@ -1,7 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { ClientOnly, createRootRouteWithContext, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { NotFoundPage } from "@/components/pages/not-found-page";
-import { PwaRegistration } from "@/components/trade/mobile/pwa-registration";
+import { PwaRegistration } from "@/components/trade/mobile/pwa/registration";
 import { Toaster } from "@/components/ui/sonner";
 import { MarketsInfoProvider } from "@/lib/hyperliquid/hooks/MarketsInfoProvider";
 import { buildPageHead, mergeHead } from "@/lib/seo";

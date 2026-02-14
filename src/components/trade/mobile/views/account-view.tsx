@@ -20,16 +20,15 @@ import { cn } from "@/lib/cn";
 import { formatPercent, formatToken, formatUSD, shortenAddress } from "@/lib/format";
 import { getValueColorClass, toNumberOrZero } from "@/lib/trade/numbers";
 import { useDepositModalActions } from "@/stores/use-global-modal-store";
-import { WalletDialog } from "../components/wallet-dialog";
-import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
+import { WalletDialog } from "../../components/wallet-dialog";
 
 const ACCOUNT_TEXT = UI_TEXT.ACCOUNT_PANEL;
 
-type SummaryRow = {
+interface SummaryRow {
 	label: string;
 	value: string;
 	valueClassName?: string;
-};
+}
 
 interface Props {
 	className?: string;
@@ -224,7 +223,6 @@ export function MobileAccountView({ className }: Props) {
 						Connect Wallet
 					</Button>
 				</div>
-				<MobileBottomNavSpacer />
 				<WalletDialog open={walletDialogOpen} onOpenChange={setWalletDialogOpen} />
 			</div>
 		);
@@ -237,7 +235,7 @@ export function MobileAccountView({ className }: Props) {
 
 	return (
 		<div className={cn("flex flex-col h-full min-h-0 bg-surface-execution/20", className)}>
-			<div className="shrink-0 px-4 py-4 border-b border-border-200/60 bg-surface-execution/30">
+			<div className="shrink-0 px-4 py-5 border-b border-border-200/60 bg-surface-execution/30">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3">
 						<div className="size-10 rounded-full bg-primary-default/20 flex items-center justify-center">
@@ -278,8 +276,8 @@ export function MobileAccountView({ className }: Props) {
 			</div>
 
 			<div className="flex-1 min-h-0 overflow-y-auto">
-				<div className="p-2 space-y-4">
-					<div className="p-4 rounded-xs border border-border-200/60 bg-surface-execution/30">
+				<div className="p-3 space-y-5">
+					<div className="p-5 rounded-xs border border-border-200/60 bg-surface-execution/30">
 						{isLoading ? (
 							<div className="space-y-3">
 								<Skeleton className="h-4 w-20" />
@@ -288,7 +286,7 @@ export function MobileAccountView({ className }: Props) {
 							</div>
 						) : (
 							<>
-								<div className="text-sm text-text-600 mb-1">{ACCOUNT_TEXT.EQUITY_LABEL}</div>
+								<div className="text-sm text-text-600 mb-2">{ACCOUNT_TEXT.EQUITY_LABEL}</div>
 								<div className="text-3xl font-bold tabular-nums">{headerEquity}</div>
 								{activeTab === "perps" && (
 									<div className={cn("text-sm tabular-nums mt-1", headerPnlClass)}>
@@ -341,14 +339,14 @@ export function MobileAccountView({ className }: Props) {
 						</TabsContentGroup>
 					</Tabs>
 
-					<div className="grid grid-cols-2 gap-3 pt-2">
+					<div className="grid grid-cols-2 gap-4 pt-2">
 						<Button
 							variant="text"
 							size="none"
 							onClick={() => openDepositModal("deposit")}
 							className={cn(
 								"py-4 text-base font-semibold rounded-xs",
-								"bg-market-up-100 border border-market-up-600 text-market-up-600",
+								"bg-market-up-600 border border-market-up-600 text-text-10",
 								"hover:bg-market-up-100/30 transition-colors",
 								"flex items-center justify-center gap-2",
 								"min-h-[56px]",
@@ -382,8 +380,6 @@ export function MobileAccountView({ className }: Props) {
 					)}
 				</div>
 			</div>
-
-			<MobileBottomNavSpacer />
 		</div>
 	);
 }

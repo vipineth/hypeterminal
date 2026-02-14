@@ -207,7 +207,7 @@
   --warning-100: #4A3A12;
 
   /* Error */
-  --error-700: #A63A2B;
+  --error-700: #E5564A;
   --error-100: #3A1C1C;
 
   /* Surface */
@@ -394,6 +394,12 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
+  }
+}
+
+@layer utilities {
+  .pb-safe-bottom {
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
   }
 }
 
