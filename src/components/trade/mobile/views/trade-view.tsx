@@ -17,6 +17,7 @@ import { getBaseQuoteFromPairName } from "@/domain/market";
 import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { useAssetLeverage } from "@/hooks/trade/use-asset-leverage";
+import { useWalletConnect } from "@/hooks/use-wallet-connect";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo } from "@/lib/hyperliquid";
@@ -33,7 +34,6 @@ import { useDepositModalActions } from "@/stores/use-global-modal-store";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
-import { WalletDialog } from "../../components/wallet-dialog";
 import { AdvancedOrderDropdown } from "../../tradebox/advanced-order-dropdown";
 import { LeverageControl } from "../../tradebox/leverage-control";
 import { OrderToast } from "../../tradebox/order-toast";
@@ -80,7 +80,7 @@ export function MobileTradeView({ className }: Props) {
 	const [limitPriceInput, setLimitPriceInput] = useState("");
 	const [approvalError, setApprovalError] = useState<string | null>(null);
 
-	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
+	const { connect: openWalletConnect } = useWalletConnect();
 	const { open: openDepositModal } = useDepositModalActions();
 
 	const { mutateAsync: placeOrder, isPending: isSubmitting } = useExchangeOrder();
@@ -259,7 +259,7 @@ export function MobileTradeView({ className }: Props) {
 		if (!isConnected)
 			return {
 				text: ORDER_TEXT.BUTTON_CONNECT,
-				action: () => setWalletDialogOpen(true),
+				action: openWalletConnect,
 				disabled: false,
 				variant: "cyan" as const,
 			};
@@ -391,7 +391,7 @@ export function MobileTradeView({ className }: Props) {
 							max={100}
 							step={1}
 							marks={SIZE_MARKS}
-							className="py-3"
+							className="py-5"
 							disabled={isFormDisabled || maxSize <= 0}
 						/>
 					</div>
@@ -460,7 +460,6 @@ export function MobileTradeView({ className }: Props) {
 				</Button>
 			</div>
 
-			<WalletDialog open={walletDialogOpen} onOpenChange={setWalletDialogOpen} />
 			<OrderToast />
 		</div>
 	);

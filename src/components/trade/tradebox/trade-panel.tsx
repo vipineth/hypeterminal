@@ -11,6 +11,7 @@ import { getOrderPrice } from "@/domain/trade/order/price";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
+import { useWalletConnect } from "@/hooks/use-wallet-connect";
 import { cn } from "@/lib/cn";
 import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo, useUserPositions } from "@/lib/hyperliquid";
 import { useExchangeOrder } from "@/lib/hyperliquid/hooks/exchange/useExchangeOrder";
@@ -52,7 +53,6 @@ import {
 } from "@/stores/use-order-entry-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
-import { WalletDialog } from "../components/wallet-dialog";
 import { LeverageControl } from "./leverage-control";
 import { MarginModeDialog, MarginModeToggle } from "./margin-mode-dialog";
 import { OrderSummary } from "./order-summary";
@@ -64,6 +64,7 @@ export function TradePanel() {
 	const reduceOnlyId = useId();
 	const tpSlId = useId();
 
+	const { connect: openWalletConnect } = useWalletConnect();
 	const { address, isConnected } = useConnection();
 	const { data: walletClient, isLoading: isWalletLoading, error: walletClientError } = useWalletClient();
 	const switchChain = useSwitchChain();
@@ -421,7 +422,7 @@ export function TradePanel() {
 		canApprove,
 		side,
 		isSubmitting,
-		onConnectWallet: () => setActiveDialog("wallet"),
+		onConnectWallet: openWalletConnect,
 		onDeposit: () => openDepositModal("deposit"),
 		onRegister: handleRegister,
 		onSubmit: handleSubmit,
@@ -511,8 +512,6 @@ export function TradePanel() {
 					marketKind={market?.kind}
 				/>
 			</div>
-
-			<WalletDialog open={activeDialog === "wallet"} onOpenChange={(open) => setActiveDialog(open ? "wallet" : null)} />
 
 			<OrderToast />
 		</div>
