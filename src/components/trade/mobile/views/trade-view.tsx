@@ -378,7 +378,7 @@ export function MobileTradeView({ className }: Props) {
 								value={sizeInput}
 								onChange={(e) => setSizeInput(e.target.value)}
 								className={cn(
-									"flex-1 h-10 text-sm tabular-nums",
+									"flex-1 h-10 text-base tabular-nums",
 									"bg-surface-base/50 border-border-200/60",
 									"focus:border-primary-default/60",
 								)}
@@ -416,7 +416,7 @@ export function MobileTradeView({ className }: Props) {
 								placeholder={ORDER_TEXT.INPUT_PLACEHOLDER}
 								value={limitPriceInput}
 								onChange={(e) => setLimitPriceInput(e.target.value)}
-								className="h-10 text-sm tabular-nums bg-surface-base/50"
+								className="h-10 text-base tabular-nums bg-surface-base/50"
 								disabled={isFormDisabled}
 							/>
 						</div>

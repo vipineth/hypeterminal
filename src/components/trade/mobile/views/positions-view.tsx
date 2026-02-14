@@ -118,7 +118,7 @@ export function MobilePositionsView({ className }: Props) {
 				</div>
 			</div>
 
-			<div className="flex-1 min-h-0 overflow-hidden">{renderContent()}</div>
+			<div className="flex-1 min-h-0 overflow-hidden flex flex-col">{renderContent()}</div>
 		</div>
 	);
 }
