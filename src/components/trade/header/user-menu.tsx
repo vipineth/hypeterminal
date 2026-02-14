@@ -19,8 +19,8 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useCopyToClipboard } from "@/hooks/ui/use-copy-to-clipboard";
+import { useWalletConnect } from "@/hooks/use-wallet-connect";
 import { shortenAddress } from "@/lib/format";
-import { WalletDialog } from "../components/wallet-dialog";
 
 function CopyAddressMenuItem({ address }: { address: string }) {
 	const { copied, copy } = useCopyToClipboard();
@@ -48,7 +48,7 @@ export function UserMenu() {
 	const { address, isConnected, isConnecting } = useConnection();
 	const disconnect = useDisconnect();
 	const { data: ensName } = useEnsName({ address });
-	const [isOpen, setIsOpen] = useState(false);
+	const { connect } = useWalletConnect();
 	const [mounted, setMounted] = useState(false);
 
 	useEffect(() => {
@@ -66,13 +66,10 @@ export function UserMenu() {
 
 	if (!isConnected) {
 		return (
-			<>
-				<Button size="md" variant="outlined" onClick={() => setIsOpen(true)}>
-					<WalletIcon className="size-4" />
-					<Trans>Connect Wallet</Trans>
-				</Button>
-				<WalletDialog open={isOpen} onOpenChange={setIsOpen} />
-			</>
+			<Button size="md" variant="outlined" onClick={connect}>
+				<WalletIcon className="size-4" />
+				<Trans>Connect Wallet</Trans>
+			</Button>
 		);
 	}
 

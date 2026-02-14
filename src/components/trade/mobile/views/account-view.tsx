@@ -16,11 +16,11 @@ import { Tabs, TabsContent, TabsContentGroup, TabsList, TabsTrigger } from "@/co
 import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { useCopyToClipboard } from "@/hooks/ui/use-copy-to-clipboard";
+import { useWalletConnect } from "@/hooks/use-wallet-connect";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatToken, formatUSD, shortenAddress } from "@/lib/format";
 import { getValueColorClass, toNumberOrZero } from "@/lib/trade/numbers";
 import { useDepositModalActions } from "@/stores/use-global-modal-store";
-import { WalletDialog } from "../../components/wallet-dialog";
 
 const ACCOUNT_TEXT = UI_TEXT.ACCOUNT_PANEL;
 
@@ -40,7 +40,7 @@ export function MobileAccountView({ className }: Props) {
 
 	const { perpSummary, perpPositions, spotBalances, isLoading, hasError } = useAccountBalances();
 
-	const [walletDialogOpen, setWalletDialogOpen] = useState(false);
+	const { connect: openWalletConnect } = useWalletConnect();
 	const [activeTab, setActiveTab] = useState("perps");
 	const { copied, copy } = useCopyToClipboard();
 	const { open: openDepositModal } = useDepositModalActions();
@@ -212,7 +212,7 @@ export function MobileAccountView({ className }: Props) {
 					<Button
 						variant="text"
 						size="none"
-						onClick={() => setWalletDialogOpen(true)}
+						onClick={openWalletConnect}
 						className={cn(
 							"px-6 py-3 text-base font-semibold rounded-xs",
 							"bg-primary-default/20 border border-primary-default text-primary-default",
@@ -223,7 +223,6 @@ export function MobileAccountView({ className }: Props) {
 						Connect Wallet
 					</Button>
 				</div>
-				<WalletDialog open={walletDialogOpen} onOpenChange={setWalletDialogOpen} />
 			</div>
 		);
 	}

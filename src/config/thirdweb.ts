@@ -1,9 +1,28 @@
 import { createThirdwebClient } from "thirdweb";
 import { darkTheme, lightTheme } from "thirdweb/react";
+import type { Wallet } from "thirdweb/wallets";
+import { createWallet, inAppWallet } from "thirdweb/wallets";
+import { useTheme } from "@/stores/use-global-settings-store";
 
 export const thirdwebClient = createThirdwebClient({
 	clientId: import.meta.env.VITE_THIRDWEB_CLIENT_ID,
 });
+
+export const thirdwebWallets: Wallet[] = [
+	inAppWallet({
+		auth: {
+			options: ["google", "discord", "telegram", "email", "x", "passkey"],
+		},
+	}),
+	createWallet("io.metamask"),
+	createWallet("com.coinbase.wallet"),
+	createWallet("me.rainbow"),
+	createWallet("io.rabby"),
+	createWallet("io.zerion.wallet"),
+	createWallet("com.ledger"),
+];
+
+const FONT_FAMILY = "IBM Plex Sans Variable, ui-sans-serif, system-ui, sans-serif";
 
 export const thirdwebDarkTheme = darkTheme({
 	colors: {
@@ -26,7 +45,7 @@ export const thirdwebDarkTheme = darkTheme({
 		selectedTextColor: "#E6E9EE",
 		modalOverlayBg: "rgba(0, 0, 0, 0.6)",
 	},
-	fontFamily: "IBM Plex Sans Variable, ui-sans-serif, system-ui, sans-serif",
+	fontFamily: FONT_FAMILY,
 });
 
 export const thirdwebLightTheme = lightTheme({
@@ -49,5 +68,10 @@ export const thirdwebLightTheme = lightTheme({
 		selectedTextBg: "rgba(37, 99, 235, 0.15)",
 		selectedTextColor: "#232529",
 	},
-	fontFamily: "IBM Plex Sans Variable, ui-sans-serif, system-ui, sans-serif",
+	fontFamily: FONT_FAMILY,
 });
+
+export function useThirdwebTheme() {
+	const theme = useTheme();
+	return theme === "light" ? thirdwebLightTheme : thirdwebDarkTheme;
+}
