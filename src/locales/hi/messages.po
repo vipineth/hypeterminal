@@ -30,8 +30,8 @@ msgstr "24 घंटे परिवर्तन"
 #~ msgstr "24घंटे मूल्य"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "A crypto wallet lets you store and manage your digital assets securely."
-msgstr "क्रिप्टो वॉलेट आपको अपनी डिजिटल संपत्तियों को सुरक्षित रूप से स्टोर और प्रबंधित करने देता है।"
+#~ msgid "A crypto wallet lets you store and manage your digital assets securely."
+#~ msgstr "क्रिप्टो वॉलेट आपको अपनी डिजिटल संपत्तियों को सुरक्षित रूप से स्टोर और प्रबंधित करने देता है।"
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "About Builder Codes"
@@ -318,8 +318,8 @@ msgid "Confirm in wallet"
 msgstr "वॉलेट में पुष्टि करें"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Connect"
-msgstr "कनेक्ट करें"
+#~ msgid "Connect"
+#~ msgstr "कनेक्ट करें"
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "Connect a wallet to manage orders."
@@ -329,7 +329,6 @@ msgstr "कनेक्ट करें"
 #~ msgid "Connect a wallet to manage positions."
 #~ msgstr "पोजीशन प्रबंधित करने के लिए वॉलेट कनेक्ट करें।"
 
-#: src/components/trade/components/wallet-dialog.tsx
 #: src/components/trade/header/user-menu.tsx
 #: src/lib/trade/use-button-content.ts
 msgid "Connect Wallet"
@@ -344,8 +343,8 @@ msgstr "खाता देखने के लिए वॉलेट कने�
 #~ msgstr ""
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Connect your wallet to start trading on Hyperliquid"
-msgstr "Hyperliquid पर ट्रेडिंग शुरू करने के लिए अपना वॉलेट कनेक्ट करें"
+#~ msgid "Connect your wallet to start trading on Hyperliquid"
+#~ msgstr "Hyperliquid पर ट्रेडिंग शुरू करने के लिए अपना वॉलेट कनेक्ट करें"
 
 #: src/components/trade/positions/balances-tab.tsx
 msgid "Connect your wallet to view balances."
@@ -700,8 +699,8 @@ msgstr "से"
 #~ msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Fund"
-msgstr "फंड"
+#~ msgid "Fund"
+#~ msgstr "फंड"
 
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/positions/mobile-position-card.tsx
@@ -747,8 +746,8 @@ msgstr "ऑर्डर में"
 #~ msgstr "उपयोग में"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Install a wallet extension to continue"
-msgstr "जारी रखने के लिए वॉलेट एक्सटेंशन इंस्टॉल करें"
+#~ msgid "Install a wallet extension to continue"
+#~ msgstr "जारी रखने के लिए वॉलेट एक्सटेंशन इंस्टॉल करें"
 
 #. placeholder {0}: ctx.baseToken
 #. placeholder {0}: ctx.quoteToken
@@ -807,8 +806,8 @@ msgid "Leaderboard"
 msgstr "लीडरबोर्ड"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Learn more"
-msgstr "और जानें"
+#~ msgid "Learn more"
+#~ msgstr "और जानें"
 
 #: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/leverage-control.tsx
@@ -1028,8 +1027,8 @@ msgid "Minimum withdrawal is ${MIN_WITHDRAW_USD}"
 msgstr "न्यूनतम निकासी ${MIN_WITHDRAW_USD} है"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Mock Wallet (Testing)"
-msgstr "मॉक वॉलेट (टेस्टिंग)"
+#~ msgid "Mock Wallet (Testing)"
+#~ msgstr "मॉक वॉलेट (टेस्टिंग)"
 
 #: src/components/trade/header/top-nav.tsx
 #~ msgid "More"
@@ -1064,8 +1063,8 @@ msgid "NEW"
 msgstr "नया"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "New to wallets?"
-msgstr "वॉलेट में नए हैं?"
+#~ msgid "New to wallets?"
+#~ msgstr "वॉलेट में नए हैं?"
 
 #: src/components/ui/pagination.tsx
 #~ msgid "Next"
@@ -1153,8 +1152,8 @@ msgstr "<0/>/<1/> के लिए कोई ट्रेडिंग पेय�
 #~ msgstr ""
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "No wallets found"
-msgstr "कोई वॉलेट नहीं मिला"
+#~ msgid "No wallets found"
+#~ msgstr "कोई वॉलेट नहीं मिला"
 
 #: src/lib/errors/definitions/connection.ts
 msgid "Not connected"
@@ -1181,8 +1180,8 @@ msgid "OI"
 msgstr "OI"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Only you control your funds. No email or password required."
-msgstr "केवल आप अपने धन को नियंत्रित करते हैं। ईमेल या पासवर्ड की आवश्यकता नहीं।"
+#~ msgid "Only you control your funds. No email or password required."
+#~ msgstr "केवल आप अपने धन को नियंत्रित करते हैं। ईमेल या पासवर्ड की आवश्यकता नहीं।"
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "open"
@@ -1232,8 +1231,8 @@ msgid "Other"
 msgstr "अन्य"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Other Options"
-msgstr "अन्य विकल्प"
+#~ msgid "Other Options"
+#~ msgstr "अन्य विकल्प"
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #~ msgid "P&L"
@@ -1289,8 +1288,8 @@ msgid "PNL"
 msgstr "PNL"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Popular"
-msgstr "लोकप्रिय"
+#~ msgid "Popular"
+#~ msgstr "लोकप्रिय"
 
 #: src/components/trade/header/top-nav.tsx
 msgid "Portfolio"
@@ -1416,8 +1415,8 @@ msgid "Search markets..."
 msgstr "बाज़ार खोजें..."
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Secure & Private"
-msgstr "सुरक्षित और निजी"
+#~ msgid "Secure & Private"
+#~ msgstr "सुरक्षित और निजी"
 
 #: src/components/trade/header/favorites-strip.tsx
 #~ msgid "Select {coin} market"
@@ -2079,8 +2078,8 @@ msgstr "वॉलेट कनेक्ट नहीं है"
 #~ msgstr "WebSocket त्रुटि"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "What is a wallet?"
-msgstr "वॉलेट क्या है?"
+#~ msgid "What is a wallet?"
+#~ msgstr "वॉलेट क्या है?"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #~ msgid "will arrive in ~3 min"

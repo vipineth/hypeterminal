@@ -81,7 +81,7 @@ function mapExchangeToMarketScope(es: ExchangeScope): MarketScope {
 
 export function useTokenSelector({ value, onValueChange }: UseTokenSelectorOptions): UseTokenSelectorReturn {
 	const [open, setOpen] = useState(false);
-	const [localScope, setLocalScope] = useState<MarketScope>("all");
+	const [localScope, setLocalScope] = useState<MarketScope>("perp");
 	const [localSubcategory, setLocalSubcategory] = useState<string>("all");
 	const [search, setSearch] = useState("");
 	const [deferredSearch, setDeferredSearch] = useState("");

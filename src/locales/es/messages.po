@@ -30,8 +30,8 @@ msgstr "Cambio 24h"
 #~ msgstr "Precio 24h"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "A crypto wallet lets you store and manage your digital assets securely."
-msgstr "Una billetera cripto te permite almacenar y gestionar tus activos digitales de forma segura."
+#~ msgid "A crypto wallet lets you store and manage your digital assets securely."
+#~ msgstr "Una billetera cripto te permite almacenar y gestionar tus activos digitales de forma segura."
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "About Builder Codes"
@@ -318,8 +318,8 @@ msgid "Confirm in wallet"
 msgstr "Confirmar en billetera"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Connect"
-msgstr "Conectar"
+#~ msgid "Connect"
+#~ msgstr "Conectar"
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "Connect a wallet to manage orders."
@@ -329,7 +329,6 @@ msgstr "Conectar"
 #~ msgid "Connect a wallet to manage positions."
 #~ msgstr "Conecta una billetera para gestionar posiciones."
 
-#: src/components/trade/components/wallet-dialog.tsx
 #: src/components/trade/header/user-menu.tsx
 #: src/lib/trade/use-button-content.ts
 msgid "Connect Wallet"
@@ -344,8 +343,8 @@ msgstr "Conecta billetera para ver cuenta"
 #~ msgstr ""
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Connect your wallet to start trading on Hyperliquid"
-msgstr "Conecta tu billetera para comenzar a operar en Hyperliquid"
+#~ msgid "Connect your wallet to start trading on Hyperliquid"
+#~ msgstr "Conecta tu billetera para comenzar a operar en Hyperliquid"
 
 #: src/components/trade/positions/balances-tab.tsx
 msgid "Connect your wallet to view balances."
@@ -700,8 +699,8 @@ msgstr "Desde"
 #~ msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Fund"
-msgstr "Fondo"
+#~ msgid "Fund"
+#~ msgstr "Fondo"
 
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/positions/mobile-position-card.tsx
@@ -747,8 +746,8 @@ msgstr "En órdenes"
 #~ msgstr "En uso"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Install a wallet extension to continue"
-msgstr "Instala una extensión de billetera para continuar"
+#~ msgid "Install a wallet extension to continue"
+#~ msgstr "Instala una extensión de billetera para continuar"
 
 #. placeholder {0}: ctx.baseToken
 #. placeholder {0}: ctx.quoteToken
@@ -807,8 +806,8 @@ msgid "Leaderboard"
 msgstr "Clasificación"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Learn more"
-msgstr "Más información"
+#~ msgid "Learn more"
+#~ msgstr "Más información"
 
 #: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/leverage-control.tsx
@@ -1028,8 +1027,8 @@ msgid "Minimum withdrawal is ${MIN_WITHDRAW_USD}"
 msgstr "Retiro mínimo es ${MIN_WITHDRAW_USD}"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Mock Wallet (Testing)"
-msgstr "Billetera simulada (Prueba)"
+#~ msgid "Mock Wallet (Testing)"
+#~ msgstr "Billetera simulada (Prueba)"
 
 #: src/components/trade/header/top-nav.tsx
 #~ msgid "More"
@@ -1064,8 +1063,8 @@ msgid "NEW"
 msgstr "NUEVO"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "New to wallets?"
-msgstr "¿Nuevo con billeteras?"
+#~ msgid "New to wallets?"
+#~ msgstr "¿Nuevo con billeteras?"
 
 #: src/components/ui/pagination.tsx
 #~ msgid "Next"
@@ -1153,8 +1152,8 @@ msgstr "No hay par de trading disponible para <0/>/<1/>"
 #~ msgstr ""
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "No wallets found"
-msgstr "No se encontraron billeteras"
+#~ msgid "No wallets found"
+#~ msgstr "No se encontraron billeteras"
 
 #: src/lib/errors/definitions/connection.ts
 msgid "Not connected"
@@ -1181,8 +1180,8 @@ msgid "OI"
 msgstr "IA"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Only you control your funds. No email or password required."
-msgstr "Solo tú controlas tus fondos. No se requiere correo ni contraseña."
+#~ msgid "Only you control your funds. No email or password required."
+#~ msgstr "Solo tú controlas tus fondos. No se requiere correo ni contraseña."
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "open"
@@ -1232,8 +1231,8 @@ msgid "Other"
 msgstr "Otro"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Other Options"
-msgstr "Otras opciones"
+#~ msgid "Other Options"
+#~ msgstr "Otras opciones"
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #~ msgid "P&L"
@@ -1289,8 +1288,8 @@ msgid "PNL"
 msgstr "PNL"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Popular"
-msgstr "Popular"
+#~ msgid "Popular"
+#~ msgstr "Popular"
 
 #: src/components/trade/header/top-nav.tsx
 msgid "Portfolio"
@@ -1416,8 +1415,8 @@ msgid "Search markets..."
 msgstr "Buscar mercados..."
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Secure & Private"
-msgstr "Seguro y privado"
+#~ msgid "Secure & Private"
+#~ msgstr "Seguro y privado"
 
 #: src/components/trade/header/favorites-strip.tsx
 #~ msgid "Select {coin} market"
@@ -2079,8 +2078,8 @@ msgstr "Billetera no conectada"
 #~ msgstr "Error de WebSocket"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "What is a wallet?"
-msgstr "¿Qué es una billetera?"
+#~ msgid "What is a wallet?"
+#~ msgstr "¿Qué es una billetera?"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #~ msgid "will arrive in ~3 min"

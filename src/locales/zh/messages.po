@@ -30,8 +30,8 @@ msgstr "24小时涨跌"
 #~ msgstr "24小时价格"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "A crypto wallet lets you store and manage your digital assets securely."
-msgstr "加密钱包让您安全地存储和管理数字资产。"
+#~ msgid "A crypto wallet lets you store and manage your digital assets securely."
+#~ msgstr "加密钱包让您安全地存储和管理数字资产。"
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "About Builder Codes"
@@ -318,8 +318,8 @@ msgid "Confirm in wallet"
 msgstr "在钱包中确认"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Connect"
-msgstr "连接"
+#~ msgid "Connect"
+#~ msgstr "连接"
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "Connect a wallet to manage orders."
@@ -329,7 +329,6 @@ msgstr "连接"
 #~ msgid "Connect a wallet to manage positions."
 #~ msgstr "连接钱包以管理仓位。"
 
-#: src/components/trade/components/wallet-dialog.tsx
 #: src/components/trade/header/user-menu.tsx
 #: src/lib/trade/use-button-content.ts
 msgid "Connect Wallet"
@@ -344,8 +343,8 @@ msgstr "连接钱包查看账户"
 #~ msgstr ""
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Connect your wallet to start trading on Hyperliquid"
-msgstr "连接钱包开始在 Hyperliquid 上交易"
+#~ msgid "Connect your wallet to start trading on Hyperliquid"
+#~ msgstr "连接钱包开始在 Hyperliquid 上交易"
 
 #: src/components/trade/positions/balances-tab.tsx
 msgid "Connect your wallet to view balances."
@@ -700,8 +699,8 @@ msgstr "从"
 #~ msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Fund"
-msgstr "基金"
+#~ msgid "Fund"
+#~ msgstr "基金"
 
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/positions/mobile-position-card.tsx
@@ -747,8 +746,8 @@ msgstr "订单中"
 #~ msgstr "使用中"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Install a wallet extension to continue"
-msgstr "安装钱包扩展以继续"
+#~ msgid "Install a wallet extension to continue"
+#~ msgstr "安装钱包扩展以继续"
 
 #. placeholder {0}: ctx.baseToken
 #. placeholder {0}: ctx.quoteToken
@@ -807,8 +806,8 @@ msgid "Leaderboard"
 msgstr "排行榜"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Learn more"
-msgstr "了解更多"
+#~ msgid "Learn more"
+#~ msgstr "了解更多"
 
 #: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/leverage-control.tsx
@@ -1028,8 +1027,8 @@ msgid "Minimum withdrawal is ${MIN_WITHDRAW_USD}"
 msgstr "最低提款为 ${MIN_WITHDRAW_USD}"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Mock Wallet (Testing)"
-msgstr "模拟钱包（测试）"
+#~ msgid "Mock Wallet (Testing)"
+#~ msgstr "模拟钱包（测试）"
 
 #: src/components/trade/header/top-nav.tsx
 #~ msgid "More"
@@ -1064,8 +1063,8 @@ msgid "NEW"
 msgstr "新"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "New to wallets?"
-msgstr "钱包新手？"
+#~ msgid "New to wallets?"
+#~ msgstr "钱包新手？"
 
 #: src/components/ui/pagination.tsx
 #~ msgid "Next"
@@ -1153,8 +1152,8 @@ msgstr "无可用 <0/>/<1/> 交易对"
 #~ msgstr ""
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "No wallets found"
-msgstr "未找到钱包"
+#~ msgid "No wallets found"
+#~ msgstr "未找到钱包"
 
 #: src/lib/errors/definitions/connection.ts
 msgid "Not connected"
@@ -1181,8 +1180,8 @@ msgid "OI"
 msgstr "持仓量"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Only you control your funds. No email or password required."
-msgstr "只有您能控制您的资金。无需邮箱或密码。"
+#~ msgid "Only you control your funds. No email or password required."
+#~ msgstr "只有您能控制您的资金。无需邮箱或密码。"
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "open"
@@ -1232,8 +1231,8 @@ msgid "Other"
 msgstr "其他"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Other Options"
-msgstr "其他选项"
+#~ msgid "Other Options"
+#~ msgstr "其他选项"
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #~ msgid "P&L"
@@ -1289,8 +1288,8 @@ msgid "PNL"
 msgstr "盈亏"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Popular"
-msgstr "热门"
+#~ msgid "Popular"
+#~ msgstr "热门"
 
 #: src/components/trade/header/top-nav.tsx
 msgid "Portfolio"
@@ -1416,8 +1415,8 @@ msgid "Search markets..."
 msgstr "搜索市场..."
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Secure & Private"
-msgstr "安全且私密"
+#~ msgid "Secure & Private"
+#~ msgstr "安全且私密"
 
 #: src/components/trade/header/favorites-strip.tsx
 #~ msgid "Select {coin} market"
@@ -2079,8 +2078,8 @@ msgstr "钱包未连接"
 #~ msgstr "WebSocket 错误"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "What is a wallet?"
-msgstr "什么是钱包？"
+#~ msgid "What is a wallet?"
+#~ msgstr "什么是钱包？"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #~ msgid "will arrive in ~3 min"

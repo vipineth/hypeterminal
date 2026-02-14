@@ -93,14 +93,6 @@ export function TopNav() {
 							{item.label}
 						</button>
 					))}
-					<div className="h-4 w-px bg-border-200 mx-1" />
-					<button
-						type="button"
-						onClick={() => openDepositModal("deposit")}
-						className="px-2.5 py-1.5 text-text-950 hover:text-text-600 transition-colors duration-150"
-					>
-						<Trans>Fund</Trans>
-					</button>
 				</nav>
 			</div>
 

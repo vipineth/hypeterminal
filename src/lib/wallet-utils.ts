@@ -127,6 +127,10 @@ export function isMockConnector(connector: Connector): boolean {
 	return connector.id === "mock" || connector.type === "mock";
 }
 
+export function isInAppConnector(connector: Connector): boolean {
+	return connector.id === "in-app-wallet";
+}
+
 function getMockWalletInfo(connector: Connector): WalletInfo {
 	const config = mockWalletRegistry.get(connector.name);
 	const address = config?.address;
