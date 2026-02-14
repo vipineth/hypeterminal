@@ -1,18 +1,18 @@
-import { Trans } from "@lingui/react/macro";
 import {
-	ArrowSquareOutIcon,
-	FlaskIcon,
-	QuestionIcon,
-	ShieldIcon,
-	SpinnerGapIcon,
-	WalletIcon,
-	WarningCircleIcon,
+	AppleLogo as AppleLogoIcon,
+	ArrowLeft as ArrowLeftIcon,
+	ArrowRight as ArrowRightIcon,
+	FacebookLogo as FacebookLogoIcon,
+	Fingerprint as FingerprintIcon,
+	GithubLogo as GithubLogoIcon,
+	GoogleLogo as GoogleLogoIcon,
+	SpinnerGap as SpinnerGapIcon,
 } from "@phosphor-icons/react";
-import { useMemo, useState } from "react";
-import type { Address } from "viem";
-import { isAddress } from "viem";
-import { type Connector, useConnect, useConnectors } from "wagmi";
-import { mock } from "wagmi/connectors";
+import { useState } from "react";
+import { arbitrum } from "thirdweb/chains";
+import { inAppWallet } from "thirdweb/wallets";
+import { hasStoredPasskey, preAuthenticate } from "thirdweb/wallets/in-app";
+import { useConnect, useConnectors } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -22,9 +22,19 @@ import {
 	ResponsiveModalHeader,
 	ResponsiveModalTitle,
 } from "@/components/ui/responsive-modal";
-import { MOCK_WALLETS } from "@/config/wagmi";
+import { thirdwebClient } from "@/config/thirdweb";
 import { cn } from "@/lib/cn";
-import { getLastUsedWallet, getWalletInfo, isMockConnector, setLastUsedWallet } from "@/lib/wallet-utils";
+import { getWalletInfo, isInAppConnector, isMockConnector } from "@/lib/wallet-utils";
+
+type View = "main" | "email-verify";
+type LoadingKey = "google" | "apple" | "facebook" | "github" | "email" | "passkey" | string | null;
+
+const SOCIAL_OPTIONS = [
+	{ strategy: "google" as const, label: "Google", Icon: GoogleLogoIcon },
+	{ strategy: "apple" as const, label: "Apple", Icon: AppleLogoIcon },
+	{ strategy: "facebook" as const, label: "Facebook", Icon: FacebookLogoIcon },
+	{ strategy: "github" as const, label: "GitHub", Icon: GithubLogoIcon },
+];
 
 interface Props {
 	open: boolean;
@@ -33,345 +43,391 @@ interface Props {
 
 export function WalletDialog({ open, onOpenChange }: Props) {
 	const connectors = useConnectors();
-	const { mutateAsync: connectAsync, isPending, error } = useConnect();
-	const [connectingId, setConnectingId] = useState<string | null>(null);
-	const [showHelp, setShowHelp] = useState(false);
-	const [lastUsedWallet] = useState(() => getLastUsedWallet());
-	const [customAddress, setCustomAddress] = useState("");
-	const [customAddressError, setCustomAddressError] = useState<string | null>(null);
+	const { mutateAsync: connectAsync } = useConnect();
 
-	const { mockConnectors, regularConnectors } = useMemo(() => {
-		const mocks: Connector[] = [];
-		const regular: Connector[] = [];
+	const [view, setView] = useState<View>("main");
+	const [email, setEmail] = useState("");
+	const [code, setCode] = useState("");
+	const [loading, setLoading] = useState<LoadingKey>(null);
+	const [error, setError] = useState<string | null>(null);
 
-		for (const connector of connectors) {
-			if (isMockConnector(connector)) {
-				mocks.push(connector);
-			} else {
-				regular.push(connector);
+	function resetState() {
+		setView("main");
+		setEmail("");
+		setCode("");
+		setLoading(null);
+		setError(null);
+	}
+
+	function handleOpenChange(nextOpen: boolean) {
+		if (!nextOpen) resetState();
+		onOpenChange(nextOpen);
+	}
+
+	async function syncWagmi() {
+		const inAppConnector = connectors.find(isInAppConnector);
+		if (inAppConnector) {
+			try {
+				await connectAsync({ connector: inAppConnector });
+			} catch {
+				// thirdweb already connected, wagmi sync may fail silently
 			}
 		}
+	}
 
-		return { mockConnectors: mocks, regularConnectors: regular };
-	}, [connectors]);
+	async function handleSocialLogin(strategy: "google" | "apple" | "facebook" | "github") {
+		setLoading(strategy);
+		setError(null);
+		try {
+			const wallet = inAppWallet();
+			await wallet.connect({ client: thirdwebClient, chain: arbitrum, strategy });
+			await syncWagmi();
+			handleOpenChange(false);
+		} catch (e) {
+			setError(e instanceof Error ? e.message : "Connection failed");
+		} finally {
+			setLoading(null);
+		}
+	}
 
-	const availableConnectors = useMemo(() => {
-		const sortByPriority = (a: Connector, b: Connector) => {
-			if (lastUsedWallet) {
-				if (a.id === lastUsedWallet) return -1;
-				if (b.id === lastUsedWallet) return 1;
-			}
-			const priorityA = getWalletInfo(a).priority ?? 50;
-			const priorityB = getWalletInfo(b).priority ?? 50;
-			return priorityA - priorityB;
-		};
+	async function handleEmailSubmit() {
+		if (!email.trim()) return;
+		setLoading("email");
+		setError(null);
+		try {
+			await preAuthenticate({ client: thirdwebClient, strategy: "email", email: email.trim() });
+			setView("email-verify");
+		} catch (e) {
+			setError(e instanceof Error ? e.message : "Failed to send verification code");
+		} finally {
+			setLoading(null);
+		}
+	}
 
-		const popular = regularConnectors.filter((c) => getWalletInfo(c).popular).sort(sortByPriority);
-		const other = regularConnectors.filter((c) => !getWalletInfo(c).popular).sort(sortByPriority);
-		return { popular, other, all: regularConnectors };
-	}, [regularConnectors, lastUsedWallet]);
+	async function handleEmailVerify() {
+		if (code.length !== 6) return;
+		setLoading("email-verify");
+		setError(null);
+		try {
+			const wallet = inAppWallet();
+			await wallet.connect({
+				client: thirdwebClient,
+				chain: arbitrum,
+				strategy: "email",
+				email: email.trim(),
+				verificationCode: code,
+			});
+			await syncWagmi();
+			handleOpenChange(false);
+		} catch (e) {
+			setError(e instanceof Error ? e.message : "Verification failed");
+		} finally {
+			setLoading(null);
+		}
+	}
 
-	const handleConnect = async (connector: Connector) => {
-		setConnectingId(connector.uid);
-		setLastUsedWallet(connector.id);
+	async function handleResendCode() {
+		setLoading("resend");
+		setError(null);
+		try {
+			await preAuthenticate({ client: thirdwebClient, strategy: "email", email: email.trim() });
+		} catch (e) {
+			setError(e instanceof Error ? e.message : "Failed to resend code");
+		} finally {
+			setLoading(null);
+		}
+	}
+
+	async function handlePasskey() {
+		setLoading("passkey");
+		setError(null);
+		try {
+			const wallet = inAppWallet();
+			const hasPasskey = await hasStoredPasskey(thirdwebClient);
+			await wallet.connect({
+				client: thirdwebClient,
+				chain: arbitrum,
+				strategy: "passkey",
+				type: hasPasskey ? "sign-in" : "sign-up",
+			});
+			await syncWagmi();
+			handleOpenChange(false);
+		} catch (e) {
+			setError(e instanceof Error ? e.message : "Passkey authentication failed");
+		} finally {
+			setLoading(null);
+		}
+	}
+
+	async function handleExternalWallet(connectorId: string) {
+		const connector = connectors.find((c) => c.id === connectorId || c.name === connectorId);
+		if (!connector) return;
+		setLoading(connectorId);
+		setError(null);
 		try {
 			await connectAsync({ connector });
-			onOpenChange(false);
+			handleOpenChange(false);
+		} catch (e) {
+			setError(e instanceof Error ? e.message : "Connection failed");
 		} finally {
-			setConnectingId(null);
+			setLoading(null);
 		}
-	};
+	}
 
-	const handleCustomAddressConnect = async () => {
-		const trimmed = customAddress.trim();
-		if (!trimmed) {
-			setCustomAddressError("Please enter an address");
-			return;
-		}
-		if (!isAddress(trimmed)) {
-			setCustomAddressError("Invalid Ethereum address");
-			return;
-		}
-		setCustomAddressError(null);
-
-		const mockWalletIndex = MOCK_WALLETS.findIndex((w) => w.address.toLowerCase() === trimmed.toLowerCase());
-
-		if (mockWalletIndex !== -1 && mockConnectors[mockWalletIndex]) {
-			handleConnect(mockConnectors[mockWalletIndex]);
-		} else {
-			const customMockConnector = mock({
-				accounts: [trimmed as Address],
-				features: { reconnect: true },
-			});
-			setConnectingId("custom-mock");
-			try {
-				await connectAsync({ connector: customMockConnector });
-				onOpenChange(false);
-			} catch {
-				setCustomAddressError("Failed to connect with custom address");
-			} finally {
-				setConnectingId(null);
-			}
-		}
-	};
-
-	const hasConnectors = availableConnectors.all.length > 0 || mockConnectors.length > 0;
+	const externalConnectors = connectors.filter((c) => !isInAppConnector(c) && !isMockConnector(c));
 
 	return (
-		<ResponsiveModal open={open} onOpenChange={onOpenChange}>
-			<ResponsiveModalContent className="sm:max-w-md gap-0 p-0 overflow-hidden">
-				<div className="p-6 pb-4 border-b border-border-200/50">
-					<ResponsiveModalHeader className="space-y-2">
-						<ResponsiveModalTitle className="flex items-center gap-2 text-lg">
-							<WalletIcon className="size-5 text-primary-default" />
-							<Trans>Connect Wallet</Trans>
-						</ResponsiveModalTitle>
-						<ResponsiveModalDescription>
-							<Trans>Connect your wallet to start trading on Hyperliquid</Trans>
-						</ResponsiveModalDescription>
-					</ResponsiveModalHeader>
-				</div>
-
-				<div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
-					{availableConnectors.popular.length > 0 && (
-						<div className="space-y-2">
-							<p className="text-xs font-medium text-text-600 uppercase tracking-wider px-1">
-								<Trans>Popular</Trans>
-							</p>
-							<div className="space-y-2">
-								{availableConnectors.popular.map((connector) => {
-									const walletInfo = getWalletInfo(connector);
-									const Icon = walletInfo.icon;
-									const isConnecting = connectingId === connector.uid;
-
-									return (
-										<Button
-											key={connector.uid}
-											variant="text"
-											size="none"
-											onClick={() => handleConnect(connector)}
-											disabled={isPending}
-											className={cn(
-												"w-full gap-3 p-3 rounded-lg border",
-												"bg-surface-base hover:bg-surface-analysis/50 hover:border-primary-default/30",
-												"group focus:ring-2 focus:ring-primary-default/50",
-											)}
-										>
-											<div className="size-10 rounded-lg overflow-hidden flex-shrink-0 shadow-sm">
-												<Icon className="size-full" />
-											</div>
-											<div className="flex-1 text-left min-w-0">
-												<p className="font-medium text-sm group-hover:text-primary-default transition-colors">
-													{connector.name}
-												</p>
-												<p className="text-xs text-text-600 truncate">{walletInfo.description}</p>
-											</div>
-											{isConnecting ? (
-												<SpinnerGapIcon className="size-4 animate-spin text-primary-default flex-shrink-0" />
-											) : (
-												<div className="size-4 rounded-full border border-border-200 group-hover:border-primary-default/50 flex-shrink-0 transition-colors" />
-											)}
-										</Button>
-									);
-								})}
-							</div>
-						</div>
-					)}
-
-					{availableConnectors.other.length > 0 && (
-						<div className="space-y-2">
-							<p className="text-xs font-medium text-text-600 uppercase tracking-wider px-1">
-								<Trans>Other Options</Trans>
-							</p>
-							<div className="space-y-2">
-								{availableConnectors.other.map((connector) => {
-									const walletInfo = getWalletInfo(connector);
-									const Icon = walletInfo.icon;
-									const isConnecting = connectingId === connector.uid;
-
-									return (
-										<Button
-											key={connector.uid}
-											variant="text"
-											size="none"
-											onClick={() => handleConnect(connector)}
-											disabled={isPending}
-											className={cn(
-												"w-full gap-3 p-3 rounded-lg border",
-												"bg-surface-base hover:bg-surface-analysis/50 hover:border-primary-default/30",
-												"group focus:ring-2 focus:ring-primary-default/50",
-											)}
-										>
-											<div className="size-10 rounded-lg overflow-hidden flex-shrink-0 shadow-sm">
-												<Icon className="size-full" />
-											</div>
-											<div className="flex-1 text-left min-w-0">
-												<p className="font-medium text-sm group-hover:text-primary-default transition-colors">
-													{connector.name}
-												</p>
-												<p className="text-xs text-text-600 truncate">{walletInfo.description}</p>
-											</div>
-											{isConnecting ? (
-												<SpinnerGapIcon className="size-4 animate-spin text-primary-default flex-shrink-0" />
-											) : (
-												<div className="size-4 rounded-full border border-border-200 group-hover:border-primary-default/50 flex-shrink-0 transition-colors" />
-											)}
-										</Button>
-									);
-								})}
-							</div>
-						</div>
-					)}
-
-					{mockConnectors.length > 0 && (
-						<div className="space-y-2">
-							<p className="text-xs font-medium text-warning-700 uppercase tracking-wider px-1">
-								<Trans>Mock Wallet (Testing)</Trans>
-							</p>
-							<div className="space-y-2">
-								{mockConnectors.map((connector, index) => {
-									const config = MOCK_WALLETS[index];
-									const isConnecting = connectingId === connector.uid;
-
-									return (
-										<Button
-											key={connector.uid}
-											variant="text"
-											size="none"
-											onClick={() => handleConnect(connector)}
-											disabled={isPending}
-											className={cn(
-												"w-full gap-3 p-3 rounded-lg border border-warning-700/30",
-												"bg-warning-700/5 hover:bg-warning-700/10 hover:border-warning-700/50",
-												"group focus:ring-2 focus:ring-warning-700/50",
-											)}
-										>
-											<div className="size-10 rounded-lg overflow-hidden flex-shrink-0 shadow-sm bg-warning-700/20 flex items-center justify-center">
-												<FlaskIcon className="size-5 text-warning-700" />
-											</div>
-											<div className="flex-1 text-left min-w-0">
-												<p className="font-medium text-sm group-hover:text-warning-700 transition-colors">
-													{config?.name ?? connector.name}
-												</p>
-												<p className="text-xs text-text-600 truncate font-mono">{config?.address ?? "Mock wallet"}</p>
-											</div>
-											{isConnecting ? (
-												<SpinnerGapIcon className="size-4 animate-spin text-warning-700 flex-shrink-0" />
-											) : (
-												<div className="size-4 rounded-full border border-warning-700/50 flex-shrink-0 transition-colors" />
-											)}
-										</Button>
-									);
-								})}
-							</div>
-							<div className="pt-2 space-y-2">
-								<div className="flex gap-2">
-									<Input
-										placeholder="0x..."
-										value={customAddress}
-										onChange={(e) => {
-											setCustomAddress(e.target.value);
-											setCustomAddressError(null);
-										}}
-										className="font-mono text-xs"
-									/>
-									<Button
-										variant="outlined"
-										size="sm"
-										onClick={handleCustomAddressConnect}
-										disabled={isPending}
-										className="shrink-0"
-									>
-										<Trans>Connect</Trans>
-									</Button>
-								</div>
-								{customAddressError && <p className="text-xs text-error-700 px-1">{customAddressError}</p>}
-							</div>
-						</div>
-					)}
-
-					{!hasConnectors && (
-						<div className="py-8 text-center space-y-3">
-							<div className="size-12 rounded-full bg-surface-analysis flex items-center justify-center mx-auto">
-								<WarningCircleIcon className="size-6 text-text-600" />
-							</div>
-							<div>
-								<p className="text-sm font-medium">
-									<Trans>No wallets found</Trans>
-								</p>
-								<p className="text-xs text-text-600 mt-1">
-									<Trans>Install a wallet extension to continue</Trans>
-								</p>
-							</div>
-						</div>
-					)}
-
-					{error && (
-						<div className="flex items-start gap-2 p-3 rounded-xs bg-error-700/10 border border-error-700/20">
-							<WarningCircleIcon className="size-4 text-error-700 shrink-0 mt-0.5" />
-							<p className="text-xs text-error-700">{error.message}</p>
-						</div>
-					)}
-				</div>
-
-				<div className="border-t border-border-200/50 bg-surface-analysis">
-					<Button
-						variant="text"
-						size="none"
-						onClick={() => setShowHelp(!showHelp)}
-						className="w-full justify-between p-4 text-sm text-text-600 hover:text-text-950 hover:bg-transparent"
-					>
-						<span className="flex items-center gap-2">
-							<QuestionIcon className="size-4" />
-							<Trans>New to wallets?</Trans>
-						</span>
-						<span className={cn("transition-transform", showHelp && "rotate-180")}>
-							<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-								<path
-									d="M2.5 4.5L6 8L9.5 4.5"
-									stroke="currentColor"
-									strokeWidth="1.5"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								/>
-							</svg>
-						</span>
-					</Button>
-
-					{showHelp && (
-						<div className="px-4 pb-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
-							<div className="flex items-start gap-3 text-xs">
-								<ShieldIcon className="size-4 text-market-up-600 flex-shrink-0 mt-0.5" />
-								<div>
-									<p className="font-medium text-text-950">
-										<Trans>Secure & Private</Trans>
-									</p>
-									<p className="text-text-600 mt-0.5">
-										<Trans>Only you control your funds. No email or password required.</Trans>
-									</p>
-								</div>
-							</div>
-							<div className="flex items-start gap-3 text-xs">
-								<WalletIcon className="size-4 text-primary-default flex-shrink-0 mt-0.5" />
-								<div>
-									<p className="font-medium text-text-950">
-										<Trans>What is a wallet?</Trans>
-									</p>
-									<p className="text-text-600 mt-0.5">
-										<Trans>A crypto wallet lets you store and manage your digital assets securely.</Trans>
-									</p>
-								</div>
-							</div>
-							<Button variant="outlined" size="sm" className="w-full mt-2" asChild>
-								<a href="https://ethereum.org/en/wallets/" target="_blank" rel="noopener noreferrer">
-									<Trans>Learn more</Trans>
-									<ArrowSquareOutIcon className="size-3 ml-1.5" />
-								</a>
-							</Button>
-						</div>
-					)}
-				</div>
+		<ResponsiveModal open={open} onOpenChange={handleOpenChange}>
+			<ResponsiveModalContent className="sm:max-w-sm gap-0 overflow-hidden p-0">
+				{view === "main" ? (
+					<MainView
+						loading={loading}
+						error={error}
+						email={email}
+						externalConnectors={externalConnectors}
+						onEmailChange={setEmail}
+						onSocialLogin={handleSocialLogin}
+						onEmailSubmit={handleEmailSubmit}
+						onPasskey={handlePasskey}
+						onExternalWallet={handleExternalWallet}
+					/>
+				) : (
+					<EmailVerifyView
+						loading={loading}
+						error={error}
+						email={email}
+						code={code}
+						onCodeChange={setCode}
+						onVerify={handleEmailVerify}
+						onResend={handleResendCode}
+						onBack={() => {
+							setView("main");
+							setCode("");
+							setError(null);
+						}}
+					/>
+				)}
 			</ResponsiveModalContent>
 		</ResponsiveModal>
+	);
+}
+
+interface MainViewProps {
+	loading: LoadingKey;
+	error: string | null;
+	email: string;
+	externalConnectors: ReturnType<typeof useConnectors>;
+	onEmailChange: (email: string) => void;
+	onSocialLogin: (strategy: "google" | "apple" | "facebook" | "github") => void;
+	onEmailSubmit: () => void;
+	onPasskey: () => void;
+	onExternalWallet: (connectorId: string) => void;
+}
+
+function MainView({
+	loading,
+	error,
+	email,
+	externalConnectors,
+	onEmailChange,
+	onSocialLogin,
+	onEmailSubmit,
+	onPasskey,
+	onExternalWallet,
+}: MainViewProps) {
+	return (
+		<div className="flex flex-col gap-4 p-5">
+			<ResponsiveModalHeader className="p-0">
+				<ResponsiveModalTitle className="text-base font-semibold text-text-950">Connect</ResponsiveModalTitle>
+				<ResponsiveModalDescription className="text-xs text-text-500">
+					Sign in to get started
+				</ResponsiveModalDescription>
+			</ResponsiveModalHeader>
+
+			<div className="flex gap-2">
+				{SOCIAL_OPTIONS.map(({ strategy, label, Icon }) => (
+					<Button
+						key={strategy}
+						variant="outlined"
+						tone="base"
+						size="none"
+						disabled={!!loading}
+						className="flex-1 flex-col gap-1 p-2.5"
+						onClick={() => onSocialLogin(strategy)}
+					>
+						{loading === strategy ? (
+							<SpinnerGapIcon className="size-5 animate-spin text-text-500" />
+						) : (
+							<Icon className="size-5 text-text-600" weight="bold" />
+						)}
+						<span className="text-3xs text-text-600">{label}</span>
+					</Button>
+				))}
+			</div>
+
+			<form
+				onSubmit={(e) => {
+					e.preventDefault();
+					onEmailSubmit();
+				}}
+				className="flex gap-2"
+			>
+				<Input
+					type="email"
+					placeholder="Enter your email"
+					inputSize="lg"
+					value={email}
+					onChange={(e) => onEmailChange(e.target.value)}
+					disabled={!!loading}
+				/>
+				<Button
+					type="submit"
+					variant="contained"
+					tone="accent"
+					size="icon"
+					disabled={!email.trim() || !!loading}
+					className="size-9 shrink-0"
+				>
+					{loading === "email" ? (
+						<SpinnerGapIcon className="size-4 animate-spin" />
+					) : (
+						<ArrowRightIcon className="size-4" weight="bold" />
+					)}
+				</Button>
+			</form>
+
+			<Button
+				variant="outlined"
+				tone="base"
+				size="lg"
+				disabled={!!loading}
+				className="justify-start gap-2 px-3"
+				onClick={onPasskey}
+			>
+				{loading === "passkey" ? (
+					<SpinnerGapIcon className="size-4 animate-spin text-text-500" />
+				) : (
+					<FingerprintIcon className="size-4 text-text-600" weight="bold" />
+				)}
+				<span>Passkey</span>
+			</Button>
+
+			{error && <p className="text-2xs text-error-700">{error}</p>}
+
+			{externalConnectors.length > 0 && (
+				<>
+					<div className="flex items-center gap-3">
+						<div className="h-px flex-1 bg-border-200" />
+						<span className="text-3xs font-medium text-text-400">OR</span>
+						<div className="h-px flex-1 bg-border-200" />
+					</div>
+
+					<div className="flex flex-col gap-1.5">
+						{externalConnectors.map((connector) => {
+							const info = getWalletInfo(connector);
+							const WalletIcon = info.icon;
+							return (
+								<Button
+									key={connector.uid}
+									variant="ghost"
+									tone="base"
+									size="lg"
+									disabled={!!loading}
+									className="justify-start gap-2.5 px-3"
+									onClick={() => onExternalWallet(connector.id)}
+								>
+									{loading === connector.id ? (
+										<SpinnerGapIcon className="size-5 animate-spin text-text-500" />
+									) : (
+										<WalletIcon className="size-5" />
+									)}
+									<span>{connector.name}</span>
+								</Button>
+							);
+						})}
+					</div>
+				</>
+			)}
+		</div>
+	);
+}
+
+interface EmailVerifyViewProps {
+	loading: LoadingKey;
+	error: string | null;
+	email: string;
+	code: string;
+	onCodeChange: (code: string) => void;
+	onVerify: () => void;
+	onResend: () => void;
+	onBack: () => void;
+}
+
+function EmailVerifyView({
+	loading,
+	error,
+	email,
+	code,
+	onCodeChange,
+	onVerify,
+	onResend,
+	onBack,
+}: EmailVerifyViewProps) {
+	return (
+		<div className="flex flex-col gap-4 p-5">
+			<ResponsiveModalHeader className="p-0">
+				<div className="flex items-center gap-2">
+					<Button variant="ghost" tone="base" size="icon" onClick={onBack} className="size-7">
+						<ArrowLeftIcon className="size-4" weight="bold" />
+					</Button>
+					<div>
+						<ResponsiveModalTitle className="text-base font-semibold text-text-950">
+							Verify your email
+						</ResponsiveModalTitle>
+						<ResponsiveModalDescription className="text-xs text-text-500">
+							Enter the code sent to {email}
+						</ResponsiveModalDescription>
+					</div>
+				</div>
+			</ResponsiveModalHeader>
+
+			<form
+				onSubmit={(e) => {
+					e.preventDefault();
+					onVerify();
+				}}
+				className="flex flex-col gap-3"
+			>
+				<Input
+					type="text"
+					inputMode="numeric"
+					placeholder="000000"
+					inputSize="lg"
+					maxLength={6}
+					value={code}
+					onChange={(e) => {
+						const v = e.target.value.replace(/\D/g, "");
+						onCodeChange(v);
+					}}
+					disabled={!!loading}
+					autoFocus
+					className="text-center tracking-[0.3em]"
+				/>
+				<Button type="submit" variant="contained" tone="accent" size="lg" disabled={code.length !== 6 || !!loading}>
+					{loading === "email-verify" ? <SpinnerGapIcon className="size-4 animate-spin" /> : "Verify"}
+				</Button>
+			</form>
+
+			{error && <p className="text-2xs text-error-700">{error}</p>}
+
+			<button
+				type="button"
+				onClick={onResend}
+				disabled={!!loading}
+				className={cn("text-xs text-primary-default hover:text-primary-hover disabled:opacity-50", "self-center")}
+			>
+				{loading === "resend" ? "Sending..." : "Resend code"}
+			</button>
+		</div>
 	);
 }

@@ -1,8 +1,10 @@
+import { inAppWalletConnector } from "@thirdweb-dev/wagmi-adapter";
 import { createConfig, http } from "wagmi";
 import { arbitrum } from "wagmi/chains";
 import { coinbaseWallet, injected, mock, walletConnect } from "wagmi/connectors";
 import type { MockWalletConfig } from "@/lib/wallet-utils";
 import { registerMockWallet } from "@/lib/wallet-utils";
+import { thirdwebClient } from "./thirdweb";
 
 function createMockConnectors(mockWallets: MockWalletConfig[]) {
 	return mockWallets.map((wallet) => {
@@ -26,6 +28,7 @@ export function createWagmiConfig(options: WagmiConfigOptions = {}) {
 		chains: [arbitrum],
 		connectors: [
 			...mockConnectors,
+			inAppWalletConnector({ client: thirdwebClient }),
 			injected(),
 			coinbaseWallet(),
 			walletConnect({ projectId: import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID }),

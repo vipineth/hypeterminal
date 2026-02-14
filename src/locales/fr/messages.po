@@ -30,8 +30,8 @@ msgstr "Variation 24h"
 #~ msgstr "Prix 24h"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "A crypto wallet lets you store and manage your digital assets securely."
-msgstr "Un portefeuille crypto vous permet de stocker et gérer vos actifs numériques en toute sécurité."
+#~ msgid "A crypto wallet lets you store and manage your digital assets securely."
+#~ msgstr "Un portefeuille crypto vous permet de stocker et gérer vos actifs numériques en toute sécurité."
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "About Builder Codes"
@@ -318,8 +318,8 @@ msgid "Confirm in wallet"
 msgstr "Confirmer dans le portefeuille"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Connect"
-msgstr "Connecter"
+#~ msgid "Connect"
+#~ msgstr "Connecter"
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "Connect a wallet to manage orders."
@@ -329,7 +329,6 @@ msgstr "Connecter"
 #~ msgid "Connect a wallet to manage positions."
 #~ msgstr "Connectez un portefeuille pour gérer les positions."
 
-#: src/components/trade/components/wallet-dialog.tsx
 #: src/components/trade/header/user-menu.tsx
 #: src/lib/trade/use-button-content.ts
 msgid "Connect Wallet"
@@ -344,8 +343,8 @@ msgstr "Connectez le portefeuille pour voir le compte"
 #~ msgstr ""
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Connect your wallet to start trading on Hyperliquid"
-msgstr "Connectez votre portefeuille pour commencer à trader sur Hyperliquid"
+#~ msgid "Connect your wallet to start trading on Hyperliquid"
+#~ msgstr "Connectez votre portefeuille pour commencer à trader sur Hyperliquid"
 
 #: src/components/trade/positions/balances-tab.tsx
 msgid "Connect your wallet to view balances."
@@ -700,8 +699,8 @@ msgstr "De"
 #~ msgstr ""
 
 #: src/components/trade/header/top-nav.tsx
-msgid "Fund"
-msgstr "Fonds"
+#~ msgid "Fund"
+#~ msgstr "Fonds"
 
 #: src/components/trade/chart/constants.ts
 #: src/components/trade/positions/mobile-position-card.tsx
@@ -747,8 +746,8 @@ msgstr "En ordres"
 #~ msgstr "En cours d'utilisation"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Install a wallet extension to continue"
-msgstr "Installez une extension de portefeuille pour continuer"
+#~ msgid "Install a wallet extension to continue"
+#~ msgstr "Installez une extension de portefeuille pour continuer"
 
 #. placeholder {0}: ctx.baseToken
 #. placeholder {0}: ctx.quoteToken
@@ -807,8 +806,8 @@ msgid "Leaderboard"
 msgstr "Classement"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Learn more"
-msgstr "En savoir plus"
+#~ msgid "Learn more"
+#~ msgstr "En savoir plus"
 
 #: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/leverage-control.tsx
@@ -1028,8 +1027,8 @@ msgid "Minimum withdrawal is ${MIN_WITHDRAW_USD}"
 msgstr "Retrait minimum de ${MIN_WITHDRAW_USD}"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Mock Wallet (Testing)"
-msgstr "Portefeuille simulé (Test)"
+#~ msgid "Mock Wallet (Testing)"
+#~ msgstr "Portefeuille simulé (Test)"
 
 #: src/components/trade/header/top-nav.tsx
 #~ msgid "More"
@@ -1064,8 +1063,8 @@ msgid "NEW"
 msgstr "NOUVEAU"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "New to wallets?"
-msgstr "Nouveau avec les portefeuilles ?"
+#~ msgid "New to wallets?"
+#~ msgstr "Nouveau avec les portefeuilles ?"
 
 #: src/components/ui/pagination.tsx
 #~ msgid "Next"
@@ -1153,8 +1152,8 @@ msgstr "Aucune paire de trading disponible pour <0/>/<1/>"
 #~ msgstr ""
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "No wallets found"
-msgstr "Aucun portefeuille trouvé"
+#~ msgid "No wallets found"
+#~ msgstr "Aucun portefeuille trouvé"
 
 #: src/lib/errors/definitions/connection.ts
 msgid "Not connected"
@@ -1181,8 +1180,8 @@ msgid "OI"
 msgstr "OI"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Only you control your funds. No email or password required."
-msgstr "Vous seul contrôlez vos fonds. Pas d'email ni de mot de passe requis."
+#~ msgid "Only you control your funds. No email or password required."
+#~ msgstr "Vous seul contrôlez vos fonds. Pas d'email ni de mot de passe requis."
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "open"
@@ -1232,8 +1231,8 @@ msgid "Other"
 msgstr "Autre"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Other Options"
-msgstr "Autres options"
+#~ msgid "Other Options"
+#~ msgstr "Autres options"
 
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #~ msgid "P&L"
@@ -1289,8 +1288,8 @@ msgid "PNL"
 msgstr "PNL"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Popular"
-msgstr "Populaire"
+#~ msgid "Popular"
+#~ msgstr "Populaire"
 
 #: src/components/trade/header/top-nav.tsx
 msgid "Portfolio"
@@ -1416,8 +1415,8 @@ msgid "Search markets..."
 msgstr "Rechercher des marchés..."
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "Secure & Private"
-msgstr "Sécurisé et privé"
+#~ msgid "Secure & Private"
+#~ msgstr "Sécurisé et privé"
 
 #: src/components/trade/header/favorites-strip.tsx
 #~ msgid "Select {coin} market"
@@ -2079,8 +2078,8 @@ msgstr "Portefeuille non connecté"
 #~ msgstr "Erreur WebSocket"
 
 #: src/components/trade/components/wallet-dialog.tsx
-msgid "What is a wallet?"
-msgstr "Qu'est-ce qu'un portefeuille ?"
+#~ msgid "What is a wallet?"
+#~ msgstr "Qu'est-ce qu'un portefeuille ?"
 
 #: src/components/trade/order-entry/deposit-modal.tsx
 #~ msgid "will arrive in ~3 min"
