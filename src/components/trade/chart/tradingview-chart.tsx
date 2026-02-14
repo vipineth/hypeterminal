@@ -17,34 +17,18 @@ import {
 import { createDatafeed } from "./datafeed";
 import { buildChartOverrides, generateChartCssUrl, getLoadingScreenColors, getToolbarBgColor } from "./theme-colors";
 
-// const TOOLBAR_HEIGHT_PX = 35;
-
-// function patchToolbarHeight(container: HTMLElement | null) {
-// 	if (!container) return;
-
-// 	const iframe = container.querySelector("iframe");
-// 	const doc = iframe?.contentDocument ?? document;
-
-// 	const style = doc.createElement("style");
-// 	style.textContent = `
-// 		.layout__area--top [class*="innerWrap-"] { height: ${TOOLBAR_HEIGHT_PX}px !important; }
-// 	`;
-// 	doc.head.appendChild(style);
-
-// 	const topArea = doc.querySelector<HTMLElement>(".layout__area--top");
-// 	if (topArea) topArea.style.height = `${TOOLBAR_HEIGHT_PX}px`;
-// }
-
 interface Props {
 	symbol?: string;
 	interval?: string;
 	theme?: "light" | "dark";
+	extraDisabledFeatures?: string[];
 }
 
 export function TradingViewChart({
 	symbol = DEFAULT_CHART_SYMBOL,
 	interval = DEFAULT_CHART_INTERVAL,
 	theme = DEFAULT_CHART_THEME,
+	extraDisabledFeatures,
 }: Props) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const widgetRef = useRef<IChartingLibraryWidget | null>(null);
@@ -138,7 +122,9 @@ export function TradingViewChart({
 					custom_font_family: CHART_CUSTOM_FONT_FAMILY,
 					time_frames: CHART_TIME_FRAMES,
 					enabled_features: CHART_ENABLED_FEATURES,
-					disabled_features: CHART_DISABLED_FEATURES,
+					disabled_features: extraDisabledFeatures
+						? ([...CHART_DISABLED_FEATURES, ...extraDisabledFeatures] as typeof CHART_DISABLED_FEATURES)
+						: CHART_DISABLED_FEATURES,
 					overrides: overrides,
 					loading_screen: loadingColors,
 					toolbar_bg: toolbarBg,
@@ -170,7 +156,7 @@ export function TradingViewChart({
 				cssUrlRef.current = null;
 			}
 		};
-	}, [symbol, interval, theme]);
+	}, [symbol, interval, theme, extraDisabledFeatures]);
 
 	return (
 		<div className="relative w-full h-full" style={{ minHeight: "300px" }}>

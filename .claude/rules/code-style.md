@@ -25,6 +25,10 @@ description: Code style rules
 
 Only create helpers when logic is reused, complex, or significantly improves readability. Don't create helpers for simple one-liners.
 
+## Conditional Classnames
+
+- **Always use `cn()` for conditional classes** - Never use template literals, ternaries, or string concatenation for className. `cn()` handles falsy values automatically.
+
 ## Ternary Operators
 
 - Use ternaries only for simple single-level conditionals

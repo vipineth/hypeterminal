@@ -5,7 +5,7 @@ import {
 	TrendDownIcon,
 	TrendUpIcon,
 } from "@phosphor-icons/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -21,9 +21,8 @@ import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { useSubL2Book } from "@/lib/hyperliquid/hooks/subscription";
 import { processLevels } from "@/lib/trade/orderbook";
 import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global-settings-store";
-import { OrderbookRow } from "../orderbook/orderbook-row";
-import { TradesPanel } from "../orderbook/trades-panel";
-import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
+import { OrderbookRow } from "../../orderbook/orderbook-row";
+import { TradesPanel } from "../../orderbook/trades-panel";
 
 const ORDERBOOK_TEXT = UI_TEXT.ORDERBOOK;
 
@@ -70,11 +69,11 @@ function formatTickLabel(tickSize: number): string {
 	return String(Number(tickSize.toPrecision(4)));
 }
 
-interface MobileBookViewProps {
+interface Props {
 	className?: string;
 }
 
-export function MobileBookView({ className }: MobileBookViewProps) {
+export function MobileBookView({ className }: Props) {
 	const [view, setView] = useState<View>("book");
 	const [selectedOption, setSelectedOption] = useState<PriceGroupOption | null>(null);
 	const { showOrderbookInQuote } = useGlobalSettings();
@@ -95,20 +94,15 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 		},
 	);
 
-	const bids = useMemo(() => processLevels(book?.levels[0]), [book?.levels]);
-	const asks = useMemo(() => processLevels(book?.levels[1]), [book?.levels]);
+	const bids = processLevels(book?.levels[0]);
+	const asks = processLevels(book?.levels[1]);
 
-	const maxTotal = useMemo(() => {
-		const totals = [...asks, ...bids].map((r) => r.total);
-		return totals.length > 0 ? Math.max(...totals) : 0;
-	}, [asks, bids]);
+	const totals = [...asks, ...bids].map((r) => r.total);
+	const maxTotal = totals.length > 0 ? Math.max(...totals) : 0;
 
 	const bestBid = bids[0]?.price;
 	const bestAsk = asks[0]?.price;
-	const mid = useMemo(() => {
-		if (!Number.isFinite(bestBid) || !Number.isFinite(bestAsk)) return undefined;
-		return (bestBid + bestAsk) / 2;
-	}, [bestBid, bestAsk]);
+	const mid = Number.isFinite(bestBid) && Number.isFinite(bestAsk) ? (bestBid + bestAsk) / 2 : undefined;
 
 	const [midDirection, setMidDirection] = useState<"up" | "down" | "flat">("flat");
 	const lastMidRef = useRef<number | undefined>(undefined);
@@ -124,30 +118,22 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 		lastMidRef.current = mid;
 	}, [mid]);
 
-	const spread = useMemo(() => {
-		if (!Number.isFinite(bestBid) || !Number.isFinite(bestAsk)) return undefined;
-		return bestAsk - bestBid;
-	}, [bestAsk, bestBid]);
+	const spread = Number.isFinite(bestBid) && Number.isFinite(bestAsk) ? bestAsk - bestBid : undefined;
 
-	const spreadPct = useMemo(() => {
-		if (
-			typeof spread !== "number" ||
-			typeof mid !== "number" ||
-			!Number.isFinite(spread) ||
-			!Number.isFinite(mid) ||
-			mid === 0
-		) {
-			return undefined;
-		}
-		return (spread / mid) * 100;
-	}, [spread, mid]);
+	const spreadPct =
+		typeof spread === "number" &&
+		typeof mid === "number" &&
+		Number.isFinite(spread) &&
+		Number.isFinite(mid) &&
+		mid !== 0
+			? (spread / mid) * 100
+			: undefined;
 
-	const priceGroupingOptions = useMemo(() => generatePriceGroupingOptions(mid), [mid]);
+	const priceGroupingOptions = generatePriceGroupingOptions(mid);
 
-	const { baseToken, quoteToken } = useMemo(() => {
-		if (!selectedMarket) return { baseToken: "", quoteToken: "" };
-		return getBaseQuoteFromPairName(selectedMarket.pairName, selectedMarket.kind);
-	}, [selectedMarket]);
+	const { baseToken, quoteToken } = selectedMarket
+		? getBaseQuoteFromPairName(selectedMarket.pairName, selectedMarket.kind)
+		: { baseToken: "", quoteToken: "" };
 
 	useEffect(() => {
 		if (selectedOption === null && priceGroupingOptions.length > 0) {
@@ -157,7 +143,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 
 	return (
 		<div className={cn("flex flex-col h-full min-h-0", className)}>
-			<div className="shrink-0 px-3 py-2 border-b border-border-200/60 bg-surface-execution/30">
+			<div className="shrink-0 px-4 py-3 border-b border-border-200/60 bg-surface-execution/30">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-1 bg-surface-analysis rounded-md p-0.5">
 						<Button
@@ -200,7 +186,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 							className={cn(
 								"px-2 py-1.5 text-xs border border-border-200/60 rounded",
 								"min-h-[36px] flex items-center gap-1",
-								"text-text-600 hover:text-text-950 hover:border-text-400",
+								"text-text-600 hover:text-text-950 hover:border-fg-400",
 								"hover:bg-transparent transition-colors",
 							)}
 							aria-label="Toggle display units"
@@ -218,7 +204,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 										className={cn(
 											"px-2 py-1.5 text-xs border border-border-200/60 rounded",
 											"min-h-[36px] flex items-center gap-1",
-											"hover:border-text-400 hover:bg-transparent transition-colors",
+											"hover:border-fg-400 hover:bg-transparent transition-colors",
 										)}
 									>
 										{selectedOption?.label ?? "—"}
@@ -247,19 +233,15 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 				</div>
 			</div>
 
-			{/* Content */}
 			{view === "book" ? (
 				<div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-					{/* Column headers */}
-					<div className="shrink-0 grid grid-cols-3 gap-2 px-3 py-2 text-xs uppercase tracking-wider text-text-600 border-b border-border-200/40">
+					<div className="shrink-0 grid grid-cols-3 gap-2 px-4 py-2.5 text-xs uppercase tracking-wider text-text-600 border-b border-border-200/40">
 						<div>{ORDERBOOK_TEXT.HEADER_PRICE}</div>
 						<div className="text-right">{ORDERBOOK_TEXT.HEADER_SIZE}</div>
 						<div className="text-right">{ORDERBOOK_TEXT.HEADER_TOTAL}</div>
 					</div>
 
-					{/* Order book */}
 					<div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-						{/* Asks - show more rows to fill mobile screen */}
 						{bookStatus !== "error" && asks.length > 0 ? (
 							<div className="flex-1 flex flex-col justify-end gap-px py-1 overflow-hidden">
 								{asks
@@ -289,8 +271,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 							</div>
 						)}
 
-						{/* Mid price */}
-						<div className="shrink-0 py-2 px-3 flex items-center justify-center gap-3 border-y border-border-200/40 bg-surface-execution/30">
+						<div className="shrink-0 py-3 px-4 flex items-center justify-center gap-3 border-y border-border-200/40 bg-surface-execution/30">
 							<span className="text-xl font-bold tabular-nums text-warning-700">
 								{typeof mid === "number" && Number.isFinite(mid) ? formatNumber(mid, 2) : FALLBACK_VALUE_PLACEHOLDER}
 							</span>
@@ -301,7 +282,6 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 							) : null}
 						</div>
 
-						{/* Bids - show more rows to fill mobile screen */}
 						{bookStatus !== "error" && bids.length > 0 ? (
 							<div className="flex-1 flex flex-col gap-px py-1 overflow-hidden">
 								{bids.slice(0, 12).map((level, index) => (
@@ -318,8 +298,7 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 						) : null}
 					</div>
 
-					{/* Spread */}
-					<div className="shrink-0 px-3 py-2 border-t border-border-200/40 flex items-center justify-between text-xs text-text-600">
+					<div className="shrink-0 px-4 py-2.5 border-t border-border-200/40 flex items-center justify-between text-xs text-text-600">
 						<span>{ORDERBOOK_TEXT.SPREAD_LABEL}</span>
 						<span className="tabular-nums text-warning-700">
 							{typeof spread === "number" &&
@@ -336,8 +315,6 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 					<TradesPanel key={name} />
 				</div>
 			)}
-
-			<MobileBottomNavSpacer />
 		</div>
 	);
 }

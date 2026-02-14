@@ -207,7 +207,7 @@
   --warning-100: #4A3A12;
 
   /* Error */
-  --error-700: #A63A2B;
+  --error-700: #E5564A;
   --error-100: #3A1C1C;
 
   /* Surface */
@@ -353,6 +353,16 @@
     --sal: env(safe-area-inset-left);
   }
 
+  @media (width < theme(--breakpoint-md)) {
+    :root {
+      --text-5xs: 0.5625rem;      /* 8px → 9px */
+      --text-4xs: 0.6875rem;      /* 9px → 11px */
+      --text-3xs: 0.75rem;        /* 10px → 12px */
+      --text-2xs: 0.8125rem;      /* 11px → 13px */
+      --text-nav: 0.9375rem;      /* 13px → 15px */
+    }
+  }
+
   html {
     height: 100%;
     scrollbar-gutter: stable;
@@ -384,6 +394,12 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
+  }
+}
+
+@layer utilities {
+  .pb-safe-bottom {
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
   }
 }
 

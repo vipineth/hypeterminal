@@ -3,8 +3,14 @@ import { SpinnerGapIcon, TrendDownIcon, TrendUpIcon } from "@phosphor-icons/reac
 import { useCallback, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { InfoRow } from "@/components/ui/info-row";
+import {
+	ResponsiveModal,
+	ResponsiveModalContent,
+	ResponsiveModalFooter,
+	ResponsiveModalHeader,
+	ResponsiveModalTitle,
+} from "@/components/ui/responsive-modal";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { throwIfAnyResponseError } from "@/domain/trade/orders";
 import { cn } from "@/lib/cn";
@@ -112,10 +118,10 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 	if (!position) return null;
 
 	return (
-		<Dialog open={open} onOpenChange={handleOpenChange}>
-			<DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden">
-				<DialogHeader className="px-5 pt-5 pb-3">
-					<DialogTitle className="flex items-center gap-1">
+		<ResponsiveModal open={open} onOpenChange={handleOpenChange}>
+			<ResponsiveModalContent className="sm:max-w-md p-0 gap-0 overflow-hidden">
+				<ResponsiveModalHeader className="px-5 pt-5 pb-3">
+					<ResponsiveModalTitle className="flex items-center gap-1">
 						<AssetDisplay coin={position.coin} />
 						<Badge variant={position.isLong ? "long" : "short"} size="sm">
 							{position.isLong ? (
@@ -130,8 +136,8 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 								</>
 							)}
 						</Badge>
-					</DialogTitle>
-				</DialogHeader>
+					</ResponsiveModalTitle>
+				</ResponsiveModalHeader>
 
 				<div className="px-5 pb-4">
 					<div className="rounded-xs border border-border-200/50 bg-surface-analysis p-3 space-y-1 text-2xs">
@@ -188,7 +194,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 					)}
 				</div>
 
-				<DialogFooter className="px-5 py-3 border-t border-border-200/50">
+				<ResponsiveModalFooter className="px-5 py-3 border-t border-border-200/50">
 					<Button size="sm" variant="text" onClick={() => handleOpenChange(false)} disabled={isSubmitting}>
 						{t`Cancel`}
 					</Button>
@@ -202,8 +208,8 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 							t`Confirm`
 						)}
 					</TradingActionButton>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
+				</ResponsiveModalFooter>
+			</ResponsiveModalContent>
+		</ResponsiveModal>
 	);
 }

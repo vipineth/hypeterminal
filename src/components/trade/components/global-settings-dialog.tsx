@@ -2,8 +2,13 @@ import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import type { ChangeEvent } from "react";
 import { useId, useRef, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NumberInput } from "@/components/ui/number-input";
+import {
+	ResponsiveModal,
+	ResponsiveModalContent,
+	ResponsiveModalHeader,
+	ResponsiveModalTitle,
+} from "@/components/ui/responsive-modal";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
@@ -70,11 +75,11 @@ export function GlobalSettingsDialog() {
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={close}>
-			<DialogContent className="sm:max-w-md gap-0 p-0">
-				<DialogHeader className="px-5 pt-5 pb-4 border-b border-border-200/50">
-					<DialogTitle>{t`Settings`}</DialogTitle>
-				</DialogHeader>
+		<ResponsiveModal open={open} onOpenChange={close}>
+			<ResponsiveModalContent className="sm:max-w-md gap-0 p-0">
+				<ResponsiveModalHeader className="px-5 pt-5 pb-4 border-b border-border-200/50">
+					<ResponsiveModalTitle>{t`Settings`}</ResponsiveModalTitle>
+				</ResponsiveModalHeader>
 
 				<div className="px-5 py-4 space-y-5 max-h-[70vh] overflow-y-auto">
 					<SettingsSection title={t`Display Language`}>
@@ -161,8 +166,8 @@ export function GlobalSettingsDialog() {
 						/>
 					</SettingsSection>
 				</div>
-			</DialogContent>
-		</Dialog>
+			</ResponsiveModalContent>
+		</ResponsiveModal>
 	);
 }
 

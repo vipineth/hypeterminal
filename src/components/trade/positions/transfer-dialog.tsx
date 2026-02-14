@@ -3,8 +3,14 @@ import { ArrowsLeftRightIcon, SpinnerGapIcon, WarningCircleIcon } from "@phospho
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NumberInput } from "@/components/ui/number-input";
+import {
+	ResponsiveModal,
+	ResponsiveModalContent,
+	ResponsiveModalDescription,
+	ResponsiveModalHeader,
+	ResponsiveModalTitle,
+} from "@/components/ui/responsive-modal";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
 import { exceedsBalance, isAmountWithinBalance } from "@/domain/market";
 import { getAvailableFromTotals, getPerpAvailable, getSpotBalance } from "@/domain/trade/balances";
@@ -109,12 +115,12 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={handleOpenChange}>
-			<DialogContent className="sm:max-w-sm">
-				<DialogHeader>
-					<DialogTitle>{t`Transfer USDC`}</DialogTitle>
-					<DialogDescription>{t`Move USDC between your Perp and Spot accounts.`}</DialogDescription>
-				</DialogHeader>
+		<ResponsiveModal open={open} onOpenChange={handleOpenChange}>
+			<ResponsiveModalContent className="sm:max-w-sm">
+				<ResponsiveModalHeader>
+					<ResponsiveModalTitle>{t`Transfer USDC`}</ResponsiveModalTitle>
+					<ResponsiveModalDescription>{t`Move USDC between your Perp and Spot accounts.`}</ResponsiveModalDescription>
+				</ResponsiveModalHeader>
 
 				<div className="space-y-4">
 					<div className="flex items-center justify-center gap-3 py-2">
@@ -182,7 +188,7 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 						{isPending ? t`Transferring...` : t`Transfer`}
 					</Button>
 				</div>
-			</DialogContent>
-		</Dialog>
+			</ResponsiveModalContent>
+		</ResponsiveModal>
 	);
 }

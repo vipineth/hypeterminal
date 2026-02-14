@@ -373,6 +373,11 @@ export const UI_TEXT = {
 		CROSS_LEVERAGE_LABEL: "Cross Leverage",
 		DEPOSIT_LABEL: "Deposit",
 		WITHDRAW_LABEL: "Withdraw",
+		SPOT_TOTAL_VALUE_LABEL: "Total Value",
+		SPOT_AVAILABLE_LABEL: "Available",
+		SPOT_IN_ORDERS_LABEL: "In Orders",
+		SPOT_ASSETS_LABEL: "Assets",
+		ERROR_LOADING: "Failed to load account data.",
 	},
 	BALANCES_TAB: {
 		TITLE: "Account Balances",

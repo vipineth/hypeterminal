@@ -53,16 +53,16 @@ export function TopNav() {
 	return (
 		<header
 			className={cn(
-				"fixed top-0 left-0 right-0 z-40 h-11 border-b px-3 flex items-center justify-between bg-surface-execution transition-colors duration-300 ease-in-out",
+				"fixed top-0 left-0 right-0 z-40 h-10 md:h-11 border-b px-2 md:px-3 flex items-center justify-between bg-surface-execution transition-colors duration-300 ease-in-out",
 				accentClass,
 			)}
 		>
-			<div className="flex items-center gap-3 min-w-0">
-				<div className="flex items-center gap-1.5">
-					<div className="size-5 rounded bg-primary-default/10 border border-primary-default/30 flex items-center justify-center">
-						<TerminalIcon className="size-3 text-primary-default" />
+			<div className="flex items-center gap-2 md:gap-3 min-w-0">
+				<div className="flex items-center gap-1 md:gap-1.5">
+					<div className="size-4 md:size-5 rounded bg-primary-default/10 border border-primary-default/30 flex items-center justify-center">
+						<TerminalIcon className="size-2.5 md:size-3 text-primary-default" />
 					</div>
-					<span className="text-xs font-bold tracking-tight">
+					<span className="text-3xs md:text-xs font-bold tracking-tight">
 						<span className="text-primary-default">HYPE</span>
 						<span className="text-text-950">TERMINAL</span>
 					</span>
@@ -93,30 +93,38 @@ export function TopNav() {
 							{item.label}
 						</button>
 					))}
+					<div className="h-4 w-px bg-border-200 mx-1" />
+					<button
+						type="button"
+						onClick={() => openDepositModal("deposit")}
+						className="px-2.5 py-1.5 text-text-950 hover:text-text-600 transition-colors duration-150"
+					>
+						<Trans>Fund</Trans>
+					</button>
 				</nav>
 			</div>
 
-			<div className="flex items-center gap-2">
+			<div className="flex items-center gap-1.5 md:gap-2">
 				{isConnected && (
 					<Button
 						variant="outlined"
 						onClick={() => openDepositModal("deposit")}
-						className="h-6 px-2 text-xs font-medium rounded-xs bg-fill-100 border border-border-300 text-text-950 hover:border-border-500 transition-colors inline-flex items-center gap-1 shadow-xs"
+						className="h-5 px-1.5 text-2xs md:h-6 md:px-2 md:text-xs font-medium rounded-xs bg-fill-100 border border-border-300 text-text-950 hover:border-border-500 transition-colors inline-flex items-center gap-1 shadow-xs"
 					>
-						<DownloadSimpleIcon className="size-4" />
+						<DownloadSimpleIcon className="size-3.5 md:size-4" />
 						<Trans>Deposit</Trans>
 					</Button>
 				)}
 				<UserMenu />
-				<div className="flex items-center gap-1">
+				<div className="flex items-center gap-0.5 md:gap-1">
 					<ThemeToggle />
 					<button
 						type="button"
-						className="size-7 inline-flex items-center justify-center rounded text-text-600 hover:text-primary-default transition-colors duration-150"
+						className="size-6 md:size-7 inline-flex items-center justify-center rounded text-text-600 hover:text-primary-default transition-colors duration-150"
 						onClick={openSettingsDialog}
 						aria-label={t`Settings`}
 					>
-						<GearIcon className="size-4" />
+						<GearIcon className="size-3.5 md:size-4" />
 					</button>
 				</div>
 			</div>

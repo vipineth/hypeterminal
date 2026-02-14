@@ -14,8 +14,14 @@ import { isAddress } from "viem";
 import { type Connector, useConnect, useConnectors } from "wagmi";
 import { mock } from "wagmi/connectors";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import {
+	ResponsiveModal,
+	ResponsiveModalContent,
+	ResponsiveModalDescription,
+	ResponsiveModalHeader,
+	ResponsiveModalTitle,
+} from "@/components/ui/responsive-modal";
 import { MOCK_WALLETS } from "@/config/wagmi";
 import { cn } from "@/lib/cn";
 import { getLastUsedWallet, getWalletInfo, isMockConnector, setLastUsedWallet } from "@/lib/wallet-utils";
@@ -112,18 +118,18 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 	const hasConnectors = availableConnectors.all.length > 0 || mockConnectors.length > 0;
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-md gap-0 p-0 overflow-hidden">
+		<ResponsiveModal open={open} onOpenChange={onOpenChange}>
+			<ResponsiveModalContent className="sm:max-w-md gap-0 p-0 overflow-hidden">
 				<div className="p-6 pb-4 border-b border-border-200/50">
-					<DialogHeader className="space-y-2">
-						<DialogTitle className="flex items-center gap-2 text-lg">
+					<ResponsiveModalHeader className="space-y-2">
+						<ResponsiveModalTitle className="flex items-center gap-2 text-lg">
 							<WalletIcon className="size-5 text-primary-default" />
 							<Trans>Connect Wallet</Trans>
-						</DialogTitle>
-						<DialogDescription>
+						</ResponsiveModalTitle>
+						<ResponsiveModalDescription>
 							<Trans>Connect your wallet to start trading on Hyperliquid</Trans>
-						</DialogDescription>
-					</DialogHeader>
+						</ResponsiveModalDescription>
+					</ResponsiveModalHeader>
 				</div>
 
 				<div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
@@ -365,7 +371,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 						</div>
 					)}
 				</div>
-			</DialogContent>
-		</Dialog>
+			</ResponsiveModalContent>
+		</ResponsiveModal>
 	);
 }
