@@ -329,7 +329,6 @@ msgstr "वॉलेट में पुष्टि करें"
 #~ msgid "Connect a wallet to manage positions."
 #~ msgstr "पोजीशन प्रबंधित करने के लिए वॉलेट कनेक्ट करें।"
 
-#: src/components/trade/header/user-menu.tsx
 #: src/lib/trade/use-button-content.ts
 msgid "Connect Wallet"
 msgstr "वॉलेट कनेक्ट करें"
@@ -837,6 +836,10 @@ msgstr "लिमिट प्राइस"
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "limit ro"
 #~ msgstr "लिमिट आरओ"
+
+#: src/components/trade/header/top-nav.tsx
+msgid "Link mobile device"
+msgstr ""
 
 #: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/positions-tab.tsx

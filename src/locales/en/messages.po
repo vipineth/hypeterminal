@@ -329,7 +329,6 @@ msgstr "Confirm in wallet"
 #~ msgid "Connect a wallet to manage positions."
 #~ msgstr "Connect a wallet to manage positions."
 
-#: src/components/trade/header/user-menu.tsx
 #: src/lib/trade/use-button-content.ts
 msgid "Connect Wallet"
 msgstr "Connect Wallet"
@@ -841,6 +840,10 @@ msgstr "Limit Price"
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "limit ro"
 #~ msgstr "limit ro"
+
+#: src/components/trade/header/top-nav.tsx
+msgid "Link mobile device"
+msgstr "Link mobile device"
 
 #: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/positions-tab.tsx

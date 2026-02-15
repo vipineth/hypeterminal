@@ -5,6 +5,8 @@ const DepositModal = createLazyComponent(() => import("../tradebox/deposit-modal
 const GlobalSettingsDialog = createLazyComponent(() => import("./global-settings-dialog"), "GlobalSettingsDialog");
 const SpotSwapModal = createLazyComponent(() => import("./spot-swap-modal"), "SpotSwapModal");
 const CommandMenu = createLazyComponent(() => import("./command-menu"), "CommandMenu");
+const LinkDeviceModal = createLazyComponent(() => import("./link-device/link-device-modal"), "LinkDeviceModal");
+const ScanQrModal = createLazyComponent(() => import("./link-device/scan-qr-modal"), "ScanQrModal");
 
 export function GlobalModals() {
 	return (
@@ -13,6 +15,8 @@ export function GlobalModals() {
 			<GlobalSettingsDialog />
 			<SpotSwapModal />
 			<CommandMenu />
+			<LinkDeviceModal />
+			<ScanQrModal />
 		</Suspense>
 	);
 }
