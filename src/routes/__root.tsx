@@ -1,7 +1,9 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { ClientOnly, createRootRouteWithContext, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { NotFoundPage } from "@/components/pages/not-found-page";
 import { Toaster } from "@/components/ui/sonner";
+import { loadTradingViewScript } from "@/lib/chart/load-tradingview";
 import { MarketsInfoProvider } from "@/lib/hyperliquid/hooks/MarketsInfoProvider";
 import { buildPageHead, mergeHead } from "@/lib/seo";
 import { ExchangeScopeProvider } from "@/providers/exchange-scope";
@@ -24,6 +26,13 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 });
 
 function RootComponent() {
+	useEffect(() => {
+		requestIdleCallback(() => loadTradingViewScript());
+		if ("serviceWorker" in navigator) {
+			navigator.serviceWorker.register("/sw.js", { scope: "/" });
+		}
+	}, []);
+
 	return (
 		<ExchangeScopeProvider>
 			<MarketsInfoProvider>

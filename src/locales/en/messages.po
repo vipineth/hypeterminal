@@ -21,7 +21,7 @@ msgstr "% filled"
 msgid "24H"
 msgstr "24H"
 
-#: src/components/trade/chart/constants.ts
+#: src/components/trade/chart/token-selector-columns.ts
 msgid "24h Change"
 msgstr "24h Change"
 
@@ -699,7 +699,7 @@ msgstr "From"
 #~ msgid "Full Position"
 #~ msgstr "Full Position"
 
-#: src/components/trade/chart/constants.ts
+#: src/components/trade/chart/token-selector-columns.ts
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Funding"
 msgstr "Funding"
@@ -948,7 +948,7 @@ msgstr "MARK"
 msgid "Mark Price"
 msgstr "Mark Price"
 
-#: src/components/trade/chart/constants.ts
+#: src/components/trade/chart/token-selector-columns.ts
 #: src/components/trade/chart/token-selector.tsx
 #: src/components/trade/tradebox/trade-header.tsx
 msgid "Market"
@@ -1194,7 +1194,7 @@ msgstr "Only you control your funds. No email or password required."
 #~ msgid "open"
 #~ msgstr "open"
 
-#: src/components/trade/chart/constants.ts
+#: src/components/trade/chart/token-selector-columns.ts
 msgid "Open Interest"
 msgstr "Open Interest"
 
@@ -1327,7 +1327,7 @@ msgstr "Position reversed"
 #~ msgid "Previous"
 #~ msgstr "Previous"
 
-#: src/components/trade/chart/constants.ts
+#: src/components/trade/chart/token-selector-columns.ts
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
@@ -2082,7 +2082,7 @@ msgstr "View on explorer"
 msgid "VOL"
 msgstr "VOL"
 
-#: src/components/trade/chart/constants.ts
+#: src/components/trade/chart/token-selector-columns.ts
 msgid "Volume"
 msgstr "Volume"
 

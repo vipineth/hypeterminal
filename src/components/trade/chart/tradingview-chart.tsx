@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { loadTradingViewScript } from "@/lib/chart/load-tradingview";
 import type { IChartingLibraryWidget, ResolutionString } from "@/types/charting_library";
 import {
 	CHART_CUSTOM_FONT_FAMILY,
@@ -17,24 +18,6 @@ import {
 import { createDatafeed } from "./datafeed";
 import { buildChartOverrides, generateChartCssUrl, getLoadingScreenColors, getToolbarBgColor } from "./theme-colors";
 
-// const TOOLBAR_HEIGHT_PX = 35;
-
-// function patchToolbarHeight(container: HTMLElement | null) {
-// 	if (!container) return;
-
-// 	const iframe = container.querySelector("iframe");
-// 	const doc = iframe?.contentDocument ?? document;
-
-// 	const style = doc.createElement("style");
-// 	style.textContent = `
-// 		.layout__area--top [class*="innerWrap-"] { height: ${TOOLBAR_HEIGHT_PX}px !important; }
-// 	`;
-// 	doc.head.appendChild(style);
-
-// 	const topArea = doc.querySelector<HTMLElement>(".layout__area--top");
-// 	if (topArea) topArea.style.height = `${TOOLBAR_HEIGHT_PX}px`;
-// }
-
 interface Props {
 	symbol?: string;
 	interval?: string;
@@ -48,7 +31,6 @@ export function TradingViewChart({
 }: Props) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const widgetRef = useRef<IChartingLibraryWidget | null>(null);
-	const scriptLoadedRef = useRef(false);
 	const cssUrlRef = useRef<string | null>(null);
 	const chartReadyRef = useRef(false);
 
@@ -56,56 +38,9 @@ export function TradingViewChart({
 		if (!containerRef.current) return;
 		chartReadyRef.current = false;
 
-		const loadScript = (): Promise<void> => {
-			return new Promise((resolve, reject) => {
-				if (window.TradingView) {
-					resolve();
-					return;
-				}
-
-				if (scriptLoadedRef.current) {
-					const checkInterval = setInterval(() => {
-						if (window.TradingView) {
-							clearInterval(checkInterval);
-							clearTimeout(timeout);
-							resolve();
-						}
-					}, 100);
-
-					const timeout = setTimeout(() => {
-						clearInterval(checkInterval);
-						reject(new Error("TradingView library load timeout"));
-					}, 10000);
-					return;
-				}
-
-				scriptLoadedRef.current = true;
-				const script = document.createElement("script");
-				script.src = `${CHART_LIBRARY_PATH}charting_library.js`;
-				script.async = true;
-
-				const timeout = setTimeout(() => {
-					script.remove();
-					reject(new Error("Script load timeout"));
-				}, 30000);
-
-				script.onload = () => {
-					clearTimeout(timeout);
-					resolve();
-				};
-
-				script.onerror = () => {
-					clearTimeout(timeout);
-					reject(new Error("Failed to load TradingView library"));
-				};
-
-				document.head.appendChild(script);
-			});
-		};
-
 		const initWidget = async () => {
 			try {
-				await loadScript();
+				await loadTradingViewScript();
 
 				if (!containerRef.current || !window.TradingView) return;
 

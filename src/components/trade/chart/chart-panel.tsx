@@ -1,7 +1,6 @@
 import { ClientOnly } from "@tanstack/react-router";
 import { Suspense, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { createChartName } from "@/lib/chart/candle";
 import { cn } from "@/lib/cn";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { createLazyComponent } from "@/lib/lazy";
@@ -17,7 +16,6 @@ export function ChartPanel() {
 	const theme = useTheme();
 	const { data: selectedMarket } = useSelectedMarketInfo();
 	const [chartType, setChartType] = useState<ChartType>("default");
-
 	const chartTheme = theme === "dark" ? "dark" : "light";
 
 	return (
@@ -39,6 +37,8 @@ export function ChartPanel() {
 						<button
 							type="button"
 							onClick={() => setChartType("tradingview")}
+							onMouseEnter={() => TradingViewChart.preload()}
+							onFocus={() => TradingViewChart.preload()}
 							className={cn(
 								"px-1.5 py-0.5 rounded-xs transition-colors",
 								chartType === "tradingview" ? "text-text-950 font-semibold" : "text-text-500 hover:text-text-950",
@@ -57,10 +57,7 @@ export function ChartPanel() {
 							<KlineChart symbol={selectedMarket.name} theme={chartTheme} />
 						)}
 						{chartType === "tradingview" && selectedMarket && (
-							<TradingViewChart
-								symbol={createChartName(selectedMarket.pairName, selectedMarket.name)}
-								theme={chartTheme}
-							/>
+							<TradingViewChart symbol={selectedMarket.name} theme={chartTheme} />
 						)}
 					</Suspense>
 				</ClientOnly>

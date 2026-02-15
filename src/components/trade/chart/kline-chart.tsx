@@ -1,6 +1,6 @@
 import { CaretDownIcon } from "@phosphor-icons/react";
 import type { Chart } from "klinecharts";
-import { dispose, init, LoadDataType } from "klinecharts";
+import { dispose, FormatDateType, init, LoadDataType } from "klinecharts";
 import { useEffect, useRef, useState } from "react";
 import {
 	DropdownMenu,
@@ -23,6 +23,16 @@ import { cn } from "@/lib/cn";
 import { getInfoClient } from "@/lib/hyperliquid/clients";
 import { useSubCandle } from "@/lib/hyperliquid/hooks/subscription/useSubCandle";
 
+const SHORT_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+function formatShortDate(date: Date): string {
+	return `${SHORT_MONTHS[date.getMonth()]} ${date.getDate()}`;
+}
+
+function formatTime(date: Date): string {
+	return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+}
+
 interface Props {
 	symbol?: string;
 	theme?: "light" | "dark";
@@ -40,7 +50,19 @@ export function KlineChart({ symbol = "", theme = "dark" }: Props) {
 		const container = containerRef.current;
 		if (!container || !symbol) return;
 
-		const chart = init(container);
+		const chart = init(container, {
+			customApi: {
+				formatDate: (_dateTimeFormat, timestamp, _format, type) => {
+					const date = new Date(timestamp);
+					if (type === FormatDateType.XAxis) {
+						if (activeInterval.barMs >= 86_400_000) return formatShortDate(date);
+						if (date.getHours() === 0 && date.getMinutes() === 0) return formatShortDate(date);
+						return formatTime(date);
+					}
+					return `${formatShortDate(date)} ${formatTime(date)}`;
+				},
+			},
+		});
 		if (!chart) return;
 		chartRef.current = chart;
 
@@ -50,8 +72,8 @@ export function KlineChart({ symbol = "", theme = "dark" }: Props) {
 		chart.setLoadDataCallback(({ type, data, callback }) => {
 			const interval = intervalRef.current;
 
-			if (type === LoadDataType.Init || type === LoadDataType.Backward) {
-				const endTime = type === LoadDataType.Backward && data ? data.timestamp : Date.now();
+			if (type === LoadDataType.Forward && data) {
+				const endTime = data.timestamp;
 				const startTime = endTime - 500 * interval.barMs;
 
 				getInfoClient()
@@ -61,8 +83,12 @@ export function KlineChart({ symbol = "", theme = "dark" }: Props) {
 						startTime,
 						endTime,
 					})
-					.then((candles) => callback(candlesToKLineData(candles), true))
+					.then((candles) => callback(candlesToKLineData(candles), candles.length > 0))
 					.catch(() => callback([], false));
+			}
+
+			if (type === LoadDataType.Backward) {
+				callback([], false);
 			}
 		});
 

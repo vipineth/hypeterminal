@@ -15,6 +15,7 @@ function createManualChunks(id: string) {
     if (id.includes('@tanstack/react-query') || id.includes('@tanstack/react-table') || id.includes('@tanstack/react-virtual')) return 'vendor-tanstack'
     if (id.includes('recharts') || id.includes('d3-')) return 'vendor-charts'
     if (id.includes('viem') || id.includes('wagmi') || id.includes('@wagmi')) return 'vendor-web3'
+    if (id.includes('klinecharts')) return 'vendor-klinecharts'
   }
 }
 
@@ -37,7 +38,17 @@ const config = defineConfig({
     },
   },
   plugins: [
-    nitro(),
+    nitro({
+      compressPublicAssets: true,
+      routeRules: {
+        '/assets/**': {
+          headers: { 'cache-control': 'public, max-age=31536000, immutable' },
+        },
+        '/charting_library/**': {
+          headers: { 'cache-control': 'public, max-age=31536000, immutable' },
+        },
+      },
+    }),
     lingui(),
     viteTsConfigPaths({
       projects: ['./tsconfig.json'],

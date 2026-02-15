@@ -8,6 +8,7 @@ import {
 	MagnifyingGlassIcon,
 	StarIcon,
 } from "@phosphor-icons/react";
+
 import { flexRender } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,7 @@ import { formatPercent, formatPrice, formatUSD } from "@/lib/format";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid";
 import { getValueColorClass } from "@/lib/trade/numbers";
 import { AssetDisplay } from "../components/asset-display";
-import type { MarketRow, MarketScope } from "./constants";
+import type { MarketRow, MarketScope } from "./token-selector-columns";
 import { useTokenSelector } from "./use-token-selector";
 
 export type TokenSelectorProps = {
@@ -51,6 +52,13 @@ function getDex(market: MarketRow): string | undefined {
 	return undefined;
 }
 
+function SortIcon({ columnId, sorting }: { columnId: string; sorting: { id: string; desc: boolean }[] }) {
+	const sort = sorting.find((s) => s.id === columnId);
+	if (sort?.desc === false) return <ArrowUpIcon className="size-3" />;
+	if (sort?.desc === true) return <ArrowDownIcon className="size-3" />;
+	return <ArrowsDownUpIcon className="size-3 opacity-50" />;
+}
+
 interface TokenSelectorContentProps {
 	selectedMarket: UnifiedMarketInfo | undefined;
 	scope: MarketScope;
@@ -63,6 +71,7 @@ interface TokenSelectorContentProps {
 	isLoading: boolean;
 	isFavorite: (name: string) => boolean;
 	sorting: { id: string; desc: boolean }[];
+	handleSort: (columnId: string) => void;
 	handleSelect: (name: string) => void;
 	handleSubcategorySelect: (value: string) => void;
 	handleScopeSelect: (value: MarketScope) => void;
@@ -88,6 +97,7 @@ function TokenSelectorContent({
 	isLoading,
 	isFavorite,
 	sorting,
+	handleSort,
 	handleSelect,
 	handleSubcategorySelect,
 	handleScopeSelect,
@@ -187,7 +197,6 @@ function TokenSelectorContent({
 				{headerGroup?.headers
 					.filter((h) => h.id !== "pairName")
 					.map((header) => {
-						const sortState = header.column.getIsSorted();
 						const hiddenOnMobile = ["oi", "volume", "funding"].includes(header.id);
 						const hideForSpot = scope === "spot" && ["oi", "funding"].includes(header.id);
 
@@ -198,7 +207,7 @@ function TokenSelectorContent({
 								key={header.id}
 								variant="text"
 								size="none"
-								onClick={header.column.getToggleSortingHandler()}
+								onClick={() => handleSort(header.id)}
 								className={cn(
 									"justify-end gap-1 hover:text-text-950 hover:bg-transparent",
 									mobile ? "w-20" : "w-16 sm:w-20",
@@ -207,15 +216,7 @@ function TokenSelectorContent({
 								aria-label={t`Sort by ${String(header.column.columnDef.header ?? "")}`}
 							>
 								<span className="truncate">{flexRender(header.column.columnDef.header, header.getContext())}</span>
-								<span className="shrink-0">
-									{sortState === "asc" ? (
-										<ArrowUpIcon className={mobile ? "size-3" : "size-2.5"} />
-									) : sortState === "desc" ? (
-										<ArrowDownIcon className={mobile ? "size-3" : "size-2.5"} />
-									) : (
-										<ArrowsDownUpIcon className={cn(mobile ? "size-3" : "size-2.5", "opacity-40")} />
-									)}
-								</span>
+								<SortIcon columnId={header.id} sorting={sorting} />
 							</Button>
 						);
 					})}
@@ -398,6 +399,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 		isLoading,
 		isFavorite,
 		sorting,
+		handleSort,
 		handleSelect,
 		handleSubcategorySelect,
 		handleScopeSelect,
@@ -423,6 +425,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 		isLoading,
 		isFavorite,
 		sorting,
+		handleSort,
 		handleSelect,
 		handleSubcategorySelect,
 		handleScopeSelect,

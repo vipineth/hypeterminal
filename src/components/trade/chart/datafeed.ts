@@ -1,9 +1,9 @@
 import { t } from "@lingui/core/macro";
 import type { AllMidsResponse, MetaResponse } from "@nktkas/hyperliquid";
-import { candleSnapshotToBar, filterAndSortBars, parseChartName } from "@/lib/chart/candle";
+import { candleSnapshotToBar, filterAndSortBars } from "@/lib/chart/candle";
 import { resolutionToInterval } from "@/lib/chart/resolution";
 import { getCandleStore, streamKey } from "@/lib/chart/store";
-import { coinFromSymbolName, inferPriceScaleFromMids } from "@/lib/chart/symbol";
+import { coinFromSymbolName, inferPriceScaleFromMids, symbolFromCoin } from "@/lib/chart/symbol";
 import { getInfoClient } from "@/lib/hyperliquid/clients";
 import type {
 	Bar,
@@ -122,18 +122,19 @@ export function createDatafeed(): IBasicDataFeed {
 			void extension;
 
 			void (async () => {
-				const { displayName, symbol: ticker } = parseChartName(symbolName);
+				const coin = coinFromSymbolName(symbolName);
+				const displayName = symbolFromCoin(coin);
 
-				if (!(await isKnownCoin(ticker))) {
+				if (!(await isKnownCoin(coin))) {
 					onError(t`Unknown symbol: ${symbolName}`);
 					return;
 				}
 
-				const pricescale = await inferPriceScale(ticker);
+				const pricescale = await inferPriceScale(coin);
 
 				const symbolInfo: LibrarySymbolInfo = {
 					name: displayName,
-					ticker: ticker,
+					ticker: coin,
 					description: displayName,
 					type: CHART_DATAFEED_CONFIG.SYMBOL_TYPE,
 					session: SESSION_24X7,

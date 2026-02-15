@@ -10,7 +10,6 @@ export { type CandleStore, type CandleStoreState, getCandleStore, streamKey } fr
 export {
 	coinFromSymbolName,
 	inferPriceScaleFromMids,
-	normalizeSymbolName,
 	priceScaleFromMid,
 	symbolFromCoin,
 } from "./symbol";

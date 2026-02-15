@@ -56,15 +56,6 @@ export function filterAndSortBars(bars: (Bar | null)[], fromMs: number, toMs: nu
 		.sort((a, b) => a.time - b.time);
 }
 
-export function createChartName(displayName: string, symbol: string): string {
-	return `${displayName}::${symbol}`;
-}
-
-export function parseChartName(chartName: string): { displayName: string; symbol: string } {
-	const [displayName, symbol] = chartName.split("::");
-	return { displayName: displayName ?? chartName, symbol: symbol ?? chartName };
-}
-
 export function candlesToKLineData(candles: CandleSnapshotResponse): KLineData[] {
 	const result: KLineData[] = [];
 	for (const c of candles) {

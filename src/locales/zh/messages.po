@@ -21,7 +21,7 @@ msgstr "% 已成交"
 msgid "24H"
 msgstr ""
 
-#: src/components/trade/chart/constants.ts
+#: src/components/trade/chart/token-selector-columns.ts
 msgid "24h Change"
 msgstr ""
 
@@ -699,7 +699,7 @@ msgstr ""
 #~ msgid "Full Position"
 #~ msgstr ""
 
-#: src/components/trade/chart/constants.ts
+#: src/components/trade/chart/token-selector-columns.ts
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Funding"
 msgstr "资金费率"
@@ -944,7 +944,7 @@ msgstr "标记"
 msgid "Mark Price"
 msgstr ""
 
-#: src/components/trade/chart/constants.ts
+#: src/components/trade/chart/token-selector-columns.ts
 #: src/components/trade/chart/token-selector.tsx
 #: src/components/trade/tradebox/trade-header.tsx
 msgid "Market"
@@ -1190,7 +1190,7 @@ msgstr ""
 #~ msgid "open"
 #~ msgstr "未成交"
 
-#: src/components/trade/chart/constants.ts
+#: src/components/trade/chart/token-selector-columns.ts
 msgid "Open Interest"
 msgstr "未平仓量"
 
@@ -1323,7 +1323,7 @@ msgstr ""
 #~ msgid "Previous"
 #~ msgstr "上一页"
 
-#: src/components/trade/chart/constants.ts
+#: src/components/trade/chart/token-selector-columns.ts
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/history-tab.tsx
@@ -2074,7 +2074,7 @@ msgstr ""
 msgid "VOL"
 msgstr "成交量"
 
-#: src/components/trade/chart/constants.ts
+#: src/components/trade/chart/token-selector-columns.ts
 msgid "Volume"
 msgstr "成交量"
 

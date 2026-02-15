@@ -1,14 +1,13 @@
 import { getCoreRowModel, type Row, type SortingState, useReactTable } from "@tanstack/react-table";
 import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
-import Big from "big.js";
-import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { type ExchangeScope, get24hChange, getOiUsd, isTokenInCategory, type MarketCategory } from "@/domain/market";
 import { useMarketsInfo } from "@/lib/hyperliquid";
 import { createSearcher } from "@/lib/search";
 import { marketSearchConfig } from "@/lib/search/presets/market";
 import { useExchangeScope } from "@/providers/exchange-scope";
 import { useFavoriteMarkets, useMarketActions } from "@/stores/use-market-store";
-import { type MarketRow, type MarketScope, TOKEN_SELECTOR_COLUMNS } from "./constants";
+import { type MarketRow, type MarketScope, TOKEN_SELECTOR_COLUMNS } from "./token-selector-columns";
 
 export interface Subcategory {
 	value: string;
@@ -33,6 +32,7 @@ export interface UseTokenSelectorReturn {
 	isLoading: boolean;
 	isFavorite: (name: string) => boolean;
 	sorting: SortingState;
+	handleSort: (columnId: string) => void;
 	handleSelect: (name: string) => void;
 	handleSubcategorySelect: (sub: string) => void;
 	handleScopeSelect: (scope: MarketScope) => void;
@@ -87,6 +87,7 @@ export function useTokenSelector({ value, onValueChange }: UseTokenSelectorOptio
 	const [deferredSearch, setDeferredSearch] = useState("");
 	const [isPending, startTransition] = useTransition();
 	const [sorting, setSorting] = useState<SortingState>([{ id: "volume", desc: true }]);
+	const deferredSorting = useDeferredValue(sorting);
 	const [highlightedIndex, setHighlightedIndex] = useState(-1);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const hasInitializedRef = useRef(false);
@@ -180,26 +181,33 @@ export function useTokenSelector({ value, onValueChange }: UseTokenSelectorOptio
 
 		function sortSection(section: MarketRow[]): MarketRow[] {
 			if (deferredSearch) return section;
-			if (sorting.length === 0) return section;
+			if (deferredSorting.length === 0) return section;
 
-			const { id, desc } = sorting[0];
+			const { id, desc } = deferredSorting[0];
 			return [...section].sort((a, b) => {
-				const cmp = Big(getSortValue(a, id)).cmp(Big(getSortValue(b, id)));
-				return desc ? -cmp : cmp;
+				const av = Number(getSortValue(a, id));
+				const bv = Number(getSortValue(b, id));
+				return desc ? bv - av : av - bv;
 			});
 		}
 
 		return [...sortSection(favoriteMarkets), ...sortSection(nonFavoriteMarkets)];
-	}, [filteredMarkets, isFavorite, sorting, deferredSearch]);
+	}, [filteredMarkets, isFavorite, deferredSorting, deferredSearch]);
+
+	function handleSort(columnId: string) {
+		setSorting((prev) => {
+			const current = prev[0];
+			if (current?.id === columnId) return [{ id: columnId, desc: !current.desc }];
+			return [{ id: columnId, desc: true }];
+		});
+	}
 
 	const table = useReactTable({
 		data: sortedMarkets,
 		columns: TOKEN_SELECTOR_COLUMNS,
 		getCoreRowModel: getCoreRowModel(),
 		manualSorting: true,
-		state: { sorting },
-		onSortingChange: setSorting,
-		enableSorting: true,
+		enableSorting: false,
 	});
 
 	const { rows } = table.getRowModel();
@@ -307,6 +315,7 @@ export function useTokenSelector({ value, onValueChange }: UseTokenSelectorOptio
 		isLoading: open && (isLoading || isPending),
 		isFavorite,
 		sorting,
+		handleSort,
 		handleSelect,
 		handleSubcategorySelect: setLocalSubcategory,
 		handleScopeSelect,
