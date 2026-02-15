@@ -412,9 +412,9 @@
 
   .terminal-scanlines::after {
     content: "";
-    position: fixed;
+    position: absolute;
     inset: 0;
-    z-index: 9999;
+    z-index: 40;
     pointer-events: none;
     background-image: repeating-linear-gradient(
       0deg,
