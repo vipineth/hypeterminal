@@ -1,24 +1,25 @@
 import type { CandleSnapshotResponse, CandleWsEvent } from "@nktkas/hyperliquid";
+import type { KLineData } from "klinecharts";
 import { toNumber } from "@/lib/trade/numbers";
 import type { Bar } from "@/types/charting_library";
 
-const CHART_NAME_SEPARATOR = "::";
-
-function parseDecimal(value: string | undefined): number {
-	const parsed = toNumber(value);
-	return parsed ?? Number.NaN;
+interface RawCandle {
+	t: number;
+	o: string;
+	h: string;
+	l: string;
+	c: string;
+	v: string;
 }
 
-export function candleSnapshotToBar(candle: CandleSnapshotResponse[number]): Bar | null {
-	const open = parseDecimal(candle.o);
-	const high = parseDecimal(candle.h);
-	const low = parseDecimal(candle.l);
-	const close = parseDecimal(candle.c);
-	const volume = parseDecimal(candle.v);
+function rawCandleToBar(candle: RawCandle): Bar | null {
+	const open = toNumber(candle.o);
+	const high = toNumber(candle.h);
+	const low = toNumber(candle.l);
+	const close = toNumber(candle.c);
+	const volume = toNumber(candle.v);
 
-	if (!Number.isFinite(open) || !Number.isFinite(high) || !Number.isFinite(low) || !Number.isFinite(close)) {
-		return null;
-	}
+	if (open == null || high == null || low == null || close == null) return null;
 
 	return {
 		time: candle.t,
@@ -26,29 +27,27 @@ export function candleSnapshotToBar(candle: CandleSnapshotResponse[number]): Bar
 		high,
 		low,
 		close,
-		volume: Number.isFinite(volume) ? volume : undefined,
+		volume: volume ?? undefined,
 	};
 }
 
-export function candleEventToBar(event: CandleWsEvent): Bar | null {
-	const open = parseDecimal(event.o);
-	const high = parseDecimal(event.h);
-	const low = parseDecimal(event.l);
-	const close = parseDecimal(event.c);
-	const volume = parseDecimal(event.v);
-
-	if (!Number.isFinite(open) || !Number.isFinite(high) || !Number.isFinite(low) || !Number.isFinite(close)) {
-		return null;
-	}
-
+function barToKLineData(bar: Bar): KLineData {
 	return {
-		time: event.t,
-		open,
-		high,
-		low,
-		close,
-		volume: Number.isFinite(volume) ? volume : undefined,
+		timestamp: bar.time,
+		open: bar.open,
+		high: bar.high,
+		low: bar.low,
+		close: bar.close,
+		volume: bar.volume ?? 0,
 	};
+}
+
+export function candleSnapshotToBar(candle: CandleSnapshotResponse[number]): Bar | null {
+	return rawCandleToBar(candle);
+}
+
+export function candleEventToBar(event: CandleWsEvent): Bar | null {
+	return rawCandleToBar(event);
 }
 
 export function filterAndSortBars(bars: (Bar | null)[], fromMs: number, toMs: number): Bar[] {
@@ -58,10 +57,26 @@ export function filterAndSortBars(bars: (Bar | null)[], fromMs: number, toMs: nu
 }
 
 export function createChartName(displayName: string, symbol: string): string {
-	return `${displayName}${CHART_NAME_SEPARATOR}${symbol}`;
+	return `${displayName}::${symbol}`;
 }
 
 export function parseChartName(chartName: string): { displayName: string; symbol: string } {
-	const [displayName, symbol] = chartName.split(CHART_NAME_SEPARATOR);
+	const [displayName, symbol] = chartName.split("::");
 	return { displayName: displayName ?? chartName, symbol: symbol ?? chartName };
+}
+
+export function candlesToKLineData(candles: CandleSnapshotResponse): KLineData[] {
+	const result: KLineData[] = [];
+	for (const c of candles) {
+		const bar = candleSnapshotToBar(c);
+		if (!bar) continue;
+		result.push(barToKLineData(bar));
+	}
+	return result.sort((a, b) => a.timestamp - b.timestamp);
+}
+
+export function candleEventToKLineData(event: CandleWsEvent): KLineData | null {
+	const bar = candleEventToBar(event);
+	if (!bar) return null;
+	return barToKLineData(bar);
 }

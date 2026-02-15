@@ -22,7 +22,7 @@ function getCssVar(name: string): string {
 	return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
-function colorToHex(cssColor: string): string {
+export function colorToHex(cssColor: string): string {
 	if (!cssColor || typeof document === "undefined") return "#000000";
 
 	const canvas = document.createElement("canvas");
@@ -38,7 +38,7 @@ function colorToHex(cssColor: string): string {
 	return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
 }
 
-function colorToRgba(cssColor: string, alpha: number): string {
+export function colorToRgba(cssColor: string, alpha: number): string {
 	if (!cssColor || typeof document === "undefined") return `rgba(0, 0, 0, ${alpha})`;
 
 	const canvas = document.createElement("canvas");
