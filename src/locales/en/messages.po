@@ -221,6 +221,7 @@ msgstr "Buy"
 #~ msgstr "Buy Long"
 
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/position-limit-close-modal.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/twap-tab.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
@@ -276,17 +277,17 @@ msgstr "Change leverage"
 msgid "Chart"
 msgstr "Chart"
 
-#: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/positions/position-actions-dropdown.tsx
 #: src/components/ui/dialog.tsx
 #: src/components/ui/sheet.tsx
 msgid "Close"
 msgstr "Close"
 
 #: src/components/trade/positions/positions-tab.tsx
-msgid "Close position"
-msgstr "Close position"
+#~ msgid "Close position"
+#~ msgstr "Close position"
 
-#: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/positions/position-actions-dropdown.tsx
 msgid "Closing..."
 msgstr "Closing..."
 
@@ -561,6 +562,7 @@ msgstr "Enter trigger price"
 msgid "Entry"
 msgstr "Entry"
 
+#: src/components/trade/positions/position-limit-close-modal.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 msgid "Entry Price"
 msgstr "Entry Price"
@@ -654,6 +656,10 @@ msgstr "Failed to load trades."
 #: src/components/pages/builder-page.tsx
 #~ msgid "Failed to register builder code"
 #~ msgstr "Failed to register builder code"
+
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Failed to reverse position"
+msgstr "Failed to reverse position"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Failed to switch margin mode"
@@ -816,6 +822,15 @@ msgstr "Leverage"
 msgid "Limit"
 msgstr "Limit"
 
+#: src/components/trade/positions/position-actions-dropdown.tsx
+msgid "Limit Close"
+msgstr "Limit Close"
+
+#: src/components/trade/positions/position-limit-close-modal.tsx
+msgid "Limit close order placed"
+msgstr "Limit close order placed"
+
+#: src/components/trade/positions/position-limit-close-modal.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Limit Price"
 msgstr "Limit Price"
@@ -888,6 +903,7 @@ msgstr "Loading wallet..."
 msgid "Loading..."
 msgstr "Loading..."
 
+#: src/components/trade/positions/position-limit-close-modal.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Long"
@@ -927,6 +943,7 @@ msgstr "Mark"
 msgid "MARK"
 msgstr "MARK"
 
+#: src/components/trade/positions/position-limit-close-modal.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 msgid "Mark Price"
 msgstr "Mark Price"
@@ -936,6 +953,10 @@ msgstr "Mark Price"
 #: src/components/trade/tradebox/trade-header.tsx
 msgid "Market"
 msgstr "Market"
+
+#: src/components/trade/positions/position-actions-dropdown.tsx
+msgid "Market Close"
+msgstr "Market Close"
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "Market metadata unavailable."
@@ -953,9 +974,9 @@ msgstr "Market Order Slippage"
 msgid "markets"
 msgstr "markets"
 
-#: src/components/trade/positions/transfer-dialog.tsx
-#~ msgid "Max"
-#~ msgstr "Max"
+#: src/components/trade/positions/position-limit-close-modal.tsx
+msgid "Max"
+msgstr "Max"
 
 #: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/positions/send-dialog.tsx
@@ -1266,6 +1287,10 @@ msgstr "Perps Account"
 #~ msgid "Perps: Max 0.1% (10 basis points)"
 #~ msgstr "Perps: Max 0.1% (10 basis points)"
 
+#: src/components/trade/positions/position-limit-close-modal.tsx
+msgid "Place Limit Close"
+msgstr "Place Limit Close"
+
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -1286,9 +1311,17 @@ msgstr "Portfolio"
 msgid "Position"
 msgstr "Position"
 
+#: src/components/trade/positions/position-actions-dropdown.tsx
+msgid "Position actions"
+msgstr "Position actions"
+
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Position closed"
 msgstr "Position closed"
+
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Position reversed"
+msgstr "Position reversed"
 
 #: src/components/ui/pagination.tsx
 #~ msgid "Previous"
@@ -1375,6 +1408,10 @@ msgstr "Remove from favorites"
 #: src/components/trade/tradebox/leverage-control.tsx
 msgid "Retry"
 msgstr "Retry"
+
+#: src/components/trade/positions/position-actions-dropdown.tsx
+msgid "Reverse"
+msgstr "Reverse"
 
 #: src/components/trade/tradebox/tp-sl-section.tsx
 msgid "Risk/Reward"
@@ -1514,6 +1551,7 @@ msgstr "Set to {p}%"
 msgid "Settings"
 msgstr "Settings"
 
+#: src/components/trade/positions/position-limit-close-modal.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Short"
@@ -1580,6 +1618,8 @@ msgstr "Signer not ready"
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/position-limit-close-modal.tsx
+#: src/components/trade/positions/position-limit-close-modal.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -1587,6 +1627,10 @@ msgstr "Signer not ready"
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Size"
 msgstr "Size"
+
+#: src/components/trade/positions/position-limit-close-modal.tsx
+msgid "Size exceeds position"
+msgstr "Size exceeds position"
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "SL"
@@ -1701,6 +1745,7 @@ msgstr "Stop trigger must be above mark"
 msgid "Stop trigger must be below mark"
 msgstr "Stop trigger must be below mark"
 
+#: src/components/trade/positions/position-limit-close-modal.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 msgid "Submitting..."
 msgstr "Submitting..."
@@ -1984,6 +2029,7 @@ msgstr "Unknown error"
 msgid "Unknown symbol: {symbolName}"
 msgstr "Unknown symbol: {symbolName}"
 
+#: src/components/trade/positions/position-limit-close-modal.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 msgid "Unrealized P&L"
 msgstr "Unrealized P&L"

@@ -8,8 +8,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { FALLBACK_VALUE_PLACEHOLDER, HL_ALL_DEXS } from "@/config/constants";
-import { getExecutedPrice } from "@/domain/trade/order/price";
-import { formatPriceForOrder, formatSizeForOrder } from "@/domain/trade/orders";
+import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
 import { useMarkets, useUserPositions } from "@/lib/hyperliquid";
@@ -23,7 +22,8 @@ import { useExchangeScope } from "@/providers/exchange-scope";
 import { useMarketOrderSlippageBps } from "@/stores/use-global-settings-store";
 import { useMarketActions } from "@/stores/use-market-store";
 import { AssetDisplay } from "../components/asset-display";
-import { TradingActionButton } from "../components/trading-action-button";
+import { PositionActionsDropdown } from "./position-actions-dropdown";
+import { PositionLimitCloseModal } from "./position-limit-close-modal";
 import { PositionTpSlModal } from "./position-tpsl-modal";
 
 interface PlaceholderProps {
@@ -67,6 +67,18 @@ interface TpSlOrderInfo {
 	slOrderId?: number;
 }
 
+interface LimitClosePositionData {
+	coin: string;
+	assetId: number;
+	isLong: boolean;
+	size: number;
+	entryPx: number;
+	markPx: number;
+	unrealizedPnl: number;
+	roe: number;
+	szDecimals: number;
+}
+
 interface PositionRowProps {
 	position: Position;
 	markets: Markets;
@@ -76,6 +88,8 @@ interface PositionRowProps {
 	isRowClosing: boolean;
 	isEven: boolean;
 	onClose: (assetId: number, size: number, markPx: number, szDecimals: number, isLong: boolean, coin: string) => void;
+	onLimitClose: (data: LimitClosePositionData) => void;
+	onReverse: (assetId: number, size: number, markPx: number, szDecimals: number, isLong: boolean, coin: string) => void;
 	onOpenTpSl: (data: TpSlPositionData) => void;
 	onSelectMarket: (coin: string) => void;
 }
@@ -89,6 +103,8 @@ function PositionRow({
 	isRowClosing,
 	isEven,
 	onClose,
+	onLimitClose,
+	onReverse,
 	onOpenTpSl,
 	onSelectMarket,
 }: PositionRowProps) {
@@ -101,17 +117,39 @@ function PositionRow({
 	const markPx = toBig(markPxRaw)?.toNumber() ?? Number.NaN;
 	const displayName = market?.pairName ?? p.coin;
 
+	const entryPx = toBig(p.entryPx)?.toNumber() ?? Number.NaN;
 	const unrealizedPnl = toBig(p.unrealizedPnl)?.toNumber() ?? Number.NaN;
+	const roe = toBig(p.returnOnEquity)?.toNumber() ?? Number.NaN;
 	const cumFunding = toBig(p.cumFunding.sinceOpen)?.toNumber() ?? Number.NaN;
 	const canClose = isPositive(absSize) && typeof assetId === "number" && isPositive(markPx);
 
-	const pnlClass = unrealizedPnl >= 0 ? "text-market-up-600" : "text-market-down-600";
+	const pnlClass = getValueColorClass(unrealizedPnl);
 	const fundingClass = getValueColorClass(cumFunding ? -cumFunding : null);
 	const hasTpSl = !!(tpSlInfo?.tpPrice || tpSlInfo?.slPrice);
 
 	function handleClose() {
 		if (!canClose || typeof assetId !== "number") return;
 		onClose(assetId, absSize, markPx, szDecimals, isLong, p.coin);
+	}
+
+	function handleLimitClose() {
+		if (!canClose || typeof assetId !== "number") return;
+		onLimitClose({
+			coin: p.coin,
+			assetId,
+			isLong,
+			size: absSize,
+			entryPx,
+			markPx,
+			unrealizedPnl,
+			roe,
+			szDecimals,
+		});
+	}
+
+	function handleReverse() {
+		if (!canClose || typeof assetId !== "number") return;
+		onReverse(assetId, absSize, markPx, szDecimals, isLong, p.coin);
 	}
 
 	function handleOpenTpSl() {
@@ -121,10 +159,10 @@ function PositionRow({
 			assetId,
 			isLong,
 			size: absSize,
-			entryPx: toBig(p.entryPx)?.toNumber() ?? Number.NaN,
+			entryPx,
 			markPx,
 			unrealizedPnl,
-			roe: toBig(p.returnOnEquity)?.toNumber() ?? Number.NaN,
+			roe,
 			szDecimals,
 			existingTpPrice: tpSlInfo?.tpPrice,
 			existingSlPrice: tpSlInfo?.slPrice,
@@ -234,15 +272,14 @@ function PositionRow({
 				</Tooltip>
 			</TableCell>
 			<TableCell className="text-right py-1.5">
-				<TradingActionButton
-					variant="text"
-					size="sm"
-					aria-label={t`Close position`}
-					onClick={handleClose}
-					disabled={!canClose || isClosing}
-				>
-					{isRowClosing ? t`Closing...` : t`Close`}
-				</TradingActionButton>
+				<PositionActionsDropdown
+					canClose={canClose}
+					isClosing={isClosing}
+					isRowClosing={isRowClosing}
+					onMarketClose={handleClose}
+					onLimitClose={handleLimitClose}
+					onReverse={handleReverse}
+				/>
 			</TableCell>
 		</TableRow>
 	);
@@ -256,6 +293,8 @@ export function PositionsTab() {
 	const { setSelectedMarket } = useMarketActions();
 	const [tpSlModalOpen, setTpSlModalOpen] = useState(false);
 	const [selectedTpSlPosition, setSelectedTpSlPosition] = useState<TpSlPositionData | null>(null);
+	const [limitCloseModalOpen, setLimitCloseModalOpen] = useState(false);
+	const [selectedLimitClosePosition, setSelectedLimitClosePosition] = useState<LimitClosePositionData | null>(null);
 
 	const { mutate: placeOrder, isPending: isClosing, error: closeError, reset: resetCloseError } = useExchangeOrder();
 
@@ -309,23 +348,18 @@ export function PositionsTab() {
 		resetCloseError();
 		closingKeyRef.current = `${assetId}`;
 
-		const side = isLong ? "sell" : "buy";
-		const orderPrice = getExecutedPrice("market", side, markPx, slippageBps, markPx);
+		const { orders, grouping } = buildOrderPlan({
+			kind: "marketClose",
+			assetId,
+			size,
+			szDecimals,
+			isLong,
+			markPx,
+			slippageBps,
+		});
 
 		placeOrder(
-			{
-				orders: [
-					{
-						a: assetId,
-						b: side === "buy",
-						p: formatPriceForOrder(orderPrice),
-						s: formatSizeForOrder(size, szDecimals),
-						r: true,
-						t: { limit: { tif: "FrontendMarket" as const } },
-					},
-				],
-				grouping: "na",
-			},
+			{ orders, grouping },
 			{
 				onSuccess: () => {
 					toast.success(t`Position closed` + (coin ? ` — ${coin}` : ""));
@@ -338,6 +372,50 @@ export function PositionsTab() {
 				},
 			},
 		);
+	}
+
+	function handleReverse(
+		assetId: number,
+		size: number,
+		markPx: number,
+		szDecimals: number,
+		isLong: boolean,
+		coin: string,
+	) {
+		if (isClosing) return;
+
+		resetCloseError();
+		closingKeyRef.current = `${assetId}`;
+
+		const { orders, grouping } = buildOrderPlan({
+			kind: "reverse",
+			assetId,
+			size,
+			szDecimals,
+			isLong,
+			markPx,
+			slippageBps,
+		});
+
+		placeOrder(
+			{ orders, grouping },
+			{
+				onSuccess: () => {
+					toast.success(t`Position reversed` + (coin ? ` — ${coin}` : ""));
+				},
+				onError: (error) => {
+					toast.error(error.message || t`Failed to reverse position`);
+				},
+				onSettled: () => {
+					closingKeyRef.current = null;
+				},
+			},
+		);
+	}
+
+	function handleOpenLimitCloseModal(data: LimitClosePositionData) {
+		setSelectedLimitClosePosition(data);
+		setLimitCloseModalOpen(true);
 	}
 
 	function handleOpenTpSlModal(data: TpSlPositionData) {
@@ -417,6 +495,8 @@ export function PositionsTab() {
 										isRowClosing={isClosing && closingKeyRef.current === `${markets.getAssetId(p.coin)}`}
 										isEven={i % 2 === 1}
 										onClose={handleClosePosition}
+										onLimitClose={handleOpenLimitCloseModal}
+										onReverse={handleReverse}
 										onOpenTpSl={handleOpenTpSlModal}
 										onSelectMarket={(name) => setSelectedMarket(scope, name)}
 									/>
@@ -429,6 +509,11 @@ export function PositionsTab() {
 			</div>
 
 			<PositionTpSlModal open={tpSlModalOpen} onOpenChange={setTpSlModalOpen} position={selectedTpSlPosition} />
+			<PositionLimitCloseModal
+				open={limitCloseModalOpen}
+				onOpenChange={setLimitCloseModalOpen}
+				position={selectedLimitClosePosition}
+			/>
 		</div>
 	);
 }

@@ -221,6 +221,7 @@ msgstr "Comprar"
 #~ msgstr "Comprar largo"
 
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/position-limit-close-modal.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/twap-tab.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
@@ -276,17 +277,17 @@ msgstr ""
 msgid "Chart"
 msgstr "Gráfico"
 
-#: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/positions/position-actions-dropdown.tsx
 #: src/components/ui/dialog.tsx
 #: src/components/ui/sheet.tsx
 msgid "Close"
 msgstr "Cerrar"
 
 #: src/components/trade/positions/positions-tab.tsx
-msgid "Close position"
-msgstr "Cerrar posición"
+#~ msgid "Close position"
+#~ msgstr "Cerrar posición"
 
-#: src/components/trade/positions/positions-tab.tsx
+#: src/components/trade/positions/position-actions-dropdown.tsx
 msgid "Closing..."
 msgstr "Cerrando..."
 
@@ -561,6 +562,7 @@ msgstr ""
 msgid "Entry"
 msgstr "Entrada"
 
+#: src/components/trade/positions/position-limit-close-modal.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 msgid "Entry Price"
 msgstr ""
@@ -654,6 +656,10 @@ msgstr "Error al cargar operaciones."
 #: src/components/pages/builder-page.tsx
 #~ msgid "Failed to register builder code"
 #~ msgstr ""
+
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Failed to reverse position"
+msgstr ""
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Failed to switch margin mode"
@@ -812,6 +818,15 @@ msgstr ""
 msgid "Limit"
 msgstr "Límite"
 
+#: src/components/trade/positions/position-actions-dropdown.tsx
+msgid "Limit Close"
+msgstr ""
+
+#: src/components/trade/positions/position-limit-close-modal.tsx
+msgid "Limit close order placed"
+msgstr ""
+
+#: src/components/trade/positions/position-limit-close-modal.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Limit Price"
 msgstr "Precio límite"
@@ -884,6 +899,7 @@ msgstr "Cargando billetera..."
 msgid "Loading..."
 msgstr "Cargando..."
 
+#: src/components/trade/positions/position-limit-close-modal.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Long"
@@ -923,6 +939,7 @@ msgstr "Marca"
 msgid "MARK"
 msgstr "MARCA"
 
+#: src/components/trade/positions/position-limit-close-modal.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 msgid "Mark Price"
 msgstr ""
@@ -932,6 +949,10 @@ msgstr ""
 #: src/components/trade/tradebox/trade-header.tsx
 msgid "Market"
 msgstr "Mercado"
+
+#: src/components/trade/positions/position-actions-dropdown.tsx
+msgid "Market Close"
+msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "Market metadata unavailable."
@@ -949,9 +970,9 @@ msgstr "Deslizamiento de orden de mercado"
 msgid "markets"
 msgstr "mercados"
 
-#: src/components/trade/positions/transfer-dialog.tsx
-#~ msgid "Max"
-#~ msgstr "Máx"
+#: src/components/trade/positions/position-limit-close-modal.tsx
+msgid "Max"
+msgstr "Máx"
 
 #: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/positions/send-dialog.tsx
@@ -1262,6 +1283,10 @@ msgstr ""
 #~ msgid "Perps: Max 0.1% (10 basis points)"
 #~ msgstr ""
 
+#: src/components/trade/positions/position-limit-close-modal.tsx
+msgid "Place Limit Close"
+msgstr ""
+
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -1282,8 +1307,16 @@ msgstr "Portafolio"
 msgid "Position"
 msgstr "Posición"
 
+#: src/components/trade/positions/position-actions-dropdown.tsx
+msgid "Position actions"
+msgstr ""
+
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Position closed"
+msgstr ""
+
+#: src/components/trade/positions/positions-tab.tsx
+msgid "Position reversed"
 msgstr ""
 
 #: src/components/ui/pagination.tsx
@@ -1370,6 +1403,10 @@ msgstr "Quitar de favoritos"
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/leverage-control.tsx
 msgid "Retry"
+msgstr ""
+
+#: src/components/trade/positions/position-actions-dropdown.tsx
+msgid "Reverse"
 msgstr ""
 
 #: src/components/trade/tradebox/tp-sl-section.tsx
@@ -1510,6 +1547,7 @@ msgstr ""
 msgid "Settings"
 msgstr "Configuración"
 
+#: src/components/trade/positions/position-limit-close-modal.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Short"
@@ -1576,6 +1614,8 @@ msgstr "Firmante no listo"
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/orders-history-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
+#: src/components/trade/positions/position-limit-close-modal.tsx
+#: src/components/trade/positions/position-limit-close-modal.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/positions/twap-tab.tsx
@@ -1583,6 +1623,10 @@ msgstr "Firmante no listo"
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Size"
 msgstr "Tamaño"
+
+#: src/components/trade/positions/position-limit-close-modal.tsx
+msgid "Size exceeds position"
+msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "SL"
@@ -1697,6 +1741,7 @@ msgstr ""
 msgid "Stop trigger must be below mark"
 msgstr ""
 
+#: src/components/trade/positions/position-limit-close-modal.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 msgid "Submitting..."
 msgstr ""
@@ -1976,6 +2021,7 @@ msgstr ""
 msgid "Unknown symbol: {symbolName}"
 msgstr "Símbolo desconocido: {symbolName}"
 
+#: src/components/trade/positions/position-limit-close-modal.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 msgid "Unrealized P&L"
 msgstr ""

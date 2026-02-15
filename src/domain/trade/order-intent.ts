@@ -1,4 +1,6 @@
-import { buildOrders, formatPriceForOrder } from "@/domain/trade/orders";
+import Big from "big.js";
+import { getExecutedPrice } from "@/domain/trade/order/price";
+import { buildOrders, formatPriceForOrder, formatSizeForOrder } from "@/domain/trade/orders";
 import { isPositive } from "@/lib/trade/numbers";
 import {
 	type ExchangeOrder,
@@ -49,7 +51,36 @@ export type PositionTpSlIntent = {
 	slPriceNum: number | null;
 };
 
-export type OrderIntent = EntryOrderIntent | PositionTpSlIntent;
+export type MarketCloseIntent = {
+	kind: "marketClose";
+	assetId: number;
+	size: number;
+	szDecimals: number;
+	isLong: boolean;
+	markPx: number;
+	slippageBps: number;
+};
+
+export type LimitCloseIntent = {
+	kind: "limitClose";
+	assetId: number;
+	size: number;
+	szDecimals: number;
+	isLong: boolean;
+	price: number;
+};
+
+export type ReverseIntent = {
+	kind: "reverse";
+	assetId: number;
+	size: number;
+	szDecimals: number;
+	isLong: boolean;
+	markPx: number;
+	slippageBps: number;
+};
+
+export type OrderIntent = EntryOrderIntent | PositionTpSlIntent | MarketCloseIntent | LimitCloseIntent | ReverseIntent;
 
 export function buildOrderPlan(intent: OrderIntent): OrderPlan {
 	switch (intent.kind) {
@@ -57,9 +88,19 @@ export function buildOrderPlan(intent: OrderIntent): OrderPlan {
 			return buildEntryPlan(intent);
 		case "positionTpsl":
 			return buildPositionTpSlPlan(intent);
+		case "marketClose":
+			return buildMarketClosePlan(intent);
+		case "limitClose":
+			return buildLimitClosePlan(intent);
+		case "reverse":
+			return buildReversePlan(intent);
 		default:
 			return assertNever(intent);
 	}
+}
+
+function getCloseSide(isLong: boolean): Side {
+	return isLong ? "sell" : "buy";
 }
 
 function buildEntryPlan(intent: EntryOrderIntent): OrderPlan {
@@ -109,6 +150,75 @@ function buildPositionTpSlPlan(intent: PositionTpSlIntent): OrderPlan {
 		orders,
 		grouping: "positionTpsl",
 		errors: orders.length === 0 ? ["No TP/SL provided"] : [],
+		warnings: [],
+	};
+}
+
+function buildMarketClosePlan({
+	assetId,
+	size,
+	szDecimals,
+	isLong,
+	markPx,
+	slippageBps,
+}: MarketCloseIntent): OrderPlan {
+	const side = getCloseSide(isLong);
+	const orderPrice = getExecutedPrice("market", side, markPx, slippageBps, markPx);
+
+	return {
+		orders: [
+			{
+				a: assetId,
+				b: side === "buy",
+				p: formatPriceForOrder(orderPrice),
+				s: formatSizeForOrder(size, szDecimals),
+				r: true,
+				t: { limit: { tif: "FrontendMarket" } },
+			},
+		],
+		grouping: "na",
+		errors: [],
+		warnings: [],
+	};
+}
+
+function buildLimitClosePlan({ assetId, size, szDecimals, isLong, price }: LimitCloseIntent): OrderPlan {
+	const side = getCloseSide(isLong);
+
+	return {
+		orders: [
+			{
+				a: assetId,
+				b: side === "buy",
+				p: formatPriceForOrder(price),
+				s: formatSizeForOrder(size, szDecimals),
+				r: true,
+				t: { limit: { tif: "Gtc" } },
+			},
+		],
+		grouping: "na",
+		errors: [],
+		warnings: [],
+	};
+}
+
+function buildReversePlan({ assetId, size, szDecimals, isLong, markPx, slippageBps }: ReverseIntent): OrderPlan {
+	const side = getCloseSide(isLong);
+	const orderPrice = getExecutedPrice("market", side, markPx, slippageBps, markPx);
+
+	return {
+		orders: [
+			{
+				a: assetId,
+				b: side === "buy",
+				p: formatPriceForOrder(orderPrice),
+				s: formatSizeForOrder(Big(size).times(2).toNumber(), szDecimals),
+				r: false,
+				t: { limit: { tif: "FrontendMarket" } },
+			},
+		],
+		grouping: "na",
+		errors: [],
 		warnings: [],
 	};
 }
