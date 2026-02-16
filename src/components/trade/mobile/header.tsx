@@ -1,8 +1,9 @@
-import { BellIcon, GearIcon, TerminalIcon } from "@phosphor-icons/react";
+import { GearIcon, QrCodeIcon, TerminalIcon } from "@phosphor-icons/react";
+import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { UI_TEXT } from "@/config/constants";
 import { cn } from "@/lib/cn";
-import { useSettingsDialogActions } from "@/stores/use-global-modal-store";
+import { useScanQrModalActions, useSettingsDialogActions } from "@/stores/use-global-modal-store";
 import { ThemeToggle } from "../header/theme-toggle";
 import { UserMenu } from "../header/user-menu";
 
@@ -14,6 +15,8 @@ interface Props {
 
 export function MobileHeader({ className }: Props) {
 	const { open: openSettingsDialog } = useSettingsDialogActions();
+	const { open: openScanQr } = useScanQrModalActions();
+	const { isConnected } = useConnection();
 
 	return (
 		<header
@@ -24,32 +27,29 @@ export function MobileHeader({ className }: Props) {
 				className,
 			)}
 		>
-			<div className="h-14 px-4 flex items-center justify-between">
-				<div className="flex items-center gap-1.5">
-					<div className="size-6 rounded bg-market-up-100 border border-market-up-600/40 flex items-center justify-center">
-						<TerminalIcon className="size-3.5 text-market-up-600" />
-					</div>
-					<span className="hidden sm:inline text-xs font-semibold tracking-tight text-primary-default">
-						{TOP_NAV_TEXT.BRAND_PREFIX}
-						<span className="text-text-950">{TOP_NAV_TEXT.BRAND_SUFFIX}</span>
-					</span>
+			<div className="h-12 px-3 flex items-center justify-between">
+				<div className="size-6 rounded bg-market-up-100 border border-market-up-600/40 flex items-center justify-center">
+					<TerminalIcon className="size-3.5 text-market-up-600" />
 				</div>
 
-				<div className="flex items-center gap-1">
+				<div className="flex items-center gap-0.5">
 					<UserMenu />
-					<Button
-						variant="text"
-						size="md"
-						className="size-11 active:bg-surface-analysis/50"
-						aria-label={TOP_NAV_TEXT.NOTIFICATIONS_ARIA}
-					>
-						<BellIcon className="size-4" />
-					</Button>
+					{!isConnected && (
+						<Button
+							variant="text"
+							size="sm"
+							className="size-8 text-text-600 active:bg-surface-analysis/50"
+							aria-label="Scan QR to connect"
+							onClick={openScanQr}
+						>
+							<QrCodeIcon className="size-4" />
+						</Button>
+					)}
 					<ThemeToggle />
 					<Button
 						variant="text"
-						size="md"
-						className="size-11 active:bg-surface-analysis/50"
+						size="sm"
+						className="size-8 text-text-600 active:bg-surface-analysis/50"
 						aria-label={TOP_NAV_TEXT.SETTINGS_ARIA}
 						onClick={openSettingsDialog}
 					>

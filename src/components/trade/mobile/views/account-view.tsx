@@ -1,7 +1,9 @@
 import {
 	ArrowSquareOutIcon,
 	CopyIcon,
+	DeviceMobileIcon,
 	LightningIcon,
+	QrCodeIcon,
 	SignOutIcon,
 	WalletIcon,
 	WarningCircleIcon,
@@ -20,7 +22,11 @@ import { useWalletConnect } from "@/hooks/use-wallet-connect";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatToken, formatUSD, shortenAddress } from "@/lib/format";
 import { getValueColorClass, toNumberOrZero } from "@/lib/trade/numbers";
-import { useDepositModalActions } from "@/stores/use-global-modal-store";
+import {
+	useDepositModalActions,
+	useLinkDeviceModalActions,
+	useScanQrModalActions,
+} from "@/stores/use-global-modal-store";
 
 const ACCOUNT_TEXT = UI_TEXT.ACCOUNT_PANEL;
 
@@ -44,6 +50,8 @@ export function MobileAccountView({ className }: Props) {
 	const [activeTab, setActiveTab] = useState("perps");
 	const { copied, copy } = useCopyToClipboard();
 	const { open: openDepositModal } = useDepositModalActions();
+	const { open: openLinkDevice } = useLinkDeviceModalActions();
+	const { open: openScanQr } = useScanQrModalActions();
 
 	function handleCopyAddress() {
 		if (!address) return;
@@ -209,19 +217,35 @@ export function MobileAccountView({ className }: Props) {
 							Connect your wallet to view your account, positions, and start trading.
 						</p>
 					</div>
-					<Button
-						variant="text"
-						size="none"
-						onClick={openWalletConnect}
-						className={cn(
-							"px-6 py-3 text-base font-semibold rounded-xs",
-							"bg-primary-default/20 border border-primary-default text-primary-default",
-							"hover:bg-primary-default/30 transition-colors",
-							"min-h-[48px]",
-						)}
-					>
-						Connect Wallet
-					</Button>
+					<div className="flex flex-col gap-3">
+						<Button
+							variant="text"
+							size="none"
+							onClick={openWalletConnect}
+							className={cn(
+								"px-6 py-3 text-base font-semibold rounded-xs",
+								"bg-primary-default/20 border border-primary-default text-primary-default",
+								"hover:bg-primary-default/30 transition-colors",
+								"min-h-[48px]",
+							)}
+						>
+							Connect Wallet
+						</Button>
+						<Button
+							variant="text"
+							size="none"
+							onClick={openScanQr}
+							className={cn(
+								"px-6 py-3 text-sm font-semibold rounded-xs",
+								"bg-surface-analysis border border-border-200/60 text-text-950",
+								"hover:bg-surface-analysis transition-colors",
+								"min-h-[48px] flex items-center justify-center gap-2",
+							)}
+						>
+							<QrCodeIcon className="size-5" />
+							Scan QR to Connect
+						</Button>
+					</div>
 				</div>
 			</div>
 		);
@@ -370,6 +394,22 @@ export function MobileAccountView({ className }: Props) {
 							{ACCOUNT_TEXT.WITHDRAW_LABEL}
 						</Button>
 					</div>
+
+					<Button
+						variant="text"
+						size="none"
+						onClick={openLinkDevice}
+						className={cn(
+							"w-full py-4 text-sm font-semibold rounded-xs",
+							"bg-surface-analysis border border-border-200/60 text-text-950",
+							"hover:bg-surface-analysis transition-colors",
+							"flex items-center justify-center gap-2",
+							"min-h-[48px]",
+						)}
+					>
+						<DeviceMobileIcon className="size-5" />
+						Link Mobile Device
+					</Button>
 
 					{hasError && (
 						<div className="flex items-center gap-2 px-3 py-2 rounded-xs bg-error-100 border border-error-700/20">

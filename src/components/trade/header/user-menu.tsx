@@ -66,9 +66,8 @@ export function UserMenu() {
 
 	if (!isConnected) {
 		return (
-			<Button size="md" variant="outlined" onClick={connect}>
+			<Button size="md" className="px-2" variant="text" onClick={connect}>
 				<WalletIcon className="size-4" />
-				<Trans>Connect Wallet</Trans>
 			</Button>
 		);
 	}

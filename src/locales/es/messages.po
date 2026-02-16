@@ -329,7 +329,6 @@ msgstr "Confirmar en billetera"
 #~ msgid "Connect a wallet to manage positions."
 #~ msgstr "Conecta una billetera para gestionar posiciones."
 
-#: src/components/trade/header/user-menu.tsx
 #: src/lib/trade/use-button-content.ts
 msgid "Connect Wallet"
 msgstr "Conectar billetera"
@@ -837,6 +836,10 @@ msgstr "Precio límite"
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "limit ro"
 #~ msgstr "límite sr"
+
+#: src/components/trade/header/top-nav.tsx
+msgid "Link mobile device"
+msgstr ""
 
 #: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/positions-tab.tsx

@@ -329,7 +329,6 @@ msgstr "Confirmer dans le portefeuille"
 #~ msgid "Connect a wallet to manage positions."
 #~ msgstr "Connectez un portefeuille pour gérer les positions."
 
-#: src/components/trade/header/user-menu.tsx
 #: src/lib/trade/use-button-content.ts
 msgid "Connect Wallet"
 msgstr "Connecter le portefeuille"
@@ -837,6 +836,10 @@ msgstr "Prix limite"
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "limit ro"
 #~ msgstr "limite réd. seul."
+
+#: src/components/trade/header/top-nav.tsx
+msgid "Link mobile device"
+msgstr ""
 
 #: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/positions-tab.tsx

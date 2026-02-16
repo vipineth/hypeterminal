@@ -1,12 +1,16 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { DownloadSimpleIcon, GearIcon, TerminalIcon } from "@phosphor-icons/react";
+import { DeviceMobileIcon, DownloadSimpleIcon, GearIcon, TerminalIcon } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { useExchangeScope } from "@/providers/exchange-scope";
-import { useDepositModalActions, useSettingsDialogActions } from "@/stores/use-global-modal-store";
+import {
+	useDepositModalActions,
+	useLinkDeviceModalActions,
+	useSettingsDialogActions,
+} from "@/stores/use-global-modal-store";
 import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
 
@@ -45,6 +49,7 @@ function getScopeAccentClass(scope: string): string {
 export function TopNav() {
 	const { open: openDepositModal } = useDepositModalActions();
 	const { open: openSettingsDialog } = useSettingsDialogActions();
+	const { open: openLinkDevice } = useLinkDeviceModalActions();
 	const { isConnected } = useConnection();
 	const { scope } = useExchangeScope();
 
@@ -101,7 +106,7 @@ export function TopNav() {
 					<Button
 						variant="outlined"
 						onClick={() => openDepositModal("deposit")}
-						className="h-5 px-1.5 text-2xs md:h-6 md:px-2 md:text-xs font-medium rounded-xs bg-fill-100 border border-border-300 text-text-950 hover:border-border-500 transition-colors inline-flex items-center gap-1 shadow-xs"
+						className="px-1.5 text-2xs md:px-2 md:text-xs font-medium rounded-xs bg-fill-100 border border-border-300 text-text-950 hover:border-border-500 transition-colors inline-flex items-center gap-1 shadow-xs"
 					>
 						<DownloadSimpleIcon className="size-3.5 md:size-4" />
 						<Trans>Deposit</Trans>
@@ -109,6 +114,16 @@ export function TopNav() {
 				)}
 				<UserMenu />
 				<div className="flex items-center gap-0.5 md:gap-1">
+					{isConnected && (
+						<button
+							type="button"
+							className="size-6 md:size-7 inline-flex items-center justify-center rounded-xs text-text-600 hover:text-primary-default transition-colors duration-150"
+							onClick={openLinkDevice}
+							aria-label={t`Link mobile device`}
+						>
+							<DeviceMobileIcon className="size-3.5 md:size-4" />
+						</button>
+					)}
 					<ThemeToggle />
 					<button
 						type="button"

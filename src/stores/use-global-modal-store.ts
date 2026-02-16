@@ -8,6 +8,8 @@ type GlobalModal =
 	| { type: "settings" }
 	| { type: "swap"; fromToken: string; toToken?: string }
 	| { type: "commandMenu" }
+	| { type: "linkDevice" }
+	| { type: "scanQr" }
 	| null;
 
 interface DepositActions {
@@ -31,12 +33,24 @@ interface CommandMenuActions {
 	close: () => void;
 }
 
+interface LinkDeviceActions {
+	open: () => void;
+	close: () => void;
+}
+
+interface ScanQrActions {
+	open: () => void;
+	close: () => void;
+}
+
 interface GlobalModalState {
 	modal: GlobalModal;
 	depositActions: DepositActions;
 	settingsActions: SettingsActions;
 	swapActions: SwapActions;
 	commandMenuActions: CommandMenuActions;
+	linkDeviceActions: LinkDeviceActions;
+	scanQrActions: ScanQrActions;
 }
 
 const useGlobalModalStore = create<GlobalModalState>((set) => {
@@ -61,6 +75,14 @@ const useGlobalModalStore = create<GlobalModalState>((set) => {
 			open: () => set({ modal: { type: "commandMenu" } }),
 			close,
 		},
+		linkDeviceActions: {
+			open: () => set({ modal: { type: "linkDevice" } }),
+			close,
+		},
+		scanQrActions: {
+			open: () => set({ modal: { type: "scanQr" } }),
+			close,
+		},
 	};
 });
 
@@ -81,3 +103,9 @@ export const useSwapModalActions = () => useGlobalModalStore((s) => s.swapAction
 
 export const useCommandMenuOpen = () => useGlobalModalStore((s) => s.modal?.type === "commandMenu");
 export const useCommandMenuActions = () => useGlobalModalStore((s) => s.commandMenuActions);
+
+export const useLinkDeviceModalOpen = () => useGlobalModalStore((s) => s.modal?.type === "linkDevice");
+export const useLinkDeviceModalActions = () => useGlobalModalStore((s) => s.linkDeviceActions);
+
+export const useScanQrModalOpen = () => useGlobalModalStore((s) => s.modal?.type === "scanQr");
+export const useScanQrModalActions = () => useGlobalModalStore((s) => s.scanQrActions);

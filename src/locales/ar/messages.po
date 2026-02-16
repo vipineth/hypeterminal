@@ -329,7 +329,6 @@ msgstr "تأكيد في المحفظة"
 #~ msgid "Connect a wallet to manage positions."
 #~ msgstr "قم بتوصيل المحفظة لإدارة المراكز."
 
-#: src/components/trade/header/user-menu.tsx
 #: src/lib/trade/use-button-content.ts
 msgid "Connect Wallet"
 msgstr "ربط المحفظة"
@@ -837,6 +836,10 @@ msgstr "السعر المحدد"
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "limit ro"
 #~ msgstr "محدد تقليل فقط"
+
+#: src/components/trade/header/top-nav.tsx
+msgid "Link mobile device"
+msgstr ""
 
 #: src/components/trade/positions/mobile-position-card.tsx
 #: src/components/trade/positions/positions-tab.tsx
