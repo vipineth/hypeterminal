@@ -33,6 +33,13 @@ function formatTime(date: Date): string {
 	return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
 }
 
+function formatTooltipDate(date: Date): string {
+	const m = date.getMonth() + 1;
+	const d = date.getDate();
+	const y = String(date.getFullYear()).slice(2);
+	return `${m}/${d}/${y} ${formatTime(date)}`;
+}
+
 interface Props {
 	symbol?: string;
 	theme?: "light" | "dark";
@@ -59,7 +66,7 @@ export function KlineChart({ symbol = "", theme = "dark" }: Props) {
 						if (date.getHours() === 0 && date.getMinutes() === 0) return formatShortDate(date);
 						return formatTime(date);
 					}
-					return `${formatShortDate(date)} ${formatTime(date)}`;
+					return formatTooltipDate(date);
 				},
 			},
 		});

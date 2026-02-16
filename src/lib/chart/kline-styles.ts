@@ -6,6 +6,7 @@ export function buildKlineStyles(candleType: CandleType): DeepPartial<Styles> {
 	const colors = getChartColors();
 
 	const textSecondary = colorToHex(colors.textSecondary);
+	const textTertiary = colorToHex(colors.textTertiary);
 	const green = colorToHex(colors.green);
 	const red = colorToHex(colors.red);
 	const accent = colorToHex(colors.accent);
@@ -93,6 +94,14 @@ export function buildKlineStyles(candleType: CandleType): DeepPartial<Styles> {
 			tooltip: {
 				showRule: TooltipShowRule.Always,
 				showType: TooltipShowType.Standard,
+				custom: [
+					{ title: { text: "T ", color: textTertiary }, value: "{time}" },
+					{ title: { text: "O ", color: textTertiary }, value: "{open}" },
+					{ title: { text: "H ", color: textTertiary }, value: "{high}" },
+					{ title: { text: "L ", color: textTertiary }, value: "{low}" },
+					{ title: { text: "C ", color: textTertiary }, value: "{close}" },
+					{ title: { text: "V ", color: textTertiary }, value: "{volume}" },
+				],
 				text: tooltipText,
 			},
 		},
