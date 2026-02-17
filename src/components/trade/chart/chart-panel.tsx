@@ -1,6 +1,8 @@
 import { ClientOnly } from "@tanstack/react-router";
 import { Suspense, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useIntentScriptLoader } from "@/hooks/ui/use-intent-script-loader";
+import { TRADINGVIEW_SCRIPT_SRC } from "@/lib/chart/load-tradingview";
 import { cn } from "@/lib/cn";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { createLazyComponent } from "@/lib/lazy";
@@ -17,6 +19,11 @@ export function ChartPanel() {
 	const { data: selectedMarket } = useSelectedMarketInfo();
 	const [chartType, setChartType] = useState<ChartType>("default");
 	const chartTheme = theme === "dark" ? "dark" : "light";
+	const { intentHandlers: tradingViewIntentHandlers } = useIntentScriptLoader({
+		src: TRADINGVIEW_SCRIPT_SRC,
+		isReady: () => typeof window !== "undefined" && Boolean(window.TradingView),
+		onIntent: () => TradingViewChart.preload?.(),
+	});
 
 	return (
 		<div className="h-full flex flex-col overflow-hidden">
@@ -37,8 +44,7 @@ export function ChartPanel() {
 						<button
 							type="button"
 							onClick={() => setChartType("tradingview")}
-							onMouseEnter={() => TradingViewChart.preload()}
-							onFocus={() => TradingViewChart.preload()}
+							{...tradingViewIntentHandlers}
 							className={cn(
 								"px-1.5 py-0.5 rounded-xs transition-colors",
 								chartType === "tradingview" ? "text-text-950 font-semibold" : "text-text-500 hover:text-text-950",

@@ -12,6 +12,7 @@ interface Props {
 	orderValue: number;
 	marginRequired: number;
 	estimatedFee: number;
+	feeRatePercent: string;
 	slippagePercent: number;
 	szDecimals: number | undefined;
 	onSlippageClick: () => void;
@@ -24,6 +25,7 @@ export function OrderSummary({
 	orderValue,
 	marginRequired,
 	estimatedFee,
+	feeRatePercent,
 	slippagePercent,
 	szDecimals,
 	onSlippageClick,
@@ -67,7 +69,7 @@ export function OrderSummary({
 			/>
 			<InfoRow
 				label={t`Est. Fee`}
-				value={estimatedFee > 0 ? formatUSD(estimatedFee) : FALLBACK_VALUE_PLACEHOLDER}
+				value={orderValue > 0 ? `${feeRatePercent} (${formatUSD(estimatedFee)})` : feeRatePercent}
 				valueClassName="text-text-600"
 			/>
 			{DEFAULT_BUILDER_CONFIG?.f && (

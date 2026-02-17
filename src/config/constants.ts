@@ -23,6 +23,8 @@ export const HL_ALL_DEXS = "ALL_DEXS" as const;
 export const ORDER_MIN_NOTIONAL_USD = 10;
 export const ORDER_FEE_RATE_TAKER = 0.00045;
 export const ORDER_FEE_RATE_MAKER = 0.00015;
+export const ORDER_FEE_RATE_SPOT_TAKER = 0.0007;
+export const ORDER_FEE_RATE_SPOT_MAKER = 0.0004;
 export const ORDER_SIZE_PERCENT_STEPS = [25, 50, 75, 100] as const;
 export const ORDER_LEVERAGE_STEPS = [1, 2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 125, 150, 200] as const;
 

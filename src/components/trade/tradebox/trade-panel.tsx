@@ -10,6 +10,7 @@ import { getLiquidationInfo, getOrderMetrics } from "@/domain/trade/order/metric
 import { getOrderPrice } from "@/domain/trade/order/price";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
+import { useFeeRates } from "@/hooks/trade/use-fee-rates";
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import { cn } from "@/lib/cn";
 import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo, useUserPositions } from "@/lib/hyperliquid";
@@ -22,6 +23,7 @@ import {
 	isScaleOrderType,
 	isStopOrderType,
 	isTakeProfitOrderType,
+	isTakerOrderType,
 	isTriggerOrderType,
 	isTwapOrderType,
 	usesLimitPrice as usesLimitPriceForOrder,
@@ -106,6 +108,7 @@ export function TradePanel() {
 		switchModeError,
 	} = useOrderEntryData({ market, side, markPx, sizeMode, sizeInput });
 
+	const { takerRate, makerRate } = useFeeRates(market?.kind);
 	const { addOrder, updateOrder } = useOrderQueueActions();
 	const selectedPrice = useSelectedPrice();
 	const orderType = useOrderType();
@@ -182,9 +185,12 @@ export function TradePanel() {
 		scaleEndPriceInput,
 	);
 
+	const feeRate = isTakerOrderType(orderType) ? takerRate : makerRate;
+	const feeRatePercent = `${(feeRate * 100).toFixed(4)}%`;
+
 	const { marginRequired, estimatedFee } = useMemo(
-		() => getOrderMetrics({ sizeValue, price, leverage, orderType }),
-		[leverage, orderType, price, sizeValue],
+		() => getOrderMetrics({ sizeValue, price, leverage, feeRate }),
+		[leverage, feeRate, price, sizeValue],
 	);
 
 	const { liqPrice, liqWarning } = useMemo(
@@ -505,6 +511,7 @@ export function TradePanel() {
 					orderValue={orderValue}
 					marginRequired={marginRequired}
 					estimatedFee={estimatedFee}
+					feeRatePercent={feeRatePercent}
 					slippagePercent={slippagePercent}
 					szDecimals={market?.szDecimals}
 					onSlippageClick={openSettingsDialog}

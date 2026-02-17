@@ -1,14 +1,12 @@
 import Big from "big.js";
-import { ORDER_FEE_RATE_MAKER, ORDER_FEE_RATE_TAKER } from "@/config/constants";
 import { toBig } from "@/lib/trade/numbers";
-import { isTakerOrderType, type OrderType } from "@/lib/trade/order-types";
 import type { Side } from "@/lib/trade/types";
 
 interface OrderMetricsInput {
 	sizeValue: number;
 	price: number;
 	leverage: number | null;
-	orderType: OrderType;
+	feeRate: number;
 }
 
 interface OrderMetricsResult {
@@ -33,8 +31,7 @@ export function getOrderMetrics(input: OrderMetricsInput): OrderMetricsResult {
 	const sz = toBig(input.sizeValue);
 	const px = toBig(input.price);
 	const orderValue = sz && px ? sz.times(px).toNumber() : 0;
-	const feeRate = isTakerOrderType(input.orderType) ? ORDER_FEE_RATE_TAKER : ORDER_FEE_RATE_MAKER;
-	const estimatedFee = Big(orderValue).times(feeRate).toNumber();
+	const estimatedFee = Big(orderValue).times(input.feeRate).toNumber();
 	const marginRequired = input.leverage ? Big(orderValue).div(input.leverage).toNumber() : 0;
 	return { orderValue, marginRequired, estimatedFee };
 }

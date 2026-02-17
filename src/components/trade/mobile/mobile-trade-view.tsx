@@ -5,18 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider, type SliderMark } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-	FALLBACK_VALUE_PLACEHOLDER,
-	ORDER_FEE_RATE_MAKER,
-	ORDER_FEE_RATE_TAKER,
-	ORDER_MIN_NOTIONAL_USD,
-	UI_TEXT,
-} from "@/config/constants";
+import { FALLBACK_VALUE_PLACEHOLDER, ORDER_MIN_NOTIONAL_USD, UI_TEXT } from "@/config/constants";
 import { ARBITRUM_CHAIN_ID } from "@/config/contracts";
 import { getBaseQuoteFromPairName } from "@/domain/market";
 import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { useAssetLeverage } from "@/hooks/trade/use-asset-leverage";
+import { useFeeRates } from "@/hooks/trade/use-fee-rates";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo } from "@/lib/hyperliquid";
@@ -140,7 +135,9 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const sizeValue = sizeMode === "quote" && price > 0 ? sizeInputValue / price : sizeInputValue;
 	const orderValue = sizeValue * price;
 	const marginRequired = leverage ? orderValue / leverage : 0;
-	const feeRate = isMarketExecution ? ORDER_FEE_RATE_TAKER : ORDER_FEE_RATE_MAKER;
+	const { takerRate, makerRate } = useFeeRates(market?.kind);
+	const feeRate = isMarketExecution ? takerRate : makerRate;
+	const feeRatePercent = `${(feeRate * 100).toFixed(4)}%`;
 	const estimatedFee = orderValue * feeRate;
 
 	const liqPrice = (() => {
@@ -482,7 +479,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 						/>
 						<SummaryRow
 							label={ORDER_TEXT.SUMMARY_FEE}
-							value={estimatedFee > 0 ? formatUSD(estimatedFee) : FALLBACK_VALUE_PLACEHOLDER}
+							value={orderValue > 0 ? `${feeRatePercent} (${formatUSD(estimatedFee)})` : feeRatePercent}
 							valueClass="text-text-600"
 						/>
 					</div>
