@@ -17,6 +17,15 @@ type ChartColors = {
 	surface: string;
 };
 
+type ChartChromeColors = {
+	grid: string;
+	scaleLine: string;
+	separator: string;
+	border: string;
+	toolbarDivider: string;
+	crosshair: string;
+};
+
 function getCssVar(name: string): string {
 	if (typeof window === "undefined") return "";
 	return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -68,23 +77,31 @@ export function getChartColors(): ChartColors {
 	};
 }
 
+export function getChartChromeColors(colors: ChartColors = getChartColors()): ChartChromeColors {
+	return {
+		grid: colorToRgba(colors.border, 0.06),
+		scaleLine: colorToRgba(colors.border, 0.16),
+		separator: colorToRgba(colors.border, 0.12),
+		border: colorToRgba(colors.border, 0.14),
+		toolbarDivider: colorToRgba(colors.border, 0.12),
+		crosshair: colorToHex(colors.textSecondary),
+	};
+}
+
 export function buildChartOverrides(): Record<string, string | number | boolean> {
 	const colors = getChartColors();
+	const chrome = getChartChromeColors(colors);
 
 	const bg = colorToHex(colors.background);
-	const textSecondary = colorToHex(colors.textSecondary);
 	const green = colorToHex(colors.green);
 	const red = colorToHex(colors.red);
-
-	const gridColor = colorToRgba(colors.border, 0.3);
-	const crosshairColor = textSecondary;
 
 	return {
 		"paneProperties.background": bg,
 		"paneProperties.backgroundType": "solid",
-		"paneProperties.vertGridProperties.color": gridColor,
-		"paneProperties.horzGridProperties.color": gridColor,
-		"paneProperties.crossHairProperties.color": crosshairColor,
+		"paneProperties.vertGridProperties.color": "rgba(0, 0, 0, 0)",
+		"paneProperties.horzGridProperties.color": "rgba(0, 0, 0, 0)",
+		"paneProperties.crossHairProperties.color": chrome.crosshair,
 		"paneProperties.crossHairProperties.style": 2,
 		"paneProperties.crossHairProperties.width": 1,
 
@@ -98,8 +115,8 @@ export function buildChartOverrides(): Record<string, string | number | boolean>
 		"paneProperties.legendProperties.showVolume": false,
 
 		"scalesProperties.backgroundColor": bg,
-		"scalesProperties.lineColor": colorToRgba(colors.border, 0.5),
-		"scalesProperties.textColor": textSecondary,
+		"scalesProperties.lineColor": chrome.scaleLine,
+		"scalesProperties.textColor": chrome.crosshair,
 		"scalesProperties.fontSize": 10,
 		"scalesProperties.scaleSeriesOnly": false,
 
@@ -257,7 +274,8 @@ export async function generateChartCssUrl(): Promise<string> {
 	const fg = colorToHex(colors.foreground);
 	const surface = colorToHex(colors.surface);
 	const textSecondary = colorToHex(colors.textSecondary);
-	const border = colorToRgba(colors.border, 0.4);
+	const chrome = getChartChromeColors(colors);
+	const border = chrome.border;
 	const accent = colorToHex(colors.accent);
 
 	const hoverBg = colorToRgba(colors.foreground, 0.06);
@@ -294,7 +312,7 @@ ${staticCss}
 	--tv-color-toolbar-toggle-button-background-active: ${accentSoft};
 	--tv-color-toolbar-toggle-button-background-active-hover: ${colorToRgba(colors.accent, 0.2)};
 
-	--tv-color-toolbar-divider-background: ${colorToRgba(colors.border, 0.6)};
+	--tv-color-toolbar-divider-background: ${chrome.toolbarDivider};
 	--tv-color-toolbar-save-layout-loader: ${accent};
 	--tv-color-bar-mark-background-color: ${surface};
 

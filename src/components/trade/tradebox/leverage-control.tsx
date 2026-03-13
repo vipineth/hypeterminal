@@ -22,9 +22,14 @@ const LeverageBadge = forwardRef<HTMLButtonElement, BadgeProps>(({ leverage, onC
 	return (
 		<Button
 			ref={ref}
-			variant="outlined"
+			variant="outline"
 			onClick={onClick}
-			className={cn(isLoading && "opacity-70", className)}
+			size="sm"
+			className={cn(
+				"h-8 rounded-lg border-border-100 bg-surface-base/40 px-2.5 text-2xs hover:bg-accent",
+				isLoading && "opacity-70",
+				className,
+			)}
 			aria-label={t`Change leverage`}
 		>
 			<span className="text-text-600">{t`Leverage`}</span>
@@ -176,18 +181,18 @@ function LeverageEditor({
 
 			{updateError && (
 				<div className={cn("flex", compact ? "gap-2" : "gap-3")}>
-					<Button variant="outlined" size={compact ? "sm" : "lg"} className="flex-1" onClick={handleCancel}>
+					<Button variant="outline" size={compact ? "sm" : "lg"} className="flex-1" onClick={handleCancel}>
 						<Trans>Cancel</Trans>
 					</Button>
 					<Button
-						variant="text"
-						size={compact ? "none" : undefined}
+						variant="outline"
+						size={compact ? "sm" : "lg"}
 						onClick={handleConfirm}
 						disabled={isUpdating}
 						className={cn(
-							"flex-1 font-semibold uppercase tracking-wider hover:bg-transparent",
-							"bg-primary-default/20 border border-primary-default text-primary-default hover:bg-primary-default/30",
-							compact ? "py-2 text-2xs gap-1.5" : "py-3 text-xs gap-2",
+							"flex-1 font-semibold uppercase tracking-wider",
+							"border-primary-default/45 bg-primary-default/12 text-primary-default hover:bg-primary-default/18",
+							compact ? "text-2xs gap-1.5" : "text-xs gap-2",
 						)}
 					>
 						{isUpdating && <SpinnerGapIcon className={cn(iconSize, "animate-spin")} />}
@@ -198,12 +203,11 @@ function LeverageEditor({
 
 			{!updateError && compact && (
 				<Button
-					variant="outlined"
-					size="md"
-					tone="accent"
+					variant="outline"
+					size="sm"
 					onClick={handleConfirm}
 					disabled={!isDirty || isUpdating || showSuccess}
-					className="w-full"
+					className="h-8 w-full rounded-lg border-primary-default/45 bg-primary-default/12 text-primary-default hover:bg-primary-default/18"
 				>
 					{isUpdating && <SpinnerGapIcon className="size-3 animate-spin" />}
 					<Trans>Confirm</Trans>
@@ -212,14 +216,15 @@ function LeverageEditor({
 
 			{!updateError && !compact && (
 				<Button
-					variant="text"
+					variant="outline"
+					size="lg"
 					onClick={handleConfirm}
 					disabled={!isDirty || isUpdating || showSuccess}
 					className={cn(
-						"w-full py-3 text-xs font-semibold uppercase tracking-wider gap-2 border hover:bg-transparent",
+						"w-full text-xs font-semibold uppercase tracking-wider gap-2 rounded-xl",
 						isDirty && !isUpdating && !showSuccess
-							? "bg-primary-default/20 border-primary-default text-primary-default hover:bg-primary-default/30"
-							: "bg-primary-default/10 border-primary-default/30 text-primary-default/50",
+							? "border-primary-default/45 bg-primary-default/12 text-primary-default hover:bg-primary-default/18"
+							: "border-primary-default/20 bg-primary-default/8 text-primary-default/50",
 					)}
 				>
 					{isUpdating && <SpinnerGapIcon className="size-4 animate-spin" />}

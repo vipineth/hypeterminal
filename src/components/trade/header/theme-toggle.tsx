@@ -21,11 +21,13 @@ function ThemeToggleButton() {
 
 	return (
 		<Button
-			variant="text"
+			variant="ghost"
 			size="sm"
 			className={cn(
-				"size-7",
-				isDark ? "text-warning-700 hover:text-warning-700/80" : "text-primary-default hover:text-primary-default/80",
+				"size-8 rounded-lg",
+				isDark
+					? "text-warning-700 hover:bg-accent hover:text-warning-700"
+					: "text-primary-default hover:bg-accent hover:text-primary-default",
 			)}
 			onClick={() => setTheme(isDark ? "light" : "dark")}
 			aria-label={isDark ? t`Switch to light mode` : t`Switch to dark mode`}

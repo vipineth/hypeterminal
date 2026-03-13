@@ -142,15 +142,15 @@ function TokenSelectorContent({
 								return (
 									<Button
 										key={s.value}
-										variant="text"
-										size="none"
+										variant={isSelected ? "secondary" : "ghost"}
+										size="xs"
 										onClick={() => handleScopeSelect(s.value)}
 										className={cn(
-											"px-2 py-1 uppercase tracking-wider cursor-pointer",
+											"h-6 rounded-md px-2 uppercase tracking-[0.14em] cursor-pointer",
 											mobile ? "text-2xs" : "text-3xs",
 											isSelected
 												? "bg-warning-700/10 text-warning-700 hover:bg-warning-700/10 hover:text-warning-700"
-												: "text-text-950 hover:bg-transparent",
+												: "text-text-500 hover:text-text-950",
 										)}
 									>
 										{s.label}
@@ -166,15 +166,15 @@ function TokenSelectorContent({
 								return (
 									<Button
 										key={sub.value}
-										variant="text"
-										size="none"
+										variant={isSelected ? "secondary" : "ghost"}
+										size="xs"
 										onClick={() => handleSubcategorySelect(sub.value)}
 										className={cn(
-											"px-2 py-0.5 tracking-wider cursor-pointer",
+											"h-6 rounded-md px-2 tracking-[0.12em] cursor-pointer",
 											mobile ? "text-3xs" : "text-4xs",
 											isSelected
 												? "bg-primary-default/10 text-primary-default hover:bg-primary-default/10 hover:text-primary-default"
-												: "text-text-950 hover:bg-transparent hover:text-text-950",
+												: "text-text-500 hover:text-text-950",
 										)}
 										aria-label={t`Filter by ${sub.label}`}
 										aria-pressed={isSelected}
@@ -205,11 +205,11 @@ function TokenSelectorContent({
 						return (
 							<Button
 								key={header.id}
-								variant="text"
-								size="none"
+								variant="ghost"
+								size="xs"
 								onClick={() => handleSort(header.id)}
 								className={cn(
-									"justify-end gap-1 hover:text-text-950 hover:bg-transparent",
+									"h-auto justify-end gap-1 px-0 text-text-500 hover:bg-transparent hover:text-text-950",
 									mobile ? "w-20" : "w-16 sm:w-20",
 									hiddenOnMobile && (mobile ? "hidden" : "hidden sm:flex"),
 								)}
@@ -296,13 +296,13 @@ function TokenSelectorContent({
 											<div className="flex items-center gap-1">
 												<span className={cn("font-semibold", mobile ? "text-xs" : "text-2xs")}>{market.pairName}</span>
 												<Button
-													variant="text"
-													size="none"
+													variant="ghost"
+													size="xs"
 													onClick={(e) => {
 														e.stopPropagation();
 														toggleFavorite(market.name);
 													}}
-													className="hover:scale-110 hover:bg-transparent"
+													className="size-5 px-0 hover:scale-110 hover:bg-transparent"
 													aria-label={isFav ? t`Remove from favorites` : t`Add to favorites`}
 												>
 													<StarIcon
@@ -440,12 +440,12 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 
 	const trigger = (
 		<Button
-			variant="text"
-			size="none"
+			variant="outline"
+			size="sm"
 			role="combobox"
 			aria-expanded={open}
 			aria-label={t`Select token`}
-			className="gap-2 px-2 py-1.5 bg-surface-execution border border-border-200/40 rounded-sm text-2xs font-bold uppercase tracking-wider hover:bg-surface-execution"
+			className="h-8 gap-2 rounded-lg border-border-100 bg-surface-execution px-2.5 text-2xs font-semibold uppercase tracking-[0.14em] hover:bg-accent"
 		>
 			{selectedMarket && (
 				<AssetDisplay

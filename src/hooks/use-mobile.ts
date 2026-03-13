@@ -1,38 +1,19 @@
-import { useCallback, useSyncExternalStore } from "react";
-import { MOBILE_BREAKPOINT_PX } from "@/config/constants";
+import * as React from "react";
 
-function subscribeToMediaQuery(callback: () => void): () => void {
-	const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT_PX - 1}px)`);
-	mql.addEventListener("change", callback);
-	return () => mql.removeEventListener("change", callback);
-}
+const MOBILE_BREAKPOINT = 768;
 
-function getIsMobile(): boolean {
-	if (typeof window === "undefined") return false;
-	return window.innerWidth < MOBILE_BREAKPOINT_PX;
-}
+export function useIsMobile() {
+	const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined);
 
-function getServerSnapshot(): boolean {
-	return false;
-}
+	React.useEffect(() => {
+		const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
+		const onChange = () => {
+			setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+		};
+		mql.addEventListener("change", onChange);
+		setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+		return () => mql.removeEventListener("change", onChange);
+	}, []);
 
-export function useIsMobile(): boolean {
-	return useSyncExternalStore(subscribeToMediaQuery, getIsMobile, getServerSnapshot);
-}
-
-export function useOnlineStatus(): boolean {
-	const getOnline = useCallback(() => navigator.onLine, []);
-
-	return useSyncExternalStore(
-		(callback) => {
-			window.addEventListener("online", callback);
-			window.addEventListener("offline", callback);
-			return () => {
-				window.removeEventListener("online", callback);
-				window.removeEventListener("offline", callback);
-			};
-		},
-		getOnline,
-		() => true,
-	);
+	return !!isMobile;
 }

@@ -436,9 +436,9 @@ export function TradePanel() {
 	// const actionButtonClass = getActionButtonClass(buttonContent.variant);
 
 	return (
-		<div className="min-h-0 flex flex-col overflow-hidden bg-surface-execution">
+		<div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-card/95">
 			{capabilities.isLeveraged && (
-				<div className="p-2 border-b border-border-200/60 flex items-center justify-between">
+				<div className="flex items-center justify-between border-b border-border-100/80 bg-surface-base/70 px-4 py-3 backdrop-blur-xl">
 					{capabilities.hasMarginMode ? (
 						<MarginModeToggle
 							mode={marginMode}
@@ -462,7 +462,7 @@ export function TradePanel() {
 				onConfirm={handleMarginModeConfirm}
 			/>
 
-			<div className="p-2 space-y-4 overflow-y-auto flex-1 min-h-0">
+			<div className="flex-1 min-h-0 space-y-6 overflow-y-auto px-4 py-4">
 				<TradeHeader
 					orderType={orderType}
 					side={side}
@@ -484,20 +484,30 @@ export function TradePanel() {
 					onSwapClick={() => swapTargetToken && openSwapModal(DEFAULT_QUOTE_TOKEN, swapTargetToken)}
 				/>
 
-				<div className="space-y-2">
+				<div className="space-y-2.5">
 					{validation.errors.length > 0 && isConnected && availableBalance > 0 && (
-						<div className="text-4xs text-market-down-600">{validation.errors.join(" • ")}</div>
+						<div className="rounded-lg border border-market-down-600/25 bg-market-down-100 px-3 py-2 text-4xs text-market-down-600">
+							{validation.errors.join(" • ")}
+						</div>
 					)}
 
-					{approvalError && <div className="text-4xs text-market-down-600">{approvalError}</div>}
+					{approvalError && (
+						<div className="rounded-lg border border-market-down-600/25 bg-market-down-100 px-3 py-2 text-4xs text-market-down-600">
+							{approvalError}
+						</div>
+					)}
 
 					<Button
-						variant="contained"
-						tone="accent"
+						variant="default"
 						size="lg"
 						onClick={buttonContent.action}
 						disabled={buttonContent.disabled}
-						className={cn("w-full")}
+						className={cn(
+							"h-11 w-full rounded-xl text-sm font-semibold shadow-sm",
+							buttonContent.variant === "cyan" && "bg-primary-default text-primary-foreground hover:bg-primary-hover",
+							buttonContent.variant === "buy" && "bg-market-up-600 text-background hover:bg-market-up-500",
+							buttonContent.variant === "sell" && "bg-market-down-600 text-background hover:bg-market-down-500",
+						)}
 						aria-label={buttonContent.text}
 					>
 						{(isSubmitting || isRegistering) && <SpinnerGapIcon className="size-3 animate-spin" />}
@@ -505,18 +515,20 @@ export function TradePanel() {
 					</Button>
 				</div>
 
-				<OrderSummary
-					liqPrice={liqPrice}
-					liqWarning={liqWarning}
-					orderValue={orderValue}
-					marginRequired={marginRequired}
-					estimatedFee={estimatedFee}
-					feeRatePercent={feeRatePercent}
-					slippagePercent={slippagePercent}
-					szDecimals={market?.szDecimals}
-					onSlippageClick={openSettingsDialog}
-					marketKind={market?.kind}
-				/>
+				<div className="rounded-xl border border-border-100/80 bg-surface-base/38 p-3 shadow-xs">
+					<OrderSummary
+						liqPrice={liqPrice}
+						liqWarning={liqWarning}
+						orderValue={orderValue}
+						marginRequired={marginRequired}
+						estimatedFee={estimatedFee}
+						feeRatePercent={feeRatePercent}
+						slippagePercent={slippagePercent}
+						szDecimals={market?.szDecimals}
+						onSlippageClick={openSettingsDialog}
+						marketKind={market?.kind}
+					/>
+				</div>
 			</div>
 
 			<WalletDialog open={activeDialog === "wallet"} onOpenChange={(open) => setActiveDialog(open ? "wallet" : null)} />

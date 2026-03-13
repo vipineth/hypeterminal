@@ -57,7 +57,7 @@ export function UserMenu() {
 
 	if (!mounted || isConnecting) {
 		return (
-			<Button variant="text" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider" disabled>
+			<Button variant="ghost" size="sm" className="h-8 gap-1.5 rounded-lg px-3 text-sm text-text-500" disabled>
 				<SpinnerGapIcon className="size-3 animate-spin" />
 				<Trans>Connecting...</Trans>
 			</Button>
@@ -67,7 +67,12 @@ export function UserMenu() {
 	if (!isConnected) {
 		return (
 			<>
-				<Button size="md" variant="outlined" onClick={() => setIsOpen(true)}>
+				<Button
+					size="default"
+					variant="outline"
+					className="h-8 rounded-lg px-3 text-sm"
+					onClick={() => setIsOpen(true)}
+				>
 					<WalletIcon className="size-4" />
 					<Trans>Connect Wallet</Trans>
 				</Button>
@@ -80,13 +85,13 @@ export function UserMenu() {
 		<div className="flex items-center gap-1.5">
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<Button variant="text" size="sm" className="h-7 gap-1.5 text-3xs uppercase tracking-wider">
+					<Button variant="ghost" size="sm" className="h-8 gap-1.5 rounded-lg px-3 text-sm text-text-950">
 						<div className="size-1.5 rounded-full bg-market-up-600 animate-pulse" />
 						{ensName ?? (address ? shortenAddress(address) : "")}
 						<CaretDownIcon className="size-2.5" />
 					</Button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent align="end" className="min-w-40 text-xs font-mono">
+				<DropdownMenuContent align="end" className="min-w-44 text-sm">
 					{address && <CopyAddressMenuItem address={address} />}
 					<DropdownMenuItem className="flex items-center gap-2">
 						<PlusCircleIcon className="size-3.5 text-text-600" />

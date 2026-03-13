@@ -53,41 +53,41 @@ export function TopNav() {
 	return (
 		<header
 			className={cn(
-				"fixed top-0 left-0 right-0 z-40 h-11 border-b px-3 flex items-center justify-between bg-surface-execution transition-colors duration-300 ease-in-out",
+				"fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between border-b bg-surface-base/88 px-4 backdrop-blur-xl transition-colors duration-300 ease-in-out",
 				accentClass,
 			)}
 		>
-			<div className="flex items-center gap-3 min-w-0">
-				<div className="flex items-center gap-1.5">
-					<div className="size-5 rounded bg-primary-default/10 border border-primary-default/30 flex items-center justify-center">
-						<TerminalIcon className="size-3 text-primary-default" />
+			<div className="flex min-w-0 items-center gap-4">
+				<div className="flex items-center gap-2">
+					<div className="flex size-6 items-center justify-center rounded-lg border border-primary-default/20 bg-primary-default/10">
+						<TerminalIcon className="size-3.5 text-primary-default" />
 					</div>
-					<span className="text-xs font-bold tracking-tight">
+					<span className="text-sm font-semibold tracking-tight">
 						<span className="text-primary-default">HYPE</span>
 						<span className="text-text-950">TERMINAL</span>
 					</span>
 				</div>
-				<div className="h-4 w-px bg-border-200 hidden md:block" />
-				<nav className="hidden lg:flex items-center text-nav tracking-wide">
+				<div className="hidden h-5 w-px bg-border-100 md:block" />
+				<nav className="hidden items-center text-sm lg:flex">
 					{SCOPE_NAV_ITEMS.map((item) => (
 						<Link
 							key={item.scope}
 							to={item.to}
 							className={cn(
-								"px-2.5 py-1.5 transition-colors duration-150",
-								scope === item.scope ? item.activeClass : "text-text-950 hover:text-text-600",
+								"rounded-md px-2.5 py-1.5 transition-colors duration-150",
+								scope === item.scope ? item.activeClass : "text-text-500 hover:bg-accent hover:text-text-950",
 							)}
 						>
 							{item.label}
 						</Link>
 					))}
-					<div className="h-4 w-px bg-border-200 mx-1" />
+					<div className="mx-2 h-5 w-px bg-border-100" />
 					{STATIC_NAV_ITEMS.map((item) => (
 						<button
 							key={item.key}
 							type="button"
 							disabled
-							className="px-2.5 py-1.5 text-text-950/40 cursor-not-allowed"
+							className="rounded-md px-2.5 py-1.5 text-text-400 cursor-not-allowed"
 							tabIndex={-1}
 						>
 							{item.label}
@@ -96,12 +96,12 @@ export function TopNav() {
 				</nav>
 			</div>
 
-			<div className="flex items-center gap-2">
+			<div className="flex items-center gap-2.5">
 				{isConnected && (
 					<Button
-						variant="outlined"
+						variant="outline"
 						onClick={() => openDepositModal("deposit")}
-						className="h-6 px-2 text-xs font-medium rounded-xs bg-fill-100 border border-border-300 text-text-950 hover:border-border-500 transition-colors inline-flex items-center gap-1 shadow-xs"
+						className="h-8 gap-1.5 rounded-lg border-border-100 bg-surface-execution px-3 text-sm font-medium text-text-950 shadow-xs hover:bg-accent"
 					>
 						<DownloadSimpleIcon className="size-4" />
 						<Trans>Deposit</Trans>
@@ -112,7 +112,7 @@ export function TopNav() {
 					<ThemeToggle />
 					<button
 						type="button"
-						className="size-7 inline-flex items-center justify-center rounded text-text-600 hover:text-primary-default transition-colors duration-150"
+						className="inline-flex size-8 items-center justify-center rounded-lg text-text-500 transition-colors duration-150 hover:bg-accent hover:text-text-950"
 						onClick={openSettingsDialog}
 						aria-label={t`Settings`}
 					>

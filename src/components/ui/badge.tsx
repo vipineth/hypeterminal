@@ -1,46 +1,49 @@
+import { mergeProps } from "@base-ui/react/merge-props";
+import { useRender } from "@base-ui/react/use-render";
 import { cva, type VariantProps } from "class-variance-authority";
-import { Slot as SlotPrimitive } from "radix-ui";
-import type * as React from "react";
-import { cn } from "@/lib/cn";
+
+import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-	"inline-flex items-center justify-center rounded-full border w-fit whitespace-nowrap shrink-0 [&>svg]:pointer-events-none focus-visible:border-primary-default/50 focus-visible:ring-primary-default/50 focus-visible:ring-[3px] aria-invalid:ring-error-700/20 dark:aria-invalid:ring-error-700/40 aria-invalid:border-error-700 transition-[color,box-shadow] overflow-hidden",
+	"group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3!",
 	{
 		variants: {
 			variant: {
-				default: "border-transparent bg-primary-default text-white [a&]:hover:bg-primary-hover",
-				secondary: "border-transparent bg-surface-base text-text-800 [a&]:hover:bg-surface-base/90",
+				default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
+				secondary: "bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80",
 				destructive:
-					"border-transparent bg-error-700 text-white [a&]:hover:bg-error-700/90 focus-visible:ring-error-700/20 dark:focus-visible:ring-error-700/40 dark:bg-error-700/60",
-				outline: "text-text-950 [a&]:hover:bg-surface-analysis [a&]:hover:text-text-950",
-				// Trading variants
-				long: "border-market-up-600/40 bg-market-up-100 text-market-up-600",
-				short: "border-market-down-600/40 bg-market-down-100 text-market-down-600",
-				neutral: "border-border-200/60 bg-surface-analysis text-text-800",
-			},
-			size: {
-				default: "px-2 py-0.5 text-xs font-medium gap-1 [&>svg]:size-3",
-				sm: "px-1.5 py-0 text-2xs font-medium gap-0.5 [&>svg]:size-2.5",
-				xs: "px-1 py-0 text-3xs font-medium gap-0.5 [&>svg]:size-2",
+					"bg-destructive/10 text-destructive focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/20",
+				outline: "border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground",
+				ghost: "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
+				link: "text-primary underline-offset-4 hover:underline",
 			},
 		},
 		defaultVariants: {
 			variant: "default",
-			size: "default",
 		},
 	},
 );
 
 function Badge({
 	className,
-	variant,
-	size,
-	asChild = false,
+	variant = "default",
+	render,
 	...props
-}: React.ComponentProps<"span"> & VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
-	const Comp = asChild ? SlotPrimitive.Slot : "span";
-
-	return <Comp data-slot="badge" className={cn(badgeVariants({ variant, size }), className)} {...props} />;
+}: useRender.ComponentProps<"span"> & VariantProps<typeof badgeVariants>) {
+	return useRender({
+		defaultTagName: "span",
+		props: mergeProps<"span">(
+			{
+				className: cn(badgeVariants({ variant }), className),
+			},
+			props,
+		),
+		render,
+		state: {
+			slot: "badge",
+			variant,
+		},
+	});
 }
 
 export { Badge, badgeVariants };

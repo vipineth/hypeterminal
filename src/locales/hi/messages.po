@@ -278,8 +278,6 @@ msgid "Chart"
 msgstr "चार्ट"
 
 #: src/components/trade/positions/position-actions-dropdown.tsx
-#: src/components/ui/dialog.tsx
-#: src/components/ui/sheet.tsx
 msgid "Close"
 msgstr "बंद करें"
 
@@ -496,8 +494,8 @@ msgid "Display Language"
 msgstr "प्रदर्शन भाषा"
 
 #: src/components/ui/sidebar.tsx
-msgid "Displays the mobile sidebar."
-msgstr "मोबाइल साइडबार दिखाता है।"
+#~ msgid "Displays the mobile sidebar."
+#~ msgstr "मोबाइल साइडबार दिखाता है।"
 
 #: src/components/trade/header/top-nav.tsx
 #~ msgid "Docs"
@@ -856,8 +854,8 @@ msgid "Liquidated"
 msgstr ""
 
 #: src/components/ui/spinner.tsx
-msgid "Loading"
-msgstr "लोड हो रहा है"
+#~ msgid "Loading"
+#~ msgstr "लोड हो रहा है"
 
 #: src/components/trade/positions/balances-tab.tsx
 msgid "Loading balances..."
@@ -1604,8 +1602,8 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/ui/sidebar.tsx
-msgid "Sidebar"
-msgstr "साइडबार"
+#~ msgid "Sidebar"
+#~ msgstr "साइडबार"
 
 #: src/lib/trade/use-button-content.ts
 msgid "Sign in wallet..."
@@ -1892,8 +1890,8 @@ msgstr ""
 #: src/components/ui/sidebar.tsx
 #: src/components/ui/sidebar.tsx
 #: src/components/ui/sidebar.tsx
-msgid "Toggle Sidebar"
-msgstr "साइडबार टॉगल करें"
+#~ msgid "Toggle Sidebar"
+#~ msgstr "साइडबार टॉगल करें"
 
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Toggle size mode"

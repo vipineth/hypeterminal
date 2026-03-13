@@ -1,6 +1,6 @@
 import type { CandleTooltipCustomCallbackData, DeepPartial, Styles } from "klinecharts";
 import { type CandleType, LineType, TooltipShowRule, TooltipShowType, YAxisPosition } from "klinecharts";
-import { colorToHex, colorToRgba, getChartColors } from "@/components/trade/chart/theme-colors";
+import { colorToHex, colorToRgba, getChartChromeColors, getChartColors } from "@/components/trade/chart/theme-colors";
 
 function formatTooltipTs(ts: number): string {
 	const d = new Date(ts);
@@ -38,8 +38,8 @@ export function buildKlineStyles(candleType: CandleType, options?: KlineStyleOpt
 	const textTertiary = colorToHex(colors.textTertiary);
 	const green = colorToHex(colors.green);
 	const red = colorToHex(colors.red);
-	const gridColor = colorToRgba(colors.border, 0.3);
-	const scaleLineColor = colorToRgba(colors.border, 0.5);
+	const chrome = getChartChromeColors(colors);
+	const scaleLineColor = chrome.scaleLine;
 	const overlayTextColor = colorToHex(colors.foreground);
 
 	const tooltipText = {
@@ -75,8 +75,8 @@ export function buildKlineStyles(candleType: CandleType, options?: KlineStyleOpt
 
 	return {
 		grid: {
-			horizontal: { show: true, color: gridColor, size: 1, style: LineType.Dashed },
-			vertical: { show: true, color: gridColor, size: 1, style: LineType.Dashed },
+			horizontal: { show: false },
+			vertical: { show: false },
 		},
 		candle: {
 			type: candleType,
@@ -180,7 +180,7 @@ export function buildKlineStyles(candleType: CandleType, options?: KlineStyleOpt
 			tickLine: options?.yAxisInside ? { show: false } : tickLine,
 			tickText: options?.yAxisInside ? { ...tickText, marginStart: 2, marginEnd: 2 } : tickText,
 		},
-		separator: { color: colorToRgba(colors.border, 0.4), size: 1 },
+		separator: { color: chrome.separator, size: 1 },
 		crosshair: {
 			show: true,
 			horizontal: crosshairAxis,

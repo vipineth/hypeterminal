@@ -278,8 +278,6 @@ msgid "Chart"
 msgstr "图表"
 
 #: src/components/trade/positions/position-actions-dropdown.tsx
-#: src/components/ui/dialog.tsx
-#: src/components/ui/sheet.tsx
 msgid "Close"
 msgstr "关闭"
 
@@ -496,8 +494,8 @@ msgid "Display Language"
 msgstr "显示语言"
 
 #: src/components/ui/sidebar.tsx
-msgid "Displays the mobile sidebar."
-msgstr "显示移动端侧边栏。"
+#~ msgid "Displays the mobile sidebar."
+#~ msgstr "显示移动端侧边栏。"
 
 #: src/components/trade/header/top-nav.tsx
 #~ msgid "Docs"
@@ -856,8 +854,8 @@ msgid "Liquidated"
 msgstr ""
 
 #: src/components/ui/spinner.tsx
-msgid "Loading"
-msgstr "加载中"
+#~ msgid "Loading"
+#~ msgstr "加载中"
 
 #: src/components/trade/positions/balances-tab.tsx
 msgid "Loading balances..."
@@ -1604,8 +1602,8 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/ui/sidebar.tsx
-msgid "Sidebar"
-msgstr "侧边栏"
+#~ msgid "Sidebar"
+#~ msgstr "侧边栏"
 
 #: src/lib/trade/use-button-content.ts
 msgid "Sign in wallet..."
@@ -1892,8 +1890,8 @@ msgstr ""
 #: src/components/ui/sidebar.tsx
 #: src/components/ui/sidebar.tsx
 #: src/components/ui/sidebar.tsx
-msgid "Toggle Sidebar"
-msgstr "切换侧边栏"
+#~ msgid "Toggle Sidebar"
+#~ msgstr "切换侧边栏"
 
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Toggle size mode"

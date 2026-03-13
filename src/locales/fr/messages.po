@@ -278,8 +278,6 @@ msgid "Chart"
 msgstr "Graphique"
 
 #: src/components/trade/positions/position-actions-dropdown.tsx
-#: src/components/ui/dialog.tsx
-#: src/components/ui/sheet.tsx
 msgid "Close"
 msgstr "Fermer"
 
@@ -496,8 +494,8 @@ msgid "Display Language"
 msgstr "Langue d'affichage"
 
 #: src/components/ui/sidebar.tsx
-msgid "Displays the mobile sidebar."
-msgstr "Affiche la barre latérale mobile."
+#~ msgid "Displays the mobile sidebar."
+#~ msgstr "Affiche la barre latérale mobile."
 
 #: src/components/trade/header/top-nav.tsx
 #~ msgid "Docs"
@@ -856,8 +854,8 @@ msgid "Liquidated"
 msgstr ""
 
 #: src/components/ui/spinner.tsx
-msgid "Loading"
-msgstr "Chargement"
+#~ msgid "Loading"
+#~ msgstr "Chargement"
 
 #: src/components/trade/positions/balances-tab.tsx
 msgid "Loading balances..."
@@ -1604,8 +1602,8 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/ui/sidebar.tsx
-msgid "Sidebar"
-msgstr "Barre latérale"
+#~ msgid "Sidebar"
+#~ msgstr "Barre latérale"
 
 #: src/lib/trade/use-button-content.ts
 msgid "Sign in wallet..."
@@ -1892,8 +1890,8 @@ msgstr ""
 #: src/components/ui/sidebar.tsx
 #: src/components/ui/sidebar.tsx
 #: src/components/ui/sidebar.tsx
-msgid "Toggle Sidebar"
-msgstr "Basculer la barre latérale"
+#~ msgid "Toggle Sidebar"
+#~ msgstr "Basculer la barre latérale"
 
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Toggle size mode"

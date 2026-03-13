@@ -73,10 +73,10 @@ export function TradesPanel() {
 				<div>{t`Time`}</div>
 				<div className="text-right">{t`Price`}</div>
 				<Button
-					variant="text"
-					size="none"
+					variant="ghost"
+					size="xs"
 					onClick={toggleAssetDisplay}
-					className="text-right hover:text-text-950 hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
+					className="h-auto justify-end gap-0.5 px-0 text-right text-3xs uppercase tracking-wider hover:bg-transparent hover:text-text-950"
 				>
 					{t`Size`}
 					<span className="text-text-950">({displayAsset})</span>

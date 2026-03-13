@@ -184,20 +184,20 @@ export function TradeFormFields({
 
 	return (
 		<>
-			<div className="space-y-0.5 text-3xs">
+			<div className="space-y-1 text-2xs">
 				<div className="flex items-center justify-between text-text-950">
-					<span>{t`Available`}</span>
+					<span className="text-text-500">{t`Available`}</span>
 					<div className="flex items-center gap-2">
 						<span className={cn("tabular-nums flex items-center gap-1", getValueColorClass(availableBalance))}>
 							{formatAvailableBalance()} {availableBalanceToken}
 						</span>
 						{isConnected && swapTargetToken && (
-							<Button variant="text" size="sm" onClick={onSwapClick}>
+							<Button variant="ghost" size="sm" className="h-7 rounded-md px-2 text-2xs" onClick={onSwapClick}>
 								{t`Swap`}
 							</Button>
 						)}
 						{isConnected && (
-							<Button variant="text" size="sm" onClick={onDepositClick}>
+							<Button variant="ghost" size="sm" className="h-7 rounded-md px-2 text-2xs" onClick={onDepositClick}>
 								{t`Deposit`}
 							</Button>
 						)}
@@ -205,7 +205,7 @@ export function TradeFormFields({
 				</div>
 				{!isSpotMarket && positionSize !== 0 && (
 					<div className="flex items-center justify-between text-text-950">
-						<span>{t`Position`}</span>
+						<span className="text-text-500">{t`Position`}</span>
 						<span className={cn("tabular-nums", getValueColorClass(positionSize))}>
 							{positionSize > 0 ? "+" : ""}
 							{formatDecimalFloor(positionSize, szDecimals)} {baseToken}
@@ -215,25 +215,27 @@ export function TradeFormFields({
 			</div>
 
 			<div className="space-y-1.5">
-				<div className="text-4xs uppercase tracking-wider text-text-950">{t`Size`}</div>
-				<div className="flex items-center gap-1">
+				<div className="text-3xs font-medium uppercase tracking-[0.14em] text-text-500">{t`Size`}</div>
+				<div className="flex items-center gap-2">
 					<Button
-						variant="text"
+						variant="outline"
+						size="sm"
 						onClick={handleSizeModeToggle}
-						className="px-2 py-1.5 text-3xs border border-border-200/60 hover:border-text-400 hover:bg-transparent gap-1"
+						className="h-9 rounded-lg border-border-100 bg-surface-execution px-2.5 text-2xs hover:bg-accent"
 						aria-label={t`Toggle size mode`}
 						disabled={isFormDisabled}
 					>
-						<span className="text-4xs">{sizeModeLabel}</span>
+						<span className="text-3xs">{sizeModeLabel}</span>
 						<ArrowsLeftRightIcon className="size-2.5" />
 					</Button>
 					<NumberInput
 						placeholder="0.00"
 						value={sizeInput}
 						onChange={(e) => handleSizeChange(e.target.value)}
+						inputSize="lg"
 						maxAllowedDecimals={szDecimals}
 						className={cn(
-							"flex-1 text-2xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums",
+							"flex-1 rounded-lg border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50",
 							sizeHasError && "border-market-down-600 focus:border-market-down-600",
 						)}
 						disabled={isFormDisabled}
@@ -266,7 +268,7 @@ export function TradeFormFields({
 							}}
 							allowDecimals={false}
 							inputSize="sm"
-							className="w-14 text-2xs text-right pr-5 bg-surface-base/50 border-border-200/60 tabular-nums"
+							className="w-14 rounded-lg border-border-100 bg-surface-execution pr-5 text-right text-2xs tabular-nums shadow-none"
 							disabled={isFormDisabled || maxSize <= 0}
 						/>
 						<span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-2xs text-text-600 pointer-events-none">
@@ -278,15 +280,16 @@ export function TradeFormFields({
 
 			{usesTriggerPrice && (
 				<div className="space-y-1.5">
-					<div className="text-4xs uppercase tracking-wider text-text-950">{t`Trigger Price (USDC)`}</div>
+					<div className="text-3xs font-medium uppercase tracking-[0.14em] text-text-500">{t`Trigger Price (USDC)`}</div>
 					<NumberInput
 						placeholder="0.00"
 						value={triggerPriceInput}
 						onChange={(e) => setTriggerPrice(e.target.value)}
+						inputSize="lg"
 						maxLabel={t`Mid`}
 						onMaxClick={() => setTriggerPrice(toFixed(markPx, szDecimalsToPriceDecimals(szDecimals)))}
 						className={cn(
-							"w-full text-2xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums",
+							"w-full rounded-lg border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50",
 							usesTriggerPrice &&
 								!isPositive(triggerPriceNum) &&
 								sizeValue > 0 &&
@@ -299,15 +302,16 @@ export function TradeFormFields({
 
 			{usesLimitPrice && (
 				<div className="space-y-1.5">
-					<div className="text-4xs uppercase tracking-wider text-text-950">{t`Limit Price`}</div>
+					<div className="text-3xs font-medium uppercase tracking-[0.14em] text-text-500">{t`Limit Price`}</div>
 					<NumberInput
 						placeholder="0.00"
 						value={limitPriceInput}
 						onChange={(e) => setLimitPrice(e.target.value)}
+						inputSize="lg"
 						maxLabel={t`Mid`}
 						onMaxClick={() => setLimitPrice(toFixed(markPx, szDecimalsToPriceDecimals(szDecimals)))}
 						className={cn(
-							"w-full text-2xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums",
+							"w-full rounded-lg border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50",
 							usesLimitPrice && !price && sizeValue > 0 && "border-market-down-600 focus:border-market-down-600",
 						)}
 						disabled={isFormDisabled}
@@ -317,9 +321,12 @@ export function TradeFormFields({
 
 			{showTif && (
 				<div className="space-y-1.5">
-					<div className="text-4xs uppercase tracking-wider text-text-950">{t`Time in Force`}</div>
+					<div className="text-3xs font-medium uppercase tracking-[0.14em] text-text-500">{t`Time in Force`}</div>
 					<Select value={tif} onValueChange={(value) => setTif(value as LimitTif)} disabled={isFormDisabled}>
-						<SelectTrigger size="sm" className="w-full text-2xs bg-surface-base/50 border-border-200/60">
+						<SelectTrigger
+							size="sm"
+							className="w-full rounded-lg border-border-100 bg-surface-execution text-2xs shadow-none"
+						>
 							<SelectValue />
 						</SelectTrigger>
 						<SelectContent>
@@ -336,24 +343,26 @@ export function TradeFormFields({
 			{scaleOrder && (
 				<>
 					<div className="space-y-1.5">
-						<div className="text-4xs uppercase tracking-wider text-text-950">{t`Start Price (USDC)`}</div>
+						<div className="text-3xs font-medium uppercase tracking-[0.14em] text-text-500">{t`Start Price (USDC)`}</div>
 						<NumberInput
 							placeholder="0.00"
 							value={scaleStartPriceInput}
 							onChange={(e) => setScaleStart(e.target.value)}
-							className="w-full text-2xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums"
+							inputSize="lg"
+							className="w-full rounded-lg border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50"
 							disabled={isFormDisabled}
 							maxLabel={t`Mid`}
 							onMaxClick={() => setScaleStart(toFixed(markPx, szDecimalsToPriceDecimals(szDecimals)))}
 						/>
 					</div>
 					<div className="space-y-1.5">
-						<div className="text-4xs uppercase tracking-wider text-text-950">{t`End Price (USDC)`}</div>
+						<div className="text-3xs font-medium uppercase tracking-[0.14em] text-text-500">{t`End Price (USDC)`}</div>
 						<NumberInput
 							placeholder="0.00"
 							value={scaleEndPriceInput}
 							onChange={(e) => setScaleEnd(e.target.value)}
-							className="w-full text-2xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums"
+							inputSize="lg"
+							className="w-full rounded-lg border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50"
 							disabled={isFormDisabled}
 							maxLabel={t`Mid`}
 							onMaxClick={() => setScaleEnd(toFixed(markPx, szDecimalsToPriceDecimals(szDecimals)))}
@@ -361,15 +370,16 @@ export function TradeFormFields({
 					</div>
 					<div className="space-y-1.5">
 						<div className="flex items-center justify-between">
-							<div className="text-4xs uppercase tracking-wider text-text-950">{t`Number of Orders`}</div>
-							<span className="text-4xs text-text-950">{`${SCALE_LEVELS_MIN}-${SCALE_LEVELS_MAX}`}</span>
+							<div className="text-3xs font-medium uppercase tracking-[0.14em] text-text-500">{t`Number of Orders`}</div>
+							<span className="text-3xs text-text-500">{`${SCALE_LEVELS_MIN}-${SCALE_LEVELS_MAX}`}</span>
 						</div>
 						<NumberInput
 							placeholder="4"
 							value={String(scaleLevelsNum)}
 							onChange={(e) => setScaleLevels(Number(e.target.value) || 4)}
 							allowDecimals={false}
-							className="w-full text-2xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums"
+							inputSize="lg"
+							className="w-full rounded-lg border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50"
 							disabled={isFormDisabled}
 						/>
 					</div>
@@ -380,19 +390,20 @@ export function TradeFormFields({
 				<>
 					<div className="space-y-1.5">
 						<div className="flex items-center justify-between">
-							<div className="text-4xs uppercase tracking-wider text-text-950">{t`Duration (Minutes)`}</div>
-							<span className="text-4xs text-text-950">{`${TWAP_MINUTES_MIN}-${TWAP_MINUTES_MAX}`}</span>
+							<div className="text-3xs font-medium uppercase tracking-[0.14em] text-text-500">{t`Duration (Minutes)`}</div>
+							<span className="text-3xs text-text-500">{`${TWAP_MINUTES_MIN}-${TWAP_MINUTES_MAX}`}</span>
 						</div>
 						<NumberInput
 							placeholder="30"
 							value={String(twapMinutesNum)}
 							onChange={(e) => setTwapMinutes(Number(e.target.value) || 30)}
 							allowDecimals={false}
-							className="w-full text-2xs bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums"
+							inputSize="lg"
+							className="w-full rounded-lg border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50"
 							disabled={isFormDisabled}
 						/>
 					</div>
-					<div className="flex items-center gap-2 text-3xs">
+					<div className="flex items-center gap-2 text-2xs">
 						<Checkbox
 							checked={twapRandomize}
 							onCheckedChange={(checked) => setTwapRandomize(checked === true)}
@@ -405,7 +416,7 @@ export function TradeFormFields({
 
 			{(capabilities.hasReduceOnly || (capabilities.hasTpSl && canUseTpSl)) && (
 				<div className="space-y-4">
-					<div className="flex items-center gap-3 text-3xs">
+					<div className="flex items-center gap-3 text-2xs">
 						{capabilities.hasReduceOnly && (
 							<div className="inline-flex items-center gap-2">
 								<Checkbox

@@ -41,7 +41,7 @@ export function FooterBar() {
 	const { open } = useCommandMenuActions();
 
 	return (
-		<footer className="fixed bottom-0 left-0 right-0 z-40 h-6 border-t border-border-200/60 px-2 text-4xs uppercase tracking-wider flex items-center justify-between bg-surface-execution">
+		<footer className="fixed bottom-0 left-0 right-0 z-40 flex h-8 items-center justify-between border-t border-border-100/80 bg-surface-base/88 px-3 text-[11px] text-text-500 backdrop-blur-xl">
 			<div className="flex items-center gap-3">
 				<div className="flex items-center gap-1.5">
 					{icon}
@@ -51,9 +51,9 @@ export function FooterBar() {
 			<button
 				type="button"
 				onClick={open}
-				className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 text-text-500 hover:text-text-950 transition-colors"
+				className="absolute left-1/2 flex -translate-x-1/2 items-center gap-1.5 transition-colors hover:text-text-950"
 			>
-				<kbd className="ml-0.5 rounded-xs border border-border-200 bg-surface-analysis px-1 py-px text-4xs text-text-600">
+				<kbd className="ml-0.5 rounded-md border border-border-100 bg-surface-analysis px-1.5 py-0.5 text-[10px] text-text-600">
 					{"\u2318K"}
 				</kbd>
 			</button>
@@ -62,16 +62,16 @@ export function FooterBar() {
 					href={GITHUB_URL}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="flex items-center text-text-950 hover:text-primary-default transition-colors"
+					className="flex items-center text-text-950 transition-colors hover:text-primary-default"
 					aria-label="GitHub"
 				>
 					<GithubLogoIcon className="size-3" />
 				</a>
-				<div className="h-3 w-px bg-border-200/60" />
+				<div className="h-3 w-px bg-border-100/80" />
 				<ClientOnly>
 					<span className="text-text-950 tabular-nums">{formatTime(new Date())}</span>
 				</ClientOnly>
-				<div className="h-3 w-px bg-border-200/60" />
+				<div className="h-3 w-px bg-border-100/80" />
 				<span className="text-text-950">{APP_VERSION}</span>
 			</div>
 		</footer>

@@ -1,7 +1,7 @@
 import { WifiSlashIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useOnlineStatus } from "@/hooks/use-mobile";
+import { useOnlineStatus } from "@/hooks/use-online-status";
 import { cn } from "@/lib/cn";
 
 interface Props {
@@ -67,8 +67,8 @@ export function OfflineBanner({ className }: Props) {
 
 			{!isOnline && (
 				<Button
-					variant="text"
-					size="none"
+					variant="ghost"
+					size="icon"
 					onClick={() => setDismissed(true)}
 					className={cn(
 						"size-8 flex items-center justify-center",

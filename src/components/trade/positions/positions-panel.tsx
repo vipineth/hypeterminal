@@ -66,13 +66,17 @@ export function PositionsPanel() {
 	return (
 		<div className="h-full flex flex-col overflow-hidden bg-surface-execution">
 			<Tabs value={activeTab} onValueChange={handleTabChange} className="flex-1 min-h-0 flex flex-col">
-				<div className="p-2">
-					<TabsList variant="underline" fullWidth>
+				<div className="border-b border-border-100/80 px-3 pt-2">
+					<TabsList variant="line" className="w-full justify-start gap-1 overflow-x-auto">
 						{POSITIONS_TABS.map((tab) => {
 							const count = getTabCount(tab.value);
 
 							return (
-								<TabsTrigger key={tab.value} value={tab.value} className="inline-flex items-center gap-1">
+								<TabsTrigger
+									key={tab.value}
+									value={tab.value}
+									className="inline-flex shrink-0 items-center gap-1 px-2 pb-2 text-2xs"
+								>
 									<span>{tab.label}</span>
 									{typeof count === "number" ? <span>({count})</span> : null}
 								</TabsTrigger>

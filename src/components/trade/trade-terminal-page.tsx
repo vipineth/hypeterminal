@@ -1,9 +1,7 @@
 import { Suspense } from "react";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/cn";
 import { createLazyComponent } from "@/lib/lazy";
-import { useGlobalSettings } from "@/stores/use-global-settings-store";
 import { FooterBar } from "./footer/footer-bar";
 import { TopNav } from "./header/top-nav";
 import { MainWorkspace } from "./layout/main-workspace";
@@ -15,7 +13,6 @@ const GlobalModals = createLazyComponent(() => import("./components/global-modal
 export function TradeTerminalPage() {
 	useDocumentTitle();
 	const isMobile = useIsMobile();
-	const { showChartScanlines } = useGlobalSettings();
 
 	return (
 		<>
@@ -24,12 +21,7 @@ export function TradeTerminalPage() {
 					<MobileTerminal />
 				</Suspense>
 			) : (
-				<div
-					className={cn(
-						"bg-surface-200 text-fg-950 min-h-screen w-full flex flex-col font-mono pt-11 pb-6",
-						showChartScanlines && "terminal-scanlines",
-					)}
-				>
+				<div className="flex min-h-screen w-full flex-col bg-surface-base text-text-950 pt-14 pb-8">
 					<TopNav />
 					<MainWorkspace />
 					<FooterBar />
@@ -44,7 +36,7 @@ export function TradeTerminalPage() {
 
 function MobileLoadingFallback() {
 	return (
-		<div className="h-dvh w-full flex items-center justify-center bg-surface-200 text-fg-950">
+		<div className="flex h-dvh w-full items-center justify-center bg-surface-base text-text-950">
 			<div className="animate-pulse text-fg-600">Loading...</div>
 		</div>
 	);

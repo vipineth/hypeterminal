@@ -66,14 +66,17 @@ function FavoriteChip({ name, isActive }: FavoriteChipProps) {
 	return (
 		<div className="group/fav relative shrink-0">
 			<Button
-				variant="text"
+				variant={isActive ? "secondary" : "ghost"}
+				size="xs"
 				onClick={handleClick}
 				onKeyDown={handleKeyDown}
 				tabIndex={0}
 				aria-label={t`Select ${displayName} market`}
 				className={cn(
-					"flex items-center gap-1 shrink-0 px-2 py-1.5 text-3xs rounded-sm bg-surface-execution border transition-colors",
-					isActive ? "border-border-300" : "border-transparent hover:border-border-100",
+					"flex h-8 items-center gap-1 shrink-0 rounded-lg border px-2.5 text-3xs transition-colors",
+					isActive
+						? "border-border-300 bg-surface-execution text-text-950"
+						: "border-transparent text-text-500 hover:border-border-100 hover:bg-accent hover:text-text-950",
 				)}
 			>
 				<span className="font-medium text-text-950 uppercase">{displayName}</span>

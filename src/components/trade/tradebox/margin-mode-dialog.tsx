@@ -29,7 +29,13 @@ export function MarginModeToggle({ mode, disabled, onClick }: MarginModeTogglePr
 	const Icon = MODE_ICONS[mode];
 
 	return (
-		<Button variant="outlined" size="md" onClick={onClick} disabled={disabled}>
+		<Button
+			variant="outline"
+			size="sm"
+			onClick={onClick}
+			disabled={disabled}
+			className="h-8 rounded-lg border-border-100 bg-surface-base/40 px-2.5 text-2xs hover:bg-accent"
+		>
 			<Icon className="size-3" />
 			<span>{label}</span>
 			<CaretDownIcon className="size-3" />
@@ -216,7 +222,7 @@ export function MarginModeDialog({
 				)}
 
 				<DialogFooter>
-					<Button variant="text" size="sm" onClick={handleCancel} disabled={isUpdating}>
+					<Button variant="ghost" size="sm" onClick={handleCancel} disabled={isUpdating}>
 						<Trans>Cancel</Trans>
 					</Button>
 					<TradingActionButton

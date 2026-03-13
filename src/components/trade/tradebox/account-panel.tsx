@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { InfoRow, InfoRowGroup } from "@/components/ui/info-row";
-import { Tabs, TabsContent, TabsContentGroup, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
@@ -186,15 +186,15 @@ export function AccountPanel() {
 	}, [spotMetrics]);
 
 	return (
-		<div className="shrink-0 flex flex-col bg-surface-execution border-t border-border-200 mb-10">
-			<div className="px-2 py-2 border-b border-border-200 flex items-center justify-between">
-				<span className="text-3xs text-text-950">{t`Account`}</span>
-				<div className="flex items-center gap-2">
-					<div className="flex items-center gap-1">
-						<span className="text-3xs text-text-950">{t`Equity`}</span>
+		<div className="flex shrink-0 flex-col border-t border-border-100/80 bg-card/95">
+			<div className="flex items-center justify-between border-b border-border-100/80 px-4 py-3">
+				<span className="text-xs font-medium text-text-950">{t`Account`}</span>
+				<div className="flex items-center gap-3">
+					<div className="flex items-center gap-1.5">
+						<span className="text-3xs uppercase tracking-[0.16em] text-text-500">{t`Equity`}</span>
 						<span
 							className={cn(
-								"text-xs font-medium tabular-nums",
+								"text-sm font-medium tabular-nums",
 								(activeTab === "perps" ? hasPerpData : hasSpotData) ? "text-market-up-600" : "text-text-950",
 							)}
 						>
@@ -202,25 +202,25 @@ export function AccountPanel() {
 						</span>
 					</div>
 					{activeTab === "perps" && (
-						<div className="flex items-center gap-1">
-							<span className="text-3xs text-text-950">{t`PNL`}</span>
-							<span className={cn("text-xs font-medium tabular-nums", headerPnlClass)}>{headerPnl}</span>
+						<div className="flex items-center gap-1.5">
+							<span className="text-3xs uppercase tracking-[0.16em] text-text-500">{t`PNL`}</span>
+							<span className={cn("text-sm font-medium tabular-nums", headerPnlClass)}>{headerPnl}</span>
 						</div>
 					)}
 				</div>
 			</div>
 
 			<Tabs value={activeTab} onValueChange={setActiveTab}>
-				<TabsList variant="underline">
+				<TabsList variant="line" className="px-4 pt-1">
 					<TabsTrigger value="perps">{t`Perps`}</TabsTrigger>
 					<TabsTrigger value="spot">{t`Spot`}</TabsTrigger>
 				</TabsList>
 
 				{!isConnected ? (
-					<div className="text-2xs text-text-600 text-center py-4">{t`Connect wallet to view account`}</div>
+					<div className="px-3 py-5 text-center text-2xs text-text-600">{t`Connect wallet to view account`}</div>
 				) : (
-					<div className="p-2 overflow-y-auto">
-						<TabsContentGroup>
+					<div className="overflow-y-auto px-4 pb-4 pt-3">
+						<div className="space-y-2">
 							<TabsContent value="perps" forceMount>
 								{hasPerpData ? (
 									<InfoRowGroup className="divide-border-200/30">
@@ -253,15 +253,25 @@ export function AccountPanel() {
 									<div className="text-2xs text-text-600 text-center py-4">{t`Loading...`}</div>
 								)}
 							</TabsContent>
-						</TabsContentGroup>
+						</div>
 
 						{(hasPerpData || hasSpotData) && (
-							<div className="grid grid-cols-2 gap-1 mt-4">
-								<Button variant="outlined" onClick={() => openDepositModal("withdraw")} aria-label={t`Withdraw`}>
+							<div className="mt-4 grid grid-cols-2 gap-2">
+								<Button
+									variant="outline"
+									className="h-9 rounded-xl bg-surface-base/40"
+									onClick={() => openDepositModal("withdraw")}
+									aria-label={t`Withdraw`}
+								>
 									<UploadSimpleIcon className="size-4" />
 									{t`Withdraw`}
 								</Button>
-								<Button variant="outlined" onClick={() => openDepositModal("deposit")} aria-label={t`Deposit`}>
+								<Button
+									variant="outline"
+									className="h-9 rounded-xl bg-surface-base/40"
+									onClick={() => openDepositModal("deposit")}
+									aria-label={t`Deposit`}
+								>
 									<DownloadSimpleIcon className="size-4" />
 									{t`Deposit`}
 								</Button>

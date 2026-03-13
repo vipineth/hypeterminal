@@ -33,11 +33,11 @@ function OrderbookRowComponent({ level, side, maxTotal, showInQuote = false, szD
 			/>
 			<div className="grid grid-cols-3 gap-2 text-3xs tabular-nums py-0.5 px-2 relative z-10">
 				<Button
-					variant="text"
-					size="none"
+					variant="ghost"
+					size="xs"
 					onClick={() => setSelectedPrice(level.price)}
 					className={cn(
-						"text-left justify-start font-medium",
+						"h-auto justify-start px-0 text-left font-medium hover:bg-transparent",
 						isAsk ? "text-market-down-600 hover:text-market-down-600" : "text-market-up-600 hover:text-market-up-600",
 					)}
 				>

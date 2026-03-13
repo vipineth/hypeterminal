@@ -30,15 +30,15 @@ export function TradeHeader({ orderType, side, sideLabels, marketKind, onOrderTy
 					else if (v === "limit") onOrderTypeChange("limit");
 				}}
 			>
-				<TabsList variant="underline" className="w-full">
-					<TabsTrigger value="market" className="flex-1 text-xs normal-case">{t`Market`}</TabsTrigger>
-					<TabsTrigger value="limit" className="flex-1 text-xs normal-case">{t`Limit`}</TabsTrigger>
+				<TabsList variant="line" className="w-full">
+					<TabsTrigger value="market" className="flex-1 text-sm font-medium normal-case">{t`Market`}</TabsTrigger>
+					<TabsTrigger value="limit" className="flex-1 text-sm font-medium normal-case">{t`Limit`}</TabsTrigger>
 					<div className="relative inline-flex flex-1 items-center justify-center pb-2">
 						<AdvancedOrderDropdown
 							orderType={orderType}
 							onOrderTypeChange={onOrderTypeChange}
 							marketKind={marketKind}
-							className={cn("text-xs normal-case", isAdvancedTab ? "font-semibold text-text-950" : "text-text-600")}
+							className={cn("text-sm normal-case", isAdvancedTab ? "font-semibold text-text-950" : "text-text-600")}
 						/>
 						{isAdvancedTab && <span aria-hidden className="absolute bottom-0 inset-x-0 h-0.5 bg-primary-default" />}
 					</div>
