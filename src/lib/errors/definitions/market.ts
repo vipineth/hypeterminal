@@ -42,9 +42,3 @@ export const noMarkPriceValidator: Validator<HasMarkPrice> = createValidator({
 	getMessage: () => t`No mark price`,
 	validate: (ctx) => ctx.orderType !== "market" || ctx.markPx > 0,
 });
-
-export const marketValidators: Validator<MarketContext>[] = [
-	noMarketValidator,
-	marketNotReadyValidator,
-	noMarkPriceValidator,
-];

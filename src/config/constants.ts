@@ -3,7 +3,6 @@ import type { ChartingLibraryFeatureset, ResolutionString, TimeFrameItem } from 
 export const APP_NAME = "HypeTerminal";
 export const APP_VERSION = "v0.1.0";
 
-export const QUICK_PERCENT_OPTIONS = [25, 50, 100, 200, 400] as const;
 export const TP_QUICK_PERCENT_OPTIONS = [25, 50, 100, 200] as const;
 export const SL_QUICK_PERCENT_OPTIONS = [5, 10, 25, 50] as const;
 
@@ -11,11 +10,7 @@ export const FALLBACK_VALUE_PLACEHOLDER = "-";
 export const FORMAT_COMPACT_THRESHOLD = 10_000;
 export const FORMAT_COMPACT_DEFAULT = true;
 
-export const MOBILE_BREAKPOINT_PX = 768;
-
-export const DEFAULT_MARKET_KEY = "perp:BTC";
 export const DEFAULT_MARKET_NAME = "BTC";
-export const DEFAULT_MARKET_SCOPE = "perp" as const;
 export const DEFAULT_QUOTE_TOKEN = "USDC";
 
 export const HL_ALL_DEXS = "ALL_DEXS" as const;
@@ -25,8 +20,6 @@ export const ORDER_FEE_RATE_TAKER = 0.00045;
 export const ORDER_FEE_RATE_MAKER = 0.00015;
 export const ORDER_FEE_RATE_SPOT_TAKER = 0.0007;
 export const ORDER_FEE_RATE_SPOT_MAKER = 0.0004;
-export const ORDER_SIZE_PERCENT_STEPS = [25, 50, 75, 100] as const;
-export const ORDER_LEVERAGE_STEPS = [1, 2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 125, 150, 200] as const;
 
 export const TWAP_MINUTES_MIN = 5;
 export const TWAP_MINUTES_MAX = 1440;
@@ -34,11 +27,9 @@ export const SCALE_LEVELS_MIN = 2;
 export const SCALE_LEVELS_MAX = 20;
 
 export const DEFAULT_MAX_LEVERAGE = 50;
-export const MARKET_LEVERAGE_HARD_MAX = 100;
 export const DEFAULT_MARKET_ORDER_SLIPPAGE_PERCENT = 2.5;
 export const MARKET_ORDER_SLIPPAGE_MIN_PERCENT = 0.1;
 export const MARKET_ORDER_SLIPPAGE_MAX_PERCENT = 100;
-export const DEFAULT_LEVERAGE_BY_MODE = { cross: 10, isolated: 10 } as const;
 
 export const STORAGE_KEYS = {
 	MARKET_PREFS: "market-prefs-v2",
@@ -67,13 +58,6 @@ export const PANEL_LAYOUT = {
 		chart: { defaultSize: 76, minSize: 40 },
 		orderbook: { defaultSize: 24, minSize: 20 },
 	},
-} as const;
-
-export const SIDEBAR_LAYOUT = {
-	WIDTH: "16rem",
-	WIDTH_MOBILE: "18rem",
-	WIDTH_ICON: "3rem",
-	KEYBOARD_SHORTCUT: "b",
 } as const;
 
 export const SEO_DEFAULTS = {

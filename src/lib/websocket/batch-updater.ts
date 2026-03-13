@@ -1,51 +1,7 @@
-type FlushCallback<T> = (items: T[]) => void;
-
 interface BatchedUpdater<T> {
 	add: (item: T) => void;
 	flush: () => void;
 	destroy: () => void;
-}
-
-export function createBatchedUpdater<T>(flush: FlushCallback<T>): BatchedUpdater<T> {
-	let buffer: T[] = [];
-	let rafId: number | null = null;
-
-	function scheduleFlush() {
-		if (rafId !== null) return;
-		rafId = requestAnimationFrame(() => {
-			rafId = null;
-			if (buffer.length > 0) {
-				const items = buffer;
-				buffer = [];
-				flush(items);
-			}
-		});
-	}
-
-	return {
-		add: (item: T) => {
-			buffer.push(item);
-			scheduleFlush();
-		},
-		flush: () => {
-			if (rafId !== null) {
-				cancelAnimationFrame(rafId);
-				rafId = null;
-			}
-			if (buffer.length > 0) {
-				const items = buffer;
-				buffer = [];
-				flush(items);
-			}
-		},
-		destroy: () => {
-			if (rafId !== null) {
-				cancelAnimationFrame(rafId);
-				rafId = null;
-			}
-			buffer = [];
-		},
-	};
 }
 
 export function createThrottledUpdater<T>(callback: (item: T) => void, intervalMs = 16): BatchedUpdater<T> {

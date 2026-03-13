@@ -6,7 +6,8 @@ export {
 	WebSocketTransport,
 	type WebSocketTransportOptions,
 } from "@nktkas/hyperliquid";
-export * from "./asset-id";
+export type { MarketKind } from "@/domain/market";
+export { type Position, type UserPositions, useUserPositions } from "./account";
 export { getMarketCapabilities, type MarketCapabilities } from "./capabilities";
 export { createExchangeClient, getInfoClient, getSubscriptionClient, initializeClients } from "./clients";
 export * from "./errors";
@@ -26,13 +27,10 @@ export {
 	useMarketsInfo,
 	useSelectedMarketInfo,
 } from "./hooks/useMarketsInfo";
-export { type UseSpotTokensReturn, useSpotTokens } from "./markets/use-spot-tokens";
 export { useTradingGuard } from "./hooks/useTradingGuard";
 export { useHttpTransport, useSubscriptionTransport } from "./hooks/useTransport";
 // Legacy exports - deprecated, use useMarkets() instead
 export { getMarketKindFromName } from "./hooks/utils/markets";
-export type { MarketKind } from "@/domain/market";
-export { type Position, type UserPositions, useUserPositions } from "./account";
 export {
 	type BuilderPerpMarket,
 	type Markets,
@@ -45,6 +43,7 @@ export {
 	type UnifiedMarket,
 	useMarkets,
 } from "./markets";
+export { type UseSpotTokensReturn, useSpotTokens } from "./markets/use-spot-tokens";
 export type { HyperliquidContextValue, HyperliquidProviderProps } from "./provider";
 export { HyperliquidProvider, useConfig, useHyperliquid, useHyperliquidOptional } from "./provider";
 export { infoKeys } from "./query/keys";

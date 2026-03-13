@@ -20,13 +20,3 @@ export function createLazyComponent<T extends Record<string, any>, K extends key
 ) {
 	return lazyRouteComponent(importer, exportName);
 }
-
-/**
- * Creates a lazy-loaded component that uses the default export.
- *
- * @example
- * const Modal = createLazyDefault(() => import("./modal"));
- */
-export function createLazyDefault<T extends { default: React.ComponentType<unknown> }>(importer: () => Promise<T>) {
-	return lazyRouteComponent(importer, "default");
-}

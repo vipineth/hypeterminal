@@ -39,10 +39,6 @@ export const infoKeys = {
 	method: <TParams>(method: string, params?: TParams) => createKey("info", method, params),
 };
 
-export const exchangeKeys = {
-	method: <TParams>(method: string, params?: TParams) => createKey("exchange", method, params),
-};
-
 export const subscriptionKeys = {
 	method: <TParams>(method: string, params?: TParams) =>
 		["hl", "subscription", method, stableSubscriptionValue(params ?? {})] as const,

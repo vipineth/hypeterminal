@@ -54,5 +54,3 @@ export const slPriceValidator: Validator<TpSlContext> = createValidator({
 		return validateSlPrice(ctx.price, ctx.slPriceNum, ctx.side);
 	},
 });
-
-export const tpSlValidators: Validator<TpSlContext>[] = [enterTpSlPriceValidator, tpPriceValidator, slPriceValidator];

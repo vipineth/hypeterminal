@@ -3,8 +3,6 @@
  * This ensures the chart colors stay in sync with the app theme
  */
 
-import type { ColorGradient, CustomThemeColors } from "@/types/charting_library";
-
 type ChartColors = {
 	background: string;
 	foreground: string;
@@ -189,66 +187,6 @@ export function getLoadingScreenColors(): { backgroundColor: string; foregroundC
 export function getToolbarBgColor(): string {
 	const colors = getChartColors();
 	return colorToHex(colors.background);
-}
-
-function generateColorGradient(baseHex: string): ColorGradient {
-	const r = Number.parseInt(baseHex.slice(1, 3), 16);
-	const g = Number.parseInt(baseHex.slice(3, 5), 16);
-	const b = Number.parseInt(baseHex.slice(5, 7), 16);
-
-	const shades = new Array<string>(19);
-
-	for (let i = 0; i < 19; i++) {
-		let newR: number;
-		let newG: number;
-		let newB: number;
-
-		if (i < 9) {
-			const lightFactor = 1 - i / 9;
-			newR = Math.round(r + (255 - r) * lightFactor);
-			newG = Math.round(g + (255 - g) * lightFactor);
-			newB = Math.round(b + (255 - b) * lightFactor);
-		} else if (i === 9) {
-			newR = r;
-			newG = g;
-			newB = b;
-		} else {
-			const darkFactor = 1 - (i - 9) / 9;
-			newR = Math.round(r * darkFactor);
-			newG = Math.round(g * darkFactor);
-			newB = Math.round(b * darkFactor);
-		}
-
-		const hex = `#${newR.toString(16).padStart(2, "0")}${newG.toString(16).padStart(2, "0")}${newB.toString(16).padStart(2, "0")}`;
-		shades[i] = hex;
-	}
-
-	return shades as ColorGradient;
-}
-
-export function getCustomThemeColors(): CustomThemeColors {
-	const colors = getChartColors();
-
-	const accent = colorToHex(colors.accent);
-	const textTertiary = colorToHex(colors.textTertiary);
-	const red = colorToHex(colors.red);
-	const green = colorToHex(colors.green);
-	const amber = colorToHex(getCssVar("--warning-700") || colors.accent);
-	const purple = colorToHex(getCssVar("--primary-default") || colors.accent);
-	const bg = colorToHex(colors.background);
-	const fg = colorToHex(colors.foreground);
-
-	return {
-		color1: generateColorGradient(accent),
-		color2: generateColorGradient(textTertiary),
-		color3: generateColorGradient(red),
-		color4: generateColorGradient(green),
-		color5: generateColorGradient(amber),
-		color6: generateColorGradient(purple),
-		color7: generateColorGradient(accent),
-		white: bg,
-		black: fg,
-	};
 }
 
 let staticCssCache: string | null = null;

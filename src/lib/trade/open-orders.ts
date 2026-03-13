@@ -17,30 +17,12 @@ export const ORDER_TYPE_CONFIG = {
 	default: { class: "bg-surface-analysis/50" },
 } as const;
 
-export function isLongOrder(order: OpenOrder): boolean {
-	return order.side === "B";
-}
-
 export function isTakeProfitOrder(order: OpenOrder): boolean {
 	return order.orderType.startsWith(ORDER_TYPE_CONFIG.takeProfit.prefix);
 }
 
 export function isStopOrder(order: OpenOrder): boolean {
 	return order.orderType.startsWith(ORDER_TYPE_CONFIG.stop.prefix);
-}
-
-export function getFilledSize(order: OpenOrder): number {
-	const origSz = toBig(order.origSz);
-	const remaining = toBig(order.sz);
-	if (!origSz || !remaining) return Number.NaN;
-	return origSz.minus(remaining).toNumber();
-}
-
-export function getFillPercent(order: OpenOrder): number {
-	const origSz = toBig(order.origSz);
-	const filled = getFilledSize(order);
-	if (!origSz || origSz.eq(0) || !Number.isFinite(filled)) return 0;
-	return toBig(filled)?.div(origSz).times(100).toNumber() ?? 0;
 }
 
 export function getOrderValue(order: OpenOrder): number | null {

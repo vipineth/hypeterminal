@@ -119,10 +119,6 @@ export function registerMockWallet(config: MockWalletConfig): void {
 	mockWalletRegistry.set(config.name, config);
 }
 
-export function getMockWalletConfig(name: string): MockWalletConfig | undefined {
-	return mockWalletRegistry.get(name);
-}
-
 export function isMockConnector(connector: Connector): boolean {
 	return connector.id === "mock" || connector.type === "mock";
 }

@@ -19,5 +19,3 @@ export const twapMinutesRangeValidator: Validator<TwapContext> = createValidator
 		return minutes >= TWAP_MINUTES_MIN && minutes <= TWAP_MINUTES_MAX;
 	},
 });
-
-export const twapValidators: Validator<TwapContext>[] = [twapMinutesRangeValidator];

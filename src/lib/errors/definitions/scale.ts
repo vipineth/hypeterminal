@@ -70,10 +70,3 @@ export const scaleLevelMinNotionalValidator: Validator<ScaleContext> = createVal
 		return perLevelNotional >= ORDER_MIN_NOTIONAL_USD;
 	},
 });
-
-export const scaleValidators: Validator<ScaleContext>[] = [
-	enterPriceRangeValidator,
-	scaleLevelsRangeValidator,
-	scaleStartEndDifferValidator,
-	scaleLevelMinNotionalValidator,
-];

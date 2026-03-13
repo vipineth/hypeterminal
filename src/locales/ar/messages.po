@@ -762,8 +762,6 @@ msgstr ""
 msgid "Insufficient <0/> balance"
 msgstr ""
 
-#: src/lib/errors/definitions/deposit.ts
-#: src/lib/errors/definitions/deposit.ts
 #: src/lib/hyperliquid/use-deposit.ts
 msgid "Insufficient balance"
 msgstr ""
@@ -1019,19 +1017,17 @@ msgstr "الحد الأدنى $10"
 msgid "Minimum"
 msgstr ""
 
-#. placeholder {0}: ctx.minDeposit
 #: src/lib/errors/definitions/deposit.ts
-msgid "Minimum deposit is {0} USDC"
-msgstr ""
+#~ msgid "Minimum deposit is {0} USDC"
+#~ msgstr ""
 
 #: src/lib/hyperliquid/use-deposit.ts
 msgid "Minimum deposit is 5 USDC"
 msgstr ""
 
-#. placeholder {0}: ctx.minWithdraw
 #: src/lib/errors/definitions/deposit.ts
-msgid "Minimum withdrawal is ${0}"
-msgstr ""
+#~ msgid "Minimum withdrawal is ${0}"
+#~ msgstr ""
 
 #: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Minimum withdrawal is ${MIN_WITHDRAW_USD}"

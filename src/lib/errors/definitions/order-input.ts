@@ -57,11 +57,3 @@ export const exceedsMaxSizeValidator: Validator<OrderInputContext> = createValid
 	getMessage: () => t`Exceeds max size`,
 	validate: (ctx) => ctx.maxSize <= 0 || ctx.sizeValue <= ctx.maxSize,
 });
-
-export const orderInputValidators: Validator<OrderInputContext>[] = [
-	enterLimitPriceValidator,
-	enterTriggerPriceValidator,
-	enterSizeValidator,
-	minOrderNotionalValidator,
-	exceedsMaxSizeValidator,
-];

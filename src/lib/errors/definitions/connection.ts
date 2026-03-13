@@ -13,9 +13,11 @@ interface HasReadyToTrade {
 	isReadyToTrade: boolean;
 }
 
-export type ConnectionContext = HasConnection & HasWalletLoading & HasReadyToTrade & {
-	needsAgentApproval: boolean;
-};
+export type ConnectionContext = HasConnection &
+	HasWalletLoading &
+	HasReadyToTrade & {
+		needsAgentApproval: boolean;
+	};
 
 export const walletNotConnectedValidator: Validator<HasConnection> = createValidator({
 	id: "wallet-not-connected",
@@ -43,9 +45,3 @@ export const signerNotReadyValidator: Validator<HasReadyToTrade> = createValidat
 	getMessage: () => t`Signer not ready`,
 	validate: (ctx) => ctx.isReadyToTrade,
 });
-
-export const connectionValidators: Validator<ConnectionContext>[] = [
-	walletNotConnectedValidator,
-	walletLoadingValidator,
-	signerNotReadyValidator,
-];

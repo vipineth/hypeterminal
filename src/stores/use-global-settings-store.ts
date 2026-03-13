@@ -171,11 +171,6 @@ export function useMarginMode() {
 	return useGlobalSettingsStore((state) => state.marginMode);
 }
 
-export function useResolvedFormatLocale(): string {
-	const numberFormatLocale = useGlobalSettingsStore((state) => state.numberFormatLocale);
-	return resolveNumberFormatLocale(numberFormatLocale);
-}
-
 export function getResolvedFormatLocale(): string {
 	return resolveNumberFormatLocale(useGlobalSettingsStore.getState().numberFormatLocale);
 }
