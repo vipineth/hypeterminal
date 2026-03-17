@@ -27,7 +27,7 @@ export function ChartPanel() {
 
 	return (
 		<div className="h-full flex flex-col overflow-hidden">
-			<div className="px-2 py-2.5 border-b border-border-200/85 bg-surface-analysis">
+			<div className="px-2 py-2.5 border-b border-border-50 bg-surface-analysis">
 				<div className="flex items-center justify-between gap-2">
 					<MarketOverview />
 					<div className="flex items-center gap-1 text-3xs">

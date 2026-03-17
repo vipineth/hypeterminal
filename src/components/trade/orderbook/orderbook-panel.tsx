@@ -94,7 +94,7 @@ export function OrderbookPanel() {
 			</div>
 
 			<TabsContent value="book" className="flex-1 min-h-0 flex flex-col">
-				<div className="grid grid-cols-3 gap-2 px-2 py-1.5 items-center text-3xs text-text-950 uppercase tracking-wider border-b border-border-200/40 shrink-0">
+				<div className="grid grid-cols-3 gap-2 px-2 py-1.5 items-center text-3xs text-text-950 uppercase tracking-wider border-b border-border-50 shrink-0">
 					<div className="flex items-center gap-1">
 						{t`Price`}
 						<DropdownMenu>
@@ -165,7 +165,7 @@ export function OrderbookPanel() {
 
 					<div
 						data-slot="orderbook-spread"
-						className="shrink-0 px-2 py-1.5 border-y border-border-200/40 flex items-center justify-between text-3xs text-text-950"
+						className="shrink-0 px-2 py-2 bg-surface-base/30 flex items-center justify-between text-3xs text-text-950"
 					>
 						<span>{t`Spread`}</span>
 						<span className="tabular-nums font-medium text-market-down-600">

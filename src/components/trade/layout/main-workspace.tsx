@@ -23,9 +23,9 @@ export function MainWorkspace() {
 
 	return (
 		<div className="flex-1 min-h-0">
-			<div className="flex items-center gap-3 border-b border-border-100/80 bg-surface-base/72 px-3 py-2 backdrop-blur-xl">
+			<div className="flex items-center gap-3 border-b border-border-50 bg-surface-base/72 px-3 py-2 backdrop-blur-xl">
 				<TokenSelector selectedMarket={selectedMarket} onValueChange={handleMarketChange} />
-				<div className="h-5 w-px shrink-0 bg-border-100/80" />
+				<div className="h-5 w-px shrink-0 bg-border-50" />
 				<FavoritesStrip />
 			</div>
 			<ResizablePanelGroup className="h-full min-h-0" defaultLayout={defaultLayout} onLayoutChanged={onLayoutChanged}>
@@ -38,7 +38,7 @@ export function MainWorkspace() {
 				</ResizablePanel>
 				<ResizableHandle
 					withHandle
-					className="bg-border-100/70 data-[resize-handle-state=hover]:bg-border-300 data-[resize-handle-state=drag]:bg-primary-default/35"
+					className="bg-transparent data-[resize-handle-state=hover]:bg-border-200 data-[resize-handle-state=drag]:bg-primary-default/35"
 				/>
 				<ResizablePanel defaultSize={sidebar.defaultSize}>
 					<TradeSidebar />

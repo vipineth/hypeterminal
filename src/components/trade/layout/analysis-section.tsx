@@ -32,7 +32,7 @@ export function AnalysisSection() {
 				<ResizablePanel panelRef={chartPanelRef} defaultSize={chart.defaultSize} minSize={chart.minSize}>
 					<MarketInfo />
 				</ResizablePanel>
-				<ResizableHandle withHandle />
+				<ResizableHandle withHandle className="bg-border-50" />
 				<ResizablePanel panelRef={positionsPanelRef} defaultSize={positions.defaultSize} minSize={positions.minSize}>
 					<PositionsPanel />
 				</ResizablePanel>

@@ -186,8 +186,8 @@ export function AccountPanel() {
 	}, [spotMetrics]);
 
 	return (
-		<div className="flex shrink-0 flex-col border-t border-border-100/80 bg-card/95">
-			<div className="flex items-center justify-between border-b border-border-100/80 px-4 py-3">
+		<div className="flex shrink-0 flex-col border-t border-border-100 bg-card/95">
+			<div className="flex items-center justify-between px-4 py-3">
 				<span className="text-xs font-medium text-text-950">{t`Account`}</span>
 				<div className="flex items-center gap-3">
 					<div className="flex items-center gap-1.5">
@@ -223,7 +223,7 @@ export function AccountPanel() {
 						<div className="space-y-2">
 							<TabsContent value="perps" forceMount>
 								{hasPerpData ? (
-									<InfoRowGroup className="divide-border-200/30">
+									<InfoRowGroup className="">
 										{perpRows.map((row) => (
 											<InfoRow
 												key={row.label}
@@ -239,7 +239,7 @@ export function AccountPanel() {
 							</TabsContent>
 							<TabsContent value="spot" forceMount>
 								{hasSpotData ? (
-									<InfoRowGroup className="divide-border-200/30">
+									<InfoRowGroup className="">
 										{spotRows.map((row) => (
 											<InfoRow
 												key={row.label}

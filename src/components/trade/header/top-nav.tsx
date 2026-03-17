@@ -67,7 +67,7 @@ export function TopNav() {
 						<span className="text-text-950">TERMINAL</span>
 					</span>
 				</div>
-				<div className="hidden h-5 w-px bg-border-100 md:block" />
+				<div className="hidden h-5 w-px bg-border-50 md:block" />
 				<nav className="hidden items-center text-sm lg:flex">
 					{SCOPE_NAV_ITEMS.map((item) => (
 						<Link
@@ -81,7 +81,7 @@ export function TopNav() {
 							{item.label}
 						</Link>
 					))}
-					<div className="mx-2 h-5 w-px bg-border-100" />
+					<div className="mx-2 h-5 w-px bg-border-50" />
 					{STATIC_NAV_ITEMS.map((item) => (
 						<button
 							key={item.key}

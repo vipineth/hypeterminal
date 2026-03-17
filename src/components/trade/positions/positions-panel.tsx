@@ -66,7 +66,7 @@ export function PositionsPanel() {
 	return (
 		<div className="h-full flex flex-col overflow-hidden bg-surface-execution">
 			<Tabs value={activeTab} onValueChange={handleTabChange} className="flex-1 min-h-0 flex flex-col">
-				<div className="border-b border-border-100/80 px-3 pt-2">
+				<div className="border-b border-border-50 px-3 pt-2">
 					<TabsList variant="line" className="w-full justify-start gap-1 overflow-x-auto">
 						{POSITIONS_TABS.map((tab) => {
 							const count = getTabCount(tab.value);

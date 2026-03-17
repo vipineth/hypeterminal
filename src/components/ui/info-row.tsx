@@ -26,7 +26,7 @@ function InfoRowGroup({ className, ...props }: React.ComponentProps<"div">) {
 	return (
 		<div
 			data-slot="info-row-group"
-			className={cn("divide-y divide-border-200 text-2xs tracking-[0.5px]", className)}
+			className={cn("divide-y divide-border-50 text-2xs tracking-[0.5px]", className)}
 			{...props}
 		/>
 	);

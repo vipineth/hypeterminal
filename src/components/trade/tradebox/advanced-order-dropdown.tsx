@@ -13,6 +13,7 @@ import {
 import {
 	DropdownMenu,
 	DropdownMenuContent,
+	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
@@ -95,31 +96,35 @@ export function AdvancedOrderDropdown({ orderType, onOrderTypeChange, marketKind
 			<DropdownMenuContent align="end" className="min-w-44">
 				{hasTriggerOptions && (
 					<>
-						<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-text-950">
-							{t`Trigger`}
-						</DropdownMenuLabel>
-						{triggerOptions.map((option) => (
-							<AdvancedOrderItem
-								key={option.value}
-								option={option}
-								isSelected={orderType === option.value}
-								onSelect={() => onOrderTypeChange(option.value)}
-							/>
-						))}
+						<DropdownMenuGroup>
+							<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-text-950">
+								{t`Trigger`}
+							</DropdownMenuLabel>
+							{triggerOptions.map((option) => (
+								<AdvancedOrderItem
+									key={option.value}
+									option={option}
+									isSelected={orderType === option.value}
+									onSelect={() => onOrderTypeChange(option.value)}
+								/>
+							))}
+						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
 					</>
 				)}
-				<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-text-950">
-					{t`Execution`}
-				</DropdownMenuLabel>
-				{executionOptions.map((option) => (
-					<AdvancedOrderItem
-						key={option.value}
-						option={option}
-						isSelected={orderType === option.value}
-						onSelect={() => onOrderTypeChange(option.value)}
-					/>
-				))}
+				<DropdownMenuGroup>
+					<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-text-950">
+						{t`Execution`}
+					</DropdownMenuLabel>
+					{executionOptions.map((option) => (
+						<AdvancedOrderItem
+							key={option.value}
+							option={option}
+							isSelected={orderType === option.value}
+							onSelect={() => onOrderTypeChange(option.value)}
+						/>
+					))}
+				</DropdownMenuGroup>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);
