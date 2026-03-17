@@ -51,9 +51,8 @@ export function GlobalSettingsDialog() {
 		setLocalSlippageInput(null);
 	}
 
-	function handleSlippageSliderChange(values: number[]) {
-		const nextValue = values[0];
-		if (typeof nextValue === "number" && nextValue !== slippagePercent) {
+	function handleSlippageSliderChange(nextValue: number) {
+		if (nextValue !== slippagePercent) {
 			setMarketOrderSlippagePercent(nextValue);
 		}
 	}
@@ -129,7 +128,8 @@ export function GlobalSettingsDialog() {
 								<span className="text-xs text-text-600 min-w-8">%</span>
 							</div>
 							<Slider
-								value={[slippagePercent]}
+								thumbLabel="Market order slippage"
+								value={slippagePercent}
 								onValueChange={handleSlippageSliderChange}
 								min={MARKET_ORDER_SLIPPAGE_MIN_PERCENT}
 								max={MARKET_ORDER_SLIPPAGE_MAX_PERCENT}

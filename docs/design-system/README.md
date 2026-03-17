@@ -5,6 +5,7 @@ This branch adopts `shadcn` as the only primitive component system and uses Prac
 ## Rules
 
 - Keep generated files in `src/components/ui` stock. Do not add app-specific props, aliases, or variant names there.
+- For Base UI primitives, follow the documented anatomy and prop names. See `base-ui-slider.md` for the local slider policy.
 - Use shadcn semantic tokens only: `background`, `foreground`, `card`, `popover`, `primary`, `secondary`, `muted`, `accent`, `destructive`, `border`, `input`, `ring`, and `chart-*`.
 - Use Practical UI only to supply the values for those semantic tokens.
 - Build recurring product patterns outside `src/components/ui`.

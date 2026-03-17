@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { NumberInput } from "@/components/ui/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider, type SliderMark } from "@/components/ui/slider";
+import { Slider } from "@/components/ui/slider";
 import {
 	FALLBACK_VALUE_PLACEHOLDER,
 	ORDER_MIN_NOTIONAL_USD,
@@ -148,8 +148,6 @@ export function TradeFormFields({
 	const showTif = orderType === "limit" || orderType === "scale";
 	const availableTifOptions = orderType === "limit" ? (["Gtc", "Ioc", "Alo"] as const) : (["Gtc", "Alo"] as const);
 
-	const sizeMarks: SliderMark[] = [{ value: 0 }, { value: 25 }, { value: 50 }, { value: 75 }, { value: 100 }];
-
 	const triggerPriceNum = toNumber(triggerPriceInput);
 	const sizeHasError = (sizeValue > maxSize && maxSize > 0) || (orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD);
 
@@ -244,18 +242,19 @@ export function TradeFormFields({
 
 				<div className="flex items-center gap-2">
 					<Slider
-						value={[sliderValue]}
-						onValueChange={(v) => {
+						thumbLabel="Order size percentage"
+						thickness="lg"
+						value={sliderValue}
+						onValueChange={(nextValue) => {
 							setIsDraggingSlider(true);
-							setDragSliderValue(v[0]);
+							setDragSliderValue(nextValue);
 						}}
-						onValueCommit={(v) => {
+						onValueCommitted={(nextValue) => {
 							setIsDraggingSlider(false);
-							handleSizePercentApply(v[0]);
+							handleSizePercentApply(nextValue);
 						}}
 						max={100}
 						step={0.1}
-						marks={sizeMarks}
 						className="flex-1 py-5"
 						disabled={isFormDisabled || maxSize <= 0}
 					/>

@@ -22,6 +22,7 @@ These stay stock shadcn:
 - `Command`
 
 Do not add custom props like `tone`, `contained`, `outlined`, `text`, `underline`, or app-specific sizes to those files.
+Do not add unsupported pseudo-APIs to Base UI wrappers in `src/components/ui`; keep them aligned with the underlying primitive docs.
 
 ## App Layer
 
