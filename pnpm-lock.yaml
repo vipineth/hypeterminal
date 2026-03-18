@@ -20,9 +20,6 @@ importers:
       '@fontsource-variable/ibm-plex-sans':
         specifier: 5.2.8
         version: 5.2.8
-      '@fontsource-variable/raleway':
-        specifier: ^5.2.8
-        version: 5.2.8
       '@lingui/core':
         specifier: 5.7.0
         version: 5.7.0(@lingui/babel-plugin-lingui-macro@5.7.0(babel-plugin-macros@3.1.0)(typescript@5.9.3))(babel-plugin-macros@3.1.0)
@@ -861,9 +858,6 @@ packages:
 
   '@fontsource-variable/ibm-plex-sans@5.2.8':
     resolution: {integrity: sha512-n5PF2iFa0CZT0QYTPzxvZ39opC9LnU0zdoRccoADbs+Dtsd+lbXOZF7RNuIPHcQX1dKjF63sxnRImQIB5eD0Ag==}
-
-  '@fontsource-variable/raleway@5.2.8':
-    resolution: {integrity: sha512-PahqGI7bkz4a80m91Jt65DRsuFQmRip5vGDbI9sChVSKjLrdDfXbeGIwnTPi/ZVCOoQrbLnqzBOLQpLohnz+WA==}
 
   '@hono/node-server@1.19.11':
     resolution: {integrity: sha512-dr8/3zEaB+p0D2n/IUrlPF1HZm586qgJNXK1a9fhg/PzdtkK7Ksd5l312tJX2yBuALqDYBlG20QEbayqPyxn+g==}
@@ -5876,8 +5870,6 @@ snapshots:
   '@fontsource-variable/figtree@5.2.10': {}
 
   '@fontsource-variable/ibm-plex-sans@5.2.8': {}
-
-  '@fontsource-variable/raleway@5.2.8': {}
 
   '@hono/node-server@1.19.11(hono@4.12.7)':
     dependencies:
