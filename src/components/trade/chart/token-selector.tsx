@@ -445,7 +445,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 			role="combobox"
 			aria-expanded={open}
 			aria-label={t`Select token`}
-			className="h-8 gap-2 rounded-lg border-border-100 bg-surface-execution px-2.5 text-2xs font-semibold uppercase tracking-[0.14em] hover:bg-accent"
+			className="h-8 gap-2 rounded-xs border-border-100 bg-surface-execution px-2.5 text-2xs font-semibold uppercase tracking-[0.14em] hover:bg-accent"
 		>
 			{selectedMarket && (
 				<AssetDisplay

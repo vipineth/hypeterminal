@@ -200,7 +200,6 @@ async function fetchStaticCss(): Promise<string> {
 		staticCssCache = await response.text();
 		return staticCssCache;
 	} catch (error) {
-		console.error("Failed to load tradingview-theme.css:", error);
 		return "";
 	}
 }

@@ -1,10 +1,8 @@
-"use client";
-
 import { CaretDownIcon, CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
 import * as React from "react";
 import { type DayButton, DayPicker, getDefaultClassNames, type Locale } from "react-day-picker";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 
 const CalendarLocaleContext = React.createContext<Partial<Locale> | undefined>(undefined);
 
@@ -116,12 +114,12 @@ function Calendar({
 					table: "w-full border-collapse",
 					weekdays: cn("flex", defaultClassNames.weekdays),
 					weekday: cn(
-						"flex-1 rounded-(--cell-radius) text-[0.8rem] font-normal text-muted-foreground select-none",
+						"flex-1 rounded-(--cell-radius) text-xs font-normal text-muted-foreground select-none",
 						defaultClassNames.weekday,
 					),
 					week: cn("mt-2 flex w-full", defaultClassNames.week),
 					week_number_header: cn("w-(--cell-size) select-none", defaultClassNames.week_number_header),
-					week_number: cn("text-[0.8rem] text-muted-foreground select-none", defaultClassNames.week_number),
+					week_number: cn("text-xs text-muted-foreground select-none", defaultClassNames.week_number),
 					day: cn(
 						"group/day relative aspect-square h-full w-full rounded-(--cell-radius) p-0 text-center select-none [&:last-child[data-selected=true]_button]:rounded-r-(--cell-radius)",
 						props.showWeekNumber

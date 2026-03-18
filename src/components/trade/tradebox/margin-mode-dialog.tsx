@@ -34,7 +34,7 @@ export function MarginModeToggle({ mode, disabled, onClick }: MarginModeTogglePr
 			size="sm"
 			onClick={onClick}
 			disabled={disabled}
-			className="h-8 rounded-lg border-border-100 bg-surface-base/40 px-2.5 text-2xs hover:bg-accent"
+			className="h-8 rounded-xs border-border-100 bg-surface-base/40 px-2.5 text-2xs hover:bg-accent"
 		>
 			<Icon className="size-3" />
 			<span>{label}</span>

@@ -133,7 +133,7 @@ function StatusScreen({
 					{explorerUrl && (
 						<Button
 							asChild
-							variant="text"
+							variant="ghost"
 							size="none"
 							className="h-auto p-0 text-3xs text-primary-default hover:underline"
 						>
@@ -218,7 +218,7 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 			</div>
 
 			<Button
-				variant="contained"
+				variant="default"
 				onClick={onSubmit}
 				disabled={!validation.valid || isPending}
 				className="mt-auto w-full"
@@ -346,7 +346,7 @@ function WithdrawForm({
 			</div>
 
 			<Button
-				variant="contained"
+				variant="default"
 				onClick={onSubmit}
 				disabled={!validation.valid || isPending}
 				className="mt-auto w-full"
@@ -551,7 +551,7 @@ export function DepositModal() {
 				onClose={handleClose}
 			>
 				<div className="flex w-full gap-2">
-					<Button variant="outlined" onClick={handleClose} className="flex-1">
+					<Button variant="outline" onClick={handleClose} className="flex-1">
 						<Trans>Cancel</Trans>
 					</Button>
 					<Button onClick={resetDeposit} className="flex-1">
@@ -607,7 +607,7 @@ export function DepositModal() {
 				onClose={handleClose}
 			>
 				<div className="flex w-full gap-2">
-					<Button variant="outlined" onClick={handleClose} className="flex-1">
+					<Button variant="outline" onClick={handleClose} className="flex-1">
 						<Trans>Cancel</Trans>
 					</Button>
 					<Button onClick={resetWithdraw} className="flex-1">

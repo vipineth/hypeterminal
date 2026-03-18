@@ -130,7 +130,7 @@ export function TwapTab() {
 														{isBuy ? t`buy` : t`sell`}
 													</span>
 													<Button
-														variant="text"
+														variant="ghost"
 														size="none"
 														onClick={() => setSelectedMarket(scope, state.coin)}
 														className="gap-1.5"
@@ -169,7 +169,7 @@ export function TwapTab() {
 											</TableCell>
 											<TableCell className="text-right py-1.5">
 												<Button
-													variant="outlined"
+													variant="outline"
 													size="sm"
 													className="border-market-down-600 text-market-down-600 hover:border-market-down-600/80 hover:bg-market-down-100"
 													aria-label={t`Cancel TWAP order`}

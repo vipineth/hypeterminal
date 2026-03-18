@@ -141,7 +141,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 									return (
 										<Button
 											key={connector.uid}
-											variant="text"
+											variant="ghost"
 											size="none"
 											onClick={() => handleConnect(connector)}
 											disabled={isPending}
@@ -186,7 +186,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 									return (
 										<Button
 											key={connector.uid}
-											variant="text"
+											variant="ghost"
 											size="none"
 											onClick={() => handleConnect(connector)}
 											disabled={isPending}
@@ -230,7 +230,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 									return (
 										<Button
 											key={connector.uid}
-											variant="text"
+											variant="ghost"
 											size="none"
 											onClick={() => handleConnect(connector)}
 											disabled={isPending}
@@ -270,7 +270,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 										className="font-mono text-xs"
 									/>
 									<Button
-										variant="outlined"
+										variant="outline"
 										size="sm"
 										onClick={handleCustomAddressConnect}
 										disabled={isPending}
@@ -310,7 +310,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 
 				<div className="border-t border-border-200/50 bg-surface-analysis">
 					<Button
-						variant="text"
+						variant="ghost"
 						size="none"
 						onClick={() => setShowHelp(!showHelp)}
 						className="w-full justify-between p-4 text-sm text-text-600 hover:text-text-950 hover:bg-transparent"
@@ -356,7 +356,7 @@ export function WalletDialog({ open, onOpenChange }: Props) {
 									</p>
 								</div>
 							</div>
-							<Button variant="outlined" size="sm" className="w-full mt-2" asChild>
+							<Button variant="outline" size="sm" className="w-full mt-2" asChild>
 								<a href="https://ethereum.org/en/wallets/" target="_blank" rel="noopener noreferrer">
 									<Trans>Learn more</Trans>
 									<ArrowSquareOutIcon className="size-3 ml-1.5" />

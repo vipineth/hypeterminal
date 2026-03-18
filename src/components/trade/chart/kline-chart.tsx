@@ -218,7 +218,7 @@ export function KlineChart({ symbol = "", theme = "dark", yAxisInside = false }:
 						{MORE_INTERVALS.map((interval) => (
 							<DropdownMenuItem
 								key={interval.resolution}
-								selected={activeInterval.resolution === interval.resolution}
+								className={cn(activeInterval.resolution === interval.resolution ? "font-semibold text-text-950" : "")}
 								onSelect={() => setActiveInterval(interval)}
 							>
 								{interval.label}
@@ -241,7 +241,7 @@ export function KlineChart({ symbol = "", theme = "dark", yAxisInside = false }:
 						{CHART_TYPES.map((ct) => (
 							<DropdownMenuItem
 								key={ct.label}
-								selected={activeChartType.label === ct.label}
+								className={cn(activeChartType.label === ct.label ? "font-semibold text-text-950" : "")}
 								onSelect={() => setActiveChartType(ct)}
 							>
 								{ct.label}

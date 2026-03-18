@@ -114,7 +114,7 @@ export function HistoryTab() {
 										>
 											<TableCell className="text-xs font-medium py-1.5">
 												<Button
-													variant="text"
+													variant="ghost"
 													size="none"
 													onClick={() => setSelectedMarket(scope, fill.coin)}
 													className="gap-1.5"

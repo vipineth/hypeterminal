@@ -26,7 +26,7 @@ const LeverageBadge = forwardRef<HTMLButtonElement, BadgeProps>(({ leverage, onC
 			onClick={onClick}
 			size="sm"
 			className={cn(
-				"h-8 rounded-lg border-border-100 bg-surface-base/40 px-2.5 text-2xs hover:bg-accent",
+				"h-8 rounded-xs border-border-100 bg-surface-base/40 px-2.5 text-2xs hover:bg-accent",
 				isLoading && "opacity-70",
 				className,
 			)}
@@ -207,7 +207,7 @@ function LeverageEditor({
 					size="sm"
 					onClick={handleConfirm}
 					disabled={!isDirty || isUpdating || showSuccess}
-					className="h-8 w-full rounded-lg border-primary-default/45 bg-primary-default/12 text-primary-default hover:bg-primary-default/18"
+					className="h-8 w-full rounded-xs border-primary-default/45 bg-primary-default/12 text-primary-default hover:bg-primary-default/18"
 				>
 					{isUpdating && <SpinnerGapIcon className="size-3 animate-spin" />}
 					<Trans>Confirm</Trans>
@@ -221,7 +221,7 @@ function LeverageEditor({
 					onClick={handleConfirm}
 					disabled={!isDirty || isUpdating || showSuccess}
 					className={cn(
-						"w-full text-xs font-semibold uppercase tracking-wider gap-2 rounded-xl",
+						"w-full text-xs font-semibold uppercase tracking-wider gap-2 rounded-xs",
 						isDirty && !isUpdating && !showSuccess
 							? "border-primary-default/45 bg-primary-default/12 text-primary-default hover:bg-primary-default/18"
 							: "border-primary-default/20 bg-primary-default/8 text-primary-default/50",

@@ -219,7 +219,7 @@ export function TradeFormFields({
 						variant="outline"
 						size="sm"
 						onClick={handleSizeModeToggle}
-						className="h-9 rounded-lg border-border-100 bg-surface-execution px-2.5 text-2xs hover:bg-accent"
+						className="h-9 rounded-xs border-border-100 bg-surface-execution px-2.5 text-2xs hover:bg-accent"
 						aria-label={t`Toggle size mode`}
 						disabled={isFormDisabled}
 					>
@@ -233,7 +233,7 @@ export function TradeFormFields({
 						inputSize="lg"
 						maxAllowedDecimals={szDecimals}
 						className={cn(
-							"flex-1 rounded-lg border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50",
+							"flex-1 rounded-xs border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50",
 							sizeHasError && "border-market-down-600 focus:border-market-down-600",
 						)}
 						disabled={isFormDisabled}
@@ -267,7 +267,7 @@ export function TradeFormFields({
 							}}
 							allowDecimals={false}
 							inputSize="sm"
-							className="w-14 rounded-lg border-border-100 bg-surface-execution pr-5 text-right text-2xs tabular-nums shadow-none"
+							className="w-14 rounded-xs border-border-100 bg-surface-execution pr-5 text-right text-2xs tabular-nums shadow-none"
 							disabled={isFormDisabled || maxSize <= 0}
 						/>
 						<span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-2xs text-text-600 pointer-events-none">
@@ -288,7 +288,7 @@ export function TradeFormFields({
 						maxLabel={t`Mid`}
 						onMaxClick={() => setTriggerPrice(toFixed(markPx, szDecimalsToPriceDecimals(szDecimals)))}
 						className={cn(
-							"w-full rounded-lg border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50",
+							"w-full rounded-xs border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50",
 							usesTriggerPrice &&
 								!isPositive(triggerPriceNum) &&
 								sizeValue > 0 &&
@@ -310,7 +310,7 @@ export function TradeFormFields({
 						maxLabel={t`Mid`}
 						onMaxClick={() => setLimitPrice(toFixed(markPx, szDecimalsToPriceDecimals(szDecimals)))}
 						className={cn(
-							"w-full rounded-lg border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50",
+							"w-full rounded-xs border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50",
 							usesLimitPrice && !price && sizeValue > 0 && "border-market-down-600 focus:border-market-down-600",
 						)}
 						disabled={isFormDisabled}
@@ -324,7 +324,7 @@ export function TradeFormFields({
 					<Select value={tif} onValueChange={(value) => setTif(value as LimitTif)} disabled={isFormDisabled}>
 						<SelectTrigger
 							size="sm"
-							className="w-full rounded-lg border-border-100 bg-surface-execution text-2xs shadow-none"
+							className="w-full rounded-xs border-border-100 bg-surface-execution text-2xs shadow-none"
 						>
 							<SelectValue />
 						</SelectTrigger>
@@ -348,7 +348,7 @@ export function TradeFormFields({
 							value={scaleStartPriceInput}
 							onChange={(e) => setScaleStart(e.target.value)}
 							inputSize="lg"
-							className="w-full rounded-lg border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50"
+							className="w-full rounded-xs border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50"
 							disabled={isFormDisabled}
 							maxLabel={t`Mid`}
 							onMaxClick={() => setScaleStart(toFixed(markPx, szDecimalsToPriceDecimals(szDecimals)))}
@@ -361,7 +361,7 @@ export function TradeFormFields({
 							value={scaleEndPriceInput}
 							onChange={(e) => setScaleEnd(e.target.value)}
 							inputSize="lg"
-							className="w-full rounded-lg border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50"
+							className="w-full rounded-xs border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50"
 							disabled={isFormDisabled}
 							maxLabel={t`Mid`}
 							onMaxClick={() => setScaleEnd(toFixed(markPx, szDecimalsToPriceDecimals(szDecimals)))}
@@ -378,7 +378,7 @@ export function TradeFormFields({
 							onChange={(e) => setScaleLevels(Number(e.target.value) || 4)}
 							allowDecimals={false}
 							inputSize="lg"
-							className="w-full rounded-lg border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50"
+							className="w-full rounded-xs border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50"
 							disabled={isFormDisabled}
 						/>
 					</div>
@@ -398,7 +398,7 @@ export function TradeFormFields({
 							onChange={(e) => setTwapMinutes(Number(e.target.value) || 30)}
 							allowDecimals={false}
 							inputSize="lg"
-							className="w-full rounded-lg border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50"
+							className="w-full rounded-xs border-border-100 bg-surface-execution tabular-nums shadow-none focus:border-primary-default/50"
 							disabled={isFormDisabled}
 						/>
 					</div>

@@ -38,7 +38,7 @@ export function MobileHeader({ className }: Props) {
 				<div className="flex items-center gap-1">
 					<UserMenu />
 					<Button
-						variant="text"
+						variant="ghost"
 						size="md"
 						className="size-11 active:bg-surface-analysis/50"
 						aria-label={TOP_NAV_TEXT.NOTIFICATIONS_ARIA}
@@ -47,7 +47,7 @@ export function MobileHeader({ className }: Props) {
 					</Button>
 					<ThemeToggle />
 					<Button
-						variant="text"
+						variant="ghost"
 						size="md"
 						className="size-11 active:bg-surface-analysis/50"
 						aria-label={TOP_NAV_TEXT.SETTINGS_ARIA}

@@ -41,7 +41,7 @@ export function FooterBar() {
 	const { open } = useCommandMenuActions();
 
 	return (
-		<footer className="fixed bottom-0 left-0 right-0 z-40 flex h-8 items-center justify-between border-t border-border-100 bg-surface-base/88 px-3 text-[11px] text-text-500 backdrop-blur-xl">
+		<footer className="fixed bottom-0 left-0 right-0 z-40 flex h-8 items-center justify-between border-t border-border-100 bg-surface-base/88 px-3 text-2xs text-text-500 backdrop-blur-xl">
 			<div className="flex items-center gap-3">
 				<div className="flex items-center gap-1.5">
 					{icon}
@@ -53,7 +53,7 @@ export function FooterBar() {
 				onClick={open}
 				className="absolute left-1/2 flex -translate-x-1/2 items-center gap-1.5 transition-colors hover:text-text-950"
 			>
-				<kbd className="ml-0.5 rounded-md border border-border-50 bg-surface-analysis px-1.5 py-0.5 text-[10px] text-text-600">
+				<kbd className="ml-0.5 rounded-md border border-border-50 bg-surface-analysis px-1.5 py-0.5 text-3xs text-text-600">
 					{"\u2318K"}
 				</kbd>
 			</button>

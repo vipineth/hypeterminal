@@ -184,7 +184,7 @@ function PositionRow({
 				)}
 			>
 				<Button
-					variant="text"
+					variant="ghost"
 					size="none"
 					onClick={() => onSelectMarket(p.coin)}
 					className="gap-1.5"

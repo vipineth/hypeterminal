@@ -153,7 +153,7 @@ export function BalancesTab() {
 					<div className="flex items-center justify-end gap-1">
 						{canTransfer && (
 							<Button
-								variant="text"
+								variant="ghost"
 								size="none"
 								onClick={() => handleTransferClick(row)}
 								className="text-4xs text-primary-default hover:text-primary-default/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
@@ -164,7 +164,7 @@ export function BalancesTab() {
 						)}
 						{canSwap && (
 							<Button
-								variant="text"
+								variant="ghost"
 								size="none"
 								onClick={() => openSwapModal(row.asset)}
 								className="text-4xs text-primary-default hover:text-primary-default/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
@@ -175,7 +175,7 @@ export function BalancesTab() {
 						)}
 						{parseFloat(row.available) > 0 && (
 							<Button
-								variant="text"
+								variant="ghost"
 								size="none"
 								onClick={() => handleSendClick(row)}
 								className="text-4xs text-primary-default hover:text-primary-default/80 hover:bg-transparent px-1.5 py-0.5 gap-1"

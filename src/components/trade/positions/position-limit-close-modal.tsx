@@ -219,7 +219,7 @@ export function PositionLimitCloseModal({ open, onOpenChange, position }: Props)
 				</div>
 
 				<DialogFooter className="px-5 py-3 border-t border-border-200/50">
-					<Button size="sm" variant="text" onClick={() => handleOpenChange(false)} disabled={isSubmitting}>
+					<Button size="sm" variant="ghost" onClick={() => handleOpenChange(false)} disabled={isSubmitting}>
 						{t`Cancel`}
 					</Button>
 					<TradingActionButton onClick={handleSubmit} disabled={!canSubmit} className="min-w-24">

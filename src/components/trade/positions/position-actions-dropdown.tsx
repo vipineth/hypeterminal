@@ -30,7 +30,7 @@ export function PositionActionsDropdown({
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button
-					variant="text"
+					variant="ghost"
 					size="sm"
 					disabled={!canClose || isClosing}
 					className="gap-0.5"

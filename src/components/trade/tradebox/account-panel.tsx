@@ -259,7 +259,7 @@ export function AccountPanel() {
 							<div className="mt-4 grid grid-cols-2 gap-2">
 								<Button
 									variant="outline"
-									className="h-9 rounded-xl bg-surface-base/40"
+									className="h-9 rounded-xs bg-surface-base/40"
 									onClick={() => openDepositModal("withdraw")}
 									aria-label={t`Withdraw`}
 								>
@@ -268,7 +268,7 @@ export function AccountPanel() {
 								</Button>
 								<Button
 									variant="outline"
-									className="h-9 rounded-xl bg-surface-base/40"
+									className="h-9 rounded-xs bg-surface-base/40"
 									onClick={() => openDepositModal("deposit")}
 									aria-label={t`Deposit`}
 								>

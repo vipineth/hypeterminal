@@ -24,7 +24,7 @@ function ThemeToggleButton() {
 			variant="ghost"
 			size="sm"
 			className={cn(
-				"size-8 rounded-lg",
+				"size-8 rounded-xs",
 				isDark
 					? "text-warning-700 hover:bg-accent hover:text-warning-700"
 					: "text-primary-default hover:bg-accent hover:text-primary-default",

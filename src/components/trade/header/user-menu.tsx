@@ -57,7 +57,7 @@ export function UserMenu() {
 
 	if (!mounted || isConnecting) {
 		return (
-			<Button variant="ghost" size="sm" className="h-8 gap-1.5 rounded-lg px-3 text-sm text-text-500" disabled>
+			<Button variant="ghost" size="sm" className="h-8 gap-1.5 rounded-xs px-3 text-sm text-text-500" disabled>
 				<SpinnerGapIcon className="size-3 animate-spin" />
 				<Trans>Connecting...</Trans>
 			</Button>
@@ -70,7 +70,7 @@ export function UserMenu() {
 				<Button
 					size="default"
 					variant="outline"
-					className="h-8 rounded-lg px-3 text-sm"
+					className="h-8 rounded-xs px-3 text-sm"
 					onClick={() => setIsOpen(true)}
 				>
 					<WalletIcon className="size-4" />
@@ -85,7 +85,7 @@ export function UserMenu() {
 		<div className="flex items-center gap-1.5">
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<Button variant="ghost" size="sm" className="h-8 gap-1.5 rounded-lg px-3 text-sm text-text-950">
+					<Button variant="ghost" size="sm" className="h-8 gap-1.5 rounded-xs px-3 text-sm text-text-950">
 						<div className="size-1.5 rounded-full bg-market-up-600 animate-pulse" />
 						{ensName ?? (address ? shortenAddress(address) : "")}
 						<CaretDownIcon className="size-2.5" />

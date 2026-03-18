@@ -1,8 +1,6 @@
-"use client";
-
 import { Slider as SliderPrimitive } from "@base-ui/react/slider";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 
 type SliderRootProps = SliderPrimitive.Root.Props<number>;
 type SliderThickness = "sm" | "md" | "lg";

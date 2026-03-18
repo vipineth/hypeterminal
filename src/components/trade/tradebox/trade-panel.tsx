@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { SpinnerGapIcon } from "@phosphor-icons/react";
-import { useCallback, useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_QUOTE_TOKEN, TWAP_MINUTES_MAX, TWAP_MINUTES_MIN } from "@/config/constants";
@@ -142,14 +142,14 @@ export function TradePanel() {
 	const { open: openSettingsDialog } = useSettingsDialogActions();
 	const { open: openSwapModal } = useSwapModalActions();
 
-	const swapTargetToken = useMemo(() => {
+	const swapTargetToken = (() => {
 		if (!market || market.kind !== "builderPerp") return null;
 
 		const quoteToken = getMarketQuoteToken(market);
 		if (quoteToken === DEFAULT_QUOTE_TOKEN) return null;
 
 		return quoteToken;
-	}, [market]);
+	})();
 
 	useEffect(() => {
 		if (selectedPrice !== null) {
@@ -188,15 +188,9 @@ export function TradePanel() {
 	const feeRate = isTakerOrderType(orderType) ? takerRate : makerRate;
 	const feeRatePercent = `${(feeRate * 100).toFixed(4)}%`;
 
-	const { marginRequired, estimatedFee } = useMemo(
-		() => getOrderMetrics({ sizeValue, price, leverage, feeRate }),
-		[leverage, feeRate, price, sizeValue],
-	);
+	const { marginRequired, estimatedFee } = getOrderMetrics({ sizeValue, price, leverage, feeRate });
 
-	const { liqPrice, liqWarning } = useMemo(
-		() => getLiquidationInfo({ price, sizeValue, leverage, side }),
-		[leverage, price, side, sizeValue],
-	);
+	const { liqPrice, liqWarning } = getLiquidationInfo({ price, sizeValue, leverage, side });
 
 	const needsAgentApproval = !isAgentReady;
 	const isReadyToTrade = isAgentReady;
@@ -264,14 +258,11 @@ export function TradePanel() {
 	const isRegistering =
 		registerStatus === "approving_fee" || registerStatus === "approving_agent" || registerStatus === "verifying";
 
-	const handleMarginModeConfirm = useCallback(
-		async (mode: MarginMode) => {
-			await switchMarginMode(mode);
-		},
-		[switchMarginMode],
-	);
+	async function handleMarginModeConfirm(mode: MarginMode) {
+		await switchMarginMode(mode);
+	}
 
-	const handleRegister = useCallback(() => {
+	function handleRegister() {
 		if (isRegistering) return;
 		setApprovalError(null);
 
@@ -280,9 +271,9 @@ export function TradePanel() {
 			setApprovalError(message);
 			setTimeout(() => setApprovalError(null), APPROVAL_ERROR_DISMISS_MS);
 		});
-	}, [isRegistering, registerAgent]);
+	}
 
-	const handleSubmit = useCallback(async () => {
+	async function handleSubmit() {
 		if (!validation.canSubmit || isSubmitting) return;
 		if (!market || !baseToken || typeof market.assetId !== "number") return;
 
@@ -381,39 +372,7 @@ export function TradePanel() {
 			const errorMessage = error instanceof Error ? error.message : t`Order failed`;
 			updateOrder(orderId, { status: "failed", error: errorMessage });
 		}
-	}, [
-		addOrder,
-		baseToken,
-		canUseTpSl,
-		isSubmitting,
-		limitPriceInput,
-		market,
-		markPx,
-		orderType,
-		placeOrder,
-		placeTwapOrder,
-		price,
-		reduceOnly,
-		resetForm,
-		scaleEndPriceInput,
-		scaleLevelsNum,
-		scaleOrder,
-		scaleStartPriceInput,
-		side,
-		sizeValue,
-		slippageBps,
-		slPriceNum,
-		tif,
-		tpPriceNum,
-		tpSlEnabled,
-		triggerOrder,
-		triggerPriceInput,
-		twapMinutesNum,
-		twapOrder,
-		twapRandomize,
-		updateOrder,
-		validation.canSubmit,
-	]);
+	}
 
 	const buttonContent = useButtonContent({
 		isConnected,
@@ -432,8 +391,6 @@ export function TradePanel() {
 		onRegister: handleRegister,
 		onSubmit: handleSubmit,
 	});
-
-	// const actionButtonClass = getActionButtonClass(buttonContent.variant);
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-card/95">
@@ -486,13 +443,13 @@ export function TradePanel() {
 
 				<div className="space-y-2.5">
 					{validation.errors.length > 0 && isConnected && availableBalance > 0 && (
-						<div className="rounded-lg border border-market-down-600/25 bg-market-down-100 px-3 py-2 text-4xs text-market-down-600">
+						<div className="rounded-xs border border-market-down-600/25 bg-market-down-100 px-3 py-2 text-4xs text-market-down-600">
 							{validation.errors.join(" • ")}
 						</div>
 					)}
 
 					{approvalError && (
-						<div className="rounded-lg border border-market-down-600/25 bg-market-down-100 px-3 py-2 text-4xs text-market-down-600">
+						<div className="rounded-xs border border-market-down-600/25 bg-market-down-100 px-3 py-2 text-4xs text-market-down-600">
 							{approvalError}
 						</div>
 					)}
@@ -503,7 +460,7 @@ export function TradePanel() {
 						onClick={buttonContent.action}
 						disabled={buttonContent.disabled}
 						className={cn(
-							"h-11 w-full rounded-xl text-sm font-semibold shadow-sm",
+							"h-11 w-full rounded-xs text-sm font-semibold shadow-sm",
 							buttonContent.variant === "cyan" && "bg-primary-default text-primary-foreground hover:bg-primary-hover",
 							buttonContent.variant === "buy" && "bg-market-up-600 text-background hover:bg-market-up-500",
 							buttonContent.variant === "sell" && "bg-market-down-600 text-background hover:bg-market-down-500",
@@ -515,7 +472,7 @@ export function TradePanel() {
 					</Button>
 				</div>
 
-				<div className="rounded-xl border border-border-100/80 bg-surface-base/38 p-3 shadow-xs">
+				<div className="rounded-xs border border-border-100/80 bg-surface-base/40 p-3 shadow-xs">
 					<OrderSummary
 						liqPrice={liqPrice}
 						liqWarning={liqWarning}

@@ -179,7 +179,7 @@ export function OrdersTab() {
 				<div className="ml-auto flex items-center gap-2">
 					<span className="text-primary-default tabular-nums">{headerCount}</span>
 					<Button
-						variant="text"
+						variant="ghost"
 						size="sm"
 						aria-label={t`Cancel selected orders`}
 						onClick={handleCancelSelected}
@@ -188,7 +188,7 @@ export function OrdersTab() {
 						{isCancelling ? t`Canceling...` : t`Cancel selected`}
 					</Button>
 					<Button
-						variant="text"
+						variant="ghost"
 						size="sm"
 						aria-label={t`Cancel all orders`}
 						onClick={handleCancelAll}
@@ -300,7 +300,7 @@ function OrderRow({
 			<TableCell className="text-xs font-medium py-1.5">
 				<div className="flex items-center gap-1.5">
 					<Button
-						variant="text"
+						variant="ghost"
 						size="none"
 						onClick={() => onSelectMarket(order.coin)}
 						className="gap-1.5"
@@ -339,7 +339,7 @@ function OrderRow({
 			</TableCell>
 			<TableCell className="text-right py-1.5">
 				<Button
-					variant="text"
+					variant="ghost"
 					size="sm"
 					aria-label={t`Cancel order`}
 					onClick={() => onCancel([order])}

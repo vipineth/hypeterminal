@@ -101,7 +101,7 @@ export function TopNav() {
 					<Button
 						variant="outline"
 						onClick={() => openDepositModal("deposit")}
-						className="h-8 gap-1.5 rounded-lg border-border-100 bg-surface-execution px-3 text-sm font-medium text-text-950 shadow-xs hover:bg-accent"
+						className="h-8 gap-1.5 rounded-xs border-border-100 bg-surface-execution px-3 text-sm font-medium text-text-950 shadow-xs hover:bg-accent"
 					>
 						<DownloadSimpleIcon className="size-4" />
 						<Trans>Deposit</Trans>
@@ -112,7 +112,7 @@ export function TopNav() {
 					<ThemeToggle />
 					<button
 						type="button"
-						className="inline-flex size-8 items-center justify-center rounded-lg text-text-500 transition-colors duration-150 hover:bg-accent hover:text-text-950"
+						className="inline-flex size-8 items-center justify-center rounded-xs text-text-500 transition-colors duration-150 hover:bg-accent hover:text-text-950"
 						onClick={openSettingsDialog}
 						aria-label={t`Settings`}
 					>
