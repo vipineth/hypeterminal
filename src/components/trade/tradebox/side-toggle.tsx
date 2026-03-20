@@ -17,7 +17,7 @@ interface Props {
 
 export function SideToggle({ side, onSideChange, labels }: Props) {
 	return (
-		<Tabs value={side} onValueChange={(v) => onSideChange(v as Side)} className="mb-2">
+		<Tabs value={side} onValueChange={(v) => onSideChange(v as Side)}>
 			<TabsList className="grid w-full grid-cols-2">
 				<TabsTrigger
 					value="buy"

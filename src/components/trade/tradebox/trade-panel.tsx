@@ -395,7 +395,7 @@ export function TradePanel() {
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-card/95">
 			{capabilities.isLeveraged && (
-				<div className="flex items-center justify-between border-b border-border-100/80 bg-surface-base/70 px-4 py-3 backdrop-blur-xl">
+				<div className="flex items-center justify-between border-b border-border-100/80 bg-surface-base/70 px-4 py-2.5 backdrop-blur-xl">
 					{capabilities.hasMarginMode ? (
 						<MarginModeToggle
 							mode={marginMode}
@@ -419,7 +419,7 @@ export function TradePanel() {
 				onConfirm={handleMarginModeConfirm}
 			/>
 
-			<div className="flex-1 min-h-0 space-y-6 overflow-y-auto px-4 py-4">
+			<div className="flex-1 min-h-0 space-y-3 overflow-y-auto px-4 py-3">
 				<TradeHeader
 					orderType={orderType}
 					side={side}
@@ -470,21 +470,21 @@ export function TradePanel() {
 						{(isSubmitting || isRegistering) && <SpinnerGapIcon className="size-3 animate-spin" />}
 						{buttonContent.text}
 					</Button>
-				</div>
 
-				<div className="rounded-xs border border-border-100/80 bg-surface-base/40 p-3 shadow-xs">
-					<OrderSummary
-						liqPrice={liqPrice}
-						liqWarning={liqWarning}
-						orderValue={orderValue}
-						marginRequired={marginRequired}
-						estimatedFee={estimatedFee}
-						feeRatePercent={feeRatePercent}
-						slippagePercent={slippagePercent}
-						szDecimals={market?.szDecimals}
-						onSlippageClick={openSettingsDialog}
-						marketKind={market?.kind}
-					/>
+					<div className="rounded-xs border border-border-100/80 bg-surface-base/40 p-2.5">
+						<OrderSummary
+							liqPrice={liqPrice}
+							liqWarning={liqWarning}
+							orderValue={orderValue}
+							marginRequired={marginRequired}
+							estimatedFee={estimatedFee}
+							feeRatePercent={feeRatePercent}
+							slippagePercent={slippagePercent}
+							szDecimals={market?.szDecimals}
+							onSlippageClick={openSettingsDialog}
+							marketKind={market?.kind}
+						/>
+					</div>
 				</div>
 			</div>
 

@@ -111,7 +111,7 @@ export function TpSlSection({
 	}
 
 	return (
-		<div className="space-y-3">
+		<div className="space-y-2.5">
 			<PriceInputWithPercent
 				label={t`Take Profit`}
 				icon={TrendUpIcon}
@@ -139,7 +139,7 @@ export function TpSlSection({
 			/>
 
 			{riskRewardDisplay && (
-				<div className="rounded-xs border border-border-200/40 bg-surface-analysis p-2.5 space-y-2">
+				<div className="rounded-xs border border-border-200/40 bg-surface-analysis p-2 space-y-1.5">
 					<div className="flex items-center justify-between">
 						<span className="text-3xs text-text-950">{t`Risk/Reward`}</span>
 						<span

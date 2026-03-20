@@ -212,7 +212,7 @@ export function TradeFormFields({
 				)}
 			</div>
 
-			<div className="space-y-1.5">
+			<div className="space-y-1.5 border-t border-border-50 pt-3">
 				<div className="text-3xs font-medium uppercase tracking-[0.14em] text-text-500">{t`Size`}</div>
 				<div className="flex items-center gap-2">
 					<Button
@@ -255,7 +255,7 @@ export function TradeFormFields({
 						}}
 						max={100}
 						step={0.1}
-						className="flex-1 py-5"
+						className="flex-1 py-2"
 						disabled={isFormDisabled || maxSize <= 0}
 					/>
 					<div className="relative">
@@ -414,7 +414,7 @@ export function TradeFormFields({
 			)}
 
 			{(capabilities.hasReduceOnly || (capabilities.hasTpSl && canUseTpSl)) && (
-				<div className="space-y-4">
+				<div className="space-y-3 border-t border-border-50 pt-3">
 					<div className="flex items-center gap-3 text-2xs">
 						{capabilities.hasReduceOnly && (
 							<div className="inline-flex items-center gap-2">
