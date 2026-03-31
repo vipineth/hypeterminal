@@ -1,6 +1,8 @@
+import { Input as BaseInput } from "@base-ui/react/input";
 import type * as React from "react";
 import { useCallback } from "react";
 import { cn } from "@/lib/cn";
+import { getInputClassName, type InputSize } from "./input";
 
 /**
  * Validates numeric input string format.
@@ -30,7 +32,7 @@ function exceedsDecimalLimit(value: string, maxDecimals: number | undefined): bo
 }
 
 interface Props extends Omit<React.ComponentProps<"input">, "type" | "onChange" | "min" | "max" | "step"> {
-	inputSize?: "sm" | "default" | "lg";
+	inputSize?: InputSize;
 	allowDecimals?: boolean;
 	allowNegative?: boolean;
 	maxAllowedDecimals?: number;
@@ -161,23 +163,14 @@ export function NumberInput({
 	);
 
 	const inputEl = (
-		<input
+		<BaseInput
 			type="text"
 			inputMode={effectiveAllowDecimals ? "decimal" : "numeric"}
 			data-slot="input"
 			data-size={inputSize}
 			value={value}
 			disabled={disabled}
-			className={cn(
-				"file:text-text-strong placeholder:text-text-disabled selection:bg-fill-brand-strong selection:text-white dark:bg-fill-100/30 border-stroke-weak min-w-0 rounded-8 border bg-transparent px-2 py-1 shadow-raised transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
-				"focus-visible:border-stroke-brand-strong focus-visible:ring-stroke-brand-strong/20 focus-visible:ring-[2px]",
-				"aria-invalid:ring-stroke-error-strong/20 dark:aria-invalid:ring-stroke-error-strong/40 aria-invalid:border-stroke-error-strong",
-				inputSize === "sm" && "h-6 text-xs px-1.5",
-				inputSize === "default" && "h-7 text-xs",
-				inputSize === "lg" && "h-9 text-sm px-3",
-				hasMax && "pr-20",
-				className,
-			)}
+			className={getInputClassName(inputSize, cn(hasMax && "pr-20", className))}
 			onKeyDown={handleKeyDown}
 			onChange={handleChange}
 			{...props}
