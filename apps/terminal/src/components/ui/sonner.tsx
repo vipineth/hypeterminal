@@ -23,16 +23,16 @@ const Toaster = ({ ...props }: ToasterProps) => {
 			}}
 			style={
 				{
-					"--normal-bg": "var(--surface-execution)",
-					"--normal-text": "var(--text-950)",
-					"--normal-border": "var(--border-200)",
-					"--border-radius": "var(--radius-xs)",
-					"--success-bg": "var(--surface-execution)",
-					"--success-text": "var(--market-up-600)",
-					"--success-border": "var(--market-up-600)",
-					"--error-bg": "var(--surface-execution)",
-					"--error-text": "var(--market-down-600)",
-					"--error-border": "var(--market-down-600)",
+					"--normal-bg": "var(--bg-overlay)",
+					"--normal-text": "var(--text-strong)",
+					"--normal-border": "var(--stroke-weak)",
+					"--border-radius": "var(--radius-8)",
+					"--success-bg": "var(--bg-overlay)",
+					"--success-text": "var(--text-success)",
+					"--success-border": "var(--text-success)",
+					"--error-bg": "var(--bg-overlay)",
+					"--error-text": "var(--text-error)",
+					"--error-border": "var(--text-error)",
 					"--width": "320px",
 				} as React.CSSProperties
 			}

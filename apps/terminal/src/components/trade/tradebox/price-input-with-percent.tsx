@@ -33,20 +33,20 @@ export function PriceInputWithPercent({
 	return (
 		<div className="space-y-1.5">
 			<div className="flex items-center justify-between">
-				<div className="flex items-center gap-1.5 text-text-950">
-					<span className="text-3xs font-medium uppercase tracking-wide">{label}</span>
+				<div className="flex items-center gap-1.5 text-text-strong">
+					<span className="text-xs font-medium uppercase tracking-wide">{label}</span>
 					<Icon className="size-3" />
 				</div>
 				{pnlValue !== null && (
-					<span className={cn("text-3xs tabular-nums", getValueColorClass(pnlValue))}>
+					<span className={cn("text-xs tabular-nums", getValueColorClass(pnlValue))}>
 						{formatUSD(pnlValue, { signDisplay: "exceptZero" })}
 					</span>
 				)}
 			</div>
 			<div
 				className={cn(
-					"flex items-center rounded-md border bg-surface-base overflow-hidden",
-					error ? "border-market-down-600" : "border-border-200/60 focus-within:border-text-400",
+					"flex items-center rounded-12 border bg-bg-sunken overflow-hidden",
+					error ? "border-stroke-error-strong" : "border-stroke-weak/60 focus-within:border-stroke-strong",
 				)}
 			>
 				<Input
@@ -56,14 +56,14 @@ export function PriceInputWithPercent({
 					className="h-8 flex-1 text-xs border-0 focus-visible:ring-0 tabular-nums"
 					disabled={disabled}
 				/>
-				<div className="flex items-center gap-0.5 px-1.5 border-l border-border-200/40">
+				<div className="flex items-center gap-0.5 px-1.5 border-l border-stroke-weak/40">
 					{percentOptions.map((p) => (
 						<button
 							key={p}
 							type="button"
 							onClick={() => onPercentClick(p)}
 							disabled={disabled || !isPositive(referencePrice)}
-							className="px-1.5 py-1 text-4xs font-medium text-text-950 bg-surface-analysis hover:bg-primary-default/20 rounded-xs transition-colors disabled:opacity-50"
+							className="px-1.5 py-1 text-xs font-medium text-text-strong bg-bg-raised hover:bg-fill-brand-weak/20 rounded-8 transition-colors disabled:opacity-50"
 							aria-label={t`Set to ${p}%`}
 						>
 							{p}%
@@ -71,7 +71,7 @@ export function PriceInputWithPercent({
 					))}
 				</div>
 			</div>
-			{error && <div className="text-4xs text-market-down-600">{error}</div>}
+			{error && <div className="text-xs text-text-error">{error}</div>}
 		</div>
 	);
 }

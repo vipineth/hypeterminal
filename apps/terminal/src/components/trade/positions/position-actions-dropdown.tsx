@@ -1,13 +1,6 @@
 import { t } from "@lingui/core/macro";
-import { ArrowsClockwiseIcon, CaretDownIcon, LightningIcon, TagIcon } from "@phosphor-icons/react";
-import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { ArrowsClockwiseIcon, LightningIcon, TagIcon } from "@phosphor-icons/react";
+import { Dropdown } from "@/anvil";
 
 interface Props {
 	canClose: boolean;
@@ -27,34 +20,35 @@ export function PositionActionsDropdown({
 	onReverse,
 }: Props) {
 	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Button
-					variant="text"
-					size="sm"
-					disabled={!canClose || isClosing}
-					className="gap-0.5"
-					aria-label={t`Position actions`}
-				>
-					{isRowClosing ? t`Closing...` : t`Close`}
-					{!isRowClosing && <CaretDownIcon className="size-3" />}
-				</Button>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent align="end">
-				<DropdownMenuItem onClick={onMarketClose}>
-					<LightningIcon className="size-3.5" />
-					{t`Market Close`}
-				</DropdownMenuItem>
-				<DropdownMenuItem onClick={onLimitClose}>
-					<TagIcon className="size-3.5" />
-					{t`Limit Close`}
-				</DropdownMenuItem>
-				<DropdownMenuSeparator className="bg-border-200" />
-				<DropdownMenuItem onClick={onReverse}>
-					<ArrowsClockwiseIcon className="size-3.5" />
-					{t`Reverse`}
-				</DropdownMenuItem>
-			</DropdownMenuContent>
-		</DropdownMenu>
+		<Dropdown
+			trigger={isRowClosing ? t`Closing...` : t`Close`}
+			disabled={!canClose || isClosing}
+			align="end"
+			groups={[
+				{
+					items: [
+						{
+							label: t`Market Close`,
+							icon: <LightningIcon className="size-3.5" />,
+							onSelect: onMarketClose,
+						},
+						{
+							label: t`Limit Close`,
+							icon: <TagIcon className="size-3.5" />,
+							onSelect: onLimitClose,
+						},
+					],
+				},
+				{
+					items: [
+						{
+							label: t`Reverse`,
+							icon: <ArrowsClockwiseIcon className="size-3.5" />,
+							onSelect: onReverse,
+						},
+					],
+				},
+			]}
+		/>
 	);
 }

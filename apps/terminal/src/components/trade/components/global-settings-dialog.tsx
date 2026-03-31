@@ -1,12 +1,9 @@
 import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import type { ChangeEvent } from "react";
-import { useId, useRef, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useRef, useState } from "react";
+import { Modal, ModalContent, ModalHeader, ModalPopup, ModalTitle, Select, Slider, Toggle } from "@/anvil";
 import { NumberInput } from "@/components/ui/number-input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
 import { MARKET_ORDER_SLIPPAGE_MAX_PERCENT, MARKET_ORDER_SLIPPAGE_MIN_PERCENT } from "@/config/constants";
 import {
 	dynamicActivate,
@@ -58,63 +55,42 @@ export function GlobalSettingsDialog() {
 		setLocalSlippageInput(null);
 	}
 
-	function handleSlippageSliderChange(values: number[]) {
-		const nextValue = values[0];
+	function handleSlippageSliderChange(value: number | readonly number[]) {
+		const nextValue = Array.isArray(value) ? value[0] : value;
 		if (typeof nextValue === "number" && nextValue !== slippagePercent) {
 			setMarketOrderSlippagePercent(nextValue);
 		}
 	}
 
-	const showScanlinesId = useId();
-	const showOrderbookQuoteId = useId();
-
-	function handleLanguageChange(locale: LocaleCode) {
-		dynamicActivate(locale);
+	function handleLanguageChange(value: string | null) {
+		if (value) dynamicActivate(value as LocaleCode);
 	}
 
-	function handleNumberFormatChange(locale: NumberFormatLocale) {
-		setNumberFormatLocale(locale);
+	function handleNumberFormatChange(value: string | null) {
+		if (value) setNumberFormatLocale(value as NumberFormatLocale);
 	}
+
+	const languageOptions = localeList.map(({ code, name }) => ({ value: code, label: name }));
+	const numberFormatOptions = numberFormatLocaleList.map(({ code, name }) => ({ value: code, label: name }));
+	const networkOptions = [
+		{ value: "mainnet", label: "Mainnet" },
+		{ value: "testnet", label: "Testnet" },
+	];
 
 	return (
-		<Dialog open={open} onOpenChange={close}>
-			<DialogContent className="sm:max-w-md gap-0 p-0">
-				<DialogHeader className="px-5 pt-5 pb-4 border-b border-border-200/50">
-					<DialogTitle>{t`Settings`}</DialogTitle>
-				</DialogHeader>
+		<Modal open={open} onOpenChange={close}>
+			<ModalPopup size="sm">
+				<ModalHeader className="border-b border-stroke-weak/50">
+					<ModalTitle>{t`Settings`}</ModalTitle>
+				</ModalHeader>
 
-				<div className="px-5 py-4 space-y-5 max-h-[70vh] overflow-y-auto">
+				<ModalContent className="space-y-5 max-h-[70vh] overflow-y-auto">
 					<SettingsSection title={t`Display Language`}>
-						<Select value={i18n.locale} onValueChange={(value) => handleLanguageChange(value as LocaleCode)}>
-							<SelectTrigger className="w-full h-9">
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								{localeList.map(({ code, name }) => (
-									<SelectItem key={code} value={code}>
-										{name}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
+						<Select value={i18n.locale} onValueChange={handleLanguageChange} options={languageOptions} />
 					</SettingsSection>
 
 					<SettingsSection title={t`Number Format`} description={t`Format for numbers and dates`}>
-						<Select
-							value={numberFormatLocale}
-							onValueChange={(value) => handleNumberFormatChange(value as NumberFormatLocale)}
-						>
-							<SelectTrigger className="w-full h-9">
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								{numberFormatLocaleList.map(({ code, name }) => (
-									<SelectItem key={code} value={code}>
-										{name}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
+						<Select value={numberFormatLocale} onValueChange={handleNumberFormatChange} options={numberFormatOptions} />
 					</SettingsSection>
 
 					<SettingsSection
@@ -133,7 +109,7 @@ export function GlobalSettingsDialog() {
 									inputSize="sm"
 									className="flex-1 text-right tabular-nums"
 								/>
-								<span className="text-xs text-text-600 min-w-8">%</span>
+								<span className="text-xs text-text-weak min-w-8">%</span>
 							</div>
 							<Slider
 								value={[slippagePercent]}
@@ -142,26 +118,20 @@ export function GlobalSettingsDialog() {
 								max={MARKET_ORDER_SLIPPAGE_MAX_PERCENT}
 								step={0.1}
 							/>
-							<div className="flex items-center justify-between text-3xs text-text-950">
+							<div className="flex items-center justify-between text-xs text-text-strong">
 								<span>{MARKET_ORDER_SLIPPAGE_MIN_PERCENT}%</span>
-								<span className="font-medium text-text-950 tabular-nums">{slippagePercent}%</span>
+								<span className="font-medium text-text-strong tabular-nums">{slippagePercent}%</span>
 								<span>{MARKET_ORDER_SLIPPAGE_MAX_PERCENT}%</span>
 							</div>
 						</div>
 					</SettingsSection>
 
 					<SettingsSection title={t`Chart`}>
-						<SettingsToggle
-							id={showScanlinesId}
-							label={t`Show Scanlines`}
-							checked={showChartScanlines}
-							onCheckedChange={setShowChartScanlines}
-						/>
+						<Toggle label={t`Show Scanlines`} checked={showChartScanlines} onCheckedChange={setShowChartScanlines} />
 					</SettingsSection>
 
 					<SettingsSection title={t`Order Book`}>
-						<SettingsToggle
-							id={showOrderbookQuoteId}
+						<Toggle
 							label={t`Show Values in Quote Asset`}
 							checked={showOrderbookInQuote}
 							onCheckedChange={setShowOrderbookInQuote}
@@ -169,19 +139,17 @@ export function GlobalSettingsDialog() {
 					</SettingsSection>
 
 					<SettingsSection title={t`Network`} description={t`Switch between mainnet and testnet. Page will reload.`}>
-						<Select value={network} onValueChange={(value) => setNetwork(value as "mainnet" | "testnet")}>
-							<SelectTrigger className="w-full h-9">
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="mainnet">Mainnet</SelectItem>
-								<SelectItem value="testnet">Testnet</SelectItem>
-							</SelectContent>
-						</Select>
+						<Select
+							value={network}
+							onValueChange={(value) => {
+								if (value) setNetwork(value as "mainnet" | "testnet");
+							}}
+							options={networkOptions}
+						/>
 					</SettingsSection>
-				</div>
-			</DialogContent>
-		</Dialog>
+				</ModalContent>
+			</ModalPopup>
+		</Modal>
 	);
 }
 
@@ -195,28 +163,10 @@ function SettingsSection({ title, description, children }: SettingsSectionProps)
 	return (
 		<div className="space-y-2">
 			<div>
-				<h3 className="text-sm font-medium text-text-950">{title}</h3>
-				{description && <p className="text-xs text-text-600 mt-0.5">{description}</p>}
+				<h3 className="text-sm font-medium text-text-strong">{title}</h3>
+				{description && <p className="text-xs text-text-weak mt-0.5">{description}</p>}
 			</div>
 			{children}
-		</div>
-	);
-}
-
-interface SettingsToggleProps {
-	id: string;
-	label: string;
-	checked: boolean;
-	onCheckedChange: (checked: boolean) => void;
-}
-
-function SettingsToggle({ id, label, checked, onCheckedChange }: SettingsToggleProps) {
-	return (
-		<div className="flex items-center justify-between">
-			<label htmlFor={id} className="text-xs text-text-600 cursor-pointer">
-				{label}
-			</label>
-			<Switch id={id} checked={checked} onCheckedChange={onCheckedChange} />
 		</div>
 	);
 }

@@ -2,9 +2,7 @@ import { t } from "@lingui/core/macro";
 import { ArrowsLeftRightIcon, DownloadSimpleIcon, UploadSimpleIcon } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
-import { Button } from "@/components/ui/button";
-import { InfoRow, InfoRowGroup } from "@/components/ui/info-row";
-import { Tabs, TabsContent, TabsContentGroup, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button, InfoRow, InfoRowGroup, SegmentedControlItem, SegmentedControls } from "@/anvil";
 import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
@@ -117,7 +115,7 @@ export function AccountPanel() {
 	const headerPnl = getHeaderPnl();
 
 	const headerPnlClass =
-		activeTab === "perps" && hasPerpData ? getValueColorClass(perpMetrics.unrealizedPnl) : "text-text-950";
+		activeTab === "perps" && hasPerpData ? getValueColorClass(perpMetrics.unrealizedPnl) : "text-text-strong";
 
 	const perpRows = useMemo((): SummaryRow[] => {
 		if (!perpMetrics) return [];
@@ -125,7 +123,7 @@ export function AccountPanel() {
 			{
 				label: t`Balance`,
 				value: formatUSD(perpMetrics.totalRawUsd),
-				valueClassName: "tabular-nums text-market-up-600",
+				valueClassName: "tabular-nums text-text-success",
 			},
 			{
 				label: t`Unrealized PNL`,
@@ -171,7 +169,7 @@ export function AccountPanel() {
 			{
 				label: t`In Orders`,
 				value: formatUSD(spotMetrics.inOrderValue),
-				valueClassName: "tabular-nums text-warning-700",
+				valueClassName: "tabular-nums text-text-warning",
 			},
 			{
 				label: t`Assets`,
@@ -187,16 +185,16 @@ export function AccountPanel() {
 	}, [spotMetrics]);
 
 	return (
-		<div className="shrink-0 flex flex-col bg-surface-execution border-t border-border-200 mb-10">
-			<div className="px-2 py-2 border-b border-border-200 flex items-center justify-between">
-				<span className="text-3xs text-text-950">{t`Account`}</span>
+		<div className="shrink-0 flex flex-col bg-bg-overlay border-t border-stroke-weak mb-10">
+			<div className="px-2 py-2 border-b border-stroke-weak flex items-center justify-between">
+				<span className="text-xs text-text-strong">{t`Account`}</span>
 				<div className="flex items-center gap-2">
 					<div className="flex items-center gap-1">
-						<span className="text-3xs text-text-950">{t`Equity`}</span>
+						<span className="text-xs text-text-strong">{t`Equity`}</span>
 						<span
 							className={cn(
 								"text-xs font-medium tabular-nums",
-								(activeTab === "perps" ? hasPerpData : hasSpotData) ? "text-market-up-600" : "text-text-950",
+								(activeTab === "perps" ? hasPerpData : hasSpotData) ? "text-text-success" : "text-text-strong",
 							)}
 						>
 							{headerEquity}
@@ -204,77 +202,76 @@ export function AccountPanel() {
 					</div>
 					{activeTab === "perps" && (
 						<div className="flex items-center gap-1">
-							<span className="text-3xs text-text-950">{t`PNL`}</span>
+							<span className="text-xs text-text-strong">{t`PNL`}</span>
 							<span className={cn("text-xs font-medium tabular-nums", headerPnlClass)}>{headerPnl}</span>
 						</div>
 					)}
 				</div>
 			</div>
 
-			<Tabs value={activeTab} onValueChange={setActiveTab}>
-				<TabsList variant="underline">
-					<TabsTrigger value="perps">{t`Perps`}</TabsTrigger>
-					<TabsTrigger value="spot">{t`Spot`}</TabsTrigger>
-				</TabsList>
+			<SegmentedControls value={activeTab} onValueChange={setActiveTab} fullWidth className="mx-2 mt-2">
+				<SegmentedControlItem value="perps">{t`Perps`}</SegmentedControlItem>
+				<SegmentedControlItem value="spot">{t`Spot`}</SegmentedControlItem>
+			</SegmentedControls>
 
-				{!isConnected ? (
-					<div className="text-2xs text-text-600 text-center py-4">{t`Connect wallet to view account`}</div>
-				) : (
-					<div className="p-2 overflow-y-auto">
-						<TabsContentGroup>
-							<TabsContent value="perps" forceMount>
-								{hasPerpData ? (
-									<InfoRowGroup className="divide-border-200/30">
-										{perpRows.map((row) => (
-											<InfoRow
-												key={row.label}
-												label={row.label}
-												value={row.value}
-												valueClassName={row.valueClassName}
-											/>
-										))}
-									</InfoRowGroup>
-								) : (
-									<div className="text-2xs text-text-600 text-center py-4">{t`Loading...`}</div>
-								)}
-							</TabsContent>
-							<TabsContent value="spot" forceMount>
-								{hasSpotData ? (
-									<InfoRowGroup className="divide-border-200/30">
-										{spotRows.map((row) => (
-											<InfoRow
-												key={row.label}
-												label={row.label}
-												value={row.value}
-												valueClassName={row.valueClassName}
-											/>
-										))}
-									</InfoRowGroup>
-								) : (
-									<div className="text-2xs text-text-600 text-center py-4">{t`Loading...`}</div>
-								)}
-							</TabsContent>
-						</TabsContentGroup>
+			{!isConnected ? (
+				<div className="text-xs text-text-weak text-center py-4">{t`Connect wallet to view account`}</div>
+			) : (
+				<div className="p-2 overflow-y-auto">
+					{activeTab === "perps" &&
+						(hasPerpData ? (
+							<InfoRowGroup className="divide-stroke-weak/30">
+								{perpRows.map((row) => (
+									<InfoRow key={row.label} label={row.label} value={row.value} valueClassName={row.valueClassName} />
+								))}
+							</InfoRowGroup>
+						) : (
+							<div className="text-xs text-text-weak text-center py-4">{t`Loading...`}</div>
+						))}
+					{activeTab === "spot" &&
+						(hasSpotData ? (
+							<InfoRowGroup className="divide-stroke-weak/30">
+								{spotRows.map((row) => (
+									<InfoRow key={row.label} label={row.label} value={row.value} valueClassName={row.valueClassName} />
+								))}
+							</InfoRowGroup>
+						) : (
+							<div className="text-xs text-text-weak text-center py-4">{t`Loading...`}</div>
+						))}
 
-						{(hasPerpData || hasSpotData) && (
-							<div className="grid grid-cols-3 gap-1 mt-4">
-								<Button variant="outlined" onClick={() => openDepositModal("withdraw")} aria-label={t`Withdraw`}>
-									<UploadSimpleIcon className="size-4" />
-									{t`Withdraw`}
-								</Button>
-								<Button variant="outlined" onClick={() => openDepositModal("deposit")} aria-label={t`Deposit`}>
-									<DownloadSimpleIcon className="size-4" />
-									{t`Deposit`}
-								</Button>
-								<Button variant="outlined" onClick={() => openDepositModal("bridge")} aria-label={t`Bridge`}>
-									<ArrowsLeftRightIcon className="size-4" />
-									{t`Bridge`}
-								</Button>
-							</div>
-						)}
-					</div>
-				)}
-			</Tabs>
+					{(hasPerpData || hasSpotData) && (
+						<div className="grid grid-cols-3 gap-1 mt-4">
+							<Button
+								variant="outline"
+								intent="neutral"
+								onClick={() => openDepositModal("withdraw")}
+								aria-label={t`Withdraw`}
+								iconLeft={<UploadSimpleIcon className="size-4" />}
+							>
+								{t`Withdraw`}
+							</Button>
+							<Button
+								variant="outline"
+								intent="neutral"
+								onClick={() => openDepositModal("deposit")}
+								aria-label={t`Deposit`}
+								iconLeft={<DownloadSimpleIcon className="size-4" />}
+							>
+								{t`Deposit`}
+							</Button>
+							<Button
+								variant="outline"
+								intent="neutral"
+								onClick={() => openDepositModal("bridge")}
+								aria-label={t`Bridge`}
+								iconLeft={<ArrowsLeftRightIcon className="size-4" />}
+							>
+								{t`Bridge`}
+							</Button>
+						</div>
+					)}
+				</div>
+			)}
 		</div>
 	);
 }

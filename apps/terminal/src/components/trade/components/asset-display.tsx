@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar } from "@/anvil";
 import { cn } from "@/lib/cn";
 import type { SpotToken, UnifiedMarket } from "@/lib/hyperliquid/markets";
 import { useMarkets } from "@/lib/hyperliquid/markets/use-markets";
@@ -61,10 +61,7 @@ export function AssetDisplay({
 	const fallbackText = getFallbackText(name);
 
 	const icon = (
-		<Avatar className={cn("size-4 border border-border-200", iconClassName)}>
-			<AvatarImage src={iconUrl} alt={name} />
-			<AvatarFallback className="text-4xs text-text-950 bg-surface-analysis">{fallbackText}</AvatarFallback>
-		</Avatar>
+		<Avatar className={cn("size-4", iconClassName)} size="sm" src={iconUrl} alt={name} initials={fallbackText} />
 	);
 
 	if (showIcon && !showName) {

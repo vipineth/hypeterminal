@@ -2,8 +2,7 @@ import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { ArrowsDownUpIcon, CheckIcon, SpinnerGapIcon, WarningIcon } from "@phosphor-icons/react";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button, Modal, ModalContent, ModalDescription, ModalHeader, ModalPopup, ModalTitle } from "@/anvil";
 import { NumberInput } from "@/components/ui/number-input";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
 import { SWAP_SUCCESS_DURATION_MS } from "@/config/time";
@@ -202,22 +201,22 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 	const isDisabled = isSubmitting || showSuccess;
 
 	return (
-		<Dialog open onOpenChange={handleClose}>
-			<DialogContent className="sm:max-w-md gap-0 p-0 overflow-hidden">
-				<DialogHeader className="px-5 pt-5 pb-3 border-b border-border-200/50">
-					<DialogTitle>
+		<Modal open onOpenChange={handleClose}>
+			<ModalPopup size="sm">
+				<ModalHeader>
+					<ModalTitle>
 						<Trans>Swap</Trans>
-					</DialogTitle>
-					<DialogDescription>
+					</ModalTitle>
+					<ModalDescription>
 						{spotMarket ? (
 							<Trans>Trade via {spotMarket.pairName} spot market</Trans>
 						) : (
 							<Trans>Select tokens to swap</Trans>
 						)}
-					</DialogDescription>
-				</DialogHeader>
+					</ModalDescription>
+				</ModalHeader>
 
-				<div className="px-5 py-4 space-y-3">
+				<ModalContent className="space-y-3">
 					<div className="relative">
 						<div className="space-y-1">
 							<TokenPanel
@@ -242,11 +241,12 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 
 							<div className="relative h-0 flex items-center justify-center z-10">
 								<Button
-									variant="outlined"
-									size="none"
+									variant="outline"
+									intent="neutral"
+									size="sm"
 									onClick={handleFlip}
 									disabled={isDisabled}
-									className="size-8 rounded-full bg-surface-base border-border-200/60 hover:border-primary-default hover:bg-primary-default/10 transition-colors disabled:opacity-50"
+									className="size-8 rounded-full bg-bg-base border-stroke-weak hover:border-stroke-brand-strong hover:bg-fill-hover transition-colors"
 									aria-label={t`Swap direction`}
 								>
 									<ArrowsDownUpIcon className="size-3.5" />
@@ -272,7 +272,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 						</div>
 					</div>
 
-					<div className="flex items-center justify-between text-3xs text-text-950 px-1">
+					<div className="flex items-center justify-between text-xs text-text-strong px-1">
 						<span>
 							<Trans>Rate</Trans>
 						</span>
@@ -288,7 +288,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 						</span>
 					</div>
 
-					<div className="flex items-center justify-between text-3xs text-text-950 px-1">
+					<div className="flex items-center justify-between text-xs text-text-strong px-1">
 						<span>
 							<Trans>Slippage tolerance</Trans>
 						</span>
@@ -296,9 +296,9 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 					</div>
 
 					{insufficientBalance && !showSuccess && (
-						<div className="flex items-start gap-2 p-2.5 bg-warning-700/10 border border-warning-700/20 rounded-xs">
-							<WarningIcon className="size-3.5 text-warning-700 shrink-0 mt-0.5" />
-							<p className="text-xs text-warning-700">
+						<div className="flex items-start gap-2 p-2.5 bg-fill-warning-weak border border-stroke-warning-strong/20 rounded-8">
+							<WarningIcon className="size-3.5 text-text-warning shrink-0 mt-0.5" />
+							<p className="text-xs text-text-warning">
 								<Trans>
 									Insufficient <AssetDisplay coin={fromToken} hideIcon /> balance
 								</Trans>
@@ -307,9 +307,9 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 					)}
 
 					{noPairAvailable && !showSuccess && (
-						<div className="flex items-start gap-2 p-2.5 bg-warning-700/10 border border-warning-700/20 rounded-xs">
-							<WarningIcon className="size-3.5 text-warning-700 shrink-0 mt-0.5" />
-							<p className="text-xs text-warning-700">
+						<div className="flex items-start gap-2 p-2.5 bg-fill-warning-weak border border-stroke-warning-strong/20 rounded-8">
+							<WarningIcon className="size-3.5 text-text-warning shrink-0 mt-0.5" />
+							<p className="text-xs text-text-warning">
 								<Trans>
 									No trading pair available for <AssetDisplay coin={fromToken} hideIcon />/
 									<AssetDisplay coin={toToken} hideIcon />
@@ -319,14 +319,14 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 					)}
 
 					{error && !showSuccess && (
-						<div className="flex items-center gap-2 p-2.5 bg-market-down-100 border border-market-down-600/20 rounded-xs text-xs text-market-down-600">
+						<div className="flex items-center gap-2 p-2.5 bg-fill-error-weak border border-stroke-error-strong/20 rounded-8 text-xs text-text-error">
 							<WarningIcon className="size-3.5 shrink-0" />
 							<span className="flex-1">{error}</span>
 						</div>
 					)}
 
 					{showSuccess && (
-						<div className="flex flex-col items-center gap-1.5 p-3 bg-market-up-100 border border-market-up-600/20 rounded-xs text-market-up-600">
+						<div className="flex flex-col items-center gap-1.5 p-3 bg-fill-success-weak border border-stroke-success-strong/20 rounded-8 text-text-success">
 							<div className="flex items-center gap-2 text-xs">
 								<CheckIcon className="size-3.5" />
 								<Trans>Swap submitted</Trans>
@@ -339,7 +339,8 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 					)}
 
 					<TradingActionButton
-						variant="contained"
+						variant="filled"
+						intent="brand"
 						size="lg"
 						onClick={handleSubmit}
 						disabled={!canSubmit || isSubmitting}
@@ -354,9 +355,9 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 							<Trans>Swap</Trans>
 						)}
 					</TradingActionButton>
-				</div>
-			</DialogContent>
-		</Dialog>
+				</ModalContent>
+			</ModalPopup>
+		</Modal>
 	);
 }
 
@@ -386,13 +387,13 @@ function TokenPanel({
 	return (
 		<div
 			className={cn(
-				"p-3 rounded-xs border transition-colors",
-				hasError ? "border-warning-700/40 bg-warning-700/5" : "border-border-200/40 bg-surface-execution/30",
+				"p-3 rounded-8 border transition-colors",
+				hasError ? "border-stroke-warning-strong/40 bg-fill-warning-weak/50" : "border-stroke-weak/40 bg-bg-overlay/30",
 			)}
 		>
 			<div className="flex items-center justify-between mb-2">
-				<span className="text-3xs text-text-950 uppercase tracking-wider">{label}</span>
-				<span className="text-3xs text-text-950 tabular-nums">
+				<span className="text-xs text-text-strong uppercase tracking-wider">{label}</span>
+				<span className="text-xs text-text-strong tabular-nums">
 					<Trans>Balance</Trans>: {formatToken(balance, 4)}
 				</span>
 			</div>
@@ -413,13 +414,13 @@ function TokenPanel({
 							}
 							onMaxClick={onMaxClick}
 							className={cn(
-								"w-full h-9 text-base font-medium bg-transparent border-border-200/40 focus:border-primary-default/60 tabular-nums text-right",
-								hasError && "text-warning-700 border-warning-700/40 focus:border-warning-700",
+								"w-full h-9 text-base font-medium bg-transparent border-stroke-weak/40 focus:border-stroke-brand-strong/60 tabular-nums text-right",
+								hasError && "text-text-warning border-stroke-warning-strong/40 focus:border-stroke-warning-strong",
 							)}
 							disabled={disabled}
 						/>
 					) : (
-						<div className="h-9 flex items-center justify-end text-base font-medium text-text-600 tabular-nums pr-2">
+						<div className="h-9 flex items-center justify-end text-base font-medium text-text-weak tabular-nums pr-2">
 							{amount || "0.00"}
 						</div>
 					)}

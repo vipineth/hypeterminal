@@ -2,7 +2,7 @@ import { t } from "@lingui/core/macro";
 import { ListNumbersIcon, XIcon } from "@phosphor-icons/react";
 import { useCallback, useEffect, useState } from "react";
 import { useConnection } from "wagmi";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/anvil/button";
 import { Spinner } from "@/components/ui/spinner";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
@@ -101,7 +101,7 @@ export function MobileOrdersTab({ className }: Props) {
 
 	if (!isConnected) {
 		return (
-			<div className="flex-1 flex items-center justify-center p-6 text-sm text-text-500">
+			<div className="flex-1 flex items-center justify-center p-6 text-sm text-text-weak">
 				{t`Connect your wallet to view open orders.`}
 			</div>
 		);
@@ -113,36 +113,37 @@ export function MobileOrdersTab({ className }: Props) {
 
 	if (status === "error") {
 		return (
-			<div className="flex-1 flex items-center justify-center p-6 text-sm text-market-down">
+			<div className="flex-1 flex items-center justify-center p-6 text-sm text-text-error">
 				<span>{t`Failed to load open orders.`}</span>
-				{error instanceof Error && <span className="mt-1 text-3xs text-text-500">{error.message}</span>}
+				{error instanceof Error && <span className="mt-1 text-xs text-text-weak">{error.message}</span>}
 			</div>
 		);
 	}
 
 	if (openOrders.length === 0) {
 		return (
-			<div className="flex-1 flex items-center justify-center p-6 text-sm text-text-500">{t`No open orders.`}</div>
+			<div className="flex-1 flex items-center justify-center p-6 text-sm text-text-weak">{t`No open orders.`}</div>
 		);
 	}
 
 	return (
 		<div className={cn("flex-1 min-h-0 flex flex-col", className)}>
-			<div className="px-3 py-2 flex items-center gap-2 text-3xs uppercase tracking-wider text-text-500">
+			<div className="px-3 py-2 flex items-center gap-2 text-xs uppercase tracking-wider text-text-weak">
 				<ListNumbersIcon className="size-3" />
 				{t`Open Orders`}
-				<span className="font-semibold text-primary-default tabular-nums">{headerCount}</span>
+				<span className="font-semibold text-text-brand tabular-nums">{headerCount}</span>
 				<Button
-					variant="text"
+					variant="ghost"
+					intent="error"
 					size="sm"
-					className="ml-auto text-market-down"
+					className="ml-auto"
 					onClick={handleCancelAll}
 					disabled={isCancelling || openOrders.length === 0}
 				>
 					{isCancelling ? t`Canceling...` : t`Cancel All`}
 				</Button>
 			</div>
-			{actionError && <div className="px-3 pb-1 text-3xs text-market-down">{actionError}</div>}
+			{actionError && <div className="px-3 pb-1 text-xs text-text-error">{actionError}</div>}
 			<div className="flex-1 min-h-0 overflow-y-auto px-3 pb-3 space-y-2">
 				{openOrders.map((order) => (
 					<MobileOrderCard
@@ -178,37 +179,33 @@ function MobileOrderCard({ order, szDecimals, kind, isCancelling, onCancel, onSe
 	return (
 		<div
 			className={cn(
-				"rounded-sm border bg-surface-base/50",
-				isLong ? "border-market-up-600/30" : "border-market-down-600/30",
+				"rounded-8 border bg-bg-sunken/50",
+				isLong ? "border-stroke-success-strong/30" : "border-stroke-error-strong/30",
 			)}
 		>
-			<div className="flex items-center justify-between px-3 py-2.5 border-b border-border/40">
-				<Button variant="text" size="none" onClick={() => onSelectMarket(order.coin)} className="gap-2">
+			<div className="flex items-center justify-between px-3 py-2.5 border-b border-stroke-weak/40">
+				<Button variant="ghost" intent="neutral" size="sm" onClick={() => onSelectMarket(order.coin)}>
 					<AssetDisplay
 						coin={order.coin}
 						nameClassName="text-sm font-semibold"
 						subtitle={
-							<span
-								className={cn("text-3xs font-medium uppercase", isLong ? "text-market-up-600" : "text-market-down-600")}
-							>
+							<span className={cn("text-xs font-medium uppercase", isLong ? "text-text-success" : "text-text-error")}>
 								{sideLabel}
 							</span>
 						}
 					/>
 				</Button>
 				<div className="flex items-center gap-2">
-					<span className={cn("text-3xs px-1.5 py-0.5 rounded-sm uppercase", typeConfig.class)}>
-						{typeConfig.label}
-					</span>
+					<span className={cn("text-xs px-1.5 py-0.5 rounded-8 uppercase", typeConfig.class)}>{typeConfig.label}</span>
 					{order.reduceOnly && (
-						<span className="text-3xs px-1.5 py-0.5 rounded-sm bg-primary-muted/20 text-primary-default uppercase">
+						<span className="text-xs px-1.5 py-0.5 rounded-8 bg-fill-brand-weak text-text-brand uppercase">
 							{t`RO`}
 						</span>
 					)}
 				</div>
 			</div>
 
-			<div className="grid grid-cols-3 gap-px bg-border/20">
+			<div className="grid grid-cols-3 gap-px bg-stroke-weak/20">
 				<MetricCell label={t`Price`} value={formatPrice(order.limitPx, { szDecimals })} />
 				<MetricCell
 					label={t`Size`}
@@ -219,20 +216,18 @@ function MobileOrderCard({ order, szDecimals, kind, isCancelling, onCancel, onSe
 			</div>
 
 			<div className="flex items-center justify-between px-3 py-2.5">
-				<span className="text-3xs text-text-500 tabular-nums">
+				<span className="text-xs text-text-weak tabular-nums">
 					{formatDateTime(order.timestamp, { dateStyle: "short", timeStyle: "short" })}
 				</span>
 				<Button
-					variant="outlined"
+					variant="outline"
+					intent="error"
 					size="sm"
 					onClick={() => onCancel([order])}
 					disabled={isCancelling}
-					className={cn(
-						"min-h-[36px] text-xs gap-1",
-						"border-market-down-600/60 text-market-down-600 hover:bg-market-down-600/10",
-					)}
+					className="min-h-[36px]"
+					iconLeft={isCancelling ? <Spinner className="size-3" /> : <XIcon className="size-3.5" />}
 				>
-					{isCancelling ? <Spinner className="size-3" /> : <XIcon className="size-3.5" />}
 					{t`Cancel`}
 				</Button>
 			</div>
@@ -248,10 +243,10 @@ interface MetricCellProps {
 
 function MetricCell({ label, value, sub }: MetricCellProps) {
 	return (
-		<div className="px-3 py-2 bg-surface-base/50">
-			<div className="text-3xs text-text-500 mb-0.5">{label}</div>
+		<div className="px-3 py-2 bg-bg-sunken/50">
+			<div className="text-xs text-text-weak mb-0.5">{label}</div>
 			<div className="text-xs tabular-nums font-medium">{value}</div>
-			{sub && <div className="text-3xs text-text-500 tabular-nums">{sub}</div>}
+			{sub && <div className="text-xs text-text-weak tabular-nums">{sub}</div>}
 		</div>
 	);
 }

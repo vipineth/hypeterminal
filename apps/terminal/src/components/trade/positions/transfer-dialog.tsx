@@ -2,8 +2,7 @@ import { t } from "@lingui/core/macro";
 import { ArrowsLeftRightIcon, SpinnerGapIcon, WarningCircleIcon } from "@phosphor-icons/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConnection } from "wagmi";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button, Modal, ModalContent, ModalDescription, ModalHeader, ModalPopup, ModalTitle } from "@/anvil";
 import { NumberInput } from "@/components/ui/number-input";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
 import { exceedsBalance, isAmountWithinBalance } from "@/domain/market";
@@ -109,80 +108,83 @@ export function TransferDialog({ open, onOpenChange, initialDirection = "toSpot"
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={handleOpenChange}>
-			<DialogContent className="sm:max-w-sm">
-				<DialogHeader>
-					<DialogTitle>{t`Transfer USDC`}</DialogTitle>
-					<DialogDescription>{t`Move USDC between your Perp and Spot accounts.`}</DialogDescription>
-				</DialogHeader>
+		<Modal open={open} onOpenChange={handleOpenChange}>
+			<ModalPopup size="sm">
+				<ModalHeader>
+					<ModalTitle>{t`Transfer USDC`}</ModalTitle>
+					<ModalDescription>{t`Move USDC between your Perp and Spot accounts.`}</ModalDescription>
+				</ModalHeader>
 
-				<div className="space-y-4">
-					<div className="flex items-center justify-center gap-3 py-2">
-						<div className="flex flex-col items-center">
-							<span
-								className={cn(
-									"text-3xs px-2 py-1 uppercase font-medium",
-									direction === "toSpot"
-										? "bg-primary-default/20 text-primary-default"
-										: "bg-warning-700/20 text-warning-700",
-								)}
+				<ModalContent>
+					<div className="space-y-4">
+						<div className="flex items-center justify-center gap-3 py-2">
+							<div className="flex flex-col items-center">
+								<span
+									className={cn(
+										"text-xs px-2 py-1 uppercase font-medium",
+										direction === "toSpot"
+											? "bg-fill-brand-strong/20 text-text-brand"
+											: "bg-fill-warning-strong/20 text-text-warning",
+									)}
+								>
+									{fromLabel}
+								</span>
+							</div>
+							<button
+								type="button"
+								onClick={handleFlip}
+								className="p-1.5 rounded-8 hover:bg-bg-raised/50 transition-colors text-text-weak hover:text-text-brand"
 							>
-								{fromLabel}
-							</span>
+								<ArrowsLeftRightIcon className="size-4" />
+							</button>
+							<div className="flex flex-col items-center">
+								<span
+									className={cn(
+										"text-xs px-2 py-1 uppercase font-medium",
+										direction === "toPerp"
+											? "bg-fill-brand-strong/20 text-text-brand"
+											: "bg-fill-warning-strong/20 text-text-warning",
+									)}
+								>
+									{toLabel}
+								</span>
+							</div>
 						</div>
-						<button
-							type="button"
-							onClick={handleFlip}
-							className="p-1.5 rounded-sm hover:bg-surface-analysis/50 transition-colors text-text-600 hover:text-primary-default"
-						>
-							<ArrowsLeftRightIcon className="size-4" />
-						</button>
-						<div className="flex flex-col items-center">
-							<span
+
+						<div className="space-y-1.5">
+							<span className="text-xs uppercase tracking-wider text-text-strong">{t`Amount (USDC)`}</span>
+							<NumberInput
+								placeholder="0.00"
+								value={amount}
+								onChange={(e) => handleAmountChange(e.target.value)}
+								maxLabel={
+									<>
+										{t`MAX`}: {formatToken(availableBalance, 2)}
+									</>
+								}
+								onMaxClick={handleMaxClick}
 								className={cn(
-									"text-3xs px-2 py-1 uppercase font-medium",
-									direction === "toPerp"
-										? "bg-primary-default/20 text-primary-default"
-										: "bg-warning-700/20 text-warning-700",
+									"w-full h-9 text-sm bg-bg-sunken/50 border-stroke-weak/60 focus:border-stroke-brand-strong/60 tabular-nums",
+									exceedsBalance(amount, availableBalanceValue) &&
+										"border-stroke-error-strong focus:border-stroke-error-strong",
 								)}
-							>
-								{toLabel}
-							</span>
+							/>
 						</div>
+
+						{error && (
+							<div className="flex items-center gap-2 p-2.5 rounded-8 bg-fill-error-weak border border-stroke-error-strong/20 text-xs text-text-error">
+								<WarningCircleIcon className="size-3.5 shrink-0" />
+								<span className="flex-1">{error}</span>
+							</div>
+						)}
+
+						<Button onClick={handleTransfer} disabled={!isValidAmount || isPending} size="lg" className="w-full">
+							{isPending && <SpinnerGapIcon className="size-3.5 animate-spin mr-2" />}
+							{isPending ? t`Transferring...` : t`Transfer`}
+						</Button>
 					</div>
-
-					<div className="space-y-1.5">
-						<span className="text-4xs uppercase tracking-wider text-text-950">{t`Amount (USDC)`}</span>
-						<NumberInput
-							placeholder="0.00"
-							value={amount}
-							onChange={(e) => handleAmountChange(e.target.value)}
-							maxLabel={
-								<>
-									{t`MAX`}: {formatToken(availableBalance, 2)}
-								</>
-							}
-							onMaxClick={handleMaxClick}
-							className={cn(
-								"w-full h-9 text-sm bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums",
-								exceedsBalance(amount, availableBalanceValue) && "border-market-down-600 focus:border-market-down-600",
-							)}
-						/>
-					</div>
-
-					{error && (
-						<div className="flex items-center gap-2 p-2.5 rounded-xs bg-market-down-100 border border-market-down-600/20 text-3xs text-market-down-600">
-							<WarningCircleIcon className="size-3.5 shrink-0" />
-							<span className="flex-1">{error}</span>
-						</div>
-					)}
-
-					<Button onClick={handleTransfer} disabled={!isValidAmount || isPending} size="lg" className="w-full">
-						{isPending && <SpinnerGapIcon className="size-3.5 animate-spin mr-2" />}
-						{isPending ? t`Transferring...` : t`Transfer`}
-					</Button>
-				</div>
-			</DialogContent>
-		</Dialog>
+				</ModalContent>
+			</ModalPopup>
+		</Modal>
 	);
 }

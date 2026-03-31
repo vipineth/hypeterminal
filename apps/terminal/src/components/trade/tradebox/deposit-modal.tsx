@@ -14,12 +14,19 @@ import {
 import { Suspense, useState } from "react";
 import { formatUnits } from "viem";
 import { useConnection } from "wagmi";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { InfoRow } from "@/components/ui/info-row";
+import {
+	Button,
+	InfoRow,
+	Modal,
+	ModalContent,
+	ModalHeader,
+	ModalPopup,
+	ModalTitle,
+	SegmentedControlItem,
+	SegmentedControls,
+	Select,
+} from "@/anvil";
 import { NumberInput } from "@/components/ui/number-input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MIN_DEPOSIT_USDC, MIN_WITHDRAW_USD, USDC_DECIMALS, WITHDRAWAL_FEE_USD } from "@/config/contracts";
 import { cn } from "@/lib/cn";
 import { formatTransferError } from "@/lib/errors/format";
@@ -44,36 +51,14 @@ interface NetworkSelectProps {
 }
 
 function NetworkSelect({ label, value, onChange, disabled }: NetworkSelectProps) {
-	const selectedNetwork = NETWORKS.find((n) => n.id === value) ?? NETWORKS[0];
-
 	return (
-		<div className="space-y-1.5">
-			<span className="text-4xs uppercase tracking-wider text-text-950">{label}</span>
-			<Select value={value} onValueChange={(v) => onChange(v as NetworkId)} disabled={disabled}>
-				<SelectTrigger className="w-full h-9 bg-surface-base/50 border-border-200/60">
-					<SelectValue>
-						<span className="flex items-center gap-2">
-							<span className="flex size-5 items-center justify-center rounded bg-surface-analysis text-4xs font-medium">
-								{selectedNetwork.shortName}
-							</span>
-							<span>{selectedNetwork.name}</span>
-						</span>
-					</SelectValue>
-				</SelectTrigger>
-				<SelectContent>
-					{NETWORKS.map((network) => (
-						<SelectItem key={network.id} value={network.id}>
-							<span className="flex items-center gap-2">
-								<span className="flex size-5 items-center justify-center rounded bg-surface-analysis text-4xs font-medium">
-									{network.shortName}
-								</span>
-								<span>{network.name}</span>
-							</span>
-						</SelectItem>
-					))}
-				</SelectContent>
-			</Select>
-		</div>
+		<Select
+			label={label as string}
+			value={value}
+			onValueChange={(v) => v && onChange(v as NetworkId)}
+			disabled={disabled}
+			options={NETWORKS.map((n) => ({ value: n.id, label: n.name }))}
+		/>
 	);
 }
 
@@ -101,58 +86,56 @@ function StatusScreen({
 	const explorerUrl = txHash ? getExplorerTxUrl(txHash) : null;
 
 	return (
-		<Dialog open onOpenChange={closable ? onClose : undefined}>
-			<DialogContent className="sm:max-w-md" showCloseButton={closable}>
-				<DialogHeader>
-					<DialogTitle>{title}</DialogTitle>
-				</DialogHeader>
-				<div className="flex flex-col items-center gap-4 py-6">
-					{icon === "loading" ? (
-						<div className="relative">
-							<div className="absolute inset-0 animate-ping rounded-full bg-primary-default/20" />
-							<div className="relative flex size-14 items-center justify-center rounded-full bg-primary-default/10 border border-primary-default/30">
-								<SpinnerGapIcon className="size-7 animate-spin text-primary-default" />
+		<Modal open onOpenChange={closable ? onClose : undefined}>
+			<ModalPopup size="sm" showClose={closable}>
+				<ModalHeader>
+					<ModalTitle>{title}</ModalTitle>
+				</ModalHeader>
+				<ModalContent>
+					<div className="flex flex-col items-center gap-4 py-6">
+						{icon === "loading" ? (
+							<div className="relative">
+								<div className="absolute inset-0 animate-ping rounded-full bg-fill-brand-weak/20" />
+								<div className="relative flex size-14 items-center justify-center rounded-full bg-fill-brand-weak/10 border border-stroke-brand-strong/30">
+									<SpinnerGapIcon className="size-7 animate-spin text-text-brand" />
+								</div>
 							</div>
+						) : (
+							<div
+								className={cn(
+									"flex size-14 items-center justify-center rounded-full border",
+									icon === "success"
+										? "bg-fill-success-weak border-fill-success-weak/30"
+										: "bg-fill-error-weak border-stroke-error-strong/30",
+								)}
+							>
+								{icon === "success" ? (
+									<CheckCircleIcon className="size-7 text-text-success" />
+								) : (
+									<WarningCircleIcon className="size-7 text-text-error" />
+								)}
+							</div>
+						)}
+						<div className="text-center space-y-1.5">
+							<p className="text-sm font-medium">{heading}</p>
+							{description && <p className="text-xs text-text-weak">{description}</p>}
 						</div>
-					) : (
-						<div
-							className={cn(
-								"flex size-14 items-center justify-center rounded-full border",
-								icon === "success"
-									? "bg-market-up-100 border-market-up-600/30"
-									: "bg-market-down-100 border-market-down-600/30",
-							)}
-						>
-							{icon === "success" ? (
-								<CheckCircleIcon className="size-7 text-market-up-600" />
-							) : (
-								<WarningCircleIcon className="size-7 text-market-down-600" />
-							)}
-						</div>
-					)}
-					<div className="text-center space-y-1.5">
-						<p className="text-sm font-medium">{heading}</p>
-						{description && <p className="text-xs text-text-600">{description}</p>}
-					</div>
-					{explorerUrl && (
-						<Button
-							asChild
-							variant="text"
-							size="none"
-							className="h-auto p-0 text-3xs text-primary-default hover:underline"
-						>
-							<a href={explorerUrl} target="_blank" rel="noopener noreferrer">
-								<span className="inline-flex items-center gap-1.5">
-									<Trans>View on explorer</Trans>
-									<ArrowSquareOutIcon className="size-3" />
-								</span>
+						{explorerUrl && (
+							<a
+								href={explorerUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="inline-flex items-center gap-1.5 text-xs text-text-brand hover:underline"
+							>
+								<Trans>View on explorer</Trans>
+								<ArrowSquareOutIcon className="size-3" />
 							</a>
-						</Button>
-					)}
-					{children && <div className="w-full pt-2">{children}</div>}
-				</div>
-			</DialogContent>
-		</Dialog>
+						)}
+						{children && <div className="w-full pt-2">{children}</div>}
+					</div>
+				</ModalContent>
+			</ModalPopup>
+		</Modal>
 	);
 }
 
@@ -171,7 +154,7 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 			<NetworkSelect label={<Trans>From</Trans>} value="arbitrum" onChange={() => {}} disabled />
 
 			<div className="space-y-1.5">
-				<span className="text-4xs uppercase tracking-wider text-text-950">
+				<span className="text-xs uppercase tracking-wider text-text-strong">
 					<Trans>Amount</Trans>
 				</span>
 				<NumberInput
@@ -185,20 +168,20 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 					}
 					onMaxClick={() => onAmountChange(balance)}
 					className={cn(
-						"w-full h-10 text-base bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums font-medium",
-						validation.error && "border-market-down-600 focus:border-market-down-600",
+						"w-full h-10 text-base bg-bg-sunken/50 border-stroke-weak/60 focus:border-stroke-brand-strong/60 tabular-nums font-medium",
+						validation.error && "border-stroke-error-strong focus:border-stroke-error-strong",
 					)}
 				/>
-				<p className={cn("text-4xs flex items-center gap-1", validation.error ? "text-market-down-600" : "invisible")}>
+				<p className={cn("text-xs flex items-center gap-1", validation.error ? "text-text-error" : "invisible")}>
 					<WarningCircleIcon className="size-3" />
 					{validation.error || "\u00A0"}
 				</p>
 			</div>
 
-			<div className="rounded-xs border border-border-200/40 bg-surface-analysis p-3 space-y-2 text-3xs">
+			<div className="rounded-8 border border-stroke-weak/40 bg-bg-raised p-3 space-y-2 text-xs">
 				<InfoRow
 					className="p-0"
-					labelClassName="flex items-center gap-1.5 text-text-950"
+					labelClassName="flex items-center gap-1.5 text-text-strong"
 					label={
 						<>
 							<WalletIcon className="size-3" />
@@ -209,7 +192,7 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 				/>
 				<InfoRow
 					className="p-0"
-					labelClassName="flex items-center gap-1.5 text-text-950"
+					labelClassName="flex items-center gap-1.5 text-text-strong"
 					label={
 						<>
 							<ClockIcon className="size-3" />
@@ -222,7 +205,8 @@ function DepositForm({ amount, onAmountChange, balance, validation, isPending, o
 			</div>
 
 			<Button
-				variant="contained"
+				variant="filled"
+				intent="neutral"
 				onClick={onSubmit}
 				disabled={!validation.valid || isPending}
 				className="mt-auto w-full"
@@ -272,7 +256,7 @@ function WithdrawForm({
 			<NetworkSelect label={<Trans>To</Trans>} value="arbitrum" onChange={() => {}} disabled />
 
 			<div className="space-y-1.5">
-				<span className="text-4xs uppercase tracking-wider text-text-950">
+				<span className="text-xs uppercase tracking-wider text-text-strong">
 					<Trans>Amount</Trans>
 				</span>
 				<NumberInput
@@ -291,20 +275,20 @@ function WithdrawForm({
 					}
 					onMaxClick={() => !isPending && onAmountChange(maxWithdraw)}
 					className={cn(
-						"w-full h-10 text-base bg-surface-base/50 border-border-200/60 focus:border-primary-default/60 tabular-nums font-medium",
-						validation.error && "border-market-down-600 focus:border-market-down-600",
+						"w-full h-10 text-base bg-bg-sunken/50 border-stroke-weak/60 focus:border-stroke-brand-strong/60 tabular-nums font-medium",
+						validation.error && "border-stroke-error-strong focus:border-stroke-error-strong",
 					)}
 				/>
-				<p className={cn("text-4xs flex items-center gap-1", validation.error ? "text-market-down-600" : "invisible")}>
+				<p className={cn("text-xs flex items-center gap-1", validation.error ? "text-text-error" : "invisible")}>
 					<WarningCircleIcon className="size-3" />
 					{validation.error || "\u00A0"}
 				</p>
 			</div>
 
-			<div className="rounded-xs border border-border-200/40 bg-surface-analysis p-3 space-y-2 text-3xs">
+			<div className="rounded-8 border border-stroke-weak/40 bg-bg-raised p-3 space-y-2 text-xs">
 				<InfoRow
 					className="p-0"
-					labelClassName="flex items-center gap-1.5 text-text-950"
+					labelClassName="flex items-center gap-1.5 text-text-strong"
 					label={
 						<>
 							<WalletIcon className="size-3" />
@@ -315,7 +299,7 @@ function WithdrawForm({
 				/>
 				<InfoRow
 					className="p-0"
-					labelClassName="flex items-center gap-1.5 text-text-950"
+					labelClassName="flex items-center gap-1.5 text-text-strong"
 					label={
 						<>
 							<ArrowLineDownIcon className="size-3" />
@@ -326,7 +310,7 @@ function WithdrawForm({
 				/>
 				<InfoRow
 					className="p-0"
-					labelClassName="flex items-center gap-1.5 text-text-950"
+					labelClassName="flex items-center gap-1.5 text-text-strong"
 					label={
 						<>
 							<ArrowLineUpIcon className="size-3" />
@@ -337,7 +321,7 @@ function WithdrawForm({
 				/>
 				<InfoRow
 					className="p-0"
-					labelClassName="flex items-center gap-1.5 text-text-950"
+					labelClassName="flex items-center gap-1.5 text-text-strong"
 					label={
 						<>
 							<ClockIcon className="size-3" />
@@ -350,7 +334,8 @@ function WithdrawForm({
 			</div>
 
 			<Button
-				variant="contained"
+				variant="filled"
+				intent="neutral"
 				onClick={onSubmit}
 				disabled={!validation.valid || isPending}
 				className="mt-auto w-full"
@@ -374,14 +359,14 @@ function WithdrawForm({
 function WalletNotConnected() {
 	return (
 		<div className="flex flex-col items-center gap-4 py-8">
-			<div className="flex size-12 items-center justify-center rounded-full bg-surface-analysis border border-border-200/40">
-				<WalletIcon className="size-6 text-text-950" />
+			<div className="flex size-12 items-center justify-center rounded-full bg-bg-raised border border-stroke-weak/40">
+				<WalletIcon className="size-6 text-text-strong" />
 			</div>
 			<div className="text-center space-y-1">
 				<p className="text-sm font-medium">
 					<Trans>Wallet not connected</Trans>
 				</p>
-				<p className="text-3xs text-text-950">
+				<p className="text-xs text-text-strong">
 					<Trans>Connect your wallet to withdraw funds</Trans>
 				</p>
 			</div>
@@ -399,29 +384,29 @@ interface WrongNetworkScreenProps {
 
 function WrongNetworkScreen({ open, onClose, onSwitch, isSwitching, error }: WrongNetworkScreenProps) {
 	return (
-		<Dialog open={open} onOpenChange={onClose}>
-			<DialogContent className="sm:max-w-md">
-				<DialogHeader>
-					<DialogTitle>
+		<Modal open={open} onOpenChange={onClose}>
+			<ModalPopup size="sm">
+				<ModalHeader>
+					<ModalTitle>
 						<Trans>Transfer</Trans>
-					</DialogTitle>
-				</DialogHeader>
-				<div className="space-y-4 py-2">
-					<div className="flex items-start gap-3 rounded-xs border border-warning-700/40 bg-warning-700/5 p-4">
-						<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-warning-700/20">
-							<WarningCircleIcon className="size-4 text-warning-700" />
+					</ModalTitle>
+				</ModalHeader>
+				<ModalContent className="space-y-4">
+					<div className="flex items-start gap-3 rounded-8 border border-fill-warning-weak/40 bg-fill-warning-weak/5 p-4">
+						<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-fill-warning-weak/20">
+							<WarningCircleIcon className="size-4 text-text-warning" />
 						</div>
 						<div className="space-y-1">
 							<p className="text-sm font-medium">
 								<Trans>Wrong network</Trans>
 							</p>
-							<p className="text-3xs text-text-950">
+							<p className="text-xs text-text-strong">
 								<Trans>Switch to Arbitrum to deposit USDC to Hyperliquid</Trans>
 							</p>
 						</div>
 					</div>
-					{error && <p className="text-3xs text-market-down-600 px-1">{error.message}</p>}
-					<Button onClick={onSwitch} disabled={isSwitching} className="w-full">
+					{error && <p className="text-xs text-text-error px-1">{error.message}</p>}
+					<Button variant="filled" intent="neutral" onClick={onSwitch} disabled={isSwitching} className="w-full">
 						{isSwitching ? (
 							<>
 								<SpinnerGapIcon className="size-4 animate-spin" />
@@ -431,9 +416,9 @@ function WrongNetworkScreen({ open, onClose, onSwitch, isSwitching, error }: Wro
 							<Trans>Switch to Arbitrum</Trans>
 						)}
 					</Button>
-				</div>
-			</DialogContent>
-		</Dialog>
+				</ModalContent>
+			</ModalPopup>
+		</Modal>
 	);
 }
 
@@ -531,7 +516,7 @@ export function DepositModal() {
 				heading={<Trans>Deposit complete</Trans>}
 				description={
 					<>
-						<span className="tabular-nums font-medium text-market-up-600">{depositAmount} USDC</span>{" "}
+						<span className="tabular-nums font-medium text-text-success">{depositAmount} USDC</span>{" "}
 						<Trans>sent to Hyperliquid</Trans>
 					</>
 				}
@@ -555,7 +540,7 @@ export function DepositModal() {
 				onClose={handleClose}
 			>
 				<div className="flex w-full gap-2">
-					<Button variant="outlined" onClick={handleClose} className="flex-1">
+					<Button variant="outline" intent="neutral" onClick={handleClose} className="flex-1">
 						<Trans>Cancel</Trans>
 					</Button>
 					<Button onClick={resetDeposit} className="flex-1">
@@ -588,7 +573,7 @@ export function DepositModal() {
 				heading={<Trans>Withdrawal submitted</Trans>}
 				description={
 					<>
-						<span className="tabular-nums font-medium text-market-up-600">${withdrawAmount}</span>{" "}
+						<span className="tabular-nums font-medium text-text-success">${withdrawAmount}</span>{" "}
 						<Trans>will arrive in ~5 min</Trans>
 					</>
 				}
@@ -611,7 +596,7 @@ export function DepositModal() {
 				onClose={handleClose}
 			>
 				<div className="flex w-full gap-2">
-					<Button variant="outlined" onClick={handleClose} className="flex-1">
+					<Button variant="outline" intent="neutral" onClick={handleClose} className="flex-1">
 						<Trans>Cancel</Trans>
 					</Button>
 					<Button onClick={resetWithdraw} className="flex-1">
@@ -624,70 +609,73 @@ export function DepositModal() {
 
 	// Main form
 	return (
-		<Dialog open={open} onOpenChange={handleClose}>
-			<DialogContent className="sm:max-w-md">
-				<DialogHeader>
-					<DialogTitle>
+		<Modal open={open} onOpenChange={handleClose}>
+			<ModalPopup size="sm">
+				<ModalHeader>
+					<ModalTitle>
 						<Trans>Transfer</Trans>
-					</DialogTitle>
-				</DialogHeader>
+					</ModalTitle>
+				</ModalHeader>
 
-				<Tabs
-					value={activeTab}
-					onValueChange={(v) => setTab(v as "deposit" | "withdraw" | "bridge")}
-					className="space-y-4"
-				>
-					<TabsList variant="pill" className="w-full grid grid-cols-3">
-						<TabsTrigger value="deposit">
-							<ArrowLineDownIcon className="size-3" />
+				<ModalContent className="space-y-4">
+					<SegmentedControls
+						value={activeTab}
+						onValueChange={(v) => setTab(v as "deposit" | "withdraw" | "bridge")}
+						fullWidth
+					>
+						<SegmentedControlItem value="deposit" icon={<ArrowLineDownIcon className="size-3" />}>
 							<Trans>Deposit</Trans>
-						</TabsTrigger>
-						<TabsTrigger value="withdraw">
-							<ArrowLineUpIcon className="size-3" />
+						</SegmentedControlItem>
+						<SegmentedControlItem value="withdraw" icon={<ArrowLineUpIcon className="size-3" />}>
 							<Trans>Withdraw</Trans>
-						</TabsTrigger>
-						<TabsTrigger value="bridge">
-							<ArrowsLeftRightIcon className="size-3" />
+						</SegmentedControlItem>
+						<SegmentedControlItem value="bridge" icon={<ArrowsLeftRightIcon className="size-3" />}>
 							<Trans>Bridge</Trans>
-						</TabsTrigger>
-					</TabsList>
+						</SegmentedControlItem>
+					</SegmentedControls>
 
-					<div className="grid min-h-95 [&>*]:col-start-1 [&>*]:row-start-1">
-						<TabsContent value="deposit" forceMount className="flex flex-col data-[state=inactive]:invisible">
-							<DepositForm
-								amount={depositAmount}
-								onAmountChange={setDepositAmount}
-								balance={depositBalance}
-								validation={depositValidation}
-								isPending={false}
-								onSubmit={handleDepositSubmit}
-							/>
-						</TabsContent>
-
-						<TabsContent value="withdraw" forceMount className="flex flex-col data-[state=inactive]:invisible">
-							{!address ? (
-								<WalletNotConnected />
-							) : (
-								<WithdrawForm
-									amount={withdrawAmount}
-									onAmountChange={setWithdrawAmount}
-									available={withdrawable}
-									balanceStatus={balanceStatus}
-									validation={withdrawValidation}
-									isPending={isWithdrawPending}
-									onSubmit={handleWithdrawSubmit}
+					<div className="min-h-95">
+						{activeTab === "deposit" && (
+							<div className="flex flex-col">
+								<DepositForm
+									amount={depositAmount}
+									onAmountChange={setDepositAmount}
+									balance={depositBalance}
+									validation={depositValidation}
+									isPending={false}
+									onSubmit={handleDepositSubmit}
 								/>
-							)}
-						</TabsContent>
+							</div>
+						)}
 
-						<TabsContent value="bridge" forceMount className="flex flex-col data-[state=inactive]:invisible">
-							<Suspense fallback={null}>
-								<LazyBridgeTab />
-							</Suspense>
-						</TabsContent>
+						{activeTab === "withdraw" && (
+							<div className="flex flex-col">
+								{!address ? (
+									<WalletNotConnected />
+								) : (
+									<WithdrawForm
+										amount={withdrawAmount}
+										onAmountChange={setWithdrawAmount}
+										available={withdrawable}
+										balanceStatus={balanceStatus}
+										validation={withdrawValidation}
+										isPending={isWithdrawPending}
+										onSubmit={handleWithdrawSubmit}
+									/>
+								)}
+							</div>
+						)}
+
+						{activeTab === "bridge" && (
+							<div className="flex flex-col">
+								<Suspense fallback={null}>
+									<LazyBridgeTab />
+								</Suspense>
+							</div>
+						)}
 					</div>
-				</Tabs>
-			</DialogContent>
-		</Dialog>
+				</ModalContent>
+			</ModalPopup>
+		</Modal>
 	);
 }

@@ -1,12 +1,5 @@
-import { Trans } from "@lingui/react/macro";
-import { CaretDownIcon, CheckIcon } from "@phosphor-icons/react";
-import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { CaretDownIcon } from "@phosphor-icons/react";
+import { Dropdown, type DropdownItem } from "@/anvil";
 import { cn } from "@/lib/cn";
 import { formatToken } from "@/lib/format";
 import type { SpotToken } from "@/lib/hyperliquid/markets";
@@ -24,52 +17,31 @@ interface Props {
 export function TokenSelectorDropdown({ tokens, selectedToken, onSelect, getBalance, disabled, className }: Props) {
 	const selected = tokens.find((t) => t.name === selectedToken);
 
+	const items: DropdownItem[] = tokens.map((token) => {
+		const balance = getBalance(token.name);
+		const isSelected = token.name === selectedToken;
+		return {
+			label: `${token.name}${isSelected ? " ✓" : ""}  ${formatToken(balance, 4)}`,
+			icon: <AssetDisplay coin={token.name} hideName iconClassName="size-5" />,
+			onSelect: () => onSelect(token.name),
+		};
+	});
+
 	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger asChild disabled={disabled}>
-				<Button
-					variant="text"
-					size="none"
-					className={cn(
-						"flex items-center gap-2 px-2.5 py-1.5 border border-border-200/40 bg-surface-execution/30 hover:bg-surface-execution/50 hover:border-border-200/60 transition-colors",
-						disabled && "opacity-50 cursor-not-allowed",
-						className,
-					)}
-				>
+		<Dropdown
+			items={items}
+			disabled={disabled}
+			trigger={
+				<span className={cn("inline-flex items-center gap-2", className)}>
 					{selected ? (
 						<AssetDisplay coin={selected.name} iconClassName="size-5" nameClassName="text-sm font-medium" />
 					) : (
 						<span className="text-sm font-medium">{selectedToken}</span>
 					)}
-					<CaretDownIcon className="size-3.5 text-text-600 ml-1" />
-				</Button>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent align="start" className="w-56">
-				{tokens.length === 0 ? (
-					<div className="px-3 py-2 text-xs text-text-600">
-						<Trans>No tokens available</Trans>
-					</div>
-				) : (
-					tokens.map((token) => {
-						const balance = getBalance(token.name);
-						const isSelected = token.name === selectedToken;
-
-						return (
-							<DropdownMenuItem
-								key={token.name}
-								onClick={() => onSelect(token.name)}
-								className="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer"
-							>
-								<div className="flex items-center gap-2">
-									<AssetDisplay coin={token.name} iconClassName="size-5" nameClassName="text-sm font-medium" />
-									{isSelected && <CheckIcon className="size-3.5 text-primary-default" />}
-								</div>
-								<span className="text-xs text-text-600 tabular-nums">{formatToken(balance, 4)}</span>
-							</DropdownMenuItem>
-						);
-					})
-				)}
-			</DropdownMenuContent>
-		</DropdownMenu>
+					<CaretDownIcon className="size-3.5 text-text-weak ml-1" />
+				</span>
+			}
+			className={cn(disabled && "opacity-50 cursor-not-allowed")}
+		/>
 	);
 }

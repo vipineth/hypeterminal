@@ -1,14 +1,8 @@
-import { CaretDownIcon } from "@phosphor-icons/react";
 import type { Chart } from "klinecharts";
 import { dispose, FormatDateType, init, LoadDataType } from "klinecharts";
 import { useEffect, useRef, useState } from "react";
 import { useConnection } from "wagmi";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Dropdown } from "@/anvil";
 import { candleEventToKLineData, candlesToKLineData } from "@/lib/chart/candle";
 import {
 	CHART_TYPES,
@@ -47,7 +41,7 @@ interface Props {
 	yAxisInside?: boolean;
 }
 
-export function KlineChart({ symbol = "", theme = "dark", yAxisInside = false }: Props) {
+export function KlineChart({ symbol = "", yAxisInside = false }: Props) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const chartRef = useRef<Chart | null>(null);
 	const [activeInterval, setActiveInterval] = useState(DEFAULT_INTERVAL);
@@ -129,7 +123,7 @@ export function KlineChart({ symbol = "", theme = "dark", yAxisInside = false }:
 			chartRef.current = null;
 			dispose(container);
 		};
-	}, [symbol, theme, activeInterval, activeChartType, yAxisInside]);
+	}, [symbol, activeInterval, activeChartType, yAxisInside]);
 
 	const candleData = useSubscription(
 		"candle",
@@ -191,70 +185,56 @@ export function KlineChart({ symbol = "", theme = "dark", yAxisInside = false }:
 
 	return (
 		<div className="flex flex-col h-full">
-			<div className="flex items-center gap-0.5 p-2 py-1.5 border-b border-border-200/85 bg-surface-analysis">
+			<div className="flex items-center gap-0.5 p-2 py-1.5 border-b border-stroke-weak/85 bg-bg-raised">
 				{STARRED_INTERVALS.map((interval) => (
 					<button
 						key={interval.resolution}
 						type="button"
 						onClick={() => setActiveInterval(interval)}
 						className={cn(
-							"px-1.5 py-0.5 text-3xs rounded-xs transition-colors",
+							"px-1.5 py-0.5 text-xs rounded-8 transition-colors",
 							activeInterval.resolution === interval.resolution
-								? "text-text-950 font-semibold"
-								: "text-text-500 hover:text-text-950",
+								? "text-text-strong font-semibold"
+								: "text-text-weak hover:text-text-strong",
 						)}
 					>
 						{interval.label}
 					</button>
 				))}
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<button
-							type="button"
+				<Dropdown
+					trigger={
+						<span
 							className={cn(
-								"flex items-center gap-0.5 px-1.5 py-0.5 text-3xs rounded-xs transition-colors",
-								isNonFavoriteActive ? "text-text-950 font-semibold" : "text-text-500 hover:text-text-950",
+								"flex items-center gap-0.5 text-xs",
+								isNonFavoriteActive ? "text-text-strong font-semibold" : "text-text-weak",
 							)}
 						>
 							{isNonFavoriteActive && activeInterval.label}
-							<CaretDownIcon className="size-2.5" />
-						</button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="start" className="min-w-20">
-						{MORE_INTERVALS.map((interval) => (
-							<DropdownMenuItem
-								key={interval.resolution}
-								selected={activeInterval.resolution === interval.resolution}
-								onSelect={() => setActiveInterval(interval)}
-							>
-								{interval.label}
-							</DropdownMenuItem>
-						))}
-					</DropdownMenuContent>
-				</DropdownMenu>
-				<div className="w-px h-3.5 bg-border-200" />
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<button
-							type="button"
-							className="flex items-center gap-0.5 px-1.5 py-0.5 text-3xs text-text-950 font-semibold rounded-xs hover:bg-surface-execution/50 transition-colors"
-						>
+						</span>
+					}
+					items={MORE_INTERVALS.map((interval) => ({
+						label: interval.label,
+						onSelect: () => setActiveInterval(interval),
+					}))}
+					align="start"
+					size="sm"
+					className="inline-flex"
+				/>
+				<div className="w-px h-3.5 bg-stroke-weak" />
+				<Dropdown
+					trigger={
+						<span className="flex items-center gap-0.5 text-xs text-text-strong font-semibold">
 							{activeChartType.label}
-							<CaretDownIcon className="size-2.5 text-text-500" />
-						</button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="start" className="min-w-24">
-						{CHART_TYPES.map((ct) => (
-							<DropdownMenuItem
-								key={ct.label}
-								selected={activeChartType.label === ct.label}
-								onSelect={() => setActiveChartType(ct)}
-							>
-								{ct.label}
-							</DropdownMenuItem>
-						))}
-					</DropdownMenuContent>
-				</DropdownMenu>
+						</span>
+					}
+					items={CHART_TYPES.map((ct) => ({
+						label: ct.label,
+						onSelect: () => setActiveChartType(ct),
+					}))}
+					align="start"
+					size="sm"
+					className="inline-flex"
+				/>
 			</div>
 			<div ref={containerRef} className="flex-1 min-h-0" />
 		</div>

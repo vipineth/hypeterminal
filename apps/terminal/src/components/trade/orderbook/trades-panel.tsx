@@ -1,7 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { ArrowSquareOutIcon, ArrowsLeftRightIcon } from "@phosphor-icons/react";
 import { memo, useMemo } from "react";
-import { Button } from "@/components/ui/button";
 import { getBaseQuoteFromPairName } from "@/domain/market";
 import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
@@ -24,20 +23,18 @@ const TradeRow = memo(function TradeRow({ trade, szDecimals, showInQuote }: Prop
 			target="_blank"
 			rel="noopener noreferrer"
 			className={cn(
-				"grid grid-cols-3 gap-2 text-3xs tabular-nums py-0.5 hover:bg-surface-analysis/30 group",
+				"grid grid-cols-3 gap-2 text-xs tabular-nums py-0.5 hover:bg-fill-hover group",
 				trade.side === "buy" ? "trade-row-buy" : "trade-row-sell",
 			)}
 		>
-			<div className="text-text-950 flex items-center gap-1">
+			<div className="text-text-strong flex items-center gap-1">
 				{trade.time}
 				<ArrowSquareOutIcon className="size-2.5 opacity-100 hover:opacity-80" />
 			</div>
-			<div
-				className={cn("text-right font-medium", trade.side === "buy" ? "text-market-up-600" : "text-market-down-600")}
-			>
+			<div className={cn("text-right font-medium", trade.side === "buy" ? "text-text-success" : "text-text-error")}>
 				{formatNumber(trade.price, 2)}
 			</div>
-			<div className="text-right text-text-950">{sizeDisplay}</div>
+			<div className="text-right text-text-strong">{sizeDisplay}</div>
 		</a>
 	);
 });
@@ -68,27 +65,26 @@ export function TradesPanel() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col">
-			<div className="grid grid-cols-3 gap-2 px-2 py-1 h-9 items-center text-3xs text-text-950 uppercase tracking-wider border-b border-border-200/40">
+			<div className="grid grid-cols-3 gap-2 px-2 py-1 h-9 items-center text-xs text-text-strong uppercase tracking-wider border-b border-stroke-weak/40">
 				<div>{t`Time`}</div>
 				<div className="text-right">{t`Price`}</div>
-				<Button
-					variant="text"
-					size="none"
+				<button
+					type="button"
 					onClick={toggleAssetDisplay}
-					className="text-right hover:text-text-950 hover:bg-transparent transition-colors inline-flex items-center justify-end gap-0.5"
+					className="text-right hover:text-text-strong transition-colors inline-flex items-center justify-end gap-0.5"
 				>
 					{t`Size`}
-					<span className="text-text-950">({displayAsset})</span>
+					<span className="text-text-strong">({displayAsset})</span>
 					<ArrowsLeftRightIcon className="size-2 opacity-40" />
-				</Button>
+				</button>
 			</div>
 
 			{status === "error" ? (
-				<div className="flex-1 flex items-center justify-center px-2 py-6 text-3xs text-text-950">
+				<div className="flex-1 flex items-center justify-center px-2 py-6 text-xs text-text-strong">
 					{error instanceof Error ? error.message : t`Failed to load trades.`}
 				</div>
 			) : processed.length === 0 ? (
-				<div className="flex-1 flex items-center justify-center px-2 py-6 text-3xs text-text-950">
+				<div className="flex-1 flex items-center justify-center px-2 py-6 text-xs text-text-strong">
 					{t`Waiting for trades...`}
 				</div>
 			) : (

@@ -2,10 +2,9 @@ import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { CaretDownIcon, CheckIcon, SpinnerGapIcon, WarningIcon } from "@phosphor-icons/react";
 import { forwardRef, useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button, Drawer, DrawerContent } from "@/anvil";
 import { NumberInput } from "@/components/ui/number-input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useAssetLeverage } from "@/hooks/trade/use-asset-leverage";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/cn";
@@ -22,14 +21,15 @@ const LeverageBadge = forwardRef<HTMLButtonElement, BadgeProps>(({ leverage, onC
 	return (
 		<Button
 			ref={ref}
-			variant="outlined"
+			variant="outline"
+			intent="neutral"
 			onClick={onClick}
 			className={cn(isLoading && "opacity-70", className)}
 			aria-label={t`Change leverage`}
 		>
-			<span className="text-text-600">{t`Leverage`}</span>
-			<span className="tabular-nums font-medium text-text-950">{leverage}x</span>
-			<CaretDownIcon className="size-2.5 text-text-600" />
+			<span className="text-text-weak">{t`Leverage`}</span>
+			<span className="tabular-nums font-medium text-text-strong">{leverage}x</span>
+			<CaretDownIcon className="size-2.5 text-text-weak" />
 		</Button>
 	);
 });
@@ -126,8 +126,8 @@ function LeverageEditor({
 			<div className="flex items-center justify-between">
 				<span
 					className={cn(
-						"uppercase tracking-wide text-text-600",
-						compact ? "text-2xs font-normal" : "text-xs font-medium",
+						"uppercase tracking-wide text-text-weak",
+						compact ? "text-xs font-normal" : "text-xs font-medium",
 					)}
 				>
 					<Trans>Leverage</Trans>
@@ -144,7 +144,7 @@ function LeverageEditor({
 						inputSize={compact ? "sm" : "lg"}
 						className={cn("text-center font-medium tabular-nums", compact ? "w-12" : "w-16")}
 					/>
-					<span className={cn("text-text-600", compact ? "text-xs" : "text-base")}>x</span>
+					<span className={cn("text-text-weak", compact ? "text-xs" : "text-base")}>x</span>
 				</div>
 			</div>
 
@@ -153,8 +153,8 @@ function LeverageEditor({
 			{updateError && (
 				<div
 					className={cn(
-						"flex items-center bg-market-down-100 border border-market-down-600/20 rounded-xs text-market-down-600",
-						compact ? "gap-1.5 p-1.5 text-3xs" : "gap-2 p-2.5 text-sm",
+						"flex items-center bg-fill-error-weak border border-stroke-error-strong/20 rounded-8 text-text-error",
+						compact ? "gap-1.5 p-1.5 text-xs" : "gap-2 p-2.5 text-sm",
 					)}
 				>
 					<WarningIcon className={cn(iconSize, "shrink-0")} />
@@ -165,8 +165,8 @@ function LeverageEditor({
 			{showSuccess && (
 				<div
 					className={cn(
-						"flex items-center justify-center bg-market-up-100 border border-market-up-600/20 rounded-xs text-market-up-600",
-						compact ? "gap-1.5 p-1.5 text-3xs" : "gap-2 p-2.5 text-sm",
+						"flex items-center justify-center bg-fill-success-weak border border-fill-success-weak/20 rounded-8 text-text-success",
+						compact ? "gap-1.5 p-1.5 text-xs" : "gap-2 p-2.5 text-sm",
 					)}
 				>
 					<CheckIcon className={iconSize} />
@@ -176,19 +176,22 @@ function LeverageEditor({
 
 			{updateError && (
 				<div className={cn("flex", compact ? "gap-2" : "gap-3")}>
-					<Button variant="outlined" size={compact ? "sm" : "lg"} className="flex-1" onClick={handleCancel}>
+					<Button
+						variant="outline"
+						intent="neutral"
+						size={compact ? "sm" : "lg"}
+						className="flex-1"
+						onClick={handleCancel}
+					>
 						<Trans>Cancel</Trans>
 					</Button>
 					<Button
-						variant="text"
-						size={compact ? "none" : undefined}
+						variant="outline"
+						intent="brand"
+						size={compact ? "sm" : "lg"}
 						onClick={handleConfirm}
 						disabled={isUpdating}
-						className={cn(
-							"flex-1 font-semibold uppercase tracking-wider hover:bg-transparent",
-							"bg-primary-default/20 border border-primary-default text-primary-default hover:bg-primary-default/30",
-							compact ? "py-2 text-2xs gap-1.5" : "py-3 text-xs gap-2",
-						)}
+						className="flex-1"
 					>
 						{isUpdating && <SpinnerGapIcon className={cn(iconSize, "animate-spin")} />}
 						<Trans>Retry</Trans>
@@ -198,9 +201,9 @@ function LeverageEditor({
 
 			{!updateError && compact && (
 				<Button
-					variant="outlined"
-					size="md"
-					tone="accent"
+					variant="outline"
+					intent="brand"
+					size="sm"
 					onClick={handleConfirm}
 					disabled={!isDirty || isUpdating || showSuccess}
 					className="w-full"
@@ -212,15 +215,12 @@ function LeverageEditor({
 
 			{!updateError && !compact && (
 				<Button
-					variant="text"
+					variant="outline"
+					intent="brand"
+					size="lg"
 					onClick={handleConfirm}
 					disabled={!isDirty || isUpdating || showSuccess}
-					className={cn(
-						"w-full py-3 text-xs font-semibold uppercase tracking-wider gap-2 border hover:bg-transparent",
-						isDirty && !isUpdating && !showSuccess
-							? "bg-primary-default/20 border-primary-default text-primary-default hover:bg-primary-default/30"
-							: "bg-primary-default/10 border-primary-default/30 text-primary-default/50",
-					)}
+					className="w-full"
 				>
 					{isUpdating && <SpinnerGapIcon className="size-4 animate-spin" />}
 					<Trans>Confirm</Trans>
@@ -283,11 +283,11 @@ export function LeverageControl({ className }: Props) {
 					isLoading={isLoading}
 					className={className}
 				/>
-				<Sheet open={open} onOpenChange={handleOpenChange}>
-					<SheetContent side="bottom" className="px-4 pb-8 pt-6">
+				<Drawer side="bottom" open={open} onOpenChange={handleOpenChange}>
+					<DrawerContent className="px-4 pb-8 pt-6">
 						<LeverageEditor {...editorProps} compact={false} />
-					</SheetContent>
-				</Sheet>
+					</DrawerContent>
+				</Drawer>
 			</>
 		);
 	}

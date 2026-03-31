@@ -40,7 +40,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 
 	return (
 		<div className={cn("flex flex-col flex-1 min-h-0", className)}>
-			<div className="shrink-0 px-3 py-2 border-b border-border-200/60 bg-surface-execution/30">
+			<div className="shrink-0 px-3 py-2 border-b border-stroke-weak/60 bg-bg-overlay/30">
 				<div className="flex items-center justify-between gap-3">
 					<TokenSelector selectedMarket={selectedMarket} onValueChange={handleMarketChange} />
 
@@ -49,7 +49,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 							<Skeleton className="h-6 w-24" />
 						) : (
 							<>
-								<div className="text-lg font-semibold tabular-nums text-warning-700">{formatUSD(markPx ?? null)}</div>
+								<div className="text-lg font-semibold tabular-nums text-text-warning">{formatUSD(markPx ?? null)}</div>
 								{typeof change24h === "number" && (
 									<span className={cn("text-sm tabular-nums font-medium", getValueColorClass(change24h))}>
 										{change24h >= 0 ? "+" : ""}
@@ -62,7 +62,7 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 				</div>
 			</div>
 
-			<div className="shrink-0 px-3 py-1.5 border-b border-border-200/40 bg-surface-execution/20 overflow-x-auto">
+			<div className="shrink-0 px-3 py-1.5 border-b border-stroke-weak/40 bg-bg-overlay/20 overflow-x-auto">
 				<div className="flex items-center gap-4 text-xs min-w-max">
 					{isLoading ? (
 						<>
@@ -126,8 +126,8 @@ export function MobileChartView({ className }: MobileChartViewProps) {
 function StatPill({ label, value }: { label: string; value: string }) {
 	return (
 		<div className="flex items-center gap-1.5">
-			<span className="text-text-950 uppercase tracking-wider text-3xs">{label}</span>
-			<span className="tabular-nums text-text-950">{value}</span>
+			<span className="text-text-strong uppercase tracking-wider text-xs">{label}</span>
+			<span className="tabular-nums text-text-strong">{value}</span>
 		</div>
 	);
 }

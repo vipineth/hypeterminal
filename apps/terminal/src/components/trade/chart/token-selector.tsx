@@ -1,19 +1,8 @@
 import { t } from "@lingui/core/macro";
-import {
-	ArrowDownIcon,
-	ArrowsDownUpIcon,
-	ArrowUpIcon,
-	CaretDownIcon,
-	FireIcon,
-	MagnifyingGlassIcon,
-	StarIcon,
-} from "@phosphor-icons/react";
+import { ArrowDownIcon, ArrowsDownUpIcon, ArrowUpIcon, CaretDownIcon, FireIcon, StarIcon } from "@phosphor-icons/react";
 
 import { flexRender } from "@tanstack/react-table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
-import { Input } from "@/components/ui/input";
+import { Badge, Button, Drawer, DrawerContent, DrawerTrigger, SearchInput } from "@/anvil";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { get24hChange, getOiUsd, isTokenInCategory } from "@/domain/market";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -118,23 +107,20 @@ function TokenSelectorContent({
 
 	return (
 		<div className="flex flex-col">
-			<div className="border-b border-border-200/40">
-				<div className="relative p-2">
-					<MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-text-600" />
-					<Input
+			<div className="border-b border-stroke-weak/40">
+				<div className="p-2">
+					<SearchInput
 						placeholder={t`Search markets...`}
 						value={search}
 						onChange={(e) => setSearch(e.target.value)}
-						className={cn(
-							"pl-7 py-4 bg-surface-base/50 border-border-200/60 focus:border-primary-default/40",
-							mobile ? "text-sm" : "text-xs",
-						)}
+						onClear={() => setSearch("")}
+						size={mobile ? "md" : "sm"}
 					/>
 				</div>
 			</div>
 
 			{showSelectorFilters ? (
-				<div className="p-2 border-b border-border-200/40 bg-surface-base/50">
+				<div className="p-2 border-b border-stroke-weak/40 bg-bg-sunken/50">
 					{showScopeTabs ? (
 						<div className="flex items-center gap-0.5 flex-wrap">
 							{marketScopes.map((s) => {
@@ -142,15 +128,14 @@ function TokenSelectorContent({
 								return (
 									<Button
 										key={s.value}
-										variant="text"
-										size="none"
+										variant="link"
+										intent="neutral"
 										onClick={() => handleScopeSelect(s.value)}
 										className={cn(
-											"px-2 py-1 uppercase tracking-wider cursor-pointer",
-											mobile ? "text-2xs" : "text-3xs",
+											"px-2 py-1 uppercase tracking-wider cursor-pointer no-underline text-xs",
 											isSelected
-												? "bg-warning-700/10 text-warning-700 hover:bg-warning-700/10 hover:text-warning-700"
-												: "text-text-950 hover:bg-transparent",
+												? "bg-text-warning/10 text-text-warning hover:bg-text-warning/10 hover:text-text-warning"
+												: "text-text-strong hover:bg-transparent",
 										)}
 									>
 										{s.label}
@@ -166,15 +151,14 @@ function TokenSelectorContent({
 								return (
 									<Button
 										key={sub.value}
-										variant="text"
-										size="none"
+										variant="link"
+										intent="neutral"
 										onClick={() => handleSubcategorySelect(sub.value)}
 										className={cn(
-											"px-2 py-0.5 tracking-wider cursor-pointer",
-											mobile ? "text-3xs" : "text-4xs",
+											"px-2 py-0.5 tracking-wider cursor-pointer no-underline text-xs",
 											isSelected
-												? "bg-primary-default/10 text-primary-default hover:bg-primary-default/10 hover:text-primary-default"
-												: "text-text-950 hover:bg-transparent hover:text-text-950",
+												? "bg-text-brand/10 text-text-brand hover:bg-text-brand/10 hover:text-text-brand"
+												: "text-text-strong hover:bg-transparent hover:text-text-strong",
 										)}
 										aria-label={t`Filter by ${sub.label}`}
 										aria-pressed={isSelected}
@@ -189,8 +173,8 @@ function TokenSelectorContent({
 			) : null}
 			<div
 				className={cn(
-					"flex items-center px-3 py-1.5 uppercase tracking-wider text-text-950 border-b border-border-200/40 bg-surface-base/30",
-					mobile ? "text-3xs" : "text-4xs",
+					"flex items-center px-3 py-1.5 uppercase tracking-wider text-text-strong border-b border-stroke-weak/40 bg-bg-sunken/30",
+					mobile ? "text-xs" : "text-xs",
 				)}
 			>
 				<div className="flex-1 min-w-0">{t`Market`}</div>
@@ -205,11 +189,11 @@ function TokenSelectorContent({
 						return (
 							<Button
 								key={header.id}
-								variant="text"
-								size="none"
+								variant="link"
+								intent="neutral"
 								onClick={() => handleSort(header.id)}
 								className={cn(
-									"justify-end gap-1 hover:text-text-950 hover:bg-transparent",
+									"justify-end gap-1 hover:text-text-strong hover:bg-transparent no-underline text-xs",
 									mobile ? "w-20" : "w-16 sm:w-20",
 									hiddenOnMobile && (mobile ? "hidden" : "hidden sm:flex"),
 								)}
@@ -225,11 +209,11 @@ function TokenSelectorContent({
 			<div ref={containerRef} className={cn("overflow-auto", mobile ? "h-[60vh]" : "h-72")}>
 				{isLoading ? (
 					<div className="flex items-center justify-center py-8">
-						<span className={cn("text-text-950", mobile ? "text-2xs" : "text-3xs")}>{t`Loading markets...`}</span>
+						<span className={cn("text-text-strong", mobile ? "text-xs" : "text-xs")}>{t`Loading markets...`}</span>
 					</div>
 				) : rows.length === 0 ? (
 					<div
-						className={cn("py-8 text-center text-text-950", mobile ? "text-2xs" : "text-3xs")}
+						className={cn("py-8 text-center text-text-strong", mobile ? "text-xs" : "text-xs")}
 					>{t`No markets found.`}</div>
 				) : (
 					<div
@@ -250,8 +234,8 @@ function TokenSelectorContent({
 
 							const changeClass = cn(
 								"font-medium tabular-nums",
-								mobile ? "text-xs" : "text-2xs",
-								changePercent === null ? "text-text-600" : getValueColorClass(changePercent),
+								mobile ? "text-xs" : "text-xs",
+								changePercent === null ? "text-text-weak" : getValueColorClass(changePercent),
 							);
 							const changeText = formatPercent(changePercent !== null ? changePercent / 100 : null);
 
@@ -274,12 +258,12 @@ function TokenSelectorContent({
 									aria-selected={isSelected}
 									tabIndex={0}
 									className={cn(
-										"flex items-center px-3 cursor-pointer border-b border-border-200/20",
-										"hover:bg-primary-default/10 transition-colors",
+										"flex items-center px-3 cursor-pointer border-b border-stroke-weak/20",
+										"hover:bg-fill-hover transition-colors",
 										"absolute top-0 left-0 w-full",
 										mobile ? "py-2.5" : "py-1.5",
-										isSelected && !isHighlighted && "bg-surface-analysis",
-										isHighlighted && "bg-primary-default/15",
+										isSelected && !isHighlighted && "bg-bg-raised",
+										isHighlighted && "bg-fill-hover",
 									)}
 									style={{
 										height: `${virtualItem.size}px`,
@@ -294,40 +278,39 @@ function TokenSelectorContent({
 										/>
 										<div className="min-w-0">
 											<div className="flex items-center gap-1">
-												<span className={cn("font-semibold", mobile ? "text-xs" : "text-2xs")}>{market.pairName}</span>
-												<Button
-													variant="text"
-													size="none"
+												<span className={cn("font-semibold", mobile ? "text-xs" : "text-xs")}>{market.pairName}</span>
+												<button
+													type="button"
 													onClick={(e) => {
 														e.stopPropagation();
 														toggleFavorite(market.name);
 													}}
-													className="hover:scale-110 hover:bg-transparent"
+													className="hover:scale-110 cursor-pointer"
 													aria-label={isFav ? t`Remove from favorites` : t`Add to favorites`}
 												>
 													<StarIcon
 														className={cn(
 															"transition-colors",
 															mobile ? "size-3" : "size-2.5",
-															isFav ? "fill-warning-700 text-warning-700" : "text-text-600 hover:text-warning-700",
+															isFav ? "fill-text-warning text-text-warning" : "text-text-weak hover:text-text-warning",
 														)}
 													/>
-												</Button>
+												</button>
 												{isTokenInCategory(market.shortName, "new") && (
-													<Badge variant="neutral" size="xs" className="px-1 py-0 text-4xs">
+													<Badge tone="neutral" size="sm" className="px-1 py-0 text-xs">
 														{t`NEW`}
 													</Badge>
 												)}
 											</div>
-											<div className={cn("flex items-center gap-1.5 text-text-950", mobile ? "text-3xs" : "text-4xs")}>
+											<div className={cn("flex items-center gap-1.5 text-text-strong", mobile ? "text-xs" : "text-xs")}>
 												{getMaxLeverage(market) && <span>{getMaxLeverage(market)}x</span>}
-												{isSpot && <span className="text-primary-default">Spot</span>}
-												{isHip3 && <span className="text-warning-700">{getDex(market)}</span>}
+												{isSpot && <span className="text-text-brand">Spot</span>}
+												{isHip3 && <span className="text-text-warning">{getDex(market)}</span>}
 											</div>
 										</div>
 									</div>
 									<div className={cn("text-right", mobile ? "w-20" : "w-16 sm:w-20")}>
-										<span className={cn("font-medium tabular-nums", mobile ? "text-xs" : "text-2xs")}>
+										<span className={cn("font-medium tabular-nums", mobile ? "text-xs" : "text-xs")}>
 											{formatPrice(market.markPx, {
 												szDecimals: getSzDecimals(market),
 											})}
@@ -338,11 +321,11 @@ function TokenSelectorContent({
 									</div>
 									{scope !== "spot" && (
 										<div className="w-16 sm:w-20 text-right hidden sm:block">
-											<span className="text-2xs font-medium tabular-nums">{formatUSD(oiValue)}</span>
+											<span className="text-xs font-medium tabular-nums">{formatUSD(oiValue)}</span>
 										</div>
 									)}
 									<div className="w-16 sm:w-20 text-right hidden sm:block">
-										<span className="text-2xs font-medium tabular-nums">{formatUSD(market.dayNtlVlm)}</span>
+										<span className="text-xs font-medium tabular-nums">{formatUSD(market.dayNtlVlm)}</span>
 									</div>
 									{scope !== "spot" && (
 										<div className="w-16 sm:w-20 text-right hidden sm:block">
@@ -350,8 +333,8 @@ function TokenSelectorContent({
 												{market.funding && <FireIcon className={cn("size-2.5", getValueColorClass(market.funding))} />}
 												<span
 													className={cn(
-														"text-2xs tabular-nums font-medium",
-														market.funding ? getValueColorClass(market.funding) : "text-text-600",
+														"text-xs tabular-nums font-medium",
+														market.funding ? getValueColorClass(market.funding) : "text-text-weak",
 													)}
 												>
 													{formatPercent(market.funding, {
@@ -371,8 +354,8 @@ function TokenSelectorContent({
 
 			<div
 				className={cn(
-					"px-3 py-1.5 bg-surface-base/30 flex items-center justify-between text-text-950",
-					mobile ? "text-3xs" : "text-4xs",
+					"px-3 py-1.5 bg-bg-sunken/30 flex items-center justify-between text-text-strong",
+					mobile ? "text-xs" : "text-xs",
 				)}
 			>
 				<span>
@@ -439,13 +422,12 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 	};
 
 	const trigger = (
-		<Button
-			variant="text"
-			size="none"
+		<button
+			type="button"
 			role="combobox"
 			aria-expanded={open}
 			aria-label={t`Select token`}
-			className="gap-2 px-2 py-1.5 bg-surface-execution border border-border-200/40 rounded-sm text-2xs font-bold uppercase tracking-wider hover:bg-surface-execution"
+			className="inline-flex items-center gap-2 px-2 py-1.5 bg-bg-overlay border border-stroke-weak/40 rounded-8 text-xs font-bold uppercase tracking-wider hover:bg-bg-overlay cursor-pointer"
 		>
 			{selectedMarket && (
 				<AssetDisplay
@@ -455,14 +437,14 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 					nameClassName="inline-flex min-w-[13ch]"
 				/>
 			)}
-			<CaretDownIcon className="size-4 text-text-600" />
-		</Button>
+			<CaretDownIcon className="size-4 text-text-weak" />
+		</button>
 	);
 
 	if (isMobile) {
 		return (
-			<Drawer open={open} onOpenChange={setOpen}>
-				<DrawerTrigger asChild>{trigger}</DrawerTrigger>
+			<Drawer side="bottom" open={open} onOpenChange={setOpen}>
+				<DrawerTrigger>{trigger}</DrawerTrigger>
 				<DrawerContent className="max-h-[90vh] overflow-hidden">
 					<TokenSelectorContent {...contentProps} mobile />
 				</DrawerContent>
@@ -474,7 +456,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>{trigger}</PopoverTrigger>
 			<PopoverContent
-				className="w-[calc(100vw-1rem)] sm:w-2xl max-w-2xl p-0 border-border-200/60 bg-surface-execution"
+				className="w-[calc(100vw-1rem)] sm:w-2xl max-w-2xl p-0 border-stroke-weak/60 bg-bg-overlay"
 				align="start"
 				sideOffset={8}
 				onKeyDown={handleKeyDown}

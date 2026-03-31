@@ -1,41 +1,81 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "@fontsource-variable/ibm-plex-sans";
+@import "@fontsource-variable/inter";
 
-@custom-variant dark (&:is(.dark *));
+/* ============================================
+   Anvil Design System — Design Tokens
+   Source: Figma variable exports
+   + HyperTerminal Trading Extensions
+   ============================================ */
 
+/* --- Dark mode: class-based toggle --- */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* =============================================
+   Layer 1: Primitive Tokens
+   ============================================= */
 @theme {
-  /* Typography - Font Families */
-  --font-sans: "IBM Plex Sans Variable", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  --font-mono: "IBM Plex Sans Variable", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  /* ---- Font Families ---- */
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", monospace;
 
-  /* Typography - Custom text sizes for dense UI */
-  --text-nav: 0.8125rem; /* 13px - top nav links */
-  --text-nav--line-height: 1.38;
-  --text-2xs: 0.6875rem; /* 11px */
-  --text-2xs--line-height: 1.45;
-  --text-3xs: 0.625rem; /* 10px */
-  --text-3xs--line-height: 1.5;
-  --text-4xs: 0.5625rem; /* 9px */
-  --text-4xs--line-height: 1.55;
-  --text-5xs: 0.5rem; /* 8px - badges */
-  --text-5xs--line-height: 1.5;
+  /* ---- Typography Scale (Desktop) ----
+     Figma name      → Tailwind class
+     Tiny     14/20  → text-xs
+     Small    16/24  → text-sm
+     Heading4 20/28  → text-base
+     Heading3 24/32  → text-lg
+     Heading2 32/40  → text-xl
+     Heading1 40/48  → text-2xl
+     Display  56/64  → text-3xl
+  */
+  --text-xs: 14px;
+  --text-xs--line-height: 20px;
+  --text-sm: 16px;
+  --text-sm--line-height: 24px;
+  --text-base: 20px;
+  --text-base--line-height: 28px;
+  --text-lg: 24px;
+  --text-lg--line-height: 32px;
+  --text-xl: 32px;
+  --text-xl--line-height: 40px;
+  --text-2xl: 40px;
+  --text-2xl--line-height: 48px;
+  --text-3xl: 56px;
+  --text-3xl--line-height: 64px;
 
-  /* Border Radius */
-  --radius-sm: calc(0.125rem - 4px);
-  --radius-md: calc(0.125rem - 2px);
-  --radius-lg: 0.125rem;
-  --radius-xl: calc(0.125rem + 4px);
+  /* ---- Grey Solid Primitives ---- */
+  --color-grey-solid-0: #ffffff;
+  --color-grey-solid-50: #f5f6fa;
+  --color-grey-solid-800: #292b33;
+  --color-grey-solid-850: #1d1e26;
+  --color-grey-solid-900: #12131a;
+  --color-grey-solid-1000: #000000;
 
-  /* Shadows - Light Mode */
-  --shadow-xs: 0px 1px 2px 0px hsl(220 20% 20% / 0.08);
-  --shadow-sm: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 1px 2px -1px hsl(220 20% 20% / 0.1);
-  --shadow-md: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 2px 4px -1px hsl(220 20% 20% / 0.1);
-  --shadow-lg: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 4px 6px -1px hsl(220 20% 20% / 0.1);
-  --shadow-xl: 0px 1px 2px 0px hsl(220 20% 20% / 0.1), 0px 8px 10px -1px hsl(220 20% 20% / 0.1);
-  --shadow-2xl: 0px 1px 2px 0px hsl(220 20% 20% / 0.25);
+  /* ---- Spacing Base (4px grid) ---- */
+  --spacing: 4px;
 
-  /* Custom Animations */
+  /* ---- Border Radius ---- */
+  --radius-none: 0px;
+  --radius-4: 4px;
+  --radius-8: 8px;
+  --radius-12: 12px;
+  --radius-16: 16px;
+  --radius-20: 20px;
+  --radius-24: 24px;
+  --radius-32: 32px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-raised: 0 4px 8px -2px rgba(0, 0, 0, 0.04), 0 2px 4px -2px rgba(0, 0, 0, 0.08);
+  --shadow-overlay: 0 20px 24px -4px rgba(0, 0, 0, 0.08), 0 8px 8px -4px rgba(0, 0, 0, 0.04);
+  --inset-shadow-sunken: inset 0 1px 4px rgba(0, 0, 0, 0.08);
+
+  /* ---- Letter Spacing ---- */
+  --tracking-uppercase: 2px;
+  --tracking-heading-1: -0.5px;
+
+  /* ---- HyperTerminal Custom Animations ---- */
   --animate-pulse-slow: pulse-slow 2s ease-in-out infinite;
   --animate-blink: blink 1s step-end infinite;
   --animate-collapse-down: collapse-down 0.2s ease-out;
@@ -53,298 +93,354 @@
   }
 
   @keyframes collapse-down {
-    from {
-      height: 0;
-      opacity: 0;
-    }
-    to {
-      height: var(--radix-collapsible-content-height);
-      opacity: 1;
-    }
+    from { height: 0; opacity: 0; }
+    to { height: var(--radix-collapsible-content-height); opacity: 1; }
   }
 
   @keyframes collapse-up {
-    from {
-      height: var(--radix-collapsible-content-height);
-      opacity: 1;
-    }
-    to {
-      height: 0;
-      opacity: 0;
-    }
+    from { height: var(--radix-collapsible-content-height); opacity: 1; }
+    to { height: 0; opacity: 0; }
   }
 
   @keyframes countdown {
     from { width: 100%; }
     to { width: 0%; }
   }
-
 }
 
-/* =============================================================================
-   LIGHT MODE - Default theme
-   ============================================================================= */
+/* =============================================
+   Layer 2: Semantic Tokens (Light/Dark)
+   ============================================= */
+@layer base {
 
-:root {
-  /* Text */
-  --text-950: #232529;
-  --text-600: #555C65;
-  --text-500: #626B75;
-  --text-400: #7E8792;
-  --text-10: #FFFFFF;
+  /* ==================== LIGHT MODE ==================== */
+  :root {
+    color-scheme: light;
 
-  /* Border */
-  --border-500: #A6ACB3;
-  --border-300: #D2D6DA;
-  --border-200: #E0E3E6;
-  --border-100: #ECEEEF;
-  --border-50: #F6F7F8;
+    /* Background */
+    --bg-base: #ffffff;
+    --bg-raised: #ffffff;
+    --bg-overlay: #ffffff;
+    --bg-sunken: #f5f6fa;
+    --bg-alternate: #f5f6fa;
+    --bg-brand: #4c64d9;
+    --bg-inverse: #12131a;
 
-  /* Primary */
-  --primary-default: #2563EB;
-  --primary-hover: #1D4ED8;
-  --primary-active: #1E40AF;
-  --primary-muted: #92B1F5;
+    /* Text */
+    --text-strong: #000626e5;
+    --text-weak: #000933a6;
+    --text-brand: #4c64d9;
+    --text-disabled: #0011661a;
+    --text-error: #c73a3a;
+    --text-warning: #8f6c1a;
+    --text-success: #067a57;
+    --text-info: #1a74a8;
+    --text-inverse-strong: #ffffff;
+    --text-inverse-weak: #ffffffc7;
+    --text-inverse-disabled: #ffffff1f;
 
-  /* Market Up */
-  --market-up-600: #3C7D3E;
-  --market-up-500: #4E9950;
-  --market-up-100: #E6F4E6;
-  --market-up-50: #F3FAF3;
+    /* Fill */
+    --fill-strong: #000626e5;
+    --fill-weak: #0015800a;
+    --fill-weaker: #00158005;
+    --fill-hover: #0015800a;
+    --fill-press: #0011661a;
+    --fill-selected: #4c64d9;
+    --fill-disabled: #0011661a;
+    --fill-overlay: #000d4d73;
+    --fill-brand-strong: #4c64d9;
+    --fill-brand-weak: #4c64d90d;
+    --fill-error-strong: #c73a3a;
+    --fill-error-weak: #ff4a4a0d;
+    --fill-warning-strong: #8f6c1a;
+    --fill-warning-weak: #ffc02e0d;
+    --fill-success-strong: #067a57;
+    --fill-success-weak: #0acc920d;
+    --fill-info-strong: #1a74a8;
+    --fill-info-weak: #26b0ff0d;
+    --fill-inverse-strong: #ffffff;
+    --fill-inverse-weak: #ffffff0f;
+    --fill-inverse-hover: #ffffff0f;
+    --fill-inverse-press: #ffffff1f;
+    --fill-inverse-disabled: #ffffff1f;
+    --fill-white: #ffffff;
+    --fill-yellow: #fec62e;
 
-  /* Market Down */
-  --market-down-600: #C94139;
-  --market-down-500: #E06A63;
-  --market-down-100: #FBE6E5;
-  --market-down-50: #FDF4F3;
+    /* Stroke */
+    --stroke-strong: #000d4d73;
+    --stroke-weak: #0011661a;
+    --stroke-selected: #4c64d9;
+    --stroke-focus: #4c64d9;
+    --stroke-disabled: #0011661a;
+    --stroke-brand-strong: #4c64d9cc;
+    --stroke-brand-weak: #4c64d933;
+    --stroke-error-strong: #c73a3acc;
+    --stroke-error-weak: #c73a3a24;
+    --stroke-warning-strong: #8f6c1acc;
+    --stroke-warning-weak: #8f6c1a33;
+    --stroke-success-strong: #067a57cc;
+    --stroke-success-weak: #067a5733;
+    --stroke-info-strong: #1a74a8cc;
+    --stroke-info-weak: #1a74a833;
+    --stroke-inverse-strong: #ffffff99;
+    --stroke-inverse-weak: #ffffff1f;
+    --stroke-inverse-disabled: #ffffff1f;
 
-  /* Market Neutral (no Figma token yet) */
-  --market-neutral: #8A919A;
+    /* Icon */
+    --icon-neutral: #000d4d73;
+    --icon-brand: #4c64d9cc;
+    --icon-disabled: #0011661a;
+    --icon-error: #c73a3acc;
+    --icon-warning: #8f6c1acc;
+    --icon-success: #067a57cc;
+    --icon-info: #1a74a8cc;
+    --icon-inverse: #ffffff99;
+    --icon-inverse-strong: #ffffff;
+    --icon-inverse-disabled: #ffffff1f;
 
-  /* Success */
-  --success-700: #1F7A3F;
-  --success-100: #F1FCF4;
+    /* HyperTerminal Trading Extensions */
+    --market-neutral: #8A919A;
+    --scope-perp: #2563EB;
+    --scope-spot: #0F766E;
+    --scope-builders: #B45309;
+    --sel: rgba(37, 99, 235, 0.15);
+  }
 
-  /* Warning */
-  --warning-700: #FBAC3C;
-  --warning-100: #FFF9ED;
+  /* ==================== DARK MODE ==================== */
+  .dark {
+    color-scheme: dark;
 
-  /* Error */
-  --error-700: #A63A2B;
-  --error-100: #FDF4F3;
+    /* Background */
+    --bg-base: #12131a;
+    --bg-raised: #1d1e26;
+    --bg-overlay: #292b33;
+    --bg-sunken: #000000;
+    --bg-alternate: #1d1e26;
+    --bg-brand: #b2bcf1;
+    --bg-inverse: #ffffff;
 
-  /* Surface */
-  --surface-base: #F1F3F4;
-  --surface-analysis: #FDFDFD;
-  --surface-execution: #FFFFFF;
-  --surface-monitoring-row-a: #FFFFFF;
-  --surface-monitoring-row-b: #F9F9FA;
+    /* Text */
+    --text-strong: #ffffff;
+    --text-weak: #ffffffc7;
+    --text-brand: #b2bcf1;
+    --text-disabled: #ffffff1f;
+    --text-error: #ff9c9c;
+    --text-warning: #e0be70;
+    --text-success: #77c7af;
+    --text-info: #7ec0e5;
+    --text-inverse-strong: #000626e5;
+    --text-inverse-weak: #000933a6;
+    --text-inverse-disabled: #0011661a;
 
-  /* Fill */
-  --fill-900: #000000;
-  --fill-300: #ECEEEF;
-  --fill-100: #FFFFFF;
-  --fill-50: #FFFFFF;
+    /* Fill */
+    --fill-strong: #ffffff;
+    --fill-weak: #ffffff0f;
+    --fill-weaker: #ffffff08;
+    --fill-hover: #ffffff0f;
+    --fill-press: #ffffff1f;
+    --fill-selected: #b2bcf1;
+    --fill-disabled: #ffffff1f;
+    --fill-overlay: #000626e5;
+    --fill-brand-strong: #b2bcf1;
+    --fill-brand-weak: #b2bcf10f;
+    --fill-error-strong: #ff9c9c;
+    --fill-error-weak: #ff9c9c14;
+    --fill-warning-strong: #e0be70;
+    --fill-warning-weak: #e0be7014;
+    --fill-success-strong: #77c7af;
+    --fill-success-weak: #77c7af14;
+    --fill-info-strong: #7ec0e5;
+    --fill-info-weak: #7ec0e514;
+    --fill-inverse-strong: #12131a;
+    --fill-inverse-weak: #0015800a;
+    --fill-inverse-hover: #0015800a;
+    --fill-inverse-press: #0011661a;
+    --fill-inverse-disabled: #0011661a;
+    --fill-white: #ffffff;
+    --fill-yellow: #fec62e;
 
-  /* Highlight */
-  --highlight: #F7931A;
+    /* Stroke */
+    --stroke-strong: #ffffff99;
+    --stroke-weak: #ffffff1f;
+    --stroke-selected: #b2bcf1;
+    --stroke-focus: #b2bcf1;
+    --stroke-disabled: #ffffff1f;
+    --stroke-brand-strong: #b2bcf1cc;
+    --stroke-brand-weak: #b2bcf133;
+    --stroke-error-strong: #ff9c9ccc;
+    --stroke-error-weak: #ff9c9c33;
+    --stroke-warning-strong: #e0be70cc;
+    --stroke-warning-weak: #e0be7033;
+    --stroke-success-strong: #77c7afcc;
+    --stroke-success-weak: #77c7af33;
+    --stroke-info-strong: #7ec0e5cc;
+    --stroke-info-weak: #7ec0e533;
+    --stroke-inverse-strong: #000d4d73;
+    --stroke-inverse-weak: #0011661a;
+    --stroke-inverse-disabled: #0011661a;
 
-  /* Scope Accents */
-  --scope-perp: #2563EB;
-  --scope-spot: #0F766E;
-  --scope-builders: #B45309;
+    /* Icon */
+    --icon-neutral: #ffffff99;
+    --icon-brand: #b2bcf1cc;
+    --icon-disabled: #ffffff1f;
+    --icon-error: #ff9c9ccc;
+    --icon-warning: #e0be70cc;
+    --icon-success: #77c7afcc;
+    --icon-info: #7ec0e5cc;
+    --icon-inverse: #000d4d73;
+    --icon-inverse-strong: #000626e5;
+    --icon-inverse-disabled: #0011661a;
 
-  /* Structural */
-  --sel: rgba(37, 99, 235, 0.15);
+    /* HyperTerminal Trading Extensions (Dark) */
+    --market-neutral: #6B7280;
+    --scope-perp: #4F7DFF;
+    --scope-spot: #2DD4BF;
+    --scope-builders: #F59E0B;
+    --sel: rgba(79, 125, 255, 0.15);
+  }
 }
 
-/* =============================================================================
-   DARK MODE (Inverse)
-   ============================================================================= */
-
-.dark {
-  /* Text */
-  --text-950: #E6E9EE;
-  --text-600: #B8BEC7;
-  --text-500: #9AA1AB;
-  --text-400: #555D68;
-  --text-10: #131619;
-
-  /* Border */
-  --border-500: #7F8792;
-  --border-300: #6A727E;
-  --border-200: #343B45;
-  --border-100: #242A33;
-  --border-50: #222833;
-
-  /* Primary */
-  --primary-default: #4F7DFF;
-  --primary-hover: #3B6CF6;
-  --primary-active: #2F5CE0;
-  --primary-muted: #385194;
-
-  /* Market Up */
-  --market-up-600: #4CAF6A;
-  --market-up-500: #2F854E;
-  --market-up-100: #122B1D;
-  --market-up-50: #0E2318;
-
-  /* Market Down */
-  --market-down-600: #E26D63;
-  --market-down-500: #C94B44;
-  --market-down-100: #3A1C1C;
-  --market-down-50: #32282E;
-
-  /* Market Neutral (no Figma token yet) */
-  --market-neutral: #9AA4B2;
-
-  /* Success */
-  --success-700: #1F7A3F;
-  --success-100: #123524;
-
-  /* Warning */
-  --warning-700: #FFAD0D;
-  --warning-100: #4A3A12;
-
-  /* Error */
-  --error-700: #A63A2B;
-  --error-100: #3A1C1C;
-
-  /* Surface */
-  --surface-base: #0D0F11;
-  --surface-analysis: #191D23;
-  --surface-execution: #20242A;
-  --surface-monitoring-row-a: #20242A;
-  --surface-monitoring-row-b: #191D23;
-
-  /* Fill */
-  --fill-900: #000000;
-  --fill-300: #2A303A;
-  --fill-100: #262C36;
-  --fill-50: #404754;
-
-  /* Highlight */
-  --highlight: #F7931A;
-
-  /* Scope Accents */
-  --scope-perp: #4F7DFF;
-  --scope-spot: #2DD4BF;
-  --scope-builders: #F59E0B;
-
-  /* Structural */
-  --sel: rgba(79, 125, 255, 0.15);
-
-  /* Override shadows for dark mode */
-  --shadow-xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.09);
-  --shadow-sm: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 1px 2px -1px hsl(0 0% 0% / 0.18);
-  --shadow-md: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 2px 4px -1px hsl(0 0% 0% / 0.18);
-  --shadow-lg: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 4px 6px -1px hsl(0 0% 0% / 0.18);
-  --shadow-xl: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 8px 10px -1px hsl(0 0% 0% / 0.18);
-  --shadow-2xl: 0px 1px 2px 0px hsl(0 0% 0% / 0.45);
-}
-
-/* =============================================================================
-   THEME INLINE - Map CSS variables to Tailwind utilities
-   ============================================================================= */
-
+/* =============================================
+   Layer 3: Wire semantic tokens → Tailwind
+   ============================================= */
 @theme inline {
+  /* Background */
+  --color-bg-base: var(--bg-base);
+  --color-bg-raised: var(--bg-raised);
+  --color-bg-overlay: var(--bg-overlay);
+  --color-bg-sunken: var(--bg-sunken);
+  --color-bg-alternate: var(--bg-alternate);
+  --color-bg-brand: var(--bg-brand);
+  --color-bg-inverse: var(--bg-inverse);
+
   /* Text */
-  --color-text-950: var(--text-950);
-  --color-text-600: var(--text-600);
-  --color-text-500: var(--text-500);
-  --color-text-400: var(--text-400);
-  --color-text-10: var(--text-10);
-
-  /* Border */
-  --color-border-500: var(--border-500);
-  --color-border-300: var(--border-300);
-  --color-border-200: var(--border-200);
-  --color-border-100: var(--border-100);
-  --color-border-50: var(--border-50);
-
-  /* Primary */
-  --color-primary-default: var(--primary-default);
-  --color-primary-hover: var(--primary-hover);
-  --color-primary-active: var(--primary-active);
-  --color-primary-muted: var(--primary-muted);
-
-  /* Market */
-  --color-market-up-600: var(--market-up-600);
-  --color-market-up-500: var(--market-up-500);
-  --color-market-up-100: var(--market-up-100);
-  --color-market-up-50: var(--market-up-50);
-  --color-market-down-600: var(--market-down-600);
-  --color-market-down-500: var(--market-down-500);
-  --color-market-down-100: var(--market-down-100);
-  --color-market-down-50: var(--market-down-50);
-  --color-market-neutral: var(--market-neutral);
-
-  /* Success */
-  --color-success-700: var(--success-700);
-  --color-success-100: var(--success-100);
-
-  /* Warning */
-  --color-warning-700: var(--warning-700);
-  --color-warning-100: var(--warning-100);
-
-  /* Error */
-  --color-error-700: var(--error-700);
-  --color-error-100: var(--error-100);
-
-  /* Surface */
-  --color-surface-base: var(--surface-base);
-  --color-surface-analysis: var(--surface-analysis);
-  --color-surface-execution: var(--surface-execution);
-  --color-surface-monitoring-row-a: var(--surface-monitoring-row-a);
-  --color-surface-monitoring-row-b: var(--surface-monitoring-row-b);
+  --color-text-strong: var(--text-strong);
+  --color-text-weak: var(--text-weak);
+  --color-text-brand: var(--text-brand);
+  --color-text-disabled: var(--text-disabled);
+  --color-text-error: var(--text-error);
+  --color-text-warning: var(--text-warning);
+  --color-text-success: var(--text-success);
+  --color-text-info: var(--text-info);
+  --color-text-inverse-strong: var(--text-inverse-strong);
+  --color-text-inverse-weak: var(--text-inverse-weak);
+  --color-text-inverse-disabled: var(--text-inverse-disabled);
 
   /* Fill */
-  --color-fill-900: var(--fill-900);
-  --color-fill-300: var(--fill-300);
-  --color-fill-100: var(--fill-100);
-  --color-fill-50: var(--fill-50);
+  --color-fill-strong: var(--fill-strong);
+  --color-fill-weak: var(--fill-weak);
+  --color-fill-weaker: var(--fill-weaker);
+  --color-fill-hover: var(--fill-hover);
+  --color-fill-press: var(--fill-press);
+  --color-fill-selected: var(--fill-selected);
+  --color-fill-disabled: var(--fill-disabled);
+  --color-fill-overlay: var(--fill-overlay);
+  --color-fill-brand-strong: var(--fill-brand-strong);
+  --color-fill-brand-weak: var(--fill-brand-weak);
+  --color-fill-error-strong: var(--fill-error-strong);
+  --color-fill-error-weak: var(--fill-error-weak);
+  --color-fill-warning-strong: var(--fill-warning-strong);
+  --color-fill-warning-weak: var(--fill-warning-weak);
+  --color-fill-success-strong: var(--fill-success-strong);
+  --color-fill-success-weak: var(--fill-success-weak);
+  --color-fill-info-strong: var(--fill-info-strong);
+  --color-fill-info-weak: var(--fill-info-weak);
+  --color-fill-inverse-strong: var(--fill-inverse-strong);
+  --color-fill-inverse-weak: var(--fill-inverse-weak);
+  --color-fill-inverse-hover: var(--fill-inverse-hover);
+  --color-fill-inverse-press: var(--fill-inverse-press);
+  --color-fill-inverse-disabled: var(--fill-inverse-disabled);
+  --color-fill-white: var(--fill-white);
+  --color-fill-yellow: var(--fill-yellow);
 
-  /* Highlight */
-  --color-highlight: var(--highlight);
+  /* Stroke */
+  --color-stroke-strong: var(--stroke-strong);
+  --color-stroke-weak: var(--stroke-weak);
+  --color-stroke-selected: var(--stroke-selected);
+  --color-stroke-focus: var(--stroke-focus);
+  --color-stroke-disabled: var(--stroke-disabled);
+  --color-stroke-brand-strong: var(--stroke-brand-strong);
+  --color-stroke-brand-weak: var(--stroke-brand-weak);
+  --color-stroke-error-strong: var(--stroke-error-strong);
+  --color-stroke-error-weak: var(--stroke-error-weak);
+  --color-stroke-warning-strong: var(--stroke-warning-strong);
+  --color-stroke-warning-weak: var(--stroke-warning-weak);
+  --color-stroke-success-strong: var(--stroke-success-strong);
+  --color-stroke-success-weak: var(--stroke-success-weak);
+  --color-stroke-info-strong: var(--stroke-info-strong);
+  --color-stroke-info-weak: var(--stroke-info-weak);
+  --color-stroke-inverse-strong: var(--stroke-inverse-strong);
+  --color-stroke-inverse-weak: var(--stroke-inverse-weak);
+  --color-stroke-inverse-disabled: var(--stroke-inverse-disabled);
 
-  /* Scope Accents */
+  /* Icon */
+  --color-icon-neutral: var(--icon-neutral);
+  --color-icon-brand: var(--icon-brand);
+  --color-icon-disabled: var(--icon-disabled);
+  --color-icon-error: var(--icon-error);
+  --color-icon-warning: var(--icon-warning);
+  --color-icon-success: var(--icon-success);
+  --color-icon-info: var(--icon-info);
+  --color-icon-inverse: var(--icon-inverse);
+  --color-icon-inverse-strong: var(--icon-inverse-strong);
+  --color-icon-inverse-disabled: var(--icon-inverse-disabled);
+
+  /* HyperTerminal Trading Extensions */
+  --color-market-neutral: var(--market-neutral);
   --color-scope-perp: var(--scope-perp);
   --color-scope-spot: var(--scope-spot);
   --color-scope-builders: var(--scope-builders);
-
-  /* Structural */
   --color-sel: var(--sel);
-
-  /* Shadows */
-  --shadow-xs: var(--shadow-xs);
-  --shadow-sm: var(--shadow-sm);
-  --shadow-md: var(--shadow-md);
-  --shadow-lg: var(--shadow-lg);
-  --shadow-xl: var(--shadow-xl);
-  --shadow-2xl: var(--shadow-2xl);
 }
 
-/* =============================================================================
-   BASE STYLES
-   ============================================================================= */
+/* =============================================
+   Layer 4: Responsive Typography
+   ============================================= */
+@layer base {
+  @media (max-width: 767px) {
+    :root,
+    .dark {
+      --text-xl: 28px;
+      --text-xl--line-height: 36px;
+      --text-2xl: 36px;
+      --text-2xl--line-height: 44px;
+      --text-3xl: 40px;
+      --text-3xl--line-height: 48px;
+    }
+  }
+}
 
+/* =============================================
+   Base Styles
+   ============================================= */
 @layer base {
   * {
-    @apply border-border-200 outline-primary-default/50;
+    border-color: var(--stroke-weak);
   }
+
   body {
-    @apply bg-surface-base text-text-950 font-mono;
+    font-family: var(--font-sans);
+    background-color: var(--bg-base);
+    color: var(--text-strong);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+
   ::selection {
     background: var(--sel);
     color: inherit;
   }
+
+  @supports (-webkit-touch-callout: none) {
+    input, textarea, select {
+      font-size: max(1em, 16px);
+    }
+  }
 }
 
-/* =============================================================================
-   COMPONENT STYLES
-   ============================================================================= */
-
+/* =============================================
+   HyperTerminal App Styles
+   ============================================= */
 @layer base {
   :root {
     --sat: env(safe-area-inset-top);
@@ -372,9 +468,7 @@
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    html {
-      scroll-behavior: smooth;
-    }
+    html { scroll-behavior: smooth; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -388,28 +482,13 @@
 }
 
 @layer components {
-  .active\:scale-98:active {
-    transform: scale(0.98);
-  }
+  .active\:scale-98:active { transform: scale(0.98); }
+  .active\:scale-95:active { transform: scale(0.95); }
 
-  .active\:scale-95:active {
-    transform: scale(0.95);
-  }
+  .touch-target { min-height: 44px; min-width: 44px; }
+  .touch-target-lg { min-height: 48px; min-width: 48px; }
 
-  .touch-target {
-    min-height: 44px;
-    min-width: 44px;
-  }
-
-  .touch-target-lg {
-    min-height: 48px;
-    min-width: 48px;
-  }
-
-  .terminal-scanlines {
-    position: relative;
-  }
-
+  .terminal-scanlines { position: relative; }
   .terminal-scanlines::after {
     content: "";
     position: absolute;
@@ -420,39 +499,39 @@
       0deg,
       transparent,
       transparent 2px,
-      oklch(from var(--text-950) l c h / 0.01) 3px,
-      oklch(from var(--text-950) l c h / 0.01) 1px
+      oklch(from var(--text-strong) l c h / 0.01) 3px,
+      oklch(from var(--text-strong) l c h / 0.01) 1px
     );
   }
 
   .testnet-bg {
-    background-color: oklch(from var(--warning-700) l c h / 0.06);
+    background-color: oklch(from var(--text-warning) l c h / 0.06);
   }
 
   .terminal-grid {
     background-image:
-      linear-gradient(oklch(from var(--border-200) l c h / 0.08) 1px, transparent 1px),
-      linear-gradient(90deg, oklch(from var(--border-200) l c h / 0.08) 1px, transparent 1px);
+      linear-gradient(oklch(from var(--stroke-weak) l c h / 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(from var(--stroke-weak) l c h / 0.08) 1px, transparent 1px);
     background-size: 50px 50px;
   }
   .dark .terminal-grid {
     background-image:
-      linear-gradient(oklch(from var(--border-200) l c h / 0.15) 1px, transparent 1px),
-      linear-gradient(90deg, oklch(from var(--border-200) l c h / 0.15) 1px, transparent 1px);
+      linear-gradient(oklch(from var(--stroke-weak) l c h / 0.15) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(from var(--stroke-weak) l c h / 0.15) 1px, transparent 1px);
     background-size: 50px 50px;
   }
 
   .depth-bar-ask {
-    background: linear-gradient(90deg, transparent 0%, oklch(from var(--market-down-600) l c h / 0.12) 100%);
+    background: linear-gradient(90deg, transparent 0%, oklch(from var(--text-error) l c h / 0.12) 100%);
   }
   .depth-bar-bid {
-    background: linear-gradient(90deg, oklch(from var(--market-up-600) l c h / 0.12) 0%, transparent 100%);
+    background: linear-gradient(90deg, oklch(from var(--text-success) l c h / 0.12) 0%, transparent 100%);
   }
   .dark .depth-bar-ask {
-    background: linear-gradient(90deg, transparent 0%, oklch(from var(--market-down-600) l c h / 0.15) 100%);
+    background: linear-gradient(90deg, transparent 0%, oklch(from var(--text-error) l c h / 0.15) 100%);
   }
   .dark .depth-bar-bid {
-    background: linear-gradient(90deg, oklch(from var(--market-up-600) l c h / 0.15) 0%, transparent 100%);
+    background: linear-gradient(90deg, oklch(from var(--text-success) l c h / 0.15) 0%, transparent 100%);
   }
 
   .trade-row-buy,
@@ -464,12 +543,12 @@
   }
   .trade-row-buy {
     @starting-style {
-      background-color: oklch(from var(--market-up-600) l c h / 0.12);
+      background-color: oklch(from var(--text-success) l c h / 0.12);
     }
   }
   .trade-row-sell {
     @starting-style {
-      background-color: oklch(from var(--market-down-600) l c h / 0.12);
+      background-color: oklch(from var(--text-error) l c h / 0.12);
     }
   }
 }

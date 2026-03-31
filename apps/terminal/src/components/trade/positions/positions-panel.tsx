@@ -1,7 +1,7 @@
 import { Suspense, useMemo, useTransition } from "react";
 import { useConnection } from "wagmi";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/anvil";
 import { Spinner } from "@/components/ui/spinner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HL_ALL_DEXS, POSITIONS_TABS } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
@@ -68,10 +68,10 @@ export function PositionsPanel() {
 	}
 
 	return (
-		<div className="h-full flex flex-col overflow-hidden bg-surface-execution">
-			<Tabs value={activeTab} onValueChange={handleTabChange} className="flex-1 min-h-0 flex flex-col">
+		<div className="h-full flex flex-col overflow-hidden bg-bg-overlay">
+			<Tabs value={activeTab} onValueChange={handleTabChange} className="flex-1 min-h-0 flex flex-col" fullWidth>
 				<div className="p-2">
-					<TabsList variant="underline" fullWidth>
+					<TabsList>
 						{POSITIONS_TABS.map((tab) => {
 							const count = getTabCount(tab.value);
 
@@ -130,7 +130,7 @@ export function PositionsPanel() {
 function TabLoadingFallback() {
 	return (
 		<div className="flex-1 flex items-center justify-center">
-			<Spinner className="size-4 text-text-600" />
+			<Spinner className="size-4 text-text-weak" />
 		</div>
 	);
 }

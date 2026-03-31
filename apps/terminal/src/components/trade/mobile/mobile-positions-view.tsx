@@ -1,8 +1,8 @@
 import { WalletIcon } from "@phosphor-icons/react";
 import { useTransition } from "react";
 import { useConnection } from "wagmi";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/anvil/tabs";
 import { Spinner } from "@/components/ui/spinner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { useSubscription } from "@/lib/hyperliquid";
@@ -79,8 +79,8 @@ export function MobilePositionsView({ className }: Props) {
 	return (
 		<div className={cn("flex-1 min-h-0 flex flex-col", className)}>
 			<Tabs value={activeTab} onValueChange={handleTabChange} className="flex-1 min-h-0 flex flex-col">
-				<div className="shrink-0 overflow-x-auto border-b border-border-200/60">
-					<TabsList variant="underline" className="px-3 min-w-max">
+				<div className="shrink-0 overflow-x-auto border-b border-stroke-weak/60">
+					<TabsList className="px-3 min-w-max">
 						{MOBILE_TABS.map((tab) => {
 							const count = getTabCount(tab.value);
 							const loading = isTabLoading(tab.value);
@@ -136,10 +136,10 @@ export function MobilePositionsView({ className }: Props) {
 function EmptyState() {
 	return (
 		<div className="h-full flex flex-col items-center justify-center gap-4 p-6 text-center">
-			<div className="size-16 rounded-full flex items-center justify-center bg-surface-analysis">
-				<WalletIcon className="size-8 text-text-600" />
+			<div className="size-16 rounded-full flex items-center justify-center bg-bg-raised">
+				<WalletIcon className="size-8 text-text-weak" />
 			</div>
-			<p className="text-sm text-text-600 max-w-xs">Connect wallet to view positions</p>
+			<p className="text-sm text-text-weak max-w-xs">Connect wallet to view positions</p>
 		</div>
 	);
 }

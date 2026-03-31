@@ -19,8 +19,8 @@ export function Flash({
 	className,
 	timeout = 200,
 	transitionLength = 100,
-	upColor = "oklch(from var(--positive) l c h / 0.35)",
-	downColor = "oklch(from var(--negative) l c h / 0.35)",
+	upColor = "oklch(from var(--text-success) l c h / 0.35)",
+	downColor = "oklch(from var(--text-error) l c h / 0.35)",
 }: FlashProps) {
 	const prevRef = useRef(value);
 	const [flash, setFlash] = useState<FlashDirection>(null);

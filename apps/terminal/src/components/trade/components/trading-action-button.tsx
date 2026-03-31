@@ -1,7 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { SpinnerGapIcon } from "@phosphor-icons/react";
 import { type ComponentProps, type ReactNode, useCallback } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/anvil";
 import { cn } from "@/lib/cn";
 import { useTradingGuard } from "@/lib/hyperliquid";
 

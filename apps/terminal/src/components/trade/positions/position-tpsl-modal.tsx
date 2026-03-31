@@ -1,10 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { SpinnerGapIcon, TrendDownIcon, TrendUpIcon } from "@phosphor-icons/react";
 import { useCallback, useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { InfoRow } from "@/components/ui/info-row";
+import { Badge, Button, InfoRow, Modal, ModalContent, ModalFooter, ModalHeader, ModalPopup, ModalTitle } from "@/anvil";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { throwIfAnyResponseError } from "@/domain/trade/orders";
 import { cn } from "@/lib/cn";
@@ -95,9 +92,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 			setTpPriceInput("");
 			setSlPriceInput("");
 			onOpenChange(false);
-		} catch {
-			// error is captured by mutation
-		}
+		} catch {}
 	}, [canSubmit, hasSl, hasTp, onOpenChange, placeOrder, position, resetError, slPriceNum, tpPriceNum]);
 
 	function handleOpenChange(nextOpen: boolean) {
@@ -112,12 +107,12 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 	if (!position) return null;
 
 	return (
-		<Dialog open={open} onOpenChange={handleOpenChange}>
-			<DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden">
-				<DialogHeader className="px-5 pt-5 pb-3">
-					<DialogTitle className="flex items-center gap-1">
+		<Modal open={open} onOpenChange={handleOpenChange}>
+			<ModalPopup size="sm" showClose={false}>
+				<ModalHeader>
+					<ModalTitle className="flex items-center gap-1">
 						<AssetDisplay coin={position.coin} />
-						<Badge variant={position.isLong ? "long" : "short"} size="sm">
+						<Badge tone={position.isLong ? "success" : "error"} size="sm">
 							{position.isLong ? (
 								<>
 									<TrendUpIcon className="size-3" />
@@ -130,11 +125,11 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 								</>
 							)}
 						</Badge>
-					</DialogTitle>
-				</DialogHeader>
+					</ModalTitle>
+				</ModalHeader>
 
-				<div className="px-5 pb-4">
-					<div className="rounded-xs border border-border-200/50 bg-surface-analysis p-3 space-y-1 text-2xs">
+				<ModalContent>
+					<div className="rounded-8 border border-stroke-weak/50 bg-bg-raised p-3 space-y-1 text-xs">
 						<InfoRow
 							className="p-0"
 							label={t`Size`}
@@ -151,23 +146,23 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 							className="p-0"
 							label={t`Mark Price`}
 							value={formatPrice(position.markPx, { szDecimals: position.szDecimals })}
-							valueClassName="font-medium text-warning-700"
+							valueClassName="font-medium text-text-warning"
 						/>
 						<InfoRow
-							className="p-0 border-t border-border-200/50 pt-3"
+							className="p-0 border-t border-stroke-weak/50 pt-3"
 							label={t`Unrealized P&L`}
 							value={
 								<>
 									{formatUSD(position.unrealizedPnl, { signDisplay: "exceptZero" })}
-									<span className="font-normal text-text-600 ml-1">({formatPercent(position.roe, 1)})</span>
+									<span className="font-normal text-text-weak ml-1">({formatPercent(position.roe, 1)})</span>
 								</>
 							}
 							valueClassName={cn("font-semibold", getValueColorClass(position.unrealizedPnl))}
 						/>
 					</div>
-				</div>
+				</ModalContent>
 
-				<div className="px-5 pb-4">
+				<div className="px-6 pb-4">
 					<TpSlSection
 						side={side}
 						referencePrice={referencePrice}
@@ -182,14 +177,14 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 					/>
 
 					{error && (
-						<div className="mt-3 px-2 py-1.5 rounded-xs bg-market-down-100 border border-market-down-600/20 text-3xs text-market-down-600">
+						<div className="mt-3 px-2 py-1.5 rounded-8 bg-fill-error-weak border border-stroke-error-strong/20 text-xs text-text-error">
 							{error.message}
 						</div>
 					)}
 				</div>
 
-				<DialogFooter className="px-5 py-3 border-t border-border-200/50">
-					<Button size="sm" variant="text" onClick={() => handleOpenChange(false)} disabled={isSubmitting}>
+				<ModalFooter className="border-t border-stroke-weak/50">
+					<Button size="sm" variant="link" onClick={() => handleOpenChange(false)} disabled={isSubmitting}>
 						{t`Cancel`}
 					</Button>
 					<TradingActionButton onClick={handleSubmit} disabled={!canSubmit} className="min-w-24">
@@ -202,8 +197,8 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 							t`Confirm`
 						)}
 					</TradingActionButton>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
+				</ModalFooter>
+			</ModalPopup>
+		</Modal>
 	);
 }

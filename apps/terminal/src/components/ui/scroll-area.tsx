@@ -9,7 +9,7 @@ const ScrollArea = forwardRef<
 	<ScrollAreaPrimitive.Root ref={ref} data-slot="scroll-area" className={cn("relative", className)} {...props}>
 		<ScrollAreaPrimitive.Viewport
 			data-slot="scroll-area-viewport"
-			className="focus-visible:ring-primary-default/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1"
+			className="focus-visible:outline-stroke-focus size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:outline-2 focus-visible:outline-offset-2"
 		>
 			{children}
 		</ScrollAreaPrimitive.Viewport>
@@ -37,7 +37,7 @@ const ScrollBar = forwardRef<
 	>
 		<ScrollAreaPrimitive.ScrollAreaThumb
 			data-slot="scroll-area-thumb"
-			className="bg-border relative flex-1 rounded-full"
+			className="bg-stroke-weak relative flex-1 rounded-full"
 		/>
 	</ScrollAreaPrimitive.ScrollAreaScrollbar>
 ));

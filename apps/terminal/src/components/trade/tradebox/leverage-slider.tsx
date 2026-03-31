@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Slider, type SliderMark } from "@/components/ui/slider";
+import { Slider } from "@/anvil";
 
 interface Props {
 	value: number;
@@ -9,7 +9,12 @@ interface Props {
 	className?: string;
 }
 
-function generateMarks(max: number): SliderMark[] {
+interface Mark {
+	value: number;
+	label: string;
+}
+
+function generateMarks(max: number): Mark[] {
 	const values: number[] = [];
 
 	if (max <= 5) {
@@ -39,15 +44,34 @@ export function LeverageSlider({ value, onChange, max, disabled, className }: Pr
 	const marks = useMemo(() => generateMarks(max), [max]);
 
 	return (
-		<Slider
-			value={[value]}
-			onValueChange={(v) => onChange(v[0])}
-			min={1}
-			max={max}
-			step={1}
-			marks={marks}
-			disabled={disabled}
-			className={className}
-		/>
+		<div className={className}>
+			<Slider
+				value={value}
+				onValueChange={(v) => onChange(v as number)}
+				min={1}
+				max={max}
+				step={1}
+				disabled={disabled}
+				label={`${value}×`}
+			/>
+			<div className="relative h-5 mt-1">
+				{marks.map((mark) => {
+					const position = ((mark.value - 1) / (max - 1)) * 100;
+					const isSelected = value === mark.value;
+					return (
+						<button
+							key={mark.value}
+							type="button"
+							onClick={() => onChange(mark.value)}
+							disabled={disabled}
+							className={`absolute -translate-x-1/2 text-xs tabular-nums transition-colors ${isSelected ? "text-text-brand font-medium" : "text-text-strong"}`}
+							style={{ left: `${position}%` }}
+						>
+							{mark.label}
+						</button>
+					);
+				})}
+			</div>
+		</div>
 	);
 }

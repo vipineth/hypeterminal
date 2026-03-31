@@ -3,7 +3,7 @@ import { CrosshairIcon, ListChecksIcon, PencilIcon, PlusIcon, XIcon } from "@pho
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useConnection } from "wagmi";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/anvil/button";
 import { Spinner } from "@/components/ui/spinner";
 import { FALLBACK_VALUE_PLACEHOLDER, HL_ALL_DEXS } from "@/config/constants";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
@@ -140,19 +140,17 @@ function MobilePositionCard({
 	return (
 		<div
 			className={cn(
-				"rounded-sm border bg-surface-base/50",
-				isLong ? "border-market-up-600/30" : "border-market-down-600/30",
+				"rounded-8 border bg-bg-sunken/50",
+				isLong ? "border-stroke-success-strong/30" : "border-stroke-error-strong/30",
 			)}
 		>
-			<div className="flex items-center justify-between px-3 py-2.5 border-b border-border/40">
-				<Button variant="text" size="none" onClick={() => onSelectMarket(p.coin)} className="gap-2">
+			<div className="flex items-center justify-between px-3 py-2.5 border-b border-stroke-weak/40">
+				<Button variant="ghost" intent="neutral" size="sm" onClick={() => onSelectMarket(p.coin)}>
 					<AssetDisplay
 						coin={p.coin}
 						nameClassName="text-sm font-semibold"
 						subtitle={
-							<span
-								className={cn("text-3xs font-medium uppercase", isLong ? "text-market-up-600" : "text-market-down-600")}
-							>
+							<span className={cn("text-xs font-medium uppercase", isLong ? "text-text-success" : "text-text-error")}>
 								{isLong ? t`Long` : t`Short`}
 							</span>
 						}
@@ -162,11 +160,11 @@ function MobilePositionCard({
 					<div className={cn("text-sm font-semibold tabular-nums", pnlClass)}>
 						{formatUSD(unrealizedPnl, { signDisplay: "exceptZero" })}
 					</div>
-					<div className={cn("text-3xs tabular-nums", pnlClass)}>{formatPercent(p.returnOnEquity, 1)}</div>
+					<div className={cn("text-xs tabular-nums", pnlClass)}>{formatPercent(p.returnOnEquity, 1)}</div>
 				</div>
 			</div>
 
-			<div className="grid grid-cols-3 gap-px bg-border/20">
+			<div className="grid grid-cols-3 gap-px bg-stroke-weak/20">
 				<MetricCell
 					label={t`Size`}
 					value={formatToken(absSize, { decimals: szDecimals, symbol: p.coin })}
@@ -182,7 +180,7 @@ function MobilePositionCard({
 				<MetricCell
 					label={t`Liq`}
 					value={formatPrice(p.liquidationPx, { szDecimals })}
-					valueClass={liqIsNear ? "text-market-down-600" : "text-text-500"}
+					valueClass={liqIsNear ? "text-text-error" : "text-text-weak"}
 				/>
 				<MetricCell
 					label={t`Funding`}
@@ -199,30 +197,30 @@ function MobilePositionCard({
 					onClick={handleOpenTpSl}
 					disabled={typeof assetId !== "number"}
 					className={cn(
-						"flex items-center gap-1 text-xs min-h-[36px] px-2 rounded-sm transition-all touch-manipulation",
-						"border border-border/40 hover:border-fg-400",
-						"active:scale-[0.97] active:bg-surface-analysis/50",
+						"flex items-center gap-1 text-xs min-h-[36px] px-2 rounded-8 transition-all touch-manipulation",
+						"border border-stroke-weak/40 hover:border-fg-400",
+						"active:scale-[0.97] active:bg-bg-raised/50",
 						"disabled:opacity-50 disabled:cursor-not-allowed",
 					)}
 				>
 					{hasTpSl ? (
 						<>
-							<CrosshairIcon className="size-3.5 text-text-500" />
-							<span className="tabular-nums text-3xs">
+							<CrosshairIcon className="size-3.5 text-text-weak" />
+							<span className="tabular-nums text-xs">
 								{tpSlInfo?.tpPrice && (
-									<span className="text-market-up-600">{formatPrice(tpSlInfo.tpPrice, { szDecimals })}</span>
+									<span className="text-text-success">{formatPrice(tpSlInfo.tpPrice, { szDecimals })}</span>
 								)}
-								{tpSlInfo?.tpPrice && tpSlInfo?.slPrice && <span className="text-text-500"> / </span>}
+								{tpSlInfo?.tpPrice && tpSlInfo?.slPrice && <span className="text-text-weak"> / </span>}
 								{tpSlInfo?.slPrice && (
-									<span className="text-market-down-600">{formatPrice(tpSlInfo.slPrice, { szDecimals })}</span>
+									<span className="text-text-error">{formatPrice(tpSlInfo.slPrice, { szDecimals })}</span>
 								)}
 							</span>
-							<PencilIcon className="size-3 text-text-400" />
+							<PencilIcon className="size-3 text-text-disabled" />
 						</>
 					) : (
 						<>
-							<PlusIcon className="size-3.5 text-text-500" />
-							<span className="text-text-500">{t`TP/SL`}</span>
+							<PlusIcon className="size-3.5 text-text-weak" />
+							<span className="text-text-weak">{t`TP/SL`}</span>
 						</>
 					)}
 				</button>
@@ -232,10 +230,10 @@ function MobilePositionCard({
 					onClick={handleLimitClose}
 					disabled={!canClose || isClosing}
 					className={cn(
-						"flex items-center gap-1 text-xs min-h-[36px] px-2 rounded-sm transition-all touch-manipulation",
-						"border border-border/40 hover:border-fg-400",
-						"text-text-500 hover:text-text-950",
-						"active:scale-[0.97] active:bg-surface-analysis/50",
+						"flex items-center gap-1 text-xs min-h-[36px] px-2 rounded-8 transition-all touch-manipulation",
+						"border border-stroke-weak/40 hover:border-fg-400",
+						"text-text-weak hover:text-text-strong",
+						"active:scale-[0.97] active:bg-bg-raised/50",
 						"disabled:opacity-50 disabled:cursor-not-allowed",
 					)}
 				>
@@ -245,16 +243,14 @@ function MobilePositionCard({
 				<div className="flex-1" />
 
 				<Button
-					variant="outlined"
+					variant="outline"
+					intent="error"
 					size="sm"
 					onClick={handleClose}
 					disabled={!canClose || isClosing}
-					className={cn(
-						"min-h-[36px] text-xs gap-1",
-						"border-market-down-600/60 text-market-down-600 hover:bg-market-down-600/10",
-					)}
+					className="min-h-[36px]"
+					iconLeft={isRowClosing ? <Spinner className="size-3" /> : <XIcon className="size-3.5" />}
 				>
-					{isRowClosing ? <Spinner className="size-3" /> : <XIcon className="size-3.5" />}
 					{t`Close`}
 				</Button>
 			</div>
@@ -271,10 +267,10 @@ interface MetricCellProps {
 
 function MetricCell({ label, value, sub, valueClass }: MetricCellProps) {
 	return (
-		<div className="px-3 py-2 bg-surface-base/50">
-			<div className="text-3xs text-text-500 mb-0.5">{label}</div>
+		<div className="px-3 py-2 bg-bg-sunken/50">
+			<div className="text-xs text-text-weak mb-0.5">{label}</div>
 			<div className={cn("text-xs tabular-nums font-medium", valueClass)}>{value}</div>
-			{sub && <div className="text-3xs text-text-500 tabular-nums">{sub}</div>}
+			{sub && <div className="text-xs text-text-weak tabular-nums">{sub}</div>}
 		</div>
 	);
 }
@@ -373,7 +369,7 @@ export function MobilePositionsTab() {
 
 	if (!isConnected) {
 		return (
-			<div className="flex-1 flex items-center justify-center p-6 text-sm text-text-500">
+			<div className="flex-1 flex items-center justify-center p-6 text-sm text-text-weak">
 				{t`Connect your wallet to view positions.`}
 			</div>
 		);
@@ -385,7 +381,7 @@ export function MobilePositionsTab() {
 
 	if (positionsError) {
 		return (
-			<div className="flex-1 flex items-center justify-center p-6 text-sm text-market-down">
+			<div className="flex-1 flex items-center justify-center p-6 text-sm text-text-error">
 				{t`Failed to load positions.`}
 			</div>
 		);
@@ -393,18 +389,18 @@ export function MobilePositionsTab() {
 
 	if (positions.length === 0) {
 		return (
-			<div className="flex-1 flex items-center justify-center p-6 text-sm text-text-500">{t`No active positions.`}</div>
+			<div className="flex-1 flex items-center justify-center p-6 text-sm text-text-weak">{t`No active positions.`}</div>
 		);
 	}
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col">
-			<div className="px-3 py-2 flex items-center gap-2 text-3xs uppercase tracking-wider text-text-500">
+			<div className="px-3 py-2 flex items-center gap-2 text-xs uppercase tracking-wider text-text-weak">
 				<ListChecksIcon className="size-3" />
 				{t`Active Positions`}
-				<span className="font-semibold text-market-up ml-auto tabular-nums">{headerCount}</span>
+				<span className="font-semibold text-text-success ml-auto tabular-nums">{headerCount}</span>
 			</div>
-			{actionError && <div className="px-3 pb-1 text-3xs text-market-down">{actionError}</div>}
+			{actionError && <div className="px-3 pb-1 text-xs text-text-error">{actionError}</div>}
 			<div className="flex-1 min-h-0 overflow-y-auto px-3 pb-3 space-y-2">
 				{positions.map((p) => (
 					<MobilePositionCard

@@ -1,18 +1,7 @@
-import {
-	ArrowsClockwiseIcon,
-	ArrowsLeftRightIcon,
-	CaretDownIcon,
-	TrendDownIcon,
-	TrendUpIcon,
-} from "@phosphor-icons/react";
+import { ArrowsClockwiseIcon, ArrowsLeftRightIcon, TrendDownIcon, TrendUpIcon } from "@phosphor-icons/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Button } from "@/anvil/button";
+import { Dropdown, type DropdownItem } from "@/anvil/dropdown";
 import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/config/constants";
 import { getBaseQuoteFromPairName } from "@/domain/market";
 import { cn } from "@/lib/cn";
@@ -157,36 +146,24 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 
 	return (
 		<div className={cn("flex flex-col h-full min-h-0", className)}>
-			<div className="shrink-0 px-3 py-2 border-b border-border-200/60 bg-surface-execution/30">
+			<div className="shrink-0 px-3 py-2 border-b border-stroke-weak/60 bg-bg-overlay/30">
 				<div className="flex items-center justify-between">
-					<div className="flex items-center gap-1 bg-surface-analysis rounded-md p-0.5">
+					<div className="flex items-center gap-1 bg-bg-raised rounded-8 p-0.5">
 						<Button
-							variant="text"
-							size="none"
+							variant={view === "book" ? "filled" : "ghost"}
+							intent={view === "book" ? "neutral" : "neutral"}
+							size="sm"
 							onClick={() => setView("book")}
-							className={cn(
-								"px-3 py-1.5 text-xs font-medium rounded transition-colors",
-								"min-h-[36px]",
-								"hover:bg-transparent",
-								view === "book"
-									? "bg-surface-base text-primary-default shadow-sm"
-									: "text-text-600 hover:text-text-950",
-							)}
+							className={cn("min-h-[36px]", view !== "book" && "opacity-60")}
 						>
 							{ORDERBOOK_TEXT.BOOK_LABEL}
 						</Button>
 						<Button
-							variant="text"
-							size="none"
+							variant={view === "trades" ? "filled" : "ghost"}
+							intent={view === "trades" ? "neutral" : "neutral"}
+							size="sm"
 							onClick={() => setView("trades")}
-							className={cn(
-								"px-3 py-1.5 text-xs font-medium rounded transition-colors",
-								"min-h-[36px]",
-								"hover:bg-transparent",
-								view === "trades"
-									? "bg-surface-base text-primary-default shadow-sm"
-									: "text-text-600 hover:text-text-950",
-							)}
+							className={cn("min-h-[36px]", view !== "trades" && "opacity-60")}
 						>
 							{ORDERBOOK_TEXT.TRADES_LABEL}
 						</Button>
@@ -194,72 +171,44 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 
 					<div className="flex items-center gap-2">
 						<Button
-							variant="text"
-							size="none"
+							variant="outline"
+							intent="neutral"
+							size="sm"
 							onClick={() => setShowOrderbookInQuote(!showOrderbookInQuote)}
-							className={cn(
-								"px-2 py-1.5 text-xs border border-border-200/60 rounded",
-								"min-h-[36px] flex items-center gap-1",
-								"text-text-600 hover:text-text-950 hover:border-text-400",
-								"hover:bg-transparent transition-colors",
-							)}
+							className="min-h-[36px]"
 							aria-label="Toggle display units"
+							iconRight={<ArrowsLeftRightIcon className="size-3" />}
 						>
 							{showOrderbookInQuote ? quoteToken : baseToken}
-							<ArrowsLeftRightIcon className="size-3" />
 						</Button>
 
 						{view === "book" && (
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button
-										variant="text"
-										size="none"
-										className={cn(
-											"px-2 py-1.5 text-xs border border-border-200/60 rounded",
-											"min-h-[36px] flex items-center gap-1",
-											"hover:border-text-400 hover:bg-transparent transition-colors",
-										)}
-									>
-										{selectedOption?.label ?? "—"}
-										<CaretDownIcon className="size-3" />
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="end" className="min-w-20 font-mono text-xs">
-									{priceGroupingOptions.map((option) => {
-										const isSelected =
-											selectedOption?.nSigFigs === option.nSigFigs && selectedOption?.mantissa === option.mantissa;
-										return (
-											<DropdownMenuItem
-												key={`${option.nSigFigs}-${option.mantissa ?? 0}`}
-												onClick={() => setSelectedOption(option)}
-												selected={isSelected}
-												className="min-h-[40px]"
-											>
-												{option.label}
-											</DropdownMenuItem>
-										);
-									})}
-								</DropdownMenuContent>
-							</DropdownMenu>
+							<Dropdown
+								size="sm"
+								trigger={selectedOption?.label ?? "\u2014"}
+								align="end"
+								className="font-mono"
+								items={priceGroupingOptions.map(
+									(option): DropdownItem => ({
+										label: option.label,
+										onSelect: () => setSelectedOption(option),
+									}),
+								)}
+							/>
 						)}
 					</div>
 				</div>
 			</div>
 
-			{/* Content */}
 			{view === "book" ? (
 				<div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-					{/* Column headers */}
-					<div className="shrink-0 grid grid-cols-3 gap-2 px-3 py-2 text-xs uppercase tracking-wider text-text-600 border-b border-border-200/40">
+					<div className="shrink-0 grid grid-cols-3 gap-2 px-3 py-2 text-xs uppercase tracking-wider text-text-weak border-b border-stroke-weak/40">
 						<div>{ORDERBOOK_TEXT.HEADER_PRICE}</div>
 						<div className="text-right">{ORDERBOOK_TEXT.HEADER_SIZE}</div>
 						<div className="text-right">{ORDERBOOK_TEXT.HEADER_TOTAL}</div>
 					</div>
 
-					{/* Order book */}
 					<div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-						{/* Asks - show more rows to fill mobile screen */}
 						{bookStatus !== "error" && asks.length > 0 ? (
 							<div className="flex-1 flex flex-col justify-end gap-px py-1 overflow-hidden">
 								{asks
@@ -279,9 +228,9 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 						) : (
 							<div className="flex-1 flex items-center justify-center">
 								{bookStatus === "error" ? (
-									<div className="text-sm text-market-down-600">{ORDERBOOK_TEXT.FAILED}</div>
+									<div className="text-sm text-text-error">{ORDERBOOK_TEXT.FAILED}</div>
 								) : (
-									<div className="flex flex-col items-center gap-2 text-text-600">
+									<div className="flex flex-col items-center gap-2 text-text-weak">
 										<ArrowsClockwiseIcon className="size-5 animate-spin" />
 										<span className="text-sm">{ORDERBOOK_TEXT.WAITING}</span>
 									</div>
@@ -289,19 +238,17 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 							</div>
 						)}
 
-						{/* Mid price */}
-						<div className="shrink-0 py-2 px-3 flex items-center justify-center gap-3 border-y border-border-200/40 bg-surface-execution/30">
-							<span className="text-xl font-bold tabular-nums text-warning-700">
+						<div className="shrink-0 py-2 px-3 flex items-center justify-center gap-3 border-y border-stroke-weak/40 bg-bg-overlay/30">
+							<span className="text-xl font-bold tabular-nums text-text-warning">
 								{typeof mid === "number" && Number.isFinite(mid) ? formatNumber(mid, 2) : FALLBACK_VALUE_PLACEHOLDER}
 							</span>
 							{midDirection === "up" ? (
-								<TrendUpIcon className="size-5 text-market-up-600" />
+								<TrendUpIcon className="size-5 text-text-success" />
 							) : midDirection === "down" ? (
-								<TrendDownIcon className="size-5 text-market-down-600" />
+								<TrendDownIcon className="size-5 text-text-error" />
 							) : null}
 						</div>
 
-						{/* Bids - show more rows to fill mobile screen */}
 						{bookStatus !== "error" && bids.length > 0 ? (
 							<div className="flex-1 flex flex-col gap-px py-1 overflow-hidden">
 								{bids.slice(0, 12).map((level, index) => (
@@ -318,10 +265,9 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 						) : null}
 					</div>
 
-					{/* Spread */}
-					<div className="shrink-0 px-3 py-2 border-t border-border-200/40 flex items-center justify-between text-xs text-text-600">
+					<div className="shrink-0 px-3 py-2 border-t border-stroke-weak/40 flex items-center justify-between text-xs text-text-weak">
 						<span>{ORDERBOOK_TEXT.SPREAD_LABEL}</span>
-						<span className="tabular-nums text-warning-700">
+						<span className="tabular-nums text-text-warning">
 							{typeof spread === "number" &&
 							Number.isFinite(spread) &&
 							typeof spreadPct === "number" &&

@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { StarIcon, XIcon } from "@phosphor-icons/react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/anvil";
 import { get24hChange } from "@/domain/market";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice } from "@/lib/format";
@@ -15,7 +15,7 @@ export function FavoritesStrip() {
 
 	if (favorites.length === 0) {
 		return (
-			<div className="flex items-center gap-2 text-3xs text-text-950">
+			<div className="flex items-center gap-2 text-xs text-text-strong">
 				<StarIcon className="size-3" />
 				<span>{t`Select favorite markets`}</span>
 			</div>
@@ -66,20 +66,21 @@ function FavoriteChip({ name, isActive }: FavoriteChipProps) {
 	return (
 		<div className="group/fav relative shrink-0">
 			<Button
-				variant="text"
+				variant="link"
+				intent="neutral"
 				onClick={handleClick}
 				onKeyDown={handleKeyDown}
 				tabIndex={0}
 				aria-label={t`Select ${displayName} market`}
 				className={cn(
-					"flex items-center gap-1 shrink-0 px-2 py-1.5 text-3xs rounded-sm bg-surface-execution border transition-colors",
-					isActive ? "border-border-300" : "border-transparent hover:border-border-100",
+					"flex items-center gap-1 shrink-0 px-2 py-1.5 text-xs rounded-8 bg-bg-overlay border no-underline transition-colors",
+					isActive ? "border-stroke-strong" : "border-transparent hover:border-stroke-weak",
 				)}
 			>
-				<span className="font-medium text-text-950 uppercase">{displayName}</span>
+				<span className="font-medium text-text-strong uppercase">{displayName}</span>
 				{market?.markPx != null && (
 					<>
-						<span className="tabular-nums text-text-950">{formatPrice(market.markPx, { szDecimals })}</span>
+						<span className="tabular-nums text-text-strong">{formatPrice(market.markPx, { szDecimals })}</span>
 						{changePct != null && (
 							<span className={cn("tabular-nums", getValueColorClass(changePct))}>
 								{formatPercent(changePct / 100)}
@@ -92,7 +93,7 @@ function FavoriteChip({ name, isActive }: FavoriteChipProps) {
 				type="button"
 				onClick={handleRemove}
 				aria-label={t`Remove ${displayName} from favorites`}
-				className="absolute -top-0.5 -right-0.5 hidden size-3 cursor-pointer items-center justify-center bg-surface-execution text-text-600 hover:text-text-950 group-hover/fav:flex"
+				className="absolute -top-0.5 -right-0.5 hidden size-3 cursor-pointer items-center justify-center bg-bg-overlay text-text-weak hover:text-text-strong group-hover/fav:flex"
 			>
 				<XIcon className="size-2.5" weight="bold" />
 			</button>

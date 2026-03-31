@@ -95,8 +95,8 @@ msgid "Add TP/SL"
 msgstr "Add TP/SL"
 
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
-msgid "Advanced order types"
-msgstr "Advanced order types"
+#~ msgid "Advanced order types"
+#~ msgstr "Advanced order types"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Agent"
@@ -483,6 +483,10 @@ msgstr "Continue"
 #: src/hooks/ui/use-copy-to-clipboard.ts
 msgid "Copied to clipboard"
 msgstr "Copied to clipboard"
+
+#: src/components/trade/header/user-menu.tsx
+msgid "Copied!"
+msgstr "Copied!"
 
 #: src/components/trade/header/user-menu.tsx
 msgid "Copy Address"
@@ -1336,8 +1340,8 @@ msgid "No route available. Try a different amount or asset."
 msgstr "No route available. Try a different amount or asset."
 
 #: src/components/trade/components/token-selector-dropdown.tsx
-msgid "No tokens available"
-msgstr "No tokens available"
+#~ msgid "No tokens available"
+#~ msgstr "No tokens available"
 
 #: src/components/trade/tradebox/bridge-tab.tsx
 msgid "No tokens with value found across supported chains"
@@ -1533,8 +1537,8 @@ msgid "Position"
 msgstr "Position"
 
 #: src/components/trade/positions/position-actions-dropdown.tsx
-msgid "Position actions"
-msgstr "Position actions"
+#~ msgid "Position actions"
+#~ msgstr "Position actions"
 
 #: src/components/trade/mobile/mobile-positions-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx

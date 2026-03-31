@@ -27,16 +27,16 @@ export function ChartPanel() {
 
 	return (
 		<div className="h-full flex flex-col overflow-hidden">
-			<div className="px-2 py-2.5 border-b border-border-200/85 bg-surface-analysis">
+			<div className="px-2 py-2.5 border-b border-stroke-weak/85 bg-bg-raised">
 				<div className="flex items-center justify-between gap-2">
 					<MarketOverview />
-					<div className="flex items-center gap-1 text-3xs">
+					<div className="flex items-center gap-1 text-xs">
 						<button
 							type="button"
 							onClick={() => setChartType("default")}
 							className={cn(
-								"px-1.5 py-0.5 rounded-xs transition-colors",
-								chartType === "default" ? "text-text-950 font-semibold" : "text-text-500 hover:text-text-950",
+								"px-1.5 py-0.5 rounded-8 transition-colors",
+								chartType === "default" ? "text-text-strong font-semibold" : "text-text-weak hover:text-text-strong",
 							)}
 						>
 							Default
@@ -46,8 +46,10 @@ export function ChartPanel() {
 							onClick={() => setChartType("tradingview")}
 							{...tradingViewIntentHandlers}
 							className={cn(
-								"px-1.5 py-0.5 rounded-xs transition-colors",
-								chartType === "tradingview" ? "text-text-950 font-semibold" : "text-text-500 hover:text-text-950",
+								"px-1.5 py-0.5 rounded-8 transition-colors",
+								chartType === "tradingview"
+									? "text-text-strong font-semibold"
+									: "text-text-weak hover:text-text-strong",
 							)}
 						>
 							TradingView
@@ -74,7 +76,7 @@ export function ChartPanel() {
 
 function ChartLoadingFallback() {
 	return (
-		<div className="h-full w-full flex items-center justify-center bg-surface-base/20">
+		<div className="h-full w-full flex items-center justify-center bg-bg-sunken/20">
 			<Skeleton className="h-full w-full" />
 		</div>
 	);

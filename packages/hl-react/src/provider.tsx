@@ -28,8 +28,17 @@ export interface HyperliquidProviderProps {
 	agentName?: string;
 }
 
+function useConnectionSafe() {
+	try {
+		// biome-ignore lint/correctness/useHookAtTopLevel: safe — useConnection is always called, catch handles missing provider
+		return useConnection();
+	} catch {
+		return { address: undefined } as ReturnType<typeof useConnection>;
+	}
+}
+
 export function HyperliquidProvider({ children, env, builderConfig, agentName = "app" }: HyperliquidProviderProps) {
-	const { address } = useConnection();
+	const { address } = useConnectionSafe();
 
 	const initRef = useRef(false);
 	if (!initRef.current) {

@@ -1,5 +1,5 @@
 import { TrendDownIcon, TrendUpIcon } from "@phosphor-icons/react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SegmentedControlItem, SegmentedControls } from "@/anvil";
 import type { Side } from "@/lib/trade/types";
 
 interface SideLabels {
@@ -17,25 +17,23 @@ interface Props {
 
 export function SideToggle({ side, onSideChange, labels }: Props) {
 	return (
-		<Tabs value={side} onValueChange={(v) => onSideChange(v as Side)} className="mb-2">
-			<TabsList variant="pill" className="w-full">
-				<TabsTrigger
-					value="buy"
-					className="flex-1 text-sm data-[state=active]:text-market-up-600"
-					aria-label={labels.buyAria}
-				>
-					<TrendUpIcon className="size-4" />
-					{labels.buy}
-				</TabsTrigger>
-				<TabsTrigger
-					value="sell"
-					className="flex-1 text-sm data-[state=active]:text-market-down-600"
-					aria-label={labels.sellAria}
-				>
-					<TrendDownIcon className="size-4" />
-					{labels.sell}
-				</TabsTrigger>
-			</TabsList>
-		</Tabs>
+		<SegmentedControls value={side} onValueChange={(v) => onSideChange(v as Side)} fullWidth className="mb-2">
+			<SegmentedControlItem
+				value="buy"
+				className="flex-1 text-sm data-[active]:text-text-success"
+				aria-label={labels.buyAria}
+				icon={<TrendUpIcon className="size-4" />}
+			>
+				{labels.buy}
+			</SegmentedControlItem>
+			<SegmentedControlItem
+				value="sell"
+				className="flex-1 text-sm data-[active]:text-text-error"
+				aria-label={labels.sellAria}
+				icon={<TrendDownIcon className="size-4" />}
+			>
+				{labels.sell}
+			</SegmentedControlItem>
+		</SegmentedControls>
 	);
 }

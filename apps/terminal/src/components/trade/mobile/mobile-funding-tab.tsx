@@ -32,7 +32,7 @@ export function MobileFundingTab({ className }: Props) {
 
 	if (!isConnected) {
 		return (
-			<div className="flex-1 flex items-center justify-center p-6 text-sm text-text-500">
+			<div className="flex-1 flex items-center justify-center p-6 text-sm text-text-weak">
 				{t`Connect your wallet to view funding payments.`}
 			</div>
 		);
@@ -44,16 +44,16 @@ export function MobileFundingTab({ className }: Props) {
 
 	if (status === "error") {
 		return (
-			<div className="flex-1 flex items-center justify-center p-6 text-sm text-market-down">
+			<div className="flex-1 flex items-center justify-center p-6 text-sm text-text-error">
 				<span>{t`Failed to load funding history.`}</span>
-				{error instanceof Error && <span className="mt-1 text-3xs text-text-500">{error.message}</span>}
+				{error instanceof Error && <span className="mt-1 text-xs text-text-weak">{error.message}</span>}
 			</div>
 		);
 	}
 
 	if (updates.length === 0) {
 		return (
-			<div className="flex-1 flex items-center justify-center p-6 text-sm text-text-500">
+			<div className="flex-1 flex items-center justify-center p-6 text-sm text-text-weak">
 				{t`No funding payments found.`}
 			</div>
 		);
@@ -61,7 +61,7 @@ export function MobileFundingTab({ className }: Props) {
 
 	return (
 		<div className={cn("flex-1 min-h-0 flex flex-col", className)}>
-			<div className="px-3 py-2 flex items-center gap-2 text-3xs uppercase tracking-wider text-text-500">
+			<div className="px-3 py-2 flex items-center gap-2 text-xs uppercase tracking-wider text-text-weak">
 				<PercentIcon className="size-3" />
 				{t`Funding History`}
 				<span className={cn("font-semibold ml-auto tabular-nums", headerClass)}>{headerTotal}</span>
@@ -79,18 +79,18 @@ export function MobileFundingTab({ className }: Props) {
 						<div
 							key={`${update.coin}-${update.time}-${index}`}
 							className={cn(
-								"rounded-sm border bg-surface-base/50",
-								isPositivePayment ? "border-market-up-600/30" : "border-market-down-600/30",
+								"rounded-8 border bg-bg-sunken/50",
+								isPositivePayment ? "border-stroke-success-strong/30" : "border-stroke-error-strong/30",
 							)}
 						>
-							<div className="flex items-center justify-between px-3 py-2.5 border-b border-border/40">
+							<div className="flex items-center justify-between px-3 py-2.5 border-b border-stroke-weak/40">
 								<AssetDisplay coin={update.coin} nameClassName="text-sm font-semibold" />
 								<div className={cn("text-sm font-semibold tabular-nums", getValueColorClass(usdc))}>
 									{formatToken(usdc, { symbol: "USDC" })}
 								</div>
 							</div>
 
-							<div className="grid grid-cols-3 gap-px bg-border/20">
+							<div className="grid grid-cols-3 gap-px bg-stroke-weak/20">
 								<MetricCell
 									label={t`Position`}
 									value={formatToken(positionSize, { decimals: market?.szDecimals, symbol: market?.shortName })}
@@ -118,8 +118,8 @@ interface MetricCellProps {
 
 function MetricCell({ label, value, valueClass }: MetricCellProps) {
 	return (
-		<div className="px-3 py-2 bg-surface-base/50">
-			<div className="text-3xs text-text-500 mb-0.5">{label}</div>
+		<div className="px-3 py-2 bg-bg-sunken/50">
+			<div className="text-xs text-text-weak mb-0.5">{label}</div>
 			<div className={cn("text-xs tabular-nums font-medium", valueClass)}>{value}</div>
 		</div>
 	);

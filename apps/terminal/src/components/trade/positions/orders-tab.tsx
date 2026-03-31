@@ -2,10 +2,8 @@ import { t } from "@lingui/core/macro";
 import { ListNumbersIcon } from "@phosphor-icons/react";
 import { useCallback, useEffect, useState } from "react";
 import { useConnection } from "wagmi";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button, Checkbox, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/anvil";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { formatDateTime, formatPrice, formatToken, formatUSD } from "@/lib/format";
@@ -25,8 +23,8 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 	return (
 		<div
 			className={cn(
-				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-market-down-600" : "text-text-600",
+				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-xs",
+				variant === "error" ? "text-text-error" : "text-text-weak",
 			)}
 		>
 			{children}
@@ -159,7 +157,7 @@ export function OrdersTab() {
 			return (
 				<Placeholder variant="error">
 					<span>{t`Failed to load open orders.`}</span>
-					{error instanceof Error && <span className="mt-1 text-4xs text-text-600">{error.message}</span>}
+					{error instanceof Error && <span className="mt-1 text-xs text-text-weak">{error.message}</span>}
 				</Placeholder>
 			);
 		}
@@ -171,13 +169,13 @@ export function OrdersTab() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
-			<div className="text-3xs uppercase tracking-wider text-text-600 mb-1.5 flex items-center gap-2">
+			<div className="text-xs uppercase tracking-wider text-text-weak mb-1.5 flex items-center gap-2">
 				<ListNumbersIcon className="size-3" />
 				{t`Open Orders`}
 				<div className="ml-auto flex items-center gap-2">
-					<span className="text-primary-default tabular-nums">{headerCount}</span>
+					<span className="text-text-brand tabular-nums">{headerCount}</span>
 					<Button
-						variant="text"
+						variant="link"
 						size="sm"
 						aria-label={t`Cancel selected orders`}
 						onClick={handleCancelSelected}
@@ -186,7 +184,7 @@ export function OrdersTab() {
 						{isCancelling ? t`Canceling...` : t`Cancel selected`}
 					</Button>
 					<Button
-						variant="text"
+						variant="link"
 						size="sm"
 						aria-label={t`Cancel all orders`}
 						onClick={handleCancelAll}
@@ -196,33 +194,34 @@ export function OrdersTab() {
 					</Button>
 				</div>
 			</div>
-			{actionError ? <div className="mb-1 text-4xs text-market-down-600">{actionError}</div> : null}
-			<div className="flex-1 min-h-0 overflow-hidden border border-border-200/40 rounded-sm bg-surface-base/50">
+			{actionError ? <div className="mb-1 text-xs text-text-error">{actionError}</div> : null}
+			<div className="flex-1 min-h-0 overflow-hidden border border-stroke-weak/40 rounded-8 bg-bg-sunken/50">
 				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table>
 							<TableHeader>
-								<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
+								<TableRow className="border-stroke-weak/40 bg-bg-raised hover:bg-bg-raised">
 									<TableHead className="w-7">
 										<Checkbox
-											checked={allSelected ? true : someSelected ? "indeterminate" : false}
+											checked={allSelected}
+											indeterminate={someSelected && !allSelected}
 											onCheckedChange={handleToggleAll}
 											aria-label={t`Select all orders`}
 											disabled={openOrders.length === 0 || isCancelling}
 										/>
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Time`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Asset`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Type`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
+									<TableHead className="text-xs font-medium uppercase tracking-wider text-text-weak h-7">{t`Time`}</TableHead>
+									<TableHead className="text-xs font-medium uppercase tracking-wider text-text-weak h-7">{t`Asset`}</TableHead>
+									<TableHead className="text-xs font-medium uppercase tracking-wider text-text-weak h-7">{t`Type`}</TableHead>
+									<TableHead className="text-xs font-medium uppercase tracking-wider text-text-weak text-right h-7">
 										{t`Price`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
+									<TableHead className="text-xs font-medium uppercase tracking-wider text-text-weak text-right h-7">
 										{t`Size`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Trigger`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7">{t`Reduce`}</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7">
+									<TableHead className="text-xs font-medium uppercase tracking-wider text-text-weak h-7">{t`Trigger`}</TableHead>
+									<TableHead className="text-xs font-medium uppercase tracking-wider text-text-weak h-7">{t`Reduce`}</TableHead>
+									<TableHead className="text-xs font-medium uppercase tracking-wider text-text-weak text-right h-7">
 										{t`Actions`}
 									</TableHead>
 								</TableRow>
@@ -283,7 +282,7 @@ function OrderRow({
 	const typeConfig = getOrderTypeConfig(order);
 
 	return (
-		<TableRow className={cn("border-border-200/40 hover:bg-surface-analysis/30", isEven && "bg-surface-analysis")}>
+		<TableRow className={cn("border-stroke-weak/40 hover:bg-bg-raised/30", isEven && "bg-bg-raised")}>
 			<TableCell className="py-1.5">
 				<Checkbox
 					checked={isSelected}
@@ -292,27 +291,26 @@ function OrderRow({
 					disabled={isCancelling}
 				/>
 			</TableCell>
-			<TableCell className="text-xs text-text-600 py-1.5 whitespace-nowrap">
+			<TableCell className="text-xs text-text-weak py-1.5 whitespace-nowrap">
 				{formatDateTime(order.timestamp, { dateStyle: "short", timeStyle: "short" })}
 			</TableCell>
 			<TableCell className="text-xs font-medium py-1.5">
 				<div className="flex items-center gap-1.5">
 					<Button
-						variant="text"
-						size="none"
+						variant="link"
 						onClick={() => onSelectMarket(order.coin)}
 						className="gap-1.5"
 						aria-label={t`Switch to ${order.coin} market`}
 					>
 						<AssetDisplay coin={order.coin} />
 					</Button>
-					<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", getSideClass(order.side))}>
+					<span className={cn("text-xs px-1 py-0.5 rounded-8 uppercase", getSideClass(order.side))}>
 						{getSideLabel(order.side, kind)}
 					</span>
 				</div>
 			</TableCell>
 			<TableCell className="text-xs py-1.5">
-				<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", typeConfig.class)}>{typeConfig.label}</span>
+				<span className={cn("text-xs px-1 py-0.5 rounded-8 uppercase", typeConfig.class)}>{typeConfig.label}</span>
 			</TableCell>
 			<TableCell className="text-xs text-right tabular-nums py-1.5">
 				{formatPrice(order.limitPx, { szDecimals })}
@@ -322,22 +320,22 @@ function OrderRow({
 					<span className="tabular-nums">
 						{formatToken(order.origSz, { decimals: szDecimals, symbol: order.coin })}
 					</span>
-					<span className="text-2xs text-text-500">({formatUSD(getOrderValue(order), { compact: false })})</span>
+					<span className="text-xs text-text-weak">({formatUSD(getOrderValue(order), { compact: false })})</span>
 				</div>
 			</TableCell>
-			<TableCell className="text-xs text-text-600 py-1.5">
+			<TableCell className="text-xs text-text-weak py-1.5">
 				{order.triggerCondition || FALLBACK_VALUE_PLACEHOLDER}
 			</TableCell>
 			<TableCell className="text-xs py-1.5">
 				{order.reduceOnly ? (
-					<span className="text-primary-default">{t`Yes`}</span>
+					<span className="text-text-brand">{t`Yes`}</span>
 				) : (
-					<span className="text-text-600">{t`No`}</span>
+					<span className="text-text-weak">{t`No`}</span>
 				)}
 			</TableCell>
 			<TableCell className="text-right py-1.5">
 				<Button
-					variant="text"
+					variant="link"
 					size="sm"
 					aria-label={t`Cancel order`}
 					onClick={() => onCancel([order])}

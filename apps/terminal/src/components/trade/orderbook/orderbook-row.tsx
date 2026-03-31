@@ -1,5 +1,4 @@
 import { memo } from "react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
 import type { BookLevel } from "@/lib/trade/orderbook";
@@ -26,25 +25,24 @@ function OrderbookRowComponent({ level, side, maxTotal, showInQuote = false, szD
 	const totalText = formatNumber(totalValue, { decimals: displayDecimals, compact: true });
 
 	return (
-		<div className="relative hover:bg-surface-analysis/30 cursor-pointer group">
+		<div className="relative hover:bg-fill-hover cursor-pointer group">
 			<div
 				className={cn("absolute inset-y-0 pointer-events-none", isAsk ? "depth-bar-ask" : "depth-bar-bid")}
 				style={{ width: `${depthPct}%`, [isAsk ? "right" : "left"]: 0, [isAsk ? "left" : "right"]: "auto" }}
 			/>
-			<div className="grid grid-cols-3 gap-2 text-3xs tabular-nums py-0.5 px-2 relative z-10">
-				<Button
-					variant="text"
-					size="none"
+			<div className="grid grid-cols-3 gap-2 text-xs tabular-nums py-0.5 px-2 relative z-10">
+				<button
+					type="button"
 					onClick={() => setSelectedPrice(level.price)}
 					className={cn(
 						"text-left justify-start font-medium",
-						isAsk ? "text-market-down-600 hover:text-market-down-600" : "text-market-up-600 hover:text-market-up-600",
+						isAsk ? "text-text-error hover:text-text-error" : "text-text-success hover:text-text-success",
 					)}
 				>
 					{formatNumber(level.price)}
-				</Button>
-				<div className="text-right text-text-950 group-hover:text-text-950">{sizeText}</div>
-				<div className="text-right text-text-950 group-hover:text-text-950">{totalText}</div>
+				</button>
+				<div className="text-right text-text-strong group-hover:text-text-strong">{sizeText}</div>
+				<div className="text-right text-text-strong group-hover:text-text-strong">{totalText}</div>
 			</div>
 		</div>
 	);

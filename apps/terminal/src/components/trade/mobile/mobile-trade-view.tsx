@@ -1,10 +1,10 @@
 import { CaretDownIcon, SpinnerGapIcon, TrendDownIcon, TrendUpIcon } from "@phosphor-icons/react";
 import { useEffect, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Slider, type SliderMark } from "@/components/ui/slider";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/anvil/button";
+import { Slider } from "@/anvil/slider";
+import { Tabs, TabsList, TabsTrigger } from "@/anvil/tabs";
+import { TextInput } from "@/anvil/text-input";
 import { FALLBACK_VALUE_PLACEHOLDER, ORDER_MIN_NOTIONAL_USD, UI_TEXT } from "@/config/constants";
 import { ARBITRUM_CHAIN_ID } from "@/config/contracts";
 import { getBaseQuoteFromPairName } from "@/domain/market";
@@ -37,7 +37,6 @@ import { OrderToast } from "../tradebox/order-toast";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
 
 const ORDER_TEXT = UI_TEXT.ORDER_ENTRY;
-const SIZE_MARKS: SliderMark[] = [{ value: 0 }, { value: 25 }, { value: 50 }, { value: 75 }, { value: 100 }];
 
 interface MobileTradeViewProps {
 	className?: string;
@@ -196,7 +195,10 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 		}
 	};
 
-	const handleSliderChange = (values: number[]) => applySizeFromPercent(values[0]);
+	const handleSliderChange = (value: number | readonly number[]) => {
+		const v = Array.isArray(value) ? value[0] : value;
+		applySizeFromPercent(v);
+	};
 
 	const handleSizeModeToggle = () => {
 		if (sizeMode === "base" && price > 0 && sizeValue > 0) {
@@ -322,12 +324,12 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 	const isFormDisabled = !isConnected || availableBalance <= 0;
 
 	return (
-		<div className={cn("flex flex-col h-full min-h-0 bg-surface-execution/20", className)}>
-			<div className="shrink-0 px-4 py-2 border-b border-border-200/60 bg-surface-execution/30">
+		<div className={cn("flex flex-col h-full min-h-0 bg-bg-overlay/20", className)}>
+			<div className="shrink-0 px-4 py-2 border-b border-stroke-weak/60 bg-bg-overlay/30">
 				<div className="flex items-center justify-between">
 					<TokenSelector selectedMarket={market} onValueChange={handleMarketChange} />
 					<div className="text-right">
-						<div className="text-lg font-semibold tabular-nums text-warning-700">
+						<div className="text-lg font-semibold tabular-nums text-text-warning">
 							{formatPrice(markPx || null, { szDecimals: market?.szDecimals })}
 						</div>
 					</div>
@@ -341,12 +343,13 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							if (v === "market") setOrderType("market");
 							else if (v === "limit") setOrderType("limit");
 						}}
+						fullWidth
 					>
-						<TabsList variant="underline" className="w-full">
-							<TabsTrigger value="market" className="flex-1 text-xs normal-case">
+						<TabsList className="w-full">
+							<TabsTrigger value="market" className="flex-1 normal-case">
 								Market
 							</TabsTrigger>
-							<TabsTrigger value="limit" className="flex-1 text-xs normal-case">
+							<TabsTrigger value="limit" className="flex-1 normal-case">
 								Limit
 							</TabsTrigger>
 							<div className="relative inline-flex flex-1 items-center justify-center pb-2">
@@ -354,71 +357,70 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 									orderType={orderType}
 									onOrderTypeChange={setOrderType}
 									marketKind={market?.kind}
-									className={cn("text-xs normal-case", isAdvancedTab ? "font-semibold text-text-950" : "text-text-600")}
+									className={cn(
+										"text-xs normal-case",
+										isAdvancedTab ? "font-semibold text-text-strong" : "text-text-weak",
+									)}
 								/>
-								{isAdvancedTab && <span aria-hidden className="absolute bottom-0 inset-x-0 h-0.5 bg-primary-default" />}
+								{isAdvancedTab && (
+									<span aria-hidden className="absolute bottom-0 inset-x-0 h-0.5 bg-fill-brand-strong" />
+								)}
 							</div>
 						</TabsList>
 					</Tabs>
-					<Tabs value={side} onValueChange={(v) => setSide(v as Side)}>
-						<TabsList variant="pill" className="w-full">
+					<Tabs value={side} onValueChange={(v) => setSide(v as Side)} variant="pills" fullWidth>
+						<TabsList className="w-full">
 							<TabsTrigger
 								value="buy"
-								className="flex-1 text-sm data-[state=active]:text-market-up-600"
+								className="flex-1 text-sm data-active:text-text-success"
 								aria-label="Buy Long"
+								icon={<TrendUpIcon className="size-4" />}
 							>
-								<TrendUpIcon className="size-4" />
 								Long
 							</TabsTrigger>
 							<TabsTrigger
 								value="sell"
-								className="flex-1 text-sm data-[state=active]:text-market-down-600"
+								className="flex-1 text-sm data-active:text-text-error"
 								aria-label="Sell Short"
+								icon={<TrendDownIcon className="size-4" />}
 							>
-								<TrendDownIcon className="size-4" />
 								Short
 							</TabsTrigger>
 						</TabsList>
 					</Tabs>
 					<div className="flex items-center justify-between text-xs">
 						<div className="flex items-center gap-2">
-							<span className="text-text-600">Leverage</span>
+							<span className="text-text-weak">Leverage</span>
 							<LeverageControl key={market?.name} />
 						</div>
 						<div className="text-right">
-							<span className="text-text-600">{ORDER_TEXT.AVAILABLE_LABEL}: </span>
+							<span className="text-text-weak">{ORDER_TEXT.AVAILABLE_LABEL}: </span>
 							<span className={cn("tabular-nums font-medium", getValueColorClass(availableBalance))}>
 								{isConnected ? formatUSD(availableBalance) : FALLBACK_VALUE_PLACEHOLDER}
 							</span>
 						</div>
 					</div>
 					<div className="space-y-1.5">
-						<p className="text-xs text-text-600">{ORDER_TEXT.SIZE_LABEL}</p>
+						<p className="text-xs text-text-weak">{ORDER_TEXT.SIZE_LABEL}</p>
 						<div className="flex items-center gap-2">
 							<Button
-								variant="text"
-								size="none"
+								variant="outline"
+								intent="neutral"
+								size="sm"
 								onClick={handleSizeModeToggle}
-								className={cn(
-									"px-3 py-2.5 text-xs border border-border-200/60 rounded-xs gap-1 hover:bg-transparent",
-									"hover:border-text-400",
-								)}
 								disabled={isFormDisabled}
+								iconRight={<CaretDownIcon className="size-3" />}
 							>
 								{sizeMode === "base" ? baseToken || "\u2014" : quoteToken || "\u2014"}
-								<CaretDownIcon className="size-3" />
 							</Button>
-							<Input
+							<TextInput
 								type="text"
 								inputMode="decimal"
 								placeholder={ORDER_TEXT.INPUT_PLACEHOLDER}
 								value={sizeInput}
 								onChange={(e) => setSizeInput(e.target.value)}
-								className={cn(
-									"flex-1 h-10 text-sm tabular-nums",
-									"bg-surface-base/50 border-border-200/60",
-									"focus:border-primary-default/60",
-								)}
+								className="flex-1 tabular-nums"
+								size="md"
 								disabled={isFormDisabled}
 							/>
 						</div>
@@ -427,7 +429,6 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 							onValueChange={handleSliderChange}
 							max={100}
 							step={1}
-							marks={SIZE_MARKS}
 							className="py-3"
 							disabled={isFormDisabled || maxSize <= 0}
 						/>
@@ -435,34 +436,30 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 					{usesLimitPrice && (
 						<div className="space-y-1.5">
 							<div className="flex items-center justify-between">
-								<p className="text-xs text-text-600">{ORDER_TEXT.LIMIT_PRICE_LABEL}</p>
+								<p className="text-xs text-text-weak">{ORDER_TEXT.LIMIT_PRICE_LABEL}</p>
 								{markPx > 0 && (
-									<Button
-										variant="text"
-										size="none"
-										onClick={handleMarkPriceClick}
-										className="text-3xs text-primary-default"
-									>
+									<Button variant="link" intent="brand" size="sm" onClick={handleMarkPriceClick} className="text-xs">
 										{ORDER_TEXT.MARK_PRICE_LABEL}: {formatPrice(markPx, { szDecimals: market?.szDecimals })}
 									</Button>
 								)}
 							</div>
-							<Input
+							<TextInput
 								type="text"
 								inputMode="decimal"
 								placeholder={ORDER_TEXT.INPUT_PLACEHOLDER}
 								value={limitPriceInput}
 								onChange={(e) => setLimitPriceInput(e.target.value)}
-								className="h-10 text-sm tabular-nums bg-surface-base/50"
+								className="tabular-nums"
+								size="md"
 								disabled={isFormDisabled}
 							/>
 						</div>
 					)}
 					{validation.errors.length > 0 && isConnected && availableBalance > 0 && !validation.needsApproval && (
-						<div className="text-xs text-market-down-600">{validation.errors.join(" \u2022 ")}</div>
+						<div className="text-xs text-text-error">{validation.errors.join(" \u2022 ")}</div>
 					)}
-					{approvalError && <div className="text-xs text-market-down-600">{approvalError}</div>}
-					<div className="border border-border-200/40 rounded-xs divide-y divide-border/40 text-xs">
+					{approvalError && <div className="text-xs text-text-error">{approvalError}</div>}
+					<div className="border border-stroke-weak/40 rounded-8 divide-y divide-stroke-weak/40 text-xs">
 						<SummaryRow
 							label={ORDER_TEXT.SUMMARY_ORDER_VALUE}
 							value={orderValue > 0 ? formatUSD(orderValue) : FALLBACK_VALUE_PLACEHOLDER}
@@ -474,32 +471,33 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 						<SummaryRow
 							label={ORDER_TEXT.SUMMARY_LIQ}
 							value={liqPrice ? formatPrice(liqPrice, { szDecimals: market?.szDecimals }) : FALLBACK_VALUE_PLACEHOLDER}
-							valueClass="text-market-down-600"
+							valueClass="text-text-error"
 						/>
 						<SummaryRow
 							label={ORDER_TEXT.SUMMARY_FEE}
 							value={orderValue > 0 ? `${feeRatePercent} (${formatUSD(estimatedFee)})` : feeRatePercent}
-							valueClass="text-text-600"
+							valueClass="text-text-weak"
 						/>
 					</div>
 				</div>
 			</div>
-			<div className="shrink-0 p-4 border-t border-border-200/60 bg-surface-base/95 backdrop-blur-sm">
+			<div className="shrink-0 p-4 border-t border-stroke-weak/60 bg-bg-sunken/95 backdrop-blur-sm">
 				<Button
-					variant="outlined"
+					variant="outline"
 					size="lg"
 					onClick={buttonContent.action}
 					disabled={buttonContent.disabled}
+					intent={buttonContent.variant === "cyan" ? "brand" : buttonContent.variant === "buy" ? "neutral" : "error"}
 					className={cn(
 						"w-full py-2",
 						buttonContent.variant === "cyan"
-							? "bg-primary-default/20 border-primary-default text-primary-default hover:bg-primary-default/30"
+							? "bg-fill-brand-weak border-stroke-brand-strong text-text-brand hover:bg-fill-brand-weak/30"
 							: buttonContent.variant === "buy"
-								? "bg-market-up-100 border-market-up-600 text-market-up-600 hover:bg-market-up-100/30"
-								: "bg-market-down-100 border-market-down-600 text-market-down-600 hover:bg-market-down-600/30",
+								? "bg-fill-success-weak border-stroke-success-strong text-text-success hover:bg-fill-success-weak/30"
+								: "bg-fill-error-weak border-stroke-error-strong text-text-error hover:bg-fill-error-weak/30",
 					)}
+					iconLeft={isSubmitting || isRegistering ? <SpinnerGapIcon className="size-5 animate-spin" /> : undefined}
 				>
-					{(isSubmitting || isRegistering) && <SpinnerGapIcon className="size-5 animate-spin" />}
 					{buttonContent.text}
 				</Button>
 			</div>
@@ -515,7 +513,7 @@ export function MobileTradeView({ className }: MobileTradeViewProps) {
 function SummaryRow({ label, value, valueClass }: { label: string; value: string; valueClass?: string }) {
 	return (
 		<div className="flex items-center justify-between px-3 py-2">
-			<span className="text-text-600">{label}</span>
+			<span className="text-text-weak">{label}</span>
 			<span className={cn("tabular-nums", valueClass)}>{value}</span>
 		</div>
 	);

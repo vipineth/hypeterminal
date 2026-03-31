@@ -15,10 +15,8 @@ import {
 import Big from "big.js";
 import { useEffect, useRef, useState } from "react";
 import { useConnection } from "wagmi";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge, Button, InfoRow, InfoRowGroup } from "@/anvil";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { InfoRow, InfoRowGroup } from "@/components/ui/info-row";
 import { cn } from "@/lib/cn";
 import { formatDateTimeShort, formatDuration, formatUSD, shortenAddress } from "@/lib/format";
 import { initLiFi } from "@/lib/lifi/config";
@@ -67,9 +65,9 @@ function PoweredByLiFi() {
 			href="https://li.fi"
 			target="_blank"
 			rel="noopener noreferrer"
-			className="flex items-center justify-center gap-1.5 py-2 text-text-400 opacity-60 hover:opacity-100 transition-opacity"
+			className="flex items-center justify-center gap-1.5 py-2 text-text-disabled opacity-60 hover:opacity-100 transition-opacity"
 		>
-			<span className="text-4xs">Powered by</span>
+			<span className="text-xs">Powered by</span>
 			<LiFiLogo className="h-2.5" />
 		</a>
 	);
@@ -84,7 +82,7 @@ function HyperCoreUsdcIcon({ size = "md" }: { size?: "sm" | "md" }) {
 			<img
 				src={HL_ICON_URL}
 				alt="Hyperliquid"
-				className={cn("absolute -bottom-0.5 -right-0.5 rounded-full border border-surface-execution", badgeSize)}
+				className={cn("absolute -bottom-0.5 -right-0.5 rounded-full border border-bg-overlay", badgeSize)}
 			/>
 		</div>
 	);
@@ -93,14 +91,14 @@ function HyperCoreUsdcIcon({ size = "md" }: { size?: "sm" | "md" }) {
 function BridgeWalletNotConnected() {
 	return (
 		<div className="flex flex-col items-center gap-4 py-8">
-			<div className="flex size-12 items-center justify-center rounded-full bg-surface-analysis border border-border-200/40">
-				<WalletIcon className="size-6 text-text-950" />
+			<div className="flex size-12 items-center justify-center rounded-full bg-bg-raised border border-stroke-weak/40">
+				<WalletIcon className="size-6 text-text-strong" />
 			</div>
 			<div className="text-center space-y-1">
 				<p className="text-sm font-medium">
 					<Trans>Wallet not connected</Trans>
 				</p>
-				<p className="text-3xs text-text-950">
+				<p className="text-xs text-text-strong">
 					<Trans>Connect your wallet to bridge funds</Trans>
 				</p>
 			</div>
@@ -127,18 +125,18 @@ function TokenIcon({ token, size = "md" }: { token: BridgeToken; size?: "sm" | "
 			) : null}
 			<div
 				className={cn(
-					"rounded-full bg-surface-analysis flex items-center justify-center",
+					"rounded-full bg-bg-raised flex items-center justify-center",
 					iconSize,
 					token.logoURI && "hidden",
 				)}
 			>
-				<CoinIcon className={cn(fallbackIconSize, "text-text-600")} />
+				<CoinIcon className={cn(fallbackIconSize, "text-text-weak")} />
 			</div>
 			{token.chainLogoURI ? (
 				<img
 					src={token.chainLogoURI}
 					alt={token.chainName}
-					className={cn("absolute -bottom-0.5 -right-0.5 rounded-full border border-surface-execution", badgeSize)}
+					className={cn("absolute -bottom-0.5 -right-0.5 rounded-full border border-bg-overlay", badgeSize)}
 				/>
 			) : null}
 		</div>
@@ -222,7 +220,7 @@ function ExplorerLink({ href, children }: { href: string; children: React.ReactN
 			href={href}
 			target="_blank"
 			rel="noopener noreferrer"
-			className="inline-flex items-center gap-1 text-primary-default hover:text-primary-hover"
+			className="inline-flex items-center gap-1 text-text-brand hover:opacity-80"
 		>
 			{children}
 			<ArrowSquareOutIcon className="size-3" />
@@ -249,7 +247,7 @@ function QuoteCountdown({ dataUpdatedAt }: { dataUpdatedAt: number }) {
 	return (
 		<div className="relative flex size-7 items-center justify-center shrink-0">
 			<svg className="size-7 -rotate-90" viewBox="0 0 24 24" role="img" aria-label="Quote countdown">
-				<circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" className="text-border-200" />
+				<circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" className="text-stroke-weak" />
 				<circle
 					cx="12"
 					cy="12"
@@ -257,13 +255,13 @@ function QuoteCountdown({ dataUpdatedAt }: { dataUpdatedAt: number }) {
 					fill="none"
 					stroke="currentColor"
 					strokeWidth="2"
-					className="text-primary-default transition-[stroke-dashoffset] duration-1000 ease-linear"
+					className="text-text-brand transition-[stroke-dashoffset] duration-1000 ease-linear"
 					strokeDasharray={circumference}
 					strokeDashoffset={offset}
 					strokeLinecap="round"
 				/>
 			</svg>
-			<span className="absolute text-4xs tabular-nums font-medium text-text-950">{remaining}</span>
+			<span className="absolute text-xs tabular-nums font-medium text-text-strong">{remaining}</span>
 		</div>
 	);
 }
@@ -276,8 +274,8 @@ interface TokenRowProps {
 
 function tokenRowStyle(isDust: boolean, isSelected: boolean): string {
 	if (isDust) return "opacity-50 cursor-not-allowed border-transparent";
-	if (isSelected) return "border-primary-default bg-primary-default/5 cursor-pointer";
-	return "border-transparent hover:bg-surface-base/50 active:bg-surface-base cursor-pointer";
+	if (isSelected) return "border-stroke-brand-strong bg-fill-brand-strong/5 cursor-pointer";
+	return "border-transparent hover:bg-bg-sunken/50 active:bg-bg-sunken cursor-pointer";
 }
 
 function TokenRow({ token, isSelected, onSelect }: TokenRowProps) {
@@ -287,24 +285,24 @@ function TokenRow({ token, isSelected, onSelect }: TokenRowProps) {
 			disabled={token.isDust}
 			onClick={() => onSelect(token)}
 			className={cn(
-				"flex items-center gap-3 px-3 py-2.5 text-left transition-colors rounded-xs w-full border",
+				"flex items-center gap-3 px-3 py-2.5 text-left transition-colors rounded-8 w-full border",
 				tokenRowStyle(token.isDust, isSelected),
 			)}
 		>
 			<TokenIcon token={token} />
 			<div className="flex-1 min-w-0">
 				<div className="flex items-center gap-1.5">
-					<span className="text-xs font-medium text-text-950 truncate">{token.symbol}</span>
-					<span className="text-3xs text-text-500 truncate">{token.chainName}</span>
+					<span className="text-xs font-medium text-text-strong truncate">{token.symbol}</span>
+					<span className="text-xs text-text-weak truncate">{token.chainName}</span>
 				</div>
-				<span className="text-3xs text-text-500 truncate block">{token.name}</span>
+				<span className="text-xs text-text-weak truncate block">{token.name}</span>
 			</div>
 			<div className="text-right shrink-0">
-				<div className="text-xs tabular-nums text-text-950">{formatTokenBalance(token.amount, token.decimals)}</div>
-				<div className="text-3xs tabular-nums text-text-500">{formatUSD(token.amountUSD, 2)}</div>
+				<div className="text-xs tabular-nums text-text-strong">{formatTokenBalance(token.amount, token.decimals)}</div>
+				<div className="text-xs tabular-nums text-text-weak">{formatUSD(token.amountUSD, 2)}</div>
 			</div>
 			{token.isDust ? (
-				<Badge variant="neutral" size="xs" className="shrink-0">
+				<Badge tone="neutral" size="sm" className="shrink-0">
 					<Trans>Low Balance</Trans>
 				</Badge>
 			) : null}
@@ -315,8 +313,8 @@ function TokenRow({ token, isSelected, onSelect }: TokenRowProps) {
 function AssetSelectionLoading() {
 	return (
 		<div className="flex flex-col items-center gap-4 py-8">
-			<SpinnerGapIcon className="size-6 animate-spin text-text-500" />
-			<p className="text-3xs text-text-500">
+			<SpinnerGapIcon className="size-6 animate-spin text-text-weak" />
+			<p className="text-xs text-text-weak">
 				<Trans>Loading balances across all chains...</Trans>
 			</p>
 		</div>
@@ -326,18 +324,18 @@ function AssetSelectionLoading() {
 function AssetSelectionError({ onRetry }: { onRetry: () => void }) {
 	return (
 		<div className="flex flex-col items-center gap-4 py-8">
-			<div className="flex size-12 items-center justify-center rounded-full bg-market-down-100 border border-market-down-600/30">
-				<WarningCircleIcon className="size-6 text-market-down-600" />
+			<div className="flex size-12 items-center justify-center rounded-full bg-fill-error-weak border border-stroke-error-strong/30">
+				<WarningCircleIcon className="size-6 text-text-error" />
 			</div>
 			<div className="text-center space-y-1">
 				<p className="text-sm font-medium">
 					<Trans>Failed to load balances</Trans>
 				</p>
-				<p className="text-3xs text-text-500">
+				<p className="text-xs text-text-weak">
 					<Trans>Could not fetch your token balances</Trans>
 				</p>
 			</div>
-			<Button variant="outlined" size="sm" onClick={onRetry}>
+			<Button variant="outline" intent="neutral" size="sm" onClick={onRetry}>
 				<Trans>Try Again</Trans>
 			</Button>
 		</div>
@@ -347,14 +345,14 @@ function AssetSelectionError({ onRetry }: { onRetry: () => void }) {
 function AssetSelectionEmpty() {
 	return (
 		<div className="flex flex-col items-center gap-4 py-8">
-			<div className="flex size-12 items-center justify-center rounded-full bg-surface-analysis border border-border-200/40">
-				<WalletIcon className="size-6 text-text-500" />
+			<div className="flex size-12 items-center justify-center rounded-full bg-bg-raised border border-stroke-weak/40">
+				<WalletIcon className="size-6 text-text-weak" />
 			</div>
 			<div className="text-center space-y-1">
 				<p className="text-sm font-medium">
 					<Trans>No balances found</Trans>
 				</p>
-				<p className="text-3xs text-text-500">
+				<p className="text-xs text-text-weak">
 					<Trans>No tokens with value found across supported chains</Trans>
 				</p>
 			</div>
@@ -428,7 +426,7 @@ function AmountEntryScreen({ token, initialUsd, onBack, onContinue }: AmountEntr
 			<button
 				type="button"
 				onClick={onBack}
-				className="flex items-center gap-1 text-3xs text-primary-default hover:text-primary-hover self-start"
+				className="flex items-center gap-1 text-xs text-text-brand hover:opacity-80 self-start"
 			>
 				<ArrowLeftIcon className="size-3" />
 				<Trans>Back</Trans>
@@ -436,14 +434,14 @@ function AmountEntryScreen({ token, initialUsd, onBack, onContinue }: AmountEntr
 
 			<div className="flex flex-col items-center gap-4 py-4">
 				<div className="flex items-baseline justify-center">
-					<span className="text-4xl font-semibold text-text-950 tabular-nums">$</span>
+					<span className="text-4xl font-semibold text-text-strong tabular-nums">$</span>
 					<input
 						type="text"
 						inputMode="decimal"
 						value={usdInput}
 						onChange={handleUsdChange}
 						placeholder="0.00"
-						className="text-4xl font-semibold text-text-950 tabular-nums bg-transparent border-none outline-none text-center w-36 placeholder:text-text-400"
+						className="text-4xl font-semibold text-text-strong tabular-nums bg-transparent border-none outline-none text-center w-36 placeholder:text-text-disabled"
 					/>
 				</div>
 
@@ -453,7 +451,7 @@ function AmountEntryScreen({ token, initialUsd, onBack, onContinue }: AmountEntr
 							key={p}
 							type="button"
 							onClick={() => handlePercent(p)}
-							className="px-3 py-1.5 text-3xs font-medium text-text-950 bg-surface-analysis hover:bg-primary-default/20 rounded-xs transition-colors"
+							className="px-3 py-1.5 text-xs font-medium text-text-strong bg-bg-raised hover:bg-fill-brand-strong/20 rounded-8 transition-colors"
 						>
 							<Trans>{p}%</Trans>
 						</button>
@@ -461,38 +459,38 @@ function AmountEntryScreen({ token, initialUsd, onBack, onContinue }: AmountEntr
 					<button
 						type="button"
 						onClick={handleMax}
-						className="px-3 py-1.5 text-3xs font-medium text-text-950 bg-surface-analysis hover:bg-primary-default/20 rounded-xs transition-colors"
+						className="px-3 py-1.5 text-xs font-medium text-text-strong bg-bg-raised hover:bg-fill-brand-strong/20 rounded-8 transition-colors"
 					>
 						<Trans>Max</Trans>
 					</button>
 				</div>
 			</div>
 
-			<div className="flex items-center justify-center gap-3 rounded-xs border border-border-200 p-3">
+			<div className="flex items-center justify-center gap-3 rounded-8 border border-stroke-weak p-3">
 				<div className="flex items-center gap-2">
 					<TokenIcon token={token} />
 					<div className="text-left">
-						<p className="text-4xs text-text-500">
+						<p className="text-xs text-text-weak">
 							<Trans>You send</Trans>
 						</p>
-						<p className="text-xs font-medium text-text-950">{token.symbol}</p>
+						<p className="text-xs font-medium text-text-strong">{token.symbol}</p>
 					</div>
 				</div>
-				<ArrowRightIcon className="size-4 text-text-500 shrink-0" />
+				<ArrowRightIcon className="size-4 text-text-weak shrink-0" />
 				<div className="flex items-center gap-2">
 					<HyperCoreUsdcIcon />
 					<div className="text-left">
-						<p className="text-4xs text-text-500">
+						<p className="text-xs text-text-weak">
 							<Trans>You receive</Trans>
 						</p>
-						<p className="text-xs font-medium text-text-950">USDC</p>
+						<p className="text-xs font-medium text-text-strong">USDC</p>
 					</div>
 				</div>
 			</div>
 
 			<Button
-				variant="contained"
-				tone="accent"
+				variant="filled"
+				intent="brand"
 				size="lg"
 				className="w-full mt-auto"
 				disabled={!canContinue}
@@ -541,7 +539,7 @@ function ConfirmationScreen({ token, tokenAmount, address, onBack, onConfirm }: 
 					<button
 						type="button"
 						onClick={onBack}
-						className="flex items-center gap-1 text-3xs text-primary-default hover:text-primary-hover"
+						className="flex items-center gap-1 text-xs text-text-brand hover:opacity-80"
 					>
 						<ArrowLeftIcon className="size-3" />
 						<Trans>Back</Trans>
@@ -549,9 +547,9 @@ function ConfirmationScreen({ token, tokenAmount, address, onBack, onConfirm }: 
 					{quote ? <QuoteCountdown dataUpdatedAt={dataUpdatedAt} /> : null}
 				</div>
 
-				<p className="text-4xl font-semibold text-text-950 tabular-nums text-center py-2">{usdDisplay}</p>
+				<p className="text-4xl font-semibold text-text-strong tabular-nums text-center py-2">{usdDisplay}</p>
 
-				<InfoRowGroup className="text-3xs">
+				<InfoRowGroup className="text-xs">
 					<InfoRow
 						label={<Trans>Source</Trans>}
 						value={
@@ -573,7 +571,7 @@ function ConfirmationScreen({ token, tokenAmount, address, onBack, onConfirm }: 
 					/>
 				</InfoRowGroup>
 
-				<InfoRowGroup className="text-3xs mt-3">
+				<InfoRowGroup className="text-xs mt-3">
 					<InfoRow
 						label={<Trans>You send</Trans>}
 						value={
@@ -589,7 +587,7 @@ function ConfirmationScreen({ token, tokenAmount, address, onBack, onConfirm }: 
 							<span className="flex items-center gap-1.5">
 								<HyperCoreUsdcIcon size="sm" />
 								{receiveAmount} USDC
-								{receiveAmountUSD ? <span className="text-text-500 ml-1">{receiveAmountUSD}</span> : null}
+								{receiveAmountUSD ? <span className="text-text-weak ml-1">{receiveAmountUSD}</span> : null}
 							</span>
 						}
 					/>
@@ -598,7 +596,7 @@ function ConfirmationScreen({ token, tokenAmount, address, onBack, onConfirm }: 
 
 			{quote ? (
 				<Collapsible>
-					<CollapsibleTrigger className="flex w-full items-center justify-between rounded-xs px-2 py-1.5 text-3xs text-text-500 hover:bg-surface-base/50 transition-colors group">
+					<CollapsibleTrigger className="flex w-full items-center justify-between rounded-8 px-2 py-1.5 text-xs text-text-weak hover:bg-bg-sunken/50 transition-colors group">
 						<span>
 							<Trans>Transaction breakdown</Trans> ({formatUSD(quote.totalFeesUSD, 2)})
 						</span>
@@ -606,7 +604,7 @@ function ConfirmationScreen({ token, tokenAmount, address, onBack, onConfirm }: 
 						<CaretUpIcon className="size-3 hidden group-data-[state=open]:block" />
 					</CollapsibleTrigger>
 					<CollapsibleContent>
-						<InfoRowGroup className="text-3xs">
+						<InfoRowGroup className="text-xs">
 							{quote.gasCosts.map((gas) => (
 								<InfoRow
 									key={`gas-${gas.token.symbol}-${gas.amount}`}
@@ -623,17 +621,17 @@ function ConfirmationScreen({ token, tokenAmount, address, onBack, onConfirm }: 
 			) : null}
 
 			{quoteError ? (
-				<div className="flex items-center gap-2 rounded-xs border border-market-down-600/30 bg-market-down-100 p-2.5">
-					<WarningCircleIcon className="size-4 text-market-down-600 shrink-0" />
-					<span className="text-3xs text-market-down-600">
+				<div className="flex items-center gap-2 rounded-8 border border-stroke-error-strong/30 bg-fill-error-weak p-2.5">
+					<WarningCircleIcon className="size-4 text-text-error shrink-0" />
+					<span className="text-xs text-text-error">
 						<Trans>No route available. Try a different amount or asset.</Trans>
 					</span>
 				</div>
 			) : null}
 
 			<Button
-				variant="contained"
-				tone="accent"
+				variant="filled"
+				intent="brand"
 				size="lg"
 				className="w-full mt-auto"
 				disabled={!quote || quoteLoading}
@@ -677,14 +675,14 @@ function ExecutingScreen({ address, statusText, txHash, onDone }: ExecutingScree
 		return (
 			<div className="flex flex-1 flex-col">
 				<div className="flex flex-1 flex-col items-center justify-center gap-4">
-					<div className="flex size-12 items-center justify-center rounded-full bg-warning-100 border border-warning-700/30">
-						<ClockIcon className="size-6 text-warning-700" />
+					<div className="flex size-12 items-center justify-center rounded-full bg-fill-warning-weak border border-fill-warning-weak/30">
+						<ClockIcon className="size-6 text-text-warning" />
 					</div>
 					<div className="text-center space-y-1">
-						<p className="text-sm font-medium text-text-950">
+						<p className="text-sm font-medium text-text-strong">
 							<Trans>Taking longer than expected</Trans>
 						</p>
-						<p className="text-3xs text-text-500 max-w-70">
+						<p className="text-xs text-text-weak max-w-70">
 							<Trans>Your bridge is still processing. Funds are safe.</Trans>
 						</p>
 					</div>
@@ -694,7 +692,7 @@ function ExecutingScreen({ address, statusText, txHash, onDone }: ExecutingScree
 						</ExplorerLink>
 					) : null}
 				</div>
-				<Button variant="outlined" size="lg" className="w-full mt-auto" onClick={onDone}>
+				<Button variant="outline" intent="neutral" size="lg" className="w-full mt-auto" onClick={onDone}>
 					<Trans>Close</Trans>
 				</Button>
 			</div>
@@ -704,12 +702,12 @@ function ExecutingScreen({ address, statusText, txHash, onDone }: ExecutingScree
 	return (
 		<div className="flex flex-1 flex-col gap-4">
 			<div className="flex flex-1 flex-col items-center justify-center gap-4">
-				<div className="flex size-12 items-center justify-center rounded-full bg-primary-default/10 border border-primary-default/30">
-					<SpinnerGapIcon className="size-6 animate-spin text-primary-default" />
+				<div className="flex size-12 items-center justify-center rounded-full bg-fill-brand-strong/10 border border-stroke-brand-strong/30">
+					<SpinnerGapIcon className="size-6 animate-spin text-text-brand" />
 				</div>
 				<div className="text-center space-y-1">
-					<p className="text-sm font-medium text-text-950">{statusText}</p>
-					<p className="text-3xs text-text-500">
+					<p className="text-sm font-medium text-text-strong">{statusText}</p>
+					<p className="text-xs text-text-weak">
 						{txHash ? (
 							<Trans>Your transaction is being processed</Trans>
 						) : (
@@ -721,11 +719,11 @@ function ExecutingScreen({ address, statusText, txHash, onDone }: ExecutingScree
 
 			{txHash ? (
 				<div className="space-y-3">
-					<InfoRowGroup className="text-3xs">
+					<InfoRowGroup className="text-xs">
 						<InfoRow
 							label={<Trans>Fill status</Trans>}
 							value={
-								<Badge variant="neutral" size="xs">
+								<Badge tone="neutral" size="sm">
 									<Trans>Processing</Trans>
 								</Badge>
 							}
@@ -742,7 +740,7 @@ function ExecutingScreen({ address, statusText, txHash, onDone }: ExecutingScree
 						<InfoRow label={<Trans>Destination</Trans>} value="Hyperliquid" />
 					</InfoRowGroup>
 
-					<InfoRowGroup className="text-3xs">
+					<InfoRowGroup className="text-xs">
 						<InfoRow
 							label={<Trans>You receive</Trans>}
 							value={
@@ -756,7 +754,7 @@ function ExecutingScreen({ address, statusText, txHash, onDone }: ExecutingScree
 				</div>
 			) : null}
 
-			<Button variant="outlined" size="lg" className="w-full mt-auto" onClick={onDone}>
+			<Button variant="outline" intent="neutral" size="lg" className="w-full mt-auto" onClick={onDone}>
 				<Trans>Close</Trans>
 			</Button>
 		</div>
@@ -790,24 +788,24 @@ function SuccessScreen({
 	return (
 		<div className="flex flex-1 flex-col gap-4">
 			<div className="flex flex-col items-center gap-3 pt-6 pb-2">
-				<div className="flex size-12 items-center justify-center rounded-full bg-market-up-100 border border-market-up-600/30">
-					<CheckCircleIcon className="size-6 text-market-up-600" weight="fill" />
+				<div className="flex size-12 items-center justify-center rounded-full bg-fill-success-weak border border-fill-success-weak/30">
+					<CheckCircleIcon className="size-6 text-text-success" weight="fill" />
 				</div>
 				<div className="text-center space-y-1">
-					<p className="text-sm font-medium text-text-950">
+					<p className="text-sm font-medium text-text-strong">
 						<Trans>Deposit successful</Trans>
 					</p>
-					<p className="text-3xs text-text-500">
+					<p className="text-xs text-text-weak">
 						<Trans>Your funds were successfully deposited.</Trans>
 					</p>
 				</div>
 			</div>
 
-			<InfoRowGroup className="text-3xs">
+			<InfoRowGroup className="text-xs">
 				<InfoRow
 					label={<Trans>Fill status</Trans>}
 					value={
-						<span className="text-market-up-600 font-medium">
+						<span className="text-text-success font-medium">
 							<Trans>Successful</Trans>
 						</span>
 					}
@@ -817,7 +815,7 @@ function SuccessScreen({
 				) : null}
 			</InfoRowGroup>
 
-			<InfoRowGroup className="text-3xs">
+			<InfoRowGroup className="text-xs">
 				<InfoRow
 					label={<Trans>Source</Trans>}
 					value={
@@ -837,7 +835,7 @@ function SuccessScreen({
 				<InfoRow label={<Trans>Destination</Trans>} value="Hyperliquid" />
 			</InfoRowGroup>
 
-			<InfoRowGroup className="text-3xs">
+			<InfoRowGroup className="text-xs">
 				<InfoRow
 					label={<Trans>You receive</Trans>}
 					value={
@@ -851,13 +849,13 @@ function SuccessScreen({
 
 			{processDetails.length > 0 ? (
 				<Collapsible>
-					<CollapsibleTrigger className="flex w-full items-center justify-between rounded-xs px-2 py-1.5 text-3xs text-text-500 hover:bg-surface-base/50 transition-colors group">
+					<CollapsibleTrigger className="flex w-full items-center justify-between rounded-8 px-2 py-1.5 text-xs text-text-weak hover:bg-bg-sunken/50 transition-colors group">
 						<Trans>More details</Trans>
 						<CaretDownIcon className="size-3 group-data-[state=open]:hidden" />
 						<CaretUpIcon className="size-3 hidden group-data-[state=open]:block" />
 					</CollapsibleTrigger>
 					<CollapsibleContent>
-						<InfoRowGroup className="text-3xs">
+						<InfoRowGroup className="text-xs">
 							{processDetails.map((detail) => (
 								<InfoRow
 									key={detail.txHash}
@@ -886,10 +884,10 @@ function SuccessScreen({
 			) : null}
 
 			<div className="flex gap-2 w-full mt-auto">
-				<Button variant="outlined" size="lg" className="flex-1" onClick={onDone}>
+				<Button variant="outline" intent="neutral" size="lg" className="flex-1" onClick={onDone}>
 					<Trans>Close</Trans>
 				</Button>
-				<Button variant="contained" tone="accent" size="lg" className="flex-1" onClick={onNewDeposit}>
+				<Button variant="filled" intent="brand" size="lg" className="flex-1" onClick={onNewDeposit}>
 					<Trans>New deposit</Trans>
 				</Button>
 			</div>
@@ -907,21 +905,21 @@ function BridgeErrorScreen({ error, onBack, onRetry }: ErrorScreenProps) {
 	return (
 		<div className="flex flex-1 flex-col items-center">
 			<div className="flex flex-1 flex-col items-center justify-center gap-4">
-				<div className="flex size-12 items-center justify-center rounded-full bg-market-down-100 border border-market-down-600/30">
-					<WarningCircleIcon className="size-6 text-market-down-600" />
+				<div className="flex size-12 items-center justify-center rounded-full bg-fill-error-weak border border-stroke-error-strong/30">
+					<WarningCircleIcon className="size-6 text-text-error" />
 				</div>
 				<div className="text-center space-y-1">
-					<p className="text-sm font-medium text-text-950">
+					<p className="text-sm font-medium text-text-strong">
 						<Trans>Bridge failed</Trans>
 					</p>
-					<p className="text-3xs text-text-500 max-w-70">{error}</p>
+					<p className="text-xs text-text-weak max-w-70">{error}</p>
 				</div>
 			</div>
 			<div className="flex gap-2 w-full mt-auto">
-				<Button variant="outlined" size="lg" className="flex-1" onClick={onBack}>
+				<Button variant="outline" intent="neutral" size="lg" className="flex-1" onClick={onBack}>
 					<Trans>Back</Trans>
 				</Button>
-				<Button variant="contained" tone="accent" size="lg" className="flex-1" onClick={onRetry}>
+				<Button variant="filled" intent="brand" size="lg" className="flex-1" onClick={onRetry}>
 					<Trans>Try Again</Trans>
 				</Button>
 			</div>

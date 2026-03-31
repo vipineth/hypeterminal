@@ -10,27 +10,27 @@ function getStatusDisplay(status: ApiStatus) {
 	switch (status) {
 		case "connected":
 			return {
-				icon: <WifiHighIcon className="size-3 text-market-up-600" />,
+				icon: <WifiHighIcon className="size-3 text-text-success" />,
 				text: t`Connected`,
-				className: "text-market-up-600",
+				className: "text-text-success",
 			};
 		case "connecting":
 			return {
-				icon: <SpinnerGapIcon className="size-3 text-warning-700 animate-spin" />,
+				icon: <SpinnerGapIcon className="size-3 text-text-warning animate-spin" />,
 				text: t`Connecting`,
-				className: "text-warning-700",
+				className: "text-text-warning",
 			};
 		case "error":
 			return {
-				icon: <WifiSlashIcon className="size-3 text-market-down-600" />,
+				icon: <WifiSlashIcon className="size-3 text-text-error" />,
 				text: t`Disconnected`,
-				className: "text-market-down-600",
+				className: "text-text-error",
 			};
 		default:
 			return {
-				icon: <WifiHighIcon className="size-3 text-text-950" />,
+				icon: <WifiHighIcon className="size-3 text-text-strong" />,
 				text: t`Offline`,
-				className: "text-text-950",
+				className: "text-text-strong",
 			};
 	}
 }
@@ -41,7 +41,7 @@ export function FooterBar() {
 	const { open } = useCommandMenuActions();
 
 	return (
-		<footer className="fixed bottom-0 left-0 right-0 z-40 h-6 border-t border-border-200/60 px-2 text-4xs uppercase tracking-wider flex items-center justify-between bg-surface-execution">
+		<footer className="fixed bottom-0 left-0 right-0 z-40 h-6 border-t border-stroke-weak/60 px-2 text-xs uppercase tracking-wider flex items-center justify-between bg-bg-overlay">
 			<div className="flex items-center gap-3">
 				<div className="flex items-center gap-1.5">
 					{icon}
@@ -51,9 +51,9 @@ export function FooterBar() {
 			<button
 				type="button"
 				onClick={open}
-				className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 text-text-500 hover:text-text-950 transition-colors"
+				className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 text-text-weak hover:text-text-strong transition-colors"
 			>
-				<kbd className="ml-0.5 rounded-xs border border-border-200 bg-surface-analysis px-1 py-px text-4xs text-text-600">
+				<kbd className="ml-0.5 rounded-8 border border-stroke-weak bg-bg-raised px-1 py-px text-xs text-text-weak">
 					{"\u2318K"}
 				</kbd>
 			</button>
@@ -62,17 +62,17 @@ export function FooterBar() {
 					href={GITHUB_URL}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="flex items-center text-text-950 hover:text-primary-default transition-colors"
+					className="flex items-center text-text-strong hover:text-text-brand transition-colors"
 					aria-label="GitHub"
 				>
 					<GithubLogoIcon className="size-3" />
 				</a>
-				<div className="h-3 w-px bg-border-200/60" />
+				<div className="h-3 w-px bg-stroke-weak/60" />
 				<ClientOnly>
-					<span className="text-text-950 tabular-nums">{formatTime(new Date())}</span>
+					<span className="text-text-strong tabular-nums">{formatTime(new Date())}</span>
 				</ClientOnly>
-				<div className="h-3 w-px bg-border-200/60" />
-				<span className="text-text-950">{APP_VERSION}</span>
+				<div className="h-3 w-px bg-stroke-weak/60" />
+				<span className="text-text-strong">{APP_VERSION}</span>
 			</div>
 		</footer>
 	);

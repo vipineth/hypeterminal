@@ -32,14 +32,20 @@ function RootComponent() {
 	}, []);
 
 	return (
-		<ExchangeScopeProvider>
-			<MarketsInfoProvider>
-				<Outlet />
-				<ClientOnly fallback={null}>
+		<ClientOnly
+			fallback={
+				<div className="flex h-screen w-screen items-center justify-center bg-bg-base">
+					<div className="text-text-weak text-sm">Loading...</div>
+				</div>
+			}
+		>
+			<ExchangeScopeProvider>
+				<MarketsInfoProvider>
+					<Outlet />
 					<Toaster />
-				</ClientOnly>
-			</MarketsInfoProvider>
-		</ExchangeScopeProvider>
+				</MarketsInfoProvider>
+			</ExchangeScopeProvider>
+		</ClientOnly>
 	);
 }
 

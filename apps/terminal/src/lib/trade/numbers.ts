@@ -93,7 +93,7 @@ export function limitDecimalInput(input: string, maxDecimals: number): string {
 	return input.slice(0, decimalIndex + maxDecimals + 1);
 }
 
-export function getValueColorClass(value: Numeric): "text-market-up-600" | "text-market-down-600" {
+export function getValueColorClass(value: Numeric): "text-text-success" | "text-text-error" {
 	const num = toNumber(value);
-	return num !== null && num >= 0 ? "text-market-up-600" : "text-market-down-600";
+	return num !== null && num >= 0 ? "text-text-success" : "text-text-error";
 }

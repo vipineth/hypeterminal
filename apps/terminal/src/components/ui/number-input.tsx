@@ -169,10 +169,10 @@ export function NumberInput({
 			value={value}
 			disabled={disabled}
 			className={cn(
-				"file:text-text-950 placeholder:text-text-400 selection:bg-primary-default selection:text-white dark:bg-fill-100/30 border-border-200 min-w-0 rounded-sm border bg-transparent px-2 py-1 shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+				"file:text-text-strong placeholder:text-text-disabled selection:bg-fill-brand-strong selection:text-white dark:bg-fill-100/30 border-stroke-weak min-w-0 rounded-8 border bg-transparent px-2 py-1 shadow-raised transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
 				"focus-visible:border-primary-default/50 focus-visible:ring-primary-default/50 focus-visible:ring-[3px]",
-				"aria-invalid:ring-error-700/20 dark:aria-invalid:ring-error-700/40 aria-invalid:border-error-700",
-				inputSize === "sm" && "h-6 text-2xs px-1.5",
+				"aria-invalid:ring-stroke-error-strong/20 dark:aria-invalid:ring-stroke-error-strong/40 aria-invalid:border-stroke-error-strong",
+				inputSize === "sm" && "h-6 text-xs px-1.5",
 				inputSize === "default" && "h-7 text-xs",
 				inputSize === "lg" && "h-9 text-sm px-3",
 				hasMax && "pr-20",
@@ -193,7 +193,7 @@ export function NumberInput({
 				type="button"
 				onClick={onMaxClick}
 				disabled={disabled}
-				className="absolute right-2 top-1/2 -translate-y-1/2 text-3xs text-primary-default hover:text-primary-default/80 active:scale-90 active:opacity-70 transition-all whitespace-nowrap tabular-nums disabled:opacity-50 disabled:pointer-events-none"
+				className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-text-brand hover:text-text-brand/80 active:scale-90 active:opacity-70 transition-all whitespace-nowrap tabular-nums disabled:opacity-50 disabled:pointer-events-none"
 			>
 				{maxLabel}
 			</button>

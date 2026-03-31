@@ -1,4 +1,4 @@
-import { ClientOnly, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { buildPageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/design")({
@@ -6,18 +6,14 @@ export const Route = createFileRoute("/design")({
 	head: () =>
 		buildPageHead({
 			title: "Design System",
-			description: "Internal design system workspace — tokens, components, and consistency checks.",
+			description: "Design showcase removed.",
 			path: "/design",
 		}),
 	component: function DesignRoute() {
 		return (
-			<ClientOnly fallback={<div className="flex h-screen items-center justify-center text-text-500">Loading…</div>}>
-				<DesignSystem />
-			</ClientOnly>
+			<div className="flex h-screen items-center justify-center text-text-weak">
+				Design showcase removed — use Anvil
+			</div>
 		);
 	},
 });
-
-import { lazy } from "react";
-
-const DesignSystem = lazy(() => import("@/components/design/design-system"));

@@ -2,10 +2,8 @@ import { t } from "@lingui/core/macro";
 import { ArrowsDownUpIcon, ArrowsLeftRightIcon, PaperPlaneTiltIcon, WalletIcon } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button, Checkbox, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/anvil";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER, HL_ALL_DEXS } from "@/config/constants";
 import {
 	type BalanceRow,
@@ -34,8 +32,8 @@ function Placeholder({ children, variant }: PlaceholderProps) {
 	return (
 		<div
 			className={cn(
-				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-3xs",
-				variant === "error" ? "text-market-down-600" : "text-text-950",
+				"h-full w-full flex flex-col items-center justify-center px-2 py-6 text-xs",
+				variant === "error" ? "text-text-error" : "text-text-strong",
 			)}
 		>
 			{children}
@@ -128,35 +126,34 @@ export function BalancesTab() {
 		return (
 			<TableRow
 				key={`${row.type}-${row.asset}`}
-				className={cn("border-border-200/40 hover:bg-surface-analysis/30", index % 2 === 1 && "bg-surface-analysis")}
+				className={cn("border-stroke-weak/40 hover:bg-bg-raised/30", index % 2 === 1 && "bg-bg-raised")}
 			>
 				<TableCell className="text-xs font-medium py-1.5">
 					<AssetDisplay coin={row.asset} />
 				</TableCell>
 				<TableCell className="text-xs text-right tabular-nums py-1.5">{formatToken(row.available, decimals)}</TableCell>
 				<TableCell className="text-xs text-right tabular-nums py-1.5">{formatToken(row.total, decimals)}</TableCell>
-				<TableCell className="text-xs text-right tabular-nums text-market-up-600 py-1.5">
+				<TableCell className="text-xs text-right tabular-nums text-text-success py-1.5">
 					{formatUSD(row.usdValue, { compact: true })}
 				</TableCell>
 				<TableCell className="text-xs text-right tabular-nums py-1.5">
 					{pnlData ? (
-						<span className={pnlData.pnl >= 0 ? "text-market-up-600" : "text-market-down-600"}>
+						<span className={pnlData.pnl >= 0 ? "text-text-success" : "text-text-error"}>
 							{pnlData.pnl >= 0 ? "+" : ""}
 							{formatUSD(pnlData.pnl, { compact: true })} ({pnlData.pnlPercent >= 0 ? "+" : ""}
 							{pnlData.pnlPercent.toFixed(1)}%)
 						</span>
 					) : (
-						<span className="text-text-600">—</span>
+						<span className="text-text-weak">—</span>
 					)}
 				</TableCell>
 				<TableCell className="text-right py-1.5">
 					<div className="flex items-center justify-end gap-1">
 						{canTransfer && (
 							<Button
-								variant="text"
-								size="none"
+								variant="link"
 								onClick={() => handleTransferClick(row)}
-								className="text-4xs text-primary-default hover:text-primary-default/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
+								className="text-xs text-text-brand hover:text-text-brand/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
 							>
 								<ArrowsLeftRightIcon className="size-2.5" />
 								{transferLabel}
@@ -164,10 +161,9 @@ export function BalancesTab() {
 						)}
 						{canSwap && (
 							<Button
-								variant="text"
-								size="none"
+								variant="link"
 								onClick={() => openSwapModal(row.asset)}
-								className="text-4xs text-primary-default hover:text-primary-default/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
+								className="text-xs text-text-brand hover:text-text-brand/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
 							>
 								<ArrowsDownUpIcon className="size-2.5" />
 								{t`Swap`}
@@ -175,10 +171,9 @@ export function BalancesTab() {
 						)}
 						{parseFloat(row.available) > 0 && (
 							<Button
-								variant="text"
-								size="none"
+								variant="link"
 								onClick={() => handleSendClick(row)}
-								className="text-4xs text-primary-default hover:text-primary-default/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
+								className="text-xs text-text-brand hover:text-text-brand/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
 							>
 								<PaperPlaneTiltIcon className="size-2.5" />
 								{t`Send`}
@@ -203,12 +198,12 @@ export function BalancesTab() {
 
 	return (
 		<div className="flex-1 min-h-0 flex flex-col p-2">
-			<div className="text-3xs uppercase tracking-wider text-text-600 mb-1.5 flex items-center gap-2">
+			<div className="text-xs uppercase tracking-wider text-text-weak mb-1.5 flex items-center gap-2">
 				<WalletIcon className="size-3" />
 				{t`Account Balances`}
 				<label
 					htmlFor="hideSmallBalances"
-					className="ml-auto flex items-center gap-1.5 cursor-pointer text-4xs normal-case tracking-normal"
+					className="ml-auto flex items-center gap-1.5 cursor-pointer text-xs normal-case tracking-normal"
 				>
 					<Checkbox
 						checked={hideSmallBalances}
@@ -217,32 +212,32 @@ export function BalancesTab() {
 					/>
 					{t`Hide small`}
 				</label>
-				<span className="text-market-up-600 tabular-nums">
+				<span className="text-text-success tabular-nums">
 					{isConnected && !isLoading ? formatUSD(totalValue, { compact: true }) : FALLBACK_VALUE_PLACEHOLDER}
 				</span>
 			</div>
-			<div className="flex-1 min-h-0 overflow-hidden border border-border-200/40 rounded-sm bg-surface-base/50">
+			<div className="flex-1 min-h-0 overflow-hidden border border-stroke-weak/40 rounded-8 bg-bg-sunken/50">
 				{placeholder ?? (
 					<ScrollArea className="h-full w-full">
 						<Table className="w-auto min-w-full">
 							<TableHeader>
-								<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 h-7 w-35">
+								<TableRow className="border-stroke-weak/40 bg-bg-raised hover:bg-bg-raised">
+									<TableHead className="text-xs font-medium uppercase tracking-wider text-text-weak h-7 w-35">
 										{t`Asset`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7 w-22.5">
+									<TableHead className="text-xs font-medium uppercase tracking-wider text-text-weak text-right h-7 w-22.5">
 										{t`Available`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7 w-22.5">
+									<TableHead className="text-xs font-medium uppercase tracking-wider text-text-weak text-right h-7 w-22.5">
 										{t`Total`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7 w-22.5">
+									<TableHead className="text-xs font-medium uppercase tracking-wider text-text-weak text-right h-7 w-22.5">
 										{t`USD Value`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7 w-25">
+									<TableHead className="text-xs font-medium uppercase tracking-wider text-text-weak text-right h-7 w-25">
 										{t`PNL`}
 									</TableHead>
-									<TableHead className="text-4xs font-medium uppercase tracking-wider text-text-600 text-right h-7 w-20">
+									<TableHead className="text-xs font-medium uppercase tracking-wider text-text-weak text-right h-7 w-20">
 										{t`Actions`}
 									</TableHead>
 								</TableRow>
@@ -250,10 +245,10 @@ export function BalancesTab() {
 							<TableBody>
 								{perpBalances.length > 0 && (
 									<>
-										<TableRow className="border-border-200/40 hover:bg-transparent">
+										<TableRow className="border-stroke-weak/40 hover:bg-transparent">
 											<TableCell
 												colSpan={6}
-												className="text-3xs uppercase tracking-wider text-primary-default bg-primary-default/5 py-1 font-medium"
+												className="text-xs uppercase tracking-wider text-text-brand bg-fill-brand-strong/5 py-1 font-medium"
 											>
 												{t`Perpetuals`}
 											</TableCell>
@@ -263,10 +258,10 @@ export function BalancesTab() {
 								)}
 								{spotBalancesFiltered.length > 0 && (
 									<>
-										<TableRow className="border-border-200/40 hover:bg-transparent">
+										<TableRow className="border-stroke-weak/40 hover:bg-transparent">
 											<TableCell
 												colSpan={6}
-												className="text-3xs uppercase tracking-wider text-warning-700 bg-warning-700/5 py-1 font-medium"
+												className="text-xs uppercase tracking-wider text-text-warning bg-fill-warning-strong/5 py-1 font-medium"
 											>
 												{t`Spot`}
 											</TableCell>

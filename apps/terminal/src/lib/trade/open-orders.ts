@@ -7,14 +7,14 @@ export type OpenOrder = FrontendOpenOrdersResponse[number];
 export type OrderSide = OpenOrder["side"];
 
 const SIDE_CLASS = {
-	B: "bg-market-up-100 text-market-up-600",
-	A: "bg-market-down-100 text-market-down-600",
+	B: "bg-fill-success-weak text-text-success",
+	A: "bg-fill-error-weak text-text-error",
 } as const satisfies Record<OrderSide, string>;
 
 export const ORDER_TYPE_CONFIG = {
-	takeProfit: { prefix: "Take Profit", class: "bg-market-up-100 text-market-up-600" },
-	stop: { prefix: "Stop", class: "bg-warning-100 text-warning-700" },
-	default: { class: "bg-surface-analysis/50" },
+	takeProfit: { prefix: "Take Profit", class: "bg-fill-success-weak text-text-success" },
+	stop: { prefix: "Stop", class: "bg-fill-warning-weak text-text-warning" },
+	default: { class: "bg-bg-raised/50" },
 } as const;
 
 export function isLongOrder(order: OpenOrder): boolean {

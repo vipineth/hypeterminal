@@ -1,7 +1,5 @@
 import { t } from "@lingui/core/macro";
 import {
-	CaretDownIcon,
-	CheckIcon,
 	CrosshairIcon,
 	type Icon,
 	OctagonIcon,
@@ -10,14 +8,7 @@ import {
 	TimerIcon,
 	XCircleIcon,
 } from "@phosphor-icons/react";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Dropdown, type DropdownGroup } from "@/anvil";
 import { cn } from "@/lib/cn";
 import type { MarketKind } from "@/lib/hyperliquid";
 import {
@@ -72,6 +63,14 @@ function getFilteredOptions(options: AdvancedOrderOption[], marketKind: MarketKi
 	return options;
 }
 
+function toDropdownItems(options: AdvancedOrderOption[], onOrderTypeChange: (type: OrderType) => void) {
+	return options.map((option) => ({
+		label: option.label,
+		icon: <option.icon className="size-3" />,
+		onSelect: () => onOrderTypeChange(option.value),
+	}));
+}
+
 export function AdvancedOrderDropdown({ orderType, onOrderTypeChange, marketKind = "perp", className }: Props) {
 	const isAdvanced = isAdvancedOrderType(orderType);
 	const label = getAdvancedOrderLabel(orderType, t`Other`);
@@ -80,73 +79,23 @@ export function AdvancedOrderDropdown({ orderType, onOrderTypeChange, marketKind
 	const executionOptions = getFilteredOptions(EXECUTION_OPTIONS, marketKind);
 	const hasTriggerOptions = triggerOptions.length > 0;
 
+	const groups: DropdownGroup[] = [
+		...(hasTriggerOptions ? [{ label: t`Trigger`, items: toDropdownItems(triggerOptions, onOrderTypeChange) }] : []),
+		{ label: t`Execution`, items: toDropdownItems(executionOptions, onOrderTypeChange) },
+	];
+
 	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<button
-					type="button"
-					className={cn("inline-flex items-center gap-1 outline-none hover:text-text-950 transition-colors", className)}
-					aria-label={t`Advanced order types`}
+		<Dropdown
+			trigger={
+				<span
+					className={cn("inline-flex items-center outline-none hover:text-text-strong transition-colors", className)}
 				>
 					{isAdvanced ? label : t`Other`}
-					<CaretDownIcon className="size-3 text-text-600" />
-				</button>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent align="end" className="min-w-44">
-				{hasTriggerOptions && (
-					<>
-						<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-text-950">
-							{t`Trigger`}
-						</DropdownMenuLabel>
-						{triggerOptions.map((option) => (
-							<AdvancedOrderItem
-								key={option.value}
-								option={option}
-								isSelected={orderType === option.value}
-								onSelect={() => onOrderTypeChange(option.value)}
-							/>
-						))}
-						<DropdownMenuSeparator />
-					</>
-				)}
-				<DropdownMenuLabel className="text-3xs uppercase tracking-widest text-text-950">
-					{t`Execution`}
-				</DropdownMenuLabel>
-				{executionOptions.map((option) => (
-					<AdvancedOrderItem
-						key={option.value}
-						option={option}
-						isSelected={orderType === option.value}
-						onSelect={() => onOrderTypeChange(option.value)}
-					/>
-				))}
-			</DropdownMenuContent>
-		</DropdownMenu>
-	);
-}
-
-interface AdvancedOrderItemProps {
-	option: AdvancedOrderOption;
-	isSelected: boolean;
-	onSelect: () => void;
-}
-
-function AdvancedOrderItem({ option, isSelected, onSelect }: AdvancedOrderItemProps) {
-	const Icon = option.icon;
-	return (
-		<DropdownMenuItem selected={isSelected} onSelect={onSelect} className="gap-2.5 py-1.5 pl-1.5 pr-2">
-			<span
-				className={cn(
-					"flex size-5 items-center justify-center rounded transition-colors",
-					isSelected ? "bg-primary-default/15 text-primary-default" : "bg-surface-analysis text-text-600",
-				)}
-			>
-				<Icon className="size-3" />
-			</span>
-			<span className={cn("flex-1 text-xs", isSelected ? "text-text-950 font-medium" : "text-text-600")}>
-				{option.label}
-			</span>
-			{isSelected && <CheckIcon className="size-3.5 text-primary-default" />}
-		</DropdownMenuItem>
+				</span>
+			}
+			groups={groups}
+			align="end"
+			className="min-w-44"
+		/>
 	);
 }

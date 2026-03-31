@@ -2,11 +2,18 @@ import { t } from "@lingui/core/macro";
 import { PaperPlaneTiltIcon, SpinnerGapIcon, WarningCircleIcon } from "@phosphor-icons/react";
 import { useCallback, useMemo, useState } from "react";
 import { isAddress } from "viem";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import {
+	Button,
+	Modal,
+	ModalContent,
+	ModalDescription,
+	ModalHeader,
+	ModalPopup,
+	ModalTitle,
+	Select,
+	TextInput,
+} from "@/anvil";
 import { NumberInput } from "@/components/ui/number-input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
 import { exceedsBalance, isAmountWithinBalance } from "@/domain/market";
 import { type BalanceRow, getAvailableFromTotals, getPerpAvailable } from "@/domain/trade/balances";
@@ -16,7 +23,6 @@ import { formatToken } from "@/lib/format";
 import { useExchange } from "@/lib/hyperliquid";
 import { useSpotTokens } from "@/lib/hyperliquid/markets/use-spot-tokens";
 import { floorToString, limitDecimalInput } from "@/lib/trade/numbers";
-import { AssetDisplay } from "../components/asset-display";
 
 type AccountType = "perp" | "spot";
 
@@ -93,9 +99,11 @@ export function SendDialog({
 	const isValidAmount = isAmountWithinBalance(amount, availableBalance);
 	const canSend = isValidDestination && isValidAmount && !!tokenId && !isPending;
 
-	function handleAccountTypeChange(value: AccountType) {
-		setAccountType(value);
-		if (value === "perp") {
+	function handleAccountTypeChange(value: string | null) {
+		if (!value) return;
+		const v = value as AccountType;
+		setAccountType(v);
+		if (v === "perp") {
 			setSelectedToken(DEFAULT_QUOTE_TOKEN);
 		} else if (!availableSpotTokens.some((t) => t.asset === selectedToken)) {
 			setSelectedToken(availableSpotTokens[0]?.asset ?? DEFAULT_QUOTE_TOKEN);
@@ -103,7 +111,8 @@ export function SendDialog({
 		setAmount("");
 	}
 
-	function handleTokenChange(value: string) {
+	function handleTokenChange(value: string | null) {
+		if (!value) return;
 		setSelectedToken(value);
 		setAmount("");
 	}
@@ -154,83 +163,88 @@ export function SendDialog({
 		onOpenChange(newOpen);
 	}
 
-	return (
-		<Dialog open={open} onOpenChange={handleOpenChange}>
-			<DialogContent className="sm:max-w-sm">
-				<DialogHeader>
-					<DialogTitle>{t`Send Tokens`}</DialogTitle>
-					<DialogDescription>{t`Send tokens to another account on the Hyperliquid L1.`}</DialogDescription>
-				</DialogHeader>
+	const accountTypeOptions = [
+		{ value: "perp", label: t`Perps Account` },
+		{ value: "spot", label: t`Spot Account` },
+	];
 
-				<div className="space-y-4">
-					<div className="space-y-1.5">
-						<Input
-							placeholder={t`Destination`}
-							value={destination}
-							onChange={(e) => setDestination(e.target.value)}
-							inputSize="lg"
+	const tokenSelectOptions = tokenOptions.map((tokenName) => ({
+		value: tokenName,
+		label: tokenName,
+	}));
+
+	return (
+		<Modal open={open} onOpenChange={handleOpenChange}>
+			<ModalPopup size="sm">
+				<ModalHeader>
+					<ModalTitle>{t`Send Tokens`}</ModalTitle>
+					<ModalDescription>{t`Send tokens to another account on the Hyperliquid L1.`}</ModalDescription>
+				</ModalHeader>
+
+				<ModalContent>
+					<div className="space-y-4">
+						<div className="space-y-1.5">
+							<TextInput
+								placeholder={t`Destination`}
+								value={destination}
+								onChange={(e) => setDestination(e.target.value)}
+								size="lg"
+								className={cn(
+									destination &&
+										!isValidDestination &&
+										"border-stroke-error-strong focus-visible:border-stroke-error-strong",
+								)}
+							/>
+						</div>
+
+						<div className="flex gap-2">
+							<Select
+								value={accountType}
+								onValueChange={handleAccountTypeChange}
+								options={accountTypeOptions}
+								className="flex-1"
+							/>
+
+							<Select
+								value={selectedToken}
+								onValueChange={handleTokenChange}
+								options={tokenSelectOptions}
+								className="flex-1"
+							/>
+						</div>
+
+						<NumberInput
+							placeholder={t`Amount`}
+							value={amount}
+							onChange={(e) => handleAmountChange(e.target.value)}
+							maxLabel={
+								<>
+									{t`MAX`}: {formatToken(availableBalanceStr, 2)}
+								</>
+							}
+							onMaxClick={handleMaxClick}
 							className={cn(
-								"w-full bg-surface-base/50 border-border-200/60",
-								destination && !isValidDestination && "border-market-down-600 focus-visible:border-market-down-600",
+								"w-full h-10 text-sm bg-bg-sunken/50 border-stroke-weak/60 tabular-nums",
+								exceedsBalance(amount, availableBalance) &&
+									"border-stroke-error-strong focus:border-stroke-error-strong",
 							)}
 						/>
-					</div>
 
-					<div className="flex gap-2">
-						<Select value={accountType} onValueChange={(v) => handleAccountTypeChange(v as AccountType)}>
-							<SelectTrigger className="flex-1 h-10 bg-surface-base/50 border-border-200/60">
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="perp">{t`Perps Account`}</SelectItem>
-								<SelectItem value="spot">{t`Spot Account`}</SelectItem>
-							</SelectContent>
-						</Select>
-
-						<Select value={selectedToken} onValueChange={handleTokenChange}>
-							<SelectTrigger className="flex-1 h-10 bg-surface-base/50 border-border-200/60">
-								<AssetDisplay coin={selectedToken} hideIcon />
-							</SelectTrigger>
-							<SelectContent>
-								{tokenOptions.map((tokenName) => (
-									<SelectItem key={tokenName} value={tokenName}>
-										<AssetDisplay coin={tokenName} hideIcon />
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</div>
-
-					<NumberInput
-						placeholder={t`Amount`}
-						value={amount}
-						onChange={(e) => handleAmountChange(e.target.value)}
-						maxLabel={
-							<>
-								{t`MAX`}: {formatToken(availableBalanceStr, 2)}
-							</>
-						}
-						onMaxClick={handleMaxClick}
-						className={cn(
-							"w-full h-10 text-sm bg-surface-base/50 border-border-200/60 tabular-nums",
-							exceedsBalance(amount, availableBalance) && "border-market-down-600 focus:border-market-down-600",
+						{error && (
+							<div className="flex items-center gap-2 p-2.5 rounded-8 bg-fill-error-weak border border-stroke-error-strong/20 text-xs text-text-error">
+								<WarningCircleIcon className="size-3.5 shrink-0" />
+								<span className="flex-1">{error}</span>
+							</div>
 						)}
-					/>
 
-					{error && (
-						<div className="flex items-center gap-2 p-2.5 rounded-xs bg-market-down-100 border border-market-down-600/20 text-3xs text-market-down-600">
-							<WarningCircleIcon className="size-3.5 shrink-0" />
-							<span className="flex-1">{error}</span>
-						</div>
-					)}
-
-					<Button onClick={handleSend} disabled={!canSend} size="lg" className="w-full">
-						{isPending && <SpinnerGapIcon className="size-3.5 animate-spin mr-2" />}
-						<PaperPlaneTiltIcon className="size-3.5 mr-2" />
-						{isPending ? t`Sending...` : t`Send`}
-					</Button>
-				</div>
-			</DialogContent>
-		</Dialog>
+						<Button onClick={handleSend} disabled={!canSend} size="lg" className="w-full">
+							{isPending && <SpinnerGapIcon className="size-3.5 animate-spin mr-2" />}
+							<PaperPlaneTiltIcon className="size-3.5 mr-2" />
+							{isPending ? t`Sending...` : t`Send`}
+						</Button>
+					</div>
+				</ModalContent>
+			</ModalPopup>
+		</Modal>
 	);
 }
