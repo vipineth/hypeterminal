@@ -1,29 +1,28 @@
-import { ScrollArea as ScrollAreaPrimitive } from "radix-ui";
+import { ScrollArea as ScrollAreaPrimitive } from "@base-ui/react/scroll-area";
 import { type ComponentPropsWithoutRef, type ElementRef, forwardRef } from "react";
 import { cn } from "@/lib/cn";
 
-const ScrollArea = forwardRef<
-	ElementRef<typeof ScrollAreaPrimitive.Root>,
-	ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
->(({ className, children, ...props }, ref) => (
-	<ScrollAreaPrimitive.Root ref={ref} data-slot="scroll-area" className={cn("relative", className)} {...props}>
-		<ScrollAreaPrimitive.Viewport
-			data-slot="scroll-area-viewport"
-			className="focus-visible:outline-stroke-focus size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:outline-2 focus-visible:outline-offset-2"
-		>
-			{children}
-		</ScrollAreaPrimitive.Viewport>
-		<ScrollBar />
-		<ScrollAreaPrimitive.Corner />
-	</ScrollAreaPrimitive.Root>
-));
-ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName;
+const ScrollArea = forwardRef<HTMLDivElement, ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>>(
+	({ className, children, ...props }, ref) => (
+		<ScrollAreaPrimitive.Root ref={ref} data-slot="scroll-area" className={cn("relative", className)} {...props}>
+			<ScrollAreaPrimitive.Viewport
+				data-slot="scroll-area-viewport"
+				className="size-full rounded-[inherit] outline-none"
+			>
+				{children}
+			</ScrollAreaPrimitive.Viewport>
+			<ScrollBar />
+			<ScrollAreaPrimitive.Corner />
+		</ScrollAreaPrimitive.Root>
+	),
+);
+ScrollArea.displayName = "ScrollArea";
 
 const ScrollBar = forwardRef<
-	ElementRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>,
-	ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>
+	ElementRef<typeof ScrollAreaPrimitive.Scrollbar>,
+	ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Scrollbar>
 >(({ className, orientation = "vertical", ...props }, ref) => (
-	<ScrollAreaPrimitive.ScrollAreaScrollbar
+	<ScrollAreaPrimitive.Scrollbar
 		ref={ref}
 		data-slot="scroll-area-scrollbar"
 		orientation={orientation}
@@ -35,12 +34,9 @@ const ScrollBar = forwardRef<
 		)}
 		{...props}
 	>
-		<ScrollAreaPrimitive.ScrollAreaThumb
-			data-slot="scroll-area-thumb"
-			className="bg-stroke-weak relative flex-1 rounded-full"
-		/>
-	</ScrollAreaPrimitive.ScrollAreaScrollbar>
+		<ScrollAreaPrimitive.Thumb data-slot="scroll-area-thumb" className="bg-stroke-weak relative flex-1 rounded-full" />
+	</ScrollAreaPrimitive.Scrollbar>
 ));
-ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName;
+ScrollBar.displayName = "ScrollBar";
 
 export { ScrollArea, ScrollBar };

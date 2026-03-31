@@ -38,7 +38,6 @@
 		"cmdk": "1.1.1",
 		"klinecharts": "9.8.12",
 		"motion": "12.33.0",
-		"radix-ui": "1.4.3",
 		"react": "19.2.0",
 		"react-dom": "19.2.0",
 		"react-resizable-panels": "4.6.0",

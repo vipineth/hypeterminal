@@ -82,8 +82,6 @@
   /* ---- HyperTerminal Custom Animations ---- */
   --animate-pulse-slow: pulse-slow 2s ease-in-out infinite;
   --animate-blink: blink 1s step-end infinite;
-  --animate-collapse-down: collapse-down 0.2s ease-out;
-  --animate-collapse-up: collapse-up 0.2s ease-out;
   --animate-countdown: countdown linear forwards;
 
   @keyframes pulse-slow {
@@ -96,15 +94,6 @@
     50% { opacity: 0; }
   }
 
-  @keyframes collapse-down {
-    from { height: 0; opacity: 0; }
-    to { height: var(--radix-collapsible-content-height); opacity: 1; }
-  }
-
-  @keyframes collapse-up {
-    from { height: var(--radix-collapsible-content-height); opacity: 1; }
-    to { height: 0; opacity: 0; }
-  }
 
   @keyframes countdown {
     from { width: 100%; }
@@ -203,6 +192,8 @@
     --icon-inverse-disabled: #ffffff1f;
 
     /* HyperTerminal Trading Extensions */
+    --market-up: var(--text-success);
+    --market-down: var(--text-error);
     --market-neutral: #8A919A;
     --scope-perp: #2563EB;
     --scope-spot: #0F766E;
@@ -296,6 +287,8 @@
     --icon-inverse-disabled: #0011661a;
 
     /* HyperTerminal Trading Extensions (Dark) */
+    --market-up: var(--text-success);
+    --market-down: var(--text-error);
     --market-neutral: #6B7280;
     --scope-perp: #4F7DFF;
     --scope-spot: #2DD4BF;
@@ -390,6 +383,8 @@
   --color-icon-inverse-disabled: var(--icon-inverse-disabled);
 
   /* HyperTerminal Trading Extensions */
+  --color-market-up: var(--market-up);
+  --color-market-down: var(--market-down);
   --color-market-neutral: var(--market-neutral);
   --color-scope-perp: var(--scope-perp);
   --color-scope-spot: var(--scope-spot);

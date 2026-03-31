@@ -1,4 +1,4 @@
-import { Popover as PopoverPrimitive } from "radix-ui";
+import { Popover as PopoverPrimitive } from "@base-ui/react/popover";
 import type * as React from "react";
 import { cn } from "@/lib/cn";
 
@@ -15,19 +15,25 @@ function PopoverContent({
 	align = "center",
 	sideOffset = 4,
 	...props
-}: React.ComponentProps<typeof PopoverPrimitive.Content>) {
+}: React.ComponentProps<typeof PopoverPrimitive.Popup> & {
+	align?: "start" | "center" | "end";
+	sideOffset?: number;
+}) {
 	return (
 		<PopoverPrimitive.Portal>
-			<PopoverPrimitive.Content
-				data-slot="popover-content"
-				align={align}
-				sideOffset={sideOffset}
-				className={cn(
-					"font-sans bg-bg-overlay text-text-strong data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-72 origin-(--radix-popover-content-transform-origin) rounded-md border p-4 shadow-md outline-hidden ease-out duration-150",
-					className,
-				)}
-				{...props}
-			/>
+			<PopoverPrimitive.Positioner align={align} sideOffset={sideOffset}>
+				<PopoverPrimitive.Popup
+					data-slot="popover-content"
+					className={cn(
+						"font-sans bg-bg-overlay text-text-strong z-50 w-72 rounded-12 border border-stroke-weak p-4 shadow-overlay outline-hidden",
+						"transition-[opacity,transform] duration-150 ease-out origin-(--transform-origin)",
+						"data-starting-style:opacity-0 data-starting-style:scale-95",
+						"data-ending-style:opacity-0 data-ending-style:scale-95",
+						className,
+					)}
+					{...props}
+				/>
+			</PopoverPrimitive.Positioner>
 		</PopoverPrimitive.Portal>
 	);
 }
