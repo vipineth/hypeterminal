@@ -12,6 +12,7 @@ import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import { useFeeRates } from "@/hooks/trade/use-fee-rates";
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
+import { cn } from "@/lib/cn";
 import {
 	useAgentRegistration,
 	useAgentStatus,
