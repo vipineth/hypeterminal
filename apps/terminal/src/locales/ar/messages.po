@@ -338,7 +338,6 @@ msgstr "الرسم البياني"
 #: src/components/trade/tradebox/bridge-tab.tsx
 #: src/components/trade/tradebox/bridge-tab.tsx
 #: src/components/trade/tradebox/bridge-tab.tsx
-#: src/components/ui/sheet.tsx
 msgid "Close"
 msgstr "إغلاق"
 
@@ -603,8 +602,8 @@ msgid "Display Language"
 msgstr "لغة العرض"
 
 #: src/components/ui/sidebar.tsx
-msgid "Displays the mobile sidebar."
-msgstr "يعرض الشريط الجانبي للجوال."
+#~ msgid "Displays the mobile sidebar."
+#~ msgstr "يعرض الشريط الجانبي للجوال."
 
 #: src/components/trade/header/top-nav.tsx
 #~ msgid "Docs"
@@ -1843,8 +1842,8 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/ui/sidebar.tsx
-msgid "Sidebar"
-msgstr "الشريط الجانبي"
+#~ msgid "Sidebar"
+#~ msgstr "الشريط الجانبي"
 
 #: src/lib/trade/use-button-content.ts
 msgid "Sign in wallet..."
@@ -1922,8 +1921,8 @@ msgid "Sort by {0}"
 msgstr "ترتيب حسب {0}"
 
 #: src/components/ui/virtual-table.tsx
-msgid "Sort by {headerLabel}"
-msgstr "ترتيب حسب {headerLabel}"
+#~ msgid "Sort by {headerLabel}"
+#~ msgstr "ترتيب حسب {headerLabel}"
 
 #. placeholder {0}: sorting[0].id
 #: src/components/trade/chart/token-selector.tsx
@@ -2163,8 +2162,8 @@ msgstr ""
 #: src/components/ui/sidebar.tsx
 #: src/components/ui/sidebar.tsx
 #: src/components/ui/sidebar.tsx
-msgid "Toggle Sidebar"
-msgstr "تبديل الشريط الجانبي"
+#~ msgid "Toggle Sidebar"
+#~ msgstr "تبديل الشريط الجانبي"
 
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Toggle size mode"

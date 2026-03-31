@@ -338,7 +338,6 @@ msgstr "Chart"
 #: src/components/trade/tradebox/bridge-tab.tsx
 #: src/components/trade/tradebox/bridge-tab.tsx
 #: src/components/trade/tradebox/bridge-tab.tsx
-#: src/components/ui/sheet.tsx
 msgid "Close"
 msgstr "Close"
 
@@ -603,8 +602,8 @@ msgid "Display Language"
 msgstr "Display Language"
 
 #: src/components/ui/sidebar.tsx
-msgid "Displays the mobile sidebar."
-msgstr "Displays the mobile sidebar."
+#~ msgid "Displays the mobile sidebar."
+#~ msgstr "Displays the mobile sidebar."
 
 #: src/components/trade/header/top-nav.tsx
 #~ msgid "Docs"
@@ -1847,8 +1846,8 @@ msgstr "Show Values in Quote Asset"
 #~ msgstr "Side"
 
 #: src/components/ui/sidebar.tsx
-msgid "Sidebar"
-msgstr "Sidebar"
+#~ msgid "Sidebar"
+#~ msgstr "Sidebar"
 
 #: src/lib/trade/use-button-content.ts
 msgid "Sign in wallet..."
@@ -1926,8 +1925,8 @@ msgid "Sort by {0}"
 msgstr "Sort by {0}"
 
 #: src/components/ui/virtual-table.tsx
-msgid "Sort by {headerLabel}"
-msgstr "Sort by {headerLabel}"
+#~ msgid "Sort by {headerLabel}"
+#~ msgstr "Sort by {headerLabel}"
 
 #. placeholder {0}: sorting[0].id
 #: src/components/trade/chart/token-selector.tsx
@@ -2167,8 +2166,8 @@ msgstr "To Spot"
 #: src/components/ui/sidebar.tsx
 #: src/components/ui/sidebar.tsx
 #: src/components/ui/sidebar.tsx
-msgid "Toggle Sidebar"
-msgstr "Toggle Sidebar"
+#~ msgid "Toggle Sidebar"
+#~ msgstr "Toggle Sidebar"
 
 #: src/components/trade/tradebox/trade-form-fields.tsx
 msgid "Toggle size mode"
