@@ -152,7 +152,7 @@ export function OrderbookPanel() {
 							className="shrink-0 px-2 py-1.5 border-y border-stroke-weak/40 flex items-center justify-between text-xs text-text-strong"
 						>
 							<span>{t`Spread`}</span>
-							<span className="tabular-nums font-medium text-text-error">
+							<span className="tabular-nums font-medium text-text-weak">
 								{`${formatNumber(spread, 2)} (${formatNumber(spreadPct, 3)}%)`}
 							</span>
 						</div>

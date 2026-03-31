@@ -1,7 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { CaretDownIcon, CaretUpDownIcon, CaretUpIcon } from "@phosphor-icons/react";
 import { flexRender, type Header, type RowData } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/anvil";
 import type { UseVirtualTableReturn } from "@/hooks/ui/use-virtual-table";
 import { cn } from "@/lib/cn";
 
@@ -83,9 +83,10 @@ export function VirtualTable<TData extends RowData>({
 								return (
 									<Button
 										key={header.id}
-										variant="text"
-										size="none"
-										className={cn(headerClassName, "hover:bg-transparent")}
+										variant="ghost"
+										intent="neutral"
+										size="sm"
+										className={cn(headerClassName, "hover:bg-transparent p-0 font-normal")}
 										style={headerStyle}
 										onClick={header.column.getToggleSortingHandler()}
 										aria-label={t`Sort by ${headerLabel}`}

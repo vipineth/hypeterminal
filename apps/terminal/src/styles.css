@@ -526,16 +526,16 @@
   }
 
   .depth-bar-ask {
-    background: linear-gradient(90deg, transparent 0%, oklch(from var(--text-error) l c h / 0.12) 100%);
+    background: linear-gradient(90deg, transparent 0%, oklch(from var(--text-error) l c h / 0.18) 100%);
   }
   .depth-bar-bid {
-    background: linear-gradient(90deg, oklch(from var(--text-success) l c h / 0.12) 0%, transparent 100%);
+    background: linear-gradient(90deg, oklch(from var(--text-success) l c h / 0.18) 0%, transparent 100%);
   }
   .dark .depth-bar-ask {
-    background: linear-gradient(90deg, transparent 0%, oklch(from var(--text-error) l c h / 0.15) 100%);
+    background: linear-gradient(90deg, transparent 0%, oklch(from var(--text-error) l c h / 0.25) 100%);
   }
   .dark .depth-bar-bid {
-    background: linear-gradient(90deg, oklch(from var(--text-success) l c h / 0.15) 0%, transparent 100%);
+    background: linear-gradient(90deg, oklch(from var(--text-success) l c h / 0.25) 0%, transparent 100%);
   }
 
   .trade-row-buy,

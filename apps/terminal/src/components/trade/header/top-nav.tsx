@@ -12,14 +12,29 @@ import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
 
 const SCOPE_NAV_ITEMS = [
-	{ scope: "all" as const, label: <Trans>All</Trans>, to: "/", activeClass: "text-text-strong font-medium" },
-	{ scope: "perp" as const, label: <Trans>Perp</Trans>, to: "/perp", activeClass: "text-scope-perp font-medium" },
-	{ scope: "spot" as const, label: <Trans>Spot</Trans>, to: "/spot", activeClass: "text-scope-spot font-medium" },
+	{
+		scope: "all" as const,
+		label: <Trans>All</Trans>,
+		to: "/",
+		activeClass: "text-text-strong font-medium bg-fill-hover",
+	},
+	{
+		scope: "perp" as const,
+		label: <Trans>Perp</Trans>,
+		to: "/perp",
+		activeClass: "text-scope-perp font-medium bg-scope-perp/10",
+	},
+	{
+		scope: "spot" as const,
+		label: <Trans>Spot</Trans>,
+		to: "/spot",
+		activeClass: "text-scope-spot font-medium bg-scope-spot/10",
+	},
 	{
 		scope: "builders-perp" as const,
 		label: <Trans>Builders</Trans>,
 		to: "/builders-perp",
-		activeClass: "text-scope-builders font-medium",
+		activeClass: "text-scope-builders font-medium bg-scope-builders/10",
 	},
 ] as const;
 
@@ -77,8 +92,8 @@ export function TopNav() {
 							key={item.scope}
 							to={item.to}
 							className={cn(
-								"px-2.5 py-1.5 transition-colors duration-150",
-								scope === item.scope ? item.activeClass : "text-text-strong hover:text-text-weak",
+								"px-2.5 py-1 rounded-8 transition-colors duration-150",
+								scope === item.scope ? item.activeClass : "text-text-weak hover:text-text-strong",
 							)}
 						>
 							{item.label}

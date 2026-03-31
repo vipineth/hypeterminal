@@ -1,7 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/anvil";
 
 export function NotFoundPage() {
 	return (
@@ -16,11 +16,11 @@ export function NotFoundPage() {
 						<Trans>The page you are looking for does not exist.</Trans>
 					</p>
 				</div>
-				<Button asChild size="sm" variant="contained">
-					<a href="/" aria-label={t`Go to trading terminal`}>
+				<a href="/" aria-label={t`Go to trading terminal`}>
+					<Button variant="filled" intent="brand" size="sm">
 						<Trans>Go to trading terminal</Trans>
-					</a>
-				</Button>
+					</Button>
+				</a>
 			</div>
 		</div>
 	);

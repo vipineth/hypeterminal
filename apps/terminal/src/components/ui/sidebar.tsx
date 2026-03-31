@@ -3,7 +3,7 @@ import { Sidebar as SidebarIcon } from "@phosphor-icons/react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Slot as SlotPrimitive } from "radix-ui";
 import * as React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/anvil";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -233,9 +233,10 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
 		<Button
 			data-sidebar="trigger"
 			data-slot="sidebar-trigger"
-			variant="text"
+			variant="ghost"
+			intent="neutral"
 			size="sm"
-			className={cn("size-7", className)}
+			className={cn("size-7 p-0", className)}
 			onClick={(event) => {
 				onClick?.(event);
 				toggleSidebar();

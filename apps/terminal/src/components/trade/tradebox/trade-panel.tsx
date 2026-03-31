@@ -496,10 +496,13 @@ export function TradePanel() {
 
 					<Button
 						variant="filled"
-						intent="brand"
+						intent={buttonContent.variant === "buy" ? "brand" : buttonContent.variant === "sell" ? "error" : "brand"}
 						onClick={buttonContent.action}
 						disabled={buttonContent.disabled}
-						className="w-full"
+						className={cn(
+							"w-full",
+							buttonContent.variant === "buy" && "bg-fill-success-strong hover:bg-fill-success-strong/90",
+						)}
 						aria-label={buttonContent.text}
 						iconLeft={isSubmitting || isRegistering ? <SpinnerGapIcon className="size-3 animate-spin" /> : undefined}
 					>

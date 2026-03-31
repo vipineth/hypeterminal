@@ -185,7 +185,7 @@ export function KlineChart({ symbol = "", yAxisInside = false }: Props) {
 
 	return (
 		<div className="flex flex-col h-full">
-			<div className="flex items-center gap-0.5 p-2 py-1.5 border-b border-stroke-weak/85 bg-bg-raised">
+			<div className="flex items-center gap-0.5 p-2 py-1.5 border-b border-stroke-weak/60 bg-bg-raised">
 				{STARRED_INTERVALS.map((interval) => (
 					<button
 						key={interval.resolution}

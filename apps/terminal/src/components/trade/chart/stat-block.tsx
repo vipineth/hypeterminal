@@ -8,9 +8,9 @@ interface Props {
 
 export function StatBlock({ label, value, valueClass }: Props) {
 	return (
-		<div className="flex items-center gap-1.5">
-			<span className="text-text-weak uppercase tracking-tight">{label}</span>
-			<span className={cn("tabular-nums text-text-strong", valueClass)}>{value}</span>
+		<div className="flex items-center gap-1">
+			<span className="text-2xs text-text-weak uppercase tracking-tight">{label}</span>
+			<span className={cn("tabular-nums font-medium text-text-strong", valueClass)}>{value}</span>
 		</div>
 	);
 }

@@ -73,11 +73,12 @@ export function MarketOverview() {
 					{getLabelForMarketKind(selectedMarketInfo)}
 				</Badge>
 			) : null}
-			<StatBlock
-				label={isSpot ? t`PRICE` : t`MARK`}
-				value={formatUSD(markPx, { compact: false })}
-				valueClass={getValueColorClass(change24h)}
-			/>
+			<div className="flex items-center gap-1">
+				<span className="text-2xs text-text-weak uppercase tracking-tight">{isSpot ? t`PRICE` : t`MARK`}</span>
+				<span className={cn("text-sm tabular-nums font-semibold", getValueColorClass(change24h))}>
+					{formatUSD(markPx, { compact: false })}
+				</span>
+			</div>
 			<StatBlock
 				label={t`24H`}
 				value={change24h !== null ? formatPercent(change24h / 100, { signDisplay: "exceptZero" }) : "—"}
@@ -95,7 +96,7 @@ export function MarketOverview() {
 					/>
 					<div className="flex items-center gap-1">
 						<FireIcon className={cn("size-3", getValueColorClass(fundingNum))} />
-						<span className={cn("tabular-nums", getValueColorClass(fundingNum))}>
+						<span className={cn("tabular-nums font-medium", getValueColorClass(fundingNum))}>
 							{formatPercent(fundingNum, {
 								minimumFractionDigits: 4,
 								signDisplay: "exceptZero",
