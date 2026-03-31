@@ -1713,8 +1713,8 @@ msgid "Select order"
 msgstr "ऑर्डर चुनें"
 
 #: src/components/trade/orderbook/orderbook-panel.tsx
-msgid "Select order book aggregation"
-msgstr "ऑर्डर बुक एग्रीगेशन चुनें"
+#~ msgid "Select order book aggregation"
+#~ msgstr "ऑर्डर बुक एग्रीगेशन चुनें"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Select signing mode"

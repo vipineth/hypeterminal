@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { ArrowsLeftRightIcon, BookBookmarkIcon, CaretDownIcon, ListDashesIcon } from "@phosphor-icons/react";
+import { BookBookmarkIcon, ListDashesIcon } from "@phosphor-icons/react";
 import { useDeferredValue, useMemo, useState } from "react";
 import { Dropdown, SegmentedControlItem, SegmentedControls } from "@/anvil";
 import { getBaseQuoteFromPairName, getPercent } from "@/domain/market";
@@ -95,41 +95,35 @@ export function OrderbookPanel() {
 
 			{tab === "book" && (
 				<div className="flex-1 min-h-0 flex flex-col">
-					<div className="grid grid-cols-3 gap-2 px-2 py-1.5 items-center text-xs text-text-strong uppercase tracking-wider border-b border-stroke-weak/40 shrink-0">
-						<div className="flex items-center gap-1">
+					<div className="grid grid-cols-3 gap-1 px-2 py-1.5 items-center text-2xs text-text-strong uppercase tracking-wider border-b border-stroke-weak/40 shrink-0">
+						<div className="min-w-0 flex items-center gap-1">
 							{t`Price`}
 							<Dropdown
 								trigger={
-									<button
-										type="button"
-										className="px-1.5 text-xs hover:bg-transparent inline-flex items-center gap-1"
-										aria-label={t`Select order book aggregation`}
-									>
+									<span className="text-2xs tabular-nums">
 										{selectedOption?.label ?? priceGroupingOptions[0]?.label ?? "—"}
-										<CaretDownIcon className="size-2.5" />
-									</button>
+									</span>
 								}
 								items={dropdownItems}
-								align="end"
+								size="sm"
+								align="start"
 							/>
 						</div>
 						<button
-							className="inline-flex items-center justify-end gap-0.5 hover:text-text-strong"
+							className="min-w-0 inline-flex items-center justify-end gap-0.5 hover:text-text-strong truncate"
 							type="button"
 							onClick={toggleAssetDisplay}
 						>
 							{t`Size`}
-							<span className="text-text-strong">({displayAsset})</span>
-							<ArrowsLeftRightIcon className="size-2 opacity-40" />
+							<span className="text-text-strong truncate">({displayAsset})</span>
 						</button>
 						<button
-							className="inline-flex items-center justify-end gap-0.5 hover:text-text-strong"
+							className="min-w-0 inline-flex items-center justify-end gap-0.5 hover:text-text-strong truncate"
 							type="button"
 							onClick={toggleAssetDisplay}
 						>
 							{t`Total`}
-							<span className="text-text-strong">({displayAsset})</span>
-							<ArrowsLeftRightIcon className="size-2 opacity-40" />
+							<span className="text-text-strong truncate">({displayAsset})</span>
 						</button>
 					</div>
 

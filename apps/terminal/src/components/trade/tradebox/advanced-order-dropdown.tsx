@@ -95,7 +95,7 @@ export function AdvancedOrderDropdown({ orderType, onOrderTypeChange, marketKind
 			}
 			groups={groups}
 			align="end"
-			className="min-w-44"
+			className="min-w-0"
 		/>
 	);
 }

@@ -23,8 +23,9 @@ const LeverageBadge = forwardRef<HTMLButtonElement, BadgeProps>(({ leverage, onC
 			ref={ref}
 			variant="outline"
 			intent="neutral"
+			size="sm"
 			onClick={onClick}
-			className={cn(isLoading && "opacity-70", className)}
+			className={cn("shrink-0", isLoading && "opacity-70", className)}
 			aria-label={t`Change leverage`}
 		>
 			<span className="text-text-weak">{t`Leverage`}</span>

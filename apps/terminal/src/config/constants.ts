@@ -54,8 +54,8 @@ export const TOKEN_ICON_BASE_URL = "https://app.hyperliquid.xyz/coins";
 export const PANEL_LAYOUT = {
 	MAIN: {
 		id: "CHART_WITH_SWAPBOX",
-		analysis: { defaultSize: 77 },
-		sidebar: { defaultSize: 23 },
+		analysis: { defaultSize: 77, minSize: 50 },
+		sidebar: { defaultSize: 23, minSize: 18 },
 	},
 	ANALYSIS: {
 		id: "CHART_WITH_POSITIONS",

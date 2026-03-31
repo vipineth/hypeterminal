@@ -29,16 +29,20 @@
      Heading1 40/48  → text-2xl
      Display  56/64  → text-3xl
   */
-  --text-xs: 14px;
-  --text-xs--line-height: 20px;
-  --text-sm: 16px;
-  --text-sm--line-height: 24px;
-  --text-base: 20px;
-  --text-base--line-height: 28px;
-  --text-lg: 24px;
-  --text-lg--line-height: 32px;
-  --text-xl: 32px;
-  --text-xl--line-height: 40px;
+  --text-3xs: 10px;
+  --text-3xs--line-height: 14px;
+  --text-2xs: 11px;
+  --text-2xs--line-height: 16px;
+  --text-xs: 12px;
+  --text-xs--line-height: 16px;
+  --text-sm: 14px;
+  --text-sm--line-height: 20px;
+  --text-base: 16px;
+  --text-base--line-height: 24px;
+  --text-lg: 20px;
+  --text-lg--line-height: 28px;
+  --text-xl: 28px;
+  --text-xl--line-height: 36px;
   --text-2xl: 40px;
   --text-2xl--line-height: 48px;
   --text-3xl: 56px;
@@ -147,7 +151,7 @@
     --fill-press: #0011661a;
     --fill-selected: #4c64d9;
     --fill-disabled: #0011661a;
-    --fill-overlay: #000d4d73;
+    --fill-overlay: #000d4daa;
     --fill-brand-strong: #4c64d9;
     --fill-brand-weak: #4c64d90d;
     --fill-error-strong: #c73a3a;
@@ -400,12 +404,12 @@
   @media (max-width: 767px) {
     :root,
     .dark {
-      --text-xl: 28px;
-      --text-xl--line-height: 36px;
-      --text-2xl: 36px;
-      --text-2xl--line-height: 44px;
-      --text-3xl: 40px;
-      --text-3xl--line-height: 48px;
+      --text-xl: 24px;
+      --text-xl--line-height: 32px;
+      --text-2xl: 32px;
+      --text-2xl--line-height: 40px;
+      --text-3xl: 36px;
+      --text-3xl--line-height: 44px;
     }
   }
 }

@@ -38,8 +38,9 @@ export function MarginModeToggle({ mode, disabled, onClick }: MarginModeTogglePr
 			disabled={disabled}
 			iconLeft={<Icon className="size-3" />}
 			iconRight={<CaretDownIcon className="size-3" />}
+			className="min-w-0"
 		>
-			{label}
+			<span className="truncate">{label}</span>
 		</Button>
 	);
 }

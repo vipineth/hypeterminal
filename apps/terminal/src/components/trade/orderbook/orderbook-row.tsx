@@ -30,7 +30,7 @@ function OrderbookRowComponent({ level, side, maxTotal, showInQuote = false, szD
 				className={cn("absolute inset-y-0 pointer-events-none", isAsk ? "depth-bar-ask" : "depth-bar-bid")}
 				style={{ width: `${depthPct}%`, [isAsk ? "right" : "left"]: 0, [isAsk ? "left" : "right"]: "auto" }}
 			/>
-			<div className="grid grid-cols-3 gap-2 text-xs tabular-nums py-0.5 px-2 relative z-10">
+			<div className="grid grid-cols-3 gap-1 text-2xs tabular-nums py-0.5 px-2 relative z-10">
 				<button
 					type="button"
 					onClick={() => setSelectedPrice(level.price)}

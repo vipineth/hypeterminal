@@ -29,7 +29,7 @@ export function MainWorkspace() {
 				<FavoritesStrip />
 			</div>
 			<ResizablePanelGroup className="h-full min-h-0" defaultLayout={defaultLayout} onLayoutChanged={onLayoutChanged}>
-				<ResizablePanel defaultSize={analysis.defaultSize}>
+				<ResizablePanel defaultSize={analysis.defaultSize} minSize={analysis.minSize}>
 					<div className="h-full flex flex-col bg-bg-raised">
 						<div className="flex-1 min-h-0">
 							<AnalysisSection />
@@ -40,7 +40,7 @@ export function MainWorkspace() {
 					withHandle
 					className="bg-stroke-weak/40 data-[resize-handle-state=hover]:bg-fill-brand-strong/30 data-[resize-handle-state=drag]:bg-fill-brand-strong/50"
 				/>
-				<ResizablePanel defaultSize={sidebar.defaultSize}>
+				<ResizablePanel defaultSize={sidebar.defaultSize} minSize={sidebar.minSize}>
 					<TradeSidebar />
 				</ResizablePanel>
 			</ResizablePanelGroup>

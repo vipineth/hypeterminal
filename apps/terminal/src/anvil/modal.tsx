@@ -35,8 +35,8 @@ interface ModalPopupProps
 const ModalPopup = React.forwardRef<HTMLDivElement, ModalPopupProps>(
 	({ className, size, showClose = true, children, ...props }, ref) => (
 		<Dialog.Portal>
-			<Dialog.Backdrop className="fixed inset-0 bg-fill-overlay transition-opacity duration-200 ease-out motion-reduce:transition-none data-starting-style:opacity-0 data-ending-style:opacity-0" />
-			<div className="fixed inset-0 flex items-center justify-center overflow-y-auto p-6">
+			<Dialog.Backdrop className="fixed inset-0 z-50 bg-fill-overlay transition-opacity duration-200 ease-out motion-reduce:transition-none data-starting-style:opacity-0 data-ending-style:opacity-0" />
+			<div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-6">
 				<Dialog.Popup
 					className={cn(
 						modalPopupVariants({ size, className }),

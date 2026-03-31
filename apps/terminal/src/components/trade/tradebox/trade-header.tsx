@@ -22,7 +22,7 @@ export function TradeHeader({ orderType, side, sideLabels, marketKind, onOrderTy
 	const isAdvancedTab = tabsOrderType === "advanced";
 
 	return (
-		<div className="space-y-4">
+		<div className="space-y-4 min-w-0">
 			<Tabs
 				value={tabsOrderType}
 				onValueChange={(v) => {

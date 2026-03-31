@@ -1717,8 +1717,8 @@ msgid "Select order"
 msgstr "Select order"
 
 #: src/components/trade/orderbook/orderbook-panel.tsx
-msgid "Select order book aggregation"
-msgstr "Select order book aggregation"
+#~ msgid "Select order book aggregation"
+#~ msgstr "Select order book aggregation"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Select signing mode"

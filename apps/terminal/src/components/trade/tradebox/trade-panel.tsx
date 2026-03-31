@@ -441,7 +441,7 @@ export function TradePanel() {
 	return (
 		<div className="min-h-0 flex flex-col overflow-hidden bg-bg-overlay">
 			{capabilities.isLeveraged && (
-				<div className="p-2 border-b border-stroke-weak/60 flex items-center justify-between">
+				<div className="p-2 border-b border-stroke-weak/60 flex items-center justify-between gap-2 min-w-0">
 					{capabilities.hasMarginMode ? (
 						<MarginModeToggle
 							mode={marginMode}

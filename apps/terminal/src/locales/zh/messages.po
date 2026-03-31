@@ -1713,8 +1713,8 @@ msgid "Select order"
 msgstr "选择订单"
 
 #: src/components/trade/orderbook/orderbook-panel.tsx
-msgid "Select order book aggregation"
-msgstr "选择订单簿聚合"
+#~ msgid "Select order book aggregation"
+#~ msgstr "选择订单簿聚合"
 
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Select signing mode"

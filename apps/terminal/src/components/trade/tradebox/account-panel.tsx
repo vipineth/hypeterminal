@@ -185,7 +185,7 @@ export function AccountPanel() {
 	}, [spotMetrics]);
 
 	return (
-		<div className="shrink-0 flex flex-col bg-bg-overlay border-t border-stroke-weak mb-10">
+		<div className="shrink-0 flex flex-col bg-bg-overlay border-t border-stroke-weak mb-10 overflow-hidden">
 			<div className="px-2 py-2 border-b border-stroke-weak flex items-center justify-between">
 				<span className="text-xs text-text-strong">{t`Account`}</span>
 				<div className="flex items-center gap-2">
