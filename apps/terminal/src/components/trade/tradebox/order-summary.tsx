@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { PencilIcon } from "@phosphor-icons/react";
-import { InfoRow, InfoRowGroup } from "@/anvil";
+import { InfoRow, InfoRowGroup } from "@/components/ui/info-row";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { DEFAULT_BUILDER_CONFIG } from "@/config/hyperliquid";
 import { bpsToPercentage, formatPrice, formatUSD } from "@/lib/format";

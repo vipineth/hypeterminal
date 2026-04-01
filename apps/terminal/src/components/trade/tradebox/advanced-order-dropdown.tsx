@@ -1,3 +1,4 @@
+import { Dropdown, type DropdownGroup } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import {
 	CrosshairIcon,
@@ -8,7 +9,6 @@ import {
 	TimerIcon,
 	XCircleIcon,
 } from "@phosphor-icons/react";
-import { Dropdown, type DropdownGroup } from "@/anvil";
 import { cn } from "@/lib/cn";
 import type { MarketKind } from "@/lib/hyperliquid";
 import {

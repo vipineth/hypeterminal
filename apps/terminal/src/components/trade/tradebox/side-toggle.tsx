@@ -1,5 +1,5 @@
+import { SegmentedControlItem, SegmentedControls } from "@hypeterminal/ui";
 import { TrendDownIcon, TrendUpIcon } from "@phosphor-icons/react";
-import { SegmentedControlItem, SegmentedControls } from "@/anvil";
 import type { Side } from "@/lib/trade/types";
 
 interface SideLabels {

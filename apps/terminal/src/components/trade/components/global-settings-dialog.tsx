@@ -1,8 +1,8 @@
+import { Modal, ModalContent, ModalHeader, ModalPopup, ModalTitle, Select, Slider, Toggle } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import type { ChangeEvent } from "react";
 import { useRef, useState } from "react";
-import { Modal, ModalContent, ModalHeader, ModalPopup, ModalTitle, Select, Slider, Toggle } from "@/anvil";
 import { NumberInput } from "@/components/ui/number-input";
 import { MARKET_ORDER_SLIPPAGE_MAX_PERCENT, MARKET_ORDER_SLIPPAGE_MIN_PERCENT } from "@/config/constants";
 import {

@@ -1,6 +1,6 @@
+import { Button } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { WarningIcon } from "@phosphor-icons/react";
-import { Button } from "@/anvil";
 import { useGlobalSettingsActions, useIsTestnet } from "@/stores/use-global-settings-store";
 
 export function TestnetBanner() {

@@ -1,7 +1,7 @@
+import { Modal, ModalDescription, ModalPopup, ModalTitle } from "@hypeterminal/ui";
 import { MagnifyingGlassIcon } from "@phosphor-icons/react";
 import { Command as CommandPrimitive } from "cmdk";
 import type * as React from "react";
-import { Modal, ModalDescription, ModalPopup, ModalTitle } from "@/anvil";
 import { cn } from "@/lib/cn";
 
 function Command({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) {

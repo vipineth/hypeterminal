@@ -1,8 +1,8 @@
+import { Button } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { SpinnerGapIcon } from "@phosphor-icons/react";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
-import { Button } from "@/anvil";
 import { DEFAULT_QUOTE_TOKEN, TWAP_MINUTES_MAX, TWAP_MINUTES_MIN } from "@/config/constants";
 import { APPROVAL_ERROR_DISMISS_MS } from "@/config/time";
 import { getMarketQuoteToken } from "@/domain/trade/balances";

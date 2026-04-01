@@ -1,7 +1,6 @@
+import { Button, Dropdown, type DropdownItem } from "@hypeterminal/ui";
 import { ArrowsClockwiseIcon, ArrowsLeftRightIcon, TrendDownIcon, TrendUpIcon } from "@phosphor-icons/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button } from "@/anvil/button";
-import { Dropdown, type DropdownItem } from "@/anvil/dropdown";
 import { FALLBACK_VALUE_PLACEHOLDER, UI_TEXT } from "@/config/constants";
 import { getBaseQuoteFromPairName } from "@/domain/market";
 import { cn } from "@/lib/cn";

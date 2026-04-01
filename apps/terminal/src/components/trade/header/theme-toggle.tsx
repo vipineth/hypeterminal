@@ -1,7 +1,7 @@
+import { ButtonIcon } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { MoonIcon, SunIcon } from "@phosphor-icons/react";
 import { ClientOnly } from "@tanstack/react-router";
-import { ButtonIcon } from "@/anvil";
 import { cn } from "@/lib/cn";
 import { useSetTheme, useTheme } from "@/stores/use-global-settings-store";
 

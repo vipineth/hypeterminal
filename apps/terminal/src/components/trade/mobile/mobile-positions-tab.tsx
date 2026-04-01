@@ -1,9 +1,9 @@
+import { Button } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { CrosshairIcon, ListChecksIcon, PencilIcon, PlusIcon, XIcon } from "@phosphor-icons/react";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useConnection } from "wagmi";
-import { Button } from "@/anvil/button";
 import { Spinner } from "@/components/ui/spinner";
 import { FALLBACK_VALUE_PLACEHOLDER, HL_ALL_DEXS } from "@/config/constants";
 import { buildOrderPlan } from "@/domain/trade/order-intent";

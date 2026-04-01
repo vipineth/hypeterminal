@@ -1,10 +1,7 @@
+import { Button, Slider, Tabs, TabsList, TabsTrigger, TextInput } from "@hypeterminal/ui";
 import { CaretDownIcon, SpinnerGapIcon, TrendDownIcon, TrendUpIcon } from "@phosphor-icons/react";
 import { useEffect, useMemo, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
-import { Button } from "@/anvil/button";
-import { Slider } from "@/anvil/slider";
-import { Tabs, TabsList, TabsTrigger } from "@/anvil/tabs";
-import { TextInput } from "@/anvil/text-input";
 import { FALLBACK_VALUE_PLACEHOLDER, ORDER_MIN_NOTIONAL_USD, UI_TEXT } from "@/config/constants";
 import { ARBITRUM_CHAIN_ID } from "@/config/contracts";
 import { getBaseQuoteFromPairName } from "@/domain/market";

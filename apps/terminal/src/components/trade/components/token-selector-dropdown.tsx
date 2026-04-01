@@ -1,5 +1,5 @@
+import { Dropdown, type DropdownItem } from "@hypeterminal/ui";
 import { CaretDownIcon } from "@phosphor-icons/react";
-import { Dropdown, type DropdownItem } from "@/anvil";
 import { cn } from "@/lib/cn";
 import { formatToken } from "@/lib/format";
 import type { SpotToken } from "@/lib/hyperliquid/markets";

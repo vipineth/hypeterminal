@@ -1,8 +1,8 @@
+import { Button, Checkbox, Select, Slider } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { ArrowsLeftRightIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import { useConnection } from "wagmi";
-import { Button, Checkbox, Select, Slider } from "@/anvil";
 import { NumberInput } from "@/components/ui/number-input";
 import {
 	FALLBACK_VALUE_PLACEHOLDER,

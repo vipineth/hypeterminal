@@ -1,7 +1,7 @@
+import { Dropdown, SegmentedControlItem, SegmentedControls } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { BookBookmarkIcon, ListDashesIcon } from "@phosphor-icons/react";
 import { useDeferredValue, useMemo, useState } from "react";
-import { Dropdown, SegmentedControlItem, SegmentedControls } from "@/anvil";
 import { getBaseQuoteFromPairName, getPercent } from "@/domain/market";
 import { formatNumber } from "@/lib/format";
 import { useSelectedMarketInfo, useSubscription } from "@/lib/hyperliquid";

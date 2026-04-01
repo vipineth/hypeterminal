@@ -1,5 +1,5 @@
+import { ButtonIcon } from "@hypeterminal/ui";
 import { BellIcon, GearIcon, TerminalIcon } from "@phosphor-icons/react";
-import { ButtonIcon } from "@/anvil/button-icons";
 import { UI_TEXT } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { useSettingsDialogActions } from "@/stores/use-global-modal-store";

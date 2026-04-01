@@ -1,3 +1,14 @@
+import {
+	Button,
+	Modal,
+	ModalContent,
+	ModalHeader,
+	ModalPopup,
+	ModalTitle,
+	SegmentedControlItem,
+	SegmentedControls,
+	Select,
+} from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import {
@@ -14,18 +25,7 @@ import {
 import { Suspense, useState } from "react";
 import { formatUnits } from "viem";
 import { useConnection } from "wagmi";
-import {
-	Button,
-	InfoRow,
-	Modal,
-	ModalContent,
-	ModalHeader,
-	ModalPopup,
-	ModalTitle,
-	SegmentedControlItem,
-	SegmentedControls,
-	Select,
-} from "@/anvil";
+import { InfoRow } from "@/components/ui/info-row";
 import { NumberInput } from "@/components/ui/number-input";
 import { MIN_DEPOSIT_USDC, MIN_WITHDRAW_USD, USDC_DECIMALS, WITHDRAWAL_FEE_USD } from "@/config/contracts";
 import { cn } from "@/lib/cn";

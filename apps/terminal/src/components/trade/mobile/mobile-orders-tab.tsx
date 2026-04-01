@@ -1,8 +1,8 @@
+import { Button } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { ListNumbersIcon, XIcon } from "@phosphor-icons/react";
 import { useCallback, useEffect, useState } from "react";
 import { useConnection } from "wagmi";
-import { Button } from "@/anvil/button";
 import { Spinner } from "@/components/ui/spinner";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";

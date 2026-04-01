@@ -1,6 +1,6 @@
+import { Button } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { StarIcon, XIcon } from "@phosphor-icons/react";
-import { Button } from "@/anvil";
 import { get24hChange } from "@/domain/market";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice } from "@/lib/format";

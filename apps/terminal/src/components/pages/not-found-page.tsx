@@ -1,7 +1,6 @@
+import { Button } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-
-import { Button } from "@/anvil";
 
 export function NotFoundPage() {
 	return (

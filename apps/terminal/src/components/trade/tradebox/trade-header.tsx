@@ -1,5 +1,5 @@
+import { Tabs, TabsList, TabsTrigger } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
-import { Tabs, TabsList, TabsTrigger } from "@/anvil";
 import type { SideLabels } from "@/domain/trade/order/labels";
 import { cn } from "@/lib/cn";
 import type { MarketKind } from "@/lib/hyperliquid";

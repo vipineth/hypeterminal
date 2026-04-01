@@ -1,6 +1,6 @@
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@hypeterminal/ui";
 import { Suspense, useMemo, useTransition } from "react";
 import { useConnection } from "wagmi";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/anvil";
 import { Spinner } from "@/components/ui/spinner";
 import { HL_ALL_DEXS, POSITIONS_TABS } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";

@@ -1,5 +1,5 @@
+import { Avatar } from "@hypeterminal/ui";
 import type { ReactNode } from "react";
-import { Avatar } from "@/anvil";
 import { cn } from "@/lib/cn";
 import type { SpotToken, UnifiedMarket } from "@/lib/hyperliquid/markets";
 import { useMarkets } from "@/lib/hyperliquid/markets/use-markets";

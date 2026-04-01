@@ -1,3 +1,4 @@
+import { Badge, Button } from "@hypeterminal/ui";
 import { Trans } from "@lingui/react/macro";
 import {
 	ArrowLeftIcon,
@@ -15,8 +16,8 @@ import {
 import Big from "big.js";
 import { useEffect, useRef, useState } from "react";
 import { useConnection } from "wagmi";
-import { Badge, Button, InfoRow, InfoRowGroup } from "@/anvil";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { InfoRow, InfoRowGroup } from "@/components/ui/info-row";
 import { cn } from "@/lib/cn";
 import { formatDateTimeShort, formatDuration, formatUSD, shortenAddress } from "@/lib/format";
 import { initLiFi } from "@/lib/lifi/config";

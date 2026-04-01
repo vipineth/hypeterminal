@@ -1,7 +1,8 @@
+import { Badge, Button, Modal, ModalContent, ModalFooter, ModalHeader, ModalPopup, ModalTitle } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { SpinnerGapIcon, TrendDownIcon, TrendUpIcon } from "@phosphor-icons/react";
 import { useCallback, useEffect, useState } from "react";
-import { Badge, Button, InfoRow, Modal, ModalContent, ModalFooter, ModalHeader, ModalPopup, ModalTitle } from "@/anvil";
+import { InfoRow } from "@/components/ui/info-row";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { throwIfAnyResponseError } from "@/domain/trade/orders";
 import { cn } from "@/lib/cn";

@@ -1,7 +1,3 @@
-import { t } from "@lingui/core/macro";
-import { Trans } from "@lingui/react/macro";
-import { CaretDownIcon, CheckIcon, ShieldIcon, SpinnerGapIcon, StackIcon, WarningIcon } from "@phosphor-icons/react";
-import { useEffect, useRef, useState } from "react";
 import {
 	Button,
 	Modal,
@@ -11,7 +7,11 @@ import {
 	ModalHeader,
 	ModalPopup,
 	ModalTitle,
-} from "@/anvil";
+} from "@hypeterminal/ui";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
+import { CaretDownIcon, CheckIcon, ShieldIcon, SpinnerGapIcon, StackIcon, WarningIcon } from "@phosphor-icons/react";
+import { useEffect, useRef, useState } from "react";
 import { MARGIN_MODE_SUCCESS_DURATION_MS } from "@/config/time";
 import { cn } from "@/lib/cn";
 import type { MarginMode } from "@/lib/trade/margin-mode";

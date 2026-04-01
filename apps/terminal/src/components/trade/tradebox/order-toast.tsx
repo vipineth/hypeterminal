@@ -1,7 +1,7 @@
+import { Button } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { CheckIcon, LightningIcon, SpinnerGapIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect } from "react";
-import { Button } from "@/anvil";
 import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/time";
 import { cn } from "@/lib/cn";
 import { useGlobalSettings } from "@/stores/use-global-settings-store";

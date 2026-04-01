@@ -1,9 +1,9 @@
+import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Tooltip } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { ListChecksIcon, PencilIcon, PlusIcon } from "@phosphor-icons/react";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useConnection } from "wagmi";
-import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Tooltip } from "@/anvil";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { FALLBACK_VALUE_PLACEHOLDER, HL_ALL_DEXS } from "@/config/constants";
 import { buildOrderPlan } from "@/domain/trade/order-intent";

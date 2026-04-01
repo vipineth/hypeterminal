@@ -1,8 +1,8 @@
+import { Button, Drawer, DrawerContent } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { CaretDownIcon, CheckIcon, SpinnerGapIcon, WarningIcon } from "@phosphor-icons/react";
 import { forwardRef, useEffect, useRef, useState } from "react";
-import { Button, Drawer, DrawerContent } from "@/anvil";
 import { NumberInput } from "@/components/ui/number-input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAssetLeverage } from "@/hooks/trade/use-asset-leverage";

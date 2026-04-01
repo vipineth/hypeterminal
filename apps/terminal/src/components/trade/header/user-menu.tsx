@@ -1,9 +1,9 @@
+import { Button, Dropdown } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { CheckIcon, CopyIcon, PlusCircleIcon, SignOutIcon, SpinnerGapIcon, WalletIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { useConnection, useDisconnect, useEnsName } from "wagmi";
-import { Button, Dropdown } from "@/anvil";
 import { useCopyToClipboard } from "@/hooks/ui/use-copy-to-clipboard";
 import { shortenAddress } from "@/lib/format";
 import { WalletDialog } from "../components/wallet-dialog";

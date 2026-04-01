@@ -1,6 +1,6 @@
+import { Dropdown } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { ArrowsClockwiseIcon, LightningIcon, TagIcon } from "@phosphor-icons/react";
-import { Dropdown } from "@/anvil";
 
 interface Props {
 	canClose: boolean;

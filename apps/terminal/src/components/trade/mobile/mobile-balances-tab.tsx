@@ -1,9 +1,8 @@
+import { Button, Checkbox } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { ArrowsDownUpIcon, ArrowsLeftRightIcon, PaperPlaneTiltIcon, WalletIcon } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
-import { Button } from "@/anvil/button";
-import { Checkbox } from "@/anvil/checkboxes";
 import { DEFAULT_QUOTE_TOKEN, HL_ALL_DEXS } from "@/config/constants";
 import {
 	type BalanceRow,

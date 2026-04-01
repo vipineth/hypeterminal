@@ -1,6 +1,6 @@
+import { Badge } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { ArrowSquareOutIcon, FireIcon } from "@phosphor-icons/react";
-import { Badge } from "@/anvil/badge";
 import { get24hChange, getOiUsd } from "@/domain/market";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatUSD, shortenAddress } from "@/lib/format";

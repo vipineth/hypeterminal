@@ -1,8 +1,9 @@
+import { Button, SegmentedControlItem, SegmentedControls } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { ArrowsLeftRightIcon, DownloadSimpleIcon, UploadSimpleIcon } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
-import { Button, InfoRow, InfoRowGroup, SegmentedControlItem, SegmentedControls } from "@/anvil";
+import { InfoRow, InfoRowGroup } from "@/components/ui/info-row";
 import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";

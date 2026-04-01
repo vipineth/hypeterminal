@@ -1,8 +1,8 @@
+import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { TimerIcon } from "@phosphor-icons/react";
 import { useMemo } from "react";
 import { useConnection } from "wagmi";
-import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/anvil";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { TimeTicker } from "@/components/ui/time-ticker";
 import { FALLBACK_VALUE_PLACEHOLDER, HL_ALL_DEXS } from "@/config/constants";

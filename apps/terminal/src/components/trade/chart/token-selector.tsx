@@ -1,8 +1,7 @@
+import { Badge, Button, Drawer, DrawerContent, DrawerTrigger, SearchInput } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { ArrowDownIcon, ArrowsDownUpIcon, ArrowUpIcon, CaretDownIcon, FireIcon, StarIcon } from "@phosphor-icons/react";
-
 import { flexRender } from "@tanstack/react-table";
-import { Badge, Button, Drawer, DrawerContent, DrawerTrigger, SearchInput } from "@/anvil";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { get24hChange, getOiUsd, isTokenInCategory } from "@/domain/market";
 import { useIsMobile } from "@/hooks/use-mobile";

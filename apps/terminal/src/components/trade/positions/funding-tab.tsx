@@ -1,7 +1,7 @@
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { PercentIcon } from "@phosphor-icons/react";
 import { useConnection } from "wagmi";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/anvil";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";

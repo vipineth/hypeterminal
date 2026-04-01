@@ -1,7 +1,7 @@
+import { Button } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { ArrowSquareOutIcon, ClockCounterClockwiseIcon } from "@phosphor-icons/react";
 import { useConnection } from "wagmi";
-import { Button } from "@/anvil/button";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";
 import { getExplorerTxUrl } from "@/lib/explorer";

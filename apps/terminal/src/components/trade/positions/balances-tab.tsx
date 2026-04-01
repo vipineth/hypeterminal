@@ -1,8 +1,8 @@
+import { Button, Checkbox, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { ArrowsDownUpIcon, ArrowsLeftRightIcon, PaperPlaneTiltIcon, WalletIcon } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
-import { Button, Checkbox, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/anvil";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER, HL_ALL_DEXS } from "@/config/constants";
 import {

@@ -1,8 +1,8 @@
+import { Dropdown } from "@hypeterminal/ui";
 import type { Chart } from "klinecharts";
 import { dispose, FormatDateType, init, LoadDataType } from "klinecharts";
 import { useEffect, useRef, useState } from "react";
 import { useConnection } from "wagmi";
-import { Dropdown } from "@/anvil";
 import { candleEventToKLineData, candlesToKLineData } from "@/lib/chart/candle";
 import {
 	CHART_TYPES,

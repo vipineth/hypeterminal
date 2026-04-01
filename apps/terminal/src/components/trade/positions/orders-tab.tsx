@@ -1,8 +1,8 @@
+import { Button, Checkbox, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { ListNumbersIcon } from "@phosphor-icons/react";
 import { useCallback, useEffect, useState } from "react";
 import { useConnection } from "wagmi";
-import { Button, Checkbox, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/anvil";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/constants";
 import { cn } from "@/lib/cn";

@@ -1,9 +1,7 @@
+import { Badge, Button, ButtonIcon } from "@hypeterminal/ui";
 import { ArrowSquareOutIcon, CopyIcon, LightningIcon, SignOutIcon, WalletIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import { useConnection, useDisconnect } from "wagmi";
-import { Badge } from "@/anvil/badge";
-import { Button } from "@/anvil/button";
-import { ButtonIcon } from "@/anvil/button-icons";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UI_TEXT } from "@/config/constants";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";

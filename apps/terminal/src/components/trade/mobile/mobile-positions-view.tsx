@@ -1,7 +1,7 @@
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@hypeterminal/ui";
 import { WalletIcon } from "@phosphor-icons/react";
 import { useTransition } from "react";
 import { useConnection } from "wagmi";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/anvil/tabs";
 import { Spinner } from "@/components/ui/spinner";
 import { useAccountBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";

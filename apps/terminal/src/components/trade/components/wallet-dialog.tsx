@@ -1,3 +1,13 @@
+import {
+	Button,
+	Modal,
+	ModalContent,
+	ModalDescription,
+	ModalHeader,
+	ModalPopup,
+	ModalTitle,
+	TextInput,
+} from "@hypeterminal/ui";
 import { Trans } from "@lingui/react/macro";
 import {
 	ArrowSquareOutIcon,
@@ -13,7 +23,6 @@ import type { Address } from "viem";
 import { isAddress } from "viem";
 import { type Connector, useConnect, useConnectors } from "wagmi";
 import { mock } from "wagmi/connectors";
-import { Button, Modal, ModalContent, ModalDescription, ModalHeader, ModalPopup, ModalTitle, TextInput } from "@/anvil";
 import { MOCK_WALLETS } from "@/config/wagmi";
 import { cn } from "@/lib/cn";
 import { getLastUsedWallet, getWalletInfo, isMockConnector, setLastUsedWallet } from "@/lib/wallet-utils";

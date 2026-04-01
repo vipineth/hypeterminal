@@ -1,5 +1,5 @@
+import { Slider } from "@hypeterminal/ui";
 import { useMemo } from "react";
-import { Slider } from "@/anvil";
 
 interface Props {
 	value: number;

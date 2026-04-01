@@ -1,7 +1,3 @@
-import { t } from "@lingui/core/macro";
-import { PaperPlaneTiltIcon, SpinnerGapIcon, WarningCircleIcon } from "@phosphor-icons/react";
-import { useCallback, useMemo, useState } from "react";
-import { isAddress } from "viem";
 import {
 	Button,
 	Modal,
@@ -12,7 +8,11 @@ import {
 	ModalTitle,
 	Select,
 	TextInput,
-} from "@/anvil";
+} from "@hypeterminal/ui";
+import { t } from "@lingui/core/macro";
+import { PaperPlaneTiltIcon, SpinnerGapIcon, WarningCircleIcon } from "@phosphor-icons/react";
+import { useCallback, useMemo, useState } from "react";
+import { isAddress } from "viem";
 import { NumberInput } from "@/components/ui/number-input";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/constants";
 import { exceedsBalance, isAmountWithinBalance } from "@/domain/market";

@@ -1,9 +1,9 @@
+import { Button, ButtonIcon } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { DownloadSimpleIcon, GearIcon, TerminalIcon } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
 import { useConnection } from "wagmi";
-import { Button, ButtonIcon } from "@/anvil";
 import { cn } from "@/lib/cn";
 import { useExchangeScope } from "@/providers/exchange-scope";
 import { useDepositModalActions, useSettingsDialogActions } from "@/stores/use-global-modal-store";
