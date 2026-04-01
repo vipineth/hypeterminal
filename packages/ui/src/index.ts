@@ -111,6 +111,14 @@ export {
 	radioIndicatorVariants,
 } from "./radio-buttons";
 export { SearchInput, type SearchInputProps, searchInputVariants } from "./search-input";
+export {
+	SegmentedControlItem,
+	type SegmentedControlItemProps,
+	SegmentedControls,
+	type SegmentedControlsProps,
+	segmentedControlItemVariants,
+	segmentedControlsVariants,
+} from "./segmented-controls";
 export { Select, type SelectGroupOption, type SelectOption, type SelectProps, selectTriggerVariants } from "./select";
 export { Slider, type SliderProps, sliderVariants } from "./slider";
 export { Slot, type SlotProps, slotVariants } from "./slot";
