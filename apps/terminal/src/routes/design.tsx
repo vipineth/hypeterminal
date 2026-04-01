@@ -10,10 +10,6 @@ export const Route = createFileRoute("/design")({
 			path: "/design",
 		}),
 	component: function DesignRoute() {
-		return (
-			<div className="flex h-screen items-center justify-center text-text-weak">
-				Design showcase removed — use Anvil
-			</div>
-		);
+		return <div className="flex h-screen items-center justify-center text-text-weak">Design showcase removed</div>;
 	},
 });

@@ -5,8 +5,8 @@
 All mockups should follow the **HyperTerminal Design System** (`@hypeterminal/ui`).
 Reference: `packages/ui/src/`
 
-- Use Anvil's semantic color tokens (bg-base, bg-raised, bg-overlay, text-strong, text-weak, etc.)
-- Use Anvil components: Button, ButtonIcon, Tooltip, Segmented Controls, NumberInput, etc.
+- Use semantic color tokens (bg-base, bg-raised, bg-overlay, text-strong, text-weak, etc.)
+- Use `@hypeterminal/ui` components: Button, ButtonIcon, Tooltip, Tabs, NumberInput, etc.
 - Typography: Inter for UI, JetBrains Mono for data/numbers
 - Icons: Phosphor Icons (used in the codebase) or Lucide (available in Pencil)
 - Corner radius: 4px (sm) throughout

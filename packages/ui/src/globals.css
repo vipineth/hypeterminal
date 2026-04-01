@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ============================================
-   Anvil Design System — Design Tokens
+   HyperTerminal UI — Design Tokens
    Source: Figma variable exports (src/tokens/)
    ALL values taken directly from token files.
    ============================================ */
@@ -64,7 +64,7 @@
   */
 	--spacing: 4px;
 
-	/* --- ANVIL:RADIUS:START --- */
+	/* --- RADIUS:START --- */
 	/* Global radius control: set --radius-factor on :root
        none = 0, sm = 0.5, md = 1 (default), lg = 1.5
        For "full", set pill-able radii to 9999px directly */
@@ -78,7 +78,7 @@
 	--radius-24: calc(24px * var(--radius-factor));
 	--radius-32: calc(32px * var(--radius-factor));
 	--radius-full: 9999px;
-	/* --- ANVIL:RADIUS:END --- */
+	/* --- RADIUS:END --- */
 
 	/* ---- Shadows ---- */
 	--shadow-raised: 0 4px 8px -2px rgba(0, 0, 0, 0.04), 0 2px 4px -2px rgba(0, 0, 0, 0.08);

@@ -1,8 +1,8 @@
-# Anvil Design System Migration PRD
+# @hypeterminal/ui Migration PRD
 
 ## Goal
 
-Fully replace HyperTerminal's current UI component library and design token system with the Anvil design system. Every component uses Anvil `sm` size. No preserving the current look — Anvil becomes the single source of truth.
+Fully replace HyperTerminal's current UI component library and design token system with the @hypeterminal/ui. Every component uses @hypeterminal/ui `sm` size. No preserving the current look — @hypeterminal/ui becomes the single source of truth.
 
 ## Source
 
@@ -14,9 +14,9 @@ Fully replace HyperTerminal's current UI component library and design token syst
 
 ## Phase 0: Foundation Setup
 
-### 0.1 — Copy Anvil into the project
+### 0.1 — Copy @hypeterminal/ui into the project
 
-Copy `src/components/ui/` from the design system repo into `apps/terminal/src/anvil/`.
+Copy `src/components/ui/` from the design system repo into `apps/terminal/packages/ui/src/`.
 
 Files to copy:
 - All `.tsx` component files (40 components)
@@ -28,9 +28,9 @@ Files to copy:
 
 ### 0.2 — Merge token CSS
 
-Replace the current `src/styles.css` with Anvil's `globals.css` as the base. Add trading-specific tokens as extensions.
+Replace the current `src/styles.css` with @hypeterminal/ui `globals.css` as the base. Add trading-specific tokens as extensions.
 
-**Tokens to keep from current system (add to Anvil's globals.css):**
+**Tokens to keep from current system (add to @hypeterminal/ui globals.css):**
 
 ```css
 /* Trading tokens — HyperTerminal extensions */
@@ -52,20 +52,20 @@ Wire them into Tailwind in the `@theme inline` block:
 --color-scope-builders: var(--scope-builders);
 ```
 
-**Tokens to delete:** Everything else in current `styles.css` that Anvil replaces (text-950, surface-*, border-*, primary-*, fill-*, etc.)
+**Tokens to delete:** Everything else in current `styles.css` that @hypeterminal/ui replaces (text-950, surface-*, border-*, primary-*, fill-*, etc.)
 
 ### 0.3 — Update imports
 
-Add path alias so Anvil components can be imported as `@/anvil`:
+Add path alias so @hypeterminal/ui components can be imported as `@hypeterminal/ui`:
 ```typescript
 // in tsconfig or vite config
-"@/anvil": ["./src/anvil"]
-// or import from "@/anvil/index"
+"@hypeterminal/ui": ["./packages/ui/src"]
+// or import from "@hypeterminal/ui/index"
 ```
 
 ### 0.4 — Install missing dependencies (if not already present)
 
-- `@base-ui/react` (Anvil uses this, check version matches)
+- `@base-ui/react` (@hypeterminal/ui uses this, check version matches)
 - `class-variance-authority` (already in project)
 - `clsx` (already in project)
 - `tailwind-merge` (already in project)
@@ -76,13 +76,13 @@ Add path alias so Anvil components can be imported as `@/anvil`:
 
 **Current:** `@/components/ui/button` — variants: contained/outlined/ghost/text/destructive, sizes: none/sm/md/lg/icon, tones: base/accent
 
-**Anvil:** `@/anvil` — `Button` + `ButtonIcon`
+**@hypeterminal/ui:** `@hypeterminal/ui` — `Button` + `ButtonIcon`
 
 ### Conversion table
 
-| Current | Anvil |
+| Current | @hypeterminal/ui |
 |---------|-------|
-| `import { Button } from "@/components/ui/button"` | `import { Button } from "@/anvil"` |
+| `import { Button } from "@/components/ui/button"` | `import { Button } from "@hypeterminal/ui"` |
 | `variant="contained" tone="base"` | `variant="filled" intent="neutral"` |
 | `variant="contained" tone="accent"` | `variant="filled" intent="brand"` |
 | `variant="outlined" tone="base"` | `variant="outline" intent="neutral"` |
@@ -97,7 +97,7 @@ Add path alias so Anvil components can be imported as `@/anvil`:
 | `size="md"` | `size="sm"` (use sm everywhere) |
 | `size="lg"` | `size="sm"` (use sm everywhere) |
 | `size="none"` | Remove — apply custom padding via className if needed |
-| `asChild` | Remove — Anvil doesn't use Radix Slot. Wrap with anchor or use `render` prop from Base UI |
+| `asChild` | Remove — @hypeterminal/ui doesn't use Radix Slot. Wrap with anchor or use `render` prop from Base UI |
 
 ### Icon handling
 
@@ -109,7 +109,7 @@ Current pattern (icon inside children):
 </Button>
 ```
 
-Anvil pattern (dedicated props):
+@hypeterminal/ui pattern (dedicated props):
 ```tsx
 <Button variant="outline" intent="neutral" iconLeft={<DownloadIcon size={16} />}>
   Deposit
@@ -125,7 +125,7 @@ Current:
 </Button>
 ```
 
-Anvil:
+@hypeterminal/ui:
 ```tsx
 <ButtonIcon variant="ghost" intent="neutral">
   <GearIcon size={16} />
@@ -191,13 +191,13 @@ Anvil:
 
 **Current:** `@/components/ui/dialog` — Radix Dialog with separate Overlay/Portal/Content
 
-**Anvil:** `@/anvil` — `Modal`, `ModalTrigger`, `ModalClose`, `ModalPopup`, `ModalHeader`, `ModalTitle`, `ModalDescription`, `ModalContent`, `ModalFooter`
+**@hypeterminal/ui:** `@hypeterminal/ui` — `Modal`, `ModalTrigger`, `ModalClose`, `ModalPopup`, `ModalHeader`, `ModalTitle`, `ModalDescription`, `ModalContent`, `ModalFooter`
 
 ### Conversion table
 
-| Current | Anvil |
+| Current | @hypeterminal/ui |
 |---------|-------|
-| `import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog"` | `import { Modal, ModalTrigger, ModalPopup, ModalHeader, ModalTitle, ModalDescription, ModalContent, ModalFooter, ModalClose } from "@/anvil"` |
+| `import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog"` | `import { Modal, ModalTrigger, ModalPopup, ModalHeader, ModalTitle, ModalDescription, ModalContent, ModalFooter, ModalClose } from "@hypeterminal/ui"` |
 | `<Dialog>` | `<Modal>` |
 | `<DialogTrigger>` | `<ModalTrigger>` |
 | `<DialogContent>` | `<ModalPopup size="sm">` |
@@ -212,7 +212,7 @@ Anvil:
 ### Key differences
 
 1. **No separate DialogOverlay/DialogPortal** — `ModalPopup` bundles overlay + portal + animation + close button
-2. **Body wrapper** — Anvil adds `ModalContent` for the body area between header and footer. Current Dialog has no explicit body wrapper — content goes directly inside DialogContent.
+2. **Body wrapper** — @hypeterminal/ui adds `ModalContent` for the body area between header and footer. Current Dialog has no explicit body wrapper — content goes directly inside DialogContent.
 3. **Controlled open state** — Both support `open` + `onOpenChange`. Pattern stays the same.
 4. **Size** — `ModalPopup` accepts `size="sm" | "md" | "lg"`. Use `sm` for everything initially.
 
@@ -236,7 +236,7 @@ Current:
 </Dialog>
 ```
 
-Anvil:
+@hypeterminal/ui:
 ```tsx
 <Modal open={open} onOpenChange={setOpen}>
   <ModalPopup size="sm">
@@ -274,11 +274,11 @@ Anvil:
 
 **Current:** `@/components/ui/tabs` — variants: pill/underline, with Framer Motion animated indicator
 
-**Anvil:** `@/anvil` — `Tabs` (underline style) + `SegmentedControls` (pill/toggle style)
+**@hypeterminal/ui:** `@hypeterminal/ui` — `Tabs` (underline style) + `SegmentedControls` (pill/toggle style)
 
 ### Decision per usage
 
-| File | Current variant | Anvil component |
+| File | Current variant | @hypeterminal/ui component |
 |------|----------------|-----------------|
 | account-panel.tsx | pill | `SegmentedControls` |
 | positions-panel.tsx | underline | `Tabs` |
@@ -293,7 +293,7 @@ Anvil:
 
 ### Conversion — Underline Tabs
 
-| Current | Anvil |
+| Current | @hypeterminal/ui |
 |---------|-------|
 | `<Tabs>` | `<Tabs>` |
 | `<TabsList variant="underline">` | `<TabsList>` |
@@ -303,7 +303,7 @@ Anvil:
 
 ### Conversion — Pill Tabs to SegmentedControls
 
-| Current | Anvil |
+| Current | @hypeterminal/ui |
 |---------|-------|
 | `<Tabs>` | `<SegmentedControls>` |
 | `<TabsList variant="pill">` | (removed — styling is built into SegmentedControls) |
@@ -342,7 +342,7 @@ const [tab, setTab] = useState("deposit");
 
 **Current:** `@/components/ui/dropdown-menu` — Radix compound components (DropdownMenu, Trigger, Content, Item, Separator, etc.)
 
-**Anvil:** `@/anvil` — Single `Dropdown` component with declarative `items`/`groups` props
+**@hypeterminal/ui:** `@hypeterminal/ui` — Single `Dropdown` component with declarative `items`/`groups` props
 
 ### Conversion pattern
 
@@ -365,7 +365,7 @@ Current (compound/imperative):
 </DropdownMenu>
 ```
 
-Anvil (declarative):
+@hypeterminal/ui (declarative):
 ```tsx
 <Dropdown
   trigger={<Button variant="outline" intent="neutral">Menu</Button>}
@@ -400,15 +400,15 @@ Or without groups:
 
 1. **Flat API** — No more composing 5-6 sub-components. Pass data as props.
 2. **No asChild** — `trigger` prop accepts a ReactNode directly.
-3. **No CheckboxItem/RadioItem** — Anvil Dropdown is action-only. If a dropdown needs checkboxes or radio selection, either extend Anvil or handle differently.
+3. **No CheckboxItem/RadioItem** — @hypeterminal/ui Dropdown is action-only. If a dropdown needs checkboxes or radio selection, either extend @hypeterminal/ui or handle differently.
 4. **Separator** — Handled automatically between `groups`.
 5. **danger** replaces `variant="destructive"`.
 
 ### Special case: DropdownMenuCheckboxItem
 
-Current `orderbook-panel.tsx` and `mobile-book-view.tsx` may use checkbox items in dropdowns. Anvil's Dropdown doesn't support this. Options:
+Current `orderbook-panel.tsx` and `mobile-book-view.tsx` may use checkbox items in dropdowns. @hypeterminal/ui Dropdown doesn't support this. Options:
 - Convert to a `Select` or `Popover` with checkboxes
-- Extend Anvil's Dropdown to support a `checked` state on items
+- Extend @hypeterminal/ui Dropdown to support a `checked` state on items
 
 ### Files to update
 
@@ -426,7 +426,7 @@ Current `orderbook-panel.tsx` and `mobile-book-view.tsx` may use checkbox items 
 
 **Current:** `@/components/ui/select` — Radix compound components (Select, SelectTrigger, SelectContent, SelectItem, etc.)
 
-**Anvil:** `@/anvil` — Single `Select` component with declarative `options` prop
+**@hypeterminal/ui:** `@hypeterminal/ui` — Single `Select` component with declarative `options` prop
 
 ### Conversion pattern
 
@@ -443,7 +443,7 @@ Current:
 </Select>
 ```
 
-Anvil:
+@hypeterminal/ui:
 ```tsx
 <Select
   value={value}
@@ -492,7 +492,7 @@ With groups:
 
 **Current:** `@/components/ui/input` — bare input element with inputSize prop, manual label/error wrapping
 
-**Anvil:** `@/anvil` — `TextInput` with built-in Field.Root, label, hint, error, icons
+**@hypeterminal/ui:** `@hypeterminal/ui` — `TextInput` with built-in Field.Root, label, hint, error, icons
 
 ### Conversion pattern
 
@@ -505,7 +505,7 @@ Current:
 </div>
 ```
 
-Anvil:
+@hypeterminal/ui:
 ```tsx
 <TextInput
   label="Email"
@@ -517,7 +517,7 @@ Anvil:
 
 ### Prop mapping
 
-| Current | Anvil |
+| Current | @hypeterminal/ui |
 |---------|-------|
 | `inputSize="sm"` | `size="sm"` |
 | `inputSize="default"` | `size="sm"` |
@@ -528,14 +528,14 @@ Anvil:
 
 ### NumberInput (8 files)
 
-Anvil already has `NumberInput` wrapping Base UI NumberField. Current HyperTerminal `number-input.tsx` does manual regex validation, arrow key stepping, and synthetic events — all of which Base UI NumberField handles natively.
+@hypeterminal/ui already has `NumberInput` wrapping Base UI NumberField. Current HyperTerminal `number-input.tsx` does manual regex validation, arrow key stepping, and synthetic events — all of which Base UI NumberField handles natively.
 
-| Current | Anvil |
+| Current | @hypeterminal/ui |
 |---------|-------|
 | `<NumberInput inputSize="sm" allowDecimals min={0} max={100} step={0.01}>` | `<NumberInput size="sm" min={0} max={100} step={0.01}>` |
 | `allowDecimals={false}` | `step={1}` (integer steps) |
 | `maxAllowedDecimals={2}` | `step={0.01}` |
-| `maxLabel` + `onMaxClick` | TBD — may need to extend Anvil NumberInput or use className override |
+| `maxLabel` + `onMaxClick` | TBD — may need to extend @hypeterminal/ui NumberInput or use className override |
 
 NumberInput files:
 1. apps/terminal/src/components/trade/tradebox/trade-form-fields.tsx
@@ -566,29 +566,29 @@ NumberInput files:
 
 **Current:** `@/components/ui/badge` — variants: default/secondary/destructive/outline/long/short/neutral, sizes: default/sm/xs
 
-**Anvil:** `@/anvil` — `Badge` with tones: error/warning/success/information/neutral/brand
+**@hypeterminal/ui:** `@hypeterminal/ui` — `Badge` with tones: error/warning/success/information/neutral/brand
 
 ### Conversion table
 
-| Current | Anvil |
+| Current | @hypeterminal/ui |
 |---------|-------|
 | `variant="default"` | `tone="brand"` |
 | `variant="secondary"` | `tone="neutral"` |
 | `variant="destructive"` | `tone="error"` |
-| `variant="outline"` | `tone="neutral"` (Anvil badges always have fill+border) |
+| `variant="outline"` | `tone="neutral"` (@hypeterminal/ui badges always have fill+border) |
 | `variant="neutral"` | `tone="neutral"` |
 | `variant="long"` | `tone="success"` + custom className for market-up color |
 | `variant="short"` | `tone="error"` + custom className for market-down color |
-| `size="xs"` | `size="sm"` (Anvil minimum) |
+| `size="xs"` | `size="sm"` (@hypeterminal/ui minimum) |
 | `size="sm"` | `size="sm"` |
 
 ### Trading badges (long/short)
 
 These need market colors. Two options:
-1. Add `tone="long"` and `tone="short"` to Anvil's Badge (preferred — keeps it clean)
+1. Add `tone="long"` and `tone="short"` to @hypeterminal/ui Badge (preferred — keeps it clean)
 2. Use `tone="success"` / `tone="error"` and accept the semantic color difference
 
-Recommendation: Extend Anvil Badge with trading tones after initial migration.
+Recommendation: Extend @hypeterminal/ui Badge with trading tones after initial migration.
 
 ### Files to update
 
@@ -608,9 +608,9 @@ Recommendation: Extend Anvil Badge with trading tones after initial migration.
 
 **Current:** `@/components/ui/card` — Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, CardAction
 
-**Anvil:** `@/anvil` — Same compound structure with added `variant` prop
+**@hypeterminal/ui:** `@hypeterminal/ui` — Same compound structure with added `variant` prop
 
-| Current | Anvil |
+| Current | @hypeterminal/ui |
 |---------|-------|
 | `<Card>` | `<Card variant="outlined">` |
 | `<CardHeader>` | `<CardHeader>` |
@@ -618,7 +618,7 @@ Recommendation: Extend Anvil Badge with trading tones after initial migration.
 | `<CardDescription>` | `<CardDescription>` |
 | `<CardContent>` | `<CardContent>` |
 | `<CardFooter>` | `<CardFooter>` |
-| `<CardAction>` | Not in Anvil — use className positioning |
+| `<CardAction>` | Not in @hypeterminal/ui — use className positioning |
 
 Card files (all in positions/):
 1. orders-tab.tsx
@@ -633,9 +633,9 @@ Card files (all in positions/):
 
 **Current:** `@/components/ui/table` — Table, TableHeader, TableBody, TableRow, TableHead, TableCell
 
-**Anvil:** `@/anvil` — Same structure with added `variant="striped"` option
+**@hypeterminal/ui:** `@hypeterminal/ui` — Same structure with added `variant="striped"` option
 
-| Current | Anvil |
+| Current | @hypeterminal/ui |
 |---------|-------|
 | `<Table>` | `<Table>` |
 | `<TableHeader>` | `<TableHeader>` |
@@ -661,7 +661,7 @@ Table files (same positions/ directory):
 
 ### Switch to Toggle (3 files)
 
-| Current | Anvil |
+| Current | @hypeterminal/ui |
 |---------|-------|
 | `<Switch>` (Radix) | `<Toggle size="sm">` |
 | `<Switch>` + manual label | `<Toggle label="...">` |
@@ -673,7 +673,7 @@ Files:
 
 ### Checkbox (6 files)
 
-| Current | Anvil |
+| Current | @hypeterminal/ui |
 |---------|-------|
 | `<Checkbox>` (Radix) | `<Checkbox size="sm">` |
 | Manual label next to checkbox | `<Checkbox label="..." description="...">` |
@@ -688,7 +688,7 @@ Files:
 
 ### Slider (4 files)
 
-| Current | Anvil |
+| Current | @hypeterminal/ui |
 |---------|-------|
 | `<Slider>` (Radix) | `<Slider>` |
 | Manual label/value display | `<Slider label="..." showValue>` |
@@ -715,7 +715,7 @@ Current (4 components):
 </TooltipProvider>
 ```
 
-Anvil (1 component):
+@hypeterminal/ui (1 component):
 ```tsx
 <Tooltip content="Tip text">
   <button>Hover me</button>
@@ -728,7 +728,7 @@ Files:
 
 ### Sheet to Drawer (2 files)
 
-| Current | Anvil |
+| Current | @hypeterminal/ui |
 |---------|-------|
 | `<Sheet>` | `<Drawer side="right">` |
 | `<SheetTrigger>` | `<DrawerTrigger>` |
@@ -743,7 +743,7 @@ Files:
 
 ### Separator to Divider (1 file)
 
-| Current | Anvil |
+| Current | @hypeterminal/ui |
 |---------|-------|
 | `<Separator>` | `<Divider>` |
 | `orientation="horizontal"` | `orientation="horizontal"` (same) |
@@ -754,9 +754,9 @@ File: bridge-tab.tsx
 
 ## Phase 10b: Missing Components (found during audit)
 
-### Textarea → Anvil Textarea (1 file)
+### Textarea → @hypeterminal/ui Textarea (1 file)
 
-| Current | Anvil |
+| Current | @hypeterminal/ui |
 |---------|-------|
 | `<Textarea>` | `<Textarea size="sm">` |
 | Manual label/error | `<Textarea label="..." errorMessage="...">` (built-in) |
@@ -765,7 +765,7 @@ File: apps/terminal/src/components/ui/input-group.tsx (internal import)
 
 ### Avatar (1 file)
 
-| Current | Anvil |
+| Current | @hypeterminal/ui |
 |---------|-------|
 | `<Avatar>` (Radix) | `<Avatar size="sm">` |
 | Image + fallback | `<Avatar src="..." alt="..." initials="..." status="online">` |
@@ -774,7 +774,7 @@ File: apps/terminal/src/components/trade/components/asset-display.tsx
 
 ### Alert (1 file)
 
-| Current | Anvil |
+| Current | @hypeterminal/ui |
 |---------|-------|
 | `<Alert>` + `<AlertTitle>` + `<AlertDescription>` | `<Alert tone="..." title="..." description="...">` |
 
@@ -782,19 +782,19 @@ File: apps/terminal/src/components/design/components-gallery.tsx
 
 ### Drawer (existing, not Sheet) (1 file)
 
-Current `drawer.tsx` (vaul-based) already imported in token-selector.tsx. Replace with Anvil Drawer.
+Current `drawer.tsx` (vaul-based) already imported in token-selector.tsx. Replace with @hypeterminal/ui Drawer.
 
 File: apps/terminal/src/components/trade/chart/token-selector.tsx
 
 ### Collapsible (1 file — rewrite to Base UI)
 
-Currently wraps Radix Collapsible. Base UI has `@base-ui/react/collapsible` with the same Root/Trigger/Content pattern. Rewrite to use Base UI, style with Anvil tokens. Drop-in replacement.
+Currently wraps Radix Collapsible. Base UI has `@base-ui/react/collapsible` with the same Root/Trigger/Content pattern. Rewrite to use Base UI, style with @hypeterminal/ui tokens. Drop-in replacement.
 
 File: apps/terminal/src/components/trade/tradebox/bridge-tab.tsx
 
-### InfoRow (6 files — rebuild with Anvil tokens)
+### InfoRow (6 files — rebuild with @hypeterminal/ui tokens)
 
-Simple `flex justify-between` with label + value. No Anvil equivalent needed — rebuild as a tiny utility using Anvil tokens (`text-text-weak` for label, `text-text-strong` for value, `border-stroke-weak` for dividers). Delete old component after restyling.
+Simple `flex justify-between` with label + value. No @hypeterminal/ui equivalent needed — rebuild as a tiny utility using @hypeterminal/ui tokens (`text-text-weak` for label, `text-text-strong` for value, `border-stroke-weak` for dividers). Delete old component after restyling.
 
 Files:
 1. apps/terminal/src/components/trade/tradebox/order-summary.tsx
@@ -806,11 +806,11 @@ Files:
 
 ### Empty (0 imports — likely dead code, verify before deleting)
 
-Empty state component. If used, replace with Anvil's `TextBlock` (icon + heading + description) wrapped in a dashed border container. Anvil's `Slot` component is also designed for placeholder states.
+Empty state component. If used, replace with @hypeterminal/ui `TextBlock` (icon + heading + description) wrapped in a dashed border container. @hypeterminal/ui `Slot` component is also designed for placeholder states.
 
 ### Item (0 imports — likely dead code, verify before deleting)
 
-Complex list item compound component. If used, rebuild with Anvil `Card variant="outlined" orientation="horizontal"` or inline layout with Anvil tokens.
+Complex list item compound component. If used, rebuild with @hypeterminal/ui `Card variant="outlined" orientation="horizontal"` or inline layout with @hypeterminal/ui tokens.
 
 ### TimeTicker (2 files — keep as-is)
 
@@ -911,14 +911,14 @@ After all component migrations, sweep every file for remaining old token classes
 
 | Find | Replace |
 |------|---------|
-| `text-5xs` | `text-xs` (Anvil min is 14px) |
+| `text-5xs` | `text-xs` (@hypeterminal/ui min is 14px) |
 | `text-4xs` | `text-xs` |
 | `text-3xs` | `text-xs` |
 | `text-2xs` | `text-xs` |
-| `text-xs` | `text-xs` (stays same — now means 14px in Anvil) |
+| `text-xs` | `text-xs` (stays same — now means 14px in @hypeterminal/ui) |
 | `text-nav` | `text-xs` |
-| `text-sm` | `text-sm` (now means 16px in Anvil) |
-| `text-base` | `text-base` (now means 20px in Anvil) |
+| `text-sm` | `text-sm` (now means 16px in @hypeterminal/ui) |
+| `text-base` | `text-base` (now means 20px in @hypeterminal/ui) |
 
 ### Semantic status colors
 
@@ -945,13 +945,13 @@ After all component migrations, sweep every file for remaining old token classes
 
 ### Delete old UI components
 
-Remove the entire `src/components/ui/` directory EXCEPT these files that have no Anvil equivalent:
+Remove the entire `src/components/ui/` directory EXCEPT these files that have no @hypeterminal/ui equivalent:
 
 **Keep:**
 - `scroll-area.tsx` — replace internals with Base UI ScrollArea, keep the component
-- `skeleton.tsx` — no Anvil equivalent
-- `spinner.tsx` — no Anvil equivalent
-- `command.tsx` — cmdk-based, no Anvil equivalent
+- `skeleton.tsx` — no @hypeterminal/ui equivalent
+- `spinner.tsx` — no @hypeterminal/ui equivalent
+- `command.tsx` — cmdk-based, no @hypeterminal/ui equivalent
 - `sidebar.tsx` — app-specific layout
 - `resizable.tsx` — react-resizable-panels, layout-specific
 - `virtual-table.tsx` — performance optimization, keep
@@ -961,7 +961,7 @@ Remove the entire `src/components/ui/` directory EXCEPT these files that have no
 - `time-ticker.tsx` — pure logic, no UI (2 files use it)
 - `flash.tsx` — pure behavior, update tokens only
 
-**Delete (replaced by Anvil):**
+**Delete (replaced by @hypeterminal/ui):**
 - button.tsx, button-group.tsx
 - dialog.tsx, alert-dialog.tsx
 - tabs.tsx
@@ -986,29 +986,29 @@ Remove the entire `src/components/ui/` directory EXCEPT these files that have no
 - collapsible.tsx
 - table.tsx
 - avatar.tsx
-- info-row.tsx (rebuild with Anvil tokens, delete old)
+- info-row.tsx (rebuild with @hypeterminal/ui tokens, delete old)
 - item.tsx (0 imports — verify dead code, delete)
 - empty.tsx (0 imports — verify dead code, or replace with TextBlock + Slot)
 
 ### Update CLAUDE.md / design-tokens.md
 
-Update project rules to reference Anvil tokens instead of old token names.
+Update project rules to reference @hypeterminal/ui tokens instead of old token names.
 
 ### Update design/ showcase
 
-Rewrite `design-system.tsx`, `components-gallery.tsx`, `consistency-checks.tsx` to use Anvil components — or delete them and rely on Anvil's own showcase pages.
+Rewrite `design-system.tsx`, `components-gallery.tsx`, `consistency-checks.tsx` to use @hypeterminal/ui components — or delete them and rely on @hypeterminal/ui own showcase pages.
 
 ---
 
-## Components Not in Anvil (Use Base UI Directly)
+## Components Not in @hypeterminal/ui (Use Base UI Directly)
 
 | Need | Solution |
 |------|----------|
-| Popover | `@base-ui/react/popover` — style with Anvil tokens |
-| ScrollArea | `@base-ui/react/scroll-area` — style with Anvil tokens |
-| Progress bar | `@base-ui/react/progress` — style with Anvil tokens |
-| Collapsible | `@base-ui/react/collapsible` — style with Anvil tokens |
-| Context menu | `@base-ui/react/context-menu` — style with Anvil tokens |
+| Popover | `@base-ui/react/popover` — style with @hypeterminal/ui tokens |
+| ScrollArea | `@base-ui/react/scroll-area` — style with @hypeterminal/ui tokens |
+| Progress bar | `@base-ui/react/progress` — style with @hypeterminal/ui tokens |
+| Collapsible | `@base-ui/react/collapsible` — style with @hypeterminal/ui tokens |
+| Context menu | `@base-ui/react/context-menu` — style with @hypeterminal/ui tokens |
 | Toast | `@base-ui/react/toast` or keep sonner |
 | Accordion | `@base-ui/react/accordion` — if needed |
 
@@ -1017,9 +1017,9 @@ Rewrite `design-system.tsx`, `components-gallery.tsx`, `consistency-checks.tsx` 
 ## Dependencies
 
 ### Before migration starts
-- [x] ~~Anvil team adds `NumberInput` component~~ — Already exists in Anvil (`number-input.tsx` + showcase)
-- [ ] Verify `@base-ui/react` version compatibility between Anvil and HyperTerminal
-- [ ] Check if Anvil NumberInput supports `maxLabel` + `onMaxClick` (trading "MAX" button) — if not, extend it
+- [x] ~~@hypeterminal/ui team adds `NumberInput` component~~ — Already exists in @hypeterminal/ui (`number-input.tsx` + showcase)
+- [ ] Verify `@base-ui/react` version compatibility between @hypeterminal/ui and HyperTerminal
+- [ ] Check if @hypeterminal/ui NumberInput supports `maxLabel` + `onMaxClick` (trading "MAX" button) — if not, extend it
 
 ### Can run in parallel
 - Phases 1-10 can each be done independently as separate PRs
@@ -1033,6 +1033,6 @@ Rewrite `design-system.tsx`, `components-gallery.tsx`, `consistency-checks.tsx` 
 After each phase:
 1. `npm run build` — no TypeScript errors
 2. `npm run dev` — visual check that components render
-3. Dark mode toggle — verify colors switch correctly (Anvil tokens handle this automatically, no `dark:` prefixes needed for semantic tokens)
+3. Dark mode toggle — verify colors switch correctly (@hypeterminal/ui tokens handle this automatically, no `dark:` prefixes needed for semantic tokens)
 4. Check interactive states: hover, active, focus-visible, disabled
 5. Check mobile layout if the component appears in mobile views
