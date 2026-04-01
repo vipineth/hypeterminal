@@ -6,7 +6,8 @@ Fully replace HyperTerminal's current UI component library and design token syst
 
 ## Source
 
-- **Anvil repo:** `/Users/ankit/Documents/make/practical-ui-design-system/src/anvil/`
+- **UI package:** `packages/ui/src/` (`@hypeterminal/ui`)
+- **UI tokens:** `packages/ui/src/globals.css`
 - **Target:** `/Users/ankit/Documents/make/hypeterminal/apps/terminal/src/`
 
 ---
@@ -15,15 +16,15 @@ Fully replace HyperTerminal's current UI component library and design token syst
 
 ### 0.1 — Copy Anvil into the project
 
-Copy the entire `src/anvil/` directory from the design system repo into `apps/terminal/src/anvil/`.
+Copy `src/components/ui/` from the design system repo into `apps/terminal/src/anvil/`.
 
 Files to copy:
-- All `.tsx` component files
+- All `.tsx` component files (40 components)
 - `index.ts` (barrel exports)
 - `config.ts` (DEFAULT_SIZE = "sm")
 - `types.ts` (Size, BrandConfig)
 - `utils.ts` (cn utility)
-- `globals.css` (design tokens)
+- `globals.css` from `src/styles/globals.css` (design tokens)
 
 ### 0.2 — Merge token CSS
 
@@ -525,15 +526,28 @@ Anvil:
 | Manual error display | `error="..."` prop |
 | Manual icon placement | `iconLeft={...}` / `iconRight={...}` |
 
-### NumberInput cases
+### NumberInput (8 files)
 
-Any input currently used for numeric entry with manual validation should wait for Phase 9 (NumberInput from Anvil). For now, mark these with a `// TODO: migrate to NumberInput` comment:
-- trade-form-fields.tsx (price, amount, quantity inputs)
-- tp-sl-section.tsx (take profit / stop loss values)
-- price-input-with-percent.tsx
-- leverage-slider.tsx / leverage-control.tsx
+Anvil already has `NumberInput` wrapping Base UI NumberField. Current HyperTerminal `number-input.tsx` does manual regex validation, arrow key stepping, and synthetic events — all of which Base UI NumberField handles natively.
 
-### Files to update
+| Current | Anvil |
+|---------|-------|
+| `<NumberInput inputSize="sm" allowDecimals min={0} max={100} step={0.01}>` | `<NumberInput size="sm" min={0} max={100} step={0.01}>` |
+| `allowDecimals={false}` | `step={1}` (integer steps) |
+| `maxAllowedDecimals={2}` | `step={0.01}` |
+| `maxLabel` + `onMaxClick` | TBD — may need to extend Anvil NumberInput or use className override |
+
+NumberInput files:
+1. apps/terminal/src/components/trade/tradebox/trade-form-fields.tsx
+2. apps/terminal/src/components/trade/tradebox/leverage-control.tsx
+3. apps/terminal/src/components/trade/tradebox/deposit-modal.tsx
+4. apps/terminal/src/components/trade/positions/transfer-dialog.tsx
+5. apps/terminal/src/components/trade/positions/send-dialog.tsx
+6. apps/terminal/src/components/trade/positions/position-limit-close-modal.tsx
+7. apps/terminal/src/components/trade/components/spot-swap-modal.tsx
+8. apps/terminal/src/components/trade/components/global-settings-dialog.tsx
+
+### TextInput files to update
 
 1. apps/terminal/src/components/trade/positions/send-dialog.tsx
 2. apps/terminal/src/components/trade/mobile/mobile-trade-view.tsx
@@ -738,6 +752,80 @@ File: bridge-tab.tsx
 
 ---
 
+## Phase 10b: Missing Components (found during audit)
+
+### Textarea → Anvil Textarea (1 file)
+
+| Current | Anvil |
+|---------|-------|
+| `<Textarea>` | `<Textarea size="sm">` |
+| Manual label/error | `<Textarea label="..." errorMessage="...">` (built-in) |
+
+File: apps/terminal/src/components/ui/input-group.tsx (internal import)
+
+### Avatar (1 file)
+
+| Current | Anvil |
+|---------|-------|
+| `<Avatar>` (Radix) | `<Avatar size="sm">` |
+| Image + fallback | `<Avatar src="..." alt="..." initials="..." status="online">` |
+
+File: apps/terminal/src/components/trade/components/asset-display.tsx
+
+### Alert (1 file)
+
+| Current | Anvil |
+|---------|-------|
+| `<Alert>` + `<AlertTitle>` + `<AlertDescription>` | `<Alert tone="..." title="..." description="...">` |
+
+File: apps/terminal/src/components/design/components-gallery.tsx
+
+### Drawer (existing, not Sheet) (1 file)
+
+Current `drawer.tsx` (vaul-based) already imported in token-selector.tsx. Replace with Anvil Drawer.
+
+File: apps/terminal/src/components/trade/chart/token-selector.tsx
+
+### Collapsible (1 file — rewrite to Base UI)
+
+Currently wraps Radix Collapsible. Base UI has `@base-ui/react/collapsible` with the same Root/Trigger/Content pattern. Rewrite to use Base UI, style with Anvil tokens. Drop-in replacement.
+
+File: apps/terminal/src/components/trade/tradebox/bridge-tab.tsx
+
+### InfoRow (6 files — rebuild with Anvil tokens)
+
+Simple `flex justify-between` with label + value. No Anvil equivalent needed — rebuild as a tiny utility using Anvil tokens (`text-text-weak` for label, `text-text-strong` for value, `border-stroke-weak` for dividers). Delete old component after restyling.
+
+Files:
+1. apps/terminal/src/components/trade/tradebox/order-summary.tsx
+2. apps/terminal/src/components/trade/tradebox/deposit-modal.tsx
+3. apps/terminal/src/components/trade/tradebox/bridge-tab.tsx
+4. apps/terminal/src/components/trade/tradebox/account-panel.tsx
+5. apps/terminal/src/components/trade/positions/position-tpsl-modal.tsx
+6. apps/terminal/src/components/trade/positions/position-limit-close-modal.tsx
+
+### Empty (0 imports — likely dead code, verify before deleting)
+
+Empty state component. If used, replace with Anvil's `TextBlock` (icon + heading + description) wrapped in a dashed border container. Anvil's `Slot` component is also designed for placeholder states.
+
+### Item (0 imports — likely dead code, verify before deleting)
+
+Complex list item compound component. If used, rebuild with Anvil `Card variant="outlined" orientation="horizontal"` or inline layout with Anvil tokens.
+
+### TimeTicker (2 files — keep as-is)
+
+Pure logic component (requestAnimationFrame timer). Returns raw text, zero UI. No design system relevance. Keep in place, no changes needed.
+
+Files:
+1. apps/terminal/src/components/trade/positions/twap-tab.tsx
+2. apps/terminal/src/components/trade/mobile/mobile-twap-tab.tsx
+
+### Flash (0 imports — keep, update tokens)
+
+Price flash animation. Pure behavior. Keep as-is but update CSS variables from `--positive`/`--negative` to `--market-up`/`--market-down` during token sweep.
+
+---
+
 ## Phase 11: Global Token Find-and-Replace
 
 After all component migrations, sweep every file for remaining old token classes.
@@ -870,6 +958,8 @@ Remove the entire `src/components/ui/` directory EXCEPT these files that have no
 - `flash.tsx` — trading animation, keep
 - `chart.tsx` — recharts integration, keep
 - `sonner.tsx` — toast notifications, keep
+- `time-ticker.tsx` — pure logic, no UI (2 files use it)
+- `flash.tsx` — pure behavior, update tokens only
 
 **Delete (replaced by Anvil):**
 - button.tsx, button-group.tsx
@@ -896,8 +986,9 @@ Remove the entire `src/components/ui/` directory EXCEPT these files that have no
 - collapsible.tsx
 - table.tsx
 - avatar.tsx
-- item.tsx, info-row.tsx, empty.tsx
-- time-ticker.tsx (if unused)
+- info-row.tsx (rebuild with Anvil tokens, delete old)
+- item.tsx (0 imports — verify dead code, delete)
+- empty.tsx (0 imports — verify dead code, or replace with TextBlock + Slot)
 
 ### Update CLAUDE.md / design-tokens.md
 
@@ -926,8 +1017,9 @@ Rewrite `design-system.tsx`, `components-gallery.tsx`, `consistency-checks.tsx` 
 ## Dependencies
 
 ### Before migration starts
-- [ ] Anvil team adds `NumberInput` component wrapping Base UI NumberField
+- [x] ~~Anvil team adds `NumberInput` component~~ — Already exists in Anvil (`number-input.tsx` + showcase)
 - [ ] Verify `@base-ui/react` version compatibility between Anvil and HyperTerminal
+- [ ] Check if Anvil NumberInput supports `maxLabel` + `onMaxClick` (trading "MAX" button) — if not, extend it
 
 ### Can run in parallel
 - Phases 1-10 can each be done independently as separate PRs

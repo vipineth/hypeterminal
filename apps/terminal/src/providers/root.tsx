@@ -4,14 +4,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { DEFAULT_BUILDER_CONFIG, PROJECT_NAME } from "@/config/hyperliquid";
 import { config } from "@/config/wagmi";
-import { configureNetwork, HyperliquidProvider } from "@/lib/hyperliquid";
+import { HyperliquidProvider } from "@/lib/hyperliquid";
 import { MarketsProvider } from "@/lib/hyperliquid/markets";
 import { getNetwork } from "@/lib/network";
 import "@/lib/i18n";
 
 const network = getNetwork();
 const env = network === "testnet" ? "Testnet" : "Mainnet";
-configureNetwork(network === "testnet");
 
 const isServer = typeof document === "undefined";
 

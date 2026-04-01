@@ -1,4 +1,4 @@
-import { RingBuffer } from "@hypeterminal/hl-react/internal/circular-buffer";
+import { RingBuffer } from "@hypeterminal/hl-react/internal/circular-buffer/ring-buffer";
 import { describe, expect, it } from "vitest";
 
 type TwapHistoryItem = {

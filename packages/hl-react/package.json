@@ -11,7 +11,8 @@
 		"./markets/types": "./src/markets/types.ts",
 		"./registries/*": "./src/registries/*.ts",
 		"./internal/websocket/*": "./src/internal/websocket/*.ts",
-		"./internal/circular-buffer": "./src/internal/circular-buffer/index.ts"
+		"./internal/circular-buffer/ring-buffer": "./src/internal/circular-buffer/ring-buffer.ts",
+		"./internal/circular-buffer/use-ring-buffer": "./src/internal/circular-buffer/use-ring-buffer.ts"
 	},
 	"devDependencies": {
 		"@types/react": "^19.2.0"

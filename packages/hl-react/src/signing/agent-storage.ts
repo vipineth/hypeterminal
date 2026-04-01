@@ -1,4 +1,4 @@
-import { useCallback, useSyncExternalStore } from "react";
+import { useRef, useSyncExternalStore } from "react";
 import type { Address, Hex } from "viem";
 import { z } from "zod";
 import type { AgentWallet, HyperliquidEnv } from "./types";
@@ -67,37 +67,38 @@ export function removeAgentFromStorage(env: HyperliquidEnv, userAddress: string)
 }
 
 function subscribeToStorage(callback: () => void): () => void {
+	if (typeof window === "undefined") return () => {};
 	const handleStorage = () => callback();
 	window.addEventListener("storage", handleStorage);
 	return () => window.removeEventListener("storage", handleStorage);
 }
 
 export function useAgentWalletStorage(env: HyperliquidEnv, userAddress: string | undefined): AgentWallet | null {
-	const getSnapshot = useCallback(() => {
+	const cacheRef = useRef<{ raw: string | null; parsed: AgentWallet | null }>({ raw: null, parsed: null });
+
+	function getSnapshot(): string | null {
 		if (!userAddress) return null;
-		return readAgentFromStorage(env, userAddress);
-	}, [env, userAddress]);
+		const data = readAgentFromStorage(env, userAddress);
+		return data ? JSON.stringify(data) : null;
+	}
 
-	const agent = useSyncExternalStore(
-		subscribeToStorage,
-		() => {
-			const data = getSnapshot();
-			return data ? JSON.stringify(data) : null;
-		},
-		() => null,
-	);
+	const raw = useSyncExternalStore(subscribeToStorage, getSnapshot, () => null);
 
-	return agent ? (JSON.parse(agent) as AgentWallet) : null;
+	if (raw !== cacheRef.current.raw) {
+		cacheRef.current = { raw, parsed: raw ? (JSON.parse(raw) as AgentWallet) : null };
+	}
+
+	return cacheRef.current.parsed;
 }
 
 export function useAgentWalletActions() {
-	const setAgent = useCallback((env: HyperliquidEnv, userAddress: string, privateKey: string, publicKey: string) => {
+	function setAgent(env: HyperliquidEnv, userAddress: string, privateKey: string, publicKey: string) {
 		writeAgentToStorage(env, userAddress, privateKey, publicKey);
-	}, []);
+	}
 
-	const clearAgent = useCallback((env: HyperliquidEnv, userAddress: string) => {
+	function clearAgent(env: HyperliquidEnv, userAddress: string) {
 		removeAgentFromStorage(env, userAddress);
-	}, []);
+	}
 
 	return { setAgent, clearAgent };
 }

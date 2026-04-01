@@ -1,10 +1,8 @@
 import type { InfoClient, SubscriptionClient } from "@nktkas/hyperliquid";
 import type { ReactNode } from "react";
-import { createContext, useContext } from "react";
-import type { HyperliquidContextValue } from "./provider";
+import { useContext } from "react";
+import { HyperliquidContext, type HyperliquidContextValue } from "./provider";
 import type { BuilderConfig, HyperliquidEnv } from "./signing/types";
-
-const HyperliquidContext = createContext<HyperliquidContextValue | null>(null);
 
 export interface MockHyperliquidProviderProps {
 	children: ReactNode;
@@ -30,6 +28,7 @@ export function MockHyperliquidProvider({ children, value = {} }: MockHyperliqui
 		info: createMockInfoClient(),
 		subscription: createMockSubscriptionClient(),
 		env: "Testnet" as HyperliquidEnv,
+		isTestnet: true,
 		builderConfig: { b: "0x0000000000000000000000000000000000000000", f: 0 } as BuilderConfig,
 		agentName: "test",
 		clientKey: "mock",

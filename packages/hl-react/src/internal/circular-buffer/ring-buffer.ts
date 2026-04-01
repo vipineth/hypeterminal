@@ -5,15 +5,9 @@ export type RingBufferOptions<T> = {
 	shouldReplace?: (existing: T, incoming: T) => boolean;
 };
 
-/**
- * A bounded sorted buffer with deduplication.
- * - Pre-allocated Map for O(1) deduplication lookups
- * - In-place sorting to minimize allocations
- * - Stable snapshot reference when unchanged
- */
 export class RingBuffer<T> {
 	private items: T[];
-	private keyMap: Map<string, T>;
+	private keyMap: Map<string, number>;
 	private readonly maxSize: number;
 	private readonly getKey: (item: T) => string;
 	private readonly compare: (a: T, b: T) => number;
@@ -38,25 +32,18 @@ export class RingBuffer<T> {
 		for (let i = 0; i < newItems.length; i++) {
 			const item = newItems[i];
 			const key = this.getKey(item);
-			const hasExisting = this.keyMap.has(key);
-			const existing = this.keyMap.get(key);
+			const existingIndex = this.keyMap.get(key);
 
-			if (hasExisting) {
-				const existingItem = existing as T;
+			if (existingIndex !== undefined) {
+				const existingItem = this.items[existingIndex];
 				if (!this.shouldReplace || !this.shouldReplace(existingItem, item)) continue;
 
-				const existingIndex = this.items.findIndex((candidate) => this.getKey(candidate) === key);
-				if (existingIndex === -1) {
-					this.items.push(item);
-				} else {
-					this.items[existingIndex] = item;
-				}
-				this.keyMap.set(key, item);
+				this.items[existingIndex] = item;
 				changed = true;
 				continue;
 			}
 
-			this.keyMap.set(key, item);
+			this.keyMap.set(key, this.items.length);
 			this.items.push(item);
 			changed = true;
 		}
@@ -64,6 +51,7 @@ export class RingBuffer<T> {
 		if (!changed) return false;
 
 		this.items.sort(this.compare);
+		this.rebuildKeyMap();
 
 		if (this.items.length > this.maxSize) {
 			for (let i = this.maxSize; i < this.items.length; i++) {
@@ -95,5 +83,12 @@ export class RingBuffer<T> {
 
 	get size(): number {
 		return this.items.length;
+	}
+
+	private rebuildKeyMap(): void {
+		this.keyMap.clear();
+		for (let i = 0; i < this.items.length; i++) {
+			this.keyMap.set(this.getKey(this.items[i]), i);
+		}
 	}
 }

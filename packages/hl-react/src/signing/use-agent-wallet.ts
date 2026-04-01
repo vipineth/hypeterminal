@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import type { Address } from "viem";
 import { type PrivateKeyAccount, privateKeyToAccount } from "viem/accounts";
 import { useConnection } from "wagmi";
@@ -21,14 +20,14 @@ export function useAgentWallet(): UseAgentWalletResult {
 
 	const agentWallet = useAgentWalletStorage(env, userAddress);
 
-	const signer = useMemo(() => {
+	const signer = (() => {
 		if (!isReady || !agentWallet?.privateKey) return null;
 		try {
 			return privateKeyToAccount(agentWallet.privateKey);
 		} catch {
 			return null;
 		}
-	}, [isReady, agentWallet?.privateKey]);
+	})();
 
 	return {
 		data: isReady ? agentWallet : null,

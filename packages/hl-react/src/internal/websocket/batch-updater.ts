@@ -6,20 +6,26 @@ interface BatchedUpdater<T> {
 	destroy: () => void;
 }
 
+const scheduleFrame =
+	typeof requestAnimationFrame === "function" ? requestAnimationFrame : (cb: () => void) => setTimeout(cb, 16);
+
+const cancelFrame =
+	typeof cancelAnimationFrame === "function" ? cancelAnimationFrame : (id: number) => clearTimeout(id);
+
 export function createBatchedUpdater<T>(flush: FlushCallback<T>): BatchedUpdater<T> {
 	let buffer: T[] = [];
 	let rafId: number | null = null;
 
 	function scheduleFlush() {
 		if (rafId !== null) return;
-		rafId = requestAnimationFrame(() => {
+		rafId = scheduleFrame(() => {
 			rafId = null;
 			if (buffer.length > 0) {
 				const items = buffer;
 				buffer = [];
 				flush(items);
 			}
-		});
+		}) as number;
 	}
 
 	return {
@@ -29,7 +35,7 @@ export function createBatchedUpdater<T>(flush: FlushCallback<T>): BatchedUpdater
 		},
 		flush: () => {
 			if (rafId !== null) {
-				cancelAnimationFrame(rafId);
+				cancelFrame(rafId);
 				rafId = null;
 			}
 			if (buffer.length > 0) {
@@ -40,7 +46,7 @@ export function createBatchedUpdater<T>(flush: FlushCallback<T>): BatchedUpdater
 		},
 		destroy: () => {
 			if (rafId !== null) {
-				cancelAnimationFrame(rafId);
+				cancelFrame(rafId);
 				rafId = null;
 			}
 			buffer = [];

@@ -28,12 +28,12 @@ export function useThrottledValue<T>(value: T, interval: number): T {
 		}
 
 		const remaining = interval - (now - lastUpdateTime.current);
-		const id = window.setTimeout(() => {
+		const id = setTimeout(() => {
 			lastUpdateTime.current = Date.now();
 			setThrottledValue(value);
 		}, remaining);
 
-		return () => window.clearTimeout(id);
+		return () => clearTimeout(id);
 	}, [value, interval]);
 
 	return throttledValue;

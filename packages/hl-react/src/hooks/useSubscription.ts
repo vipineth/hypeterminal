@@ -1,6 +1,6 @@
 import type { ISubscription, SubscriptionClient } from "@nktkas/hyperliquid";
 import { useRef } from "react";
-import { RingBuffer } from "../internal/circular-buffer";
+import { RingBuffer } from "../internal/circular-buffer/ring-buffer";
 import { useHyperliquid } from "../provider";
 import { serializeKey, subscriptionKeys } from "../query/keys";
 import { getAccumulateConfig, getDefaultThrottle } from "../registries/subscription";

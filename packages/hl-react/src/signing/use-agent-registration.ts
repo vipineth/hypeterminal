@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Address } from "viem";
 import { zeroAddress } from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
@@ -38,10 +38,22 @@ export function useAgentRegistration(): UseAgentRegistrationResult {
 
 	const [currentStep, setCurrentStep] = useState<RegistrationStep>(null);
 	const { setAgent, clearAgent } = useAgentWalletActions();
+	const mountedRef = useRef(true);
+
+	useEffect(() => {
+		mountedRef.current = true;
+		return () => {
+			mountedRef.current = false;
+		};
+	}, []);
 
 	const agentStatus = useAgentStatus();
 	const approveBuilderFee = useExchange("approveBuilderFee");
 	const approveAgent = useExchange("approveAgent");
+
+	function safeSetStep(step: RegistrationStep) {
+		if (mountedRef.current) setCurrentStep(step);
+	}
 
 	const registration = useMutation({
 		mutationKey: ["hl", "registration", address],
@@ -51,7 +63,7 @@ export function useAgentRegistration(): UseAgentRegistrationResult {
 			let requirements = await agentStatus.refetch();
 
 			if (requirements.needsBuilderFee && builderConfig?.b && builderConfig?.f !== undefined) {
-				setCurrentStep("fee");
+				safeSetStep("fee");
 				await approveBuilderFee.mutateAsync({
 					builder: builderConfig.b,
 					maxFeeRate: convertFeeToPercentageString(builderConfig.f),
@@ -60,7 +72,7 @@ export function useAgentRegistration(): UseAgentRegistrationResult {
 			}
 
 			if (requirements.needsAgent) {
-				setCurrentStep("agent");
+				safeSetStep("agent");
 				clearAgent(env, address);
 
 				const privateKey = generatePrivateKey();
@@ -71,22 +83,22 @@ export function useAgentRegistration(): UseAgentRegistrationResult {
 				await approveAgent.mutateAsync({ agentAddress: publicKey, agentName });
 				await agentStatus.refetch();
 
-				setCurrentStep(null);
+				safeSetStep(null);
 				return publicKey;
 			}
 
-			setCurrentStep(null);
+			safeSetStep(null);
 			return agentStatus.agentAddress ?? zeroAddress;
 		},
 	});
 
 	const status = deriveRegistrationStatus(registration.isPending, registration.isError, currentStep);
 
-	const reset = useCallback(() => {
+	function reset() {
 		if (address) clearAgent(env, address);
 		registration.reset();
 		setCurrentStep(null);
-	}, [address, env, clearAgent, registration]);
+	}
 
 	return {
 		register: registration.mutateAsync,

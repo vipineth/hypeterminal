@@ -1,0 +1,402 @@
+@import "tailwindcss";
+
+/* ============================================
+   Anvil Design System — Design Tokens
+   Source: Figma variable exports (src/tokens/)
+   ALL values taken directly from token files.
+   ============================================ */
+
+/* --- Dark mode: class-based toggle --- */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* =============================================
+   Layer 1: Primitive Tokens
+   These override Tailwind defaults with our
+   design system's scale.
+   ============================================= */
+@theme {
+	/* ---- Font Families ---- */
+	--font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+	--font-mono: ui-monospace, "SF Mono", monospace;
+
+	/* ---- Typography Scale (Desktop) ----
+     Figma name      → Tailwind class
+     Micro    12/16  → text-2xs
+     Tiny     14/20  → text-xs
+     Small    16/24  → text-sm
+     Heading4 20/28  → text-base
+     Heading3 24/32  → text-lg
+     Heading2 32/40  → text-xl
+     Heading1 40/48  → text-2xl
+     Display  56/64  → text-3xl
+  */
+	--text-2xs: 12px;
+	--text-2xs--line-height: 16px;
+	--text-xs: 14px;
+	--text-xs--line-height: 20px;
+	--text-sm: 16px;
+	--text-sm--line-height: 24px;
+	--text-base: 20px;
+	--text-base--line-height: 28px;
+	--text-lg: 24px;
+	--text-lg--line-height: 32px;
+	--text-xl: 32px;
+	--text-xl--line-height: 40px;
+	--text-2xl: 40px;
+	--text-2xl--line-height: 48px;
+	--text-3xl: 56px;
+	--text-3xl--line-height: 64px;
+
+	/* ---- Grey Solid Primitives (from _Theme.json) ---- */
+	--color-grey-solid-0: #ffffff;
+	--color-grey-solid-50: #f5f6fa;
+	--color-grey-solid-800: #292b33;
+	--color-grey-solid-850: #1d1e26;
+	--color-grey-solid-900: #12131a;
+	--color-grey-solid-1000: #000000;
+
+	/* ---- Spacing Base (from Spacing.json) ----
+     4px grid: Tailwind 1=4px, 2=8px, 3=12px, 4=16px ...
+     Figma Spacing/4  → p-1, gap-1, m-1
+     Figma Spacing/8  → p-2, gap-2, m-2
+     Figma Spacing/12 → p-3, gap-3, m-3
+     etc. All Figma spacing values divide evenly by 4.
+  */
+	--spacing: 4px;
+
+	/* --- ANVIL:RADIUS:START --- */
+	/* Global radius control: set --radius-factor on :root
+       none = 0, sm = 0.5, md = 1 (default), lg = 1.5
+       For "full", set pill-able radii to 9999px directly */
+	--radius-factor: 0.5;
+	--radius-none: 0px;
+	--radius-4: calc(4px * var(--radius-factor));
+	--radius-8: calc(8px * var(--radius-factor));
+	--radius-12: calc(12px * var(--radius-factor));
+	--radius-16: calc(16px * var(--radius-factor));
+	--radius-20: calc(20px * var(--radius-factor));
+	--radius-24: calc(24px * var(--radius-factor));
+	--radius-32: calc(32px * var(--radius-factor));
+	--radius-full: 9999px;
+	/* --- ANVIL:RADIUS:END --- */
+
+	/* ---- Shadows ---- */
+	--shadow-raised: 0 4px 8px -2px rgba(0, 0, 0, 0.04), 0 2px 4px -2px rgba(0, 0, 0, 0.08);
+	--shadow-overlay: 0 20px 24px -4px rgba(0, 0, 0, 0.08), 0 8px 8px -4px rgba(0, 0, 0, 0.04);
+	--inset-shadow-sunken: inset 0 1px 4px rgba(0, 0, 0, 0.08);
+
+	/* ---- Letter Spacing ---- */
+	--tracking-uppercase: 2px;
+	--tracking-heading-1: -0.5px;
+}
+
+/* =============================================
+   Layer 2: Semantic Tokens
+   Light/Dark mode values from Colours semantic/
+   ============================================= */
+@layer base {
+	/* ==================== LIGHT MODE ==================== */
+	:root {
+		color-scheme: light;
+
+		/* Background */
+		--bg-base: #ffffff;
+		--bg-raised: #ffffff;
+		--bg-overlay: #ffffff;
+		--bg-sunken: #f5f6fa;
+		--bg-alternate: #f5f6fa;
+		--bg-brand: #4c64d9;
+		--bg-inverse: #12131a;
+
+		/* Text */
+		--text-strong: #000626e5;
+		--text-weak: #000933a6;
+		--text-brand: #4c64d9;
+		--text-disabled: #0011661a;
+		--text-error: #c73a3a;
+		--text-warning: #8f6c1a;
+		--text-success: #067a57;
+		--text-info: #1a74a8;
+		--text-inverse-strong: #ffffff;
+		--text-inverse-weak: #ffffffc7;
+		--text-inverse-disabled: #ffffff1f;
+
+		/* Fill */
+		--fill-strong: #000626e5;
+		--fill-weak: #0015800a;
+		--fill-weaker: #00158005;
+		--fill-hover: #0015800a;
+		--fill-press: #0011661a;
+		--fill-selected: #4c64d9;
+		--fill-disabled: #0011661a;
+		--fill-overlay: #000d4d73;
+		--fill-brand-strong: #4c64d9;
+		--fill-brand-weak: #4c64d90d;
+		--fill-error-strong: #c73a3a;
+		--fill-error-weak: #ff4a4a0d;
+		--fill-warning-strong: #8f6c1a;
+		--fill-warning-weak: #ffc02e0d;
+		--fill-success-strong: #067a57;
+		--fill-success-weak: #0acc920d;
+		--fill-info-strong: #1a74a8;
+		--fill-info-weak: #26b0ff0d;
+		--fill-inverse-strong: #ffffff;
+		--fill-inverse-weak: #ffffff0f;
+		--fill-inverse-hover: #ffffff0f;
+		--fill-inverse-press: #ffffff1f;
+		--fill-inverse-disabled: #ffffff1f;
+		--fill-white: #ffffff;
+		--fill-yellow: #fec62e;
+
+		/* Stroke */
+		--stroke-strong: #000d4d73;
+		--stroke-weak: #0011661a;
+		--stroke-selected: #4c64d9;
+		--stroke-focus: #4c64d9;
+		--stroke-disabled: #0011661a;
+		--stroke-brand-strong: #4c64d9cc;
+		--stroke-brand-weak: #4c64d933;
+		--stroke-error-strong: #c73a3acc;
+		--stroke-error-weak: #c73a3a24;
+		--stroke-warning-strong: #8f6c1acc;
+		--stroke-warning-weak: #8f6c1a33;
+		--stroke-success-strong: #067a57cc;
+		--stroke-success-weak: #067a5733;
+		--stroke-info-strong: #1a74a8cc;
+		--stroke-info-weak: #1a74a833;
+		--stroke-inverse-strong: #ffffff99;
+		--stroke-inverse-weak: #ffffff1f;
+		--stroke-inverse-disabled: #ffffff1f;
+
+		/* Icon */
+		--icon-neutral: #000d4d73;
+		--icon-brand: #4c64d9cc;
+		--icon-disabled: #0011661a;
+		--icon-error: #c73a3acc;
+		--icon-warning: #8f6c1acc;
+		--icon-success: #067a57cc;
+		--icon-info: #1a74a8cc;
+		--icon-inverse: #ffffff99;
+		--icon-inverse-strong: #ffffff;
+		--icon-inverse-disabled: #ffffff1f;
+	}
+
+	/* ==================== DARK MODE ==================== */
+	.dark {
+		color-scheme: dark;
+
+		/* Background */
+		--bg-base: #12131a;
+		--bg-raised: #1d1e26;
+		--bg-overlay: #292b33;
+		--bg-sunken: #000000;
+		--bg-alternate: #1d1e26;
+		--bg-brand: #b2bcf1;
+		--bg-inverse: #ffffff;
+
+		/* Text */
+		--text-strong: #ffffff;
+		--text-weak: #ffffffc7;
+		--text-brand: #b2bcf1;
+		--text-disabled: #ffffff1f;
+		--text-error: #ff9c9c;
+		--text-warning: #e0be70;
+		--text-success: #77c7af;
+		--text-info: #7ec0e5;
+		--text-inverse-strong: #000626e5;
+		--text-inverse-weak: #000933a6;
+		--text-inverse-disabled: #0011661a;
+
+		/* Fill */
+		--fill-strong: #ffffff;
+		--fill-weak: #ffffff0f;
+		--fill-weaker: #ffffff08;
+		--fill-hover: #ffffff0f;
+		--fill-press: #ffffff1f;
+		--fill-selected: #b2bcf1;
+		--fill-disabled: #ffffff1f;
+		--fill-overlay: #000626e5;
+		--fill-brand-strong: #b2bcf1;
+		--fill-brand-weak: #b2bcf10f;
+		--fill-error-strong: #ff9c9c;
+		--fill-error-weak: #ff9c9c14;
+		--fill-warning-strong: #e0be70;
+		--fill-warning-weak: #e0be7014;
+		--fill-success-strong: #77c7af;
+		--fill-success-weak: #77c7af14;
+		--fill-info-strong: #7ec0e5;
+		--fill-info-weak: #7ec0e514;
+		--fill-inverse-strong: #12131a;
+		--fill-inverse-weak: #0015800a;
+		--fill-inverse-hover: #0015800a;
+		--fill-inverse-press: #0011661a;
+		--fill-inverse-disabled: #0011661a;
+		--fill-white: #ffffff;
+		--fill-yellow: #fec62e;
+
+		/* Stroke */
+		--stroke-strong: #ffffff99;
+		--stroke-weak: #ffffff1f;
+		--stroke-selected: #b2bcf1;
+		--stroke-focus: #b2bcf1;
+		--stroke-disabled: #ffffff1f;
+		--stroke-brand-strong: #b2bcf1cc;
+		--stroke-brand-weak: #b2bcf133;
+		--stroke-error-strong: #ff9c9ccc;
+		--stroke-error-weak: #ff9c9c33;
+		--stroke-warning-strong: #e0be70cc;
+		--stroke-warning-weak: #e0be7033;
+		--stroke-success-strong: #77c7afcc;
+		--stroke-success-weak: #77c7af33;
+		--stroke-info-strong: #7ec0e5cc;
+		--stroke-info-weak: #7ec0e533;
+		--stroke-inverse-strong: #000d4d73;
+		--stroke-inverse-weak: #0011661a;
+		--stroke-inverse-disabled: #0011661a;
+
+		/* Icon */
+		--icon-neutral: #ffffff99;
+		--icon-brand: #b2bcf1cc;
+		--icon-disabled: #ffffff1f;
+		--icon-error: #ff9c9ccc;
+		--icon-warning: #e0be70cc;
+		--icon-success: #77c7afcc;
+		--icon-info: #7ec0e5cc;
+		--icon-inverse: #000d4d73;
+		--icon-inverse-strong: #000626e5;
+		--icon-inverse-disabled: #0011661a;
+	}
+}
+
+/* =============================================
+   Layer 3: Wire semantic tokens → Tailwind
+   These create utility classes like bg-fill-brand-strong
+   ============================================= */
+@theme inline {
+	/* Background */
+	--color-bg-base: var(--bg-base);
+	--color-bg-raised: var(--bg-raised);
+	--color-bg-overlay: var(--bg-overlay);
+	--color-bg-sunken: var(--bg-sunken);
+	--color-bg-alternate: var(--bg-alternate);
+	--color-bg-brand: var(--bg-brand);
+	--color-bg-inverse: var(--bg-inverse);
+
+	/* Text */
+	--color-text-strong: var(--text-strong);
+	--color-text-weak: var(--text-weak);
+	--color-text-brand: var(--text-brand);
+	--color-text-disabled: var(--text-disabled);
+	--color-text-error: var(--text-error);
+	--color-text-warning: var(--text-warning);
+	--color-text-success: var(--text-success);
+	--color-text-info: var(--text-info);
+	--color-text-inverse-strong: var(--text-inverse-strong);
+	--color-text-inverse-weak: var(--text-inverse-weak);
+	--color-text-inverse-disabled: var(--text-inverse-disabled);
+
+	/* Fill */
+	--color-fill-strong: var(--fill-strong);
+	--color-fill-weak: var(--fill-weak);
+	--color-fill-weaker: var(--fill-weaker);
+	--color-fill-hover: var(--fill-hover);
+	--color-fill-press: var(--fill-press);
+	--color-fill-selected: var(--fill-selected);
+	--color-fill-disabled: var(--fill-disabled);
+	--color-fill-overlay: var(--fill-overlay);
+	--color-fill-brand-strong: var(--fill-brand-strong);
+	--color-fill-brand-weak: var(--fill-brand-weak);
+	--color-fill-error-strong: var(--fill-error-strong);
+	--color-fill-error-weak: var(--fill-error-weak);
+	--color-fill-warning-strong: var(--fill-warning-strong);
+	--color-fill-warning-weak: var(--fill-warning-weak);
+	--color-fill-success-strong: var(--fill-success-strong);
+	--color-fill-success-weak: var(--fill-success-weak);
+	--color-fill-info-strong: var(--fill-info-strong);
+	--color-fill-info-weak: var(--fill-info-weak);
+	--color-fill-inverse-strong: var(--fill-inverse-strong);
+	--color-fill-inverse-weak: var(--fill-inverse-weak);
+	--color-fill-inverse-hover: var(--fill-inverse-hover);
+	--color-fill-inverse-press: var(--fill-inverse-press);
+	--color-fill-inverse-disabled: var(--fill-inverse-disabled);
+	--color-fill-white: var(--fill-white);
+	--color-fill-yellow: var(--fill-yellow);
+
+	/* Stroke */
+	--color-stroke-strong: var(--stroke-strong);
+	--color-stroke-weak: var(--stroke-weak);
+	--color-stroke-selected: var(--stroke-selected);
+	--color-stroke-focus: var(--stroke-focus);
+	--color-stroke-disabled: var(--stroke-disabled);
+	--color-stroke-brand-strong: var(--stroke-brand-strong);
+	--color-stroke-brand-weak: var(--stroke-brand-weak);
+	--color-stroke-error-strong: var(--stroke-error-strong);
+	--color-stroke-error-weak: var(--stroke-error-weak);
+	--color-stroke-warning-strong: var(--stroke-warning-strong);
+	--color-stroke-warning-weak: var(--stroke-warning-weak);
+	--color-stroke-success-strong: var(--stroke-success-strong);
+	--color-stroke-success-weak: var(--stroke-success-weak);
+	--color-stroke-info-strong: var(--stroke-info-strong);
+	--color-stroke-info-weak: var(--stroke-info-weak);
+	--color-stroke-inverse-strong: var(--stroke-inverse-strong);
+	--color-stroke-inverse-weak: var(--stroke-inverse-weak);
+	--color-stroke-inverse-disabled: var(--stroke-inverse-disabled);
+
+	/* Icon */
+	--color-icon-neutral: var(--icon-neutral);
+	--color-icon-brand: var(--icon-brand);
+	--color-icon-disabled: var(--icon-disabled);
+	--color-icon-error: var(--icon-error);
+	--color-icon-warning: var(--icon-warning);
+	--color-icon-success: var(--icon-success);
+	--color-icon-info: var(--icon-info);
+	--color-icon-inverse: var(--icon-inverse);
+	--color-icon-inverse-strong: var(--icon-inverse-strong);
+	--color-icon-inverse-disabled: var(--icon-inverse-disabled);
+}
+
+/* =============================================
+   Layer 4: Responsive Typography
+   Mobile overrides for text-xl, text-2xl, text-3xl
+   ============================================= */
+@layer base {
+	@media (max-width: 767px) {
+		:root,
+		.dark {
+			/* text-xl: 28px/36px on mobile (vs 32px/40px desktop) */
+			--text-xl: 28px;
+			--text-xl--line-height: 36px;
+			/* text-2xl: 36px/44px on mobile (vs 40px/48px desktop) */
+			--text-2xl: 36px;
+			--text-2xl--line-height: 44px;
+			/* text-3xl: 40px/48px on mobile (vs 56px/64px desktop) */
+			--text-3xl: 40px;
+			--text-3xl--line-height: 48px;
+		}
+	}
+}
+
+/* =============================================
+   Base Styles
+   ============================================= */
+@layer base {
+	* {
+		border-color: var(--stroke-weak);
+	}
+
+	body {
+		font-family: var(--font-sans);
+		background-color: var(--bg-base);
+		color: var(--text-strong);
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	@supports (-webkit-touch-callout: none) {
+		input,
+		textarea,
+		select {
+			font-size: max(1em, 16px);
+		}
+	}
+}

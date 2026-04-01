@@ -1,5 +1,4 @@
 import type { AllDexsClearinghouseStateWsEvent } from "@nktkas/hyperliquid";
-import { useMemo } from "react";
 import { useConnection } from "wagmi";
 import { useSubscription } from "../hooks/useSubscription";
 
@@ -91,28 +90,26 @@ export function useUserPositions(): UserPositions {
 	const isLoading = enabled && (status === "subscribing" || status === "idle");
 	const hasError = status === "error";
 
-	return useMemo(() => {
-		if (!enabled) return EMPTY;
+	if (!enabled) return EMPTY;
 
-		const positions = normalizePositions(data);
-		const withdrawable = getWithdrawable(data);
+	const positions = normalizePositions(data);
+	const withdrawable = getWithdrawable(data);
 
-		return {
-			positions,
-			withdrawable,
-			isLoading,
-			hasError,
+	return {
+		positions,
+		withdrawable,
+		isLoading,
+		hasError,
 
-			getPosition(coin: string, dex?: string) {
-				if (dex !== undefined) {
-					return positions.find((p) => p.coin === coin && p.dex === dex) ?? null;
-				}
-				return positions.find((p) => p.coin === coin) ?? null;
-			},
+		getPosition(coin: string, dex?: string) {
+			if (dex !== undefined) {
+				return positions.find((p) => p.coin === coin && p.dex === dex) ?? null;
+			}
+			return positions.find((p) => p.coin === coin) ?? null;
+		},
 
-			hasPosition(coin: string, dex?: string) {
-				return this.getPosition(coin, dex) !== null;
-			},
-		};
-	}, [data, enabled, isLoading, hasError]);
+		hasPosition(coin: string, dex?: string) {
+			return this.getPosition(coin, dex) !== null;
+		},
+	};
 }

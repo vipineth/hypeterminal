@@ -11,12 +11,6 @@ import {
 } from "@nktkas/hyperliquid";
 import type { AbstractWallet } from "@nktkas/hyperliquid/signing";
 
-let testnet = false;
-
-export function configureNetwork(isTestnet: boolean): void {
-	testnet = isTestnet;
-}
-
 const cache = new Map<string, unknown>();
 
 function getOrCreate<T>(key: string, create: () => T): T {
@@ -28,35 +22,38 @@ function getOrCreate<T>(key: string, create: () => T): T {
 	return value;
 }
 
-function getHttpOptions(): HttpTransportOptions {
-	return { isTestnet: testnet };
+function getHttpOptions(isTestnet: boolean): HttpTransportOptions {
+	return { isTestnet };
 }
 
-function getWsOptions(): WebSocketTransportOptions {
-	return { isTestnet: testnet };
+function getWsOptions(isTestnet: boolean): WebSocketTransportOptions {
+	return { isTestnet };
 }
 
-export function getHttpTransport(): IRequestTransport {
-	return getOrCreate("http", () => new HttpTransport(getHttpOptions()));
+export function getHttpTransport(isTestnet: boolean): IRequestTransport {
+	return getOrCreate(`http:${isTestnet}`, () => new HttpTransport(getHttpOptions(isTestnet)));
 }
 
-export function getWsTransport(): ISubscriptionTransport {
-	return getOrCreate("ws", () => new WebSocketTransport(getWsOptions()));
+export function getWsTransport(isTestnet: boolean): ISubscriptionTransport {
+	return getOrCreate(`ws:${isTestnet}`, () => new WebSocketTransport(getWsOptions(isTestnet)));
 }
 
-export function getInfoClient(): InfoClient {
-	return getOrCreate("info", () => new InfoClient({ transport: getHttpTransport() }));
+export function getInfoClient(isTestnet: boolean): InfoClient {
+	return getOrCreate(`info:${isTestnet}`, () => new InfoClient({ transport: getHttpTransport(isTestnet) }));
 }
 
-export function getSubscriptionClient(): SubscriptionClient {
-	return getOrCreate("subscription", () => new SubscriptionClient({ transport: getWsTransport() }));
+export function getSubscriptionClient(isTestnet: boolean): SubscriptionClient {
+	return getOrCreate(
+		`subscription:${isTestnet}`,
+		() => new SubscriptionClient({ transport: getWsTransport(isTestnet) }),
+	);
 }
 
-export function createExchangeClient(wallet: AbstractWallet): ExchangeClient {
-	return new ExchangeClient({ transport: getHttpTransport(), wallet });
+export function createExchangeClient(wallet: AbstractWallet, isTestnet: boolean): ExchangeClient {
+	return new ExchangeClient({ transport: getHttpTransport(isTestnet), wallet });
 }
 
-export function initializeClients(): void {
-	getInfoClient();
-	getSubscriptionClient();
+export function initializeClients(isTestnet: boolean): void {
+	getInfoClient(isTestnet);
+	getSubscriptionClient(isTestnet);
 }

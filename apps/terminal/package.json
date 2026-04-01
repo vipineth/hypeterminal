@@ -20,6 +20,7 @@
 		"@fontsource-variable/inter": "^5.2.8",
 		"@fontsource-variable/raleway": "^5.2.8",
 		"@hypeterminal/hl-react": "workspace:*",
+		"@hypeterminal/ui": "workspace:*",
 		"@lifi/sdk": "^3.16.3",
 		"@lingui/core": "5.7.0",
 		"@lingui/react": "5.7.0",

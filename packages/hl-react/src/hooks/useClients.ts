@@ -1,5 +1,4 @@
 import type { ExchangeClient, InfoClient, SubscriptionClient } from "@nktkas/hyperliquid";
-import { useMemo } from "react";
 import { useConnection, useWalletClient } from "wagmi";
 import { createExchangeClient } from "../clients";
 import { useHyperliquid } from "../provider";
@@ -16,22 +15,22 @@ export interface HyperliquidClients {
 }
 
 export function useHyperliquidClients(): HyperliquidClients {
-	const { info, subscription } = useHyperliquid();
+	const { info, subscription, isTestnet } = useHyperliquid();
 	const { signer, isReady: agentReady } = useAgentWallet();
 	const { address } = useConnection();
 	const { data: walletClient } = useWalletClient();
 
-	const trading = useMemo(() => {
+	const trading = (() => {
 		if (!signer || !agentReady) return null;
-		return createExchangeClient(signer);
-	}, [signer, agentReady]);
+		return createExchangeClient(signer, isTestnet);
+	})();
 
-	const user = useMemo(() => {
+	const user = (() => {
 		if (!walletClient || !address) return null;
 		const wallet = toHyperliquidWallet(walletClient, address);
 		if (!wallet) return null;
-		return createExchangeClient(wallet);
-	}, [walletClient, address]);
+		return createExchangeClient(wallet, isTestnet);
+	})();
 
 	return {
 		info,

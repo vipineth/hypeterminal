@@ -1,5 +1,5 @@
 import type { ISubscription } from "@nktkas/hyperliquid";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useStore } from "zustand";
 import { createThrottledUpdater } from "../../internal/websocket/batch-updater";
 import { isPayloadOversized } from "../../internal/websocket/payload-guard";
@@ -7,18 +7,6 @@ import { getPayloadLimitBytesForSubscriptionKey } from "../../internal/websocket
 import { useHyperliquidStoreApi } from "../../provider";
 import type { SubscriptionOptions, SubscriptionResult } from "../../types";
 
-/**
- * Core subscription hook using the standard WebSocket pattern.
- *
- * Key stability: The `key` is a serialized string that includes params.
- * Object params are stabilized via `stableSubscriptionValue` (sorts keys,
- * normalizes hex addresses), so callers don't need to memoize params.
- *
- * Ref pattern: The `subscribe` function changes every render (it captures
- * current params). We use a ref to always have the latest function without
- * adding it to effect deps, which would cause unnecessary resubscriptions.
- * The effect only runs when `key` changes (i.e., when params actually change).
- */
 export function useSub<TData>(
 	key: string,
 	subscribe: (listener: (data: TData) => void) => Promise<ISubscription>,
@@ -27,14 +15,8 @@ export function useSub<TData>(
 	const { enabled = true, throttleMs, maxPayloadBytes, dropOversizedPayload = true } = options;
 	const store = useHyperliquidStoreApi();
 	const entry = useStore(store, (state) => state.subscriptions[key]);
-	const payloadLimitBytes = useMemo(
-		() => maxPayloadBytes ?? getPayloadLimitBytesForSubscriptionKey(key),
-		[key, maxPayloadBytes],
-	);
+	const payloadLimitBytes = maxPayloadBytes ?? getPayloadLimitBytesForSubscriptionKey(key);
 
-	// Ref pattern: subscribe changes every render, but we only resubscribe
-	// when `key` changes. The ref gives us the latest function without
-	// adding it to deps.
 	const subscribeRef = useRef(subscribe);
 	subscribeRef.current = subscribe;
 

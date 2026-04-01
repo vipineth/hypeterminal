@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAgentRegistration } from "../signing/use-agent-registration";
 import { useAgentStatus } from "../signing/use-agent-status";
 
@@ -39,7 +39,10 @@ export function useTradingGuard(): UseTradingGuardResult {
 		if (!wasReady && isReady && pendingActionRef.current && mountedRef.current) {
 			const action = pendingActionRef.current;
 			pendingActionRef.current = null;
-			Promise.resolve(action()).catch(() => {});
+			Promise.resolve(action()).catch((err) => {
+				if (!mountedRef.current) return;
+				setLocalError(err instanceof Error ? err : new Error(String(err)));
+			});
 		}
 
 		if (wasReady && !isReady) {
@@ -49,7 +52,7 @@ export function useTradingGuard(): UseTradingGuardResult {
 		prevIsReadyRef.current = isReady;
 	}, [isReady]);
 
-	const enableTrading = useCallback(() => {
+	function enableTrading() {
 		if (isEnabling) return;
 		setLocalError(null);
 		registerAgent().catch((err) => {
@@ -58,23 +61,23 @@ export function useTradingGuard(): UseTradingGuardResult {
 			const error = err instanceof Error ? err : new Error(String(err));
 			setLocalError(error);
 		});
-	}, [isEnabling, registerAgent]);
+	}
 
-	const guardAction = useCallback(
-		(action: PendingAction) => {
-			if (isReady) {
-				Promise.resolve(action()).catch(() => {});
-				return;
-			}
-			pendingActionRef.current = action;
-			enableTrading();
-		},
-		[isReady, enableTrading],
-	);
+	function guardAction(action: PendingAction) {
+		if (isReady) {
+			Promise.resolve(action()).catch((err) => {
+				if (!mountedRef.current) return;
+				setLocalError(err instanceof Error ? err : new Error(String(err)));
+			});
+			return;
+		}
+		pendingActionRef.current = action;
+		enableTrading();
+	}
 
-	const clearError = useCallback(() => {
+	function clearError() {
 		setLocalError(null);
-	}, []);
+	}
 
 	return {
 		isReady,

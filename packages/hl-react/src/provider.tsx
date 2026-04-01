@@ -13,12 +13,13 @@ export interface HyperliquidContextValue {
 	info: InfoClient;
 	subscription: SubscriptionClient;
 	env: HyperliquidEnv;
+	isTestnet: boolean;
 	builderConfig: BuilderConfig;
 	agentName: string;
 	clientKey: string;
 }
 
-const HyperliquidContext = createContext<HyperliquidContextValue | null>(null);
+export const HyperliquidContext = createContext<HyperliquidContextValue | null>(null);
 export const HyperliquidStoreContext = createContext<HyperliquidStore | null>(null);
 
 export interface HyperliquidProviderProps {
@@ -39,10 +40,11 @@ function useConnectionSafe() {
 
 export function HyperliquidProvider({ children, env, builderConfig, agentName = "app" }: HyperliquidProviderProps) {
 	const { address } = useConnectionSafe();
+	const isTestnet = env === "Testnet";
 
 	const initRef = useRef(false);
 	if (!initRef.current) {
-		initializeClients();
+		initializeClients(isTestnet);
 		initRef.current = true;
 	}
 
@@ -50,8 +52,8 @@ export function HyperliquidProvider({ children, env, builderConfig, agentName = 
 	if (!storeRef.current) {
 		storeRef.current = createHyperliquidStore(
 			createHyperliquidConfig({
-				httpTransport: getHttpTransport(),
-				wsTransport: getWsTransport(),
+				httpTransport: getHttpTransport(isTestnet),
+				wsTransport: getWsTransport(isTestnet),
 				ssr: false,
 			}),
 		);
@@ -60,9 +62,10 @@ export function HyperliquidProvider({ children, env, builderConfig, agentName = 
 	const clientKey = address ?? "disconnected";
 
 	const value = {
-		info: getInfoClient(),
-		subscription: getSubscriptionClient(),
+		info: getInfoClient(isTestnet),
+		subscription: getSubscriptionClient(isTestnet),
 		env,
+		isTestnet,
 		builderConfig,
 		agentName,
 		clientKey,

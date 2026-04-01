@@ -47,5 +47,29 @@
 		"formatter": {
 			"quoteStyle": "double"
 		}
-	}
+	},
+	"overrides": [
+		{
+			"includes": ["packages/ui/src/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noNonNullAssertion": "off"
+					},
+					"a11y": {
+						"useButtonType": "off",
+						"noLabelWithoutControl": "off"
+					},
+					"suspicious": {
+						"noArrayIndexKey": "off"
+					}
+				}
+			},
+			"css": {
+				"linter": {
+					"enabled": false
+				}
+			}
+		}
+	]
 }
