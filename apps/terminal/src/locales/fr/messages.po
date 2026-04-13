@@ -80,6 +80,8 @@ msgstr ""
 #~ msgid "About Builder Codes"
 #~ msgstr ""
 
+#: src/components/account/account-page.tsx
+#: src/components/trade/header/top-nav.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 msgid "Account"
 msgstr "Compte"
@@ -193,10 +195,12 @@ msgstr ""
 msgid "Asset"
 msgstr "Actif"
 
-#: src/components/trade/tradebox/account-panel.tsx
-#~ msgid "Assets"
-#~ msgstr ""
+#: src/components/account/account-page.tsx
+msgid "Assets"
+msgstr ""
 
+#: src/components/account/account-page.tsx
+#: src/components/account/account-page.tsx
 #: src/components/trade/mobile/mobile-balances-tab.tsx
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
@@ -225,6 +229,7 @@ msgstr ""
 #~ msgid "Back to asset selection"
 #~ msgstr ""
 
+#: src/components/account/account-page.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 msgid "Balance"
 msgstr "Solde"
@@ -249,6 +254,7 @@ msgstr ""
 #~ msgid "Breadcrumb"
 #~ msgstr "Fil d'Ariane"
 
+#: src/components/account/account-page.tsx
 #: src/components/trade/mobile/mobile-account-view.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 #: src/components/trade/tradebox/account-panel.tsx
@@ -451,6 +457,8 @@ msgstr ""
 #~ msgid "Connect a wallet to manage positions."
 #~ msgstr "Connectez un portefeuille pour gérer les positions."
 
+#: src/components/account/account-page.tsx
+#: src/components/account/account-page.tsx
 #: src/components/trade/components/wallet-modal.tsx
 #: src/components/trade/header/user-menu.tsx
 #: src/components/trade/mobile/mobile-account-view.tsx
@@ -510,6 +518,10 @@ msgstr "Connectez votre portefeuille pour voir l'historique des transactions."
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Connect your wallet to view TWAP orders."
 msgstr "Connectez votre portefeuille pour voir les ordres TWAP."
+
+#: src/components/account/account-page.tsx
+msgid "Connect your wallet to view your account overview, positions, and history."
+msgstr ""
 
 #: src/components/trade/mobile/mobile-account-view.tsx
 msgid "Connect your wallet to view your account, positions, and start trading."
@@ -578,9 +590,9 @@ msgstr "Croisé"
 msgid "Cross Account Leverage"
 msgstr ""
 
-#: src/components/trade/tradebox/account-panel.tsx
-#~ msgid "Cross Leverage"
-#~ msgstr "Effet de levier croisé"
+#: src/components/account/account-page.tsx
+msgid "Cross Leverage"
+msgstr "Effet de levier croisé"
 
 #: src/components/trade/mobile/mobile-account-view.tsx
 msgid "Cross Margin"
@@ -618,6 +630,7 @@ msgstr ""
 msgid "Default"
 msgstr ""
 
+#: src/components/account/account-page.tsx
 #: src/components/trade/header/top-nav.tsx
 #: src/components/trade/mobile/mobile-nav-drawer.tsx
 #: src/components/trade/tradebox/account-panel.tsx
@@ -923,9 +936,10 @@ msgstr "Frais"
 #~ msgid "Fetching quote..."
 #~ msgstr ""
 
+#. placeholder {0}: formatPrice(markPx, { szDecimals: market?.szDecimals })
 #: src/components/trade/mobile/mobile-trade-view.tsx
-#~ msgid "Fill limit price with mark price {0}"
-#~ msgstr ""
+msgid "Fill limit price with mark price {0}"
+msgstr ""
 
 #: src/components/trade/tradebox/bridge-tab.tsx
 #: src/components/trade/tradebox/bridge-tab.tsx
@@ -1008,9 +1022,9 @@ msgstr "Aller au terminal de trading"
 msgid "Hide small"
 msgstr ""
 
-#: src/components/trade/tradebox/account-panel.tsx
-#~ msgid "In Orders"
-#~ msgstr ""
+#: src/components/account/account-page.tsx
+msgid "In Orders"
+msgstr ""
 
 #: src/components/trade/positions/balances-tab.tsx
 #~ msgid "In Use"
@@ -1223,17 +1237,17 @@ msgstr ""
 #~ msgid "Margin Mode"
 #~ msgstr ""
 
-#: src/components/trade/tradebox/account-panel.tsx
-#~ msgid "Margin Ratio"
-#~ msgstr "Ratio de marge"
+#: src/components/account/account-page.tsx
+msgid "Margin Ratio"
+msgstr "Ratio de marge"
 
 #: src/components/trade/tradebox/order-summary.tsx
 msgid "Margin Req."
 msgstr "Marge req."
 
-#: src/components/trade/tradebox/account-panel.tsx
-#~ msgid "Margin Used"
-#~ msgstr "Marge utilisée"
+#: src/components/account/account-page.tsx
+msgid "Margin Used"
+msgstr "Marge utilisée"
 
 #: src/components/trade/mobile/mobile-positions-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -1663,6 +1677,8 @@ msgstr ""
 msgid "Perpetuals"
 msgstr ""
 
+#: src/components/account/account-page.tsx
+#: src/components/account/account-page.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 msgid "Perps"
 msgstr "Perpétuels"
@@ -1948,6 +1964,7 @@ msgstr "Vendre"
 #~ msgid "Sell Short"
 #~ msgstr "Vendre short"
 
+#: src/components/account/account-page.tsx
 #: src/components/trade/mobile/mobile-balances-tab.tsx
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/send-modal.tsx
@@ -2153,6 +2170,8 @@ msgstr ""
 #~ msgid "spot"
 #~ msgstr "spot"
 
+#: src/components/account/account-page.tsx
+#: src/components/account/account-page.tsx
 #: src/components/trade/header/top-nav.tsx
 #: src/components/trade/mobile/mobile-balances-tab.tsx
 #: src/components/trade/mobile/mobile-nav-drawer.tsx
@@ -2415,6 +2434,10 @@ msgstr ""
 msgid "Total"
 msgstr "Total"
 
+#: src/components/account/account-page.tsx
+msgid "Total Equity"
+msgstr ""
+
 #: src/components/trade/positions/twap-tab.tsx
 #~ msgid "Total Size"
 #~ msgstr "Taille totale"
@@ -2423,9 +2446,9 @@ msgstr "Total"
 msgid "Total time"
 msgstr ""
 
-#: src/components/trade/tradebox/account-panel.tsx
-#~ msgid "Total Value"
-#~ msgstr ""
+#: src/components/account/account-page.tsx
+msgid "Total Value"
+msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "TP"
@@ -2496,6 +2519,7 @@ msgstr ""
 msgid "Transaction was rejected"
 msgstr ""
 
+#: src/components/account/account-page.tsx
 #: src/components/trade/positions/transfer-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
@@ -2579,6 +2603,8 @@ msgstr "Symbole inconnu : {symbolName}"
 msgid "Unrealized P&L"
 msgstr ""
 
+#: src/components/account/account-page.tsx
+#: src/components/account/account-page.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 msgid "Unrealized PNL"
 msgstr "PNL non réalisé"
@@ -2680,6 +2706,7 @@ msgstr "Portefeuille non connecté"
 msgid "will arrive in ~5 min"
 msgstr ""
 
+#: src/components/account/account-page.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
@@ -2688,6 +2715,10 @@ msgstr ""
 #: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Withdraw"
 msgstr "Retirer"
+
+#: src/components/account/account-page.tsx
+msgid "Withdrawable"
+msgstr ""
 
 #: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Withdrawal failed"

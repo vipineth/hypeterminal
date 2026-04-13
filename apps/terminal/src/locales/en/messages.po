@@ -80,6 +80,8 @@ msgstr "7 days"
 #~ msgid "About Builder Codes"
 #~ msgstr "About Builder Codes"
 
+#: src/components/account/account-page.tsx
+#: src/components/trade/header/top-nav.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 msgid "Account"
 msgstr "Account"
@@ -193,10 +195,12 @@ msgstr "Amount"
 msgid "Asset"
 msgstr "Asset"
 
-#: src/components/trade/tradebox/account-panel.tsx
-#~ msgid "Assets"
-#~ msgstr "Assets"
+#: src/components/account/account-page.tsx
+msgid "Assets"
+msgstr "Assets"
 
+#: src/components/account/account-page.tsx
+#: src/components/account/account-page.tsx
 #: src/components/trade/mobile/mobile-balances-tab.tsx
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
@@ -225,6 +229,7 @@ msgstr "Back"
 #~ msgid "Back to asset selection"
 #~ msgstr "Back to asset selection"
 
+#: src/components/account/account-page.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 msgid "Balance"
 msgstr "Balance"
@@ -249,6 +254,7 @@ msgstr "Balance available to trade"
 #~ msgid "Breadcrumb"
 #~ msgstr "Breadcrumb"
 
+#: src/components/account/account-page.tsx
 #: src/components/trade/mobile/mobile-account-view.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 #: src/components/trade/tradebox/account-panel.tsx
@@ -451,6 +457,8 @@ msgstr "Connect"
 #~ msgid "Connect a wallet to manage positions."
 #~ msgstr "Connect a wallet to manage positions."
 
+#: src/components/account/account-page.tsx
+#: src/components/account/account-page.tsx
 #: src/components/trade/components/wallet-modal.tsx
 #: src/components/trade/header/user-menu.tsx
 #: src/components/trade/mobile/mobile-account-view.tsx
@@ -510,6 +518,10 @@ msgstr "Connect your wallet to view trade history."
 #: src/components/trade/positions/twap-tab.tsx
 msgid "Connect your wallet to view TWAP orders."
 msgstr "Connect your wallet to view TWAP orders."
+
+#: src/components/account/account-page.tsx
+msgid "Connect your wallet to view your account overview, positions, and history."
+msgstr "Connect your wallet to view your account overview, positions, and history."
 
 #: src/components/trade/mobile/mobile-account-view.tsx
 msgid "Connect your wallet to view your account, positions, and start trading."
@@ -578,9 +590,9 @@ msgstr "Cross"
 msgid "Cross Account Leverage"
 msgstr "Cross Account Leverage"
 
-#: src/components/trade/tradebox/account-panel.tsx
-#~ msgid "Cross Leverage"
-#~ msgstr "Cross Leverage"
+#: src/components/account/account-page.tsx
+msgid "Cross Leverage"
+msgstr "Cross Leverage"
 
 #: src/components/trade/mobile/mobile-account-view.tsx
 msgid "Cross Margin"
@@ -618,6 +630,7 @@ msgstr "Custom wallet address"
 msgid "Default"
 msgstr "Default"
 
+#: src/components/account/account-page.tsx
 #: src/components/trade/header/top-nav.tsx
 #: src/components/trade/mobile/mobile-nav-drawer.tsx
 #: src/components/trade/tradebox/account-panel.tsx
@@ -923,9 +936,10 @@ msgstr "Fee"
 #~ msgid "Fetching quote..."
 #~ msgstr "Fetching quote..."
 
+#. placeholder {0}: formatPrice(markPx, { szDecimals: market?.szDecimals })
 #: src/components/trade/mobile/mobile-trade-view.tsx
-#~ msgid "Fill limit price with mark price {0}"
-#~ msgstr "Fill limit price with mark price {0}"
+msgid "Fill limit price with mark price {0}"
+msgstr "Fill limit price with mark price {0}"
 
 #: src/components/trade/tradebox/bridge-tab.tsx
 #: src/components/trade/tradebox/bridge-tab.tsx
@@ -1008,9 +1022,9 @@ msgstr "Go to trading terminal"
 msgid "Hide small"
 msgstr "Hide small"
 
-#: src/components/trade/tradebox/account-panel.tsx
-#~ msgid "In Orders"
-#~ msgstr "In Orders"
+#: src/components/account/account-page.tsx
+msgid "In Orders"
+msgstr "In Orders"
 
 #: src/components/trade/positions/balances-tab.tsx
 #~ msgid "In Use"
@@ -1227,17 +1241,17 @@ msgstr "Margin mode"
 #~ msgid "Margin Mode"
 #~ msgstr "Margin Mode"
 
-#: src/components/trade/tradebox/account-panel.tsx
-#~ msgid "Margin Ratio"
-#~ msgstr "Margin Ratio"
+#: src/components/account/account-page.tsx
+msgid "Margin Ratio"
+msgstr "Margin Ratio"
 
 #: src/components/trade/tradebox/order-summary.tsx
 msgid "Margin Req."
 msgstr "Margin Req."
 
-#: src/components/trade/tradebox/account-panel.tsx
-#~ msgid "Margin Used"
-#~ msgstr "Margin Used"
+#: src/components/account/account-page.tsx
+msgid "Margin Used"
+msgstr "Margin Used"
 
 #: src/components/trade/mobile/mobile-positions-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -1667,6 +1681,8 @@ msgstr "Perp"
 msgid "Perpetuals"
 msgstr "Perpetuals"
 
+#: src/components/account/account-page.tsx
+#: src/components/account/account-page.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 msgid "Perps"
 msgstr "Perps"
@@ -1952,6 +1968,7 @@ msgstr "Sell"
 #~ msgid "Sell Short"
 #~ msgstr "Sell Short"
 
+#: src/components/account/account-page.tsx
 #: src/components/trade/mobile/mobile-balances-tab.tsx
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/send-modal.tsx
@@ -2157,6 +2174,8 @@ msgstr "Source"
 #~ msgid "spot"
 #~ msgstr "spot"
 
+#: src/components/account/account-page.tsx
+#: src/components/account/account-page.tsx
 #: src/components/trade/header/top-nav.tsx
 #: src/components/trade/mobile/mobile-balances-tab.tsx
 #: src/components/trade/mobile/mobile-nav-drawer.tsx
@@ -2419,6 +2438,10 @@ msgstr "TOKEN"
 msgid "Total"
 msgstr "Total"
 
+#: src/components/account/account-page.tsx
+msgid "Total Equity"
+msgstr "Total Equity"
+
 #: src/components/trade/positions/twap-tab.tsx
 #~ msgid "Total Size"
 #~ msgstr "Total Size"
@@ -2427,9 +2450,9 @@ msgstr "Total"
 msgid "Total time"
 msgstr "Total time"
 
-#: src/components/trade/tradebox/account-panel.tsx
-#~ msgid "Total Value"
-#~ msgstr "Total Value"
+#: src/components/account/account-page.tsx
+msgid "Total Value"
+msgstr "Total Value"
 
 #: src/components/trade/positions/orders-tab.tsx
 #~ msgid "TP"
@@ -2504,6 +2527,7 @@ msgstr "Transaction breakdown"
 msgid "Transaction was rejected"
 msgstr "Transaction was rejected"
 
+#: src/components/account/account-page.tsx
 #: src/components/trade/positions/transfer-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
@@ -2587,6 +2611,8 @@ msgstr "Unknown symbol: {symbolName}"
 msgid "Unrealized P&L"
 msgstr "Unrealized P&L"
 
+#: src/components/account/account-page.tsx
+#: src/components/account/account-page.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 msgid "Unrealized PNL"
 msgstr "Unrealized PNL"
@@ -2688,6 +2714,7 @@ msgstr "Wallet not connected"
 msgid "will arrive in ~5 min"
 msgstr "will arrive in ~5 min"
 
+#: src/components/account/account-page.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 #: src/components/trade/tradebox/account-panel.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
@@ -2696,6 +2723,10 @@ msgstr "will arrive in ~5 min"
 #: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Withdraw"
 msgstr "Withdraw"
+
+#: src/components/account/account-page.tsx
+msgid "Withdrawable"
+msgstr "Withdrawable"
 
 #: src/components/trade/tradebox/deposit-modal.tsx
 msgid "Withdrawal failed"

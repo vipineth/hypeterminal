@@ -100,6 +100,12 @@ export function TopNav() {
 						</Link>
 					))}
 					<Divider orientation="vertical" className="my-2 mx-1" />
+					<Link
+						to="/account"
+						className="px-2.5 py-1 rounded-8 transition-colors duration-150 text-text-weak hover:text-text-strong [&.active]:text-text-strong [&.active]:font-medium"
+					>
+						<Trans>Account</Trans>
+					</Link>
 					{STATIC_NAV_ITEMS.map((item) => (
 						<button
 							key={item.key}
