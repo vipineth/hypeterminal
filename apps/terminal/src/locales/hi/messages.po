@@ -98,6 +98,10 @@ msgstr "खाता शेष"
 msgid "Account Equity"
 msgstr ""
 
+#: src/components/account/account-pnl-chart.tsx
+#~ msgid "Account Value"
+#~ msgstr ""
+
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -412,9 +416,9 @@ msgstr "बंद हो रहा है..."
 #~ msgid "Collapse account panel"
 #~ msgstr "खाता पैनल छोटा करें"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
-#~ msgid "Coming soon"
-#~ msgstr "जल्द आ रहा है"
+#: src/components/account/account-pnl-chart.tsx
+msgid "Coming soon"
+msgstr "जल्द आ रहा है"
 
 #: src/components/trade/positions/twap-tab.tsx
 #~ msgid "completed"
@@ -1483,6 +1487,10 @@ msgstr ""
 msgid "No balances found. Deposit funds to start trading."
 msgstr "कोई शेष नहीं मिला। ट्रेडिंग शुरू करने के लिए धन जमा करें।"
 
+#: src/components/account/account-pnl-chart.tsx
+#~ msgid "No data available"
+#~ msgstr ""
+
 #: src/components/trade/mobile/mobile-history-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
 msgid "No fills found."
@@ -1762,6 +1770,10 @@ msgstr "PNL"
 #: src/components/trade/mobile/mobile-nav-drawer.tsx
 msgid "Portfolio"
 msgstr "पोर्टफोलियो"
+
+#: src/components/account/account-pnl-chart.tsx
+msgid "Portfolio PNL"
+msgstr ""
 
 #: src/components/trade/mobile/mobile-funding-tab.tsx
 #: src/components/trade/positions/funding-tab.tsx

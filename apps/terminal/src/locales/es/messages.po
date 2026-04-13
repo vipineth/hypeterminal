@@ -98,6 +98,10 @@ msgstr "Saldos de cuenta"
 msgid "Account Equity"
 msgstr ""
 
+#: src/components/account/account-pnl-chart.tsx
+#~ msgid "Account Value"
+#~ msgstr ""
+
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/orders-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -412,9 +416,9 @@ msgstr "Cerrando..."
 #~ msgid "Collapse account panel"
 #~ msgstr "Contraer panel de cuenta"
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
-#~ msgid "Coming soon"
-#~ msgstr "Próximamente"
+#: src/components/account/account-pnl-chart.tsx
+msgid "Coming soon"
+msgstr "Próximamente"
 
 #: src/components/trade/positions/twap-tab.tsx
 #~ msgid "completed"
@@ -1483,6 +1487,10 @@ msgstr ""
 msgid "No balances found. Deposit funds to start trading."
 msgstr "No se encontraron saldos. Deposita fondos para comenzar a operar."
 
+#: src/components/account/account-pnl-chart.tsx
+#~ msgid "No data available"
+#~ msgstr ""
+
 #: src/components/trade/mobile/mobile-history-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
 msgid "No fills found."
@@ -1762,6 +1770,10 @@ msgstr "PNL"
 #: src/components/trade/mobile/mobile-nav-drawer.tsx
 msgid "Portfolio"
 msgstr "Portafolio"
+
+#: src/components/account/account-pnl-chart.tsx
+msgid "Portfolio PNL"
+msgstr ""
 
 #: src/components/trade/mobile/mobile-funding-tab.tsx
 #: src/components/trade/positions/funding-tab.tsx

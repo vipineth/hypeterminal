@@ -13,6 +13,7 @@ import { Skeleton } from "boneyard-js/react";
 import { Suspense, useState } from "react";
 import { useConnection } from "wagmi";
 import { AccountBalances } from "@/components/account/account-balances";
+import { AccountPnlChart } from "@/components/account/account-pnl-chart";
 import { AccountPositions } from "@/components/account/account-positions";
 import { WalletModal } from "@/components/trade/components/wallet-modal";
 import { TopNav } from "@/components/trade/header/top-nav";
@@ -175,6 +176,8 @@ function ConnectedAccountView({ address }: { address: string }) {
 					</div>
 				)}
 			</div>
+
+			<AccountPnlChart />
 
 			<div className="rounded-xs border border-stroke-weak bg-bg-raised">
 				<Tabs value={equityTab} onValueChange={setEquityTab}>
