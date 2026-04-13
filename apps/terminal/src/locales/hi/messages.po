@@ -166,6 +166,7 @@ msgstr ""
 #~ msgid "All cross positions share the same cross margin as collateral. In the event of liquidation, your cross margin balance and any remaining open positions under assets in this mode may be forfeited."
 #~ msgstr ""
 
+#: src/components/account/account-history.tsx
 #: src/components/trade/positions/send-modal.tsx
 #: src/components/trade/positions/transfer-modal.tsx
 #: src/components/trade/tradebox/deposit-modal.tsx
@@ -189,6 +190,9 @@ msgstr ""
 #~ msgid "Approve a builder to charge fees on orders placed on your behalf. Builder codes allow DeFi applications to receive a portion of trading fees."
 #~ msgstr ""
 
+#: src/components/account/account-history.tsx
+#: src/components/account/account-history.tsx
+#: src/components/account/account-history.tsx
 #: src/components/account/account-positions.tsx
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/funding-tab.tsx
@@ -699,6 +703,10 @@ msgstr ""
 msgid "Destination address"
 msgstr ""
 
+#: src/components/account/account-history.tsx
+msgid "Details"
+msgstr ""
+
 #: src/components/trade/order-entry/order-entry-panel.tsx
 #~ msgid "Direct"
 #~ msgstr ""
@@ -801,6 +809,10 @@ msgstr ""
 
 #: src/lib/errors/definitions/order-input.ts
 msgid "Enter trigger price"
+msgstr ""
+
+#: src/components/account/account-history.tsx
+msgid "entries"
 msgstr ""
 
 #: src/components/account/account-positions.tsx
@@ -948,6 +960,8 @@ msgstr ""
 msgid "Failed to update leverage"
 msgstr ""
 
+#: src/components/account/account-history.tsx
+#: src/components/account/account-history.tsx
 #: src/components/trade/mobile/mobile-history-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
 msgid "Fee"
@@ -1005,6 +1019,7 @@ msgstr ""
 #~ msgid "Full Position"
 #~ msgstr ""
 
+#: src/components/account/account-history.tsx
 #: src/components/trade/chart/token-selector-columns.ts
 #: src/components/trade/chart/token-selector.tsx
 #: src/components/trade/mobile/mobile-positions-tab.tsx
@@ -1137,6 +1152,10 @@ msgstr "लीडरबोर्ड"
 msgid "Learn more"
 msgstr ""
 
+#: src/components/account/account-history.tsx
+msgid "Ledger"
+msgstr ""
+
 #: src/components/account/account-leverage-settings.tsx
 #: src/components/account/account-positions.tsx
 #: src/components/account/account-positions.tsx
@@ -1204,6 +1223,7 @@ msgstr ""
 msgid "Liq. Price"
 msgstr "लिक्विडेशन प्राइस"
 
+#: src/components/account/account-history.tsx
 #: src/components/trade/mobile/mobile-history-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
 msgid "Liquidated"
@@ -1536,10 +1556,15 @@ msgstr "कोई शेष नहीं मिला। ट्रेडिं�
 msgid "No fills found."
 msgstr "कोई निष्पादन नहीं मिला।"
 
+#: src/components/account/account-history.tsx
 #: src/components/trade/mobile/mobile-funding-tab.tsx
 #: src/components/trade/positions/funding-tab.tsx
 msgid "No funding payments found."
 msgstr "कोई फंडिंग भुगतान नहीं मिला।"
+
+#: src/components/account/account-history.tsx
+msgid "No ledger activity found."
+msgstr ""
 
 #: src/lib/errors/definitions/market.ts
 msgid "No mark price"
@@ -1566,6 +1591,7 @@ msgstr ""
 msgid "No open positions. Leverage settings appear here when you have active positions."
 msgstr ""
 
+#: src/components/account/account-history.tsx
 #: src/components/trade/mobile/mobile-orders-history-tab.tsx
 #: src/components/trade/positions/orders-history-tab.tsx
 msgid "No order history found."
@@ -1589,6 +1615,10 @@ msgstr ""
 
 #: src/components/trade/tradebox/bridge-tab.tsx
 msgid "No tokens with value found across supported chains"
+msgstr ""
+
+#: src/components/account/account-history.tsx
+msgid "No trades found."
 msgstr ""
 
 #: src/components/trade/order-entry/swap-asset-modal.tsx
@@ -1714,13 +1744,14 @@ msgstr ""
 msgid "Order Value"
 msgstr "ऑर्डर वैल्यू"
 
+#: src/components/account/account-history.tsx
 #: src/components/trade/positions/orders-history-tab.tsx
 msgid "orders"
 msgstr ""
 
-#: src/components/trade/positions/orders-history-tab.tsx
-#~ msgid "Orders"
-#~ msgstr ""
+#: src/components/account/account-history.tsx
+msgid "Orders"
+msgstr ""
 
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx
@@ -1744,9 +1775,14 @@ msgstr "पृष्ठ नहीं मिला"
 #~ msgid "pagination"
 #~ msgstr "पृष्ठांकन"
 
+#: src/components/account/account-history.tsx
 #: src/components/trade/positions/funding-tab.tsx
 msgid "Payment"
 msgstr "भुगतान"
+
+#: src/components/account/account-history.tsx
+msgid "payments"
+msgstr ""
 
 #: src/components/trade/tradebox/order-toast.tsx
 msgid "pending"
@@ -1761,6 +1797,10 @@ msgstr "लंबित"
 #: src/components/trade/positions/transfer-modal.tsx
 #: src/components/trade/positions/transfer-modal.tsx
 msgid "Perp"
+msgstr ""
+
+#: src/components/account/account-history.tsx
+msgid "Perp → Spot"
 msgstr ""
 
 #: src/components/trade/mobile/mobile-balances-tab.tsx
@@ -1799,6 +1839,7 @@ msgstr ""
 msgid "Please enter an address"
 msgstr ""
 
+#: src/components/account/account-history.tsx
 #: src/components/account/account-positions.tsx
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
@@ -1819,6 +1860,7 @@ msgstr "पोर्टफोलियो"
 msgid "Portfolio PNL"
 msgstr ""
 
+#: src/components/account/account-history.tsx
 #: src/components/trade/mobile/mobile-funding-tab.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/tradebox/trade-form-fields.tsx
@@ -1854,6 +1896,8 @@ msgstr ""
 #~ msgid "Previous"
 #~ msgstr "पिछला"
 
+#: src/components/account/account-history.tsx
+#: src/components/account/account-history.tsx
 #: src/components/trade/chart/token-selector-columns.ts
 #: src/components/trade/chart/token-selector.tsx
 #: src/components/trade/mobile/mobile-history-tab.tsx
@@ -1902,6 +1946,7 @@ msgstr ""
 msgid "Randomize timing"
 msgstr ""
 
+#: src/components/account/account-history.tsx
 #: src/components/trade/components/spot-swap-modal.tsx
 #: src/components/trade/mobile/mobile-funding-tab.tsx
 #: src/components/trade/positions/funding-tab.tsx
@@ -2163,9 +2208,9 @@ msgstr ""
 #~ msgid "Show Values in USD"
 #~ msgstr "USD में मान दिखाएं"
 
-#: src/components/trade/positions/position-tpsl-modal.tsx
-#~ msgid "Side"
-#~ msgstr ""
+#: src/components/account/account-history.tsx
+msgid "Side"
+msgstr ""
 
 #: src/components/ui/sidebar.tsx
 #~ msgid "Sidebar"
@@ -2183,6 +2228,8 @@ msgstr "साइनर तैयार नहीं"
 #~ msgid "Signing..."
 #~ msgstr "साइन हो रहा है..."
 
+#: src/components/account/account-history.tsx
+#: src/components/account/account-history.tsx
 #: src/components/account/account-positions.tsx
 #: src/components/account/account-positions.tsx
 #: src/components/trade/mobile/mobile-history-tab.tsx
@@ -2282,6 +2329,10 @@ msgstr ""
 msgid "Spot"
 msgstr "स्पॉट"
 
+#: src/components/account/account-history.tsx
+msgid "Spot → Perp"
+msgstr ""
+
 #: src/components/trade/positions/send-modal.tsx
 msgid "Spot Account"
 msgstr ""
@@ -2315,6 +2366,7 @@ msgstr ""
 #~ msgid "Start Price (USDC)"
 #~ msgstr ""
 
+#: src/components/account/account-history.tsx
 #: src/components/trade/positions/orders-history-tab.tsx
 msgid "Status"
 msgstr "स्थिति"
@@ -2486,6 +2538,10 @@ msgstr "आप जो पृष्ठ ढूंढ रहे हैं वह �
 msgid "TIF"
 msgstr ""
 
+#: src/components/account/account-history.tsx
+#: src/components/account/account-history.tsx
+#: src/components/account/account-history.tsx
+#: src/components/account/account-history.tsx
 #: src/components/trade/mobile/mobile-funding-tab.tsx
 #: src/components/trade/orderbook/trades-panel.tsx
 #: src/components/trade/positions/funding-tab.tsx
@@ -2609,10 +2665,12 @@ msgstr "ट्रेड इतिहास"
 msgid "Trade via {0} spot market"
 msgstr ""
 
+#: src/components/account/account-history.tsx
 #: src/components/trade/positions/history-tab.tsx
 msgid "trades"
 msgstr ""
 
+#: src/components/account/account-history.tsx
 #: src/components/trade/orderbook/orderbook-panel.tsx
 msgid "Trades"
 msgstr "ट्रेड्स"
@@ -2684,6 +2742,8 @@ msgstr ""
 msgid "TWAP Orders"
 msgstr "TWAP ऑर्डर"
 
+#: src/components/account/account-history.tsx
+#: src/components/account/account-history.tsx
 #: src/components/trade/mobile/mobile-orders-history-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/orders-history-tab.tsx
