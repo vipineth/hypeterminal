@@ -42,7 +42,7 @@ export function AccountLeverageSettings() {
 		return (
 			<Section>
 				<SectionHeader />
-				<div className="p-6 text-center text-xs text-text-600">
+				<div className="p-6 text-center text-xs text-text-weak">
 					<Trans>No open positions. Leverage settings appear here when you have active positions.</Trans>
 				</div>
 			</Section>
@@ -59,7 +59,7 @@ export function AccountLeverageSettings() {
 					))}
 				</div>
 			) : (
-				<div className="divide-y divide-border-200/40">
+				<div className="divide-y divide-stroke-weak/40">
 					{positions.map((p) => (
 						<LeverageRow key={`${p.coin}-${p.szi}`} position={p} />
 					))}
@@ -70,13 +70,13 @@ export function AccountLeverageSettings() {
 }
 
 function Section({ children }: { children: React.ReactNode }) {
-	return <div className="rounded-xs border border-border-200 bg-surface-execution overflow-hidden">{children}</div>;
+	return <div className="rounded-xs border border-stroke-weak bg-bg-raised overflow-hidden">{children}</div>;
 }
 
 function SectionHeader() {
 	return (
-		<div className="flex items-center gap-2 px-4 py-2.5 border-b border-border-200/40">
-			<GearSixIcon className="size-3.5 text-text-600" />
+		<div className="flex items-center gap-2 px-4 py-2.5 border-b border-stroke-weak/40">
+			<GearSixIcon className="size-3.5 text-text-weak" />
 			<span className="text-xs font-medium">
 				<Trans>Leverage Settings</Trans>
 			</span>
@@ -157,7 +157,7 @@ function EditTrigger({
 		return (
 			<>
 				<Button variant="ghost" size="sm" onClick={() => onOpenChange(true)} aria-label={t`Edit leverage`}>
-					<PencilSimpleIcon className="size-3.5 text-text-600" />
+					<PencilSimpleIcon className="size-3.5 text-text-weak" />
 				</Button>
 				<Sheet open={open} onOpenChange={onOpenChange}>
 					<SheetContent side="bottom" className="px-4 pb-8 pt-6">
@@ -173,11 +173,13 @@ function EditTrigger({
 
 	return (
 		<Popover open={open} onOpenChange={onOpenChange}>
-			<PopoverTrigger asChild>
-				<Button variant="ghost" size="sm" aria-label={t`Edit leverage`}>
-					<PencilSimpleIcon className="size-3.5 text-text-600" />
-				</Button>
-			</PopoverTrigger>
+			<PopoverTrigger
+				render={(props) => (
+					<Button variant="ghost" size="sm" aria-label={t`Edit leverage`} {...props}>
+						<PencilSimpleIcon className="size-3.5 text-text-weak" />
+					</Button>
+				)}
+			/>
 			<PopoverContent align="end" className="w-64 p-3">
 				{editor}
 			</PopoverContent>
@@ -284,12 +286,7 @@ function LeverageEditorInline({
 	return (
 		<div className={compact ? "space-y-3" : "space-y-5"}>
 			<div className="flex items-center justify-between">
-				<span
-					className={cn(
-						"uppercase tracking-wide text-text-600",
-						compact ? "text-2xs font-normal" : "text-xs font-medium",
-					)}
-				>
+				<span className={cn("uppercase text-text-weak", compact ? "text-2xs font-normal" : "text-xs font-medium")}>
 					<Trans>Leverage</Trans>
 				</span>
 				<div className={cn("flex items-center", compact ? "gap-1" : "gap-1.5")}>
@@ -304,22 +301,17 @@ function LeverageEditorInline({
 						inputSize={compact ? "sm" : "lg"}
 						className={cn("text-center font-medium tabular-nums", compact ? "w-12" : "w-16")}
 					/>
-					<span className={cn("text-text-600", compact ? "text-xs" : "text-base")}>x</span>
+					<span className={cn("text-text-weak", compact ? "text-xs" : "text-base")}>x</span>
 				</div>
 			</div>
 
 			<LeverageSlider value={pendingLeverage} onChange={handleSliderChange} max={maxLeverage} disabled={isPending} />
 
 			<div className="flex items-center justify-between">
-				<span
-					className={cn(
-						"uppercase tracking-wide text-text-600",
-						compact ? "text-2xs font-normal" : "text-xs font-medium",
-					)}
-				>
+				<span className={cn("uppercase text-text-weak", compact ? "text-2xs font-normal" : "text-xs font-medium")}>
 					<Trans>Margin Mode</Trans>
 				</span>
-				<Button variant="outlined" size="sm" onClick={handleSwitchMode} disabled={isPending}>
+				<Button variant="outline" intent="neutral" size="sm" onClick={handleSwitchMode} disabled={isPending}>
 					{isPending && <SpinnerGapIcon className={cn(iconSize, "animate-spin")} />}
 					{marginMode === "cross" ? t`Cross → Isolated` : t`Isolated → Cross`}
 				</Button>
@@ -328,7 +320,7 @@ function LeverageEditorInline({
 			{error && (
 				<div
 					className={cn(
-						"flex items-center bg-market-down-100 border border-market-down-600/20 rounded-xs text-market-down-600",
+						"flex items-center bg-fill-error-weak border border-stroke-error-weak rounded-xs text-market-down",
 						compact ? "gap-1.5 p-1.5 text-3xs" : "gap-2 p-2.5 text-sm",
 					)}
 				>
@@ -339,9 +331,9 @@ function LeverageEditorInline({
 			)}
 
 			<Button
-				variant="outlined"
+				variant="outline"
 				size={compact ? "md" : "lg"}
-				tone="accent"
+				intent="brand"
 				onClick={handleConfirm}
 				disabled={!isDirty || isPending}
 				className="w-full"

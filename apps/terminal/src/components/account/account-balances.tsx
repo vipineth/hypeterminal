@@ -152,9 +152,7 @@ function SectionHeader({ totalValue, hideSmall, onHideSmallChange }: SectionHead
 				{t`Hide small`}
 			</label>
 			{totalValue !== null && (
-				<span className="text-xs font-semibold text-market-up tabular-nums">
-					{formatUSD(totalValue, { compact: true })}
-				</span>
+				<span className="text-xs font-semibold tabular-nums">{formatUSD(totalValue, { compact: true })}</span>
 			)}
 		</div>
 	);
@@ -165,11 +163,11 @@ function BalancesTable({ rows }: { rows: SpotRow[] }) {
 		<Table>
 			<TableHeader>
 				<TableRow className="border-stroke-weak/40 bg-bg-alternate hover:bg-bg-alternate">
-					<TableHead className="text-3xs font-medium uppercase tracking-wider text-text-weak h-7">{t`Token`}</TableHead>
-					<TableHead className="text-3xs font-medium uppercase tracking-wider text-text-weak text-right h-7">{t`Total`}</TableHead>
-					<TableHead className="text-3xs font-medium uppercase tracking-wider text-text-weak text-right h-7">{t`Available`}</TableHead>
-					<TableHead className="text-3xs font-medium uppercase tracking-wider text-text-weak text-right h-7">{t`In Orders`}</TableHead>
-					<TableHead className="text-3xs font-medium uppercase tracking-wider text-text-weak text-right h-7">{t`USD Value`}</TableHead>
+					<TableHead className="text-3xs font-medium uppercase text-text-weak h-7">{t`Token`}</TableHead>
+					<TableHead className="text-3xs font-medium uppercase text-text-weak text-right h-7">{t`Total`}</TableHead>
+					<TableHead className="text-3xs font-medium uppercase text-text-weak text-right h-7">{t`Available`}</TableHead>
+					<TableHead className="text-3xs font-medium uppercase text-text-weak text-right h-7">{t`In Orders`}</TableHead>
+					<TableHead className="text-3xs font-medium uppercase text-text-weak text-right h-7">{t`USD Value`}</TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>
@@ -192,7 +190,7 @@ function BalancesTable({ rows }: { rows: SpotRow[] }) {
 								? formatToken(row.inOrders, row.coin === DEFAULT_QUOTE_TOKEN ? 2 : row.szDecimals)
 								: "—"}
 						</TableCell>
-						<TableCell className="text-xs text-right tabular-nums text-market-up py-1.5">
+						<TableCell className="text-xs text-right tabular-nums py-1.5">
 							{formatUSD(row.usdValue, { compact: true })}
 						</TableCell>
 					</TableRow>
@@ -206,12 +204,10 @@ function BalanceCard({ row }: { row: SpotRow }) {
 	const decimals = row.coin === DEFAULT_QUOTE_TOKEN ? 2 : row.szDecimals;
 
 	return (
-		<div className="rounded-sm border border-stroke-weak/40 bg-bg-base/50">
+		<div className="rounded-xs border border-stroke-weak/40 bg-bg-raised">
 			<div className="flex items-center justify-between px-3 py-2.5 border-b border-stroke-weak/40">
 				<AssetDisplay coin={row.coin} nameClassName="text-sm font-semibold" />
-				<span className="text-sm font-semibold tabular-nums text-market-up">
-					{formatUSD(row.usdValue, { compact: true })}
-				</span>
+				<span className="text-sm font-semibold tabular-nums">{formatUSD(row.usdValue, { compact: true })}</span>
 			</div>
 			<div className="border-t border-stroke-weak/40">
 				<div className="grid grid-cols-3 divide-x divide-stroke-weak/40">
@@ -236,7 +232,7 @@ interface MetricCellProps {
 
 function MetricCell({ label, value, valueClass }: MetricCellProps) {
 	return (
-		<div className="px-3 py-2 bg-bg-base/50">
+		<div className="px-3 py-2">
 			<div className="text-3xs text-text-weak mb-0.5">{label}</div>
 			<div className={cn("text-xs tabular-nums font-medium", valueClass)}>{value}</div>
 		</div>

@@ -51,7 +51,7 @@ export function AccountHistory({ address }: Props) {
 	const [tab, setTab] = useState("trades");
 
 	return (
-		<div className="rounded-xs border border-border-200 bg-surface-execution">
+		<div className="rounded-xs border border-stroke-weak bg-bg-raised">
 			<Tabs value={tab} onValueChange={setTab}>
 				<TabsList variant="underline">
 					<TabsTrigger value="trades">
@@ -98,8 +98,8 @@ function TimeRangeSelector({ value, onChange }: { value: TimeRange; onChange: (v
 					className={cn(
 						"px-2 py-0.5 rounded-xs text-3xs font-medium transition-colors",
 						value === r.value
-							? "bg-primary-default text-text-10"
-							: "text-text-600 hover:text-text-950 hover:bg-surface-analysis",
+							? "bg-fill-brand-strong text-text-inverse-strong"
+							: "text-text-weak hover:text-text-strong hover:bg-bg-alternate",
 					)}
 				>
 					{r.label}
@@ -122,23 +122,23 @@ function LoadingSkeleton() {
 
 function EmptyState({ message }: { message: string }) {
 	return (
-		<div className="flex flex-col items-center justify-center py-12 text-sm text-text-600">
-			<ClockCounterClockwiseIcon className="size-8 mb-2 text-text-500" />
+		<div className="flex flex-col items-center justify-center py-12 text-sm text-text-weak">
+			<ClockCounterClockwiseIcon className="size-8 mb-2 text-text-weak" />
 			{message}
 		</div>
 	);
 }
 
-const HEAD_CLASS = "text-4xs font-medium uppercase tracking-wider text-text-600 h-7";
+const HEAD_CLASS = "text-3xs font-medium uppercase text-text-weak h-7";
 const CELL_CLASS = "text-xs py-1.5";
 
 function ExplorerLink({ hash, time }: { hash: string; time: number }) {
 	const url = getExplorerTxUrl(hash);
-	if (!url) return <span className="tabular-nums text-text-600">{formatDateTimeShort(time)}</span>;
+	if (!url) return <span className="tabular-nums text-text-weak">{formatDateTimeShort(time)}</span>;
 
 	return (
 		<a
-			className="flex items-center gap-1 tabular-nums text-text-600 underline decoration-dashed decoration-text-500/30"
+			className="flex items-center gap-1 tabular-nums text-text-weak underline decoration-dashed decoration-text-500/30"
 			href={url}
 			target="_blank"
 			rel="noopener noreferrer"
@@ -156,7 +156,7 @@ function TradesTab({ address }: { address: string }) {
 
 	const { data, isLoading } = useInfoUserFillsByTime({
 		user: address,
-		startTime: startTime ?? 0,
+		startTime,
 		aggregateByTime: true,
 	});
 
@@ -164,8 +164,8 @@ function TradesTab({ address }: { address: string }) {
 
 	return (
 		<div className="flex flex-col">
-			<div className="flex items-center justify-between px-3 py-2 border-b border-border-200/40">
-				<span className="text-3xs text-text-600 tabular-nums">
+			<div className="flex items-center justify-between px-3 py-2 border-b border-stroke-weak/40">
+				<span className="text-3xs text-text-weak tabular-nums">
 					{fills.length} {t`trades`}
 				</span>
 				<TimeRangeSelector value={range} onChange={setRange} />
@@ -178,7 +178,7 @@ function TradesTab({ address }: { address: string }) {
 				<ScrollArea className="max-h-96">
 					<Table>
 						<TableHeader>
-							<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
+							<TableRow className="border-stroke-weak/40 bg-bg-alternate hover:bg-bg-alternate">
 								<TableHead className={HEAD_CLASS}>{t`Asset`}</TableHead>
 								<TableHead className={HEAD_CLASS}>{t`Side`}</TableHead>
 								<TableHead className={cn(HEAD_CLASS, "text-right")}>{t`Price`}</TableHead>
@@ -197,10 +197,7 @@ function TradesTab({ address }: { address: string }) {
 								return (
 									<TableRow
 										key={`${fill.hash}-${fill.tid}`}
-										className={cn(
-											"border-border-200/40 hover:bg-surface-analysis/30",
-											i % 2 === 1 && "bg-surface-analysis",
-										)}
+										className={cn("border-stroke-weak/40 hover:bg-bg-alternate/30", i % 2 === 1 && "bg-bg-alternate")}
 									>
 										<TableCell className={cn(CELL_CLASS, "font-medium")}>
 											<AssetDisplay coin={fill.coin} />
@@ -208,8 +205,8 @@ function TradesTab({ address }: { address: string }) {
 										<TableCell className={CELL_CLASS}>
 											<span
 												className={cn(
-													"text-4xs px-1 py-0.5 rounded-sm uppercase",
-													fill.liquidation ? "bg-market-down-100 text-market-down-600" : "bg-surface-analysis/50",
+													"text-3xs px-1 py-0.5 rounded-sm uppercase",
+													fill.liquidation ? "bg-fill-error-weak text-market-down" : "bg-bg-alternate/50",
 												)}
 											>
 												{fill.liquidation ? t`Liquidated` : fill.dir}
@@ -230,7 +227,7 @@ function TradesTab({ address }: { address: string }) {
 													{formatUSD(closedPnl, { signDisplay: "exceptZero" })}
 												</span>
 											) : (
-												<span className="text-text-600">—</span>
+												<span className="text-text-weak">—</span>
 											)}
 										</TableCell>
 										<TableCell className={cn(CELL_CLASS, "text-right")}>
@@ -263,8 +260,8 @@ function FundingTab({ address }: { address: string }) {
 
 	return (
 		<div className="flex flex-col">
-			<div className="flex items-center justify-between px-3 py-2 border-b border-border-200/40">
-				<span className="text-3xs text-text-600 tabular-nums">
+			<div className="flex items-center justify-between px-3 py-2 border-b border-stroke-weak/40">
+				<span className="text-3xs text-text-weak tabular-nums">
 					{entries.length} {t`payments`}
 					{entries.length > 0 && (
 						<span className={cn("ml-2 font-semibold", getValueColorClass(totalFunding))}>
@@ -282,7 +279,7 @@ function FundingTab({ address }: { address: string }) {
 				<ScrollArea className="max-h-96">
 					<Table>
 						<TableHeader>
-							<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
+							<TableRow className="border-stroke-weak/40 bg-bg-alternate hover:bg-bg-alternate">
 								<TableHead className={HEAD_CLASS}>{t`Asset`}</TableHead>
 								<TableHead className={cn(HEAD_CLASS, "text-right")}>{t`Position`}</TableHead>
 								<TableHead className={cn(HEAD_CLASS, "text-right")}>{t`Rate`}</TableHead>
@@ -302,10 +299,7 @@ function FundingTab({ address }: { address: string }) {
 								return (
 									<TableRow
 										key={`${delta.coin}-${entry.time}-${i}`}
-										className={cn(
-											"border-border-200/40 hover:bg-surface-analysis/30",
-											i % 2 === 1 && "bg-surface-analysis",
-										)}
+										className={cn("border-stroke-weak/40 hover:bg-bg-alternate/30", i % 2 === 1 && "bg-bg-alternate")}
 									>
 										<TableCell className={cn(CELL_CLASS, "font-medium")}>
 											<AssetDisplay coin={delta.coin} />
@@ -355,8 +349,8 @@ function OrdersTab({ address }: { address: string }) {
 
 	return (
 		<div className="flex flex-col">
-			<div className="flex items-center justify-between px-3 py-2 border-b border-border-200/40">
-				<span className="text-3xs text-text-600 tabular-nums">
+			<div className="flex items-center justify-between px-3 py-2 border-b border-stroke-weak/40">
+				<span className="text-3xs text-text-weak tabular-nums">
 					{orders.length} {t`orders`}
 				</span>
 			</div>
@@ -368,7 +362,7 @@ function OrdersTab({ address }: { address: string }) {
 				<ScrollArea className="max-h-96">
 					<Table>
 						<TableHeader>
-							<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
+							<TableRow className="border-stroke-weak/40 bg-bg-alternate hover:bg-bg-alternate">
 								<TableHead className={HEAD_CLASS}>{t`Asset`}</TableHead>
 								<TableHead className={HEAD_CLASS}>{t`Type`}</TableHead>
 								<TableHead className={cn(HEAD_CLASS, "text-right")}>{t`Price`}</TableHead>
@@ -385,15 +379,12 @@ function OrdersTab({ address }: { address: string }) {
 								return (
 									<TableRow
 										key={`${order.oid}-${entry.statusTimestamp}`}
-										className={cn(
-											"border-border-200/40 hover:bg-surface-analysis/30",
-											i % 2 === 1 && "bg-surface-analysis",
-										)}
+										className={cn("border-stroke-weak/40 hover:bg-bg-alternate/30", i % 2 === 1 && "bg-bg-alternate")}
 									>
 										<TableCell className={cn(CELL_CLASS, "font-medium")}>
 											<div className="flex items-center gap-1.5">
 												<AssetDisplay coin={order.coin} />
-												<span className={cn("text-4xs px-1 py-0.5 rounded-sm uppercase", getSideClass(order.side))}>
+												<span className={cn("text-3xs px-1 py-0.5 rounded-sm uppercase", getSideClass(order.side))}>
 													{getSideLabel(order.side, market?.kind)}
 												</span>
 											</div>
@@ -408,7 +399,7 @@ function OrdersTab({ address }: { address: string }) {
 										<TableCell className={CELL_CLASS}>
 											<OrderStatusBadge status={entry.status} />
 										</TableCell>
-										<TableCell className={cn(CELL_CLASS, "text-right tabular-nums text-text-600 whitespace-nowrap")}>
+										<TableCell className={cn(CELL_CLASS, "text-right tabular-nums text-text-weak whitespace-nowrap")}>
 											{formatDateTimeShort(entry.statusTimestamp)}
 										</TableCell>
 									</TableRow>
@@ -426,24 +417,24 @@ function OrdersTab({ address }: { address: string }) {
 function OrderStatusBadge({ status }: { status: string }) {
 	const colorClass =
 		status === "filled"
-			? "text-market-up-600 bg-market-up-100"
+			? "text-market-up bg-fill-success-weak"
 			: status === "open" || status === "triggered"
-				? "text-primary-default bg-primary-muted"
-				: "text-text-600 bg-surface-analysis/50";
+				? "text-text-brand bg-fill-brand-weak"
+				: "text-text-weak bg-bg-alternate/50";
 
-	return <span className={cn("text-4xs px-1.5 py-0.5 rounded-sm capitalize", colorClass)}>{status}</span>;
+	return <span className={cn("text-3xs px-1.5 py-0.5 rounded-sm capitalize", colorClass)}>{status}</span>;
 }
 
 const LEDGER_TYPE_CONFIG: Record<string, { label: string; icon: typeof DownloadSimpleIcon; colorClass: string }> = {
-	deposit: { label: "Deposit", icon: DownloadSimpleIcon, colorClass: "text-market-up-600" },
-	withdraw: { label: "Withdraw", icon: UploadSimpleIcon, colorClass: "text-market-down-600" },
-	accountClassTransfer: { label: "Transfer", icon: ArrowsDownUpIcon, colorClass: "text-primary-default" },
-	internalTransfer: { label: "Transfer", icon: PaperPlaneTiltIcon, colorClass: "text-primary-default" },
-	liquidation: { label: "Liquidation", icon: GavelIcon, colorClass: "text-market-down-600" },
-	rewardsClaim: { label: "Reward", icon: GiftIcon, colorClass: "text-market-up-600" },
-	spotTransfer: { label: "Spot Transfer", icon: PaperPlaneTiltIcon, colorClass: "text-primary-default" },
-	subAccountTransfer: { label: "Sub Transfer", icon: ArrowsDownUpIcon, colorClass: "text-primary-default" },
-	send: { label: "Send", icon: PaperPlaneTiltIcon, colorClass: "text-market-down-600" },
+	deposit: { label: "Deposit", icon: DownloadSimpleIcon, colorClass: "text-market-up" },
+	withdraw: { label: "Withdraw", icon: UploadSimpleIcon, colorClass: "text-market-down" },
+	accountClassTransfer: { label: "Transfer", icon: ArrowsDownUpIcon, colorClass: "text-text-brand" },
+	internalTransfer: { label: "Transfer", icon: PaperPlaneTiltIcon, colorClass: "text-text-brand" },
+	liquidation: { label: "Liquidation", icon: GavelIcon, colorClass: "text-market-down" },
+	rewardsClaim: { label: "Reward", icon: GiftIcon, colorClass: "text-market-up" },
+	spotTransfer: { label: "Spot Transfer", icon: PaperPlaneTiltIcon, colorClass: "text-text-brand" },
+	subAccountTransfer: { label: "Sub Transfer", icon: ArrowsDownUpIcon, colorClass: "text-text-brand" },
+	send: { label: "Send", icon: PaperPlaneTiltIcon, colorClass: "text-market-down" },
 };
 
 type LedgerDelta = UserNonFundingLedgerUpdatesResponse[number]["delta"];
@@ -493,8 +484,8 @@ function LedgerTab({ address }: { address: string }) {
 
 	return (
 		<div className="flex flex-col">
-			<div className="flex items-center justify-between px-3 py-2 border-b border-border-200/40">
-				<span className="text-3xs text-text-600 tabular-nums">
+			<div className="flex items-center justify-between px-3 py-2 border-b border-stroke-weak/40">
+				<span className="text-3xs text-text-weak tabular-nums">
 					{entries.length} {t`entries`}
 				</span>
 				<TimeRangeSelector value={range} onChange={setRange} />
@@ -507,7 +498,7 @@ function LedgerTab({ address }: { address: string }) {
 				<ScrollArea className="max-h-96">
 					<Table>
 						<TableHeader>
-							<TableRow className="border-border-200/40 bg-surface-analysis hover:bg-surface-analysis">
+							<TableRow className="border-stroke-weak/40 bg-bg-alternate hover:bg-bg-alternate">
 								<TableHead className={HEAD_CLASS}>{t`Type`}</TableHead>
 								<TableHead className={cn(HEAD_CLASS, "text-right")}>{t`Amount`}</TableHead>
 								<TableHead className={HEAD_CLASS}>{t`Details`}</TableHead>
@@ -519,17 +510,14 @@ function LedgerTab({ address }: { address: string }) {
 								const config = LEDGER_TYPE_CONFIG[entry.delta.type];
 								const Icon = config?.icon ?? ClockCounterClockwiseIcon;
 								const label = config?.label ?? entry.delta.type;
-								const colorClass = config?.colorClass ?? "text-text-600";
+								const colorClass = config?.colorClass ?? "text-text-weak";
 								const amount = getLedgerAmount(entry.delta);
 								const token = getLedgerToken(entry.delta);
 
 								return (
 									<TableRow
 										key={`${entry.hash}-${entry.time}`}
-										className={cn(
-											"border-border-200/40 hover:bg-surface-analysis/30",
-											i % 2 === 1 && "bg-surface-analysis",
-										)}
+										className={cn("border-stroke-weak/40 hover:bg-bg-alternate/30", i % 2 === 1 && "bg-bg-alternate")}
 									>
 										<TableCell className={CELL_CLASS}>
 											<div className="flex items-center gap-1.5">
@@ -545,10 +533,10 @@ function LedgerTab({ address }: { address: string }) {
 														: formatToken(amount, { symbol: token })}
 												</span>
 											) : (
-												<span className="text-text-600">—</span>
+												<span className="text-text-weak">—</span>
 											)}
 										</TableCell>
-										<TableCell className={cn(CELL_CLASS, "text-text-600 text-3xs max-w-40 truncate")}>
+										<TableCell className={cn(CELL_CLASS, "text-text-weak text-3xs max-w-40 truncate")}>
 											<LedgerDetails delta={entry.delta} />
 										</TableCell>
 										<TableCell className={cn(CELL_CLASS, "text-right")}>

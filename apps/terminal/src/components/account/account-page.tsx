@@ -44,7 +44,7 @@ export function AccountPage() {
 		<>
 			<div
 				className={cn(
-					"bg-bg-base text-text-strong min-h-screen w-full flex flex-col",
+					"bg-bg-base text-text-strong min-h-dvh w-full flex flex-col",
 					isTestnet ? "pt-[4.75rem]" : "pt-11",
 					isTestnet && "testnet-bg",
 				)}

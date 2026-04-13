@@ -88,7 +88,7 @@ function SectionHeader({ count }: { count: number | null }) {
 			<span className="text-xs font-medium">
 				<Trans>Open Positions</Trans>
 			</span>
-			{count !== null && <span className="text-xs font-semibold text-market-up ml-auto tabular-nums">{count}</span>}
+			{count !== null && <span className="text-xs font-semibold text-text-weak ml-auto tabular-nums">{count}</span>}
 		</div>
 	);
 }
@@ -104,14 +104,14 @@ function PositionsTable({ positions, markets, mids }: PositionsTableProps) {
 		<Table>
 			<TableHeader>
 				<TableRow className="border-stroke-weak/40 bg-bg-alternate hover:bg-bg-alternate">
-					<TableHead className="text-3xs font-medium uppercase tracking-wider text-text-weak h-7">{t`Asset`}</TableHead>
-					<TableHead className="text-3xs font-medium uppercase tracking-wider text-text-weak text-right h-7">{t`Size`}</TableHead>
-					<TableHead className="text-3xs font-medium uppercase tracking-wider text-text-weak text-right h-7">{t`Entry`}</TableHead>
-					<TableHead className="text-3xs font-medium uppercase tracking-wider text-text-weak text-right h-7">{t`Mark`}</TableHead>
-					<TableHead className="text-3xs font-medium uppercase tracking-wider text-text-weak text-right h-7">{t`PNL`}</TableHead>
-					<TableHead className="text-3xs font-medium uppercase tracking-wider text-text-weak text-right h-7">{t`Leverage`}</TableHead>
-					<TableHead className="text-3xs font-medium uppercase tracking-wider text-text-weak text-right h-7">{t`Margin`}</TableHead>
-					<TableHead className="text-3xs font-medium uppercase tracking-wider text-text-weak text-right h-7">{t`Liq Price`}</TableHead>
+					<TableHead className="text-3xs font-medium uppercase text-text-weak h-7">{t`Asset`}</TableHead>
+					<TableHead className="text-3xs font-medium uppercase text-text-weak text-right h-7">{t`Size`}</TableHead>
+					<TableHead className="text-3xs font-medium uppercase text-text-weak text-right h-7">{t`Entry`}</TableHead>
+					<TableHead className="text-3xs font-medium uppercase text-text-weak text-right h-7">{t`Mark`}</TableHead>
+					<TableHead className="text-3xs font-medium uppercase text-text-weak text-right h-7">{t`PNL`}</TableHead>
+					<TableHead className="text-3xs font-medium uppercase text-text-weak text-right h-7">{t`Leverage`}</TableHead>
+					<TableHead className="text-3xs font-medium uppercase text-text-weak text-right h-7">{t`Margin`}</TableHead>
+					<TableHead className="text-3xs font-medium uppercase text-text-weak text-right h-7">{t`Liq Price`}</TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>
@@ -121,7 +121,7 @@ function PositionsTable({ positions, markets, mids }: PositionsTableProps) {
 						position={p}
 						markets={markets}
 						markPx={mids?.[p.coin]}
-						isEven={i % 2 === 1}
+						isEven={i % 2 === 0}
 					/>
 				))}
 			</TableBody>
@@ -225,7 +225,7 @@ function PositionCard({ position: p, markets, markPx: markPxRaw }: PositionCardP
 	const marginMode = p.leverage.type === "isolated" ? t`Isolated` : t`Cross`;
 
 	return (
-		<div className={cn("rounded-sm border bg-bg-base/50", isLong ? "border-market-up/30" : "border-market-down/30")}>
+		<div className={cn("rounded-xs border bg-bg-raised", isLong ? "border-market-up/30" : "border-market-down/30")}>
 			<div className="flex items-center justify-between px-3 py-2.5 border-b border-stroke-weak/40">
 				<AssetDisplay
 					coin={p.coin}
@@ -279,7 +279,7 @@ interface MetricCellProps {
 
 function MetricCell({ label, value, sub, valueClass, warning }: MetricCellProps) {
 	return (
-		<div className="px-3 py-2 bg-bg-base/50">
+		<div className="px-3 py-2">
 			<div className="text-3xs text-text-weak mb-0.5">{label}</div>
 			<div className={cn("text-xs tabular-nums font-medium", valueClass)}>
 				{warning && <WarningIcon className="size-3 text-market-down inline mr-0.5" />}
