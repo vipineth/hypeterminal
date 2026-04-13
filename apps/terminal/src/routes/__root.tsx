@@ -17,7 +17,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 	head: () => {
 		const seoHead = buildPageHead();
 		return mergeHead(seoHead, {
-			links: [{ rel: "stylesheet", href: appCss }],
+			links: [
+				{ rel: "stylesheet", href: appCss },
+				{ rel: "preconnect", href: "https://api.hyperliquid.xyz" },
+				{ rel: "dns-prefetch", href: "https://api.hyperliquid.xyz" },
+				{ rel: "dns-prefetch", href: "https://app.hyperliquid.xyz" },
+			],
 		});
 	},
 	shellComponent: RootDocument,

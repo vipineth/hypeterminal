@@ -11,11 +11,13 @@ const isAnalyze = process.env.ANALYZE === 'true'
 
 function createManualChunks(id: string) {
   if (id.includes('node_modules')) {
-    if (id.includes('@radix-ui')) return 'vendor-radix'
+    if (id.includes('@nktkas/hyperliquid')) return 'vendor-hyperliquid'
     if (id.includes('@tanstack/react-query') || id.includes('@tanstack/react-table') || id.includes('@tanstack/react-virtual')) return 'vendor-tanstack'
     if (id.includes('recharts') || id.includes('d3-')) return 'vendor-charts'
     if (id.includes('viem') || id.includes('wagmi') || id.includes('@wagmi')) return 'vendor-web3'
     if (id.includes('klinecharts')) return 'vendor-klinecharts'
+    if (id.includes('@lifi/sdk') || id.includes('@lifi/types')) return 'vendor-lifi'
+    if (id.includes('@lingui/core') || id.includes('@lingui/react')) return 'vendor-lingui'
   }
 }
 

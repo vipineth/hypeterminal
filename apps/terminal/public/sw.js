@@ -1,4 +1,5 @@
 const CACHE_VERSION = "v1";
+const ASSET_CACHE = `assets-${CACHE_VERSION}`;
 const CHARTING_CACHE = `charting-${CACHE_VERSION}`;
 const FONT_CACHE = `fonts-${CACHE_VERSION}`;
 const ICON_CACHE = `icons-${CACHE_VERSION}`;
@@ -16,7 +17,7 @@ self.addEventListener("activate", (event) => {
 				keys
 					.filter(
 						(k) =>
-							![CHARTING_CACHE, FONT_CACHE, ICON_CACHE, NAV_CACHE].includes(k),
+							![ASSET_CACHE, CHARTING_CACHE, FONT_CACHE, ICON_CACHE, NAV_CACHE].includes(k),
 					)
 					.map((k) => caches.delete(k)),
 			),
@@ -29,6 +30,11 @@ self.addEventListener("fetch", (event) => {
 	const url = new URL(request.url);
 
 	if (request.method !== "GET") return;
+
+	if (url.pathname.startsWith("/assets/")) {
+		event.respondWith(cacheFirst(request, ASSET_CACHE));
+		return;
+	}
 
 	if (url.pathname.startsWith("/charting_library/")) {
 		event.respondWith(cacheFirst(request, CHARTING_CACHE));
