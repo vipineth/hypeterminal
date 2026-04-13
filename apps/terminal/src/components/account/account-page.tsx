@@ -13,6 +13,7 @@ import { Skeleton } from "boneyard-js/react";
 import { Suspense, useState } from "react";
 import { useConnection } from "wagmi";
 import { AccountBalances } from "@/components/account/account-balances";
+import { AccountLeverageSettings } from "@/components/account/account-leverage-settings";
 import { AccountPnlChart } from "@/components/account/account-pnl-chart";
 import { AccountPositions } from "@/components/account/account-positions";
 import { WalletModal } from "@/components/trade/components/wallet-modal";
@@ -236,6 +237,7 @@ function ConnectedAccountView({ address }: { address: string }) {
 
 			<AccountPositions />
 			<AccountBalances />
+			<AccountLeverageSettings />
 
 			<Suspense fallback={null}>
 				<TransferModal open={transferOpen} onOpenChange={setTransferOpen} />

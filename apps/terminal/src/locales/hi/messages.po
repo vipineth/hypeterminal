@@ -383,6 +383,10 @@ msgstr "रद्द हो रहा है..."
 #~ msgid "cancelled"
 #~ msgstr "रद्द"
 
+#: src/components/account/account-leverage-settings.tsx
+msgid "Cannot switch to isolated mode with an open position"
+msgstr ""
+
 #: src/components/trade/tradebox/margin-mode-modal.tsx
 msgid "Cannot switch to Isolated mode with an open position. Close your position first."
 msgstr ""
@@ -424,6 +428,7 @@ msgstr "जल्द आ रहा है"
 #~ msgid "completed"
 #~ msgstr "पूर्ण"
 
+#: src/components/account/account-leverage-settings.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 #: src/components/trade/tradebox/bridge-tab.tsx
 #: src/components/trade/tradebox/leverage-control.tsx
@@ -586,6 +591,8 @@ msgstr ""
 msgid "Created"
 msgstr ""
 
+#: src/components/account/account-leverage-settings.tsx
+#: src/components/account/account-leverage-settings.tsx
 #: src/components/account/account-positions.tsx
 #: src/components/account/account-positions.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -594,6 +601,10 @@ msgstr ""
 #: src/components/trade/tradebox/trade-header.tsx
 msgid "Cross"
 msgstr "क्रॉस"
+
+#: src/components/account/account-leverage-settings.tsx
+msgid "Cross → Isolated"
+msgstr ""
 
 #: src/components/trade/tradebox/account-panel.tsx
 msgid "Cross Account Leverage"
@@ -735,6 +746,11 @@ msgstr ""
 
 #: src/components/trade/tradebox/margin-mode-modal.tsx
 msgid "Each position uses only its allocated margin. If the margin ratio reaches 100%, the position is liquidated. Margin can be added or removed individually."
+msgstr ""
+
+#: src/components/account/account-leverage-settings.tsx
+#: src/components/account/account-leverage-settings.tsx
+msgid "Edit leverage"
 msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx
@@ -924,9 +940,13 @@ msgstr "ट्रेड लोड करने में विफल।"
 msgid "Failed to reverse position"
 msgstr ""
 
-#: src/components/trade/order-entry/order-entry-panel.tsx
-#~ msgid "Failed to switch margin mode"
-#~ msgstr ""
+#: src/components/account/account-leverage-settings.tsx
+msgid "Failed to switch margin mode"
+msgstr ""
+
+#: src/components/account/account-leverage-settings.tsx
+msgid "Failed to update leverage"
+msgstr ""
 
 #: src/components/trade/mobile/mobile-history-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
@@ -1089,6 +1109,8 @@ msgstr ""
 msgid "Invalid Ethereum address"
 msgstr ""
 
+#: src/components/account/account-leverage-settings.tsx
+#: src/components/account/account-leverage-settings.tsx
 #: src/components/account/account-positions.tsx
 #: src/components/account/account-positions.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -1097,6 +1119,10 @@ msgstr ""
 #: src/components/trade/tradebox/trade-header.tsx
 msgid "Isolated"
 msgstr "आइसोलेटेड"
+
+#: src/components/account/account-leverage-settings.tsx
+msgid "Isolated → Cross"
+msgstr ""
 
 #: src/components/trade/footer/footer-bar.tsx
 #~ msgid "Latency:"
@@ -1111,12 +1137,21 @@ msgstr "लीडरबोर्ड"
 msgid "Learn more"
 msgstr ""
 
+#: src/components/account/account-leverage-settings.tsx
 #: src/components/account/account-positions.tsx
 #: src/components/account/account-positions.tsx
 #: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/margin-mode-modal.tsx
 msgid "Leverage"
+msgstr ""
+
+#: src/components/account/account-leverage-settings.tsx
+msgid "Leverage Settings"
+msgstr ""
+
+#: src/components/account/account-leverage-settings.tsx
+msgid "Leverage updated to {pendingLeverage}× for {coin}"
 msgstr ""
 
 #: src/components/trade/components/global-settings-dialog.tsx
@@ -1262,9 +1297,14 @@ msgstr ""
 msgid "Margin mode"
 msgstr ""
 
-#: src/components/trade/tradebox/margin-mode-dialog.tsx
-#~ msgid "Margin Mode"
-#~ msgstr ""
+#: src/components/account/account-leverage-settings.tsx
+msgid "Margin Mode"
+msgstr ""
+
+#. placeholder {0}: newMode === "cross" ? t`Cross` : t`Isolated`
+#: src/components/account/account-leverage-settings.tsx
+msgid "Margin mode switched to {0} for {coin}"
+msgstr ""
 
 #: src/components/account/account-page.tsx
 msgid "Margin Ratio"
@@ -1520,6 +1560,10 @@ msgstr "कोई खुला ऑर्डर नहीं।"
 
 #: src/components/account/account-positions.tsx
 msgid "No open positions."
+msgstr ""
+
+#: src/components/account/account-leverage-settings.tsx
+msgid "No open positions. Leverage settings appear here when you have active positions."
 msgstr ""
 
 #: src/components/trade/mobile/mobile-orders-history-tab.tsx
@@ -2680,6 +2724,7 @@ msgstr "अवास्तविक PNL"
 msgid "Unsupported resolution: {0}"
 msgstr "असमर्थित रेजोल्यूशन: {0}"
 
+#: src/components/account/account-leverage-settings.tsx
 #: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/margin-mode-modal.tsx
 msgid "Update failed"
