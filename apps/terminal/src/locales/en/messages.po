@@ -185,6 +185,7 @@ msgstr "Amount"
 #~ msgid "Approve a builder to charge fees on orders placed on your behalf. Builder codes allow DeFi applications to receive a portion of trading fees."
 #~ msgstr "Approve a builder to charge fees on orders placed on your behalf. Builder codes allow DeFi applications to receive a portion of trading fees."
 
+#: src/components/account/account-positions.tsx
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/funding-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
@@ -199,6 +200,8 @@ msgstr "Asset"
 msgid "Assets"
 msgstr "Assets"
 
+#: src/components/account/account-balances.tsx
+#: src/components/account/account-balances.tsx
 #: src/components/account/account-page.tsx
 #: src/components/account/account-page.tsx
 #: src/components/trade/mobile/mobile-balances-tab.tsx
@@ -579,6 +582,8 @@ msgstr "Could not fetch your token balances"
 msgid "Created"
 msgstr "Created"
 
+#: src/components/account/account-positions.tsx
+#: src/components/account/account-positions.tsx
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/margin-mode-modal.tsx
 #: src/components/trade/tradebox/margin-mode-modal.tsx
@@ -778,6 +783,8 @@ msgstr "Enter TP or SL price"
 msgid "Enter trigger price"
 msgstr "Enter trigger price"
 
+#: src/components/account/account-positions.tsx
+#: src/components/account/account-positions.tsx
 #: src/components/trade/mobile/mobile-positions-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Entry"
@@ -861,6 +868,7 @@ msgstr "Failed to enable trading"
 msgid "Failed to load balances"
 msgstr "Failed to load balances"
 
+#: src/components/account/account-balances.tsx
 #: src/components/trade/mobile/mobile-balances-tab.tsx
 #: src/components/trade/positions/balances-tab.tsx
 msgid "Failed to load balances."
@@ -885,6 +893,7 @@ msgstr "Failed to load order book."
 msgid "Failed to load order history."
 msgstr "Failed to load order history."
 
+#: src/components/account/account-positions.tsx
 #: src/components/trade/mobile/mobile-positions-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Failed to load positions."
@@ -1017,11 +1026,14 @@ msgstr "Go to Trade"
 msgid "Go to trading terminal"
 msgstr "Go to trading terminal"
 
+#: src/components/account/account-balances.tsx
 #: src/components/trade/mobile/mobile-balances-tab.tsx
 #: src/components/trade/positions/balances-tab.tsx
 msgid "Hide small"
 msgstr "Hide small"
 
+#: src/components/account/account-balances.tsx
+#: src/components/account/account-balances.tsx
 #: src/components/account/account-page.tsx
 msgid "In Orders"
 msgstr "In Orders"
@@ -1073,6 +1085,8 @@ msgstr "Invalid amount"
 msgid "Invalid Ethereum address"
 msgstr "Invalid Ethereum address"
 
+#: src/components/account/account-positions.tsx
+#: src/components/account/account-positions.tsx
 #: src/components/trade/positions/positions-tab.tsx
 #: src/components/trade/tradebox/margin-mode-modal.tsx
 #: src/components/trade/tradebox/margin-mode-modal.tsx
@@ -1097,6 +1111,8 @@ msgstr "Leaderboard"
 msgid "Learn more"
 msgstr "Learn more"
 
+#: src/components/account/account-positions.tsx
+#: src/components/account/account-positions.tsx
 #: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/leverage-control.tsx
 #: src/components/trade/tradebox/margin-mode-modal.tsx
@@ -1143,6 +1159,11 @@ msgstr "Limit Price"
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Liq"
 msgstr "Liq"
+
+#: src/components/account/account-positions.tsx
+#: src/components/account/account-positions.tsx
+msgid "Liq Price"
+msgstr "Liq Price"
 
 #: src/components/trade/tradebox/order-summary.tsx
 msgid "Liq. Price"
@@ -1202,6 +1223,8 @@ msgstr "Loading wallet..."
 msgid "Loading..."
 msgstr "Loading..."
 
+#: src/components/account/account-positions.tsx
+#: src/components/account/account-positions.tsx
 #: src/components/trade/mobile/mobile-positions-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 msgid "Long"
@@ -1220,6 +1243,8 @@ msgstr "Maintenance Margin"
 #~ msgid "Manage your risk on individual positions by restricting the amount of margin allocated to each. If the margin ratio of an isolated position reaches 100%, the position will be liquidated. Margin can be added or removed to individual positions in this mode."
 #~ msgstr "Manage your risk on individual positions by restricting the amount of margin allocated to each. If the margin ratio of an isolated position reaches 100%, the position will be liquidated. Margin can be added or removed to individual positions in this mode."
 
+#: src/components/account/account-positions.tsx
+#: src/components/account/account-positions.tsx
 #: src/components/trade/mobile/mobile-positions-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Margin"
@@ -1253,6 +1278,8 @@ msgstr "Margin Req."
 msgid "Margin Used"
 msgstr "Margin Used"
 
+#: src/components/account/account-positions.tsx
+#: src/components/account/account-positions.tsx
 #: src/components/trade/mobile/mobile-positions-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
 msgid "Mark"
@@ -1487,6 +1514,10 @@ msgstr "No markets found."
 msgid "No open orders."
 msgstr "No open orders."
 
+#: src/components/account/account-positions.tsx
+msgid "No open positions."
+msgstr "No open positions."
+
 #: src/components/trade/mobile/mobile-orders-history-tab.tsx
 #: src/components/trade/positions/orders-history-tab.tsx
 msgid "No order history found."
@@ -1499,6 +1530,10 @@ msgstr "No response from exchange"
 #: src/components/trade/tradebox/bridge-tab.tsx
 msgid "No route available. Try a different amount or asset."
 msgstr "No route available. Try a different amount or asset."
+
+#: src/components/account/account-balances.tsx
+msgid "No spot balances."
+msgstr "No spot balances."
 
 #: src/components/trade/components/token-selector-dropdown.tsx
 #~ msgid "No tokens available"
@@ -1584,6 +1619,10 @@ msgstr "Open Interest"
 #: src/components/trade/mobile/mobile-orders-tab.tsx
 msgid "Open Orders"
 msgstr "Open Orders"
+
+#: src/components/account/account-positions.tsx
+msgid "Open Positions"
+msgstr "Open Positions"
 
 #: src/components/trade/positions/positions-tab.tsx
 #~ msgid "Open positions count"
@@ -1712,6 +1751,7 @@ msgstr "Place Limit Close"
 msgid "Please enter an address"
 msgstr "Please enter an address"
 
+#: src/components/account/account-positions.tsx
 #: src/components/trade/positions/balances-tab.tsx
 #: src/components/trade/positions/history-tab.tsx
 #: src/components/trade/positions/positions-tab.tsx
@@ -2024,6 +2064,8 @@ msgstr "Set to {p}%"
 msgid "Settings"
 msgstr "Settings"
 
+#: src/components/account/account-positions.tsx
+#: src/components/account/account-positions.tsx
 #: src/components/trade/mobile/mobile-positions-tab.tsx
 #: src/components/trade/positions/position-tpsl-modal.tsx
 msgid "Short"
@@ -2089,6 +2131,8 @@ msgstr "Signer not ready"
 #~ msgid "Signing..."
 #~ msgstr "Signing..."
 
+#: src/components/account/account-positions.tsx
+#: src/components/account/account-positions.tsx
 #: src/components/trade/mobile/mobile-history-tab.tsx
 #: src/components/trade/mobile/mobile-orders-history-tab.tsx
 #: src/components/trade/mobile/mobile-orders-tab.tsx
@@ -2189,6 +2233,10 @@ msgstr "Spot"
 #: src/components/trade/positions/send-modal.tsx
 msgid "Spot Account"
 msgstr "Spot Account"
+
+#: src/components/account/account-balances.tsx
+msgid "Spot Balances"
+msgstr "Spot Balances"
 
 #: src/components/pages/builder-page.tsx
 #~ msgid "Spot: Max 1% (100 basis points)"
@@ -2428,10 +2476,16 @@ msgstr "To Spot"
 msgid "Toggle size mode"
 msgstr "Toggle size mode"
 
+#: src/components/account/account-balances.tsx
+msgid "Token"
+msgstr "Token"
+
 #: src/components/trade/market-overview.tsx
 msgid "TOKEN"
 msgstr "TOKEN"
 
+#: src/components/account/account-balances.tsx
+#: src/components/account/account-balances.tsx
 #: src/components/trade/mobile/mobile-balances-tab.tsx
 #: src/components/trade/orderbook/orderbook-panel.tsx
 #: src/components/trade/positions/balances-tab.tsx
@@ -2638,6 +2692,7 @@ msgstr "Updated"
 msgid "Updated live"
 msgstr "Updated live"
 
+#: src/components/account/account-balances.tsx
 #: src/components/trade/positions/balances-tab.tsx
 msgid "USD Value"
 msgstr "USD Value"

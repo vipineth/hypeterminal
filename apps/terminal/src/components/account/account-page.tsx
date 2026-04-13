@@ -12,6 +12,8 @@ import {
 import { Skeleton } from "boneyard-js/react";
 import { Suspense, useState } from "react";
 import { useConnection } from "wagmi";
+import { AccountBalances } from "@/components/account/account-balances";
+import { AccountPositions } from "@/components/account/account-positions";
 import { WalletModal } from "@/components/trade/components/wallet-modal";
 import { TopNav } from "@/components/trade/header/top-nav";
 import { TestnetBanner } from "@/components/trade/testnet-banner";
@@ -228,6 +230,9 @@ function ConnectedAccountView({ address }: { address: string }) {
 					<Trans>Send</Trans>
 				</Button>
 			</div>
+
+			<AccountPositions />
+			<AccountBalances />
 
 			<Suspense fallback={null}>
 				<TransferModal open={transferOpen} onOpenChange={setTransferOpen} />
