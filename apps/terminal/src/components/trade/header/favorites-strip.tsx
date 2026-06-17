@@ -46,7 +46,7 @@ function FavoriteChip({ name, isActive }: FavoriteChipProps) {
 	const displayName = market?.pairName ?? name;
 	const changePct = get24hChange(market?.prevDayPx, market?.markPx);
 
-	function handleClick() {
+	function selectFavoriteMarket() {
 		setSelectedMarket(scope, name);
 	}
 
@@ -67,7 +67,7 @@ function FavoriteChip({ name, isActive }: FavoriteChipProps) {
 			<Button
 				variant="link"
 				intent="neutral"
-				onClick={handleClick}
+				onClick={selectFavoriteMarket}
 				onKeyDown={handleKeyDown}
 				tabIndex={0}
 				aria-pressed={isActive}

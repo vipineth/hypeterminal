@@ -6,7 +6,7 @@ import { useConnection } from "wagmi";
 import { NumberInput } from "@/components/ui/number-input";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/app";
 import { exceedsBalance, getTokenTransferDecimals, isAmountWithinBalance } from "@/domain/market";
-import { getPerpAvailable, getSpotAvailable, getSpotBalance } from "@/domain/trade/balances";
+import { getNormalizedWithdrawable, getSpotAvailable, getSpotBalance } from "@/domain/trade/balances";
 import { useDefaultDexBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { useExchange } from "@/lib/hyperliquid";
@@ -49,7 +49,7 @@ function TransferModalBody({ onOpenChange, initialDirection }: BodyProps) {
 	const { address } = useConnection();
 	const { getToken } = useSpotTokens();
 	const { mutateAsync: sendAsset, isPending } = useExchange("sendAsset");
-	const { perpSummary, spotBalances, spotAvailableAfterMaintenance } = useDefaultDexBalances();
+	const { withdrawable, spotBalances, spotAvailableAfterMaintenance, accountAbstraction } = useDefaultDexBalances();
 
 	const usdcTokenInfo = getToken(DEFAULT_QUOTE_TOKEN);
 	const usdcTokenId = usdcTokenInfo ? formatTokenId(usdcTokenInfo) : "";
@@ -59,7 +59,7 @@ function TransferModalBody({ onOpenChange, initialDirection }: BodyProps) {
 	const spotUsdcBal = getSpotBalance(spotBalances, DEFAULT_QUOTE_TOKEN);
 	const availableBalanceValue =
 		direction === "toSpot"
-			? getPerpAvailable(perpSummary?.accountValue, perpSummary?.totalMarginUsed)
+			? Number(getNormalizedWithdrawable(withdrawable, spotBalances, spotAvailableAfterMaintenance, accountAbstraction))
 			: getSpotAvailable(spotUsdcBal, spotAvailableAfterMaintenance);
 
 	const isValidAmount = isAmountWithinBalance(amount, availableBalanceValue) && !!address && !!usdcTokenId;

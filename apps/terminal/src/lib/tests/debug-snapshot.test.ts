@@ -8,6 +8,13 @@ let registerDebugSnapshot: typeof import("@hypeterminal/hl-react/internal/websoc
 let registerChaosHarness: typeof import("@hypeterminal/hl-react/internal/websocket/chaos").registerChaosHarness;
 let registerHealthReport: typeof import("@hypeterminal/hl-react/internal/websocket/health").registerHealthReport;
 
+function requireDebugSnapshot(): NonNullable<ReturnType<NonNullable<Window["__hl_debug"]>>> {
+	const snapshot = window.__hl_debug?.();
+	expect(snapshot).toBeDefined();
+	if (!snapshot) throw new Error("missing debug snapshot");
+	return snapshot;
+}
+
 describe("debug snapshot", () => {
 	beforeEach(async () => {
 		vi.useFakeTimers();
@@ -48,7 +55,7 @@ describe("debug snapshot", () => {
 		store.getState().setSubscriptionData(key1, { levels: [] });
 		store.getState().setSubscriptionData(key2, [{ px: "100", sz: "1" }]);
 
-		const snapshot = window.__hl_debug?.();
+		const snapshot = requireDebugSnapshot();
 
 		expect(snapshot).toHaveProperty("subscriptions");
 		expect(snapshot).toHaveProperty("counters");
@@ -93,7 +100,7 @@ describe("debug snapshot", () => {
 		store.getState().setSubscriptionData(key, {});
 		await vi.advanceTimersByTimeAsync(25_000);
 
-		const snapshot = window.__hl_debug?.();
+		const snapshot = requireDebugSnapshot();
 		expect(snapshot.subscriptions[key]?.isStale).toBe(true);
 
 		store.getState().releaseSubscription(key);

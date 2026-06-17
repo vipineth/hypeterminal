@@ -6,6 +6,7 @@ import { defineConfig, type PluginOption } from 'vite'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 import { lingui } from '@lingui/vite-plugin'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { securityHeaders } from './src/config/security-headers'
 
 const isAnalyze = process.env.ANALYZE === 'true'
 
@@ -50,11 +51,14 @@ const config = defineConfig({
     nitro({
       compressPublicAssets: true,
       routeRules: {
+        '/**': {
+          headers: securityHeaders,
+        },
         '/assets/**': {
-          headers: { 'cache-control': 'public, max-age=31536000, immutable' },
+          headers: { ...securityHeaders, 'cache-control': 'public, max-age=31536000, immutable' },
         },
         '/charting_library/**': {
-          headers: { 'cache-control': 'public, max-age=31536000, immutable' },
+          headers: { ...securityHeaders, 'cache-control': 'public, max-age=31536000, immutable' },
         },
       },
     }),

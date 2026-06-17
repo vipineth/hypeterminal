@@ -110,6 +110,18 @@ function cacheKey(symbol: LibrarySymbolInfo, resolution: ResolutionString): stri
 	return `${symbol.ticker ?? symbol.name}:${resolution as string}`;
 }
 
+function isSameBar(a: Bar | undefined, b: Bar | undefined): boolean {
+	if (!a || !b) return false;
+	return (
+		a.time === b.time &&
+		a.open === b.open &&
+		a.high === b.high &&
+		a.low === b.low &&
+		a.close === b.close &&
+		a.volume === b.volume
+	);
+}
+
 const configuration: DatafeedConfiguration = {
 	exchanges: [{ value: EXCHANGE, name: EXCHANGE, desc: EXCHANGE }],
 	supported_resolutions: SUPPORTED_RESOLUTIONS,
@@ -243,7 +255,8 @@ export function createDatafeed(): IBasicDataFeed {
 			store.getState().subscribe(key, coin, interval, listenerGuid, wrappedOnTick, onResetCacheNeededCallback);
 
 			const cached = store.getState().getLastBar(symbolCacheKey);
-			if (cached) {
+			const streamLastBar = store.getState().streams[key]?.lastBar;
+			if (cached && !isSameBar(cached, streamLastBar)) {
 				onTick(cached);
 			}
 		},

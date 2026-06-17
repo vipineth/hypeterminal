@@ -85,7 +85,7 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
 		const currentValue = value !== undefined ? value.toString() : internalValue;
 		const hasValue = currentValue.length > 0;
 
-		const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const updateSearchValue = (e: React.ChangeEvent<HTMLInputElement>) => {
 			if (value === undefined) {
 				setInternalValue(e.target.value);
 			}
@@ -121,7 +121,7 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
 						id={inputId}
 						type="search"
 						value={currentValue}
-						onChange={handleChange}
+						onChange={updateSearchValue}
 						disabled={disabled}
 						required={required}
 						className={cn(

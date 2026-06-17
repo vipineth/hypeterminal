@@ -3,9 +3,10 @@ name: Check Translations
 on:
   pull_request:
     paths:
-      - "src/**/*.ts"
-      - "src/**/*.tsx"
-      - "src/locales/**/*.po"
+      - "apps/terminal/src/**/*.ts"
+      - "apps/terminal/src/**/*.tsx"
+      - "apps/terminal/src/locales/**/*.po"
+      - "apps/terminal/lingui.config.*"
 
 jobs:
   check:
@@ -30,16 +31,16 @@ jobs:
 
       - name: Check for uncommitted changes
         run: |
-          if ! git diff --quiet src/locales/**/*.po; then
+          if ! git diff --quiet -- apps/terminal/src/locales/**/*.po; then
             echo "::error::Translation catalogs are out of date."
             echo ""
             echo "Run 'pnpm i18n:extract' locally and commit the changes."
             echo ""
             echo "Changed files:"
-            git diff --name-only src/locales/**/*.po
+            git diff --name-only -- apps/terminal/src/locales/**/*.po
             echo ""
             echo "Diff:"
-            git diff src/locales/**/*.po
+            git diff -- apps/terminal/src/locales/**/*.po
             exit 1
           fi
           echo "Translation catalogs are up to date."

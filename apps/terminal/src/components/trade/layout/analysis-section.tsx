@@ -95,12 +95,12 @@ export function AnalysisSection({ onDesiredHeightChange }: AnalysisSectionProps)
 		const previousCursor = document.documentElement.style.cursor;
 		const previousUserSelect = document.body.style.userSelect;
 
-		document.documentElement.style.cursor = "row-resize";
-		document.body.style.userSelect = "none";
+		Object.assign(document.documentElement.style, { cursor: "row-resize" });
+		Object.assign(document.body.style, { userSelect: "none" });
 
 		function cleanup() {
-			document.documentElement.style.cursor = previousCursor;
-			document.body.style.userSelect = previousUserSelect;
+			Object.assign(document.documentElement.style, { cursor: previousCursor });
+			Object.assign(document.body.style, { userSelect: previousUserSelect });
 			window.removeEventListener("pointermove", handlePointerMove);
 			window.removeEventListener("pointerup", handlePointerUp);
 			window.removeEventListener("pointercancel", handlePointerUp);

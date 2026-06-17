@@ -44,8 +44,8 @@ interface BodyProps {
 
 function PositionLimitCloseModalBody({ position, onOpenChange }: BodyProps) {
 	const priceDecimalsInit = szDecimalsToPriceDecimals(position.szDecimals);
-	const [priceInput, setPriceInput] = useState(position.markPx.toFixed(priceDecimalsInit));
-	const [sizeInput, setSizeInput] = useState(formatDecimalFloor(position.size, position.szDecimals));
+	const [priceInput, setPriceInput] = useState(() => position.markPx.toFixed(priceDecimalsInit));
+	const [sizeInput, setSizeInput] = useState(() => formatDecimalFloor(position.size, position.szDecimals));
 	const [submitError, setSubmitError] = useState<string | null>(null);
 
 	const { mutateAsync: placeOrder, isPending: isSubmitting, error } = useExchange("order");

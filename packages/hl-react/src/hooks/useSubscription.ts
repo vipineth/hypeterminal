@@ -34,7 +34,8 @@ export function useSubscription<M extends SubMethod>(
 
 			if (accConfig) {
 				const wrappedListener = (event: SubEvent<M>) => {
-					const buffer = bufferRef.current!;
+					const buffer = bufferRef.current;
+					if (!buffer) return;
 					if (accConfig.isSnapshot(event)) {
 						buffer.clear();
 					}

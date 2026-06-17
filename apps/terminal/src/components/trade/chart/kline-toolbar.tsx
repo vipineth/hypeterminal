@@ -62,7 +62,7 @@ export function KlineToolbar({
 					align="start"
 					size="sm"
 					triggerVariant="minimal"
-					triggerAriaLabel={isNonFavoriteActive ? undefined : t`More intervals`}
+					triggerAriaLabel={t`More intervals`}
 					className="inline-flex"
 					popupClassName="min-w-0 w-max"
 				/>
@@ -77,6 +77,7 @@ export function KlineToolbar({
 					align="start"
 					size="sm"
 					triggerVariant="minimal"
+					triggerAriaLabel={t`Chart type`}
 					className="inline-flex"
 					popupClassName="min-w-0 w-max"
 				/>

@@ -133,9 +133,9 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
 		const isMinimalTrigger = triggerVariant === "minimal";
 		const caretSize = isMinimalTrigger ? 12 : itemSize === "sm" ? 14 : 16;
 
-		const renderItem = (item: DropdownItem, index: number) => (
+		const renderItem = (item: DropdownItem) => (
 			<Menu.Item
-				key={index}
+				key={item.label}
 				disabled={item.disabled}
 				onClick={item.onSelect}
 				className={cn(
@@ -195,18 +195,18 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
 									popupClassName,
 								)}
 							>
-								{items?.map((item, i) => renderItem(item, i))}
+								{items?.map(renderItem)}
 
-								{groups?.map((group, groupIndex) => (
-									<React.Fragment key={groupIndex}>
-										{groupIndex > 0 && <Menu.Separator className="my-1 h-px bg-stroke-weak" />}
+								{groups?.map((group) => (
+									<React.Fragment key={group.label ?? group.items.map((item) => item.label).join("|")}>
+										{group !== groups[0] && <Menu.Separator className="my-1 h-px bg-stroke-weak" />}
 										<Menu.Group>
 											{group.label && (
 												<Menu.GroupLabel className="px-3 py-1.5 text-xs font-semibold text-fg-muted select-none">
 													{group.label}
 												</Menu.GroupLabel>
 											)}
-											{group.items.map((item, i) => renderItem(item, i))}
+											{group.items.map(renderItem)}
 										</Menu.Group>
 									</React.Fragment>
 								))}

@@ -54,8 +54,10 @@ CardHeader.displayName = "CardHeader";
 
 interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
 
-const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(({ className, ...props }, ref) => (
-	<h3 className={cn("text-base font-semibold text-fg text-balance", className)} ref={ref} {...props} />
+const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(({ className, children, ...props }, ref) => (
+	<h3 className={cn("text-base font-semibold text-fg text-balance", className)} ref={ref} {...props}>
+		{children}
+	</h3>
 ));
 CardTitle.displayName = "CardTitle";
 

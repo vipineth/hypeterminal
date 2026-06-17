@@ -8,7 +8,7 @@ import {
 	useInfo,
 } from "@hypeterminal/hl-react";
 import type { MetaResponse, PerpDexsResponse, SpotMetaResponse } from "@nktkas/hyperliquid";
-import { createContext, type ReactNode, useContext, useMemo } from "react";
+import { createContext, type ReactNode, use, useMemo } from "react";
 import { getIconUrlFromMarketName, getTokenDisplayName, getUnderlyingAsset } from "@/domain/market/tokens";
 import {
 	getBuilderPerpAssetId,
@@ -66,7 +66,11 @@ function createMarkets(params: CreateMarketsParams): Markets {
 
 	if (spotMeta?.universe && spotTokens.length > 0) {
 		for (const pair of spotMeta.universe) {
-			const tokensInfo = pair.tokens.map((idx) => spotTokens[idx]).filter((t): t is SpotToken => !!t);
+			const tokensInfo: SpotToken[] = [];
+			for (const idx of pair.tokens) {
+				const token = spotTokens[idx];
+				if (token) tokensInfo.push(token);
+			}
 
 			if (tokensInfo.length < 2) continue;
 
@@ -217,7 +221,7 @@ export function MarketsProvider({ children }: Props) {
 }
 
 export function useMarkets(): Markets {
-	const context = useContext(MarketsContext);
+	const context = use(MarketsContext);
 
 	if (!context) {
 		throw new Error("useMarkets must be used within a MarketsProvider");

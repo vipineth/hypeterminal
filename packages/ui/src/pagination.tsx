@@ -101,6 +101,22 @@ function getVisiblePages(current: number, total: number): (number | "ellipsis")[
 	return pages;
 }
 
+function getVisiblePageItems(current: number, total: number): { key: string; value: number | "ellipsis" }[] {
+	const pages = getVisiblePages(current, total);
+	const pageItems: { key: string; value: number | "ellipsis" }[] = [];
+
+	for (let position = 0; position < pages.length; position++) {
+		const page = pages[position];
+		if (page === "ellipsis") {
+			pageItems.push({ key: `ellipsis-${pages[position - 1]}-${pages[position + 1]}`, value: page });
+		} else {
+			pageItems.push({ key: `page-${page}`, value: page });
+		}
+	}
+
+	return pageItems;
+}
+
 interface PaginationProps extends React.HTMLAttributes<HTMLElement>, VariantProps<typeof navButtonVariants> {
 	currentPage: number;
 	totalPages: number;
@@ -171,7 +187,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
 			);
 		}
 
-		const pages = getVisiblePages(currentPage, totalPages);
+		const pages = getVisiblePageItems(currentPage, totalPages);
 		const showResultCount = totalItems !== undefined;
 		const startItem = showResultCount ? (currentPage - 1) * itemsPerPage + 1 : 0;
 		const endItem = showResultCount ? Math.min(currentPage * itemsPerPage, totalItems!) : 0;
@@ -190,29 +206,34 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
 						Previous
 					</button>
 
-					{pages.map((page, index) =>
-						page === "ellipsis" ? (
-							<span
-								key={`ellipsis-${index}`}
-								className={cn(
-									"inline-flex items-center justify-center text-xs font-normal text-fg-muted select-none",
-									pageBtnSize,
-								)}
-							>
-								&hellip;
-							</span>
-						) : (
+					{pages.map((page) => {
+						if (page.value === "ellipsis") {
+							return (
+								<span
+									key={page.key}
+									className={cn(
+										"inline-flex items-center justify-center text-xs font-normal text-fg-muted select-none",
+										pageBtnSize,
+									)}
+								>
+									&hellip;
+								</span>
+							);
+						}
+
+						const pageNumber = page.value;
+						return (
 							<button
-								key={page}
-								onClick={() => handlePageChange(page)}
-								aria-label={`Page ${page}`}
-								aria-current={page === currentPage ? "page" : undefined}
-								className={cn(pageButtonVariants({ current: page === currentPage }), pageBtnSize)}
+								key={page.key}
+								onClick={() => handlePageChange(pageNumber)}
+								aria-label={`Page ${pageNumber}`}
+								aria-current={pageNumber === currentPage ? "page" : undefined}
+								className={cn(pageButtonVariants({ current: pageNumber === currentPage }), pageBtnSize)}
 							>
-								{page}
+								{pageNumber}
 							</button>
-						),
-					)}
+						);
+					})}
 
 					<button
 						onClick={() => handlePageChange(currentPage + 1)}
@@ -226,11 +247,11 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
 					</button>
 				</div>
 
-				{showResultCount && (
+				{showResultCount ? (
 					<span className="text-xs font-normal text-fg-muted tabular-nums">
 						Showing {startItem} – {endItem} of {totalItems}
 					</span>
-				)}
+				) : null}
 			</nav>
 		);
 	},

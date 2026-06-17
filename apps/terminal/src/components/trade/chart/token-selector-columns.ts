@@ -15,7 +15,7 @@ const columnHelper = createColumnHelper<MarketRow>();
 const numericStringSortFn: SortingFn<MarketRow> = (rowA, rowB, columnId) => {
 	const a = Number(rowA.getValue(columnId));
 	const b = Number(rowB.getValue(columnId));
-	if (isNaN(a) || isNaN(b)) return 0;
+	if (Number.isNaN(a) || Number.isNaN(b)) return 0;
 	return a - b;
 };
 

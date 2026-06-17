@@ -1,4 +1,4 @@
-import { createContext, type ReactNode, useContext } from "react";
+import { createContext, type ReactNode, use } from "react";
 import { type UseMarketsInfoReturn, useMarketsInfoInternal } from "./useMarketsInfo";
 
 const MarketsInfoContext = createContext<UseMarketsInfoReturn | null>(null);
@@ -17,7 +17,7 @@ export function MarketsInfoProvider({ children }: MarketsInfoProviderProps) {
 }
 
 export function useMarketsInfoContext(): UseMarketsInfoReturn {
-	const context = useContext(MarketsInfoContext);
+	const context = use(MarketsInfoContext);
 	if (!context) {
 		throw new Error("useMarketsInfoContext must be used within a MarketsInfoProvider");
 	}

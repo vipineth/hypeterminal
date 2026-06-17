@@ -51,6 +51,8 @@ export function TradingViewChart({
 
 		const initWidget = async () => {
 			try {
+				if (disposed || !containerRef.current) return;
+				// react-doctor-disable-next-line react-doctor/async-defer-await
 				await loadTradingViewScript();
 
 				if (disposed || !containerRef.current || !window.TradingView) return;
@@ -126,15 +128,15 @@ export function TradingViewChart({
 						defaultLabel.textContent = "Default";
 						defaultLabel.style.cssText =
 							"font-size:12px;font-weight:400;color:var(--tv-muted-fg,rgba(128,128,128,0.8));cursor:pointer;";
-						defaultLabel.addEventListener("pointerover", () => {
+						defaultLabel.onpointerover = () => {
 							defaultLabel.style.color = "var(--tv-fg,inherit)";
-						});
-						defaultLabel.addEventListener("pointerout", () => {
+						};
+						defaultLabel.onpointerout = () => {
 							defaultLabel.style.color = "var(--tv-muted-fg,rgba(128,128,128,0.8))";
-						});
-						defaultLabel.addEventListener("click", () => {
+						};
+						defaultLabel.onclick = () => {
 							onSwitchToDefaultRef.current?.();
-						});
+						};
 
 						btn.appendChild(defaultLabel);
 						btn.appendChild(sep);

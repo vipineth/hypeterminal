@@ -1,4 +1,10 @@
-import { type BuilderPerpMarket, type PerpMarket, type SpotMarket, useSubscription } from "@hypeterminal/hl-react";
+import {
+	type BuilderPerpMarket,
+	type PerpMarket,
+	type SpotMarket,
+	useInfo,
+	useSubscription,
+} from "@hypeterminal/hl-react";
 import { useEffect, useMemo, useState } from "react";
 import { STORAGE_KEYS } from "@/config/app";
 import { MARKETS_STATS_TTL_MS } from "@/config/time";
@@ -42,11 +48,11 @@ interface StatsCache {
 function loadStatsCache(): StatsCache | null {
 	if (typeof window === "undefined") return null;
 	try {
-		const json = sessionStorage.getItem(STORAGE_KEYS.MARKETS_STATS);
+		const json = localStorage.getItem(STORAGE_KEYS.MARKETS_STATS);
 		if (!json) return null;
 		const data = JSON.parse(json) as StatsCache;
 		if (Date.now() - data.savedAt > MARKETS_STATS_TTL_MS) {
-			sessionStorage.removeItem(STORAGE_KEYS.MARKETS_STATS);
+			localStorage.removeItem(STORAGE_KEYS.MARKETS_STATS);
 			return null;
 		}
 		return data;
@@ -60,7 +66,7 @@ function saveStatsCache(allDexsCtxs: AllDexsAssetCtxs | undefined, spotCtxs: Spo
 	if (!allDexsCtxs && !spotCtxs) return;
 	try {
 		const data: StatsCache = { allDexsCtxs, spotCtxs, savedAt: Date.now() };
-		sessionStorage.setItem(STORAGE_KEYS.MARKETS_STATS, JSON.stringify(data));
+		localStorage.setItem(STORAGE_KEYS.MARKETS_STATS, JSON.stringify(data));
 	} catch {}
 }
 
@@ -115,12 +121,25 @@ export function useMarketsInfoInternal(options: UseMarketsInfoOptions = {}) {
 
 	const [cachedStats] = useState(() => loadStatsCache());
 
+	// HTTP snapshots bridge the gap until the first WS push (~2-10s after load).
+	// Disabled once WS data or a cached copy exists; main perp dex + spot only —
+	// builder-dex stats fill in when allDexsAssetCtxs arrives.
+	const { data: perpSnapshot } = useInfo("metaAndAssetCtxs", undefined, {
+		staleTime: Infinity,
+		enabled: !allDexsCtxsEvent && !cachedStats?.allDexsCtxs,
+	});
+	const { data: spotSnapshot } = useInfo("spotMetaAndAssetCtxs", undefined, {
+		staleTime: Infinity,
+		enabled: !spotCtxsEvent && !cachedStats?.spotCtxs,
+	});
+
 	useEffect(() => {
 		saveStatsCache(allDexsCtxsEvent?.ctxs, spotCtxsEvent);
 	}, [allDexsCtxsEvent, spotCtxsEvent]);
 
-	const allDexsCtxs = allDexsCtxsEvent?.ctxs ?? cachedStats?.allDexsCtxs;
-	const spotCtxs = spotCtxsEvent ?? cachedStats?.spotCtxs;
+	const snapshotDexsCtxs: AllDexsAssetCtxs | undefined = perpSnapshot ? [["", perpSnapshot[1]]] : undefined;
+	const allDexsCtxs = allDexsCtxsEvent?.ctxs ?? cachedStats?.allDexsCtxs ?? snapshotDexsCtxs;
+	const spotCtxs = spotCtxsEvent ?? cachedStats?.spotCtxs ?? spotSnapshot?.[1];
 
 	const result = useMemo((): MarketsInfoResult => {
 		const perpCtxs = getDexCtxs(allDexsCtxs, "");

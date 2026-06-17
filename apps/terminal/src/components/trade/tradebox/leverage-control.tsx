@@ -2,7 +2,7 @@ import { Button, Drawer, DrawerContent } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { CaretDownIcon, CheckIcon, SpinnerGapIcon, WarningIcon } from "@phosphor-icons/react";
-import { forwardRef, useEffect, useState } from "react";
+import { type Ref, useEffect, useState } from "react";
 import { NumberInput } from "@/components/ui/number-input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { LEVERAGE_SUCCESS_DURATION_MS } from "@/config/time";
@@ -21,9 +21,10 @@ interface BadgeProps {
 	onClick?: () => void;
 	isLoading?: boolean;
 	className?: string;
+	ref?: Ref<HTMLButtonElement>;
 }
 
-const LeverageBadge = forwardRef<HTMLButtonElement, BadgeProps>(({ leverage, onClick, isLoading, className }, ref) => {
+function LeverageBadge({ leverage, onClick, isLoading, className, ref }: BadgeProps) {
 	return (
 		<Button
 			ref={ref}
@@ -39,7 +40,7 @@ const LeverageBadge = forwardRef<HTMLButtonElement, BadgeProps>(({ leverage, onC
 			<CaretDownIcon className="size-2.5 text-fg-muted" />
 		</Button>
 	);
-});
+}
 
 LeverageBadge.displayName = "LeverageBadge";
 

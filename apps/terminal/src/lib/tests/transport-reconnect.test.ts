@@ -29,7 +29,7 @@ describe("createWsReconnectTrigger SDK coupling", () => {
 		// Retrieve the module-cached transport the trigger will target.
 		const transport = getWsTransport(true);
 		expect(transport).toBeInstanceOf(WebSocketTransport);
-		const socket = (transport as WebSocketTransport).socket as {
+		const socket = (transport as InstanceType<typeof WebSocketTransport>).socket as {
 			close: (code?: number, reason?: string, permanent?: boolean) => void;
 		};
 		expect(typeof socket?.close).toBe("function");

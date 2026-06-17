@@ -12,6 +12,10 @@ import type * as React from "react";
 import { cn } from "@/lib/cn";
 
 type InputSize = "sm" | "default" | "lg" | "xl";
+type InputProps = Omit<React.ComponentProps<typeof BaseInput>, "className"> & {
+	inputSize?: InputSize;
+	className?: string;
+};
 
 const inputBaseStyles = [
 	"placeholder:text-fg-muted selection:bg-brand selection:text-white",
@@ -33,14 +37,7 @@ function getInputClassName(inputSize: InputSize, className?: string) {
 	return cn(inputBaseStyles, inputSizeStyles[inputSize], className);
 }
 
-function Input({
-	className,
-	type,
-	inputSize = "default",
-	...props
-}: React.ComponentProps<typeof BaseInput> & {
-	inputSize?: InputSize;
-}) {
+function Input({ className, type, inputSize = "default", ...props }: InputProps) {
 	return (
 		<BaseInput
 			type={type}

@@ -5,8 +5,14 @@
 	"scripts": {
 		"dev": "pnpm --filter @hypeterminal/terminal dev",
 		"build": "pnpm --filter @hypeterminal/terminal build",
+		"build:terminal": "pnpm --filter @hypeterminal/terminal build",
+		"build:website": "pnpm --filter @hypeterminal/website build",
+		"build:all": "pnpm build:terminal && pnpm build:website",
 		"serve": "pnpm --filter @hypeterminal/terminal serve",
 		"test": "pnpm --filter @hypeterminal/terminal test",
+		"typecheck": "pnpm -r --if-present typecheck",
+		"verify": "pnpm check && pnpm typecheck && pnpm test && pnpm build:all",
+		"audit:prod": "pnpm audit --prod",
 		"diagnostics:browser": "node scripts/browser-diagnostics.js",
 		"validate:mobile-device": "node scripts/validate-mobile-phone-access-device-validation.js",
 		"test:mobile-device-validator": "node --test scripts/validate-mobile-phone-access-device-validation.test.js",
@@ -30,7 +36,13 @@
 	},
 	"pnpm": {
 		"overrides": {
-			"@noble/hashes": "1.8.0"
+			"@noble/hashes": "1.8.0",
+			"jayson>uuid": "11.1.1",
+			"vite>esbuild": ">=0.28.1",
+			"tsx>esbuild": ">=0.28.1",
+			"esbuild": ">=0.28.1",
+			"viem>ws": ">=8.21.0",
+			"axios>form-data": ">=4.0.6"
 		}
 	}
 }

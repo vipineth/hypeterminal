@@ -181,6 +181,7 @@ describe("MobileAgentSyncModal", () => {
 	});
 
 	afterEach(() => {
+		vi.useRealTimers();
 		act(() => root.unmount());
 		container.remove();
 		vi.clearAllMocks();
@@ -215,7 +216,8 @@ describe("MobileAgentSyncModal", () => {
 		});
 		expect(container.textContent).toContain("Phone link ready");
 		expect(container.textContent).toContain(PAIRING_CODE);
-		expect(container.textContent).toContain("Expires");
+		expect(container.textContent).toContain("Phone link expires");
+		expect(container.textContent).toContain("Trading key approved until");
 		expect(getButton(container, "Copy code")).toBeDefined();
 		expect(getButton(container, "Copy phone link")).toBeDefined();
 		expect(getButton(container, "Show QR")).toBeDefined();
@@ -282,6 +284,75 @@ describe("MobileAgentSyncModal", () => {
 			"data:image/png;base64,phone-link-qr",
 		);
 		expect(container.textContent).toContain("QR visible");
+	});
+
+	it("transitions to expired state after the link TTL elapses", async () => {
+		vi.spyOn(Date, "now").mockReturnValue(EXPIRES_AT_MS - 50);
+		const { MobileAgentSyncModal } = await import("@/components/trade/components/mobile-agent-sync-modal");
+
+		act(() => {
+			root.render(createElement(MobileAgentSyncModal, { open: true, onOpenChange: vi.fn() }));
+		});
+		act(() => {
+			getButton(container, "Create phone link").click();
+		});
+		await flushAsyncWork();
+
+		expect(container.textContent).toContain("Phone link ready");
+		expect(container.textContent).toContain(PAIRING_CODE);
+
+		await act(async () => {
+			await new Promise((resolve) => setTimeout(resolve, 150));
+		});
+
+		expect(container.textContent).toContain("Phone link expired");
+		expect(container.textContent).toContain("Trading key still approved until");
+		expect(container.textContent).not.toContain(PAIRING_CODE);
+		expect(container.textContent).not.toContain("Copy phone link");
+	}, 10_000);
+
+	it("keeps the reset action available after link expiry", async () => {
+		vi.spyOn(Date, "now").mockReturnValue(EXPIRES_AT_MS - 50);
+		const { MobileAgentSyncModal } = await import("@/components/trade/components/mobile-agent-sync-modal");
+
+		act(() => {
+			root.render(createElement(MobileAgentSyncModal, { open: true, onOpenChange: vi.fn() }));
+		});
+		act(() => {
+			getButton(container, "Create phone link").click();
+		});
+		await flushAsyncWork();
+
+		await act(async () => {
+			await new Promise((resolve) => setTimeout(resolve, 150));
+		});
+
+		expect(container.textContent).toContain("Phone link expired");
+		expect(getButton(container, "Reset")).toBeDefined();
+	}, 10_000);
+
+	it("clears expiry timer when the modal closes before link expires", async () => {
+		const onOpenChange = vi.fn();
+		const { MobileAgentSyncModal } = await import("@/components/trade/components/mobile-agent-sync-modal");
+
+		act(() => {
+			root.render(createElement(MobileAgentSyncModal, { open: true, onOpenChange }));
+		});
+		act(() => {
+			getButton(container, "Create phone link").click();
+		});
+		await flushAsyncWork();
+
+		expect(container.textContent).toContain("Phone link ready");
+
+		act(() => {
+			getButton(container, "Close modal").click();
+		});
+		await flushAsyncWork();
+
+		expect(onOpenChange).toHaveBeenCalledWith(false);
+		expect(container.textContent).not.toContain("Phone link expired");
+		expect(container.textContent).not.toContain("Phone link ready");
 	});
 
 	it("clears ready link and QR state when the modal closes", async () => {

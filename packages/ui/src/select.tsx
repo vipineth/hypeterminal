@@ -72,8 +72,9 @@ function findSelectedLabel(
 	if (!value) return undefined;
 	for (const opt of options) {
 		if (isGroupOption(opt)) {
-			const found = opt.options.find((o) => o.value === value);
-			if (found) return found.label;
+			for (const option of opt.options) {
+				if (option.value === value) return option.label;
+			}
 		} else if (opt.value === value) {
 			return opt.label;
 		}

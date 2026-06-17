@@ -27,7 +27,7 @@ const GENESIS_BLOCK_HASH = "0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69a
 const L1_DOMAIN = {
 	name: "Exchange",
 	version: "1",
-	chainId: 1337,
+	chainId: 1337n,
 	verifyingContract: ZERO_ADDRESS,
 } as const;
 
@@ -164,7 +164,7 @@ describe("createL1AgentWallet", () => {
 			const domain = {
 				name: "HyperliquidSignTransaction",
 				version: "1",
-				chainId: 421614,
+				chainId: 421614n,
 				verifyingContract: ZERO_ADDRESS,
 			};
 			const types = {
@@ -183,7 +183,7 @@ describe("createL1AgentWallet", () => {
 			const message = {
 				hyperliquidChain: "Arbitrum",
 				agentAddress: "0x000000000000000000000000000000000000dead" as const,
-				nonce: 1234,
+				nonce: 1234n,
 			};
 
 			const expected = await account.signTypedData({ domain, types, primaryType: "HyperliquidTransaction", message });

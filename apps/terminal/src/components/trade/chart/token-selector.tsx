@@ -5,7 +5,7 @@ import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid";
 import { createLazyComponent } from "@/lib/lazy";
-import { TOKEN_SELECTOR_TRIGGER_CLASSNAME, TokenSelectorTriggerContent } from "./token-selector-trigger";
+import { MARKET_SELECTOR_TRIGGER_CLASSNAME, TokenSelectorTriggerContent } from "./token-selector-trigger";
 
 const TokenSelectorPopup = createLazyComponent(() => import("./token-selector-popup"), "TokenSelectorPopup");
 
@@ -17,6 +17,7 @@ export type TokenSelectorProps = {
 export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorProps) {
 	const isMobile = useIsMobile();
 	const headingId = useId();
+	const popupId = useId();
 	const [open, setOpen] = useState(false);
 	const [hasOpened, setHasOpened] = useState(false);
 	const preloadPopup = useCallback(() => TokenSelectorPopup.preload?.(), []);
@@ -30,9 +31,11 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 	useEffect(() => {
 		if (hasOpened || typeof window === "undefined") return;
 
-		if ("requestIdleCallback" in window) {
-			const idleId = window.requestIdleCallback(() => preloadPopup(), { timeout: 2_000 });
-			return () => window.cancelIdleCallback(idleId);
+		const requestIdleCallback = window.requestIdleCallback?.bind(window);
+		const cancelIdleCallback = window.cancelIdleCallback?.bind(window);
+		if (requestIdleCallback && cancelIdleCallback) {
+			const idleId = requestIdleCallback(() => preloadPopup(), { timeout: 2_000 });
+			return () => cancelIdleCallback(idleId);
 		}
 
 		const timeoutId = window.setTimeout(preloadPopup, 1_000);
@@ -49,6 +52,7 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 					onOpenChange={handleOpenChange}
 					mobile={isMobile}
 					headingId={headingId}
+					contentId={popupId}
 				/>
 			</Suspense>
 		) : null;
@@ -59,8 +63,9 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 				<DrawerTrigger
 					role="combobox"
 					aria-expanded={open}
+					aria-controls={popupId}
 					aria-label={t`Select token`}
-					className={TOKEN_SELECTOR_TRIGGER_CLASSNAME}
+					className={MARKET_SELECTOR_TRIGGER_CLASSNAME}
 					onPointerEnter={preloadPopup}
 					onPointerDown={preloadPopup}
 					onFocus={preloadPopup}
@@ -79,8 +84,9 @@ export function TokenSelector({ selectedMarket, onValueChange }: TokenSelectorPr
 					type="button"
 					role="combobox"
 					aria-expanded={open}
+					aria-controls={popupId}
 					aria-label={t`Select token`}
-					className={TOKEN_SELECTOR_TRIGGER_CLASSNAME}
+					className={MARKET_SELECTOR_TRIGGER_CLASSNAME}
 					onPointerEnter={preloadPopup}
 					onPointerDown={preloadPopup}
 					onFocus={preloadPopup}

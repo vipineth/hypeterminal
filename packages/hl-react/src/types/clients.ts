@@ -34,13 +34,13 @@ type ExchangeClientMethods = {
 export type ExchangeMethod = keyof ExchangeClientMethods & string;
 
 export type ExchangeParams<M extends ExchangeMethod> = ExchangeClientMethods[M] extends {
-	(params: infer P, ...args: any[]): Promise<unknown>;
-	(...args: any[]): Promise<unknown>;
+	(params: infer P, ...args: never[]): Promise<unknown>;
+	(...args: never[]): Promise<unknown>;
 }
 	? P | undefined
-	: ExchangeClientMethods[M] extends (params: infer P, ...args: any[]) => Promise<unknown>
+	: ExchangeClientMethods[M] extends (params: infer P, ...args: never[]) => Promise<unknown>
 		? P
-		: ExchangeClientMethods[M] extends (...args: any[]) => Promise<unknown>
+		: ExchangeClientMethods[M] extends (...args: never[]) => Promise<unknown>
 			? undefined
 			: never;
 
@@ -53,7 +53,7 @@ export type ExchangeResponse<M extends ExchangeMethod> = ExchangeClientMethods[M
 // ── SubscriptionClient mapped types ─────────────────────────────────
 
 type SubClientMethods = {
-	[K in keyof SubscriptionClient as SubscriptionClient[K] extends (...args: any[]) => Promise<ISubscription>
+	[K in keyof SubscriptionClient as SubscriptionClient[K] extends (...args: never[]) => Promise<ISubscription>
 		? K
 		: never]: SubscriptionClient[K];
 };
@@ -62,13 +62,13 @@ export type SubMethod = keyof SubClientMethods & string;
 
 type SubOptionalParamsMethods = "allMids" | "assetCtxs";
 
-type LastParam<T extends (...args: any[]) => any> = Parameters<T> extends [...infer _Rest, infer L] ? L : never;
+type LastParam<T extends (...args: never[]) => unknown> = Parameters<T> extends [...infer _Rest, infer L] ? L : never;
 
 export type SubParams<M extends SubMethod> = M extends SubOptionalParamsMethods
-	? Parameters<SubClientMethods[M]> extends [infer P, any]
+	? Parameters<SubClientMethods[M]> extends [infer P, unknown]
 		? P | undefined
 		: undefined
-	: Parameters<SubClientMethods[M]> extends [infer P, any]
+	: Parameters<SubClientMethods[M]> extends [infer P, unknown]
 		? P
 		: undefined;
 
