@@ -133,6 +133,21 @@ async function flushAsyncWork(times = 1) {
 	}
 }
 
+async function waitForCondition(assertion: () => void, attempts = 120) {
+	let lastError: unknown;
+	for (let i = 0; i < attempts; i += 1) {
+		try {
+			assertion();
+			return;
+		} catch (error) {
+			lastError = error;
+			await flushAsyncWork();
+		}
+	}
+
+	throw lastError;
+}
+
 async function enterPairingCode(container: HTMLElement, pairingCode: string) {
 	const pairingInput = container.querySelector('input[placeholder="0000-0000-0000-0000"]') as HTMLInputElement | null;
 	if (!pairingInput) throw new Error("missing pairing input");
@@ -1084,9 +1099,8 @@ describe("MobileAgentSyncRoute", () => {
 		act(() => {
 			importButton?.closest("form")?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
 		});
-		await flushAsyncWork(60);
 
-		expect(testState.setAgent).toHaveBeenCalled();
+		await waitForCondition(() => expect(testState.setAgent).toHaveBeenCalled());
 		expect(window.sessionStorage.getItem("hypeterminal.mobile-sync.import-draft.v1")).toBeNull();
 		expect(container.textContent).toContain("Phone access ready");
 		expect(container.textContent).not.toContain("Phone link loaded");

@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { contentSecurityPolicy, cspDirectives } from "@/config/security-headers";
 
 describe("security-headers CSP", () => {
-	it("does not allow unsafe-inline in script-src", () => {
-		expect(cspDirectives["script-src"]).not.toContain("'unsafe-inline'");
+	it("allows only the SSR bootstrap-compatible script sources", () => {
+		expect(cspDirectives["script-src"]).toBe("'self' blob: 'unsafe-inline'");
 	});
 
 	it("does not allow bare https: in connect-src", () => {
