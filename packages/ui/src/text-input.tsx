@@ -41,7 +41,7 @@ const inputTextSizeClasses: Record<"xxs" | "xs" | "sm" | "md" | "lg", string> = 
 };
 
 interface TextInputProps
-	extends Omit<React.ComponentPropsWithoutRef<"input">, "size">,
+	extends Omit<React.ComponentPropsWithoutRef<"input">, "prefix" | "size">,
 		Omit<VariantProps<typeof textInputVariants>, "invalid"> {
 	label?: string;
 	hint?: string;

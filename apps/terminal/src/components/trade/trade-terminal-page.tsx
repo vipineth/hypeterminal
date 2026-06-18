@@ -20,7 +20,7 @@ const GlobalModals = createLazyComponent(() => import("./components/global-modal
 const FooterBar = createLazyComponent(() => import("./footer/footer-bar"), "FooterBar");
 
 if (typeof window !== "undefined" && window.innerWidth < MOBILE_BREAKPOINT_PX) {
-	MobileTerminal.preload();
+	MobileTerminal.preload?.();
 }
 
 export function TradeTerminalPage() {

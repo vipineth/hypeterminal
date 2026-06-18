@@ -173,9 +173,9 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 								{asks
 									.slice(0, 12)
 									.reverse()
-									.map((level, index) => (
+									.map((level) => (
 										<OrderbookRow
-											key={`ask-${level.price}-${index}`}
+											key={`ask-${level.price}-${level.size}`}
 											level={level}
 											side="ask"
 											maxTotal={maxTotal}
@@ -211,9 +211,9 @@ export function MobileBookView({ className }: MobileBookViewProps) {
 
 						{bookStatus !== "error" && bids.length > 0 ? (
 							<div className="flex-1 flex flex-col gap-px py-1 overflow-hidden">
-								{bids.slice(0, 12).map((level, index) => (
+								{bids.slice(0, 12).map((level) => (
 									<OrderbookRow
-										key={`bid-${level.price}-${index}`}
+										key={`bid-${level.price}-${level.size}`}
 										level={level}
 										side="bid"
 										maxTotal={maxTotal}

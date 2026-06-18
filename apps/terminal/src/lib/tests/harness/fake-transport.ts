@@ -19,11 +19,16 @@ export function createFakeTransport(): {
 	const subscriptions: FakeSubscription[] = [];
 
 	const transport: ISubscriptionTransport = {
-		subscribe(listener: Listener): ISubscription {
+		async subscribe<T>(
+			channel: string,
+			payload: unknown,
+			listener: (data: CustomEvent<T>) => void,
+		): Promise<ISubscription> {
 			const failureController = new AbortController();
+			const key = JSON.stringify([channel, payload]);
 			const entry: FakeSubscription = {
-				listener,
-				key: "",
+				listener: (data) => listener(new CustomEvent<T>(channel, { detail: data as T })),
+				key,
 				unsubscribed: false,
 				failureController,
 				subscription: {
@@ -36,7 +41,7 @@ export function createFakeTransport(): {
 			subscriptions.push(entry);
 			return entry.subscription;
 		},
-	} as ISubscriptionTransport;
+	};
 
 	function emit(_key: string, data: unknown) {
 		for (const sub of subscriptions) {

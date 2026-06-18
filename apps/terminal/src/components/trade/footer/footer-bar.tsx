@@ -2,6 +2,7 @@ import { Divider } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { GithubLogoIcon, SpinnerGapIcon, WifiHighIcon, WifiSlashIcon } from "@phosphor-icons/react";
 import { ClientOnly } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { APP_VERSION, GITHUB_URL } from "@/config/app";
 import { APP_BAR_BUTTON_HEIGHT_CLASS, APP_FOOTER_HEIGHT_CLASS } from "@/config/layout";
 import { cn } from "@/lib/cn";
@@ -36,6 +37,17 @@ function getStatusDisplay(status: ApiStatus) {
 				className: "text-fg",
 			};
 	}
+}
+
+function FooterClock() {
+	const [now, setNow] = useState(() => new Date());
+
+	useEffect(() => {
+		const interval = window.setInterval(() => setNow(new Date()), 1_000);
+		return () => window.clearInterval(interval);
+	}, []);
+
+	return <span className="tabular-nums text-fg">{formatTime(now)}</span>;
 }
 
 export function FooterBar() {
@@ -81,7 +93,7 @@ export function FooterBar() {
 				</a>
 				<Divider orientation="vertical" className="my-1.5" />
 				<ClientOnly>
-					<span className="tabular-nums text-fg">{formatTime(new Date())}</span>
+					<FooterClock />
 				</ClientOnly>
 				<Divider orientation="vertical" className="my-1.5" />
 				<span className="text-fg">{APP_VERSION}</span>

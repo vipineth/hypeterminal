@@ -23,6 +23,7 @@ import {
 } from "wagmi/chains";
 import { coinbaseWallet, injected, mock, walletConnect } from "wagmi/connectors";
 import { APP_NAME } from "@/config/app";
+import { getWalletConnectProjectId } from "@/config/env";
 import type { MockWalletConfig } from "@/lib/wallet-utils";
 import { registerMockWallet } from "@/lib/wallet-utils";
 
@@ -75,32 +76,36 @@ function createMockConnectors(mockWallets: MockWalletConfig[]) {
 
 interface WagmiConfigOptions {
 	mockWallets?: MockWalletConfig[];
+	env?: Record<string, string | undefined>;
 }
 
-const WALLET_CONNECT_PROJECT_ID = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID;
 const WALLET_CONNECT_METADATA = {
 	name: APP_NAME,
 	description: "Professional trading terminal for Hyperliquid.",
-	url: "https://hypeterminal.xyz",
-	icons: ["https://hypeterminal.xyz/icon-192.png"],
+	url: "https://app.hypeterminal.com",
+	icons: ["https://app.hypeterminal.com/icon-192.png"],
 };
 
+function isPresent<T>(value: T | null | undefined): value is T {
+	return value != null;
+}
+
 export function createWagmiConfig(options: WagmiConfigOptions = {}) {
-	const { mockWallets = [] } = options;
+	const { mockWallets = [], env } = options;
 	const mockConnectors = createMockConnectors(mockWallets);
+	const walletConnectProjectId = getWalletConnectProjectId(env);
+
+	const walletConnectConnector = walletConnectProjectId
+		? walletConnect({
+				projectId: walletConnectProjectId,
+				metadata: WALLET_CONNECT_METADATA,
+				showQrModal: false,
+			})
+		: null;
 
 	return createConfig({
 		chains: BRIDGE_CHAINS,
-		connectors: [
-			...mockConnectors,
-			injected(),
-			coinbaseWallet(),
-			walletConnect({
-				projectId: WALLET_CONNECT_PROJECT_ID,
-				metadata: WALLET_CONNECT_METADATA,
-				showQrModal: false,
-			}),
-		],
+		connectors: [...mockConnectors, injected(), coinbaseWallet(), walletConnectConnector].filter(isPresent),
 		transports: BRIDGE_TRANSPORTS,
 		ssr: true,
 	});

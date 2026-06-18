@@ -6,6 +6,12 @@
       "sourceType": "github",
       "computedHash": "2f771f8eb25f9856d2169a4de4766de94e2bdbff999f42c458c8f1e2ca405c03"
     },
+    "improve": {
+      "source": "shadcn/improve",
+      "sourceType": "github",
+      "skillPath": "skills/improve/SKILL.md",
+      "computedHash": "431adaf38132005b32cacb952313f18b4c03ee98ee4c5859bad323156a48bb02"
+    },
     "react-useeffect": {
       "source": "softaworks/agent-toolkit",
       "sourceType": "github",

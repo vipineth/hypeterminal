@@ -1,6 +1,6 @@
 import type { InfoClient, SubscriptionClient } from "@nktkas/hyperliquid";
 import type { ReactNode } from "react";
-import { createContext, useContext, useRef } from "react";
+import { createContext, use, useRef } from "react";
 import { useStore } from "zustand";
 import {
 	createWsReconnectTrigger,
@@ -116,7 +116,7 @@ export function HyperliquidProvider({
 }
 
 export function useHyperliquid(): HyperliquidContextValue {
-	const context = useContext(HyperliquidContext);
+	const context = use(HyperliquidContext);
 	if (!context) {
 		throw new Error("useHyperliquid must be used within a HyperliquidProvider");
 	}
@@ -124,11 +124,11 @@ export function useHyperliquid(): HyperliquidContextValue {
 }
 
 export function useHyperliquidOptional(): HyperliquidContextValue | null {
-	return useContext(HyperliquidContext);
+	return use(HyperliquidContext);
 }
 
 export function useHyperliquidStoreApi() {
-	const store = useContext(HyperliquidStoreContext);
+	const store = use(HyperliquidStoreContext);
 	if (!store) {
 		throw new ProviderNotFoundError();
 	}

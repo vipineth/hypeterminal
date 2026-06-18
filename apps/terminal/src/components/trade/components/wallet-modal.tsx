@@ -411,7 +411,7 @@ function DesktopWalletScannerPanel({
 					autoPlay
 					muted
 					playsInline
-					className="aspect-[4/3] max-h-[min(48dvh,24rem)] w-full bg-black object-cover"
+					className="aspect-[4/3] max-h-[min(48dvh,24rem)] w-full bg-neutral-950 object-cover"
 				/>
 				<div className="pointer-events-none absolute inset-[18%] rounded-xs border-2 border-white/80 shadow-[0_0_0_999px_rgba(0,0,0,0.35)]" />
 				{isConnecting && (

@@ -44,16 +44,21 @@ const Breadcrumbs = React.forwardRef<HTMLElement, BreadcrumbsProps>(
 			<BreadcrumbsContext.Provider value={size}>
 				<nav aria-label="Breadcrumb" ref={ref} {...props}>
 					<ol className={cn(breadcrumbsVariants({ size, className }))}>
-						{items.map((child, i) => (
-							<React.Fragment key={i}>
-								{child}
-								{i < items.length - 1 && (
-									<li role="presentation" aria-hidden="true" className="flex items-center text-icon">
-										{sep}
-									</li>
-								)}
-							</React.Fragment>
-						))}
+						{items.map((child) => {
+							const childKey = React.isValidElement(child) ? child.key : String(child);
+							const showSeparator = child !== items.at(-1);
+
+							return (
+								<React.Fragment key={childKey}>
+									{child}
+									{showSeparator && (
+										<li role="presentation" aria-hidden="true" className="flex items-center text-icon">
+											{sep}
+										</li>
+									)}
+								</React.Fragment>
+							);
+						})}
 					</ol>
 				</nav>
 			</BreadcrumbsContext.Provider>

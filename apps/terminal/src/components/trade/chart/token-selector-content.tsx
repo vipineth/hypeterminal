@@ -52,8 +52,9 @@ interface Props {
 	toggleFavorite: (name: string) => void;
 	table: ReturnType<typeof useTokenSelector>["table"];
 	rows: ReturnType<typeof useTokenSelector>["rows"];
-	virtualizer: ReturnType<typeof useTokenSelector>["virtualizer"];
-	containerRef: React.RefObject<HTMLDivElement | null>;
+	virtualItems: ReturnType<typeof useTokenSelector>["virtualItems"];
+	totalSize: number;
+	containerRef: React.RefCallback<HTMLDivElement>;
 	filteredMarkets: ReturnType<typeof useTokenSelector>["filteredMarkets"];
 	highlightedIndex: number;
 	headingId: string;
@@ -79,7 +80,8 @@ export function TokenSelectorContent({
 	toggleFavorite,
 	table,
 	rows,
-	virtualizer,
+	virtualItems,
+	totalSize,
 	containerRef,
 	filteredMarkets,
 	highlightedIndex,
@@ -87,7 +89,6 @@ export function TokenSelectorContent({
 	mobile,
 }: Props) {
 	useRenderCommitTrack("token-search");
-	const virtualItems = virtualizer.getVirtualItems();
 	const headerGroup = table.getHeaderGroups()[0];
 	const marketScopes: { value: MarketScope; label: string }[] = [
 		{ value: "all", label: t`All` },
@@ -233,7 +234,7 @@ export function TokenSelectorContent({
 						role="listbox"
 						aria-label={t`Markets`}
 						style={{
-							height: `${virtualizer.getTotalSize()}px`,
+							height: `${totalSize}px`,
 							width: "100%",
 							position: "relative",
 						}}

@@ -1,5 +1,5 @@
 import { getCoreRowModel, getSortedRowModel, type Row, type SortingState, useReactTable } from "@tanstack/react-table";
-import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
+import { useVirtualizer, type VirtualItem, type Virtualizer } from "@tanstack/react-virtual";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { TOKEN_SELECTOR_OVERSCAN, TOKEN_SELECTOR_ROW_HEIGHT_PX } from "@/config/layout";
 import { PERP_CATEGORIES } from "@/config/markets";
@@ -44,7 +44,9 @@ export interface UseTokenSelectorReturn {
 	table: ReturnType<typeof useReactTable<MarketRow>>;
 	rows: Row<MarketRow>[];
 	virtualizer: Virtualizer<HTMLDivElement, Element>;
-	containerRef: React.RefObject<HTMLDivElement | null>;
+	virtualItems: VirtualItem[];
+	totalSize: number;
+	containerRef: React.RefCallback<HTMLDivElement>;
 	filteredMarkets: MarketRow[];
 	highlightedIndex: number;
 	handleKeyDown: (e: React.KeyboardEvent) => void;
@@ -97,6 +99,10 @@ export function useTokenSelector({
 	open: controlledOpen,
 	onOpenChange,
 }: UseTokenSelectorOptions): UseTokenSelectorReturn {
+	// The compiler would cache virtualizer.getVirtualItems()/table.getRowModel()
+	// reads keyed on the stable instances, so the list never re-renders after the
+	// virtualizer's internal notify. Memoization here is manual instead.
+	"use no memo";
 	const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
 	const [localScope, setLocalScope] = useState<MarketScope>("all");
 	const [localSubcategory, setLocalSubcategory] = useState<string>("all");
@@ -105,7 +111,9 @@ export function useTokenSelector({
 	const [isPending, startTransition] = useTransition();
 	const [sorting, setSorting] = useState<SortingState>([{ id: "volume", desc: true }]);
 	const [highlightedIndex, setHighlightedIndex] = useState(-1);
-	const containerRef = useRef<HTMLDivElement>(null);
+	// State (not a ref) so the virtualizer re-attaches when the popup's portal
+	// mounts the scroll container in a later commit than this component's render.
+	const [container, setContainer] = useState<HTMLDivElement | null>(null);
 	const hasInitializedRef = useRef(false);
 	const open = controlledOpen ?? uncontrolledOpen;
 	const setOpen = onOpenChange ?? setUncontrolledOpen;
@@ -230,10 +238,12 @@ export function useTokenSelector({
 
 	const virtualizer = useVirtualizer({
 		count: rows.length,
-		getScrollElement: () => containerRef.current,
+		getScrollElement: () => container,
 		estimateSize: () => TOKEN_SELECTOR_ROW_HEIGHT_PX,
 		overscan: TOKEN_SELECTOR_OVERSCAN,
 	});
+	const virtualItems = virtualizer.getVirtualItems();
+	const totalSize = virtualizer.getTotalSize();
 
 	useEffect(() => {
 		if (open) {
@@ -347,7 +357,9 @@ export function useTokenSelector({
 		table,
 		rows,
 		virtualizer,
-		containerRef,
+		virtualItems,
+		totalSize,
+		containerRef: setContainer,
 		filteredMarkets,
 		highlightedIndex,
 		handleKeyDown,

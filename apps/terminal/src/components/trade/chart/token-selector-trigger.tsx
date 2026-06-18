@@ -3,7 +3,7 @@ import { CaretDownIcon } from "@phosphor-icons/react";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid";
 import { AssetDisplay } from "../components/asset-display";
 
-export const TOKEN_SELECTOR_TRIGGER_CLASSNAME =
+export const MARKET_SELECTOR_TRIGGER_CLASSNAME =
 	"inline-flex items-center gap-1 max-w-full min-w-0 px-1.5 py-1.5 rounded-8 border border-stroke-weak/50 bg-surface/80 hover:bg-fill-hover transition-colors cursor-pointer leading-none";
 
 function getMarketKindBadgeLabel(market: UnifiedMarketInfo | undefined): string {

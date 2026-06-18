@@ -127,19 +127,17 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 				<div className="p-2 space-y-4">
 					<div className="p-4 rounded-xs border border-stroke-weak/60 bg-surface">
 						<Skeleton name="account-equity" loading={isLoading}>
-							<>
-								<div className="text-2xs uppercase font-medium text-fg-muted mb-1.5">{ACCOUNT_TEXT.EQUITY_LABEL}</div>
-								<div className="text-3xl font-bold tabular-nums text-fg">{formatUSD(accountValue)}</div>
-								<div
-									className={cn(
-										"text-sm tabular-nums mt-1.5 font-medium",
-										unrealizedPnl >= 0 ? "text-success" : "text-error",
-									)}
-								>
-									{unrealizedPnl >= 0 ? "+" : ""}
-									{formatUSD(unrealizedPnl)} {ACCOUNT_TEXT.UNREALIZED_LABEL}
-								</div>
-							</>
+							<div className="text-2xs uppercase font-medium text-fg-muted mb-1.5">{ACCOUNT_TEXT.EQUITY_LABEL}</div>
+							<div className="text-3xl font-bold tabular-nums text-fg">{formatUSD(accountValue)}</div>
+							<div
+								className={cn(
+									"text-sm tabular-nums mt-1.5 font-medium",
+									unrealizedPnl >= 0 ? "text-success" : "text-error",
+								)}
+							>
+								{unrealizedPnl >= 0 ? "+" : ""}
+								{formatUSD(unrealizedPnl)} {ACCOUNT_TEXT.UNREALIZED_LABEL}
+							</div>
 						</Skeleton>
 					</div>
 

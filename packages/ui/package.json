@@ -9,6 +9,21 @@
 		".": "./src/index.ts",
 		"./globals.css": "./src/globals.css"
 	},
+	"scripts": {
+		"typecheck": "tsc -p tsconfig.json --noEmit"
+	},
+	"devDependencies": {
+		"@base-ui/react": "1.3.0",
+		"@phosphor-icons/react": "2.1.10",
+		"@types/react": "19.2.7",
+		"@types/react-dom": "19.2.3",
+		"class-variance-authority": "0.7.1",
+		"clsx": "2.1.1",
+		"react": "19.2.0",
+		"react-dom": "19.2.0",
+		"tailwind-merge": "3.4.0",
+		"tailwindcss": "4.0.6"
+	},
 	"peerDependencies": {
 		"@base-ui/react": "1.3.0",
 		"@phosphor-icons/react": ">=2.1.10 <3",

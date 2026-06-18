@@ -80,7 +80,6 @@ interface NumberInputProps extends Omit<VariantProps<typeof numberInputVariants>
 	name?: string;
 	id?: string;
 	placeholder?: string;
-	autoFocus?: boolean;
 	selectOnFocus?: boolean;
 	showStepper?: boolean;
 	prefix?: React.ReactNode;
@@ -119,7 +118,6 @@ const NumberInput = React.forwardRef<HTMLDivElement, NumberInputProps>(
 			name,
 			id,
 			placeholder,
-			autoFocus,
 			selectOnFocus,
 			showStepper = false,
 			prefix,
@@ -133,7 +131,7 @@ const NumberInput = React.forwardRef<HTMLDivElement, NumberInputProps>(
 		const isInvalid = !!error;
 		const stepperSize = stepperIconSizes[size];
 
-		function handleFocus(e: React.FocusEvent<HTMLInputElement>) {
+		function selectTextOnFocus(e: React.FocusEvent<HTMLInputElement>) {
 			if (selectOnFocus) {
 				e.target.select();
 			}
@@ -194,8 +192,7 @@ const NumberInput = React.forwardRef<HTMLDivElement, NumberInputProps>(
 						)}
 						<NumberField.Input
 							placeholder={placeholder}
-							autoFocus={autoFocus}
-							onFocus={handleFocus}
+							onFocus={selectTextOnFocus}
 							onBlur={onBlur}
 							className={cn(
 								"flex-1 min-w-0 bg-transparent outline-none tabular-nums",

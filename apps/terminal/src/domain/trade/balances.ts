@@ -242,6 +242,19 @@ export function getBalanceRows(
 	];
 }
 
+export function getNormalizedWithdrawable(
+	withdrawable: string,
+	spotBalances: SpotBalance[] | null | undefined,
+	spotAvailableAfterMaintenance: SpotAvailableAfterMaintenance | null | undefined,
+	accountAbstraction: AccountAbstraction | null | undefined,
+): string {
+	if (isQuoteBalanceSharedWithPerps(accountAbstraction)) {
+		const quoteBalance = getSpotBalance(spotBalances, DEFAULT_QUOTE_TOKEN);
+		return getSpotAvailableValue(quoteBalance, spotAvailableAfterMaintenance);
+	}
+	return withdrawable;
+}
+
 export function getTotalUsdValue(rows: BalanceRow[]): number {
 	return rows.reduce((sum, row) => Big(sum).plus(toSafeBig(row.usdValue)).toNumber(), 0);
 }

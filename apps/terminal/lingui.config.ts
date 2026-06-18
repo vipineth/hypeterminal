@@ -7,10 +7,7 @@ export default defineConfig({
       path: "<rootDir>/src/locales/{locale}/messages",
     },
   ],
-  // Top 6 most spoken languages globally
-  locales: ["en", "zh", "hi", "es", "fr", "ar"],
-  sourceLocale: "en",
-  formatOptions: {
-    lineNumbers: false,
-  },
+	// Top 6 most spoken languages globally
+	locales: ["en", "zh", "hi", "es", "fr", "ar"],
+	sourceLocale: "en",
 })

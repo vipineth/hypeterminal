@@ -40,7 +40,15 @@ type SyncState =
 	| { status: "idle" }
 	| { status: "approving" }
 	| { status: "creating" }
-	| { status: "ready"; url: string; pairingCode: string; agentAddress: string; expiresAtMs: number }
+	| {
+			status: "ready";
+			url: string;
+			pairingCode: string;
+			agentAddress: string;
+			expiresAtMs: number;
+			agentValidUntilMs: number;
+	  }
+	| { status: "link-expired"; agentAddress: string; agentValidUntilMs: number }
 	| { status: "error"; message: string };
 
 type ResetState =
@@ -64,6 +72,26 @@ export function MobileAgentSyncModal({ open, onOpenChange }: MobileAgentSyncModa
 	const [qrError, setQrError] = useState<string | null>(null);
 
 	const readyUrl = syncState.status === "ready" ? syncState.url : null;
+
+	useEffect(() => {
+		if (syncState.status !== "ready") return;
+		const delay = syncState.expiresAtMs - Date.now();
+		if (delay <= 0) {
+			setSyncState({
+				status: "link-expired",
+				agentAddress: syncState.agentAddress,
+				agentValidUntilMs: syncState.agentValidUntilMs,
+			});
+			return;
+		}
+		const timer = setTimeout(() => {
+			setSyncState((prev) => {
+				if (prev.status !== "ready") return prev;
+				return { status: "link-expired", agentAddress: prev.agentAddress, agentValidUntilMs: prev.agentValidUntilMs };
+			});
+		}, delay);
+		return () => clearTimeout(timer);
+	}, [syncState]);
 
 	useEffect(() => {
 		if (!showQr || !readyUrl) {
@@ -151,6 +179,7 @@ export function MobileAgentSyncModal({ open, onOpenChange }: MobileAgentSyncModa
 				pairingCode: syncUrl.pairingCode,
 				agentAddress: syncUrl.agentAddress,
 				expiresAtMs: syncUrl.expiresAtMs,
+				agentValidUntilMs: syncUrl.agentValidUntilMs,
 			});
 		} catch (error) {
 			setSyncState({
@@ -195,6 +224,7 @@ export function MobileAgentSyncModal({ open, onOpenChange }: MobileAgentSyncModa
 
 	const isPending = syncState.status === "approving" || syncState.status === "creating";
 	const isReady = syncState.status === "ready";
+	const isLinkExpired = syncState.status === "link-expired";
 	const isResetting = resetState.status === "resetting";
 
 	return (
@@ -238,7 +268,7 @@ export function MobileAgentSyncModal({ open, onOpenChange }: MobileAgentSyncModa
 					</div>
 				)}
 
-				{!isReady && (
+				{!isReady && !isLinkExpired && (
 					<div className="rounded-8 border border-stroke-weak bg-fill-weak p-3">
 						<div className="flex items-start gap-3">
 							<ShieldCheckIcon className="mt-0.5 size-5 shrink-0 text-brand" weight="duotone" aria-hidden />
@@ -268,6 +298,10 @@ export function MobileAgentSyncModal({ open, onOpenChange }: MobileAgentSyncModa
 					/>
 				)}
 
+				{isLinkExpired && (
+					<ExpiredLinkPanel state={syncState} onCreateNew={handleCreateSync} disabled={isPending || !address} />
+				)}
+
 				<ResetMobileAccessPanel
 					state={resetState}
 					disabled={isPending || isResetting || !address}
@@ -275,7 +309,7 @@ export function MobileAgentSyncModal({ open, onOpenChange }: MobileAgentSyncModa
 				/>
 			</ModalContent>
 
-			{!isReady && (
+			{!isReady && !isLinkExpired && (
 				<ModalFooter className="border-t border-stroke-weak">
 					<Button
 						type="button"
@@ -328,9 +362,13 @@ function ReadySyncPanel({
 	onCopyPairingCode: () => void;
 	onReveal: () => void;
 }) {
-	const expiresAtLabel = new Date(state.expiresAtMs).toLocaleTimeString([], {
+	const linkExpiresLabel = new Date(state.expiresAtMs).toLocaleTimeString([], {
 		hour: "2-digit",
 		minute: "2-digit",
+	});
+	const agentExpiresLabel = new Date(state.agentValidUntilMs).toLocaleDateString([], {
+		month: "short",
+		day: "numeric",
 	});
 
 	return (
@@ -342,7 +380,7 @@ function ReadySyncPanel({
 						<Trans>Phone link ready</Trans>
 					</p>
 					<p className="mt-0.5 truncate text-xs text-fg-muted">
-						<Trans>Trading key approved</Trans>
+						<Trans>Trading key approved until {agentExpiresLabel}</Trans>
 					</p>
 				</div>
 			</div>
@@ -379,7 +417,7 @@ function ReadySyncPanel({
 							<Trans>Scan on your phone</Trans>
 						</p>
 						<p className="mt-0.5 text-xs text-fg-muted">
-							<Trans>Expires {expiresAtLabel}</Trans>
+							<Trans>Phone link expires {linkExpiresLabel}</Trans>
 						</p>
 					</div>
 				</div>
@@ -425,6 +463,51 @@ function ReadySyncPanel({
 					{showQr ? <Trans>QR visible</Trans> : <Trans>Show QR</Trans>}
 				</Button>
 			</div>
+		</div>
+	);
+}
+
+function ExpiredLinkPanel({
+	state,
+	onCreateNew,
+	disabled,
+}: {
+	state: Extract<SyncState, { status: "link-expired" }>;
+	onCreateNew: () => void;
+	disabled: boolean;
+}) {
+	const agentExpiresLabel = new Date(state.agentValidUntilMs).toLocaleDateString([], {
+		month: "short",
+		day: "numeric",
+	});
+
+	return (
+		<div className="space-y-3">
+			<div className="flex items-start gap-2 rounded-8 border border-stroke-error-strong/25 bg-error-soft p-3">
+				<WarningCircleIcon className="mt-0.5 size-4 shrink-0 text-error" weight="fill" aria-hidden />
+				<div className="min-w-0">
+					<p className="text-sm font-semibold text-fg">
+						<Trans>Phone link expired</Trans>
+					</p>
+					<p className="mt-0.5 text-xs text-fg-muted">
+						<Trans>
+							Trading key still approved until {agentExpiresLabel}. Create a new link to import on your phone.
+						</Trans>
+					</p>
+				</div>
+			</div>
+			<Button
+				type="button"
+				variant="filled"
+				intent="brand"
+				size="sm"
+				onClick={onCreateNew}
+				disabled={disabled}
+				iconLeft={<DeviceMobileIcon className="size-3.5" />}
+				className="w-full"
+			>
+				<Trans>Create new phone link</Trans>
+			</Button>
 		</div>
 	);
 }

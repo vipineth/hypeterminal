@@ -91,6 +91,8 @@ export function forgetParsedKey(key: string): void {
 export function isUserStreamKey(key: string): boolean {
 	const parsed = parseKey(key);
 	if (!parsed) return false;
+	const params = parsed.params;
+	if (params && typeof params === "object" && !Array.isArray(params) && "user" in params) return true;
 	if (parsed.method !== undefined) {
 		if (USER_STREAM_METHODS.has(parsed.method)) return true;
 		if (import.meta.env?.DEV && !KNOWN_METHODS.has(parsed.method) && !warnedUnknownMethods.has(parsed.method)) {
@@ -101,8 +103,6 @@ export function isUserStreamKey(key: string): boolean {
 			);
 		}
 	}
-	const params = parsed.params;
-	if (params && typeof params === "object" && !Array.isArray(params) && "user" in params) return true;
 	return false;
 }
 

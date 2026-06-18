@@ -116,7 +116,7 @@ export function FundingTab() {
 
 									return (
 										<TableRow
-											key={`${update.coin}-${update.time}-${index}`}
+											key={`${update.coin}-${update.time}-${update.usdc}`}
 											className={cn(positionsPanelRowHoverClass, index % 2 === 1 && positionsPanelRowStripeClass)}
 										>
 											<TableCell size="dense" className={cn(positionsPanelTableCellClass, "font-medium text-fg")}>

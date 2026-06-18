@@ -30,7 +30,6 @@ import {
 	isMobileSyncEnvelopeExpired,
 	readMobileSyncDraft,
 	saveMobileSyncDraft,
-	updateMobileSyncPairingCodeDraft,
 } from "@/lib/mobile-sync/draft-storage";
 import { isMobileSyncImportError, verifyImportedMobileAgent } from "@/lib/mobile-sync/import-verification";
 import {
@@ -124,7 +123,7 @@ function MobileAgentSyncRoute() {
 		if (storedDraft.status === "found") {
 			setEnvelope(storedDraft.draft.envelope);
 			setEnvelopeSource("stored");
-			setPairingCode(storedDraft.draft.pairingCodeDraft);
+			setPairingCode("");
 			setLoadError(null);
 			setShowLinkInput(false);
 			return;
@@ -287,7 +286,6 @@ function MobileAgentSyncRoute() {
 				return;
 			}
 			setPairingCode(nextPairingCode);
-			updateMobileSyncPairingCodeDraft(envelope, nextPairingCode);
 			setSubmitError(null);
 		} catch {
 			setSubmitError(t`Clipboard paste was blocked. Paste from the keyboard menu or type the code manually.`);
@@ -309,7 +307,6 @@ function MobileAgentSyncRoute() {
 		);
 		const nextPairingCode = formatPairingCodeInput(event.target.value);
 		setPairingCode(nextPairingCode);
-		updateMobileSyncPairingCodeDraft(envelope, nextPairingCode);
 		setSubmitError(null);
 	};
 

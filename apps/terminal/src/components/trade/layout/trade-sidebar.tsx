@@ -23,6 +23,7 @@ export function TradeSidebar() {
 	const formKey = market?.name ?? "default";
 	const stickyTopPx = isTestnet ? appHeaderWithBannerHeightPx : appHeaderHeightPx;
 	const [frame, setFrame] = useState<SidebarFrame | null>(null);
+	const updateMaxHeightRef = useRef<() => void>(() => {});
 
 	const updateMaxHeight = useCallback(() => {
 		const sidebar = sidebarRef.current;
@@ -53,6 +54,7 @@ export function TradeSidebar() {
 			return nextFrame;
 		});
 	}, [stickyTopPx]);
+	updateMaxHeightRef.current = updateMaxHeight;
 
 	useLayoutEffect(() => {
 		updateMaxHeight();
@@ -62,20 +64,24 @@ export function TradeSidebar() {
 		const sidebar = sidebarRef.current;
 		if (!sidebar) return;
 
-		window.addEventListener("resize", updateMaxHeight);
-		window.addEventListener("scroll", updateMaxHeight, { passive: true });
+		function updateFrame() {
+			updateMaxHeightRef.current();
+		}
 
-		const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(updateMaxHeight) : null;
+		window.addEventListener("resize", updateFrame);
+		window.addEventListener("scroll", updateFrame, { passive: true });
+
+		const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(updateFrame) : null;
 		observer?.observe(sidebar);
 		if (sidebar.parentElement) observer?.observe(sidebar.parentElement);
 
-		updateMaxHeight();
+		updateFrame();
 		return () => {
-			window.removeEventListener("resize", updateMaxHeight);
-			window.removeEventListener("scroll", updateMaxHeight);
+			window.removeEventListener("resize", updateFrame);
+			window.removeEventListener("scroll", updateFrame);
 			observer?.disconnect();
 		};
-	}, [updateMaxHeight]);
+	}, []);
 
 	const sidebarStyle: CSSProperties = frame
 		? {

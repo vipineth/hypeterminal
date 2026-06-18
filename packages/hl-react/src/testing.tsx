@@ -1,8 +1,10 @@
 import type { InfoClient, SubscriptionClient } from "@nktkas/hyperliquid";
 import type { ReactNode } from "react";
-import { useContext } from "react";
+import { use } from "react";
 import { HyperliquidContext, type HyperliquidContextValue } from "./provider";
 import type { BuilderConfig, HyperliquidEnv } from "./signing/types";
+
+const EMPTY_MOCK_VALUE: Partial<HyperliquidContextValue> = {};
 
 export interface MockHyperliquidProviderProps {
 	children: ReactNode;
@@ -23,7 +25,7 @@ function createMockSubscriptionClient(): SubscriptionClient {
 	} as unknown as SubscriptionClient;
 }
 
-export function MockHyperliquidProvider({ children, value = {} }: MockHyperliquidProviderProps) {
+export function MockHyperliquidProvider({ children, value = EMPTY_MOCK_VALUE }: MockHyperliquidProviderProps) {
 	const mockValue: HyperliquidContextValue = {
 		info: createMockInfoClient(),
 		subscription: createMockSubscriptionClient(),
@@ -39,7 +41,7 @@ export function MockHyperliquidProvider({ children, value = {} }: MockHyperliqui
 }
 
 export function useMockHyperliquid(): HyperliquidContextValue {
-	const context = useContext(HyperliquidContext);
+	const context = use(HyperliquidContext);
 	if (!context) {
 		throw new Error("useMockHyperliquid must be used within a MockHyperliquidProvider");
 	}

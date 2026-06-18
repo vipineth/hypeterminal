@@ -5,5 +5,6 @@ export default defineConfig({
 	plugins: [viteTsConfigPaths({ projects: ["./tsconfig.json"] })],
 	test: {
 		environment: "node",
+		setupFiles: ["./vitest.setup.ts"],
 	},
 });

@@ -17,6 +17,7 @@ export function PriceInput({ midPrice, szDecimals, onMidClick, labelValue, ...pr
 	const hasMid = midPrice != null && midPrice > 0 && onMidClick != null;
 	const priceDecimals = szDecimalsToPriceDecimals(szDecimals ?? PRICE_INPUT_DEFAULT_DECIMALS);
 	const formattedMid = midPrice != null && midPrice > 0 ? toFixed(midPrice, priceDecimals) : undefined;
+	const handleMidClick = hasMid && formattedMid ? () => onMidClick(formattedMid) : undefined;
 
 	return (
 		<NumberInput
@@ -30,7 +31,7 @@ export function PriceInput({ midPrice, szDecimals, onMidClick, labelValue, ...pr
 					</span>
 				) : undefined
 			}
-			onMaxClick={hasMid ? () => onMidClick(formattedMid!) : undefined}
+			onMaxClick={handleMidClick}
 		/>
 	);
 }

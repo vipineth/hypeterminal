@@ -44,6 +44,7 @@ async function fetchCandlesWithRetry(params: CandleSnapshotParams, shouldContinu
 
 	for (const retryDelayMs of [0, ...CANDLE_FETCH_RETRY_DELAYS_MS]) {
 		if (!shouldContinue()) return [];
+		// react-doctor-disable-next-line react-doctor/async-await-in-loop
 		if (retryDelayMs > 0) await delay(retryDelayMs);
 		if (!shouldContinue()) return [];
 

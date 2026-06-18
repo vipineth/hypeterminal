@@ -124,12 +124,12 @@ export function AccountPanel() {
 					<InfoRowGroup className="divide-y-0">
 						<InfoRow
 							label={t`Spot`}
-							value={hasSpotData ? formatUSD(spotMetrics.totalValue) : FALLBACK_VALUE_PLACEHOLDER}
+							value={spotMetrics ? formatUSD(spotMetrics.totalValue) : FALLBACK_VALUE_PLACEHOLDER}
 							valueClassName="tabular-nums"
 						/>
 						<InfoRow
 							label={t`Perps`}
-							value={hasPerpData ? formatUSD(perpMetrics.accountValue) : FALLBACK_VALUE_PLACEHOLDER}
+							value={perpMetrics ? formatUSD(perpMetrics.accountValue) : FALLBACK_VALUE_PLACEHOLDER}
 							valueClassName="tabular-nums"
 						/>
 					</InfoRowGroup>

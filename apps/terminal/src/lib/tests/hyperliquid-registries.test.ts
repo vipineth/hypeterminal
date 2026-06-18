@@ -88,12 +88,13 @@ describe("subscription registry", () => {
 		for (const method of EXPECTED_ACCUMULATING) {
 			const config = getAccumulateConfig(method);
 			expect(config, `${method} should have accumulate config`).not.toBeNull();
-			expect(typeof config!.getItems).toBe("function");
-			expect(typeof config!.withItems).toBe("function");
-			expect(typeof config!.isSnapshot).toBe("function");
-			expect(config!.buffer.maxSize).toBeGreaterThan(0);
-			expect(typeof config!.buffer.getKey).toBe("function");
-			expect(typeof config!.buffer.compare).toBe("function");
+			if (!config) continue;
+			expect(typeof config.getItems).toBe("function");
+			expect(typeof config.withItems).toBe("function");
+			expect(typeof config.isSnapshot).toBe("function");
+			expect(config.buffer.maxSize).toBeGreaterThan(0);
+			expect(typeof config.buffer.getKey).toBe("function");
+			expect(typeof config.buffer.compare).toBe("function");
 		}
 	});
 

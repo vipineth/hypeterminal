@@ -13,8 +13,10 @@ import { ArrowLineDownIcon, ArrowLineUpIcon, ArrowsLeftRightIcon } from "@phosph
 import { Suspense, useState } from "react";
 import { useConnection } from "wagmi";
 import { NETWORKS } from "@/config/networks";
+import { getNormalizedWithdrawable } from "@/domain/trade/balances";
+import { useDefaultDexBalances } from "@/hooks/trade/use-account-balances";
 import { formatTransferError } from "@/lib/errors/format";
-import { useDeposit, useExchange, useUserPositions } from "@/lib/hyperliquid";
+import { useDeposit, useExchange } from "@/lib/hyperliquid";
 import { createLazyComponent } from "@/lib/lazy";
 import { toNumberOrZero } from "@/lib/trade/numbers";
 import { validateWithdraw } from "@/lib/trade/withdraw-validation";
@@ -54,8 +56,18 @@ export function DepositModal() {
 
 	const { address } = useConnection();
 
-	const userPositions = useUserPositions();
-	const withdrawable = userPositions.withdrawable;
+	const {
+		withdrawable: rawWithdrawable,
+		spotBalances,
+		spotAvailableAfterMaintenance,
+		accountAbstraction,
+	} = useDefaultDexBalances();
+	const withdrawable = getNormalizedWithdrawable(
+		rawWithdrawable,
+		spotBalances,
+		spotAvailableAfterMaintenance,
+		accountAbstraction,
+	);
 	const withdrawableNum = toNumberOrZero(withdrawable);
 
 	const {

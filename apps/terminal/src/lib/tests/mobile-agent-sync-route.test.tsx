@@ -133,6 +133,33 @@ async function flushAsyncWork(times = 1) {
 	}
 }
 
+async function waitForCondition(assertion: () => void, attempts = 120) {
+	let lastError: unknown;
+	for (let i = 0; i < attempts; i += 1) {
+		try {
+			assertion();
+			return;
+		} catch (error) {
+			lastError = error;
+			await flushAsyncWork();
+		}
+	}
+
+	throw lastError;
+}
+
+async function enterPairingCode(container: HTMLElement, pairingCode: string) {
+	const pairingInput = container.querySelector('input[placeholder="0000-0000-0000-0000"]') as HTMLInputElement | null;
+	if (!pairingInput) throw new Error("missing pairing input");
+
+	act(() => {
+		Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set?.call(pairingInput, pairingCode);
+		pairingInput.dispatchEvent(new Event("input", { bubbles: true }));
+	});
+	await flushAsyncWork();
+	return pairingInput;
+}
+
 function setClipboardReadText(readText?: () => Promise<string>) {
 	Object.defineProperty(navigator, "clipboard", {
 		configurable: true,
@@ -345,9 +372,9 @@ describe("MobileAgentSyncRoute", () => {
 		expect(pairingInput?.disabled).toBe(true);
 	});
 
-	it("recovers a saved phone link and pairing-code draft after reload", async () => {
+	it("recovers a saved phone link after reload without persisting the pairing code", async () => {
 		const sync = await createSyncFixture();
-		saveMobileSyncDraft(sync.envelope, "ABCD-1234-EF56-7890", {
+		saveMobileSyncDraft(sync.envelope, {
 			storage: window.sessionStorage,
 			nowMs: NOW_MS,
 		});
@@ -361,13 +388,13 @@ describe("MobileAgentSyncRoute", () => {
 
 		expect(container.textContent).toContain("Recovered after reload");
 		const pairingInput = container.querySelector('input[placeholder="0000-0000-0000-0000"]') as HTMLInputElement | null;
-		expect(pairingInput?.value).toBe("ABCD-1234-EF56-7890");
+		expect(pairingInput?.value).toBe("");
 		expect(pairingInput?.disabled).toBe(false);
 	});
 
 	it("clears an expired stored phone link and leaves manual paste available", async () => {
 		const sync = await createSyncFixture();
-		saveMobileSyncDraft(sync.envelope, "ABCD-1234-EF56-7890", {
+		saveMobileSyncDraft(sync.envelope, {
 			storage: window.sessionStorage,
 			nowMs: NOW_MS,
 		});
@@ -573,7 +600,7 @@ describe("MobileAgentSyncRoute", () => {
 		expect(container.querySelector('input[placeholder="Paste link from desktop"]')).toBeNull();
 		expect(pairingInput?.value).toBe("ABCD-1234-EF56-7890");
 		expect(window.sessionStorage.getItem(MOBILE_SYNC_DRAFT_STORAGE_KEY)).toContain(sync.syncId);
-		expect(window.sessionStorage.getItem(MOBILE_SYNC_DRAFT_STORAGE_KEY)).toContain("ABCD-1234-EF56-7890");
+		expect(window.sessionStorage.getItem(MOBILE_SYNC_DRAFT_STORAGE_KEY)).not.toContain("ABCD-1234-EF56-7890");
 	});
 
 	it("clears an existing loaded link when manual replacement is invalid", async () => {
@@ -651,7 +678,8 @@ describe("MobileAgentSyncRoute", () => {
 		});
 		await flushAsyncWork();
 
-		expect(window.sessionStorage.getItem(MOBILE_SYNC_DRAFT_STORAGE_KEY)).toContain("ABCD-1234-EF56-7890");
+		expect(window.sessionStorage.getItem(MOBILE_SYNC_DRAFT_STORAGE_KEY)).toContain(sync.syncId);
+		expect(window.sessionStorage.getItem(MOBILE_SYNC_DRAFT_STORAGE_KEY)).not.toContain("ABCD-1234-EF56-7890");
 		const resetButton = [...container.querySelectorAll("button")].find((button) =>
 			button.textContent?.includes("Reset"),
 		);
@@ -667,7 +695,7 @@ describe("MobileAgentSyncRoute", () => {
 		expect(pairingInput?.value).toBe("");
 	});
 
-	it("pastes a complete pairing code from the clipboard and stores the draft", async () => {
+	it("pastes a complete pairing code from the clipboard without storing the code", async () => {
 		const sync = await createSyncFixture();
 		const url = new URL(sync.url);
 		window.history.replaceState(null, "", `${url.pathname}${url.hash}`);
@@ -689,11 +717,10 @@ describe("MobileAgentSyncRoute", () => {
 		await flushAsyncWork();
 
 		const pairingInput = container.querySelector('input[placeholder="0000-0000-0000-0000"]') as HTMLInputElement | null;
-		const storedDraft = JSON.parse(window.sessionStorage.getItem(MOBILE_SYNC_DRAFT_STORAGE_KEY) ?? "{}") as {
-			pairingCodeDraft?: string;
-		};
+		const storedDraft = window.sessionStorage.getItem(MOBILE_SYNC_DRAFT_STORAGE_KEY);
 		expect(pairingInput?.value).toBe("ABCD-1234-EF56-7890");
-		expect(storedDraft.pairingCodeDraft).toBe("ABCD-1234-EF56-7890");
+		expect(storedDraft).toContain(sync.syncId);
+		expect(storedDraft).not.toContain("ABCD-1234-EF56-7890");
 		expect(container.textContent).not.toContain("Clipboard does not contain a pairing code.");
 	});
 
@@ -950,7 +977,7 @@ describe("MobileAgentSyncRoute", () => {
 				validUntil: sync.agentValidUntilMs,
 			},
 		];
-		saveMobileSyncDraft(sync.envelope, "0000-0000-0000-0000", {
+		saveMobileSyncDraft(sync.envelope, {
 			storage: window.sessionStorage,
 			nowMs: NOW_MS,
 		});
@@ -961,6 +988,7 @@ describe("MobileAgentSyncRoute", () => {
 			root.render(createElement(MobileAgentSyncRoute));
 		});
 		await flushAsyncWork();
+		await enterPairingCode(container, "0000-0000-0000-0000");
 
 		const importButton = [...container.querySelectorAll("button")].find((button) =>
 			button.textContent?.includes("Import phone access"),
@@ -1010,7 +1038,7 @@ describe("MobileAgentSyncRoute", () => {
 		testState.address = address;
 		const sync = await createSyncFixture(syncOptions);
 		testState.extraAgents = extraAgents;
-		saveMobileSyncDraft(sync.envelope, sync.pairingCode, {
+		saveMobileSyncDraft(sync.envelope, {
 			storage: window.sessionStorage,
 			nowMs: NOW_MS,
 		});
@@ -1021,6 +1049,7 @@ describe("MobileAgentSyncRoute", () => {
 			root.render(createElement(MobileAgentSyncRoute));
 		});
 		await flushAsyncWork();
+		await enterPairingCode(container, sync.pairingCode);
 
 		const importButton = [...container.querySelectorAll("button")].find((button) =>
 			button.textContent?.includes("Import phone access"),
@@ -1047,7 +1076,7 @@ describe("MobileAgentSyncRoute", () => {
 				validUntil: sync.agentValidUntilMs,
 			},
 		];
-		saveMobileSyncDraft(sync.envelope, sync.pairingCode, {
+		saveMobileSyncDraft(sync.envelope, {
 			storage: window.sessionStorage,
 			nowMs: NOW_MS,
 		});
@@ -1059,7 +1088,7 @@ describe("MobileAgentSyncRoute", () => {
 		});
 		await flushAsyncWork();
 
-		const pairingInput = container.querySelector('input[placeholder="0000-0000-0000-0000"]') as HTMLInputElement | null;
+		const pairingInput = await enterPairingCode(container, sync.pairingCode);
 		expect(pairingInput?.value).toBe(sync.pairingCode);
 
 		const importButton = [...container.querySelectorAll("button")].find((button) =>
@@ -1070,9 +1099,8 @@ describe("MobileAgentSyncRoute", () => {
 		act(() => {
 			importButton?.closest("form")?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
 		});
-		await flushAsyncWork(60);
 
-		expect(testState.setAgent).toHaveBeenCalled();
+		await waitForCondition(() => expect(testState.setAgent).toHaveBeenCalled());
 		expect(window.sessionStorage.getItem("hypeterminal.mobile-sync.import-draft.v1")).toBeNull();
 		expect(container.textContent).toContain("Phone access ready");
 		expect(container.textContent).not.toContain("Phone link loaded");

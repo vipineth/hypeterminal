@@ -23,6 +23,7 @@ temp/
 
 # Compiled translation catalogs (generated at build time)
 src/locales/**/messages.js
+apps/terminal/src/locales/**/messages.js
 
 # Framework temp files
 .astro/

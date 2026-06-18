@@ -55,11 +55,8 @@ interface AvatarProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
 	({ className, size: sizeProp, src, alt, initials, status, ...props }, ref) => {
 		const size = sizeProp ?? DEFAULT_SIZE;
-		const [imgError, setImgError] = React.useState(false);
-		React.useEffect(() => {
-			setImgError(false);
-		}, [src]);
-		const showImage = src && !imgError;
+		const [failedSrc, setFailedSrc] = React.useState<string | undefined>(undefined);
+		const showImage = src && failedSrc !== src;
 		const showInitials = !showImage && initials;
 		const showIcon = !showImage && !initials;
 
@@ -67,7 +64,7 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
 			<div className={cn(avatarVariants({ size, className }))} ref={ref} {...props}>
 				<div className="size-full rounded-full overflow-hidden flex items-center justify-center">
 					{showImage && (
-						<img src={src} alt={alt || ""} className="size-full object-cover" onError={() => setImgError(true)} />
+						<img src={src} alt={alt || ""} className="size-full object-cover" onError={() => setFailedSrc(src)} />
 					)}
 					{showInitials && (
 						<div
@@ -122,8 +119,11 @@ const AvatarGroup = React.forwardRef<HTMLDivElement, AvatarGroupProps>(
 
 		return (
 			<div className={cn("flex items-center -space-x-2", className)} ref={ref} {...props}>
-				{visible.map((child, i) => (
-					<div key={i} className="ring-2 ring-background rounded-full">
+				{visible.map((child) => (
+					<div
+						key={React.isValidElement(child) && child.key != null ? child.key : String(child)}
+						className="ring-2 ring-background rounded-full"
+					>
 						{child}
 					</div>
 				))}

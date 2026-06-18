@@ -176,7 +176,16 @@ import { Trans } from "@lingui/react/macro";
 
 ## Environment
 
-Env vars are read via `import.meta.env` in `src/lib/network.ts` and `src/config/wagmi.ts` — mostly `VITE_*` flags for testnet/mainnet and chain selection.
+Real `.env*` files are gitignored. Copy `apps/terminal/.env.example` to `apps/terminal/.env.local` and fill in the values.
+
+| Variable | Required | Default | Purpose |
+|---|---|---|---|
+| `VITE_WALLET_CONNECT_PROJECT_ID` | Required for WalletConnect | none | Enables WalletConnect connector and QR/deep-link flows |
+| `VITE_ETHEREUM_RPC_URL` | No | `https://ethereum-rpc.publicnode.com` | Ethereum mainnet RPC used by bridge config |
+| `VITE_HYPERLIQUID_TESTNET` | No | `false` | Defaults server-side network selection to testnet |
+| `VITE_PERF_ENABLED` | No | `false` | Enables render profiling by default |
+
+When `VITE_WALLET_CONNECT_PROJECT_ID` is absent or blank, the WalletConnect connector is omitted; `injected()` and Coinbase Wallet remain available.
 
 ## Conventions
 

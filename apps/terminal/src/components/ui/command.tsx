@@ -28,6 +28,7 @@ function CommandDialog({
 }: React.ComponentProps<typeof Modal> & {
 	title?: string;
 	description?: string;
+	children?: React.ReactNode;
 	className?: string;
 	showCloseButton?: boolean;
 	shouldFilter?: boolean;

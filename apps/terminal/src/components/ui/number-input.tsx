@@ -165,7 +165,7 @@ export function NumberInput({
 		[effectiveAllowDecimals, allowNegative, min, max, step, onChange, onKeyDown, createSyntheticEvent],
 	);
 
-	const handleChange = useCallback(
+	const validateInputValue = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			const inputValue = e.target.value;
 
@@ -197,7 +197,7 @@ export function NumberInput({
 			disabled={disabled}
 			className={getInputClassName(inputSize, cn(hasMax && "pr-20", hasSuffix && "pr-7", className))}
 			onKeyDown={handleKeyDown}
-			onChange={handleChange}
+			onChange={validateInputValue}
 			{...props}
 		/>
 	);

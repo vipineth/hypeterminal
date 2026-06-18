@@ -76,6 +76,7 @@ export function TradeHeader({
 					size="sm"
 					align="start"
 					triggerVariant="minimal"
+					triggerAriaLabel={t`Order type`}
 					className="inline-flex"
 				/>
 				{isLeveraged && (

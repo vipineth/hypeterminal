@@ -71,7 +71,7 @@ export function MobileFundingTab({ className }: Props) {
 					<span className={cn("font-semibold ml-auto tabular-nums", headerClass)}>{headerTotal}</span>
 				</div>
 				<div className="flex-1 min-h-0 overflow-y-auto px-3 pb-3 space-y-2">
-					{updates.map((update, index) => {
+					{updates.map((update) => {
 						const market = markets.getMarket(update.coin);
 						const szi = toNumber(update.szi);
 						const rate = toNumber(update.fundingRate);
@@ -80,7 +80,7 @@ export function MobileFundingTab({ className }: Props) {
 
 						return (
 							<div
-								key={`${update.coin}-${update.time}-${index}`}
+								key={`${update.coin}-${update.time}-${update.usdc}`}
 								className="rounded-xs border border-stroke-weak bg-surface overflow-hidden"
 							>
 								<div className="flex items-center justify-between px-3 py-1.5 border-b border-stroke-weak">

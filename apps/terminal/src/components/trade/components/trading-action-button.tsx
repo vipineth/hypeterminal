@@ -22,7 +22,7 @@ export function TradingActionButton({
 }: Props) {
 	const { isReady, isEnabling, needsTrading, guardAction } = useTradingGuard();
 
-	const handleClick = useCallback(() => {
+	const runGuardedAction = useCallback(() => {
 		guardAction(onClick);
 	}, [guardAction, onClick]);
 
@@ -34,7 +34,7 @@ export function TradingActionButton({
 				{...buttonProps}
 				variant={variant}
 				intent={intent}
-				onClick={handleClick}
+				onClick={runGuardedAction}
 				disabled={disabled || isEnabling || (!isReady && !needsTrading)}
 				className={className}
 			>

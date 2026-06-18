@@ -47,6 +47,7 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
 	({ className, label, showValue, thumbSize = "md", ...props }, ref) => {
 		const val = props.value ?? props.defaultValue;
 		const thumbCount = Array.isArray(val) ? val.length : 1;
+		const thumbIndexes = Array.from({ length: thumbCount }, (_, thumbIndex) => thumbIndex);
 
 		return (
 			<BaseSlider.Root ref={ref} className={cn(sliderVariants({ className }))} {...props}>
@@ -67,10 +68,10 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
 					>
 						<BaseSlider.Indicator className="absolute inset-y-0 h-auto rounded-32 bg-fill-selected min-w-1 inset-shadow-sunken" />
 					</BaseSlider.Track>
-					{Array.from({ length: thumbCount }, (_, i) => (
+					{thumbIndexes.map((thumbIndex) => (
 						<BaseSlider.Thumb
-							key={i}
-							index={i}
+							key={`thumb-${thumbIndex}`}
+							index={thumbIndex}
 							className={cn(
 								"relative rounded-full bg-white",
 								"border-2 border-stroke-focus shadow-md",

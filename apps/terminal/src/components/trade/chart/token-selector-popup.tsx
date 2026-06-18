@@ -5,7 +5,7 @@ import type { UnifiedMarketInfo } from "@/lib/hyperliquid";
 import { TokenSelectorContent } from "./token-selector-content";
 import { useTokenSelector } from "./use-token-selector";
 
-const TOKEN_SELECTOR_POPOVER_WIDTH = "w-[min(44rem,calc(100vw-1rem))]";
+const MARKET_SELECTOR_POPOVER_WIDTH = "w-[min(44rem,calc(100vw-1rem))]";
 
 export type TokenSelectorPopupProps = {
 	selectedMarket: UnifiedMarketInfo | undefined;
@@ -14,6 +14,7 @@ export type TokenSelectorPopupProps = {
 	onOpenChange: (open: boolean) => void;
 	mobile?: boolean;
 	headingId: string;
+	contentId: string;
 };
 
 export function TokenSelectorPopup({
@@ -23,6 +24,7 @@ export function TokenSelectorPopup({
 	onOpenChange,
 	mobile = false,
 	headingId,
+	contentId,
 }: TokenSelectorPopupProps) {
 	const {
 		scope,
@@ -42,7 +44,8 @@ export function TokenSelectorPopup({
 		toggleFavorite,
 		table,
 		rows,
-		virtualizer,
+		virtualItems,
+		totalSize,
 		containerRef,
 		filteredMarkets,
 		highlightedIndex,
@@ -74,7 +77,8 @@ export function TokenSelectorPopup({
 			toggleFavorite={toggleFavorite}
 			table={table}
 			rows={rows}
-			virtualizer={virtualizer}
+			virtualItems={virtualItems}
+			totalSize={totalSize}
 			containerRef={containerRef}
 			filteredMarkets={filteredMarkets}
 			highlightedIndex={highlightedIndex}
@@ -84,12 +88,17 @@ export function TokenSelectorPopup({
 	);
 
 	if (mobile) {
-		return <DrawerContent keepMounted>{content}</DrawerContent>;
+		return (
+			<DrawerContent id={contentId} aria-labelledby={headingId} keepMounted>
+				{content}
+			</DrawerContent>
+		);
 	}
 
 	return (
 		<PopoverContent
-			className={cn(TOKEN_SELECTOR_POPOVER_WIDTH, "p-0 border-stroke-weak bg-surface")}
+			id={contentId}
+			className={cn(MARKET_SELECTOR_POPOVER_WIDTH, "p-0 border-stroke-weak bg-surface")}
 			align="start"
 			sideOffset={4}
 			alignOffset={-2}
