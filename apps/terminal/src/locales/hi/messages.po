@@ -204,7 +204,7 @@ msgstr ""
 #~ msgid "Approve a builder to charge fees on orders placed on your behalf. Builder codes allow DeFi applications to receive a portion of trading fees."
 #~ msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:304
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:338
 msgid "Approve in wallet..."
 msgstr ""
 
@@ -284,7 +284,7 @@ msgstr ""
 #: src/components/trade/mobile/mobile-account-view.tsx:188
 #: src/components/trade/tradebox/account-panel.tsx:172
 #: src/components/trade/tradebox/account-panel.tsx:175
-#: src/components/trade/tradebox/deposit-modal.tsx:224
+#: src/components/trade/tradebox/deposit-modal.tsx:236
 msgid "Bridge"
 msgstr ""
 
@@ -369,8 +369,8 @@ msgstr ""
 #: src/components/trade/positions/position-limit-close-modal.tsx:202
 #: src/components/trade/positions/position-tpsl-modal.tsx:172
 #: src/components/trade/positions/twap-tab.tsx:193
-#: src/components/trade/tradebox/deposit-modal.tsx:137
-#: src/components/trade/tradebox/deposit-modal.tsx:192
+#: src/components/trade/tradebox/deposit-modal.tsx:149
+#: src/components/trade/tradebox/deposit-modal.tsx:204
 #: src/components/trade/tradebox/leverage-control.tsx:187
 #: src/components/trade/tradebox/margin-mode-modal.tsx:244
 #: src/routes/mobile-agent-sync.tsx:413
@@ -494,7 +494,7 @@ msgstr ""
 msgid "Confirm Close"
 msgstr ""
 
-#: src/components/trade/tradebox/deposit-modal.tsx:152
+#: src/components/trade/tradebox/deposit-modal.tsx:164
 msgid "Confirm in wallet"
 msgstr ""
 
@@ -552,11 +552,11 @@ msgstr "वॉलेट कनेक्ट करें"
 msgid "Connect wallet to view account"
 msgstr "खाता देखने के लिए वॉलेट कनेक्ट करें"
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:122
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:150
 msgid "Connect your wallet before linking a mobile device."
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:165
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:194
 msgid "Connect your wallet before resetting mobile access."
 msgstr ""
 
@@ -640,8 +640,8 @@ msgstr "कनेक्ट हो रहा है..."
 msgid "Continue"
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:367
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:414
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:405
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:452
 #: src/components/trade/components/wallet-modal.tsx:576
 msgid "Copied"
 msgstr ""
@@ -662,7 +662,7 @@ msgstr ""
 msgid "Copy Address"
 msgstr "पता कॉपी करें"
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:367
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:405
 msgid "Copy code"
 msgstr ""
 
@@ -670,7 +670,7 @@ msgstr ""
 msgid "Copy link"
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:414
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:452
 msgid "Copy phone link"
 msgstr ""
 
@@ -686,7 +686,7 @@ msgstr ""
 msgid "Could not import phone access."
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:158
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:187
 msgid "Could not link mobile device."
 msgstr ""
 
@@ -695,24 +695,28 @@ msgstr ""
 msgid "Could not open the camera."
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:94
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:122
 #: src/components/trade/components/wallet-modal.tsx:500
 msgid "Could not render QR"
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:191
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:220
 msgid "Could not reset mobile access."
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:247
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:509
+msgid "Create new phone link"
+msgstr ""
+
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:277
 msgid "Create phone access"
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:307
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:341
 msgid "Create phone link"
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:210
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:240
 msgid "Create secure phone access for trading from this account."
 msgstr ""
 
@@ -720,7 +724,7 @@ msgstr ""
 msgid "Created"
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:305
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:339
 msgid "Creating link..."
 msgstr ""
 
@@ -779,21 +783,21 @@ msgstr ""
 #: src/components/trade/mobile/mobile-nav-drawer.tsx:132
 #: src/components/trade/tradebox/account-panel.tsx:163
 #: src/components/trade/tradebox/account-panel.tsx:166
-#: src/components/trade/tradebox/deposit-modal.tsx:107
-#: src/components/trade/tradebox/deposit-modal.tsx:129
-#: src/components/trade/tradebox/deposit-modal.tsx:150
-#: src/components/trade/tradebox/deposit-modal.tsx:218
+#: src/components/trade/tradebox/deposit-modal.tsx:119
+#: src/components/trade/tradebox/deposit-modal.tsx:141
+#: src/components/trade/tradebox/deposit-modal.tsx:162
+#: src/components/trade/tradebox/deposit-modal.tsx:230
 #: src/components/trade/tradebox/deposit/deposit-form.tsx:96
 #: src/components/trade/tradebox/trade-form-fields.tsx:146
 #: src/lib/trade/use-button-content.ts:72
 msgid "Deposit"
 msgstr "जमा करें"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:109
+#: src/components/trade/tradebox/deposit-modal.tsx:121
 msgid "Deposit complete"
 msgstr ""
 
-#: src/components/trade/tradebox/deposit-modal.tsx:131
+#: src/components/trade/tradebox/deposit-modal.tsx:143
 msgid "Deposit failed"
 msgstr ""
 
@@ -872,8 +876,8 @@ msgstr ""
 #~ msgid "Docs"
 #~ msgstr "दस्तावेज़"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:120
-#: src/components/trade/tradebox/deposit-modal.tsx:175
+#: src/components/trade/tradebox/deposit-modal.tsx:132
+#: src/components/trade/tradebox/deposit-modal.tsx:187
 msgid "Done"
 msgstr ""
 
@@ -1004,8 +1008,8 @@ msgstr ""
 #~ msgstr "खाता पैनल विस्तृत करें"
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:382
-msgid "Expires {expiresAtLabel}"
-msgstr ""
+#~ msgid "Expires {expiresAtLabel}"
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:513
 msgid "Expires {expiresAtLabel}."
@@ -1361,7 +1365,7 @@ msgstr "लिमिट प्राइस"
 msgid "Link desktop wallet"
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:206
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:236
 #: src/components/trade/header/user-menu.tsx:102
 msgid "Link mobile device"
 msgstr ""
@@ -2003,7 +2007,7 @@ msgstr ""
 #~ msgid "pagination"
 #~ msgstr "पृष्ठांकन"
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:355
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:393
 #: src/routes/mobile-agent-sync.tsx:423
 #: src/routes/mobile-agent-sync.tsx:536
 msgid "Pairing code"
@@ -2074,7 +2078,7 @@ msgstr ""
 msgid "Phone access ready"
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:482
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:565
 msgid "Phone access reset. The replacement key expires at {expiresAtLabel}."
 msgstr ""
 
@@ -2082,15 +2086,23 @@ msgstr ""
 msgid "Phone link"
 msgstr ""
 
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:490
+msgid "Phone link expired"
+msgstr ""
+
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:420
+msgid "Phone link expires {linkExpiresLabel}"
+msgstr ""
+
 #: src/routes/mobile-agent-sync.tsx:507
 msgid "Phone link loaded"
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:390
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:428
 msgid "Phone link QR"
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:342
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:380
 msgid "Phone link ready"
 msgstr ""
 
@@ -2208,7 +2220,7 @@ msgstr ""
 msgid "Processing"
 msgstr ""
 
-#: src/components/trade/tradebox/deposit-modal.tsx:152
+#: src/components/trade/tradebox/deposit-modal.tsx:164
 msgid "Processing deposit"
 msgstr ""
 
@@ -2225,7 +2237,7 @@ msgstr ""
 msgid "QR scanning is not available in this browser."
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:425
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:463
 msgid "QR visible"
 msgstr ""
 
@@ -2287,7 +2299,7 @@ msgstr ""
 #~ msgid "Remove from favorites"
 #~ msgstr "पसंदीदा से हटाएं"
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:457
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:540
 msgid "Replaces the current phone key. The old phone must link again."
 msgstr ""
 
@@ -2295,12 +2307,12 @@ msgstr ""
 #~ msgid "Requirements:"
 #~ msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:475
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:558
 #: src/routes/mobile-agent-sync.tsx:523
 msgid "Reset"
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:454
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:537
 msgid "Reset phone access"
 msgstr ""
 
@@ -2308,13 +2320,13 @@ msgstr ""
 msgid "Resets in"
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:475
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:558
 msgid "Resetting..."
 msgstr ""
 
 #: src/components/trade/mobile/offline-banner.tsx:80
-#: src/components/trade/tradebox/deposit-modal.tsx:140
-#: src/components/trade/tradebox/deposit-modal.tsx:195
+#: src/components/trade/tradebox/deposit-modal.tsx:152
+#: src/components/trade/tradebox/deposit-modal.tsx:207
 #: src/components/trade/tradebox/leverage-control.tsx:198
 msgid "Retry"
 msgstr ""
@@ -2375,7 +2387,7 @@ msgstr ""
 #~ msgid "Scan desktop wallet QR"
 #~ msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:379
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:417
 msgid "Scan on your phone"
 msgstr ""
 
@@ -2494,7 +2506,7 @@ msgstr ""
 msgid "Sending..."
 msgstr ""
 
-#: src/components/trade/tradebox/deposit-modal.tsx:113
+#: src/components/trade/tradebox/deposit-modal.tsx:125
 msgid "sent to Hyperliquid"
 msgstr ""
 
@@ -2575,7 +2587,7 @@ msgstr ""
 #~ msgid "Show Positions on Chart"
 #~ msgstr "चार्ट पर पोजीशन दिखाएं"
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:425
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:463
 msgid "Show QR"
 msgstr ""
 
@@ -3111,7 +3123,15 @@ msgid "Trading"
 msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:345
-msgid "Trading key approved"
+#~ msgid "Trading key approved"
+#~ msgstr ""
+
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:383
+msgid "Trading key approved until {agentExpiresLabel}"
+msgstr ""
+
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:493
+msgid "Trading key still approved until {agentExpiresLabel}. Create a new link to import on your phone."
 msgstr ""
 
 #: src/components/trade/chart/chart-source-toggle.tsx:60
@@ -3127,7 +3147,7 @@ msgid "Transaction was rejected"
 msgstr ""
 
 #: src/components/trade/positions/transfer-modal.tsx:179
-#: src/components/trade/tradebox/deposit-modal.tsx:207
+#: src/components/trade/tradebox/deposit-modal.tsx:219
 #: src/components/trade/tradebox/deposit/wrong-network-screen.tsx:19
 msgid "Transfer"
 msgstr ""
@@ -3162,7 +3182,7 @@ msgstr ""
 #~ msgid "Trigger Price (USDC)"
 #~ msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:306
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:340
 msgid "Try again"
 msgstr ""
 
@@ -3208,7 +3228,7 @@ msgstr "प्रकार"
 msgid "Unknown error"
 msgstr ""
 
-#: src/components/trade/chart/datafeed.ts:140
+#: src/components/trade/chart/datafeed.ts:152
 msgid "Unknown symbol: {symbolName}"
 msgstr "अज्ञात प्रतीक: {symbolName}"
 
@@ -3222,7 +3242,7 @@ msgid "Unrealized PNL"
 msgstr "अवास्तविक PNL"
 
 #. placeholder {0}: String(resolution)
-#: src/components/trade/chart/datafeed.ts:180
+#: src/components/trade/chart/datafeed.ts:192
 msgid "Unsupported resolution: {0}"
 msgstr "असमर्थित रेजोल्यूशन: {0}"
 
@@ -3258,7 +3278,7 @@ msgstr ""
 msgid "Use phone link"
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:217
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:247
 #: src/routes/mobile-agent-sync.tsx:333
 msgid "Using"
 msgstr ""
@@ -3309,7 +3329,7 @@ msgstr ""
 #~ msgid "Wallet client not ready"
 #~ msgstr "वॉलेट क्लाइंट तैयार नहीं है"
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:226
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:256
 #: src/components/trade/tradebox/bridge/shared-ui.tsx:74
 #: src/components/trade/tradebox/deposit/shared-ui.tsx:118
 msgid "Wallet not connected"
@@ -3332,7 +3352,7 @@ msgstr ""
 #~ msgstr ""
 
 #. placeholder {0}: ARBITRUM_NETWORK.estimatedWithdrawTime
-#: src/components/trade/tradebox/deposit-modal.tsx:169
+#: src/components/trade/tradebox/deposit-modal.tsx:181
 msgid "will arrive in {0}"
 msgstr ""
 
@@ -3346,18 +3366,18 @@ msgstr ""
 
 #: src/components/trade/tradebox/account-panel.tsx:154
 #: src/components/trade/tradebox/account-panel.tsx:157
-#: src/components/trade/tradebox/deposit-modal.tsx:163
-#: src/components/trade/tradebox/deposit-modal.tsx:184
-#: src/components/trade/tradebox/deposit-modal.tsx:221
+#: src/components/trade/tradebox/deposit-modal.tsx:175
+#: src/components/trade/tradebox/deposit-modal.tsx:196
+#: src/components/trade/tradebox/deposit-modal.tsx:233
 #: src/components/trade/tradebox/deposit/withdraw-form.tsx:121
 msgid "Withdraw"
 msgstr "निकासी"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:186
+#: src/components/trade/tradebox/deposit-modal.tsx:198
 msgid "Withdrawal failed"
 msgstr ""
 
-#: src/components/trade/tradebox/deposit-modal.tsx:165
+#: src/components/trade/tradebox/deposit-modal.tsx:177
 msgid "Withdrawal submitted"
 msgstr ""
 
@@ -3417,6 +3437,6 @@ msgstr ""
 msgid "Your transaction is being processed"
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:250
+#: src/components/trade/components/mobile-agent-sync-modal.tsx:280
 msgid "Your wallet approves one trading key for this phone. It cannot withdraw funds."
 msgstr ""
