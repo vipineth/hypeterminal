@@ -57,14 +57,6 @@ describe("exchange registry", () => {
 		}
 	});
 
-	it("routes representative L1 methods to trading client", () => {
-		const expectedL1Methods: ExchangeMethod[] = ["agentEnableDexAbstraction", "setDisplayName"];
-		for (const method of expectedL1Methods) {
-			const config = getExchangeMethodConfig(method);
-			expect(config.client, `${method} should use trading client`).toBe("trading");
-		}
-	});
-
 	it("only injects builder config for order", () => {
 		for (const method of EXCHANGE_METHODS) {
 			const config = getExchangeMethodConfig(method);

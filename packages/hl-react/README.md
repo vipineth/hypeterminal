@@ -85,7 +85,7 @@ Endpoint coverage is intentionally generic rather than one-hook-per-endpoint:
 
 As of `@nktkas/hyperliquid` `0.32.2`, newer SDK methods such as prediction-market info (`outcomeMeta`, `perpCategories`), builder/HIP-3 info (`perpDexs`, `perpDexStatus`, `userDexAbstraction`, `perpDexLimits`), richer subscriptions (`allDexsAssetCtxs`, `allDexsClearinghouseState`), and exchange actions (`sendToEvmWithData`, `setDisplayName`, `convertToMultiSigUser`, `userSetAbstraction`, `userPortfolioMargin`) are available through the same generic hooks.
 
-HIP-4 status: Hyperliquid's HIP-4 outcome-market API is present in the locked `0.32.2` SDK as `useInfo("outcomeMeta", undefined)`. Upstream `main` also contains additional outcome-market methods, but this package documents and tests against the pinned workspace SDK version.
+HIP-4 status: Hyperliquid's HIP-4 outcome-market API is present in the locked `0.32.2` SDK as `useInfo("outcomeMeta", undefined)`. Upstream `main` also contains additional outcome-market methods, but this package documents and tests against the pinned workspace SDK version. The peer dependency accepts newer 0.x SDK minors for install compatibility; those newer minors are untested until the workspace SDK pin is bumped.
 
 ### `useInfo` — REST one-shot queries
 
