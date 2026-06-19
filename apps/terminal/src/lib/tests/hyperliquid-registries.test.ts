@@ -33,7 +33,6 @@ describe("exchange registry", () => {
 		"sendAsset",
 		"sendToEvmWithData",
 		"spotSend",
-		"stakingLinkDisableTradingUser",
 		"tokenDelegate",
 		"usdClassTransfer",
 		"usdSend",

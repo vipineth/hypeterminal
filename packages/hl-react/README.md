@@ -131,7 +131,6 @@ linkStakingUser
 sendAsset
 sendToEvmWithData
 spotSend
-stakingLinkDisableTradingUser
 tokenDelegate
 usdClassTransfer
 usdSend
