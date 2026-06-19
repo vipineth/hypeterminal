@@ -27,6 +27,10 @@ const USER_SIGNED_METHODS: ReadonlySet<string> = new Set([
 	"withdraw3",
 ]);
 
+// All other ExchangeClient methods are L1 actions and intentionally use the
+// agent trading client. Examples include setDisplayName and agentEnableDexAbstraction
+// agent-side actions in the SDK, which call executeL1Action rather than
+// executeUserSignedAction.
 const BUILDER_INJECTED_METHODS: ReadonlySet<string> = new Set(["order"]);
 
 const CLIENT_KEY_METHODS: ReadonlySet<string> = new Set(["order", "cancel"]);

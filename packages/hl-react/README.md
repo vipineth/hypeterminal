@@ -83,9 +83,9 @@ Endpoint coverage is intentionally generic rather than one-hook-per-endpoint:
 | `SubscriptionClient` | `useSubscription(method, params, options)` | `useSubscription("allDexsAssetCtxs", undefined)` |
 | `ExchangeClient` | `useExchange(method, options)` | `useExchange("sendToEvmWithData")` |
 
-As of `@nktkas/hyperliquid` `0.32.2`, newer SDK methods such as prediction-market info (`outcomeMeta`, `settledOutcome`, `perpCategories`), builder/HIP-3 info (`perpDexs`, `perpDexStatus`, `userDexAbstraction`, `perpDexLimits`), richer subscriptions (`allDexsAssetCtxs`, `allDexsClearinghouseState`, `fastAssetCtxs`, `outcomeMetaUpdates`), and exchange actions (`sendToEvmWithData`, `setDisplayName`, `convertToMultiSigUser`, `userSetAbstraction`, `userPortfolioMargin`) are available through the same generic hooks.
+As of `@nktkas/hyperliquid` `0.32.2`, newer SDK methods such as prediction-market info (`outcomeMeta`, `perpCategories`), builder/HIP-3 info (`perpDexs`, `perpDexStatus`, `userDexAbstraction`, `perpDexLimits`), richer subscriptions (`allDexsAssetCtxs`, `allDexsClearinghouseState`), and exchange actions (`sendToEvmWithData`, `setDisplayName`, `convertToMultiSigUser`, `userSetAbstraction`, `userPortfolioMargin`) are available through the same generic hooks.
 
-HIP-4 status: Hyperliquid's HIP-4 outcome-market APIs are present in the upstream SDK under outcome-market method names rather than a literal `HIP-4` namespace. Use `useInfo("outcomeMeta", undefined)`, `useInfo("settledOutcome", { outcome })`, `useSubscription("outcomeMetaUpdates", undefined)`, and `useExchange("userOutcome")` for the current SDK surface.
+HIP-4 status: Hyperliquid's HIP-4 outcome-market API is present in the locked `0.32.2` SDK as `useInfo("outcomeMeta", undefined)`. Upstream `main` also contains additional outcome-market methods, but this package documents and tests against the pinned workspace SDK version.
 
 ### `useInfo` — REST one-shot queries
 
