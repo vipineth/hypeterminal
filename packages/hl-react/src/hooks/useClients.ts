@@ -10,7 +10,7 @@ export interface HyperliquidClients {
 	subscription: SubscriptionClient;
 	/** Exchange client using agent wallet - for L1 trading actions (order, cancel, etc.) */
 	trading: ExchangeClient | null;
-	/** Exchange client using user wallet - for user-signed actions (approveAgent, approveBuilderFee, withdraw, etc.) */
+	/** Exchange client using user wallet - for EIP-712/user-signed actions such as approvals, transfers, and withdrawals. */
 	user: ExchangeClient | null;
 }
 

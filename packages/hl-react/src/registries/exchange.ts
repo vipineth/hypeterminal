@@ -11,12 +11,20 @@ interface ExchangeMethodConfig {
 const USER_SIGNED_METHODS: ReadonlySet<string> = new Set([
 	"approveAgent",
 	"approveBuilderFee",
+	"cDeposit",
+	"cWithdraw",
+	"convertToMultiSigUser",
+	"linkStakingUser",
 	"sendAsset",
+	"sendToEvmWithData",
 	"spotSend",
+	"stakingLinkDisableTradingUser",
 	"tokenDelegate",
 	"usdClassTransfer",
 	"usdSend",
 	"userDexAbstraction",
+	"userPortfolioMargin",
+	"userSetAbstraction",
 	"withdraw3",
 ]);
 
