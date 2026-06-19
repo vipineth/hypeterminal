@@ -75,6 +75,18 @@ Wrap inside `WagmiProvider` and `QueryClientProvider` — the hooks depend on bo
 
 All hooks are strongly typed against the SDK's method signatures — if a method exists on the underlying SDK, a typed hook path exists for it.
 
+Endpoint coverage is intentionally generic rather than one-hook-per-endpoint:
+
+| SDK client | React hook | Example |
+|---|---|---|
+| `InfoClient` | `useInfo(method, params, options)` | `useInfo("perpDexs", undefined)` |
+| `SubscriptionClient` | `useSubscription(method, params, options)` | `useSubscription("allDexsAssetCtxs", undefined)` |
+| `ExchangeClient` | `useExchange(method, options)` | `useExchange("sendToEvmWithData")` |
+
+As of `@nktkas/hyperliquid` `0.32.2`, newer SDK methods such as prediction-market info (`outcomeMeta`, `perpCategories`), builder/HIP-3 info (`perpDexs`, `perpDexStatus`, `userDexAbstraction`, `perpDexLimits`), richer subscriptions (`allDexsAssetCtxs`, `allDexsClearinghouseState`), and exchange actions (`sendToEvmWithData`, `setDisplayName`, `convertToMultiSigUser`, `userSetAbstraction`, `userPortfolioMargin`) are available through the same generic hooks.
+
+HIP-4 status: Hyperliquid's HIP-4 outcome-market API is present in the locked `0.32.2` SDK as `useInfo("outcomeMeta", undefined)`. Upstream `main` also contains additional outcome-market methods, but this package documents and tests against the pinned workspace SDK version. The peer dependency accepts newer 0.x SDK minors for install compatibility; those newer minors are untested until the workspace SDK pin is bumped.
+
 ### `useInfo` — REST one-shot queries
 
 Thin wrapper around `InfoClient` methods (`meta`, `userFills`, `clearinghouseState`, `l2Book`, etc.), cached by TanStack Query via `infoKey` / `infoQueryOptions`.
@@ -105,7 +117,28 @@ Backing store tracks `status` (`idle | subscribing | active | error`) per key, r
 
 ### `useExchange` — signed mutations
 
-Wraps `ExchangeClient` methods (`order`, `cancel`, `modify`, `approveAgent`, `approveBuilderFee`, `withdraw`, …). Returns a TanStack Query mutation. Signing comes from either the agent wallet (default, fast-path trading) or the user wallet (approvals, withdrawals) — `useClients` decides.
+Wraps `ExchangeClient` methods (`order`, `cancel`, `modify`, `approveAgent`, `approveBuilderFee`, `withdraw3`, `sendToEvmWithData`, …). Returns a TanStack Query mutation. Signing comes from either the agent wallet (default, fast-path L1 trading actions) or the connected user wallet (EIP-712/user-signed actions) — `registries/exchange.ts` decides.
+
+User-wallet routed methods currently include:
+
+```text
+approveAgent
+approveBuilderFee
+cDeposit
+cWithdraw
+convertToMultiSigUser
+linkStakingUser
+sendAsset
+sendToEvmWithData
+spotSend
+tokenDelegate
+usdClassTransfer
+usdSend
+userDexAbstraction
+userPortfolioMargin
+userSetAbstraction
+withdraw3
+```
 
 ### `useAgent*` — agent wallet lifecycle
 
@@ -150,7 +183,7 @@ The Zustand store (`store.ts`) drives the lifecycle: `acquireSubscription` bumps
 ## Peer dependencies
 
 ```json
-"@nktkas/hyperliquid":   "^0.31.0",
+"@nktkas/hyperliquid":   ">=0.32.2 <1",
 "@tanstack/react-query": "^5",
 "react":                 "^19",
 "viem":                  "^2",
@@ -167,8 +200,9 @@ Fine-grained entry points for consumers that want only part of the surface:
 
 ```ts
 import { useHyperliquidStore } from "@hypeterminal/hl-react/store";
+import { useExchange } from "@hypeterminal/hl-react/hooks/useExchange";
 import type { PerpMarket } from "@hypeterminal/hl-react/markets/types";
-import { subscriptionRegistry } from "@hypeterminal/hl-react/registries/subscription";
+import { getAccumulateConfig } from "@hypeterminal/hl-react/registries/subscription";
 import { estimatePayloadSizeBytes } from "@hypeterminal/hl-react/internal/websocket/payload-guard";
 import { RingBuffer } from "@hypeterminal/hl-react/internal/circular-buffer/ring-buffer";
 ```

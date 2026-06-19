@@ -26,12 +26,19 @@ describe("exchange registry", () => {
 	const EXPECTED_USER_SIGNED: ExchangeMethod[] = [
 		"approveAgent",
 		"approveBuilderFee",
+		"cDeposit",
+		"cWithdraw",
+		"convertToMultiSigUser",
+		"linkStakingUser",
 		"sendAsset",
+		"sendToEvmWithData",
 		"spotSend",
 		"tokenDelegate",
 		"usdClassTransfer",
 		"usdSend",
 		"userDexAbstraction",
+		"userPortfolioMargin",
+		"userSetAbstraction",
 		"withdraw3",
 	];
 

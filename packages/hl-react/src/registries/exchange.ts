@@ -11,15 +11,24 @@ interface ExchangeMethodConfig {
 const USER_SIGNED_METHODS: ReadonlySet<string> = new Set([
 	"approveAgent",
 	"approveBuilderFee",
+	"cDeposit",
+	"cWithdraw",
+	"convertToMultiSigUser",
+	"linkStakingUser",
 	"sendAsset",
+	"sendToEvmWithData",
 	"spotSend",
 	"tokenDelegate",
 	"usdClassTransfer",
 	"usdSend",
 	"userDexAbstraction",
+	"userPortfolioMargin",
+	"userSetAbstraction",
 	"withdraw3",
 ]);
 
+// All other ExchangeClient methods are L1 actions routed to the trading client.
+// They call executeL1Action in the SDK, not executeUserSignedAction.
 const BUILDER_INJECTED_METHODS: ReadonlySet<string> = new Set(["order"]);
 
 const CLIENT_KEY_METHODS: ReadonlySet<string> = new Set(["order", "cancel"]);
