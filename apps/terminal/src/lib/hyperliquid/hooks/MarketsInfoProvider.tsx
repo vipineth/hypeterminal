@@ -7,6 +7,11 @@ interface MarketsInfoProviderProps {
 	children: ReactNode;
 }
 
+// Singleton owner of the live market-ctx subscription. Its context value changes every
+// updateInterval (5s), so it is kept separate from MarketsProvider to avoid re-rendering
+// static-only consumers. It must mount inside ClientOnly + ExchangeScopeProvider because
+// useMarketsInfoInternal reads useExchangeScope() and opens WebSocket subscriptions.
+// Do not merge with MarketsProvider — see the note there.
 export function MarketsInfoProvider({ children }: MarketsInfoProviderProps) {
 	const marketsInfo = useMarketsInfoInternal({
 		updateInterval: 5000,

@@ -180,6 +180,10 @@ interface Props {
 	children: ReactNode;
 }
 
+// Deliberately separate from MarketsInfoProvider. This holds static market metadata
+// (never ticks) so its ~14 direct useMarkets() consumers are isolated from the 5s
+// live-ctx re-render. It also mounts above ClientOnly/ExchangeScope (no scope dep),
+// which the live provider cannot. Do not merge the two — see MarketsInfoProvider.
 export function MarketsProvider({ children }: Props) {
 	const {
 		data: spotMeta,
