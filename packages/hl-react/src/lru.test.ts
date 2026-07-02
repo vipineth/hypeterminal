@@ -1,5 +1,5 @@
-import { LRU } from "@hypeterminal/hl-react/lru";
 import { describe, expect, it } from "vitest";
+import { LRU } from "./lru";
 
 describe("LRU", () => {
 	it("stores and retrieves values", () => {

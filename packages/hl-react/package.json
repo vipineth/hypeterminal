@@ -18,7 +18,6 @@
 		"./hooks/useSubscription": "./src/hooks/useSubscription.ts",
 		"./hooks/useTradingGuard": "./src/hooks/useTradingGuard.ts",
 		"./hooks/useTransport": "./src/hooks/useTransport.ts",
-		"./lru": "./src/lru.ts",
 		"./hooks/utils/useSub": "./src/hooks/utils/useSub.ts",
 		"./markets/types": "./src/markets/types.ts",
 		"./registries/*": "./src/registries/*.ts",
@@ -26,14 +25,15 @@
 		"./signing/l1-agent-wallet": "./src/signing/l1-agent-wallet.ts",
 		"./signing/mobile-agent": "./src/signing/mobile-agent.ts",
 		"./internal/websocket/*": "./src/internal/websocket/*.ts",
-		"./internal/circular-buffer/ring-buffer": "./src/internal/circular-buffer/ring-buffer.ts",
 		"./internal/circular-buffer/use-ring-buffer": "./src/internal/circular-buffer/use-ring-buffer.ts"
 	},
 	"scripts": {
-		"typecheck": "tsc -p tsconfig.json --noEmit"
+		"typecheck": "tsc -p tsconfig.json --noEmit",
+		"test": "vitest run"
 	},
 	"devDependencies": {
-		"@types/react": "19.2.7"
+		"@types/react": "19.2.7",
+		"vitest": "4.1.8"
 	},
 	"peerDependencies": {
 		"@nktkas/hyperliquid": ">=0.32.2 <1",
