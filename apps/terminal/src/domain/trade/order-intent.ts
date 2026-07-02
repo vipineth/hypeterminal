@@ -51,7 +51,23 @@ export type ReverseIntent = {
 	slippageBps: number;
 };
 
-export type OrderIntent = EntryOrderIntent | PositionTpSlIntent | MarketCloseIntent | LimitCloseIntent | ReverseIntent;
+export type SwapIntent = {
+	kind: "swap";
+	assetId: number;
+	isBuy: boolean;
+	sizeValue: number;
+	szDecimals: number;
+	markPx: number;
+	slippageBps: number;
+};
+
+export type OrderIntent =
+	| EntryOrderIntent
+	| PositionTpSlIntent
+	| MarketCloseIntent
+	| LimitCloseIntent
+	| ReverseIntent
+	| SwapIntent;
 
 export function buildOrderPlan(intent: OrderIntent): OrderPlan {
 	switch (intent.kind) {
@@ -65,6 +81,8 @@ export function buildOrderPlan(intent: OrderIntent): OrderPlan {
 			return buildLimitClosePlan(intent);
 		case "reverse":
 			return buildReversePlan(intent);
+		case "swap":
+			return buildSwapPlan(intent);
 		default:
 			return assertNever(intent);
 	}
@@ -158,6 +176,27 @@ function buildReversePlan({ assetId, size, szDecimals, isLong, markPx, slippageB
 				b: side === "buy",
 				p: formatPriceForOrder(orderPrice),
 				s: formatSizeForOrder(Big(size).times(2).toNumber(), szDecimals),
+				r: false,
+				t: { limit: { tif: "FrontendMarket" } },
+			},
+		],
+		grouping: "na",
+		errors: [],
+		warnings: [],
+	};
+}
+
+function buildSwapPlan({ assetId, isBuy, sizeValue, szDecimals, markPx, slippageBps }: SwapIntent): OrderPlan {
+	const slippageMultiplier = 1 + slippageBps / 10000;
+	const price = isBuy ? markPx * slippageMultiplier : markPx / slippageMultiplier;
+
+	return {
+		orders: [
+			{
+				a: assetId,
+				b: isBuy,
+				p: formatPriceForOrder(price),
+				s: formatSizeForOrder(sizeValue, szDecimals),
 				r: false,
 				t: { limit: { tif: "FrontendMarket" } },
 			},

@@ -93,6 +93,110 @@ describe("buildOrderPlan entry (characterization)", () => {
 			{ a: 0, b: true, p: "95", s: "1.5", r: true, t: { trigger: { isMarket: true, triggerPx: "95", tpsl: "sl" } } },
 		]);
 	});
+
+	it("builds a stop-limit trigger at the limit price (not market)", () => {
+		const plan = buildOrderPlan({
+			...ENTRY_BASE,
+			orderType: "stopLimit",
+			triggerPriceInput: "95",
+			limitPriceInput: "96",
+		});
+		expect(plan.orders).toEqual([
+			{ a: 0, b: true, p: "96", s: "1.5", r: true, t: { trigger: { isMarket: false, triggerPx: "95", tpsl: "sl" } } },
+		]);
+	});
+
+	it("builds a take-profit-market trigger with tp tpsl", () => {
+		const plan = buildOrderPlan({ ...ENTRY_BASE, orderType: "takeProfitMarket", triggerPriceInput: "110" });
+		expect(plan.orders).toEqual([
+			{ a: 0, b: true, p: "110", s: "1.5", r: true, t: { trigger: { isMarket: true, triggerPx: "110", tpsl: "tp" } } },
+		]);
+	});
+
+	it("builds a take-profit-limit trigger at the limit price with tp tpsl", () => {
+		const plan = buildOrderPlan({
+			...ENTRY_BASE,
+			orderType: "takeProfitLimit",
+			triggerPriceInput: "110",
+			limitPriceInput: "109",
+		});
+		expect(plan.orders).toEqual([
+			{ a: 0, b: true, p: "109", s: "1.5", r: true, t: { trigger: { isMarket: false, triggerPx: "110", tpsl: "tp" } } },
+		]);
+	});
+
+	it("attaches both tp and sl legs on the opposite side with normalTpsl grouping", () => {
+		const plan = buildOrderPlan({
+			...ENTRY_BASE,
+			tpSlEnabled: true,
+			canUseTpSl: true,
+			tpPriceNum: 110,
+			slPriceNum: 90,
+		});
+		expect(plan.orders).toEqual([
+			{ a: 0, b: true, p: "100.5", s: "1.5", r: false, t: { limit: { tif: "FrontendMarket" } } },
+			{ a: 0, b: false, p: "110", s: "1.5", r: true, t: { trigger: { isMarket: true, triggerPx: "110", tpsl: "tp" } } },
+			{ a: 0, b: false, p: "90", s: "1.5", r: true, t: { trigger: { isMarket: true, triggerPx: "90", tpsl: "sl" } } },
+		]);
+		expect(plan.grouping).toBe("normalTpsl");
+	});
+
+	it("propagates the chosen tif and reduceOnly to every scale level", () => {
+		const plan = buildOrderPlan({
+			...ENTRY_BASE,
+			orderType: "scale",
+			sizeValue: 3,
+			scaleStartPriceInput: "100",
+			scaleEndPriceInput: "110",
+			scaleLevelsNum: 3,
+			tif: "Alo",
+			reduceOnly: true,
+		});
+		expect(plan.orders.every((o) => o.r === true)).toBe(true);
+		expect(plan.orders.every((o) => JSON.stringify(o.t) === JSON.stringify({ limit: { tif: "Alo" } }))).toBe(true);
+	});
+
+	it("formats sub-1 prices to 5 significant figures", () => {
+		const plan = buildOrderPlan({ ...ENTRY_BASE, orderType: "limit", side: "sell", price: 0.012345 });
+		expect(plan.orders[0].p).toBe("0.012345");
+	});
+
+	it("formats a zero price as '0'", () => {
+		const plan = buildOrderPlan({ ...ENTRY_BASE, orderType: "limit", price: 0 });
+		expect(plan.orders[0].p).toBe("0");
+	});
+});
+
+describe("buildOrderPlan swap (characterization — byte-exact spot swap math)", () => {
+	const SWAP_BASE = {
+		kind: "swap" as const,
+		assetId: 0,
+		isBuy: true,
+		sizeValue: 1.5,
+		szDecimals: 3,
+		markPx: 100,
+		slippageBps: 100,
+	};
+
+	it("prices a buy at markPx * (1 + bps/10000)", () => {
+		const plan = buildOrderPlan(SWAP_BASE);
+		expect(plan.orders).toEqual([
+			{ a: 0, b: true, p: "101", s: "1.5", r: false, t: { limit: { tif: "FrontendMarket" } } },
+		]);
+		expect(plan.grouping).toBe("na");
+	});
+
+	it("prices a sell at markPx / (1 + bps/10000) — not the symmetric getExecutedPrice formula", () => {
+		const plan = buildOrderPlan({ ...SWAP_BASE, isBuy: false });
+		expect(plan.orders[0]).toEqual({
+			a: 0,
+			b: false,
+			p: "99.01",
+			s: "1.5",
+			r: false,
+			t: { limit: { tif: "FrontendMarket" } },
+		});
+	});
 });
 
 describe("buildOrderPlan close/reverse/tpsl (characterization)", () => {

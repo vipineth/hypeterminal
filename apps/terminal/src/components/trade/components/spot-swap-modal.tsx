@@ -8,7 +8,7 @@ import { NumberInput } from "@/components/ui/number-input";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/app";
 import { SWAP_SUCCESS_DURATION_MS } from "@/config/time";
 import { getSpotAvailable, getSpotBalance } from "@/domain/trade/balances";
-import { formatPriceForOrder, formatSizeForOrder } from "@/domain/trade/orders";
+import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { findSpotPair, getAvailablePairTokens, getSwapSide } from "@/domain/trade/swap";
 import { useDefaultDexBalances } from "@/hooks/trade/use-account-balances";
 import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
@@ -164,19 +164,17 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 
 		setError(null);
 
-		const slippageMultiplier = 1 + DEFAULT_SLIPPAGE_BPS / 10000;
-		const price = isBuying ? markPx * slippageMultiplier : markPx / slippageMultiplier;
+		const plan = buildOrderPlan({
+			kind: "swap",
+			assetId: spotMarket.assetId,
+			isBuy: isBuying,
+			sizeValue: orderSize,
+			szDecimals,
+			markPx,
+			slippageBps: DEFAULT_SLIPPAGE_BPS,
+		});
 
-		const order = {
-			a: spotMarket.assetId,
-			b: isBuying,
-			p: formatPriceForOrder(price),
-			s: formatSizeForOrder(orderSize, szDecimals),
-			r: false,
-			t: { limit: { tif: "FrontendMarket" as const } },
-		};
-
-		const result = await submitPlan({ orders: [order], grouping: "na" });
+		const result = await submitPlan(plan);
 		if (result.ok) {
 			triggerAutoClose();
 		} else {

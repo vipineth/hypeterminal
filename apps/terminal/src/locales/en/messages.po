@@ -1161,7 +1161,7 @@ msgstr "Flip transfer direction"
 msgid "Frequency"
 msgstr "Frequency"
 
-#: src/components/trade/components/spot-swap-modal.tsx:212
+#: src/components/trade/components/spot-swap-modal.tsx:210
 #: src/components/trade/tradebox/deposit/deposit-form.tsx:27
 msgid "From"
 msgstr "From"
@@ -1268,7 +1268,7 @@ msgstr "Insufficient {0} balance"
 #~ msgid "Insufficient {fromTokenDisplay} balance"
 #~ msgstr "Insufficient {fromTokenDisplay} balance"
 
-#: src/components/trade/components/spot-swap-modal.tsx:295
+#: src/components/trade/components/spot-swap-modal.tsx:293
 msgid "Insufficient <0/> balance"
 msgstr "Insufficient <0/> balance"
 
@@ -1811,7 +1811,7 @@ msgstr "No tokens with value found across supported chains"
 #~ msgid "No trading pair available for {fromTokenDisplay}/{toTokenDisplay}"
 #~ msgstr "No trading pair available for {fromTokenDisplay}/{toTokenDisplay}"
 
-#: src/components/trade/components/spot-swap-modal.tsx:306
+#: src/components/trade/components/spot-swap-modal.tsx:304
 msgid "No trading pair available for <0/>/<1/>"
 msgstr "No trading pair available for <0/>/<1/>"
 
@@ -2254,7 +2254,7 @@ msgstr "QR visible"
 msgid "Randomize timing"
 msgstr "Randomize timing"
 
-#: src/components/trade/components/spot-swap-modal.tsx:269
+#: src/components/trade/components/spot-swap-modal.tsx:267
 #: src/components/trade/mobile/mobile-funding-tab.tsx:104
 #: src/components/trade/positions/funding-tab.tsx:91
 msgid "Rate"
@@ -2473,7 +2473,7 @@ msgstr "Select order"
 msgid "Select token"
 msgstr "Select token"
 
-#: src/components/trade/components/spot-swap-modal.tsx:203
+#: src/components/trade/components/spot-swap-modal.tsx:201
 msgid "Select tokens to swap"
 msgstr "Select tokens to swap"
 
@@ -2687,7 +2687,7 @@ msgid "Slippage"
 msgstr "Slippage"
 
 #: src/components/trade/components/global-settings-modal.tsx:83
-#: src/components/trade/components/spot-swap-modal.tsx:285
+#: src/components/trade/components/spot-swap-modal.tsx:283
 msgid "Slippage tolerance"
 msgstr "Slippage tolerance"
 
@@ -2809,27 +2809,27 @@ msgstr "Successful"
 #~ msgid "Support"
 #~ msgstr "Support"
 
-#: src/components/trade/components/spot-swap-modal.tsx:197
-#: src/components/trade/components/spot-swap-modal.tsx:341
+#: src/components/trade/components/spot-swap-modal.tsx:195
+#: src/components/trade/components/spot-swap-modal.tsx:339
 #: src/components/trade/mobile/mobile-balances-tab.tsx:177
 #: src/components/trade/positions/balances-tab.tsx:179
 #: src/components/trade/tradebox/trade-form-fields.tsx:141
 msgid "Swap"
 msgstr "Swap"
 
-#: src/components/trade/components/spot-swap-modal.tsx:240
+#: src/components/trade/components/spot-swap-modal.tsx:238
 msgid "Swap direction"
 msgstr "Swap direction"
 
-#: src/components/trade/components/spot-swap-modal.tsx:183
+#: src/components/trade/components/spot-swap-modal.tsx:181
 msgid "Swap failed"
 msgstr "Swap failed"
 
-#: src/components/trade/components/spot-swap-modal.tsx:325
+#: src/components/trade/components/spot-swap-modal.tsx:323
 msgid "Swap submitted"
 msgstr "Swap submitted"
 
-#: src/components/trade/components/spot-swap-modal.tsx:338
+#: src/components/trade/components/spot-swap-modal.tsx:336
 msgid "Swapping..."
 msgstr "Swapping..."
 
@@ -3023,7 +3023,7 @@ msgstr "Time / Total"
 msgid "Time In Force"
 msgstr "Time In Force"
 
-#: src/components/trade/components/spot-swap-modal.tsx:247
+#: src/components/trade/components/spot-swap-modal.tsx:245
 #: src/components/trade/tradebox/deposit/withdraw-form.tsx:40
 msgid "To"
 msgstr "To"
@@ -3115,7 +3115,7 @@ msgid "Trade History"
 msgstr "Trade History"
 
 #. placeholder {0}: spotMarket.pairName
-#: src/components/trade/components/spot-swap-modal.tsx:201
+#: src/components/trade/components/spot-swap-modal.tsx:199
 msgid "Trade via {0} spot market"
 msgstr "Trade via {0} spot market"
 
