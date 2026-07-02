@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatErrorForDisplay } from "@/lib/errors";
+import { formatErrorForDisplay } from "@/lib/errors/display";
 
 describe("errors", () => {
 	it("formats nested error details for display", () => {
