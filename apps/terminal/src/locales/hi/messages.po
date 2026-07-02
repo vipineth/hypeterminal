@@ -3233,7 +3233,7 @@ msgstr "प्रकार"
 msgid "Unknown error"
 msgstr ""
 
-#: src/components/trade/chart/datafeed.ts:152
+#: src/components/trade/chart/datafeed.ts:142
 msgid "Unknown symbol: {symbolName}"
 msgstr "अज्ञात प्रतीक: {symbolName}"
 
@@ -3247,7 +3247,7 @@ msgid "Unrealized PNL"
 msgstr "अवास्तविक PNL"
 
 #. placeholder {0}: String(resolution)
-#: src/components/trade/chart/datafeed.ts:192
+#: src/components/trade/chart/datafeed.ts:182
 msgid "Unsupported resolution: {0}"
 msgstr "असमर्थित रेजोल्यूशन: {0}"
 

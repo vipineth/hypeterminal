@@ -24,6 +24,12 @@ export function getMarketKindFromName(name: string): MarketKind {
 	return "perp";
 }
 
+export function getDexFromName(name: string): string | undefined {
+	const separatorIdx = name.indexOf(BUILDER_DEX_SEPARATOR);
+	if (separatorIdx <= 0) return undefined;
+	return name.slice(0, separatorIdx);
+}
+
 export function getPerpDisplayName(name: string, quoteToken?: string): string {
 	return `${name}${PERP_MARKET_NAME_SEPARATOR}${quoteToken ?? DEFAULT_QUOTE_TOKEN}`;
 }

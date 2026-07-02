@@ -3233,7 +3233,7 @@ msgstr "类型"
 msgid "Unknown error"
 msgstr ""
 
-#: src/components/trade/chart/datafeed.ts:152
+#: src/components/trade/chart/datafeed.ts:142
 msgid "Unknown symbol: {symbolName}"
 msgstr "未知交易对: {symbolName}"
 
@@ -3247,7 +3247,7 @@ msgid "Unrealized PNL"
 msgstr "未实现盈亏"
 
 #. placeholder {0}: String(resolution)
-#: src/components/trade/chart/datafeed.ts:192
+#: src/components/trade/chart/datafeed.ts:182
 msgid "Unsupported resolution: {0}"
 msgstr "不支持的分辨率: {0}"
 

@@ -135,6 +135,6 @@ export {
 	type UnifiedMarket,
 	useMarkets,
 } from "./markets";
-export { getMarketKindFromName } from "./markets/helper";
+export { getDexFromName, getMarketKindFromName } from "./markets/helper";
 export { type UseSpotTokensReturn, useSpotTokens } from "./markets/use-spot-tokens";
 export { type DepositStatus, type UseDepositResult, useDeposit } from "./use-deposit";

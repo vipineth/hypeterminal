@@ -4,7 +4,7 @@ import { candleSnapshotToBar, filterAndSortBars } from "@/lib/chart/candle";
 import { resolutionToInterval } from "@/lib/chart/resolution";
 import { getCandleStore, streamKey } from "@/lib/chart/store";
 import { coinFromSymbolName, inferPriceScaleFromMids, symbolFromCoin } from "@/lib/chart/symbol";
-import { getInfoClient } from "@/lib/hyperliquid";
+import { getDexFromName, getInfoClient, getMarketKindFromName } from "@/lib/hyperliquid";
 import type {
 	Bar,
 	DatafeedConfiguration,
@@ -52,12 +52,6 @@ async function getMeta(): Promise<MetaResponse> {
 const allMidsCache = new Map<string, { value: AllMidsResponse; fetchedAt: number }>();
 const allMidsPromise = new Map<string, Promise<AllMidsResponse>>();
 
-function getDexForCoin(coin: string): string | undefined {
-	const separatorIdx = coin.indexOf(":");
-	if (separatorIdx <= 0) return undefined;
-	return coin.slice(0, separatorIdx);
-}
-
 async function getAllMids(dex?: string): Promise<AllMidsResponse> {
 	const cacheKey = dex ?? "";
 	const now = Date.now();
@@ -82,13 +76,9 @@ async function getAllMids(dex?: string): Promise<AllMidsResponse> {
 }
 
 async function isKnownCoin(coin: string): Promise<boolean> {
-	// Spot markets use @id format (e.g., @232)
-	if (coin.startsWith("@")) return true;
+	// Spot (@id) and HIP-3 builder (dex:coin) names are self-identifying; only perp needs a meta lookup.
+	if (getMarketKindFromName(coin) !== "perp") return true;
 
-	// HIP-3 markets use dex:coin format (e.g., xyz:XYZ100)
-	if (coin.includes(":")) return true;
-
-	// Perp markets - check against meta
 	try {
 		const meta = await getMeta();
 		return meta.universe.some((asset) => asset.name === coin && !(asset.isDelisted ?? false));
@@ -99,7 +89,7 @@ async function isKnownCoin(coin: string): Promise<boolean> {
 
 async function inferPriceScale(coin: string): Promise<number> {
 	try {
-		const mids = await getAllMids(getDexForCoin(coin));
+		const mids = await getAllMids(getDexFromName(coin));
 		return inferPriceScaleFromMids(coin, mids);
 	} catch {
 		return DEFAULT_PRICESCALE;
