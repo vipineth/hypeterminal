@@ -8,13 +8,13 @@ import { NumberInput } from "@/components/ui/number-input";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/app";
 import { SWAP_SUCCESS_DURATION_MS } from "@/config/time";
 import { getSpotAvailable, getSpotBalance } from "@/domain/trade/balances";
-import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
+import { formatPriceForOrder, formatSizeForOrder } from "@/domain/trade/orders";
 import { findSpotPair, getAvailablePairTokens, getSwapSide } from "@/domain/trade/swap";
 import { useDefaultDexBalances } from "@/hooks/trade/use-account-balances";
+import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { useAutoCloseSuccess } from "@/hooks/ui/use-auto-close-success";
 import { cn } from "@/lib/cn";
 import { formatToken } from "@/lib/format";
-import { useExchange } from "@/lib/hyperliquid";
 import { useMarketsInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 import { toNumber, toNumberOrZero } from "@/lib/trade/numbers";
 import {
@@ -49,7 +49,7 @@ interface Props {
 function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Props) {
 	const { spotMarkets } = useMarketsInfo();
 	const { spotBalances, spotAvailableAfterMaintenance } = useDefaultDexBalances();
-	const { mutateAsync: placeOrder, isPending: isSubmitting } = useExchange("order");
+	const { submitPlan, isSubmitting } = useSubmitPlan();
 
 	const defaultToToken = useMemo(() => {
 		if (initialToToken) return initialToToken;
@@ -176,16 +176,13 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 			t: { limit: { tif: "FrontendMarket" as const } },
 		};
 
-		try {
-			const result = await placeOrder({ orders: [order], grouping: "na" });
-			throwIfResponseError(result.response?.data?.statuses?.[0]);
-
+		const result = await submitPlan({ orders: [order], grouping: "na" });
+		if (result.ok) {
 			triggerAutoClose();
-		} catch (err) {
-			const message = err instanceof Error ? err.message : t`Swap failed`;
-			setError(message);
+		} else {
+			setError(result.error || t`Swap failed`);
 		}
-	}, [spotMarket, orderSize, isSubmitting, isBuying, markPx, szDecimals, placeOrder, triggerAutoClose]);
+	}, [spotMarket, orderSize, isSubmitting, isBuying, markPx, szDecimals, submitPlan, triggerAutoClose]);
 
 	const insufficientBalance = amountValue > fromBalance;
 	const noPairAvailable = fromToken && toToken && !spotMarket;

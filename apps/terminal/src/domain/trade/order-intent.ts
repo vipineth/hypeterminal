@@ -1,9 +1,8 @@
 import Big from "big.js";
-import type { ExchangeOrder, LimitTif, OrderType } from "@/config/trade";
+import type { ExchangeOrder } from "@/config/trade";
 import { getExecutedPrice } from "@/domain/trade/order/price";
-import { buildOrders, formatPriceForOrder, formatSizeForOrder } from "@/domain/trade/orders";
+import { buildOrders, type EntryOrderParams, formatPriceForOrder, formatSizeForOrder } from "@/domain/trade/orders";
 import { isPositive } from "@/lib/trade/numbers";
-import { isScaleOrderType, isStopOrderType, isTriggerOrderType, usesLimitPrice } from "@/lib/trade/order-types";
 import type { Side } from "@/lib/trade/types";
 
 export type OrderPlan = {
@@ -13,28 +12,7 @@ export type OrderPlan = {
 	warnings: string[];
 };
 
-export type EntryOrderIntent = {
-	kind: "entry";
-	assetId: number;
-	side: Side;
-	orderType: OrderType;
-	sizeValue: number;
-	szDecimals: number;
-	markPx: number;
-	price: number;
-	slippageBps: number;
-	reduceOnly: boolean;
-	tif: LimitTif;
-	limitPriceInput: string;
-	triggerPriceInput: string;
-	scaleStartPriceInput: string;
-	scaleEndPriceInput: string;
-	scaleLevelsNum: number | null;
-	tpSlEnabled: boolean;
-	canUseTpSl: boolean;
-	tpPriceNum: number | null;
-	slPriceNum: number | null;
-};
+export type EntryOrderIntent = EntryOrderParams & { kind: "entry" };
 
 export type PositionTpSlIntent = {
 	kind: "positionTpsl";
@@ -97,33 +75,7 @@ function getCloseSide(isLong: boolean): Side {
 }
 
 function buildEntryPlan(intent: EntryOrderIntent): OrderPlan {
-	const orderType = intent.orderType;
-	const { orders, grouping } = buildOrders({
-		assetId: intent.assetId,
-		side: intent.side,
-		orderType,
-		sizeValue: intent.sizeValue,
-		szDecimals: intent.szDecimals,
-		markPx: intent.markPx,
-		price: intent.price,
-		slippageBps: intent.slippageBps,
-		reduceOnly: intent.reduceOnly,
-		tif: intent.tif,
-		limitPriceInput: intent.limitPriceInput,
-		triggerPriceInput: intent.triggerPriceInput,
-		scaleStartPriceInput: intent.scaleStartPriceInput,
-		scaleEndPriceInput: intent.scaleEndPriceInput,
-		scaleLevelsNum: intent.scaleLevelsNum,
-		tpSlEnabled: intent.tpSlEnabled,
-		canUseTpSl: intent.canUseTpSl,
-		tpPriceNum: intent.tpPriceNum,
-		slPriceNum: intent.slPriceNum,
-		isStopOrder: isStopOrderType(orderType),
-		isTriggerOrder: isTriggerOrderType(orderType),
-		isScaleOrder: isScaleOrderType(orderType),
-		usesLimitPriceForOrder: usesLimitPrice(orderType),
-	});
-
+	const { orders, grouping } = buildOrders(intent);
 	return { orders, grouping, errors: [], warnings: [] };
 }
 

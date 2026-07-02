@@ -5,10 +5,9 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { InfoRow } from "@/components/ui/info-row";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
-import { throwIfAnyResponseError } from "@/domain/trade/orders";
+import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
-import { useExchange } from "@/lib/hyperliquid";
 import { isPositive, toNumber } from "@/lib/trade/numbers";
 import { validateSlPrice, validateTpPrice } from "@/lib/trade/tpsl";
 import { getValueColorClass } from "@/lib/ui/value-color";
@@ -53,7 +52,7 @@ function PositionTpSlModalBody({ position, onOpenChange }: BodyProps) {
 	);
 	const [submitError, setSubmitError] = useState<string | null>(null);
 
-	const { mutateAsync: placeOrder, isPending: isSubmitting, error } = useExchange("order");
+	const { submitPlan, isSubmitting } = useSubmitPlan();
 
 	const tpPriceNum = toNumber(tpPriceInput);
 	const slPriceNum = toNumber(slPriceInput);
@@ -85,18 +84,17 @@ function PositionTpSlModalBody({ position, onOpenChange }: BodyProps) {
 		if (plan.errors.length > 0) return;
 
 		setSubmitError(null);
-		try {
-			const result = await placeOrder({ orders: plan.orders, grouping: plan.grouping });
-			throwIfAnyResponseError(result.response?.data?.statuses);
+		const result = await submitPlan(plan);
+		if (result.ok) {
 			onOpenChange(false);
-		} catch (err) {
-			const message = err instanceof Error ? err.message : t`Failed to update TP/SL orders`;
+		} else {
+			const message = result.error || t`Failed to update TP/SL orders`;
 			setSubmitError(message);
 			toast.error(message);
 		}
 	}
 
-	const visibleError = submitError ?? error?.message;
+	const visibleError = submitError;
 
 	return (
 		<>

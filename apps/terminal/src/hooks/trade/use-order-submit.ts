@@ -2,8 +2,8 @@ import { t } from "@lingui/core/macro";
 import { type LimitTif, type OrderType, TWAP_MINUTES_MAX, TWAP_MINUTES_MIN } from "@/config/trade";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
+import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { useExchange } from "@/lib/hyperliquid";
-import { deriveOrderOutcome, extractStatusErrors } from "@/lib/trade/extract-order-status";
 import { clampInt, isPositive } from "@/lib/trade/numbers";
 import type { Side } from "@/lib/trade/types";
 import { useOrderEntryActions } from "@/stores/use-order-entry-store";
@@ -42,7 +42,7 @@ export interface OrderSubmitInput {
 }
 
 interface UseOrderSubmitResult {
-	handleSubmit: (input: OrderSubmitInput) => Promise<void>;
+	handleSubmit: (input: OrderSubmitInput) => Promise<boolean>;
 	isSubmitting: boolean;
 }
 
@@ -57,14 +57,14 @@ function getQueueOrderType(input: OrderSubmitInput): QueueOrderType {
 }
 
 export function useOrderSubmit(): UseOrderSubmitResult {
-	const { mutateAsync: placeOrder, isPending: isSubmittingOrder } = useExchange("order");
+	const { submitPlan, isSubmitting: isSubmittingOrder } = useSubmitPlan();
 	const { mutateAsync: placeTwapOrder, isPending: isSubmittingTwap } = useExchange("twapOrder");
 	const { addOrder, updateOrder } = useOrderQueueActions();
 	const { resetForm } = useOrderEntryActions();
 
 	const isSubmitting = isSubmittingOrder || isSubmittingTwap;
 
-	async function handleSubmit(input: OrderSubmitInput) {
+	async function handleSubmit(input: OrderSubmitInput): Promise<boolean> {
 		const {
 			market,
 			baseToken,
@@ -123,6 +123,8 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 				});
 				throwIfResponseError(result.response?.data?.status);
 				updateOrder(orderId, { status: "success", outcome: "twapStarted" });
+				resetForm();
+				return true;
 			} else {
 				const plan = buildOrderPlan({
 					kind: "entry",
@@ -147,28 +149,20 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 					slPriceNum,
 				});
 
-				if (plan.errors.length > 0) {
-					updateOrder(orderId, { status: "failed", error: plan.errors.join("; ") });
-					return;
-				}
+				const result = await submitPlan(plan);
 
-				const result = await placeOrder({ orders: plan.orders, grouping: plan.grouping });
-				const statuses = result.response?.data?.statuses ?? [];
-				const errors = extractStatusErrors(statuses);
-
-				if (errors.length > 0) {
-					updateOrder(orderId, { status: "failed", error: errors.join("; ") });
-				} else if (statuses.length === 0) {
-					updateOrder(orderId, { status: "failed", error: t`No response from exchange` });
+				if (result.ok) {
+					updateOrder(orderId, { status: "success", outcome: result.outcome });
 				} else {
-					updateOrder(orderId, { status: "success", outcome: deriveOrderOutcome(statuses) });
+					updateOrder(orderId, { status: "failed", error: result.error });
 				}
+				resetForm();
+				return result.ok;
 			}
-
-			resetForm();
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : t`Order failed`;
 			updateOrder(orderId, { status: "failed", error: errorMessage });
+			return false;
 		}
 	}
 

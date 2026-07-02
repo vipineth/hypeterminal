@@ -6,18 +6,17 @@ import { NumberInput } from "@/components/ui/number-input";
 import { PriceInput } from "@/components/ui/price-input";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/app";
 import { ARBITRUM_CHAIN_ID } from "@/config/contracts";
-import { BPS_PER_UNIT, SIZE_PERCENT_OPTIONS } from "@/config/trade";
+import { SIZE_PERCENT_OPTIONS } from "@/config/trade";
 import { UI_TEXT } from "@/config/ui-text";
 import { get24hChange } from "@/domain/market";
 import { getLiquidationInfo } from "@/domain/trade/order/metrics";
 import { getSliderValue } from "@/domain/trade/order/size";
-import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
 import { useFeeRates } from "@/hooks/trade/use-fee-rates";
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
+import { useOrderSubmit } from "@/hooks/trade/use-order-submit";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatToken, formatUSD } from "@/lib/format";
-import { useAgentRegistration, useAgentStatus, useExchange, useSelectedMarketInfo } from "@/lib/hyperliquid";
-import { deriveOrderOutcome } from "@/lib/trade/extract-order-status";
+import { useAgentRegistration, useAgentStatus, useSelectedMarketInfo } from "@/lib/hyperliquid";
 import type { MarginMode } from "@/lib/trade/margin-mode";
 import { toNumberOrZero } from "@/lib/trade/numbers";
 import {
@@ -33,7 +32,6 @@ import { useDepositModalActions, useSettingsDialogActions } from "@/stores/use-g
 import { useMarketOrderSlippageBps, useMarketOrderSlippagePercent } from "@/stores/use-global-settings-store";
 import { useMarketActions } from "@/stores/use-market-store";
 import { useOrderEntryActions, useOrderSide, useOrderType } from "@/stores/use-order-entry-store";
-import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
 import { TokenSelector } from "../chart/token-selector";
 import { WalletModal } from "../components/wallet-modal";
@@ -73,7 +71,6 @@ export function MobileTradeView({ className }: Props) {
 	const slippageBps = useMarketOrderSlippageBps();
 	const slippagePercent = useMarketOrderSlippagePercent();
 
-	const { addOrder, updateOrder } = useOrderQueueActions();
 	const selectedPrice = useSelectedPrice();
 
 	const orderType = useOrderType();
@@ -95,7 +92,7 @@ export function MobileTradeView({ className }: Props) {
 	const { open: openDepositModal } = useDepositModalActions();
 	const { open: openSettingsDialog } = useSettingsDialogActions();
 
-	const { mutateAsync: placeOrder, isPending: isSubmitting } = useExchange("order");
+	const { handleSubmit: submitOrder, isSubmitting } = useOrderSubmit();
 
 	const usesLimitPrice = usesLimitPriceForOrder(orderType);
 	const isMarketExecution = orderType === "market" || isTakerOrderType(orderType);
@@ -219,51 +216,36 @@ export function MobileTradeView({ className }: Props) {
 		if (!validation.canSubmit || isSubmitting) return;
 		if (!market || !baseToken || typeof market.assetId !== "number") return;
 
-		let orderPrice = price;
-		if (isMarketExecution) {
-			const slip = slippageBps / BPS_PER_UNIT;
-			orderPrice = side === "buy" ? markPx * (1 + slip) : markPx * (1 - slip);
-		}
-
-		const szDecimals = market.szDecimals ?? 0;
-		const formattedPrice = formatPriceForOrder(orderPrice);
-		const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
-
-		const orderId = addOrder({
-			market: baseToken,
+		const succeeded = await submitOrder({
+			market: { assetId: market.assetId, szDecimals: market.szDecimals },
+			baseToken,
 			side,
-			size: formattedSize,
-			price: formattedPrice,
 			orderType: isMarketExecution ? "market" : "limit",
-			status: "pending",
+			sizeValue,
+			price,
+			markPx,
+			slippageBps,
+			reduceOnly,
+			tif: "Gtc",
+			limitPriceInput,
+			triggerPriceInput: "",
+			scaleStartPriceInput: "",
+			scaleEndPriceInput: "",
+			scaleLevelsNum: null,
+			twapMinutesNum: null,
+			twapRandomize: false,
+			tpSlEnabled: false,
+			canUseTpSl: false,
+			tpPriceNum: null,
+			slPriceNum: null,
+			twapOrder: false,
+			scaleOrder: false,
+			triggerOrder: false,
 		});
 
-		try {
-			const result = await placeOrder({
-				orders: [
-					{
-						a: market.assetId,
-						b: side === "buy",
-						p: formattedPrice,
-						s: formattedSize,
-						r: reduceOnly,
-						t: isMarketExecution ? { limit: { tif: "FrontendMarket" as const } } : { limit: { tif: "Gtc" as const } },
-					},
-				],
-				grouping: "na",
-			});
-
-			const statuses = result.response?.data?.statuses ?? [];
-			throwIfResponseError(statuses[0]);
-
-			updateOrder(orderId, { status: "success", outcome: deriveOrderOutcome(statuses) });
+		if (succeeded) {
 			setSizeInput("");
 			setLimitPriceInput("");
-		} catch (error) {
-			updateOrder(orderId, {
-				status: "failed",
-				error: error instanceof Error ? error.message : ORDER_TEXT.ORDER_ERROR_FALLBACK,
-			});
 		}
 	}
 

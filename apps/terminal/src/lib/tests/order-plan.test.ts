@@ -1,0 +1,221 @@
+import { describe, expect, it } from "vitest";
+import { getExecutedPrice } from "@/domain/trade/order/price";
+import { buildOrderPlan } from "@/domain/trade/order-intent";
+import { buildOrders } from "@/domain/trade/orders";
+import { interpretOrderStatuses, NO_EXCHANGE_RESPONSE } from "@/lib/trade/extract-order-status";
+
+const ENTRY_BASE = {
+	kind: "entry" as const,
+	assetId: 0,
+	side: "buy" as const,
+	orderType: "market" as const,
+	sizeValue: 1.5,
+	szDecimals: 3,
+	markPx: 100,
+	price: 100,
+	slippageBps: 50,
+	reduceOnly: false,
+	tif: "Gtc" as const,
+	limitPriceInput: "",
+	triggerPriceInput: "",
+	scaleStartPriceInput: "",
+	scaleEndPriceInput: "",
+	scaleLevelsNum: null,
+	tpSlEnabled: false,
+	canUseTpSl: false,
+	tpPriceNum: null,
+	slPriceNum: null,
+};
+
+describe("getExecutedPrice (characterization)", () => {
+	it("applies positive slippage for market buy", () => {
+		expect(getExecutedPrice("market", "buy", 100, 50, 100)).toBe(100.5);
+	});
+	it("applies negative slippage for market sell", () => {
+		expect(getExecutedPrice("market", "sell", 100, 50, 100)).toBe(99.5);
+	});
+	it("returns the limit price unchanged for non-market orders", () => {
+		expect(getExecutedPrice("limit", "buy", 100, 50, 105)).toBe(105);
+		expect(getExecutedPrice("limit", "sell", 100, 50, 105)).toBe(105);
+	});
+	it("returns mark price when slippage is zero", () => {
+		expect(getExecutedPrice("market", "buy", 100, 0, 100)).toBe(100);
+	});
+});
+
+describe("buildOrderPlan entry (characterization)", () => {
+	it("builds a market buy with FrontendMarket tif and slippage-adjusted price", () => {
+		const plan = buildOrderPlan(ENTRY_BASE);
+		expect(plan).toEqual({
+			orders: [{ a: 0, b: true, p: "100.5", s: "1.5", r: false, t: { limit: { tif: "FrontendMarket" } } }],
+			grouping: "na",
+			errors: [],
+			warnings: [],
+		});
+	});
+
+	it("builds a limit sell at the exact limit price with the chosen tif", () => {
+		const plan = buildOrderPlan({ ...ENTRY_BASE, side: "sell", orderType: "limit", price: 105, tif: "Gtc" });
+		expect(plan.orders).toEqual([{ a: 0, b: false, p: "105", s: "1.5", r: false, t: { limit: { tif: "Gtc" } } }]);
+		expect(plan.grouping).toBe("na");
+	});
+
+	it("attaches a reduce-only tp trigger and switches grouping to normalTpsl", () => {
+		const plan = buildOrderPlan({ ...ENTRY_BASE, tpSlEnabled: true, canUseTpSl: true, tpPriceNum: 110 });
+		expect(plan.orders).toEqual([
+			{ a: 0, b: true, p: "100.5", s: "1.5", r: false, t: { limit: { tif: "FrontendMarket" } } },
+			{ a: 0, b: false, p: "110", s: "1.5", r: true, t: { trigger: { isMarket: true, triggerPx: "110", tpsl: "tp" } } },
+		]);
+		expect(plan.grouping).toBe("normalTpsl");
+	});
+
+	it("builds scale orders evenly spaced across the price range", () => {
+		const plan = buildOrderPlan({
+			...ENTRY_BASE,
+			orderType: "scale",
+			sizeValue: 3,
+			scaleStartPriceInput: "100",
+			scaleEndPriceInput: "110",
+			scaleLevelsNum: 3,
+		});
+		expect(plan.orders.map((o) => o.p)).toEqual(["100", "105", "110"]);
+		expect(plan.orders.every((o) => o.s === "1")).toBe(true);
+		expect(plan.grouping).toBe("na");
+	});
+
+	it("builds a stop-market trigger with isMarket and sl tpsl", () => {
+		const plan = buildOrderPlan({
+			...ENTRY_BASE,
+			orderType: "stopMarket",
+			triggerPriceInput: "95",
+		});
+		expect(plan.orders).toEqual([
+			{ a: 0, b: true, p: "95", s: "1.5", r: true, t: { trigger: { isMarket: true, triggerPx: "95", tpsl: "sl" } } },
+		]);
+	});
+});
+
+describe("buildOrderPlan close/reverse/tpsl (characterization)", () => {
+	it("market-closes a long as a reduce-only sell at slippage-adjusted price", () => {
+		const plan = buildOrderPlan({
+			kind: "marketClose",
+			assetId: 0,
+			size: 1.5,
+			szDecimals: 3,
+			isLong: true,
+			markPx: 100,
+			slippageBps: 50,
+		});
+		expect(plan.orders).toEqual([
+			{ a: 0, b: false, p: "99.5", s: "1.5", r: true, t: { limit: { tif: "FrontendMarket" } } },
+		]);
+		expect(plan.grouping).toBe("na");
+	});
+
+	it("reverses a long by doubling size with reduceOnly false", () => {
+		const plan = buildOrderPlan({
+			kind: "reverse",
+			assetId: 0,
+			size: 1.5,
+			szDecimals: 3,
+			isLong: true,
+			markPx: 100,
+			slippageBps: 50,
+		});
+		expect(plan.orders).toEqual([
+			{ a: 0, b: false, p: "99.5", s: "3", r: false, t: { limit: { tif: "FrontendMarket" } } },
+		]);
+	});
+
+	it("limit-closes a short as a reduce-only buy at Gtc", () => {
+		const plan = buildOrderPlan({
+			kind: "limitClose",
+			assetId: 0,
+			size: 1.5,
+			szDecimals: 3,
+			isLong: false,
+			price: 100,
+		});
+		expect(plan.orders).toEqual([{ a: 0, b: true, p: "100", s: "1.5", r: true, t: { limit: { tif: "Gtc" } } }]);
+	});
+
+	it("builds position tp+sl triggers with zero size and positionTpsl grouping", () => {
+		const plan = buildOrderPlan({
+			kind: "positionTpsl",
+			assetId: 0,
+			isLong: true,
+			tpPriceNum: 110,
+			slPriceNum: 90,
+		});
+		expect(plan.orders).toEqual([
+			{ a: 0, b: false, p: "110", s: "0", r: true, t: { trigger: { isMarket: true, triggerPx: "110", tpsl: "tp" } } },
+			{ a: 0, b: false, p: "90", s: "0", r: true, t: { trigger: { isMarket: true, triggerPx: "90", tpsl: "sl" } } },
+		]);
+		expect(plan.grouping).toBe("positionTpsl");
+	});
+
+	it("reports an error when position tpsl has no prices", () => {
+		const plan = buildOrderPlan({ kind: "positionTpsl", assetId: 0, isLong: true, tpPriceNum: null, slPriceNum: null });
+		expect(plan.orders).toEqual([]);
+		expect(plan.errors.length).toBeGreaterThan(0);
+	});
+});
+
+describe("interpretOrderStatuses (unified result handling)", () => {
+	it("treats a status-level error as a failure (the positions-tab bug this fixes)", () => {
+		expect(interpretOrderStatuses([{ error: "Insufficient margin" }])).toEqual({
+			ok: false,
+			error: "Insufficient margin",
+		});
+	});
+
+	it("joins multiple status errors", () => {
+		expect(interpretOrderStatuses([{ error: "a" }, { error: "b" }])).toEqual({ ok: false, error: "a; b" });
+	});
+
+	it("fails an empty response instead of reporting silent success", () => {
+		expect(interpretOrderStatuses([])).toEqual({ ok: false, error: NO_EXCHANGE_RESPONSE });
+	});
+
+	it("reports filled and resting outcomes", () => {
+		expect(interpretOrderStatuses([{ filled: { totalSz: "1" } }])).toEqual({ ok: true, outcome: "filled" });
+		expect(interpretOrderStatuses([{ resting: { oid: 1 } }])).toEqual({ ok: true, outcome: "resting" });
+		expect(interpretOrderStatuses(["waitingForFill"])).toEqual({ ok: true, outcome: "resting" });
+		expect(interpretOrderStatuses(["waitingForTrigger"])).toEqual({ ok: true, outcome: "triggerSet" });
+	});
+
+	it("lets any error win over a resting sibling", () => {
+		expect(interpretOrderStatuses([{ resting: { oid: 1 } }, { error: "rejected" }])).toEqual({
+			ok: false,
+			error: "rejected",
+		});
+	});
+});
+
+describe("buildOrders grouping (characterization)", () => {
+	it("returns na grouping for a plain market order", () => {
+		const result = buildOrders({
+			assetId: 0,
+			side: "buy",
+			orderType: "market",
+			sizeValue: 1.5,
+			szDecimals: 3,
+			markPx: 100,
+			price: 100,
+			slippageBps: 50,
+			reduceOnly: false,
+			tif: "Gtc",
+			limitPriceInput: "",
+			triggerPriceInput: "",
+			scaleStartPriceInput: "",
+			scaleEndPriceInput: "",
+			scaleLevelsNum: null,
+			tpSlEnabled: false,
+			canUseTpSl: false,
+			tpPriceNum: null,
+			slPriceNum: null,
+		});
+		expect(result.grouping).toBe("na");
+		expect(result.orders).toHaveLength(1);
+	});
+});

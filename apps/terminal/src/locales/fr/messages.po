@@ -106,7 +106,7 @@ msgstr ""
 
 #: src/components/trade/positions/balances-tab.tsx:269
 #: src/components/trade/positions/orders-tab.tsx:278
-#: src/components/trade/positions/positions-tab.tsx:222
+#: src/components/trade/positions/positions-tab.tsx:218
 #: src/components/trade/positions/twap-tab.tsx:114
 msgid "Actions"
 msgstr "Actions"
@@ -119,7 +119,7 @@ msgstr "actif"
 #~ msgid "Active"
 #~ msgstr "Actif"
 
-#: src/components/trade/mobile/mobile-positions-tab.tsx:166
+#: src/components/trade/mobile/mobile-positions-tab.tsx:161
 msgid "Active Positions"
 msgstr "Positions actives"
 
@@ -213,7 +213,7 @@ msgstr ""
 #: src/components/trade/positions/history-tab.tsx:79
 #: src/components/trade/positions/orders-history-tab.tsx:77
 #: src/components/trade/positions/orders-tab.tsx:251
-#: src/components/trade/positions/positions-tab.tsx:175
+#: src/components/trade/positions/positions-tab.tsx:171
 #: src/components/trade/positions/twap-tab.tsx:77
 msgid "Asset"
 msgstr "Actif"
@@ -224,7 +224,7 @@ msgstr "Actif"
 
 #: src/components/trade/mobile/mobile-balances-tab.tsx:150
 #: src/components/trade/positions/balances-tab.tsx:241
-#: src/components/trade/positions/position-limit-close-modal.tsx:165
+#: src/components/trade/positions/position-limit-close-modal.tsx:163
 #: src/components/trade/positions/transfer-modal.tsx:147
 #: src/components/trade/tradebox/trade-form-fields.tsx:128
 msgid "Available"
@@ -366,8 +366,8 @@ msgstr ""
 #: src/components/trade/mobile/mobile-position-card.tsx:185
 #: src/components/trade/mobile/mobile-twap-tab.tsx:110
 #: src/components/trade/positions/orders-tab.tsx:399
-#: src/components/trade/positions/position-limit-close-modal.tsx:202
-#: src/components/trade/positions/position-tpsl-modal.tsx:172
+#: src/components/trade/positions/position-limit-close-modal.tsx:200
+#: src/components/trade/positions/position-tpsl-modal.tsx:170
 #: src/components/trade/positions/twap-tab.tsx:193
 #: src/components/trade/tradebox/deposit-modal.tsx:149
 #: src/components/trade/tradebox/deposit-modal.tsx:204
@@ -478,7 +478,7 @@ msgstr "Fermeture..."
 #~ msgid "completed"
 #~ msgstr "terminé"
 
-#: src/components/trade/positions/position-tpsl-modal.tsx:181
+#: src/components/trade/positions/position-tpsl-modal.tsx:179
 #: src/components/trade/tradebox/bridge/confirmation-screen.tsx:162
 #: src/components/trade/tradebox/leverage-control.tsx:213
 #: src/components/trade/tradebox/leverage-control.tsx:227
@@ -543,7 +543,7 @@ msgstr ""
 #: src/components/trade/header/user-menu.tsx:73
 #: src/components/trade/mobile/mobile-account-view.tsx:69
 #: src/components/trade/mobile/mobile-account-view.tsx:75
-#: src/components/trade/mobile/mobile-nav-drawer.tsx:143
+#: src/components/trade/mobile/mobile-nav-drawer.tsx:146
 #: src/lib/trade/use-button-content.ts:48
 msgid "Connect Wallet"
 msgstr "Connecter le portefeuille"
@@ -592,8 +592,8 @@ msgstr "Connectez votre portefeuille pour voir les ordres ouverts."
 msgid "Connect your wallet to view order history."
 msgstr ""
 
-#: src/components/trade/mobile/mobile-positions-tab.tsx:128
-#: src/components/trade/positions/positions-tab.tsx:137
+#: src/components/trade/mobile/mobile-positions-tab.tsx:123
+#: src/components/trade/positions/positions-tab.tsx:133
 msgid "Connect your wallet to view positions."
 msgstr "Connectez votre portefeuille pour voir les positions."
 
@@ -779,8 +779,8 @@ msgstr ""
 msgid "Default"
 msgstr ""
 
-#: src/components/trade/header/top-nav.tsx:99
-#: src/components/trade/mobile/mobile-nav-drawer.tsx:132
+#: src/components/trade/header/top-nav.tsx:101
+#: src/components/trade/mobile/mobile-nav-drawer.tsx:135
 #: src/components/trade/tradebox/account-panel.tsx:163
 #: src/components/trade/tradebox/account-panel.tsx:166
 #: src/components/trade/tradebox/deposit-modal.tsx:119
@@ -949,12 +949,12 @@ msgid "Enter trigger price"
 msgstr ""
 
 #: src/components/trade/mobile/mobile-position-card.tsx:159
-#: src/components/trade/positions/positions-tab.tsx:192
+#: src/components/trade/positions/positions-tab.tsx:188
 msgid "Entry"
 msgstr "Entrée"
 
-#: src/components/trade/positions/position-limit-close-modal.tsx:122
-#: src/components/trade/positions/position-tpsl-modal.tsx:125
+#: src/components/trade/positions/position-limit-close-modal.tsx:120
+#: src/components/trade/positions/position-tpsl-modal.tsx:123
 msgid "Entry Price"
 msgstr ""
 
@@ -976,7 +976,7 @@ msgstr "Frais est."
 #~ msgid "Est. P&L"
 #~ msgstr ""
 
-#: src/components/trade/positions/position-limit-close-modal.tsx:187
+#: src/components/trade/positions/position-limit-close-modal.tsx:185
 msgid "Est. P&L at Limit"
 msgstr ""
 
@@ -1023,7 +1023,7 @@ msgstr ""
 msgid "failed"
 msgstr "échoué"
 
-#: src/components/trade/mobile/mobile-positions-tab.tsx:94
+#: src/components/trade/mobile/mobile-positions-tab.tsx:92
 #: src/components/trade/positions/positions-tab.tsx:94
 msgid "Failed to close position"
 msgstr ""
@@ -1072,8 +1072,8 @@ msgstr "Échec du chargement du carnet d'ordres."
 msgid "Failed to load order history."
 msgstr ""
 
-#: src/components/trade/mobile/mobile-positions-tab.tsx:136
-#: src/components/trade/positions/positions-tab.tsx:142
+#: src/components/trade/mobile/mobile-positions-tab.tsx:131
+#: src/components/trade/positions/positions-tab.tsx:138
 msgid "Failed to load positions."
 msgstr "Échec du chargement des positions."
 
@@ -1090,7 +1090,7 @@ msgstr "Échec du chargement des transactions."
 #~ msgid "Failed to load TWAP history."
 #~ msgstr "Échec du chargement de l'historique TWAP."
 
-#: src/components/trade/positions/position-limit-close-modal.tsx:93
+#: src/components/trade/positions/position-limit-close-modal.tsx:91
 msgid "Failed to place limit close order"
 msgstr ""
 
@@ -1106,7 +1106,7 @@ msgstr ""
 #~ msgid "Failed to switch margin mode"
 #~ msgstr ""
 
-#: src/components/trade/positions/position-tpsl-modal.tsx:93
+#: src/components/trade/positions/position-tpsl-modal.tsx:91
 msgid "Failed to update TP/SL orders"
 msgstr ""
 
@@ -1161,7 +1161,7 @@ msgstr ""
 msgid "Frequency"
 msgstr ""
 
-#: src/components/trade/components/spot-swap-modal.tsx:215
+#: src/components/trade/components/spot-swap-modal.tsx:212
 #: src/components/trade/tradebox/deposit/deposit-form.tsx:27
 msgid "From"
 msgstr ""
@@ -1173,7 +1173,7 @@ msgstr ""
 #: src/components/trade/chart/token-selector-columns.ts:82
 #: src/components/trade/chart/token-selector-content.tsx:23
 #: src/components/trade/mobile/mobile-position-card.tsx:172
-#: src/components/trade/positions/positions-tab.tsx:201
+#: src/components/trade/positions/positions-tab.tsx:197
 msgid "Funding"
 msgstr "Financement"
 
@@ -1206,7 +1206,7 @@ msgstr ""
 #~ msgid "Go to previous page"
 #~ msgstr "Aller à la page précédente"
 
-#: src/components/trade/mobile/mobile-positions-tab.tsx:155
+#: src/components/trade/mobile/mobile-positions-tab.tsx:150
 msgid "Go to Trade"
 msgstr ""
 
@@ -1268,7 +1268,7 @@ msgstr ""
 #~ msgid "Insufficient {fromTokenDisplay} balance"
 #~ msgstr ""
 
-#: src/components/trade/components/spot-swap-modal.tsx:298
+#: src/components/trade/components/spot-swap-modal.tsx:295
 msgid "Insufficient <0/> balance"
 msgstr ""
 
@@ -1311,7 +1311,7 @@ msgstr "Isolé"
 #~ msgid "Latency:"
 #~ msgstr "Latence :"
 
-#: src/config/nav.tsx:67
+#: src/config/nav.tsx:73
 msgid "Leaderboard"
 msgstr "Classement"
 
@@ -1340,15 +1340,15 @@ msgstr "Limite"
 
 #: src/components/trade/mobile/mobile-position-card.tsx:233
 #: src/components/trade/positions/position-actions-dropdown.tsx:32
-#: src/components/trade/positions/position-limit-close-modal.tsx:109
+#: src/components/trade/positions/position-limit-close-modal.tsx:107
 msgid "Limit Close"
 msgstr ""
 
-#: src/components/trade/positions/position-limit-close-modal.tsx:90
+#: src/components/trade/positions/position-limit-close-modal.tsx:88
 msgid "Limit close order placed"
 msgstr ""
 
-#: src/components/trade/positions/position-limit-close-modal.tsx:148
+#: src/components/trade/positions/position-limit-close-modal.tsx:146
 #: src/components/trade/tradebox/trade-form-fields.tsx:189
 msgid "Limit Price"
 msgstr "Prix limite"
@@ -1371,7 +1371,7 @@ msgid "Link mobile device"
 msgstr ""
 
 #: src/components/trade/mobile/mobile-position-card.tsx:168
-#: src/components/trade/positions/positions-tab.tsx:198
+#: src/components/trade/positions/positions-tab.tsx:194
 msgid "Liq"
 msgstr "Liq."
 
@@ -1412,7 +1412,7 @@ msgstr "Chargement des ordres ouverts..."
 msgid "Loading order history..."
 msgstr ""
 
-#: src/components/trade/positions/positions-tab.tsx:138
+#: src/components/trade/positions/positions-tab.tsx:134
 msgid "Loading positions..."
 msgstr "Chargement des positions..."
 
@@ -1441,7 +1441,7 @@ msgstr "Achat"
 #~ msgid "Long {0} position"
 #~ msgstr ""
 
-#: src/components/trade/positions/position-tpsl-modal.tsx:111
+#: src/components/trade/positions/position-tpsl-modal.tsx:109
 msgid "Long position"
 msgstr ""
 
@@ -1470,7 +1470,7 @@ msgstr ""
 msgid "Maintenance Margin"
 msgstr ""
 
-#: src/components/trade/positions/position-tpsl-modal.tsx:104
+#: src/components/trade/positions/position-tpsl-modal.tsx:102
 msgid "Manage TP/SL"
 msgstr ""
 
@@ -1479,12 +1479,12 @@ msgstr ""
 #~ msgstr ""
 
 #. placeholder {0}: position.coin
-#: src/components/trade/positions/position-tpsl-modal.tsx:190
+#: src/components/trade/positions/position-tpsl-modal.tsx:188
 msgid "Manage TP/SL for {0} long position"
 msgstr ""
 
 #. placeholder {0}: position.coin
-#: src/components/trade/positions/position-tpsl-modal.tsx:191
+#: src/components/trade/positions/position-tpsl-modal.tsx:189
 msgid "Manage TP/SL for {0} short position"
 msgstr ""
 
@@ -1493,7 +1493,7 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/trade/mobile/mobile-position-card.tsx:164
-#: src/components/trade/positions/positions-tab.tsx:189
+#: src/components/trade/positions/positions-tab.tsx:185
 msgid "Margin"
 msgstr ""
 
@@ -1527,7 +1527,7 @@ msgstr "Marge req."
 #~ msgstr "Marge utilisée"
 
 #: src/components/trade/mobile/mobile-position-card.tsx:160
-#: src/components/trade/positions/positions-tab.tsx:195
+#: src/components/trade/positions/positions-tab.tsx:191
 msgid "Mark"
 msgstr "Mark"
 
@@ -1535,8 +1535,8 @@ msgstr "Mark"
 #~ msgid "MARK"
 #~ msgstr "MARQUE"
 
-#: src/components/trade/positions/position-limit-close-modal.tsx:128
-#: src/components/trade/positions/position-tpsl-modal.tsx:131
+#: src/components/trade/positions/position-limit-close-modal.tsx:126
+#: src/components/trade/positions/position-tpsl-modal.tsx:129
 msgid "Mark Price"
 msgstr ""
 
@@ -1577,7 +1577,7 @@ msgid "markets"
 msgstr "marchés"
 
 #: src/components/trade/chart/token-selector-content.tsx:235
-#: src/components/trade/mobile/mobile-nav-drawer.tsx:81
+#: src/components/trade/mobile/mobile-nav-drawer.tsx:84
 msgid "Markets"
 msgstr ""
 
@@ -1716,8 +1716,8 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-positions-tab.tsx:147
-#: src/components/trade/positions/positions-tab.tsx:146
+#: src/components/trade/mobile/mobile-positions-tab.tsx:142
+#: src/components/trade/positions/positions-tab.tsx:142
 msgid "No active positions."
 msgstr "Aucune position active."
 
@@ -1784,8 +1784,8 @@ msgid "No order history found."
 msgstr ""
 
 #: src/hooks/trade/use-order-submit.ts:162
-msgid "No response from exchange"
-msgstr ""
+#~ msgid "No response from exchange"
+#~ msgstr ""
 
 #: src/components/trade/tradebox/bridge/confirmation-screen.tsx:143
 msgid "No route available. Try a different amount or asset."
@@ -1807,7 +1807,7 @@ msgstr ""
 #~ msgid "No trading pair available for {fromTokenDisplay}/{toTokenDisplay}"
 #~ msgstr ""
 
-#: src/components/trade/components/spot-swap-modal.tsx:309
+#: src/components/trade/components/spot-swap-modal.tsx:306
 msgid "No trading pair available for <0/>/<1/>"
 msgstr ""
 
@@ -1927,7 +1927,8 @@ msgstr "Carnet d'ordres"
 msgid "Order book in quote asset"
 msgstr ""
 
-#: src/hooks/trade/use-order-submit.ts:170
+#: src/hooks/trade/use-order-submit.ts:163
+#: src/hooks/trade/use-submit-plan.ts:24
 msgid "Order failed"
 msgstr "Ordre échoué"
 
@@ -1982,6 +1983,10 @@ msgstr ""
 #: src/components/trade/components/wallet-dialog.tsx:
 #~ msgid "Other Options"
 #~ msgstr ""
+
+#: src/config/nav.tsx:58
+msgid "Outcome"
+msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:614
 msgid "Owner account"
@@ -2111,7 +2116,7 @@ msgstr ""
 msgid "Place {0} Order"
 msgstr ""
 
-#: src/components/trade/positions/position-limit-close-modal.tsx:211
+#: src/components/trade/positions/position-limit-close-modal.tsx:209
 msgid "Place Limit Close"
 msgstr ""
 
@@ -2119,7 +2124,7 @@ msgstr ""
 msgid "Placed"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-nav-drawer.tsx:103
+#: src/components/trade/mobile/mobile-nav-drawer.tsx:106
 msgid "Platform"
 msgstr ""
 
@@ -2129,7 +2134,7 @@ msgstr ""
 
 #: src/components/trade/positions/balances-tab.tsx:262
 #: src/components/trade/positions/history-tab.tsx:110
-#: src/components/trade/positions/positions-tab.tsx:208
+#: src/components/trade/positions/positions-tab.tsx:204
 msgid "PNL"
 msgstr "PNL"
 
@@ -2141,7 +2146,7 @@ msgstr ""
 #~ msgid "Popular"
 #~ msgstr ""
 
-#: src/config/nav.tsx:65
+#: src/config/nav.tsx:71
 msgid "Portfolio"
 msgstr "Portefeuille"
 
@@ -2164,7 +2169,7 @@ msgstr ""
 #~ msgid "Position closed"
 #~ msgstr ""
 
-#: src/components/trade/mobile/mobile-positions-tab.tsx:90
+#: src/components/trade/mobile/mobile-positions-tab.tsx:88
 #: src/components/trade/positions/positions-tab.tsx:93
 msgid "Position closed — {coin}"
 msgstr ""
@@ -2177,7 +2182,7 @@ msgstr ""
 msgid "Position reversed — {coin}"
 msgstr ""
 
-#: src/components/trade/positions/positions-tab.tsx:157
+#: src/components/trade/positions/positions-tab.tsx:153
 msgid "positions"
 msgstr ""
 
@@ -2245,7 +2250,7 @@ msgstr ""
 msgid "Randomize timing"
 msgstr ""
 
-#: src/components/trade/components/spot-swap-modal.tsx:272
+#: src/components/trade/components/spot-swap-modal.tsx:269
 #: src/components/trade/mobile/mobile-funding-tab.tsx:104
 #: src/components/trade/positions/funding-tab.tsx:91
 msgid "Rate"
@@ -2464,7 +2469,7 @@ msgstr "Sélectionner l'ordre"
 msgid "Select token"
 msgstr "Sélectionner le jeton"
 
-#: src/components/trade/components/spot-swap-modal.tsx:206
+#: src/components/trade/components/spot-swap-modal.tsx:203
 msgid "Select tokens to swap"
 msgstr ""
 
@@ -2539,7 +2544,7 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/trade/components/global-settings-modal.tsx:76
-#: src/components/trade/header/top-nav.tsx:111
+#: src/components/trade/header/top-nav.tsx:113
 msgid "Settings"
 msgstr "Paramètres"
 
@@ -2551,7 +2556,7 @@ msgstr "Vente"
 #~ msgid "Short {0} position"
 #~ msgstr ""
 
-#: src/components/trade/positions/position-tpsl-modal.tsx:111
+#: src/components/trade/positions/position-tpsl-modal.tsx:109
 msgid "Short position"
 msgstr ""
 
@@ -2633,17 +2638,17 @@ msgstr "Signataire non prêt"
 #: src/components/trade/positions/history-tab.tsx:96
 #: src/components/trade/positions/orders-history-tab.tsx:94
 #: src/components/trade/positions/orders-tab.tsx:268
-#: src/components/trade/positions/position-limit-close-modal.tsx:116
-#: src/components/trade/positions/position-limit-close-modal.tsx:162
-#: src/components/trade/positions/position-tpsl-modal.tsx:119
-#: src/components/trade/positions/positions-tab.tsx:182
+#: src/components/trade/positions/position-limit-close-modal.tsx:114
+#: src/components/trade/positions/position-limit-close-modal.tsx:160
+#: src/components/trade/positions/position-tpsl-modal.tsx:117
+#: src/components/trade/positions/positions-tab.tsx:178
 #: src/components/trade/positions/twap-tab.tsx:84
 #: src/components/trade/tradebox/order-toast.tsx:103
 #: src/components/trade/tradebox/trade-form-fields.tsx:211
 msgid "Size"
 msgstr "Taille"
 
-#: src/components/trade/positions/position-limit-close-modal.tsx:180
+#: src/components/trade/positions/position-limit-close-modal.tsx:178
 msgid "Size exceeds position"
 msgstr ""
 
@@ -2655,12 +2660,12 @@ msgstr ""
 #~ msgid "SL"
 #~ msgstr ""
 
-#: src/components/trade/positions/position-tpsl-modal.tsx:72
+#: src/components/trade/positions/position-tpsl-modal.tsx:71
 #: src/lib/errors/definitions/tpsl.ts:49
 msgid "SL must be above entry"
 msgstr ""
 
-#: src/components/trade/positions/position-tpsl-modal.tsx:72
+#: src/components/trade/positions/position-tpsl-modal.tsx:71
 #: src/lib/errors/definitions/tpsl.ts:49
 msgid "SL must be below entry"
 msgstr ""
@@ -2678,7 +2683,7 @@ msgid "Slippage"
 msgstr "Glissement"
 
 #: src/components/trade/components/global-settings-modal.tsx:83
-#: src/components/trade/components/spot-swap-modal.tsx:288
+#: src/components/trade/components/spot-swap-modal.tsx:285
 msgid "Slippage tolerance"
 msgstr ""
 
@@ -2686,7 +2691,7 @@ msgstr ""
 #~ msgid "Something went wrong"
 #~ msgstr "Une erreur s'est produite"
 
-#: src/components/trade/mobile/mobile-nav-drawer.tsx:112
+#: src/components/trade/mobile/mobile-nav-drawer.tsx:115
 msgid "Soon"
 msgstr ""
 
@@ -2739,7 +2744,7 @@ msgstr ""
 msgid "Spread"
 msgstr "Écart"
 
-#: src/config/nav.tsx:66
+#: src/config/nav.tsx:72
 msgid "Staking"
 msgstr "Staking"
 
@@ -2787,8 +2792,8 @@ msgstr ""
 msgid "Stop trigger must be below mark"
 msgstr ""
 
-#: src/components/trade/positions/position-limit-close-modal.tsx:208
-#: src/components/trade/positions/position-tpsl-modal.tsx:178
+#: src/components/trade/positions/position-limit-close-modal.tsx:206
+#: src/components/trade/positions/position-tpsl-modal.tsx:176
 msgid "Submitting..."
 msgstr ""
 
@@ -2800,27 +2805,27 @@ msgstr ""
 #~ msgid "Support"
 #~ msgstr "Support"
 
-#: src/components/trade/components/spot-swap-modal.tsx:200
-#: src/components/trade/components/spot-swap-modal.tsx:344
+#: src/components/trade/components/spot-swap-modal.tsx:197
+#: src/components/trade/components/spot-swap-modal.tsx:341
 #: src/components/trade/mobile/mobile-balances-tab.tsx:177
 #: src/components/trade/positions/balances-tab.tsx:179
 #: src/components/trade/tradebox/trade-form-fields.tsx:141
 msgid "Swap"
 msgstr ""
 
-#: src/components/trade/components/spot-swap-modal.tsx:243
+#: src/components/trade/components/spot-swap-modal.tsx:240
 msgid "Swap direction"
 msgstr ""
 
-#: src/components/trade/components/spot-swap-modal.tsx:185
+#: src/components/trade/components/spot-swap-modal.tsx:183
 msgid "Swap failed"
 msgstr ""
 
-#: src/components/trade/components/spot-swap-modal.tsx:328
+#: src/components/trade/components/spot-swap-modal.tsx:325
 msgid "Swap submitted"
 msgstr ""
 
-#: src/components/trade/components/spot-swap-modal.tsx:341
+#: src/components/trade/components/spot-swap-modal.tsx:338
 msgid "Swapping..."
 msgstr ""
 
@@ -3014,7 +3019,7 @@ msgstr ""
 msgid "Time In Force"
 msgstr ""
 
-#: src/components/trade/components/spot-swap-modal.tsx:250
+#: src/components/trade/components/spot-swap-modal.tsx:247
 #: src/components/trade/tradebox/deposit/withdraw-form.tsx:40
 msgid "To"
 msgstr ""
@@ -3065,12 +3070,12 @@ msgstr ""
 #~ msgid "TP"
 #~ msgstr ""
 
-#: src/components/trade/positions/position-tpsl-modal.tsx:71
+#: src/components/trade/positions/position-tpsl-modal.tsx:70
 #: src/lib/errors/definitions/tpsl.ts:35
 msgid "TP must be above entry"
 msgstr ""
 
-#: src/components/trade/positions/position-tpsl-modal.tsx:71
+#: src/components/trade/positions/position-tpsl-modal.tsx:70
 #: src/lib/errors/definitions/tpsl.ts:35
 msgid "TP must be below entry"
 msgstr ""
@@ -3084,7 +3089,7 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/trade/mobile/mobile-position-card.tsx:222
-#: src/components/trade/positions/positions-tab.tsx:215
+#: src/components/trade/positions/positions-tab.tsx:211
 #: src/components/trade/tradebox/trade-form-fields.tsx:301
 msgid "TP/SL"
 msgstr "TP/SL"
@@ -3106,7 +3111,7 @@ msgid "Trade History"
 msgstr "Historique des transactions"
 
 #. placeholder {0}: spotMarket.pairName
-#: src/components/trade/components/spot-swap-modal.tsx:204
+#: src/components/trade/components/spot-swap-modal.tsx:201
 msgid "Trade via {0} spot market"
 msgstr ""
 
@@ -3232,8 +3237,8 @@ msgstr ""
 msgid "Unknown symbol: {symbolName}"
 msgstr "Symbole inconnu : {symbolName}"
 
-#: src/components/trade/positions/position-limit-close-modal.tsx:134
-#: src/components/trade/positions/position-tpsl-modal.tsx:137
+#: src/components/trade/positions/position-limit-close-modal.tsx:132
+#: src/components/trade/positions/position-tpsl-modal.tsx:135
 msgid "Unrealized P&L"
 msgstr ""
 
@@ -3287,7 +3292,7 @@ msgstr ""
 #~ msgid "Value"
 #~ msgstr "Valeur"
 
-#: src/config/nav.tsx:64
+#: src/config/nav.tsx:70
 msgid "Vaults"
 msgstr "Coffres"
 

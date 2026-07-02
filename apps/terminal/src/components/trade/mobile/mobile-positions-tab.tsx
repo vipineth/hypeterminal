@@ -7,7 +7,8 @@ import { toast } from "sonner";
 import { useConnection } from "wagmi";
 import { FALLBACK_VALUE_PLACEHOLDER, HL_ALL_DEXS } from "@/config/app";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
-import { useExchange, useMarkets, useSubscription, useUserPositions } from "@/lib/hyperliquid";
+import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
+import { useMarkets, useSubscription, useUserPositions } from "@/lib/hyperliquid";
 import { buildClosePositionDescription } from "@/lib/trade/close-toast";
 import { buildTpSlOrdersByCoin } from "@/lib/trade/open-orders";
 import type { Side } from "@/lib/trade/types";
@@ -40,7 +41,7 @@ export function MobilePositionsTab() {
 	const [closingAssetIds, setClosingAssetIds] = useState<Set<number>>(() => new Set());
 	const [closeErrors, setCloseErrors] = useState<Map<number, string>>(() => new Map());
 
-	const { mutate: placeOrder, reset: resetCloseError } = useExchange("order");
+	const { submitPlan } = useSubmitPlan();
 	const { positions, isLoading: positionsLoading, hasError: positionsError } = useUserPositions();
 	const markets = useMarkets();
 
@@ -57,10 +58,9 @@ export function MobilePositionsTab() {
 
 	const tpSlOrdersByCoin = useMemo(() => buildTpSlOrdersByCoin(openOrders), [openOrders]);
 
-	function handleClosePosition(data: ClosePositionData) {
+	async function handleClosePosition(data: ClosePositionData) {
 		const { assetId, size, markPx, szDecimals, isLong, coin, unrealizedPnl, roe } = data;
 		if (closingAssetIds.has(assetId)) return;
-		resetCloseError();
 		setCloseErrors((prev) => {
 			if (!prev.has(assetId)) return prev;
 			const next = new Map(prev);
@@ -73,7 +73,7 @@ export function MobilePositionsTab() {
 			return next;
 		});
 
-		const { orders, grouping } = buildOrderPlan({
+		const plan = buildOrderPlan({
 			kind: "marketClose",
 			assetId,
 			size,
@@ -83,31 +83,26 @@ export function MobilePositionsTab() {
 			slippageBps,
 		});
 
-		placeOrder(
-			{ orders, grouping },
-			{
-				onSuccess: () =>
-					toast.success(t`Position closed — ${coin}`, {
-						description: buildClosePositionDescription({ size, szDecimals, coin, unrealizedPnl, roe }),
-					}),
-				onError: (error) => {
-					const message = error.message || t`Failed to close position`;
-					toast.error(message);
-					setCloseErrors((prev) => {
-						const next = new Map(prev);
-						next.set(assetId, message);
-						return next;
-					});
-				},
-				onSettled: () => {
-					setClosingAssetIds((prev) => {
-						const next = new Set(prev);
-						next.delete(assetId);
-						return next;
-					});
-				},
-			},
-		);
+		const result = await submitPlan(plan);
+		if (result.ok) {
+			toast.success(t`Position closed — ${coin}`, {
+				description: buildClosePositionDescription({ size, szDecimals, coin, unrealizedPnl, roe }),
+			});
+		} else {
+			const message = result.error || t`Failed to close position`;
+			toast.error(message);
+			setCloseErrors((prev) => {
+				const next = new Map(prev);
+				next.set(assetId, message);
+				return next;
+			});
+		}
+
+		setClosingAssetIds((prev) => {
+			const next = new Set(prev);
+			next.delete(assetId);
+			return next;
+		});
 	}
 
 	function handleOpenLimitCloseModal(data: LimitClosePositionData) {

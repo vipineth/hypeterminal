@@ -7,10 +7,10 @@ import { InfoRow } from "@/components/ui/info-row";
 import { NumberInput } from "@/components/ui/number-input";
 import { PriceInput } from "@/components/ui/price-input";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
-import { throwIfAnyResponseError } from "@/domain/trade/orders";
+import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
-import { useExchange, useSubscription } from "@/lib/hyperliquid";
+import { useSubscription } from "@/lib/hyperliquid";
 import { formatDecimalFloor, isPositive, toNumber } from "@/lib/trade/numbers";
 import { getValueColorClass } from "@/lib/ui/value-color";
 import { TradingActionButton } from "../components/trading-action-button";
@@ -48,7 +48,7 @@ function PositionLimitCloseModalBody({ position, onOpenChange }: BodyProps) {
 	const [sizeInput, setSizeInput] = useState(() => formatDecimalFloor(position.size, position.szDecimals));
 	const [submitError, setSubmitError] = useState<string | null>(null);
 
-	const { mutateAsync: placeOrder, isPending: isSubmitting, error } = useExchange("order");
+	const { submitPlan, isSubmitting } = useSubmitPlan();
 	const { data: liveCtxEvent } = useSubscription(
 		"activeAssetCtx",
 		{ coin: position.coin },
@@ -73,7 +73,7 @@ function PositionLimitCloseModalBody({ position, onOpenChange }: BodyProps) {
 	async function handleSubmit() {
 		if (!canSubmit || priceNum === null || sizeNum === null) return;
 
-		const { orders, grouping } = buildOrderPlan({
+		const plan = buildOrderPlan({
 			kind: "limitClose",
 			assetId: position.assetId,
 			size: sizeNum,
@@ -83,14 +83,12 @@ function PositionLimitCloseModalBody({ position, onOpenChange }: BodyProps) {
 		});
 
 		setSubmitError(null);
-		try {
-			const result = await placeOrder({ orders, grouping });
-			throwIfAnyResponseError(result.response?.data?.statuses);
-
+		const result = await submitPlan(plan);
+		if (result.ok) {
 			toast.success(t`Limit close order placed` + (position.coin ? ` — ${position.coin}` : ""));
 			onOpenChange(false);
-		} catch (err) {
-			const message = err instanceof Error ? err.message : t`Failed to place limit close order`;
+		} else {
+			const message = result.error || t`Failed to place limit close order`;
 			setSubmitError(message);
 			toast.error(message);
 		}
@@ -101,7 +99,7 @@ function PositionLimitCloseModalBody({ position, onOpenChange }: BodyProps) {
 	}
 
 	const priceDecimals = szDecimalsToPriceDecimals(position.szDecimals);
-	const visibleError = submitError ?? error?.message;
+	const visibleError = submitError;
 
 	return (
 		<>

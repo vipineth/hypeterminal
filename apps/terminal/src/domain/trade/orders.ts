@@ -10,9 +10,10 @@ import {
 } from "@/config/trade";
 import { getExecutedPrice } from "@/domain/trade/order/price";
 import { clampInt, formatDecimalFloor, isPositive, toBig, toSafeBig } from "@/lib/trade/numbers";
+import { isScaleOrderType, isStopOrderType, isTriggerOrderType, usesLimitPrice } from "@/lib/trade/order-types";
 import type { Side } from "@/lib/trade/types";
 
-export interface OrderBuildParams {
+export interface EntryOrderParams {
 	assetId: number;
 	side: Side;
 	orderType: OrderType;
@@ -32,10 +33,6 @@ export interface OrderBuildParams {
 	canUseTpSl: boolean;
 	tpPriceNum: number | null;
 	slPriceNum: number | null;
-	isStopOrder: boolean;
-	isTriggerOrder: boolean;
-	isScaleOrder: boolean;
-	usesLimitPriceForOrder: boolean;
 }
 
 export interface OrderBuildResult {
@@ -43,7 +40,7 @@ export interface OrderBuildResult {
 	grouping: "normalTpsl" | "positionTpsl" | "na";
 }
 
-export function buildOrders(params: OrderBuildParams): OrderBuildResult {
+export function buildOrders(params: EntryOrderParams): OrderBuildResult {
 	const {
 		assetId,
 		side,
@@ -64,11 +61,12 @@ export function buildOrders(params: OrderBuildParams): OrderBuildResult {
 		canUseTpSl,
 		tpPriceNum,
 		slPriceNum,
-		isStopOrder,
-		isTriggerOrder,
-		isScaleOrder,
-		usesLimitPriceForOrder,
 	} = params;
+
+	const isScaleOrder = isScaleOrderType(orderType);
+	const isTriggerOrder = isTriggerOrderType(orderType);
+	const isStopOrder = isStopOrderType(orderType);
+	const usesLimitPriceForOrder = usesLimitPrice(orderType);
 
 	const orders: ExchangeOrder[] = [];
 	const formattedSize = formatSizeForOrder(sizeValue, szDecimals);

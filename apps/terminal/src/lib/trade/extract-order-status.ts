@@ -1,5 +1,16 @@
 export type OrderOutcome = "filled" | "resting" | "triggerSet" | "twapStarted";
 
+export type OrderResult = { ok: true; outcome: OrderOutcome } | { ok: false; error: string };
+
+export const NO_EXCHANGE_RESPONSE = "No response from exchange";
+
+export function interpretOrderStatuses(statuses: unknown[]): OrderResult {
+	const errors = extractStatusErrors(statuses);
+	if (errors.length > 0) return { ok: false, error: errors.join("; ") };
+	if (statuses.length === 0) return { ok: false, error: NO_EXCHANGE_RESPONSE };
+	return { ok: true, outcome: deriveOrderOutcome(statuses) };
+}
+
 export function extractStatusErrors(statuses: unknown[]): string[] {
 	const errors: string[] = [];
 	for (const status of statuses) {
