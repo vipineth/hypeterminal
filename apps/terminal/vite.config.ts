@@ -12,6 +12,7 @@ const isAnalyze = process.env.ANALYZE === 'true'
 
 function createManualChunks(id: string) {
   if (id.includes('node_modules')) {
+    if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) return 'vendor-react'
     if (id.includes('@base-ui')) return 'vendor-base-ui'
     if (id.includes('@phosphor-icons/react')) return 'vendor-icons'
     if (id.includes('@radix-ui')) return 'vendor-radix'
