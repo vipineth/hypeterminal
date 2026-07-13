@@ -6,7 +6,7 @@ export const cspDirectives: Record<string, string> = {
 	"form-action": "'self'",
 	"img-src": "'self' data: blob: https:",
 	"font-src": "'self' data:",
-	"style-src": "'self' 'unsafe-inline'",
+	"style-src": "'self' blob: 'unsafe-inline'",
 	"script-src": "'self' blob: 'unsafe-inline'",
 	"connect-src": [
 		"'self'",
@@ -27,7 +27,7 @@ export const cspDirectives: Record<string, string> = {
 	].join(" "),
 	"worker-src": "'self' blob:",
 	"frame-src":
-		"'self' https://verify.walletconnect.com https://verify.walletconnect.org https://secure.walletconnect.com",
+		"'self' blob: https://verify.walletconnect.com https://verify.walletconnect.org https://secure.walletconnect.com",
 	"manifest-src": "'self'",
 };
 

@@ -21,6 +21,16 @@ describe("security-headers CSP", () => {
 		expect(frameSrc.split(" ")).not.toContain("https:");
 	});
 
+	it("allows blob: iframes for the TradingView charting library", () => {
+		const frameSrc = cspDirectives["frame-src"] ?? "";
+		expect(frameSrc.split(" ")).toContain("blob:");
+	});
+
+	it("allows blob: stylesheets for the chart custom_css_url", () => {
+		const styleSrc = cspDirectives["style-src"] ?? "";
+		expect(styleSrc.split(" ")).toContain("blob:");
+	});
+
 	it("keeps object-src as 'none'", () => {
 		expect(cspDirectives["object-src"]).toBe("'none'");
 	});
