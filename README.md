@@ -1,6 +1,17 @@
 # HypeTerminal
 
-A trading terminal for [Hyperliquid](https://hyperliquid.xyz) — perps, spot, and builder-deployed perp DEXes — with real-time market data, full order-type support, and multi-wallet / agent-wallet signing.
+An ultra-fast, open-source trading terminal for [Hyperliquid](https://hyperliquid.xyz) — perps, spot, and builder-deployed perp DEXes — with real-time market data, full order-type support, and multi-wallet / agent-wallet signing.
+
+**Live:** [app.hypeterminal.com](https://app.hypeterminal.com) &nbsp;·&nbsp; **About:** [hypeterminal.com](https://hypeterminal.com)
+
+## Highlights
+
+- **Every Hyperliquid market** — perps, spot, and builder-deployed perp DEXes in one interface.
+- **Real-time everything** — L2 order book, trades, and market data over resilient WebSocket subscriptions.
+- **Full order support** — market, limit, and advanced order types with margin and leverage controls.
+- **Multi-wallet signing** — connect multiple wallets; agent wallets for low-friction trading.
+- **Fast by construction** — server-rendered and streamed (TanStack Start), React 19, aggressive code-splitting.
+- **Open & inspectable** — the entire trading surface lives in one public monorepo.
 
 ## Why this exists
 
@@ -13,8 +24,10 @@ This repo is a pnpm monorepo. The `apps/terminal` web app is the product; the `p
 ```
 hypeterminal/
 ├── apps/
-│   └── terminal/                         # the web app (TanStack Start + Vite + SSR)
-│       └── README.md  ───────────────▶   apps/terminal/README.md
+│   ├── terminal/                         # the trading app (TanStack Start + Vite + SSR) → app.hypeterminal.com
+│   │   └── README.md  ───────────────▶   apps/terminal/README.md
+│   └── website/                          # marketing site (Astro, static)               → hypeterminal.com
+│       └── README.md  ───────────────▶   apps/website/README.md
 ├── packages/
 │   ├── hl-react/                         # @hypeterminal/hl-react — React bindings for Hyperliquid
 │   │   └── README.md  ───────────────▶   packages/hl-react/README.md
@@ -58,20 +71,26 @@ hypeterminal/
 Prereqs: **Node 22.19+**, **pnpm 9+**.
 
 ```bash
-git clone https://github.com/your-org/hypeterminal.git
+git clone https://github.com/vipineth/hypeterminal.git
 cd hypeterminal
 pnpm install
-pnpm dev                    # runs apps/terminal at http://localhost:3000
+pnpm dev                    # trading app at http://localhost:3000
 ```
+
+The marketing site runs separately: `pnpm --filter @hypeterminal/website dev` → http://localhost:3010.
 
 ### Root scripts
 
 | Command | What it does |
 |---|---|
-| `pnpm dev` | Dev server for `apps/terminal` (HMR across workspace) |
-| `pnpm build` | Lingui catalog compile + Vite production build |
-| `pnpm serve` | Preview the built app |
+| `pnpm dev` | Dev server for the trading app (`apps/terminal`), HMR across the workspace |
+| `pnpm build` | Build the trading app (Lingui compile + Vite production build) |
+| `pnpm build:website` | Build the marketing site (`apps/website`, Astro) |
+| `pnpm build:all` | Build both apps |
+| `pnpm serve` | Preview the built trading app |
 | `pnpm test` | Vitest across the workspace |
+| `pnpm typecheck` | `tsc` across every package |
+| `pnpm verify` | `check` + `typecheck` + `test` + `build:all` — the full pre-push gate |
 | `pnpm lint` / `format` / `check` / `fix` | Biome |
 | `pnpm i18n:extract` / `i18n:compile` | Lingui catalog management |
 
@@ -91,11 +110,12 @@ All project rules live in `.claude/rules/` and apply across packages:
 | `ssr.md` | SSR-safe module boundaries (no `window`/`document` at import time) |
 | `git.md` | Commits: `type(scope): subject`, ≤72 chars, lowercase, imperative |
 
-Commit types: `feat`, `fix`, `refactor`, `perf`, `style`, `test`, `build`, `ci`, `docs`, `chore`, `revert`, `i18n`.
+Commit types (Conventional Commits): `feat`, `fix`, `refactor`, `perf`, `style`, `test`, `build`, `ci`, `docs`, `chore`, `revert`.
 
 ## Further reading
 
 - **[apps/terminal/README.md](apps/terminal/README.md)** — app architecture, routes, directory layout, order flow
+- **[apps/website/README.md](apps/website/README.md)** — the Astro marketing site
 - **[packages/hl-react/README.md](packages/hl-react/README.md)** — hook taxonomy, transport layer, agent-wallet lifecycle, WS reliability internals
 - **[packages/ui/README.md](packages/ui/README.md)** — design tokens, component inventory, CVA patterns
 - **[packages/hyperliquid-api/SKILL.md](packages/hyperliquid-api/SKILL.md)** — Agent Skill for AI tools working with the Hyperliquid API
