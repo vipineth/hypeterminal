@@ -471,8 +471,6 @@ export function toHyperliquidWallet(
 
 ## Implementation Strategy
 
-> See [signing-architecture-proposal.md](./signing-architecture-proposal.md) for full details.
-
 ### Current State Issues
 
 | Issue | Description |
