@@ -145,7 +145,7 @@ Administrative operations that use EIP-712 typed data with Hyperliquid's signatu
 | `tokenDelegate` | Delegate/undelegate staking | `validator`, `amount`, `isUndelegate` |
 | `userDexAbstraction` | Enable/disable HIP-3 DEX abstraction | `user`, `enabled` |
 
-> **Note:** The builder fee is env-driven (`VITE_BUILDER_ADDRESS` / `VITE_BUILDER_FEE_TENTH_BPS`). When either is unset or invalid, `approveBuilderFee` is skipped — registration is a single `approveAgent` signature and orders carry no `builder` field.
+> **Note:** The builder fee is env-driven (`VITE_BUILDER_ADDRESS` / `VITE_BUILDER_FEE_BPS`). When either is unset or invalid, `approveBuilderFee` is skipped — registration is a single `approveAgent` signature and orders carry no `builder` field.
 
 ### Code Example
 

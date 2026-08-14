@@ -185,7 +185,7 @@ Real `.env*` files are gitignored. Copy `apps/terminal/.env.example` to `apps/te
 | `VITE_HYPERLIQUID_TESTNET` | No | `false` | Defaults server-side network selection to testnet |
 | `VITE_PERF_ENABLED` | No | `false` | Enables render profiling by default |
 | `VITE_BUILDER_ADDRESS` | No | none | Builder fee recipient. The fee is disabled unless both builder vars are set and valid |
-| `VITE_BUILDER_FEE_TENTH_BPS` | No | none | Builder fee in tenths of a basis point (`10` = 0.01%). Max 1000; above 100 is rejected for perp orders |
+| `VITE_BUILDER_FEE_BPS` | No | none | Builder fee in basis points, one decimal place max (`1` = 0.01%). Max 100; above 10 is rejected for perp orders |
 
 When `VITE_WALLET_CONNECT_PROJECT_ID` is absent or blank, the WalletConnect connector is omitted; `injected()` and Coinbase Wallet remain available.
 
