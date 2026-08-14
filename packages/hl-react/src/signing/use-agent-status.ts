@@ -68,16 +68,19 @@ export function useAgentStatus(): UseAgentStatusResult {
 	);
 
 	async function refetch(): Promise<AgentRequirements> {
-		const [feeResult, agentsResult] = await Promise.all([builderFeeQuery.refetch(), extraAgentsQuery.refetch()]);
+		const [feeResult, agentsResult] = await Promise.all([
+			hasBuilderConfig ? builderFeeQuery.refetch() : Promise.resolve(undefined),
+			extraAgentsQuery.refetch(),
+		]);
 
-		if (hasBuilderConfig && feeResult.data === undefined) {
+		if (hasBuilderConfig && feeResult?.data === undefined) {
 			throw new Error("Could not load builder fee status");
 		}
 		if (agentsResult.data === undefined) {
 			throw new Error("Could not load agent status");
 		}
 
-		return deriveRequirements(feeResult.data, agentsResult.data, localAgent?.publicKey, builderConfig);
+		return deriveRequirements(feeResult?.data, agentsResult.data, localAgent?.publicKey, builderConfig);
 	}
 
 	return {
