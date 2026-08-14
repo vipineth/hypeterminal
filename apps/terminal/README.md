@@ -184,8 +184,12 @@ Real `.env*` files are gitignored. Copy `apps/terminal/.env.example` to `apps/te
 | `VITE_ETHEREUM_RPC_URL` | No | `https://ethereum-rpc.publicnode.com` | Ethereum mainnet RPC used by bridge config |
 | `VITE_HYPERLIQUID_TESTNET` | No | `false` | Defaults server-side network selection to testnet |
 | `VITE_PERF_ENABLED` | No | `false` | Enables render profiling by default |
+| `VITE_BUILDER_ADDRESS` | No | none | Builder fee recipient. The fee is disabled unless both builder vars are set and valid |
+| `VITE_BUILDER_FEE_TENTH_BPS` | No | none | Builder fee in tenths of a basis point (`10` = 0.01%). Max 1000; above 100 is rejected for perp orders |
 
 When `VITE_WALLET_CONNECT_PROJECT_ID` is absent or blank, the WalletConnect connector is omitted; `injected()` and Coinbase Wallet remain available.
+
+The builder vars are baked in at build time, so changing them requires a redeploy. If you turn the fee back on, also update the fee copy in `apps/website/src/components/Faq.astro`.
 
 ## Conventions
 
