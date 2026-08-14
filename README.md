@@ -79,6 +79,17 @@ pnpm dev                    # trading app at http://localhost:3000
 
 The marketing site runs separately: `pnpm --filter @hypeterminal/website dev` → http://localhost:3010.
 
+### Builder fee
+
+No builder fee is charged by default — orders carry no `builder` field. To collect one on your own deployment, set both vars before building:
+
+```bash
+VITE_BUILDER_ADDRESS=0x…            # 0x + 40 hex
+VITE_BUILDER_FEE_BPS=1              # basis points, 1 = 0.01%, one decimal place max
+```
+
+Both must be set and valid or the fee stays off. They are inlined at build time, so changing them requires a rebuild. See [apps/terminal/README.md](apps/terminal/README.md) for the full env table.
+
 ### Root scripts
 
 | Command | What it does |

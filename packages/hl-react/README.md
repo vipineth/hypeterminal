@@ -71,6 +71,8 @@ import { HyperliquidProvider } from "@hypeterminal/hl-react";
 
 Wrap inside `WagmiProvider` and `QueryClientProvider` — the hooks depend on both.
 
+`builderConfig` is optional (`{ b, f } | undefined`). Pass `undefined` to run without a builder fee: orders carry no `builder` field, the `maxBuilderFee` query never fires, and registration is a single `approveAgent` signature.
+
 ## Hook taxonomy
 
 All hooks are strongly typed against the SDK's method signatures — if a method exists on the underlying SDK, a typed hook path exists for it.
@@ -145,7 +147,7 @@ withdraw3
 | Hook | Role |
 |---|---|
 | `useAgentStatus` | Does the user need a builder-fee approval? An agent approval? What agent is registered? |
-| `useAgentRegistration` | Multi-step mutation: approve builder fee → generate + persist a new agent key → `approveAgent` on Hyperliquid. States: `idle → approving_fee → approving_agent → verifying → idle/error`. |
+| `useAgentRegistration` | Multi-step mutation: approve builder fee (skipped when `builderConfig` is undefined) → generate + persist a new agent key → `approveAgent` on Hyperliquid. States: `idle → approving_fee → approving_agent → verifying → idle/error`. |
 | `useAgentWallet` | Returns `{ data, signer, address, isReady }` — the cached `PrivateKeyAccount` used for trading signatures. |
 
 Agent keys persist to `localStorage` under `hyperliquid_agent_{env}_{userAddress}` with Zod validation. `StorageEvent` listeners keep tabs in sync.

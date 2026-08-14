@@ -63,7 +63,7 @@ export function TwapOrderSummary({
 					{orderValue > 0 ? `${feeRatePercent} (${formatUSD(estimatedFee)})` : feeRatePercent}
 				</span>
 			</SummaryRow>
-			{DEFAULT_BUILDER_CONFIG?.f && (
+			{!!DEFAULT_BUILDER_CONFIG?.f && (
 				<SummaryRow label={t`Builder Fee`}>
 					<span className="text-fg-muted">{`${bpsToPercentage(DEFAULT_BUILDER_CONFIG?.f)}%`}</span>
 				</SummaryRow>
