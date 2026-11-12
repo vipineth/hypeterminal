@@ -19,7 +19,6 @@ logs/
 tmp/
 temp/
 .expect/
-.sandcastle/logs/
 
 # Compiled translation catalogs (generated at build time)
 src/locales/**/messages.js
@@ -48,7 +47,6 @@ apps/terminal/src/locales/**/messages.js
 *.local
 count.txt
 todos.json
-.ralph/.env
 
 # Auto-generated boneyard skeleton registry (built from dev server)
 apps/terminal/src/bones/registry.ts

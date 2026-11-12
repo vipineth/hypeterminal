@@ -11,48 +11,19 @@
 		"build": "pnpm --filter @hypeterminal/terminal build",
 		"build:terminal": "pnpm --filter @hypeterminal/terminal build",
 		"build:website": "pnpm --filter @hypeterminal/website build",
-		"build:all": "pnpm build:terminal && pnpm build:website",
 		"serve": "pnpm --filter @hypeterminal/terminal serve",
 		"test": "pnpm --filter @hypeterminal/terminal test",
 		"typecheck": "pnpm -r --if-present typecheck",
-		"verify": "pnpm check && pnpm typecheck && pnpm test && pnpm build:all",
 		"audit:prod": "pnpm audit --prod",
-		"diagnostics:browser": "node scripts/browser-diagnostics.js",
-		"validate:mobile-device": "node scripts/validate-mobile-phone-access-device-validation.js",
-		"test:mobile-device-validator": "node --test scripts/validate-mobile-phone-access-device-validation.test.js",
-		"template:mobile-device": "node scripts/validate-mobile-phone-access-device-validation.js --print-template",
-		"init:mobile-device": "node scripts/validate-mobile-phone-access-device-validation.js --init-missing",
 		"format": "biome format",
 		"lint": "biome lint",
 		"check": "biome check",
 		"fix": "biome check --write",
 		"i18n:extract": "pnpm --filter @hypeterminal/terminal i18n:extract",
-		"i18n:compile": "pnpm --filter @hypeterminal/terminal i18n:compile",
-		"prepare": "lefthook install"
+		"i18n:compile": "pnpm --filter @hypeterminal/terminal i18n:compile"
 	},
 	"devDependencies": {
-		"@ai-hero/sandcastle": "0.5.6",
 		"@biomejs/biome": "2.2.4",
-		"@commitlint/cli": "20.3.1",
-		"@commitlint/config-conventional": "20.3.1",
-		"lefthook": "1.11.0",
 		"typescript": "5.7.2"
-	},
-	"pnpm": {
-		"overrides": {
-			"@noble/hashes": "1.8.0",
-			"jayson>uuid": "11.1.1",
-			"vite>esbuild": ">=0.28.1",
-			"tsx>esbuild": ">=0.28.1",
-			"esbuild": ">=0.28.1",
-			"viem>ws": ">=8.21.0",
-			"axios>form-data": ">=4.0.6",
-			"axios": ">=1.18.0",
-			"postcss": ">=8.5.23",
-			"js-yaml": ">=4.3.1 <5",
-			"svgo": ">=4.0.2",
-			"sharp": ">=0.35.0",
-			"valibot": ">=1.4.2"
-		}
 	}
 }
