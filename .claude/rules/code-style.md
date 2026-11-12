@@ -40,24 +40,18 @@ Only create helpers when logic is reused, complex, or significantly improves rea
 
 ## hl-react Subscriptions
 
-- Use `useSubL2Book`, `useSubTrades` for real-time data
+- Use `useSubscription` / `useSub*` hooks for real-time data
 - Use `useInfo*` hooks for one-time fetches
-- Use `useAction*` hooks for mutations
+- Use `useExchange*` hooks for mutations
 - Process data in `lib/`, not components
 - Only memoize array transformations, not trivial calculations
 - Use literal types: `nSigFigs: 2 | 3 | 4 | 5` not `number`
 
-
-## Format Functions
-
-Pass API values directly to formatters - they accept `string | number | null | undefined`:
-
-
 ## Icons
 
 - Use `@phosphor-icons/react` for all icons
-- Import convention: append `Icon` to the icon name, e.g. `CrossIcon`, `CaretDownIcon`, `BellIcon`
-- Example: `import { CrossIcon } from "@phosphor-icons/react"`
+- Import convention: append `Icon` to the icon name, e.g. `XIcon`, `CaretDownIcon`, `BellIcon`
+- Example: `import { XIcon } from "@phosphor-icons/react"`
 
 ## Comment Policy
 

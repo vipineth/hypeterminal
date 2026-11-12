@@ -17,7 +17,4 @@ import { Button, Modal, Tabs } from "@hypeterminal/ui";
 
 // Correct — app-specific component that composes UI primitives
 import { InfoRow } from "@/components/ui/info-row";
-
-// Wrong — old vendored path (deleted)
-// import { Button } from "@/anvil";
 ```

@@ -15,7 +15,7 @@
 Keep calculations out of components:
 - Place in `src/domain/market/` for market-related calculations
 - Accept values directly: `get24hChange(prevDayPx, markPx)`
-- Use `Numeric` type (`string | number | null | undefined`)
+- Use the `Numeric` type from `lib/trade/numbers.ts` (`string | number | null | undefined | Big`); `toBig` / `toSafeBig` there wrap big.js
 
 ### Flow
 

@@ -9,11 +9,9 @@
 	"scripts": {
 		"dev": "pnpm --filter @hypeterminal/terminal dev",
 		"build": "pnpm --filter @hypeterminal/terminal build",
-		"build:terminal": "pnpm --filter @hypeterminal/terminal build",
 		"build:website": "pnpm --filter @hypeterminal/website build",
 		"serve": "pnpm --filter @hypeterminal/terminal serve",
 		"typecheck": "pnpm -r --if-present typecheck",
-		"audit:prod": "pnpm audit --prod",
 		"format": "biome format",
 		"lint": "biome lint",
 		"check": "biome check",

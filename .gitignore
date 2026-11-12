@@ -9,7 +9,6 @@ dist-ssr/
 .nitro/
 .vinxi/
 .vercel/
-coverage/
 *.tsbuildinfo
 *.tgz
 
@@ -18,16 +17,13 @@ coverage/
 logs/
 tmp/
 temp/
-.expect/
 
 # Compiled translation catalogs (generated at build time)
-src/locales/**/messages.js
 apps/terminal/src/locales/**/messages.js
 
 # Framework temp files
 .astro/
 .tanstack/
-.wrangler/
 
 # Environment files
 .env
@@ -45,8 +41,3 @@ apps/terminal/src/locales/**/messages.js
 
 # Local/personal files
 *.local
-count.txt
-todos.json
-
-# Auto-generated boneyard skeleton registry (built from dev server)
-apps/terminal/src/bones/registry.ts

@@ -9,16 +9,11 @@
 		"ignoreUnknown": false,
 		"includes": [
 			"**/src/**/*",
-			"**/.vscode/**/*",
-			"**/index.html",
-			"**/vite.config.js",
-			"!**/.deepsec",
 			"!**/dist",
 			"!**/node_modules",
 			"!apps/terminal/src/locales/**/messages.js",
 			"!**/src/routeTree.gen.ts",
 			"!**/src/styles.css",
-			"!**/src/types/charting_library.d.ts",
 			"!apps/website"
 		]
 	},

@@ -1,131 +1,41 @@
 # HypeTerminal
 
-An ultra-fast, open-source trading terminal for [Hyperliquid](https://hyperliquid.xyz) — perps, spot, and builder-deployed perp DEXes — with real-time market data, full order-type support, and multi-wallet / agent-wallet signing.
+An open-source trading terminal for [Hyperliquid](https://hyperliquid.xyz): perps, spot and builder-deployed perp DEXes, with real-time market data and agent-wallet signing.
 
-**Live:** [app.hypeterminal.com](https://app.hypeterminal.com) &nbsp;·&nbsp; **About:** [hypeterminal.com](https://hypeterminal.com)
+**Live:** [app.hypeterminal.com](https://app.hypeterminal.com) · **About:** [hypeterminal.com](https://hypeterminal.com)
 
-## Highlights
-
-- **Every Hyperliquid market** — perps, spot, and builder-deployed perp DEXes in one interface.
-- **Real-time everything** — L2 order book, trades, and market data over resilient WebSocket subscriptions.
-- **Full order support** — market, limit, and advanced order types with margin and leverage controls.
-- **Multi-wallet signing** — connect multiple wallets; agent wallets for low-friction trading.
-- **Fast by construction** — server-rendered and streamed (TanStack Start), React 19, aggressive code-splitting.
-- **Open & inspectable** — the entire trading surface lives in one public monorepo.
-
-## Why this exists
-
-Hyperliquid is an open blockchain, and serious users should have open-source clients and tooling they can inspect instead of relying only on closed trading interfaces. HypeTerminal keeps the trading surface reproducible: market data, order flow, signing, wallet flows, and UI primitives live in one public monorepo.
-
-This repo is a pnpm monorepo. The `apps/terminal` web app is the product; the `packages/*` are the pieces it's built from. Each package/app has its own README with depth — this file is the map.
-
-## Monorepo map
+## Layout
 
 ```
-hypeterminal/
-├── apps/
-│   ├── terminal/                         # the trading app (TanStack Start + Vite + SSR) → app.hypeterminal.com
-│   │   └── README.md  ───────────────▶   apps/terminal/README.md
-│   └── website/                          # marketing site (Astro, static)               → hypeterminal.com
-│       └── README.md  ───────────────▶   apps/website/README.md
-├── packages/
-│   ├── hl-react/                         # @hypeterminal/hl-react — React bindings for Hyperliquid
-│   │   └── README.md  ───────────────▶   packages/hl-react/README.md
-│   ├── ui/                               # @hypeterminal/ui — design system (Base UI + Tailwind v4 + CVA)
-│   │   └── README.md  ───────────────▶   packages/ui/README.md
-│   └── hyperliquid-api/                  # Agent Skill for AI tools (NOT a runtime dep)
-│       └── SKILL.md   ───────────────▶   packages/hyperliquid-api/SKILL.md
-└── .claude/rules/                        # coding conventions — see "Conventions" below
+apps/terminal      trading app (TanStack Start + Vite + SSR, React 19)
+apps/website       marketing site (Astro)
+packages/hl-react  @hypeterminal/hl-react: React bindings for Hyperliquid (transports, useInfo / useSub / useExchange, agent wallets)
+packages/ui        @hypeterminal/ui: design system (Base UI + Tailwind v4 + CVA)
+.claude/rules      coding conventions
 ```
 
-**Source-shipped packages.** `hl-react` and `ui` have `"main": "./src/index.ts"` — no build step. The Vite dev server type-checks, transpiles, and HMRs directly from source.
-
-## How the pieces fit
-
-```
-┌──────────────────────────────────────────────────────────────────┐
-│ apps/terminal                                                    │
-│   React 19 + TanStack Start (SSR) + Vite 7 + Tailwind v4         │
-│   Routes · Stores (Zustand) · Order entry · Chart · Orderbook    │
-└──────────┬──────────────────────────────────────────┬────────────┘
-           │ imports hooks                            │ imports primitives
-           ▼                                          ▼
-┌─────────────────────────────────────┐   ┌──────────────────────────────┐
-│ @hypeterminal/hl-react              │   │ @hypeterminal/ui             │
-│ ─ HttpTransport + WebSocketTransport│   │ ─ Base UI primitives         │
-│ ─ useInfo / useSub / useExchange    │   │ ─ CVA variants               │
-│ ─ Agent-wallet lifecycle            │   │ ─ Tailwind v4 `@theme` tokens│
-│ ─ WS reliability + payload guards   │   │ ─ Phosphor icons             │
-└─────────────┬───────────────────────┘   └──────────────────────────────┘
-              │ wraps
-              ▼
-       @nktkas/hyperliquid  ──▶  Hyperliquid API (REST + WS)
-```
-
-- `hl-react` owns **everything about talking to Hyperliquid**: transports, hook types (info/sub/exchange), signing, agent wallets, WS reliability.
-- `ui` owns **everything about how the app looks**: primitives, tokens, variants. Design-system only — no app logic.
-- `terminal` composes the two into the product: routes, state, business rules, pages.
+`hl-react` and `ui` ship source (`"main": "./src/index.ts"`), so there is no package build step.
 
 ## Quick start
 
-Prereqs: **Node 22.19+**, **pnpm 9+**.
+Node 22.19+ and pnpm.
 
 ```bash
-git clone https://github.com/vipineth/hypeterminal.git
-cd hypeterminal
 pnpm install
-pnpm dev                    # trading app at http://localhost:3000
+cp apps/terminal/.env.example apps/terminal/.env
+pnpm dev        # http://localhost:3000
 ```
-
-The marketing site runs separately: `pnpm --filter @hypeterminal/website dev` → http://localhost:3010.
-
-### Root scripts
 
 | Command | What it does |
 |---|---|
-| `pnpm dev` | Dev server for the trading app (`apps/terminal`), HMR across the workspace |
-| `pnpm build` | Build the trading app (Lingui compile + Vite production build) |
-| `pnpm build:website` | Build the marketing site (`apps/website`, Astro) |
-| `pnpm build:all` | Build both apps |
-| `pnpm serve` | Preview the built trading app |
-| `pnpm test` | Vitest across the workspace |
-| `pnpm typecheck` | `tsc` across every package |
-| `pnpm verify` | `check` + `typecheck` + `test` + `build:all` — the full pre-push gate |
+| `pnpm dev` | Trading app dev server |
+| `pnpm build` | Lingui compile + Vite production build |
+| `pnpm serve` | Preview the built app |
+| `pnpm build:website` | Build the marketing site |
+| `pnpm typecheck` | `tsc` across packages |
 | `pnpm lint` / `format` / `check` / `fix` | Biome |
-| `pnpm i18n:extract` / `i18n:compile` | Lingui catalog management |
-
-Per-package commands live in each subpackage — see their READMEs.
-
-## Conventions
-
-All project rules live in `.claude/rules/` and apply across packages:
-
-| File | Scope |
-|---|---|
-| `code-style.md` | Component structure, comment policy, hook usage (React 19 compiler → no manual `useMemo`) |
-| `hyperliquid.md` | Keep Hyperliquid API strings as strings; use `big.js` only when math is needed |
-| `ui-library.md` | `packages/ui` is design-system only; app components live in `apps/terminal/src/components/` |
-| `design-tokens.md` | Semantic tokens only (no hex); background elevation model (sunken→base→raised→overlay) |
-| `style-ui-guide.md` | Border / focus conventions |
-| `ssr.md` | SSR-safe module boundaries (no `window`/`document` at import time) |
-| `git.md` | Commits: `type(scope): subject`, ≤72 chars, lowercase, imperative |
-
-Commit types (Conventional Commits): `feat`, `fix`, `refactor`, `perf`, `style`, `test`, `build`, `ci`, `docs`, `chore`, `revert`.
-
-## Further reading
-
-- **[apps/terminal/README.md](apps/terminal/README.md)** — app architecture, routes, directory layout, order flow
-- **[apps/website/README.md](apps/website/README.md)** — the Astro marketing site
-- **[packages/hl-react/README.md](packages/hl-react/README.md)** — hook taxonomy, transport layer, agent-wallet lifecycle, WS reliability internals
-- **[packages/ui/README.md](packages/ui/README.md)** — design tokens, component inventory, CVA patterns
-- **[packages/hyperliquid-api/SKILL.md](packages/hyperliquid-api/SKILL.md)** — Agent Skill for AI tools working with the Hyperliquid API
+| `pnpm i18n:extract` / `i18n:compile` | Lingui catalogs |
 
 ## License
 
 [MIT](LICENSE)
-
-## Acknowledgments
-
-- [Hyperliquid](https://hyperliquid.xyz) — the protocol
-- [@nktkas/hyperliquid](https://github.com/nktkas/hyperliquid) — the TS SDK we build on
-- [TanStack](https://tanstack.com), [Base UI](https://base-ui.com), [Tailwind](https://tailwindcss.com)

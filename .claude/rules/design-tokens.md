@@ -19,7 +19,7 @@ Never cause **literal doubling** of the Tailwind property prefix. If a token is 
 **Rule of thumb:** the only stutter to avoid is a literal repeat of the same word (`bg-bg-*`, `text-text-*`). Having different words like `border-stroke-*` or `bg-fill-*` is fine and actually helps: `bg-fill-hover` clearly means "interactive fill used as background," distinct from `bg-surface` (a surface color).
 
 **Checklist when adding a color:**
-1. Put the raw value in Layer 2 (`:root` + `.dark`) of `packages/ui/src/globals.css`.
+1. Put the raw value in Layer 2 (`:root` + `.dark`) of `packages/ui/src/globals.css`, and in `apps/terminal/src/styles.css` if the app overrides that layer (it does for most surface tokens).
 2. Wire it into Layer 3 `@theme inline` with `--color-<name>: var(--<layer2-name>);`.
 3. Pick the `<name>` so that when Tailwind adds its property prefix, there's no literal doubling.
 4. If it's used across multiple properties (bg/text), use a single semantic token and let Tailwind generate all three utilities.
