@@ -110,5 +110,5 @@ const CheckboxGroup = React.forwardRef<HTMLDivElement, CheckboxGroupProps>(
 );
 CheckboxGroup.displayName = "CheckboxGroup";
 
-export { Checkbox, checkboxVariants, CheckboxGroup };
-export type { CheckboxProps, CheckboxGroupProps };
+export type { CheckboxGroupProps, CheckboxProps };
+export { Checkbox, CheckboxGroup, checkboxVariants };

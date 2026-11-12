@@ -126,5 +126,5 @@ const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
 );
 TextInput.displayName = "TextInput";
 
-export { TextInput, textInputVariants };
 export type { TextInputProps };
+export { TextInput, textInputVariants };

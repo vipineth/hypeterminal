@@ -68,5 +68,5 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
 );
 Badge.displayName = "Badge";
 
-export { Badge, badgeVariants };
 export type { BadgeProps, BadgeTone };
+export { Badge, badgeVariants };

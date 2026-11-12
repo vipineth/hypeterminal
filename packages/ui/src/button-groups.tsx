@@ -194,5 +194,5 @@ const ButtonGroupItem = React.forwardRef<HTMLButtonElement, ButtonGroupItemProps
 );
 ButtonGroupItem.displayName = "ButtonGroupItem";
 
-export { ButtonGroup, ButtonGroupItem, buttonGroupVariants, buttonGroupItemVariants };
-export type { ButtonGroupProps, ButtonGroupItemProps };
+export type { ButtonGroupItemProps, ButtonGroupProps };
+export { ButtonGroup, ButtonGroupItem, buttonGroupItemVariants, buttonGroupVariants };

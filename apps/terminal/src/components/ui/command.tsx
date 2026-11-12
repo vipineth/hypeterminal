@@ -97,4 +97,4 @@ function CommandItem({ className, ...props }: React.ComponentProps<typeof Comman
 	);
 }
 
-export { Command, CommandDialog, CommandInput, CommandList, CommandEmpty, CommandItem };
+export { Command, CommandDialog, CommandEmpty, CommandInput, CommandItem, CommandList };

@@ -258,5 +258,5 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
 );
 Pagination.displayName = "Pagination";
 
-export { Pagination, pageButtonVariants, navButtonVariants };
 export type { PaginationProps };
+export { navButtonVariants, Pagination, pageButtonVariants };

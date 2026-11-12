@@ -220,5 +220,5 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
 );
 Dropdown.displayName = "Dropdown";
 
-export { Dropdown, dropdownMinimalTriggerVariants, dropdownTriggerVariants, dropdownItemVariants };
-export type { DropdownProps, DropdownItem, DropdownGroup };
+export type { DropdownGroup, DropdownItem, DropdownProps };
+export { Dropdown, dropdownItemVariants, dropdownMinimalTriggerVariants, dropdownTriggerVariants };

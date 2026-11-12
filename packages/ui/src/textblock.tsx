@@ -53,5 +53,5 @@ const TextBlock = React.forwardRef<HTMLDivElement, TextBlockProps>(
 );
 TextBlock.displayName = "TextBlock";
 
-export { TextBlock, textBlockVariants };
 export type { TextBlockProps };
+export { TextBlock, textBlockVariants };

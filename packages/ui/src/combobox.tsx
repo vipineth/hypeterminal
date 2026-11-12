@@ -240,5 +240,5 @@ const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(
 
 Combobox.displayName = "Combobox";
 
-export { Combobox, comboboxVariants };
 export type { ComboboxProps };
+export { Combobox, comboboxVariants };

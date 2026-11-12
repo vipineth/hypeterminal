@@ -237,5 +237,5 @@ const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
 
 Autocomplete.displayName = "Autocomplete";
 
-export { Autocomplete, autocompleteVariants };
 export type { AutocompleteProps };
+export { Autocomplete, autocompleteVariants };

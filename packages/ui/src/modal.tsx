@@ -192,25 +192,25 @@ function AdaptiveModal({ open, onOpenChange, size, showClose = true, children, c
 }
 AdaptiveModal.displayName = "AdaptiveModal";
 
-export {
-	Modal,
-	ModalTrigger,
-	ModalClose,
-	ModalPopup,
-	ModalHeader,
-	ModalTitle,
-	ModalDescription,
-	ModalContent,
-	ModalFooter,
-	AdaptiveModal,
-	modalPopupVariants,
-};
 export type {
-	ModalPopupProps,
-	ModalHeaderProps,
-	ModalTitleProps,
-	ModalDescriptionProps,
-	ModalContentProps,
-	ModalFooterProps,
 	AdaptiveModalProps,
+	ModalContentProps,
+	ModalDescriptionProps,
+	ModalFooterProps,
+	ModalHeaderProps,
+	ModalPopupProps,
+	ModalTitleProps,
+};
+export {
+	AdaptiveModal,
+	Modal,
+	ModalClose,
+	ModalContent,
+	ModalDescription,
+	ModalFooter,
+	ModalHeader,
+	ModalPopup,
+	ModalTitle,
+	ModalTrigger,
+	modalPopupVariants,
 };

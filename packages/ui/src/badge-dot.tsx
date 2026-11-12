@@ -49,5 +49,5 @@ const BadgeDot = React.forwardRef<HTMLSpanElement, BadgeDotProps>(
 );
 BadgeDot.displayName = "BadgeDot";
 
-export { BadgeDot, badgeDotVariants };
 export type { BadgeDotProps, BadgeDotTone };
+export { BadgeDot, badgeDotVariants };

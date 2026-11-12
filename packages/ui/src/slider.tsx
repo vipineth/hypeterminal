@@ -89,5 +89,5 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
 );
 Slider.displayName = "Slider";
 
-export { Slider, sliderVariants };
 export type { SliderProps, SliderThumbSize };
+export { Slider, sliderVariants };

@@ -75,5 +75,5 @@ const TextLink = React.forwardRef<HTMLAnchorElement, TextLinkProps>(
 );
 TextLink.displayName = "TextLink";
 
-export { TextLink, textLinkVariants };
 export type { TextLinkProps };
+export { TextLink, textLinkVariants };

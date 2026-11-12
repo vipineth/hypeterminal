@@ -1,5 +1,5 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.6.5/schema.json",
 	"vcs": {
 		"enabled": false,
 		"clientKind": "git",
@@ -28,7 +28,7 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true,
+			"preset": "recommended",
 			"correctness": {
 				"noUnusedImports": "error",
 				"useExhaustiveDependencies": "warn",
@@ -42,12 +42,37 @@
 			}
 		}
 	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	},
 	"javascript": {
 		"formatter": {
 			"quoteStyle": "double"
 		}
 	},
 	"overrides": [
+		{
+			"includes": ["apps/terminal/src/router.tsx"],
+			"linter": {
+				"rules": {
+					"correctness": {
+						"noComponentHookFactories": "off"
+					}
+				}
+			}
+		},
+		{
+			"includes": ["apps/terminal/src/components/trade/components/wallet-modal.tsx"],
+			"linter": {
+				"rules": {
+					"a11y": {
+						"noAmbiguousAnchorText": "off"
+					}
+				}
+			}
+		},
 		{
 			"includes": ["packages/ui/src/**"],
 			"linter": {

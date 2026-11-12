@@ -20,7 +20,7 @@
 		"i18n:compile": "pnpm --filter @hypeterminal/terminal i18n:compile"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.2.4",
+		"@biomejs/biome": "2.6.5",
 		"typescript": "5.7.2"
 	}
 }

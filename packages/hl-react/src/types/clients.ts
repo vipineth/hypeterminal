@@ -66,16 +66,12 @@ type SubListener = (data: never) => void;
 
 type SubArgs<M extends SubMethod> = Parameters<SubClientMethods[M]>;
 
-type SubRequiredParams<M extends SubMethod> = SubArgs<M> extends [infer P, SubListener, ...unknown[]]
-	? P extends SubListener
-		? undefined
-		: P
-	: undefined;
+type SubRequiredParams<M extends SubMethod> =
+	SubArgs<M> extends [infer P, SubListener, ...unknown[]] ? (P extends SubListener ? undefined : P) : undefined;
 
 export type SubParams<M extends SubMethod> = M extends SubOptionalParamsMethods
 	? SubRequiredParams<M> | undefined
 	: SubRequiredParams<M>;
 
-export type SubEvent<M extends SubMethod> = Extract<SubArgs<M>[number], SubListener> extends (data: infer E) => void
-	? E
-	: never;
+export type SubEvent<M extends SubMethod> =
+	Extract<SubArgs<M>[number], SubListener> extends (data: infer E) => void ? E : never;

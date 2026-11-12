@@ -439,7 +439,7 @@ export function TradePanel() {
 }
 
 function getSwapTargetToken(market: NonNullable<ReturnType<typeof useSelectedMarketInfo>["data"]> | undefined) {
-	if (!market || market.kind !== "builderPerp") return null;
+	if (market?.kind !== "builderPerp") return null;
 
 	const quoteToken = getMarketQuoteToken(market);
 	if (quoteToken === DEFAULT_QUOTE_TOKEN) return null;

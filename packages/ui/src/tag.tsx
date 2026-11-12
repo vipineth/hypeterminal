@@ -89,5 +89,5 @@ const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
 );
 Tag.displayName = "Tag";
 
-export { Tag, tagVariants };
 export type { TagProps };
+export { Tag, tagVariants };

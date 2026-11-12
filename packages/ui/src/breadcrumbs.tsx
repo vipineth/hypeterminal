@@ -110,5 +110,5 @@ const BreadcrumbItem = React.forwardRef<HTMLLIElement, BreadcrumbItemProps>(
 );
 BreadcrumbItem.displayName = "BreadcrumbItem";
 
-export { Breadcrumbs, BreadcrumbItem, breadcrumbsVariants };
-export type { BreadcrumbsProps, BreadcrumbItemProps };
+export type { BreadcrumbItemProps, BreadcrumbsProps };
+export { BreadcrumbItem, Breadcrumbs, breadcrumbsVariants };

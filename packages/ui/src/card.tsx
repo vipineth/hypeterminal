@@ -107,13 +107,13 @@ const CardMedia = React.forwardRef<HTMLDivElement, CardMediaProps>(({ className,
 ));
 CardMedia.displayName = "CardMedia";
 
-export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, CardMedia, cardVariants };
 export type {
-	CardProps,
-	CardHeaderProps,
-	CardTitleProps,
-	CardDescriptionProps,
 	CardContentProps,
+	CardDescriptionProps,
 	CardFooterProps,
+	CardHeaderProps,
 	CardMediaProps,
+	CardProps,
+	CardTitleProps,
 };
+export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardMedia, CardTitle, cardVariants };

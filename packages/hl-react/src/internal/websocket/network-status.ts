@@ -66,4 +66,4 @@ export function getNetworkState(): NetworkState {
 	return currentState;
 }
 
-export type { NetworkState, NetworkListener };
+export type { NetworkListener, NetworkState };

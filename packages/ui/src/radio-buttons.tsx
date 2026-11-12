@@ -135,5 +135,5 @@ const RadioGroupItem = React.forwardRef<HTMLSpanElement, RadioGroupItemProps>(
 );
 RadioGroupItem.displayName = "RadioGroupItem";
 
+export type { RadioGroupItemProps, RadioGroupProps };
 export { RadioGroup, RadioGroupItem, radioIndicatorVariants, radioItemVariants };
-export type { RadioGroupProps, RadioGroupItemProps };

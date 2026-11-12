@@ -96,26 +96,26 @@ const TableCaption = React.forwardRef<HTMLTableCaptionElement, TableCaptionProps
 ));
 TableCaption.displayName = "TableCaption";
 
+export type {
+	TableBodyProps,
+	TableCaptionProps,
+	TableCellProps,
+	TableFooterProps,
+	TableHeaderProps,
+	TableHeadProps,
+	TableProps,
+	TableRowProps,
+};
 export {
 	Table,
-	TableHeader,
 	TableBody,
-	TableFooter,
-	TableRow,
-	TableHead,
-	TableCell,
 	TableCaption,
-	tableVariants,
-	tableHeadVariants,
+	TableCell,
+	TableFooter,
+	TableHead,
+	TableHeader,
+	TableRow,
 	tableCellVariants,
-};
-export type {
-	TableProps,
-	TableHeaderProps,
-	TableBodyProps,
-	TableFooterProps,
-	TableRowProps,
-	TableHeadProps,
-	TableCellProps,
-	TableCaptionProps,
+	tableHeadVariants,
+	tableVariants,
 };

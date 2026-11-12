@@ -37,5 +37,5 @@ const Slot = React.forwardRef<HTMLDivElement, SlotProps>(({ className, size, chi
 ));
 Slot.displayName = "Slot";
 
-export { Slot, slotVariants };
 export type { SlotProps };
+export { Slot, slotVariants };

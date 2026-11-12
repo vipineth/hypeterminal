@@ -158,5 +158,5 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
 
 SearchInput.displayName = "SearchInput";
 
-export { SearchInput, searchInputVariants };
 export type { SearchInputProps };
+export { SearchInput, searchInputVariants };

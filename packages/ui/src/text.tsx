@@ -67,5 +67,5 @@ const Text = React.forwardRef<HTMLElement, TextProps>(
 );
 Text.displayName = "Text";
 
-export { Text, textVariants };
 export type { TextProps };
+export { Text, textVariants };

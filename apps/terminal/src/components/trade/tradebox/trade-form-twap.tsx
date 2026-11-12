@@ -37,7 +37,7 @@ export function TradeFormTwap({ disabled }: Props) {
 
 	function handleMinutesChange(value: string) {
 		const m = clamp(Math.floor(Number(value) || 0), 0, MINUTES_PER_INPUT_MAX);
-		const cappedHours = hours >= HOURS_MAX ? HOURS_MAX : hours;
+		const cappedHours = Math.min(hours, HOURS_MAX);
 		const total = cappedHours >= HOURS_MAX ? HOURS_MAX * 60 : cappedHours * 60 + m;
 		setTwapMinutes(clamp(total, 0, TWAP_MINUTES_MAX));
 	}

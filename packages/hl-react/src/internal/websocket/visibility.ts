@@ -78,4 +78,4 @@ export function getVisibilityState(): VisibilityState {
 	return currentState;
 }
 
-export type { VisibilityState, VisibilityListener };
+export type { VisibilityListener, VisibilityState };

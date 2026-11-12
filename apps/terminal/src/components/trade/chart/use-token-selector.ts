@@ -273,7 +273,7 @@ export function useTokenSelector({
 		if (!hasInitializedRef.current) {
 			hasInitializedRef.current = true;
 			const index = value ? rows.findIndex((row) => row.original.name === value) : -1;
-			setHighlightedIndex(index >= 0 ? index : 0);
+			setHighlightedIndex(Math.max(index, 0));
 			if (index > 0) {
 				requestAnimationFrame(() => {
 					virtualizer.scrollToIndex(index, { align: "center" });

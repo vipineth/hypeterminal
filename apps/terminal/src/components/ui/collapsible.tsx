@@ -20,4 +20,4 @@ function CollapsibleContent({ className, ...props }: React.ComponentProps<typeof
 	);
 }
 
-export { Collapsible, CollapsibleTrigger, CollapsibleContent };
+export { Collapsible, CollapsibleContent, CollapsibleTrigger };

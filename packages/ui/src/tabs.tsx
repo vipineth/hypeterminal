@@ -205,5 +205,5 @@ const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(({ classN
 ));
 TabsContent.displayName = "TabsContent";
 
-export { TabsRoot as Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants, tabsTriggerVariants };
-export type { TabsRootProps as TabsProps, TabsListProps, TabsTriggerProps, TabsContentProps, TabsVariant };
+export type { TabsContentProps, TabsListProps, TabsRootProps as TabsProps, TabsTriggerProps, TabsVariant };
+export { TabsContent, TabsList, TabsRoot as Tabs, TabsTrigger, tabsListVariants, tabsTriggerVariants };

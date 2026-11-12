@@ -223,5 +223,5 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
 );
 Alert.displayName = "Alert";
 
-export { Alert, alertVariants };
 export type { AlertProps, AlertTone };
+export { Alert, alertVariants };

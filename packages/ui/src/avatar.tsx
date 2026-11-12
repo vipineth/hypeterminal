@@ -143,5 +143,5 @@ const AvatarGroup = React.forwardRef<HTMLDivElement, AvatarGroupProps>(
 );
 AvatarGroup.displayName = "AvatarGroup";
 
+export type { AvatarGroupProps, AvatarProps, AvatarStatus };
 export { Avatar, AvatarGroup, avatarVariants };
-export type { AvatarProps, AvatarGroupProps, AvatarStatus };

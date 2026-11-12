@@ -177,29 +177,29 @@ const DrawerFooter = React.forwardRef<HTMLDivElement, DrawerFooterProps>(({ clas
 ));
 DrawerFooter.displayName = "DrawerFooter";
 
+export type {
+	DrawerBodyProps,
+	DrawerCloseProps,
+	DrawerContentProps,
+	DrawerDescriptionProps,
+	DrawerFooterProps,
+	DrawerHeaderProps,
+	DrawerOverlayProps,
+	DrawerProps,
+	DrawerSide,
+	DrawerTitleProps,
+	DrawerTriggerProps,
+};
 export {
 	Drawer,
-	DrawerTrigger,
-	DrawerClose,
-	DrawerOverlay,
-	DrawerContent,
-	DrawerHeader,
-	DrawerTitle,
-	DrawerDescription,
 	DrawerBody,
+	DrawerClose,
+	DrawerContent,
+	DrawerDescription,
 	DrawerFooter,
+	DrawerHeader,
+	DrawerOverlay,
+	DrawerTitle,
+	DrawerTrigger,
 	drawerContentVariants,
-};
-export type {
-	DrawerProps,
-	DrawerTriggerProps,
-	DrawerCloseProps,
-	DrawerOverlayProps,
-	DrawerContentProps,
-	DrawerHeaderProps,
-	DrawerTitleProps,
-	DrawerDescriptionProps,
-	DrawerBodyProps,
-	DrawerFooterProps,
-	DrawerSide,
 };

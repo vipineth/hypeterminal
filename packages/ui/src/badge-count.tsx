@@ -36,5 +36,5 @@ const BadgeCount = React.forwardRef<HTMLSpanElement, BadgeCountProps>(
 );
 BadgeCount.displayName = "BadgeCount";
 
-export { BadgeCount, badgeCountVariants };
 export type { BadgeCountProps };
+export { BadgeCount, badgeCountVariants };

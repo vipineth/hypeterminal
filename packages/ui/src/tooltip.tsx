@@ -77,5 +77,5 @@ Tooltip.displayName = "Tooltip";
 
 const TooltipProvider = BaseTooltip.Provider;
 
-export { Tooltip, TooltipProvider, tooltipPopupVariants, tooltipArrowVariants };
 export type { TooltipProps };
+export { Tooltip, TooltipProvider, tooltipArrowVariants, tooltipPopupVariants };

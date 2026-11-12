@@ -19,9 +19,8 @@ type AnyMethod = (...args: unknown[]) => unknown;
 export type InferData<TMethod extends AnyMethod> = Awaited<ReturnType<TMethod>>;
 export type InferParams<TMethod extends AnyMethod> = Exclude<Parameters<TMethod>[0], AbortSignal>;
 export type InferSubListener<TMethod extends AnyMethod> = Extract<Parameters<TMethod>[number], (data: unknown) => void>;
-export type InferSubEvent<TMethod extends AnyMethod> = InferSubListener<TMethod> extends (data: infer D) => void
-	? D
-	: never;
+export type InferSubEvent<TMethod extends AnyMethod> =
+	InferSubListener<TMethod> extends (data: infer D) => void ? D : never;
 export type InferSubParams<TMethod extends AnyMethod> = Exclude<Parameters<TMethod>[0], InferSubListener<TMethod>>;
 
 export type SubscriptionStatus = "idle" | "subscribing" | "active" | "error";

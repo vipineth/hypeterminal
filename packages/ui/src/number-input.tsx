@@ -220,5 +220,5 @@ const NumberInput = React.forwardRef<HTMLDivElement, NumberInputProps>(
 );
 NumberInput.displayName = "NumberInput";
 
-export { NumberInput, numberInputVariants };
 export type { NumberInputProps };
+export { NumberInput, numberInputVariants };

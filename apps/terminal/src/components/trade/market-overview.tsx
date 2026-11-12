@@ -61,7 +61,7 @@ function getSpotTokenAddress(market: UnifiedMarketInfo | undefined): string | nu
 	const baseToken = market.tokensInfo[0];
 	if (!baseToken) return null;
 	const tokenId = (baseToken as { tokenId?: string }).tokenId;
-	if (!tokenId || !tokenId.startsWith("0x")) return null;
+	if (!tokenId?.startsWith("0x")) return null;
 	return tokenId;
 }
 

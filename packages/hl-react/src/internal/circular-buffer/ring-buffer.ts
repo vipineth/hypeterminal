@@ -36,7 +36,7 @@ export class RingBuffer<T> {
 
 			if (existingIndex !== undefined) {
 				const existingItem = this.items[existingIndex];
-				if (!this.shouldReplace || !this.shouldReplace(existingItem, item)) continue;
+				if (!this.shouldReplace?.(existingItem, item)) continue;
 
 				this.items[existingIndex] = item;
 				changed = true;

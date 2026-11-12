@@ -82,5 +82,5 @@ const AlertGlobal = React.forwardRef<HTMLDivElement, AlertGlobalProps>(
 );
 AlertGlobal.displayName = "AlertGlobal";
 
-export { AlertGlobal, alertGlobalVariants };
 export type { AlertGlobalProps, AlertGlobalTone };
+export { AlertGlobal, alertGlobalVariants };

@@ -75,5 +75,5 @@ const ProgressIndicator = React.forwardRef<HTMLDivElement, ProgressIndicatorProp
 );
 ProgressIndicator.displayName = "ProgressIndicator";
 
-export { ProgressIndicator, progressIndicatorVariants };
 export type { ProgressIndicatorProps };
+export { ProgressIndicator, progressIndicatorVariants };

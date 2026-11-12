@@ -135,5 +135,5 @@ const ButtonIcon = React.forwardRef<HTMLButtonElement, ButtonIconProps>(
 );
 ButtonIcon.displayName = "ButtonIcon";
 
-export { ButtonIcon, buttonIconVariants };
 export type { ButtonIconProps };
+export { ButtonIcon, buttonIconVariants };

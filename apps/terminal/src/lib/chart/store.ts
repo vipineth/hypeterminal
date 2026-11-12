@@ -273,7 +273,7 @@ export function createCandleStore(): CandleStore {
 
 			unsubscribe: (key, listenerId) => {
 				const stream = get().streams[key];
-				if (!stream || !stream.listeners.has(listenerId)) return;
+				if (!stream?.listeners.has(listenerId)) return;
 
 				const runtimeEntry = runtime.get(key);
 				const listeners = new Map(stream.listeners);

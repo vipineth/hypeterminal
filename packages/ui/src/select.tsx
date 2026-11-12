@@ -204,5 +204,5 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
 );
 Select.displayName = "Select";
 
+export type { SelectGroupOption, SelectOption, SelectProps };
 export { Select, selectTriggerVariants };
-export type { SelectProps, SelectOption, SelectGroupOption };

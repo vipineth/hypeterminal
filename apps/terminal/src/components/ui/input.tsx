@@ -49,5 +49,5 @@ function Input({ className, type, inputSize = "default", ...props }: InputProps)
 	);
 }
 
-export { Input, inputBaseStyles, inputSizeStyles, getInputClassName };
 export type { InputSize };
+export { getInputClassName, Input, inputBaseStyles, inputSizeStyles };

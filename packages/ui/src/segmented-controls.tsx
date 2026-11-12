@@ -137,5 +137,5 @@ const SegmentedControlItem = React.forwardRef<HTMLButtonElement, SegmentedContro
 );
 SegmentedControlItem.displayName = "SegmentedControlItem";
 
-export { SegmentedControls, SegmentedControlItem, segmentedControlsVariants, segmentedControlItemVariants };
-export type { SegmentedControlsProps, SegmentedControlItemProps };
+export type { SegmentedControlItemProps, SegmentedControlsProps };
+export { SegmentedControlItem, SegmentedControls, segmentedControlItemVariants, segmentedControlsVariants };
