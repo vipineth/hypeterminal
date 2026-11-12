@@ -36,7 +36,7 @@ export function createLineOverlay({ name, style, resolve }: Config): () => void 
 			totalStep: 1,
 			lock: true,
 			zLevel: -1,
-			createPointFigures: ({ overlay, coordinates, bounding, precision }) => {
+			createPointFigures: ({ chart, overlay, coordinates, bounding }) => {
 				const y = coordinates[0]?.y;
 				if (y === undefined) return [];
 
@@ -49,7 +49,7 @@ export function createLineOverlay({ name, style, resolve }: Config): () => void 
 				const bgColor = colorToHex(colors.background);
 
 				const rawPrice = overlay.points[0]?.value;
-				const priceText = rawPrice != null ? Big(rawPrice).toFixed(precision.price) : "";
+				const priceText = rawPrice != null ? Big(rawPrice).toFixed(chart.getSymbol()?.pricePrecision ?? 2) : "";
 
 				const badgeX = bounding.width - 110;
 				const priceX = bounding.width - 4;

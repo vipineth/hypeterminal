@@ -1,5 +1,4 @@
-import type { CandleTooltipCustomCallbackData, DeepPartial, Styles } from "klinecharts";
-import { type CandleType, LineType, TooltipShowRule, TooltipShowType, YAxisPosition } from "klinecharts";
+import type { CandleType, DeepPartial, Styles, TooltipLegend } from "klinecharts";
 import {
 	chartCrosshairAlpha,
 	chartGridAlpha,
@@ -73,7 +72,7 @@ export function buildKlineStyles(candleType: CandleType, options?: KlineStyleOpt
 		show: true,
 		line: {
 			show: true,
-			style: LineType.Dashed,
+			style: "dashed" as const,
 			dashedValue: [4, 2],
 			size: 1,
 			color: strokeWeakLayerRgba(colors.border, chartCrosshairAlpha),
@@ -99,8 +98,8 @@ export function buildKlineStyles(candleType: CandleType, options?: KlineStyleOpt
 
 	return {
 		grid: {
-			horizontal: { show: true, color: gridColor, size: 1, style: LineType.Dashed },
-			vertical: { show: true, color: gridColor, size: 1, style: LineType.Dashed },
+			horizontal: { show: true, color: gridColor, size: 1, style: "dashed" },
+			vertical: { show: true, color: gridColor, size: 1, style: "dashed" },
 		},
 		candle: {
 			type: candleType,
@@ -130,7 +129,7 @@ export function buildKlineStyles(candleType: CandleType, options?: KlineStyleOpt
 					upColor: overlayTextColor,
 					downColor: overlayTextColor,
 					noChangeColor: overlayTextColor,
-					line: { show: true, style: LineType.Dashed, size: 1, dashedValue: [4, 4] },
+					line: { show: true, style: "dashed", size: 1, dashedValue: [4, 4] },
 					text: {
 						show: true,
 						size: 10,
@@ -144,40 +143,43 @@ export function buildKlineStyles(candleType: CandleType, options?: KlineStyleOpt
 				},
 			},
 			tooltip: {
-				showRule: TooltipShowRule.Always,
-				showType: TooltipShowType.Standard,
-				custom: (data: CandleTooltipCustomCallbackData) => {
-					const { current } = data;
-					const isUp = current.close >= current.open;
-					const candleColor = isUp ? green : red;
-					return [
-						{
-							title: { text: "", color: "transparent" },
-							value: { text: formatTooltipTs(current.timestamp), color: textTertiary },
-						},
-						{
-							title: { text: "O ", color: textTertiary },
-							value: { text: formatPrice(current.open), color: candleColor },
-						},
-						{
-							title: { text: "H ", color: textTertiary },
-							value: { text: formatPrice(current.high), color: candleColor },
-						},
-						{
-							title: { text: "L ", color: textTertiary },
-							value: { text: formatPrice(current.low), color: candleColor },
-						},
-						{
-							title: { text: "C ", color: textTertiary },
-							value: { text: formatPrice(current.close), color: candleColor },
-						},
-						{
-							title: { text: "Vol ", color: textTertiary },
-							value: { text: formatVolume(current.volume ?? 0), color: textSecondary },
-						},
-					];
+				showRule: "always",
+				showType: "standard",
+				title: { show: false },
+				legend: {
+					...tooltipText,
+					template: ({ current }): TooltipLegend[] => {
+						if (!current) return [];
+						const isUp = current.close >= current.open;
+						const candleColor = isUp ? green : red;
+						return [
+							{
+								title: { text: "", color: "transparent" },
+								value: { text: formatTooltipTs(current.timestamp), color: textTertiary },
+							},
+							{
+								title: { text: "O ", color: textTertiary },
+								value: { text: formatPrice(current.open), color: candleColor },
+							},
+							{
+								title: { text: "H ", color: textTertiary },
+								value: { text: formatPrice(current.high), color: candleColor },
+							},
+							{
+								title: { text: "L ", color: textTertiary },
+								value: { text: formatPrice(current.low), color: candleColor },
+							},
+							{
+								title: { text: "C ", color: textTertiary },
+								value: { text: formatPrice(current.close), color: candleColor },
+							},
+							{
+								title: { text: "Vol ", color: textTertiary },
+								value: { text: formatVolume(current.volume ?? 0), color: textSecondary },
+							},
+						];
+					},
 				},
-				text: tooltipText,
 			},
 		},
 		indicator: {
@@ -190,16 +192,15 @@ export function buildKlineStyles(candleType: CandleType, options?: KlineStyleOpt
 				},
 			],
 			tooltip: {
-				showRule: TooltipShowRule.Always,
-				showType: TooltipShowType.Standard,
-				text: tooltipText,
+				showRule: "always",
+				showType: "standard",
+				title: tooltipText,
+				legend: tooltipText,
 			},
 		},
 		xAxis: { show: true, axisLine, tickLine, tickText },
 		yAxis: {
 			show: true,
-			position: YAxisPosition.Right,
-			inside: options?.yAxisInside ?? false,
 			axisLine: options?.yAxisInside ? { show: false } : axisLine,
 			tickLine: options?.yAxisInside ? { show: false } : tickLine,
 			tickText: options?.yAxisInside ? { ...tickText, marginStart: 2, marginEnd: 2 } : tickText,

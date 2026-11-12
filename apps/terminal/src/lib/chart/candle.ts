@@ -1,7 +1,8 @@
 import type { CandleSnapshotResponse, CandleWsEvent } from "@nktkas/hyperliquid";
-import type { KLineData } from "klinecharts";
+import type { KLineData, Period, PeriodType } from "klinecharts";
 import { toNumber } from "@/lib/trade/numbers";
 import type { Bar } from "@/types/charting_library";
+import type { CandleInterval } from "./resolution";
 
 interface RawCandle {
 	t: number;
@@ -70,4 +71,11 @@ export function candleEventToKLineData(event: CandleWsEvent): KLineData | null {
 	const bar = candleEventToBar(event);
 	if (!bar) return null;
 	return barToKLineData(bar);
+}
+
+const PERIOD_TYPES: Record<string, PeriodType> = { m: "minute", h: "hour", d: "day", w: "week", M: "month" };
+
+export function candleIntervalToPeriod(interval: CandleInterval): Period {
+	const span = Number.parseInt(interval, 10);
+	return { span, type: PERIOD_TYPES[interval.slice(String(span).length)] };
 }
