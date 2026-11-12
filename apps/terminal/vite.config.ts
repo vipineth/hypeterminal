@@ -1,11 +1,11 @@
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
-import viteReact from '@vitejs/plugin-react'
+import babel from '@rolldown/plugin-babel'
+import viteReact, { reactCompilerPreset } from '@vitejs/plugin-react'
 import { nitro } from 'nitro/vite'
 import { defineConfig } from 'vite'
-import viteTsConfigPaths from 'vite-tsconfig-paths'
 import { lingui } from '@lingui/vite-plugin'
-import { securityHeaders } from './src/config/security-headers'
+import { securityHeaders } from './src/config/security-headers.ts'
 
 function createManualChunks(id: string) {
   if (id.includes('node_modules')) {
@@ -27,6 +27,7 @@ const config = defineConfig({
   },
   resolve: {
     dedupe: ['react', 'react-dom', '@tanstack/react-query', 'wagmi'],
+    tsconfigPaths: true,
   },
   optimizeDeps: {
     include: ['@lifi/sdk', '@tanstack/react-table', '@tanstack/react-virtual'],
@@ -34,7 +35,7 @@ const config = defineConfig({
   environments: {
     client: {
       build: {
-        rollupOptions: {
+        rolldownOptions: {
           output: {
             manualChunks: createManualChunks,
           },
@@ -57,17 +58,11 @@ const config = defineConfig({
         },
       },
     }),
-    lingui(),
-    viteTsConfigPaths({
-      projects: ['./tsconfig.json'],
-    }),
+    lingui({ macroTransform: true }),
     tailwindcss(),
     tanstackStart(),
-    viteReact({
-      babel: {
-        plugins: ['@lingui/babel-plugin-lingui-macro', 'babel-plugin-react-compiler'],
-      },
-    }),
+    viteReact(),
+    babel({ presets: [reactCompilerPreset()] }),
   ].filter(Boolean),
 })
 
