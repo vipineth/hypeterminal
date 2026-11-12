@@ -110,5 +110,3 @@ export function useDefaultDexBalances(): AccountBalances {
 		hasError,
 	};
 }
-
-export { useDefaultDexBalances as useAccountBalances };

@@ -34,13 +34,6 @@ export {
 export { useSubscription } from "./hooks/useSubscription";
 export { useTradingGuard } from "./hooks/useTradingGuard";
 export { useHttpTransport, useSubscriptionTransport } from "./hooks/useTransport";
-export { enableHyperliquidDebug } from "./internal/websocket/debug";
-export {
-	createHealthReport,
-	type HealthAlert,
-	type HealthReport,
-	registerHealthReport,
-} from "./internal/websocket/health";
 export { getReconnectDelayMs, WS_RELIABILITY_LIMITS } from "./internal/websocket/reliability";
 export type {
 	BuilderPerpMarket,

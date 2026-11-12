@@ -246,13 +246,6 @@ export function throwIfResponseError(status: unknown): void {
 	if (error) throw new Error(error);
 }
 
-export function throwIfAnyResponseError(statuses: unknown[] | undefined): void {
-	if (!statuses) return;
-	for (const status of statuses) {
-		throwIfResponseError(status);
-	}
-}
-
 export function getDefaultLeverage(maxLeverage: number): number {
 	if (maxLeverage <= DEFAULT_LEVERAGE_FALLBACK) return maxLeverage;
 	return Math.floor(maxLeverage / 2);

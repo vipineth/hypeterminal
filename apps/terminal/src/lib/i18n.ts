@@ -1,8 +1,6 @@
 import { i18n, type Messages } from "@lingui/core";
 import { defaultLocale } from "@/config/i18n";
 
-export { resolveNumberFormatLocale } from "@/config/i18n";
-
 import { messages as enMessages } from "@/locales/en/messages.po";
 
 i18n.loadAndActivate({ locale: defaultLocale, messages: enMessages });

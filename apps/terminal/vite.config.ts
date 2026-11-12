@@ -2,13 +2,10 @@ import tailwindcss from '@tailwindcss/vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
 import { nitro } from 'nitro/vite'
-import { defineConfig, type PluginOption } from 'vite'
+import { defineConfig } from 'vite'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 import { lingui } from '@lingui/vite-plugin'
-import { visualizer } from 'rollup-plugin-visualizer'
 import { securityHeaders } from './src/config/security-headers'
-
-const isAnalyze = process.env.ANALYZE === 'true'
 
 function createManualChunks(id: string) {
   if (id.includes('node_modules')) {
@@ -33,9 +30,6 @@ const config = defineConfig({
   },
   optimizeDeps: {
     include: ['@lifi/sdk', '@tanstack/react-table', '@tanstack/react-virtual'],
-  },
-  build: {
-    sourcemap: isAnalyze,
   },
   environments: {
     client: {
@@ -74,14 +68,6 @@ const config = defineConfig({
         plugins: ['@lingui/babel-plugin-lingui-macro', 'babel-plugin-react-compiler'],
       },
     }),
-    isAnalyze &&
-      (visualizer({
-        filename: 'dist/stats.html',
-        open: true,
-        gzipSize: true,
-        brotliSize: true,
-        template: 'treemap',
-      }) as PluginOption),
   ].filter(Boolean),
 })
 

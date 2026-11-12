@@ -8,10 +8,7 @@ export const FORMAT_COMPACT_DEFAULT = true;
 export const DEFAULT_FAVORITE_MARKETS = ["BTC", "ETH", "HYPE"] as const;
 
 export const RECENT_WALLETS_LIMIT = 3;
-
-export const DEFAULT_MARKET_KEY = "perp:BTC";
 export const DEFAULT_MARKET_NAME = "BTC";
-export const DEFAULT_MARKET_SCOPE = "perp" as const;
 export const DEFAULT_QUOTE_TOKEN = "USDC";
 export const USDC_TRANSFER_DECIMALS = 2;
 

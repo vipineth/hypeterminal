@@ -189,11 +189,6 @@ export function useMarginMode() {
 	return useGlobalSettingsStore((state) => state.marginMode);
 }
 
-export function useResolvedFormatLocale(): string {
-	const numberFormatLocale = useGlobalSettingsStore((state) => state.numberFormatLocale);
-	return resolveNumberFormatLocale(numberFormatLocale, i18n.locale as LocaleCode);
-}
-
 export function getResolvedFormatLocale(): string {
 	return resolveNumberFormatLocale(useGlobalSettingsStore.getState().numberFormatLocale, i18n.locale as LocaleCode);
 }

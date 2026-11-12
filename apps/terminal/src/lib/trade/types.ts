@@ -19,33 +19,4 @@ export interface ButtonContent {
 	variant: "cyan" | "buy" | "sell";
 }
 
-export interface TpSlState {
-	enabled: boolean;
-	tp: string;
-	sl: string;
-}
-
 export type ActiveModal = "wallet" | "marginMode" | null;
-
-export interface OrderRequest {
-	a: number;
-	b: boolean;
-	p: string;
-	s: string;
-	r: boolean;
-	t: OrderTimeInForce | OrderTrigger;
-}
-
-export interface OrderTimeInForce {
-	limit: { tif: "Gtc" | "Ioc" | "Alo" | "FrontendMarket" | "LiquidationMarket" };
-}
-
-export interface OrderTrigger {
-	trigger: {
-		isMarket: boolean;
-		triggerPx: string;
-		tpsl: "tp" | "sl";
-	};
-}
-
-export type OrderGrouping = "na" | "normalTpsl" | "positionTpsl";

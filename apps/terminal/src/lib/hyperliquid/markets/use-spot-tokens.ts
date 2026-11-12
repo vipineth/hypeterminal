@@ -22,5 +22,3 @@ export function useSpotTokens() {
 		},
 	};
 }
-
-export type UseSpotTokensReturn = ReturnType<typeof useSpotTokens>;

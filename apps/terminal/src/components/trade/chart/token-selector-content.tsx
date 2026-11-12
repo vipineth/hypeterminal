@@ -4,7 +4,6 @@ import { ArrowDownIcon, ArrowsDownUpIcon, ArrowUpIcon } from "@phosphor-icons/re
 import { flexRender } from "@tanstack/react-table";
 import { cn } from "@/lib/cn";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid";
-import { useRenderCommitTrack } from "@/lib/performance/render-profile";
 import { getMarketTableColumnClass, type MarketScope } from "./token-selector-columns";
 import { TokenSelectorRow } from "./token-selector-row";
 import type { useTokenSelector } from "./use-token-selector";
@@ -88,7 +87,6 @@ export function TokenSelectorContent({
 	headingId,
 	mobile,
 }: Props) {
-	useRenderCommitTrack("token-search");
 	const headerGroup = table.getHeaderGroups()[0];
 	const marketScopes: { value: MarketScope; label: string }[] = [
 		{ value: "all", label: t`All` },

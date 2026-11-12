@@ -8,7 +8,6 @@ import { useDefaultDexBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { useSubscription, useUserPositions } from "@/lib/hyperliquid";
 import { createLazyComponent } from "@/lib/lazy";
-import { useRenderCommitTrack } from "@/lib/performance/render-profile";
 import { toNumberOrZero } from "@/lib/trade/numbers";
 import { useGlobalSettingsActions, usePositionsActiveTab } from "@/stores/use-global-settings-store";
 
@@ -23,7 +22,6 @@ const PositionsTab = createLazyComponent(() => import("./positions-tab"), "Posit
 const TwapTab = createLazyComponent(() => import("./twap-tab"), "TwapTab");
 
 export function PositionsPanel() {
-	useRenderCommitTrack("positions-table");
 	const activeTab = usePositionsActiveTab();
 	const { setPositionsActiveTab } = useGlobalSettingsActions();
 	const [isPending, startTransition] = useTransition();

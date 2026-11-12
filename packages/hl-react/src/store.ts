@@ -101,33 +101,10 @@ function detachFailureListener(runtime: SubscriptionRuntime): void {
 	runtime.detachFailureListener = undefined;
 }
 
-export type ChaosState = {
-	messageFrozenUntil: number;
-	reconnectDropCount: number;
-};
-
-export type StoreInternals = {
-	subscriptionRuntime: Map<string, SubscriptionRuntime>;
-	watchdog: StalenessWatchdog;
-	visibilityBuffer: Map<string, unknown>;
-	chaos: ChaosState;
-};
-
-const internalsByStore = new WeakMap<HyperliquidStore, StoreInternals>();
-
-export function getStoreInternals(store: HyperliquidStore): StoreInternals {
-	const internals = internalsByStore.get(store);
-	if (!internals) {
-		throw new Error("Store internals not found — store was not created by createHyperliquidStore");
-	}
-	return internals;
-}
-
 export function createHyperliquidStore(initialConfig: HyperliquidConfig): HyperliquidStore {
 	const subscriptionRuntime = new Map<string, SubscriptionRuntime>();
 	const watchdog: StalenessWatchdog = createStalenessWatchdog(WS_RELIABILITY_LIMITS.staleness.checkIntervalMs);
 	const visibilityBuffer = new Map<string, unknown>();
-	const chaos: ChaosState = { messageFrozenUntil: 0, reconnectDropCount: 0 };
 	let singletonsAttached = false;
 	let detachVisibility: (() => void) | undefined;
 	let detachNetwork: (() => void) | undefined;
@@ -338,21 +315,6 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 				const runtime = subscriptionRuntime.get(key);
 				if (!runtime || runtime.refCount <= 0 || runtime.promise || runtime.subscription) return;
 
-				if (chaos.reconnectDropCount > 0) {
-					chaos.reconnectDropCount--;
-					set((state) => {
-						const current = state.subscriptions[key];
-						if (!current) return state;
-						return setSubscriptionEntry(state, key, {
-							...current,
-							status: "error",
-							error: new Error("Chaos: reconnect dropped"),
-						});
-					});
-					scheduleReconnect();
-					return;
-				}
-
 				runtime.promise = subscribe()
 					.then((subscription) => {
 						const runtime = subscriptionRuntime.get(key);
@@ -497,7 +459,6 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 			}
 		},
 		setSubscriptionData: (key, data) => {
-			if (chaos.messageFrozenUntil > Date.now()) return;
 			watchdog.markFresh(key);
 			if (getVisibilityState() === "hidden" && shouldPauseKey(key)) {
 				visibilityBuffer.set(key, data);
@@ -533,9 +494,6 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 			});
 		},
 	}));
-
-	const internals: StoreInternals = { subscriptionRuntime, watchdog, visibilityBuffer, chaos };
-	internalsByStore.set(store, internals);
 
 	return store;
 }

@@ -67,10 +67,3 @@ export const tpTriggerBelowMarkValidator: Validator<TriggerContext> = createVali
 		return ctx.triggerPriceNum < ctx.markPx;
 	},
 });
-
-export const triggerValidators: Validator<TriggerContext>[] = [
-	stopTriggerAboveMarkValidator,
-	stopTriggerBelowMarkValidator,
-	tpTriggerAboveMarkValidator,
-	tpTriggerBelowMarkValidator,
-];

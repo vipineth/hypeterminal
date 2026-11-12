@@ -3,13 +3,6 @@ import type { SpotBalanceData } from "@/domain/trade/balances";
 import { floorToDecimals, formatDecimalFloor, toBig } from "@/lib/trade/numbers";
 import type { Side, SizeMode } from "@/lib/trade/types";
 
-interface MaxSizeInput {
-	isConnected: boolean;
-	maxTradeSzs: [number, number] | null;
-	szDecimals?: number;
-	side: Side;
-}
-
 interface OrderEntryMaxSizeInput {
 	isConnected: boolean;
 	isSpotMarket: boolean;
@@ -25,17 +18,6 @@ interface SizeValueInput {
 	sizeMode: SizeMode;
 	price: number;
 	szDecimals: number;
-}
-
-interface SizeValueResult {
-	sizeInputValue: number;
-	sizeValue: number;
-}
-
-interface SizeValuesInput {
-	sizeInput: string;
-	sizeMode: SizeMode;
-	conversionPx: number;
 }
 
 interface SizeForPercentInput {
@@ -83,17 +65,6 @@ export function getMaxSizeForOrderEntry(input: OrderEntryMaxSizeInput): number {
 	return maxTradeSize > 0 ? maxTradeSize : 0;
 }
 
-export function getMaxSize(input: MaxSizeInput): number {
-	if (!input.isConnected) return 0;
-
-	const maxTradeSize = input.maxTradeSzs?.[input.side === "buy" ? 0 : 1] ?? 0;
-	if (maxTradeSize > 0) {
-		const floored = floorToDecimals(maxTradeSize, input.szDecimals ?? 0);
-		return Number.isFinite(floored) ? floored : 0;
-	}
-	return 0;
-}
-
 export function getSizeValueFromInput(input: SizeValueInput): number {
 	const inputVal = toBig(input.sizeInput);
 	if (!inputVal || inputVal.lte(0)) return 0;
@@ -111,14 +82,6 @@ export function getOrderValue(sizeValue: number, price: number): number {
 	const px = toBig(price);
 	if (!sz || !px || sz.lte(0) || px.lte(0)) return 0;
 	return sz.times(px).toNumber();
-}
-
-export function getSizeValues(input: SizeValuesInput): SizeValueResult {
-	const sizeInputValue = toBig(input.sizeInput)?.toNumber() ?? 0;
-	const convPx = toBig(input.conversionPx);
-	const sizeValue =
-		input.sizeMode === "quote" && convPx?.gt(0) ? Big(sizeInputValue).div(convPx).toNumber() : sizeInputValue;
-	return { sizeInputValue, sizeValue };
 }
 
 export function getSizeForPercent(input: SizeForPercentInput): string {

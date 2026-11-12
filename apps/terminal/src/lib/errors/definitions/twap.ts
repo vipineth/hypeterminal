@@ -39,5 +39,3 @@ export const twapMinNotionalValidator: Validator<TwapContext> = createValidator(
 		return ctx.orderValue >= minutes * TWAP_MIN_NOTIONAL_PER_MINUTE_USD;
 	},
 });
-
-export const twapValidators: Validator<TwapContext>[] = [twapMinutesRangeValidator, twapMinNotionalValidator];

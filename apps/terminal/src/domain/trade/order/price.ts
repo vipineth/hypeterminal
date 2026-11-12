@@ -11,10 +11,6 @@ import {
 } from "@/lib/trade/order-types";
 import type { Side } from "@/lib/trade/types";
 
-export function getConversionPrice(markPx: number, price: number): number {
-	return markPx > 0 ? markPx : price;
-}
-
 export function getOrderPrice(
 	orderType: OrderType,
 	markPx: number,

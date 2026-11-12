@@ -33,13 +33,6 @@ export interface Validator<TContext> {
 	validate: (ctx: TContext) => boolean;
 }
 
-export interface ValidationResult {
-	valid: boolean;
-	errors: ValidationError[];
-	canSubmit: boolean;
-	needsApproval: boolean;
-}
-
 export function createValidator<TContext>(config: {
 	id: string;
 	code: string;
@@ -77,9 +70,4 @@ export function runValidators<TContext>(validators: Validator<TContext>[], conte
 	}
 
 	return errors.sort((a, b) => a.priority - b.priority);
-}
-
-export function getFirstError<TContext>(validators: Validator<TContext>[], context: TContext): ValidationError | null {
-	const errors = runValidators(validators, context);
-	return errors.length > 0 ? errors[0] : null;
 }

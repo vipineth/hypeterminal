@@ -1,7 +1,7 @@
 import { Button, Modal, ModalContent, ModalFooter, ModalHeader, ModalPopup, ModalTitle } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { CaretDownIcon, CheckIcon, ShieldIcon, SpinnerGapIcon, StackIcon, WarningIcon } from "@phosphor-icons/react";
+import { CheckIcon, ShieldIcon, SpinnerGapIcon, StackIcon, WarningIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import { MARGIN_MODE_SUCCESS_DURATION_MS } from "@/config/time";
 import { useAutoCloseSuccess } from "@/hooks/ui/use-auto-close-success";
@@ -9,34 +9,6 @@ import { cn } from "@/lib/cn";
 import type { MarginMode } from "@/lib/trade/margin-mode";
 import { TradingActionButton } from "../components/trading-action-button";
 import { LeverageSlider } from "./leverage-slider";
-
-const MODE_ICONS = { cross: StackIcon, isolated: ShieldIcon } as const;
-
-interface MarginModeToggleProps {
-	mode: MarginMode;
-	disabled?: boolean;
-	onClick?: () => void;
-}
-
-export function MarginModeToggle({ mode, disabled, onClick }: MarginModeToggleProps) {
-	const label = mode === "cross" ? t`Cross` : t`Isolated`;
-	const Icon = MODE_ICONS[mode];
-
-	return (
-		<Button
-			variant="outline"
-			intent="neutral"
-			size="sm"
-			onClick={onClick}
-			disabled={disabled}
-			iconLeft={<Icon className="size-3" />}
-			iconRight={<CaretDownIcon className="size-3" />}
-			className="min-w-0"
-		>
-			<span className="truncate">{label}</span>
-		</Button>
-	);
-}
 
 interface Props {
 	open: boolean;

@@ -12,13 +12,8 @@ import {
 } from "./clients";
 import { createHyperliquidConfig } from "./create-config";
 import { ProviderNotFoundError } from "./errors";
-import { registerChaosHarness } from "./internal/websocket/chaos";
-import { registerDebugSnapshot, setDebugStore } from "./internal/websocket/debug";
-import { registerHealthReport } from "./internal/websocket/health";
 import type { BuilderConfig, HyperliquidEnv } from "./signing/types";
 import { createHyperliquidStore, type HyperliquidStore, type HyperliquidStoreState } from "./store";
-
-const DIAGNOSTICS_STORAGE_KEY = "hl-diagnostics-enabled";
 
 export interface HyperliquidContextValue {
 	info: InfoClient;
@@ -39,28 +34,6 @@ export interface HyperliquidProviderProps {
 	userAddress: `0x${string}` | undefined;
 	builderConfig: BuilderConfig;
 	agentName?: string;
-}
-
-function shouldExposeDiagnostics(): boolean {
-	if (import.meta.env.DEV) return true;
-	if (typeof window === "undefined") return false;
-
-	try {
-		const params = new URLSearchParams(window.location.search);
-		const diagnosticsFlag = params.get("hl_diagnostics");
-
-		if (diagnosticsFlag === "1" || diagnosticsFlag === "true") {
-			return true;
-		}
-
-		if (diagnosticsFlag === "0" || diagnosticsFlag === "false") {
-			return false;
-		}
-
-		return window.localStorage.getItem(DIAGNOSTICS_STORAGE_KEY) === "1";
-	} catch {
-		return false;
-	}
 }
 
 export function HyperliquidProvider({
@@ -88,12 +61,6 @@ export function HyperliquidProvider({
 				triggerReconnect: createWsReconnectTrigger(isTestnet),
 			}),
 		);
-		setDebugStore(storeRef.current);
-		if (import.meta.env.DEV) registerChaosHarness(storeRef.current);
-		if (shouldExposeDiagnostics()) {
-			registerDebugSnapshot(storeRef.current);
-			registerHealthReport(storeRef.current);
-		}
 	}
 
 	const clientKey = userAddress ?? "disconnected";

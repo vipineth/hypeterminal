@@ -31,20 +31,6 @@ export function calculateSlPrice(
 	return price.toFixed(decimals);
 }
 
-export function calculatePercentFromPrice(
-	referencePrice: Numeric,
-	targetPrice: Numeric,
-	side: Side,
-	type: "tp" | "sl",
-): number | null {
-	const ref = toSafeBig(referencePrice);
-	const target = toSafeBig(targetPrice);
-	if (ref.lte(0) || target.lte(0)) return null;
-
-	const percent = target.minus(ref).div(ref).times(100).toNumber();
-	return type === "tp" ? (side === "buy" ? percent : -percent) : side === "buy" ? -percent : percent;
-}
-
 interface TpSlCalcParams {
 	referencePrice: Numeric;
 	side: Side;
@@ -73,21 +59,6 @@ export function validateSlPrice(referencePrice: Numeric, slPrice: Numeric, side:
 	const sl = toSafeBig(slPrice);
 	if (ref.lte(0) || sl.lte(0)) return false;
 	return side === "buy" ? sl.lt(ref) : sl.gt(ref);
-}
-
-export function getTpSlValidationError(
-	referencePrice: Numeric,
-	tpPrice: Numeric,
-	slPrice: Numeric,
-	side: Side,
-): string | null {
-	if (toSafeBig(tpPrice).gt(0) && !validateTpPrice(referencePrice, tpPrice, side)) {
-		return side === "buy" ? "TP must be above entry price" : "TP must be below entry price";
-	}
-	if (toSafeBig(slPrice).gt(0) && !validateSlPrice(referencePrice, slPrice, side)) {
-		return side === "buy" ? "SL must be below entry price" : "SL must be above entry price";
-	}
-	return null;
 }
 
 export interface RiskRewardDisplay {

@@ -1,5 +1,3 @@
-export { BRIDGE2_ABI } from "./abi/bridge2";
-
 export const ARBITRUM_CHAIN_ID = 42161;
 export const HYPERCORE_CHAIN_ID = 1337;
 export const HYPERCORE_USDC_ADDRESS = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831";

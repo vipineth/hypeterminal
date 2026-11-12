@@ -208,9 +208,3 @@ export function createSearcher<T>(items: T[], config: SearchConfig<T>): Searcher
 		},
 	};
 }
-
-export function search<T>(items: T[], query: string, config: SearchConfig<T>): SearchResult<T>[] {
-	if (!query.trim()) return [];
-	const index = buildSearchIndex(items, config);
-	return searchIndex(index, query);
-}

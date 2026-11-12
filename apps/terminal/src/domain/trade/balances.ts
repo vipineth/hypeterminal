@@ -69,15 +69,6 @@ export function getPerpAvailable(
 	return Math.max(0, av.minus(mu).toNumber());
 }
 
-export function getAvailableFromTotals(
-	total: string | number | null | undefined,
-	hold: string | number | null | undefined,
-): number {
-	const t = toSafeBig(total);
-	const h = toSafeBig(hold);
-	return Math.max(0, t.minus(h).toNumber());
-}
-
 function getAvailableAfterMaintenanceValue(
 	token: number | string | null | undefined,
 	spotAvailableAfterMaintenance: SpotAvailableAfterMaintenance | null | undefined,
@@ -228,18 +219,6 @@ export function getSpotBalanceRows(
 
 	rows.sort((a, b) => toSafeBig(b.usdValue).cmp(toSafeBig(a.usdValue)));
 	return rows;
-}
-
-export function getBalanceRows(
-	perpSummary: PerpSummary | null | undefined,
-	spotBalances: SpotBalance[] | null | undefined,
-	spotAvailableAfterMaintenance?: SpotAvailableAfterMaintenance | null,
-	accountAbstraction?: AccountAbstraction | null,
-): BalanceRow[] {
-	return [
-		...getPerpBalanceRows(perpSummary, spotBalances, spotAvailableAfterMaintenance, accountAbstraction),
-		...getSpotBalanceRows(spotBalances, spotAvailableAfterMaintenance, accountAbstraction),
-	];
 }
 
 export function getNormalizedWithdrawable(

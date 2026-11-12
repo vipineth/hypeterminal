@@ -19,7 +19,3 @@ export function getBaseQuoteFromPairName(
 	const [baseToken, quoteToken] = pairName.split(separator);
 	return { baseToken, quoteToken };
 }
-
-export function getBaseToken(pairName: string, kind: MarketKind): string {
-	return getBaseQuoteFromPairName(pairName, kind).baseToken;
-}

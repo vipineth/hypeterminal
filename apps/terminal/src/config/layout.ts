@@ -19,13 +19,6 @@ export const PANEL_LAYOUT = {
 	},
 } as const;
 
-export const SIDEBAR_LAYOUT = {
-	WIDTH: "16rem",
-	WIDTH_MOBILE: "18rem",
-	WIDTH_ICON: "3rem",
-	KEYBOARD_SHORTCUT: "b",
-} as const;
-
 export const TOKEN_SELECTOR_ROW_HEIGHT_PX = 48;
 export const TOKEN_SELECTOR_OVERSCAN = 10;
 

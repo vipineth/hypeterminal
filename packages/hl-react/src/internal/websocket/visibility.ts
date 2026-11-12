@@ -1,8 +1,6 @@
 // Module-level singleton shared across all HyperliquidStore instances in the
 // same app. Listener attach/detach is reference-counted, so two providers
-// coexisting is safe; the assumption is that `apps/terminal` mounts exactly
-// one provider, which is also where `__hl_debug` and the chaos harness
-// register. If that ever changes, reach for a per-store instance instead.
+// coexisting is safe.
 type VisibilityState = "visible" | "hidden";
 type VisibilityListener = (state: VisibilityState) => void;
 

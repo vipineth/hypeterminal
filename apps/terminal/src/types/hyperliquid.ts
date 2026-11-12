@@ -1,7 +1,4 @@
-import type { AllDexsAssetCtxsEvent, AssetCtxsEvent, SpotAssetCtxsEvent } from "@nktkas/hyperliquid/api/subscription";
-
-export type PerpAssetCtx = AssetCtxsEvent["ctxs"][number];
-export type PerpAssetCtxs = AssetCtxsEvent["ctxs"];
+import type { AllDexsAssetCtxsEvent, SpotAssetCtxsEvent } from "@nktkas/hyperliquid/api/subscription";
 
 export type AllDexsAssetCtxs = AllDexsAssetCtxsEvent["ctxs"];
 export type DexAssetCtxs = AllDexsAssetCtxs[number];

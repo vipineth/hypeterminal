@@ -24,7 +24,12 @@
 		"./signing/agent-storage": "./src/signing/agent-storage.ts",
 		"./signing/l1-agent-wallet": "./src/signing/l1-agent-wallet.ts",
 		"./signing/mobile-agent": "./src/signing/mobile-agent.ts",
-		"./internal/websocket/*": "./src/internal/websocket/*.ts"
+		"./internal/websocket/batch-updater": "./src/internal/websocket/batch-updater.ts",
+		"./internal/websocket/network-status": "./src/internal/websocket/network-status.ts",
+		"./internal/websocket/payload-guard": "./src/internal/websocket/payload-guard.ts",
+		"./internal/websocket/reliability": "./src/internal/websocket/reliability.ts",
+		"./internal/websocket/staleness": "./src/internal/websocket/staleness.ts",
+		"./internal/websocket/visibility": "./src/internal/websocket/visibility.ts"
 	},
 	"scripts": {
 		"typecheck": "tsc -p tsconfig.json --noEmit"

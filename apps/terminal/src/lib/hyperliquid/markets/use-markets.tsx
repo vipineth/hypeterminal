@@ -163,17 +163,6 @@ function createMarkets(params: CreateMarketsParams): Markets {
 	};
 }
 
-function createEmptyMarkets(): Markets {
-	return createMarkets({
-		perpMeta: undefined,
-		spotMeta: undefined,
-		allPerpMetas: undefined,
-		perpDexs: undefined,
-		isLoading: true,
-		error: null,
-	});
-}
-
 const MarketsContext = createContext<Markets | null>(null);
 
 interface Props {
@@ -232,5 +221,3 @@ export function useMarkets(): Markets {
 	}
 	return context;
 }
-
-export { createEmptyMarkets };

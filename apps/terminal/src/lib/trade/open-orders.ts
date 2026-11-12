@@ -32,20 +32,6 @@ export function isClosePositionOrder(order: OpenOrder): boolean {
 	return !!origSz && origSz.eq(0);
 }
 
-export function getFilledSize(order: OpenOrder): number {
-	const origSz = toBig(order.origSz);
-	const remaining = toBig(order.sz);
-	if (!origSz || !remaining) return Number.NaN;
-	return origSz.minus(remaining).toNumber();
-}
-
-export function getFillPercent(order: OpenOrder): number {
-	const origSz = toBig(order.origSz);
-	const filled = getFilledSize(order);
-	if (!origSz || origSz.eq(0) || !Number.isFinite(filled)) return 0;
-	return toBig(filled)?.div(origSz).times(100).toNumber() ?? 0;
-}
-
 export function getOrderValue(order: OpenOrder): number | null {
 	const limitPx = toBig(order.limitPx);
 	const origSz = toBig(order.origSz);
