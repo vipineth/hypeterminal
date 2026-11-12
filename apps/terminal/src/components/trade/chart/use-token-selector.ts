@@ -1,4 +1,4 @@
-import { getCoreRowModel, getSortedRowModel, type Row, type SortingState, useReactTable } from "@tanstack/react-table";
+import { type ReactTable, type Row, type SortingState, useTable } from "@tanstack/react-table";
 import { useVirtualizer, type VirtualItem, type Virtualizer } from "@tanstack/react-virtual";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { TOKEN_SELECTOR_OVERSCAN, TOKEN_SELECTOR_ROW_HEIGHT_PX } from "@/config/layout";
@@ -9,7 +9,12 @@ import { useMarketsInfo } from "@/lib/hyperliquid";
 import { createSearcher } from "@/lib/search";
 import { useExchangeScope } from "@/providers/exchange-scope";
 import { useFavoriteMarkets, useMarketActions } from "@/stores/use-market-store";
-import { type MarketRow, type MarketScope, TOKEN_SELECTOR_COLUMNS } from "./token-selector-columns";
+import {
+	type MarketRow,
+	type MarketScope,
+	TOKEN_SELECTOR_COLUMNS,
+	tokenSelectorFeatures,
+} from "./token-selector-columns";
 
 export interface Subcategory {
 	value: string;
@@ -41,8 +46,8 @@ export interface UseTokenSelectorReturn {
 	handleSubcategorySelect: (sub: string) => void;
 	handleScopeSelect: (scope: MarketScope) => void;
 	toggleFavorite: (name: string) => void;
-	table: ReturnType<typeof useReactTable<MarketRow>>;
-	rows: Row<MarketRow>[];
+	table: ReactTable<typeof tokenSelectorFeatures, MarketRow>;
+	rows: Row<typeof tokenSelectorFeatures, MarketRow>[];
 	virtualizer: Virtualizer<HTMLDivElement, Element>;
 	virtualItems: VirtualItem[];
 	totalSize: number;
@@ -216,11 +221,10 @@ export function useTokenSelector({
 		});
 	}
 
-	const table = useReactTable({
+	const table = useTable({
+		features: tokenSelectorFeatures,
 		data: filteredMarkets,
 		columns: TOKEN_SELECTOR_COLUMNS,
-		getCoreRowModel: getCoreRowModel(),
-		getSortedRowModel: getSortedRowModel(),
 		state: { sorting },
 		onSortingChange: setSorting,
 		enableSortingRemoval: false,

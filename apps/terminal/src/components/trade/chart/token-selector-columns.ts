@@ -1,5 +1,11 @@
 import { t } from "@lingui/core/macro";
-import { createColumnHelper, type SortingFn } from "@tanstack/react-table";
+import {
+	createColumnHelper,
+	createSortedRowModel,
+	rowSortingFeature,
+	type SortFn,
+	tableFeatures,
+} from "@tanstack/react-table";
 import { get24hChange, getOiUsd } from "@/domain/market";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid";
 
@@ -10,9 +16,14 @@ export type MarketRow = UnifiedMarketInfo;
 const TOKEN_SELECTOR_MOBILE_24H_CHANGE_WIDTH = "w-[7.25rem]";
 const TOKEN_SELECTOR_MOBILE_PRICE_WIDTH = "w-[4.75rem]";
 
-const columnHelper = createColumnHelper<MarketRow>();
+export const tokenSelectorFeatures = tableFeatures({
+	rowSortingFeature,
+	sortedRowModel: createSortedRowModel(),
+});
 
-const numericStringSortFn: SortingFn<MarketRow> = (rowA, rowB, columnId) => {
+const columnHelper = createColumnHelper<typeof tokenSelectorFeatures, MarketRow>();
+
+const numericStringSortFn: SortFn<typeof tokenSelectorFeatures, MarketRow> = (rowA, rowB, columnId) => {
 	const a = Number(rowA.getValue(columnId));
 	const b = Number(rowB.getValue(columnId));
 	if (Number.isNaN(a) || Number.isNaN(b)) return 0;
@@ -45,43 +56,37 @@ export function getMarketTableColumnClass(columnId: string, mobile: boolean): st
 	}
 }
 
-export const TOKEN_SELECTOR_COLUMNS = [
+export const TOKEN_SELECTOR_COLUMNS = columnHelper.columns([
 	columnHelper.accessor("pairName", {
 		header: t`Market`,
-		size: 220,
 		enableSorting: false,
 	}),
 	columnHelper.accessor("markPx", {
 		id: "price",
 		header: t`Price`,
-		size: 80,
 		sortUndefined: "last",
-		sortingFn: numericStringSortFn,
+		sortFn: numericStringSortFn,
 	}),
 	columnHelper.accessor((row: MarketRow) => get24hChange(row.prevDayPx, row.markPx) ?? undefined, {
 		id: "24h-change",
 		header: t`24h Change`,
-		size: 112,
 		sortUndefined: "last",
 	}),
 	columnHelper.accessor((row: MarketRow) => getOiUsd(row.openInterest, row.markPx) ?? undefined, {
 		id: "oi",
 		header: t`Open Interest`,
-		size: 128,
 		sortUndefined: "last",
 	}),
 	columnHelper.accessor("dayNtlVlm", {
 		id: "volume",
 		header: t`Volume`,
-		size: 80,
 		sortUndefined: "last",
-		sortingFn: numericStringSortFn,
+		sortFn: numericStringSortFn,
 	}),
 	columnHelper.accessor("funding", {
 		id: "funding",
 		header: t`Funding`,
-		size: 80,
 		sortUndefined: "last",
-		sortingFn: numericStringSortFn,
+		sortFn: numericStringSortFn,
 	}),
-];
+]);
