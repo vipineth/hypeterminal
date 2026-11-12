@@ -24,16 +24,13 @@
 		"./signing/agent-storage": "./src/signing/agent-storage.ts",
 		"./signing/l1-agent-wallet": "./src/signing/l1-agent-wallet.ts",
 		"./signing/mobile-agent": "./src/signing/mobile-agent.ts",
-		"./internal/websocket/*": "./src/internal/websocket/*.ts",
-		"./internal/circular-buffer/use-ring-buffer": "./src/internal/circular-buffer/use-ring-buffer.ts"
+		"./internal/websocket/*": "./src/internal/websocket/*.ts"
 	},
 	"scripts": {
-		"typecheck": "tsc -p tsconfig.json --noEmit",
-		"test": "vitest run"
+		"typecheck": "tsc -p tsconfig.json --noEmit"
 	},
 	"devDependencies": {
-		"@types/react": "19.2.7",
-		"vitest": "4.1.8"
+		"@types/react": "19.2.7"
 	},
 	"peerDependencies": {
 		"@nktkas/hyperliquid": ">=0.32.2 <1",
