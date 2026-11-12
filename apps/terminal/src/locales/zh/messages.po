@@ -51,7 +51,7 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/trade/chart/token-selector-columns.ts:63
-#: src/components/trade/chart/token-selector-content.tsx:17
+#: src/components/trade/chart/token-selector-content.tsx:16
 msgid "24h Change"
 msgstr ""
 
@@ -160,12 +160,12 @@ msgstr ""
 #~ msgid "Agent verification failed"
 #~ msgstr ""
 
-#: src/components/trade/chart/token-selector-content.tsx:94
+#: src/components/trade/chart/token-selector-content.tsx:92
 #: src/config/nav.tsx:34
 msgid "All"
 msgstr ""
 
-#: src/components/trade/tradebox/margin-mode-modal.tsx:69
+#: src/components/trade/tradebox/margin-mode-modal.tsx:41
 msgid "All cross positions share the same cross margin as collateral. In the event of liquidation, your cross margin balance and any remaining open positions may be forfeited."
 msgstr ""
 
@@ -371,8 +371,7 @@ msgstr ""
 #: src/components/trade/positions/twap-tab.tsx:193
 #: src/components/trade/tradebox/deposit-modal.tsx:149
 #: src/components/trade/tradebox/deposit-modal.tsx:204
-#: src/components/trade/tradebox/leverage-control.tsx:187
-#: src/components/trade/tradebox/margin-mode-modal.tsx:244
+#: src/components/trade/tradebox/margin-mode-modal.tsx:216
 #: src/routes/mobile-agent-sync.tsx:413
 msgid "Cancel"
 msgstr "取消"
@@ -416,13 +415,13 @@ msgstr "取消中..."
 #~ msgid "cancelled"
 #~ msgstr "已取消"
 
-#: src/components/trade/tradebox/margin-mode-modal.tsx:228
+#: src/components/trade/tradebox/margin-mode-modal.tsx:200
 msgid "Cannot switch to Isolated mode with an open position. Close your position first."
 msgstr ""
 
 #: src/components/trade/tradebox/leverage-control.tsx:36
-msgid "Change leverage"
-msgstr ""
+#~ msgid "Change leverage"
+#~ msgstr ""
 
 #: src/components/trade/components/global-settings-dialog.tsx:
 #~ msgid "Chart"
@@ -480,9 +479,7 @@ msgstr "平仓中..."
 
 #: src/components/trade/positions/position-tpsl-modal.tsx:179
 #: src/components/trade/tradebox/bridge/confirmation-screen.tsx:162
-#: src/components/trade/tradebox/leverage-control.tsx:213
-#: src/components/trade/tradebox/leverage-control.tsx:227
-#: src/components/trade/tradebox/margin-mode-modal.tsx:265
+#: src/components/trade/tradebox/margin-mode-modal.tsx:237
 msgid "Confirm"
 msgstr ""
 
@@ -543,7 +540,7 @@ msgstr ""
 #: src/components/trade/header/user-menu.tsx:73
 #: src/components/trade/mobile/mobile-account-view.tsx:69
 #: src/components/trade/mobile/mobile-account-view.tsx:75
-#: src/components/trade/mobile/mobile-nav-drawer.tsx:146
+#: src/components/trade/mobile/mobile-nav-drawer.tsx:143
 #: src/lib/trade/use-button-content.ts:48
 msgid "Connect Wallet"
 msgstr "连接钱包"
@@ -729,8 +726,7 @@ msgid "Creating link..."
 msgstr ""
 
 #: src/components/trade/positions/position-row.tsx:199
-#: src/components/trade/tradebox/margin-mode-modal.tsx:22
-#: src/components/trade/tradebox/margin-mode-modal.tsx:67
+#: src/components/trade/tradebox/margin-mode-modal.tsx:39
 #: src/components/trade/tradebox/trade-header.tsx:68
 msgid "Cross"
 msgstr "全仓"
@@ -751,7 +747,7 @@ msgstr ""
 msgid "Cross Margin Ratio"
 msgstr ""
 
-#: src/components/trade/tradebox/margin-mode-modal.tsx:108
+#: src/components/trade/tradebox/margin-mode-modal.tsx:80
 msgid "Current"
 msgstr ""
 
@@ -779,8 +775,8 @@ msgstr ""
 msgid "Default"
 msgstr ""
 
-#: src/components/trade/header/top-nav.tsx:101
-#: src/components/trade/mobile/mobile-nav-drawer.tsx:135
+#: src/components/trade/header/top-nav.tsx:99
+#: src/components/trade/mobile/mobile-nav-drawer.tsx:132
 #: src/components/trade/tradebox/account-panel.tsx:163
 #: src/components/trade/tradebox/account-panel.tsx:166
 #: src/components/trade/tradebox/deposit-modal.tsx:119
@@ -885,7 +881,7 @@ msgstr ""
 #~ msgid "Duration (Minutes)"
 #~ msgstr ""
 
-#: src/components/trade/tradebox/margin-mode-modal.tsx:76
+#: src/components/trade/tradebox/margin-mode-modal.tsx:48
 msgid "Each position uses only its allocated margin. If the margin ratio reaches 100%, the position is liquidated. Margin can be added or removed individually."
 msgstr ""
 
@@ -1000,8 +996,8 @@ msgid "Executed"
 msgstr "已执行"
 
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx:87
-msgid "Execution"
-msgstr ""
+#~ msgid "Execution"
+#~ msgstr ""
 
 #: src/components/trade/order-entry/account-panel.tsx:
 #~ msgid "Expand account panel"
@@ -1063,7 +1059,7 @@ msgstr "加载资金费用历史失败。"
 msgid "Failed to load open orders."
 msgstr "加载未成交订单失败。"
 
-#: src/components/trade/orderbook/orderbook-panel.tsx:155
+#: src/components/trade/orderbook/orderbook-panel.tsx:153
 msgid "Failed to load order book."
 msgstr "加载订单簿失败。"
 
@@ -1145,7 +1141,7 @@ msgid "Filled"
 msgstr "已成交"
 
 #. placeholder {0}: sub.label
-#: src/components/trade/chart/token-selector-content.tsx:160
+#: src/components/trade/chart/token-selector-content.tsx:158
 msgid "Filter by {0}"
 msgstr "按 {0} 筛选"
 
@@ -1171,7 +1167,7 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/trade/chart/token-selector-columns.ts:82
-#: src/components/trade/chart/token-selector-content.tsx:23
+#: src/components/trade/chart/token-selector-content.tsx:22
 #: src/components/trade/mobile/mobile-position-card.tsx:172
 #: src/components/trade/positions/positions-tab.tsx:197
 msgid "Funding"
@@ -1228,7 +1224,7 @@ msgstr ""
 msgid "Hide small"
 msgstr ""
 
-#: src/components/trade/chart/token-selector-content.tsx:97
+#: src/components/trade/chart/token-selector-content.tsx:95
 msgid "HIP-3"
 msgstr ""
 
@@ -1272,8 +1268,6 @@ msgstr ""
 msgid "Insufficient <0/> balance"
 msgstr ""
 
-#: src/lib/errors/definitions/deposit.ts:42
-#: src/lib/errors/definitions/deposit.ts:60
 #: src/lib/hyperliquid/use-deposit.ts:57
 #: src/lib/trade/withdraw-validation.ts:15
 msgid "Insufficient balance"
@@ -1301,8 +1295,7 @@ msgid "IOC (Immediate Or Cancel)"
 msgstr ""
 
 #: src/components/trade/positions/position-row.tsx:199
-#: src/components/trade/tradebox/margin-mode-modal.tsx:22
-#: src/components/trade/tradebox/margin-mode-modal.tsx:74
+#: src/components/trade/tradebox/margin-mode-modal.tsx:46
 #: src/components/trade/tradebox/trade-header.tsx:68
 msgid "Isolated"
 msgstr "逐仓"
@@ -1311,7 +1304,7 @@ msgstr "逐仓"
 #~ msgid "Latency:"
 #~ msgstr "延迟:"
 
-#: src/config/nav.tsx:73
+#: src/config/nav.tsx:67
 msgid "Leaderboard"
 msgstr "排行榜"
 
@@ -1319,9 +1312,7 @@ msgstr "排行榜"
 msgid "Learn more"
 msgstr ""
 
-#: src/components/trade/tradebox/leverage-control.tsx:38
-#: src/components/trade/tradebox/leverage-control.tsx:131
-#: src/components/trade/tradebox/margin-mode-modal.tsx:203
+#: src/components/trade/tradebox/margin-mode-modal.tsx:175
 msgid "Leverage"
 msgstr ""
 
@@ -1400,7 +1391,7 @@ msgstr "加载余额中..."
 msgid "Loading funding history..."
 msgstr "加载资金费用历史中..."
 
-#: src/components/trade/chart/token-selector-content.tsx:228
+#: src/components/trade/chart/token-selector-content.tsx:226
 msgid "Loading markets..."
 msgstr "加载市场中..."
 
@@ -1424,7 +1415,7 @@ msgstr "加载交易历史中..."
 msgid "Loading TWAP orders..."
 msgstr "加载 TWAP 订单中..."
 
-#: src/lib/errors/definitions/connection.ts:36
+#: src/lib/errors/definitions/connection.ts:30
 msgid "Loading wallet..."
 msgstr "加载钱包中..."
 
@@ -1501,11 +1492,11 @@ msgstr ""
 msgid "Margin · Iso"
 msgstr ""
 
-#: src/components/trade/tradebox/margin-mode-modal.tsx:172
+#: src/components/trade/tradebox/margin-mode-modal.tsx:144
 msgid "Margin & leverage"
 msgstr ""
 
-#: src/components/trade/tradebox/margin-mode-modal.tsx:179
+#: src/components/trade/tradebox/margin-mode-modal.tsx:151
 msgid "Margin mode"
 msgstr ""
 
@@ -1548,7 +1539,7 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/trade/chart/token-selector-columns.ts:50
-#: src/components/trade/chart/token-selector-content.tsx:179
+#: src/components/trade/chart/token-selector-content.tsx:177
 #: src/components/trade/mobile/mobile-orders-tab.tsx:230
 #: src/components/trade/positions/orders-tab.tsx:371
 #: src/components/trade/tradebox/trade-header.tsx:43
@@ -1564,7 +1555,7 @@ msgstr ""
 #~ msgid "Market metadata unavailable."
 #~ msgstr "市场元数据不可用。"
 
-#: src/lib/errors/definitions/market.ts:33
+#: src/lib/errors/definitions/market.ts:31
 msgid "Market not ready"
 msgstr "市场未就绪"
 
@@ -1572,12 +1563,12 @@ msgstr "市场未就绪"
 #~ msgid "Market Order Slippage"
 #~ msgstr "市价单滑点"
 
-#: src/components/trade/chart/token-selector-content.tsx:267
+#: src/components/trade/chart/token-selector-content.tsx:265
 msgid "markets"
 msgstr "个市场"
 
-#: src/components/trade/chart/token-selector-content.tsx:235
-#: src/components/trade/mobile/mobile-nav-drawer.tsx:84
+#: src/components/trade/chart/token-selector-content.tsx:233
+#: src/components/trade/mobile/mobile-nav-drawer.tsx:81
 msgid "Markets"
 msgstr ""
 
@@ -1631,8 +1622,8 @@ msgstr ""
 
 #. placeholder {0}: ctx.minDeposit
 #: src/lib/errors/definitions/deposit.ts:33
-msgid "Minimum deposit is {0} USDC"
-msgstr ""
+#~ msgid "Minimum deposit is {0} USDC"
+#~ msgstr ""
 
 #: src/lib/hyperliquid/use-deposit.ts:56
 msgid "Minimum deposit is 5 USDC"
@@ -1640,8 +1631,8 @@ msgstr ""
 
 #. placeholder {0}: ctx.minWithdraw
 #: src/lib/errors/definitions/deposit.ts:51
-msgid "Minimum withdrawal is ${0}"
-msgstr ""
+#~ msgid "Minimum withdrawal is ${0}"
+#~ msgstr ""
 
 #: src/lib/trade/withdraw-validation.ts:14
 msgid "Minimum withdrawal is ${MIN_WITHDRAW_USD}"
@@ -1726,7 +1717,7 @@ msgstr "无活跃仓位。"
 msgid "No active TWAP orders."
 msgstr ""
 
-#: src/lib/errors/definitions/balance.ts:15
+#: src/lib/errors/definitions/balance.ts:13
 msgid "No balance"
 msgstr "无余额"
 
@@ -1757,15 +1748,15 @@ msgstr "未找到成交记录。"
 msgid "No funding payments found."
 msgstr "未找到资金费用记录。"
 
-#: src/lib/errors/definitions/market.ts:42
+#: src/lib/errors/definitions/market.ts:40
 msgid "No mark price"
 msgstr "无标记价格"
 
-#: src/lib/errors/definitions/market.ts:24
+#: src/lib/errors/definitions/market.ts:22
 msgid "No market"
 msgstr "无市场"
 
-#: src/components/trade/chart/token-selector-content.tsx:231
+#: src/components/trade/chart/token-selector-content.tsx:229
 msgid "No markets found."
 msgstr "未找到市场。"
 
@@ -1827,7 +1818,7 @@ msgstr ""
 msgid "No wallets found"
 msgstr "未找到钱包"
 
-#: src/lib/errors/definitions/connection.ts:27
+#: src/lib/errors/definitions/connection.ts:21
 msgid "Not connected"
 msgstr "未连接"
 
@@ -1882,7 +1873,7 @@ msgid "OPEN INT"
 msgstr ""
 
 #: src/components/trade/chart/token-selector-columns.ts:69
-#: src/components/trade/chart/token-selector-content.tsx:19
+#: src/components/trade/chart/token-selector-content.tsx:18
 msgid "Open Interest"
 msgstr "未平仓量"
 
@@ -1918,8 +1909,8 @@ msgstr ""
 msgid "ORACLE"
 msgstr "预言机"
 
-#: src/components/trade/orderbook/orderbook-panel.tsx:94
-#: src/components/trade/orderbook/orderbook-panel.tsx:95
+#: src/components/trade/orderbook/orderbook-panel.tsx:92
+#: src/components/trade/orderbook/orderbook-panel.tsx:93
 msgid "Order Book"
 msgstr "订单簿"
 
@@ -1974,8 +1965,6 @@ msgstr ""
 #~ msgid "Orders"
 #~ msgstr ""
 
-#: src/components/trade/tradebox/advanced-order-dropdown.tsx:72
-#: src/components/trade/tradebox/advanced-order-dropdown.tsx:94
 #: src/components/trade/tradebox/trade-header.tsx:41
 msgid "Other"
 msgstr ""
@@ -1985,8 +1974,8 @@ msgstr ""
 #~ msgstr ""
 
 #: src/config/nav.tsx:58
-msgid "Outcome"
-msgstr ""
+#~ msgid "Outcome"
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:614
 msgid "Owner account"
@@ -2051,7 +2040,7 @@ msgstr "待处理"
 #~ msgid "perp"
 #~ msgstr "永续"
 
-#: src/components/trade/chart/token-selector-content.tsx:95
+#: src/components/trade/chart/token-selector-content.tsx:93
 #: src/components/trade/positions/transfer-modal.tsx:67
 #: src/components/trade/positions/transfer-modal.tsx:68
 #: src/config/nav.tsx:40
@@ -2124,7 +2113,7 @@ msgstr ""
 msgid "Placed"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-nav-drawer.tsx:106
+#: src/components/trade/mobile/mobile-nav-drawer.tsx:103
 msgid "Platform"
 msgstr ""
 
@@ -2146,7 +2135,7 @@ msgstr ""
 #~ msgid "Popular"
 #~ msgstr ""
 
-#: src/config/nav.tsx:71
+#: src/config/nav.tsx:65
 msgid "Portfolio"
 msgstr "投资组合"
 
@@ -2195,11 +2184,11 @@ msgstr ""
 #~ msgstr "上一页"
 
 #: src/components/trade/chart/token-selector-columns.ts:56
-#: src/components/trade/chart/token-selector-content.tsx:15
+#: src/components/trade/chart/token-selector-content.tsx:14
 #: src/components/trade/mobile/mobile-history-tab.tsx:110
 #: src/components/trade/mobile/mobile-orders-history-tab.tsx:111
 #: src/components/trade/mobile/mobile-orders-tab.tsx:229
-#: src/components/trade/orderbook/orderbook-panel.tsx:106
+#: src/components/trade/orderbook/orderbook-panel.tsx:104
 #: src/components/trade/orderbook/trades-panel.tsx:70
 #: src/components/trade/positions/history-tab.tsx:89
 #: src/components/trade/positions/orders-history-tab.tsx:87
@@ -2212,7 +2201,7 @@ msgstr "价格"
 #~ msgid "PRICE"
 #~ msgstr ""
 
-#: src/components/trade/orderbook/orderbook-panel.tsx:117
+#: src/components/trade/orderbook/orderbook-panel.tsx:115
 msgid "Price grouping"
 msgstr ""
 
@@ -2264,7 +2253,7 @@ msgstr ""
 msgid "Recent"
 msgstr ""
 
-#: src/components/trade/orderbook/orderbook-panel.tsx:97
+#: src/components/trade/orderbook/orderbook-panel.tsx:95
 msgid "Recent Trades"
 msgstr "最近成交"
 
@@ -2332,7 +2321,6 @@ msgstr ""
 #: src/components/trade/mobile/offline-banner.tsx:80
 #: src/components/trade/tradebox/deposit-modal.tsx:152
 #: src/components/trade/tradebox/deposit-modal.tsx:207
-#: src/components/trade/tradebox/leverage-control.tsx:198
 msgid "Retry"
 msgstr ""
 
@@ -2412,7 +2400,7 @@ msgstr ""
 #~ msgid "Search"
 #~ msgstr ""
 
-#: src/components/trade/chart/token-selector-content.tsx:110
+#: src/components/trade/chart/token-selector-content.tsx:108
 msgid "Search markets..."
 msgstr "搜索市场..."
 
@@ -2448,7 +2436,7 @@ msgstr "选择收藏市场"
 #~ msgid "Select leverage"
 #~ msgstr "选择杠杆"
 
-#: src/components/trade/chart/token-selector-content.tsx:107
+#: src/components/trade/chart/token-selector-content.tsx:105
 msgid "Select market"
 msgstr ""
 
@@ -2544,7 +2532,7 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/trade/components/global-settings-modal.tsx:76
-#: src/components/trade/header/top-nav.tsx:113
+#: src/components/trade/header/top-nav.tsx:111
 msgid "Settings"
 msgstr "设置"
 
@@ -2620,7 +2608,7 @@ msgstr ""
 msgid "Sign in wallet..."
 msgstr ""
 
-#: src/lib/errors/definitions/connection.ts:45
+#: src/lib/errors/definitions/connection.ts:39
 msgid "Signer not ready"
 msgstr "签名器未就绪"
 
@@ -2633,7 +2621,7 @@ msgstr "签名器未就绪"
 #: src/components/trade/mobile/mobile-orders-tab.tsx:233
 #: src/components/trade/mobile/mobile-position-card.tsx:147
 #: src/components/trade/mobile/mobile-twap-tab.tsx:116
-#: src/components/trade/orderbook/orderbook-panel.tsx:126
+#: src/components/trade/orderbook/orderbook-panel.tsx:124
 #: src/components/trade/orderbook/trades-panel.tsx:76
 #: src/components/trade/positions/history-tab.tsx:96
 #: src/components/trade/positions/orders-history-tab.tsx:94
@@ -2691,7 +2679,7 @@ msgstr ""
 #~ msgid "Something went wrong"
 #~ msgstr "出错了"
 
-#: src/components/trade/mobile/mobile-nav-drawer.tsx:115
+#: src/components/trade/mobile/mobile-nav-drawer.tsx:112
 msgid "Soon"
 msgstr ""
 
@@ -2703,12 +2691,12 @@ msgstr ""
 #~ msgid "Sort by {headerLabel}"
 #~ msgstr "按 {headerLabel} 排序"
 
-#: src/components/trade/chart/token-selector-content.tsx:208
+#: src/components/trade/chart/token-selector-content.tsx:206
 msgid "Sort by {sortLabel}"
 msgstr ""
 
 #. placeholder {0}: getColumnSortLabel(sorting[0].id)
-#: src/components/trade/chart/token-selector-content.tsx:270
+#: src/components/trade/chart/token-selector-content.tsx:268
 msgid "Sorted by {0}"
 msgstr "已按 {0} 排序"
 
@@ -2722,7 +2710,7 @@ msgstr ""
 #~ msgid "spot"
 #~ msgstr "现货"
 
-#: src/components/trade/chart/token-selector-content.tsx:96
+#: src/components/trade/chart/token-selector-content.tsx:94
 #: src/components/trade/mobile/mobile-balances-tab.tsx:223
 #: src/components/trade/positions/balances-tab.tsx:294
 #: src/components/trade/positions/transfer-modal.tsx:67
@@ -2740,11 +2728,11 @@ msgstr ""
 #~ msgid "Spot: Max 1% (100 basis points)"
 #~ msgstr ""
 
-#: src/components/trade/orderbook/orderbook-panel.tsx:164
+#: src/components/trade/orderbook/orderbook-panel.tsx:162
 msgid "Spread"
 msgstr "价差"
 
-#: src/config/nav.tsx:72
+#: src/config/nav.tsx:66
 msgid "Staking"
 msgstr "质押"
 
@@ -3049,7 +3037,7 @@ msgid "TOKEN"
 msgstr ""
 
 #: src/components/trade/mobile/mobile-balances-tab.tsx:151
-#: src/components/trade/orderbook/orderbook-panel.tsx:134
+#: src/components/trade/orderbook/orderbook-panel.tsx:132
 #: src/components/trade/positions/balances-tab.tsx:248
 msgid "Total"
 msgstr "合计"
@@ -3119,7 +3107,7 @@ msgstr ""
 msgid "trades"
 msgstr ""
 
-#: src/components/trade/orderbook/orderbook-panel.tsx:98
+#: src/components/trade/orderbook/orderbook-panel.tsx:96
 msgid "Trades"
 msgstr "成交"
 
@@ -3175,7 +3163,6 @@ msgstr ""
 
 #: src/components/trade/mobile/mobile-orders-tab.tsx:240
 #: src/components/trade/positions/orders-tab.tsx:271
-#: src/components/trade/tradebox/advanced-order-dropdown.tsx:86
 msgid "Trigger"
 msgstr ""
 
@@ -3251,19 +3238,17 @@ msgstr "未实现盈亏"
 msgid "Unsupported resolution: {0}"
 msgstr "不支持的分辨率: {0}"
 
-#: src/components/trade/tradebox/leverage-control.tsx:162
-#: src/components/trade/tradebox/margin-mode-modal.tsx:236
+#: src/components/trade/tradebox/margin-mode-modal.tsx:208
 msgid "Update failed"
 msgstr ""
 
 #: src/components/trade/mobile/mobile-orders-history-tab.tsx:120
 #: src/components/trade/positions/orders-history-tab.tsx:104
-#: src/components/trade/tradebox/leverage-control.tsx:174
-#: src/components/trade/tradebox/margin-mode-modal.tsx:256
+#: src/components/trade/tradebox/margin-mode-modal.tsx:228
 msgid "Updated"
 msgstr ""
 
-#: src/components/trade/chart/token-selector-content.tsx:270
+#: src/components/trade/chart/token-selector-content.tsx:268
 msgid "Updated live"
 msgstr "实时更新"
 
@@ -3292,7 +3277,7 @@ msgstr ""
 #~ msgid "Value"
 #~ msgstr "价值"
 
-#: src/config/nav.tsx:70
+#: src/config/nav.tsx:64
 msgid "Vaults"
 msgstr "金库"
 
@@ -3309,7 +3294,7 @@ msgstr ""
 #~ msgstr "成交量"
 
 #: src/components/trade/chart/token-selector-columns.ts:75
-#: src/components/trade/chart/token-selector-content.tsx:21
+#: src/components/trade/chart/token-selector-content.tsx:20
 msgid "Volume"
 msgstr "成交量"
 
@@ -3317,7 +3302,7 @@ msgstr "成交量"
 #~ msgid "waiting"
 #~ msgstr ""
 
-#: src/components/trade/orderbook/orderbook-panel.tsx:155
+#: src/components/trade/orderbook/orderbook-panel.tsx:153
 msgid "Waiting for order book..."
 msgstr "等待订单簿..."
 

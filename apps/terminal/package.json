@@ -16,8 +16,8 @@
 		"@hypeterminal/hl-react": "workspace:*",
 		"@hypeterminal/ui": "workspace:*",
 		"@lifi/sdk": "3.16.3",
-		"@lingui/core": "6.3.0",
-		"@lingui/react": "6.3.0",
+		"@lingui/core": "6.12.0",
+		"@lingui/react": "6.12.0",
 		"@nktkas/hyperliquid": "0.32.2",
 		"@phosphor-icons/react": "2.1.10",
 		"@tanstack/query-sync-storage-persister": "5.106.1",
@@ -51,9 +51,9 @@
 		"zustand": "5.0.16"
 	},
 	"devDependencies": {
-		"@lingui/babel-plugin-lingui-macro": "6.3.0",
-		"@lingui/cli": "6.3.0",
-		"@lingui/vite-plugin": "6.3.0",
+		"@lingui/babel-plugin-lingui-macro": "6.12.0",
+		"@lingui/cli": "6.12.0",
+		"@lingui/vite-plugin": "6.12.0",
 		"@tailwindcss/vite": "4.3.4",
 		"@types/big.js": "7.0.0",
 		"@types/node": "22.19.3",
