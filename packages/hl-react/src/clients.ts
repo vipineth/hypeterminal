@@ -52,17 +52,15 @@ export function getWsTransport(isTestnet: boolean): ISubscriptionTransport {
 	return getOrCreate(`ws:${isTestnet}`, () => new WebSocketTransport(getWsOptions(isTestnet)));
 }
 
-// Non-permanent close on the underlying ReconnectingWebSocket forces the SDK's
-// reconnect loop to fire, which re-runs resubscribe. `transport.socket` is an
-// SDK implementation detail — if @nktkas/hyperliquid hides or renames it, this
-// trigger must be updated. Guarded by an instanceof check so non-WS transports
-// (e.g. in-memory fakes used in tests) cleanly return a no-op.
+// `socket.reconnect()` drops the connection without terminating it, so the SDK
+// re-runs resubscribe on the next open. `close()` would terminate permanently.
+// Guarded by an instanceof check so non-WS transports (e.g. in-memory fakes used
+// in tests) cleanly return a no-op.
 export function createWsReconnectTrigger(isTestnet: boolean): () => void {
 	const transport = getWsTransport(isTestnet);
 	if (!(transport instanceof WebSocketTransport)) return () => {};
 	const socket = transport.socket;
-	if (!socket || typeof socket.close !== "function") return () => {};
-	return () => socket.close(undefined, undefined, false);
+	return () => socket.reconnect();
 }
 
 export function getInfoClient(isTestnet: boolean): InfoClient {

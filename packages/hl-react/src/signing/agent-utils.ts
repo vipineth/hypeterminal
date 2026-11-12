@@ -4,7 +4,9 @@ export function isAgentApproved(extraAgents: ExtraAgentsResponse | undefined, pu
 	if (!extraAgents || !publicKey) return false;
 	const normalizedKey = publicKey.toLowerCase();
 	const now = Date.now();
-	return extraAgents.some((agent) => agent.address.toLowerCase() === normalizedKey && agent.validUntil > now);
+	return extraAgents.some(
+		(agent) => agent.address.toLowerCase() === normalizedKey && (agent.validUntil === null || agent.validUntil > now),
+	);
 }
 
 export function isBuilderFeeApproved(

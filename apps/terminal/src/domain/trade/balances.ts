@@ -53,11 +53,7 @@ export function getSpotBalance(balances: SpotBalance[] | null | undefined, coin:
 }
 
 export function isQuoteBalanceSharedWithPerps(accountAbstraction: AccountAbstraction | null | undefined): boolean {
-	return (
-		accountAbstraction === "unifiedAccount" ||
-		accountAbstraction === "portfolioMargin" ||
-		accountAbstraction === "dexAbstraction"
-	);
+	return accountAbstraction === "unifiedAccount" || accountAbstraction === "portfolioMargin";
 }
 
 export function getPerpAvailable(
@@ -83,7 +79,8 @@ export function getSpotAvailableValue(
 	balance: SpotBalance | null | undefined,
 	spotAvailableAfterMaintenance?: SpotAvailableAfterMaintenance | null,
 ): string {
-	const availableAfterMaintenance = getAvailableAfterMaintenanceValue(balance?.token, spotAvailableAfterMaintenance);
+	const token = balance && "token" in balance ? balance.token : undefined;
+	const availableAfterMaintenance = getAvailableAfterMaintenanceValue(token, spotAvailableAfterMaintenance);
 	if (availableAfterMaintenance != null) {
 		const available = toSafeBig(availableAfterMaintenance);
 		return available.gt(0) ? available.toString() : "0";

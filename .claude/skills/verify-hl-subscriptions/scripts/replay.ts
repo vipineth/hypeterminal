@@ -80,6 +80,10 @@ class FakeSocket extends EventTarget {
 		this.dispatchEvent(new Event("close"));
 	}
 
+	reconnect() {
+		this.close();
+	}
+
 	open() {
 		this.readyState = 1;
 		const pending = this.buffered;
@@ -116,8 +120,8 @@ class FakeSocket extends EventTarget {
 const hlReact = join(root, "packages/hl-react");
 const sdk = dirname(Bun.resolveSync("@nktkas/hyperliquid", hlReact));
 const { WebSocketSubscriptionManager } = await import(join(sdk, "transport/websocket/_subscriptionManager.js"));
-const { WebSocketPostRequest } = await import(join(sdk, "transport/websocket/_postRequest.js"));
-const { HyperliquidEventTarget } = await import(join(sdk, "transport/websocket/_hyperliquidEventTarget.js"));
+const { WebSocketDispatcher } = await import(join(sdk, "transport/websocket/_dispatcher.js"));
+const { HyperliquidEventTarget } = await import(join(sdk, "transport/websocket/_events.js"));
 const { SubscriptionClient } = await import(join(sdk, "api/subscription/client.js"));
 const { createHyperliquidStore } = await import(join(hlReact, "src/store.ts"));
 const { serializeKey, subscriptionKeys } = await import(join(hlReact, "src/query/keys.ts"));
@@ -127,12 +131,15 @@ const { getDefaultThrottle } = await import(join(hlReact, "src/registries/subscr
 
 const socket = new FakeSocket();
 const hlEvents = new HyperliquidEventTarget(socket);
-const postRequest = new WebSocketPostRequest(socket, hlEvents, null);
-const manager = new WebSocketSubscriptionManager(socket, postRequest, hlEvents, true);
+const dispatcher = new WebSocketDispatcher(socket, hlEvents, null);
+const manager = new WebSocketSubscriptionManager(socket, dispatcher, hlEvents, true);
 const client = new SubscriptionClient({
-	transport: { subscribe: (channel: string, payload: unknown, listener: unknown) => manager.subscribe(channel, payload, listener) },
+	transport: {
+		subscribe: (channel: string, payload: unknown, listener: unknown, options: unknown) =>
+			manager.subscribe(channel, payload, listener, options),
+	},
 });
-const store = createHyperliquidStore({ ssr: false, triggerReconnect: () => socket.close() });
+const store = createHyperliquidStore({ ssr: false, triggerReconnect: () => socket.reconnect() });
 const params = { coin: "BTC" };
 const key = serializeKey(subscriptionKeys.method("l2Book", params));
 
@@ -141,7 +148,7 @@ function mount() {
 	const updater = createThrottledUpdater((data: unknown) => state.setSubscriptionData(key, data), getDefaultThrottle("l2Book"));
 	state.acquireSubscription(
 		key,
-		() => client.l2Book(params, (data: unknown) => updater.add(data)),
+		(onError: (error: unknown) => void) => client.l2Book(params, (data: unknown) => updater.add(data), { onError }),
 		getStalenessThresholdForKey(key),
 		undefined,
 	);

@@ -29,7 +29,7 @@ export function useSubscription<M extends SubMethod>(
 
 	return useSub(
 		key,
-		(listener: (data: SubEvent<M>) => void) => {
+		(listener: (data: SubEvent<M>) => void, onError: (error: unknown) => void) => {
 			const fn = (subscription as SubscriptionClient)[method] as (...args: unknown[]) => Promise<ISubscription>;
 
 			if (accConfig) {
@@ -43,11 +43,13 @@ export function useSubscription<M extends SubMethod>(
 					listener(accConfig.withItems(event, buffer.getItems()) as SubEvent<M>);
 				};
 				return params !== undefined
-					? fn.call(subscription, params, wrappedListener)
-					: fn.call(subscription, wrappedListener);
+					? fn.call(subscription, params, wrappedListener, { onError })
+					: fn.call(subscription, wrappedListener, { onError });
 			}
 
-			return params !== undefined ? fn.call(subscription, params, listener) : fn.call(subscription, listener);
+			return params !== undefined
+				? fn.call(subscription, params, listener, { onError })
+				: fn.call(subscription, listener, { onError });
 		},
 		mergedOptions,
 	);

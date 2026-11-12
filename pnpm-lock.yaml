@@ -54,8 +54,8 @@ importers:
         specifier: 6.12.0
         version: 6.12.0(@babel/core@7.29.7(supports-color@7.2.0))(babel-plugin-macros@3.1.0)(react@19.2.0)
       '@nktkas/hyperliquid':
-        specifier: 0.32.2
-        version: 0.32.2(typescript@5.7.2)
+        specifier: 0.33.3
+        version: 0.33.3(typescript@5.7.2)
       '@phosphor-icons/react':
         specifier: 2.1.10
         version: 2.1.10(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -217,8 +217,8 @@ importers:
   packages/hl-react:
     dependencies:
       '@nktkas/hyperliquid':
-        specifier: '>=0.32.2 <1'
-        version: 0.32.2(typescript@5.9.3)
+        specifier: '>=0.33.3 <1'
+        version: 0.33.3(typescript@5.9.3)
       '@tanstack/react-query':
         specifier: '>=5.106.1 <6'
         version: 5.106.1(@types/react@19.2.7)(react@19.2.0)
@@ -1203,13 +1203,13 @@ packages:
       '@emnapi/core': ^1.7.1 || ^2.0.0-alpha.3
       '@emnapi/runtime': ^1.7.1 || ^2.0.0-alpha.3
 
-  '@nktkas/hyperliquid@0.32.2':
-    resolution: {integrity: sha512-0Wh/keNAgnfdA/cLmdJDDzTZq/CSoT3lL/eY+MzF9R5U10d5J6nin/sEaH5HA+9K8CIag36ZtZ9dCxDvYEb0nw==}
-    engines: {node: '>=20.19.0'}
+  '@nktkas/hyperliquid@0.33.3':
+    resolution: {integrity: sha512-fvnEw/2ejN14ZZVXA+nFQ9YgfFNjCI1yLliYyUboC6hr3Gwd/RwC4Ox90K4e8tkKWqkVpOcLRQ30p0nTeK4NBQ==}
+    engines: {node: '>=22.12.0'}
 
-  '@nktkas/rews@2.1.2':
-    resolution: {integrity: sha512-IuOhyKc9UYwJr2UD3f0m7w0NZepI3kkR+94jQi5sCS0lQFujsxRpjZlourZVH0y4U4ZfkV3JtJcqJl3zG0rZfQ==}
-    engines: {node: '>=18'}
+  '@nktkas/rews@4.1.0':
+    resolution: {integrity: sha512-lPcTIPD2AE8JsJgnI+YGn9hzOhZHW3E0hrzDNUpyuVP5d1NERNz7EugR1IxW4Ly7QsM9/WmVeLif4olZsKVKjQ==}
+    engines: {node: '>=22.12.0'}
 
   '@noble/ciphers@1.3.0':
     resolution: {integrity: sha512-2I0gnIVPtfnMw9ee9h1dJG7tp81+8Ob3OJb3Mv37rx5L40/b0i7djjCVvGOVqc9AEIQyvyu1i6ypKdFw8R8gQw==}
@@ -3299,6 +3299,9 @@ packages:
   decamelize@1.2.0:
     resolution: {integrity: sha512-z2S+W9X73hAUUki+N+9Za2lBlun89zigOyGrsax+KUQ6wKW4ZoWpEYBkGhQjwAjjDCkWxhY0VKEhk8wzY7F5cA==}
     engines: {node: '>=0.10.0'}
+
+  decimal.js@10.6.0:
+    resolution: {integrity: sha512-YpgQiITW3JXGntzdUmyUR1V812Hn8T1YVXhCu+wO3OpS4eU9l4YdD3qjyiKdV6mvV29zapkMeD390UVEf2lkUg==}
 
   defu@6.1.7:
     resolution: {integrity: sha512-7z22QmUWiQ/2d0KkdYmANbRUVABpZ9SNYyH5vx6PZ+nE5bcC0l7uFvEfHlyld/HcGBFTL536ClDt3DEcSlEJAQ==}
@@ -6041,23 +6044,25 @@ snapshots:
       '@tybys/wasm-util': 0.10.3
     optional: true
 
-  '@nktkas/hyperliquid@0.32.2(typescript@5.7.2)':
+  '@nktkas/hyperliquid@0.33.3(typescript@5.7.2)':
     dependencies:
-      '@nktkas/rews': 2.1.2
+      '@nktkas/rews': 4.1.0
       '@noble/hashes': 1.8.0
+      decimal.js: 10.6.0
       valibot: 1.4.2(typescript@5.7.2)
     transitivePeerDependencies:
       - typescript
 
-  '@nktkas/hyperliquid@0.32.2(typescript@5.9.3)':
+  '@nktkas/hyperliquid@0.33.3(typescript@5.9.3)':
     dependencies:
-      '@nktkas/rews': 2.1.2
+      '@nktkas/rews': 4.1.0
       '@noble/hashes': 1.8.0
+      decimal.js: 10.6.0
       valibot: 1.4.2(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
-  '@nktkas/rews@2.1.2': {}
+  '@nktkas/rews@4.1.0': {}
 
   '@noble/ciphers@1.3.0': {}
 
@@ -8947,6 +8952,8 @@ snapshots:
       supports-color: 7.2.0
 
   decamelize@1.2.0: {}
+
+  decimal.js@10.6.0: {}
 
   defu@6.1.7: {}
 

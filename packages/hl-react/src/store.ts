@@ -20,7 +20,7 @@ export type HyperliquidStoreState = {
 	setConfig: (config: HyperliquidConfig) => void;
 	acquireSubscription: (
 		key: string,
-		subscribe: () => Promise<ISubscription>,
+		subscribe: (onError: (error: unknown) => void) => Promise<ISubscription>,
 		stalenessThresholdMs?: number,
 		pauseWhenHidden?: boolean,
 	) => void;
@@ -35,7 +35,6 @@ type SubscriptionEntry = {
 	status: SubscriptionStatus;
 	data?: unknown;
 	error?: unknown;
-	failureSignal?: AbortSignal;
 	isStale?: boolean;
 };
 
@@ -46,7 +45,6 @@ export type SubscriptionRuntime = {
 	reconnectTimer?: ReturnType<typeof setTimeout>;
 	cooldownTimer?: ReturnType<typeof setTimeout>;
 	reconnectAttempts: number;
-	detachFailureListener?: () => void;
 	detachStaleness?: () => void;
 	pauseWhenHidden?: boolean;
 };
@@ -94,11 +92,6 @@ function clearCooldownTimer(runtime: SubscriptionRuntime): void {
 		clearTimeout(runtime.cooldownTimer);
 		runtime.cooldownTimer = undefined;
 	}
-}
-
-function detachFailureListener(runtime: SubscriptionRuntime): void {
-	runtime.detachFailureListener?.();
-	runtime.detachFailureListener = undefined;
 }
 
 export function createHyperliquidStore(initialConfig: HyperliquidConfig): HyperliquidStore {
@@ -261,7 +254,6 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 							...current,
 							status: "error",
 							error: new Error("Reconnect cooldown active"),
-							failureSignal: undefined,
 						};
 						return setSubscriptionEntry(state, key, nextEntry);
 					});
@@ -311,12 +303,36 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 				}, delay);
 			};
 
+			const failSubscription = (error: unknown) => {
+				set((state) => {
+					const current = state.subscriptions[key];
+					if (!current) return state;
+					const nextEntry: SubscriptionEntry = {
+						...current,
+						status: "error",
+						error,
+					};
+					return setSubscriptionEntry(state, key, nextEntry);
+				});
+				scheduleReconnect();
+			};
+
 			const startSubscription = () => {
 				const runtime = subscriptionRuntime.get(key);
 				if (!runtime || runtime.refCount <= 0 || runtime.promise || runtime.subscription) return;
 
-				runtime.promise = subscribe()
+				const attempt: { failure?: { error: unknown }; subscription?: ISubscription } = {};
+				const onError = (error: unknown) => {
+					attempt.failure = { error };
+					const runtime = subscriptionRuntime.get(key);
+					if (!runtime || !attempt.subscription || runtime.subscription !== attempt.subscription) return;
+					runtime.subscription = undefined;
+					failSubscription(error);
+				};
+
+				runtime.promise = subscribe(onError)
 					.then((subscription) => {
+						attempt.subscription = subscription;
 						const runtime = subscriptionRuntime.get(key);
 						if (!runtime) {
 							void subscription.unsubscribe().catch(() => {});
@@ -330,52 +346,24 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 							return subscription;
 						}
 
+						if (attempt.failure) {
+							failSubscription(attempt.failure.error);
+							return undefined;
+						}
+
 						runtime.subscription = subscription;
 						runtime.reconnectAttempts = 0;
-						detachFailureListener(runtime);
-
-						const onFailure = () => {
-							const runtime = subscriptionRuntime.get(key);
-							if (!runtime) return;
-							runtime.subscription = undefined;
-							detachFailureListener(runtime);
-
-							const reason = subscription.failureSignal.reason ?? new Error("Subscription failed");
-							set((state) => {
-								const current = state.subscriptions[key];
-								if (!current) return state;
-								const nextEntry: SubscriptionEntry = {
-									...current,
-									status: "error",
-									error: reason,
-									failureSignal: undefined,
-								};
-								return setSubscriptionEntry(state, key, nextEntry);
-							});
-
-							scheduleReconnect();
-						};
-
-						subscription.failureSignal.addEventListener("abort", onFailure, { once: true });
-						runtime.detachFailureListener = () => {
-							subscription.failureSignal.removeEventListener("abort", onFailure);
-						};
 
 						set((state) => {
 							const current = state.subscriptions[key];
 							if (!current) return state;
-							if (
-								current.status === "active" &&
-								current.error === undefined &&
-								current.failureSignal === subscription.failureSignal
-							) {
+							if (current.status === "active" && current.error === undefined) {
 								return state;
 							}
 							const nextEntry: SubscriptionEntry = {
 								...current,
 								status: "active",
 								error: undefined,
-								failureSignal: subscription.failureSignal,
 							};
 							return setSubscriptionEntry(state, key, nextEntry);
 						});
@@ -390,21 +378,7 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 
 						runtime.promise = undefined;
 						runtime.subscription = undefined;
-						detachFailureListener(runtime);
-
-						set((state) => {
-							const current = state.subscriptions[key];
-							if (!current) return state;
-							const nextEntry: SubscriptionEntry = {
-								...current,
-								status: "error",
-								error,
-								failureSignal: undefined,
-							};
-							return setSubscriptionEntry(state, key, nextEntry);
-						});
-
-						scheduleReconnect();
+						failSubscription(error);
 						return undefined;
 					});
 			};
@@ -424,7 +398,6 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 
 			clearReconnectTimer(runtime);
 			clearCooldownTimer(runtime);
-			detachFailureListener(runtime);
 			runtime.detachStaleness?.();
 			watchdog.unregister(key);
 
@@ -448,7 +421,7 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 			runtime.promise = undefined;
 
 			const runUnsubscribe = async (subscription?: ISubscription) => {
-				if (!subscription || subscription.failureSignal.aborted) return;
+				if (!subscription) return;
 				await subscription.unsubscribe().catch(() => {});
 			};
 

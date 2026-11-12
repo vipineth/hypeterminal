@@ -42,7 +42,6 @@ export type SubscriptionResult<TData> = {
 	error: unknown;
 	isStale: boolean;
 	unsubscribe: (() => Promise<void>) | undefined;
-	failureSignal: AbortSignal | undefined;
 };
 
 export type HyperliquidConfig = {

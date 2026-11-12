@@ -40,9 +40,9 @@ CHECKS=(
 REPLAYS=(
 	remount-while-subscribing:holds
 	hide-show-recovers:holds
-	unmount-then-drop:finding
-	show-during-subscribe:finding
-	frozen-after-resubscribe-failure:finding
+	unmount-then-drop:holds
+	show-during-subscribe:holds
+	frozen-after-resubscribe-failure:holds
 )
 
 command -v bun >/dev/null || { echo "FAIL bun is not on PATH (needed for the real-code replays)"; exit 2; }
