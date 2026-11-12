@@ -2,6 +2,7 @@ import type { RouteExtended } from "@lifi/sdk";
 import { convertQuoteToRoute, executeRoute } from "@lifi/sdk";
 import { useRef, useState } from "react";
 import { isSafeHttpUrl } from "@/lib/safe-url";
+import { getLiFiClient } from "./config";
 import type { BridgeQuote } from "./use-quote";
 
 type BridgeStatus = "idle" | "executing" | "success" | "error";
@@ -41,11 +42,15 @@ const INITIAL_STATE: BridgeState = {
 function getProcessStatusText(route: RouteExtended): string {
 	for (const step of route.steps) {
 		if (!step.execution) continue;
-		for (const process of step.execution.process) {
-			if (process.status === "DONE") continue;
-			if (process.message) return process.message;
-			switch (process.type) {
-				case "TOKEN_ALLOWANCE":
+		for (const action of step.execution.actions) {
+			if (action.status === "DONE") continue;
+			if (action.message) return action.message;
+			switch (action.type) {
+				case "CHECK_ALLOWANCE":
+				case "RESET_ALLOWANCE":
+				case "SET_ALLOWANCE":
+				case "PERMIT":
+				case "NATIVE_PERMIT":
 					return `Approving ${step.action.fromToken.symbol}...`;
 				case "SWAP":
 					return `Swapping on ${step.action.fromChainId === step.action.toChainId ? "same chain" : "source chain"}...`;
@@ -63,26 +68,29 @@ function getLastTxHash(route: RouteExtended): string | null {
 	for (let i = route.steps.length - 1; i >= 0; i--) {
 		const step = route.steps[i];
 		if (!step.execution) continue;
-		for (let j = step.execution.process.length - 1; j >= 0; j--) {
-			const process = step.execution.process[j];
-			if (process.txHash) return process.txHash;
+		for (let j = step.execution.actions.length - 1; j >= 0; j--) {
+			const action = step.execution.actions[j];
+			if (action.txHash) return action.txHash;
 		}
 	}
 	return null;
 }
 
-function getAllProcessDetails(route: RouteExtended): ProcessDetail[] {
+function getAllProcessDetails(route: RouteExtended, doneAtByTxHash: Map<string, number>): ProcessDetail[] {
 	const details: ProcessDetail[] = [];
 	for (const step of route.steps) {
 		if (!step.execution) continue;
-		for (const process of step.execution.process) {
-			if (!process.txHash) continue;
+		for (const action of step.execution.actions) {
+			if (!action.txHash) continue;
+			if (action.status === "DONE" && !doneAtByTxHash.has(action.txHash)) {
+				doneAtByTxHash.set(action.txHash, Date.now());
+			}
 			details.push({
-				type: process.type,
-				txHash: process.txHash,
-				txLink: isSafeHttpUrl(process.txLink) ? process.txLink : "",
-				startedAt: process.startedAt,
-				doneAt: process.doneAt ?? null,
+				type: action.type,
+				txHash: action.txHash,
+				txLink: isSafeHttpUrl(action.txLink) ? action.txLink : "",
+				startedAt: step.execution.startedAt,
+				doneAt: doneAtByTxHash.get(action.txHash) ?? null,
 			});
 		}
 	}
@@ -92,10 +100,12 @@ function getAllProcessDetails(route: RouteExtended): ProcessDetail[] {
 export function useBridgeExecutor() {
 	const [state, setState] = useState<BridgeState>(INITIAL_STATE);
 	const executingRef = useRef(false);
+	const doneAtByTxHashRef = useRef(new Map<string, number>());
 
 	async function execute(quote: BridgeQuote): Promise<BridgeOutcome> {
 		if (executingRef.current) return "error";
 		executingRef.current = true;
+		doneAtByTxHashRef.current.clear();
 
 		const startedAt = Date.now();
 		setState({
@@ -112,15 +122,16 @@ export function useBridgeExecutor() {
 		try {
 			const route = convertQuoteToRoute(quote.step);
 
-			const result = await executeRoute(route, {
+			const result = await executeRoute(getLiFiClient(), route, {
 				updateRouteHook(updatedRoute) {
 					const txHash = getLastTxHash(updatedRoute);
 					const statusText = getProcessStatusText(updatedRoute);
+					const processDetails = getAllProcessDetails(updatedRoute, doneAtByTxHashRef.current);
 					setState((prev) => ({
 						...prev,
 						statusText,
 						txHash: txHash ?? prev.txHash,
-						processDetails: getAllProcessDetails(updatedRoute),
+						processDetails,
 					}));
 				},
 			});
@@ -135,7 +146,7 @@ export function useBridgeExecutor() {
 				receivedAmount: toAmount,
 				startTime: startedAt,
 				endTime: Date.now(),
-				processDetails: getAllProcessDetails(result),
+				processDetails: getAllProcessDetails(result, doneAtByTxHashRef.current),
 			});
 			return "success";
 		} catch (err) {

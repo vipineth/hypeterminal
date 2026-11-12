@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useConnection } from "wagmi";
-import { initLiFi } from "@/lib/lifi/config";
 import type { BridgeToken } from "@/lib/lifi/use-balances";
 import { useBridgeExecutor } from "@/lib/lifi/use-bridge";
 import type { BridgeQuote } from "@/lib/lifi/use-quote";
@@ -21,10 +20,6 @@ export function BridgeTab() {
 	const [tokenAmount, setTokenAmount] = useState("");
 	const lastQuoteRef = useRef<BridgeQuote | null>(null);
 	const bridge = useBridgeExecutor();
-
-	useEffect(() => {
-		initLiFi();
-	}, []);
 
 	if (!address) {
 		return <BridgeWalletNotConnected />;

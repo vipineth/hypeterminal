@@ -63,7 +63,11 @@ export function usdToTokenAmount(usd: string, priceUSD: string, decimals: number
 
 export function processTypeLabel(type: string): string {
 	switch (type) {
-		case "TOKEN_ALLOWANCE":
+		case "CHECK_ALLOWANCE":
+		case "RESET_ALLOWANCE":
+		case "SET_ALLOWANCE":
+		case "PERMIT":
+		case "NATIVE_PERMIT":
 			return "Approval tx";
 		case "SWAP":
 			return "Swap tx";

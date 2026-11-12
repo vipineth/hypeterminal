@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import Big from "big.js";
 
 import { HYPERCORE_CHAIN_ID, HYPERCORE_USDC_ADDRESS } from "@/config/contracts";
+import { getLiFiClient } from "./config";
 
 interface QuoteParams {
 	fromChainId: number;
@@ -103,7 +104,7 @@ export function useBridgeQuote(params: QuoteParams | null) {
 		queryKey: ["lifi-quote", params?.fromChainId, params?.fromTokenAddress, params?.fromAddress, params?.amount],
 		queryFn: async (): Promise<BridgeQuote> => {
 			const p = params as QuoteParams;
-			const step = await getQuote({
+			const step = await getQuote(getLiFiClient(), {
 				fromChain: p.fromChainId,
 				fromToken: p.fromTokenAddress,
 				fromAddress: p.fromAddress,

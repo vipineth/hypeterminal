@@ -30,7 +30,7 @@ const config = defineConfig({
     tsconfigPaths: true,
   },
   optimizeDeps: {
-    include: ['@lifi/sdk', '@tanstack/react-table', '@tanstack/react-virtual'],
+    include: ['@lifi/sdk', '@lifi/sdk-provider-ethereum', '@tanstack/react-table', '@tanstack/react-virtual'],
   },
   environments: {
     client: {

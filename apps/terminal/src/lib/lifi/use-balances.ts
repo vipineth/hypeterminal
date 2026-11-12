@@ -1,7 +1,8 @@
-import type { ChainType, ExtendedChain, WalletTokenExtended } from "@lifi/sdk";
-import { getChains, getWalletBalances } from "@lifi/sdk";
+import type { ChainType, ExtendedChain, GetWalletBalanceExtendedResponse, WalletTokenExtended } from "@lifi/sdk";
+import { getChains } from "@lifi/sdk";
 import { useQuery } from "@tanstack/react-query";
 import Big from "big.js";
+import { getLiFiClient } from "./config";
 
 const DUST_THRESHOLD_USD = 2;
 
@@ -18,6 +19,16 @@ export interface BridgeToken {
 	chainName: string;
 	chainLogoURI: string | undefined;
 	isDust: boolean;
+}
+
+async function getWalletBalances(walletAddress: string): Promise<Record<number, WalletTokenExtended[]>> {
+	const { apiUrl, integrator } = getLiFiClient().config;
+	const response = await fetch(`${apiUrl}/wallets/${walletAddress}/balances?extended=true`, {
+		headers: { "x-lifi-integrator": integrator },
+	});
+	if (!response.ok) throw new Error(`LI.FI balances request failed: ${response.status}`);
+	const body: GetWalletBalanceExtendedResponse = await response.json();
+	return body.balances ?? {};
 }
 
 function buildTokenList(
@@ -67,7 +78,7 @@ export function useBridgeBalances(walletAddress: string | undefined) {
 		queryFn: async () => {
 			const [balancesByChain, chains] = await Promise.all([
 				getWalletBalances(walletAddress as string),
-				getChains({ chainTypes: ["EVM" as ChainType] }),
+				getChains(getLiFiClient(), { chainTypes: ["EVM" as ChainType] }),
 			]);
 
 			const chainsMap = new Map<number, ExtendedChain>();
