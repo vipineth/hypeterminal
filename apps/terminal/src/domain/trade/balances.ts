@@ -53,7 +53,8 @@ export function getSpotBalance(balances: SpotBalance[] | null | undefined, coin:
 }
 
 export function isQuoteBalanceSharedWithPerps(accountAbstraction: AccountAbstraction | null | undefined): boolean {
-	return accountAbstraction === "unifiedAccount" || accountAbstraction === "portfolioMargin";
+	const mode: string | null | undefined = accountAbstraction;
+	return mode === "unifiedAccount" || mode === "portfolioMargin" || mode === "dexAbstraction";
 }
 
 export function getPerpAvailable(
