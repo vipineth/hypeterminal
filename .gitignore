@@ -41,3 +41,6 @@ apps/terminal/src/locales/**/messages.js
 
 # Local/personal files
 *.local
+
+# Verification runs (verify-hypeterminal skill)
+.verify/
