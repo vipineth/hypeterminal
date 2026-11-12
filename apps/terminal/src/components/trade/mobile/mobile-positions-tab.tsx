@@ -8,6 +8,7 @@ import { useConnection } from "wagmi";
 import { FALLBACK_VALUE_PLACEHOLDER, HL_ALL_DEXS } from "@/config/app";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
+import { cn } from "@/lib/cn";
 import { useMarkets, useSubscription, useUserPositions } from "@/lib/hyperliquid";
 import { buildClosePositionDescription } from "@/lib/trade/close-toast";
 import { buildTpSlOrdersByCoin } from "@/lib/trade/open-orders";
@@ -21,18 +22,22 @@ import { PositionLimitCloseModal } from "../positions/position-limit-close-modal
 import { PositionTpSlModal } from "../positions/position-tpsl-modal";
 import { MobilePositionCard } from "./mobile-position-card";
 
-export function MobilePositionsTab() {
+interface Props {
+	coin?: string;
+}
+
+export function MobilePositionsTab({ coin }: Props) {
 	const { address, isConnected } = useConnection();
 	const slippageBps = useMarketOrderSlippageBps();
 	const { scope } = useExchangeScope();
 	const { setSelectedMarket } = useMarketActions();
-	const { setMobileActiveTab } = useGlobalSettingsActions();
+	const { setMobileActiveTab, setMobileMarketOpen } = useGlobalSettingsActions();
 	const { setSide } = useOrderEntryActions();
 
 	function handleSelectMarket(name: string, side: Side) {
 		setSelectedMarket(scope, name);
 		setSide(side);
-		setMobileActiveTab("trade");
+		setMobileMarketOpen(true);
 	}
 	const [tpSlModalOpen, setTpSlModalOpen] = useState(false);
 	const [selectedTpSlPosition, setSelectedTpSlPosition] = useState<TpSlPositionData | null>(null);
@@ -42,7 +47,8 @@ export function MobilePositionsTab() {
 	const [closeErrors, setCloseErrors] = useState<Map<number, string>>(() => new Map());
 
 	const { submitPlan } = useSubmitPlan();
-	const { positions, isLoading: positionsLoading, hasError: positionsError } = useUserPositions();
+	const { positions: allPositions, isLoading: positionsLoading, hasError: positionsError } = useUserPositions();
+	const positions = coin ? allPositions.filter((p) => p.coin === coin) : allPositions;
 	const markets = useMarkets();
 
 	const allMidsEnabled = isConnected && positions.length > 0;
@@ -117,6 +123,8 @@ export function MobilePositionsTab() {
 
 	const headerCount = isConnected ? positions.length : FALLBACK_VALUE_PLACEHOLDER;
 
+	if (coin && (!isConnected || positionsError || positions.length === 0)) return null;
+
 	if (!isConnected) {
 		return (
 			<div className="flex-1 flex items-center justify-center p-6 text-sm text-fg-muted">
@@ -145,9 +153,9 @@ export function MobilePositionsTab() {
 					intent="neutral"
 					size="sm"
 					iconLeft={<TrendUpIcon className="size-4" />}
-					onClick={() => setMobileActiveTab("trade")}
+					onClick={() => setMobileActiveTab("markets")}
 				>
-					{t`Go to Trade`}
+					{t`Browse Markets`}
 				</Button>
 			</div>
 		);
@@ -156,12 +164,14 @@ export function MobilePositionsTab() {
 	return (
 		<Skeleton name="positions-tab" loading={positionsLoading}>
 			<div className="flex-1 min-h-0 flex flex-col">
-				<div className="px-3 py-2 flex items-center gap-2 text-xs uppercase text-fg-muted">
-					<ListChecksIcon className="size-3" />
-					{t`Active Positions`}
-					<span className="font-semibold text-success ml-auto tabular-nums">{headerCount}</span>
-				</div>
-				<div className="flex-1 min-h-0 overflow-y-auto px-3 pb-3 space-y-2">
+				{!coin && (
+					<div className="px-3 py-2 flex items-center gap-2 text-xs uppercase text-fg-muted">
+						<ListChecksIcon className="size-3" />
+						{t`Active Positions`}
+						<span className="font-semibold text-success ml-auto tabular-nums">{headerCount}</span>
+					</div>
+				)}
+				<div className={cn("flex-1 min-h-0 overflow-y-auto space-y-2", !coin && "px-3 pb-3")}>
 					{positions.map((p) => {
 						const assetId = markets.getAssetId(p.coin);
 						const isRowClosing = typeof assetId === "number" && closingAssetIds.has(assetId);

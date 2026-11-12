@@ -9,33 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as SplatRouteImport } from './routes/$'
-import { Route as BuildersPerpRouteImport } from './routes/builders-perp'
-import { Route as MobileAgentSyncRouteImport } from './routes/mobile-agent-sync'
-import { Route as PerpRouteImport } from './routes/perp'
 import { Route as SpotRouteImport } from './routes/spot'
+import { Route as PerpRouteImport } from './routes/perp'
+import { Route as MobileAgentSyncRouteImport } from './routes/mobile-agent-sync'
+import { Route as BuildersPerpRouteImport } from './routes/builders-perp'
+import { Route as SplatRouteImport } from './routes/$'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as BuildersPerpIndexRouteImport } from './routes/builders-perp.index'
 import { Route as BuildersPerpDexRouteImport } from './routes/builders-perp.$dex'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SplatRoute = SplatRouteImport.update({
-  id: '/$',
-  path: '/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BuildersPerpRoute = BuildersPerpRouteImport.update({
-  id: '/builders-perp',
-  path: '/builders-perp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MobileAgentSyncRoute = MobileAgentSyncRouteImport.update({
-  id: '/mobile-agent-sync',
-  path: '/mobile-agent-sync',
+const SpotRoute = SpotRouteImport.update({
+  id: '/spot',
+  path: '/spot',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PerpRoute = PerpRouteImport.update({
@@ -43,9 +28,24 @@ const PerpRoute = PerpRouteImport.update({
   path: '/perp',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SpotRoute = SpotRouteImport.update({
-  id: '/spot',
-  path: '/spot',
+const MobileAgentSyncRoute = MobileAgentSyncRouteImport.update({
+  id: '/mobile-agent-sync',
+  path: '/mobile-agent-sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BuildersPerpRoute = BuildersPerpRouteImport.update({
+  id: '/builders-perp',
+  path: '/builders-perp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SplatRoute = SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BuildersPerpIndexRoute = BuildersPerpIndexRouteImport.update({
@@ -132,32 +132,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/$': {
-      id: '/$'
-      path: '/$'
-      fullPath: '/$'
-      preLoaderRoute: typeof SplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/builders-perp': {
-      id: '/builders-perp'
-      path: '/builders-perp'
-      fullPath: '/builders-perp'
-      preLoaderRoute: typeof BuildersPerpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mobile-agent-sync': {
-      id: '/mobile-agent-sync'
-      path: '/mobile-agent-sync'
-      fullPath: '/mobile-agent-sync'
-      preLoaderRoute: typeof MobileAgentSyncRouteImport
+    '/spot': {
+      id: '/spot'
+      path: '/spot'
+      fullPath: '/spot'
+      preLoaderRoute: typeof SpotRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/perp': {
@@ -167,11 +146,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PerpRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/spot': {
-      id: '/spot'
-      path: '/spot'
-      fullPath: '/spot'
-      preLoaderRoute: typeof SpotRouteImport
+    '/mobile-agent-sync': {
+      id: '/mobile-agent-sync'
+      path: '/mobile-agent-sync'
+      fullPath: '/mobile-agent-sync'
+      preLoaderRoute: typeof MobileAgentSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/builders-perp': {
+      id: '/builders-perp'
+      path: '/builders-perp'
+      fullPath: '/builders-perp'
+      preLoaderRoute: typeof BuildersPerpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/builders-perp/': {

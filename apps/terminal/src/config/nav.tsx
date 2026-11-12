@@ -1,23 +1,26 @@
 import { Trans } from "@lingui/react/macro";
 import type { Icon } from "@phosphor-icons/react";
-import { BookOpenIcon, ChartBarIcon, CurrencyCircleDollarIcon, ListIcon, TrendUpIcon } from "@phosphor-icons/react";
+import { ChartLineUpIcon, ClockCounterClockwiseIcon, HouseIcon } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 
-export type MobileTab = "chart" | "book" | "trade" | "positions" | "account";
+export type MobileTab = "home" | "markets" | "activity";
+
+export const DEFAULT_MOBILE_TAB: MobileTab = "markets";
 
 export interface MobileNavItem {
 	id: MobileTab;
-	label: string;
 	icon: Icon;
 }
 
 export const MOBILE_NAV_ITEMS: MobileNavItem[] = [
-	{ id: "chart", label: "Chart", icon: ChartBarIcon },
-	{ id: "book", label: "Book", icon: BookOpenIcon },
-	{ id: "trade", label: "Trade", icon: TrendUpIcon },
-	{ id: "positions", label: "Positions", icon: ListIcon },
-	{ id: "account", label: "Account", icon: CurrencyCircleDollarIcon },
+	{ id: "home", icon: HouseIcon },
+	{ id: "markets", icon: ChartLineUpIcon },
+	{ id: "activity", icon: ClockCounterClockwiseIcon },
 ];
+
+export function parseMobileTab(value: string): MobileTab {
+	return MOBILE_NAV_ITEMS.some((item) => item.id === value) ? (value as MobileTab) : DEFAULT_MOBILE_TAB;
+}
 
 export type ScopeNavKey = "all" | "perp" | "spot" | "builders-perp";
 

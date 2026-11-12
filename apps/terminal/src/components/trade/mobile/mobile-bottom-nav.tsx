@@ -1,10 +1,20 @@
+import { t } from "@lingui/core/macro";
 import { MOBILE_BOTTOM_NAV_HEIGHT_PX } from "@/config/layout";
 import { MOBILE_NAV_ITEMS, type MobileTab } from "@/config/nav";
 import { cn } from "@/lib/cn";
 
 const NAV_BADGE_MAX_COUNT = 99;
 
-export type { MobileTab };
+function getTabLabel(tab: MobileTab): string {
+	switch (tab) {
+		case "home":
+			return t`Home`;
+		case "markets":
+			return t`Markets`;
+		case "activity":
+			return t`Activity`;
+	}
+}
 
 interface Props {
 	activeTab: MobileTab;
@@ -21,7 +31,7 @@ export function MobileBottomNav({ activeTab, onTabChange, badges, className }: P
 				"pb-[env(safe-area-inset-bottom)]",
 				className,
 			)}
-			aria-label="Primary navigation"
+			aria-label={t`Primary navigation`}
 		>
 			<div className="flex items-stretch">
 				{MOBILE_NAV_ITEMS.map((item) => {
@@ -29,6 +39,7 @@ export function MobileBottomNav({ activeTab, onTabChange, badges, className }: P
 					const badgeCount = badges?.[item.id];
 					const showBadge = typeof badgeCount === "number" && badgeCount > 0;
 					const Icon = item.icon;
+					const label = getTabLabel(item.id);
 
 					return (
 						<button
@@ -44,7 +55,7 @@ export function MobileBottomNav({ activeTab, onTabChange, badges, className }: P
 								isActive ? "text-brand" : "text-fg",
 							)}
 							aria-current={isActive ? "page" : undefined}
-							aria-label={item.label}
+							aria-label={label}
 						>
 							<span className="relative">
 								<Icon className="size-5" />
@@ -62,7 +73,7 @@ export function MobileBottomNav({ activeTab, onTabChange, badges, className }: P
 									</span>
 								)}
 							</span>
-							<span className="text-xs font-medium tracking-wide">{item.label}</span>
+							<span className="text-xs font-medium tracking-wide">{label}</span>
 						</button>
 					);
 				})}

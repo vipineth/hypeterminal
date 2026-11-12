@@ -475,6 +475,16 @@
 
   .touch-target { min-height: 44px; min-width: 44px; }
   .touch-target-lg { min-height: 48px; min-width: 48px; }
+  .touch-hitbox { position: relative; }
+  .touch-hitbox::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
 
   .terminal-scanlines { position: relative; }
   .terminal-scanlines::after {

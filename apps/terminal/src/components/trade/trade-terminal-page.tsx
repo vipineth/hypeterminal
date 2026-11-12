@@ -86,8 +86,6 @@ function MobileLoadingFallback() {
 					<NavSkeleton />
 					<NavSkeleton />
 					<NavSkeleton />
-					<NavSkeleton />
-					<NavSkeleton />
 				</div>
 			</div>
 		</div>

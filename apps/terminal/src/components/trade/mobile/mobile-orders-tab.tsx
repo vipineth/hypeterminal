@@ -35,14 +35,14 @@ export function MobileOrdersTab({ className }: Props) {
 	const { address, isConnected } = useConnection();
 	const { scope } = useExchangeScope();
 	const { setSelectedMarket } = useMarketActions();
-	const { setMobileActiveTab } = useGlobalSettingsActions();
+	const { setMobileMarketOpen } = useGlobalSettingsActions();
 	const { setSide } = useOrderEntryActions();
 	const markets = useMarkets();
 
 	function handleSelectMarket(name: string, side: Side) {
 		setSelectedMarket(scope, name);
 		setSide(side);
-		setMobileActiveTab("trade");
+		setMobileMarketOpen(true);
 	}
 
 	const {

@@ -50,7 +50,7 @@ msgstr "24h"
 #~ msgid "24H"
 #~ msgstr "24H"
 
-#: src/components/trade/chart/token-selector-columns.ts:63
+#: src/components/trade/chart/token-selector-columns.ts:72
 #: src/components/trade/chart/token-selector-content.tsx:16
 msgid "24h Change"
 msgstr "24h Change"
@@ -62,6 +62,10 @@ msgstr "24h Change"
 #: src/components/trade/layout/market-overview-variants-demo.tsx:
 #~ msgid "24h vol"
 #~ msgstr "24h vol"
+
+#: src/components/trade/mobile/mobile-market-stats.tsx:37
+msgid "24h Vol"
+msgstr "24h Vol"
 
 #: src/components/trade/market-overview.tsx:135
 #: src/components/trade/market-overview.tsx:175
@@ -119,9 +123,13 @@ msgstr "active"
 #~ msgid "Active"
 #~ msgstr "Active"
 
-#: src/components/trade/mobile/mobile-positions-tab.tsx:161
+#: src/components/trade/mobile/mobile-positions-tab.tsx:170
 msgid "Active Positions"
 msgstr "Active Positions"
+
+#: src/components/trade/mobile/mobile-bottom-nav.tsx:15
+msgid "Activity"
+msgstr "Activity"
 
 #: src/components/trade/positions/position-row.tsx:105
 msgid "Add"
@@ -136,13 +144,17 @@ msgstr "Add {0} to favorites"
 msgid "Add funds"
 msgstr "Add funds"
 
-#: src/components/trade/chart/token-selector.tsx:
-#~ msgid "Add to favorites"
-#~ msgstr "Add to favorites"
+#: src/components/trade/mobile/mobile-market-header.tsx:62
+msgid "Add to favorites"
+msgstr "Add to favorites"
 
 #: src/components/trade/positions/position-row.tsx:246
 msgid "Add TP/SL"
 msgstr "Add TP/SL"
+
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:251
+msgid "Advanced"
+msgstr "Advanced"
 
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx:
 #~ msgid "Advanced order types"
@@ -161,7 +173,7 @@ msgstr "Add TP/SL"
 #~ msgstr "Agent verification failed"
 
 #: src/components/trade/chart/token-selector-content.tsx:92
-#: src/config/nav.tsx:34
+#: src/config/nav.tsx:37
 msgid "All"
 msgstr "All"
 
@@ -222,7 +234,12 @@ msgstr "Asset"
 #~ msgid "Assets"
 #~ msgstr "Assets"
 
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:225
+msgid "Auto close"
+msgstr "Auto close"
+
 #: src/components/trade/mobile/mobile-balances-tab.tsx:150
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:132
 #: src/components/trade/positions/balances-tab.tsx:241
 #: src/components/trade/positions/position-limit-close-modal.tsx:163
 #: src/components/trade/positions/transfer-modal.tsx:147
@@ -243,6 +260,7 @@ msgid "Avg Price"
 msgstr "Avg Price"
 
 #: src/components/trade/components/wallet-modal.tsx:470
+#: src/components/trade/mobile/mobile-market-header.tsx:34
 #: src/components/trade/tradebox/bridge/amount-entry-screen.tsx:59
 #: src/components/trade/tradebox/bridge/bridge-error-screen.tsx:29
 #: src/components/trade/tradebox/bridge/confirmation-screen.tsx:61
@@ -308,6 +326,10 @@ msgstr "Bridge failed"
 #~ msgid "Bridging in progress"
 #~ msgstr "Bridging in progress"
 
+#: src/components/trade/mobile/mobile-positions-tab.tsx:158
+msgid "Browse Markets"
+msgstr "Browse Markets"
+
 #: src/components/pages/builder-page.tsx:
 #~ msgid "Builder Address"
 #~ msgstr "Builder Address"
@@ -334,7 +356,7 @@ msgstr "Builder Fee"
 #~ msgid "Builder must have at least 100 USDC in perps account value"
 #~ msgstr "Builder must have at least 100 USDC in perps account value"
 
-#: src/config/nav.tsx:52
+#: src/config/nav.tsx:55
 msgid "Builders"
 msgstr "Builders"
 
@@ -589,7 +611,7 @@ msgstr "Connect your wallet to view open orders."
 msgid "Connect your wallet to view order history."
 msgstr "Connect your wallet to view order history."
 
-#: src/components/trade/mobile/mobile-positions-tab.tsx:123
+#: src/components/trade/mobile/mobile-positions-tab.tsx:131
 #: src/components/trade/positions/positions-tab.tsx:133
 msgid "Connect your wallet to view positions."
 msgstr "Connect your wallet to view positions."
@@ -725,6 +747,7 @@ msgstr "Created"
 msgid "Creating link..."
 msgstr "Creating link..."
 
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:206
 #: src/components/trade/positions/position-row.tsx:199
 #: src/components/trade/tradebox/margin-mode-modal.tsx:39
 #: src/components/trade/tradebox/trade-header.tsx:68
@@ -1019,7 +1042,7 @@ msgstr "Explorer"
 msgid "failed"
 msgstr "failed"
 
-#: src/components/trade/mobile/mobile-positions-tab.tsx:92
+#: src/components/trade/mobile/mobile-positions-tab.tsx:98
 #: src/components/trade/positions/positions-tab.tsx:94
 msgid "Failed to close position"
 msgstr "Failed to close position"
@@ -1032,7 +1055,7 @@ msgstr "Failed to connect with custom address"
 msgid "Failed to copy"
 msgstr "Failed to copy"
 
-#: src/components/trade/tradebox/trade-panel.tsx:258
+#: src/hooks/trade/use-trade-ticket.ts:233
 msgid "Failed to enable trading"
 msgstr "Failed to enable trading"
 
@@ -1068,7 +1091,7 @@ msgstr "Failed to load order book."
 msgid "Failed to load order history."
 msgstr "Failed to load order history."
 
-#: src/components/trade/mobile/mobile-positions-tab.tsx:131
+#: src/components/trade/mobile/mobile-positions-tab.tsx:139
 #: src/components/trade/positions/positions-tab.tsx:138
 msgid "Failed to load positions."
 msgstr "Failed to load positions."
@@ -1166,7 +1189,7 @@ msgstr "From"
 #~ msgid "Full Position"
 #~ msgstr "Full Position"
 
-#: src/components/trade/chart/token-selector-columns.ts:82
+#: src/components/trade/chart/token-selector-columns.ts:88
 #: src/components/trade/chart/token-selector-content.tsx:22
 #: src/components/trade/mobile/mobile-position-card.tsx:172
 #: src/components/trade/positions/positions-tab.tsx:197
@@ -1176,6 +1199,10 @@ msgstr "Funding"
 #: src/components/trade/market-overview.tsx:155
 msgid "FUNDING"
 msgstr "FUNDING"
+
+#: src/components/trade/mobile/mobile-market-stats.tsx:30
+msgid "Funding / 1h"
+msgstr "Funding / 1h"
 
 #: src/components/trade/mobile/mobile-funding-tab.tsx:70
 msgid "Funding History"
@@ -1203,8 +1230,8 @@ msgstr "Gas ({0})"
 #~ msgstr "Go to previous page"
 
 #: src/components/trade/mobile/mobile-positions-tab.tsx:150
-msgid "Go to Trade"
-msgstr "Go to Trade"
+#~ msgid "Go to Trade"
+#~ msgstr "Go to Trade"
 
 #: src/components/pages/not-found-page.tsx:20
 #: src/components/pages/not-found-page.tsx:23
@@ -1227,6 +1254,10 @@ msgstr "Hide small"
 #: src/components/trade/chart/token-selector-content.tsx:95
 msgid "HIP-3"
 msgstr "HIP-3"
+
+#: src/components/trade/mobile/mobile-bottom-nav.tsx:11
+msgid "Home"
+msgstr "Home"
 
 #: src/components/trade/tradebox/trade-form-twap.tsx:51
 msgid "Hour(s)"
@@ -1294,6 +1325,7 @@ msgstr "Invalid Ethereum address"
 msgid "IOC (Immediate Or Cancel)"
 msgstr "IOC (Immediate Or Cancel)"
 
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:206
 #: src/components/trade/positions/position-row.tsx:199
 #: src/components/trade/tradebox/margin-mode-modal.tsx:46
 #: src/components/trade/tradebox/trade-header.tsx:68
@@ -1308,7 +1340,7 @@ msgstr "Isolated"
 #~ msgid "Latency:"
 #~ msgstr "Latency:"
 
-#: src/config/nav.tsx:67
+#: src/config/nav.tsx:70
 msgid "Leaderboard"
 msgstr "Leaderboard"
 
@@ -1316,6 +1348,7 @@ msgstr "Leaderboard"
 msgid "Learn more"
 msgstr "Learn more"
 
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:205
 #: src/components/trade/tradebox/margin-mode-modal.tsx:175
 msgid "Leverage"
 msgstr "Leverage"
@@ -1328,6 +1361,7 @@ msgstr "Leverage"
 #~ msgid "limit"
 #~ msgstr "limit"
 
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:85
 #: src/components/trade/tradebox/trade-header.tsx:44
 #: src/components/trade/tradebox/trade-header.tsx:49
 msgid "Limit"
@@ -1343,6 +1377,7 @@ msgstr "Limit Close"
 msgid "Limit close order placed"
 msgstr "Limit close order placed"
 
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:111
 #: src/components/trade/positions/position-limit-close-modal.tsx:146
 #: src/components/trade/tradebox/trade-form-fields.tsx:189
 msgid "Limit Price"
@@ -1366,6 +1401,7 @@ msgid "Link mobile device"
 msgstr "Link mobile device"
 
 #: src/components/trade/mobile/mobile-position-card.tsx:168
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:214
 #: src/components/trade/positions/positions-tab.tsx:194
 msgid "Liq"
 msgstr "Liq"
@@ -1488,6 +1524,7 @@ msgstr "Manage TP/SL for {0} short position"
 #~ msgstr "Manage your risk on individual positions by restricting the amount of margin allocated to each. If the margin ratio of an isolated position reaches 100%, the position will be liquidated. Margin can be added or removed to individual positions in this mode."
 
 #: src/components/trade/mobile/mobile-position-card.tsx:164
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:185
 #: src/components/trade/positions/positions-tab.tsx:185
 msgid "Margin"
 msgstr "Margin"
@@ -1521,7 +1558,9 @@ msgstr "Margin Req."
 #~ msgid "Margin Used"
 #~ msgstr "Margin Used"
 
+#: src/components/trade/mobile/mobile-market-stats.tsx:25
 #: src/components/trade/mobile/mobile-position-card.tsx:160
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:76
 #: src/components/trade/positions/positions-tab.tsx:191
 msgid "Mark"
 msgstr "Mark"
@@ -1542,9 +1581,10 @@ msgstr "Mark Price"
 #~ msgid "Mark:"
 #~ msgstr "Mark:"
 
-#: src/components/trade/chart/token-selector-columns.ts:50
+#: src/components/trade/chart/token-selector-columns.ts:61
 #: src/components/trade/chart/token-selector-content.tsx:177
 #: src/components/trade/mobile/mobile-orders-tab.tsx:230
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:84
 #: src/components/trade/positions/orders-tab.tsx:371
 #: src/components/trade/tradebox/trade-header.tsx:43
 #: src/components/trade/tradebox/trade-header.tsx:48
@@ -1572,6 +1612,7 @@ msgid "markets"
 msgstr "markets"
 
 #: src/components/trade/chart/token-selector-content.tsx:233
+#: src/components/trade/mobile/mobile-bottom-nav.tsx:13
 #: src/components/trade/mobile/mobile-nav-drawer.tsx:81
 msgid "Markets"
 msgstr "Markets"
@@ -1580,6 +1621,7 @@ msgstr "Markets"
 #~ msgid "Master"
 #~ msgstr "Master"
 
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:177
 #: src/components/trade/tradebox/bridge/amount-entry-screen.tsx:94
 msgid "Max"
 msgstr "Max"
@@ -1711,7 +1753,7 @@ msgstr "New to wallets?"
 msgid "No"
 msgstr "No"
 
-#: src/components/trade/mobile/mobile-positions-tab.tsx:142
+#: src/components/trade/mobile/mobile-positions-tab.tsx:150
 #: src/components/trade/positions/positions-tab.tsx:142
 msgid "No active positions."
 msgstr "No active positions."
@@ -1844,6 +1886,10 @@ msgstr "Number format"
 msgid "Number of Orders"
 msgstr "Number of Orders"
 
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:253
+msgid "Off"
+msgstr "Off"
+
 #: src/components/trade/footer/footer-bar.tsx:36
 msgid "Offline"
 msgstr "Offline"
@@ -1872,11 +1918,15 @@ msgstr "Offline"
 msgid "Open command menu"
 msgstr "Open command menu"
 
+#: src/components/trade/mobile/mobile-market-stats.tsx:34
+msgid "Open Int"
+msgstr "Open Int"
+
 #: src/components/trade/market-overview.tsx:144
 msgid "OPEN INT"
 msgstr "OPEN INT"
 
-#: src/components/trade/chart/token-selector-columns.ts:69
+#: src/components/trade/chart/token-selector-columns.ts:77
 #: src/components/trade/chart/token-selector-content.tsx:18
 msgid "Open Interest"
 msgstr "Open Interest"
@@ -1905,9 +1955,9 @@ msgstr "Open wallet"
 msgid "Opening camera..."
 msgstr "Opening camera..."
 
-#: src/components/trade/layout/market-overview-variants-demo.tsx:
-#~ msgid "Oracle"
-#~ msgstr "Oracle"
+#: src/components/trade/mobile/mobile-market-stats.tsx:28
+msgid "Oracle"
+msgstr "Oracle"
 
 #: src/components/trade/market-overview.tsx:131
 msgid "ORACLE"
@@ -2047,7 +2097,7 @@ msgstr "pending"
 #: src/components/trade/chart/token-selector-content.tsx:93
 #: src/components/trade/positions/transfer-modal.tsx:67
 #: src/components/trade/positions/transfer-modal.tsx:68
-#: src/config/nav.tsx:40
+#: src/config/nav.tsx:43
 msgid "Perp"
 msgstr "Perp"
 
@@ -2139,7 +2189,7 @@ msgstr "Point your camera at the WalletConnect QR code on your desktop wallet."
 #~ msgid "Popular"
 #~ msgstr "Popular"
 
-#: src/config/nav.tsx:65
+#: src/config/nav.tsx:68
 msgid "Portfolio"
 msgstr "Portfolio"
 
@@ -2162,7 +2212,7 @@ msgstr "Position close actions"
 #~ msgid "Position closed"
 #~ msgstr "Position closed"
 
-#: src/components/trade/mobile/mobile-positions-tab.tsx:88
+#: src/components/trade/mobile/mobile-positions-tab.tsx:94
 #: src/components/trade/positions/positions-tab.tsx:93
 msgid "Position closed — {coin}"
 msgstr "Position closed — {coin}"
@@ -2187,7 +2237,7 @@ msgstr "Preparing your quote..."
 #~ msgid "Previous"
 #~ msgstr "Previous"
 
-#: src/components/trade/chart/token-selector-columns.ts:56
+#: src/components/trade/chart/token-selector-columns.ts:66
 #: src/components/trade/chart/token-selector-content.tsx:14
 #: src/components/trade/mobile/mobile-history-tab.tsx:110
 #: src/components/trade/mobile/mobile-orders-history-tab.tsx:111
@@ -2208,6 +2258,10 @@ msgstr "Price"
 #: src/components/trade/orderbook/orderbook-panel.tsx:115
 msgid "Price grouping"
 msgstr "Price grouping"
+
+#: src/components/trade/mobile/mobile-bottom-nav.tsx:34
+msgid "Primary navigation"
+msgstr "Primary navigation"
 
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx:
 #: src/components/trade/tradebox/advanced-order-dropdown.tsx:
@@ -2269,6 +2323,10 @@ msgstr "Recovered after reload. Expires {expiresAtLabel}."
 #~ msgid "Reduce"
 #~ msgstr "Reduce"
 
+#: src/components/trade/mobile/mobile-ticket-advanced.tsx:44
+msgid "Reduce only"
+msgstr "Reduce only"
+
 #: src/components/trade/positions/twap-tab.tsx:104
 #: src/components/trade/tradebox/trade-form-fields.tsx:288
 #: src/components/trade/tradebox/trade-form-fields.tsx:292
@@ -2293,9 +2351,9 @@ msgstr "Remove {0} from favorites"
 msgid "Remove {displayName} from favorites"
 msgstr "Remove {displayName} from favorites"
 
-#: src/components/trade/chart/token-selector.tsx:
-#~ msgid "Remove from favorites"
-#~ msgstr "Remove from favorites"
+#: src/components/trade/mobile/mobile-market-header.tsx:62
+msgid "Remove from favorites"
+msgstr "Remove from favorites"
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:540
 msgid "Replaces the current phone key. The old phone must link again."
@@ -2624,6 +2682,7 @@ msgstr "Signer not ready"
 #: src/components/trade/mobile/mobile-orders-history-tab.tsx:112
 #: src/components/trade/mobile/mobile-orders-tab.tsx:233
 #: src/components/trade/mobile/mobile-position-card.tsx:147
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:129
 #: src/components/trade/mobile/mobile-twap-tab.tsx:116
 #: src/components/trade/orderbook/orderbook-panel.tsx:124
 #: src/components/trade/orderbook/trades-panel.tsx:76
@@ -2720,7 +2779,7 @@ msgstr "Source"
 #: src/components/trade/positions/transfer-modal.tsx:67
 #: src/components/trade/positions/transfer-modal.tsx:68
 #: src/components/trade/tradebox/account-panel.tsx:126
-#: src/config/nav.tsx:46
+#: src/config/nav.tsx:49
 msgid "Spot"
 msgstr "Spot"
 
@@ -2736,7 +2795,7 @@ msgstr "Spot Account"
 msgid "Spread"
 msgstr "Spread"
 
-#: src/config/nav.tsx:66
+#: src/config/nav.tsx:69
 msgid "Staking"
 msgstr "Staking"
 
@@ -2783,6 +2842,10 @@ msgstr "Stop trigger must be above mark"
 #: src/lib/errors/definitions/trigger.ts:34
 msgid "Stop trigger must be below mark"
 msgstr "Stop trigger must be below mark"
+
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:252
+msgid "Stop, TWAP, Scale, TIF & more"
+msgstr "Stop, TWAP, Scale, TIF & more"
 
 #: src/components/trade/positions/position-limit-close-modal.tsx:206
 #: src/components/trade/positions/position-tpsl-modal.tsx:176
@@ -2916,6 +2979,11 @@ msgstr "Sync ID"
 msgid "Take Profit"
 msgstr "Take Profit"
 
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:226
+msgid "Take profit / stop loss"
+msgstr "Take profit / stop loss"
+
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:233
 #: src/components/trade/tradebox/trade-form-fields.tsx:297
 msgid "Take Profit / Stop Loss"
 msgstr "Take Profit / Stop Loss"
@@ -3035,6 +3103,10 @@ msgstr "To Spot"
 #: src/components/trade/tradebox/trade-form-fields.tsx:240
 msgid "Toggle size mode"
 msgstr "Toggle size mode"
+
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:159
+msgid "Toggle size unit"
+msgstr "Toggle size unit"
 
 #: src/components/trade/market-overview.tsx:187
 msgid "TOKEN"
@@ -3170,6 +3242,7 @@ msgstr "Transferring..."
 msgid "Trigger"
 msgstr "Trigger"
 
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:92
 #: src/components/trade/tradebox/trade-form-fields.tsx:167
 msgid "Trigger Price"
 msgstr "Trigger Price"
@@ -3203,6 +3276,10 @@ msgstr "TWAP order value too small. Min is ${min}, which is ${TWAP_MIN_NOTIONAL_
 #: src/components/trade/mobile/mobile-twap-tab.tsx:66
 msgid "TWAP Orders"
 msgstr "TWAP Orders"
+
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:252
+msgid "TWAP, Scale & more"
+msgstr "TWAP, Scale & more"
 
 #: src/components/trade/mobile/mobile-orders-history-tab.tsx:110
 #: src/components/trade/positions/history-tab.tsx:82
@@ -3281,7 +3358,7 @@ msgstr "Using"
 #~ msgid "Value"
 #~ msgstr "Value"
 
-#: src/config/nav.tsx:64
+#: src/config/nav.tsx:67
 msgid "Vaults"
 msgstr "Vaults"
 
@@ -3297,7 +3374,7 @@ msgstr "View on explorer"
 #~ msgid "VOL"
 #~ msgstr "VOL"
 
-#: src/components/trade/chart/token-selector-columns.ts:75
+#: src/components/trade/chart/token-selector-columns.ts:82
 #: src/components/trade/chart/token-selector-content.tsx:20
 msgid "Volume"
 msgstr "Volume"

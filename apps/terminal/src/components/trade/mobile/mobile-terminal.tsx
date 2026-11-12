@@ -3,14 +3,14 @@ import { HL_ALL_DEXS } from "@/config/app";
 import { cn } from "@/lib/cn";
 import { useSubscription, useUserPositions } from "@/lib/hyperliquid";
 import { toNumber } from "@/lib/trade/numbers";
-import { useGlobalSettingsActions, useMobileActiveTab } from "@/stores/use-global-settings-store";
+import { useGlobalSettingsActions, useMobileActiveTab, useMobileMarketOpen } from "@/stores/use-global-settings-store";
+import { OrderToast } from "../tradebox/order-toast";
 import { MobileAccountView } from "./mobile-account-view";
-import { MobileBookView } from "./mobile-book-view";
-import { MobileBottomNav, type MobileTab } from "./mobile-bottom-nav";
-import { MobileChartView } from "./mobile-chart-view";
+import { MobileBottomNav } from "./mobile-bottom-nav";
 import { MobileHeader } from "./mobile-header";
+import { MobileMarketPage } from "./mobile-market-page";
+import { MobileMarketsView } from "./mobile-markets-view";
 import { MobilePositionsView } from "./mobile-positions-view";
-import { MobileTradeView } from "./mobile-trade-view";
 import { OfflineBanner } from "./offline-banner";
 
 interface Props {
@@ -18,7 +18,8 @@ interface Props {
 }
 
 export function MobileTerminal({ className }: Props) {
-	const activeTab = useMobileActiveTab() as MobileTab;
+	const activeTab = useMobileActiveTab();
+	const marketOpen = useMobileMarketOpen();
 	const { setMobileActiveTab } = useGlobalSettingsActions();
 	const { address, isConnected } = useConnection();
 	const { positions } = useUserPositions();
@@ -37,20 +38,25 @@ export function MobileTerminal({ className }: Props) {
 
 	return (
 		<div className={cn("h-dvh w-full flex flex-col bg-background text-fg font-sans", "overflow-hidden", className)}>
-			<MobileHeader />
+			{!marketOpen && <MobileHeader />}
 			<OfflineBanner />
 			<main className="flex-1 min-h-0 flex flex-col overflow-hidden">
-				{activeTab === "chart" && <MobileChartView />}
-				{activeTab === "book" && <MobileBookView />}
-				{activeTab === "trade" && <MobileTradeView />}
-				{activeTab === "positions" && <MobilePositionsView />}
-				{activeTab === "account" && <MobileAccountView />}
+				{marketOpen ? (
+					<MobileMarketPage />
+				) : (
+					<>
+						{activeTab === "home" && <MobileAccountView />}
+						{activeTab === "markets" && <MobileMarketsView />}
+						{activeTab === "activity" && <MobilePositionsView />}
+					</>
+				)}
 			</main>
 			<MobileBottomNav
 				activeTab={activeTab}
 				onTabChange={setMobileActiveTab}
-				badges={{ positions: positionsCount + ordersCount }}
+				badges={{ activity: positionsCount + ordersCount }}
 			/>
+			<OrderToast />
 		</div>
 	);
 }

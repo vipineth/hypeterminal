@@ -156,7 +156,7 @@ function AdaptiveModal({ open, onOpenChange, size, showClose = true, children, c
 	if (isMobile) {
 		return (
 			<Drawer side="bottom" open={open} onOpenChange={onOpenChange}>
-				<DrawerContent className={cn("relative pb-[env(safe-area-inset-bottom)]", className)}>
+				<DrawerContent className={cn("pb-[env(safe-area-inset-bottom)]", className)}>
 					<div
 						className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full bg-fill/20"
 						aria-hidden="true"

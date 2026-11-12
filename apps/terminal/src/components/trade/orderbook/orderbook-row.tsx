@@ -26,26 +26,23 @@ function OrderbookRowComponent({ level, side, maxTotal, priceDecimals, showInQuo
 	const totalText = formatNumber(totalValue, { decimals: displayDecimals, compact: true });
 
 	return (
-		<div className="relative hover:bg-fill-hover cursor-pointer group">
-			<div
+		<button
+			type="button"
+			onClick={() => setSelectedPrice(level.price)}
+			className="relative block w-full text-left hover:bg-fill-hover cursor-pointer group"
+		>
+			<span
 				className={cn("absolute inset-y-0 pointer-events-none", isAsk ? "depth-bar-ask" : "depth-bar-bid")}
 				style={{ width: `${depthPct}%`, [isAsk ? "right" : "left"]: 0, [isAsk ? "left" : "right"]: "auto" }}
 			/>
-			<div className="grid grid-cols-3 gap-1 text-2xs tabular-nums py-0.5 px-2 relative z-10">
-				<button
-					type="button"
-					onClick={() => setSelectedPrice(level.price)}
-					className={cn(
-						"text-left justify-start font-medium",
-						isAsk ? "text-error hover:text-error" : "text-success hover:text-success",
-					)}
-				>
+			<span className="grid grid-cols-3 gap-1 text-2xs tabular-nums py-0.5 px-2 relative z-10">
+				<span className={cn("text-left font-medium", isAsk ? "text-error" : "text-success")}>
 					{formatNumber(level.price, priceDecimals)}
-				</button>
-				<div className="text-right text-fg group-hover:text-fg">{sizeText}</div>
-				<div className="text-right text-fg group-hover:text-fg">{totalText}</div>
-			</div>
-		</div>
+				</span>
+				<span className="text-right text-fg group-hover:text-fg">{sizeText}</span>
+				<span className="text-right text-fg group-hover:text-fg">{totalText}</span>
+			</span>
+		</button>
 	);
 }
 
