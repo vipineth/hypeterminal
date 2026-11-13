@@ -25,7 +25,7 @@ function isFullWalletClient(value: unknown): value is FullWalletClient {
 	);
 }
 
-// Some viem releases reject struct names containing ":" before signing, and every Hyperliquid
+// viem 2.57.12-2.57.16 signTypedData rejects struct names containing ":", and every Hyperliquid
 // user-signed type is "HyperliquidTransaction:*", so the request goes to the wallet directly.
 function signWithWallet(client: WalletClientLike, account: `0x${string}`, params: SignTypedDataParams) {
 	return client.request(
