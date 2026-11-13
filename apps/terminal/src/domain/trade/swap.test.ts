@@ -52,6 +52,20 @@ describe("swap buy sizing", () => {
 		expect(misses.length, misses.slice(0, 3).join("; ")).toBe(0);
 	});
 
+	it("never spends more than the amount when it falls between lots", () => {
+		const overspends: string[] = [];
+		for (const market of [JEFF_USDC, HFUN_USDC]) {
+			for (let cents = 1_000; cents <= 60_000; cents += 7) {
+				const amount = Big(cents).div(100);
+				const { wireSize } = swap(market, amount.toFixed(), true);
+				if (wireSize && Big(wireSize).times(market.markPx).gt(amount)) {
+					overspends.push(`${amount.toFixed()} at ${market.markPx} sent ${wireSize}`);
+				}
+			}
+		}
+		expect(overspends.length, overspends.slice(0, 3).join("; ")).toBe(0);
+	});
+
 	it("shows the size the wire sends", () => {
 		const { wireSize, estimatedReceive } = swap(JEFF_USDC, "52.91", true);
 		expect(estimatedReceive).toBe(Number(wireSize));

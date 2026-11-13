@@ -122,6 +122,15 @@ describe("parseMarkets on the committed mainnet snapshot", () => {
 		expect(perp("io:NVDA").assetId).toBe(200014);
 	});
 
+	it("marks main-dex perps as perp and every builder dex perp as builderPerp", () => {
+		const perps = model.markets.filter(isPerpLike);
+		const misKinded = perps.filter((market) => market.kind !== (market.dex.index === 0 ? "perp" : "builderPerp"));
+
+		expect(misKinded.map((market) => market.name)).toEqual([]);
+		expect(perp("BTC").kind).toBe("perp");
+		expect(perp("xyz:NVDA").kind).toBe("builderPerp");
+	});
+
 	it("lists only the live NVDA listings and keeps the delisted ones by full coin", () => {
 		const nvda = model.markets.filter((market) => market.shortName === "NVDA");
 
