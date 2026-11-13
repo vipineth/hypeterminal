@@ -1,5 +1,5 @@
 import { toSafeBig } from "@/lib/trade/numbers";
-import { spotBalance } from "../account";
+import { spotBalance, spotBase } from "../account";
 import { expectStatuses } from "../assert";
 import { intents, lotSize, plan } from "../plans";
 import { fresh, type Scenario, send } from "./common";
@@ -14,7 +14,7 @@ export const spotScenarios: Scenario[] = [
 		scope: "spot",
 		run: async (ctx) => {
 			const venue = await fresh(ctx);
-			const base = venue.baseToken ?? "";
+			const base = spotBase(venue);
 			const usdcBefore = toSafeBig(await spotBalance(ctx.h, "USDC"));
 			const baseBefore = toSafeBig(await spotBalance(ctx.h, base));
 			const size = lotSize(venue);

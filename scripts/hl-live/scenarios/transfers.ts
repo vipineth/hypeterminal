@@ -1,6 +1,7 @@
 import type { ExchangeClient } from "@nktkas/hyperliquid";
 import { toSafeBig } from "@/lib/trade/numbers";
 import { enterUnified, exitUnified, SPOT_DEX, spotBalance } from "../account";
+import { errorMessage } from "../assert";
 import { expectSame, type Scenario, type ScenarioContext, Unsupported } from "./common";
 
 const AMOUNT = "1";
@@ -31,7 +32,7 @@ async function roundTrip(ctx: ScenarioContext, sendAsset: SendAsset): Promise<vo
 	try {
 		await move(home, target);
 	} catch (error) {
-		const message = (error as Error).message;
+		const message = errorMessage(error);
 		if (target !== SPOT_DEX && message.includes("Invalid send")) throw new Unsupported(`sendAsset into ${target}: ${message}`);
 		throw error;
 	}
@@ -91,7 +92,7 @@ export const transferScenarios: Scenario[] = [
 			try {
 				await enterUnified(ctx.h, () => ctx.h.agent.agentSetAbstraction({ abstraction: "u" }));
 			} catch (error) {
-				const message = (error as Error).message;
+				const message = errorMessage(error);
 				if (message.includes("Abstraction transition not allowed")) {
 					throw new Unsupported(`agentSetAbstraction from ${before}: ${message}`);
 				}

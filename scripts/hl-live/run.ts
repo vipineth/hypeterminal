@@ -4,7 +4,7 @@ import { HttpTransport, InfoClient } from "@nktkas/hyperliquid";
 import { listLiveMarkets, type LiveMetaSnapshot } from "@/domain/trade/live-plan-set";
 import { toSafeBig } from "@/lib/trade/numbers";
 import { acquireLock, cleanVenue, exitUnified, enterUnified, loadVenue, SPOT_DEX, spotBalance, type VenueSpec } from "./account";
-import { validateOrder } from "./assert";
+import { errorMessage, validateOrder } from "./assert";
 import { collectDrift, DRIFT_SNAPSHOT_PATH, type DriftShape, diffDrift, fetchDriftInputs, mergeDrift } from "./drift";
 import { createHarness, type Harness, loadKeys } from "./harness";
 import { lotSize, readonlyPlans, TWAP_NOTIONAL, twapPlan } from "./plans";
@@ -55,7 +55,7 @@ async function runScenario(h: Harness, scenario: Scenario, spec: VenueSpec, agen
 		return result("pass");
 	} catch (error) {
 		if (error instanceof Unsupported) return result("unsupported", error.message);
-		return result("fail", (error as Error).message.split("\n")[0]);
+		return result("fail", errorMessage(error).split("\n")[0]);
 	} finally {
 		if (scenario.scope !== "account") await cleanVenue(h, spec);
 	}

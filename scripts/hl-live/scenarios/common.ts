@@ -2,7 +2,7 @@ import type { ExchangeOrder } from "@/config/trade";
 import type { OrderPlan } from "@/domain/trade/order-intent";
 import { toSafeBig } from "@/lib/trade/numbers";
 import { type Venue, loadVenue, perpState, venueOrders } from "../account";
-import { bookTooThin, expectPosition, expectStatuses, newCloid, type OrderStatus, positionSize } from "../assert";
+import { bookTooThin, errorMessage, expectPosition, expectStatuses, newCloid, type OrderStatus, positionSize } from "../assert";
 import type { Harness } from "../harness";
 import { intents, lotSize, plan } from "../plans";
 
@@ -38,7 +38,7 @@ export async function send(ctx: ScenarioContext, built: OrderPlan): Promise<{ st
 		return { statuses: response.response.data.statuses, orders };
 	} catch (error) {
 		const [first] = orders;
-		const message = String((error as Error).message);
+		const message = errorMessage(error);
 		if (message.includes(DEX_OI_CAP)) throw new Unsupported(message);
 		if (message.includes(NO_MATCH) && first) {
 			const book = await ctx.h.info.l2Book({ coin: ctx.venue.coin });
@@ -77,8 +77,19 @@ export async function expectRejected(action: () => Promise<unknown>, pattern: Re
 	try {
 		await action();
 	} catch (error) {
-		if (pattern.test((error as Error).message)) return;
+		if (pattern.test(errorMessage(error))) return;
 		throw error;
 	}
 	throw new Error(`expected a rejection matching ${pattern}`);
+}
+
+const POLL_MS = 500;
+const POLL_LIMIT_MS = 10_000;
+
+export async function waitFor(label: string, check: () => Promise<boolean>): Promise<void> {
+	const deadline = Date.now() + POLL_LIMIT_MS;
+	while (!(await check())) {
+		if (Date.now() > deadline) throw new Error(`${label} after ${POLL_LIMIT_MS / 1000}s`);
+		await new Promise((resolve) => setTimeout(resolve, POLL_MS));
+	}
 }

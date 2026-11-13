@@ -5,7 +5,7 @@ import type { InfoClient } from "@nktkas/hyperliquid";
 import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
 import { getBuilderPerpAssetId, getPerpAssetId, getSpotAssetId } from "@/lib/hyperliquid/markets/helper";
 import { toSafeBig } from "@/lib/trade/numbers";
-import { positionSize } from "./assert";
+import { errorMessage, positionSize } from "./assert";
 import type { Harness } from "./harness";
 import type { PlanMarket } from "./plans";
 
@@ -53,6 +53,11 @@ export async function loadVenue(info: InfoClient, spec: VenueSpec): Promise<Venu
 	};
 }
 
+export function spotBase(venue: Venue): string {
+	if (!venue.baseToken) throw new Error(`${venue.coin} has no spot base token`);
+	return venue.baseToken;
+}
+
 export function perpState(h: Harness, venue: Venue) {
 	return h.info.clearinghouseState({ user: h.user, dex: venue.dex });
 }
@@ -84,7 +89,7 @@ function aggressivePrice(venue: Venue, isBuy: boolean): string {
 
 async function closeExposure(h: Harness, venue: Venue): Promise<void> {
 	if (venue.kind === "spot") {
-		const held = toSafeBig(await spotBalance(h, venue.baseToken ?? ""));
+		const held = toSafeBig(await spotBalance(h, spotBase(venue)));
 		if (held.times(toSafeBig(venue.markPx)).lt(MIN_SPOT_SELL_NOTIONAL)) return;
 		const size = formatSize(held.round(venue.szDecimals, ROUND_DOWN).toFixed(), venue.szDecimals);
 		await h.agent.order({
@@ -111,45 +116,55 @@ async function closeExposure(h: Harness, venue: Venue): Promise<void> {
 	});
 }
 
-async function ignoreRace(action: () => Promise<unknown>): Promise<void> {
-	try {
-		await action();
-	} catch {}
-}
-
 export async function cleanVenue(h: Harness, spec: VenueSpec): Promise<void> {
 	const venue = await loadVenue(h.info, spec);
+	const failures: string[] = [];
+	const attempt = (action: () => Promise<unknown>) =>
+		action().catch((error: unknown) => {
+			failures.push(errorMessage(error));
+		});
 	for (const twapId of await activeTwapIds(h, venue.coin)) {
-		await ignoreRace(() => h.agent.twapCancel({ a: venue.assetId, t: twapId }));
+		await attempt(() => h.agent.twapCancel({ a: venue.assetId, t: twapId }));
 	}
 	const orders = await venueOrders(h, venue);
 	if (orders.length > 0) {
-		await ignoreRace(() => h.agent.cancel({ cancels: orders.map((order) => ({ a: venue.assetId, o: order.oid })) }));
+		await attempt(() => h.agent.cancel({ cancels: orders.map((order) => ({ a: venue.assetId, o: order.oid })) }));
 	}
-	await ignoreRace(() => closeExposure(h, venue));
+	await attempt(() => closeExposure(h, venue));
 
+	const left: string[] = [];
+	const twaps = await activeTwapIds(h, venue.coin);
+	if (twaps.length > 0) left.push(`${twaps.length} running twaps`);
 	const leftOrders = await venueOrders(h, venue);
-	if (leftOrders.length > 0) throw new Error(`cleanup left ${leftOrders.length} open orders on ${venue.coin}`);
-	if (venue.kind !== "spot") {
-		const left = positionSize(await perpState(h, venue), venue.coin);
-		if (!toSafeBig(left).eq(0)) throw new Error(`cleanup left a ${venue.coin} position of ${left}`);
+	if (leftOrders.length > 0) left.push(`${leftOrders.length} open orders`);
+	if (venue.kind === "spot") {
+		const held = toSafeBig(await spotBalance(h, spotBase(venue)));
+		if (held.times(toSafeBig(venue.markPx)).gte(MIN_SPOT_SELL_NOTIONAL)) left.push(`${held.toFixed()} ${spotBase(venue)}`);
+	} else {
+		const size = positionSize(await perpState(h, venue), venue.coin);
+		if (!toSafeBig(size).eq(0)) left.push(`a position of ${size}`);
 	}
+	if (left.length > 0) throw new Error(`cleanup left ${left.join(", ")} on ${venue.coin}: ${failures.join("; ")}`);
 }
 
 function statePath(user: string, name: string): string {
 	return join(tmpdir(), `hl-live-${user.toLowerCase()}.${name}`);
 }
 
+function isAlive(pid: number): boolean {
+	try {
+		process.kill(pid, 0);
+		return true;
+	} catch (error) {
+		return (error as NodeJS.ErrnoException).code !== "ESRCH";
+	}
+}
+
 export function acquireLock(user: string): () => void {
 	const path = statePath(user, "lock");
 	if (existsSync(path)) {
 		const pid = Number(readFileSync(path, "utf8"));
-		try {
-			process.kill(pid, 0);
-			throw new Error(`another harness run (pid ${pid}) holds ${path}, runs on one principal must not overlap`);
-		} catch (error) {
-			if ((error as NodeJS.ErrnoException).code !== "ESRCH") throw error;
-		}
+		if (isAlive(pid)) throw new Error(`another harness run (pid ${pid}) holds ${path}, runs on one principal must not overlap`);
 	}
 	writeFileSync(path, String(process.pid));
 	return () => {

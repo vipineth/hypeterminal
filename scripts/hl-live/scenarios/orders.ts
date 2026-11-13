@@ -1,8 +1,8 @@
 import { toSafeBig } from "@/lib/trade/numbers";
 import { activeTwapIds, perpState, venueOrders } from "../account";
-import { expectPosition, expectStatuses, harnessOrders } from "../assert";
+import { errorMessage, expectPosition, expectStatuses, harnessOrders } from "../assert";
 import { intents, lotSize, plan, priceAt, SCALE_LEVELS, scaleTotal, TWAP_NOTIONAL, twapPlan } from "../plans";
-import { expectRejected, expectSame, fresh, openLong, orderByCloid, type Scenario, send, Unsupported } from "./common";
+import { expectRejected, expectSame, fresh, openLong, orderByCloid, type Scenario, send, Unsupported, waitFor } from "./common";
 
 const restingLimit: Scenario["run"] = async (ctx) => {
 	const venue = await fresh(ctx);
@@ -103,9 +103,16 @@ export const orderScenarios: Scenario[] = [
 			if (!built.action) throw new Error(`the app refused to build the twap: ${built.errors.join(", ")}`);
 			const response = await ctx.h.agent.twapOrder(built.action);
 			const twapId = response.response.data.status.running.twapId;
-			if (!(await activeTwapIds(ctx.h, venue.coin)).includes(twapId)) throw new Error(`twap ${twapId} is not running`);
-			await ctx.h.agent.twapCancel({ a: venue.assetId, t: twapId });
-			if ((await activeTwapIds(ctx.h, venue.coin)).includes(twapId)) throw new Error(`twap ${twapId} still runs after cancel`);
+			await waitFor(`twap ${twapId} never showed in twapHistory`, async () =>
+				(await ctx.h.info.twapHistory({ user: ctx.h.user })).some((entry) => entry.twapId === twapId),
+			);
+			const cancelError = await ctx.h.agent
+				.twapCancel({ a: venue.assetId, t: twapId })
+				.then(() => "")
+				.catch(errorMessage);
+			await waitFor(`twap ${twapId} still runs after cancel ${cancelError}`, async () =>
+				!(await activeTwapIds(ctx.h, venue.coin)).includes(twapId),
+			);
 		},
 	},
 	{

@@ -2,7 +2,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { ExchangeClient, type HttpTransport, InfoClient } from "@nktkas/hyperliquid";
-import { createWalletClient, custom, type Hex } from "viem";
+import { createWalletClient, custom, type Hex, type TypedDataDomain } from "viem";
 import { generatePrivateKey, type PrivateKeyAccount, privateKeyToAccount } from "viem/accounts";
 import { createL1AgentWallet } from "../../packages/hl-react/src/signing/l1-agent-wallet.ts";
 import { toHyperliquidWallet } from "../../packages/hl-react/src/wallet.ts";
@@ -32,7 +32,7 @@ export interface Harness {
 }
 
 interface TypedDataJson {
-	domain: { name?: string; chainId?: number | string; verifyingContract?: string };
+	domain: TypedDataDomain;
 	types: Record<string, { name: string; type: string }[]>;
 	primaryType: string;
 	message: Record<string, unknown>;
@@ -64,11 +64,15 @@ function readEnvFile(path: string): Map<string, string> {
 	return entries;
 }
 
+function isKey(value: string): value is Hex {
+	return KEY_PATTERN.test(value);
+}
+
 function parseKey(name: string, raw: string | undefined): Hex {
 	if (!raw) throw new Error(`${name} is not set`);
 	const key = raw.startsWith("0x") ? raw : `0x${raw}`;
-	if (!KEY_PATTERN.test(key)) throw new Error(`${name} is not a 32-byte hex key`);
-	return key as Hex;
+	if (!isKey(key)) throw new Error(`${name} is not a 32-byte hex key`);
+	return key;
 }
 
 export function loadKeys(env: NodeJS.ProcessEnv = process.env): HarnessKeys {
@@ -113,7 +117,7 @@ function principalProvider(account: PrivateKeyAccount, transport: HttpTransport)
 					refuseUnlessTestnetUserAction(transport, typedData);
 					const { EIP712Domain: _domain, ...types } = typedData.types;
 					return account.signTypedData({
-						domain: typedData.domain as Parameters<PrivateKeyAccount["signTypedData"]>[0]["domain"],
+						domain: typedData.domain,
 						types,
 						primaryType: typedData.primaryType,
 						message: typedData.message,

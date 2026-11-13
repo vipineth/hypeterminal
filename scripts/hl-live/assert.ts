@@ -13,6 +13,10 @@ export const HARNESS_CLOID_PREFIX = "0x686c6c697665";
 const MIN_ORDER_NOTIONAL = 10;
 const ROUND_UP = 3;
 
+export function errorMessage(error: unknown): string {
+	return error instanceof Error ? error.message : String(error);
+}
+
 export function newCloid(): `0x${string}` {
 	const tail = Array.from(crypto.getRandomValues(new Uint8Array(10)), (byte) => byte.toString(16).padStart(2, "0"));
 	return `${HARNESS_CLOID_PREFIX}${tail.join("")}`;
@@ -70,7 +74,7 @@ export function validateOrder(order: ExchangeOrder, kind: WireMarketKind, szDeci
 			const onGrid = format(value);
 			if (onGrid !== value) problems.push(`${label} ${value} is not on the wire grid, expected ${onGrid}`);
 		} catch (error) {
-			problems.push(`${label} ${value} is invalid: ${(error as Error).message}`);
+			problems.push(`${label} ${value} is invalid: ${errorMessage(error)}`);
 		}
 	};
 	const toPriceGrid = (value: string) => formatPrice(value, szDecimals, priceType);
