@@ -56,9 +56,9 @@ export function bookTooThin(book: L2BookResponse | null, isBuy: boolean, price: 
 	return isBuy ? toSafeBig(best.px).gt(price) : toSafeBig(best.px).lt(price);
 }
 
-export function sizeForNotional(markPx: Numeric, szDecimals: number, notional: number): string {
+export function sizeForNotional(markPx: Numeric, szDecimals: number, notional: number, wholeTens = false): string {
 	const raw = toSafeBig(notional).div(toSafeBig(markPx)).round(szDecimals, ROUND_UP);
-	if (szDecimals > 0) return raw.toString();
+	if (szDecimals > 0 || !wholeTens) return raw.toString();
 	return raw.div(10).round(0, ROUND_UP).times(10).toString();
 }
 

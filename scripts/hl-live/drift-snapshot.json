@@ -1,0 +1,42 @@
+{
+	"perpDexFields": [
+		"assetToFundingClamp",
+		"assetToFundingInterestRate",
+		"assetToFundingMultiplier",
+		"assetToStreamingOiCap",
+		"deployer",
+		"feeRecipient",
+		"fullName",
+		"name",
+		"oracleUpdater",
+		"subDeployers"
+	],
+	"metaFields": [
+		"collateralToken",
+		"marginTables",
+		"universe"
+	],
+	"assetFields": [
+		"deployerFeeScale",
+		"growthMode",
+		"isDelisted",
+		"lastFeeScaleChangeTime",
+		"marginMode",
+		"marginTableId",
+		"maxLeverage",
+		"name",
+		"onlyIsolated",
+		"szDecimals"
+	],
+	"marginModes": [
+		"noCross",
+		"strictIsolated"
+	],
+	"userAbstractions": [
+		"default",
+		"dexAbstraction",
+		"disabled",
+		"portfolioMargin",
+		"unifiedAccount"
+	]
+}

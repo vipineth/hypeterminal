@@ -90,8 +90,9 @@ describe("bookTooThin", () => {
 });
 
 describe("sizeForNotional", () => {
-	it("rounds a whole-lot size up to a multiple of 10", () => {
-		expect(sizeForNotional("0.06525", 0, 12)).toBe("190");
+	it("rounds a whole-lot size up to a multiple of 10 when asked, so a dropped zero changes the size", () => {
+		expect(sizeForNotional("0.06525", 0, 12, true)).toBe("190");
+		expect(sizeForNotional("4.53", 0, 15)).toBe("4");
 	});
 
 	it("rounds a fractional size up to the lot", () => {

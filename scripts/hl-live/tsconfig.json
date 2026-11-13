@@ -6,7 +6,7 @@
 				"./../../apps/terminal/src/*"
 			],
 			"@nktkas/hyperliquid": [
-				"./../../apps/terminal/node_modules/@nktkas/hyperliquid"
+				"./../../apps/terminal/node_modules/@nktkas/hyperliquid/esm/mod"
 			],
 			"@nktkas/hyperliquid/*": [
 				"./../../apps/terminal/node_modules/@nktkas/hyperliquid/esm/*/mod"
