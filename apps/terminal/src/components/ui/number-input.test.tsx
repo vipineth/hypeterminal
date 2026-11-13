@@ -65,4 +65,8 @@ describe("NumberInput arrow stepping", () => {
 	it("steps an uncapped 1.2701 up to 2.2701, not 2.2701000000000002", () => {
 		expect(stepInto(undefined, "ArrowUp", "1.2701")).toBe("2.2701");
 	});
+
+	it("never steps past the decimal cap from a longer value the app wrote", () => {
+		expect(stepInto(3, "ArrowUp", "80.2713")).toBe("81.271");
+	});
 });
