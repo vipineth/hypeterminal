@@ -1,8 +1,20 @@
-import { ApiRequestError, HttpRequestError } from "@nktkas/hyperliquid";
 import Big from "big.js";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { useTradeTicket } from "@/hooks/trade/use-trade-ticket";
+import type { LockManagerLike } from "@/lib/trade/order-sender";
+import {
+	comesBackUp,
+	createFakeExchange,
+	createMemoryLocks,
+	createMemoryStorage,
+	type FakeExchange,
+	goesDownOnFirstSend,
+	type LegOutcome,
+	type WireOrder,
+} from "@/test/fake-exchange";
+
+type UseTradeTicket = typeof import("@/hooks/trade/use-trade-ticket").useTradeTicket;
+let useTradeTicket: UseTradeTicket;
 
 const POINTS_USDC = vi.hoisted(() => ({
 	kind: "spot",
@@ -49,38 +61,72 @@ const form = vi.hoisted(() => ({
 }));
 
 const liveFeed = vi.hoisted(() => ({ markPx: null as string | null, status: "active", isStale: false }));
-const exchange = vi.hoisted(() => ({ placeOrder: vi.fn() }));
-const info = vi.hoisted(() => ({ orderStatus: vi.fn(), twapHistory: vi.fn() }));
+const net = vi.hoisted(() => ({
+	venue: null as unknown as FakeExchange,
+	storage: null as unknown as Storage,
+	locks: null as unknown as LockManagerLike,
+	address: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+}));
 const formActions = vi.hoisted(() => ({ resetForm: vi.fn() }));
-const queue = vi.hoisted(() => ({ addOrder: vi.fn(() => "order-1"), updateOrder: vi.fn(), removeOrder: vi.fn() }));
+const queue = vi.hoisted(() => ({
+	addOrder: vi.fn(() => "order-1"),
+	updateOrder: vi.fn(),
+	updateByRequestKey: vi.fn(),
+	removeOrder: vi.fn(),
+}));
 
-vi.mock("@/stores/use-order-queue-store", () => ({
+vi.mock("@/stores/use-order-queue-store", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@/stores/use-order-queue-store")>()),
 	useOrderQueueActions: () => queue,
 }));
 
 vi.mock("wagmi", () => ({
-	useConnection: () => ({ address: "0x0000000000000000000000000000000000000001", isConnected: true }),
+	useConnection: () => ({ address: net.address, isConnected: true }),
 	useWalletClient: () => ({ data: {}, isLoading: false, error: null }),
 	useSwitchChain: () => ({ isPending: false, mutate: () => {} }),
 }));
 
-vi.mock("@/lib/hyperliquid", async (importOriginal) => ({
-	...(await importOriginal<typeof import("@/lib/hyperliquid")>()),
-	useSelectedMarketInfo: () => ({ data: form.market }),
-	useUserPositions: () => ({ getPosition: () => null }),
-	useAgentStatus: () => ({ isReady: true, isLoading: false }),
-	useAgentRegistration: () => ({ register: async () => {}, status: "ready" }),
-	useExchange: () => ({ mutateAsync: exchange.placeOrder, isPending: false }),
-	useSubscription: (method: string, params: { coin: string }) => ({
-		data:
-			method === "activeAssetCtx" && params.coin === form.market.name
-				? { ctx: { markPx: liveFeed.markPx ?? form.market.markPx } }
-				: undefined,
-		status: liveFeed.status,
-		isStale: liveFeed.isStale,
-	}),
-	getInfoClient: () => info,
+vi.mock("@hypeterminal/hl-react", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@hypeterminal/hl-react")>()),
+	useHyperliquidClients: () => ({ trading: net.venue.trading }),
 }));
+
+vi.mock("@/lib/trade/browser-env", () => ({
+	getBrowserStorage: () => net.storage,
+	getBrowserLocks: () => net.locks,
+	subscribeToStorageEvents: () => () => {},
+}));
+
+vi.mock("@/lib/hyperliquid", async (importOriginal) => {
+	const { DEFAULT_BUILDER_CONFIG } = await import("@/config/hyperliquid");
+	function sendThroughSdk(method: string, params: Record<string, unknown>) {
+		const trading = net.venue.trading as unknown as Record<string, (params: unknown) => Promise<unknown>>;
+		return method === "order"
+			? trading.order.call(net.venue.trading, { ...params, builder: DEFAULT_BUILDER_CONFIG })
+			: trading[method].call(net.venue.trading, params);
+	}
+	return {
+		...(await importOriginal<typeof import("@/lib/hyperliquid")>()),
+		useSelectedMarketInfo: () => ({ data: form.market }),
+		useUserPositions: () => ({ getPosition: () => null }),
+		useAgentStatus: () => ({ isReady: true, isLoading: false }),
+		useAgentRegistration: () => ({ register: async () => {}, status: "ready" }),
+		useHyperliquid: () => ({ builderConfig: DEFAULT_BUILDER_CONFIG, isTestnet: true }),
+		useExchange: (method: string) => ({
+			mutateAsync: (params: Record<string, unknown>) => sendThroughSdk(method, params),
+			isPending: false,
+		}),
+		useSubscription: (method: string, params: { coin: string }) => ({
+			data:
+				method === "activeAssetCtx" && params.coin === form.market.name
+					? { ctx: { markPx: liveFeed.markPx ?? form.market.markPx } }
+					: undefined,
+			status: liveFeed.status,
+			isStale: liveFeed.isStale,
+		}),
+		getInfoClient: () => net.venue.info,
+	};
+});
 
 vi.mock("@/hooks/trade/use-fee-rates", () => ({
 	useFeeRates: () => ({ takerRate: 0.0007, makerRate: 0.0004 }),
@@ -137,11 +183,7 @@ type Ticket = ReturnType<typeof useTradeTicket>;
 
 interface Props {
 	onTicket: (ticket: Ticket) => void;
-}
-
-function TicketProbe({ onTicket }: Props) {
-	onTicket(useTradeTicket());
-	return null;
+	render: UseTradeTicket;
 }
 
 function typeSizeHere(size: string) {
@@ -149,9 +191,14 @@ function typeSizeHere(size: string) {
 	form.sizeUnit = { mode: form.sizeMode, assetId: form.market.assetId, szDecimals: form.market.szDecimals };
 }
 
-function renderTicket(): Ticket {
+function TicketProbe({ onTicket, render }: Props) {
+	onTicket(render());
+	return null;
+}
+
+function renderTicket(render: UseTradeTicket = useTradeTicket): Ticket {
 	const tickets: Ticket[] = [];
-	renderToString(<TicketProbe onTicket={(ticket) => tickets.push(ticket)} />);
+	renderToString(<TicketProbe render={render} onTicket={(ticket) => tickets.push(ticket)} />);
 	return tickets[0];
 }
 
@@ -161,8 +208,21 @@ async function pressSubmit() {
 	await ticket.buttonContent.action();
 }
 
+async function loadTicket(): Promise<UseTradeTicket> {
+	vi.resetModules();
+	return (await import("@/hooks/trade/use-trade-ticket")).useTradeTicket;
+}
+
+function orderBodies() {
+	return net.venue.orderRequests();
+}
+
+function twapBodies() {
+	return net.venue.sentBodies().filter((body) => body.action.type === "twapOrder");
+}
+
 function sentOrders() {
-	return exchange.placeOrder.mock.calls.map(([action]) => action.orders.map(withoutCloid));
+	return orderBodies().map(({ action }) => (action.orders as { c?: string }[]).map(withoutCloid));
 }
 
 function withoutCloid({ c: _cloid, ...order }: { c?: string }) {
@@ -170,7 +230,21 @@ function withoutCloid({ c: _cloid, ...order }: { c?: string }) {
 }
 
 function sentCloids(): string[][] {
-	return exchange.placeOrder.mock.calls.map(([action]) => action.orders.map((order: { c?: string }) => order.c));
+	return orderBodies().map(({ action }) => (action.orders as { c?: string }[]).map((order) => order.c ?? ""));
+}
+
+function distinctOrderNonces(): number {
+	return new Set(orderBodies().map((body) => body.nonce)).size;
+}
+
+function lastQueueUpdate() {
+	return queue.updateOrder.mock.lastCall?.[1];
+}
+
+async function pressSubmitPastRetries() {
+	const submitted = pressSubmit();
+	await vi.advanceTimersByTimeAsync(12_000);
+	await submitted;
 }
 
 beforeEach(() => {
@@ -182,6 +256,21 @@ beforeEach(() => {
 function wireNotional(orders: { p: string; s: string }[]): number {
 	return orders.reduce((total, order) => total.plus(Big(order.s).times(order.p)), Big(0)).toNumber();
 }
+
+beforeEach(async () => {
+	net.venue = createFakeExchange();
+	net.storage = createMemoryStorage();
+	net.locks = createMemoryLocks();
+	net.address = "0x0000000000000000000000000000000000000001";
+	queue.addOrder.mockClear();
+	queue.updateOrder.mockClear();
+	queue.updateByRequestKey.mockClear();
+	useTradeTicket ??= await loadTicket();
+});
+
+afterEach(() => {
+	vi.useRealTimers();
+});
 
 describe("spot trade ticket", () => {
 	beforeEach(() => {
@@ -203,8 +292,6 @@ describe("spot trade ticket", () => {
 		form.sizeUnit = null;
 		form.maxTradeSzs = [100, 100];
 		formActions.resetForm.mockReset();
-		exchange.placeOrder.mockReset();
-		exchange.placeOrder.mockResolvedValue({ response: { data: { statuses: [{ resting: { oid: 1 } }] } } });
 	});
 
 	it("sends a spot limit buy at the spot tick, not the coarser perp tick", async () => {
@@ -273,8 +360,6 @@ describe("perp trade ticket", () => {
 		form.slPrice = "";
 		form.sizeUnit = null;
 		form.maxTradeSzs = [100, 100];
-		exchange.placeOrder.mockReset();
-		exchange.placeOrder.mockResolvedValue({ response: { data: { statuses: [{ resting: { oid: 1 } }] } } });
 	});
 
 	it("sends a short's tp and sl from the typed strings a number cannot hold", async () => {
@@ -337,8 +422,6 @@ describe("perp ticket tp/sl against the live mark and the sent entry price", () 
 		form.slPrice = "";
 		form.sizeUnit = null;
 		form.maxTradeSzs = [100, 100];
-		exchange.placeOrder.mockReset();
-		exchange.placeOrder.mockResolvedValue({ response: { data: { statuses: [{ resting: { oid: 1 } }] } } });
 	});
 
 	it("blocks a stop the live mark has crossed while the cached mark has not", () => {
@@ -503,8 +586,6 @@ describe("size the ticket sends after the size field changes context", () => {
 		form.tpSlEnabled = false;
 		form.sizeUnit = null;
 		form.maxTradeSzs = [100, 100];
-		exchange.placeOrder.mockReset();
-		exchange.placeOrder.mockResolvedValue({ response: { data: { statuses: [{ resting: { oid: 1 } }] } } });
 	});
 
 	it("sends nothing after toggling a USDC size that buys no whole lot", async () => {
@@ -602,8 +683,6 @@ describe("order flags a market cannot take", () => {
 		form.slPrice = "70";
 		form.sizeUnit = null;
 		form.maxTradeSzs = [100, 100];
-		exchange.placeOrder.mockReset();
-		exchange.placeOrder.mockResolvedValue({ response: { data: { statuses: [{ resting: { oid: 1 } }] } } });
 	});
 
 	function switchToSpot() {
@@ -617,7 +696,7 @@ describe("order flags a market cannot take", () => {
 		await pressSubmit();
 		const [orders] = sentOrders();
 		expect(orders.map((order: { r: boolean }) => order.r)).toEqual([true, true, true]);
-		expect(exchange.placeOrder.mock.calls[0][0].grouping).toBe("normalTpsl");
+		expect(orderBodies()[0].action.grouping).toBe("normalTpsl");
 	});
 
 	it("never sends a perp's hidden reduce-only on a spot limit", async () => {
@@ -631,51 +710,38 @@ describe("order flags a market cannot take", () => {
 		switchToSpot();
 		form.orderType = "twap";
 		await pressSubmit();
-		expect(exchange.placeOrder.mock.calls[0][0].twap).toMatchObject({ a: 10008, s: "100", r: false });
+		expect(twapBodies()[0].action.twap).toMatchObject({ a: 10008, s: "100", r: false });
 	});
 
 	it("never sends a perp's hidden tp/sl on a spot limit", async () => {
 		switchToSpot();
 		form.reduceOnly = false;
 		await pressSubmit();
-		expect(exchange.placeOrder.mock.calls[0][0]).toMatchObject({
+		expect(orderBodies()[0].action).toMatchObject({
 			orders: [{ a: 10008, b: true, p: "30", s: "100", r: false, t: { limit: { tif: "Gtc" } } }],
 			grouping: "na",
 		});
 	});
 });
 
+function answerLegs(...answers: ((order: WireOrder) => LegOutcome)[]) {
+	net.venue.state.legOutcome = (order, index) => answers[index]?.(order);
+}
+
+function filledLeg(order: WireOrder): LegOutcome {
+	return { status: { filled: { totalSz: order.s, avgPx: order.p, oid: 11 } }, lookup: "filled" };
+}
+
+function restingLeg(): LegOutcome {
+	return { status: { resting: { oid: 12 } }, lookup: "open" };
+}
+
+function rejectedLeg(reason: string) {
+	return (): LegOutcome => ({ status: { error: reason }, lookup: "badTriggerPxRejected" });
+}
+
 describe("order legs the ticket reports and retries", () => {
 	const TP_REASON = "Invalid TP/SL price. asset=5";
-	const FILLED = { filled: { totalSz: "1", avgPx: "80.276", oid: 11 } };
-	const UNKNOWN_OID = { status: "unknownOid" };
-
-	function entryFilledTpRejected() {
-		const response = { status: "ok", response: { type: "order", data: { statuses: [FILLED, { error: TP_REASON }] } } };
-		return new ApiRequestError(response, `order 1: ${TP_REASON}`);
-	}
-
-	function timedOut() {
-		return new HttpRequestError({ detail: "Request timed out after 10000 ms" });
-	}
-
-	function lookup(status: string, isTrigger = false) {
-		return { status: "order", order: { status, statusTimestamp: 0, order: { isTrigger } } };
-	}
-
-	function filledWith(...rest: unknown[]) {
-		return { response: { data: { statuses: [FILLED, ...rest] } } };
-	}
-
-	function lastQueueUpdate() {
-		return queue.updateOrder.mock.lastCall?.[1];
-	}
-
-	async function pressSubmitPastReconcile() {
-		const submitted = pressSubmit();
-		await vi.advanceTimersByTimeAsync(7000);
-		await submitted;
-	}
 
 	beforeEach(() => {
 		form.market = SOL_PERP;
@@ -691,18 +757,17 @@ describe("order legs the ticket reports and retries", () => {
 		form.slPrice = "";
 		form.sizeUnit = null;
 		form.maxTradeSzs = [100, 100];
-		exchange.placeOrder.mockReset();
-		info.orderStatus.mockReset();
-		queue.updateOrder.mockReset();
 	});
 
-	afterEach(() => {
-		vi.useRealTimers();
-	});
+	function marketOrder(size: string) {
+		form.orderType = "market";
+		form.tpSlEnabled = false;
+		typeSizeHere(size);
+	}
 
 	it("reports an entry that fills with a rejected take profit per leg", async () => {
 		typeSizeHere("1");
-		exchange.placeOrder.mockRejectedValue(entryFilledTpRejected());
+		answerLegs(filledLeg, rejectedLeg(TP_REASON));
 		await pressSubmit();
 		expect(lastQueueUpdate()).toEqual({ status: "failed", error: `Entry filled. Take profit rejected: ${TP_REASON}` });
 	});
@@ -710,7 +775,6 @@ describe("order legs the ticket reports and retries", () => {
 	it("gives every leg its own cloid from one plan id", async () => {
 		typeSizeHere("3");
 		form.slPrice = "70";
-		exchange.placeOrder.mockResolvedValue(filledWith("waitingForTrigger", "waitingForTrigger"));
 		await pressSubmit();
 		const [cloids] = sentCloids();
 		expect(cloids).toHaveLength(3);
@@ -719,127 +783,163 @@ describe("order legs the ticket reports and retries", () => {
 		expect(new Set(cloids.map((cloid) => cloid.slice(0, 30))).size).toBe(1);
 	});
 
-	it("sends nothing when the same plan is retried after its entry filled", async () => {
-		typeSizeHere("2");
-		exchange.placeOrder.mockRejectedValue(entryFilledTpRejected());
-		info.orderStatus
-			.mockResolvedValueOnce(lookup("filled"))
-			.mockResolvedValueOnce(lookup("badTriggerPxRejected", true));
+	it("signs the builder fee into the order", async () => {
+		marketOrder("1");
 		await pressSubmit();
-		await pressSubmit();
-		expect(exchange.placeOrder).toHaveBeenCalledTimes(1);
-		expect(info.orderStatus.mock.calls.map(([params]) => params.oid)).toEqual(sentCloids()[0]);
-		expect(lastQueueUpdate()).toEqual({
-			status: "failed",
-			error: "Not sent again. Entry filled. Take profit rejected",
-		});
+		expect(orderBodies()[0].action.builder).toEqual({ b: "0x744e2f0b69456b42278b3e797a58ff57e5180a7e", f: 10 });
 	});
 
-	it("sends a double-clicked market order once", async () => {
-		form.orderType = "market";
-		form.tpSlEnabled = false;
-		typeSizeHere("4");
-		exchange.placeOrder.mockResolvedValue(filledWith());
+	it("sends a double-clicked market order once while the exchange answers every read", async () => {
+		marketOrder("4");
 		const ticket = renderTicket();
 		await Promise.all([ticket.buttonContent.action(), ticket.buttonContent.action()]);
-		expect(exchange.placeOrder).toHaveBeenCalledTimes(1);
+		expect(net.venue.state.placedLegs).toBe(1);
+		expect(net.venue.exchangeRequests).toHaveLength(1);
+	});
+
+	it("keeps submit disabled while an order is being sent", async () => {
+		vi.useFakeTimers();
+		marketOrder("4");
+		net.venue.nextExchangeRequests("lost");
+		const submitted = pressSubmit();
+		await vi.advanceTimersByTimeAsync(10);
+		expect(renderTicket().buttonContent.disabled).toBe(true);
+		await vi.advanceTimersByTimeAsync(12_000);
+		await submitted;
+		expect(renderTicket().buttonContent.disabled).toBe(false);
 	});
 
 	it("reports a timed-out order the exchange filled as filled", async () => {
 		vi.useFakeTimers();
-		form.orderType = "market";
-		form.tpSlEnabled = false;
-		typeSizeHere("5");
-		exchange.placeOrder.mockRejectedValue(timedOut());
-		info.orderStatus.mockResolvedValueOnce(UNKNOWN_OID).mockResolvedValue(lookup("filled"));
-		await pressSubmitPastReconcile();
+		marketOrder("5");
+		net.venue.nextExchangeRequests("noReply");
+		await pressSubmitPastRetries();
 		expect(lastQueueUpdate()).toEqual({ status: "success", outcome: "filled" });
+		expect(net.venue.state.placedLegs).toBe(1);
 	});
 
-	it("retries a timed-out plan the exchange never saw with the same cloids", async () => {
+	it("places a timed-out order the exchange never saw exactly once", async () => {
 		vi.useFakeTimers();
-		typeSizeHere("6");
-		exchange.placeOrder.mockRejectedValueOnce(timedOut()).mockResolvedValueOnce(filledWith("waitingForTrigger"));
-		info.orderStatus.mockResolvedValue(UNKNOWN_OID);
-		await pressSubmitPastReconcile();
-		expect(lastQueueUpdate()).toEqual({ status: "failed", error: "Request timed out after 10000 ms" });
-		await pressSubmit();
-		const [firstCloids, retryCloids] = sentCloids();
-		expect(firstCloids[0]).toMatch(/^0x[0-9a-f]{32}$/);
-		expect(retryCloids).toEqual(firstCloids);
+		marketOrder("6");
+		net.venue.nextExchangeRequests("lost");
+		await pressSubmitPastRetries();
 		expect(lastQueueUpdate()).toEqual({ status: "success", outcome: "filled" });
+		expect(net.venue.state.placedLegs).toBe(1);
+		expect(distinctOrderNonces()).toBe(1);
+	});
+
+	it("expires each order 30 s past the exchange clock", async () => {
+		marketOrder("1");
+		await pressSubmit();
+		const [body] = orderBodies();
+		expect(body.expiresAfter).toBeGreaterThan(net.venue.exchangeNow() + 29_000);
+		expect(body.expiresAfter).toBeLessThanOrEqual(net.venue.exchangeNow() + 30_000);
 	});
 
 	it("gives an identical order new cloids once the first one filled", async () => {
-		form.orderType = "market";
-		form.tpSlEnabled = false;
-		typeSizeHere("7");
-		exchange.placeOrder.mockResolvedValue(filledWith());
+		marketOrder("7");
 		await pressSubmit();
 		await pressSubmit();
 		const [first, second] = sentCloids();
 		expect(first[0]).toMatch(/^0x[0-9a-f]{32}$/);
 		expect(second).not.toEqual(first);
+		expect(net.venue.state.placedLegs).toBe(2);
 	});
 
-	it("never resends a timed-out order while the exchange cannot be reached to check it", async () => {
+	it("places one order when an unconfirmed order is pressed again after the exchange comes back", async () => {
 		vi.useFakeTimers();
-		form.orderType = "market";
+		marketOrder("8");
+		goesDownOnFirstSend(net.venue);
+		await pressSubmitPastRetries();
+		comesBackUp(net.venue);
+		await pressSubmitPastRetries();
+		expect(net.venue.state.placedLegs).toBe(1);
+	});
+
+	it("shows the earlier unconfirmed order as filled when a later press finds it filled", async () => {
+		vi.useFakeTimers();
+		marketOrder("8");
+		goesDownOnFirstSend(net.venue);
+		await pressSubmitPastRetries();
+		const unconfirmed = lastQueueUpdate();
+		comesBackUp(net.venue);
+		await pressSubmitPastRetries();
+		expect(unconfirmed).toMatchObject({ status: "unsettled", requestKey: expect.stringMatching(/#\d+$/) });
+		expect(queue.updateByRequestKey).toHaveBeenCalledWith(
+			unconfirmed.requestKey,
+			expect.objectContaining({ status: "success", outcome: "filled" }),
+		);
+	});
+
+	it("places one order when an unconfirmed order is pressed again after a reload", async () => {
+		vi.useFakeTimers();
+		marketOrder("9");
+		goesDownOnFirstSend(net.venue);
+		await pressSubmitPastRetries();
+		comesBackUp(net.venue);
+		useTradeTicket = await loadTicket();
+		await pressSubmitPastRetries();
+		expect(net.venue.state.placedLegs).toBe(1);
+	});
+
+	it("places one order when a timed-out original arrives after the order is pressed again", async () => {
+		vi.useFakeTimers();
+		marketOrder("10");
+		net.venue.nextExchangeRequests("inTransit");
+		goesDownOnFirstSend(net.venue);
+		await pressSubmitPastRetries();
+		comesBackUp(net.venue);
+		await pressSubmitPastRetries();
+		net.venue.deliverInTransit();
+		expect(net.venue.state.placedLegs).toBe(1);
+	});
+
+	it("places one order when a USDC-sized order is typed again after the mark moved", async () => {
+		vi.useFakeTimers();
+		form.sizeMode = "quote";
+		marketOrder("800");
+		goesDownOnFirstSend(net.venue);
+		await pressSubmitPastRetries();
+		comesBackUp(net.venue);
+		form.market = { ...SOL_PERP, markPx: "81.5" };
+		typeSizeHere("800");
+		await pressSubmitPastRetries();
+		expect(net.venue.state.placedLegs).toBe(1);
+	});
+
+	it("places one order when two tabs press the same order at once", async () => {
+		marketOrder("11");
+		const secondTab = await loadTicket();
+		await Promise.all([renderTicket().buttonContent.action(), renderTicket(secondTab).buttonContent.action()]);
+		expect(net.venue.state.placedLegs).toBe(1);
+	});
+
+	it("reports a scale order with filled and resting legs as partly filled", async () => {
+		form.orderType = "scale";
 		form.tpSlEnabled = false;
-		typeSizeHere("8");
-		const offline = new HttpRequestError({ detail: "Failed to fetch" });
-		exchange.placeOrder.mockRejectedValue(offline);
-		info.orderStatus.mockRejectedValue(offline);
-		await pressSubmitPastReconcile();
-		expect(lastQueueUpdate()).toEqual({
-			status: "failed",
-			error: "Order status unknown: Failed to fetch. Check open orders before you try again.",
-		});
+		form.scaleStart = "82";
+		form.scaleEnd = "79";
+		form.scaleLevels = 2;
+		typeSizeHere("2");
+		answerLegs(filledLeg, restingLeg);
 		await pressSubmit();
-		expect(exchange.placeOrder).toHaveBeenCalledTimes(1);
 		expect(lastQueueUpdate()).toEqual({
-			status: "failed",
-			error: "Order status unknown. Check open orders before you try again.",
+			status: "success",
+			outcome: "partiallyFilled",
+			detail: "1 of 2 legs filled, 1 placed",
 		});
 	});
 });
 
 describe("twap the ticket sends once", () => {
-	const STARTED_TWAP_ID = 20459;
-	let nextTwapId = 30000;
-
-	function timedOut() {
-		return new HttpRequestError({ detail: "Request timed out after 10000 ms" });
-	}
-
-	function started() {
-		return { response: { data: { status: { running: { twapId: STARTED_TWAP_ID } } } } };
-	}
-
-	function historyRecord(sz: string, twapId = nextTwapId++, startedAt = Date.now()) {
-		const state = {
-			coin: "SOL",
-			side: "B",
-			sz,
-			executedSz: "0.0",
-			executedNtl: "0.0",
-			minutes: 30,
-			reduceOnly: false,
-			randomize: false,
-			timestamp: startedAt,
-		};
-		return { time: Math.floor(startedAt / 1000), state, status: { status: "activated" }, twapId };
-	}
-
-	function lastQueueUpdate() {
-		return queue.updateOrder.mock.lastCall?.[1];
-	}
-
-	async function pressSubmitPastReconcile() {
-		const submitted = pressSubmit();
-		await vi.advanceTimersByTimeAsync(7000);
-		await submitted;
-	}
+	const SAME_PARAMS = {
+		side: "B",
+		minutes: 30,
+		reduceOnly: false,
+		randomize: false,
+		executedSz: "0.0",
+		executedNtl: "0.0",
+	};
 
 	beforeEach(() => {
 		form.market = SOL_PERP;
@@ -852,90 +952,93 @@ describe("twap the ticket sends once", () => {
 		form.tpSlEnabled = false;
 		form.sizeUnit = null;
 		form.maxTradeSzs = [100, 100];
-		exchange.placeOrder.mockReset();
-		info.twapHistory.mockReset();
-		queue.updateOrder.mockReset();
 	});
 
-	afterEach(() => {
-		vi.useRealTimers();
-	});
-
-	it("sends a double-clicked twap once", async () => {
+	it("sends a double-clicked twap once while the exchange answers every read", async () => {
 		typeSizeHere("4");
-		exchange.placeOrder.mockResolvedValue(started());
 		const ticket = renderTicket();
 		await Promise.all([ticket.buttonContent.action(), ticket.buttonContent.action()]);
-		expect(exchange.placeOrder).toHaveBeenCalledTimes(1);
-		expect(exchange.placeOrder.mock.calls[0][0].twap).toMatchObject({ a: 5, b: true, s: "4", m: 30 });
+		expect(net.venue.state.startedTwaps).toBe(1);
+		expect(twapBodies()).toHaveLength(1);
+		expect(twapBodies()[0].action.twap).toMatchObject({ a: 5, b: true, s: "4", m: 30 });
 	});
 
 	it("reports a timed-out twap the exchange started as started", async () => {
 		vi.useFakeTimers();
 		typeSizeHere("5");
-		exchange.placeOrder.mockRejectedValue(timedOut());
-		info.twapHistory.mockResolvedValueOnce([]).mockImplementation(async () => [historyRecord("5.0")]);
-		await pressSubmitPastReconcile();
-		expect(exchange.placeOrder).toHaveBeenCalledTimes(1);
+		net.venue.nextExchangeRequests("noReply");
+		await pressSubmitPastRetries();
+		expect(lastQueueUpdate()).toEqual({ status: "success", outcome: "twapStarted" });
+		expect(net.venue.state.startedTwaps).toBe(1);
+	});
+
+	it("reports a timed-out twap the exchange started as started when the device clock runs 6 minutes ahead", async () => {
+		vi.useFakeTimers();
+		net.venue.state.clockSkewMs = -6 * 60 * 1000;
+		useTradeTicket = await loadTicket();
+		typeSizeHere("5");
+		net.venue.nextExchangeRequests("noReply");
+		await pressSubmitPastRetries();
 		expect(lastQueueUpdate()).toEqual({ status: "success", outcome: "twapStarted" });
 	});
 
-	it("never resends a timed-out twap the exchange started while it could not be checked", async () => {
+	it("never reports a twap from another coin or an earlier press as this one", async () => {
 		vi.useFakeTimers();
 		typeSizeHere("6");
-		exchange.placeOrder.mockRejectedValue(timedOut());
-		info.twapHistory.mockRejectedValue(new HttpRequestError({ detail: "Failed to fetch" }));
-		await pressSubmitPastReconcile();
-		expect(lastQueueUpdate()).toEqual({
-			status: "failed",
-			error: "TWAP status unknown: Request timed out after 10000 ms. Check the TWAP tab before you try again.",
+		net.venue.seedTwap({
+			time: 0,
+			state: { coin: "ETH", sz: "6", ...SAME_PARAMS, timestamp: Date.now() },
+			status: { status: "activated" },
+			twapId: 1,
 		});
-		info.twapHistory.mockReset();
-		info.twapHistory.mockImplementation(async () => [historyRecord("6")]);
-		await pressSubmit();
-		expect(exchange.placeOrder).toHaveBeenCalledTimes(1);
-		expect(lastQueueUpdate()).toEqual({
-			status: "failed",
-			error: "Not sent again. The exchange already has this TWAP. Check the TWAP tab.",
+		net.venue.seedTwap({
+			time: 0,
+			state: { coin: "SOL", sz: "6", ...SAME_PARAMS, timestamp: Date.now() - 4 * 60 * 1000 },
+			status: { status: "terminated" },
+			twapId: 2,
 		});
+		net.venue.state.exchangeDown = true;
+		await pressSubmitPastRetries();
+		expect(lastQueueUpdate()).toMatchObject({ status: "unsettled", requestKey: expect.stringMatching(/#\d+$/) });
+		expect(net.venue.state.startedTwaps).toBe(0);
 	});
 
-	it("resends a timed-out twap the exchange never saw", async () => {
+	it("reports a twap the exchange started with an error as failed", async () => {
 		vi.useFakeTimers();
 		typeSizeHere("7");
-		exchange.placeOrder.mockRejectedValueOnce(timedOut()).mockResolvedValueOnce(started());
-		info.twapHistory.mockImplementation(async () => [
-			historyRecord("70"),
-			historyRecord("7", nextTwapId++, Date.now() - 6 * 60 * 1000),
-		]);
-		await pressSubmitPastReconcile();
-		expect(lastQueueUpdate()).toEqual({ status: "failed", error: "Request timed out after 10000 ms" });
-		await pressSubmit();
-		expect(exchange.placeOrder).toHaveBeenCalledTimes(2);
-		expect(exchange.placeOrder.mock.calls[1][0]).toEqual(exchange.placeOrder.mock.calls[0][0]);
-		expect(lastQueueUpdate()).toEqual({ status: "success", outcome: "twapStarted" });
+		net.venue.state.twapStatus = { status: "error", description: "Insufficient margin" };
+		net.venue.nextExchangeRequests("noReply");
+		await pressSubmitPastRetries();
+		expect(lastQueueUpdate()).toEqual({ status: "failed", error: "TWAP failed: Insufficient margin" });
 	});
 
-	it("does not mistake a twap the exchange confirmed for a later timed-out one", async () => {
+	it("starts a timed-out twap the exchange never saw exactly once", async () => {
 		vi.useFakeTimers();
 		typeSizeHere("8");
-		exchange.placeOrder.mockResolvedValueOnce(started()).mockRejectedValueOnce(timedOut());
-		info.twapHistory.mockImplementation(async () => [historyRecord("8", STARTED_TWAP_ID)]);
-		await pressSubmit();
-		await pressSubmitPastReconcile();
-		expect(lastQueueUpdate()).toEqual({ status: "failed", error: "Request timed out after 10000 ms" });
+		net.venue.nextExchangeRequests("lost");
+		await pressSubmitPastRetries();
+		expect(lastQueueUpdate()).toEqual({ status: "success", outcome: "twapStarted" });
+		expect(net.venue.state.startedTwaps).toBe(1);
 	});
 
-	it("does not mistake a twap a reconcile found for a later timed-out one", async () => {
+	it("starts one twap when an unconfirmed twap is pressed again after the exchange comes back", async () => {
 		vi.useFakeTimers();
 		typeSizeHere("9");
-		const found = historyRecord("9");
-		exchange.placeOrder.mockRejectedValue(timedOut());
-		info.twapHistory.mockImplementation(async () => [found]);
-		await pressSubmitPastReconcile();
-		expect(lastQueueUpdate()).toEqual({ status: "success", outcome: "twapStarted" });
-		await pressSubmitPastReconcile();
-		expect(exchange.placeOrder).toHaveBeenCalledTimes(2);
-		expect(lastQueueUpdate()).toEqual({ status: "failed", error: "Request timed out after 10000 ms" });
+		goesDownOnFirstSend(net.venue);
+		await pressSubmitPastRetries();
+		comesBackUp(net.venue);
+		await pressSubmitPastRetries();
+		expect(net.venue.state.startedTwaps).toBe(1);
+	});
+
+	it("starts one twap when an unconfirmed twap is pressed again after a reload", async () => {
+		vi.useFakeTimers();
+		typeSizeHere("9");
+		goesDownOnFirstSend(net.venue);
+		await pressSubmitPastRetries();
+		comesBackUp(net.venue);
+		useTradeTicket = await loadTicket();
+		await pressSubmitPastRetries();
+		expect(net.venue.state.startedTwaps).toBe(1);
 	});
 });

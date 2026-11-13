@@ -8,7 +8,7 @@ export const OTHER_AGENT_KEY = keccak256(stringToHex("hypeterminal fake exchange
 
 type Fate = "deliver" | "lost" | "noReply" | "inTransit";
 
-type WireOrder = {
+export type WireOrder = {
 	a: number;
 	b: boolean;
 	p: string;
@@ -31,6 +31,8 @@ type TwapHistoryRecord = {
 
 const DEFAULT_COINS: Record<number, string> = { 4: "ETH", 5: "SOL", 10008: "@8" };
 
+let nextTwapId = 50000;
+
 export function createFakeExchange({ coins = DEFAULT_COINS }: { coins?: Record<number, string> } = {}) {
 	const exchangeRequests: string[] = [];
 	const processedNonces = new Set<number>();
@@ -46,7 +48,6 @@ export function createFakeExchange({ coins = DEFAULT_COINS }: { coins?: Record<n
 		clockSkewMs: 0,
 		nonceFloor: 0,
 		nextOid: 1,
-		nextTwapId: 50000,
 		placedLegs: 0,
 		startedTwaps: 0,
 		twapError: null as string | null,
@@ -84,7 +85,7 @@ export function createFakeExchange({ coins = DEFAULT_COINS }: { coins?: Record<n
 
 	function startTwap(twap: Record<string, unknown>) {
 		if (state.twapError) return { status: { error: state.twapError } };
-		const twapId = state.nextTwapId++;
+		const twapId = nextTwapId++;
 		state.startedTwaps++;
 		twapHistory.push({
 			time: Math.floor(exchangeNow() / 1000),

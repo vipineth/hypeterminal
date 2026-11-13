@@ -319,11 +319,12 @@ describe("order sender", () => {
 		venue.nextExchangeRequests("noReply");
 		const { sender } = openTab(venue, storage, locks);
 		const outcome = await sender.submit(signerFor(venue), twapBuy());
+		const started = venue.twapHistory.find((record) => record.state.coin === "SOL" && record.twapId !== 1);
 		expect(outcome).toMatchObject({
 			kind: "sent",
 			settlement: {
 				kind: "consumed",
-				lookup: { kind: "twap", match: { twapId: 50000, status: { status: "activated" } } },
+				lookup: { kind: "twap", match: { twapId: started?.twapId, status: { status: "activated" } } },
 			},
 		});
 		expect(venue.state.startedTwaps).toBe(1);
