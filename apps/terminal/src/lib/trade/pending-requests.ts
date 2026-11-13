@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 const KEY_PREFIX = "hypeterminal:pending-request:v2:";
+const DISMISSAL_PREFIX = "hypeterminal:dismissed-request:v1:";
 const PROBE_KEY = "hypeterminal:pending-request:probe";
 
 const hexSchema = z.custom<`0x${string}`>((value) => typeof value === "string" && /^0x[0-9a-fA-F]+$/.test(value));
@@ -54,24 +55,20 @@ const slotRecordSchema = z.discriminatedUnion("state", [
 		settledAt: z.number(),
 		partial: partialPlanSchema.nullable().catch(null),
 	}),
-	z.object({
-		state: z.literal("dismissed"),
-		request: pendingRequestSchema,
-		dismissedAt: z.number(),
-		lookup: z.unknown(),
-	}),
 ]);
 
 export type PendingRequest = z.infer<typeof pendingRequestSchema>;
 export type RequestLabel = z.infer<typeof labelSchema>;
 export type PartialPlan = z.infer<typeof partialPlanSchema>;
 export type SlotRecord = z.infer<typeof slotRecordSchema>;
+export type Dismissal = { request: PendingRequest; dismissedAt: number; lookup: unknown };
 
 export type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem" | "key" | "length">;
 
 export interface RequestStore {
 	read(slot: string): SlotRecord | null;
 	write(slot: string, record: SlotRecord): boolean;
+	recordDismissal(dismissal: Dismissal): boolean;
 	isWritable(): boolean;
 	list(slotPrefix: string): PendingRequest[];
 	subscribe(listener: () => void): () => void;
@@ -100,16 +97,25 @@ export function createRequestStore(
 		}
 	}
 
-	function write(slot: string, record: SlotRecord): boolean {
+	function save(key: string, value: unknown): boolean {
 		const storage = getStorage();
 		if (!storage) return false;
 		try {
-			storage.setItem(KEY_PREFIX + slot, JSON.stringify(record));
+			storage.setItem(key, JSON.stringify(value));
 		} catch {
 			return false;
 		}
+		return true;
+	}
+
+	function write(slot: string, record: SlotRecord): boolean {
+		if (!save(KEY_PREFIX + slot, record)) return false;
 		for (const listener of listeners) listener();
 		return true;
+	}
+
+	function recordDismissal(dismissal: Dismissal): boolean {
+		return save(`${DISMISSAL_PREFIX}${dismissal.request.slot}#${dismissal.request.nonce}`, dismissal);
 	}
 
 	function isWritable(): boolean {
@@ -155,5 +161,5 @@ export function createRequestStore(
 		};
 	}
 
-	return { read, write, isWritable, list, subscribe };
+	return { read, write, recordDismissal, isWritable, list, subscribe };
 }

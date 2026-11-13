@@ -306,6 +306,16 @@ describe("reportSubmit", () => {
 		});
 	});
 
+	it("names an earlier order that settled on this press in one sentence per fact", () => {
+		const earlier: Settlement = { kind: "expired", request: request("order"), lookup: orderLookup(UNKNOWN) };
+		expect(reportSubmit({ kind: "blocked", earlier })).toEqual({
+			ok: false,
+			status: "notSent",
+			error:
+				"Not sent. An earlier order on this market was still unconfirmed: Not placed. The request expired before the exchange took it. Press again to send a new order.",
+		});
+	});
+
 	it("names why a browser or a moved slot refused the press", () => {
 		expect(reportSubmit({ kind: "refused", reason: "storage" })).toEqual({
 			ok: false,
@@ -316,7 +326,13 @@ describe("reportSubmit", () => {
 		expect(reportSubmit({ kind: "refused", reason: "slotMoved", to: "settled" })).toEqual({
 			ok: false,
 			status: "notSent",
-			error: "Not sent. Another order on this market just went through. Press again to send a new one.",
+			error: "Not sent. Another order on this market was just settled in another tab. Press again to send a new one.",
+		});
+		expect(reportSubmit({ kind: "refused", reason: "offerStale" })).toEqual({
+			ok: false,
+			status: "notSent",
+			error:
+				"Not sent. The last order on this market changed after these legs were offered. Press submit again to see what is left.",
 		});
 	});
 

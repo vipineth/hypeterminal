@@ -577,7 +577,7 @@ describe("order sender with a press that waited on the slot", () => {
 		expect(reportSubmit(outcome)).toEqual({
 			ok: false,
 			status: "notSent",
-			error: "Not sent. Another order on this market just went through. Press again to send a new one.",
+			error: "Not sent. Another order on this market was just settled in another tab. Press again to send a new one.",
 		});
 		expect(venue.state.placedLegs).toBe(1);
 	});
@@ -690,17 +690,18 @@ describe("order sender settling only on the exchange's reply", () => {
 		});
 		expect(pendingNonce(store)).toBe(sentRequest(first).nonce);
 		if (inspection.kind !== "inspected") throw new Error("expected an inspection");
+		const dismissedAt = Date.now();
 		const dismissed = await sender.dismiss(keyOf(first), inspection.lookup);
 		expect(dismissed).toMatchObject({ kind: "dismissed" });
-		expect(store.read(SLOT)).toMatchObject({
-			state: "dismissed",
-			request: { nonce: sentRequest(first).nonce },
-			dismissedAt: Date.now(),
-			lookup: { kind: "order", statuses: [{ status: "unknownOid" }] },
-		});
 		const next = await sender.submit(signerFor(venue, OTHER_AGENT_KEY), marketBuy());
 		expect(next).toMatchObject({ kind: "sent", settlement: { kind: "answered" } });
 		expect(venue.state.placedLegs).toBe(1);
+		expect(pendingNonce(store)).toBeNull();
+		expect(JSON.parse(storage.getItem(`hypeterminal:dismissed-request:v1:${keyOf(first)}`) ?? "null")).toMatchObject({
+			request: { nonce: sentRequest(first).nonce },
+			dismissedAt,
+			lookup: { kind: "order", statuses: [{ status: "unknownOid" }] },
+		});
 	});
 
 	it("keeps a request pending when its lookup finds nothing", async () => {
@@ -904,11 +905,7 @@ describe("order sender after a partial result", () => {
 		expect(sentPrices(venue)).toEqual(["90", "95", "96"]);
 		expect(venue.state.placedLegs).toBe(2);
 		expect(store.read(SLOT)).toMatchObject({ state: "settled", partial: null });
-		expect(await sender.submit(signerFor(venue), offer)).toEqual({
-			kind: "refused",
-			reason: "slotMoved",
-			to: "settled",
-		});
+		expect(await sender.submit(signerFor(venue), offer)).toEqual({ kind: "refused", reason: "offerStale" });
 	});
 
 	it("keeps holding while a resent leg is rejected again, and then offers only that leg", async () => {

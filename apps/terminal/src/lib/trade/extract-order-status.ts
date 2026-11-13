@@ -153,7 +153,9 @@ function describeRefusal(refusal: Refused): string {
 		case "slotMoved":
 			return refusal.to === "pending"
 				? t`Not sent. Another order on this market was just sent from another tab. Press again to send a new one.`
-				: t`Not sent. Another order on this market just went through. Press again to send a new one.`;
+				: t`Not sent. Another order on this market was just settled in another tab. Press again to send a new one.`;
+		case "offerStale":
+			return t`Not sent. The last order on this market changed after these legs were offered. Press submit again to see what is left.`;
 	}
 }
 
@@ -190,7 +192,7 @@ function reportBlocked(earlier: Settlement): OrderResult {
 		);
 	}
 	const result = reportSettlement(earlier);
-	const what = result.ok ? describeOutcome(result.outcome) : result.error;
+	const what = result.ok ? describeOutcome(result.outcome) : withoutFinalPeriod(result.error);
 	return notSent(
 		t`Not sent. An earlier order on this market was still unconfirmed: ${what}. Press again to send a new order.`,
 	);
@@ -316,8 +318,12 @@ function describeInspectedLookup(lookup: Lookup, legs: PlanLeg[]): string {
 	if (!lookup.statuses) return t`Its status could not be read.`;
 	if (!foundAny(lookup)) return t`A lookup did not find it, which does not prove it never executed.`;
 	const result = reportOrderLookup(lookup, legs);
-	const what = result.ok ? describeOutcome(result.outcome) : result.error;
+	const what = result.ok ? describeOutcome(result.outcome) : withoutFinalPeriod(result.error);
 	return t`A lookup found it: ${what}.`;
+}
+
+function withoutFinalPeriod(text: string): string {
+	return text.endsWith(".") ? text.slice(0, -1) : text;
 }
 
 function reportTwapReply(response: unknown): OrderResult {

@@ -68,7 +68,7 @@ type Busy = { kind: "busy" };
 type Missing = { kind: "missing" };
 
 export type Refused =
-	| { kind: "refused"; reason: "storage" | "locks" | "twapHistory" }
+	| { kind: "refused"; reason: "storage" | "locks" | "twapHistory" | "offerStale" }
 	| { kind: "refused"; reason: "slotMoved"; to: "pending" | "settled" };
 
 export type Held = { kind: "held"; partial: PartialPlan; offer: OrderSubmission | null };
@@ -203,7 +203,7 @@ export function createOrderSender(env: SenderEnv) {
 		let parent: PendingRequest["parent"] = null;
 		if (submission.kind === "order" && submission.parent) {
 			parent = parentOf(settled, submission.parent);
-			if (!parent) return { kind: "refused", reason: "slotMoved", to: "settled" };
+			if (!parent) return { kind: "refused", reason: "offerStale" };
 		} else {
 			const held = holdFor(settled, submission);
 			if (held) return held;
@@ -280,12 +280,12 @@ export function createOrderSender(env: SenderEnv) {
 		const { request } = settlement;
 		const current = env.store.read(request.slot);
 		if (current?.state !== "pending" || current.request.nonce !== request.nonce) return settlement;
-		env.store.write(
-			request.slot,
-			settlement.kind === "dismissed"
-				? { state: "dismissed", request, dismissedAt: Date.now(), lookup: settlement.lookup }
-				: { state: "settled", nonce: request.nonce, settledAt: Date.now(), partial: partialAfter(settlement) },
-		);
+		env.store.write(request.slot, {
+			state: "settled",
+			nonce: request.nonce,
+			settledAt: Date.now(),
+			partial: partialAfter(settlement),
+		});
 		return settlement;
 	}
 
@@ -355,7 +355,11 @@ export function createOrderSender(env: SenderEnv) {
 		return exclusive(slotOf(requestKey), (inSlot) =>
 			inSlot(async (): Promise<RequestOutcome> => {
 				const request = storedRequest(requestKey);
-				return request ? record({ kind: "dismissed", request, lookup }) : { kind: "missing" };
+				if (!request) return { kind: "missing" };
+				if (!env.store.recordDismissal({ request, dismissedAt: Date.now(), lookup })) {
+					return { kind: "refused", reason: "storage" };
+				}
+				return record({ kind: "dismissed", request, lookup });
 			}),
 		);
 	}
@@ -476,7 +480,7 @@ export type OrderSender = ReturnType<typeof createOrderSender>;
 
 function stampOf(record: SlotRecord | null): string {
 	if (!record) return "empty";
-	return `${record.state}:${record.state === "settled" ? record.nonce : record.request.nonce}`;
+	return record.state === "settled" ? `settled:${record.nonce}` : `pending:${record.request.nonce}`;
 }
 
 export function placedNothing(settlement: Settlement): boolean {

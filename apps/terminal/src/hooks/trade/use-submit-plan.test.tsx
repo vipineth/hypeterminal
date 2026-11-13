@@ -158,8 +158,8 @@ describe("retry and cancel on an unconfirmed order", () => {
 			status: "unknown",
 			error: "Dismissed without confirmation. It may have executed. Check open orders.",
 		});
-		expect(storedSlot()).toMatchObject({
-			state: "dismissed",
+		expect(storedDismissal(result.requestKey)).toMatchObject({
+			request: { nonce: storedSlot().nonce },
 			lookup: { kind: "order", statuses: [{ status: "unknownOid" }] },
 		});
 		expect(queue.updateByRequestKey).toHaveBeenLastCalledWith(
@@ -187,6 +187,10 @@ describe("retry and cancel on an unconfirmed order", () => {
 		expect(net.venue.state.placedLegs).toBe(1);
 	});
 });
+
+function storedDismissal(requestKey: string) {
+	return JSON.parse(net.storage.getItem(`hypeterminal:dismissed-request:v1:${requestKey}`) ?? "null");
+}
 
 function storedSlot() {
 	return JSON.parse(
