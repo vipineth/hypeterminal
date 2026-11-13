@@ -1,6 +1,7 @@
 import type { ClearinghouseStateResponse, FrontendOpenOrdersResponse, L2BookResponse, OrderSuccessResponse } from "@nktkas/hyperliquid";
 import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
 import type { ExchangeOrder } from "@/config/trade";
+import type Big from "big.js";
 import { type Numeric, toSafeBig } from "@/lib/trade/numbers";
 
 export type StatusKind = "resting" | "filled" | "waitingForFill" | "waitingForTrigger" | "error";
@@ -53,11 +54,13 @@ export function harnessOrders(orders: FrontendOpenOrdersResponse, coin?: string)
 	return orders.filter((order) => isHarnessCloid(order.cloid) && (coin === undefined || order.coin === coin));
 }
 
-export function bookTooThin(book: L2BookResponse | null, isBuy: boolean, price: string): boolean {
+export function depthWithinSlippage(book: L2BookResponse | null, isBuy: boolean, markPx: Numeric, slippageBps: number): Big {
 	const [bids, asks] = book?.levels ?? [[], []];
-	const best = isBuy ? asks[0] : bids[0];
-	if (!best) return true;
-	return isBuy ? toSafeBig(best.px).gt(price) : toSafeBig(best.px).lt(price);
+	const band = toSafeBig(slippageBps).div(10_000);
+	const limit = toSafeBig(markPx).times(isBuy ? band.plus(1) : toSafeBig(1).minus(band));
+	return (isBuy ? asks : bids)
+		.filter((level) => (isBuy ? toSafeBig(level.px).lte(limit) : toSafeBig(level.px).gte(limit)))
+		.reduce((sum, level) => sum.plus(toSafeBig(level.sz)), toSafeBig(0));
 }
 
 export function sizeForNotional(markPx: Numeric, szDecimals: number, notional: number, wholeTens = false): string {

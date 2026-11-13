@@ -1,7 +1,7 @@
 import type { ClearinghouseStateResponse, L2BookResponse } from "@nktkas/hyperliquid";
 import { describe, expect, it } from "vitest";
 import {
-	bookTooThin,
+	depthWithinSlippage,
 	expectPosition,
 	expectStatuses,
 	harnessOrders,
@@ -73,19 +73,19 @@ describe("positions", () => {
 	});
 });
 
-describe("bookTooThin", () => {
-	it("is thin when the best ask is above a buy limit", () => {
-		expect(bookTooThin(book("90", "110"), true, "105")).toBe(true);
-		expect(bookTooThin(book("90", "110"), true, "110")).toBe(false);
+describe("depthWithinSlippage", () => {
+	it("counts only asks a buy can reach within mark plus slippage", () => {
+		expect(depthWithinSlippage(book("90", "102"), true, "100", 250).toFixed()).toBe("1");
+		expect(depthWithinSlippage(book("90", "103"), true, "100", 250).toFixed()).toBe("0");
 	});
 
-	it("is thin when the best bid is below a sell limit", () => {
-		expect(bookTooThin(book("90", "110"), false, "95")).toBe(true);
-		expect(bookTooThin(book("90", "110"), false, "90")).toBe(false);
+	it("counts only bids a sell can reach within mark minus slippage", () => {
+		expect(depthWithinSlippage(book("98", "110"), false, "100", 250).toFixed()).toBe("1");
+		expect(depthWithinSlippage(book("97", "110"), false, "100", 250).toFixed()).toBe("0");
 	});
 
-	it("is thin when the side is empty", () => {
-		expect(bookTooThin(book("90", null), true, "1000")).toBe(true);
+	it("is zero when the side is empty", () => {
+		expect(depthWithinSlippage(book("90", null), true, "100", 250).toFixed()).toBe("0");
 	});
 });
 

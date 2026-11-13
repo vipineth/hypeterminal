@@ -2,9 +2,9 @@ import type { ExchangeOrder } from "@/config/trade";
 import type { OrderPlan } from "@/domain/trade/order-intent";
 import { toSafeBig } from "@/lib/trade/numbers";
 import { type Venue, loadVenue, perpState, venueOrders } from "../account";
-import { bookTooThin, errorMessage, expectPosition, expectStatuses, newCloid, type OrderStatus, positionSize } from "../assert";
+import { depthWithinSlippage, errorMessage, expectPosition, expectStatuses, newCloid, type OrderStatus, positionSize } from "../assert";
 import type { Harness } from "../harness";
-import { intents, lotSize, plan } from "../plans";
+import { intents, lotSize, plan, SLIPPAGE_BPS } from "../plans";
 
 export type Scope = "perp" | "spot" | "account";
 
@@ -40,14 +40,16 @@ export async function send(ctx: ScenarioContext, built: OrderPlan): Promise<{ st
 		const [first] = orders;
 		const message = errorMessage(error);
 		if (message.includes(DEX_OI_CAP)) throw new Unsupported(message);
-		if (message.includes(NO_MATCH) && first) {
-			const book = await ctx.h.info.l2Book({ coin: ctx.venue.coin });
-			if (bookTooThin(book, first.b, first.p)) {
-				throw new Unsupported(`book too thin to fill ${first.b ? "a buy" : "a sell"} at ${first.p} on ${ctx.venue.coin}`);
-			}
+		if (message.includes(NO_MATCH) && first && (await liquidityWithinSlippage(ctx, first.b)).eq(0)) {
+			throw new Unsupported(`no ${first.b ? "asks" : "bids"} within ${SLIPPAGE_BPS} bps of mark on ${ctx.venue.coin}`);
 		}
 		throw error;
 	}
+}
+
+export async function liquidityWithinSlippage(ctx: ScenarioContext, isBuy: boolean) {
+	const [venue, book] = await Promise.all([fresh(ctx), ctx.h.info.l2Book({ coin: ctx.venue.coin })]);
+	return depthWithinSlippage(book, isBuy, venue.markPx, SLIPPAGE_BPS);
 }
 
 export async function openLong(ctx: ScenarioContext, size?: string): Promise<{ venue: Venue; size: string }> {

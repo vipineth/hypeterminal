@@ -1,8 +1,8 @@
 import { toSafeBig } from "@/lib/trade/numbers";
 import { spotBalance, spotBase } from "../account";
 import { expectStatuses } from "../assert";
-import { intents, lotSize, plan } from "../plans";
-import { fresh, type Scenario, send, Unsupported } from "./common";
+import { intents, lotSize, plan, SLIPPAGE_BPS } from "../plans";
+import { fresh, liquidityWithinSlippage, type Scenario, send, Unsupported } from "./common";
 
 const MAX_ROUND_TRIP_LOSS = 0.03;
 const ROUND_DOWN = 0;
@@ -22,7 +22,10 @@ export const spotScenarios: Scenario[] = [
 			const [bought] = (await send(ctx, plan(intents.swap(venue, true, size)))).statuses;
 			expectStatuses([bought], ["filled"]);
 			if (typeof bought === "object" && "filled" in bought && !toSafeBig(bought.filled.totalSz).eq(toSafeBig(size))) {
-				throw new Unsupported(`book filled ${bought.filled.totalSz} of ${size} ${base} within slippage`);
+				const depth = await liquidityWithinSlippage(ctx, true);
+				const message = `filled ${bought.filled.totalSz} of ${size} ${base}, ${depth.toFixed()} left within ${SLIPPAGE_BPS} bps of mark`;
+				if (depth.gte(toSafeBig(size))) throw new Error(message);
+				throw new Unsupported(message);
 			}
 			const received = toSafeBig(await spotBalance(ctx.h, base)).minus(baseBefore);
 			if (received.lte(0) || received.gt(toSafeBig(size))) throw new Error(`received ${received.toFixed()} ${base}, ordered ${size}`);

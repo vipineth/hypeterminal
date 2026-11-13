@@ -62,7 +62,7 @@ A scenario is reported as `SKIP` only when testnet itself can't support it, and 
 - Every builder dex tried (`xyz`, `idx`, `osrs`, `test`, `aura`) rejects new orders with `Perp DEX open interest is at cap`, in standard and unified mode.
 - `sendAsset` into a builder dex returns `Invalid send` from perp in standard mode and from spot in unified mode.
 - `agentSetAbstraction` returns `Abstraction transition not allowed` from `disabled` and from `unifiedAccount`.
-- A thin book is a `SKIP` only when the book shows the best price beyond the order's limit, or when a spot buy fills only part of its size.
+- A thin book is a `SKIP` only when the book has no depth within the app's 250 bps slippage of mark. The band is computed from mark, never from the order's own price, so a broken slippage price still fails. A spot buy that fills part of its size is a `SKIP` only when no depth is left inside that band.
 
 ## CI
 
