@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { getExecutedPrice } from "@/domain/trade/order/price";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
-import { buildOrders, formatPriceForOrder, formatSizeForOrder, getDefaultLeverage } from "@/domain/trade/orders";
+import {
+	buildOrders,
+	formatPriceForOrder,
+	formatSizeForOrder,
+	getDefaultLeverage,
+	ORDER_PLAN_ERRORS,
+} from "@/domain/trade/orders";
 
 const ENTRY_BASE = {
 	kind: "entry" as const,
@@ -10,6 +16,7 @@ const ENTRY_BASE = {
 	orderType: "market" as const,
 	sizeValue: 1.5,
 	szDecimals: 3,
+	marketKind: "perp" as const,
 	markPx: 100,
 	price: 100,
 	slippageBps: 50,
@@ -308,5 +315,175 @@ describe("orders", () => {
 	it("formats order sizes using size decimals", () => {
 		expect(formatSizeForOrder(1.234567, 3)).toBe("1.234");
 		expect(formatSizeForOrder(1.2, 0)).toBe("1");
+	});
+});
+
+function sumSizes(sizes: string[]): number {
+	return sizes.reduce((total, size) => total + Number(size), 0);
+}
+
+describe("order wire format", () => {
+	it.each([
+		[10, "10"],
+		[100, "100"],
+		[250, "250"],
+	])("closes a %d unit long at szDecimals 0 with the full size", (size, wireSize) => {
+		const plan = buildOrderPlan({
+			kind: "marketClose",
+			assetId: 173,
+			size,
+			szDecimals: 0,
+			isLong: true,
+			markPx: 0.16,
+			slippageBps: 250,
+		});
+		expect(plan.orders).toEqual([
+			{ a: 173, b: false, p: "0.156", s: wireSize, r: true, t: { limit: { tif: "FrontendMarket" } } },
+		]);
+	});
+
+	it("keeps integer sizes intact for entry and reverse at szDecimals 0", () => {
+		const entry = buildOrderPlan({
+			...ENTRY_BASE,
+			orderType: "limit",
+			szDecimals: 0,
+			sizeValue: 100,
+			price: 0.15,
+			limitPriceInput: "0.15",
+		});
+		const reverse = buildOrderPlan({
+			kind: "reverse",
+			assetId: 173,
+			size: 250,
+			szDecimals: 0,
+			isLong: false,
+			markPx: 0.16,
+			slippageBps: 250,
+		});
+		expect(entry.orders[0].s).toBe("100");
+		expect(reverse.orders[0].s).toBe("500");
+	});
+
+	it("rounds a sub-dollar market price to 6 - szDecimals decimals, away from the book", () => {
+		const dydx = {
+			...ENTRY_BASE,
+			assetId: 33,
+			szDecimals: 1,
+			sizeValue: 200,
+			markPx: 0.09017,
+			price: 0.09017,
+			slippageBps: 250,
+		};
+		expect(buildOrderPlan(dydx).orders[0].p).toBe("0.09243");
+		expect(buildOrderPlan({ ...dydx, side: "sell" }).orders[0].p).toBe("0.08791");
+	});
+
+	it("rounds limit prices toward the passive side", () => {
+		const limit = { ...ENTRY_BASE, orderType: "limit" as const, szDecimals: 2, sizeValue: 10 };
+		const buy = buildOrderPlan({ ...limit, side: "buy", price: 1.234567, limitPriceInput: "1.234567" });
+		const sell = buildOrderPlan({ ...limit, side: "sell", price: 1.234541, limitPriceInput: "1.234541" });
+		expect(buy.orders[0].p).toBe("1.2345");
+		expect(sell.orders[0].p).toBe("1.2346");
+	});
+
+	it("uses the spot 8 - szDecimals decimal rule for spot markets", () => {
+		const spot = { ...ENTRY_BASE, orderType: "limit" as const, marketKind: "spot" as const, assetId: 10107 };
+		const sz2 = buildOrderPlan({
+			...spot,
+			szDecimals: 2,
+			sizeValue: 1000,
+			price: 0.0123456,
+			limitPriceInput: "0.0123456",
+		});
+		const sz0 = buildOrderPlan({
+			...spot,
+			szDecimals: 0,
+			sizeValue: 1e7,
+			price: 0.000012345678,
+			limitPriceInput: "0.000012345678",
+		});
+		expect(sz2.orders[0].p).toBe("0.012345");
+		expect(sz0.orders[0].p).toBe("0.00001234");
+	});
+
+	it("rounds position TP/SL triggers passively for the closing side", () => {
+		const plan = buildOrderPlan({
+			kind: "positionTpsl",
+			assetId: 5,
+			szDecimals: 2,
+			isLong: true,
+			tpPriceNum: 120.123456,
+			slPriceNum: 90.123456,
+		});
+		expect(plan.orders.map((order) => order.p)).toEqual(["120.13", "90.124"]);
+		expect(plan.orders.map((order) => order.s)).toEqual(["0", "0"]);
+	});
+
+	it("allocates a scale remainder in whole lots so legs sum to the request", () => {
+		const plan = buildOrderPlan({
+			...ENTRY_BASE,
+			orderType: "scale",
+			szDecimals: 0,
+			sizeValue: 18,
+			scaleStartPriceInput: "100",
+			scaleEndPriceInput: "104",
+			scaleLevelsNum: 5,
+		});
+		const sizes = plan.orders.map((order) => order.s);
+		expect(sumSizes(sizes)).toBe(18);
+		expect(sizes).toEqual(["4", "4", "4", "3", "3"]);
+		expect(plan.orders.map((order) => order.p)).toEqual(["100", "101", "102", "103", "104"]);
+	});
+
+	it("blocks a scale order whose cheapest leg is under the minimum even when the average passes", () => {
+		const plan = buildOrderPlan({
+			...ENTRY_BASE,
+			orderType: "scale",
+			szDecimals: 2,
+			sizeValue: 4,
+			scaleStartPriceInput: "1",
+			scaleEndPriceInput: "20",
+			scaleLevelsNum: 2,
+		});
+		expect(plan.orders).toEqual([]);
+		expect(plan.errors).toEqual([ORDER_PLAN_ERRORS.belowMinNotional]);
+	});
+
+	it("blocks an opening order under the minimum notional on its wire price", () => {
+		const plan = buildOrderPlan({ ...ENTRY_BASE, szDecimals: 0, sizeValue: 1, markPx: 5, price: 5, slippageBps: 250 });
+		expect(plan.orders).toEqual([]);
+		expect(plan.errors).toEqual([ORDER_PLAN_ERRORS.belowMinNotional]);
+	});
+
+	it("lets a reduce-only close under the minimum notional through", () => {
+		const plan = buildOrderPlan({
+			kind: "marketClose",
+			assetId: 7,
+			size: 1,
+			szDecimals: 0,
+			isLong: true,
+			markPx: 5,
+			slippageBps: 250,
+		});
+		expect(plan.errors).toEqual([]);
+		expect(plan.orders[0]).toMatchObject({ s: "1", r: true });
+	});
+
+	it("blocks a size that truncates to zero lots", () => {
+		const plan = buildOrderPlan({ ...ENTRY_BASE, szDecimals: 0, sizeValue: 0.4 });
+		expect(plan.orders).toEqual([]);
+		expect(plan.errors).toEqual([ORDER_PLAN_ERRORS.invalidSize]);
+	});
+
+	it("blocks a price that is not a positive tick", () => {
+		const plan = buildOrderPlan({ ...ENTRY_BASE, orderType: "limit", price: 0, limitPriceInput: "0" });
+		expect(plan.orders).toEqual([]);
+		expect(plan.errors).toEqual([ORDER_PLAN_ERRORS.invalidPrice]);
+	});
+
+	it("rejects TWAP instead of building a limit order", () => {
+		const plan = buildOrderPlan({ ...ENTRY_BASE, orderType: "twap", sizeValue: 3 });
+		expect(plan.orders).toEqual([]);
+		expect(plan.errors).toEqual([ORDER_PLAN_ERRORS.twapNotSupported]);
 	});
 });
