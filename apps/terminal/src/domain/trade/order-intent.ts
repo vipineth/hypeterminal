@@ -6,10 +6,12 @@ import {
 	type EntryOrderParams,
 	formatPriceForOrder,
 	formatSizeForOrder,
+	formatTriggerPxForOrder,
 	isBelowMinNotional,
 	ORDER_PLAN_ERRORS,
 	OrderBuildError,
 	type OrderPlanError,
+	type TpSl,
 	type WireMarket,
 } from "@/domain/trade/orders";
 import { toSafeBig } from "@/lib/trade/numbers";
@@ -228,16 +230,16 @@ function buildPositionTpSlOrder(
 	market: WireMarket,
 	isBuy: boolean,
 	triggerPrice: string,
-	tpsl: "tp" | "sl",
+	tpsl: TpSl,
 ): ExchangeOrder {
-	const triggerPx = formatPriceForOrder(triggerPrice, market, isBuy ? "buy" : "sell", "passive");
+	const side = isBuy ? "buy" : "sell";
 	return {
 		a: assetId,
 		b: isBuy,
-		p: triggerPx,
+		p: formatPriceForOrder(triggerPrice, market, side, "passive"),
 		s: "0",
 		r: true,
-		t: { trigger: { isMarket: true, triggerPx, tpsl } },
+		t: { trigger: { isMarket: true, triggerPx: formatTriggerPxForOrder(triggerPrice, market, side, tpsl), tpsl } },
 	};
 }
 

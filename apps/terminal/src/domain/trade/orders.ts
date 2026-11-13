@@ -44,6 +44,8 @@ export interface WireMarket {
 
 export type PriceRounding = "passive" | "aggressive";
 
+export type TpSl = "tp" | "sl";
+
 export interface EntryOrderParams {
 	assetId: number;
 	side: Side;
@@ -210,21 +212,20 @@ interface TriggerOrderParams {
 
 function buildTriggerOrder(orders: ExchangeOrder[], params: TriggerOrderParams): void {
 	const side = params.isBuy ? "buy" : "sell";
-	const triggerPx = formatPriceForOrder(params.triggerPriceInput, params.market, side, "passive");
+	const tpsl = params.isStopOrder ? "sl" : "tp";
+	const limitPriceInput = params.usesLimitPriceForOrder ? params.limitPriceInput : params.triggerPriceInput;
 
 	orders.push({
 		a: params.assetId,
 		b: params.isBuy,
-		p: params.usesLimitPriceForOrder
-			? formatPriceForOrder(params.limitPriceInput, params.market, side, "passive")
-			: triggerPx,
+		p: formatPriceForOrder(limitPriceInput, params.market, side, "passive"),
 		s: params.formattedSize,
 		r: true,
 		t: {
 			trigger: {
 				isMarket: !params.usesLimitPriceForOrder,
-				triggerPx,
-				tpsl: params.isStopOrder ? "sl" : "tp",
+				triggerPx: formatTriggerPxForOrder(params.triggerPriceInput, params.market, side, tpsl),
+				tpsl,
 			},
 		},
 	});
@@ -264,18 +265,24 @@ interface TpSlOrderParams {
 	isBuy: boolean;
 	formattedSize: string;
 	triggerPrice: string;
-	tpsl: "tp" | "sl";
+	tpsl: TpSl;
 }
 
 function buildTpSlOrder(orders: ExchangeOrder[], params: TpSlOrderParams): void {
-	const triggerPx = formatPriceForOrder(params.triggerPrice, params.market, params.isBuy ? "buy" : "sell", "passive");
+	const side = params.isBuy ? "buy" : "sell";
 	orders.push({
 		a: params.assetId,
 		b: params.isBuy,
-		p: triggerPx,
+		p: formatPriceForOrder(params.triggerPrice, params.market, side, "passive"),
 		s: params.formattedSize,
 		r: true,
-		t: { trigger: { isMarket: true, triggerPx, tpsl: params.tpsl } },
+		t: {
+			trigger: {
+				isMarket: true,
+				triggerPx: formatTriggerPxForOrder(params.triggerPrice, params.market, side, params.tpsl),
+				tpsl: params.tpsl,
+			},
+		},
 	});
 }
 
@@ -310,12 +317,20 @@ function formatWithSdk(format: () => string, reason: OrderPlanError): string {
 }
 
 export function formatPriceForOrder(price: Numeric, market: WireMarket, side: Side, rounding: PriceRounding): string {
+	return formatPriceOnTick(price, market, (side === "buy") === (rounding === "aggressive"));
+}
+
+export function formatTriggerPxForOrder(price: Numeric, market: WireMarket, side: Side, tpsl: TpSl): string {
+	const firesOnRise = (side === "buy") === (tpsl === "sl");
+	return formatPriceOnTick(price, market, firesOnRise);
+}
+
+function formatPriceOnTick(price: Numeric, market: WireMarket, roundsUp: boolean): string {
 	const value = toBig(price);
 	if (!value?.gt(0)) throw new OrderBuildError(ORDER_PLAN_ERRORS.invalidPrice);
 
 	const type = market.kind === "spot" ? "spot" : "perp";
 	const maxDecimals = type === "spot" ? HL_SPOT_PRICE_MAX_DECIMALS : HL_PERP_PRICE_MAX_DECIMALS;
-	const roundsUp = (side === "buy") === (rounding === "aggressive");
 	const mode = roundsUp ? Big.roundUp : Big.roundDown;
 	const onDecimals = value.round(Math.max(maxDecimals - market.szDecimals, 0), mode);
 	const onTick = onDecimals.eq(onDecimals.round(0, Big.roundDown))
