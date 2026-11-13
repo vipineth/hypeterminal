@@ -504,6 +504,13 @@ describe("order sender in a browser that cannot keep its records", () => {
 		expect(venue.state.placedLegs).toBe(0);
 	});
 
+	it("refuses before it signs, so no wallet is asked to sign an order that cannot be sent", async () => {
+		const clock = { now: vi.fn(async () => Date.now()), warm() {} };
+		const { sender } = openTab(venue, fullStorage(), createMemoryLocks(), { clock });
+		expect(await sender.submit(signerFor(venue), marketBuy())).toEqual({ kind: "refused", reason: "storage" });
+		expect(clock.now).not.toHaveBeenCalled();
+	});
+
 	it("sends nothing when the signed request itself cannot be saved", async () => {
 		const storage = storageFullFor("hypeterminal:pending-request:v2:");
 		const { sender } = openTab(venue, storage, createMemoryLocks());
