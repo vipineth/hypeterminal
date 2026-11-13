@@ -1,7 +1,6 @@
 import { FormatError, formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
 import Big from "big.js";
 import {
-	DEFAULT_LEVERAGE_FALLBACK,
 	type ExchangeOrder,
 	HL_PERP_PRICE_MAX_DECIMALS,
 	HL_PRICE_MAX_SIG_FIGS,
@@ -276,11 +275,6 @@ function buildTpSlOrder(orders: WireOrder[], params: TpSlOrderParams): void {
 			},
 		},
 	});
-}
-
-export function getDefaultLeverage(maxLeverage: number): number {
-	if (maxLeverage <= DEFAULT_LEVERAGE_FALLBACK) return maxLeverage;
-	return Math.floor(maxLeverage / 2);
 }
 
 export function isBelowMinNotional(order: ExchangeOrder): boolean {

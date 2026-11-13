@@ -22,8 +22,6 @@ export const LIQ_WARNING_THRESHOLD = 0.05;
 export const HL_PRICE_MAX_SIG_FIGS = 5;
 export const HL_PERP_PRICE_MAX_DECIMALS = 6;
 export const HL_SPOT_PRICE_MAX_DECIMALS = 8;
-/** Leverage ceiling below which `getDefaultLeverage` returns the max instead of halving. */
-export const DEFAULT_LEVERAGE_FALLBACK = 5;
 
 export const TWAP_MINUTES_MIN = 5;
 export const TWAP_MINUTES_MAX = 1440;
@@ -33,6 +31,7 @@ export const SCALE_LEVELS_MIN = 2;
 export const SCALE_LEVELS_MAX = 20;
 
 export const DEFAULT_MAX_LEVERAGE = 50;
+export const DEFAULT_LEVERAGE = 10;
 export const DEFAULT_MARKET_ORDER_SLIPPAGE_PERCENT = 2.5;
 export const MARKET_ORDER_SLIPPAGE_MIN_PERCENT = 0.1;
 export const MARKET_ORDER_SLIPPAGE_MAX_PERCENT = 5;

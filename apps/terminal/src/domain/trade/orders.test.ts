@@ -3,13 +3,7 @@ import { describe, expect, it } from "vitest";
 import { SCALE_LEVELS_MAX, SCALE_LEVELS_MIN } from "@/config/trade";
 import { getMarketPrice } from "@/domain/trade/order/price";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
-import {
-	buildOrders,
-	formatPriceForOrder,
-	formatSizeForOrder,
-	getDefaultLeverage,
-	ORDER_PLAN_ERRORS,
-} from "@/domain/trade/orders";
+import { buildOrders, formatPriceForOrder, formatSizeForOrder, ORDER_PLAN_ERRORS } from "@/domain/trade/orders";
 import { perpMarket, spotMarket } from "@/test/markets";
 
 const ENTRY_BASE = {
@@ -304,12 +298,6 @@ describe("buildOrders grouping (characterization)", () => {
 });
 
 describe("orders", () => {
-	it("chooses smart leverage defaults", () => {
-		expect(getDefaultLeverage(5)).toBe(5);
-		expect(getDefaultLeverage(6)).toBe(3);
-		expect(getDefaultLeverage(50)).toBe(25);
-	});
-
 	it("formats order prices to the tick in the requested direction", () => {
 		const perp = perpMarket(0, 0);
 		expect(formatPriceForOrder(100, perp, "buy", "passive")).toBe("100");

@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useConnection } from "wagmi";
-import { DEFAULT_MAX_LEVERAGE } from "@/config/trade";
+import { getPositionDex } from "@/domain/market";
 import { getMarketCapabilities } from "@/domain/market/capabilities";
+import { getDefaultLeverage, getMaxLeverage } from "@/domain/market/model";
 import { useExchange, useSelectedMarketInfo, useSubscription, useUserPositions } from "@/lib/hyperliquid";
 import { getMarginModeFromLeverage, type MarginMode } from "@/lib/trade/margin-mode";
 import { toNumber } from "@/lib/trade/numbers";
@@ -36,10 +37,6 @@ interface UseAssetLeverageReturn {
 	allowsCrossMargin: boolean;
 }
 
-function getDefaultLeverage(maxLeverage: number): number {
-	return Math.min(10, maxLeverage);
-}
-
 export function useAssetLeverage(): UseAssetLeverageReturn {
 	const { address, isConnected } = useConnection();
 	const { data: market } = useSelectedMarketInfo();
@@ -51,7 +48,7 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	const { isOnlyIsolated, allowsCrossMargin } = capabilities;
 	const isPerpMarket = market?.kind === "perp" || market?.kind === "builderPerp";
 
-	const maxLeverage = market?.kind === "spot" ? 1 : (market?.maxLeverage ?? DEFAULT_MAX_LEVERAGE);
+	const maxLeverage = getMaxLeverage(market);
 	const baseToken = market ? market.name : undefined;
 	const assetId = market?.assetId;
 
@@ -83,7 +80,7 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	}
 	const marginMode = computeMarginMode();
 
-	const hasPosition = baseToken ? userPositions.hasPosition(baseToken) : false;
+	const hasPosition = market ? userPositions.hasPosition(market.name, getPositionDex(market)) : false;
 
 	function computeCurrentLeverage(): number {
 		if (isConnected && onChainLeverage !== null) {
@@ -92,7 +89,7 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		if (disconnectedLeverage !== null) {
 			return disconnectedLeverage;
 		}
-		return getDefaultLeverage(maxLeverage);
+		return getDefaultLeverage(market);
 	}
 	const currentLeverage = computeCurrentLeverage();
 

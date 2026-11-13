@@ -1,4 +1,5 @@
 import type { MetaResponse, PerpDexsResponse, SpotMetaResponse } from "@nktkas/hyperliquid";
+import { DEFAULT_LEVERAGE, DEFAULT_MAX_LEVERAGE } from "@/config/trade";
 import { BUILDER_DEX_SEPARATOR, PERP_MARKET_NAME_SEPARATOR, SPOT_MARKET_NAME_SEPARATOR } from "@/domain/market/display";
 import { getIconUrlFromMarketName, getTokenDisplayName, getUnderlyingAsset } from "@/domain/market/tokens";
 
@@ -100,6 +101,15 @@ export function isListed(market: Market): market is ListedMarket {
 
 export function isPerpLike(market: Market): market is PerpLikeMarket {
 	return market.kind !== "spot";
+}
+
+export function getMaxLeverage(market: Market | undefined): number {
+	if (!market) return DEFAULT_MAX_LEVERAGE;
+	return market.kind === "spot" ? 1 : market.maxLeverage;
+}
+
+export function getDefaultLeverage(market: Market | undefined): number {
+	return Math.min(DEFAULT_LEVERAGE, getMaxLeverage(market));
 }
 
 export function parseMarkets({ perpDexs, allPerpMetas, spotMeta }: MetaPayloads): MarketModel {

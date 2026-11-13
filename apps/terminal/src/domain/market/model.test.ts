@@ -3,7 +3,9 @@ import type { IRequestTransport } from "@nktkas/hyperliquid";
 import { SymbolConverter } from "@nktkas/hyperliquid/utils";
 import { describe, expect, it } from "vitest";
 import { getMarketCapabilities } from "@/domain/market/capabilities";
+import { getPositionDex } from "@/domain/market/dex";
 import {
+	getDefaultLeverage,
 	isPerpLike,
 	type Market,
 	type MetaPayloads,
@@ -322,5 +324,22 @@ describe("types", () => {
 		const forged: PerpMarket = { ...btc, kind: "perp", assetId: 5 };
 
 		expect(forged.assetId).toBe(5);
+	});
+});
+
+describe("leverage", () => {
+	it("defaults to 10x capped at the market max, 1x on spot", () => {
+		expect(getDefaultLeverage(perp("BTC"))).toBe(Math.min(10, perp("BTC").maxLeverage));
+		expect(
+			getDefaultLeverage(model.markets.find((market) => isPerpLike(market) && market.maxLeverage < 10)),
+		).toBeLessThan(10);
+		expect(getDefaultLeverage(spot("@107"))).toBe(1);
+		expect(getDefaultLeverage(undefined)).toBe(10);
+	});
+
+	it("checks positions on the market's own dex", () => {
+		expect(getPositionDex(perp("BTC"))).toBe("");
+		expect(getPositionDex(perp("xyz:NVDA"))).toBe("xyz");
+		expect(getPositionDex(spot("@107"))).toBeUndefined();
 	});
 });
