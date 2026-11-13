@@ -1,4 +1,6 @@
+import Big from "big.js";
 import { describe, expect, it } from "vitest";
+import { SCALE_LEVELS_MAX, SCALE_LEVELS_MIN } from "@/config/trade";
 import { getExecutedPrice } from "@/domain/trade/order/price";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
 import {
@@ -338,6 +340,27 @@ function sumSizes(sizes: string[]): number {
 	return sizes.reduce((total, size) => total + Number(size), 0);
 }
 
+const SCALE_DIRECTIONS = [
+	["buy", "10", "11"],
+	["buy", "11", "10"],
+	["sell", "10", "11"],
+	["sell", "11", "10"],
+] as const;
+
+function scalePrices(side: "buy" | "sell", start: string, end: string, levels: number): string[] {
+	const plan = buildOrderPlan({
+		...ENTRY_BASE,
+		side,
+		orderType: "scale",
+		szDecimals: 0,
+		sizeValue: levels * 10,
+		scaleStartPriceInput: start,
+		scaleEndPriceInput: end,
+		scaleLevelsNum: levels,
+	});
+	return plan.orders.map((order) => order.p);
+}
+
 describe("order wire format", () => {
 	it.each([
 		[10, "10"],
@@ -449,6 +472,45 @@ describe("order wire format", () => {
 		expect(sumSizes(sizes)).toBe(18);
 		expect(sizes).toEqual(["4", "4", "4", "3", "3"]);
 		expect(plan.orders.map((order) => order.p)).toEqual(["100", "101", "102", "103", "104"]);
+	});
+
+	it("keeps the typed endpoints of a 4-leg scale on both sides", () => {
+		expect(scalePrices("buy", "10", "11", 4)).toEqual(["10", "10.333", "10.666", "11"]);
+		expect(scalePrices("sell", "11", "10", 4)).toEqual(["11", "10.667", "10.334", "10"]);
+	});
+
+	it("keeps endpoints and on-tick interior legs exact for both sides in both directions", () => {
+		expect(scalePrices("buy", "10", "11", 7)).toEqual(["10", "10.166", "10.333", "10.5", "10.666", "10.833", "11"]);
+		expect(scalePrices("buy", "11", "10", 7)).toEqual(["11", "10.833", "10.666", "10.5", "10.333", "10.166", "10"]);
+		expect(scalePrices("sell", "10", "11", 7)).toEqual(["10", "10.167", "10.334", "10.5", "10.667", "10.834", "11"]);
+		expect(scalePrices("sell", "11", "10", 7)).toEqual(["11", "10.834", "10.667", "10.5", "10.334", "10.167", "10"]);
+	});
+
+	it("rounds every scale leg passively within one tick of the exact ladder at every level count", () => {
+		const tick = Big("0.001");
+		const misses: string[] = [];
+		for (let levels = SCALE_LEVELS_MIN; levels <= SCALE_LEVELS_MAX; levels += 1) {
+			const steps = levels - 1;
+			for (const [side, start, end] of SCALE_DIRECTIONS) {
+				const prices = scalePrices(side, start, end, levels);
+				if (prices[0] !== start || prices.at(-1) !== end) misses.push(`${side} ${start}->${end} x${levels}: ${prices}`);
+				prices.forEach((price, i) => {
+					const exactTimesSteps = Big(start).times(steps).plus(Big(end).minus(start).times(i));
+					const low = Big(price)
+						.minus(side === "buy" ? 0 : tick)
+						.times(steps);
+					const high = Big(price)
+						.plus(side === "buy" ? tick : 0)
+						.times(steps);
+					const inRange =
+						side === "buy"
+							? low.lte(exactTimesSteps) && high.gt(exactTimesSteps)
+							: low.lt(exactTimesSteps) && high.gte(exactTimesSteps);
+					if (!inRange) misses.push(`${side} ${start}->${end} x${levels} leg ${i}: ${price}`);
+				});
+			}
+		}
+		expect(misses).toEqual([]);
 	});
 
 	it("blocks a scale order whose cheapest leg is under the minimum even when the average passes", () => {
