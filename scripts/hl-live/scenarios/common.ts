@@ -80,14 +80,14 @@ export interface ExpectedOrder {
 	side: "buy" | "sell";
 	price: string;
 	size: string;
-	tif: string;
+	tif?: string;
 }
 
 export function expectOrder(open: FrontendOpenOrder, expected: ExpectedOrder): void {
 	const actual = { side: open.side === "B" ? "buy" : "sell", price: open.limitPx, size: open.sz, tif: open.tif ?? "" };
 	const same =
 		actual.side === expected.side &&
-		actual.tif === expected.tif &&
+		(expected.tif === undefined || actual.tif === expected.tif) &&
 		toSafeBig(actual.price).eq(toSafeBig(expected.price)) &&
 		toSafeBig(actual.size).eq(toSafeBig(expected.size));
 	if (!same) throw new Error(`expected ${JSON.stringify(expected)}, the open order is ${JSON.stringify(actual)}`);

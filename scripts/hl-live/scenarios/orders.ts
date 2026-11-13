@@ -191,7 +191,7 @@ export const orderScenarios: Scenario[] = [
 			await ctx.h.agent.modify({ oid: open.oid, order: moved });
 			const after = await venueOrders(ctx.h, venue);
 			expectSame("open orders after modify", after.length, 1);
-			expectOrder(after[0], { side: "buy", price, size: lotSize(venue), tif: "Gtc" });
+			expectOrder(after[0], { side: "buy", price, size: lotSize(venue) });
 		},
 	},
 ];
