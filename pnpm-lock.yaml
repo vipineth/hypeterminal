@@ -228,6 +228,9 @@ importers:
       '@tanstack/react-query':
         specifier: '>=5.106.1 <6'
         version: 5.106.1(@types/react@19.2.7)(react@19.2.0)
+      big.js:
+        specifier: 7.0.1
+        version: 7.0.1
       react:
         specifier: '>=19.0.0 <20'
         version: 19.2.0
@@ -244,6 +247,9 @@ importers:
         specifier: '>=5.0.16 <6'
         version: 5.0.16(@types/react@19.2.7)(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0))
     devDependencies:
+      '@types/big.js':
+        specifier: 7.0.0
+        version: 7.0.0
       '@types/react':
         specifier: 19.2.7
         version: 19.2.7

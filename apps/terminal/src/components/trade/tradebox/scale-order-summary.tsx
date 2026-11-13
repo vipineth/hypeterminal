@@ -1,8 +1,8 @@
 import { t } from "@lingui/core/macro";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/app";
 import { DEFAULT_BUILDER_CONFIG } from "@/config/hyperliquid";
-import { bpsToPercentage, formatPrice, formatUSD } from "@/lib/format";
-import type { MarketKind } from "@/lib/hyperliquid";
+import { formatPrice, formatUSD } from "@/lib/format";
+import { convertFeeToPercentageString, type MarketKind } from "@/lib/hyperliquid";
 
 interface Props {
 	scaleStart: number | null;
@@ -74,7 +74,7 @@ export function ScaleOrderSummary({
 			</SummaryRow>
 			{DEFAULT_BUILDER_CONFIG?.f && (
 				<SummaryRow label={t`Builder Fee`}>
-					<span className="text-fg-muted">{`${bpsToPercentage(DEFAULT_BUILDER_CONFIG?.f)}%`}</span>
+					<span className="text-fg-muted">{convertFeeToPercentageString(DEFAULT_BUILDER_CONFIG.f)}</span>
 				</SummaryRow>
 			)}
 		</div>

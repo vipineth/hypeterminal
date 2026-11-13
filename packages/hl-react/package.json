@@ -36,6 +36,7 @@
 		"test": "vitest run"
 	},
 	"devDependencies": {
+		"@types/big.js": "7.0.0",
 		"@types/react": "19.2.7",
 		"vitest": "5.0.5"
 	},
@@ -47,5 +48,8 @@
 		"wagmi": ">=3.7.11 <4",
 		"zod": ">=4.6.7 <5",
 		"zustand": ">=5.0.16 <6"
+	},
+	"dependencies": {
+		"big.js": "7.0.1"
 	}
 }

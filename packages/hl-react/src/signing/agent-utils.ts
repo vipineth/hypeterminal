@@ -1,4 +1,5 @@
 import type { ExtraAgentsResponse, MaxBuilderFeeResponse } from "@nktkas/hyperliquid";
+import Big from "big.js";
 
 export function isAgentApproved(extraAgents: ExtraAgentsResponse | undefined, publicKey: string | undefined): boolean {
 	if (!extraAgents || !publicKey) return false;
@@ -18,8 +19,8 @@ export function isBuilderFeeApproved(
 	return maxBuilderFee >= requiredFeeNum;
 }
 
-export function convertFeeToPercentageString(fee: number | string): string {
-	const feeNum = typeof fee === "string" ? Number(fee) : fee;
-	const percentage = (feeNum / 10000) * 100;
-	return `${percentage}%`;
+const TENTHS_OF_BASIS_POINT_PER_PERCENT = 1000;
+
+export function convertFeeToPercentageString(fee: number | string): `${string}%` {
+	return `${Big(fee).div(TENTHS_OF_BASIS_POINT_PER_PERCENT).toString()}%`;
 }

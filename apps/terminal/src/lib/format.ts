@@ -361,19 +361,6 @@ export function formatDateTimeShort(value: DateInput, opts?: FormatDateOptions):
 }
 
 /**
- * Convert basis points to percentage string
- * 100000 bps = 100%, so divide by 1000 to get percentage
- * @example bpsToPercentage(10) -> "0.01"
- * @example bpsToPercentage(100) -> "0.10"
- * @example bpsToPercentage(1000) -> "1.00"
- */
-export function bpsToPercentage(bps: string | number | null | undefined, decimals = 2): string {
-	const parsed = parseNumberInput(bps);
-	if (!isValidNumber(parsed.value)) return "0";
-	return (parsed.value / 1000).toFixed(decimals);
-}
-
-/**
  * Format duration in minutes to human-readable string
  * @example formatDuration(5) -> "5m"
  * @example formatDuration(60) -> "1h"

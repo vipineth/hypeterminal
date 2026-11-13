@@ -4,8 +4,8 @@ import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/app";
 import { DEFAULT_BUILDER_CONFIG } from "@/config/hyperliquid";
 import type { OrderType } from "@/config/trade";
 import { cn } from "@/lib/cn";
-import { bpsToPercentage, formatPrice, formatUSD } from "@/lib/format";
-import type { MarketKind } from "@/lib/hyperliquid";
+import { formatPrice, formatUSD } from "@/lib/format";
+import { convertFeeToPercentageString, type MarketKind } from "@/lib/hyperliquid";
 import { isMarketExecutionOrderType } from "@/lib/trade/order-types";
 
 interface Props {
@@ -87,7 +87,7 @@ export function OrderSummary({
 			</SummaryRow>
 			{DEFAULT_BUILDER_CONFIG?.f && (
 				<SummaryRow label={t`Builder Fee`}>
-					<span className="text-fg-muted">{`${bpsToPercentage(DEFAULT_BUILDER_CONFIG?.f)}%`}</span>
+					<span className="text-fg-muted">{convertFeeToPercentageString(DEFAULT_BUILDER_CONFIG.f)}</span>
 				</SummaryRow>
 			)}
 		</div>

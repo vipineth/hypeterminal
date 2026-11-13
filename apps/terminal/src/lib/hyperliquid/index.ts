@@ -1,6 +1,7 @@
 export {
 	type ApiStatus,
 	type BuilderConfig,
+	convertFeeToPercentageString,
 	type ExchangeMethod,
 	type ExchangeParams,
 	type ExchangeResponse,

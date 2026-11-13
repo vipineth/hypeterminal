@@ -54,6 +54,7 @@ export {
 	useAgentWalletStorage,
 	writeAgentToStorage,
 } from "./signing/agent-storage";
+export { convertFeeToPercentageString } from "./signing/agent-utils";
 export {
 	createMobileAgentApproval,
 	createMobileAgentName,

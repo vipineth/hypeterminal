@@ -2,7 +2,8 @@ import { t } from "@lingui/core/macro";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/app";
 import { DEFAULT_BUILDER_CONFIG } from "@/config/hyperliquid";
 import { TWAP_SUBORDER_INTERVAL_SECONDS } from "@/config/trade";
-import { bpsToPercentage, formatDuration, formatToken, formatUSD } from "@/lib/format";
+import { formatDuration, formatToken, formatUSD } from "@/lib/format";
+import { convertFeeToPercentageString } from "@/lib/hyperliquid";
 
 interface Props {
 	twapMinutesNum: number | null;
@@ -65,7 +66,7 @@ export function TwapOrderSummary({
 			</SummaryRow>
 			{DEFAULT_BUILDER_CONFIG?.f && (
 				<SummaryRow label={t`Builder Fee`}>
-					<span className="text-fg-muted">{`${bpsToPercentage(DEFAULT_BUILDER_CONFIG?.f)}%`}</span>
+					<span className="text-fg-muted">{convertFeeToPercentageString(DEFAULT_BUILDER_CONFIG.f)}</span>
 				</SummaryRow>
 			)}
 		</div>
