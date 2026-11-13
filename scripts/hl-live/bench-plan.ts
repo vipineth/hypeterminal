@@ -1,16 +1,12 @@
 import { readFileSync } from "node:fs";
-import type { LiveMetaSnapshot } from "../../apps/terminal/src/domain/trade/live-plan-set.ts";
+import { buildLiveCases, type LiveMetaSnapshot } from "../../apps/terminal/src/domain/trade/live-plan-set.ts";
+import { buildOrderPlan } from "../../apps/terminal/src/domain/trade/order-intent.ts";
 
 const TERMINAL_DIR = new URL("../../apps/terminal/", import.meta.url).pathname;
 const SNAPSHOT_PATH = `${TERMINAL_DIR}fixtures/hl-mainnet-meta.json`;
 const WARMUP_PASSES = 20;
 const MEASURED_PASSES = 50;
 const PLAN_BUDGET_MS = 1;
-
-// Bun resolves the terminal's "@/" aliases from the tsconfig in the working directory.
-process.chdir(TERMINAL_DIR);
-const { buildOrderPlan } = await import("../../apps/terminal/src/domain/trade/order-intent.ts");
-const { buildLiveCases } = await import("../../apps/terminal/src/domain/trade/live-plan-set.ts");
 
 function quantile(sorted: Float64Array, q: number): number {
 	return sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))];

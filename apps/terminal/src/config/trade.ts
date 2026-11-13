@@ -19,7 +19,6 @@ export const LIQUIDATION_BUFFER_FACTOR = 0.9;
 /** Distance ratio below which the estimated liquidation price is flagged as too close. */
 export const LIQ_WARNING_THRESHOLD = 0.05;
 
-// HL tick-size protocol: non-integer prices carry at most 5 significant figures and (6 perp | 8 spot) - szDecimals decimals.
 export const HL_PRICE_MAX_SIG_FIGS = 5;
 export const HL_PERP_PRICE_MAX_DECIMALS = 6;
 export const HL_SPOT_PRICE_MAX_DECIMALS = 8;

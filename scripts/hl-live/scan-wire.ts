@@ -1,19 +1,20 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import type { MetaAndAssetCtxsResponse, MetaResponse, PerpDexsResponse, SpotMetaAndAssetCtxsResponse } from "@nktkas/hyperliquid";
-import type { LiveMetaSnapshot } from "../../apps/terminal/src/domain/trade/live-plan-set.ts";
+import {
+	buildLiveCases,
+	buildTwapCases,
+	checkCase,
+	checkTwapCase,
+	type LiveMetaSnapshot,
+	listLiveMarkets,
+} from "../../apps/terminal/src/domain/trade/live-plan-set.ts";
+import { buildOrderPlan } from "../../apps/terminal/src/domain/trade/order-intent.ts";
+import { buildTwapPlan } from "../../apps/terminal/src/domain/trade/twap.ts";
 
 const TERMINAL_DIR = new URL("../../apps/terminal/", import.meta.url).pathname;
 const SNAPSHOT_PATH = `${TERMINAL_DIR}fixtures/hl-mainnet-meta.json`;
 const INFO_URL = "https://api.hyperliquid.xyz/info";
 const SHOWN_VIOLATIONS = 20;
-
-// Bun resolves the terminal's "@/" aliases from the tsconfig in the working directory.
-process.chdir(TERMINAL_DIR);
-const { buildOrderPlan } = await import("../../apps/terminal/src/domain/trade/order-intent.ts");
-const { buildTwapPlan } = await import("../../apps/terminal/src/domain/trade/twap.ts");
-const { buildLiveCases, buildTwapCases, checkCase, checkTwapCase, listLiveMarkets } = await import(
-	"../../apps/terminal/src/domain/trade/live-plan-set.ts"
-);
 
 async function info<T>(body: Record<string, string>): Promise<T> {
 	const response = await fetch(INFO_URL, {
