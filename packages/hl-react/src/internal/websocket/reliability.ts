@@ -34,14 +34,14 @@ export const WS_RELIABILITY_LIMITS = {
 		maxChartLastBarEntries: 256,
 	},
 	staleness: {
-		checkIntervalMs: 5_000,
+		checkIntervalMs: 1_000,
 		defaultThresholdMs: 30_000,
 		perMethodThresholdMs: {
 			l2Book: 20_000,
 			trades: NEVER_STALE,
 			allMids: 20_000,
 			candle: NEVER_STALE,
-			activeAssetCtx: 20_000,
+			activeAssetCtx: 4_000,
 			activeAssetData: 20_000,
 			allDexsAssetCtxs: 60_000,
 			spotAssetCtxs: 60_000,
