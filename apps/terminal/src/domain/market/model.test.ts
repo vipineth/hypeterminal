@@ -20,6 +20,10 @@ function spot(name: string) {
 	return market;
 }
 
+function duplicates(labels: string[]) {
+	return labels.filter((label, i) => labels.indexOf(label) !== i);
+}
+
 function fixtureTransport(): IRequestTransport {
 	return {
 		isTestnet: false,
@@ -85,6 +89,25 @@ describe("parseMarkets on the committed mainnet snapshot", () => {
 		expect(mismatches).toEqual([]);
 		expect(spotKeys.filter(({ name, key }) => converter.getSymbolBySpotPairId(name) !== key)).toEqual([]);
 		expect(model.spot).toHaveLength(snapshot.spotMeta.universe.length);
+	});
+
+	it("gives every listed spot market and token its own label", () => {
+		expect(duplicates(model.spot.map((market) => market.pairName))).toEqual([]);
+		expect(duplicates(model.tokens.map((token) => token.displayName))).toEqual([]);
+	});
+
+	it("keeps the U on a Unit token whose stripped name belongs to another token", () => {
+		expect([spot("@699").pairName, spot("@699").tokensInfo[0].name]).toEqual(["UANSEM/USDC", "UANSEM"]);
+		expect([spot("@18").pairName, spot("@18").tokensInfo[0].name]).toEqual(["ANSEM/USDC", "ANSEM"]);
+		expect([spot("@189").pairName, spot("@703").pairName]).toEqual(["USPYX/USDC", "SPYX/USDC"]);
+		expect([spot("@188").pairName, spot("@20").pairName]).toEqual(["UPUMP/USDC", "PUMP/USDC"]);
+		expect(spot("@142").pairName).toBe("BTC/USDC");
+	});
+
+	it("resolves every token by its real name to itself", () => {
+		const misresolved = model.tokens.filter((token) => model.tokenByName.get(token.name)?.index !== token.index);
+
+		expect(misresolved.map((token) => token.name)).toEqual([]);
 	});
 
 	it("numbers HIP-3 markets by dex slot and universe position", () => {
