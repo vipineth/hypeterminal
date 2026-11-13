@@ -44,6 +44,11 @@ const form = vi.hoisted(() => ({
 
 const exchange = vi.hoisted(() => ({ placeOrder: vi.fn() }));
 const formActions = vi.hoisted(() => ({ resetForm: vi.fn() }));
+const queue = vi.hoisted(() => ({ addOrder: vi.fn(() => "order-1"), updateOrder: vi.fn(), removeOrder: vi.fn() }));
+
+vi.mock("@/stores/use-order-queue-store", () => ({
+	useOrderQueueActions: () => queue,
+}));
 
 vi.mock("wagmi", () => ({
 	useConnection: () => ({ address: "0x0000000000000000000000000000000000000001", isConnected: true }),
@@ -239,5 +244,12 @@ describe("perp trade ticket", () => {
 				t: { trigger: { isMarket: true, triggerPx: "85", tpsl: "sl" } },
 			},
 		]);
+	});
+
+	it("shows the triggers it sends in the order toast", async () => {
+		form.tpPrice = "74.999999999999999";
+		form.slPrice = "84.999999999999999";
+		await pressSubmit();
+		expect(queue.addOrder).toHaveBeenLastCalledWith(expect.objectContaining({ tpPrice: "74.999", slPrice: "85" }));
 	});
 });
