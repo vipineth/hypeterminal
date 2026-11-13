@@ -56,6 +56,19 @@ export function readSizeInput(size: string, typedIn: SizeUnit | null, current: S
 	return sameUnit ? size : "";
 }
 
+function getQuoteSizeForLots(lots: Big, price: number, szDecimals: number): string | null {
+	const quote = lots.times(price).round(QUOTE_SIZE_DECIMALS, Big.roundUp).toFixed(QUOTE_SIZE_DECIMALS);
+	const lotsBack = getSizeValueFromInput({ sizeInput: quote, sizeMode: "quote", price, szDecimals });
+	return lots.eq(lotsBack) ? quote : null;
+}
+
+function getQuoteSizeForPercent(lots: Big, price: number, szDecimals: number): string {
+	return (
+		getQuoteSizeForLots(lots, price, szDecimals) ??
+		lots.times(price).round(QUOTE_SIZE_DECIMALS, Big.roundDown).toFixed(QUOTE_SIZE_DECIMALS)
+	);
+}
+
 function formatSizeValue(value: number, decimals: number): string {
 	if (!Number.isFinite(value) || value <= 0) return "0";
 	return truncateDecimals(value, decimals);
@@ -111,7 +124,7 @@ export function getSizeForPercent(input: SizeForPercentInput): string {
 		if (isBuy) {
 			if (isQuoteMode) {
 				const quoteAmount = Big(input.spotBalance.quoteAvailable).times(pct);
-				return quoteAmount.toFixed(QUOTE_SIZE_DECIMALS);
+				return quoteAmount.round(QUOTE_SIZE_DECIMALS, Big.roundDown).toFixed(QUOTE_SIZE_DECIMALS);
 			}
 			const tokenAmount = Big(input.maxSize).times(pct).toNumber();
 			return formatSizeValue(tokenAmount, input.szDecimals);
@@ -119,9 +132,8 @@ export function getSizeForPercent(input: SizeForPercentInput): string {
 
 		if (isQuoteMode) {
 			if (input.price <= 0) return "";
-			const tokenAmount = Big(input.spotBalance.baseAvailable).times(pct);
-			const quoteAmount = tokenAmount.times(input.price);
-			return quoteAmount.toFixed(QUOTE_SIZE_DECIMALS);
+			const lots = Big(input.spotBalance.baseAvailable).times(pct).round(input.szDecimals, Big.roundDown);
+			return getQuoteSizeForPercent(lots, input.price, input.szDecimals);
 		}
 		const tokenAmount = Big(input.spotBalance.baseAvailable).times(pct).toNumber();
 		return formatSizeValue(tokenAmount, input.szDecimals);
@@ -132,7 +144,7 @@ export function getSizeForPercent(input: SizeForPercentInput): string {
 
 	if (isQuoteMode) {
 		if (input.price <= 0) return "";
-		return size.times(input.price).toFixed(QUOTE_SIZE_DECIMALS);
+		return getQuoteSizeForPercent(size.round(input.szDecimals, Big.roundDown), input.price, input.szDecimals);
 	}
 	return formatSizeValue(size.toNumber(), input.szDecimals);
 }
@@ -141,7 +153,7 @@ export function getSizeValueForModeToggle(input: SizeModeToggleInput): string {
 	if (input.sizeValue <= 0 || input.price <= 0) return "";
 
 	if (input.sizeMode === "base") {
-		return Big(input.sizeValue).times(input.price).toFixed(QUOTE_SIZE_DECIMALS);
+		return getQuoteSizeForLots(Big(input.sizeValue), input.price, input.szDecimals) ?? "";
 	}
 	return formatSizeValue(input.sizeValue, input.szDecimals);
 }
