@@ -1,4 +1,5 @@
 import Big from "big.js";
+import { renderToString } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
@@ -45,9 +46,29 @@ const MARK = 100;
 const LIMIT = 200;
 const QUOTE_BALANCE = 150;
 
+type OrderEntry = ReturnType<typeof useOrderEntryData>;
+
+interface Props {
+	sizeMode: SizeMode;
+	sizeInput: string;
+	onEntry: (entry: OrderEntry) => void;
+}
+
+function OrderEntryProbe({ sizeMode, sizeInput, onEntry }: Props) {
+	onEntry(useOrderEntryData({ market: HYPE_USDC, side: "buy", markPx: MARK, sizeMode, sizeInput }));
+	return null;
+}
+
+function renderOrderEntry(sizeMode: SizeMode, sizeInput: string): OrderEntry {
+	const entries: OrderEntry[] = [];
+	renderToString(
+		<OrderEntryProbe sizeMode={sizeMode} sizeInput={sizeInput} onEntry={(entry) => entries.push(entry)} />,
+	);
+	return entries[0];
+}
+
 function submitLimitBuy(sizeMode: SizeMode, sizeInput: string) {
-	// biome-ignore lint/correctness/useHookAtTopLevel: its React inputs are mocked, so the hook runs as a plain function
-	const entry = useOrderEntryData({ market: HYPE_USDC, side: "buy", markPx: MARK, sizeMode, sizeInput });
+	const entry = renderOrderEntry(sizeMode, sizeInput);
 	const plan = buildOrderPlan({
 		kind: "entry",
 		assetId: HYPE_USDC.assetId,
