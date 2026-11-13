@@ -109,6 +109,9 @@ describe("classifyReply", () => {
 			"rejected",
 		);
 		expect(
+			classifyReply({ status: "err", response: "Order rejected: Invalid nonce: duplicate nonce 1794596065043" }).kind,
+		).toBe("rejected");
+		expect(
 			classifyReply({
 				status: "err",
 				response: "User or API Wallet 0x6117f1250ff313fa510bf05b8b2e359411c431d7 does not exist.",
