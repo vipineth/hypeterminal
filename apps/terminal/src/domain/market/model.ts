@@ -1,21 +1,76 @@
-import type {
-	BuilderPerpMarket,
-	PerpMarket,
-	SpotMarket,
-	MarketSpotToken as SpotToken,
-	UnifiedMarket,
-} from "@hypeterminal/hl-react";
 import type { MetaResponse, PerpDexsResponse, SpotMetaResponse } from "@nktkas/hyperliquid";
+import { BUILDER_DEX_SEPARATOR, PERP_MARKET_NAME_SEPARATOR, SPOT_MARKET_NAME_SEPARATOR } from "@/domain/market/display";
 import { getIconUrlFromMarketName, getTokenDisplayName, getUnderlyingAsset } from "@/domain/market/tokens";
-import {
-	getBuilderPerpAssetId,
-	getBuilderPerpDisplayName,
-	getBuilderPerpShortName,
-	getPerpAssetId,
-	getPerpDisplayName,
-	getSpotAssetId,
-	getSpotDisplayName,
-} from "@/lib/hyperliquid/markets/helper";
+
+type SdkPerpAsset = MetaResponse["universe"][number];
+type SdkToken = SpotMetaResponse["tokens"][number];
+
+declare const assetIdBrand: unique symbol;
+export type AssetId = number & { readonly [assetIdBrand]: true };
+
+export type MarginMode = NonNullable<SdkPerpAsset["marginMode"]>;
+
+export interface SpotToken extends SdkToken {
+	displayName: string;
+	iconUrl: string;
+	transferDecimals: number;
+	isWrapped: boolean;
+}
+
+export interface Dex {
+	name: string;
+	index: number;
+	collateralToken: SpotToken;
+}
+
+interface MarketBase {
+	name: string;
+	assetId: AssetId;
+	szDecimals: number;
+	ctxIndex: number;
+	quote: SpotToken;
+	shortName: string;
+	pairName: string;
+	iconUrl: string;
+}
+
+interface PerpFields {
+	dex: Dex;
+	maxLeverage: number;
+	marginMode: MarginMode | undefined;
+	crossAllowed: boolean;
+	isDelisted: boolean;
+}
+
+export interface PerpMarket extends MarketBase, PerpFields {
+	kind: "perp";
+}
+
+export interface BuilderPerpMarket extends MarketBase, PerpFields {
+	kind: "builderPerp";
+}
+
+export interface SpotMarket extends MarketBase {
+	kind: "spot";
+	base: SpotToken;
+	isCanonical: boolean;
+	isDelisted: false;
+}
+
+export type Market = PerpMarket | SpotMarket | BuilderPerpMarket;
+export type PerpLikeMarket = PerpMarket | BuilderPerpMarket;
+export type ListedMarket = Market & { isDelisted: false };
+
+export type ParseIssue =
+	| { kind: "spotTokenMissing"; pair: string; tokenIndex: number }
+	| { kind: "collateralMissing"; dex: string; tokenIndex: number }
+	| { kind: "dexMetaMissing"; dexIndex: number }
+	| { kind: "dexSlotMismatch"; dexIndex: number; dex: string | null }
+	| { kind: "assetPrefixMismatch"; dex: string; coin: string }
+	| { kind: "duplicateTokenIndex"; tokenIndex: number }
+	| { kind: "duplicateCoin"; coin: string }
+	| { kind: "duplicateAssetId"; coin: string; assetId: number }
+	| { kind: "unknownMarginMode"; coin: string; marginMode: string };
 
 export interface MetaPayloads {
 	perpDexs: PerpDexsResponse;
@@ -24,125 +79,211 @@ export interface MetaPayloads {
 }
 
 export interface MarketModel {
-	all: readonly UnifiedMarket[];
-	perp: readonly PerpMarket[];
-	spot: readonly SpotMarket[];
-	builderPerp: readonly BuilderPerpMarket[];
+	markets: readonly Market[];
+	listed: readonly ListedMarket[];
+	dexes: readonly Dex[];
 	tokens: readonly SpotToken[];
-	byName: ReadonlyMap<string, UnifiedMarket>;
+	byName: ReadonlyMap<string, Market>;
+	tokenByIndex: ReadonlyMap<number, SpotToken>;
 	tokenByName: ReadonlyMap<string, SpotToken>;
+	issues: readonly ParseIssue[];
+}
+
+const SPOT_ASSET_ID_BASE = 10_000;
+const BUILDER_PERP_ASSET_ID_BASE = 100_000;
+const BUILDER_PERP_SLOTS_PER_DEX = 10_000;
+const MARGIN_MODES: readonly string[] = ["noCross", "strictIsolated"] satisfies MarginMode[];
+
+export function isListed(market: Market): market is ListedMarket {
+	return !market.isDelisted;
+}
+
+export function isPerpLike(market: Market): market is PerpLikeMarket {
+	return market.kind !== "spot";
 }
 
 export function parseMarkets({ perpDexs, allPerpMetas, spotMeta }: MetaPayloads): MarketModel {
-	const perpMeta = allPerpMetas[0];
+	const issues: ParseIssue[] = [];
+	const tokens = spotMeta.tokens.map(toSpotToken);
+	const tokenByIndex = indexTokens(tokens, issues);
+	const dexes = parseDexes(perpDexs, allPerpMetas, tokenByIndex, issues);
 
-	const perpMarkets: PerpMarket[] = [];
-	if (perpMeta?.universe) {
-		for (let i = 0; i < perpMeta.universe.length; i++) {
-			const market = perpMeta.universe[i];
-			if (market.isDelisted) continue;
-			perpMarkets.push({
-				...market,
-				kind: "perp",
-				shortName: market.name,
-				pairName: getPerpDisplayName(market.name),
-				assetId: getPerpAssetId(i),
-				ctxIndex: i,
-				iconUrl: getIconUrlFromMarketName(market.name, "perp"),
-			});
+	const markets: Market[] = [];
+	const byName = new Map<string, Market>();
+	const assetIds = new Set<number>();
+
+	function add(market: Market) {
+		if (byName.has(market.name)) {
+			issues.push({ kind: "duplicateCoin", coin: market.name });
+			return;
 		}
-	}
-
-	const spotMarkets: SpotMarket[] = [];
-	const realNames = new Set(spotMeta.tokens.map((token) => token.name));
-	const strippedNames = spotMeta.tokens.map(getTokenDisplayName).filter((name) => !realNames.has(name));
-	const spotTokens: SpotToken[] = spotMeta.tokens.map((token) => {
-		const strippedName = getTokenDisplayName(token);
-		const isUnique = strippedNames.indexOf(strippedName) === strippedNames.lastIndexOf(strippedName);
-		return {
-			...token,
-			displayName: realNames.has(strippedName) || !isUnique ? token.name : strippedName,
-			iconUrl: getIconUrlFromMarketName(getUnderlyingAsset(token) ?? token.name, "spot"),
-			transferDecimals: token.weiDecimals + (token.evmContract?.evm_extra_wei_decimals ?? 0),
-			isWrapped: strippedName !== token.name,
-		};
-	});
-
-	const tokenByIndex = new Map(spotTokens.map((token) => [token.index, token]));
-
-	if (spotTokens.length > 0) {
-		for (const pair of spotMeta.universe) {
-			const tokensInfo: SpotToken[] = [];
-			for (const idx of pair.tokens) {
-				const token = tokenByIndex.get(idx);
-				if (token) tokensInfo.push(token);
-			}
-
-			if (tokensInfo.length < 2) continue;
-
-			const [baseToken, quoteToken] = tokensInfo;
-			const displayName = getSpotDisplayName(baseToken.displayName, quoteToken.displayName);
-
-			spotMarkets.push({
-				...pair,
-				kind: "spot",
-				shortName: baseToken.displayName,
-				pairName: displayName,
-				assetId: getSpotAssetId(pair.index),
-				ctxIndex: pair.index,
-				tokensInfo,
-				szDecimals: baseToken.szDecimals,
-				iconUrl: getIconUrlFromMarketName(getUnderlyingAsset(baseToken) ?? baseToken.name, "spot"),
-			});
+		if (assetIds.has(market.assetId)) {
+			issues.push({ kind: "duplicateAssetId", coin: market.name, assetId: market.assetId });
+			return;
 		}
-	}
-
-	const builderPerpMarkets: BuilderPerpMarket[] = [];
-	if (allPerpMetas.length > 1) {
-		for (let dexIndex = 1; dexIndex < allPerpMetas.length; dexIndex++) {
-			const meta = allPerpMetas[dexIndex];
-			const dexInfo = perpDexs[dexIndex];
-			if (!meta || !dexInfo) continue;
-
-			const dexName = dexInfo.name;
-			const quoteToken = tokenByIndex.get(meta.collateralToken);
-
-			for (let assetIndex = 0; assetIndex < meta.universe.length; assetIndex++) {
-				const asset = meta.universe[assetIndex];
-				if (asset.isDelisted) continue;
-
-				builderPerpMarkets.push({
-					...asset,
-					kind: "builderPerp",
-					shortName: getBuilderPerpShortName(asset.name),
-					pairName: getBuilderPerpDisplayName(asset.name, quoteToken?.displayName),
-					assetId: getBuilderPerpAssetId(dexIndex, assetIndex),
-					dex: dexName,
-					dexIndex,
-					ctxIndex: assetIndex,
-					quoteToken,
-					iconUrl: getIconUrlFromMarketName(asset.name, "builderPerp"),
-				});
-			}
-		}
-	}
-
-	const all: UnifiedMarket[] = [...perpMarkets, ...spotMarkets, ...builderPerpMarkets];
-
-	const byName = new Map<string, UnifiedMarket>();
-	for (const market of all) {
 		byName.set(market.name, market);
+		assetIds.add(market.assetId);
+		markets.push(market);
 	}
 
-	const tokenByName = new Map(spotTokens.map((token) => [token.name, token]));
+	const mainDex = dexes.find((dex) => dex.index === 0);
+	if (mainDex) {
+		allPerpMetas[0].universe.forEach((asset, position) => {
+			add(toPerpMarket(asset, position, mainDex, issues));
+		});
+	}
+
+	for (const pair of spotMeta.universe) {
+		const base = tokenByIndex.get(pair.tokens[0]);
+		const quote = tokenByIndex.get(pair.tokens[1]);
+		if (!base || !quote) {
+			for (const tokenIndex of pair.tokens) {
+				if (!tokenByIndex.has(tokenIndex)) issues.push({ kind: "spotTokenMissing", pair: pair.name, tokenIndex });
+			}
+			continue;
+		}
+		add({
+			kind: "spot",
+			name: pair.name,
+			assetId: mintAssetId(SPOT_ASSET_ID_BASE + pair.index),
+			szDecimals: base.szDecimals,
+			ctxIndex: pair.index,
+			base,
+			quote,
+			isCanonical: pair.isCanonical,
+			isDelisted: false,
+			shortName: base.displayName,
+			pairName: `${base.displayName}${SPOT_MARKET_NAME_SEPARATOR}${quote.displayName}`,
+			iconUrl: getIconUrlFromMarketName(getUnderlyingAsset(base) ?? base.name, "spot"),
+		});
+	}
+
+	for (const dex of dexes) {
+		if (dex.index === 0) continue;
+		const prefix = `${dex.name}${BUILDER_DEX_SEPARATOR}`;
+		allPerpMetas[dex.index].universe.forEach((asset, position) => {
+			if (!asset.name.startsWith(prefix)) {
+				issues.push({ kind: "assetPrefixMismatch", dex: dex.name, coin: asset.name });
+				return;
+			}
+			add(toPerpMarket(asset, position, dex, issues));
+		});
+	}
 
 	return {
-		all,
-		perp: perpMarkets,
-		spot: spotMarkets,
-		builderPerp: builderPerpMarkets,
-		tokens: spotTokens,
+		markets,
+		listed: markets.filter(isListed),
+		dexes,
+		tokens,
 		byName,
-		tokenByName,
+		tokenByIndex,
+		tokenByName: indexTokenNames(tokens),
+		issues,
 	};
+}
+
+export const EMPTY_MODEL: MarketModel = parseMarkets({
+	perpDexs: [],
+	allPerpMetas: [],
+	spotMeta: { universe: [], tokens: [] },
+});
+
+function mintAssetId(value: number): AssetId {
+	return value as AssetId;
+}
+
+function toSpotToken(token: SdkToken): SpotToken {
+	const displayName = getTokenDisplayName(token);
+	return {
+		...token,
+		displayName,
+		iconUrl: getIconUrlFromMarketName(getUnderlyingAsset(token) ?? token.name, "spot"),
+		transferDecimals: token.weiDecimals + (token.evmContract?.evm_extra_wei_decimals ?? 0),
+		isWrapped: displayName !== token.name,
+	};
+}
+
+function indexTokens(tokens: readonly SpotToken[], issues: ParseIssue[]): Map<number, SpotToken> {
+	const byIndex = new Map<number, SpotToken>();
+	for (const token of tokens) {
+		if (byIndex.has(token.index)) {
+			issues.push({ kind: "duplicateTokenIndex", tokenIndex: token.index });
+			continue;
+		}
+		byIndex.set(token.index, token);
+	}
+	return byIndex;
+}
+
+function indexTokenNames(tokens: readonly SpotToken[]): Map<string, SpotToken> {
+	const byName = new Map<string, SpotToken>();
+	for (const token of tokens) {
+		if (!byName.has(token.name)) byName.set(token.name, token);
+	}
+	for (const token of tokens) {
+		if (!byName.has(token.displayName)) byName.set(token.displayName, token);
+	}
+	return byName;
+}
+
+function parseDexes(
+	perpDexs: PerpDexsResponse,
+	allPerpMetas: readonly MetaResponse[],
+	tokenByIndex: ReadonlyMap<number, SpotToken>,
+	issues: ParseIssue[],
+): Dex[] {
+	const dexes: Dex[] = [];
+	const slots = Math.max(perpDexs.length, allPerpMetas.length);
+	for (let index = 0; index < slots; index += 1) {
+		const meta = allPerpMetas[index];
+		const entry = perpDexs[index];
+		if (index >= perpDexs.length || !meta) {
+			issues.push({ kind: "dexMetaMissing", dexIndex: index });
+			continue;
+		}
+		const name = entry?.name ?? "";
+		if ((index === 0) !== (entry === null) || (index > 0 && name === "")) {
+			issues.push({ kind: "dexSlotMismatch", dexIndex: index, dex: entry?.name ?? null });
+			continue;
+		}
+		const collateralToken = tokenByIndex.get(meta.collateralToken);
+		if (!collateralToken) {
+			issues.push({ kind: "collateralMissing", dex: name, tokenIndex: meta.collateralToken });
+			continue;
+		}
+		dexes.push({ name, index, collateralToken });
+	}
+	return dexes;
+}
+
+function toPerpMarket(asset: SdkPerpAsset, position: number, dex: Dex, issues: ParseIssue[]): PerpLikeMarket {
+	const marginMode = normalizeMarginMode(asset, issues);
+	const isMain = dex.index === 0;
+	const shortName = isMain ? asset.name : asset.name.slice(dex.name.length + BUILDER_DEX_SEPARATOR.length);
+	const fields = {
+		name: asset.name,
+		assetId: mintAssetId(
+			isMain ? position : BUILDER_PERP_ASSET_ID_BASE + dex.index * BUILDER_PERP_SLOTS_PER_DEX + position,
+		),
+		szDecimals: asset.szDecimals,
+		ctxIndex: position,
+		quote: dex.collateralToken,
+		shortName,
+		pairName: `${shortName}${PERP_MARKET_NAME_SEPARATOR}${dex.collateralToken.displayName}`,
+		iconUrl: getIconUrlFromMarketName(asset.name, isMain ? "perp" : "builderPerp"),
+		dex,
+		maxLeverage: asset.maxLeverage,
+		marginMode,
+		crossAllowed: marginMode === undefined,
+		isDelisted: asset.isDelisted === true,
+	};
+	return isMain ? { kind: "perp", ...fields } : { kind: "builderPerp", ...fields };
+}
+
+function normalizeMarginMode(asset: SdkPerpAsset, issues: ParseIssue[]): MarginMode | undefined {
+	const mode: string | undefined = asset.marginMode;
+	if (mode === undefined) return asset.onlyIsolated === true ? "noCross" : undefined;
+	if (MARGIN_MODES.includes(mode)) return mode as MarginMode;
+	issues.push({ kind: "unknownMarginMode", coin: asset.name, marginMode: mode });
+	return "noCross";
 }

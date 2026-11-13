@@ -5,13 +5,7 @@ import { useEffect, useState } from "react";
 import { get24hChange, getOiUsd } from "@/domain/market";
 import { cn } from "@/lib/cn";
 import { formatClockDuration, formatPercent, formatUSD, shortenAddress } from "@/lib/format";
-import {
-	getExplorerTokenUrl,
-	type SpotMarketInfo,
-	type UnifiedMarketInfo,
-	useSelectedMarketInfo,
-	useSubscription,
-} from "@/lib/hyperliquid";
+import { getExplorerTokenUrl, type UnifiedMarketInfo, useSelectedMarketInfo, useSubscription } from "@/lib/hyperliquid";
 import { toBig } from "@/lib/trade/numbers";
 import { getValueColorClass } from "@/lib/ui/value-color";
 import { StatBlock } from "./chart/stat-block";
@@ -58,16 +52,14 @@ function StatDivider() {
 
 function getSpotTokenAddress(market: UnifiedMarketInfo | undefined): string | null {
 	if (market?.kind !== "spot") return null;
-	const baseToken = market.tokensInfo[0];
-	if (!baseToken) return null;
-	const tokenId = (baseToken as { tokenId?: string }).tokenId;
+	const tokenId = market.base.tokenId;
 	if (!tokenId?.startsWith("0x")) return null;
 	return tokenId;
 }
 
 function getSpotSubscriptionCoin(market: UnifiedMarketInfo | undefined): string {
 	if (market?.kind !== "spot") return "";
-	return `@${(market as SpotMarketInfo).index}`;
+	return `@${market.ctxIndex}`;
 }
 
 export function MarketOverview() {

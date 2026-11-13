@@ -1,7 +1,7 @@
 import Big from "big.js";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/app";
+import type { SpotToken } from "@/domain/market/model";
 import type { SpotMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
-import type { SpotToken } from "@/lib/hyperliquid/markets";
 import { toBig } from "@/lib/trade/numbers";
 
 interface SwapQuoteInput {
@@ -19,23 +19,9 @@ interface SwapQuote {
 export function getAvailablePairTokens(token: string, spotMarkets: SpotMarketInfo[]): SpotToken[] {
 	const tokenMap = new Map<string, SpotToken>();
 
-	for (const market of spotMarkets) {
-		if (market.tokensInfo.length < 2) continue;
-
-		const baseToken = market.tokensInfo[0];
-		const quoteToken = market.tokensInfo[1];
-
-		if (baseToken?.name === token && quoteToken) {
-			if (!tokenMap.has(quoteToken.name)) {
-				tokenMap.set(quoteToken.name, quoteToken);
-			}
-		}
-
-		if (quoteToken?.name === token && baseToken) {
-			if (!tokenMap.has(baseToken.name)) {
-				tokenMap.set(baseToken.name, baseToken);
-			}
-		}
+	for (const { base, quote } of spotMarkets) {
+		if (base.name === token && !tokenMap.has(quote.name)) tokenMap.set(quote.name, quote);
+		if (quote.name === token && !tokenMap.has(base.name)) tokenMap.set(base.name, base);
 	}
 
 	return Array.from(tokenMap.values()).sort((a, b) => {
@@ -47,10 +33,8 @@ export function getAvailablePairTokens(token: string, spotMarkets: SpotMarketInf
 
 export function findSpotPair(tokenA: string, tokenB: string, spotMarkets: SpotMarketInfo[]): SpotMarketInfo | null {
 	for (const market of spotMarkets) {
-		if (market.tokensInfo.length < 2) continue;
-
-		const baseToken = market.tokensInfo[0]?.name;
-		const quoteToken = market.tokensInfo[1]?.name;
+		const baseToken = market.base.name;
+		const quoteToken = market.quote.name;
 
 		if ((baseToken === tokenA && quoteToken === tokenB) || (baseToken === tokenB && quoteToken === tokenA)) {
 			return market;
@@ -60,8 +44,7 @@ export function findSpotPair(tokenA: string, tokenB: string, spotMarkets: SpotMa
 }
 
 export function getSwapSide(fromToken: string, spotMarket: SpotMarketInfo): boolean {
-	const baseToken = spotMarket.tokensInfo[0]?.name;
-	return fromToken !== baseToken;
+	return fromToken !== spotMarket.base.name;
 }
 
 export function getSwapQuote({ amount, markPx, szDecimals, isBuying }: SwapQuoteInput): SwapQuote {

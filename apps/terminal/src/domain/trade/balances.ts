@@ -12,17 +12,7 @@ import type { Side } from "@/lib/trade/types";
 export type { AccountAbstraction, SpotAvailableAfterMaintenance };
 
 export function getMarketQuoteToken(market: UnifiedMarketInfo | undefined): string {
-	if (!market) return DEFAULT_QUOTE_TOKEN;
-
-	if (market.kind === "spot") {
-		return market.tokensInfo?.[1]?.name ?? DEFAULT_QUOTE_TOKEN;
-	}
-
-	if (market.kind === "builderPerp") {
-		return market.quoteToken?.name ?? DEFAULT_QUOTE_TOKEN;
-	}
-
-	return DEFAULT_QUOTE_TOKEN;
+	return market?.quote.name ?? DEFAULT_QUOTE_TOKEN;
 }
 
 export interface SpotBalanceData {
@@ -110,7 +100,7 @@ export function getSpotBalanceData(
 	}
 
 	if (market.kind === "spot") {
-		const baseName = market.tokensInfo?.[0]?.name ?? "";
+		const baseName = market.base.name;
 		const baseBalance = getSpotBalance(spotBalances, baseName);
 		const quoteBalance = getSpotBalance(spotBalances, quoteName);
 
@@ -137,11 +127,11 @@ export function getSpotBalanceData(
 
 export function getAvailableBalanceToken(market: UnifiedMarketInfo | undefined, side: Side): string {
 	if (market?.kind === "spot") {
-		const token = side === "sell" ? market.tokensInfo?.[0] : market.tokensInfo?.[1];
-		return token?.displayName ?? token?.name ?? "";
+		const token = side === "sell" ? market.base : market.quote;
+		return token.displayName;
 	}
 	if (market?.kind === "builderPerp") {
-		return market.quoteToken?.displayName ?? market.quoteToken?.name ?? DEFAULT_QUOTE_TOKEN;
+		return market.quote.displayName;
 	}
 	return DEFAULT_QUOTE_TOKEN;
 }

@@ -24,10 +24,8 @@ const POINTS_USDC = vi.hoisted(() => ({
 	assetId: 10008,
 	szDecimals: 0,
 	markPx: "0.0026434",
-	tokensInfo: [
-		{ name: "POINTS", displayName: "POINTS" },
-		{ name: "USDC", displayName: "USDC" },
-	],
+	base: { name: "POINTS", displayName: "POINTS" },
+	quote: { name: "USDC", displayName: "USDC" },
 }));
 
 const SOL_PERP = vi.hoisted(() => ({
@@ -37,6 +35,9 @@ const SOL_PERP = vi.hoisted(() => ({
 	assetId: 5,
 	szDecimals: 2,
 	markPx: "80.276",
+	quote: { name: "USDC", displayName: "USDC" },
+	dex: { name: "", index: 0 },
+	crossAllowed: true,
 }));
 
 const form = vi.hoisted(() => ({

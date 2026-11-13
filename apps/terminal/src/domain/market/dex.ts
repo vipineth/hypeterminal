@@ -1,9 +1,5 @@
-import type { MarketKind } from "./types";
+import type { Market } from "./model";
 
-type MarketLike = { kind: MarketKind; dex?: string };
-
-export function getPositionDex(market: MarketLike): string | undefined {
-	if (market.kind === "builderPerp") return market.dex;
-	if (market.kind === "perp") return "";
-	return undefined;
+export function getPositionDex(market: Market): string | undefined {
+	return market.kind === "spot" ? undefined : market.dex.name;
 }

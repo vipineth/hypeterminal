@@ -76,9 +76,8 @@ function computeSubcategories(
 	if (scope === "spot") {
 		const quoteTokens = new Map<string, string>();
 		for (const market of spotMarkets) {
-			const quoteToken = market.tokensInfo[1];
-			if (quoteToken?.name && !quoteTokens.has(quoteToken.name)) {
-				quoteTokens.set(quoteToken.name, quoteToken.displayName);
+			if (!quoteTokens.has(market.quote.name)) {
+				quoteTokens.set(market.quote.name, market.quote.displayName);
 			}
 		}
 		return [
@@ -175,12 +174,11 @@ export function useTokenSelector({
 				}
 
 				if (scope === "spot" && market.kind === "spot") {
-					const quoteToken = market.tokensInfo[1]?.name;
-					return quoteToken === subcategory;
+					return market.quote.name === subcategory;
 				}
 
 				if (scope === "hip3" && market.kind === "builderPerp") {
-					return market.dex === subcategory;
+					return market.dex.name === subcategory;
 				}
 
 				return true;

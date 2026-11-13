@@ -28,38 +28,33 @@ export const marketSearchConfig: SearchConfig<UnifiedMarketInfo> = {
 		baseTokenName: {
 			extract: (m) => {
 				if (m.kind !== "spot") return null;
-				const token = m.tokensInfo[0];
-				return token ? [token.name, token.displayName].filter(Boolean) : null;
+				return [m.base.name, m.base.displayName].filter(Boolean);
 			},
 			weight: 1.0,
 		},
 		baseTokenFullName: {
 			extract: (m) => {
 				if (m.kind !== "spot") return null;
-				return m.tokensInfo[0]?.fullName ?? null;
+				return m.base.fullName ?? null;
 			},
 			weight: 1.0,
 		},
 		quoteTokenName: {
 			extract: (m) => {
-				if (m.kind === "spot") return m.tokensInfo[1]?.name ?? null;
-				if (m.kind === "builderPerp") return m.quoteToken?.name ?? null;
-				return null;
+				return m.kind === "perp" ? null : m.quote.name;
 			},
 			weight: 0.6,
 		},
 		quoteTokenFullName: {
 			extract: (m) => {
-				if (m.kind === "spot") return m.tokensInfo[1]?.fullName ?? null;
-				if (m.kind === "builderPerp") return m.quoteToken?.fullName ?? null;
-				return null;
+				return m.kind === "perp" ? null : m.quote.fullName;
 			},
 			weight: 0.6,
 		},
 		dex: {
 			extract: (m) => {
 				if (m.kind !== "builderPerp") return null;
-				return m.dex;
+				return m.dex.name;
 			},
 			weight: 0.8,
 		},

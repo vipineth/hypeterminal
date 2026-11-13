@@ -7,16 +7,6 @@ export {
 	type WebSocketTransportOptions,
 } from "@nktkas/hyperliquid";
 export { type Position, type UserPositions, useUserPositions } from "./account/use-user-positions";
-export {
-	calculateAssetId,
-	getAssetIdKind,
-	isBuilderPerpAssetId,
-	isPerpAssetId,
-	isSpotAssetId,
-	type ParsedAssetId,
-	parseAssetId,
-} from "./asset-id";
-export { getMarketCapabilities, type MarketCapabilities } from "./capabilities";
 export { createExchangeClient, getInfoClient, getSubscriptionClient, initializeClients } from "./clients";
 export { assertExchange, MissingTransportError, MissingWalletError, ProviderNotFoundError } from "./errors";
 export { getExplorerTokenUrl, getExplorerTxUrl } from "./explorer";
@@ -35,15 +25,6 @@ export { useSubscription } from "./hooks/useSubscription";
 export { useTradingGuard } from "./hooks/useTradingGuard";
 export { useHttpTransport, useSubscriptionTransport } from "./hooks/useTransport";
 export { getReconnectDelayMs, WS_RELIABILITY_LIMITS } from "./internal/websocket/reliability";
-export type {
-	BuilderPerpMarket,
-	MarketKind,
-	Markets,
-	PerpMarket,
-	SpotMarket,
-	SpotToken as MarketSpotToken,
-	UnifiedMarket,
-} from "./markets/types";
 export type { HyperliquidContextValue, HyperliquidProviderProps } from "./provider";
 export { HyperliquidProvider, useConfig, useHyperliquid, useHyperliquidOptional } from "./provider";
 export { createKey, infoKeys, serializeKey, subscriptionKeys } from "./query/keys";
@@ -114,12 +95,10 @@ export type {
 	SubMethod,
 	SubParams,
 } from "./types/clients";
-export {
-	isPerpDelisted,
-	isPerpOnlyIsolated,
-	type PerpAsset,
-	type PerpDex,
-	type SpotPair,
-	type SpotToken,
+export type {
+	PerpAsset,
+	PerpDex,
+	SpotPair,
+	SpotToken,
 } from "./types/markets";
 export { type UseUserWalletResult, useUserWallet } from "./use-user-wallet";

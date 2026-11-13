@@ -1,13 +1,8 @@
-import {
-	type BuilderPerpMarket,
-	type PerpMarket,
-	type SpotMarket,
-	useInfo,
-	useSubscription,
-} from "@hypeterminal/hl-react";
+import { useInfo, useSubscription } from "@hypeterminal/hl-react";
 import { useEffect, useMemo, useState } from "react";
 import { STORAGE_KEYS } from "@/config/app";
 import { MARKETS_STATS_TTL_MS } from "@/config/time";
+import type { BuilderPerpMarket, PerpMarket, SpotMarket } from "@/domain/market/model";
 import { loadLastMark, saveLastMark } from "@/lib/last-mark-cache";
 import { useExchangeScope } from "@/providers/exchange-scope";
 import { useSelectedMarket } from "@/stores/use-market-store";
@@ -94,6 +89,12 @@ function useSubscriptionWarmWindow(enabled: boolean, keepAliveMs: number) {
 	return isWarm;
 }
 
+function getSpotCtx(spotCtxs: SpotAssetCtxs | undefined, market: SpotMarket): SpotAssetCtx | undefined {
+	const ctx = spotCtxs?.[market.ctxIndex];
+	if (!ctx || ctx.coin === undefined || ctx.coin === market.name) return ctx;
+	return spotCtxs?.find((candidate) => candidate.coin === market.name);
+}
+
 function getDexCtxs(allDexsCtxs: AllDexsAssetCtxs | undefined, dexName: string) {
 	if (!allDexsCtxs) return undefined;
 	const dexEntry = allDexsCtxs.find((entry) => entry[0] === dexName);
@@ -143,32 +144,26 @@ export function useMarketsInfoInternal(options: UseMarketsInfoOptions = {}) {
 
 	const result = useMemo((): MarketsInfoResult => {
 		const perpCtxs = getDexCtxs(allDexsCtxs, "");
-
-		const perpMarketsInfo: PerpMarketInfo[] = markets.perp.map((market) => ({
-			...market,
-			...perpCtxs?.[market.ctxIndex],
-		}));
-
-		const spotMarketsInfo: SpotMarketInfo[] = markets.spot.map((market) => ({
-			...market,
-			...spotCtxs?.[market.ctxIndex],
-		}));
-
+		const perpMarketsInfo: PerpMarketInfo[] = [];
+		const spotMarketsInfo: SpotMarketInfo[] = [];
 		const builderPerpMarketsInfo: BuilderPerpMarketsInfo = { all: [] };
 
-		for (const market of markets.builderPerp) {
-			const dexCtxs = getDexCtxs(allDexsCtxs, market.dex);
+		for (const market of markets.listed) {
+			if (market.kind === "perp") {
+				perpMarketsInfo.push({ ...market, ...perpCtxs?.[market.ctxIndex] });
+				continue;
+			}
+			if (market.kind === "spot") {
+				spotMarketsInfo.push({ ...market, ...getSpotCtx(spotCtxs, market) });
+				continue;
+			}
 			const marketInfo: BuilderPerpMarketInfo = {
 				...market,
-				...dexCtxs?.[market.ctxIndex],
+				...getDexCtxs(allDexsCtxs, market.dex.name)?.[market.ctxIndex],
 			};
-
 			builderPerpMarketsInfo.all.push(marketInfo);
-
-			if (!builderPerpMarketsInfo[market.dex]) {
-				builderPerpMarketsInfo[market.dex] = [];
-			}
-			builderPerpMarketsInfo[market.dex].push(marketInfo);
+			builderPerpMarketsInfo[market.dex.name] ??= [];
+			builderPerpMarketsInfo[market.dex.name].push(marketInfo);
 		}
 
 		return {
@@ -177,7 +172,7 @@ export function useMarketsInfoInternal(options: UseMarketsInfoOptions = {}) {
 			builderPerpMarkets: builderPerpMarketsInfo,
 			markets: [...perpMarketsInfo, ...spotMarketsInfo, ...builderPerpMarketsInfo.all],
 		};
-	}, [markets.perp, markets.spot, markets.builderPerp, allDexsCtxs, spotCtxs]);
+	}, [markets.listed, allDexsCtxs, spotCtxs]);
 
 	const marketLookup = useMemo(() => {
 		const byName = new Map<string, UnifiedMarketInfo>();

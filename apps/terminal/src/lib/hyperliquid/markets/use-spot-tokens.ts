@@ -1,5 +1,5 @@
-import type { MarketSpotToken as SpotToken } from "@hypeterminal/hl-react";
 import { useMemo } from "react";
+import type { SpotToken } from "@/domain/market/model";
 import { useMarkets } from "./use-markets";
 
 export function useSpotTokens() {

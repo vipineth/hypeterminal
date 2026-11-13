@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { SEO_DEFAULTS } from "@/config/seo";
 import { formatPrice } from "@/lib/format";
-import { type SpotMarketInfo, useSelectedMarketInfo, useSubscription } from "@/lib/hyperliquid";
+import { useSelectedMarketInfo, useSubscription } from "@/lib/hyperliquid";
 
 function getSpotSubscriptionCoin(market: ReturnType<typeof useSelectedMarketInfo>["data"]): string {
 	if (market?.kind !== "spot") return "";
-	return `@${(market as SpotMarketInfo).index}`;
+	return `@${market.ctxIndex}`;
 }
 
 export function TabTitleSync() {

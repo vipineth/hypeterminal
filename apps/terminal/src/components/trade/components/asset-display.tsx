@@ -1,7 +1,7 @@
 import { Avatar } from "@hypeterminal/ui";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
-import type { SpotToken, UnifiedMarket } from "@/lib/hyperliquid/markets";
+import type { Market, SpotToken } from "@/lib/hyperliquid/markets";
 import { useMarkets } from "@/lib/hyperliquid/markets/use-markets";
 
 interface Props {
@@ -18,7 +18,7 @@ interface Props {
 }
 
 function resolveName(
-	market: UnifiedMarket | undefined,
+	market: Market | undefined,
 	token: SpotToken | undefined,
 	coin: string,
 	variant: "short" | "full" | undefined,
@@ -32,7 +32,7 @@ function resolveName(
 	return coin;
 }
 
-function resolveIconUrl(market: UnifiedMarket | undefined, token: SpotToken | undefined): string | undefined {
+function resolveIconUrl(market: Market | undefined, token: SpotToken | undefined): string | undefined {
 	return market?.iconUrl ?? token?.iconUrl;
 }
 

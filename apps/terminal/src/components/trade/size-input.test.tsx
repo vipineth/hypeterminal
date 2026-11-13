@@ -14,10 +14,8 @@ const PURR_USDC = vi.hoisted(() => ({
 	assetId: 10000,
 	szDecimals: 0,
 	markPx: "4.5342",
-	tokensInfo: [
-		{ name: "PURR", displayName: "PURR" },
-		{ name: "USDC", displayName: "USDC" },
-	],
+	base: { name: "PURR", displayName: "PURR" },
+	quote: { name: "USDC", displayName: "USDC" },
 }));
 
 interface SizeUnit {

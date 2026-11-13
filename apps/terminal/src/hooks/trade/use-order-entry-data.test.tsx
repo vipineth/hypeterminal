@@ -50,10 +50,8 @@ const HYPE_USDC = {
 	pairName: "HYPE/USDC",
 	assetId: 10107,
 	szDecimals: 2,
-	tokensInfo: [
-		{ name: "HYPE", displayName: "HYPE" },
-		{ name: "USDC", displayName: "USDC" },
-	],
+	base: { name: "HYPE", displayName: "HYPE" },
+	quote: { name: "USDC", displayName: "USDC" },
 } as unknown as UnifiedMarketInfo;
 
 const MARK = 100;

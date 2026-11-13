@@ -94,7 +94,8 @@ describe("trade balances", () => {
 			[usdcBalance],
 			{
 				kind: "spot",
-				tokensInfo: [{ name: "PURR" }, { name: "USDC" }],
+				base: { name: "PURR" },
+				quote: { name: "USDC" },
 			} as never,
 			maintenanceAvailable,
 		);

@@ -9,7 +9,7 @@ export const MARKET_SELECTOR_TRIGGER_CLASSNAME =
 function getMarketKindBadgeLabel(market: UnifiedMarketInfo | undefined): string {
 	if (!market) return "";
 	if (market.kind === "spot") return "Spot";
-	if (market.kind === "builderPerp") return market.dex;
+	if (market.kind === "builderPerp") return market.dex.name;
 	return "Perp";
 }
 

@@ -1,4 +1,4 @@
-import { type MarketKind, useInfo } from "@hypeterminal/hl-react";
+import { useInfo } from "@hypeterminal/hl-react";
 import { useConnection } from "wagmi";
 import {
 	ORDER_FEE_RATE_MAKER,
@@ -6,6 +6,7 @@ import {
 	ORDER_FEE_RATE_SPOT_TAKER,
 	ORDER_FEE_RATE_TAKER,
 } from "@/config/trade";
+import type { MarketKind } from "@/domain/market";
 
 interface FeeRates {
 	takerRate: number;

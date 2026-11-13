@@ -1,5 +1,6 @@
 import { getSideLabels, getSizeModeLabel, type SideLabels } from "@/config/ui-text";
 import { getBaseQuoteFromPairName } from "@/domain/market";
+import { getMarketCapabilities, type MarketCapabilities } from "@/domain/market/capabilities";
 import {
 	getAvailableBalanceToken,
 	getSpotBalanceData,
@@ -15,7 +16,6 @@ import {
 	readSizeInput,
 } from "@/domain/trade/order/size";
 import type { SpotBalance } from "@/hooks/trade/use-account-balances";
-import { getMarketCapabilities, type MarketCapabilities } from "@/lib/hyperliquid";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 import type { Side, SizeMode, SizeUnit } from "@/lib/trade/types";
 

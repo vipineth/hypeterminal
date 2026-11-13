@@ -1,24 +1,26 @@
-import { type Markets, type MarketSpotToken as SpotToken, type UnifiedMarket, useInfo } from "@hypeterminal/hl-react";
-import type { SpotMetaResponse } from "@nktkas/hyperliquid";
+import { useInfo } from "@hypeterminal/hl-react";
 import { createContext, type ReactNode, use, useMemo } from "react";
-import { type MarketModel, parseMarkets } from "@/domain/market/model";
+import { EMPTY_MODEL, type Market, type MarketModel, parseMarkets, type SpotToken } from "@/domain/market/model";
 
 const META_STALE_TIME_MS = 30 * 60 * 1_000;
 const DEXS_STALE_TIME_MS = 5 * 60 * 1_000;
 
-const EMPTY_SPOT_META: SpotMetaResponse = { universe: [], tokens: [] };
+export interface Markets extends MarketModel {
+	readonly isLoading: boolean;
+	readonly error: Error | null;
+	getMarket(coin: string): Market | undefined;
+	getToken(name: string): SpotToken | undefined;
+	getSzDecimals(coin: string): number;
+	getAssetId(coin: string): number | undefined;
+}
 
 function createMarkets(model: MarketModel, isLoading: boolean, error: Error | null): Markets {
 	return {
-		all: model.all,
-		perp: model.perp,
-		spot: model.spot,
-		builderPerp: model.builderPerp,
-		tokens: model.tokens,
+		...model,
 		isLoading,
 		error,
 
-		getMarket(coin: string): UnifiedMarket | undefined {
+		getMarket(coin: string): Market | undefined {
 			return model.byName.get(coin);
 		},
 
@@ -69,12 +71,7 @@ export function MarketsProvider({ children }: Props) {
 	const error = spotError ?? dexsError ?? allMetasError ?? null;
 
 	const model = useMemo(
-		() =>
-			parseMarkets({
-				spotMeta: spotMeta ?? EMPTY_SPOT_META,
-				perpDexs: perpDexs ?? [],
-				allPerpMetas: allPerpMetas ?? [],
-			}),
+		() => (spotMeta && perpDexs && allPerpMetas ? parseMarkets({ spotMeta, perpDexs, allPerpMetas }) : EMPTY_MODEL),
 		[spotMeta, perpDexs, allPerpMetas],
 	);
 	const markets = useMemo(() => createMarkets(model, isLoading, error), [model, isLoading, error]);

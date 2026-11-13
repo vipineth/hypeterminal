@@ -91,7 +91,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 
 	const markPx = toNumberOrZero(spotMarket?.markPx);
 	const szDecimals = spotMarket?.szDecimals ?? 2;
-	const baseToken = spotMarket?.tokensInfo[0]?.name ?? "";
+	const baseToken = spotMarket?.base.name ?? "";
 	const isBuying = spotMarket ? getSwapSide(fromToken, spotMarket) : false;
 
 	const amountValue = toNumber(amount) ?? 0;

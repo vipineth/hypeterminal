@@ -1,7 +1,3 @@
-export type {
-	MarketKind,
-	MarketSpotToken as SpotToken,
-	Markets,
-	UnifiedMarket,
-} from "@hypeterminal/hl-react";
-export { MarketsProvider, useMarkets } from "./use-markets";
+export type { MarketKind } from "@/domain/market";
+export type { Market, SpotToken } from "@/domain/market/model";
+export { type Markets, MarketsProvider, useMarkets } from "./use-markets";

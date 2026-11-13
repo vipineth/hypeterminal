@@ -1,6 +1,6 @@
-import type { MarketSpotToken as SpotToken } from "@hypeterminal/hl-react";
 import { DEFAULT_QUOTE_TOKEN, TOKEN_ICON_BASE_URL, USDC_TRANSFER_DECIMALS } from "@/config/app";
 import { ASSET_REPLACEMENTS, categoryMapping, type MarketCategory, NO_SPOT_PREFIX_ASSETS } from "@/config/tokens";
+import type { SpotToken } from "./model";
 import type { MarketKind } from "./types";
 
 interface RawToken {

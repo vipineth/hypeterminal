@@ -21,18 +21,13 @@ interface Props {
 	onToggleFavorite: (name: string) => void;
 }
 
-function getSzDecimals(market: MarketRow): number {
-	if (market.kind === "spot") return market.tokensInfo[0]?.szDecimals ?? 4;
-	return market.szDecimals;
-}
-
 function getMaxLeverage(market: MarketRow): number | null {
 	if (market.kind === "spot") return null;
-	return market.maxLeverage ?? null;
+	return market.maxLeverage;
 }
 
 function getDex(market: MarketRow): string | undefined {
-	if (market.kind === "builderPerp") return market.dex;
+	if (market.kind === "builderPerp") return market.dex.name;
 	return undefined;
 }
 
@@ -127,7 +122,7 @@ export function TokenSelectorRow({
 			</div>
 			<div className={cn("text-right", getMarketTableColumnClass("price", mobile))}>
 				<span className="font-medium tabular-nums text-xs">
-					{formatPrice(market.markPx, { szDecimals: getSzDecimals(market) })}
+					{formatPrice(market.markPx, { szDecimals: market.szDecimals })}
 				</span>
 			</div>
 			<div className={cn("text-right", getMarketTableColumnClass("24h-change", mobile))}>

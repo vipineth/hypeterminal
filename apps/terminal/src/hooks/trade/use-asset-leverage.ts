@@ -1,13 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useConnection } from "wagmi";
 import { DEFAULT_MAX_LEVERAGE } from "@/config/trade";
-import {
-	getMarketCapabilities,
-	useExchange,
-	useSelectedMarketInfo,
-	useSubscription,
-	useUserPositions,
-} from "@/lib/hyperliquid";
+import { getMarketCapabilities } from "@/domain/market/capabilities";
+import { useExchange, useSelectedMarketInfo, useSubscription, useUserPositions } from "@/lib/hyperliquid";
 import { getMarginModeFromLeverage, type MarginMode } from "@/lib/trade/margin-mode";
 import { toNumber } from "@/lib/trade/numbers";
 import { useGlobalSettingsActions, useMarginMode } from "@/stores/use-global-settings-store";
