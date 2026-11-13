@@ -34,6 +34,20 @@ const { values } = parseArgs({
 	},
 });
 
+const RATE_LIMIT_RETRIES = 5;
+
+function retryRateLimitedReads(): void {
+	const realFetch = globalThis.fetch;
+	globalThis.fetch = (async (input: Parameters<typeof fetch>[0], init?: RequestInit) => {
+		const url = input instanceof Request ? input.url : String(input);
+		for (let attempt = 0; ; attempt++) {
+			const response = await realFetch(input, init);
+			if (response.status !== 429 || !url.endsWith("/info") || attempt === RATE_LIMIT_RETRIES) return response;
+			await new Promise((resolve) => setTimeout(resolve, 1000 * 2 ** attempt));
+		}
+	}) as typeof fetch;
+}
+
 function elapsed(start: number): string {
 	return `${((performance.now() - start) / 1000).toFixed(1)}s`;
 }
@@ -68,6 +82,7 @@ function printResult({ scenario, venue, status, detail, ms }: Result): void {
 
 async function runTestnet(): Promise<number> {
 	const started = performance.now();
+	retryRateLimitedReads();
 	const h = createHarness(new HttpTransport({ isTestnet: true, timeout: 30_000 }), loadKeys());
 	const releaseLock = acquireLock(h.user);
 	try {

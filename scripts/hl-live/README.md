@@ -40,6 +40,7 @@ The agent is the one named `hl-live`. It is not the app's `HypeTerminal` agent, 
 - Orders carry a cloid that starts with `0x686c6c697665`, so you can tell them apart.
 - The leverage on the harness markets ends at 5x cross.
 - The builder pass and the abstraction scenario switch the account to `unifiedAccount` and back. Hyperliquid has no way back to `default`, so the account ends in `disabled`, which is the same standard mode. Unified moves all perp USDC into spot. The harness moves it back and keeps a note in the OS temp dir, so a killed run restores it on the next start.
+- A 429 on an `/info` read is retried with backoff up to five times. `/exchange` requests are never retried.
 - Only one run per principal at a time. A lock file in the OS temp dir stops a second run.
 - Each run costs about 5 testnet USDC in fees and spread. A PURR dust balance under one lot stays in spot.
 
