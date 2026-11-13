@@ -17,9 +17,11 @@ const POINTS_USDC = vi.hoisted(() => ({
 }));
 
 const form = vi.hoisted(() => ({
+	side: "buy",
 	orderType: "limit",
 	sizeMode: "base",
 	quoteBalance: "1000",
+	baseBalance: "0",
 	size: "10000",
 	limitPrice: "0.0026434",
 	scaleStart: "",
@@ -51,7 +53,10 @@ vi.mock("@/hooks/trade/use-fee-rates", () => ({
 
 vi.mock("@/hooks/trade/use-account-balances", () => ({
 	useDefaultDexBalances: () => ({
-		spotBalances: [{ coin: "USDC", token: 0, total: form.quoteBalance, hold: "0", entryNtl: "0" }],
+		spotBalances: [
+			{ coin: "USDC", token: 0, total: form.quoteBalance, hold: "0", entryNtl: "0" },
+			{ coin: "POINTS", token: 9, total: form.baseBalance, hold: "0", entryNtl: "0" },
+		],
 		spotAvailableAfterMaintenance: null,
 	}),
 }));
@@ -61,7 +66,7 @@ vi.mock("@/hooks/trade/use-asset-leverage", () => ({
 }));
 
 vi.mock("@/stores/use-order-entry-store", () => ({
-	useOrderSide: () => "buy",
+	useOrderSide: () => form.side,
 	useOrderType: () => form.orderType,
 	useSizeMode: () => form.sizeMode,
 	useReduceOnly: () => false,
@@ -115,9 +120,11 @@ function wireNotional(orders: { p: string; s: string }[]): number {
 
 describe("spot trade ticket", () => {
 	beforeEach(() => {
+		form.side = "buy";
 		form.orderType = "limit";
 		form.sizeMode = "base";
 		form.quoteBalance = "1000";
+		form.baseBalance = "0";
 		form.size = "10000";
 		form.limitPrice = "0.0026434";
 		form.scaleStart = "";
@@ -132,6 +139,20 @@ describe("spot trade ticket", () => {
 		expect(sentOrders()).toEqual([
 			[{ a: 10008, b: true, p: "0.0026434", s: "10000", r: false, t: { limit: { tif: "Gtc" } } }],
 		]);
+	});
+
+	it("never sends a limit buy above a typed price that a number cannot hold", async () => {
+		form.limitPrice = "0.00264339999999999999";
+		await pressSubmit();
+		expect(sentOrders()[0][0].p).toBe("0.0026433");
+	});
+
+	it("never sends a limit sell below a typed price that a number cannot hold", async () => {
+		form.side = "sell";
+		form.baseBalance = "20000";
+		form.limitPrice = "0.00264340000000000001";
+		await pressSubmit();
+		expect(sentOrders()[0][0]).toMatchObject({ b: false, p: "0.0026435", s: "10000" });
 	});
 
 	it("clears the form after it sends the order", async () => {
