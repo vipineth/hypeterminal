@@ -1,3 +1,4 @@
+import Big from "big.js";
 import { renderToString } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useTradeTicket } from "@/hooks/trade/use-trade-ticket";
@@ -17,6 +18,8 @@ const POINTS_USDC = vi.hoisted(() => ({
 
 const form = vi.hoisted(() => ({
 	orderType: "limit",
+	sizeMode: "base",
+	quoteBalance: "1000",
 	size: "10000",
 	limitPrice: "0.0026434",
 	scaleStart: "",
@@ -48,7 +51,7 @@ vi.mock("@/hooks/trade/use-fee-rates", () => ({
 
 vi.mock("@/hooks/trade/use-account-balances", () => ({
 	useDefaultDexBalances: () => ({
-		spotBalances: [{ coin: "USDC", token: 0, total: "1000", hold: "0", entryNtl: "0" }],
+		spotBalances: [{ coin: "USDC", token: 0, total: form.quoteBalance, hold: "0", entryNtl: "0" }],
 		spotAvailableAfterMaintenance: null,
 	}),
 }));
@@ -60,7 +63,7 @@ vi.mock("@/hooks/trade/use-asset-leverage", () => ({
 vi.mock("@/stores/use-order-entry-store", () => ({
 	useOrderSide: () => "buy",
 	useOrderType: () => form.orderType,
-	useSizeMode: () => "base",
+	useSizeMode: () => form.sizeMode,
 	useReduceOnly: () => false,
 	useOrderSize: () => form.size,
 	useLimitPrice: () => form.limitPrice,
@@ -106,9 +109,15 @@ function sentOrders() {
 	return exchange.placeOrder.mock.calls.map(([action]) => action.orders);
 }
 
+function wireNotional(orders: { p: string; s: string }[]): number {
+	return orders.reduce((total, order) => total.plus(Big(order.s).times(order.p)), Big(0)).toNumber();
+}
+
 describe("spot trade ticket", () => {
 	beforeEach(() => {
 		form.orderType = "limit";
+		form.sizeMode = "base";
+		form.quoteBalance = "1000";
 		form.size = "10000";
 		form.limitPrice = "0.0026434";
 		form.scaleStart = "";
@@ -138,5 +147,18 @@ describe("spot trade ticket", () => {
 		await pressSubmit();
 		expect(sentOrders()).toEqual([]);
 		expect(formActions.resetForm).not.toHaveBeenCalled();
+	});
+
+	it("keeps a 270 USDC scale buy from 20 down to 10 within the typed 270 on the wire", async () => {
+		form.orderType = "scale";
+		form.sizeMode = "quote";
+		form.size = "270";
+		form.scaleStart = "20";
+		form.scaleEnd = "10";
+		form.quoteBalance = "273";
+		await pressSubmit();
+		const [orders] = sentOrders();
+		expect(orders.map((order: { p: string }) => order.p)).toEqual(["20", "17.5", "15", "12.5", "10"]);
+		expect(wireNotional(orders)).toBeLessThanOrEqual(270);
 	});
 });
