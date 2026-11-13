@@ -89,6 +89,6 @@ A scenario is reported as `SKIP` only when testnet itself can't support it, and 
 The operator sets this up once in the repository settings.
 
 1. Generate a new principal key and a new agent key. Don't reuse a key that has ever held mainnet funds, and never use principal 1. The harness refuses such a key at runtime anyway.
-2. Fund the principal with at least 100 testnet USDC, and approve the agent as `hl-live` on testnet.
+2. Fund the principal with at least 100 testnet USDC, and approve the agent as `hl-live` on testnet. The harness principal refuses `ApproveAgent` by design, so do it once with the SDK's `approveAgent`, signed by the principal on an `HttpTransport({ isTestnet: true })`.
 3. Create the `hl-testnet` environment. Add required reviewers, and limit its deployment branches to `main`.
 4. Add `HL_LIVE_PRINCIPAL_KEY` and `HL_LIVE_AGENT_KEY` as secrets of the `hl-testnet` environment, not as repository secrets. Only a job that names the environment and passes its review can read them. Any workflow on any branch can read a repository secret.
