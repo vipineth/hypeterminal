@@ -34,7 +34,7 @@ export function TradeTicketSummary({ ticket }: Props) {
 				marginRequired={ticket.marginRequired}
 				estimatedFee={ticket.estimatedFee}
 				feeRatePercent={ticket.feeRatePercent}
-				szDecimals={market?.szDecimals}
+				priceDecimals={market?.priceDecimals}
 				marketKind={market?.kind}
 			/>
 		);
@@ -49,7 +49,7 @@ export function TradeTicketSummary({ ticket }: Props) {
 			estimatedFee={ticket.estimatedFee}
 			feeRatePercent={ticket.feeRatePercent}
 			slippagePercent={ticket.slippagePercent}
-			szDecimals={market?.szDecimals}
+			priceDecimals={market?.priceDecimals}
 			onSlippageClick={ticket.openSettingsDialog}
 			orderType={ticket.orderType}
 			marketKind={market?.kind}

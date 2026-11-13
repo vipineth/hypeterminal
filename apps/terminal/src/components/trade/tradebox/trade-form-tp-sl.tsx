@@ -4,11 +4,11 @@ import { TpSlSection } from "./tp-sl-section";
 interface Props {
 	referencePrice: number;
 	size: number;
-	szDecimals: number;
+	priceDecimals: number | undefined;
 	disabled: boolean;
 }
 
-export function TradeFormTpSl({ referencePrice, size, szDecimals, disabled }: Props) {
+export function TradeFormTpSl({ referencePrice, size, priceDecimals, disabled }: Props) {
 	const side = useOrderSide();
 	const tpPriceInput = useTpPrice();
 	const slPriceInput = useSlPrice();
@@ -19,7 +19,7 @@ export function TradeFormTpSl({ referencePrice, size, szDecimals, disabled }: Pr
 			side={side}
 			referencePrice={referencePrice}
 			size={size}
-			szDecimals={szDecimals}
+			priceDecimals={priceDecimals}
 			tpPrice={tpPriceInput}
 			slPrice={slPriceInput}
 			onTpPriceChange={setTpPrice}

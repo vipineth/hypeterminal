@@ -41,7 +41,7 @@ export function MobileMarketHeader({ market, onBack }: Props) {
 				</div>
 				<div className="shrink-0 text-right">
 					<div className="text-sm font-semibold tabular-nums leading-tight">
-						{formatPrice(market?.markPx, { szDecimals: market?.szDecimals })}
+						{formatPrice(market?.markPx, { decimals: market?.priceDecimals })}
 					</div>
 					<div
 						className={cn(

@@ -171,7 +171,7 @@ export function TradeFormFields({
 							onChange={(e) => setTriggerPrice(e.target.value)}
 							onMidClick={setTriggerPrice}
 							midPrice={markPx}
-							szDecimals={szDecimals}
+							priceDecimals={market?.priceDecimals}
 							className={cn(
 								"w-full text-xs tabular-nums",
 								usesTriggerPrice &&
@@ -193,7 +193,7 @@ export function TradeFormFields({
 							onChange={(e) => setLimitPrice(e.target.value)}
 							onMidClick={setLimitPrice}
 							midPrice={markPx}
-							szDecimals={szDecimals}
+							priceDecimals={market?.priceDecimals}
 							className={cn(
 								"w-full text-xs tabular-nums",
 								usesLimitPrice &&
@@ -277,7 +277,7 @@ export function TradeFormFields({
 				</div>
 			</div>
 
-			{scaleOrder && <TradeFormScale markPx={markPx} szDecimals={szDecimals} disabled={isFormDisabled} />}
+			{scaleOrder && <TradeFormScale markPx={markPx} priceDecimals={market?.priceDecimals} disabled={isFormDisabled} />}
 
 			{twapOrder && <TradeFormTwap disabled={isFormDisabled} />}
 
@@ -306,7 +306,12 @@ export function TradeFormFields({
 					</div>
 
 					{capabilities.hasTpSl && canUseTpSl && tpSlEnabled && (
-						<TradeFormTpSl referencePrice={price} size={sizeValue} szDecimals={szDecimals} disabled={isFormDisabled} />
+						<TradeFormTpSl
+							referencePrice={price}
+							size={sizeValue}
+							priceDecimals={market?.priceDecimals}
+							disabled={isFormDisabled}
+						/>
 					)}
 				</div>
 			)}

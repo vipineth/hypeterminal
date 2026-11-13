@@ -286,6 +286,7 @@ export function OrdersTab() {
 											key={order.oid}
 											order={order}
 											szDecimals={markets.getMarket(order.coin)?.szDecimals}
+											priceDecimals={markets.getMarket(order.coin)?.priceDecimals}
 											isSelected={validSelectedIds.has(order.oid)}
 											isCancelling={cancellingOids.has(order.oid)}
 											isEven={i % 2 === 1}
@@ -308,6 +309,7 @@ export function OrdersTab() {
 interface OrderRowProps {
 	order: OpenOrder;
 	szDecimals: number | undefined;
+	priceDecimals: number | undefined;
 	isSelected: boolean;
 	isCancelling: boolean;
 	isEven: boolean;
@@ -319,6 +321,7 @@ interface OrderRowProps {
 function OrderRow({
 	order,
 	szDecimals,
+	priceDecimals,
 	isSelected,
 	isCancelling,
 	isEven,
@@ -368,7 +371,7 @@ function OrderRow({
 			</TableCell>
 			<TableCell size="dense" className={cn(positionsPanelTableCellClass, "text-right tabular-nums text-fg")}>
 				<span className="text-xs font-semibold tabular-nums leading-tight">
-					{isMarketTriggerOrder(order) ? t`Market` : formatPrice(order.limitPx, { szDecimals })}
+					{isMarketTriggerOrder(order) ? t`Market` : formatPrice(order.limitPx, { decimals: priceDecimals })}
 				</span>
 			</TableCell>
 			<TableCell size="dense" className={cn(positionsPanelTableCellClass, "text-right text-fg")}>

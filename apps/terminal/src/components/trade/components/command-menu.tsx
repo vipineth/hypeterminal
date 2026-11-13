@@ -78,7 +78,7 @@ export function CommandMenu() {
 						<AssetDisplay coin={market.name} iconClassName="size-5" />
 						<div className="ml-auto flex items-center gap-2">
 							<span className="text-fg-muted text-xs">
-								{formatPrice(market.markPx, { szDecimals: market.szDecimals })}
+								{formatPrice(market.markPx, { decimals: market.priceDecimals })}
 							</span>
 							<span
 								className={cn(

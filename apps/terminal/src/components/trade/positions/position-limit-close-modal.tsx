@@ -9,7 +9,7 @@ import { PriceInput } from "@/components/ui/price-input";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { cn } from "@/lib/cn";
-import { formatPercent, formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
+import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
 import { useSubscription } from "@/lib/hyperliquid";
 import { isPositive, toNumber, truncateDecimals } from "@/lib/trade/numbers";
 import { getValueColorClass } from "@/lib/ui/value-color";
@@ -43,8 +43,8 @@ interface BodyProps {
 }
 
 function PositionLimitCloseModalBody({ position, onOpenChange }: BodyProps) {
-	const priceDecimalsInit = szDecimalsToPriceDecimals(position.market.szDecimals);
-	const [priceInput, setPriceInput] = useState(() => position.markPx.toFixed(priceDecimalsInit));
+	const priceDecimals = position.market.priceDecimals;
+	const [priceInput, setPriceInput] = useState(() => position.markPx.toFixed(priceDecimals));
 	const [sizeInput, setSizeInput] = useState(() => truncateDecimals(position.size, position.market.szDecimals));
 	const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -97,7 +97,6 @@ function PositionLimitCloseModalBody({ position, onOpenChange }: BodyProps) {
 		setSizeInput(truncateDecimals(position.size, position.market.szDecimals));
 	}
 
-	const priceDecimals = szDecimalsToPriceDecimals(position.market.szDecimals);
 	const visibleError = submitError;
 
 	return (
@@ -117,13 +116,13 @@ function PositionLimitCloseModalBody({ position, onOpenChange }: BodyProps) {
 					<InfoRow
 						className="p-0"
 						label={t`Entry Price`}
-						value={formatPrice(position.entryPx, { szDecimals: position.market.szDecimals })}
+						value={formatPrice(position.entryPx, { decimals: priceDecimals })}
 						valueClassName="font-medium tabular-nums"
 					/>
 					<InfoRow
 						className="p-0"
 						label={t`Mark Price`}
-						value={formatPrice(liveMarkPx, { szDecimals: position.market.szDecimals })}
+						value={formatPrice(liveMarkPx, { decimals: priceDecimals })}
 						valueClassName="font-medium tabular-nums text-warning"
 					/>
 					<InfoRow
@@ -149,7 +148,7 @@ function PositionLimitCloseModalBody({ position, onOpenChange }: BodyProps) {
 					placeholder="0.00"
 					maxAllowedDecimals={priceDecimals}
 					midPrice={liveMarkPx}
-					szDecimals={position.market.szDecimals}
+					priceDecimals={priceDecimals}
 					inputSize="sm"
 					className="w-full"
 				/>

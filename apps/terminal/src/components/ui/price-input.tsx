@@ -1,21 +1,25 @@
 import { t } from "@lingui/core/macro";
 import { CrosshairIcon } from "@phosphor-icons/react";
 import type React from "react";
-import { szDecimalsToPriceDecimals } from "@/lib/format";
 import { toFixed } from "@/lib/trade/numbers";
 import { NumberInput } from "./number-input";
 
-const PRICE_INPUT_DEFAULT_DECIMALS = 4;
+const PRICE_INPUT_DEFAULT_DECIMALS = 2;
 
 interface Props extends Omit<React.ComponentPropsWithoutRef<typeof NumberInput>, "maxLabel" | "onMaxClick"> {
 	midPrice?: number | null;
-	szDecimals?: number;
+	priceDecimals?: number;
 	onMidClick?: (formattedPrice: string) => void;
 }
 
-export function PriceInput({ midPrice, szDecimals, onMidClick, labelValue, ...props }: Props) {
+export function PriceInput({
+	midPrice,
+	priceDecimals = PRICE_INPUT_DEFAULT_DECIMALS,
+	onMidClick,
+	labelValue,
+	...props
+}: Props) {
 	const hasMid = midPrice != null && midPrice > 0 && onMidClick != null;
-	const priceDecimals = szDecimalsToPriceDecimals(szDecimals ?? PRICE_INPUT_DEFAULT_DECIMALS);
 	const formattedMid = midPrice != null && midPrice > 0 ? toFixed(midPrice, priceDecimals) : undefined;
 	const handleMidClick = hasMid && formattedMid ? () => onMidClick(formattedMid) : undefined;
 

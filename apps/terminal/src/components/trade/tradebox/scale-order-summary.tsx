@@ -12,7 +12,7 @@ interface Props {
 	marginRequired: number;
 	estimatedFee: number;
 	feeRatePercent: string;
-	szDecimals: number | undefined;
+	priceDecimals: number | undefined;
 	marketKind?: MarketKind;
 }
 
@@ -33,7 +33,7 @@ export function ScaleOrderSummary({
 	marginRequired,
 	estimatedFee,
 	feeRatePercent,
-	szDecimals,
+	priceDecimals,
 	marketKind = "perp",
 }: Props) {
 	const isLeveraged = marketKind !== "spot";
@@ -42,12 +42,16 @@ export function ScaleOrderSummary({
 		<div className="flex flex-col">
 			<SummaryRow label={t`Start Price`}>
 				<span className={scaleStart !== null && scaleStart > 0 ? "text-fg" : "text-fg-muted"}>
-					{scaleStart !== null && scaleStart > 0 ? formatPrice(scaleStart, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER}
+					{scaleStart !== null && scaleStart > 0
+						? formatPrice(scaleStart, { decimals: priceDecimals })
+						: FALLBACK_VALUE_PLACEHOLDER}
 				</span>
 			</SummaryRow>
 			<SummaryRow label={t`End Price`}>
 				<span className={scaleEnd !== null && scaleEnd > 0 ? "text-fg" : "text-fg-muted"}>
-					{scaleEnd !== null && scaleEnd > 0 ? formatPrice(scaleEnd, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER}
+					{scaleEnd !== null && scaleEnd > 0
+						? formatPrice(scaleEnd, { decimals: priceDecimals })
+						: FALLBACK_VALUE_PLACEHOLDER}
 				</span>
 			</SummaryRow>
 			<SummaryRow label={t`Number of Orders`}>

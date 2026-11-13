@@ -51,6 +51,7 @@ export function MobilePositionCard({
 	const displayName = market?.pairName ?? p.coin;
 	const perpMarket = market && isPerpLike(market) ? market : undefined;
 	const szDecimals = market?.szDecimals;
+	const priceDecimals = market?.priceDecimals;
 	const markPx = toBig(markPxRaw)?.toNumber() ?? Number.NaN;
 	const entryPx = toBig(p.entryPx)?.toNumber() ?? Number.NaN;
 	const unrealizedPnl = toBig(p.unrealizedPnl)?.toNumber() ?? Number.NaN;
@@ -154,8 +155,8 @@ export function MobilePositionCard({
 						</>
 					}
 				/>
-				<MetricCell label={t`Entry`} value={formatPrice(entryPx, { szDecimals })} />
-				<MetricCell label={t`Mark`} value={formatPrice(markPx, { szDecimals })} />
+				<MetricCell label={t`Entry`} value={formatPrice(entryPx, { decimals: priceDecimals })} />
+				<MetricCell label={t`Mark`} value={formatPrice(markPx, { decimals: priceDecimals })} />
 			</div>
 			<div className="grid grid-cols-3 divide-x divide-stroke-weak border-t border-stroke-weak">
 				<MetricCell
@@ -164,7 +165,7 @@ export function MobilePositionCard({
 				/>
 				<MetricCell
 					label={t`Liq`}
-					value={formatPrice(p.liquidationPx, { szDecimals })}
+					value={formatPrice(p.liquidationPx, { decimals: priceDecimals })}
 					valueClass={liqIsNear ? "text-error" : undefined}
 				/>
 				<MetricCell label={t`Funding`} value={fundingValue} valueClass={fundingClass} />
@@ -208,11 +209,11 @@ export function MobilePositionCard({
 							{hasTpSl ? (
 								<span className="inline-flex items-center gap-1 tabular-nums truncate">
 									{tpSlInfo?.tpPrice && (
-										<span className="text-success">{formatPrice(tpSlInfo.tpPrice, { szDecimals })}</span>
+										<span className="text-success">{formatPrice(tpSlInfo.tpPrice, { decimals: priceDecimals })}</span>
 									)}
 									{tpSlInfo?.tpPrice && tpSlInfo?.slPrice && <span className="text-fg-muted"> / </span>}
 									{tpSlInfo?.slPrice && (
-										<span className="text-error">{formatPrice(tpSlInfo.slPrice, { szDecimals })}</span>
+										<span className="text-error">{formatPrice(tpSlInfo.slPrice, { decimals: priceDecimals })}</span>
 									)}
 									<PencilIcon className="size-3 text-fg-disabled" />
 								</span>

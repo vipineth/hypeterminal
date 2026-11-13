@@ -53,6 +53,7 @@ export function PositionRow({
 	const market = markets.getMarket(p.coin);
 	const perpMarket = market && isPerpLike(market) ? market : undefined;
 	const szDecimals = market?.szDecimals;
+	const priceDecimals = market?.priceDecimals;
 	const markPx = toBig(markPxRaw)?.toNumber() ?? Number.NaN;
 	const displayName = market?.pairName ?? p.coin;
 
@@ -78,9 +79,9 @@ export function PositionRow({
 			return (
 				<>
 					<div className="flex items-center gap-1 text-2xs tabular-nums">
-						<span className="text-success/70">{formatPrice(tpSlInfo.tpPrice, { szDecimals })}</span>
+						<span className="text-success/70">{formatPrice(tpSlInfo.tpPrice, { decimals: priceDecimals })}</span>
 						<span className="text-fg-muted">/</span>
-						<span className="text-error/70">{formatPrice(tpSlInfo.slPrice, { szDecimals })}</span>
+						<span className="text-error/70">{formatPrice(tpSlInfo.slPrice, { decimals: priceDecimals })}</span>
 					</div>
 					<PencilIcon className="size-3 text-fg-muted group-hover:text-fg transition-colors" />
 				</>
@@ -91,9 +92,9 @@ export function PositionRow({
 				<>
 					<div className="flex items-center gap-1 text-2xs tabular-nums">
 						{tpSlInfo?.tpPrice ? (
-							<span className="text-success/70">{formatPrice(tpSlInfo.tpPrice, { szDecimals })}</span>
+							<span className="text-success/70">{formatPrice(tpSlInfo.tpPrice, { decimals: priceDecimals })}</span>
 						) : (
-							<span className="text-error/70">{formatPrice(tpSlInfo?.slPrice, { szDecimals })}</span>
+							<span className="text-error/70">{formatPrice(tpSlInfo?.slPrice, { decimals: priceDecimals })}</span>
 						)}
 					</div>
 					<PlusIcon className="size-3 text-fg-muted group-hover:text-fg transition-colors" />
@@ -202,13 +203,13 @@ export function PositionRow({
 				size="dense"
 				className={cn(positionsPanelTableCellClass, "text-right tabular-nums text-fg-muted whitespace-nowrap")}
 			>
-				<span className="tabular-nums">{formatPrice(p.entryPx, { szDecimals })}</span>
+				<span className="tabular-nums">{formatPrice(p.entryPx, { decimals: priceDecimals })}</span>
 			</TableCell>
 			<TableCell
 				size="dense"
 				className={cn(positionsPanelTableCellClass, "text-right tabular-nums text-fg whitespace-nowrap")}
 			>
-				<span className="text-xs font-semibold tabular-nums">{formatPrice(markPx, { szDecimals })}</span>
+				<span className="text-xs font-semibold tabular-nums">{formatPrice(markPx, { decimals: priceDecimals })}</span>
 			</TableCell>
 			<TableCell
 				size="dense"
@@ -218,8 +219,8 @@ export function PositionRow({
 					liqIsNear ? "text-error font-medium" : "text-fg-muted",
 				)}
 			>
-				<span className="block truncate" title={formatPrice(p.liquidationPx, { szDecimals })}>
-					{formatLiquidationPrice(p.liquidationPx, szDecimals)}
+				<span className="block truncate" title={formatPrice(p.liquidationPx, { decimals: priceDecimals })}>
+					{formatLiquidationPrice(p.liquidationPx, priceDecimals)}
 				</span>
 			</TableCell>
 			<TableCell

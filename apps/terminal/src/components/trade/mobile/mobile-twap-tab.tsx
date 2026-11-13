@@ -72,7 +72,8 @@ export function MobileTwapTab({ className }: Props) {
 						const totalSize = toBig(state.sz)?.toNumber() ?? Number.NaN;
 						const executedSize = toBig(state.executedSz)?.toNumber() ?? 0;
 						const avgPrice = getAvgPrice(state.executedNtl, state.executedSz);
-						const szDecimals = markets.getMarket(state.coin)?.szDecimals;
+						const twapMarket = markets.getMarket(state.coin);
+						const szDecimals = twapMarket?.szDecimals;
 						const creationTime = state.timestamp;
 						const totalMinutes = state.minutes;
 
@@ -119,7 +120,10 @@ export function MobileTwapTab({ className }: Props) {
 										value={formatNumber(executedSize, szDecimals)}
 										valueClass={isBuy ? "text-success" : "text-error"}
 									/>
-									<MetricCell label={t`Avg Price`} value={formatPrice(avgPrice, { szDecimals })} />
+									<MetricCell
+										label={t`Avg Price`}
+										value={formatPrice(avgPrice, { decimals: twapMarket?.priceDecimals })}
+									/>
 								</div>
 
 								<div className="flex items-center justify-between px-3 py-1.5">

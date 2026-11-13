@@ -9,7 +9,7 @@ import type { TpSl } from "@/domain/trade/orders";
 import { useLiveMarkPx } from "@/hooks/trade/use-live-mark-px";
 import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { cn } from "@/lib/cn";
-import { formatPercent, formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
+import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
 import { getTriggerMessage } from "@/lib/errors/definitions/tpsl";
 import { isPositive } from "@/lib/trade/numbers";
 import { checkTrigger } from "@/lib/trade/tpsl";
@@ -46,7 +46,7 @@ interface BodyProps {
 }
 
 function PositionTpSlModalBody({ position, onOpenChange }: BodyProps) {
-	const decimals = szDecimalsToPriceDecimals(position.market.szDecimals);
+	const decimals = position.market.priceDecimals;
 	const [tpPriceInput, setTpPriceInput] = useState(
 		position.existingTpPrice ? position.existingTpPrice.toFixed(decimals) : "",
 	);
@@ -119,13 +119,13 @@ function PositionTpSlModalBody({ position, onOpenChange }: BodyProps) {
 					<InfoRow
 						className="p-0"
 						label={t`Entry Price`}
-						value={formatPrice(position.entryPx, { szDecimals: position.market.szDecimals })}
+						value={formatPrice(position.entryPx, { decimals: position.market.priceDecimals })}
 						valueClassName="font-medium"
 					/>
 					<InfoRow
 						className="p-0"
 						label={t`Mark Price`}
-						value={formatPrice(markPx, { szDecimals: position.market.szDecimals })}
+						value={formatPrice(markPx, { decimals: position.market.priceDecimals })}
 						valueClassName="font-medium text-warning"
 					/>
 					<InfoRow
@@ -147,7 +147,7 @@ function PositionTpSlModalBody({ position, onOpenChange }: BodyProps) {
 					side={side}
 					referencePrice={position.entryPx}
 					size={size}
-					szDecimals={position.market.szDecimals}
+					priceDecimals={position.market.priceDecimals}
 					tpPrice={tpPriceInput}
 					slPrice={slPriceInput}
 					onTpPriceChange={setTpPriceInput}

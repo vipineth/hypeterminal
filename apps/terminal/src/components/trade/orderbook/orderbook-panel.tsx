@@ -3,7 +3,7 @@ import { t } from "@lingui/core/macro";
 import { BookBookmarkIcon, ListDashesIcon } from "@phosphor-icons/react";
 import { useDeferredValue, useMemo, useState } from "react";
 import { getBaseQuoteFromPairName, getPercent } from "@/domain/market";
-import { formatNumber, szDecimalsToPriceDecimals } from "@/lib/format";
+import { formatNumber } from "@/lib/format";
 import { useSelectedMarketInfo, useSubscription } from "@/lib/hyperliquid";
 import { toNumber } from "@/lib/trade/numbers";
 import { getMaxTotal, getPriceGroupingKey, getPriceGroupingOptions, processLevels } from "@/lib/trade/orderbook";
@@ -66,7 +66,7 @@ export function OrderbookPanel() {
 	const spreadPct = getPercent(spread, selectedMarket?.markPx);
 
 	const szDecimals = selectedMarket?.szDecimals ?? 4;
-	const priceDecimals = selectedOption?.decimals ?? szDecimalsToPriceDecimals(szDecimals);
+	const priceDecimals = selectedOption?.decimals ?? selectedMarket?.priceDecimals ?? 2;
 
 	const displayAsset = showOrderbookInQuote ? quoteToken : baseToken;
 	const toggleAssetDisplay = () => setShowOrderbookInQuote(!showOrderbookInQuote);

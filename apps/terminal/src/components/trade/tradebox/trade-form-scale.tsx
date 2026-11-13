@@ -6,11 +6,11 @@ import { useOrderEntryActions, useScaleEnd, useScaleLevels, useScaleStart } from
 
 interface Props {
 	markPx: number;
-	szDecimals: number;
+	priceDecimals: number | undefined;
 	disabled: boolean;
 }
 
-export function TradeFormScale({ markPx, szDecimals, disabled }: Props) {
+export function TradeFormScale({ markPx, priceDecimals, disabled }: Props) {
 	const scaleStartPriceInput = useScaleStart();
 	const scaleEndPriceInput = useScaleEnd();
 	const scaleLevelsNum = useScaleLevels();
@@ -25,7 +25,7 @@ export function TradeFormScale({ markPx, szDecimals, disabled }: Props) {
 				onChange={(e) => setScaleStart(e.target.value)}
 				onMidClick={setScaleStart}
 				midPrice={markPx}
-				szDecimals={szDecimals}
+				priceDecimals={priceDecimals}
 				className="w-full text-xs tabular-nums"
 				disabled={disabled}
 			/>
@@ -36,7 +36,7 @@ export function TradeFormScale({ markPx, szDecimals, disabled }: Props) {
 				onChange={(e) => setScaleEnd(e.target.value)}
 				onMidClick={setScaleEnd}
 				midPrice={markPx}
-				szDecimals={szDecimals}
+				priceDecimals={priceDecimals}
 				className="w-full text-xs tabular-nums"
 				disabled={disabled}
 			/>

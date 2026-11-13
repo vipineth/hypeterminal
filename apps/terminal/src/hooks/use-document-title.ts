@@ -33,13 +33,13 @@ export function useDocumentTitle() {
 
 	const markPx = isSpot ? spotCtxEvent?.ctx?.markPx : perpCtxEvent?.ctx?.markPx;
 	const pairName = market?.pairName;
-	const szDecimals = market?.szDecimals;
+	const priceDecimals = market?.priceDecimals;
 
 	useEffect(() => {
 		if (!markPx || !pairName) return;
-		const price = formatPrice(markPx, { szDecimals });
+		const price = formatPrice(markPx, { decimals: priceDecimals });
 		document.title = `${price} · ${pairName} | HypeTerminal`;
-	}, [markPx, pairName, szDecimals]);
+	}, [markPx, pairName, priceDecimals]);
 
 	useEffect(() => {
 		return () => {

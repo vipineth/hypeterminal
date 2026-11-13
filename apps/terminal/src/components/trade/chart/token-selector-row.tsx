@@ -122,7 +122,7 @@ export function TokenSelectorRow({
 			</div>
 			<div className={cn("text-right", getMarketTableColumnClass("price", mobile))}>
 				<span className="font-medium tabular-nums text-xs">
-					{formatPrice(market.markPx, { szDecimals: market.szDecimals })}
+					{formatPrice(market.markPx, { decimals: market.priceDecimals })}
 				</span>
 			</div>
 			<div className={cn("text-right", getMarketTableColumnClass("24h-change", mobile))}>

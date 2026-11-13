@@ -5,7 +5,7 @@ import { NumberInput } from "@/components/ui/number-input";
 import { SL_QUICK_PERCENT_OPTIONS, TP_QUICK_PERCENT_OPTIONS } from "@/config/trade";
 import { getRiskRewardRatio } from "@/domain/market";
 import { cn } from "@/lib/cn";
-import { formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
+import { formatUSD } from "@/lib/format";
 import { isPositive, toNumber } from "@/lib/trade/numbers";
 import { calculateEstimatedPnl, calculateSlPrice, calculateTpPrice, formatRiskRewardRatio } from "@/lib/trade/tpsl";
 import { PriceInputWithPercent } from "./price-input-with-percent";
@@ -14,7 +14,7 @@ interface Props {
 	side: "buy" | "sell";
 	referencePrice: number;
 	size: number;
-	szDecimals?: number;
+	priceDecimals?: number;
 	tpPrice: string;
 	slPrice: string;
 	onTpPriceChange: (value: string) => void;
@@ -29,7 +29,7 @@ export function TpSlSection({
 	side,
 	referencePrice,
 	size,
-	szDecimals,
+	priceDecimals = 2,
 	tpPrice,
 	slPrice,
 	onTpPriceChange,
@@ -60,8 +60,6 @@ export function TpSlSection({
 		if (!rrDisplay) return null;
 		return { rrDisplay, tpPnl, slPnl };
 	}, [riskRewardRatio, tpPnl, slPnl]);
-
-	const priceDecimals = szDecimalsToPriceDecimals(szDecimals ?? 4);
 
 	function handleTpPercentClick(percent: number) {
 		const price = calculateTpPrice(referencePrice, side, percent, priceDecimals);

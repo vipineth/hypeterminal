@@ -1,5 +1,10 @@
 import type { MetaResponse, PerpDexsResponse, SpotMetaResponse } from "@nktkas/hyperliquid";
-import { DEFAULT_LEVERAGE, DEFAULT_MAX_LEVERAGE } from "@/config/trade";
+import {
+	DEFAULT_LEVERAGE,
+	DEFAULT_MAX_LEVERAGE,
+	HL_PERP_PRICE_MAX_DECIMALS,
+	HL_SPOT_PRICE_MAX_DECIMALS,
+} from "@/config/trade";
 import { BUILDER_DEX_SEPARATOR, PERP_MARKET_NAME_SEPARATOR, SPOT_MARKET_NAME_SEPARATOR } from "@/domain/market/display";
 import { getIconUrlFromMarketName, getTokenDisplayName, getUnderlyingAsset } from "@/domain/market/tokens";
 
@@ -28,6 +33,7 @@ interface MarketBase {
 	name: string;
 	assetId: AssetId;
 	szDecimals: number;
+	priceDecimals: number;
 	ctxIndex: number;
 	quote: SpotToken;
 	shortName: string;
@@ -160,6 +166,7 @@ export function parseMarkets({ perpDexs, allPerpMetas, spotMeta }: MetaPayloads)
 			name: pair.name,
 			assetId: mintAssetId(SPOT_ASSET_ID_BASE + pair.index),
 			szDecimals: base.szDecimals,
+			priceDecimals: Math.max(0, HL_SPOT_PRICE_MAX_DECIMALS - base.szDecimals),
 			ctxIndex: pair.index,
 			base,
 			quote,
@@ -278,6 +285,7 @@ function toPerpMarket(asset: SdkPerpAsset, position: number, dex: Dex, issues: P
 			isMain ? position : BUILDER_PERP_ASSET_ID_BASE + dex.index * BUILDER_PERP_SLOTS_PER_DEX + position,
 		),
 		szDecimals: asset.szDecimals,
+		priceDecimals: Math.max(0, HL_PERP_PRICE_MAX_DECIMALS - asset.szDecimals),
 		ctxIndex: position,
 		quote: dex.collateralToken,
 		shortName,

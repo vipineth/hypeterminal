@@ -16,7 +16,7 @@ interface Props {
 	estimatedFee: number;
 	feeRatePercent: string;
 	slippagePercent: number;
-	szDecimals: number | undefined;
+	priceDecimals: number | undefined;
 	onSlippageClick: () => void;
 	orderType: OrderType;
 	marketKind?: MarketKind;
@@ -39,7 +39,7 @@ export function OrderSummary({
 	estimatedFee,
 	feeRatePercent,
 	slippagePercent,
-	szDecimals,
+	priceDecimals,
 	onSlippageClick,
 	orderType,
 	marketKind = "perp",
@@ -52,7 +52,7 @@ export function OrderSummary({
 			{isLeveraged && (
 				<SummaryRow label={t`Liq. Price`}>
 					<span className={cn(liqPrice ? (liqWarning ? "text-error" : "text-fg") : "text-fg-muted")}>
-						{liqPrice ? formatPrice(liqPrice, { szDecimals }) : FALLBACK_VALUE_PLACEHOLDER}
+						{liqPrice ? formatPrice(liqPrice, { decimals: priceDecimals }) : FALLBACK_VALUE_PLACEHOLDER}
 					</span>
 				</SummaryRow>
 			)}

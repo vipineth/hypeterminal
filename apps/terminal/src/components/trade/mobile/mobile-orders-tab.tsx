@@ -172,6 +172,7 @@ export function MobileOrdersTab({ className }: Props) {
 							key={order.oid}
 							order={order}
 							szDecimals={markets.getMarket(order.coin)?.szDecimals}
+							priceDecimals={markets.getMarket(order.coin)?.priceDecimals}
 							kind={markets.getMarket(order.coin)?.kind}
 							isCancelling={cancellingOids.has(order.oid)}
 							onCancel={handleCancelRow}
@@ -187,13 +188,22 @@ export function MobileOrdersTab({ className }: Props) {
 interface MobileOrderCardProps {
 	order: OpenOrder;
 	szDecimals: number | undefined;
+	priceDecimals: number | undefined;
 	kind: MarketKind | undefined;
 	isCancelling: boolean;
 	onCancel: (orders: OpenOrder[]) => void;
 	onSelectMarket: (marketName: string, side: Side) => void;
 }
 
-function MobileOrderCard({ order, szDecimals, kind, isCancelling, onCancel, onSelectMarket }: MobileOrderCardProps) {
+function MobileOrderCard({
+	order,
+	szDecimals,
+	priceDecimals,
+	kind,
+	isCancelling,
+	onCancel,
+	onSelectMarket,
+}: MobileOrderCardProps) {
 	const typeConfig = getOrderTypeConfig(order);
 	const sideLabel = getSideLabel(order.side, kind);
 	const isLong = order.side === "B";
@@ -227,7 +237,7 @@ function MobileOrderCard({ order, szDecimals, kind, isCancelling, onCancel, onSe
 			<div className="grid grid-cols-3 divide-x divide-stroke-weak">
 				<MetricCell
 					label={t`Price`}
-					value={isMarketTriggerOrder(order) ? t`Market` : formatPrice(order.limitPx, { szDecimals })}
+					value={isMarketTriggerOrder(order) ? t`Market` : formatPrice(order.limitPx, { decimals: priceDecimals })}
 				/>
 				<MetricCell
 					label={t`Size`}

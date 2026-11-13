@@ -132,46 +132,28 @@ export function formatUSD(value: string | number | null | undefined, opts?: numb
 	return getFormatter("number", getResolvedFormatLocale(), formatOptions).format(parsed.value);
 }
 
-/**
- * Calculate price decimals from szDecimals using Hyperliquid's rule.
- * Price decimals = max(0, 6 - szDecimals)
- *
- * @example szDecimalsToPriceDecimals(4) -> 2 (BTC: szDecimals=4, shows $88,140.12)
- * @example szDecimalsToPriceDecimals(3) -> 3 (ETH: szDecimals=3, shows $3,456.789)
- * @example szDecimalsToPriceDecimals(0) -> 6 (low-priced assets)
- */
-export function szDecimalsToPriceDecimals(szDecimals: number): number {
-	return Math.max(0, 6 - szDecimals);
-}
-
 export interface FormatPriceOptions extends FormatOptions {
-	/** Size decimals from market metadata - used to derive price decimals */
-	szDecimals?: number;
 	/** Remove trailing zeros (e.g., 12.00 -> 12, 12.50 -> 12.5). Defaults to true. */
 	trimZeros?: boolean;
 }
 
 /**
- * Format a price with decimal places derived from szDecimals.
- * Uses Hyperliquid's rule: priceDecimals = max(0, 6 - szDecimals)
+ * Format a price at the market's `priceDecimals`, or 2 decimals when none is given.
  *
- * @example formatPrice(88140.123, { szDecimals: 4 }) -> "$88,140.12" (BTC)
- * @example formatPrice("3456.789", { szDecimals: 3 }) -> "$3,456.789" (ETH)
- * @example formatPrice(0.00001234, { szDecimals: 0 }) -> "$0.000012" (low-priced)
+ * @example formatPrice(88140.123, { decimals: 1 }) -> "$88,140.1" (BTC perp)
+ * @example formatPrice("0.00000032", { decimals: 8 }) -> "$0.00000032" (BID spot)
  */
 export function formatPrice(value: string | number | null | undefined, opts?: FormatPriceOptions): string {
 	const parsed = parseNumberInput(value);
 	if (!isValidNumber(parsed.value)) return FALLBACK_VALUE_PLACEHOLDER;
 
-	// Derive decimals from szDecimals if provided, otherwise use explicit decimals or default to 2
-	const { decimals: decOpt, compact, szDecimals, trimZeros, ...rest } = opts ?? {};
-	const resolvedDecimals = decOpt ?? (szDecimals !== undefined ? szDecimalsToPriceDecimals(szDecimals) : 2);
+	const { decimals = 2, compact, trimZeros, ...rest } = opts ?? {};
 
 	const defaults: Intl.NumberFormatOptions = {
 		style: "currency",
 		currency: "USD",
-		minimumFractionDigits: trimZeros === false ? resolvedDecimals : 0,
-		maximumFractionDigits: resolvedDecimals,
+		minimumFractionDigits: trimZeros === false ? decimals : 0,
+		maximumFractionDigits: decimals,
 	};
 
 	const formatOptions = buildNumberFormatOptions(parsed.value, { compact, ...rest }, defaults, false);
@@ -180,17 +162,16 @@ export function formatPrice(value: string | number | null | undefined, opts?: Fo
 
 export function formatLiquidationPrice(
 	value: string | number | null | undefined,
-	szDecimals: number | undefined,
+	priceDecimals: number | undefined,
 ): string {
 	const parsed = parseNumberInput(value);
 	if (!isValidNumber(parsed.value)) return FALLBACK_VALUE_PLACEHOLDER;
 	const abs = Math.abs(parsed.value);
-	if (abs >= 1_000_000) return formatPrice(value, { szDecimals, compact: true });
-	if (abs >= 100_000 && szDecimals !== undefined) {
-		const cap = Math.min(4, szDecimalsToPriceDecimals(szDecimals));
-		return formatPrice(value, { decimals: cap });
+	if (abs >= 1_000_000) return formatPrice(value, { decimals: priceDecimals, compact: true });
+	if (abs >= 100_000 && priceDecimals !== undefined) {
+		return formatPrice(value, { decimals: Math.min(4, priceDecimals) });
 	}
-	return formatPrice(value, { szDecimals });
+	return formatPrice(value, { decimals: priceDecimals });
 }
 
 /**

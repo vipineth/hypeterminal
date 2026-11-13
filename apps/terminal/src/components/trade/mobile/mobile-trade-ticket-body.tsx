@@ -51,6 +51,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 	const isFormDisabled = !ticket.isConnected || entry.availableBalance <= 0;
 	const isSpot = entry.isSpotMarket;
 	const szDecimals = entry.szDecimals;
+	const priceDecimals = market?.priceDecimals;
 	const sideLabel = entry.sideLabels[side];
 	const isSubmitAction = buttonContent.variant === "buy" || buttonContent.variant === "sell";
 	const showTpSl = entry.capabilities.hasTpSl && canUseTpSl(orderType);
@@ -66,7 +67,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 						{sideLabel} {entry.baseToken}
 					</DrawerTitle>
 					<div className="text-2xs tabular-nums text-fg-muted">
-						{t`Mark`} {formatPrice(market?.markPx, { szDecimals })}
+						{t`Mark`} {formatPrice(market?.markPx, { decimals: priceDecimals })}
 					</div>
 				</div>
 				<SegmentedControls
@@ -88,7 +89,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 						onChange={(e) => setTriggerPrice(e.target.value)}
 						onMidClick={setTriggerPrice}
 						midPrice={ticket.markPx}
-						szDecimals={szDecimals}
+						priceDecimals={priceDecimals}
 						className={cn(
 							"w-full text-xs tabular-nums",
 							!isPositive(toNumber(triggerPriceInput)) &&
@@ -107,7 +108,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 						onChange={(e) => setLimitPrice(e.target.value)}
 						onMidClick={setLimitPrice}
 						midPrice={ticket.markPx}
-						szDecimals={szDecimals}
+						priceDecimals={priceDecimals}
 						className={cn(
 							"w-full text-xs tabular-nums",
 							!ticket.price && hasSize && "border-stroke-error-strong focus:border-stroke-error-strong",
@@ -187,7 +188,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 				</div>
 
 				{isScaleOrderType(orderType) && (
-					<TradeFormScale markPx={ticket.markPx} szDecimals={szDecimals} disabled={isFormDisabled} />
+					<TradeFormScale markPx={ticket.markPx} priceDecimals={priceDecimals} disabled={isFormDisabled} />
 				)}
 
 				{isTwapOrderType(orderType) && <TradeFormTwap disabled={isFormDisabled} />}
@@ -204,7 +205,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 										<span
 											className={cn("block text-2xs font-normal", ticket.liqWarning ? "text-warning" : "text-fg-muted")}
 										>
-											{t`Liq`} {formatPrice(ticket.liqPrice, { szDecimals })}
+											{t`Liq`} {formatPrice(ticket.liqPrice, { decimals: priceDecimals })}
 										</span>
 									)}
 								</>
@@ -232,7 +233,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 									<TradeFormTpSl
 										referencePrice={ticket.price}
 										size={entry.sizeValue}
-										szDecimals={szDecimals}
+										priceDecimals={priceDecimals}
 										disabled={isFormDisabled}
 									/>
 								</div>

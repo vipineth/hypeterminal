@@ -22,10 +22,10 @@ export function MobileMarketStats({ market }: Props) {
 	return (
 		<div className="shrink-0 overflow-x-auto border-b border-stroke-weak/60 bg-surface [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 			<div className="flex w-max items-center divide-x divide-stroke-weak/40 px-1.5 py-2">
-				<StatBlock label={t`Mark`} value={formatPrice(market?.markPx, { szDecimals: market?.szDecimals })} />
+				<StatBlock label={t`Mark`} value={formatPrice(market?.markPx, { decimals: market?.priceDecimals })} />
 				{!isSpot && (
 					<>
-						<StatBlock label={t`Oracle`} value={formatPrice(market?.oraclePx, { szDecimals: market?.szDecimals })} />
+						<StatBlock label={t`Oracle`} value={formatPrice(market?.oraclePx, { decimals: market?.priceDecimals })} />
 						<StatBlock
 							label={t`Funding / 1h`}
 							value={`${formatPercent(fundingNum, { minimumFractionDigits: 4, signDisplay: "exceptZero" })} · ${fundingCountdown}`}
