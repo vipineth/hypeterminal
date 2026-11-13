@@ -45,6 +45,7 @@ export const transferScenarios: Scenario[] = [
 		name: "usd class transfer",
 		signer: "principal",
 		scope: "account",
+		source: "sdk",
 		run: async (ctx) => {
 			const before = await spotBalance(ctx.h, "USDC");
 			await ctx.h.principal.usdClassTransfer({ amount: AMOUNT, toPerp: false });
@@ -57,18 +58,21 @@ export const transferScenarios: Scenario[] = [
 		name: "dex sendAsset",
 		signer: "principal",
 		scope: "perp",
+		source: "app",
 		run: (ctx) => roundTrip(ctx, (params) => ctx.h.principal.sendAsset(params)),
 	},
 	{
 		name: "agentSendAsset",
 		signer: "agent",
 		scope: "perp",
+		source: "sdk",
 		run: (ctx) => roundTrip(ctx, (params) => ctx.h.agent.agentSendAsset(params)),
 	},
 	{
 		name: "abstraction switch",
 		signer: "principal",
 		scope: "account",
+		source: "sdk",
 		run: async (ctx) => {
 			const before = await usdcSplit(ctx);
 			try {
@@ -86,6 +90,7 @@ export const transferScenarios: Scenario[] = [
 		name: "agentSetAbstraction",
 		signer: "agent",
 		scope: "account",
+		source: "sdk",
 		run: async (ctx) => {
 			const before = await ctx.h.info.userAbstraction({ user: ctx.h.user });
 			try {

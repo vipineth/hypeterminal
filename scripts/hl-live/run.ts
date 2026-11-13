@@ -8,7 +8,7 @@ import { acquireLock, cleanVenue, exitUnified, enterUnified, loadVenue, SPOT_DEX
 import { errorMessage, validateOrder } from "./assert";
 import { collectDrift, DRIFT_SNAPSHOT_PATH, type DriftShape, diffDrift, fetchDriftInputs, mergeDrift } from "./drift";
 import { createHarness, type Harness, loadKeys, mainnetHoldings } from "./harness";
-import { lotSize, readonlyPlans, TWAP_NOTIONAL, twapPlan } from "./plans";
+import { lotSize, readonlyPlans, slippageCapProblems, TWAP_NOTIONAL, twapPlan } from "./plans";
 import { type Scenario, type Scope, Unsupported } from "./scenarios/common";
 import { orderScenarios } from "./scenarios/orders";
 import { positionScenarios, resetLeverage } from "./scenarios/positions";
@@ -20,7 +20,7 @@ const DRIFT_SAMPLE_USER = "0x0000000000000000000000000000000000000000";
 
 const SCENARIOS: Scenario[] = [...orderScenarios, ...positionScenarios, ...transferScenarios, ...spotScenarios];
 
-type Result = { scenario: string; venue: string; status: "pass" | "fail" | "unsupported"; detail: string; ms: number };
+type Result = { scenario: string; venue: string; status: "pass" | "fail" | "unsupported"; detail: string; ms: number; source?: Scenario["source"] };
 
 const { values } = parseArgs({
 	options: {
@@ -61,6 +61,7 @@ async function runScenario(h: Harness, scenario: Scenario, spec: VenueSpec, agen
 		status,
 		detail,
 		ms: performance.now() - started,
+		source: name === scenario.name ? scenario.source : undefined,
 	});
 	if (scenario.signer === "agent" && !agentApproved) {
 		return [result("fail", `agent ${h.agentAddress} is not approved for ${h.user}, approve hl-live first`)];
@@ -81,9 +82,10 @@ async function runScenario(h: Harness, scenario: Scenario, spec: VenueSpec, agen
 	}
 }
 
-function printResult({ scenario, venue, status, detail, ms }: Result): void {
+function printResult({ scenario, venue, status, detail, ms, source }: Result): void {
 	const label = { pass: "PASS", fail: "FAIL", unsupported: "SKIP" }[status];
-	console.log(`${label} ${scenario} @ ${venue} (${(ms / 1000).toFixed(1)}s)${detail ? ` ${detail}` : ""}`);
+	const wire = source === "sdk" ? " [SDK wire only]" : "";
+	console.log(`${label} ${scenario}${wire} @ ${venue} (${(ms / 1000).toFixed(1)}s)${detail ? ` ${detail}` : ""}`);
 }
 
 async function step(results: Result[], scenario: string, venue: string, action: () => Promise<unknown>): Promise<boolean> {
@@ -209,12 +211,13 @@ async function runReadonly(): Promise<number> {
 	const blocked: string[] = [];
 	for (const market of markets) {
 		const planMarket = { ...market, markPx: market.markPx.toFixed() };
-		for (const { label, plan } of readonlyPlans(planMarket)) {
+		for (const { label, intent, plan } of readonlyPlans(planMarket)) {
 			plans += 1;
 			if (plan.errors.length > 0) {
 				blocked.push(`${market.name} ${label}: ${plan.errors.join(", ")} (mark ${planMarket.markPx})`);
 				continue;
 			}
+			for (const problem of slippageCapProblems(intent, plan)) problems.push(`${market.name} ${label}: ${problem}`);
 			for (const order of plan.orders) {
 				for (const problem of validateOrder(order, market.kind, market.szDecimals, planMarket.markPx)) {
 					problems.push(`${market.name} ${label}: ${problem}`);

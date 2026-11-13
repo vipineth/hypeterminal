@@ -1,3 +1,4 @@
+import { formatPrice } from "@nktkas/hyperliquid/utils";
 import type { LimitTif } from "@/config/trade";
 import type { MarketKind } from "@/domain/market/types";
 import { buildOrderPlan, type EntryOrderIntent, type OrderIntent, type OrderPlan } from "@/domain/trade/order-intent";
@@ -5,7 +6,7 @@ import type { EntryOrderParams } from "@/domain/trade/orders";
 import { buildTwapPlan, type TwapPlan } from "@/domain/trade/twap";
 import { toSafeBig } from "@/lib/trade/numbers";
 import type { Side } from "@/lib/trade/types";
-import { sizeForNotional } from "./assert";
+import { priceStep, priceWithin, sizeForNotional } from "./assert";
 
 export interface PlanMarket {
 	assetId: number;
@@ -18,6 +19,7 @@ export const ORDER_NOTIONAL = 15;
 export const TWAP_NOTIONAL = 120;
 export const TWAP_MINUTES = 5;
 export const SLIPPAGE_BPS = 250;
+const CAP_SLACK_BPS = 10;
 
 export function lotSize(market: PlanMarket, notional = ORDER_NOTIONAL): string {
 	return sizeForNotional(market.markPx, market.szDecimals, notional, market.kind !== "spot");
@@ -31,6 +33,10 @@ export function scaleTotal(market: PlanMarket): string {
 
 export function priceAt(market: PlanMarket, factor: number): string {
 	return toSafeBig(market.markPx).times(factor).toString();
+}
+
+export function tickPrice(market: PlanMarket, factor: number): string {
+	return formatPrice(priceAt(market, factor), market.szDecimals, market.kind === "spot" ? "spot" : "perp");
 }
 
 function entry(market: PlanMarket, params: Partial<EntryOrderParams>): EntryOrderIntent {
@@ -123,32 +129,55 @@ export function twapPlan(market: PlanMarket, side: Side, size: string): TwapPlan
 	});
 }
 
+function marketMark(intent: OrderIntent): number | null {
+	if (intent.kind === "entry") return intent.orderType === "market" ? intent.markPx : null;
+	if (intent.kind === "marketClose" || intent.kind === "reverse" || intent.kind === "swap") return intent.markPx;
+	return null;
+}
+
+export function slippageCapProblems(intent: OrderIntent, built: OrderPlan): string[] {
+	const markPx = marketMark(intent);
+	if (markPx === null) return [];
+	const kind = intent.kind === "swap" || (intent.kind === "entry" && intent.marketKind === "spot") ? "spot" : "perp";
+	return built.orders.flatMap((order) => {
+		if (!("limit" in order.t) || order.t.limit.tif !== "FrontendMarket") return [];
+		const band = toSafeBig(SLIPPAGE_BPS).div(10_000);
+		const target = toSafeBig(markPx).times(order.b ? band.plus(1) : toSafeBig(1).minus(band));
+		const step = priceStep(target, intent.szDecimals, kind);
+		if (priceWithin(order.p, target, step, CAP_SLACK_BPS)) return [];
+		return [`${order.b ? "buy" : "sell"} cap ${order.p} is not mark ${markPx} ${order.b ? "+" : "-"} ${SLIPPAGE_BPS} bps (${target.toFixed()})`];
+	});
+}
+
 export function plan(intent: OrderIntent): OrderPlan {
 	const built = buildOrderPlan(intent);
 	if (built.errors.length > 0) throw new Error(`the app refused to build the plan: ${built.errors.join(", ")}`);
+	const problems = slippageCapProblems(intent, built);
+	if (problems.length > 0) throw new Error(problems.join("; "));
 	return built;
 }
 
-export function readonlyPlans(market: PlanMarket): { label: string; plan: OrderPlan }[] {
+export function readonlyPlans(market: PlanMarket): { label: string; intent: OrderIntent; plan: OrderPlan }[] {
 	const size = lotSize(market);
-	if (market.kind === "spot") {
-		return [
-			{ label: "spot buy", plan: buildOrderPlan(intents.swap(market, true, size)) },
-			{ label: "spot sell", plan: buildOrderPlan(intents.swap(market, false, size)) },
-		];
-	}
 	const below = priceAt(market, 0.9);
 	const above = priceAt(market, 1.1);
-	return [
-		{ label: "market", plan: buildOrderPlan(intents.market(market, "buy", size)) },
-		{ label: "limit", plan: buildOrderPlan(intents.limit(market, "buy", size, below)) },
-		{ label: "post-only", plan: buildOrderPlan(intents.limit(market, "buy", size, below, "Alo")) },
-		{ label: "ioc", plan: buildOrderPlan(intents.limit(market, "sell", size, below, "Ioc")) },
-		{ label: "reduce-only", plan: buildOrderPlan(intents.market(market, "sell", size, true)) },
-		{ label: "tpsl normalTpsl", plan: buildOrderPlan(intents.marketWithTpSl(market, size, above, below)) },
-		{ label: "tpsl positionTpsl", plan: buildOrderPlan(intents.positionTpSl(market, true, above, below)) },
-		{ label: "scale", plan: buildOrderPlan(intents.scale(market, scaleTotal(market), below, priceAt(market, 0.95), SCALE_LEVELS)) },
-		{ label: "close", plan: buildOrderPlan(intents.close(market, size, true)) },
-		{ label: "reverse", plan: buildOrderPlan(intents.reverse(market, size, true)) },
-	];
+	const cases: [string, OrderIntent][] =
+		market.kind === "spot"
+			? [
+					["spot buy", intents.swap(market, true, size)],
+					["spot sell", intents.swap(market, false, size)],
+				]
+			: [
+					["market", intents.market(market, "buy", size)],
+					["limit", intents.limit(market, "buy", size, below)],
+					["post-only", intents.limit(market, "buy", size, below, "Alo")],
+					["ioc", intents.limit(market, "sell", size, below, "Ioc")],
+					["reduce-only", intents.market(market, "sell", size, true)],
+					["tpsl normalTpsl", intents.marketWithTpSl(market, size, above, below)],
+					["tpsl positionTpsl", intents.positionTpSl(market, true, above, below)],
+					["scale", intents.scale(market, scaleTotal(market), below, priceAt(market, 0.95), SCALE_LEVELS)],
+					["close", intents.close(market, size, true)],
+					["reverse", intents.reverse(market, size, true)],
+				];
+	return cases.map(([label, intent]) => ({ label, intent, plan: buildOrderPlan(intent) }));
 }

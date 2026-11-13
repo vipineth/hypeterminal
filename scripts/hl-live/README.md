@@ -40,7 +40,7 @@ Each principal has its own agent named `hl-live`. Hyperliquid binds an agent add
 ## What a run changes on the account
 
 - It trades only the harness markets: DOGE on the main dex, PURR/USDC on spot, and the builder market. It cancels every order and closes every position on those markets after each scenario and at the start of a run. Don't trade them by hand on the same principal.
-- Orders carry a cloid that starts with `0x686c6c697665`, so you can tell them apart.
+- Orders go out byte for byte as the app builds them, with no cloid. The harness finds its orders by the `oid` in each response.
 - The leverage on the harness markets ends at 5x cross.
 - The abstraction scenario, and the builder pass when it is on, switch the account to `unifiedAccount` and back. Hyperliquid has no way back to `default`, so the account ends in `disabled`, which is the same standard mode. Unified moves all perp USDC into spot. On the way out the harness keeps 30 USDC in spot and moves the rest back to perp with `sendAsset`, the call the app's transfer modal makes. It reads the live mode and balances and keeps no state on disk, so the next start restores a killed run, on CI as well as locally.
 - A run starts by closing anything left on the harness markets, then leaving unified if the account is still in it. If either fails, no scenario runs and the run reports why.
@@ -52,14 +52,27 @@ Each principal has its own agent named `hl-live`. Hyperliquid binds an agent add
 
 ## Scenarios
 
-| Scenario | Signer | Runs on |
-|---|---|---|
-| market, limit, post-only, IOC, reduce-only, scale, TWAP, cancel, cancel all, modify | agent | main dex, builder dex |
-| TP/SL with `normalTpsl` and `positionTpsl`, close, reverse, leverage update, isolated margin add and remove | agent | main dex, builder dex |
-| dex `sendAsset` (principal), `agentSendAsset` (agent) | as named | main dex (perp to spot and back), builder dex (into the dex and back) |
-| usd class transfer, abstraction switch | principal | account |
-| `agentSetAbstraction` | agent | account |
-| spot buy and sell | agent | spot |
+| Scenario | Signer | Code path | Runs on |
+|---|---|---|---|
+| market, limit, post-only, IOC, reduce-only, scale, TWAP, cancel, cancel all | agent | app | main dex, builder dex |
+| TP/SL with `normalTpsl` and `positionTpsl`, close, reverse, leverage update | agent | app | main dex, builder dex |
+| modify, isolated margin add and remove | agent | SDK wire only | main dex, builder dex |
+| dex `sendAsset` | principal | app | main dex (perp to spot and back), builder dex (into the dex and back) |
+| `agentSendAsset` | agent | SDK wire only | as dex `sendAsset` |
+| usd class transfer, abstraction switch | principal | SDK wire only | account |
+| `agentSetAbstraction` | agent | SDK wire only | account |
+| spot buy and sell | agent | app | spot |
+
+"app" means the scenario builds its request with the app's own code: `buildOrderPlan` and `buildTwapPlan` for orders, the app's `parseMarkets(...).byName.get(coin).assetId` for cancel and TWAP cancel asset ids, the transfer modal's `sendAsset` call, and `interpretOrderStatuses` to read each response. "SDK wire only" means the app never sends that action, so the scenario only proves the SDK's wire format and testnet's handling. Those lines print `[SDK wire only]`.
+
+Each check compares what Hyperliquid reports against the scenario's intent, not against the app's own output, so a builder bug can't move the expected value with it.
+
+- A limit order rests at the input price, which the scenario puts on the tick first, with the intended lot size, side and TIF.
+- Every market, close, reverse and swap order caps its price at mark plus or minus 250 bps, within one tick and 10 bps.
+- Each scale level rests at its interpolated price, within one tick.
+- An IOC that can't fill is rejected and leaves nothing open.
+- A TWAP's side, size and minutes match in `twapHistory`.
+- Each TP and SL matches a distinct open trigger by kind, side, trigger price and size.
 
 A scenario is reported as `SKIP` only when testnet itself can't support it, and the line says why. The causes measured on 2026-11-13 are listed below.
 

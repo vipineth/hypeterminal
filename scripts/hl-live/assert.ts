@@ -1,8 +1,9 @@
-import type { ClearinghouseStateResponse, FrontendOpenOrdersResponse, L2BookResponse, OrderSuccessResponse } from "@nktkas/hyperliquid";
+import type { ClearinghouseStateResponse, L2BookResponse, OrderSuccessResponse } from "@nktkas/hyperliquid";
 import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
 import type { ExchangeOrder } from "@/config/trade";
 import type Big from "big.js";
 import { type Numeric, toSafeBig } from "@/lib/trade/numbers";
+import { interpretOrderStatuses } from "@/lib/trade/extract-order-status";
 
 export type StatusKind = "resting" | "filled" | "waitingForFill" | "waitingForTrigger" | "error";
 
@@ -10,21 +11,12 @@ export type OrderStatus = OrderSuccessResponse["response"]["data"]["statuses"][n
 
 export type WireMarketKind = "perp" | "builderPerp" | "spot";
 
-export const HARNESS_CLOID_PREFIX = "0x686c6c697665";
 const MIN_ORDER_NOTIONAL = 10;
 const ROUND_UP = 3;
+const PRICE_SIG_FIGS = 5;
 
 export function errorMessage(error: unknown): string {
 	return error instanceof Error ? error.message : String(error);
-}
-
-export function newCloid(): `0x${string}` {
-	const tail = Array.from(crypto.getRandomValues(new Uint8Array(10)), (byte) => byte.toString(16).padStart(2, "0"));
-	return `${HARNESS_CLOID_PREFIX}${tail.join("")}`;
-}
-
-export function isHarnessCloid(cloid: string | null | undefined): boolean {
-	return typeof cloid === "string" && cloid.startsWith(HARNESS_CLOID_PREFIX);
 }
 
 export function statusKind(status: OrderStatus): StatusKind {
@@ -35,6 +27,8 @@ export function statusKind(status: OrderStatus): StatusKind {
 }
 
 export function expectStatuses(statuses: OrderStatus[], expected: StatusKind[]): void {
+	const verdict = interpretOrderStatuses(statuses);
+	if (!verdict.ok) throw new Error(`the app reads the response as a failure: ${verdict.error}`);
 	const actual = statuses.map(statusKind);
 	if (actual.join() !== expected.join()) {
 		throw new Error(`expected statuses [${expected.join(", ")}], got ${JSON.stringify(statuses)}`);
@@ -48,10 +42,6 @@ export function positionSize(state: ClearinghouseStateResponse, coin: string): s
 export function expectPosition(state: ClearinghouseStateResponse, coin: string, expected: Numeric): void {
 	const actual = positionSize(state, coin);
 	if (!toSafeBig(actual).eq(toSafeBig(expected))) throw new Error(`expected ${coin} position ${toSafeBig(expected).toString()}, got ${actual}`);
-}
-
-export function harnessOrders(orders: FrontendOpenOrdersResponse, coin?: string): FrontendOpenOrdersResponse {
-	return orders.filter((order) => isHarnessCloid(order.cloid) && (coin === undefined || order.coin === coin));
 }
 
 export function depthWithinSlippage(book: L2BookResponse | null, isBuy: boolean, markPx: Numeric, slippageBps: number): Big {
@@ -88,4 +78,17 @@ export function validateOrder(order: ExchangeOrder, kind: WireMarketKind, szDeci
 		if (!order.r && toSafeBig(order.s).times(toSafeBig(markPx)).lt(MIN_ORDER_NOTIONAL)) problems.push(`notional below ${MIN_ORDER_NOTIONAL}`);
 	}
 	return problems;
+}
+
+export function priceStep(price: Numeric, szDecimals: number, kind: WireMarketKind): Big {
+	const maxDecimals = Math.max((kind === "spot" ? 8 : 6) - szDecimals, 0);
+	const decimalStep = toSafeBig(10).pow(-maxDecimals);
+	const magnitude = Math.floor(Math.log10(toSafeBig(price).toNumber()));
+	const sigFigStep = toSafeBig(10).pow(Math.min(magnitude - PRICE_SIG_FIGS + 1, 0));
+	return decimalStep.gt(sigFigStep) ? decimalStep : sigFigStep;
+}
+
+export function priceWithin(actual: Numeric, target: Numeric, step: Big, slackBps = 0): boolean {
+	const slack = toSafeBig(target).times(slackBps).div(10_000);
+	return toSafeBig(actual).minus(toSafeBig(target)).abs().lte(step.plus(slack));
 }

@@ -1,8 +1,8 @@
 import { toSafeBig } from "@/lib/trade/numbers";
 import { cleanVenue, perpState, venueOrders } from "../account";
 import { expectPosition, expectStatuses } from "../assert";
-import { intents, lotSize, plan, priceAt } from "../plans";
-import { currentPosition, fresh, openLong, type Scenario, type ScenarioContext, send, type TaggedOrder } from "./common";
+import { intents, lotSize, plan, tickPrice } from "../plans";
+import { currentPosition, expectRejected, fresh, openLong, type Scenario, type ScenarioContext, send } from "./common";
 
 const HARNESS_LEVERAGE = 5;
 const MARGIN_ADD_USD = 2;
@@ -10,14 +10,30 @@ const MARGIN_REMOVE_USD = 1;
 const MICRO_USD = 1_000_000;
 const MARGIN_TOLERANCE = 0.05;
 
-async function expectTriggers(ctx: ScenarioContext, sent: TaggedOrder[], isPositionTpsl: boolean) {
-	const open = await venueOrders(ctx.h, ctx.venue);
-	for (const order of sent) {
-		if (!("trigger" in order.t)) continue;
-		const { triggerPx, tpsl } = order.t.trigger;
-		const match = open.find((entry) => entry.isTrigger && entry.reduceOnly && toSafeBig(entry.triggerPx).eq(toSafeBig(triggerPx)));
-		if (!match) throw new Error(`no open ${tpsl} trigger at ${triggerPx}, open: ${JSON.stringify(open.map((entry) => entry.triggerPx))}`);
-		if (match.isPositionTpsl !== isPositionTpsl) throw new Error(`${tpsl} trigger isPositionTpsl is ${match.isPositionTpsl}`);
+interface ExpectedTrigger {
+	kind: "tp" | "sl";
+	side: "A" | "B";
+	triggerPx: string;
+	size: string;
+}
+
+const TRIGGER_TYPES: Record<ExpectedTrigger["kind"], string> = { tp: "Take Profit Market", sl: "Stop Market" };
+
+async function expectTriggers(ctx: ScenarioContext, expected: ExpectedTrigger[], isPositionTpsl: boolean) {
+	const remaining = (await venueOrders(ctx.h, ctx.venue)).filter((order) => order.isTrigger);
+	const describe = remaining.map((order) => `${order.orderType} ${order.side} ${order.sz} at ${order.triggerPx}`);
+	for (const want of expected) {
+		const index = remaining.findIndex(
+			(order) =>
+				order.orderType === TRIGGER_TYPES[want.kind] &&
+				order.side === want.side &&
+				order.reduceOnly &&
+				order.isPositionTpsl === isPositionTpsl &&
+				toSafeBig(order.triggerPx).eq(toSafeBig(want.triggerPx)) &&
+				toSafeBig(order.sz).eq(toSafeBig(want.size)),
+		);
+		if (index < 0) throw new Error(`no open ${TRIGGER_TYPES[want.kind]} ${want.side} ${want.size} at ${want.triggerPx}, open: ${describe.join("; ")}`);
+		remaining.splice(index, 1);
 	}
 }
 
@@ -47,39 +63,57 @@ export const positionScenarios: Scenario[] = [
 		name: "tpsl normalTpsl",
 		signer: "agent",
 		scope: "perp",
+		source: "app",
 		run: async (ctx) => {
 			const venue = await fresh(ctx);
 			const size = lotSize(venue);
-			const built = plan(intents.marketWithTpSl(venue, size, priceAt(venue, 1.3), priceAt(venue, 0.7)));
+			const [tp, sl] = [tickPrice(venue, 1.3), tickPrice(venue, 0.7)];
+			const built = plan(intents.marketWithTpSl(venue, size, tp, sl));
 			if (built.grouping !== "normalTpsl") throw new Error(`expected normalTpsl grouping, got ${built.grouping}`);
-			const { statuses, orders } = await send(ctx, built);
-			expectStatuses(statuses, ["filled", "waitingForTrigger", "waitingForTrigger"]);
+			expectStatuses(await send(ctx, built), ["filled", "waitingForTrigger", "waitingForTrigger"]);
 			expectPosition(await perpState(ctx.h, venue), venue.coin, size);
-			await expectTriggers(ctx, orders, false);
+			await expectTriggers(
+				ctx,
+				[
+					{ kind: "tp", side: "A", triggerPx: tp, size },
+					{ kind: "sl", side: "A", triggerPx: sl, size },
+				],
+				false,
+			);
 		},
 	},
 	{
 		name: "tpsl positionTpsl",
 		signer: "agent",
 		scope: "perp",
+		source: "app",
 		run: async (ctx) => {
 			const { venue } = await openLong(ctx);
-			const built = plan(intents.positionTpSl(venue, true, priceAt(venue, 1.3), priceAt(venue, 0.7)));
+			const [tp, sl] = [tickPrice(venue, 1.3), tickPrice(venue, 0.7)];
+			const built = plan(intents.positionTpSl(venue, true, tp, sl));
 			if (built.grouping !== "positionTpsl") throw new Error(`expected positionTpsl grouping, got ${built.grouping}`);
-			const { statuses, orders } = await send(ctx, built);
-			expectStatuses(statuses, ["waitingForTrigger", "waitingForTrigger"]);
-			await expectTriggers(ctx, orders, true);
+			expectStatuses(await send(ctx, built), ["waitingForTrigger", "waitingForTrigger"]);
+			await expectTriggers(
+				ctx,
+				[
+					{ kind: "tp", side: "A", triggerPx: tp, size: "0" },
+					{ kind: "sl", side: "A", triggerPx: sl, size: "0" },
+				],
+				true,
+			);
 		},
 	},
 	{
 		name: "close",
 		signer: "agent",
 		scope: "perp",
+		source: "app",
 		run: async (ctx) => {
 			const { venue } = await openLong(ctx);
-			const held = await currentPosition(ctx);
-			const { statuses } = await send(ctx, plan(intents.close(venue, toSafeBig(held).abs().toFixed(), true)));
-			expectStatuses(statuses, ["filled"]);
+			const held = toSafeBig(await currentPosition(ctx)).abs().toFixed();
+			expectStatuses(await send(ctx, plan(intents.close(venue, held, true))), ["filled"]);
+			expectPosition(await perpState(ctx.h, venue), venue.coin, 0);
+			await expectRejected(() => send(ctx, plan(intents.close(venue, held, true))), /Reduce only order would increase position/);
 			expectPosition(await perpState(ctx.h, venue), venue.coin, 0);
 		},
 	},
@@ -87,10 +121,10 @@ export const positionScenarios: Scenario[] = [
 		name: "reverse",
 		signer: "agent",
 		scope: "perp",
+		source: "app",
 		run: async (ctx) => {
 			const { venue, size } = await openLong(ctx);
-			const { statuses } = await send(ctx, plan(intents.reverse(venue, size, true)));
-			expectStatuses(statuses, ["filled"]);
+			expectStatuses(await send(ctx, plan(intents.reverse(venue, size, true))), ["filled"]);
 			expectPosition(await perpState(ctx.h, venue), venue.coin, toSafeBig(size).neg());
 		},
 	},
@@ -98,6 +132,7 @@ export const positionScenarios: Scenario[] = [
 		name: "leverage update",
 		signer: "agent",
 		scope: "perp",
+		source: "app",
 		run: async (ctx) => {
 			const before = await leverage(ctx);
 			const target = before.value === 3 ? 4 : 3;
@@ -114,6 +149,7 @@ export const positionScenarios: Scenario[] = [
 		name: "isolated margin",
 		signer: "agent",
 		scope: "perp",
+		source: "sdk",
 		run: async (ctx) => {
 			await ctx.h.agent.updateLeverage({ asset: ctx.venue.assetId, isCross: false, leverage: HARNESS_LEVERAGE });
 			try {

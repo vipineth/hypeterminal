@@ -4,10 +4,9 @@ import {
 	depthWithinSlippage,
 	expectPosition,
 	expectStatuses,
-	harnessOrders,
-	isHarnessCloid,
-	newCloid,
 	positionSize,
+	priceStep,
+	priceWithin,
 	sizeForNotional,
 	validateOrder,
 } from "./assert";
@@ -23,26 +22,6 @@ function book(bid: string | null, ask: string | null): L2BookResponse {
 	return { coin: "DOGE", time: 0, levels: [bid ? level(bid) : [], ask ? level(ask) : []] } as L2BookResponse;
 }
 
-describe("cloids", () => {
-	it("tags every harness cloid with the prefix and 16 bytes", () => {
-		const cloid = newCloid();
-		expect(cloid).toMatch(/^0x[0-9a-f]{32}$/);
-		expect(isHarnessCloid(cloid)).toBe(true);
-	});
-
-	it("leaves other cloids and untagged orders alone", () => {
-		expect(isHarnessCloid(`0x${"ab".repeat(16)}`)).toBe(false);
-		expect(isHarnessCloid(null)).toBe(false);
-		const orders = [
-			{ coin: "DOGE", cloid: newCloid() },
-			{ coin: "DOGE", cloid: null },
-			{ coin: "BTC", cloid: newCloid() },
-		];
-		expect(harnessOrders(orders as never, "DOGE")).toHaveLength(1);
-		expect(harnessOrders(orders as never)).toHaveLength(2);
-	});
-});
-
 describe("expectStatuses", () => {
 	it("passes when every leg has the expected kind", () => {
 		expect(() =>
@@ -52,6 +31,12 @@ describe("expectStatuses", () => {
 
 	it("names the actual statuses when a leg differs", () => {
 		expect(() => expectStatuses([{ resting: { oid: 1 } }], ["filled"])).toThrow(/expected statuses \[filled\], got .*resting/);
+	});
+
+	it("fails on an error leg through the app's own status reading", () => {
+		expect(() => expectStatuses([{ resting: { oid: 1 } }, { error: "Insufficient margin" }] as never, ["resting", "error"])).toThrow(
+			/the app reads the response as a failure: Insufficient margin/,
+		);
 	});
 
 	it("counts a missing leg as a mismatch", () => {
@@ -123,5 +108,28 @@ describe("validateOrder", () => {
 	it("checks a trigger price", () => {
 		const trigger = { ...order, t: { trigger: { isMarket: true, triggerPx: "0.0712345", tpsl: "tp" as const } } };
 		expect(validateOrder(trigger, "perp", 0, "0.065")[0]).toMatch(/^trigger 0.0712345/);
+	});
+});
+
+describe("priceStep", () => {
+	it("is the five significant figure step when it is coarser than the decimal cap", () => {
+		expect(priceStep("0.065611", 0, "perp").toFixed()).toBe("0.000001");
+		expect(priceStep("95000", 5, "perp").toFixed()).toBe("1");
+		expect(priceStep("3456.7", 2, "perp").toFixed()).toBe("0.1");
+	});
+
+	it("is the decimal cap when that is coarser", () => {
+		expect(priceStep("0.0000123", 0, "perp").toFixed()).toBe("0.000001");
+		expect(priceStep("1.2345", 4, "spot").toFixed()).toBe("0.0001");
+	});
+});
+
+describe("priceWithin", () => {
+	it("allows one step plus the slack and no more", () => {
+		const step = priceStep("100", 2, "perp");
+		expect(priceWithin("100.01", "100", step)).toBe(true);
+		expect(priceWithin("100.02", "100", step)).toBe(false);
+		expect(priceWithin("100.1", "100", step, 10)).toBe(true);
+		expect(priceWithin("100.12", "100", step, 10)).toBe(false);
 	});
 });

@@ -12,6 +12,7 @@ export const spotScenarios: Scenario[] = [
 		name: "spot buy and sell",
 		signer: "agent",
 		scope: "spot",
+		source: "app",
 		run: async (ctx) => {
 			const venue = await fresh(ctx);
 			const base = spotBase(venue);
@@ -19,7 +20,7 @@ export const spotScenarios: Scenario[] = [
 			const baseBefore = toSafeBig(await spotBalance(ctx.h, base));
 			const size = lotSize(venue);
 
-			const [bought] = (await send(ctx, plan(intents.swap(venue, true, size)))).statuses;
+			const [bought] = await send(ctx, plan(intents.swap(venue, true, size)));
 			expectStatuses([bought], ["filled"]);
 			if (typeof bought === "object" && "filled" in bought && !toSafeBig(bought.filled.totalSz).eq(toSafeBig(size))) {
 				const depth = await liquidityWithinSlippage(ctx, true);
@@ -31,7 +32,7 @@ export const spotScenarios: Scenario[] = [
 			if (received.lte(0) || received.gt(toSafeBig(size))) throw new Error(`received ${received.toFixed()} ${base}, ordered ${size}`);
 
 			const sellSize = toSafeBig(await spotBalance(ctx.h, base)).round(venue.szDecimals, ROUND_DOWN).toFixed();
-			expectStatuses((await send(ctx, plan(intents.swap(await fresh(ctx), false, sellSize)))).statuses, ["filled"]);
+			expectStatuses(await send(ctx, plan(intents.swap(await fresh(ctx), false, sellSize))), ["filled"]);
 			const usdcDelta = toSafeBig(await spotBalance(ctx.h, "USDC")).minus(usdcBefore);
 			const baseDelta = toSafeBig(await spotBalance(ctx.h, base)).minus(baseBefore);
 			const lost = usdcDelta.plus(baseDelta.times(toSafeBig(venue.markPx))).neg();

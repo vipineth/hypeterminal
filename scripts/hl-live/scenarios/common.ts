@@ -1,12 +1,15 @@
-import type { ExchangeOrder } from "@/config/trade";
+import type { FrontendOpenOrdersResponse } from "@nktkas/hyperliquid";
+import { parseMarkets } from "@/domain/market/model";
 import type { OrderPlan } from "@/domain/trade/order-intent";
 import { toSafeBig } from "@/lib/trade/numbers";
 import { type Venue, loadVenue, perpState, venueOrders } from "../account";
-import { depthWithinSlippage, errorMessage, expectPosition, expectStatuses, newCloid, type OrderStatus, positionSize } from "../assert";
+import { depthWithinSlippage, errorMessage, expectPosition, expectStatuses, type OrderStatus, positionSize } from "../assert";
 import type { Harness } from "../harness";
 import { intents, lotSize, plan, SLIPPAGE_BPS } from "../plans";
 
 export type Scope = "perp" | "spot" | "account";
+
+type FrontendOpenOrder = FrontendOpenOrdersResponse[number];
 
 export interface ScenarioContext {
 	h: Harness;
@@ -17,12 +20,11 @@ export interface Scenario {
 	name: string;
 	signer: "agent" | "principal";
 	scope: Scope;
+	source: "app" | "sdk";
 	run(ctx: ScenarioContext): Promise<void>;
 }
 
 export class Unsupported extends Error {}
-
-export type TaggedOrder = ExchangeOrder & { c: `0x${string}` };
 
 const NO_MATCH = "could not immediately match";
 const DEX_OI_CAP = "Perp DEX open interest is at cap";
@@ -31,13 +33,12 @@ export async function fresh(ctx: ScenarioContext): Promise<Venue> {
 	return loadVenue(ctx.h.info, ctx.venue);
 }
 
-export async function send(ctx: ScenarioContext, built: OrderPlan): Promise<{ statuses: OrderStatus[]; orders: TaggedOrder[] }> {
-	const orders = built.orders.map((order) => ({ ...order, c: newCloid() }));
+export async function send(ctx: ScenarioContext, built: OrderPlan): Promise<OrderStatus[]> {
 	try {
-		const response = await ctx.h.agent.order({ orders, grouping: built.grouping });
-		return { statuses: response.response.data.statuses, orders };
+		const response = await ctx.h.agent.order({ orders: built.orders, grouping: built.grouping });
+		return response.response.data.statuses;
 	} catch (error) {
-		const [first] = orders;
+		const [first] = built.orders;
 		const message = errorMessage(error);
 		if (message.includes(DEX_OI_CAP)) throw new Unsupported(message);
 		if (message.includes(NO_MATCH) && first && (await liquidityWithinSlippage(ctx, first.b)).eq(0)) {
@@ -45,6 +46,11 @@ export async function send(ctx: ScenarioContext, built: OrderPlan): Promise<{ st
 		}
 		throw error;
 	}
+}
+
+export function restingOid(status: OrderStatus): number {
+	if (typeof status === "object" && "resting" in status) return status.resting.oid;
+	throw new Error(`expected a resting order, got ${JSON.stringify(status)}`);
 }
 
 export async function liquidityWithinSlippage(ctx: ScenarioContext, isBuy: boolean) {
@@ -55,8 +61,7 @@ export async function liquidityWithinSlippage(ctx: ScenarioContext, isBuy: boole
 export async function openLong(ctx: ScenarioContext, size?: string): Promise<{ venue: Venue; size: string }> {
 	const venue = await fresh(ctx);
 	const lot = size ?? lotSize(venue);
-	const { statuses } = await send(ctx, plan(intents.market(venue, "buy", lot)));
-	expectStatuses(statuses, ["filled"]);
+	expectStatuses(await send(ctx, plan(intents.market(venue, "buy", lot))), ["filled"]);
 	expectPosition(await perpState(ctx.h, venue), venue.coin, lot);
 	return { venue, size: lot };
 }
@@ -65,10 +70,42 @@ export async function currentPosition(ctx: ScenarioContext): Promise<string> {
 	return positionSize(await perpState(ctx.h, ctx.venue), ctx.venue.coin);
 }
 
-export async function orderByCloid(ctx: ScenarioContext, cloid: string) {
-	const order = (await venueOrders(ctx.h, ctx.venue)).find((entry) => entry.cloid === cloid);
-	if (!order) throw new Error(`order ${cloid} is not open on ${ctx.venue.coin}`);
+export async function openOrder(ctx: ScenarioContext, oid: number) {
+	const order = (await venueOrders(ctx.h, ctx.venue)).find((entry) => entry.oid === oid);
+	if (!order) throw new Error(`order ${oid} is not open on ${ctx.venue.coin}`);
 	return order;
+}
+
+export interface ExpectedOrder {
+	side: "buy" | "sell";
+	price: string;
+	size: string;
+	tif: string;
+}
+
+export function expectOrder(open: FrontendOpenOrder, expected: ExpectedOrder): void {
+	const actual = { side: open.side === "B" ? "buy" : "sell", price: open.limitPx, size: open.sz, tif: open.tif ?? "" };
+	const same =
+		actual.side === expected.side &&
+		actual.tif === expected.tif &&
+		toSafeBig(actual.price).eq(toSafeBig(expected.price)) &&
+		toSafeBig(actual.size).eq(toSafeBig(expected.size));
+	if (!same) throw new Error(`expected ${JSON.stringify(expected)}, the open order is ${JSON.stringify(actual)}`);
+}
+
+export async function appMarkets(ctx: ScenarioContext) {
+	const [spotMeta, perpDexs, allPerpMetas] = await Promise.all([ctx.h.info.spotMeta(), ctx.h.info.perpDexs(), ctx.h.info.allPerpMetas()]);
+	return parseMarkets({ spotMeta, perpDexs, allPerpMetas });
+}
+
+export async function cancelLikeTheApp(ctx: ScenarioContext, orders: { coin: string; oid: number }[]) {
+	const markets = await appMarkets(ctx);
+	const cancels = orders.map((order) => {
+		const assetId = markets.byName.get(order.coin)?.assetId;
+		if (typeof assetId !== "number") throw new Error(`the app finds no asset id for ${order.coin}, so it would skip this cancel`);
+		return { a: assetId, o: order.oid };
+	});
+	return ctx.h.agent.cancel({ cancels });
 }
 
 export function expectSame(label: string, actual: string | number, expected: string | number): void {
