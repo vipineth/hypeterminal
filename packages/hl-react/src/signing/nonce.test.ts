@@ -168,19 +168,22 @@ describe("createNonceManager", () => {
 		expect(verdicts.filter((verdict) => verdict !== "accepted")).toEqual([]);
 	});
 
-	it("never reissues a nonce when a tab takes over a lane whose holder could not save its mark", async () => {
-		vi.spyOn(Math, "random").mockReturnValue(0);
-		const origin = createOrigin(QUOTA_FULL);
-		const [closing, reopened] = [origin.openTab(), origin.openTab()];
-		const submit = createExchange();
+	it.each(Array.from({ length: ONE_STRIDE_MS }, (_, phase) => phase))(
+		"never reissues a nonce when a tab takes over a lane whose holder could not save its mark, at clock phase %i",
+		async (phase) => {
+			vi.setSystemTime(FROZEN_MS + phase);
+			vi.spyOn(Math, "random").mockReturnValue(0);
+			const origin = createOrigin(QUOTA_FULL);
+			const [closing, reopened] = [origin.openTab(), origin.openTab()];
+			const submit = createExchange();
 
-		const verdicts = [submit(await take(closing.nextNonce))];
-		closing.close();
-		vi.advanceTimersByTime(1);
-		verdicts.push(submit(await take(reopened.nextNonce)));
+			const verdicts = [submit(await take(closing.nextNonce))];
+			closing.close();
+			verdicts.push(submit(await take(reopened.nextNonce)));
 
-		expect(verdicts).toEqual(["accepted", "accepted"]);
-	});
+			expect(verdicts).toEqual(["accepted", "accepted"]);
+		},
+	);
 
 	it("never runs more than one stride ahead of the clock under sustained load", async () => {
 		const nextNonce = createOrigin().openTab().nextNonce;
