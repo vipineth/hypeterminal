@@ -167,7 +167,8 @@ function buildScaleOrders(orders: ExchangeOrder[], params: ScaleOrderParams): vo
 	const levels = clampInt(Math.round(params.scaleLevelsNum ?? SCALE_LEVELS_MIN), SCALE_LEVELS_MIN, SCALE_LEVELS_MAX);
 	const start = toSafeBig(params.scaleStartPriceInput);
 	const span = toSafeBig(params.scaleEndPriceInput).minus(start);
-	const legSizes = allocateScaleSizes(params.sizeValue, levels, params.market.szDecimals);
+	const sizesCheapestFirst = allocateScaleSizes(params.sizeValue, levels, params.market.szDecimals);
+	const legSizes = span.lt(0) ? sizesCheapestFirst.reverse() : sizesCheapestFirst;
 	const side = params.isBuy ? "buy" : "sell";
 
 	for (let i = 0; i < levels; i += 1) {
