@@ -1,12 +1,13 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { parseArgs } from "node:util";
 import { HttpTransport, InfoClient } from "@nktkas/hyperliquid";
+import { privateKeyToAccount } from "viem/accounts";
 import { listLiveMarkets, type LiveMetaSnapshot } from "@/domain/trade/live-plan-set";
 import { toSafeBig } from "@/lib/trade/numbers";
 import { acquireLock, cleanVenue, exitUnified, enterUnified, loadVenue, SPOT_DEX, spotBalance, type VenueSpec } from "./account";
 import { errorMessage, validateOrder } from "./assert";
 import { collectDrift, DRIFT_SNAPSHOT_PATH, type DriftShape, diffDrift, fetchDriftInputs, mergeDrift } from "./drift";
-import { createHarness, type Harness, loadKeys } from "./harness";
+import { createHarness, type Harness, loadKeys, mainnetHoldings } from "./harness";
 import { lotSize, readonlyPlans, TWAP_NOTIONAL, twapPlan } from "./plans";
 import { type Scenario, type Scope, Unsupported } from "./scenarios/common";
 import { orderScenarios } from "./scenarios/orders";
@@ -17,7 +18,7 @@ import { transferScenarios } from "./scenarios/transfers";
 const MIN_FUNDING_USDC = 100;
 const SPOT_FLOAT_MIN = 20;
 const SPOT_FLOAT_TARGET = 30;
-const PRINCIPAL_ADDRESS = "0x9fED7c631d8d525Ce642402C0e36A73cf5C77c1c";
+const DRIFT_SAMPLE_USER = "0x0000000000000000000000000000000000000000";
 
 const SCENARIOS: Scenario[] = [...orderScenarios, ...positionScenarios, ...transferScenarios, ...spotScenarios];
 
@@ -95,7 +96,15 @@ function printResult({ scenario, venue, status, detail, ms }: Result): void {
 async function runTestnet(): Promise<number> {
 	const started = performance.now();
 	retryRateLimitedReads();
-	const h = createHarness(new HttpTransport({ isTestnet: true, timeout: 30_000 }), loadKeys());
+	const keys = loadKeys();
+	const user = privateKeyToAccount(keys.principalKey).address;
+	const mainnet = new InfoClient({ transport: new HttpTransport({ timeout: 30_000 }) });
+	const holdings = await mainnetHoldings(mainnet, user).catch((error: unknown) => [`the mainnet read failed: ${errorMessage(error)}`]);
+	if (holdings.length > 0) {
+		console.log(`STOP principal ${user} is not a testnet-only key: ${holdings.join(", ")}. Give the harness a key that holds nothing on mainnet.`);
+		return 2;
+	}
+	const h = createHarness(new HttpTransport({ isTestnet: true, timeout: 30_000 }), keys);
 	const releaseLock = acquireLock(h.user);
 	try {
 		const perp = toSafeBig((await h.info.clearinghouseState({ user: h.user })).marginSummary.accountValue);
@@ -223,7 +232,7 @@ async function runReadonly(): Promise<number> {
 
 async function runDrift(write: boolean): Promise<number> {
 	const info = new InfoClient({ transport: new HttpTransport({ timeout: 30_000 }) });
-	const live = collectDrift(await fetchDriftInputs(info, [PRINCIPAL_ADDRESS]));
+	const live = collectDrift(await fetchDriftInputs(info, [DRIFT_SAMPLE_USER]));
 	const snapshot = JSON.parse(readFileSync(DRIFT_SNAPSHOT_PATH, "utf8")) as DriftShape;
 	if (write) {
 		writeFileSync(DRIFT_SNAPSHOT_PATH, `${JSON.stringify(mergeDrift(snapshot, live), null, "\t")}\n`);
@@ -237,11 +246,14 @@ async function runDrift(write: boolean): Promise<number> {
 }
 
 function pickMode(): Promise<number> {
+	const drift = values.drift || values["write-drift-snapshot"];
+	if ([values.testnet, values.readonly, drift].filter(Boolean).length !== 1) {
+		console.log("usage: bun scripts/hl-live/run.ts with exactly one of --testnet, --readonly, --drift, --write-drift-snapshot");
+		return Promise.resolve(2);
+	}
 	if (values.testnet) return runTestnet();
 	if (values.readonly) return runReadonly();
-	if (values.drift || values["write-drift-snapshot"]) return runDrift(values["write-drift-snapshot"]);
-	console.log("usage: bun scripts/hl-live/run.ts --testnet | --readonly | --drift | --write-drift-snapshot");
-	return Promise.resolve(2);
+	return runDrift(values["write-drift-snapshot"]);
 }
 
 process.exit(await pickMode());

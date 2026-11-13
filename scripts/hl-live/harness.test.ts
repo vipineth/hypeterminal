@@ -1,7 +1,7 @@
 import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { agentWallet, createHarness, principalWallet, SigningRefused } from "./harness";
+import { agentWallet, createHarness, loadKeys, mainnetHoldings, principalWallet, SigningRefused } from "./harness";
 
 const keys = { principalKey: generatePrivateKey(), agentKey: generatePrivateKey() };
 const principal = privateKeyToAccount(keys.principalKey);
@@ -102,5 +102,52 @@ describe("testnet transport", () => {
 			message: { source: "a", connectionId: `0x${"00".repeat(32)}` },
 		} as const;
 		expect(await failure(wallet.signTypedData(params as never))).toMatch(/agent refuses Agent with source a/);
+	});
+});
+
+describe("key selection", () => {
+	const env = (extra: Record<string, string>) => ({ HL_ENV_FILE: "/dev/null", ...extra });
+
+	it("reads the dedicated harness keys by default, never principal 1's variable", () => {
+		const live = generatePrivateKey();
+		const keys = loadKeys(env({ HL_LIVE_PRINCIPAL_KEY: live, HL_LIVE_AGENT_KEY: generatePrivateKey(), HL_TESTNET_PRINCIPAL_KEY: generatePrivateKey() }));
+		expect(keys.principalKey).toBe(live);
+		expect(() => loadKeys(env({ HL_TESTNET_PRINCIPAL_KEY: generatePrivateKey(), HL_TESTNET_AGENT_KEY: generatePrivateKey() }))).toThrow("HL_LIVE_PRINCIPAL_KEY is not set");
+	});
+
+	it("pairs a numbered principal with its own agent", () => {
+		const agentKey = generatePrivateKey();
+		const keys = loadKeys(env({ HL_PRINCIPAL: "2", HL_TESTNET_PRINCIPAL2_KEY: generatePrivateKey(), HL_TESTNET_AGENT2_KEY: agentKey, HL_TESTNET_AGENT_KEY: generatePrivateKey() }));
+		expect(keys.agentKey).toBe(agentKey);
+	});
+});
+
+describe("mainnet holdings guard", () => {
+	const empty = { marginSummary: { accountValue: "0.0" }, assetPositions: [] };
+
+	function mainnet(spot: { coin: string; total: string }[], perps: Record<string, object>) {
+		const dexes: string[] = [];
+		const info = {
+			spotClearinghouseState: async () => ({ balances: spot }),
+			perpDexs: async () => [null, { name: "xyz" }],
+			clearinghouseState: async ({ dex }: { dex: string }) => {
+				dexes.push(dex);
+				return perps[dex] ?? empty;
+			},
+		};
+		return { info: info as never, dexes };
+	}
+
+	it("passes a key that holds nothing on any mainnet dex", async () => {
+		const { info, dexes } = mainnet([{ coin: "USDC", total: "0.0" }], {});
+		expect(await mainnetHoldings(info, principal.address)).toEqual([]);
+		expect(dexes).toEqual(["", "xyz"]);
+	});
+
+	it("names spot tokens, collateral and positions on any dex", async () => {
+		const { info } = mainnet([{ coin: "HYPE", total: "0.01" }], {
+			xyz: { marginSummary: { accountValue: "3.5" }, assetPositions: [{ position: { coin: "xyz:NVDA" } }] },
+		});
+		expect(await mainnetHoldings(info, principal.address)).toEqual(["0.01 HYPE in spot", "3.5 USDC on xyz", "1 positions on xyz"]);
 	});
 });

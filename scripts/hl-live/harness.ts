@@ -6,6 +6,7 @@ import { createWalletClient, custom, type Hex, type TypedDataDomain } from "viem
 import { generatePrivateKey, type PrivateKeyAccount, privateKeyToAccount } from "viem/accounts";
 import { createL1AgentWallet } from "../../packages/hl-react/src/signing/l1-agent-wallet.ts";
 import { toHyperliquidWallet } from "../../packages/hl-react/src/wallet.ts";
+import { toSafeBig } from "@/lib/trade/numbers";
 
 const SIGNATURE_CHAIN_ID = "0x66eee";
 const KEY_PATTERN = /^0x[0-9a-fA-F]{64}$/;
@@ -75,15 +76,32 @@ function parseKey(name: string, raw: string | undefined): Hex {
 	return key;
 }
 
+function keyNames(selector: string): { principal: string; agent: string } {
+	if (selector === "") return { principal: "HL_LIVE_PRINCIPAL_KEY", agent: "HL_LIVE_AGENT_KEY" };
+	const suffix = selector === "1" ? "" : selector;
+	return { principal: `HL_TESTNET_PRINCIPAL${suffix}_KEY`, agent: `HL_TESTNET_AGENT${suffix}_KEY` };
+}
+
 export function loadKeys(env: NodeJS.ProcessEnv = process.env): HarnessKeys {
+	const selector = env.HL_PRINCIPAL ?? "";
+	if (selector === "fresh") return { principalKey: generatePrivateKey(), agentKey: generatePrivateKey() };
+	if (!PRINCIPAL_SELECTOR.test(selector)) throw new Error("HL_PRINCIPAL must be digits or fresh");
 	const file = readEnvFile(env.HL_ENV_FILE ?? mainCheckoutEnvFile());
 	const read = (name: string) => env[name] ?? file.get(name);
-	const selector = env.HL_PRINCIPAL ?? "";
-	const agentKey = parseKey("HL_TESTNET_AGENT_KEY", read("HL_TESTNET_AGENT_KEY"));
-	if (selector === "fresh") return { principalKey: generatePrivateKey(), agentKey };
-	if (!PRINCIPAL_SELECTOR.test(selector)) throw new Error("HL_PRINCIPAL must be digits or fresh");
-	const name = `HL_TESTNET_PRINCIPAL${selector === "1" ? "" : selector}_KEY`;
-	return { principalKey: parseKey(name, read(name)), agentKey };
+	const names = keyNames(selector);
+	return { principalKey: parseKey(names.principal, read(names.principal)), agentKey: parseKey(names.agent, read(names.agent)) };
+}
+
+export async function mainnetHoldings(mainnet: InfoClient, user: Hex): Promise<string[]> {
+	const [spot, dexs] = await Promise.all([mainnet.spotClearinghouseState({ user }), mainnet.perpDexs()]);
+	const holdings = spot.balances.filter((balance) => !toSafeBig(balance.total).eq(0)).map((balance) => `${balance.total} ${balance.coin} in spot`);
+	for (const dex of dexs.map((entry) => entry?.name ?? "")) {
+		const state = await mainnet.clearinghouseState({ user, dex });
+		const where = dex || "the main dex";
+		if (!toSafeBig(state.marginSummary.accountValue).eq(0)) holdings.push(`${state.marginSummary.accountValue} USDC on ${where}`);
+		if (state.assetPositions.length > 0) holdings.push(`${state.assetPositions.length} positions on ${where}`);
+	}
+	return holdings;
 }
 
 function refuseUnlessTestnetUserAction(transport: HttpTransport, typedData: TypedDataJson): void {

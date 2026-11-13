@@ -22,9 +22,11 @@ Exit code 0 means every scenario passed or was recorded as unsupported by testne
 
 ## Keys
 
-The harness reads `HL_TESTNET_PRINCIPAL_KEY` and `HL_TESTNET_AGENT_KEY` from the environment first, then from `apps/terminal/.env.local` in the main checkout. `HL_ENV_FILE` points it at another file. `HL_PRINCIPAL=2` selects `HL_TESTNET_PRINCIPAL2_KEY`. `HL_PRINCIPAL=fresh` uses a new random key, which is how you check the unfunded stop.
+The harness runs only on a testnet-only principal, a key that has never held anything on mainnet. Before it signs anything, a run reads the principal's mainnet `spotClearinghouseState` and `clearinghouseState` on every mainnet perp dex. It stops with exit 2 if any of them shows a balance or a position, or if the read fails. A key that holds mainnet funds can't run the harness.
 
-The agent is the one named `hl-live`. It is not the app's `HypeTerminal` agent, so a run never replaces the agent another session uses.
+By default the harness reads `HL_LIVE_PRINCIPAL_KEY` and `HL_LIVE_AGENT_KEY`, from the environment first, then from `apps/terminal/.env.local` in the main checkout. `HL_ENV_FILE` points it at another file. `HL_PRINCIPAL=2` selects `HL_TESTNET_PRINCIPAL2_KEY` with `HL_TESTNET_AGENT2_KEY`, and `HL_PRINCIPAL=1` selects `HL_TESTNET_PRINCIPAL_KEY` with `HL_TESTNET_AGENT_KEY`. `HL_PRINCIPAL=fresh` uses new random keys, which is how you check the unfunded stop.
+
+Each principal has its own agent named `hl-live`. Hyperliquid binds an agent address to one principal, so two principals can't share one. The `hl-live` agent is not the app's `HypeTerminal` agent, so a run never replaces the agent another session uses.
 
 ## Safety
 
@@ -66,4 +68,11 @@ A scenario is reported as `SKIP` only when testnet itself can't support it, and 
 
 ## CI
 
-`.github/workflows/hl-live.yml` runs the unit tests, `--readonly` and `scan-wire.ts` on every push. It runs `--drift` and `--testnet` nightly. The nightly job needs the `HL_TESTNET_PRINCIPAL_KEY` and `HL_TESTNET_AGENT_KEY` repository secrets.
+`.github/workflows/hl-live.yml` runs the unit tests, `--readonly` and `scan-wire.ts` on every push, with no secrets. The `testnet` job runs `--testnet` and `--drift` nightly and on manual dispatch, only from `refs/heads/main`, inside the `hl-testnet` environment. Every action is pinned by commit SHA.
+
+The operator sets this up once in the repository settings.
+
+1. Generate a new principal key and a new agent key. Don't reuse a key that has ever held mainnet funds, and never use principal 1. The harness refuses such a key at runtime anyway.
+2. Fund the principal with at least 100 testnet USDC, and approve the agent as `hl-live` on testnet.
+3. Create the `hl-testnet` environment. Add required reviewers, and limit its deployment branches to `main`.
+4. Add `HL_LIVE_PRINCIPAL_KEY` and `HL_LIVE_AGENT_KEY` as secrets of the `hl-testnet` environment, not as repository secrets. Only a job that names the environment and passes its review can read them. Any workflow on any branch can read a repository secret.
