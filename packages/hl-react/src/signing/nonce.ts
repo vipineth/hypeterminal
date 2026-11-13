@@ -14,9 +14,10 @@ export type NonceManager = (address: string) => Promise<number>;
 interface Lane {
 	residue: number;
 	highWater: HighWaterStorage | null;
+	previousHolderCeiling: number;
 }
 
-const UNCOORDINATED: Lane = { residue: SHARED_RESIDUE, highWater: null };
+const UNCOORDINATED: Lane = { residue: SHARED_RESIDUE, highWater: null, previousHolderCeiling: 0 };
 
 function browserLocks(): LaneLocks | null {
 	if (typeof window === "undefined") return null;
@@ -49,7 +50,9 @@ async function leaseLane(locks: LaneLocks | null, highWater: HighWaterStorage | 
 	try {
 		for (let i = 0; i < NONCE_LANES; i++) {
 			const residue = (start + i) % NONCE_LANES;
-			if (await holdForTabLifetime(locks, `hyperliquid-nonce-lane-${residue}`)) return { residue, highWater };
+			if (await holdForTabLifetime(locks, `hyperliquid-nonce-lane-${residue}`)) {
+				return { residue, highWater, previousHolderCeiling: Date.now() + STRIDE };
+			}
 		}
 	} catch {
 		return UNCOORDINATED;
@@ -90,9 +93,9 @@ export function createNonceManager(
 
 	async function allocate(address: string) {
 		lane ??= leaseLane(locks, storage);
-		const { residue, highWater } = await lane;
+		const { residue, highWater, previousHolderCeiling } = await lane;
 		const key = `hyperliquid-nonce-lane-${residue}:${address.toLowerCase()}`;
-		const previous = last.get(key) ?? readHighWater(highWater, key);
+		const previous = last.get(key) ?? Math.max(previousHolderCeiling, readHighWater(highWater, key));
 		const lead = previous - Date.now();
 		if (lead > 0) await waitForClockAtMostOneStride(lead);
 		const nonce = alignToLane(Math.max(Date.now(), previous + 1), residue);
