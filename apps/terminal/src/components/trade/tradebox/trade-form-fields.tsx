@@ -13,7 +13,7 @@ import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import { cn } from "@/lib/cn";
 import { formatToken } from "@/lib/format";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
-import { formatDecimalFloor, isPositive, toNumber, toNumberOrZero } from "@/lib/trade/numbers";
+import { isPositive, toNumber, toNumberOrZero, truncateDecimals } from "@/lib/trade/numbers";
 import {
 	canUseTpSl as canUseTpSlForOrder,
 	isScaleOrderType,
@@ -155,7 +155,7 @@ export function TradeFormFields({
 							</Tooltip>
 							<span className={cn("tabular-nums", getValueColorClass(positionSize))}>
 								{positionSize > 0 ? "+" : ""}
-								{formatDecimalFloor(positionSize, szDecimals)} {baseToken}
+								{truncateDecimals(positionSize, szDecimals)} {baseToken}
 							</span>
 						</div>
 					) : null}
@@ -215,7 +215,7 @@ export function TradeFormFields({
 								≈{" "}
 								{sizeMode === "base"
 									? `${formatToken(orderValue, 2)} USD`
-									: `${formatDecimalFloor(sizeValue, szDecimals)} ${baseToken}`}
+									: `${truncateDecimals(sizeValue, szDecimals)} ${baseToken}`}
 							</span>
 						) : null}
 					</div>

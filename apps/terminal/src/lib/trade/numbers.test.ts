@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clampInt, floorToDecimals, formatDecimalFloor, toNumber, toNumberOrZero } from "@/lib/trade/numbers";
+import { clampInt, floorToDecimals, toNumber, toNumberOrZero, truncateDecimals } from "@/lib/trade/numbers";
 
 describe("trade numbers", () => {
 	it("parses numbers from strings and returns null for invalid input", () => {
@@ -27,6 +27,14 @@ describe("trade numbers", () => {
 
 	it("floors decimals correctly", () => {
 		expect(floorToDecimals(1.239, 2)).toBe(1.23);
-		expect(formatDecimalFloor(1.239, 2)).toBe("1.23");
+		expect(truncateDecimals(1.239, 2)).toBe("1.23");
+	});
+
+	it("truncates to size decimals without dropping integer zeros", () => {
+		expect(truncateDecimals(100, 0)).toBe("100");
+		expect(truncateDecimals(250.9, 0)).toBe("250");
+		expect(truncateDecimals(-100, 0)).toBe("-100");
+		expect(truncateDecimals(1.2, 3)).toBe("1.2");
+		expect(truncateDecimals(0.4, 0)).toBe("0");
 	});
 });

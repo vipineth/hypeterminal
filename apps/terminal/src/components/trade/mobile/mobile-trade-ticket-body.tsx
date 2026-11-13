@@ -10,7 +10,7 @@ import { SIZE_PERCENT_OPTIONS } from "@/config/trade";
 import { useTradeTicket } from "@/hooks/trade/use-trade-ticket";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatToken, formatUSD } from "@/lib/format";
-import { formatDecimalFloor, isPositive, toNumber } from "@/lib/trade/numbers";
+import { isPositive, toNumber, truncateDecimals } from "@/lib/trade/numbers";
 import {
 	canUseTpSl,
 	getAdvancedOrderLabel,
@@ -188,7 +188,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 							≈{" "}
 							{ticket.sizeMode === "base"
 								? formatUSD(entry.orderValue)
-								: `${formatDecimalFloor(entry.sizeValue, szDecimals)} ${entry.baseToken}`}
+								: `${truncateDecimals(entry.sizeValue, szDecimals)} ${entry.baseToken}`}
 						</div>
 					)}
 				</div>

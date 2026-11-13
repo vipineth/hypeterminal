@@ -11,7 +11,7 @@ import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
 import { useSubscription } from "@/lib/hyperliquid";
-import { formatDecimalFloor, isPositive, toNumber } from "@/lib/trade/numbers";
+import { isPositive, toNumber, truncateDecimals } from "@/lib/trade/numbers";
 import { getValueColorClass } from "@/lib/ui/value-color";
 import { TradingActionButton } from "../components/trading-action-button";
 import type { LimitClosePositionData } from "./position-dialog-types";
@@ -45,7 +45,7 @@ interface BodyProps {
 function PositionLimitCloseModalBody({ position, onOpenChange }: BodyProps) {
 	const priceDecimalsInit = szDecimalsToPriceDecimals(position.szDecimals);
 	const [priceInput, setPriceInput] = useState(() => position.markPx.toFixed(priceDecimalsInit));
-	const [sizeInput, setSizeInput] = useState(() => formatDecimalFloor(position.size, position.szDecimals));
+	const [sizeInput, setSizeInput] = useState(() => truncateDecimals(position.size, position.szDecimals));
 	const [submitError, setSubmitError] = useState<string | null>(null);
 
 	const { submitPlan, isSubmitting } = useSubmitPlan();
@@ -95,7 +95,7 @@ function PositionLimitCloseModalBody({ position, onOpenChange }: BodyProps) {
 	}
 
 	function handleMaxSize() {
-		setSizeInput(formatDecimalFloor(position.size, position.szDecimals));
+		setSizeInput(truncateDecimals(position.size, position.szDecimals));
 	}
 
 	const priceDecimals = szDecimalsToPriceDecimals(position.szDecimals);

@@ -1,17 +1,20 @@
 import { t } from "@lingui/core/macro";
-import { type LimitTif, type OrderType, TWAP_MINUTES_MAX, TWAP_MINUTES_MIN } from "@/config/trade";
+import type { ExchangeOrder, LimitTif, OrderType } from "@/config/trade";
+import type { MarketKind } from "@/domain/market";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
-import { formatPriceForOrder, formatSizeForOrder, throwIfResponseError } from "@/domain/trade/orders";
+import { throwIfResponseError } from "@/domain/trade/orders";
+import { buildTwapPlan } from "@/domain/trade/twap";
 import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { useExchange } from "@/lib/hyperliquid";
-import { clampInt, isPositive } from "@/lib/trade/numbers";
+import { isPositive, truncateDecimals } from "@/lib/trade/numbers";
 import type { Side } from "@/lib/trade/types";
 import { useOrderEntryActions } from "@/stores/use-order-entry-store";
 import { useOrderQueueActions } from "@/stores/use-order-queue-store";
 
 interface SubmitMarket {
 	assetId: number;
-	szDecimals?: number;
+	szDecimals: number;
+	kind: MarketKind;
 }
 
 export interface OrderSubmitInput {
@@ -56,6 +59,10 @@ function getQueueOrderType(input: OrderSubmitInput): QueueOrderType {
 	return "market";
 }
 
+function findTriggerPrice(orders: ExchangeOrder[], tpsl: "tp" | "sl"): string | undefined {
+	return orders.find((order) => "trigger" in order.t && order.t.trigger.tpsl === tpsl)?.p;
+}
+
 export function useOrderSubmit(): UseOrderSubmitResult {
 	const { submitPlan, isSubmitting: isSubmittingOrder } = useSubmitPlan();
 	const { mutateAsync: placeTwapOrder, isPending: isSubmittingTwap } = useExchange("twapOrder");
@@ -64,106 +71,95 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 
 	const isSubmitting = isSubmittingOrder || isSubmittingTwap;
 
-	async function handleSubmit(input: OrderSubmitInput): Promise<boolean> {
-		const {
-			market,
-			baseToken,
-			side,
-			orderType,
-			sizeValue,
-			price,
-			markPx,
-			slippageBps,
-			reduceOnly,
-			tif,
-			limitPriceInput,
-			triggerPriceInput,
-			scaleStartPriceInput,
-			scaleEndPriceInput,
-			scaleLevelsNum,
-			twapMinutesNum,
-			twapRandomize,
+	async function submitTwap(input: OrderSubmitInput): Promise<boolean> {
+		const plan = buildTwapPlan({
+			assetId: input.market.assetId,
+			side: input.side,
+			sizeValue: input.sizeValue,
+			szDecimals: input.market.szDecimals,
+			reduceOnly: input.reduceOnly,
+			minutes: input.twapMinutesNum,
+			randomize: input.twapRandomize,
+		});
+
+		const orderId = addOrder({
+			market: input.baseToken,
+			side: input.side,
+			size: truncateDecimals(input.sizeValue, input.market.szDecimals),
+			orderType: "twap",
+			status: "pending",
+		});
+
+		if (!plan.action) {
+			updateOrder(orderId, { status: "failed", error: plan.errors.join("; ") });
+			return false;
+		}
+
+		try {
+			const result = await placeTwapOrder(plan.action);
+			throwIfResponseError(result.response?.data?.status);
+			updateOrder(orderId, { status: "success", outcome: "twapStarted" });
+			resetForm();
+			return true;
+		} catch (error) {
+			updateOrder(orderId, { status: "failed", error: error instanceof Error ? error.message : t`Order failed` });
+			return false;
+		}
+	}
+
+	async function submitEntry(input: OrderSubmitInput): Promise<boolean> {
+		const { market, tpSlEnabled, canUseTpSl, tpPriceNum, slPriceNum } = input;
+
+		const plan = buildOrderPlan({
+			kind: "entry",
+			assetId: market.assetId,
+			side: input.side,
+			orderType: input.orderType,
+			sizeValue: input.sizeValue,
+			szDecimals: market.szDecimals,
+			marketKind: market.kind,
+			markPx: input.markPx,
+			price: input.price,
+			slippageBps: input.slippageBps,
+			reduceOnly: input.reduceOnly,
+			tif: input.tif,
+			limitPriceInput: input.limitPriceInput,
+			triggerPriceInput: input.triggerPriceInput,
+			scaleStartPriceInput: input.scaleStartPriceInput,
+			scaleEndPriceInput: input.scaleEndPriceInput,
+			scaleLevelsNum: input.scaleLevelsNum,
 			tpSlEnabled,
 			canUseTpSl,
 			tpPriceNum,
 			slPriceNum,
-			twapOrder,
-		} = input;
-
-		const szDecimals = market.szDecimals ?? 0;
-		const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
-		const formattedPrice = formatPriceForOrder(price);
+		});
 
 		const hasTp = tpSlEnabled && canUseTpSl && isPositive(tpPriceNum);
 		const hasSl = tpSlEnabled && canUseTpSl && isPositive(slPriceNum);
 
 		const orderId = addOrder({
-			market: baseToken,
-			side,
-			size: formattedSize,
-			price: formattedPrice,
+			market: input.baseToken,
+			side: input.side,
+			size: truncateDecimals(input.sizeValue, market.szDecimals),
+			price: plan.orders[0]?.p,
 			orderType: getQueueOrderType(input),
-			tpPrice: hasTp ? formatPriceForOrder(tpPriceNum ?? 0) : undefined,
-			slPrice: hasSl ? formatPriceForOrder(slPriceNum ?? 0) : undefined,
+			tpPrice: hasTp ? findTriggerPrice(plan.orders, "tp") : undefined,
+			slPrice: hasSl ? findTriggerPrice(plan.orders, "sl") : undefined,
 			status: "pending",
 		});
 
-		try {
-			if (twapOrder) {
-				const minutes = clampInt(Math.round(twapMinutesNum ?? 0), TWAP_MINUTES_MIN, TWAP_MINUTES_MAX);
-				const result = await placeTwapOrder({
-					twap: {
-						a: market.assetId,
-						b: side === "buy",
-						s: formattedSize,
-						r: reduceOnly,
-						m: minutes,
-						t: twapRandomize,
-					},
-				});
-				throwIfResponseError(result.response?.data?.status);
-				updateOrder(orderId, { status: "success", outcome: "twapStarted" });
-				resetForm();
-				return true;
-			} else {
-				const plan = buildOrderPlan({
-					kind: "entry",
-					assetId: market.assetId,
-					side,
-					orderType,
-					sizeValue,
-					szDecimals,
-					markPx,
-					price,
-					slippageBps,
-					reduceOnly,
-					tif,
-					limitPriceInput,
-					triggerPriceInput,
-					scaleStartPriceInput,
-					scaleEndPriceInput,
-					scaleLevelsNum,
-					tpSlEnabled,
-					canUseTpSl,
-					tpPriceNum,
-					slPriceNum,
-				});
-
-				const result = await submitPlan(plan);
-
-				if (result.ok) {
-					updateOrder(orderId, { status: "success", outcome: result.outcome });
-				} else {
-					updateOrder(orderId, { status: "failed", error: result.error });
-				}
-				resetForm();
-				return result.ok;
-			}
-		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : t`Order failed`;
-			updateOrder(orderId, { status: "failed", error: errorMessage });
-			return false;
+		const result = await submitPlan(plan);
+		if (result.ok) {
+			updateOrder(orderId, { status: "success", outcome: result.outcome });
+		} else {
+			updateOrder(orderId, { status: "failed", error: result.error });
 		}
+		resetForm();
+		return result.ok;
+	}
+
+	function handleSubmit(input: OrderSubmitInput): Promise<boolean> {
+		return input.twapOrder ? submitTwap(input) : submitEntry(input);
 	}
 
 	return { handleSubmit, isSubmitting };

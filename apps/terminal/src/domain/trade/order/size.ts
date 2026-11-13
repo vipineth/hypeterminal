@@ -1,6 +1,6 @@
 import Big from "big.js";
 import type { SpotBalanceData } from "@/domain/trade/balances";
-import { floorToDecimals, formatDecimalFloor, toBig } from "@/lib/trade/numbers";
+import { floorToDecimals, toBig, truncateDecimals } from "@/lib/trade/numbers";
 import type { Side, SizeMode } from "@/lib/trade/types";
 
 interface OrderEntryMaxSizeInput {
@@ -40,7 +40,7 @@ interface SizeModeToggleInput {
 
 function formatSizeValue(value: number, decimals: number): string {
 	if (!Number.isFinite(value) || value <= 0) return "0";
-	return formatDecimalFloor(value, decimals);
+	return truncateDecimals(value, decimals);
 }
 
 export function getMaxSizeForOrderEntry(input: OrderEntryMaxSizeInput): number {

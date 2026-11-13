@@ -1,17 +1,48 @@
+import { FormatError, formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
+import Big from "big.js";
 import {
 	DEFAULT_LEVERAGE_FALLBACK,
 	type ExchangeOrder,
-	HL_PRICE_MAX_DECIMALS,
+	HL_PERP_PRICE_MAX_DECIMALS,
 	HL_PRICE_MAX_SIG_FIGS,
+	HL_SPOT_PRICE_MAX_DECIMALS,
 	type LimitTif,
+	ORDER_MIN_NOTIONAL_USD,
 	type OrderType,
 	SCALE_LEVELS_MAX,
 	SCALE_LEVELS_MIN,
 } from "@/config/trade";
+import type { MarketKind } from "@/domain/market";
 import { getExecutedPrice } from "@/domain/trade/order/price";
-import { clampInt, formatDecimalFloor, isPositive, toBig, toSafeBig } from "@/lib/trade/numbers";
+import { clampInt, isPositive, type Numeric, toBig, toSafeBig } from "@/lib/trade/numbers";
 import { isScaleOrderType, isStopOrderType, isTriggerOrderType, usesLimitPrice } from "@/lib/trade/order-types";
 import type { Side } from "@/lib/trade/types";
+
+export const ORDER_PLAN_ERRORS = {
+	invalidPrice: "Order price is not a valid tick for this market",
+	invalidSize: "Order size is below one lot",
+	belowMinNotional: "Each order must be worth at least 10",
+	twapNotSupported: "TWAP orders are built by the TWAP builder",
+	noTpSl: "No TP/SL provided",
+} as const;
+
+export type OrderPlanError = (typeof ORDER_PLAN_ERRORS)[keyof typeof ORDER_PLAN_ERRORS];
+
+export class OrderBuildError extends Error {
+	readonly reason: OrderPlanError;
+
+	constructor(reason: OrderPlanError) {
+		super(reason);
+		this.reason = reason;
+	}
+}
+
+export interface WireMarket {
+	szDecimals: number;
+	kind: MarketKind;
+}
+
+export type PriceRounding = "passive" | "aggressive";
 
 export interface EntryOrderParams {
 	assetId: number;
@@ -19,6 +50,7 @@ export interface EntryOrderParams {
 	orderType: OrderType;
 	sizeValue: number;
 	szDecimals: number;
+	marketKind: MarketKind;
 	markPx: number;
 	price: number;
 	slippageBps: number;
@@ -47,6 +79,7 @@ export function buildOrders(params: EntryOrderParams): OrderBuildResult {
 		orderType,
 		sizeValue,
 		szDecimals,
+		marketKind,
 		markPx,
 		price,
 		slippageBps,
@@ -63,42 +96,40 @@ export function buildOrders(params: EntryOrderParams): OrderBuildResult {
 		slPriceNum,
 	} = params;
 
-	const isScaleOrder = isScaleOrderType(orderType);
-	const isTriggerOrder = isTriggerOrderType(orderType);
-	const isStopOrder = isStopOrderType(orderType);
-	const usesLimitPriceForOrder = usesLimitPrice(orderType);
-
+	const market: WireMarket = { szDecimals, kind: marketKind };
 	const orders: ExchangeOrder[] = [];
-	const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
 	const hasTp = tpSlEnabled && canUseTpSl && isPositive(tpPriceNum);
 	const hasSl = tpSlEnabled && canUseTpSl && isPositive(slPriceNum);
 	const isBuy = side === "buy";
 
-	if (isScaleOrder) {
+	if (isScaleOrderType(orderType)) {
 		buildScaleOrders(orders, {
 			assetId,
+			market,
 			isBuy,
 			sizeValue,
-			szDecimals,
 			reduceOnly,
 			tif,
 			scaleStartPriceInput,
 			scaleEndPriceInput,
 			scaleLevelsNum,
 		});
-	} else if (isTriggerOrder) {
+	} else if (isTriggerOrderType(orderType)) {
 		buildTriggerOrder(orders, {
 			assetId,
+			market,
 			isBuy,
-			formattedSize,
+			formattedSize: formatSizeForOrder(sizeValue, szDecimals),
 			triggerPriceInput,
 			limitPriceInput,
-			isStopOrder,
-			usesLimitPriceForOrder,
+			isStopOrder: isStopOrderType(orderType),
+			usesLimitPriceForOrder: usesLimitPrice(orderType),
 		});
 	} else {
+		const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
 		buildStandardOrder(orders, {
 			assetId,
+			market,
 			isBuy,
 			orderType,
 			formattedSize,
@@ -110,10 +141,10 @@ export function buildOrders(params: EntryOrderParams): OrderBuildResult {
 		});
 
 		if (hasTp && tpPriceNum !== null) {
-			buildTpSlOrder(orders, { assetId, isBuy: !isBuy, formattedSize, triggerPrice: tpPriceNum, tpsl: "tp" });
+			buildTpSlOrder(orders, { assetId, market, isBuy: !isBuy, formattedSize, triggerPrice: tpPriceNum, tpsl: "tp" });
 		}
 		if (hasSl && slPriceNum !== null) {
-			buildTpSlOrder(orders, { assetId, isBuy: !isBuy, formattedSize, triggerPrice: slPriceNum, tpsl: "sl" });
+			buildTpSlOrder(orders, { assetId, market, isBuy: !isBuy, formattedSize, triggerPrice: slPriceNum, tpsl: "sl" });
 		}
 	}
 
@@ -122,9 +153,9 @@ export function buildOrders(params: EntryOrderParams): OrderBuildResult {
 
 interface ScaleOrderParams {
 	assetId: number;
+	market: WireMarket;
 	isBuy: boolean;
 	sizeValue: number;
-	szDecimals: number;
 	reduceOnly: boolean;
 	tif: LimitTif;
 	scaleStartPriceInput: string;
@@ -137,23 +168,32 @@ function buildScaleOrders(orders: ExchangeOrder[], params: ScaleOrderParams): vo
 	const start = toSafeBig(params.scaleStartPriceInput);
 	const end = toSafeBig(params.scaleEndPriceInput);
 	const step = levels > 1 ? end.minus(start).div(levels - 1) : start.times(0);
-	const perLevelSize = toSafeBig(params.sizeValue).div(levels);
+	const legSizes = allocateScaleSizes(params.sizeValue, levels, params.market.szDecimals);
+	const side = params.isBuy ? "buy" : "sell";
 
 	for (let i = 0; i < levels; i += 1) {
-		const levelPrice = start.plus(step.times(i)).toNumber();
 		orders.push({
 			a: params.assetId,
 			b: params.isBuy,
-			p: formatPriceForOrder(levelPrice),
-			s: formatSizeForOrder(perLevelSize.toNumber(), params.szDecimals),
+			p: formatPriceForOrder(start.plus(step.times(i)), params.market, side, "passive"),
+			s: formatSizeForOrder(legSizes[i], params.market.szDecimals),
 			r: params.reduceOnly,
 			t: { limit: { tif: params.tif } },
 		});
 	}
 }
 
+function allocateScaleSizes(total: Numeric, levels: number, szDecimals: number): Big[] {
+	const lotsPerUnit = Big(10).pow(szDecimals);
+	const totalLots = toSafeBig(total).times(lotsPerUnit).round(0, Big.roundDown);
+	const baseLots = totalLots.div(levels).round(0, Big.roundDown);
+	const extraLots = totalLots.minus(baseLots.times(levels)).toNumber();
+	return Array.from({ length: levels }, (_, i) => baseLots.plus(i < extraLots ? 1 : 0).div(lotsPerUnit));
+}
+
 interface TriggerOrderParams {
 	assetId: number;
+	market: WireMarket;
 	isBuy: boolean;
 	formattedSize: string;
 	triggerPriceInput: string;
@@ -163,13 +203,15 @@ interface TriggerOrderParams {
 }
 
 function buildTriggerOrder(orders: ExchangeOrder[], params: TriggerOrderParams): void {
-	const triggerPx = formatPriceForOrder(toBig(params.triggerPriceInput)?.toNumber() ?? 0);
-	const limitPx = formatPriceForOrder(toBig(params.limitPriceInput)?.toNumber() ?? 0);
+	const side = params.isBuy ? "buy" : "sell";
+	const triggerPx = formatPriceForOrder(params.triggerPriceInput, params.market, side, "passive");
 
 	orders.push({
 		a: params.assetId,
 		b: params.isBuy,
-		p: params.usesLimitPriceForOrder ? limitPx : triggerPx,
+		p: params.usesLimitPriceForOrder
+			? formatPriceForOrder(params.limitPriceInput, params.market, side, "passive")
+			: triggerPx,
 		s: params.formattedSize,
 		r: true,
 		t: {
@@ -184,6 +226,7 @@ function buildTriggerOrder(orders: ExchangeOrder[], params: TriggerOrderParams):
 
 interface StandardOrderParams {
 	assetId: number;
+	market: WireMarket;
 	isBuy: boolean;
 	orderType: OrderType;
 	formattedSize: string;
@@ -195,27 +238,23 @@ interface StandardOrderParams {
 }
 
 function buildStandardOrder(orders: ExchangeOrder[], params: StandardOrderParams): void {
-	const orderPrice = getExecutedPrice(
-		params.orderType,
-		params.isBuy ? "buy" : "sell",
-		params.markPx,
-		params.slippageBps,
-		params.price,
-	);
-	const formattedPrice = formatPriceForOrder(orderPrice);
+	const side = params.isBuy ? "buy" : "sell";
+	const isMarket = params.orderType === "market";
+	const orderPrice = getExecutedPrice(params.orderType, side, params.markPx, params.slippageBps, params.price);
 
 	orders.push({
 		a: params.assetId,
 		b: params.isBuy,
-		p: formattedPrice,
+		p: formatPriceForOrder(orderPrice, params.market, side, isMarket ? "aggressive" : "passive"),
 		s: params.formattedSize,
 		r: params.reduceOnly,
-		t: params.orderType === "market" ? { limit: { tif: "FrontendMarket" as const } } : { limit: { tif: params.tif } },
+		t: isMarket ? { limit: { tif: "FrontendMarket" as const } } : { limit: { tif: params.tif } },
 	});
 }
 
 interface TpSlOrderParams {
 	assetId: number;
+	market: WireMarket;
 	isBuy: boolean;
 	formattedSize: string;
 	triggerPrice: number;
@@ -223,7 +262,7 @@ interface TpSlOrderParams {
 }
 
 function buildTpSlOrder(orders: ExchangeOrder[], params: TpSlOrderParams): void {
-	const triggerPx = formatPriceForOrder(params.triggerPrice);
+	const triggerPx = formatPriceForOrder(params.triggerPrice, params.market, params.isBuy ? "buy" : "sell", "passive");
 	orders.push({
 		a: params.assetId,
 		b: params.isBuy,
@@ -251,39 +290,37 @@ export function getDefaultLeverage(maxLeverage: number): number {
 	return Math.floor(maxLeverage / 2);
 }
 
-/**
- * Format price according to Hyperliquid's tick size rules.
- * Prices must have at most 5 significant figures.
- * The number of decimal places depends on the price magnitude.
- */
-export function formatPriceForOrder(price: number): string {
-	if (!Number.isFinite(price) || price <= 0) return "0";
-
-	const log10Price = Math.log10(price);
-	const integerDigits = Math.floor(log10Price) + 1;
-
-	let decimals: number;
-	if (price >= 1) {
-		decimals = Math.max(0, HL_PRICE_MAX_SIG_FIGS - integerDigits);
-	} else {
-		decimals = HL_PRICE_MAX_SIG_FIGS - integerDigits;
-	}
-
-	decimals = Math.min(decimals, HL_PRICE_MAX_DECIMALS);
-
-	const multiplier = 10 ** decimals;
-	const rounded = Math.round(price * multiplier) / multiplier;
-
-	if (decimals === 0) {
-		return rounded.toFixed(0);
-	}
-
-	return rounded
-		.toFixed(decimals)
-		.replace(/(\.\d*?)0+$/, "$1")
-		.replace(/\.$/, "");
+export function isBelowMinNotional(order: ExchangeOrder): boolean {
+	return !order.r && Big(order.s).times(order.p).lt(ORDER_MIN_NOTIONAL_USD);
 }
 
-export function formatSizeForOrder(size: string | number, szDecimals: number): string {
-	return formatDecimalFloor(size, szDecimals);
+function formatWithSdk(format: () => string, reason: OrderPlanError): string {
+	try {
+		return format();
+	} catch (error) {
+		if (error instanceof FormatError) throw new OrderBuildError(reason);
+		throw error;
+	}
+}
+
+export function formatPriceForOrder(price: Numeric, market: WireMarket, side: Side, rounding: PriceRounding): string {
+	const value = toBig(price);
+	if (!value?.gt(0)) throw new OrderBuildError(ORDER_PLAN_ERRORS.invalidPrice);
+
+	const type = market.kind === "spot" ? "spot" : "perp";
+	const maxDecimals = type === "spot" ? HL_SPOT_PRICE_MAX_DECIMALS : HL_PERP_PRICE_MAX_DECIMALS;
+	const roundsUp = (side === "buy") === (rounding === "aggressive");
+	const mode = roundsUp ? Big.roundUp : Big.roundDown;
+	const onDecimals = value.round(Math.max(maxDecimals - market.szDecimals, 0), mode);
+	const onTick = onDecimals.eq(onDecimals.round(0, Big.roundDown))
+		? onDecimals
+		: onDecimals.prec(HL_PRICE_MAX_SIG_FIGS, mode);
+
+	return formatWithSdk(() => formatPrice(onTick.toFixed(), market.szDecimals, type), ORDER_PLAN_ERRORS.invalidPrice);
+}
+
+export function formatSizeForOrder(size: Numeric, szDecimals: number): string {
+	const value = toBig(size);
+	if (!value?.gt(0)) throw new OrderBuildError(ORDER_PLAN_ERRORS.invalidSize);
+	return formatWithSdk(() => formatSize(value.toFixed(), szDecimals), ORDER_PLAN_ERRORS.invalidSize);
 }

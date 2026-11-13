@@ -19,9 +19,10 @@ export const LIQUIDATION_BUFFER_FACTOR = 0.9;
 /** Distance ratio below which the estimated liquidation price is flagged as too close. */
 export const LIQ_WARNING_THRESHOLD = 0.05;
 
-// HL tick-size protocol: prices must carry at most 5 significant figures and 8 decimals.
+// HL tick-size protocol: non-integer prices carry at most 5 significant figures and (6 perp | 8 spot) - szDecimals decimals.
 export const HL_PRICE_MAX_SIG_FIGS = 5;
-export const HL_PRICE_MAX_DECIMALS = 8;
+export const HL_PERP_PRICE_MAX_DECIMALS = 6;
+export const HL_SPOT_PRICE_MAX_DECIMALS = 8;
 /** Leverage ceiling below which `getDefaultLeverage` returns the max instead of halving. */
 export const DEFAULT_LEVERAGE_FALLBACK = 5;
 
@@ -72,7 +73,7 @@ export const ORDER_TYPES = [
 
 export type OrderType = (typeof ORDER_TYPES)[number];
 export type AdvancedOrderType = Exclude<OrderType, "market" | "limit">;
-export type ExchangeOrder = OrderParameters["orders"][number];
+export type ExchangeOrder = OrderParameters["orders"][number] & { p: string; s: string };
 
 type OrderTypeSpec = ExchangeOrder["t"];
 export type LimitTif = Extract<OrderTypeSpec, { limit: unknown }>["limit"]["tif"];

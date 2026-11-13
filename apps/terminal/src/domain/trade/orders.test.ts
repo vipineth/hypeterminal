@@ -162,14 +162,16 @@ describe("buildOrderPlan entry (characterization)", () => {
 		expect(plan.orders.every((o) => JSON.stringify(o.t) === JSON.stringify({ limit: { tif: "Alo" } }))).toBe(true);
 	});
 
-	it("formats sub-1 prices to 5 significant figures", () => {
-		const plan = buildOrderPlan({ ...ENTRY_BASE, orderType: "limit", side: "sell", price: 0.012345 });
+	it("keeps a sub-1 price that already fits 5 significant figures and 6 - szDecimals decimals", () => {
+		const plan = buildOrderPlan({
+			...ENTRY_BASE,
+			orderType: "limit",
+			side: "sell",
+			szDecimals: 0,
+			sizeValue: 1000,
+			price: 0.012345,
+		});
 		expect(plan.orders[0].p).toBe("0.012345");
-	});
-
-	it("formats a zero price as '0'", () => {
-		const plan = buildOrderPlan({ ...ENTRY_BASE, orderType: "limit", price: 0 });
-		expect(plan.orders[0].p).toBe("0");
 	});
 });
 
@@ -192,12 +194,12 @@ describe("buildOrderPlan swap (characterization — byte-exact spot swap math)",
 		expect(plan.grouping).toBe("na");
 	});
 
-	it("prices a sell at markPx / (1 + bps/10000) — not the symmetric getExecutedPrice formula", () => {
+	it("prices a sell at markPx / (1 + bps/10000), rounded down to the spot tick", () => {
 		const plan = buildOrderPlan({ ...SWAP_BASE, isBuy: false });
 		expect(plan.orders[0]).toEqual({
 			a: 0,
 			b: false,
-			p: "99.01",
+			p: "99.009",
 			s: "1.5",
 			r: false,
 			t: { limit: { tif: "FrontendMarket" } },
@@ -253,6 +255,7 @@ describe("buildOrderPlan close/reverse/tpsl (characterization)", () => {
 		const plan = buildOrderPlan({
 			kind: "positionTpsl",
 			assetId: 0,
+			szDecimals: 3,
 			isLong: true,
 			tpPriceNum: 110,
 			slPriceNum: 90,
@@ -265,9 +268,16 @@ describe("buildOrderPlan close/reverse/tpsl (characterization)", () => {
 	});
 
 	it("reports an error when position tpsl has no prices", () => {
-		const plan = buildOrderPlan({ kind: "positionTpsl", assetId: 0, isLong: true, tpPriceNum: null, slPriceNum: null });
+		const plan = buildOrderPlan({
+			kind: "positionTpsl",
+			assetId: 0,
+			szDecimals: 3,
+			isLong: true,
+			tpPriceNum: null,
+			slPriceNum: null,
+		});
 		expect(plan.orders).toEqual([]);
-		expect(plan.errors.length).toBeGreaterThan(0);
+		expect(plan.errors).toEqual([ORDER_PLAN_ERRORS.noTpSl]);
 	});
 });
 
@@ -279,6 +289,7 @@ describe("buildOrders grouping (characterization)", () => {
 			orderType: "market",
 			sizeValue: 1.5,
 			szDecimals: 3,
+			marketKind: "perp",
 			markPx: 100,
 			price: 100,
 			slippageBps: 50,
@@ -306,10 +317,15 @@ describe("orders", () => {
 		expect(getDefaultLeverage(50)).toBe(25);
 	});
 
-	it("formats order prices with 5 significant figures", () => {
-		expect(formatPriceForOrder(100)).toBe("100");
-		expect(formatPriceForOrder(1234.56)).toBe("1234.6");
-		expect(formatPriceForOrder(0.012345)).toBe("0.012345");
+	it("formats order prices to the tick in the requested direction", () => {
+		const perp = { szDecimals: 0, kind: "perp" as const };
+		expect(formatPriceForOrder(100, perp, "buy", "passive")).toBe("100");
+		expect(formatPriceForOrder(1234.56, perp, "buy", "passive")).toBe("1234.5");
+		expect(formatPriceForOrder(1234.56, perp, "buy", "aggressive")).toBe("1234.6");
+		expect(formatPriceForOrder(1234.56, perp, "sell", "passive")).toBe("1234.6");
+		expect(formatPriceForOrder(1234.56, perp, "sell", "aggressive")).toBe("1234.5");
+		expect(formatPriceForOrder(123456.7, perp, "buy", "passive")).toBe("123450");
+		expect(formatPriceForOrder(0.012345, perp, "sell", "passive")).toBe("0.012345");
 	});
 
 	it("formats order sizes using size decimals", () => {

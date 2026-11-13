@@ -80,8 +80,8 @@ export function floorToDecimals(value: number, maxDecimals: number): number {
 	return floor(value, maxDecimals) ?? Number.NaN;
 }
 
-export function formatDecimalFloor(value: Numeric, maxDecimals: number): string {
-	return floorToString(value, maxDecimals).replace(/\.?0+$/, "");
+export function truncateDecimals(value: Numeric, maxDecimals: number): string {
+	return toBig(value)?.round(maxDecimals, Big.roundDown).toFixed() ?? "0";
 }
 
 export function limitDecimalInput(input: string, maxDecimals: number): string {

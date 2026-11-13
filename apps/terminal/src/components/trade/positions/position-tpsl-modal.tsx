@@ -76,6 +76,7 @@ function PositionTpSlModalBody({ position, onOpenChange }: BodyProps) {
 		const plan = buildOrderPlan({
 			kind: "positionTpsl",
 			assetId: position.assetId,
+			szDecimals: position.szDecimals,
 			isLong: position.isLong,
 			tpPriceNum: hasTp ? tpPriceNum : null,
 			slPriceNum: hasSl ? slPriceNum : null,

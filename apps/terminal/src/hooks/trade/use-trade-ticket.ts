@@ -241,7 +241,7 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 		if (!market || !baseToken || typeof market.assetId !== "number") return;
 
 		const submitted = await submitOrder({
-			market: { assetId: market.assetId, szDecimals: market.szDecimals },
+			market: { assetId: market.assetId, szDecimals: market.szDecimals, kind: market.kind },
 			baseToken,
 			side,
 			orderType,
