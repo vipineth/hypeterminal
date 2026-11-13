@@ -28,7 +28,7 @@ let cloidSeq = 0;
 
 function nextCloid(): `0x${string}` {
 	cloidSeq++;
-	return `0x${cloidSeq.toString(16).padStart(32, "0")}`;
+	return `0xc1${cloidSeq.toString(16).padStart(30, "0")}`;
 }
 
 function marketBuy(asset = SOL): Submission {
@@ -148,7 +148,10 @@ describe("order sender", () => {
 		venue.nextExchangeRequests("noReply");
 		const { store, sender } = openTab(venue, storage, locks);
 		const outcome = await sender.submit(signerFor(venue), marketBuy());
-		expect(outcome).toMatchObject({ kind: "sent", settlement: { kind: "consumed" } });
+		expect(outcome).toMatchObject({
+			kind: "sent",
+			settlement: { kind: "consumed", lookup: { kind: "order", statuses: [{ order: { status: "filled" } }] } },
+		});
 		expect(venue.exchangeRequests).toHaveLength(2);
 		expect(new Set(venue.exchangeRequests).size).toBe(1);
 		expect(venue.state.placedLegs).toBe(1);
