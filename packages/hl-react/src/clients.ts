@@ -14,8 +14,11 @@ import type { PrivateKeyAccount } from "viem/accounts";
 import { getSdkReconnectionDelayMs } from "./internal/websocket/reliability";
 import { LRU } from "./lru";
 import { createL1AgentWallet } from "./signing/l1-agent-wallet";
+import { createNonceManager } from "./signing/nonce";
 
 const cache = new Map<string, unknown>();
+
+const nonceManager = createNonceManager();
 
 function getOrCreate<T>(key: string, create: () => T): T {
 	let value = cache.get(key) as T | undefined;
@@ -79,7 +82,7 @@ export function createExchangeClient(wallet: AbstractWallet, isTestnet: boolean,
 		const cached = tradingClientCache.get(cacheKey);
 		if (cached) return cached;
 	}
-	const client = new ExchangeClient({ transport: getHttpTransport(isTestnet), wallet });
+	const client = new ExchangeClient({ transport: getHttpTransport(isTestnet), wallet, nonceManager });
 	if (cacheKey) {
 		tradingClientCache.set(cacheKey, client);
 	}
@@ -93,7 +96,7 @@ function isPrivateKeyAccount(wallet: AbstractWallet): wallet is PrivateKeyAccoun
 export function getTradingClient(wallet: AbstractWallet & { address: string }, isTestnet: boolean): ExchangeClient {
 	return getOrCreate(`trading:${wallet.address.toLowerCase()}:${isTestnet}`, () => {
 		const signingWallet = isPrivateKeyAccount(wallet) ? createL1AgentWallet(wallet) : wallet;
-		return new ExchangeClient({ transport: getHttpTransport(isTestnet), wallet: signingWallet });
+		return new ExchangeClient({ transport: getHttpTransport(isTestnet), wallet: signingWallet, nonceManager });
 	});
 }
 
