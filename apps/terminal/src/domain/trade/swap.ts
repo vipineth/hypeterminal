@@ -1,7 +1,8 @@
+import Big from "big.js";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/app";
 import type { SpotMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 import type { SpotToken } from "@/lib/hyperliquid/markets";
-import { toNumber, toNumberOrZero } from "@/lib/trade/numbers";
+import { toBig } from "@/lib/trade/numbers";
 
 interface SwapQuoteInput {
 	amount: string;
@@ -63,14 +64,15 @@ export function getSwapSide(fromToken: string, spotMarket: SpotMarketInfo): bool
 	return fromToken !== baseToken;
 }
 
-export function getSwapQuote({ amount, markPx, isBuying }: SwapQuoteInput): SwapQuote {
-	const amountValue = toNumber(amount) ?? 0;
-	const mark = toNumberOrZero(markPx);
-	if (amountValue <= 0 || mark <= 0) return { orderSize: 0, estimatedReceive: 0 };
+export function getSwapQuote({ amount, markPx, szDecimals, isBuying }: SwapQuoteInput): SwapQuote {
+	const amountBig = toBig(amount);
+	const mark = toBig(markPx);
+	if (!amountBig || !mark || amountBig.lte(0) || mark.lte(0)) return { orderSize: 0, estimatedReceive: 0 };
 
 	if (isBuying) {
-		const size = amountValue / mark;
+		const size = amountBig.div(mark).round(szDecimals, Big.roundDown).toNumber();
 		return { orderSize: size, estimatedReceive: size };
 	}
-	return { orderSize: amountValue, estimatedReceive: amountValue * mark };
+	const size = amountBig.round(szDecimals, Big.roundDown);
+	return { orderSize: size.toNumber(), estimatedReceive: size.times(mark).toNumber() };
 }
