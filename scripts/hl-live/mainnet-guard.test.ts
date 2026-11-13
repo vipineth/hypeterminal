@@ -55,6 +55,7 @@ describe("mainnet holdings guard", () => {
 	});
 
 	it.each([
+		["a spot transfer escrowed to HyperEVM", { spotClearinghouseState: () => ({ balances: [], evmEscrows: [{ coin: "HYPE", token: 150, total: "3.0" }] }) }, /3.0 HYPE in EVM escrow/],
 		["staked HYPE", { delegatorSummary: () => ({ delegated: "100.0", undelegated: "0.0", totalPendingWithdrawal: "0.0", nPendingWithdrawals: 0 }) }, /100.0 HYPE staked/],
 		["undelegated HYPE", { delegatorSummary: () => ({ delegated: "0.0", undelegated: "5.0", totalPendingWithdrawal: "0.0", nPendingWithdrawals: 0 }) }, /5.0 HYPE undelegated/],
 		["a pending staking withdrawal", { delegatorSummary: () => ({ delegated: "0.0", undelegated: "0.0", totalPendingWithdrawal: "7.0", nPendingWithdrawals: 1 }) }, /7.0 HYPE pending withdrawal/],
@@ -75,6 +76,7 @@ describe("mainnet holdings guard", () => {
 		["a non-numeric account value", { clearinghouseState: () => ({ marginSummary: { accountValue: "not-a-number" }, assetPositions: [] }) }, "clearinghouseState"],
 		["a spot balance with no total", { spotClearinghouseState: () => ({ balances: [{ coin: "HYPE" }] }) }, "spotClearinghouseState"],
 		["a staking summary with no delegated amount", { delegatorSummary: () => ({ undelegated: "0.0", totalPendingWithdrawal: "0.0", nPendingWithdrawals: 0 }) }, "delegatorSummary"],
+		["an escrow with a non-numeric total", { spotClearinghouseState: () => ({ balances: [], evmEscrows: [{ coin: "HYPE", total: "lots" }] }) }, "spotClearinghouseState"],
 		["a vault list that is not a list", { userVaultEquities: () => ({}) }, "userVaultEquities"],
 	])("fails closed on %s", async (_, overrides, read) => {
 		await expect(serveMainnet(overrides).holdings()).rejects.toThrow(`mainnet ${read} is not the expected shape`);

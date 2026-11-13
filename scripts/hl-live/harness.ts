@@ -95,7 +95,10 @@ export function loadKeys(env: NodeJS.ProcessEnv = process.env): HarnessKeys {
 const decimal = z.string().regex(/^-?\d+(\.\d+)?$/);
 
 const mainnetReads = {
-	spotClearinghouseState: z.object({ balances: z.array(z.object({ coin: z.string(), total: decimal })) }),
+	spotClearinghouseState: z.object({
+		balances: z.array(z.object({ coin: z.string(), total: decimal })),
+		evmEscrows: z.array(z.object({ coin: z.string(), total: decimal })).optional(),
+	}),
 	perpDexs: z.tuple([z.null()], z.object({ name: z.string().min(1) })),
 	clearinghouseState: z.object({ marginSummary: z.object({ accountValue: decimal }), assetPositions: z.array(z.unknown()) }),
 	delegatorSummary: z.object({ delegated: decimal, undelegated: decimal, totalPendingWithdrawal: decimal, nPendingWithdrawals: z.number().int() }),
@@ -133,6 +136,7 @@ export async function mainnetHoldings(mainnet: InfoClient, user: Hex): Promise<s
 	]);
 	const holdings = [
 		...spot.balances.filter((balance) => !isZero(balance.total)).map((balance) => `${balance.total} ${balance.coin} in spot`),
+		...(spot.evmEscrows ?? []).filter((escrow) => !isZero(escrow.total)).map((escrow) => `${escrow.total} ${escrow.coin} in EVM escrow`),
 		...(isZero(stake.delegated) ? [] : [`${stake.delegated} HYPE staked`]),
 		...(isZero(stake.undelegated) ? [] : [`${stake.undelegated} HYPE undelegated in staking`]),
 		...(isZero(stake.totalPendingWithdrawal) && stake.nPendingWithdrawals === 0 ? [] : [`${stake.totalPendingWithdrawal} HYPE pending withdrawal from staking`]),
