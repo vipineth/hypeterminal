@@ -7,6 +7,7 @@
 		"build": "lingui compile && vite build",
 		"serve": "vite preview",
 		"typecheck": "tsc -p tsconfig.json --noEmit",
+		"test": "vitest run",
 		"i18n:extract": "lingui extract",
 		"i18n:compile": "lingui compile"
 	},
@@ -67,6 +68,7 @@
 		"babel-plugin-macros": "3.1.0",
 		"babel-plugin-react-compiler": "1.0.0",
 		"nitro": "3.0.261103-rc",
-		"vite": "8.3.6"
+		"vite": "8.3.6",
+		"vitest": "5.0.5"
 	}
 }

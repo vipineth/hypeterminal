@@ -11,6 +11,7 @@
 		"build": "pnpm --filter @hypeterminal/terminal build",
 		"build:website": "pnpm --filter @hypeterminal/website build",
 		"serve": "pnpm --filter @hypeterminal/terminal serve",
+		"test": "pnpm --filter @hypeterminal/terminal test",
 		"typecheck": "pnpm -r --if-present typecheck",
 		"format": "biome format",
 		"lint": "biome lint",

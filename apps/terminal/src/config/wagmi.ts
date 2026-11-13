@@ -24,6 +24,7 @@ import {
 import { coinbaseWallet, injected, mock, walletConnect } from "wagmi/connectors";
 import { APP_NAME } from "@/config/app";
 import { getWalletConnectProjectId } from "@/config/env";
+import { getRpcUrl } from "@/config/rpc";
 import type { MockWalletConfig } from "@/lib/wallet-utils";
 import { registerMockWallet } from "@/lib/wallet-utils";
 
@@ -50,18 +51,8 @@ const BRIDGE_CHAINS = [
 	polygonZkEvm,
 ] as const satisfies readonly [Chain, ...Chain[]];
 
-const DEFAULT_ETHEREUM_RPC_URL = "https://ethereum-rpc.publicnode.com";
-
-export function getBridgeRpcUrl(
-	chain: Pick<Chain, "id">,
-	env: Record<string, string | undefined> = import.meta.env,
-): string | undefined {
-	if (chain.id === mainnet.id) return env.VITE_ETHEREUM_RPC_URL || DEFAULT_ETHEREUM_RPC_URL;
-	return undefined;
-}
-
 const BRIDGE_TRANSPORTS = Object.fromEntries(
-	BRIDGE_CHAINS.map((chain) => [chain.id, http(getBridgeRpcUrl(chain))]),
+	BRIDGE_CHAINS.map((chain) => [chain.id, http(getRpcUrl(chain.id, import.meta.env))]),
 ) as Record<(typeof BRIDGE_CHAINS)[number]["id"], ReturnType<typeof http>>;
 
 function createMockConnectors(mockWallets: MockWalletConfig[]) {

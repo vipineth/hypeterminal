@@ -8,6 +8,7 @@ import { NumberInput } from "@/components/ui/number-input";
 import { MIN_DEPOSIT_USDC, USDC_DECIMALS } from "@/config/contracts";
 import { NETWORKS } from "@/config/networks";
 import { cn } from "@/lib/cn";
+import type { UsdcBalance } from "@/lib/trade/deposit-validation";
 import { NetworkSelect } from "./shared-ui";
 
 const ARBITRUM_NETWORK = NETWORKS[0];
@@ -15,13 +16,53 @@ const ARBITRUM_NETWORK = NETWORKS[0];
 interface Props {
 	amount: string;
 	onAmountChange: (value: string) => void;
-	balance: string;
+	balance: UsdcBalance;
+	onRetryBalance: () => void;
 	validation: { valid: boolean; error: string | null };
 	isPending: boolean;
 	onSubmit: () => void;
 }
 
-export function DepositForm({ amount, onAmountChange, balance, validation, isPending, onSubmit }: Props) {
+function BalanceLabel({ balance }: { balance: UsdcBalance }) {
+	if (balance.status === "loading") {
+		return (
+			<span className="inline-flex items-center gap-1">
+				<SpinnerGapIcon className="size-3 animate-spin" />
+				<Trans>Loading balance</Trans>
+			</span>
+		);
+	}
+	if (balance.status === "error") {
+		return (
+			<span className="text-error">
+				<Trans>Balance unavailable. Retry</Trans>
+			</span>
+		);
+	}
+	return (
+		<>
+			Available:{" "}
+			<span className="underline decoration-dashed underline-offset-2 decoration-fg-muted/50">
+				{balance.formatted} USDC
+			</span>
+		</>
+	);
+}
+
+export function DepositForm({
+	amount,
+	onAmountChange,
+	balance,
+	onRetryBalance,
+	validation,
+	isPending,
+	onSubmit,
+}: Props) {
+	function handleBalanceClick() {
+		if (balance.status === "ready") onAmountChange(balance.formatted);
+		if (balance.status === "error") onRetryBalance();
+	}
+
 	return (
 		<div className="flex flex-1 flex-col gap-2">
 			<NetworkSelect label={<Trans>From</Trans>} value="arbitrum" onChange={() => {}} disabled />
@@ -29,15 +70,8 @@ export function DepositForm({ amount, onAmountChange, balance, validation, isPen
 			<div>
 				<NumberInput
 					label={t`Amount`}
-					labelValue={
-						<>
-							Available:{" "}
-							<span className="underline decoration-dashed underline-offset-2 decoration-fg-muted/50">
-								{balance} USDC
-							</span>
-						</>
-					}
-					onLabelValueClick={() => onAmountChange(balance)}
+					labelValue={<BalanceLabel balance={balance} />}
+					onLabelValueClick={balance.status === "loading" ? undefined : handleBalanceClick}
 					placeholder="0.00"
 					value={amount}
 					onChange={(e) => onAmountChange(e.target.value)}

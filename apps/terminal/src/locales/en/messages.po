@@ -191,7 +191,7 @@ msgstr "ALO (Add Liquidity Only)"
 
 #: src/components/trade/positions/send-modal.tsx:222
 #: src/components/trade/positions/transfer-modal.tsx:144
-#: src/components/trade/tradebox/deposit/deposit-form.tsx:31
+#: src/components/trade/tradebox/deposit/deposit-form.tsx:72
 #: src/components/trade/tradebox/deposit/withdraw-form.tsx:44
 msgid "Amount"
 msgstr "Amount"
@@ -283,6 +283,10 @@ msgstr "Balance"
 msgid "Balance available to trade"
 msgstr "Balance available to trade"
 
+#: src/components/trade/tradebox/deposit/deposit-form.tsx:38
+msgid "Balance unavailable. Retry"
+msgstr "Balance unavailable. Retry"
+
 #: src/components/trade/tradebox/deposit-modal.tsx:
 #~ msgid "Balance:"
 #~ msgstr "Balance:"
@@ -302,7 +306,7 @@ msgstr "Balance available to trade"
 #: src/components/trade/mobile/mobile-account-view.tsx:188
 #: src/components/trade/tradebox/account-panel.tsx:172
 #: src/components/trade/tradebox/account-panel.tsx:175
-#: src/components/trade/tradebox/deposit-modal.tsx:236
+#: src/components/trade/tradebox/deposit-modal.tsx:237
 msgid "Bridge"
 msgstr "Bridge"
 
@@ -391,8 +395,8 @@ msgstr "Camera permission was denied."
 #: src/components/trade/positions/position-limit-close-modal.tsx:200
 #: src/components/trade/positions/position-tpsl-modal.tsx:170
 #: src/components/trade/positions/twap-tab.tsx:193
-#: src/components/trade/tradebox/deposit-modal.tsx:149
-#: src/components/trade/tradebox/deposit-modal.tsx:204
+#: src/components/trade/tradebox/deposit-modal.tsx:150
+#: src/components/trade/tradebox/deposit-modal.tsx:205
 #: src/components/trade/tradebox/margin-mode-modal.tsx:216
 #: src/routes/mobile-agent-sync.tsx:413
 msgid "Cancel"
@@ -513,7 +517,7 @@ msgstr "Confirm"
 msgid "Confirm Close"
 msgstr "Confirm Close"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:164
+#: src/components/trade/tradebox/deposit-modal.tsx:165
 msgid "Confirm in wallet"
 msgstr "Confirm in wallet"
 
@@ -802,21 +806,21 @@ msgstr "Default"
 #: src/components/trade/mobile/mobile-nav-drawer.tsx:132
 #: src/components/trade/tradebox/account-panel.tsx:163
 #: src/components/trade/tradebox/account-panel.tsx:166
-#: src/components/trade/tradebox/deposit-modal.tsx:119
-#: src/components/trade/tradebox/deposit-modal.tsx:141
-#: src/components/trade/tradebox/deposit-modal.tsx:162
-#: src/components/trade/tradebox/deposit-modal.tsx:230
-#: src/components/trade/tradebox/deposit/deposit-form.tsx:96
+#: src/components/trade/tradebox/deposit-modal.tsx:120
+#: src/components/trade/tradebox/deposit-modal.tsx:142
+#: src/components/trade/tradebox/deposit-modal.tsx:163
+#: src/components/trade/tradebox/deposit-modal.tsx:231
+#: src/components/trade/tradebox/deposit/deposit-form.tsx:130
 #: src/components/trade/tradebox/trade-form-fields.tsx:146
 #: src/lib/trade/use-button-content.ts:72
 msgid "Deposit"
 msgstr "Deposit"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:121
+#: src/components/trade/tradebox/deposit-modal.tsx:122
 msgid "Deposit complete"
 msgstr "Deposit complete"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:143
+#: src/components/trade/tradebox/deposit-modal.tsx:144
 msgid "Deposit failed"
 msgstr "Deposit failed"
 
@@ -895,8 +899,8 @@ msgstr "Display language"
 #~ msgid "Docs"
 #~ msgstr "Docs"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:132
-#: src/components/trade/tradebox/deposit-modal.tsx:187
+#: src/components/trade/tradebox/deposit-modal.tsx:133
+#: src/components/trade/tradebox/deposit-modal.tsx:188
 msgid "Done"
 msgstr "Done"
 
@@ -1004,7 +1008,7 @@ msgstr "Est. P&L at Limit"
 #~ msgstr "Est. time"
 
 #: src/components/trade/tradebox/bridge/confirmation-screen.tsx:83
-#: src/components/trade/tradebox/deposit/deposit-form.tsx:73
+#: src/components/trade/tradebox/deposit/deposit-form.tsx:107
 #: src/components/trade/tradebox/deposit/withdraw-form.tsx:98
 msgid "Estimated time"
 msgstr "Estimated time"
@@ -1181,7 +1185,7 @@ msgid "Frequency"
 msgstr "Frequency"
 
 #: src/components/trade/components/spot-swap-modal.tsx:210
-#: src/components/trade/tradebox/deposit/deposit-form.tsx:27
+#: src/components/trade/tradebox/deposit/deposit-form.tsx:68
 msgid "From"
 msgstr "From"
 
@@ -1299,7 +1303,7 @@ msgstr "Insufficient {0} balance"
 msgid "Insufficient <0/> balance"
 msgstr "Insufficient <0/> balance"
 
-#: src/lib/hyperliquid/use-deposit.ts:57
+#: src/lib/trade/deposit-validation.ts:35
 #: src/lib/trade/withdraw-validation.ts:15
 msgid "Insufficient balance"
 msgstr "Insufficient balance"
@@ -1312,7 +1316,7 @@ msgstr "Insufficient balance"
 msgid "Insufficient funds for gas"
 msgstr "Insufficient funds for gas"
 
-#: src/lib/hyperliquid/use-deposit.ts:60
+#: src/lib/trade/deposit-validation.ts:38
 #: src/lib/trade/withdraw-validation.ts:13
 msgid "Invalid amount"
 msgstr "Invalid amount"
@@ -1418,6 +1422,10 @@ msgstr "Liquidated"
 #: src/components/ui/spinner.tsx:9
 msgid "Loading"
 msgstr "Loading"
+
+#: src/components/trade/tradebox/deposit/deposit-form.tsx:31
+msgid "Loading balance"
+msgstr "Loading balance"
 
 #: src/components/trade/tradebox/bridge/asset-selection-screen.tsx:60
 msgid "Loading balances across all chains..."
@@ -1662,7 +1670,7 @@ msgstr "Min order ${ORDER_MIN_NOTIONAL_USD}"
 msgid "Min order $10"
 msgstr "Min order $10"
 
-#: src/components/trade/tradebox/deposit/deposit-form.tsx:62
+#: src/components/trade/tradebox/deposit/deposit-form.tsx:96
 msgid "Minimum"
 msgstr "Minimum"
 
@@ -1671,7 +1679,7 @@ msgstr "Minimum"
 #~ msgid "Minimum deposit is {0} USDC"
 #~ msgstr "Minimum deposit is {0} USDC"
 
-#: src/lib/hyperliquid/use-deposit.ts:56
+#: src/lib/trade/deposit-validation.ts:33
 msgid "Minimum deposit is 5 USDC"
 msgstr "Minimum deposit is 5 USDC"
 
@@ -2272,11 +2280,11 @@ msgstr "Primary navigation"
 msgid "Processing"
 msgstr "Processing"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:164
+#: src/components/trade/tradebox/deposit-modal.tsx:165
 msgid "Processing deposit"
 msgstr "Processing deposit"
 
-#: src/components/trade/tradebox/deposit/deposit-form.tsx:91
+#: src/components/trade/tradebox/deposit/deposit-form.tsx:125
 #: src/components/trade/tradebox/deposit/withdraw-form.tsx:116
 msgid "Processing..."
 msgstr "Processing..."
@@ -2381,8 +2389,8 @@ msgid "Resetting..."
 msgstr "Resetting..."
 
 #: src/components/trade/mobile/offline-banner.tsx:80
-#: src/components/trade/tradebox/deposit-modal.tsx:152
-#: src/components/trade/tradebox/deposit-modal.tsx:207
+#: src/components/trade/tradebox/deposit-modal.tsx:153
+#: src/components/trade/tradebox/deposit-modal.tsx:208
 msgid "Retry"
 msgstr "Retry"
 
@@ -2561,7 +2569,7 @@ msgstr "Send tokens to another account on the Hyperliquid L1."
 msgid "Sending..."
 msgstr "Sending..."
 
-#: src/components/trade/tradebox/deposit-modal.tsx:125
+#: src/components/trade/tradebox/deposit-modal.tsx:126
 msgid "sent to Hyperliquid"
 msgstr "sent to Hyperliquid"
 
@@ -3216,7 +3224,7 @@ msgid "Transaction was rejected"
 msgstr "Transaction was rejected"
 
 #: src/components/trade/positions/transfer-modal.tsx:179
-#: src/components/trade/tradebox/deposit-modal.tsx:219
+#: src/components/trade/tradebox/deposit-modal.tsx:220
 #: src/components/trade/tradebox/deposit/wrong-network-screen.tsx:19
 msgid "Transfer"
 msgstr "Transfer"
@@ -3423,7 +3431,7 @@ msgstr "WalletConnect QR code"
 #~ msgstr "What is a wallet?"
 
 #. placeholder {0}: ARBITRUM_NETWORK.estimatedWithdrawTime
-#: src/components/trade/tradebox/deposit-modal.tsx:181
+#: src/components/trade/tradebox/deposit-modal.tsx:182
 msgid "will arrive in {0}"
 msgstr "will arrive in {0}"
 
@@ -3437,18 +3445,18 @@ msgstr "will arrive in {0}"
 
 #: src/components/trade/tradebox/account-panel.tsx:154
 #: src/components/trade/tradebox/account-panel.tsx:157
-#: src/components/trade/tradebox/deposit-modal.tsx:175
-#: src/components/trade/tradebox/deposit-modal.tsx:196
-#: src/components/trade/tradebox/deposit-modal.tsx:233
+#: src/components/trade/tradebox/deposit-modal.tsx:176
+#: src/components/trade/tradebox/deposit-modal.tsx:197
+#: src/components/trade/tradebox/deposit-modal.tsx:234
 #: src/components/trade/tradebox/deposit/withdraw-form.tsx:121
 msgid "Withdraw"
 msgstr "Withdraw"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:198
+#: src/components/trade/tradebox/deposit-modal.tsx:199
 msgid "Withdrawal failed"
 msgstr "Withdrawal failed"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:177
+#: src/components/trade/tradebox/deposit-modal.tsx:178
 msgid "Withdrawal submitted"
 msgstr "Withdrawal submitted"
 

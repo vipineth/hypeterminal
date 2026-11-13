@@ -46,6 +46,7 @@ export function DepositModal() {
 		isSwitching,
 		switchError,
 		balance: depositBalance,
+		refetchBalance,
 		status: depositStatus,
 		error: depositError,
 		hash: depositHash,
@@ -243,6 +244,7 @@ export function DepositModal() {
 								amount={depositAmount}
 								onAmountChange={setDepositAmount}
 								balance={depositBalance}
+								onRetryBalance={refetchBalance}
 								validation={depositValidation}
 								isPending={false}
 								onSubmit={handleDepositSubmit}

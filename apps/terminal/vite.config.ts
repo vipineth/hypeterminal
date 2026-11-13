@@ -3,9 +3,9 @@ import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import babel from '@rolldown/plugin-babel'
 import viteReact, { reactCompilerPreset } from '@vitejs/plugin-react'
 import { nitro } from 'nitro/vite'
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import { lingui } from '@lingui/vite-plugin'
-import { securityHeaders } from './src/config/security-headers.ts'
+import { createSecurityHeaders } from './src/config/security-headers.ts'
 
 function createManualChunks(id: string) {
   if (id.includes('node_modules')) {
@@ -21,49 +21,53 @@ function createManualChunks(id: string) {
   }
 }
 
-const config = defineConfig({
-  server: {
-    strictPort: false,
-  },
-  resolve: {
-    dedupe: ['react', 'react-dom', '@tanstack/react-query', 'wagmi'],
-    tsconfigPaths: true,
-  },
-  optimizeDeps: {
-    include: ['@lifi/sdk', '@lifi/sdk-provider-ethereum', '@tanstack/react-table', '@tanstack/react-virtual'],
-  },
-  environments: {
-    client: {
-      build: {
-        rolldownOptions: {
-          output: {
-            manualChunks: createManualChunks,
+const config = defineConfig(({ mode }) => {
+  const securityHeaders = createSecurityHeaders(loadEnv(mode, process.cwd(), 'VITE_'))
+
+  return {
+    server: {
+      strictPort: false,
+    },
+    resolve: {
+      dedupe: ['react', 'react-dom', '@tanstack/react-query', 'wagmi'],
+      tsconfigPaths: true,
+    },
+    optimizeDeps: {
+      include: ['@lifi/sdk', '@lifi/sdk-provider-ethereum', '@tanstack/react-table', '@tanstack/react-virtual'],
+    },
+    environments: {
+      client: {
+        build: {
+          rolldownOptions: {
+            output: {
+              manualChunks: createManualChunks,
+            },
           },
         },
       },
     },
-  },
-  plugins: [
-    nitro({
-      compressPublicAssets: true,
-      routeRules: {
-        '/**': {
-          headers: securityHeaders,
+    plugins: [
+      nitro({
+        compressPublicAssets: true,
+        routeRules: {
+          '/**': {
+            headers: securityHeaders,
+          },
+          '/assets/**': {
+            headers: { ...securityHeaders, 'cache-control': 'public, max-age=31536000, immutable' },
+          },
+          '/charting_library/**': {
+            headers: { ...securityHeaders, 'cache-control': 'public, max-age=31536000, immutable' },
+          },
         },
-        '/assets/**': {
-          headers: { ...securityHeaders, 'cache-control': 'public, max-age=31536000, immutable' },
-        },
-        '/charting_library/**': {
-          headers: { ...securityHeaders, 'cache-control': 'public, max-age=31536000, immutable' },
-        },
-      },
-    }),
-    lingui({ macroTransform: true }),
-    tailwindcss(),
-    tanstackStart(),
-    viteReact(),
-    babel({ presets: [reactCompilerPreset()] }),
-  ].filter(Boolean),
+      }),
+      lingui({ macroTransform: true }),
+      tailwindcss(),
+      tanstackStart(),
+      viteReact(),
+      babel({ presets: [reactCompilerPreset()] }),
+    ].filter(Boolean),
+  }
 })
 
 export default config

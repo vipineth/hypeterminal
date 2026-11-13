@@ -1,7 +1,6 @@
-import { t } from "@lingui/core/macro";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import type { Hash } from "viem";
-import { erc20Abi, formatUnits, parseUnits } from "viem";
+import { erc20Abi, parseUnits } from "viem";
 import {
 	useChainId,
 	useConnection,
@@ -10,26 +9,28 @@ import {
 	useWaitForTransactionReceipt,
 	useWriteContract,
 } from "wagmi";
-import { ARBITRUM_CHAIN_ID, CONTRACTS, MIN_DEPOSIT_USDC, USDC_DECIMALS } from "@/config/contracts";
+import { ARBITRUM_CHAIN_ID, CONTRACTS, USDC_DECIMALS } from "@/config/contracts";
+import {
+	type DepositValidation,
+	getUsdcBalance,
+	type UsdcBalance,
+	validateDeposit,
+} from "@/lib/trade/deposit-validation";
 
 export type DepositStatus = "idle" | "pending" | "confirming" | "success" | "error";
-
-interface ValidationResult {
-	valid: boolean;
-	error: string | null;
-}
 
 export interface UseDepositResult {
 	isArbitrum: boolean;
 	switchToArbitrum: () => void;
 	isSwitching: boolean;
 	switchError: Error | null;
-	balance: string;
+	balance: UsdcBalance;
+	refetchBalance: () => void;
 	status: DepositStatus;
 	error: Error | null;
 	hash: Hash | undefined;
 	deposit: (amount: string) => void;
-	validate: (amount: string) => ValidationResult;
+	validate: (amount: string) => DepositValidation;
 	reset: () => void;
 }
 
@@ -44,21 +45,6 @@ function deriveStatus(
 	if (isSuccess) return "success";
 	if (error) return "error";
 	return "idle";
-}
-
-function validateAmount(amount: string, balanceRaw: bigint | undefined): ValidationResult {
-	const trimmed = amount.trim();
-	if (!trimmed) return { valid: false, error: null };
-
-	try {
-		const raw = parseUnits(trimmed, USDC_DECIMALS);
-		if (raw === 0n) return { valid: false, error: null };
-		if (raw < MIN_DEPOSIT_USDC) return { valid: false, error: t`Minimum deposit is 5 USDC` };
-		if (balanceRaw !== undefined && raw > balanceRaw) return { valid: false, error: t`Insufficient balance` };
-		return { valid: true, error: null };
-	} catch {
-		return { valid: false, error: t`Invalid amount` };
-	}
 }
 
 function useArbitrumChain() {
@@ -76,7 +62,7 @@ function useArbitrumChain() {
 }
 
 function useUsdcBalance(address: `0x${string}` | undefined, enabled: boolean) {
-	const { data: balanceRaw, refetch } = useReadContract({
+	const { data, isError, refetch } = useReadContract({
 		address: CONTRACTS.arbitrum.usdc,
 		abi: erc20Abi,
 		functionName: "balanceOf",
@@ -85,15 +71,13 @@ function useUsdcBalance(address: `0x${string}` | undefined, enabled: boolean) {
 		query: { enabled },
 	});
 
-	const balance = useMemo(() => (balanceRaw ? formatUnits(balanceRaw, USDC_DECIMALS) : "0"), [balanceRaw]);
-
-	return { balanceRaw, balance, refetch };
+	return { balance: getUsdcBalance({ data, isError }), refetch };
 }
 
 export function useDeposit(): UseDepositResult {
 	const { address } = useConnection();
 	const chain = useArbitrumChain();
-	const { balanceRaw, balance, refetch } = useUsdcBalance(address, chain.isArbitrum && !!address);
+	const { balance, refetch } = useUsdcBalance(address, chain.isArbitrum && !!address);
 
 	const { mutate: write, data: hash, isPending, error: writeError, reset } = useWriteContract();
 	const { isLoading: isConfirming, isSuccess, error: confirmError } = useWaitForTransactionReceipt({ hash });
@@ -101,7 +85,7 @@ export function useDeposit(): UseDepositResult {
 	const error = writeError ?? confirmError ?? null;
 	const status = deriveStatus(isPending, isConfirming, isSuccess, error);
 
-	const validate = useCallback((amount: string) => validateAmount(amount, balanceRaw), [balanceRaw]);
+	const validate = (amount: string) => validateDeposit(amount, balance);
 
 	const deposit = useCallback(
 		(amount: string) => {
@@ -123,6 +107,7 @@ export function useDeposit(): UseDepositResult {
 	return {
 		...chain,
 		balance,
+		refetchBalance: refetch,
 		status,
 		error,
 		hash,
