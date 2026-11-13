@@ -36,8 +36,8 @@ export interface OrderSubmitInput {
 	twapRandomize: boolean;
 	tpSlEnabled: boolean;
 	canUseTpSl: boolean;
-	tpPriceNum: number | null;
-	slPriceNum: number | null;
+	tpPriceInput: string;
+	slPriceInput: string;
 	twapOrder: boolean;
 	scaleOrder: boolean;
 	triggerOrder: boolean;
@@ -107,7 +107,7 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 	}
 
 	async function submitEntry(input: OrderSubmitInput): Promise<boolean> {
-		const { market, tpSlEnabled, canUseTpSl, tpPriceNum, slPriceNum } = input;
+		const { market, tpSlEnabled, canUseTpSl, tpPriceInput, slPriceInput } = input;
 
 		const plan = buildOrderPlan({
 			kind: "entry",
@@ -128,12 +128,12 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 			scaleLevelsNum: input.scaleLevelsNum,
 			tpSlEnabled,
 			canUseTpSl,
-			tpPriceNum,
-			slPriceNum,
+			tpPriceInput,
+			slPriceInput,
 		});
 
-		const hasTp = tpSlEnabled && canUseTpSl && isPositive(tpPriceNum);
-		const hasSl = tpSlEnabled && canUseTpSl && isPositive(slPriceNum);
+		const hasTp = tpSlEnabled && canUseTpSl && isPositive(tpPriceInput);
+		const hasSl = tpSlEnabled && canUseTpSl && isPositive(slPriceInput);
 
 		const orderId = addOrder({
 			market: input.baseToken,

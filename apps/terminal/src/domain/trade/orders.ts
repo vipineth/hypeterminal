@@ -62,8 +62,8 @@ export interface EntryOrderParams {
 	scaleLevelsNum: number | null;
 	tpSlEnabled: boolean;
 	canUseTpSl: boolean;
-	tpPriceNum: number | null;
-	slPriceNum: number | null;
+	tpPriceInput: string;
+	slPriceInput: string;
 }
 
 export interface OrderBuildResult {
@@ -90,14 +90,14 @@ export function buildOrders(params: EntryOrderParams): OrderBuildResult {
 		scaleLevelsNum,
 		tpSlEnabled,
 		canUseTpSl,
-		tpPriceNum,
-		slPriceNum,
+		tpPriceInput,
+		slPriceInput,
 	} = params;
 
 	const market: WireMarket = { szDecimals, kind: marketKind };
 	const orders: ExchangeOrder[] = [];
-	const hasTp = tpSlEnabled && canUseTpSl && isPositive(tpPriceNum);
-	const hasSl = tpSlEnabled && canUseTpSl && isPositive(slPriceNum);
+	const hasTp = tpSlEnabled && canUseTpSl && isPositive(tpPriceInput);
+	const hasSl = tpSlEnabled && canUseTpSl && isPositive(slPriceInput);
 	const isBuy = side === "buy";
 
 	if (isScaleOrderType(orderType)) {
@@ -138,11 +138,11 @@ export function buildOrders(params: EntryOrderParams): OrderBuildResult {
 			tif,
 		});
 
-		if (hasTp && tpPriceNum !== null) {
-			buildTpSlOrder(orders, { assetId, market, isBuy: !isBuy, formattedSize, triggerPrice: tpPriceNum, tpsl: "tp" });
+		if (hasTp) {
+			buildTpSlOrder(orders, { assetId, market, isBuy: !isBuy, formattedSize, triggerPrice: tpPriceInput, tpsl: "tp" });
 		}
-		if (hasSl && slPriceNum !== null) {
-			buildTpSlOrder(orders, { assetId, market, isBuy: !isBuy, formattedSize, triggerPrice: slPriceNum, tpsl: "sl" });
+		if (hasSl) {
+			buildTpSlOrder(orders, { assetId, market, isBuy: !isBuy, formattedSize, triggerPrice: slPriceInput, tpsl: "sl" });
 		}
 	}
 
@@ -263,7 +263,7 @@ interface TpSlOrderParams {
 	market: WireMarket;
 	isBuy: boolean;
 	formattedSize: string;
-	triggerPrice: number;
+	triggerPrice: string;
 	tpsl: "tp" | "sl";
 }
 

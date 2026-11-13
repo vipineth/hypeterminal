@@ -180,8 +180,8 @@ function entry(market: LiveMarket, side: Side, size: Big, fields: Partial<EntryO
 		scaleLevelsNum: null,
 		tpSlEnabled: false,
 		canUseTpSl: false,
-		tpPriceNum: null,
-		slPriceNum: null,
+		tpPriceInput: "",
+		slPriceInput: "",
 		...fields,
 	};
 }
@@ -284,8 +284,8 @@ function perpCases(market: LiveMarket, side: Side): PlanCase[] {
 			entry(market, side, size, {
 				tpSlEnabled: true,
 				canUseTpSl: true,
-				tpPriceNum: entryTp.toNumber(),
-				slPriceNum: entrySl.toNumber(),
+				tpPriceInput: entryTp.toFixed(),
+				slPriceInput: entrySl.toFixed(),
 			}),
 			{
 				grouping: "normalTpsl",

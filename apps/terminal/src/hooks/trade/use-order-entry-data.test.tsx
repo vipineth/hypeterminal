@@ -101,8 +101,8 @@ function submitLimitBuy(sizeMode: SizeMode, sizeInput: string) {
 		scaleLevelsNum: null,
 		tpSlEnabled: false,
 		canUseTpSl: false,
-		tpPriceNum: null,
-		slPriceNum: null,
+		tpPriceInput: "",
+		slPriceInput: "",
 	});
 	const validation = validateSpotOrder({
 		isConnected: true,
@@ -189,8 +189,8 @@ function buildScaleBuy(market: UnifiedMarketInfo, entry: OrderEntry, levels: num
 		scaleLevelsNum: levels,
 		tpSlEnabled: false,
 		canUseTpSl: false,
-		tpPriceNum: null,
-		slPriceNum: null,
+		tpPriceInput: "",
+		slPriceInput: "",
 	});
 }
 

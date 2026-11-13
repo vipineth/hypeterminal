@@ -30,8 +30,8 @@ const ENTRY_BASE = {
 	scaleLevelsNum: null,
 	tpSlEnabled: false,
 	canUseTpSl: false,
-	tpPriceNum: null,
-	slPriceNum: null,
+	tpPriceInput: "",
+	slPriceInput: "",
 };
 
 describe("getMarketPrice (characterization)", () => {
@@ -70,7 +70,7 @@ describe("buildOrderPlan entry (characterization)", () => {
 	});
 
 	it("attaches a reduce-only tp trigger and switches grouping to normalTpsl", () => {
-		const plan = buildOrderPlan({ ...ENTRY_BASE, tpSlEnabled: true, canUseTpSl: true, tpPriceNum: 110 });
+		const plan = buildOrderPlan({ ...ENTRY_BASE, tpSlEnabled: true, canUseTpSl: true, tpPriceInput: "110" });
 		expect(plan.orders).toEqual([
 			{ a: 0, b: true, p: "100.5", s: "1.5", r: false, t: { limit: { tif: "FrontendMarket" } } },
 			{ a: 0, b: false, p: "110", s: "1.5", r: true, t: { trigger: { isMarket: true, triggerPx: "110", tpsl: "tp" } } },
@@ -139,8 +139,8 @@ describe("buildOrderPlan entry (characterization)", () => {
 			...ENTRY_BASE,
 			tpSlEnabled: true,
 			canUseTpSl: true,
-			tpPriceNum: 110,
-			slPriceNum: 90,
+			tpPriceInput: "110",
+			slPriceInput: "90",
 		});
 		expect(plan.orders).toEqual([
 			{ a: 0, b: true, p: "100.5", s: "1.5", r: false, t: { limit: { tif: "FrontendMarket" } } },
@@ -304,8 +304,8 @@ describe("buildOrders grouping (characterization)", () => {
 			scaleLevelsNum: null,
 			tpSlEnabled: false,
 			canUseTpSl: false,
-			tpPriceNum: null,
-			slPriceNum: null,
+			tpPriceInput: "",
+			slPriceInput: "",
 		});
 		expect(result.grouping).toBe("na");
 		expect(result.orders).toHaveLength(1);
