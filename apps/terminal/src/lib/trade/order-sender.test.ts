@@ -1036,7 +1036,9 @@ describe("order sender seen from another tab", () => {
 		const unsubscribe = tabB.sender.subscribe(notified);
 		venue.state.exchangeDown = true;
 		const outcome = await tabA.sender.submit(signerFor(venue), marketBuy());
+		await vi.waitFor(() => expect(tabB.store.pending()).toHaveLength(1));
 		expect(tabB.sender.list(TEST_USER)).toEqual([]);
+		notified.mockClear();
 		await vi.advanceTimersByTimeAsync(IN_FLIGHT_GRACE_MS);
 		expect(notified).toHaveBeenCalled();
 		expect(tabB.sender.list(TEST_USER).map(getRequestKey)).toEqual([keyOf(outcome)]);
