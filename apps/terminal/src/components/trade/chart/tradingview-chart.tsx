@@ -7,6 +7,7 @@ import {
 	getLoadingScreenColors,
 	getToolbarBgColor,
 } from "@/lib/chart/theme-colors";
+import { useMarkets } from "@/lib/hyperliquid/markets/use-markets";
 import type { IChartingLibraryWidget, ResolutionString } from "@/types/charting_library";
 import {
 	CHART_CUSTOM_FONT_FAMILY,
@@ -43,6 +44,9 @@ export function TradingViewChart({
 	const chartReadyRef = useRef(false);
 	const onSwitchToDefaultRef = useRef(onSwitchToDefault);
 	onSwitchToDefaultRef.current = onSwitchToDefault;
+	const { getMarket } = useMarkets();
+	const getMarketRef = useRef(getMarket);
+	getMarketRef.current = getMarket;
 
 	useEffect(() => {
 		if (!containerRef.current) return;
@@ -78,7 +82,7 @@ export function TradingViewChart({
 				const widget = new window.TradingView.widget({
 					container: containerRef.current,
 					library_path: CHART_LIBRARY_PATH,
-					datafeed: createDatafeed(),
+					datafeed: createDatafeed((coin) => getMarketRef.current(coin)),
 					symbol: symbol,
 					interval: interval as ResolutionString,
 					locale: CHART_LOCALE,

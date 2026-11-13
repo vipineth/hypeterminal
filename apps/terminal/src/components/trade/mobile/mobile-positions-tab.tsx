@@ -173,7 +173,7 @@ export function MobilePositionsTab({ coin }: Props) {
 				)}
 				<div className={cn("flex-1 min-h-0 overflow-y-auto space-y-2", !coin && "px-3 pb-3")}>
 					{positions.map((p) => {
-						const assetId = markets.getAssetId(p.coin);
+						const assetId = markets.getMarket(p.coin)?.assetId;
 						const isRowClosing = typeof assetId === "number" && closingAssetIds.has(assetId);
 						const closeErrorMessage = typeof assetId === "number" ? (closeErrors.get(assetId) ?? null) : null;
 						return (

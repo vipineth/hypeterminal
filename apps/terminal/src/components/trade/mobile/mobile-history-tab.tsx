@@ -108,7 +108,7 @@ export function MobileHistoryTab({ className }: Props) {
 
 								<div className="grid grid-cols-3 divide-x divide-stroke-weak">
 									<MetricCell label={t`Price`} value={formatUSD(fill.px)} />
-									<MetricCell label={t`Size`} value={formatNumber(fill.sz, markets.getSzDecimals(fill.coin))} />
+									<MetricCell label={t`Size`} value={formatNumber(fill.sz, markets.getMarket(fill.coin)?.szDecimals)} />
 									<MetricCell
 										label={t`Fee`}
 										value={formatToken(fill.fee, { symbol: fill.feeToken })}

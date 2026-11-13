@@ -1,10 +1,11 @@
 import { t } from "@lingui/core/macro";
-import type { AllMidsResponse, MetaResponse } from "@nktkas/hyperliquid";
+import type { AllMidsResponse } from "@nktkas/hyperliquid";
+import type { Market } from "@/domain/market/model";
 import { candleSnapshotToBar, filterAndSortBars } from "@/lib/chart/candle";
 import { resolutionToInterval } from "@/lib/chart/resolution";
 import { getCandleStore, streamKey } from "@/lib/chart/store";
 import { coinFromSymbolName, inferPriceScaleFromMids, symbolFromCoin } from "@/lib/chart/symbol";
-import { getDexFromName, getInfoClient, getMarketKindFromName } from "@/lib/hyperliquid";
+import { getInfoClient } from "@/lib/hyperliquid";
 import type {
 	Bar,
 	DatafeedConfiguration,
@@ -28,26 +29,6 @@ import {
 	SUPPORTED_RESOLUTIONS,
 	TIMEZONE,
 } from "./constants";
-
-let metaCache: { value: MetaResponse; fetchedAt: number } | undefined;
-let metaPromise: Promise<MetaResponse> | undefined;
-
-async function getMeta(): Promise<MetaResponse> {
-	if (metaCache) return metaCache.value;
-	if (metaPromise) return metaPromise;
-
-	metaPromise = getInfoClient()
-		.meta()
-		.then((meta) => {
-			metaCache = { value: meta, fetchedAt: Date.now() };
-			return meta;
-		})
-		.finally(() => {
-			metaPromise = undefined;
-		});
-
-	return metaPromise;
-}
 
 const allMidsCache = new Map<string, { value: AllMidsResponse; fetchedAt: number }>();
 const allMidsPromise = new Map<string, Promise<AllMidsResponse>>();
@@ -75,22 +56,10 @@ async function getAllMids(dex?: string): Promise<AllMidsResponse> {
 	return request;
 }
 
-async function isKnownCoin(coin: string): Promise<boolean> {
-	// Spot (@id) and HIP-3 builder (dex:coin) names are self-identifying; only perp needs a meta lookup.
-	if (getMarketKindFromName(coin) !== "perp") return true;
-
+async function inferPriceScale(market: Market): Promise<number> {
 	try {
-		const meta = await getMeta();
-		return meta.universe.some((asset) => asset.name === coin && !(asset.isDelisted ?? false));
-	} catch {
-		return true;
-	}
-}
-
-async function inferPriceScale(coin: string): Promise<number> {
-	try {
-		const mids = await getAllMids(getDexFromName(coin));
-		return inferPriceScaleFromMids(coin, mids);
+		const mids = await getAllMids(market.kind === "spot" ? undefined : market.dex.name || undefined);
+		return inferPriceScaleFromMids(market.name, mids);
 	} catch {
 		return DEFAULT_PRICESCALE;
 	}
@@ -120,7 +89,7 @@ const configuration: DatafeedConfiguration = {
 	supports_timescale_marks: false,
 };
 
-export function createDatafeed(): IBasicDataFeed {
+export function createDatafeed(getMarket: (coin: string) => Market | undefined): IBasicDataFeed {
 	const store = getCandleStore();
 	const listenerToStream = new Map<string, string>();
 
@@ -138,12 +107,13 @@ export function createDatafeed(): IBasicDataFeed {
 				const coin = coinFromSymbolName(symbolName);
 				const displayName = symbolFromCoin(coin);
 
-				if (!(await isKnownCoin(coin))) {
+				const market = getMarket(coin);
+				if (!market || market.isDelisted) {
 					onError(t`Unknown symbol: ${symbolName}`);
 					return;
 				}
 
-				const pricescale = await inferPriceScale(coin);
+				const pricescale = await inferPriceScale(market);
 
 				const symbolInfo: LibrarySymbolInfo = {
 					name: displayName,

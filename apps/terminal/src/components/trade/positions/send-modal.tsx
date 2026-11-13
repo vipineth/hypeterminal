@@ -20,7 +20,7 @@ import { type BalanceRow, getPerpAvailable, getSpotAvailable, getSpotAvailableVa
 import { useDefaultDexBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { useExchange } from "@/lib/hyperliquid";
-import { useSpotTokens } from "@/lib/hyperliquid/markets/use-spot-tokens";
+import { useMarkets } from "@/lib/hyperliquid/markets/use-markets";
 import { floorToString, limitDecimalInput } from "@/lib/trade/numbers";
 import { formatTokenId } from "@/lib/trade/token-id";
 
@@ -66,7 +66,7 @@ function SendModalBody({ onOpenChange, initialAsset, initialAccountType }: BodyP
 	const [amount, setAmount] = useState("");
 	const [error, setError] = useState<string | null>(null);
 
-	const { getToken } = useSpotTokens();
+	const { getToken } = useMarkets();
 	const { mutateAsync: sendAsset, isPending: isSendAssetPending } = useExchange("sendAsset");
 	const { mutateAsync: spotSend, isPending: isSpotSendPending } = useExchange("spotSend");
 	const { perpSummary, spotBalances, spotAvailableAfterMaintenance } = useDefaultDexBalances();

@@ -72,7 +72,7 @@ export function MobileTwapTab({ className }: Props) {
 						const totalSize = toBig(state.sz)?.toNumber() ?? Number.NaN;
 						const executedSize = toBig(state.executedSz)?.toNumber() ?? 0;
 						const avgPrice = getAvgPrice(state.executedNtl, state.executedSz);
-						const szDecimals = markets.getSzDecimals(state.coin);
+						const szDecimals = markets.getMarket(state.coin)?.szDecimals;
 						const creationTime = state.timestamp;
 						const totalMinutes = state.minutes;
 
@@ -102,7 +102,7 @@ export function MobileTwapTab({ className }: Props) {
 											size="sm"
 											disabled={isCancelling}
 											onClick={() => {
-												const assetId = markets.getAssetId(state.coin);
+												const assetId = markets.getMarket(state.coin)?.assetId;
 												if (typeof assetId !== "number") return;
 												cancelTwap({ a: assetId, t: twapId });
 											}}

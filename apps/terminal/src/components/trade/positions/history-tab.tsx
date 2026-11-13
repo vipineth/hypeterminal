@@ -158,7 +158,7 @@ export function HistoryTab() {
 												size="dense"
 												className={cn(positionsPanelTableCellClass, "text-right tabular-nums text-fg")}
 											>
-												{formatNumber(fill.sz, markets.getSzDecimals(fill.coin))}
+												{formatNumber(fill.sz, markets.getMarket(fill.coin)?.szDecimals)}
 											</TableCell>
 											<TableCell size="dense" className={cn(positionsPanelTableCellClass, "text-right tabular-nums")}>
 												<span className={feeClass}>

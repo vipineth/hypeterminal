@@ -110,7 +110,7 @@ export function OrdersTab() {
 		if (fresh.length === 0) return;
 
 		const cancels = fresh.reduce<{ a: number; o: number }[]>((acc, order) => {
-			const assetId = markets.getAssetId(order.coin);
+			const assetId = markets.getMarket(order.coin)?.assetId;
 			if (typeof assetId !== "number") return acc;
 			acc.push({ a: assetId, o: order.oid });
 			return acc;
@@ -285,7 +285,7 @@ export function OrdersTab() {
 										<OrderRow
 											key={order.oid}
 											order={order}
-											szDecimals={markets.getSzDecimals(order.coin)}
+											szDecimals={markets.getMarket(order.coin)?.szDecimals}
 											isSelected={validSelectedIds.has(order.oid)}
 											isCancelling={cancellingOids.has(order.oid)}
 											isEven={i % 2 === 1}
@@ -307,7 +307,7 @@ export function OrdersTab() {
 
 interface OrderRowProps {
 	order: OpenOrder;
-	szDecimals: number;
+	szDecimals: number | undefined;
 	isSelected: boolean;
 	isCancelling: boolean;
 	isEven: boolean;

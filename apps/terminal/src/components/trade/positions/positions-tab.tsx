@@ -221,7 +221,7 @@ export function PositionsTab() {
 							</TableHeader>
 							<TableBody className={positionsPanelTableBodyClass}>
 								{positions.map((p, i) => {
-									const assetId = markets.getAssetId(p.coin);
+									const assetId = markets.getMarket(p.coin)?.assetId;
 									return (
 										<PositionRow
 											key={p.coin}

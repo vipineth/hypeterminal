@@ -174,23 +174,14 @@ export function useMarketsInfoInternal(options: UseMarketsInfoOptions = {}) {
 		};
 	}, [markets.listed, allDexsCtxs, spotCtxs]);
 
-	const marketLookup = useMemo(() => {
-		const byName = new Map<string, UnifiedMarketInfo>();
-		const byPairName = new Map<string, UnifiedMarketInfo>();
+	const marketByName = useMemo(
+		() => new Map<string, UnifiedMarketInfo>(result.markets.map((market) => [market.name, market])),
+		[result.markets],
+	);
 
-		for (const market of result.markets) {
-			byName.set(market.name, market);
-			byPairName.set(market.pairName, market);
-		}
-
-		return { byName, byPairName };
-	}, [result.markets]);
-
-	const getMarketInfo = useMemo(() => {
-		return (name: string): UnifiedMarketInfo | undefined => {
-			return marketLookup.byName.get(name) ?? marketLookup.byPairName.get(name);
-		};
-	}, [marketLookup]);
+	function getMarketInfo(name: string): UnifiedMarketInfo | undefined {
+		return marketByName.get(name);
+	}
 
 	return {
 		...result,

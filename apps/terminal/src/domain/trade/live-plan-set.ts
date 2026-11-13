@@ -4,7 +4,6 @@ import type { ExchangeOrder } from "@/config/trade";
 import type { MarketKind } from "@/domain/market";
 import type { EntryOrderIntent, OrderIntent, OrderPlan } from "@/domain/trade/order-intent";
 import type { TwapIntent, TwapPlan } from "@/domain/trade/twap";
-import { getBuilderPerpAssetId, getPerpAssetId, getSpotAssetId } from "@/lib/hyperliquid/markets/helper";
 import type { Side } from "@/lib/trade/types";
 
 export interface LiveMetaSnapshot {
@@ -83,7 +82,7 @@ export function listLiveMarkets(snapshot: LiveMetaSnapshot): LiveMarket[] {
 			if (asset.isDelisted || markPx.lte(0)) return;
 			markets.push({
 				name: asset.name,
-				assetId: dexIndex === 0 ? getPerpAssetId(assetIndex) : getBuilderPerpAssetId(dexIndex, assetIndex),
+				assetId: dexIndex === 0 ? assetIndex : 100000 + dexIndex * 10000 + assetIndex,
 				szDecimals: asset.szDecimals,
 				kind: dexIndex === 0 ? "perp" : "builderPerp",
 				markPx,
@@ -98,7 +97,7 @@ export function listLiveMarkets(snapshot: LiveMetaSnapshot): LiveMarket[] {
 		if (!base || !tokenByIndex.has(pair.tokens[1]) || markPx.lte(0)) continue;
 		markets.push({
 			name: pair.name,
-			assetId: getSpotAssetId(pair.index),
+			assetId: 10000 + pair.index,
 			szDecimals: base.szDecimals,
 			kind: "spot",
 			markPx,

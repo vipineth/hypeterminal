@@ -10,7 +10,7 @@ import { getNormalizedWithdrawable, getSpotAvailable, getSpotBalance } from "@/d
 import { useDefaultDexBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { useExchange } from "@/lib/hyperliquid";
-import { useSpotTokens } from "@/lib/hyperliquid/markets/use-spot-tokens";
+import { useMarkets } from "@/lib/hyperliquid/markets/use-markets";
 import { floorToString, limitDecimalInput } from "@/lib/trade/numbers";
 import { formatTokenId } from "@/lib/trade/token-id";
 
@@ -47,7 +47,7 @@ function TransferModalBody({ onOpenChange, initialDirection }: BodyProps) {
 	const [error, setError] = useState<string | null>(null);
 
 	const { address } = useConnection();
-	const { getToken } = useSpotTokens();
+	const { getToken } = useMarkets();
 	const { mutateAsync: sendAsset, isPending } = useExchange("sendAsset");
 	const { withdrawable, spotBalances, spotAvailableAfterMaintenance, accountAbstraction } = useDefaultDexBalances();
 

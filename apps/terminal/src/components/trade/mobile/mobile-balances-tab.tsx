@@ -17,7 +17,7 @@ import { useDefaultDexBalances } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { formatToken, formatUSD } from "@/lib/format";
 import { useSubscription } from "@/lib/hyperliquid";
-import { useSpotTokens } from "@/lib/hyperliquid/markets/use-spot-tokens";
+import { useMarkets } from "@/lib/hyperliquid/markets/use-markets";
 import { toNumberOrZero } from "@/lib/trade/numbers";
 import { useSwapModalActions } from "@/stores/use-global-modal-store";
 import { useGlobalSettingsActions, useHideSmallBalances } from "@/stores/use-global-settings-store";
@@ -34,7 +34,7 @@ interface Props {
 
 export function MobileBalancesTab({ className }: Props) {
 	const { isConnected } = useConnection();
-	const { getToken } = useSpotTokens();
+	const { getToken } = useMarkets();
 	const hideSmallBalances = useHideSmallBalances();
 	const { setHideSmallBalances } = useGlobalSettingsActions();
 	const { open: openSwapModal } = useSwapModalActions();

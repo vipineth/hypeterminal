@@ -10,8 +10,6 @@ export interface Markets extends MarketModel {
 	readonly error: Error | null;
 	getMarket(coin: string): Market | undefined;
 	getToken(name: string): SpotToken | undefined;
-	getSzDecimals(coin: string): number;
-	getAssetId(coin: string): number | undefined;
 }
 
 function createMarkets(model: MarketModel, isLoading: boolean, error: Error | null): Markets {
@@ -26,14 +24,6 @@ function createMarkets(model: MarketModel, isLoading: boolean, error: Error | nu
 
 		getToken(name: string): SpotToken | undefined {
 			return model.tokenByName.get(name);
-		},
-
-		getSzDecimals(coin: string): number {
-			return model.byName.get(coin)?.szDecimals ?? 4;
-		},
-
-		getAssetId(coin: string): number | undefined {
-			return model.byName.get(coin)?.assetId;
 		},
 	};
 }

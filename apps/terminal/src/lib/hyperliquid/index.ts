@@ -50,5 +50,4 @@ export {
 	useSelectedMarketInfo,
 } from "./hooks/useMarketsInfo";
 export { useMarkets } from "./markets";
-export { getDexFromName, getMarketKindFromName } from "./markets/helper";
 export { useDeposit } from "./use-deposit";
