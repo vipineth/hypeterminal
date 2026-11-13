@@ -54,14 +54,17 @@ export function parseMarkets({ perpDexs, allPerpMetas, spotMeta }: MetaPayloads)
 	}
 
 	const spotMarkets: SpotMarket[] = [];
+	const realNames = new Set(spotMeta.tokens.map((token) => token.name));
+	const strippedNames = spotMeta.tokens.map(getTokenDisplayName).filter((name) => !realNames.has(name));
 	const spotTokens: SpotToken[] = spotMeta.tokens.map((token) => {
-		const displayName = getTokenDisplayName(token);
+		const strippedName = getTokenDisplayName(token);
+		const isUnique = strippedNames.indexOf(strippedName) === strippedNames.lastIndexOf(strippedName);
 		return {
 			...token,
-			displayName,
+			displayName: realNames.has(strippedName) || !isUnique ? token.name : strippedName,
 			iconUrl: getIconUrlFromMarketName(getUnderlyingAsset(token) ?? token.name, "spot"),
 			transferDecimals: token.weiDecimals + (token.evmContract?.evm_extra_wei_decimals ?? 0),
-			isWrapped: displayName !== token.name,
+			isWrapped: strippedName !== token.name,
 		};
 	});
 
@@ -131,13 +134,7 @@ export function parseMarkets({ perpDexs, allPerpMetas, spotMeta }: MetaPayloads)
 		byName.set(market.name, market);
 	}
 
-	const tokenByName = new Map<string, SpotToken>();
-	for (const token of spotTokens) {
-		tokenByName.set(token.name, token);
-		if (token.displayName !== token.name) {
-			tokenByName.set(token.displayName, token);
-		}
-	}
+	const tokenByName = new Map(spotTokens.map((token) => [token.name, token]));
 
 	return {
 		all,
