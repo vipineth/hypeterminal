@@ -192,6 +192,9 @@ importers:
       babel-plugin-react-compiler:
         specifier: 1.0.0
         version: 1.0.0
+      fake-indexeddb:
+        specifier: 6.2.7
+        version: 6.2.7
       nitro:
         specifier: 3.0.261103-rc
         version: 3.0.261103-rc
@@ -3395,6 +3398,10 @@ packages:
 
   extend@3.0.2:
     resolution: {integrity: sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==}
+
+  fake-indexeddb@6.2.7:
+    resolution: {integrity: sha512-g0ghQ+BmU3CSZaHup5FigEAAtCmtNyxkrmID7OAeK2qONHghw1aQ2l2T1RxmfhP1H1tEXVRWArUTGVCk5832ww==}
+    engines: {node: '>=18'}
 
   fast-string-truncated-width@3.0.3:
     resolution: {integrity: sha512-0jjjIEL6+0jag3l2XWWizO64/aZVtpiGE3t0Zgqxv0DPuxiMjvB3M24fCyhZUO4KomJQPj3LTSUnDP3GpdwC0g==}
@@ -8719,6 +8726,8 @@ snapshots:
   exsolve@1.2.0: {}
 
   extend@3.0.2: {}
+
+  fake-indexeddb@6.2.7: {}
 
   fast-string-truncated-width@3.0.3: {}
 

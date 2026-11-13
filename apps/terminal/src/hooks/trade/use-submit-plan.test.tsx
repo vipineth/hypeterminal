@@ -13,6 +13,7 @@ const net = vi.hoisted(() => ({
 	venue: null as unknown as FakeExchange,
 	storage: null as unknown as MemoryKeyValue,
 	locks: null as unknown as LockManagerLike,
+	tradingReady: true,
 }));
 const queue = vi.hoisted(() => ({
 	addOrder: vi.fn(),
@@ -27,7 +28,7 @@ vi.mock("wagmi", () => ({
 
 vi.mock("@hypeterminal/hl-react", async (importOriginal) => ({
 	...(await importOriginal<typeof import("@hypeterminal/hl-react")>()),
-	useHyperliquidClients: () => ({ trading: net.venue.trading }),
+	useHyperliquidClients: () => ({ trading: net.tradingReady ? net.venue.trading : undefined }),
 }));
 
 vi.mock("@/lib/trade/browser-env", () => ({
@@ -86,6 +87,7 @@ describe("retry and cancel on an unconfirmed order", () => {
 		net.venue = createFakeExchange();
 		net.storage = createMemoryKeyValue();
 		net.locks = createMemoryLocks();
+		net.tradingReady = true;
 		queue.updateByRequestKey.mockClear();
 	});
 
@@ -191,6 +193,21 @@ describe("retry and cancel on an unconfirmed order", () => {
 		const dismissed = await settle(hook.dismissRequest(result.requestKey, preview.lookup));
 		expect(dismissed).toMatchObject({ ok: true, outcome: "filled" });
 		expect(net.venue.state.placedLegs).toBe(1);
+	});
+});
+
+describe("cancel before the trading wallet is ready", () => {
+	beforeEach(() => {
+		net.venue = createFakeExchange();
+		net.storage = createMemoryKeyValue();
+		net.locks = createMemoryLocks();
+	});
+
+	it("says Cancel can run only once a trading wallet can sign it", async () => {
+		net.tradingReady = false;
+		expect((await mountSubmitPlan()).canCancel).toBe(false);
+		net.tradingReady = true;
+		expect((await mountSubmitPlan()).canCancel).toBe(true);
 	});
 });
 

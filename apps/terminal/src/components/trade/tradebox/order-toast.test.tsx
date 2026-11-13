@@ -2,14 +2,18 @@ import type { ReactNode } from "react";
 import { renderToString } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { OrderToast } from "@/components/trade/tradebox/order-toast";
+import { privateKeyToAccount } from "viem/accounts";
 import { reportSubmit } from "@/lib/trade/extract-order-status";
-import type { PendingRequest } from "@/lib/trade/pending-requests";
+import { createOrderSender } from "@/lib/trade/order-sender";
+import { createRequestStore, type PendingRequest } from "@/lib/trade/pending-requests";
 import { type OrderQueueItem, resultToQueueUpdate } from "@/stores/use-order-queue-store";
+import { createFakeExchange, createMemoryKeyValue, createMemoryLocks, TEST_AGENT_KEY, TEST_USER } from "@/test/fake-exchange";
 
 const view = vi.hoisted(() => ({
 	queued: [] as OrderQueueItem[],
 	pending: [] as PendingRequest[],
-	buttons: [] as { label: string; onClick?: () => void }[],
+	buttons: [] as { label: string; onClick?: () => void; disabled?: boolean }[],
+	canCancel: true,
 }));
 const actions = vi.hoisted(() => ({
 	addOrder: vi.fn(),
@@ -25,6 +29,7 @@ const actions = vi.hoisted(() => ({
 	})),
 	dismissRequest: vi.fn(async () => ({ ok: true })),
 	sendRejectedLegs: vi.fn(async () => ({ ok: true, outcome: "filled" })),
+	dismissUnreadable: vi.fn(async () => ({ ok: false, status: "unknown", error: "Dismissed." })),
 }));
 
 vi.mock("@hypeterminal/ui", async (importOriginal) => ({
@@ -32,13 +37,15 @@ vi.mock("@hypeterminal/ui", async (importOriginal) => ({
 	Button: ({
 		children,
 		onClick,
+		disabled,
 		"aria-label": ariaLabel,
 	}: {
 		children?: ReactNode;
 		onClick?: () => void;
+		disabled?: boolean;
 		"aria-label"?: string;
 	}) => {
-		view.buttons.push({ label: ariaLabel ?? String(children), onClick });
+		view.buttons.push({ label: ariaLabel ?? String(children), onClick, disabled });
 		return null;
 	},
 }));
@@ -62,6 +69,8 @@ vi.mock("@/hooks/trade/use-submit-plan", () => ({
 		previewDismiss: actions.previewDismiss,
 		dismissRequest: actions.dismissRequest,
 		sendRejectedLegs: actions.sendRejectedLegs,
+		dismissUnreadable: actions.dismissUnreadable,
+		canCancel: view.canCancel,
 	}),
 }));
 
@@ -102,6 +111,7 @@ describe("order toast", () => {
 		view.queued = [UNCONFIRMED_ROW];
 		view.pending = [LEFT_FROM_BEFORE_RELOAD];
 		view.buttons = [];
+		view.canCancel = true;
 		vi.clearAllMocks();
 	});
 
@@ -220,4 +230,146 @@ describe("order toast", () => {
 		);
 		expect(actions.addOrder).toHaveBeenCalledWith(expect.objectContaining({ side: "buy", size: "1" }));
 	});
+
+	it("disables Cancel on a row left from before a reload until the trading wallet is ready, and says why", () => {
+		view.queued = [];
+		view.canCancel = false;
+		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		expect(buttonsNamed("Cancel").map((button) => button.disabled)).toEqual([true]);
+		expect(buttonsNamed("Retry").map((button) => button.disabled)).toEqual([undefined]);
+		expect(html).toContain("Connect your trading wallet to cancel it.");
+	});
+
+	it("puts a leftover row back with its buttons and the reason when its Cancel is not sent", async () => {
+		const leftOverKey = `${LEFT_FROM_BEFORE_RELOAD.slot}#${LEFT_FROM_BEFORE_RELOAD.nonce}`;
+		actions.cancelRequest.mockResolvedValueOnce({
+			ok: false,
+			status: "notSent",
+			error: "Wallet is required for exchange actions",
+		} as never);
+		view.queued = [];
+		renderToString(<OrderToast />);
+		buttonsNamed("Cancel")[0].onClick?.();
+		await vi.waitFor(() =>
+			expect(actions.updateByRequestKey).toHaveBeenLastCalledWith(
+				leftOverKey,
+				expect.objectContaining({ status: "unsettled", error: "Wallet is required for exchange actions" }),
+			),
+		);
+		view.queued = [{ ...actions.addOrder.mock.calls[0][0], id: "adopted", ...lastUpdateFor(leftOverKey) }];
+		view.pending = [LEFT_FROM_BEFORE_RELOAD];
+		view.buttons = [];
+		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		expect(html).not.toContain("1 pending");
+		expect(html).toContain("1 unconfirmed");
+		expect(buttonsNamed("Retry")).toHaveLength(1);
+		expect(buttonsNamed("Cancel")).toHaveLength(1);
+	});
+
+	it("puts a leftover row back with the refusal when its Retry is refused", async () => {
+		const leftOverKey = `${LEFT_FROM_BEFORE_RELOAD.slot}#${LEFT_FROM_BEFORE_RELOAD.nonce}`;
+		const refusal = "Can't save order state in this browser. Enable site storage to trade.";
+		actions.retryRequest.mockResolvedValueOnce({ ok: false, status: "notSent", error: refusal } as never);
+		view.queued = [];
+		renderToString(<OrderToast />);
+		buttonsNamed("Retry")[0].onClick?.();
+		await vi.waitFor(() =>
+			expect(actions.updateByRequestKey).toHaveBeenLastCalledWith(
+				leftOverKey,
+				expect.objectContaining({ status: "unsettled", error: refusal }),
+			),
+		);
+	});
+
+	it("offers Dismiss only on a row whose request can no longer execute or whose signer is gone", () => {
+		view.queued = [
+			UNCONFIRMED_ROW,
+			{ ...UNCONFIRMED_ROW, id: "order-2", requestKey: `${UNCONFIRMED_ROW.requestKey}2`, canDismiss: true },
+		];
+		renderToString(<OrderToast />);
+		expect(buttonsNamed("Retry")).toHaveLength(3);
+		expect(buttonsNamed("Dismiss")).toHaveLength(1);
+		buttonsNamed("Dismiss")[0].onClick?.();
+		expect(actions.previewDismiss).toHaveBeenCalledWith(`${UNCONFIRMED_ROW.requestKey}2`);
+	});
+
+	it("shows a held press with the legs that placed and no partial resend", async () => {
+		const held = await pressHeldScale();
+		view.queued = [
+			{ id: "row-held", market: "SOL", side: "buy", size: "2", createdAt: 0, ...resultToQueueUpdate(reportSubmit(held)) },
+		];
+		view.pending = [];
+		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		expect(view.buttons.map((button) => button.label)).not.toContain("Send only the rejected legs");
+		expect(html).toContain("Leg 1 at 90 placed, Leg 2 at 95 rejected");
+	});
+
+	it("offers a confirmed Dismiss on a press refused over a pending order it can't read", async () => {
+		const unreadable = { slot: LEFT_FROM_BEFORE_RELOAD.slot, raw: '{"state":"pending"}' };
+		const refused = reportSubmit({ kind: "refused", reason: "unreadableRecord", ...unreadable } as never);
+		const row: OrderQueueItem = {
+			id: "row-3",
+			market: "ETH",
+			side: "buy",
+			size: "1",
+			createdAt: 0,
+			...resultToQueueUpdate(refused),
+		};
+		view.queued = [row];
+		view.pending = [];
+		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		expect(html).toContain("Can't read a pending order for this market.");
+		buttonsNamed("Dismiss pending order")[0].onClick?.();
+		expect(actions.updateOrder).toHaveBeenCalledWith("row-3", { confirmUnreadable: true });
+		view.queued = [{ ...row, confirmUnreadable: true }];
+		view.buttons = [];
+		expect(renderToString(<OrderToast />)).toContain("It may still execute.");
+		buttonsNamed("Yes, dismiss it")[0].onClick?.();
+		await vi.waitFor(() => expect(actions.dismissUnreadable).toHaveBeenCalledWith(unreadable.slot, unreadable.raw));
+		await vi.waitFor(() => expect(actions.updateOrder).toHaveBeenLastCalledWith("row-3", expect.objectContaining({ status: "unknown" })));
+	});
 });
+
+function lastUpdateFor(requestKey: string): Partial<OrderQueueItem> {
+	const calls = actions.updateByRequestKey.mock.calls.filter(([key]) => key === requestKey);
+	return calls.reduce((row, [, update]) => ({ ...row, ...update }), {} as Partial<OrderQueueItem>);
+}
+
+async function pressHeldScale() {
+	const venue = createFakeExchange();
+	venue.state.legOutcome = (order) =>
+		order.p === "95" ? { status: { error: "bad price" }, lookup: "rejected" } : undefined;
+	const keyValue = createMemoryKeyValue();
+	const locks = createMemoryLocks();
+	const sender = createOrderSender({
+		info: () => venue.info,
+		store: createRequestStore(() => keyValue),
+		clock: { now: async () => Date.now(), estimate: () => Date.now(), warm() {} },
+		locks: () => locks,
+		sleep: async () => {},
+	});
+	const signer = { user: TEST_USER, config: { transport: venue.transport, wallet: privateKeyToAccount(TEST_AGENT_KEY) } };
+	let cloid = 0;
+	function scale(prices: string[]) {
+		return {
+			kind: "order" as const,
+			params: {
+				orders: prices.map((p) => ({
+					a: 5,
+					b: true,
+					p,
+					s: "1",
+					r: false,
+					t: { limit: { tif: "FrontendMarket" as const } },
+					c: `0xd0${(++cloid).toString(16).padStart(30, "0")}` as `0x${string}`,
+				})),
+				grouping: "na" as const,
+			},
+			legs: prices.map((price) => ({ role: "scaleLeg" as const, price })),
+			label: { market: "SOL", side: "buy" as const, size: String(prices.length) },
+		};
+	}
+	await sender.submit(signer, scale(["90", "95"]));
+	return sender.submit(signer, scale(["90", "96"]));
+}
+

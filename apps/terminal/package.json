@@ -67,6 +67,7 @@
 		"@vitejs/plugin-react": "6.2.1",
 		"babel-plugin-macros": "3.1.0",
 		"babel-plugin-react-compiler": "1.0.0",
+		"fake-indexeddb": "6.2.7",
 		"nitro": "3.0.261103-rc",
 		"vite": "8.3.6",
 		"vitest": "5.0.5"
