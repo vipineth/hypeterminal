@@ -32,10 +32,12 @@
 		"./internal/websocket/visibility": "./src/internal/websocket/visibility.ts"
 	},
 	"scripts": {
-		"typecheck": "tsc -p tsconfig.json --noEmit"
+		"typecheck": "tsc -p tsconfig.json --noEmit",
+		"test": "vitest run"
 	},
 	"devDependencies": {
-		"@types/react": "19.2.7"
+		"@types/react": "19.2.7",
+		"vitest": "5.0.5"
 	},
 	"peerDependencies": {
 		"@nktkas/hyperliquid": ">=0.33.3 <1",
