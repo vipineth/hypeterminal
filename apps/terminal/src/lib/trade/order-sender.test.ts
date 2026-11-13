@@ -634,6 +634,7 @@ describe("order sender settling only on the exchange's reply", () => {
 			venue.state.rejectWith = arrivals === 1 ? REVOKED : null;
 		};
 		const outcome = await openTab(venue, storage, locks).sender.submit(signerFor(venue), marketBuy());
+		expect(JSON.stringify(reportSubmit(outcome))).not.toContain("does not exist");
 		expect(outcome).toMatchObject({ kind: "sent", settlement: { kind: "consumed" } });
 		expect(reportSubmit(outcome)).toEqual({
 			ok: false,
@@ -655,8 +656,8 @@ describe("order sender settling only on the exchange's reply", () => {
 		const outcome = await openTab(venue, storage, locks).sender.submit(signerFor(venue), marketBuy());
 		expect(venue.state.placedLegs).toBe(1);
 		const report = reportSubmit(outcome);
-		expect(report).toMatchObject({ ok: false, status: "unknown" });
 		expect(JSON.stringify(report)).not.toContain("Too many requests");
+		expect(report).toMatchObject({ ok: false, status: "unknown" });
 	});
 
 	it("unblocks a market only through a confirmed dismissal, which it records", async () => {
@@ -827,6 +828,7 @@ describe("order sender with twaps", () => {
 			venue.state.onArrive = null;
 		};
 		const outcome = await openTab(venue, storage, locks).sender.submit(signerFor(venue), twapBuy());
+		expect(reportSubmit(outcome).ok).toBe(false);
 		expect(outcome).toMatchObject({ settlement: { kind: "consumed", lookup: { matches: [{ twapId: 123 }] } } });
 		expect(reportSubmit(outcome)).toEqual({
 			ok: false,
@@ -865,12 +867,13 @@ describe("order sender after a partial result", () => {
 	it("holds a corrected resubmit that would place the filled leg again, and offers only the rejected leg", async () => {
 		const { sender } = openTab(venue, storage, locks);
 		const first = await sender.submit(signerFor(venue), scale(["90", "95"]));
+		const corrected = await sender.submit(signerFor(venue), scale(["90", "96"]));
+		expect(sentPrices(venue).filter((price) => price === "90")).toHaveLength(1);
 		expect(reportSubmit(first)).toEqual({
 			ok: false,
 			status: "failed",
 			error: "1 of 2 legs placed. Leg 2 at 95 rejected: bad price",
 		});
-		const corrected = await sender.submit(signerFor(venue), scale(["90", "96"]));
 		expect(corrected).toMatchObject({ kind: "held", partial: { fates: ["placed", "rejected"] } });
 		expect(heldOffer(corrected).params.orders.map((leg) => leg.p)).toEqual(["96"]);
 		expect(reportSubmit(corrected)).toMatchObject({
