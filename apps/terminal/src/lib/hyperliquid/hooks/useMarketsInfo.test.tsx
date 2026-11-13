@@ -23,19 +23,22 @@ Object.assign(
 	JSON.parse(readFileSync(new URL("../../../../fixtures/hl-mainnet-meta.json", import.meta.url), "utf8")),
 );
 
+const rendered: { info?: UseMarketsInfoReturn } = {};
+
+function Probe() {
+	rendered.info = useMarketsInfoInternal();
+	return null;
+}
+
 function renderMarketsInfo(): UseMarketsInfoReturn {
-	let result: UseMarketsInfoReturn | undefined;
-	function Probe() {
-		result = useMarketsInfoInternal();
-		return null;
-	}
+	rendered.info = undefined;
 	renderToString(
 		<MarketsProvider>
 			<Probe />
 		</MarketsProvider>,
 	);
-	if (!result) throw new Error("useMarketsInfoInternal did not render");
-	return result;
+	if (!rendered.info) throw new Error("useMarketsInfoInternal did not render");
+	return rendered.info;
 }
 
 describe("useMarketsInfo", () => {
