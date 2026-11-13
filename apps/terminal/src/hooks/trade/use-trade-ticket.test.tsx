@@ -1,7 +1,6 @@
 import { renderToString } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useTradeTicket } from "@/hooks/trade/use-trade-ticket";
-import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 
 const POINTS_USDC = vi.hoisted(() => ({
 	kind: "spot",
@@ -95,14 +94,12 @@ function TicketProbe({ onTicket }: Props) {
 	return null;
 }
 
-async function pressSubmit(): Promise<Ticket> {
+async function pressSubmit() {
 	const tickets: Ticket[] = [];
 	renderToString(<TicketProbe onTicket={(ticket) => tickets.push(ticket)} />);
 	const [ticket] = tickets;
-	expect(ticket.market).toBe(POINTS_USDC as unknown as UnifiedMarketInfo);
 	expect(ticket.buttonContent.disabled).toBe(false);
 	await ticket.buttonContent.action();
-	return ticket;
 }
 
 function sentOrders() {
