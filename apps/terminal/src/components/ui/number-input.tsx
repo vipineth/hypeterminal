@@ -14,9 +14,11 @@
  * without rewriting every caller's `onChange(e)` handler.
  */
 import { Input as BaseInput } from "@base-ui/react/input";
+import Big from "big.js";
 import type * as React from "react";
 import { useCallback } from "react";
 import { cn } from "@/lib/cn";
+import { BIG_ZERO, toBig } from "@/lib/trade/numbers";
 import { labelTypographyClass } from "./field-label";
 import { getInputClassName, type InputSize } from "./input";
 
@@ -45,6 +47,21 @@ function exceedsDecimalLimit(value: string, maxDecimals: number | undefined): bo
 	if (maxDecimals === undefined) return false;
 	const dotIndex = value.indexOf(".");
 	return dotIndex !== -1 && value.length - dotIndex - 1 > maxDecimals;
+}
+
+interface StepBounds {
+	min: number | undefined;
+	max: number | undefined;
+	allowNegative: boolean;
+	decimals: number | undefined;
+}
+
+function stepValue(value: string, delta: number, { min, max, allowNegative, decimals }: StepBounds): string {
+	let next = (toBig(value) ?? BIG_ZERO).plus(delta);
+	if (min !== undefined && next.lt(min)) next = Big(min);
+	if (max !== undefined && next.gt(max)) next = Big(max);
+	if (!allowNegative && next.lt(0)) next = BIG_ZERO;
+	return decimals === undefined ? next.toFixed() : next.round(decimals, Big.roundDown).toFixed();
 }
 
 interface Props extends Omit<React.ComponentProps<"input">, "type" | "onChange" | "min" | "max" | "step"> {
@@ -110,15 +127,12 @@ export function NumberInput({
 			if (e.key === "ArrowUp" || e.key === "ArrowDown") {
 				e.preventDefault();
 				const input = e.currentTarget;
-				const currentValue = parseFloat(input.value) || 0;
-				const delta = e.key === "ArrowUp" ? step : -step;
-				let newValue = currentValue + delta;
-
-				if (min !== undefined && newValue < min) newValue = min;
-				if (max !== undefined && newValue > max) newValue = max;
-				if (!allowNegative && newValue < 0) newValue = 0;
-
-				const newValueStr = allowDecimals ? String(newValue) : String(Math.round(newValue));
+				const newValueStr = stepValue(input.value, e.key === "ArrowUp" ? step : -step, {
+					min,
+					max,
+					allowNegative,
+					decimals: allowDecimals ? maxAllowedDecimals : 0,
+				});
 				const syntheticEvent = createSyntheticEvent(input, newValueStr);
 				onChange?.(syntheticEvent);
 				onKeyDown?.(e);
@@ -161,7 +175,7 @@ export function NumberInput({
 
 			onKeyDown?.(e);
 		},
-		[allowDecimals, allowNegative, min, max, step, onChange, onKeyDown, createSyntheticEvent],
+		[allowDecimals, allowNegative, maxAllowedDecimals, min, max, step, onChange, onKeyDown, createSyntheticEvent],
 	);
 
 	const validateInputValue = useCallback(
