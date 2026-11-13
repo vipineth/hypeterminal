@@ -42,6 +42,7 @@ export interface PerpOrderFields {
 	canUseTpSl: boolean;
 	tpPriceNum: number | null;
 	slPriceNum: number | null;
+	szDecimals: number;
 }
 
 type SpotValidationInput = BaseOrderInput & SpotOrderFields & { isSpotMarket: true };

@@ -199,6 +199,7 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 					canUseTpSl,
 					tpPriceNum,
 					slPriceNum,
+					szDecimals: market?.szDecimals ?? 0,
 				}),
 	);
 

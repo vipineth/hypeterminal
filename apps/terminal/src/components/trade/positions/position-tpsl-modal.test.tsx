@@ -6,6 +6,7 @@ import { PositionTpSlModal } from "@/components/trade/positions/position-tpsl-mo
 const typedOverPrefill = vi.hoisted(() => new Map<string, string>());
 const exchange = vi.hoisted(() => ({ placeOrder: vi.fn() }));
 const confirm = vi.hoisted(() => ({ onClick: null as null | (() => Promise<void>), disabled: true }));
+const liveMark = vi.hoisted(() => ({ markPx: undefined as string | undefined }));
 
 vi.mock("react", async (importOriginal) => {
 	const react = await importOriginal<typeof import("react")>();
@@ -38,6 +39,10 @@ vi.mock("@/lib/hyperliquid", async (importOriginal) => ({
 	useExchange: () => ({ mutateAsync: exchange.placeOrder, isPending: false }),
 }));
 
+vi.mock("@/lib/hyperliquid/hooks/useMarketsInfo", () => ({
+	useMarketsInfo: () => ({ getMarketInfo: () => ({ markPx: liveMark.markPx }) }),
+}));
+
 const SOL_SHORT = {
 	coin: "SOL",
 	assetId: 5,
@@ -52,8 +57,12 @@ const SOL_SHORT = {
 	existingSlPrice: 90,
 };
 
-async function pressConfirm() {
+function render() {
 	renderToString(<PositionTpSlModal open onOpenChange={() => {}} position={SOL_SHORT} />);
+}
+
+async function pressConfirm() {
+	render();
 	expect(confirm.disabled).toBe(false);
 	await confirm.onClick?.();
 }
@@ -63,6 +72,7 @@ describe("position tp/sl modal", () => {
 		typedOverPrefill.clear();
 		confirm.onClick = null;
 		confirm.disabled = true;
+		liveMark.markPx = "80.276";
 		exchange.placeOrder.mockReset();
 		exchange.placeOrder.mockResolvedValue({
 			response: { data: { statuses: ["waitingForTrigger", "waitingForTrigger"] } },
@@ -98,5 +108,17 @@ describe("position tp/sl modal", () => {
 				},
 			],
 		]);
+	});
+
+	it("blocks a stop the live mark has crossed since the row was clicked", () => {
+		liveMark.markPx = "95";
+		render();
+		expect(confirm.disabled).toBe(true);
+	});
+
+	it("blocks confirm while the live mark is unknown", () => {
+		liveMark.markPx = undefined;
+		render();
+		expect(confirm.disabled).toBe(true);
 	});
 });

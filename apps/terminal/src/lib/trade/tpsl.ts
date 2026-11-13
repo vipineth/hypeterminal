@@ -1,3 +1,5 @@
+import Big from "big.js";
+import { formatTriggerPxForOrder, OrderBuildError, type TpSl } from "@/domain/trade/orders";
 import { type Numeric, toBig, toSafeBig } from "./numbers";
 import type { Side } from "./types";
 
@@ -47,18 +49,39 @@ export function calculateEstimatedPnl(params: TpSlCalcParams, targetPrice: Numer
 	return params.side === "buy" ? pnl : -pnl;
 }
 
-export function validateTpPrice(referencePrice: Numeric, tpPrice: Numeric, side: Side): boolean {
-	const ref = toSafeBig(referencePrice);
-	const tp = toSafeBig(tpPrice);
-	if (ref.lte(0) || tp.lte(0)) return false;
-	return side === "buy" ? tp.gt(ref) : tp.lt(ref);
+interface TriggerCheck {
+	triggerPx: Numeric;
+	markPx: Numeric;
+	side: Side;
+	tpsl: TpSl;
+	szDecimals: number;
 }
 
-export function validateSlPrice(referencePrice: Numeric, slPrice: Numeric, side: Side): boolean {
-	const ref = toSafeBig(referencePrice);
-	const sl = toSafeBig(slPrice);
-	if (ref.lte(0) || sl.lte(0)) return false;
-	return side === "buy" ? sl.lt(ref) : sl.gt(ref);
+export function isTriggerUncrossed({ triggerPx, markPx, side, tpsl, szDecimals }: TriggerCheck): boolean {
+	const mark = toSafeBig(markPx);
+	if (mark.lte(0)) return false;
+
+	const closeSide = side === "buy" ? "sell" : "buy";
+	const firesOnRise = (closeSide === "buy") === (tpsl === "sl");
+	let wirePx: string;
+	try {
+		wirePx = formatTriggerPxForOrder(triggerPx, { szDecimals, kind: "perp" }, closeSide, tpsl);
+	} catch (error) {
+		if (error instanceof OrderBuildError) return false;
+		throw error;
+	}
+	return firesOnRise ? Big(wirePx).gt(mark) : Big(wirePx).lt(mark);
+}
+
+export interface EntryTriggerReference {
+	px: number;
+	source: "mark" | "limit";
+}
+
+export function getEntryTriggerReference(side: Side, orderPx: number, markPx: number): EntryTriggerReference {
+	const limitFillsFirst = side === "buy" ? orderPx < markPx : orderPx > markPx;
+	if (orderPx > 0 && limitFillsFirst) return { px: orderPx, source: "limit" };
+	return { px: markPx, source: "mark" };
 }
 
 export interface RiskRewardDisplay {

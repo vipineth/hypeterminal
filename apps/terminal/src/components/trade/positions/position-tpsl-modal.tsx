@@ -8,8 +8,9 @@ import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
+import { useMarketsInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 import { isPositive, toNumber } from "@/lib/trade/numbers";
-import { validateSlPrice, validateTpPrice } from "@/lib/trade/tpsl";
+import { isTriggerUncrossed } from "@/lib/trade/tpsl";
 import { getValueColorClass } from "@/lib/ui/value-color";
 import { AssetDisplay } from "../components/asset-display";
 import { TradingActionButton } from "../components/trading-action-button";
@@ -53,22 +54,25 @@ function PositionTpSlModalBody({ position, onOpenChange }: BodyProps) {
 	const [submitError, setSubmitError] = useState<string | null>(null);
 
 	const { submitPlan, isSubmitting } = useSubmitPlan();
+	const { getMarketInfo } = useMarketsInfo();
+	const markPx = getMarketInfo(position.coin)?.markPx;
 
 	const tpPriceNum = toNumber(tpPriceInput);
 	const slPriceNum = toNumber(slPriceInput);
 
 	const side = position.isLong ? "buy" : "sell";
-	const referencePrice = position.entryPx;
 	const size = position.size;
+	const hasMark = isPositive(markPx);
 
 	const hasTp = isPositive(tpPriceNum);
 	const hasSl = isPositive(slPriceNum);
-	const tpValid = !hasTp || validateTpPrice(referencePrice, tpPriceNum, side);
-	const slValid = !hasSl || validateSlPrice(referencePrice, slPriceNum, side);
-	const canSubmit = (hasTp || hasSl) && tpValid && slValid && !isSubmitting;
+	const triggerCheck = { markPx, side, szDecimals: position.szDecimals } as const;
+	const tpValid = !hasTp || isTriggerUncrossed({ ...triggerCheck, triggerPx: tpPriceInput, tpsl: "tp" });
+	const slValid = !hasSl || isTriggerUncrossed({ ...triggerCheck, triggerPx: slPriceInput, tpsl: "sl" });
+	const canSubmit = hasMark && (hasTp || hasSl) && tpValid && slValid && !isSubmitting;
 
-	const tpError = hasTp && !tpValid ? (position.isLong ? t`TP must be above entry` : t`TP must be below entry`) : null;
-	const slError = hasSl && !slValid ? (position.isLong ? t`SL must be below entry` : t`SL must be above entry`) : null;
+	const tpError = hasMark && !tpValid ? (position.isLong ? t`TP must be above mark` : t`TP must be below mark`) : null;
+	const slError = hasMark && !slValid ? (position.isLong ? t`SL must be below mark` : t`SL must be above mark`) : null;
 
 	async function handleSubmit() {
 		if (!canSubmit) return;
@@ -128,7 +132,7 @@ function PositionTpSlModalBody({ position, onOpenChange }: BodyProps) {
 					<InfoRow
 						className="p-0"
 						label={t`Mark Price`}
-						value={formatPrice(position.markPx, { szDecimals: position.szDecimals })}
+						value={formatPrice(markPx, { szDecimals: position.szDecimals })}
 						valueClassName="font-medium text-warning"
 					/>
 					<InfoRow
@@ -148,7 +152,7 @@ function PositionTpSlModalBody({ position, onOpenChange }: BodyProps) {
 			<div className="px-4 pb-4">
 				<TpSlSection
 					side={side}
-					referencePrice={referencePrice}
+					referencePrice={position.entryPx}
 					size={size}
 					szDecimals={position.szDecimals}
 					tpPrice={tpPriceInput}
