@@ -6,7 +6,15 @@ import { PositionTpSlModal } from "@/components/trade/positions/position-tpsl-mo
 const typedOverPrefill = vi.hoisted(() => new Map<string, string>());
 const exchange = vi.hoisted(() => ({ placeOrder: vi.fn() }));
 const confirm = vi.hoisted(() => ({ onClick: null as null | (() => Promise<void>), disabled: true }));
-const liveMark = vi.hoisted(() => ({ markPx: undefined as string | undefined }));
+const liveMark = vi.hoisted(() => ({
+	markPx: undefined as string | undefined,
+	status: "active",
+	isStale: false,
+	subscribed: [] as unknown[][],
+}));
+const feed = vi.hoisted(() => ({
+	useSubscription: () => ({ data: liveMark.markPx ? { ctx: { markPx: liveMark.markPx } } : undefined, ...liveMark }),
+}));
 
 vi.mock("react", async (importOriginal) => {
 	const react = await importOriginal<typeof import("react")>();
@@ -37,7 +45,10 @@ vi.mock("@/components/trade/components/asset-display", () => ({
 vi.mock("@/lib/hyperliquid", async (importOriginal) => ({
 	...(await importOriginal<typeof import("@/lib/hyperliquid")>()),
 	useExchange: () => ({ mutateAsync: exchange.placeOrder, isPending: false }),
-	useSubscription: () => ({ data: liveMark.markPx ? { coin: "SOL", ctx: { markPx: liveMark.markPx } } : undefined }),
+	useSubscription: (method: string, params: unknown) => {
+		liveMark.subscribed.push([method, params]);
+		return feed.useSubscription();
+	},
 }));
 
 const SOL_SHORT = {
@@ -54,8 +65,19 @@ const SOL_SHORT = {
 	existingSlPrice: 90,
 };
 
-function render() {
-	renderToString(<PositionTpSlModal open onOpenChange={() => {}} position={SOL_SHORT} />);
+const NVDA_LONG = {
+	...SOL_SHORT,
+	coin: "xyz:NVDA",
+	assetId: 110000,
+	isLong: true,
+	entryPx: 180,
+	markPx: 180,
+	existingTpPrice: 200,
+	existingSlPrice: 170,
+};
+
+function render(position = SOL_SHORT): string {
+	return renderToString(<PositionTpSlModal open onOpenChange={() => {}} position={position} />);
 }
 
 async function pressConfirm() {
@@ -70,6 +92,9 @@ describe("position tp/sl modal", () => {
 		confirm.onClick = null;
 		confirm.disabled = true;
 		liveMark.markPx = "80.276";
+		liveMark.status = "active";
+		liveMark.isStale = false;
+		liveMark.subscribed = [];
 		exchange.placeOrder.mockReset();
 		exchange.placeOrder.mockResolvedValue({
 			response: { data: { statuses: ["waitingForTrigger", "waitingForTrigger"] } },
@@ -113,9 +138,67 @@ describe("position tp/sl modal", () => {
 		expect(confirm.disabled).toBe(true);
 	});
 
-	it("blocks confirm while the live mark is unknown", () => {
+	it("blocks confirm and says why while the live mark is unknown", () => {
 		liveMark.markPx = undefined;
+		const html = render();
+		expect(confirm.disabled).toBe(true);
+		expect(html).toContain("Waiting for live mark price");
+	});
+
+	it("blocks confirm and says why when the mark feed has gone quiet", () => {
+		liveMark.isStale = true;
+		const html = render();
+		expect(confirm.disabled).toBe(true);
+		expect(html).toContain("Waiting for live mark price");
+	});
+
+	it("blocks confirm and says why when the mark feed has failed", () => {
+		liveMark.status = "error";
+		const html = render();
+		expect(confirm.disabled).toBe(true);
+		expect(html).toContain("Waiting for live mark price");
+	});
+
+	it("blocks confirm on the last mark while the feed resubscribes", () => {
+		liveMark.status = "subscribing";
 		render();
 		expect(confirm.disabled).toBe(true);
+	});
+
+	it("says a trigger is needed when both fields are empty", () => {
+		typedOverPrefill.set("70.0000", "");
+		typedOverPrefill.set("90.0000", "");
+		const html = render();
+		expect(confirm.disabled).toBe(true);
+		expect(html).toContain("Enter TP or SL price");
+	});
+
+	it("reads the live mark of a builder market under its prefixed name", () => {
+		liveMark.markPx = "180";
+		render(NVDA_LONG);
+		expect(liveMark.subscribed).toContainEqual(["activeAssetCtx", { coin: "xyz:NVDA" }]);
+	});
+
+	it("tells a short which way its crossed stop and take profit must move", () => {
+		liveMark.markPx = "95";
+		expect(render()).toContain("SL must be above mark");
+		liveMark.markPx = "65";
+		expect(render()).toContain("TP must be below mark");
+	});
+
+	it("tells a long which way its crossed stop and take profit must move", () => {
+		liveMark.markPx = "165";
+		expect(render(NVDA_LONG)).toContain("SL must be below mark");
+		liveMark.markPx = "205";
+		expect(render(NVDA_LONG)).toContain("TP must be above mark");
+	});
+
+	it("calls a stop that rounds to zero invalid instead of crossed", () => {
+		liveMark.markPx = "180";
+		typedOverPrefill.set("170.0000", "0.00001");
+		const html = render(NVDA_LONG);
+		expect(confirm.disabled).toBe(true);
+		expect(html).toContain("Enter a valid SL price");
+		expect(html).not.toContain("SL must be below mark");
 	});
 });

@@ -40,8 +40,10 @@ export interface PerpOrderFields {
 	twapMinutesNum: number | null;
 	tpSlEnabled: boolean;
 	canUseTpSl: boolean;
-	tpPriceNum: number | null;
-	slPriceNum: number | null;
+	tpPriceInput: string;
+	slPriceInput: string;
+	limitPriceInput: string;
+	liveMarkPx: string | null;
 	szDecimals: number;
 }
 

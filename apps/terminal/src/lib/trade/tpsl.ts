@@ -1,5 +1,11 @@
 import Big from "big.js";
-import { formatTriggerPxForOrder, OrderBuildError, type TpSl } from "@/domain/trade/orders";
+import {
+	formatPriceForOrder,
+	formatTriggerPxForOrder,
+	OrderBuildError,
+	type TpSl,
+	type WireMarket,
+} from "@/domain/trade/orders";
 import { type Numeric, toBig, toSafeBig } from "./numbers";
 import type { Side } from "./types";
 
@@ -49,39 +55,65 @@ export function calculateEstimatedPnl(params: TpSlCalcParams, targetPrice: Numer
 	return params.side === "buy" ? pnl : -pnl;
 }
 
+export type TriggerVerdict = "uncrossed" | "crossed" | "invalid";
+
 interface TriggerCheck {
-	triggerPx: Numeric;
-	markPx: Numeric;
+	triggerPx: string;
+	referencePx: string;
 	side: Side;
 	tpsl: TpSl;
 	szDecimals: number;
 }
 
-export function isTriggerUncrossed({ triggerPx, markPx, side, tpsl, szDecimals }: TriggerCheck): boolean {
-	const mark = toSafeBig(markPx);
-	if (mark.lte(0)) return false;
-
+export function checkTrigger({ triggerPx, referencePx, side, tpsl, szDecimals }: TriggerCheck): TriggerVerdict {
 	const closeSide = side === "buy" ? "sell" : "buy";
 	const firesOnRise = (closeSide === "buy") === (tpsl === "sl");
 	let wirePx: string;
 	try {
-		wirePx = formatTriggerPxForOrder(triggerPx, { szDecimals, kind: "perp" }, closeSide, tpsl);
+		wirePx = formatTriggerPxForOrder(triggerPx, perpMarket(szDecimals), closeSide, tpsl);
 	} catch (error) {
-		if (error instanceof OrderBuildError) return false;
+		if (error instanceof OrderBuildError) return "invalid";
 		throw error;
 	}
-	return firesOnRise ? Big(wirePx).gt(mark) : Big(wirePx).lt(mark);
+	const uncrossed = firesOnRise ? Big(wirePx).gt(referencePx) : Big(wirePx).lt(referencePx);
+	return uncrossed ? "uncrossed" : "crossed";
 }
 
 export interface EntryTriggerReference {
-	px: number;
+	px: string;
 	source: "mark" | "limit";
 }
 
-export function getEntryTriggerReference(side: Side, orderPx: number, markPx: number): EntryTriggerReference {
-	const limitFillsFirst = side === "buy" ? orderPx < markPx : orderPx > markPx;
-	if (orderPx > 0 && limitFillsFirst) return { px: orderPx, source: "limit" };
-	return { px: markPx, source: "mark" };
+interface EntryReferenceInput {
+	side: Side;
+	limitPriceInput: string | null;
+	markPx: string;
+	szDecimals: number;
+}
+
+export function getEntryTriggerReference({
+	side,
+	limitPriceInput,
+	markPx,
+	szDecimals,
+}: EntryReferenceInput): EntryTriggerReference {
+	const wireLimit = limitPriceInput === null ? null : formatEntryLimit(limitPriceInput, side, szDecimals);
+	if (wireLimit === null) return { px: markPx, source: "mark" };
+	const limitFillsFirst = side === "buy" ? Big(wireLimit).lt(markPx) : Big(wireLimit).gt(markPx);
+	return limitFillsFirst ? { px: wireLimit, source: "limit" } : { px: markPx, source: "mark" };
+}
+
+function formatEntryLimit(limitPriceInput: string, side: Side, szDecimals: number): string | null {
+	try {
+		return formatPriceForOrder(limitPriceInput, perpMarket(szDecimals), side, "passive");
+	} catch (error) {
+		if (error instanceof OrderBuildError) return null;
+		throw error;
+	}
+}
+
+function perpMarket(szDecimals: number): WireMarket {
+	return { szDecimals, kind: "perp" };
 }
 
 export interface RiskRewardDisplay {

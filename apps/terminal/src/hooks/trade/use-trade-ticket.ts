@@ -8,6 +8,7 @@ import { getMarketQuoteToken } from "@/domain/trade/balances";
 import { getLiquidationInfo, getOrderMetrics } from "@/domain/trade/order/metrics";
 import { getOrderPrice } from "@/domain/trade/order/price";
 import { useFeeRates } from "@/hooks/trade/use-fee-rates";
+import { useLiveMarkPx } from "@/hooks/trade/use-live-mark-px";
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import { useOrderSubmit } from "@/hooks/trade/use-order-submit";
 import {
@@ -105,6 +106,7 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 	const usesLimitPrice = usesLimitPriceForOrder(orderType);
 	const canUseTpSl = entry.capabilities.hasTpSl && canUseTpSlForOrder(orderType);
 	const reduceOnly = entry.capabilities.hasReduceOnly && storedReduceOnly;
+	const liveMarkPx = useLiveMarkPx(isSpotMarket ? null : (market?.name ?? null));
 
 	const { setOrderType, setLimitPrice } = useOrderEntryActions();
 
@@ -131,8 +133,6 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 		}
 	}, [isSpotMarket, triggerOrder, setOrderType]);
 
-	const tpPriceNum = toNumber(tpPriceInput);
-	const slPriceNum = toNumber(slPriceInput);
 	const triggerPriceNum = toNumber(triggerPriceInput);
 	const scaleStartPriceNum = toNumber(scaleStartPriceInput);
 	const scaleEndPriceNum = toNumber(scaleEndPriceInput);
@@ -197,8 +197,10 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 					twapMinutesNum,
 					tpSlEnabled,
 					canUseTpSl,
-					tpPriceNum,
-					slPriceNum,
+					tpPriceInput,
+					slPriceInput,
+					limitPriceInput,
+					liveMarkPx,
 					szDecimals: market?.szDecimals ?? 0,
 				}),
 	);

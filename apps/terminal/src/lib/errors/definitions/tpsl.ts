@@ -1,36 +1,72 @@
 import { t } from "@lingui/core/macro";
 import type { TpSl } from "@/domain/trade/orders";
 import { isPositive } from "@/lib/trade/numbers";
-import { getEntryTriggerReference, isTriggerUncrossed } from "@/lib/trade/tpsl";
+import { checkTrigger, type EntryTriggerReference, getEntryTriggerReference, type TriggerVerdict } from "@/lib/trade/tpsl";
 import type { Side } from "@/lib/trade/types";
 import { createValidator, type Validator } from "../types";
 
 export interface TpSlContext {
 	tpSlEnabled: boolean;
 	canUseTpSl: boolean;
-	tpPriceNum: number | null;
-	slPriceNum: number | null;
-	price: number;
-	markPx: number;
+	tpPriceInput: string;
+	slPriceInput: string;
+	usesLimitPrice: boolean;
+	limitPriceInput: string;
+	liveMarkPx: string | null;
 	side: Side;
 	szDecimals: number;
 }
 
-function isEntryTriggerUncrossed(ctx: TpSlContext, triggerPx: number | null, tpsl: TpSl): boolean {
-	const reference = getEntryTriggerReference(ctx.side, ctx.price, ctx.markPx);
-	return isTriggerUncrossed({ triggerPx, markPx: reference.px, side: ctx.side, tpsl, szDecimals: ctx.szDecimals });
+interface TriggerCopy {
+	verdict: TriggerVerdict;
+	tpsl: TpSl;
+	side: Side;
+	source: EntryTriggerReference["source"];
 }
 
-function getTpMessage(ctx: TpSlContext): string {
-	const { source } = getEntryTriggerReference(ctx.side, ctx.price, ctx.markPx);
-	if (source === "limit") return ctx.side === "buy" ? t`TP must be above limit price` : t`TP must be below limit price`;
-	return ctx.side === "buy" ? t`TP must be above mark` : t`TP must be below mark`;
+export function getTriggerMessage({ verdict, tpsl, side, source }: TriggerCopy): string | null {
+	if (verdict === "uncrossed") return null;
+	if (verdict === "invalid") return tpsl === "tp" ? t`Enter a valid TP price` : t`Enter a valid SL price`;
+	if (source === "limit") {
+		if (tpsl === "tp") return side === "buy" ? t`TP must be above limit price` : t`TP must be below limit price`;
+		return side === "buy" ? t`SL must be below limit price` : t`SL must be above limit price`;
+	}
+	if (tpsl === "tp") return side === "buy" ? t`TP must be above mark` : t`TP must be below mark`;
+	return side === "buy" ? t`SL must be below mark` : t`SL must be above mark`;
 }
 
-function getSlMessage(ctx: TpSlContext): string {
-	const { source } = getEntryTriggerReference(ctx.side, ctx.price, ctx.markPx);
-	if (source === "limit") return ctx.side === "buy" ? t`SL must be below limit price` : t`SL must be above limit price`;
-	return ctx.side === "buy" ? t`SL must be below mark` : t`SL must be above mark`;
+function hasTpSlInput(ctx: TpSlContext): boolean {
+	return ctx.tpSlEnabled && ctx.canUseTpSl && (isPositive(ctx.tpPriceInput) || isPositive(ctx.slPriceInput));
+}
+
+function checkEntryTrigger(ctx: TpSlContext, tpsl: TpSl): TriggerCopy | null {
+	const triggerPx = tpsl === "tp" ? ctx.tpPriceInput : ctx.slPriceInput;
+	if (!ctx.tpSlEnabled || !ctx.canUseTpSl || !isPositive(triggerPx) || ctx.liveMarkPx === null) return null;
+	const reference = getEntryTriggerReference({
+		side: ctx.side,
+		limitPriceInput: ctx.usesLimitPrice ? ctx.limitPriceInput : null,
+		markPx: ctx.liveMarkPx,
+		szDecimals: ctx.szDecimals,
+	});
+	const verdict = checkTrigger({ triggerPx, referencePx: reference.px, side: ctx.side, tpsl, szDecimals: ctx.szDecimals });
+	return { verdict, tpsl, side: ctx.side, source: reference.source };
+}
+
+function createTriggerValidator(tpsl: TpSl, id: string, code: string, priority: number): Validator<TpSlContext> {
+	return createValidator({
+		id,
+		code,
+		category: "tpsl",
+		priority,
+		getMessage: (ctx) => {
+			const check = checkEntryTrigger(ctx, tpsl);
+			return (check && getTriggerMessage(check)) ?? "";
+		},
+		validate: (ctx) => {
+			const check = checkEntryTrigger(ctx, tpsl);
+			return !check || check.verdict === "uncrossed";
+		},
+	});
 }
 
 export const enterTpSlPriceValidator: Validator<TpSlContext> = createValidator({
@@ -39,38 +75,18 @@ export const enterTpSlPriceValidator: Validator<TpSlContext> = createValidator({
 	category: "tpsl",
 	priority: 200,
 	getMessage: () => t`Enter TP or SL price`,
-	validate: (ctx) => {
-		if (!ctx.tpSlEnabled || !ctx.canUseTpSl) return true;
-		const hasTp = isPositive(ctx.tpPriceNum);
-		const hasSl = isPositive(ctx.slPriceNum);
-		return hasTp || hasSl;
-	},
+	validate: (ctx) => !ctx.tpSlEnabled || !ctx.canUseTpSl || hasTpSlInput(ctx),
 });
 
-export const tpPriceValidator: Validator<TpSlContext> = createValidator({
-	id: "tp-price-invalid",
-	code: "TPSL_002",
+export const tpSlLiveMarkValidator: Validator<TpSlContext> = createValidator({
+	id: "tpsl-live-mark",
+	code: "TPSL_004",
 	category: "tpsl",
 	priority: 201,
-	getMessage: getTpMessage,
-	validate: (ctx) => {
-		if (!ctx.tpSlEnabled || !ctx.canUseTpSl) return true;
-		const hasTp = isPositive(ctx.tpPriceNum);
-		if (!hasTp) return true;
-		return isEntryTriggerUncrossed(ctx, ctx.tpPriceNum, "tp");
-	},
+	getMessage: () => t`Waiting for live mark price`,
+	validate: (ctx) => !hasTpSlInput(ctx) || ctx.liveMarkPx !== null,
 });
 
-export const slPriceValidator: Validator<TpSlContext> = createValidator({
-	id: "sl-price-invalid",
-	code: "TPSL_003",
-	category: "tpsl",
-	priority: 202,
-	getMessage: getSlMessage,
-	validate: (ctx) => {
-		if (!ctx.tpSlEnabled || !ctx.canUseTpSl) return true;
-		const hasSl = isPositive(ctx.slPriceNum);
-		if (!hasSl) return true;
-		return isEntryTriggerUncrossed(ctx, ctx.slPriceNum, "sl");
-	},
-});
+export const tpPriceValidator = createTriggerValidator("tp", "tp-price-invalid", "TPSL_002", 202);
+
+export const slPriceValidator = createTriggerValidator("sl", "sl-price-invalid", "TPSL_003", 203);

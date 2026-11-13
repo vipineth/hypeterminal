@@ -393,7 +393,7 @@ msgstr "Camera permission was denied."
 #: src/components/trade/mobile/mobile-twap-tab.tsx:110
 #: src/components/trade/positions/orders-tab.tsx:399
 #: src/components/trade/positions/position-limit-close-modal.tsx:200
-#: src/components/trade/positions/position-tpsl-modal.tsx:175
+#: src/components/trade/positions/position-tpsl-modal.tsx:171
 #: src/components/trade/positions/twap-tab.tsx:193
 #: src/components/trade/tradebox/deposit-modal.tsx:150
 #: src/components/trade/tradebox/deposit-modal.tsx:205
@@ -503,7 +503,7 @@ msgstr "Closing..."
 #~ msgid "completed"
 #~ msgstr "completed"
 
-#: src/components/trade/positions/position-tpsl-modal.tsx:184
+#: src/components/trade/positions/position-tpsl-modal.tsx:180
 #: src/components/trade/tradebox/bridge/confirmation-screen.tsx:162
 #: src/components/trade/tradebox/margin-mode-modal.tsx:237
 msgid "Confirm"
@@ -941,6 +941,14 @@ msgstr "End Price"
 #~ msgid "End Price (USDC)"
 #~ msgstr "End Price (USDC)"
 
+#: src/lib/errors/definitions/tpsl.ts:29
+msgid "Enter a valid SL price"
+msgstr "Enter a valid SL price"
+
+#: src/lib/errors/definitions/tpsl.ts:29
+msgid "Enter a valid TP price"
+msgstr "Enter a valid TP price"
+
 #: src/lib/errors/definitions/order-input.ts:21
 #: src/lib/errors/definitions/spot-input.ts:17
 msgid "Enter limit price"
@@ -963,7 +971,8 @@ msgstr "Enter the 16-character pairing code."
 msgid "Enter the desktop code"
 msgstr "Enter the desktop code"
 
-#: src/lib/errors/definitions/tpsl.ts:41
+#: src/components/trade/positions/position-tpsl-modal.tsx:202
+#: src/lib/errors/definitions/tpsl.ts:77
 msgid "Enter TP or SL price"
 msgstr "Enter TP or SL price"
 
@@ -977,7 +986,7 @@ msgid "Entry"
 msgstr "Entry"
 
 #: src/components/trade/positions/position-limit-close-modal.tsx:120
-#: src/components/trade/positions/position-tpsl-modal.tsx:128
+#: src/components/trade/positions/position-tpsl-modal.tsx:122
 msgid "Entry Price"
 msgstr "Entry Price"
 
@@ -1059,7 +1068,7 @@ msgstr "Failed to connect with custom address"
 msgid "Failed to copy"
 msgstr "Failed to copy"
 
-#: src/hooks/trade/use-trade-ticket.ts:224
+#: src/hooks/trade/use-trade-ticket.ts:226
 msgid "Failed to enable trading"
 msgstr "Failed to enable trading"
 
@@ -1129,7 +1138,7 @@ msgstr "Failed to reverse position"
 #~ msgid "Failed to switch margin mode"
 #~ msgstr "Failed to switch margin mode"
 
-#: src/components/trade/positions/position-tpsl-modal.tsx:96
+#: src/components/trade/positions/position-tpsl-modal.tsx:90
 msgid "Failed to update TP/SL orders"
 msgstr "Failed to update TP/SL orders"
 
@@ -1480,7 +1489,7 @@ msgstr "Long"
 #~ msgid "Long {0} position"
 #~ msgstr "Long {0} position"
 
-#: src/components/trade/positions/position-tpsl-modal.tsx:114
+#: src/components/trade/positions/position-tpsl-modal.tsx:108
 msgid "Long position"
 msgstr "Long position"
 
@@ -1509,7 +1518,7 @@ msgstr "Mainnet"
 msgid "Maintenance Margin"
 msgstr "Maintenance Margin"
 
-#: src/components/trade/positions/position-tpsl-modal.tsx:107
+#: src/components/trade/positions/position-tpsl-modal.tsx:101
 msgid "Manage TP/SL"
 msgstr "Manage TP/SL"
 
@@ -1518,12 +1527,12 @@ msgstr "Manage TP/SL"
 #~ msgstr "Manage TP/SL for {0} {1} position"
 
 #. placeholder {0}: position.coin
-#: src/components/trade/positions/position-tpsl-modal.tsx:193
+#: src/components/trade/positions/position-tpsl-modal.tsx:207
 msgid "Manage TP/SL for {0} long position"
 msgstr "Manage TP/SL for {0} long position"
 
 #. placeholder {0}: position.coin
-#: src/components/trade/positions/position-tpsl-modal.tsx:194
+#: src/components/trade/positions/position-tpsl-modal.tsx:208
 msgid "Manage TP/SL for {0} short position"
 msgstr "Manage TP/SL for {0} short position"
 
@@ -1578,7 +1587,7 @@ msgstr "Mark"
 #~ msgstr "MARK"
 
 #: src/components/trade/positions/position-limit-close-modal.tsx:126
-#: src/components/trade/positions/position-tpsl-modal.tsx:134
+#: src/components/trade/positions/position-tpsl-modal.tsx:128
 msgid "Mark Price"
 msgstr "Mark Price"
 
@@ -2614,7 +2623,7 @@ msgstr "Short"
 #~ msgid "Short {0} position"
 #~ msgstr "Short {0} position"
 
-#: src/components/trade/positions/position-tpsl-modal.tsx:114
+#: src/components/trade/positions/position-tpsl-modal.tsx:108
 msgid "Short position"
 msgstr "Short position"
 
@@ -2699,7 +2708,7 @@ msgstr "Signer not ready"
 #: src/components/trade/positions/orders-tab.tsx:268
 #: src/components/trade/positions/position-limit-close-modal.tsx:114
 #: src/components/trade/positions/position-limit-close-modal.tsx:160
-#: src/components/trade/positions/position-tpsl-modal.tsx:122
+#: src/components/trade/positions/position-tpsl-modal.tsx:116
 #: src/components/trade/positions/positions-tab.tsx:178
 #: src/components/trade/positions/twap-tab.tsx:84
 #: src/components/trade/tradebox/order-toast.tsx:103
@@ -2728,8 +2737,7 @@ msgstr "Size per Suborder"
 msgid "SL must be above limit price"
 msgstr "SL must be above limit price"
 
-#: src/components/trade/positions/position-tpsl-modal.tsx:75
-#: src/lib/errors/definitions/tpsl.ts:33
+#: src/lib/errors/definitions/tpsl.ts:35
 msgid "SL must be above mark"
 msgstr "SL must be above mark"
 
@@ -2742,8 +2750,7 @@ msgstr "SL must be above mark"
 msgid "SL must be below limit price"
 msgstr "SL must be below limit price"
 
-#: src/components/trade/positions/position-tpsl-modal.tsx:75
-#: src/lib/errors/definitions/tpsl.ts:33
+#: src/lib/errors/definitions/tpsl.ts:35
 msgid "SL must be below mark"
 msgstr "SL must be below mark"
 
@@ -2874,7 +2881,7 @@ msgid "Stop, TWAP, Scale, TIF & more"
 msgstr "Stop, TWAP, Scale, TIF & more"
 
 #: src/components/trade/positions/position-limit-close-modal.tsx:206
-#: src/components/trade/positions/position-tpsl-modal.tsx:181
+#: src/components/trade/positions/position-tpsl-modal.tsx:177
 msgid "Submitting..."
 msgstr "Submitting..."
 
@@ -3165,12 +3172,11 @@ msgstr "Total time"
 #~ msgid "TP must be above entry"
 #~ msgstr "TP must be above entry"
 
-#: src/lib/errors/definitions/tpsl.ts:26
+#: src/lib/errors/definitions/tpsl.ts:31
 msgid "TP must be above limit price"
 msgstr "TP must be above limit price"
 
-#: src/components/trade/positions/position-tpsl-modal.tsx:74
-#: src/lib/errors/definitions/tpsl.ts:27
+#: src/lib/errors/definitions/tpsl.ts:34
 msgid "TP must be above mark"
 msgstr "TP must be above mark"
 
@@ -3179,12 +3185,11 @@ msgstr "TP must be above mark"
 #~ msgid "TP must be below entry"
 #~ msgstr "TP must be below entry"
 
-#: src/lib/errors/definitions/tpsl.ts:26
+#: src/lib/errors/definitions/tpsl.ts:31
 msgid "TP must be below limit price"
 msgstr "TP must be below limit price"
 
-#: src/components/trade/positions/position-tpsl-modal.tsx:74
-#: src/lib/errors/definitions/tpsl.ts:27
+#: src/lib/errors/definitions/tpsl.ts:34
 msgid "TP must be below mark"
 msgstr "TP must be below mark"
 
@@ -3350,7 +3355,7 @@ msgid "Unknown symbol: {symbolName}"
 msgstr "Unknown symbol: {symbolName}"
 
 #: src/components/trade/positions/position-limit-close-modal.tsx:132
-#: src/components/trade/positions/position-tpsl-modal.tsx:140
+#: src/components/trade/positions/position-tpsl-modal.tsx:134
 msgid "Unrealized P&L"
 msgstr "Unrealized P&L"
 
@@ -3426,6 +3431,11 @@ msgstr "Volume"
 #: src/components/trade/positions/orders-tab.tsx:
 #~ msgid "waiting"
 #~ msgstr "waiting"
+
+#: src/components/trade/positions/position-tpsl-modal.tsx:201
+#: src/lib/errors/definitions/tpsl.ts:86
+msgid "Waiting for live mark price"
+msgstr "Waiting for live mark price"
 
 #: src/components/trade/orderbook/orderbook-panel.tsx:153
 msgid "Waiting for order book..."

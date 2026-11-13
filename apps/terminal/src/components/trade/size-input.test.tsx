@@ -64,6 +64,7 @@ vi.mock("@/lib/hyperliquid", async (importOriginal) => ({
 	useAgentStatus: () => ({ isReady: true, isLoading: false }),
 	useAgentRegistration: () => ({ register: async () => {}, status: "ready" }),
 	useExchange: () => ({ mutateAsync: async () => {}, isPending: false }),
+	useSubscription: () => ({ data: undefined, status: "idle", isStale: false }),
 }));
 
 vi.mock("@/hooks/trade/use-fee-rates", () => ({

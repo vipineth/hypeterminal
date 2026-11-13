@@ -47,6 +47,7 @@ const form = vi.hoisted(() => ({
 	maxTradeSzs: [100, 100],
 }));
 
+const liveFeed = vi.hoisted(() => ({ markPx: null as string | null, status: "active", isStale: false }));
 const exchange = vi.hoisted(() => ({ placeOrder: vi.fn() }));
 const formActions = vi.hoisted(() => ({ resetForm: vi.fn() }));
 const queue = vi.hoisted(() => ({ addOrder: vi.fn(() => "order-1"), updateOrder: vi.fn(), removeOrder: vi.fn() }));
@@ -68,6 +69,14 @@ vi.mock("@/lib/hyperliquid", async (importOriginal) => ({
 	useAgentStatus: () => ({ isReady: true, isLoading: false }),
 	useAgentRegistration: () => ({ register: async () => {}, status: "ready" }),
 	useExchange: () => ({ mutateAsync: exchange.placeOrder, isPending: false }),
+	useSubscription: (method: string, params: { coin: string }) => ({
+		data:
+			method === "activeAssetCtx" && params.coin === form.market.name
+				? { ctx: { markPx: liveFeed.markPx ?? form.market.markPx } }
+				: undefined,
+		status: liveFeed.status,
+		isStale: liveFeed.isStale,
+	}),
 }));
 
 vi.mock("@/hooks/trade/use-fee-rates", () => ({
@@ -152,6 +161,12 @@ async function pressSubmit() {
 function sentOrders() {
 	return exchange.placeOrder.mock.calls.map(([action]) => action.orders);
 }
+
+beforeEach(() => {
+	liveFeed.markPx = null;
+	liveFeed.status = "active";
+	liveFeed.isStale = false;
+});
 
 function wireNotional(orders: { p: string; s: string }[]): number {
 	return orders.reduce((total, order) => total.plus(Big(order.s).times(order.p)), Big(0)).toNumber();
@@ -292,6 +307,93 @@ describe("perp trade ticket", () => {
 		const [[stop]] = sentOrders();
 		expect(stop).toMatchObject({ p: "85", t: { trigger: { triggerPx: "85.001", tpsl: "sl" } } });
 		expect(queue.addOrder).toHaveBeenLastCalledWith(expect.objectContaining({ price: "85.001" }));
+	});
+});
+
+describe("perp ticket tp/sl against the live mark and the sent entry price", () => {
+	beforeEach(() => {
+		form.market = { ...SOL_PERP, markPx: "100" };
+		form.side = "buy";
+		form.orderType = "market";
+		form.sizeMode = "base";
+		form.size = "1";
+		form.limitPrice = "";
+		form.triggerPrice = "";
+		form.reduceOnly = false;
+		form.twapMinutes = null;
+		form.tpSlEnabled = true;
+		form.tpPrice = "";
+		form.slPrice = "";
+		form.sizeUnit = null;
+		form.maxTradeSzs = [100, 100];
+		exchange.placeOrder.mockReset();
+		exchange.placeOrder.mockResolvedValue({ response: { data: { statuses: [{ resting: { oid: 1 } }] } } });
+	});
+
+	it("blocks a stop the live mark has crossed while the cached mark has not", () => {
+		form.market = { ...SOL_PERP, markPx: "110" };
+		liveFeed.markPx = "100";
+		form.slPrice = "105";
+		expect(renderTicket().validation.errors).toEqual(["SL must be below mark"]);
+	});
+
+	it("waits for a live mark before sending tp/sl while the feed is quiet or failed", () => {
+		form.tpPrice = "120";
+		liveFeed.isStale = true;
+		expect(renderTicket().validation.errors).toEqual(["Waiting for live mark price"]);
+		liveFeed.isStale = false;
+		liveFeed.status = "error";
+		expect(renderTicket().validation.errors).toEqual(["Waiting for live mark price"]);
+	});
+
+	it("still sends a plain order while the mark feed is quiet", async () => {
+		form.tpSlEnabled = false;
+		liveFeed.isStale = true;
+		await pressSubmit();
+		expect(sentOrders()).toHaveLength(1);
+	});
+
+	it("waits for a live mark the same way on a buy limit and a sell limit", () => {
+		form.market = { ...SOL_PERP, markPx: "0" };
+		liveFeed.status = "subscribing";
+		form.orderType = "limit";
+		form.limitPrice = "90";
+		form.tpPrice = "120";
+		expect(renderTicket().validation.errors).toEqual(["Waiting for live mark price"]);
+		form.side = "sell";
+		form.limitPrice = "110";
+		form.tpPrice = "100";
+		expect(renderTicket().validation.errors).toEqual(["Waiting for live mark price"]);
+	});
+
+	it("never sends a long's stop on the same price as the buy limit it sends", () => {
+		form.orderType = "limit";
+		form.limitPrice = "80.2769";
+		form.slPrice = "80.2765";
+		expect(renderTicket().validation.errors).toEqual(["SL must be below limit price"]);
+	});
+
+	it("never sends a short's stop on the same price as the sell limit it sends", () => {
+		form.market = { ...SOL_PERP, markPx: "90" };
+		form.side = "sell";
+		form.orderType = "limit";
+		form.limitPrice = "100.001";
+		form.slPrice = "100.002";
+		expect(renderTicket().validation.errors).toEqual(["SL must be above limit price"]);
+	});
+
+	it("sends a take profit whose typed string rounds above mark", async () => {
+		form.tpPrice = "100.00000000000000001";
+		await pressSubmit();
+		const [orders] = sentOrders();
+		expect(orders[1]).toMatchObject({ t: { trigger: { triggerPx: "100.01", tpsl: "tp" } } });
+	});
+
+	it("names a stop that rounds to zero on this market's tick as invalid", () => {
+		form.market = { ...SOL_PERP, markPx: "0.5" };
+		form.size = "50";
+		form.slPrice = "0.00001";
+		expect(renderTicket().validation.errors).toEqual(["Enter a valid SL price"]);
 	});
 });
 

@@ -5,12 +5,14 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { InfoRow } from "@/components/ui/info-row";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
+import type { TpSl } from "@/domain/trade/orders";
+import { useLiveMarkPx } from "@/hooks/trade/use-live-mark-px";
 import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
-import { useSubscription } from "@/lib/hyperliquid";
-import { isPositive, toNumber } from "@/lib/trade/numbers";
-import { isTriggerUncrossed } from "@/lib/trade/tpsl";
+import { getTriggerMessage } from "@/lib/errors/definitions/tpsl";
+import { isPositive } from "@/lib/trade/numbers";
+import { checkTrigger } from "@/lib/trade/tpsl";
 import { getValueColorClass } from "@/lib/ui/value-color";
 import { AssetDisplay } from "../components/asset-display";
 import { TradingActionButton } from "../components/trading-action-button";
@@ -54,25 +56,17 @@ function PositionTpSlModalBody({ position, onOpenChange }: BodyProps) {
 	const [submitError, setSubmitError] = useState<string | null>(null);
 
 	const { submitPlan, isSubmitting } = useSubmitPlan();
-	const { data: liveCtxEvent } = useSubscription("activeAssetCtx", { coin: position.coin });
-	const markPx = liveCtxEvent?.ctx.markPx;
-
-	const tpPriceNum = toNumber(tpPriceInput);
-	const slPriceNum = toNumber(slPriceInput);
+	const markPx = useLiveMarkPx(position.coin);
 
 	const side = position.isLong ? "buy" : "sell";
 	const size = position.size;
-	const hasMark = isPositive(markPx);
+	const hasTp = isPositive(tpPriceInput);
+	const hasSl = isPositive(slPriceInput);
 
-	const hasTp = isPositive(tpPriceNum);
-	const hasSl = isPositive(slPriceNum);
-	const triggerCheck = { markPx, side, szDecimals: position.szDecimals } as const;
-	const tpValid = !hasTp || isTriggerUncrossed({ ...triggerCheck, triggerPx: tpPriceInput, tpsl: "tp" });
-	const slValid = !hasSl || isTriggerUncrossed({ ...triggerCheck, triggerPx: slPriceInput, tpsl: "sl" });
-	const canSubmit = hasMark && (hasTp || hasSl) && tpValid && slValid && !isSubmitting;
-
-	const tpError = hasMark && !tpValid ? (position.isLong ? t`TP must be above mark` : t`TP must be below mark`) : null;
-	const slError = hasMark && !slValid ? (position.isLong ? t`SL must be below mark` : t`SL must be above mark`) : null;
+	const tpError = getPositionTriggerError(tpPriceInput, "tp", markPx, position);
+	const slError = getPositionTriggerError(slPriceInput, "sl", markPx, position);
+	const blockedReason = getConfirmBlockedReason(markPx, hasTp || hasSl);
+	const canSubmit = !blockedReason && !tpError && !slError && !isSubmitting;
 
 	async function handleSubmit() {
 		if (!canSubmit) return;
@@ -163,6 +157,8 @@ function PositionTpSlModalBody({ position, onOpenChange }: BodyProps) {
 					slError={slError}
 				/>
 
+				{blockedReason && <p className="mt-3 text-xs text-fg-muted">{blockedReason}</p>}
+
 				{visibleError && (
 					<div className="mt-3 px-2 py-1.5 rounded-8 bg-error-soft border border-stroke-error-weak text-xs text-error">
 						{visibleError}
@@ -187,6 +183,24 @@ function PositionTpSlModalBody({ position, onOpenChange }: BodyProps) {
 			</ModalFooter>
 		</>
 	);
+}
+
+function getPositionTriggerError(
+	triggerPx: string,
+	tpsl: TpSl,
+	markPx: string | null,
+	position: TpSlPositionData,
+): string | null {
+	if (markPx === null || !isPositive(triggerPx)) return null;
+	const side = position.isLong ? "buy" : "sell";
+	const verdict = checkTrigger({ triggerPx, referencePx: markPx, side, tpsl, szDecimals: position.szDecimals });
+	return getTriggerMessage({ verdict, tpsl, side, source: "mark" });
+}
+
+function getConfirmBlockedReason(markPx: string | null, hasTrigger: boolean): string | null {
+	if (markPx === null) return t`Waiting for live mark price`;
+	if (!hasTrigger) return t`Enter TP or SL price`;
+	return null;
 }
 
 function getTpSlModalAriaLabel(position: TpSlPositionData): string {
