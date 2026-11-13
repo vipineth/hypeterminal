@@ -310,7 +310,7 @@ describe("parse issues instead of silent guesses", () => {
 		const btc = duplicated.allPerpMetas[0].universe[0];
 		duplicated.allPerpMetas[0].universe.push({ ...btc });
 		const pair = duplicated.spotMeta.universe[1];
-		duplicated.spotMeta.universe.push({ ...pair, name: "@dup" });
+		duplicated.spotMeta.universe.push({ ...pair });
 		const parsed = parseMarkets(duplicated);
 
 		expect(issuesOf("duplicateTokenIndex", parsed.issues)).toEqual([{ kind: "duplicateTokenIndex", tokenIndex: 479 }]);
@@ -318,7 +318,7 @@ describe("parse issues instead of silent guesses", () => {
 		expect(issuesOf("duplicateCoin", parsed.issues)).toEqual([{ kind: "duplicateCoin", coin: btc.name }]);
 		expect(parsed.byName.get(btc.name)?.assetId).toBe(0);
 		expect(issuesOf("duplicateAssetId", parsed.issues)).toEqual([
-			{ kind: "duplicateAssetId", coin: "@dup", assetId: 10000 + pair.index },
+			{ kind: "duplicateAssetId", coin: pair.name, assetId: 10000 + pair.index },
 		]);
 	});
 
@@ -343,6 +343,38 @@ describe("parse issues instead of silent guesses", () => {
 		expect(parsed.byName.has("BTC")).toBe(false);
 		expect(mismatches).toContainEqual({ kind: "assetPrefixMismatch", dex: "", coin: "xyz:NVDA" });
 		expect(mismatches).toContainEqual({ kind: "assetPrefixMismatch", dex: "xyz", coin: "BTC" });
+	});
+
+	it("never publishes a spot pair whose coin and index disagree", () => {
+		const swapped = copySnapshot();
+		const hype = swapped.spotMeta.universe.find((pair) => pair.name === "@232");
+		const ubtc = swapped.spotMeta.universe.find((pair) => pair.name === "@142");
+		if (!hype || !ubtc) throw new Error("fixture lost @232 or @142");
+		[hype.index, ubtc.index] = [ubtc.index, hype.index];
+		const parsed = parseMarkets(swapped);
+		const renumbered = parsed.markets.filter((market) => model.byName.get(market.name)?.assetId !== market.assetId);
+
+		expect(renumbered.map((market) => `${market.name}=${market.assetId}`)).toEqual([]);
+		expect(parsed.byName.has("@232")).toBe(false);
+		expect(parsed.byName.has("@142")).toBe(false);
+		expect(issuesOf("spotIdentityMismatch", parsed.issues)).toEqual([
+			{ kind: "spotIdentityMismatch", coin: "@142", index: 232 },
+			{ kind: "spotIdentityMismatch", coin: "@232", index: 142 },
+		]);
+	});
+
+	it("publishes PURR/USDC only at index 0", () => {
+		const moved = copySnapshot();
+		const purr = moved.spotMeta.universe.find((pair) => pair.name === "PURR/USDC");
+		if (!purr) throw new Error("fixture lost PURR/USDC");
+
+		expect(model.byName.get("PURR/USDC")?.assetId).toBe(10000);
+		purr.index = 1;
+		const parsed = parseMarkets(moved);
+		expect(parsed.byName.has("PURR/USDC")).toBe(false);
+		expect(issuesOf("spotIdentityMismatch", parsed.issues)).toEqual([
+			{ kind: "spotIdentityMismatch", coin: "PURR/USDC", index: 1 },
+		]);
 	});
 });
 

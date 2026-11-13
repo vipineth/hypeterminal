@@ -77,6 +77,7 @@ export type ParseIssue =
 	| { kind: "duplicateTokenIndex"; tokenIndex: number }
 	| { kind: "duplicateCoin"; coin: string }
 	| { kind: "duplicateAssetId"; coin: string; assetId: number }
+	| { kind: "spotIdentityMismatch"; coin: string; index: number }
 	| { kind: "unknownMarginMode"; coin: string; marginMode: string };
 
 export interface MetaPayloads {
@@ -99,6 +100,7 @@ export interface MarketModel {
 const SPOT_ASSET_ID_BASE = 10_000;
 const BUILDER_PERP_ASSET_ID_BASE = 100_000;
 const BUILDER_PERP_SLOTS_PER_DEX = 10_000;
+const NAMED_SPOT_PAIR_INDEX: ReadonlyMap<string, number> = new Map([["PURR/USDC", 0]]);
 
 export function isListed(market: Market): market is ListedMarket {
 	return !market.isDelisted;
@@ -155,6 +157,10 @@ export function parseMarkets({ perpDexs, allPerpMetas, spotMeta }: MetaPayloads)
 			for (const tokenIndex of pair.tokens) {
 				if (!tokenByIndex.has(tokenIndex)) issues.push({ kind: "spotTokenMissing", pair: pair.name, tokenIndex });
 			}
+			continue;
+		}
+		if (pair.name !== `@${pair.index}` && NAMED_SPOT_PAIR_INDEX.get(pair.name) !== pair.index) {
+			issues.push({ kind: "spotIdentityMismatch", coin: pair.name, index: pair.index });
 			continue;
 		}
 		if (spotIndices.has(pair.index)) {
