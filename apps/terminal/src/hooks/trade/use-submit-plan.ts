@@ -32,6 +32,7 @@ interface UseSubmitPlanResult {
 }
 
 const RECONCILE_DELAYS_MS = [1000, 2000, 4000];
+const STATUS_READ_TIMEOUT_MS = 3000;
 
 const unsettledPlanIds = new Map<string, string>();
 const sendingPlanKeys = new Set<string>();
@@ -121,8 +122,9 @@ async function pollLegStates(orders: CloidOrder[], user: `0x${string}` | undefin
 async function readLegStates(orders: CloidOrder[], user: `0x${string}` | undefined): Promise<LegState[] | null> {
 	if (!user) return null;
 	const info = getInfoClient();
+	const signal = AbortSignal.timeout(STATUS_READ_TIMEOUT_MS);
 	try {
-		const lookups = await Promise.all(orders.map((order) => info.orderStatus({ user, oid: order.c })));
+		const lookups = await Promise.all(orders.map((order) => info.orderStatus({ user, oid: order.c }, signal)));
 		return lookups.map(lookupToLegState);
 	} catch {
 		return null;
