@@ -42,6 +42,7 @@ The agent is the one named `hl-live`. It is not the app's `HypeTerminal` agent, 
 - The builder pass and the abstraction scenario switch the account to `unifiedAccount` and back. Hyperliquid has no way back to `default`, so the account ends in `disabled`, which is the same standard mode. Unified moves all perp USDC into spot. The harness moves it back and keeps a note in the OS temp dir, so a killed run restores it on the next start.
 - A 429 on an `/info` read is retried with backoff up to five times. `/exchange` requests are never retried.
 - Only one run per principal at a time. A lock file in the OS temp dir stops a second run.
+- Before trading, a run tops spot USDC up to 30 from perp when it holds less than 20, so the spot scenario has funds.
 - Each run costs about 5 testnet USDC in fees and spread. A PURR dust balance under one lot stays in spot.
 
 ## Scenarios
@@ -60,7 +61,7 @@ A scenario is reported as `SKIP` only when testnet itself can't support it, and 
 - Every builder dex tried (`xyz`, `idx`, `osrs`, `test`, `aura`) rejects new orders with `Perp DEX open interest is at cap`, in standard and unified mode.
 - `sendAsset` into a builder dex returns `Invalid send` from perp in standard mode and from spot in unified mode.
 - `agentSetAbstraction` returns `Abstraction transition not allowed` from `disabled` and from `unifiedAccount`.
-- A thin book is a `SKIP` only when the book shows the best price beyond the order's limit.
+- A thin book is a `SKIP` only when the book shows the best price beyond the order's limit, or when a spot buy fills only part of its size.
 
 ## CI
 

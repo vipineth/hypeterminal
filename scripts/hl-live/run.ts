@@ -15,6 +15,8 @@ import { spotScenarios } from "./scenarios/spot";
 import { transferScenarios } from "./scenarios/transfers";
 
 const MIN_FUNDING_USDC = 100;
+const SPOT_FLOAT_MIN = 20;
+const SPOT_FLOAT_TARGET = 30;
 const PRINCIPAL_ADDRESS = "0x9fED7c631d8d525Ce642402C0e36A73cf5C77c1c";
 
 const SCENARIOS: Scenario[] = [...orderScenarios, ...positionScenarios, ...transferScenarios, ...spotScenarios];
@@ -108,6 +110,10 @@ async function runTestnet(): Promise<number> {
 
 		await exitUnified(h);
 		for (const spec of [main, spot]) await cleanVenue(h, spec);
+		const spotUsdc = toSafeBig(await spotBalance(h, "USDC"));
+		if (spotUsdc.lt(SPOT_FLOAT_MIN)) {
+			await h.principal.usdClassTransfer({ amount: toSafeBig(SPOT_FLOAT_TARGET).minus(spotUsdc).round(2, 3).toFixed(), toPerp: false });
+		}
 		if (agentApproved) await resetLeverage({ h, venue: await loadVenue(h.info, main) });
 
 		const results: Result[] = [];

@@ -2,7 +2,7 @@ import { toSafeBig } from "@/lib/trade/numbers";
 import { spotBalance, spotBase } from "../account";
 import { expectStatuses } from "../assert";
 import { intents, lotSize, plan } from "../plans";
-import { fresh, type Scenario, send } from "./common";
+import { fresh, type Scenario, send, Unsupported } from "./common";
 
 const MAX_ROUND_TRIP_LOSS = 0.03;
 const ROUND_DOWN = 0;
@@ -19,9 +19,13 @@ export const spotScenarios: Scenario[] = [
 			const baseBefore = toSafeBig(await spotBalance(ctx.h, base));
 			const size = lotSize(venue);
 
-			expectStatuses((await send(ctx, plan(intents.swap(venue, true, size)))).statuses, ["filled"]);
-			const bought = toSafeBig(await spotBalance(ctx.h, base)).minus(baseBefore);
-			if (bought.lte(0) || bought.gt(toSafeBig(size))) throw new Error(`bought ${bought.toFixed()} ${base}, ordered ${size}`);
+			const [bought] = (await send(ctx, plan(intents.swap(venue, true, size)))).statuses;
+			expectStatuses([bought], ["filled"]);
+			if (typeof bought === "object" && "filled" in bought && !toSafeBig(bought.filled.totalSz).eq(toSafeBig(size))) {
+				throw new Unsupported(`book filled ${bought.filled.totalSz} of ${size} ${base} within slippage`);
+			}
+			const received = toSafeBig(await spotBalance(ctx.h, base)).minus(baseBefore);
+			if (received.lte(0) || received.gt(toSafeBig(size))) throw new Error(`received ${received.toFixed()} ${base}, ordered ${size}`);
 
 			const sellSize = toSafeBig(await spotBalance(ctx.h, base)).round(venue.szDecimals, ROUND_DOWN).toFixed();
 			expectStatuses((await send(ctx, plan(intents.swap(await fresh(ctx), false, sellSize)))).statuses, ["filled"]);
