@@ -121,6 +121,18 @@ describe("order records in IndexedDB", () => {
 		]);
 	});
 
+	it("lets another tab delete the order database instead of leaving it, and every later open, blocked", async () => {
+		const store = await openBrowserStore();
+		await store.set(`${RECORD_PREFIX}a`, { state: "settled", nonce: 1 });
+		const deleted = await new Promise<string>((resolve) => {
+			const deleting = indexedDB.deleteDatabase("hypeterminal-orders");
+			deleting.onsuccess = () => resolve("deleted");
+			deleting.onblocked = () => resolve("blocked");
+		});
+		expect(deleted).toBe("deleted");
+		expect(await store.get(`${RECORD_PREFIX}a`)).toBeUndefined();
+	});
+
 	it("sends nothing over an earlier request when its record cannot be read", async () => {
 		const store = await openBrowserStore();
 		const locks = createMemoryLocks();

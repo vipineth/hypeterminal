@@ -12,10 +12,15 @@ function openDatabase(): Promise<IDBDatabase> {
 		const opening = indexedDB.open(DATABASE, 1);
 		opening.onupgradeneeded = () => opening.result.createObjectStore(OBJECT_STORE);
 		opening.onsuccess = () => {
-			opening.result.onclose = () => {
+			const opened = opening.result;
+			opened.onclose = () => {
 				database = null;
 			};
-			resolve(opening.result);
+			opened.onversionchange = () => {
+				opened.close();
+				database = null;
+			};
+			resolve(opened);
 		};
 		opening.onerror = () => reject(opening.error);
 		opening.onblocked = () => reject(new Error("Order database is blocked by another tab"));
