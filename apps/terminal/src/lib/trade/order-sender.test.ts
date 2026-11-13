@@ -1346,6 +1346,20 @@ describe("order sender offering Dismiss", () => {
 		expect(venue.state.placedLegs).toBe(1);
 	});
 
+	it("keeps a request pending when its dismissal cannot be recorded", async () => {
+		const { store, sender } = openTab(venue, failingWrites(storage, "hypeterminal:dismissed-request:"), locks);
+		venue.nextExchangeRequests("lost", "lost", "lost", "lost");
+		const first = await sender.submit(signerFor(venue), marketBuy());
+		vi.setSystemTime(sentRequest(first).expiresAfter + 6000);
+		venue.nextExchangeRequests("lost");
+		const lookup: Lookup = { kind: "order", statuses: null };
+		expect(await sender.dismiss(keyOf(first), lookup, signerFor(venue))).toEqual({
+			kind: "refused",
+			reason: "storage",
+		});
+		expect(await pendingNonce(store)).toBe(sentRequest(first).nonce);
+	});
+
 	it("keeps a request pending when its Cancel gets no reply, so the late original executes once", async () => {
 		const { sender } = openTab(venue, storage, locks);
 		venue.nextExchangeRequests("inTransit", "lost", "lost", "lost");
