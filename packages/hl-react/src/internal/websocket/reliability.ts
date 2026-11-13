@@ -1,3 +1,5 @@
+const NEVER_STALE = Number.POSITIVE_INFINITY;
+
 export const WS_RELIABILITY_LIMITS = {
 	reconnect: {
 		baseDelayMs: 250,
@@ -36,15 +38,18 @@ export const WS_RELIABILITY_LIMITS = {
 		defaultThresholdMs: 30_000,
 		perMethodThresholdMs: {
 			l2Book: 20_000,
-			trades: 20_000,
+			trades: NEVER_STALE,
 			allMids: 20_000,
-			candle: 20_000,
+			candle: NEVER_STALE,
 			activeAssetCtx: 20_000,
 			activeAssetData: 20_000,
-			allDexsAssetCtxs: 20_000,
-			spotAssetCtxs: 45_000,
+			allDexsAssetCtxs: 60_000,
+			spotAssetCtxs: 60_000,
 			assetCtxs: 20_000,
-			orderUpdates: 60_000,
+			orderUpdates: NEVER_STALE,
+			userFills: NEVER_STALE,
+			userFundings: NEVER_STALE,
+			userHistoricalOrders: NEVER_STALE,
 			webData2: 60_000,
 			webData3: 60_000,
 			allDexsClearinghouseState: 60_000,
