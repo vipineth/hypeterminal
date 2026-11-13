@@ -3643,8 +3643,8 @@ msgstr ""
 #~ msgid "Wallet client not ready"
 #~ msgstr "钱包客户端未就绪"
 
-#: src/hooks/trade/use-submit-plan.ts:77
-#: src/hooks/trade/use-submit-plan.ts:119
+#: src/hooks/trade/use-submit-plan.ts:81
+#: src/hooks/trade/use-submit-plan.ts:132
 msgid "Wallet is required for exchange actions"
 msgstr ""
 
