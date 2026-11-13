@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { STORAGE_KEYS } from "@/config/app";
 import { MARKETS_STATS_TTL_MS } from "@/config/time";
 import type { BuilderPerpMarket, PerpMarket, SpotMarket } from "@/domain/market/model";
+import { findSpotCtx } from "@/domain/market/spot-ctx";
 import { loadLastMark, saveLastMark } from "@/lib/last-mark-cache";
 import { useExchangeScope } from "@/providers/exchange-scope";
 import { useSelectedMarket } from "@/stores/use-market-store";
@@ -89,12 +90,6 @@ function useSubscriptionWarmWindow(enabled: boolean, keepAliveMs: number) {
 	return isWarm;
 }
 
-function getSpotCtx(spotCtxs: SpotAssetCtxs | undefined, market: SpotMarket): SpotAssetCtx | undefined {
-	const ctx = spotCtxs?.[market.ctxIndex];
-	if (!ctx || ctx.coin === undefined || ctx.coin === market.name) return ctx;
-	return spotCtxs?.find((candidate) => candidate.coin === market.name);
-}
-
 function getDexCtxs(allDexsCtxs: AllDexsAssetCtxs | undefined, dexName: string) {
 	if (!allDexsCtxs) return undefined;
 	const dexEntry = allDexsCtxs.find((entry) => entry[0] === dexName);
@@ -154,7 +149,7 @@ export function useMarketsInfoInternal(options: UseMarketsInfoOptions = {}) {
 				continue;
 			}
 			if (market.kind === "spot") {
-				spotMarketsInfo.push({ ...market, ...getSpotCtx(spotCtxs, market) });
+				spotMarketsInfo.push({ ...market, ...findSpotCtx(spotCtxs, market) });
 				continue;
 			}
 			const marketInfo: BuilderPerpMarketInfo = {
