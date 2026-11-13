@@ -146,7 +146,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 							placeholder="0.00"
 							value={sizeInput}
 							onChange={(e) => setSize(e.target.value)}
-							maxAllowedDecimals={szDecimals}
+							maxAllowedDecimals={entry.sizeInputDecimals}
 							className="flex-1 text-xs tabular-nums"
 							disabled={isFormDisabled}
 						/>

@@ -6,7 +6,12 @@ import {
 	type SpotAvailableAfterMaintenance,
 	type SpotBalanceData,
 } from "@/domain/trade/balances";
-import { getMaxSizeForOrderEntry, getOrderValue, getSizeValueFromInput } from "@/domain/trade/order/size";
+import {
+	getMaxSizeForOrderEntry,
+	getOrderValue,
+	getSizeValueFromInput,
+	QUOTE_SIZE_DECIMALS,
+} from "@/domain/trade/order/size";
 import type { SpotBalance } from "@/hooks/trade/use-account-balances";
 import { getMarketCapabilities, type MarketCapabilities } from "@/lib/hyperliquid";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
@@ -33,6 +38,7 @@ export interface OrderEntryDerived {
 	quoteToken: string;
 	capabilities: MarketCapabilities;
 	szDecimals: number;
+	sizeInputDecimals: number;
 	availableBalance: number;
 	availableBalanceToken: string;
 	spotBalance: SpotBalanceData;
@@ -91,6 +97,7 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 	const orderValue = getOrderValue(sizeValue, inputs.conversionPrice);
 	const sideLabels = getSideLabels(isSpotMarket);
 	const sizeModeLabel = getSizeModeLabel(inputs.sizeMode, baseToken, quoteToken);
+	const sizeInputDecimals = inputs.sizeMode === "quote" ? QUOTE_SIZE_DECIMALS : szDecimals;
 
 	return {
 		isSpotMarket,
@@ -98,6 +105,7 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 		quoteToken,
 		capabilities,
 		szDecimals,
+		sizeInputDecimals,
 		availableBalance,
 		availableBalanceToken,
 		spotBalance,

@@ -3,6 +3,8 @@ import type { SpotBalanceData } from "@/domain/trade/balances";
 import { floorToDecimals, toBig, truncateDecimals } from "@/lib/trade/numbers";
 import type { Side, SizeMode } from "@/lib/trade/types";
 
+export const QUOTE_SIZE_DECIMALS = 2;
+
 interface OrderEntryMaxSizeInput {
 	isConnected: boolean;
 	isSpotMarket: boolean;
@@ -93,7 +95,7 @@ export function getSizeForPercent(input: SizeForPercentInput): string {
 		if (isBuy) {
 			if (isQuoteMode) {
 				const quoteAmount = Big(input.spotBalance.quoteAvailable).times(pct);
-				return quoteAmount.toFixed(2);
+				return quoteAmount.toFixed(QUOTE_SIZE_DECIMALS);
 			}
 			const tokenAmount = Big(input.maxSize).times(pct).toNumber();
 			return formatSizeValue(tokenAmount, input.szDecimals);
@@ -103,7 +105,7 @@ export function getSizeForPercent(input: SizeForPercentInput): string {
 			if (input.price <= 0) return "";
 			const tokenAmount = Big(input.spotBalance.baseAvailable).times(pct);
 			const quoteAmount = tokenAmount.times(input.price);
-			return quoteAmount.toFixed(2);
+			return quoteAmount.toFixed(QUOTE_SIZE_DECIMALS);
 		}
 		const tokenAmount = Big(input.spotBalance.baseAvailable).times(pct).toNumber();
 		return formatSizeValue(tokenAmount, input.szDecimals);
@@ -114,7 +116,7 @@ export function getSizeForPercent(input: SizeForPercentInput): string {
 
 	if (isQuoteMode) {
 		if (input.price <= 0) return "";
-		return size.times(input.price).toFixed(2);
+		return size.times(input.price).toFixed(QUOTE_SIZE_DECIMALS);
 	}
 	return formatSizeValue(size.toNumber(), input.szDecimals);
 }
@@ -123,7 +125,7 @@ export function getSizeValueForModeToggle(input: SizeModeToggleInput): string {
 	if (input.sizeValue <= 0 || input.price <= 0) return "";
 
 	if (input.sizeMode === "base") {
-		return Big(input.sizeValue).times(input.price).toFixed(2);
+		return Big(input.sizeValue).times(input.price).toFixed(QUOTE_SIZE_DECIMALS);
 	}
 	return formatSizeValue(input.sizeValue, input.szDecimals);
 }
