@@ -5,7 +5,7 @@ import { STORAGE_KEYS } from "@/config/app";
 import { type LimitTif, ORDER_TYPES, type OrderType } from "@/config/trade";
 import { createValidatedStorage } from "@/lib/storage/validated-storage";
 import { isScaleOrderType, isTriggerOrderType } from "@/lib/trade/order-types";
-import type { Side, SizeMode } from "@/lib/trade/types";
+import type { Side, SizeMode, SizeUnit } from "@/lib/trade/types";
 
 interface PersistedState {
 	side: Side;
@@ -15,6 +15,7 @@ interface PersistedState {
 
 interface FormState {
 	size: string;
+	sizeUnit: SizeUnit | null;
 	limitPrice: string;
 	triggerPrice: string;
 	scaleStart: string;
@@ -35,9 +36,8 @@ interface OrderEntryActions {
 	setSide: (side: Side) => void;
 	setOrderType: (orderType: OrderType) => void;
 	setSizeMode: (mode: SizeMode) => void;
-	toggleSizeMode: () => void;
 
-	setSize: (size: string) => void;
+	setSize: (size: string, unit: SizeUnit) => void;
 	setLimitPrice: (price: string) => void;
 	setTriggerPrice: (price: string) => void;
 	setScaleStart: (price: string) => void;
@@ -67,6 +67,7 @@ const DEFAULT_PERSISTED: PersistedState = {
 
 const DEFAULT_FORM: FormState = {
 	size: "",
+	sizeUnit: null,
 	limitPrice: "",
 	triggerPrice: "",
 	scaleStart: "",
@@ -123,12 +124,7 @@ const useOrderEntryStore = create<OrderEntryStore>()(
 
 					setSizeMode: (sizeMode) => set({ sizeMode }),
 
-					toggleSizeMode: () =>
-						set((state) => ({
-							sizeMode: state.sizeMode === "base" ? "quote" : "base",
-						})),
-
-					setSize: (size) => set({ size }),
+					setSize: (size, sizeUnit) => set({ size, sizeUnit }),
 					setLimitPrice: (limitPrice) => set({ limitPrice }),
 					setTriggerPrice: (triggerPrice) => set({ triggerPrice }),
 					setScaleStart: (scaleStart) => set({ scaleStart }),
@@ -190,6 +186,9 @@ export function useReduceOnly() {
 
 export function useOrderSize() {
 	return useOrderEntryStore((s) => s.size);
+}
+export function useOrderSizeUnit() {
+	return useOrderEntryStore((s) => s.sizeUnit);
 }
 export function useLimitPrice() {
 	return useOrderEntryStore((s) => s.limitPrice);

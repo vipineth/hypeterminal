@@ -1,14 +1,22 @@
 import { useConnection } from "wagmi";
 import { deriveOrderEntry, type OrderEntryDerived } from "@/domain/trade/order/derive";
 import { getOrderPrice } from "@/domain/trade/order/price";
-import { getSizeForPercent as getSizeForPercentCalc, getSizeValueForModeToggle } from "@/domain/trade/order/size";
+import {
+	getSizeForPercent as getSizeForPercentCalc,
+	getSizeUnit,
+	getSizeValueForModeToggle,
+} from "@/domain/trade/order/size";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
-import type { Side, SizeMode } from "@/lib/trade/types";
+import type { Side } from "@/lib/trade/types";
 import {
 	useLimitPrice,
+	useOrderEntryActions,
+	useOrderSize,
+	useOrderSizeUnit,
 	useOrderType,
 	useScaleEnd,
 	useScaleStart,
+	useSizeMode,
 	useTriggerPrice,
 } from "@/stores/use-order-entry-store";
 import { useDefaultDexBalances } from "./use-account-balances";
@@ -17,8 +25,9 @@ import { useAssetLeverage } from "./use-asset-leverage";
 interface OrderEntryData extends OrderEntryDerived {
 	isConnected: boolean;
 
+	setSizeInput: (size: string) => void;
+	toggleSizeMode: () => void;
 	getSizeForPercent: (pct: number) => string;
-	convertSizeForModeToggle: () => string;
 
 	leverage: number;
 	currentLeverage: number;
@@ -41,17 +50,9 @@ interface UseOrderEntryDataOptions {
 	market: UnifiedMarketInfo | undefined;
 	side: Side;
 	markPx: number;
-	sizeMode: SizeMode;
-	sizeInput: string;
 }
 
-export function useOrderEntryData({
-	market,
-	side,
-	markPx,
-	sizeMode,
-	sizeInput,
-}: UseOrderEntryDataOptions): OrderEntryData {
+export function useOrderEntryData({ market, side, markPx }: UseOrderEntryDataOptions): OrderEntryData {
 	const { isConnected } = useConnection();
 	const { spotBalances, spotAvailableAfterMaintenance } = useDefaultDexBalances();
 	const {
@@ -73,6 +74,10 @@ export function useOrderEntryData({
 		allowsCrossMargin,
 	} = useAssetLeverage();
 
+	const sizeMode = useSizeMode();
+	const size = useOrderSize();
+	const sizeUnit = useOrderSizeUnit();
+	const { setSize, setSizeMode } = useOrderEntryActions();
 	const orderType = useOrderType();
 	const limitPriceInput = useLimitPrice();
 	const triggerPriceInput = useTriggerPrice();
@@ -95,7 +100,8 @@ export function useOrderEntryData({
 		side,
 		conversionPrice,
 		sizeMode,
-		sizeInput,
+		size,
+		sizeUnit,
 		spotBalances,
 		spotAvailableAfterMaintenance,
 		maxTradeSzs,
@@ -115,20 +121,28 @@ export function useOrderEntryData({
 		});
 	}
 
-	function convertSizeForModeToggle(): string {
-		return getSizeValueForModeToggle({
+	function setSizeInput(nextSize: string) {
+		setSize(nextSize, getSizeUnit(market, sizeMode));
+	}
+
+	function toggleSizeMode() {
+		const nextMode = sizeMode === "base" ? "quote" : "base";
+		const converted = getSizeValueForModeToggle({
 			sizeValue: derived.sizeValue,
 			sizeMode,
 			price: conversionPrice,
 			szDecimals: derived.szDecimals,
 		});
+		setSize(converted, getSizeUnit(market, nextMode));
+		setSizeMode(nextMode);
 	}
 
 	return {
 		isConnected,
 		...derived,
+		setSizeInput,
+		toggleSizeMode,
 		getSizeForPercent,
-		convertSizeForModeToggle,
 		leverage,
 		currentLeverage,
 		pendingLeverage,

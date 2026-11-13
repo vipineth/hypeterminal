@@ -21,13 +21,7 @@ import {
 	usesLimitPrice,
 	usesTriggerPrice,
 } from "@/lib/trade/order-types";
-import {
-	useLimitPrice,
-	useOrderEntryActions,
-	useOrderSize,
-	useTpSlEnabled,
-	useTriggerPrice,
-} from "@/stores/use-order-entry-store";
+import { useLimitPrice, useOrderEntryActions, useTpSlEnabled, useTriggerPrice } from "@/stores/use-order-entry-store";
 import { WalletModal } from "../components/wallet-modal";
 import { MarginModeModal } from "../tradebox/margin-mode-modal";
 import { TradeFormScale } from "../tradebox/trade-form-scale";
@@ -49,11 +43,10 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 	const { market, entry, orderType, side, validation, buttonContent } = ticket;
 	const [advancedOpen, setAdvancedOpen] = useState(() => isAdvancedOrderType(orderType));
 
-	const sizeInput = useOrderSize();
 	const limitPriceInput = useLimitPrice();
 	const triggerPriceInput = useTriggerPrice();
 	const tpSlEnabled = useTpSlEnabled();
-	const { setOrderType, setSize, setLimitPrice, setTriggerPrice, setTpSlEnabled } = useOrderEntryActions();
+	const { setOrderType, setLimitPrice, setTriggerPrice, setTpSlEnabled } = useOrderEntryActions();
 
 	const isFormDisabled = !ticket.isConnected || entry.availableBalance <= 0;
 	const isSpot = entry.isSpotMarket;
@@ -144,8 +137,8 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 						<NumberInput
 							id={sizeFieldId}
 							placeholder="0.00"
-							value={sizeInput}
-							onChange={(e) => setSize(e.target.value)}
+							value={entry.sizeInput}
+							onChange={(e) => entry.setSizeInput(e.target.value)}
 							maxAllowedDecimals={entry.sizeInputDecimals}
 							className="flex-1 text-xs tabular-nums"
 							disabled={isFormDisabled}

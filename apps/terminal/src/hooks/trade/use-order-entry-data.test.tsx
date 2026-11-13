@@ -14,6 +14,9 @@ const form = vi.hoisted(() => ({
 	scaleStart: "",
 	scaleEnd: "",
 	quoteBalance: "150",
+	sizeMode: "base" as SizeMode,
+	size: "",
+	sizeUnit: null as { mode: SizeMode; assetId: number; szDecimals: number } | null,
 }));
 
 vi.mock("wagmi", () => ({ useConnection: () => ({ isConnected: true }) }));
@@ -30,6 +33,10 @@ vi.mock("@/hooks/trade/use-asset-leverage", () => ({
 }));
 
 vi.mock("@/stores/use-order-entry-store", () => ({
+	useSizeMode: () => form.sizeMode,
+	useOrderSize: () => form.size,
+	useOrderSizeUnit: () => form.sizeUnit,
+	useOrderEntryActions: () => ({ setSize: () => {}, setSizeMode: () => {} }),
 	useOrderType: () => form.orderType,
 	useLimitPrice: () => form.limitPrice,
 	useTriggerPrice: () => "",
@@ -57,26 +64,20 @@ type OrderEntry = ReturnType<typeof useOrderEntryData>;
 
 interface Props {
 	market: UnifiedMarketInfo;
-	sizeMode: SizeMode;
-	sizeInput: string;
 	onEntry: (entry: OrderEntry) => void;
 }
 
-function OrderEntryProbe({ market, sizeMode, sizeInput, onEntry }: Props) {
-	onEntry(useOrderEntryData({ market, side: "buy", markPx: MARK, sizeMode, sizeInput }));
+function OrderEntryProbe({ market, onEntry }: Props) {
+	onEntry(useOrderEntryData({ market, side: "buy", markPx: MARK }));
 	return null;
 }
 
 function renderOrderEntry(market: UnifiedMarketInfo, sizeMode: SizeMode, sizeInput: string): OrderEntry {
+	form.sizeMode = sizeMode;
+	form.size = sizeInput;
+	form.sizeUnit = { mode: sizeMode, assetId: market.assetId, szDecimals: market.szDecimals };
 	const entries: OrderEntry[] = [];
-	renderToString(
-		<OrderEntryProbe
-			market={market}
-			sizeMode={sizeMode}
-			sizeInput={sizeInput}
-			onEntry={(entry) => entries.push(entry)}
-		/>,
-	);
+	renderToString(<OrderEntryProbe market={market} onEntry={(entry) => entries.push(entry)} />);
 	return entries[0];
 }
 

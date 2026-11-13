@@ -1,7 +1,7 @@
 import Big from "big.js";
 import type { SpotBalanceData } from "@/domain/trade/balances";
 import { floorToDecimals, toBig, truncateDecimals } from "@/lib/trade/numbers";
-import type { Side, SizeMode } from "@/lib/trade/types";
+import type { Side, SizeMode, SizeUnit } from "@/lib/trade/types";
 
 export const QUOTE_SIZE_DECIMALS = 2;
 
@@ -38,6 +38,22 @@ interface SizeModeToggleInput {
 	sizeMode: SizeMode;
 	price: number;
 	szDecimals: number;
+}
+
+interface SizeUnitMarket {
+	assetId: number;
+	szDecimals: number;
+}
+
+export function getSizeUnit(market: SizeUnitMarket | undefined, mode: SizeMode): SizeUnit {
+	return { mode, assetId: market?.assetId ?? null, szDecimals: market?.szDecimals ?? 0 };
+}
+
+export function readSizeInput(size: string, typedIn: SizeUnit | null, current: SizeUnit): string {
+	if (!typedIn) return "";
+	const sameUnit =
+		typedIn.mode === current.mode && typedIn.assetId === current.assetId && typedIn.szDecimals === current.szDecimals;
+	return sameUnit ? size : "";
 }
 
 function formatSizeValue(value: number, decimals: number): string {

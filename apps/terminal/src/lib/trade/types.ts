@@ -5,6 +5,12 @@
 export type Side = "buy" | "sell";
 export type SizeMode = "base" | "quote";
 
+export interface SizeUnit {
+	mode: SizeMode;
+	assetId: number | null;
+	szDecimals: number;
+}
+
 export interface FormValidationResult {
 	valid: boolean;
 	errors: string[];

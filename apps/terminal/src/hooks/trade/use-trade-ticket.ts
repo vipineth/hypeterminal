@@ -39,7 +39,6 @@ import {
 	useLimitPrice,
 	useOrderEntryActions,
 	useOrderSide,
-	useOrderSize,
 	useOrderType,
 	useReduceOnly,
 	useScaleEnd,
@@ -78,9 +77,8 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 	const side = useOrderSide();
 	const markPx = toNumberOrZero(market?.markPx);
 	const sizeMode = useSizeMode();
-	const sizeInput = useOrderSize();
 
-	const entry = useOrderEntryData({ market, side, markPx, sizeMode, sizeInput });
+	const entry = useOrderEntryData({ market, side, markPx });
 	const { isSpotMarket, baseToken, quoteToken, spotBalance, availableBalance, maxSize, sizeValue, orderValue } = entry;
 
 	const { takerRate, makerRate } = useFeeRates(market?.kind);
@@ -107,7 +105,7 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 	const usesLimitPrice = usesLimitPriceForOrder(orderType);
 	const canUseTpSl = canUseTpSlForOrder(orderType);
 
-	const { setOrderType, setSizeMode, setSize, setLimitPrice } = useOrderEntryActions();
+	const { setOrderType, setLimitPrice } = useOrderEntryActions();
 
 	const [approvalError, setApprovalError] = useState<string | null>(null);
 	const [activeModal, setActiveModal] = useState<ActiveModal>(null);
@@ -203,19 +201,10 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 				}),
 	);
 
-	function handleSizeModeToggle() {
-		const newMode = sizeMode === "base" ? "quote" : "base";
-		const convertedSize = entry.convertSizeForModeToggle();
-		if (convertedSize) {
-			setSize(convertedSize);
-		}
-		setSizeMode(newMode);
-	}
-
 	function handleSizePercentApply(pct: number) {
 		if (maxSize <= 0) return;
 		const newSize = entry.getSizeForPercent(pct);
-		if (newSize) setSize(newSize);
+		if (newSize) entry.setSizeInput(newSize);
 	}
 
 	const isRegistering =
@@ -345,7 +334,7 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 		openDepositModal: () => openDepositModal("deposit"),
 		openSettingsDialog,
 		openSwapModal: () => swapTargetToken && openSwapModal(DEFAULT_QUOTE_TOKEN, swapTargetToken),
-		handleSizeModeToggle,
+		handleSizeModeToggle: entry.toggleSizeMode,
 		handleSizePercentApply,
 	};
 }

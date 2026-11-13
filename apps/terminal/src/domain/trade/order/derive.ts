@@ -9,13 +9,15 @@ import {
 import {
 	getMaxSizeForOrderEntry,
 	getOrderValue,
+	getSizeUnit,
 	getSizeValueFromInput,
 	QUOTE_SIZE_DECIMALS,
+	readSizeInput,
 } from "@/domain/trade/order/size";
 import type { SpotBalance } from "@/hooks/trade/use-account-balances";
 import { getMarketCapabilities, type MarketCapabilities } from "@/lib/hyperliquid";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
-import type { Side, SizeMode } from "@/lib/trade/types";
+import type { Side, SizeMode, SizeUnit } from "@/lib/trade/types";
 
 export interface OrderEntryInputs {
 	isConnected: boolean;
@@ -23,7 +25,8 @@ export interface OrderEntryInputs {
 	side: Side;
 	conversionPrice: number;
 	sizeMode: SizeMode;
-	sizeInput: string;
+	size: string;
+	sizeUnit: SizeUnit | null;
 	spotBalances: SpotBalance[] | null | undefined;
 	spotAvailableAfterMaintenance?: SpotAvailableAfterMaintenance | null;
 	/** Max trade sizes in base token: [long, short] */
@@ -38,6 +41,7 @@ export interface OrderEntryDerived {
 	quoteToken: string;
 	capabilities: MarketCapabilities;
 	szDecimals: number;
+	sizeInput: string;
 	sizeInputDecimals: number;
 	availableBalance: number;
 	availableBalanceToken: string;
@@ -87,8 +91,9 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 		maxTradeSzs: inputs.maxTradeSzs,
 	});
 
+	const sizeInput = readSizeInput(inputs.size, inputs.sizeUnit, getSizeUnit(inputs.market, inputs.sizeMode));
 	const sizeValue = getSizeValueFromInput({
-		sizeInput: inputs.sizeInput,
+		sizeInput,
 		sizeMode: inputs.sizeMode,
 		price: inputs.conversionPrice,
 		szDecimals,
@@ -105,6 +110,7 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 		quoteToken,
 		capabilities,
 		szDecimals,
+		sizeInput,
 		sizeInputDecimals,
 		availableBalance,
 		availableBalanceToken,

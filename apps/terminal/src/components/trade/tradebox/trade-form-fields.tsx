@@ -27,7 +27,6 @@ import {
 	useLimitPrice,
 	useOrderEntryActions,
 	useOrderSide,
-	useOrderSize,
 	useOrderType,
 	useReduceOnly,
 	useSizeMode,
@@ -67,7 +66,6 @@ export function TradeFormFields({
 
 	const side = useOrderSide();
 	const sizeMode = useSizeMode();
-	const sizeInput = useOrderSize();
 	const orderType = useOrderType();
 	const limitPriceInput = useLimitPrice();
 	const triggerPriceInput = useTriggerPrice();
@@ -87,10 +85,12 @@ export function TradeFormFields({
 		orderValue,
 		sizeModeLabel,
 		szDecimals,
+		sizeInput,
 		sizeInputDecimals,
-	} = useOrderEntryData({ market, side, markPx, sizeMode, sizeInput });
+		setSizeInput,
+	} = useOrderEntryData({ market, side, markPx });
 
-	const { setSize, setLimitPrice, setTriggerPrice, setReduceOnly, setTpSlEnabled } = useOrderEntryActions();
+	const { setLimitPrice, setTriggerPrice, setReduceOnly, setTpSlEnabled } = useOrderEntryActions();
 
 	const isFormDisabled = !isConnected || availableBalance <= 0;
 
@@ -225,7 +225,7 @@ export function TradeFormFields({
 							id={sizeFieldId}
 							placeholder="0.00"
 							value={sizeInput}
-							onChange={(e) => setSize(e.target.value)}
+							onChange={(e) => setSizeInput(e.target.value)}
 							maxAllowedDecimals={sizeInputDecimals}
 							className={cn(
 								"flex-1 text-xs tabular-nums",
