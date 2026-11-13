@@ -343,18 +343,18 @@ describe("order wire format", () => {
 		[10, "10"],
 		[100, "100"],
 		[250, "250"],
-	])("closes a %d unit long at szDecimals 0 with the full size", (size, wireSize) => {
+	])("closes a %d DOGE long at szDecimals 0 with the full size", (size, wireSize) => {
 		const plan = buildOrderPlan({
 			kind: "marketClose",
-			assetId: 173,
+			assetId: 12,
 			size,
 			szDecimals: 0,
 			isLong: true,
-			markPx: 0.16,
+			markPx: 0.064543,
 			slippageBps: 250,
 		});
 		expect(plan.orders).toEqual([
-			{ a: 173, b: false, p: "0.156", s: wireSize, r: true, t: { limit: { tif: "FrontendMarket" } } },
+			{ a: 12, b: false, p: "0.062929", s: wireSize, r: true, t: { limit: { tif: "FrontendMarket" } } },
 		]);
 	});
 
@@ -383,7 +383,7 @@ describe("order wire format", () => {
 	it("rounds a sub-dollar market price to 6 - szDecimals decimals, away from the book", () => {
 		const dydx = {
 			...ENTRY_BASE,
-			assetId: 33,
+			assetId: 4,
 			szDecimals: 1,
 			sizeValue: 200,
 			markPx: 0.09017,
