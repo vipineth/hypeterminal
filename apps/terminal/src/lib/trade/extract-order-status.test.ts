@@ -112,6 +112,32 @@ describe("readThrownStatuses", () => {
 		});
 	});
 
+	it("names the crossing leg of a testnet bulk order the SDK threw on", () => {
+		const response = {
+			status: "ok",
+			response: {
+				type: "order",
+				data: {
+					statuses: [
+						{ resting: { oid: 65243893187, cloid: "0xb2f5734cf9ba51d0c0b4264d7f550000" } },
+						{ error: "Post only order would have immediately matched, bbo was 1924.2@1924.8. asset=4" },
+						{ resting: { oid: 65243893189, cloid: "0xb2f5734cf9ba51d0c0b4264d7f550002" } },
+					],
+				},
+			},
+		};
+		const thrown = new ApiRequestError(response, "order 1: Post only order would have immediately matched");
+		const legs: PlanLeg[] = ["1154", "1949", "1153"].map((price) => ({ role: "scaleLeg", price }));
+		expect(interpretOrderStatuses(readThrownStatuses(thrown) ?? [], legs)).toEqual({
+			result: {
+				ok: false,
+				error:
+					"2 of 3 legs placed. Leg 2 at 1949 rejected: Post only order would have immediately matched, bbo was 1924.2@1924.8. asset=4",
+			},
+			settled: false,
+		});
+	});
+
 	it("finds no statuses in a whole-request rejection or a transport failure", () => {
 		const rejected = { status: "err", response: "User or API Wallet 0x1 does not exist." };
 		expect(readThrownStatuses(new ApiRequestError(rejected, rejected.response))).toBeNull();
