@@ -11,7 +11,12 @@ function openDatabase(): Promise<IDBDatabase> {
 	database ??= new Promise<IDBDatabase>((resolve, reject) => {
 		const opening = indexedDB.open(DATABASE, 1);
 		opening.onupgradeneeded = () => opening.result.createObjectStore(OBJECT_STORE);
-		opening.onsuccess = () => resolve(opening.result);
+		opening.onsuccess = () => {
+			opening.result.onclose = () => {
+				database = null;
+			};
+			resolve(opening.result);
+		};
 		opening.onerror = () => reject(opening.error);
 		opening.onblocked = () => reject(new Error("Order database is blocked by another tab"));
 	}).catch((error) => {
@@ -23,8 +28,14 @@ function openDatabase(): Promise<IDBDatabase> {
 
 async function transact<T>(mode: IDBTransactionMode, run: (store: IDBObjectStore) => IDBRequest<T>): Promise<T> {
 	const db = await openDatabase();
+	let transaction: IDBTransaction;
+	try {
+		transaction = db.transaction(OBJECT_STORE, mode, { durability: "strict" });
+	} catch (error) {
+		database = null;
+		throw error;
+	}
 	return new Promise<T>((resolve, reject) => {
-		const transaction = db.transaction(OBJECT_STORE, mode, { durability: "strict" });
 		const request = run(transaction.objectStore(OBJECT_STORE));
 		transaction.oncomplete = () => resolve(request.result);
 		transaction.onerror = () => reject(transaction.error);

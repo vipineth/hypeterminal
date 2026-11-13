@@ -445,6 +445,16 @@ function pausedAtFirstSettle(base: KeyValueStore, until: Promise<void>): KeyValu
 	};
 }
 
+function unreadable(base: KeyValueStore): KeyValueStore {
+	return {
+		get: async () => {
+			throw new DOMException("Connection to Indexed Database server lost.", "UnknownError");
+		},
+		keys: () => base.keys(),
+		set: (key, value) => base.set(key, value),
+	};
+}
+
 function scale(prices: string[], { buy = true, asset = SOL } = {}): OrderSubmission {
 	return {
 		kind: "order",
@@ -546,6 +556,20 @@ describe("order sender in a browser that cannot keep its records", () => {
 		const outcome = await sender.submit(signerFor(venue), marketBuy());
 		expect(outcome).toEqual({ kind: "refused", reason: "storage" });
 		expect(venue.exchangeRequests).toEqual([]);
+	});
+
+	it("sends nothing and keeps the earlier request when its record cannot be read", async () => {
+		const storage = createMemoryKeyValue();
+		const locks = createMemoryLocks();
+		venue.nextExchangeRequests("noReply", "lost", "lost", "lost");
+		const first = await openTab(venue, storage, locks).sender.submit(signerFor(venue), marketBuy());
+		const sentBefore = venue.exchangeRequests.length;
+		const blind = openTab(venue, unreadable(storage), locks);
+		expect(await blind.sender.submit(signerFor(venue), marketBuy())).toEqual({ kind: "refused", reason: "storage" });
+		expect(await blind.sender.retry(keyOf(first))).toEqual({ kind: "refused", reason: "storage" });
+		expect(venue.exchangeRequests).toHaveLength(sentBefore);
+		expect(venue.state.placedLegs).toBe(1);
+		expect(await pendingNonce(openTab(venue, storage, locks).store)).toBe(sentRequest(first).nonce);
 	});
 
 	it("sends nothing without Web Locks, so two tabs cannot both sign", async () => {
@@ -1025,6 +1049,23 @@ describe("order sender seen from another tab", () => {
 		expect(await pressA).toMatchObject({ kind: "sent", settlement: { kind: "answered" } });
 		await vi.waitFor(() => expect(tabB.store.pending()).toHaveLength(0));
 		unsubscribe();
+	});
+
+	it("keeps a request written while its list was being reloaded", async () => {
+		vi.useFakeTimers({ toFake: ["Date"], now: new Date("2026-11-14T12:00:00Z") });
+		venue.nextExchangeRequests("lost", "lost", "lost", "lost");
+		const first = sentRequest(await openTab(venue, storage, locks).sender.submit(signerFor(venue), marketBuy()));
+		const tab = openTab(venue, storage, locks);
+		const otherSlot = getRequestSlot("testnet", TEST_USER, 4);
+		const refreshing = tab.store.refresh();
+		const writing = tab.store.write(otherSlot, { state: "pending", request: { ...first, slot: otherSlot } });
+		await Promise.all([refreshing, writing]);
+		expect(
+			tab.store
+				.pending()
+				.map((request) => request.slot)
+				.sort(),
+		).toEqual([otherSlot, SLOT].sort());
 	});
 
 	it("shows another tab's unconfirmed request once the grace period ends, and tells its listeners", async () => {

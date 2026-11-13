@@ -76,6 +76,8 @@ export interface ChangeBus {
 
 const SILENT_BUS: ChangeBus = { post() {}, subscribe: () => () => {} };
 
+export class UnreadableStore extends Error {}
+
 export interface RequestStore {
 	read(slot: string): Promise<SlotRecord | null>;
 	write(slot: string, record: SlotRecord): Promise<boolean>;
@@ -96,7 +98,9 @@ export function getRequestSlot(network: string, user: string, asset: number): st
 
 export function createRequestStore(getStore: () => KeyValueStore | null, bus: ChangeBus = SILENT_BUS): RequestStore {
 	const listeners = new Set<() => void>();
-	let cached = new Map<string, PendingRequest>();
+	const cached = new Map<string, PendingRequest>();
+	const cachedAt = new Map<string, number>();
+	let version = 0;
 	let pendingList: PendingRequest[] = [];
 
 	function notify() {
@@ -104,18 +108,36 @@ export function createRequestStore(getStore: () => KeyValueStore | null, bus: Ch
 		for (const listener of listeners) listener();
 	}
 
-	function cache(slot: string, record: SlotRecord | null) {
+	function place(slot: string, record: SlotRecord | null) {
 		if (record?.state === "pending") cached.set(slot, record.request);
 		else cached.delete(slot);
+	}
+
+	function cache(slot: string, record: SlotRecord | null) {
+		cachedAt.set(slot, ++version);
+		place(slot, record);
 		notify();
 	}
 
 	async function read(slot: string): Promise<SlotRecord | null> {
+		const store = getStore();
+		if (!store) throw new UnreadableStore("Order storage is unavailable");
+		let raw: unknown;
 		try {
-			const raw = await getStore()?.get(KEY_PREFIX + slot);
-			return raw === undefined || raw === null ? null : slotRecordSchema.parse(raw);
+			raw = await store.get(KEY_PREFIX + slot);
+		} catch (error) {
+			throw new UnreadableStore(error instanceof Error ? error.message : String(error));
+		}
+		if (raw === undefined || raw === null) return null;
+		const parsed = slotRecordSchema.safeParse(raw);
+		return parsed.success ? parsed.data : null;
+	}
+
+	async function readForList(slot: string): Promise<SlotRecord | null | undefined> {
+		try {
+			return await read(slot);
 		} catch {
-			return null;
+			return undefined;
 		}
 	}
 
@@ -146,23 +168,27 @@ export function createRequestStore(getStore: () => KeyValueStore | null, bus: Ch
 	}
 
 	async function refresh() {
+		const startedAt = version;
 		let keys: string[] = [];
 		try {
 			keys = (await getStore()?.keys()) ?? [];
-		} catch {}
-		const slots = keys.filter((key) => key.startsWith(KEY_PREFIX)).map((key) => key.slice(KEY_PREFIX.length));
-		const fresh = new Map<string, PendingRequest>();
-		for (const slot of slots) {
-			const record = await read(slot);
-			if (record?.state === "pending") fresh.set(slot, record.request);
+		} catch {
+			return;
 		}
-		cached = fresh;
+		const slots = keys.filter((key) => key.startsWith(KEY_PREFIX)).map((key) => key.slice(KEY_PREFIX.length));
+		const records = await Promise.all(slots.map(async (slot) => [slot, await readForList(slot)] as const));
+		const untouched = (slot: string) => (cachedAt.get(slot) ?? 0) <= startedAt;
+		for (const slot of cached.keys()) if (!slots.includes(slot) && untouched(slot)) cached.delete(slot);
+		for (const [slot, record] of records) if (record !== undefined && untouched(slot)) place(slot, record);
 		notify();
 	}
 
 	function subscribe(listener: () => void) {
 		listeners.add(listener);
-		const unsubscribeBus = bus.subscribe(async (slot) => cache(slot, await read(slot)));
+		const unsubscribeBus = bus.subscribe(async (slot) => {
+			const record = await readForList(slot);
+			if (record !== undefined) cache(slot, record);
+		});
 		void refresh();
 		return () => {
 			listeners.delete(listener);

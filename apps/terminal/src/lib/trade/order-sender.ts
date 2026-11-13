@@ -20,6 +20,7 @@ import {
 	type RequestLabel,
 	type RequestStore,
 	type SlotRecord,
+	UnreadableStore,
 } from "@/lib/trade/pending-requests";
 
 export const EXPIRY_WINDOW_MS = 30_000;
@@ -166,6 +167,9 @@ export function createOrderSender(env: SenderEnv) {
 			const guard = await safeguards();
 			if (guard.kind === "refused") return guard;
 			return await run((locked) => guard.locks.request(`hypeterminal:pending-request:${slot}`, locked));
+		} catch (error) {
+			if (error instanceof UnreadableStore) return { kind: "refused", reason: "storage" };
+			throw error;
 		} finally {
 			sending.delete(slot);
 			emitBusy();
@@ -278,7 +282,7 @@ export function createOrderSender(env: SenderEnv) {
 	async function record(settlement: Settlement): Promise<Settlement> {
 		if (settlement.kind === "pending") return settlement;
 		const { request } = settlement;
-		const current = await env.store.read(request.slot);
+		const current = await env.store.read(request.slot).catch(() => undefined);
 		if (current?.state !== "pending" || current.request.nonce !== request.nonce) return settlement;
 		await env.store.write(request.slot, {
 			state: "settled",
