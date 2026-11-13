@@ -28,7 +28,7 @@ const { values } = parseArgs({
 		drift: { type: "boolean", default: false },
 		"write-drift-snapshot": { type: "boolean", default: false },
 		main: { type: "string", default: "DOGE" },
-		builder: { type: "string", default: "xyz:TSLA" },
+		builder: { type: "string", default: "xyz:NVDA" },
 		spot: { type: "string", default: "PURR/USDC" },
 		only: { type: "string" },
 	},

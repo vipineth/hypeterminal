@@ -25,6 +25,7 @@ export class Unsupported extends Error {}
 export type TaggedOrder = ExchangeOrder & { c: `0x${string}` };
 
 const NO_MATCH = "could not immediately match";
+const DEX_OI_CAP = "Perp DEX open interest is at cap";
 
 export async function fresh(ctx: ScenarioContext): Promise<Venue> {
 	return loadVenue(ctx.h.info, ctx.venue);
@@ -37,7 +38,9 @@ export async function send(ctx: ScenarioContext, built: OrderPlan): Promise<{ st
 		return { statuses: response.response.data.statuses, orders };
 	} catch (error) {
 		const [first] = orders;
-		if (String((error as Error).message).includes(NO_MATCH) && first) {
+		const message = String((error as Error).message);
+		if (message.includes(DEX_OI_CAP)) throw new Unsupported(message);
+		if (message.includes(NO_MATCH) && first) {
 			const book = await ctx.h.info.l2Book({ coin: ctx.venue.coin });
 			if (bookTooThin(book, first.b, first.p)) {
 				throw new Unsupported(`book too thin to fill ${first.b ? "a buy" : "a sell"} at ${first.p} on ${ctx.venue.coin}`);

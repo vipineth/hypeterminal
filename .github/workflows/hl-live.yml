@@ -1,0 +1,58 @@
+name: hl-live
+
+on:
+  push:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: hl-live-${{ github.event_name == 'push' && github.ref || 'testnet' }}
+  cancel-in-progress: false
+
+jobs:
+  readonly:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.18.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.22.0
+          cache: pnpm
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter terminal test hl-live
+      - run: bun scripts/hl-live/run.ts --readonly
+      - run: bun scripts/hl-live/scan-wire.ts
+
+  testnet:
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.18.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.22.0
+          cache: pnpm
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - run: pnpm install --frozen-lockfile
+      - run: bun scripts/hl-live/run.ts --testnet
+        env:
+          HL_ENV_FILE: /dev/null
+          HL_TESTNET_PRINCIPAL_KEY: ${{ secrets.HL_TESTNET_PRINCIPAL_KEY }}
+          HL_TESTNET_AGENT_KEY: ${{ secrets.HL_TESTNET_AGENT_KEY }}
+      - if: always()
+        run: bun scripts/hl-live/run.ts --drift
