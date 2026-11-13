@@ -198,7 +198,7 @@ export function parseMarkets({ perpDexs, allPerpMetas, spotMeta }: MetaPayloads)
 		tokens,
 		byName,
 		tokenByIndex,
-		tokenByName: indexTokenNames(tokens),
+		tokenByName: new Map(tokens.map((token) => [token.name, token])),
 		issues,
 	};
 }
@@ -233,15 +233,6 @@ function indexTokens(tokens: readonly SpotToken[], issues: ParseIssue[]): Map<nu
 		byIndex.set(token.index, token);
 	}
 	return byIndex;
-}
-
-function indexTokenNames(tokens: readonly SpotToken[]): Map<string, SpotToken> {
-	const byName = new Map<string, SpotToken>();
-	for (const token of tokens) {
-		if (byName.get(token.name)?.name !== token.name) byName.set(token.name, token);
-		if (!byName.has(token.displayName)) byName.set(token.displayName, token);
-	}
-	return byName;
 }
 
 function parseDexes(
