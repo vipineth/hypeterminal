@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { createContext, use, useRef } from "react";
 import { useStore } from "zustand";
 import {
+	createWsCloseSubscriber,
 	createWsReconnectTrigger,
 	getHttpTransport,
 	getInfoClient,
@@ -59,6 +60,7 @@ export function HyperliquidProvider({
 				wsTransport: getWsTransport(isTestnet),
 				ssr: false,
 				triggerReconnect: createWsReconnectTrigger(isTestnet),
+				subscribeSocketClose: createWsCloseSubscriber(isTestnet),
 			}),
 		);
 	}

@@ -139,7 +139,14 @@ const client = new SubscriptionClient({
 			manager.subscribe(channel, payload, listener, options),
 	},
 });
-const store = createHyperliquidStore({ ssr: false, triggerReconnect: () => socket.reconnect() });
+const store = createHyperliquidStore({
+	ssr: false,
+	triggerReconnect: () => socket.reconnect(),
+	subscribeSocketClose: (onClose: () => void) => {
+		socket.addEventListener("close", onClose);
+		return () => socket.removeEventListener("close", onClose);
+	},
+});
 const params = { coin: "BTC" };
 const key = serializeKey(subscriptionKeys.method("l2Book", params));
 
@@ -310,6 +317,107 @@ const scenarios: Record<string, () => Promise<void>> = {
 			frozen,
 			"recovered: the book is streaming again",
 			"frozen: status says active (footer shows Connected) but the server is not streaming and nothing retries",
+		);
+	},
+	"drop-stays-stale-until-frame": async () => {
+		step("the BTC book mounts, is confirmed and shows a book");
+		mount();
+		await drain();
+		socket.ack();
+		await drain();
+		socket.push();
+		await advance(50);
+		step("the socket drops; the SDK keeps the subscription and calls no onError");
+		socket.close();
+		await drain();
+		const afterDrop = { ...entry() };
+		step(`after the drop: status ${afterDrop.status}, isStale ${afterDrop.isStale}`);
+		step("the socket reopens and Hyperliquid confirms the resubscribe, with no book yet");
+		socket.open();
+		await drain();
+		socket.ack();
+		await drain();
+		const afterAck = { ...entry() };
+		step(`after the ack: status ${afterAck.status}, isStale ${afterAck.isStale}`);
+		socket.push();
+		await advance(50);
+		const afterFrame = { ...entry() };
+		step(`after a new book: status ${afterFrame.status}, isStale ${afterFrame.isStale}`);
+		report(
+			!afterDrop.isStale || !afterAck.isStale || afterFrame.isStale !== false || afterDrop.data === undefined,
+			"not live from the drop until a book arrives on the new socket, and the old book stays shown",
+			"the entry claimed live data while the socket was down or before a new book arrived",
+		);
+	},
+	"show-keeps-expired-stale": async () => {
+		step("the BTC book mounts, is confirmed and shows a book");
+		mount();
+		await drain();
+		socket.ack();
+		await drain();
+		socket.push();
+		await advance(50);
+		step("the tab hides and one book is buffered, then the server goes quiet for 30s");
+		setHidden(true);
+		socket.push();
+		await advance(30_000);
+		step(`the watchdog marked the key stale and closed the socket: isStale ${entry()?.isStale}, socket ${socket.readyState}`);
+		step("the tab shows, which flushes the buffered book");
+		setHidden(false);
+		await drain();
+		const afterShow = { ...entry() };
+		step(`after the show: status ${afterShow.status}, isStale ${afterShow.isStale}`);
+		socket.open();
+		await drain();
+		socket.ack();
+		await drain();
+		socket.push();
+		await advance(50);
+		step(`after a new book: status ${entry()?.status}, isStale ${entry()?.isStale}`);
+		report(
+			!afterShow.isStale || entry()?.isStale !== false,
+			"the expired book stays stale after the show, and a new book makes it live",
+			"the show revived an expired book as live",
+		);
+	},
+	"remount-after-error-keeps-buffer-stale": async () => {
+		step("the BTC book mounts, is confirmed and shows a book");
+		mount();
+		await drain();
+		socket.ack();
+		await drain();
+		socket.push();
+		await advance(50);
+		step("the tab hides and one book is buffered");
+		setHidden(true);
+		socket.push();
+		await advance(50);
+		const beforeHide = entry()?.data;
+		step("the socket drops and reopens; Hyperliquid refuses the resubscribe, so the store marks the key error");
+		socket.close();
+		await drain();
+		socket.open();
+		await drain();
+		socket.errorReply();
+		await drain();
+		step(`entry status ${entry()?.status}`);
+		step("a second hook mounts the key, which resets the entry and subscribes again; Hyperliquid confirms");
+		mount();
+		await drain();
+		socket.ack();
+		await drain();
+		step(`entry status ${entry()?.status}, isStale ${entry()?.isStale}`);
+		step("the tab shows before any new book; the reconnect's close event has not landed yet");
+		socket.reconnect = () => {};
+		setHidden(false);
+		await drain();
+		const shown = entry();
+		const old = shown?.data !== undefined && shown?.data !== beforeHide;
+		step(`after the show: status ${shown?.status}, isStale ${shown?.isStale}, shows the pre-drop book ${old}`);
+		report(
+			old && shown?.status === "active" && !shown?.isStale,
+			"no pre-drop book is shown as live",
+			"the show put the pre-drop book back as live data",
 		);
 	},
 };

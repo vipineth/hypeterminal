@@ -101,6 +101,7 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 	let singletonsAttached = false;
 	let detachVisibility: (() => void) | undefined;
 	let detachNetwork: (() => void) | undefined;
+	let detachSocketClose: (() => void) | undefined;
 	let wasHidden = false;
 	let wasOffline = false;
 
@@ -112,15 +113,30 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 
 	function flushVisibilityBuffer(store: StoreApi<HyperliquidStoreState>) {
 		if (visibilityBuffer.size === 0) return;
-		const state = store.getState();
 		for (const [key, data] of visibilityBuffer) {
-			state.setSubscriptionData(key, data);
+			store.setState((state) => {
+				const current = state.subscriptions[key];
+				if (!current) return state;
+				return setSubscriptionEntry(state, key, { ...current, data, status: "active", error: undefined });
+			});
 		}
 		visibilityBuffer.clear();
 	}
 
-	function attachSingletons(triggerReconnect: (() => void) | undefined, store: StoreApi<HyperliquidStoreState>) {
+	function markAllStale(store: StoreApi<HyperliquidStoreState>) {
+		store.setState((state) => {
+			const subscriptions: SubscriptionMap = {};
+			for (const [key, entry] of Object.entries(state.subscriptions)) {
+				subscriptions[key] = entry.isStale ? entry : { ...entry, isStale: true };
+			}
+			return { subscriptions };
+		});
+	}
+
+	function attachSingletons(config: HyperliquidConfig, store: StoreApi<HyperliquidStoreState>) {
+		detachSocketClose ??= config.subscribeSocketClose?.(() => markAllStale(store));
 		if (singletonsAttached) return;
+		const { triggerReconnect } = config;
 		if (!triggerReconnect) return;
 		singletonsAttached = true;
 
@@ -145,6 +161,8 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 	}
 
 	function detachSingletons() {
+		detachSocketClose?.();
+		detachSocketClose = undefined;
 		if (!singletonsAttached) return;
 		singletonsAttached = false;
 		detachVisibility?.();
@@ -172,7 +190,7 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 						"Visibility-buffered values will never be flushed because no reconnect can happen on resume.",
 				);
 			}
-			attachSingletons(get().config.triggerReconnect, store);
+			attachSingletons(get().config, store);
 
 			let runtime = subscriptionRuntime.get(key);
 			if (!runtime) {
@@ -208,7 +226,7 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 					set((state) => {
 						const current = state.subscriptions[key];
 						if (!current) return state;
-						return setSubscriptionEntry(state, key, { ...current, data: buffered, isStale: false });
+						return setSubscriptionEntry(state, key, { ...current, data: buffered });
 					});
 				}
 			}
@@ -222,6 +240,7 @@ export function createHyperliquidStore(initialConfig: HyperliquidConfig): Hyperl
 					return state;
 				}
 
+				visibilityBuffer.delete(key);
 				const entry: SubscriptionEntry = {
 					status: "subscribing",
 				};

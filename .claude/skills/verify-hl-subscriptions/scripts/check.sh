@@ -21,18 +21,24 @@ CHECKS=(
 	races:NoOrphanListener:INVARIANT:holds
 	races:NoLeakAfterUnmount:INVARIANT:holds
 	races:StoreHandleLive:INVARIANT:holds
+	races:LiveClaimIsFresh:INVARIANT:holds
+	races:StaleClearsOnLiveWire:PROPERTY:holds
 	races:EventuallyLive:PROPERTY:holds
 	tab:ModelConsistent:INVARIANT:holds
 	tab:RefCountMatchesHooks:INVARIANT:holds
 	tab:StoreHandleLive:INVARIANT:holds
 	tab:NoOrphanListener:INVARIANT:finding
 	tab:NoLeakAfterUnmount:INVARIANT:finding
+	tab:LiveClaimIsFresh:INVARIANT:holds
+	tab:StaleClearsOnLiveWire:PROPERTY:holds
 	tab:EventuallyLive:PROPERTY:holds
 	network:ModelConsistent:INVARIANT:holds
 	network:RefCountMatchesHooks:INVARIANT:holds
 	network:StoreHandleLive:INVARIANT:holds
 	network:NoOrphanListener:INVARIANT:finding
 	network:NoLeakAfterUnmount:INVARIANT:finding
+	network:LiveClaimIsFresh:INVARIANT:holds
+	network:StaleClearsOnLiveWire:PROPERTY:holds
 	network:EventuallyLive:PROPERTY:finding
 )
 
@@ -43,6 +49,9 @@ REPLAYS=(
 	unmount-then-drop:holds
 	show-during-subscribe:holds
 	frozen-after-resubscribe-failure:holds
+	drop-stays-stale-until-frame:holds
+	show-keeps-expired-stale:holds
+	remount-after-error-keeps-buffer-stale:holds
 )
 
 command -v bun >/dev/null || { echo "FAIL bun is not on PATH (needed for the real-code replays)"; exit 2; }

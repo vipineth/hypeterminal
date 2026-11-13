@@ -19,6 +19,7 @@ export type CreateHyperliquidConfigParameters = {
 	wallet?: WalletType;
 	ssr?: boolean;
 	triggerReconnect?: () => void;
+	subscribeSocketClose?: (onClose: () => void) => () => void;
 };
 
 function hasWebSocketSupport(): boolean {
@@ -77,5 +78,6 @@ export function createHyperliquidConfig(params: CreateHyperliquidConfigParameter
 		wallet: params.wallet,
 		ssr: params.ssr ?? false,
 		triggerReconnect: params.triggerReconnect,
+		subscribeSocketClose: params.subscribeSocketClose,
 	};
 }

@@ -12,7 +12,7 @@ vars == <<s>>
 
 NoRt == [on |-> FALSE, ref |-> 0, sub |-> 0, promise |-> 0, timer |-> FALSE,
          cooldown |-> FALSE, attempts |-> 0, failL |-> FALSE]
-NoEntry == [on |-> FALSE, status |-> "none", stale |-> FALSE]
+NoEntry == [on |-> FALSE, status |-> "none", stale |-> FALSE, expired |-> FALSE]
 NoWd == [on |-> FALSE, had |-> FALSE, stale |-> FALSE]
 NoSdk == [req |-> "none", kind |-> "none", aborted |-> FALSE]
 
@@ -20,7 +20,7 @@ Item(k, l, ok) == [k |-> k, l |-> l, ok |-> ok]
 
 Init == s = [hooks |-> 0, task |-> "idle", micro |-> <<>>, calls |-> <<>>,
              rt |-> NoRt, entry |-> NoEntry, wd |-> NoWd,
-             vis |-> "visible", wasHidden |-> FALSE, buffered |-> FALSE,
+             vis |-> "visible", wasHidden |-> FALSE, buffered |-> FALSE, bufExpired |-> FALSE,
              sock |-> "open", serverSub |-> FALSE,
              sdk |-> NoSdk, lis |-> {}, orphan |-> FALSE,
              mounts |-> MountOps, drops |-> Drops, fails |-> ReqFails, flips |-> VisFlips]
@@ -79,7 +79,8 @@ Acquire(t) ==
                            !.wd = [on |-> TRUE, had |-> FALSE, stale |-> FALSE]]
       t2 == [t1 EXCEPT !.rt.ref = @ + 1, !.rt.timer = FALSE, !.rt.cooldown = FALSE]
       t3 == IF t2.entry.on /\ t2.entry.status # "error" THEN t2
-            ELSE [t2 EXCEPT !.entry = [on |-> TRUE, status |-> "subscribing", stale |-> FALSE]]
+            ELSE [t2 EXCEPT !.entry = [on |-> TRUE, status |-> "subscribing", stale |-> FALSE, expired |-> FALSE],
+                            !.buffered = FALSE, !.bufExpired = FALSE]
   IN StartSub(t3)
 
 (* releaseSubscription, store.ts L414-460, with detachSingletons L154-164 *)
@@ -89,7 +90,7 @@ Release(t) ==
   ELSE LET sub  == t.rt.sub
            pend == t.rt.promise
            t1 == [t EXCEPT !.rt = NoRt, !.wd = NoWd, !.entry = NoEntry,
-                           !.buffered = FALSE, !.wasHidden = FALSE]
+                           !.buffered = FALSE, !.bufExpired = FALSE, !.wasHidden = FALSE]
        IN IF sub # 0
           THEN IF sub \in t.lis /\ t.sdk.aborted THEN t1 ELSE Unsub(t1, sub)
           ELSE IF pend # 0
@@ -146,15 +147,28 @@ RequestFails(t) ==
        THEN QueueWaiting([t EXCEPT !.sdk.req = "rejected"], FALSE)
        ELSE QueueWaiting(Abort([t EXCEPT !.sdk.req = "ok"]), TRUE)
 
+Expire(t) == [t EXCEPT !.entry.expired = t.entry.on, !.bufExpired = t.buffered]
+
+(* socket close event via config.subscribeSocketClose (clients.ts
+   createWsCloseSubscriber) into markAllStale in store.ts *)
 SockClose(t) ==
-  IF t.sock = "open" THEN RequestFails([t EXCEPT !.sock = "closed", !.serverSub = FALSE]) ELSE t
+  IF t.sock = "open"
+  THEN RequestFails(Expire([t EXCEPT !.sock = "closed", !.serverSub = FALSE,
+                                       !.entry.stale = t.entry.on \/ @]))
+  ELSE t
 
 (* setSubscriptionData, store.ts L461-487; l2Book pauses while hidden *)
 SetData(t) ==
   LET t1 == IF t.wd.on THEN [t EXCEPT !.wd.had = TRUE, !.wd.stale = FALSE] ELSE t
-  IN IF t1.vis = "hidden" THEN [t1 EXCEPT !.buffered = TRUE]
-     ELSE IF t1.entry.on THEN [t1 EXCEPT !.entry.status = "active", !.entry.stale = FALSE]
+  IN IF t1.vis = "hidden" THEN [t1 EXCEPT !.buffered = TRUE, !.bufExpired = FALSE]
+     ELSE IF t1.entry.on THEN [t1 EXCEPT !.entry.status = "active", !.entry.stale = FALSE, !.entry.expired = FALSE]
      ELSE t1
+
+(* flushVisibilityBuffer in store.ts *)
+Flush(t) ==
+  IF t.entry.on
+  THEN [t EXCEPT !.entry.status = "active", !.entry.expired = t.bufExpired, !.buffered = FALSE, !.bufExpired = FALSE]
+  ELSE [t EXCEPT !.buffered = FALSE, !.bufExpired = FALSE]
 
 Macro == s.task = "idle" /\ s.micro = <<>>
 
@@ -214,8 +228,8 @@ ServerPushesBook ==
    and triggerReconnect, clients.ts L60-66 *)
 WatchdogFires ==
   /\ Macro /\ s.wd.on /\ s.wd.had /\ ~s.wd.stale /\ ~Wire(s)
-  /\ s' = GC(SockClose([s EXCEPT !.wd.stale = TRUE,
-                                 !.entry.stale = IF s.entry.on THEN TRUE ELSE @]))
+  /\ s' = GC(SockClose(Expire([s EXCEPT !.wd.stale = TRUE,
+                                          !.entry.stale = IF s.entry.on THEN TRUE ELSE @])))
 
 (* visibility listener, store.ts L134-142 *)
 TabHides ==
@@ -226,7 +240,7 @@ TabShows ==
   /\ Macro /\ s.flips > 0 /\ s.vis = "hidden"
   /\ LET t == [s EXCEPT !.flips = @ - 1, !.vis = "visible"]
      IN s' = IF t.rt.on /\ t.wasHidden
-             THEN GC(SockClose(IF t.buffered THEN SetData([t EXCEPT !.wasHidden = FALSE, !.buffered = FALSE])
+             THEN GC(SockClose(IF t.buffered THEN Flush([t EXCEPT !.wasHidden = FALSE])
                                ELSE [t EXCEPT !.wasHidden = FALSE]))
              ELSE t
 
@@ -273,6 +287,14 @@ ModelConsistent ==
   /\ s.rt.promise # 0 => \E i \in 1..Len(s.calls) : s.calls[i].l = s.rt.promise
   /\ Len(s.calls) <= MaxL
 
+(* An entry that says active and not stale shows data pushed since the last close or watchdog expiry. *)
+LiveClaimIsFresh == (s.entry.on /\ s.entry.status = "active" /\ ~s.entry.stale) => ~s.entry.expired
+
+(* A stale entry in a visible tab on a streaming socket ends up not stale. *)
+StaleClearsOnLiveWire ==
+  (s.entry.on /\ s.entry.stale /\ s.vis = "visible" /\ Wire(s))
+    ~> (~s.entry.stale \/ ~s.entry.on \/ s.vis = "hidden" \/ ~Wire(s))
+
 (* With the network healthy again and the tab visible, a mounted book gets live data and says so. *)
-EventuallyLive == <>[]((s.hooks > 0 /\ s.vis = "visible") => (Wire(s) /\ s.entry.status = "active"))
+EventuallyLive == <>[]((s.hooks > 0 /\ s.vis = "visible") => (Wire(s) /\ s.entry.status = "active" /\ ~s.entry.stale))
 =============================================================================

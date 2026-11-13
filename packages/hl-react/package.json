@@ -29,7 +29,8 @@
 		"./internal/websocket/payload-guard": "./src/internal/websocket/payload-guard.ts",
 		"./internal/websocket/reliability": "./src/internal/websocket/reliability.ts",
 		"./internal/websocket/staleness": "./src/internal/websocket/staleness.ts",
-		"./internal/websocket/visibility": "./src/internal/websocket/visibility.ts"
+		"./internal/websocket/visibility": "./src/internal/websocket/visibility.ts",
+		"./testing/fake-socket-feed": "./src/testing/fake-socket-feed.ts"
 	},
 	"scripts": {
 		"typecheck": "tsc -p tsconfig.json --noEmit",

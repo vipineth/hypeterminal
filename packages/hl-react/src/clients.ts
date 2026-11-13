@@ -66,6 +66,16 @@ export function createWsReconnectTrigger(isTestnet: boolean): () => void {
 	return () => socket.reconnect();
 }
 
+export function createWsCloseSubscriber(isTestnet: boolean): (onClose: () => void) => () => void {
+	const transport = getWsTransport(isTestnet);
+	if (!(transport instanceof WebSocketTransport)) return () => () => {};
+	const socket = transport.socket;
+	return (onClose) => {
+		socket.addEventListener("close", onClose);
+		return () => socket.removeEventListener("close", onClose);
+	};
+}
+
 export function getInfoClient(isTestnet: boolean): InfoClient {
 	return getOrCreate(`info:${isTestnet}`, () => new InfoClient({ transport: getHttpTransport(isTestnet) }));
 }

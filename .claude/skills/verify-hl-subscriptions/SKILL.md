@@ -11,6 +11,7 @@ This skill checks two promises:
 
 - **No leak.** After the last hook for a key unmounts, the SDK holds no listener for it and Hyperliquid stops streaming it. This includes an unmount that races a subscribe still in flight.
 - **Recovers.** A mounted key in a visible tab ends up with live data and a status that says so, after any socket drop, failed subscribe, or tab hide and show.
+- **Never claims old data is live.** An entry with status `active` and `isStale` false shows data pushed since the last socket close or watchdog expiry. The TP/SL check reads the mark through this claim (`apps/terminal/src/hooks/trade/use-live-mark-px.ts`).
 
 Two tools check them. A TLA+ model (`model/HlSubscriptions.tla`) explores every order of mounts, unmounts, promise settlements, timers, socket events and tab flips within small bounds. A replay (`scripts/replay.ts`) runs the model's paths against the real `store.ts`, the real `useSub` updater and the real SDK `WebSocketSubscriptionManager`, with a fake socket and a fake clock.
 
@@ -52,6 +53,8 @@ Things that are easy to get wrong:
 - The SDK deletes an id and sends `unsubscribe` only when its last listener goes (L114-121). On reopen it resubscribes every finished id (L145-157).
 - A socket close rejects every pending request (`_postRequest.ts` L162-169).
 - `useSub` builds a fresh listener closure on every `subscribe()` call (`useSub.ts` L58-86), so every retry adds a listener.
+- With resubscribe on, the SDK calls no `onError` on an ordinary drop (`_handleClose` returns early). The store hears the close only through `config.subscribeSocketClose` (`clients.ts` `createWsCloseSubscriber`) and marks every entry stale. Only a new push clears it.
+- `flushVisibilityBuffer` writes buffered data without `markFresh` and keeps `isStale`. The watchdog already recorded the receipt time when the frame was buffered.
 - The store's `.then`/`.catch` look the runtime up by key (`store.ts` L320, L386). A continuation from before an unmount lands in the runtime of the next mount.
 
 `lis` is the set of SDK listeners someone can still remove. `orphan` records that the SDK holds a listener nobody can remove. The `GC` step moves a listener from `lis` to `orphan` once nothing refers to it.
@@ -64,7 +67,9 @@ Things that are easy to get wrong:
 | `NoOrphanListener` | The SDK never holds a listener that nothing in the store can remove. This is the cause behind every leak. |
 | `StoreHandleLive` | Once the queue drains, `runtime.subscription` is a listener the SDK still holds. |
 | `RefCountMatchesHooks` | `refCount` equals the number of mounted hooks, and a runtime exists while any hook is mounted. |
-| `EventuallyLive` | Once the network stops failing, a mounted key in a visible tab ends up with live data and status `active`, and stays that way. |
+| `LiveClaimIsFresh` | An entry that says `active` and not stale shows data pushed since the last close or watchdog expiry. |
+| `StaleClearsOnLiveWire` | A stale entry in a visible tab whose socket streams again ends up not stale. `network` checks it, which `EventuallyLive` cannot do while F2 stands. |
+| `EventuallyLive` | Once the network stops failing, a mounted key in a visible tab ends up with live data, status `active` and `isStale` false, and stays that way. |
 | `ModelConsistent` | Model sanity. A break here is a modeling error. |
 
 Each property has been seen failing on a broken variant, so each check can fail:
@@ -72,7 +77,8 @@ Each property has been seen failing on a broken variant, so each check can fail:
 - `NoOrphanListener` and `NoLeakAfterUnmount` flip in `races` when `releaseSubscription` drops its `else if (pending)` branch (`store.ts` L457-459). Replay `remount-while-subscribing` flips with them.
 - `RefCountMatchesHooks` flips in every world when `acquireSubscription` drops `runtime.refCount += 1`.
 - `StoreHandleLive` flips in every world when the `.then` keeps an existing `runtime.subscription` instead of replacing it.
-- `EventuallyLive` flips in `network` on the current code (F2).
+- `LiveClaimIsFresh` flips in `network` when the store stops marking entries stale on close, when the flush clears `isStale`, or when an entry reset keeps the key's visibility buffer. The first also flips it in `tab`.
+- `EventuallyLive` flips in `network` on the current code (F2). It flips in `tab` when a push stops clearing `isStale`, and `StaleClearsOnLiveWire` flips in `tab` and `network` on that change.
 
 ## Worlds and bounds
 
@@ -120,7 +126,7 @@ Covered code, last confirmed at sync commit **1b50aa2**:
 | `packages/hl-react/src/internal/websocket/staleness.ts` | `register`, `unregister`, `markFresh`, `tick` |
 | `packages/hl-react/src/internal/websocket/visibility.ts` | `subscribeVisibility`, `getVisibilityState` |
 | `packages/hl-react/src/internal/websocket/reliability.ts` | `isUserStreamKey`, `getStalenessThresholdForKey`, `WS_RELIABILITY_LIMITS` |
-| `packages/hl-react/src/clients.ts` | `createWsReconnectTrigger` |
+| `packages/hl-react/src/clients.ts` | `createWsReconnectTrigger`, `createWsCloseSubscriber` |
 | `packages/hl-react/package.json` | the `@nktkas/hyperliquid` version (0.32.2) |
 | SDK `src/transport/websocket/_subscriptionManager.ts`, `_postRequest.ts` | `subscribe`, `_handleOpen`, `_handleClose`, close rejection |
 
@@ -140,5 +146,6 @@ Bring a verification that drifted back in line with the pstack `/maintain-formal
 - Throttle timing (`createThrottledUpdater`). The model delivers each push at once. The replay uses the real updater.
 - The `offline`/`online` listener, and `freeze`/`resume`/`pageshow`. The model's tab show is the only visibility trigger.
 - rews backoff timing, close events while reconnecting, and late server replies after a timeout.
-- Whether components render `isStale`. The app reads only `status` and `wsStatus` today, so a stale book shows as live.
+- Whether components render `isStale`. Only the live mark hook reads it today. Other panels read `status` and `wsStatus`, so a stale book still shows as live.
+- The model closes the socket in the same step as a tab show or watchdog expiry. rews closes it later, after the native close event. `packages/hl-react/src/store.test.ts` covers that window.
 - Bounds: everything above, nothing past it.
