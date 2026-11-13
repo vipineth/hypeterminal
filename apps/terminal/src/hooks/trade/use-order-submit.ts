@@ -154,7 +154,7 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 		} else {
 			updateOrder(orderId, { status: "failed", error: result.error });
 		}
-		resetForm();
+		if (plan.errors.length === 0) resetForm();
 		return result.ok;
 	}
 
