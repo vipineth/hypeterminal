@@ -166,8 +166,7 @@ interface ScaleOrderParams {
 function buildScaleOrders(orders: ExchangeOrder[], params: ScaleOrderParams): void {
 	const levels = clampInt(Math.round(params.scaleLevelsNum ?? SCALE_LEVELS_MIN), SCALE_LEVELS_MIN, SCALE_LEVELS_MAX);
 	const start = toSafeBig(params.scaleStartPriceInput);
-	const end = toSafeBig(params.scaleEndPriceInput);
-	const step = levels > 1 ? end.minus(start).div(levels - 1) : start.times(0);
+	const span = toSafeBig(params.scaleEndPriceInput).minus(start);
 	const legSizes = allocateScaleSizes(params.sizeValue, levels, params.market.szDecimals);
 	const side = params.isBuy ? "buy" : "sell";
 
@@ -175,7 +174,7 @@ function buildScaleOrders(orders: ExchangeOrder[], params: ScaleOrderParams): vo
 		orders.push({
 			a: params.assetId,
 			b: params.isBuy,
-			p: formatPriceForOrder(start.plus(step.times(i)), params.market, side, "passive"),
+			p: formatPriceForOrder(start.plus(span.times(i).div(levels - 1)), params.market, side, "passive"),
 			s: formatSizeForOrder(legSizes[i], params.market.szDecimals),
 			r: params.reduceOnly,
 			t: { limit: { tif: params.tif } },
