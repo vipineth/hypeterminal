@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { OrderOutcome, OrderResult } from "@/lib/trade/extract-order-status";
+import type { OrderOutcome, OrderResult, UnreadableSlot } from "@/lib/trade/extract-order-status";
 import type { Lookup } from "@/lib/trade/order-sender";
 
 export interface OrderQueueItem {
@@ -16,7 +16,10 @@ export interface OrderQueueItem {
 	detail?: string;
 	error?: string;
 	requestKey?: string;
+	canDismiss?: boolean;
 	confirmDismiss?: { text: string; lookup: Lookup };
+	unreadable?: UnreadableSlot;
+	confirmUnreadable?: boolean;
 	createdAt: number;
 	completedAt?: number;
 }
@@ -78,6 +81,8 @@ function applyUpdate(order: OrderQueueItem, update: Partial<Omit<OrderQueueItem,
 export function resultToQueueUpdate(result: OrderResult): Partial<Omit<OrderQueueItem, "id">> {
 	const cleared = {
 		confirmDismiss: undefined,
+		unreadable: undefined,
+		confirmUnreadable: undefined,
 		outcome: undefined,
 		detail: undefined,
 		error: undefined,
@@ -85,12 +90,25 @@ export function resultToQueueUpdate(result: OrderResult): Partial<Omit<OrderQueu
 	if (result.ok) return { ...cleared, status: "success", outcome: result.outcome, detail: result.detail };
 	switch (result.status) {
 		case "unsettled":
-			return { ...cleared, status: "unsettled", error: result.error, requestKey: result.requestKey };
+			return {
+				...cleared,
+				status: "unsettled",
+				error: result.error,
+				requestKey: result.requestKey,
+				canDismiss: result.canDismiss,
+			};
 		case "notSent":
-			return { ...cleared, status: "failed", error: result.error };
+			return { ...cleared, status: "failed", error: result.error, unreadable: result.unreadable };
 		default:
 			return { ...cleared, status: result.status, error: result.error };
 	}
+}
+
+export function requestResultToQueueUpdate(result: OrderResult): Partial<Omit<OrderQueueItem, "id">> {
+	if (!result.ok && result.status === "notSent") {
+		return { status: "unsettled", error: result.error, confirmDismiss: undefined };
+	}
+	return resultToQueueUpdate(result);
 }
 
 export function shouldClearTicket(result: OrderResult): boolean {

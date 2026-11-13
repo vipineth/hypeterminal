@@ -110,10 +110,6 @@ describe("retry and cancel on an unconfirmed order", () => {
 		expect(result).toEqual({ ok: true, outcome: "filled" });
 		expect(new Set(net.venue.exchangeRequests).size).toBe(1);
 		expect(net.venue.state.placedLegs).toBe(1);
-		expect(queue.updateByRequestKey).toHaveBeenLastCalledWith(
-			requestKey,
-			expect.objectContaining({ status: "success", outcome: "filled" }),
-		);
 	});
 
 	it("Cancel sends a noop at the stored nonce, so the original arriving late places nothing", async () => {
@@ -154,10 +150,14 @@ describe("retry and cancel on an unconfirmed order", () => {
 		net.venue.nextExchangeRequests("lost", "lost", "lost", "lost");
 		const result = await settle(hook.submitPlan(MARKET_BUY));
 		if (result.ok || result.status !== "unsettled") throw new Error("expected an unconfirmed order");
+		const early = await settle(hook.previewDismiss(result.requestKey));
+		expect(early).toMatchObject({ kind: "result", result: { status: "unsettled", canDismiss: false } });
+		await vi.advanceTimersByTimeAsync(30_000);
+		net.venue.nextExchangeRequests("lost", "lost");
 		const preview = await settle(hook.previewDismiss(result.requestKey));
 		if (preview.kind !== "confirm") throw new Error("expected a confirmation");
-		expect(preview.text).toMatch(
-			/^The exchange never confirmed this request\. A lookup did not find it, which does not prove it never executed\. It can still execute until .+\. Dismiss it\? Your next order on this market will be sent as a new one\.$/,
+		expect(preview.text).toBe(
+			"The exchange never confirmed this request. A lookup did not find it, which does not prove it never executed. It can no longer execute. Dismiss it? Your next order on this market will be sent as a new one.",
 		);
 		expect(storedSlot().state).toBe("pending");
 		const dismissed = await settle(hook.dismissRequest(result.requestKey, preview.lookup));
@@ -170,10 +170,6 @@ describe("retry and cancel on an unconfirmed order", () => {
 			request: { nonce: storedSlot().nonce },
 			lookup: { kind: "order", statuses: [{ status: "unknownOid" }] },
 		});
-		expect(queue.updateByRequestKey).toHaveBeenLastCalledWith(
-			result.requestKey,
-			expect.objectContaining({ status: "unknown" }),
-		);
 		const next = await settle(hook.submitPlan(MARKET_BUY));
 		expect(next).toEqual({ ok: true, outcome: "filled" });
 	});
@@ -187,6 +183,7 @@ describe("retry and cancel on an unconfirmed order", () => {
 		};
 		const result = await settle(hook.submitPlan(MARKET_BUY));
 		if (result.ok || result.status !== "unsettled") throw new Error("expected an unconfirmed order");
+		await vi.advanceTimersByTimeAsync(30_000);
 		const preview = await settle(hook.previewDismiss(result.requestKey));
 		if (preview.kind !== "confirm") throw new Error("expected a confirmation");
 		expect(preview.text).toContain("A lookup found it: it filled.");

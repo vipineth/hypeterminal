@@ -15,15 +15,19 @@ import { isRecord, type LegFate, lookupToLegState, readStatuses, toLegFate, toLe
 import {
 	getRequestSlot,
 	getUserSlotPrefix,
-	type PartialPlan,
+	type Hold,
 	type PendingRequest,
+	pendingRecord,
 	type RequestLabel,
 	type RequestStore,
 	type SlotRecord,
+	settledRecord,
+	UnreadableRecord,
 	UnreadableStore,
 } from "@/lib/trade/pending-requests";
 
 export const EXPIRY_WINDOW_MS = 30_000;
+export const EXPIRY_MARGIN_MS = 5000;
 export const IN_FLIGHT_GRACE_MS = 10_000;
 export const PARTIAL_HOLD_MS = 5 * 60_000;
 const AUTO_RESEND_DELAYS_MS = [1000, 2000, 4000];
@@ -58,7 +62,7 @@ export type OrderLookup = { kind: "order"; statuses: OrderStatusResponse[] | nul
 export type Lookup = OrderLookup | { kind: "twap"; matches: TwapRecord[] | null };
 
 export type Settlement =
-	| { kind: "pending"; request: PendingRequest; error: string }
+	| { kind: "pending"; request: PendingRequest; error: string; dismissible: boolean }
 	| { kind: "answered"; request: PendingRequest; response: unknown }
 	| { kind: "consumed"; request: PendingRequest; lookup: Lookup }
 	| { kind: "expired"; request: PendingRequest; lookup: OrderLookup | null }
@@ -70,9 +74,12 @@ type Missing = { kind: "missing" };
 
 export type Refused =
 	| { kind: "refused"; reason: "storage" | "locks" | "twapHistory" }
-	| { kind: "refused"; reason: "slotMoved"; to: "pending" | "settled" };
+	| { kind: "refused"; reason: "slotMoved"; to: "pending" | "settled" }
+	| { kind: "refused"; reason: "unreadableRecord"; slot: string; raw: string };
 
-export type Held = { kind: "held"; partial: PartialPlan };
+export type Held = { kind: "held"; hold: Hold };
+
+type Live = { kind: "live"; request: PendingRequest; remainingMs: number | null };
 
 export type SubmitOutcome =
 	| Busy
@@ -82,13 +89,23 @@ export type SubmitOutcome =
 	| { kind: "blocked"; earlier: Settlement }
 	| { kind: "sent"; settlement: Settlement };
 
-export type RequestOutcome = Settlement | Busy | Missing | Refused | { kind: "foreignSigner"; request: PendingRequest };
-
-export type Inspection =
+export type RequestOutcome =
+	| Settlement
 	| Busy
 	| Missing
 	| Refused
-	| { kind: "inspected"; request: PendingRequest; lookup: Lookup; canStillExecute: boolean };
+	| Live
+	| { kind: "foreignSigner"; request: PendingRequest; remainingMs: number | null };
+
+export type Inspection =
+	| Settlement
+	| Busy
+	| Missing
+	| Refused
+	| Live
+	| { kind: "inspected"; request: PendingRequest; lookup: Lookup; remainingMs: number | null };
+
+export type UnreadableOutcome = Busy | Missing | Refused | { kind: "cleared"; slot: string };
 
 type OrderSubmissionParams = Pick<OrderParameters, "builder"> & {
 	orders: CloidOrder[];
@@ -118,6 +135,7 @@ export interface SenderEnv {
 	clock: ExchangeClock;
 	locks: () => LockManagerLike | null;
 	windowMs?: number;
+	graceMs?: number;
 	sleep?: (ms: number) => Promise<void>;
 }
 
@@ -131,8 +149,10 @@ class HeldBeforeSend extends Error {}
 
 export function createOrderSender(env: SenderEnv) {
 	const windowMs = env.windowMs ?? EXPIRY_WINDOW_MS;
+	const graceMs = env.graceMs ?? IN_FLIGHT_GRACE_MS;
 	const sleep = env.sleep ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
 	const sending = new Set<string>();
+	const revealed = new Set<string>();
 	const busyListeners = new Set<() => void>();
 
 	function transport(): IRequestTransport {
@@ -167,6 +187,9 @@ export function createOrderSender(env: SenderEnv) {
 			return await run((locked) => guard.locks.request(`hypeterminal:pending-request:${slot}`, locked));
 		} catch (error) {
 			if (error instanceof UnreadableStore) return { kind: "refused", reason: "storage" };
+			if (error instanceof UnreadableRecord) {
+				return { kind: "refused", reason: "unreadableRecord", slot: error.slot, raw: error.raw };
+			}
 			throw error;
 		} finally {
 			sending.delete(slot);
@@ -199,15 +222,19 @@ export function createOrderSender(env: SenderEnv) {
 		}
 		if (current?.state === "pending") {
 			const earlier = await record(await settle(current.request, false));
-			if (!placedNothing(earlier)) return { kind: "blocked", earlier };
+			if (!placedNothing(earlier)) {
+				if (earlier.kind === "pending") revealed.add(getRequestKey(earlier.request));
+				return { kind: "blocked", earlier };
+			}
 		}
-		const held = holdFor(await env.store.read(slot), submission);
-		if (held) return held;
+		const holds = await liveHolds((await env.store.read(slot))?.holds ?? [], submission);
+		const held = holds.find((hold) => overlaps(hold, submission));
+		if (held) return { kind: "held", hold: held };
 		try {
 			const knownIds = submission.kind === "twap" ? await readTwapIds(signer.user) : [];
 			if (!knownIds) return { kind: "refused", reason: "twapHistory" };
 			const request = await signRequest(slot, asset, signer, submission, knownIds);
-			if (!(await env.store.write(slot, { state: "pending", request }))) return { kind: "refused", reason: "storage" };
+			if (!(await env.store.write(slot, pendingRecord(request, holds)))) return { kind: "refused", reason: "storage" };
 			return { kind: "signed", request };
 		} catch (error) {
 			return { kind: "failed", error: errorMessage(error) };
@@ -221,7 +248,8 @@ export function createOrderSender(env: SenderEnv) {
 		submission: Submission,
 		knownIds: number[],
 	): Promise<PendingRequest> {
-		const expiresAfter = (await env.clock.now()) + windowMs;
+		const signedAt = await env.clock.now();
+		const expiresAfter = signedAt + windowMs;
 		const body = await holdSign(config, (held) =>
 			submission.kind === "order"
 				? order(held, submission.params, { expiresAfter })
@@ -236,16 +264,17 @@ export function createOrderSender(env: SenderEnv) {
 			body: JSON.stringify(body),
 			nonce: body.nonce,
 			expiresAfter,
+			signedAt,
 			cloids: submission.kind === "order" ? submission.params.orders.map((leg) => leg.c) : [],
 			legs: submission.kind === "order" ? submission.legs : [],
 			twap: submission.kind === "twap" ? { coin: submission.coin, knownIds } : null,
 			label: submission.label,
-			createdAt: Date.now(),
 		};
 	}
 
 	async function settle(request: PendingRequest, firstSend: boolean): Promise<Settlement> {
 		const delays = firstSend ? [0, ...AUTO_RESEND_DELAYS_MS] : [0];
+		const dismissible = !firstSend && (await isPastExpiry(request));
 		let error = "";
 		for (const [attempt, delay] of delays.entries()) {
 			if (delay > 0) await sleep(delay);
@@ -266,21 +295,74 @@ export function createOrderSender(env: SenderEnv) {
 					error = reply.error;
 			}
 		}
-		return { kind: "pending", request, error };
+		return { kind: "pending", request, error, dismissible };
 	}
 
 	async function record(settlement: Settlement): Promise<Settlement> {
 		if (settlement.kind === "pending") return settlement;
 		const { request } = settlement;
-		const current = await env.store.read(request.slot).catch(() => undefined);
-		if (current?.state !== "pending" || current.request.nonce !== request.nonce) return settlement;
-		await env.store.write(request.slot, {
-			state: "settled",
-			nonce: request.nonce,
-			settledAt: Date.now(),
-			partial: partialAfter(settlement),
-		});
+		const current = await env.store.read(request.slot).catch(() => null);
+		if (!current) return settlement;
+		const holds = withResult(current.holds, settlement, (await exchangeNow()) ?? request.expiresAfter);
+		if (current.state === "pending" && current.request.nonce === request.nonce) {
+			await env.store.write(request.slot, settledRecord(request.nonce, holds));
+		} else if (holds !== current.holds) {
+			await env.store.write(request.slot, { ...current, holds });
+		}
 		return settlement;
+	}
+
+	async function exchangeNow(): Promise<number | null> {
+		try {
+			return await env.clock.now();
+		} catch {
+			return null;
+		}
+	}
+
+	async function remainingFor(request: PendingRequest): Promise<number | null> {
+		const now = await exchangeNow();
+		return now === null ? null : request.expiresAfter + EXPIRY_MARGIN_MS - now;
+	}
+
+	async function isPastExpiry(request: PendingRequest): Promise<boolean> {
+		const remainingMs = await remainingFor(request);
+		return remainingMs !== null && remainingMs <= 0;
+	}
+
+	async function isForeign(signer: Signer, request: PendingRequest): Promise<boolean> {
+		return (await getWalletAddress(signer.config.wallet)).toLowerCase() !== request.signer;
+	}
+
+	async function liveHolds(holds: Hold[], submission: Submission): Promise<Hold[]> {
+		const now = await exchangeNow();
+		const checked = await Promise.all(
+			holds.map((hold) =>
+				windowPassed(hold, now) && overlaps(hold, submission) && hold.fates.includes("unknown")
+					? confirmByLookup(hold)
+					: hold,
+			),
+		);
+		return checked.filter((hold) => !isReleased(hold, now));
+	}
+
+	async function confirmByLookup(hold: Hold): Promise<Hold> {
+		const statuses = await readOrderStatuses(hold);
+		if (!statuses) return hold;
+		return { ...hold, fates: mergeFates(hold.fates, lookupFates({ kind: "order", statuses }, hold.fates.length, "unknown")) };
+	}
+
+	async function dismissGate(
+		request: PendingRequest,
+		signer: Signer | null,
+	): Promise<{ kind: "allowed"; remainingMs: number | null } | Settlement | Live> {
+		const remainingMs = await remainingFor(request);
+		if (remainingMs !== null && remainingMs <= 0) {
+			const resent = await record(await settle(request, false));
+			return resent.kind === "pending" ? { kind: "allowed", remainingMs } : resent;
+		}
+		if (signer && (await isForeign(signer, request))) return { kind: "allowed", remainingMs };
+		return { kind: "live", request, remainingMs };
 	}
 
 	async function send(body: unknown, timeoutMs: number | null): Promise<Reply> {
@@ -315,42 +397,47 @@ export function createOrderSender(env: SenderEnv) {
 			inSlot(async (): Promise<RequestOutcome> => {
 				const request = await storedRequest(requestKey);
 				if (!request) return { kind: "missing" };
-				if ((await getWalletAddress(signer.config.wallet)).toLowerCase() !== request.signer) {
-					return { kind: "foreignSigner", request };
+				if (await isForeign(signer, request)) {
+					return { kind: "foreignSigner", request, remainingMs: await remainingFor(request) };
 				}
+				const dismissible = await isPastExpiry(request);
 				let cancelBody: SignedBody;
 				try {
 					cancelBody = await holdSign(signer.config, (held) => noop(held, { nonce: request.nonce }));
 				} catch (error) {
-					return { kind: "pending", request, error: errorMessage(error) };
+					return { kind: "pending", request, error: errorMessage(error), dismissible };
 				}
 				const reply = await send(cancelBody, READ_TIMEOUT_MS);
 				if (reply.kind === "ok") return record({ kind: "canceled", request });
 				if (reply.kind === "duplicate" || reply.kind === "tooLow") {
 					return record({ kind: "consumed", request, lookup: await lookUp(request, LOOKUP_DELAYS_MS) });
 				}
-				return { kind: "pending", request, error: reply.kind === "expired" ? "Action already expired" : reply.error };
+				const error = reply.kind === "expired" ? "Action already expired" : reply.error;
+				return { kind: "pending", request, error, dismissible };
 			}),
 		);
 	}
 
-	function inspect(requestKey: string): Promise<Inspection> {
+	function inspect(requestKey: string, signer: Signer | null = null): Promise<Inspection> {
 		return exclusive(slotOf(requestKey), (inSlot) =>
 			inSlot(async (): Promise<Inspection> => {
 				const request = await storedRequest(requestKey);
 				if (!request) return { kind: "missing" };
-				const lookup = await lookUp(request, [0]);
-				return { kind: "inspected", request, lookup, canStillExecute: await canStillExecute(request) };
+				const gate = await dismissGate(request, signer);
+				if (gate.kind !== "allowed") return gate;
+				return { kind: "inspected", request, lookup: await lookUp(request, [0]), remainingMs: gate.remainingMs };
 			}),
 		);
 	}
 
-	function dismiss(requestKey: string, lookup: Lookup): Promise<RequestOutcome> {
+	function dismiss(requestKey: string, lookup: Lookup, signer: Signer | null = null): Promise<RequestOutcome> {
 		return exclusive(slotOf(requestKey), (inSlot) =>
 			inSlot(async (): Promise<RequestOutcome> => {
 				const request = await storedRequest(requestKey);
 				if (!request) return { kind: "missing" };
-				if (!(await env.store.recordDismissal({ request, dismissedAt: Date.now(), lookup }))) {
+				const gate = await dismissGate(request, signer);
+				if (gate.kind !== "allowed") return gate;
+				if (!(await env.store.recordDismissal(requestKey, { request, dismissedAt: Date.now(), lookup }))) {
 					return { kind: "refused", reason: "storage" };
 				}
 				return record({ kind: "dismissed", request, lookup });
@@ -358,11 +445,26 @@ export function createOrderSender(env: SenderEnv) {
 		);
 	}
 
-	async function canStillExecute(request: PendingRequest): Promise<boolean> {
+	function dismissUnreadable(slot: string, raw: string): Promise<UnreadableOutcome> {
+		return exclusive(slot, (inSlot) =>
+			inSlot(async (): Promise<UnreadableOutcome> => {
+				if ((await unreadableAt(slot)) !== raw) return { kind: "missing" };
+				const dismissedAt = Date.now();
+				const saved =
+					(await env.store.recordDismissal(`${slot}#unreadable-${dismissedAt}`, { slot, raw, dismissedAt })) &&
+					(await env.store.write(slot, settledRecord(null, [])));
+				return saved ? { kind: "cleared", slot } : { kind: "refused", reason: "storage" };
+			}),
+		);
+	}
+
+	async function unreadableAt(slot: string): Promise<string | null> {
 		try {
-			return (await env.clock.now()) <= request.expiresAfter;
-		} catch {
-			return true;
+			await env.store.read(slot);
+			return null;
+		} catch (error) {
+			if (error instanceof UnreadableRecord) return error.raw;
+			throw error;
 		}
 	}
 
@@ -391,12 +493,13 @@ export function createOrderSender(env: SenderEnv) {
 		return { kind: "twap", matches };
 	}
 
-	async function readOrderStatuses(request: PendingRequest): Promise<OrderStatusResponse[] | null> {
+	async function readOrderStatuses({
+		user,
+		cloids,
+	}: Pick<PendingRequest, "user" | "cloids">): Promise<OrderStatusResponse[] | null> {
 		const signal = AbortSignal.timeout(READ_TIMEOUT_MS);
 		try {
-			return await Promise.all(
-				request.cloids.map((cloid) => env.info().orderStatus({ user: request.user, oid: cloid }, signal)),
-			);
+			return await Promise.all(cloids.map((cloid) => env.info().orderStatus({ user, oid: cloid }, signal)));
 		} catch {
 			return null;
 		}
@@ -416,13 +519,15 @@ export function createOrderSender(env: SenderEnv) {
 	}
 
 	function list(user: string): PendingRequest[] {
-		const graceStart = Date.now() - IN_FLIGHT_GRACE_MS;
+		const now = env.clock.estimate();
 		const prefix = getUserSlotPrefix(network(), user);
 		return env.store
 			.pending()
-			.filter(
-				(request) => request.slot.startsWith(prefix) && !sending.has(request.slot) && request.createdAt <= graceStart,
-			);
+			.filter((request) => request.slot.startsWith(prefix) && !sending.has(request.slot) && isVisible(request, now));
+	}
+
+	function isVisible(request: PendingRequest, now: number | null): boolean {
+		return now === null || revealed.has(getRequestKey(request)) || now - request.signedAt >= graceMs;
 	}
 
 	async function poll<T>(
@@ -445,12 +550,13 @@ export function createOrderSender(env: SenderEnv) {
 		cancel,
 		inspect,
 		dismiss,
+		dismissUnreadable,
 		list,
 		subscribe(listener: () => void) {
 			let graceTimer: ReturnType<typeof setTimeout> | undefined;
 			function recheckAfterGrace() {
 				clearTimeout(graceTimer);
-				graceTimer = setTimeout(listener, IN_FLIGHT_GRACE_MS);
+				graceTimer = setTimeout(listener, graceMs);
 			}
 			const unsubscribeStore = env.store.subscribe(() => {
 				listener();
@@ -521,32 +627,50 @@ function everyLeg(legCount: number, fate: LegFate): LegFate[] {
 	return Array.from({ length: legCount }, () => fate);
 }
 
-function partialAfter(settlement: Settlement): PartialPlan | null {
+function withResult(holds: Hold[], settlement: Settlement, since: number): Hold[] {
 	const fates = legFates(settlement);
-	if (!fates) return null;
-	const plan = planOf(settlement.request, fates);
-	if (!plan) return null;
-	const isPartial = plan.fates.includes("rejected") && plan.fates.some((fate) => fate !== "rejected");
-	return isPartial ? { ...plan, settledAt: Date.now() } : null;
+	if (!fates) return holds;
+	const { request } = settlement;
+	const known = holds.find((hold) => hold.nonce === request.nonce);
+	if (!known) return startsHold(fates) ? [...holds, holdOf(request, fates, since)] : holds;
+	const merged = mergeFates(known.fates, fates);
+	if (merged.every((fate, index) => fate === known.fates[index])) return holds;
+	return holds.map((hold) => (hold === known ? { ...hold, fates: merged, since: Math.max(hold.since, since) } : hold));
 }
 
-function planOf(request: PendingRequest, fates: LegFate[]): Omit<PartialPlan, "settledAt"> | null {
+function startsHold(fates: LegFate[]): boolean {
+	return fates.length > 1 && !fates.every((fate) => fate === "placed") && !fates.every((fate) => fate === "rejected");
+}
+
+function holdOf(request: PendingRequest, fates: LegFate[], since: number): Hold {
 	const { action } = JSON.parse(request.body) as { action: OrderSubmissionParams };
-	if (request.legs.length !== fates.length || action.orders.length === 0) return null;
-	return { roles: request.legs.map((leg) => leg.role), buy: action.orders[0].b, grouping: action.grouping, fates };
+	const { user, nonce, cloids, legs } = request;
+	return { nonce, user, cloids, legs, buy: action.orders[0].b, fates, since };
 }
 
-function holdFor(current: SlotRecord | null, submission: Submission): Held | null {
-	if (current?.state !== "settled" || !current.partial || submission.kind !== "order") return null;
-	const { partial } = current;
-	if (Date.now() - partial.settledAt >= PARTIAL_HOLD_MS) return null;
-	const roles = submission.legs.map((leg) => leg.role);
-	const sameShape =
-		roles.length === partial.roles.length &&
-		roles.every((role, index) => role === partial.roles[index]) &&
-		submission.params.orders[0]?.b === partial.buy;
-	if (!sameShape) return null;
-	return { kind: "held", partial };
+function mergeFates(known: LegFate[], learned: LegFate[]): LegFate[] {
+	return known.map((fate, index) => {
+		const next = learned[index] ?? "unknown";
+		if (fate === "placed" || next === "placed") return "placed";
+		return fate === "unknown" ? next : fate;
+	});
+}
+
+function windowPassed(hold: Hold, now: number | null): boolean {
+	return now !== null && now - hold.since >= PARTIAL_HOLD_MS;
+}
+
+function isReleased(hold: Hold, now: number | null): boolean {
+	if (hold.fates.every((fate) => fate === "rejected")) return true;
+	return windowPassed(hold, now) && !hold.fates.includes("unknown");
+}
+
+function overlaps(hold: Hold, submission: Submission): boolean {
+	if (submission.kind !== "order" || submission.params.orders[0]?.b !== hold.buy) return false;
+	return (
+		submission.legs.length === hold.legs.length &&
+		submission.legs.every((leg, index) => leg.role === hold.legs[index].role)
+	);
 }
 
 export function findOurTwaps(history: TwapHistoryResponse, request: PendingRequest): TwapRecord[] {

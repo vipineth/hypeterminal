@@ -3,28 +3,31 @@ import { z } from "zod";
 const KEY_PREFIX = "hypeterminal:pending-request:v2:";
 const DISMISSAL_PREFIX = "hypeterminal:dismissed-request:v1:";
 const PROBE_KEY = "hypeterminal:pending-request:probe";
+const RECORD_VERSION = 1;
 
 const hexSchema = z.custom<`0x${string}`>((value) => typeof value === "string" && /^0x[0-9a-fA-F]+$/.test(value));
 
 const roleSchema = z.enum(["entry", "takeProfit", "stopLoss", "order", "scaleLeg"]);
 
-const legSchema = z.object({ role: roleSchema, price: z.string() });
+const legSchema = z.strictObject({ role: roleSchema, price: z.string() });
 
-const labelSchema = z.object({
+const labelSchema = z.strictObject({
 	market: z.string(),
 	side: z.enum(["buy", "sell"]),
 	size: z.string(),
 });
 
-const partialPlanSchema = z.object({
-	roles: z.array(roleSchema),
+const holdSchema = z.strictObject({
+	nonce: z.number().int(),
+	user: hexSchema,
+	cloids: z.array(hexSchema),
+	legs: z.array(legSchema),
 	buy: z.boolean(),
-	grouping: z.enum(["na", "normalTpsl", "positionTpsl"]),
 	fates: z.array(z.enum(["placed", "rejected", "unknown"])),
-	settledAt: z.number(),
+	since: z.number(),
 });
 
-const pendingRequestSchema = z.object({
+const pendingRequestSchema = z.strictObject({
 	slot: z.string(),
 	kind: z.enum(["order", "twap"]),
 	user: hexSchema,
@@ -33,31 +36,40 @@ const pendingRequestSchema = z.object({
 	body: z.string(),
 	nonce: z.number().int(),
 	expiresAfter: z.number().int(),
+	signedAt: z.number(),
 	cloids: z.array(hexSchema),
-	legs: z.array(legSchema).catch([]),
-	twap: z
-		.object({ coin: z.string(), knownIds: z.array(z.number()) })
-		.nullable()
-		.catch(null),
-	label: labelSchema.catch({ market: "", side: "buy", size: "" }),
-	createdAt: z.number().catch(0),
+	legs: z.array(legSchema),
+	twap: z.strictObject({ coin: z.string(), knownIds: z.array(z.number()) }).nullable(),
+	label: labelSchema,
 });
 
 const slotRecordSchema = z.discriminatedUnion("state", [
-	z.object({ state: z.literal("pending"), request: pendingRequestSchema }),
-	z.object({
+	z.strictObject({
+		version: z.literal(RECORD_VERSION),
+		state: z.literal("pending"),
+		request: pendingRequestSchema,
+		holds: z.array(holdSchema),
+	}),
+	z.strictObject({
+		version: z.literal(RECORD_VERSION),
 		state: z.literal("settled"),
-		nonce: z.number().int(),
-		settledAt: z.number(),
-		partial: partialPlanSchema.nullable().catch(null),
+		nonce: z.number().int().nullable(),
+		holds: z.array(holdSchema),
 	}),
 ]);
 
 export type PendingRequest = z.infer<typeof pendingRequestSchema>;
 export type RequestLabel = z.infer<typeof labelSchema>;
-export type PartialPlan = z.infer<typeof partialPlanSchema>;
+export type Hold = z.infer<typeof holdSchema>;
 export type SlotRecord = z.infer<typeof slotRecordSchema>;
-export type Dismissal = { request: PendingRequest; dismissedAt: number; lookup: unknown };
+
+export function pendingRecord(request: PendingRequest, holds: Hold[]): SlotRecord {
+	return { version: RECORD_VERSION, state: "pending", request, holds };
+}
+
+export function settledRecord(nonce: number | null, holds: Hold[]): SlotRecord {
+	return { version: RECORD_VERSION, state: "settled", nonce, holds };
+}
 
 export interface KeyValueStore {
 	get(key: string): Promise<unknown>;
@@ -74,10 +86,21 @@ const SILENT_BUS: ChangeBus = { post() {}, subscribe: () => () => {} };
 
 export class UnreadableStore extends Error {}
 
+export class UnreadableRecord extends Error {
+	readonly slot: string;
+	readonly raw: string;
+
+	constructor(slot: string, raw: string) {
+		super("Can't read a pending order for this market");
+		this.slot = slot;
+		this.raw = raw;
+	}
+}
+
 export interface RequestStore {
 	read(slot: string): Promise<SlotRecord | null>;
 	write(slot: string, record: SlotRecord): Promise<boolean>;
-	recordDismissal(dismissal: Dismissal): Promise<boolean>;
+	recordDismissal(id: string, dismissal: unknown): Promise<boolean>;
 	isWritable(): Promise<boolean>;
 	pending(): PendingRequest[];
 	refresh(): Promise<void>;
@@ -100,7 +123,7 @@ export function createRequestStore(getStore: () => KeyValueStore | null, bus: Ch
 	let pendingList: PendingRequest[] = [];
 
 	function notify() {
-		pendingList = [...cached.values()].sort((a, b) => a.createdAt - b.createdAt);
+		pendingList = [...cached.values()].sort((a, b) => a.signedAt - b.signedAt);
 		for (const listener of listeners) listener();
 	}
 
@@ -126,14 +149,15 @@ export function createRequestStore(getStore: () => KeyValueStore | null, bus: Ch
 		}
 		if (raw === undefined || raw === null) return null;
 		const parsed = slotRecordSchema.safeParse(raw);
-		return parsed.success ? parsed.data : null;
+		if (!parsed.success) throw new UnreadableRecord(slot, describeRaw(raw));
+		return parsed.data;
 	}
 
 	async function readForList(slot: string): Promise<SlotRecord | null | undefined> {
 		try {
 			return await read(slot);
-		} catch {
-			return undefined;
+		} catch (error) {
+			return error instanceof UnreadableRecord ? null : undefined;
 		}
 	}
 
@@ -155,8 +179,8 @@ export function createRequestStore(getStore: () => KeyValueStore | null, bus: Ch
 		return true;
 	}
 
-	function recordDismissal(dismissal: Dismissal): Promise<boolean> {
-		return save(`${DISMISSAL_PREFIX}${dismissal.request.slot}#${dismissal.request.nonce}`, dismissal);
+	function recordDismissal(id: string, dismissal: unknown): Promise<boolean> {
+		return save(DISMISSAL_PREFIX + id, dismissal);
 	}
 
 	function isWritable(): Promise<boolean> {
@@ -193,4 +217,12 @@ export function createRequestStore(getStore: () => KeyValueStore | null, bus: Ch
 	}
 
 	return { read, write, recordDismissal, isWritable, pending: () => pendingList, refresh, subscribe };
+}
+
+function describeRaw(raw: unknown): string {
+	try {
+		return JSON.stringify(raw) ?? String(raw);
+	} catch {
+		return String(raw);
+	}
 }

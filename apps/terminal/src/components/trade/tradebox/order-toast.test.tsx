@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { OrderToast } from "@/components/trade/tradebox/order-toast";
 import { privateKeyToAccount } from "viem/accounts";
 import { reportSubmit } from "@/lib/trade/extract-order-status";
-import { createOrderSender } from "@/lib/trade/order-sender";
+import { createOrderSender, type Signer } from "@/lib/trade/order-sender";
 import { createRequestStore, type PendingRequest } from "@/lib/trade/pending-requests";
 import { type OrderQueueItem, resultToQueueUpdate } from "@/stores/use-order-queue-store";
 import { createFakeExchange, createMemoryKeyValue, createMemoryLocks, TEST_AGENT_KEY, TEST_USER } from "@/test/fake-exchange";
@@ -96,7 +96,7 @@ const LEFT_FROM_BEFORE_RELOAD: PendingRequest = {
 	legs: [{ role: "order", price: "1160" }],
 	twap: null,
 	label: { market: "ETH", side: "buy", size: "0.0104" },
-	createdAt: 0,
+	signedAt: 0,
 };
 
 function buttonsNamed(label: string) {
@@ -156,11 +156,13 @@ describe("order toast", () => {
 	});
 
 	it("asks before it dismisses an unconfirmed order, and shows what the lookup said", async () => {
+		view.queued = [{ ...UNCONFIRMED_ROW, canDismiss: true }];
 		renderToString(<OrderToast />);
-		expect(buttonsNamed("Dismiss")).toHaveLength(2);
-		buttonsNamed("Dismiss")[1].onClick?.();
+		expect(buttonsNamed("Dismiss")).toHaveLength(1);
+		buttonsNamed("Dismiss")[0].onClick?.();
 		await vi.waitFor(() =>
-			expect(actions.updateByRequestKey).toHaveBeenCalledWith(UNCONFIRMED_ROW.requestKey, {
+			expect(actions.updateByRequestKey).toHaveBeenLastCalledWith(UNCONFIRMED_ROW.requestKey, {
+				status: "unsettled",
 				confirmDismiss: {
 					text: "The exchange never confirmed this request.",
 					lookup: { kind: "order", statuses: null },
@@ -196,7 +198,10 @@ describe("order toast", () => {
 			label: { market: "SOL", side: "buy", size: "1" },
 		};
 		const blockedSell = resultToQueueUpdate(
-			reportSubmit({ kind: "blocked", earlier: { kind: "pending", request: buyLeftOver, error: "Failed to fetch" } }),
+			reportSubmit({
+				kind: "blocked",
+				earlier: { kind: "pending", request: buyLeftOver, error: "Failed to fetch", dismissible: false },
+			}),
 		);
 		view.queued = [
 			{ id: "row-2", market: "SOL", side: "sell", size: "5", status: "pending", createdAt: 0, ...blockedSell },
@@ -278,7 +283,14 @@ describe("order toast", () => {
 	it("shows a held press with the legs that placed and no partial resend", async () => {
 		const held = await pressHeldScale();
 		view.queued = [
-			{ id: "row-held", market: "SOL", side: "buy", size: "2", createdAt: 0, ...resultToQueueUpdate(reportSubmit(held)) },
+			{
+				id: "row-held",
+				market: "SOL",
+				side: "buy",
+				size: "2",
+				createdAt: 0,
+				...resultToQueueUpdate(reportSubmit(held)),
+			} as OrderQueueItem,
 		];
 		view.pending = [];
 		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
@@ -289,17 +301,17 @@ describe("order toast", () => {
 	it("offers a confirmed Dismiss on a press refused over a pending order it can't read", async () => {
 		const unreadable = { slot: LEFT_FROM_BEFORE_RELOAD.slot, raw: '{"state":"pending"}' };
 		const refused = reportSubmit({ kind: "refused", reason: "unreadableRecord", ...unreadable } as never);
-		const row: OrderQueueItem = {
+		const row = {
 			id: "row-3",
 			market: "ETH",
 			side: "buy",
 			size: "1",
 			createdAt: 0,
 			...resultToQueueUpdate(refused),
-		};
+		} as OrderQueueItem;
 		view.queued = [row];
 		view.pending = [];
-		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "").replaceAll("&#x27;", "'");
 		expect(html).toContain("Can't read a pending order for this market.");
 		buttonsNamed("Dismiss pending order")[0].onClick?.();
 		expect(actions.updateOrder).toHaveBeenCalledWith("row-3", { confirmUnreadable: true });
@@ -330,7 +342,10 @@ async function pressHeldScale() {
 		locks: () => locks,
 		sleep: async () => {},
 	});
-	const signer = { user: TEST_USER, config: { transport: venue.transport, wallet: privateKeyToAccount(TEST_AGENT_KEY) } };
+	const signer: Signer = {
+		user: TEST_USER,
+		config: { transport: venue.transport, wallet: privateKeyToAccount(TEST_AGENT_KEY) },
+	};
 	let cloid = 0;
 	function scale(prices: string[]) {
 		return {

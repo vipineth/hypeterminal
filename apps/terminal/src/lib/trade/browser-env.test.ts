@@ -1,6 +1,7 @@
 import { IDBDatabase, IDBFactory, IDBObjectStore } from "fake-indexeddb";
 import { privateKeyToAccount } from "viem/accounts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { Signer } from "@/lib/trade/order-sender";
 import type { KeyValueStore } from "@/lib/trade/pending-requests";
 import { createFakeExchange, createMemoryLocks, type FakeExchange, TEST_AGENT_KEY, TEST_USER } from "@/test/fake-exchange";
 
@@ -40,7 +41,7 @@ function marketBuy(cloid: `0x${string}`) {
 	};
 }
 
-function signerFor(venue: FakeExchange) {
+function signerFor(venue: FakeExchange): Signer {
 	return { user: TEST_USER, config: { transport: venue.transport, wallet: privateKeyToAccount(TEST_AGENT_KEY) } };
 }
 

@@ -18,6 +18,7 @@ import {
 import {
 	createRequestStore,
 	getRequestSlot,
+	pendingRecord,
 	type ChangeBus,
 	type KeyValueStore,
 	type RequestStore,
@@ -541,7 +542,7 @@ describe("order sender in a browser that cannot keep its records", () => {
 	});
 
 	it("refuses before it signs, so no wallet is asked to sign an order that cannot be sent", async () => {
-		const clock = { now: vi.fn(async () => Date.now()), warm() {} };
+		const clock = { now: vi.fn(async () => Date.now()), estimate: () => Date.now(), warm() {} };
 		const { sender } = openTab(venue, fullStorage(), createMemoryLocks(), { clock });
 		expect(await sender.submit(signerFor(venue), marketBuy())).toEqual({ kind: "refused", reason: "storage" });
 		expect(clock.now).not.toHaveBeenCalled();
@@ -648,7 +649,11 @@ describe("order sender settling only on the exchange's reply", () => {
 
 	it("keeps an unconfirmed order pending when the device clock runs ahead, so its late original executes once", async () => {
 		let ahead = 0;
-		const clock: ExchangeClock = { now: async () => Date.now() + ahead, warm() {} };
+		const clock: ExchangeClock = {
+			now: async () => Date.now() + ahead,
+			estimate: () => Date.now() + ahead,
+			warm() {},
+		};
 		const { sender } = openTab(venue, storage, locks, { clock });
 		venue.nextExchangeRequests("inTransit", "lost", "lost", "lost");
 		const first = await sender.submit(signerFor(venue), marketBuy());
@@ -729,14 +734,15 @@ describe("order sender settling only on the exchange's reply", () => {
 			kind: "blocked",
 			earlier: { kind: "pending" },
 		});
+		venue.nextExchangeRequests("lost", "lost");
 		const inspection = await sender.inspect(keyOf(first));
 		expect(inspection).toMatchObject({
 			kind: "inspected",
-			canStillExecute: false,
 			lookup: { kind: "order", statuses: [{ status: "unknownOid" }] },
 		});
 		expect(await pendingNonce(store)).toBe(sentRequest(first).nonce);
 		if (inspection.kind !== "inspected") throw new Error("expected an inspection");
+		expect(inspection.remainingMs).toBeLessThan(0);
 		const dismissedAt = Date.now();
 		const dismissed = await sender.dismiss(keyOf(first), inspection.lookup);
 		expect(dismissed).toMatchObject({ kind: "dismissed" });
@@ -945,6 +951,7 @@ describe("order sender seen from another tab", () => {
 		const tabA = openTab(venue, storage, locks, { bus: bus.join(), sleep: () => gate });
 		const tabB = openTab(venue, storage, locks, { bus: bus.join() });
 		const unsubscribe = tabB.sender.subscribe(() => {});
+		await tabB.clock.now();
 		venue.nextExchangeRequests("lost");
 		const pressA = tabA.sender.submit(signerFor(venue), marketBuy());
 		await vi.waitFor(() => expect(tabB.store.pending()).toHaveLength(1));
@@ -962,7 +969,7 @@ describe("order sender seen from another tab", () => {
 		const tab = openTab(venue, storage, locks);
 		const otherSlot = getRequestSlot("testnet", TEST_USER, 4);
 		const refreshing = tab.store.refresh();
-		const writing = tab.store.write(otherSlot, { state: "pending", request: { ...first, slot: otherSlot } });
+		const writing = tab.store.write(otherSlot, pendingRecord({ ...first, slot: otherSlot }, []));
 		await Promise.all([refreshing, writing]);
 		expect(
 			tab.store
@@ -979,6 +986,7 @@ describe("order sender seen from another tab", () => {
 		const tabB = openTab(venue, storage, locks, { bus: bus.join() });
 		const notified = vi.fn();
 		const unsubscribe = tabB.sender.subscribe(notified);
+		await tabB.clock.now();
 		venue.state.exchangeDown = true;
 		const outcome = await tabA.sender.submit(signerFor(venue), marketBuy());
 		await vi.waitFor(() => expect(tabB.store.pending()).toHaveLength(1));

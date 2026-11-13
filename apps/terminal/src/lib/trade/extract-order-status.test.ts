@@ -36,11 +36,11 @@ function request(kind: "order" | "twap", legs: PlanLeg[] = ORDER): PendingReques
 		body: "{}",
 		nonce: 1794596065043,
 		expiresAfter: 1794596095043,
+		signedAt: 1794596065043,
 		cloids: [],
 		legs,
 		twap: kind === "twap" ? { coin: "SOL", knownIds: [] } : null,
 		label: { market: "SOL", side: "buy", size: "1" },
-		createdAt: 0,
 	};
 }
 
@@ -137,12 +137,18 @@ describe("interpretOrderStatuses", () => {
 });
 
 describe("reportSettlement", () => {
-	it("keeps an unconfirmed request retryable by its key", () => {
-		expect(reportSettlement({ kind: "pending", request: request("order"), error: "Failed to fetch" })).toEqual({
+	it("keeps an unconfirmed request retryable by its key, and dismissible only once the sender says so", () => {
+		const pending = { kind: "pending" as const, request: request("order"), error: "Failed to fetch" };
+		expect(reportSettlement({ ...pending, dismissible: false })).toEqual({
 			ok: false,
 			status: "unsettled",
 			error: "Not confirmed: Failed to fetch. Retry or cancel it.",
 			requestKey: "testnet:0x0000000000000000000000000000000000000001:5#1794596065043",
+			canDismiss: false,
+		});
+		expect(reportSettlement({ ...pending, dismissible: true })).toMatchObject({
+			error: "Not confirmed: Failed to fetch. Retry, cancel or dismiss it.",
+			canDismiss: true,
 		});
 	});
 
@@ -283,11 +289,16 @@ describe("reportSettlement", () => {
 
 describe("reportSubmit", () => {
 	it("gives a press blocked by an unconfirmed order its own not-sent result with no request key", () => {
-		const earlier: Settlement = { kind: "pending", request: request("order"), error: "Failed to fetch" };
+		const earlier: Settlement = {
+			kind: "pending",
+			request: request("order"),
+			error: "Failed to fetch",
+			dismissible: false,
+		};
 		expect(reportSubmit({ kind: "blocked", earlier })).toEqual({
 			ok: false,
 			status: "notSent",
-			error: "Not sent. An earlier order on this market is not confirmed yet. Retry, cancel or dismiss it first.",
+			error: "Not sent. An earlier order on this market is not confirmed yet. Retry or cancel it first.",
 		});
 	});
 
@@ -329,40 +340,64 @@ describe("reportSubmit", () => {
 		});
 	});
 
-	it("holds a resubmit after a partial and names the legs that went through", () => {
-		const partial = {
-			roles: ["scaleLeg", "scaleLeg"] as PlanLeg["role"][],
+	it("holds a resubmit after a partial and names each leg's price and fate", () => {
+		const hold = {
+			nonce: 1,
+			user: "0x0000000000000000000000000000000000000001" as const,
+			cloids: [],
+			legs: [
+				{ role: "scaleLeg" as const, price: "90" },
+				{ role: "scaleLeg" as const, price: "95" },
+				{ role: "scaleLeg" as const, price: "97" },
+			],
 			buy: true,
-			grouping: "na" as const,
-			fates: ["placed", "rejected"] as ("placed" | "rejected")[],
-			settledAt: 0,
+			fates: ["placed" as const, "rejected" as const, "unknown" as const],
+			since: 0,
 		};
-		expect(reportSubmit({ kind: "held", partial })).toEqual({
+		expect(reportSubmit({ kind: "held", hold })).toEqual({
 			ok: false,
 			status: "notSent",
 			error:
-				"Not sent. Your last order on this market partly went through: Leg 1 placed, Leg 2 rejected. Sending it again would place the same legs twice.",
+				"Not sent. Your last order on this market partly went through: Leg 1 at 90 placed, Leg 2 at 95 rejected, Leg 3 at 97 not confirmed. Sending the same order again could place those legs twice. Check open orders and send only the missing legs as a new order.",
+		});
+	});
+
+	it("names a pending order it cannot read and carries what it showed, so the row can dismiss exactly that", () => {
+		expect(reportSubmit({ kind: "refused", reason: "unreadableRecord", slot: "s", raw: "{}" })).toEqual({
+			ok: false,
+			status: "notSent",
+			error:
+				"Not sent. Can't read a pending order for this market. It may come from another version of the app and could still execute.",
+			unreadable: { slot: "s", raw: "{}" },
 		});
 	});
 });
 
 describe("describeInspection", () => {
-	it("says an unconfirmed order can still execute until its expiry", () => {
+	it("says until when, in device time, an unconfirmed order can still execute", () => {
+		const until = new Date(Date.now() + 24_000).toLocaleTimeString();
 		const text = describeInspection({
 			kind: "inspected",
 			request: request("order"),
 			lookup: orderLookup(UNKNOWN),
-			canStillExecute: true,
+			remainingMs: 24_000,
 		});
-		expect(text).toMatch(/It can still execute until .+\. Dismiss it\?/);
+		expect(text).toContain(`It can still execute until ${until}. Dismiss it?`);
+		const unknownClock = describeInspection({
+			kind: "inspected",
+			request: request("order"),
+			lookup: orderLookup(UNKNOWN),
+			remainingMs: null,
+		});
+		expect(unknownClock).toContain("It may still execute. Dismiss it?");
 		const expired = describeInspection({
 			kind: "inspected",
 			request: request("order"),
 			lookup: { kind: "order", statuses: null },
-			canStillExecute: false,
+			remainingMs: -1000,
 		});
 		expect(expired).toBe(
-			"The exchange never confirmed this request. Its status could not be read. Dismiss it? Your next order on this market will be sent as a new one.",
+			"The exchange never confirmed this request. Its status could not be read. It can no longer execute. Dismiss it? Your next order on this market will be sent as a new one.",
 		);
 	});
 });

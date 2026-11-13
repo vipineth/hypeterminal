@@ -254,7 +254,7 @@ function toQueueItem(request: PendingRequest): OrderQueueItem {
 		status: "unsettled",
 		error: t`Not confirmed. Retry or cancel it.`,
 		requestKey: getRequestKey(request),
-		createdAt: request.createdAt,
+		createdAt: request.signedAt,
 	};
 }
 

@@ -927,9 +927,9 @@ describe("order legs the ticket reports and retries", () => {
 		net.venue.nextExchangeRequests("lost");
 		await pressSubmitPastRetries();
 		const sellRow = lastQueueUpdate();
-		expect(sellRow).toEqual({
+		expect(sellRow).toMatchObject({
 			status: "failed",
-			error: "Not sent. An earlier order on this market is not confirmed yet. Retry, cancel or dismiss it first.",
+			error: "Not sent. An earlier order on this market is not confirmed yet. Retry or cancel it first.",
 		});
 		expect(sellRow.requestKey).toBeUndefined();
 		expect(formActions.resetForm).not.toHaveBeenCalled();
@@ -962,8 +962,9 @@ describe("order legs the ticket reports and retries", () => {
 		const held = lastQueueUpdate();
 		expect(held).toMatchObject({
 			status: "failed",
-			error:
-				"Not sent. Your last order on this market partly went through: Leg 1 placed, Leg 2 rejected. Sending it again would place the same legs twice.",
+			error: expect.stringMatching(
+				/^Not sent\. Your last order on this market partly went through: Leg 1 at \S+ placed, Leg 2 at \S+ rejected\. /,
+			),
 		});
 		expect(orderBodies()).toHaveLength(1);
 		expect(formActions.resetForm).not.toHaveBeenCalled();

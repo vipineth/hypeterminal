@@ -19,16 +19,19 @@ import {
 	type Settlement,
 	type SubmitOutcome,
 	type TwapRecord,
+	type UnreadableOutcome,
 } from "@/lib/trade/order-sender";
-import type { PartialPlan } from "@/lib/trade/pending-requests";
+import type { Hold } from "@/lib/trade/pending-requests";
 
 export type OrderOutcome = "filled" | "partiallyFilled" | "resting" | "triggerSet" | "twapStarted";
 
 export type OrderResult =
 	| { ok: true; outcome: OrderOutcome; detail?: string }
 	| { ok: false; status: "failed" | "unknown"; error: string }
-	| { ok: false; status: "notSent"; error: string }
-	| { ok: false; status: "unsettled"; error: string; requestKey: string };
+	| { ok: false; status: "notSent"; error: string; unreadable?: UnreadableSlot }
+	| { ok: false; status: "unsettled"; error: string; requestKey: string; canDismiss: boolean };
+
+export type UnreadableSlot = { slot: string; raw: string };
 
 export const NO_EXCHANGE_RESPONSE = "No response from exchange";
 
@@ -129,6 +132,10 @@ export function reportSubmit(outcome: SubmitOutcome): OrderResult {
 		case "busy":
 			return notSent(t`This order is already being sent`);
 		case "refused":
+			if (outcome.reason === "unreadableRecord") {
+				const { slot, raw } = outcome;
+				return { ok: false, status: "notSent", error: describeRefusal(outcome), unreadable: { slot, raw } };
+			}
 			return notSent(describeRefusal(outcome));
 		case "failed":
 			return notSent(t`Not sent: ${outcome.error}`);
@@ -153,19 +160,21 @@ function describeRefusal(refusal: Refused): string {
 			return refusal.to === "pending"
 				? t`Not sent. Another order on this market was just sent from another tab. Press again to send a new one.`
 				: t`Not sent. Another order on this market was just settled in another tab. Press again to send a new one.`;
+		case "unreadableRecord":
+			return t`Not sent. Can't read a pending order for this market. It may come from another version of the app and could still execute.`;
 	}
 }
 
-function reportHeld({ partial }: Held): OrderResult {
+function reportHeld({ hold }: Held): OrderResult {
 	return notSent(
-		t`Not sent. Your last order on this market partly went through: ${describePartial(partial)}. Sending it again would place the same legs twice.`,
+		t`Not sent. Your last order on this market partly went through: ${describeHold(hold)}. Sending the same order again could place those legs twice. Check open orders and send only the missing legs as a new order.`,
 	);
 }
 
-function describePartial(partial: PartialPlan): string {
-	return partial.fates
+function describeHold(hold: Hold): string {
+	return hold.fates
 		.map((fate, index) => {
-			const name = getLegName({ role: partial.roles[index] ?? "order", price: "" }, index);
+			const name = getLegName(hold.legs[index] ?? UNNAMED_LEG, index);
 			if (fate === "placed") return t`${name} placed`;
 			if (fate === "rejected") return t`${name} rejected`;
 			return t`${name} not confirmed`;
@@ -176,7 +185,9 @@ function describePartial(partial: PartialPlan): string {
 function reportBlocked(earlier: Settlement): OrderResult {
 	if (earlier.kind === "pending") {
 		return notSent(
-			t`Not sent. An earlier order on this market is not confirmed yet. Retry, cancel or dismiss it first.`,
+			earlier.dismissible
+				? t`Not sent. An earlier order on this market is not confirmed yet. Retry, cancel or dismiss it first.`
+				: t`Not sent. An earlier order on this market is not confirmed yet. Retry or cancel it first.`,
 		);
 	}
 	const result = reportSettlement(earlier);
@@ -210,13 +221,45 @@ export function reportRequestOutcome(outcome: RequestOutcome): OrderResult {
 		case "missing":
 			return unknown(t`This request was already settled. Check open orders.`);
 		case "foreignSigner": {
-			const expiry = new Date(outcome.request.expiresAfter).toLocaleTimeString();
-			const error = t`Cannot cancel: another agent key signed this order. It expires at ${expiry}.`;
-			return { ok: false, status: "unsettled", error, requestKey: getRequestKey(outcome.request) };
+			const error = isLive(outcome.remainingMs)
+				? t`Cannot cancel: another agent key signed this order. ${describeRemaining(outcome.remainingMs)}`
+				: t`Cannot cancel: another agent key signed this order.`;
+			return { ok: false, status: "unsettled", error, requestKey: getRequestKey(outcome.request), canDismiss: true };
 		}
+		case "live":
+			return {
+				ok: false,
+				status: "unsettled",
+				error: t`Not dismissed. ${describeRemaining(outcome.remainingMs)} Retry or cancel it.`,
+				requestKey: getRequestKey(outcome.request),
+				canDismiss: false,
+			};
 		default:
 			return reportSettlement(outcome);
 	}
+}
+
+export function reportUnreadableOutcome(outcome: UnreadableOutcome): OrderResult {
+	switch (outcome.kind) {
+		case "busy":
+			return notSent(t`This market is busy. Try again.`);
+		case "refused":
+			return notSent(describeRefusal(outcome));
+		case "missing":
+			return unknown(t`That pending order changed before it was dismissed. Press again to check this market.`);
+		case "cleared":
+			return unknown(t`Dismissed. The order it could not read may have executed. Check open orders.`);
+	}
+}
+
+function isLive(remainingMs: number | null): boolean {
+	return remainingMs === null || remainingMs > 0;
+}
+
+function describeRemaining(remainingMs: number | null): string {
+	if (remainingMs === null) return t`It may still execute.`;
+	const until = new Date(Date.now() + remainingMs).toLocaleTimeString();
+	return t`It can still execute until ${until}.`;
 }
 
 export function reportSettlement(settlement: Settlement): OrderResult {
@@ -226,8 +269,11 @@ export function reportSettlement(settlement: Settlement): OrderResult {
 			return {
 				ok: false,
 				status: "unsettled",
-				error: t`Not confirmed: ${settlement.error}. Retry or cancel it.`,
+				error: settlement.dismissible
+					? t`Not confirmed: ${settlement.error}. Retry, cancel or dismiss it.`
+					: t`Not confirmed: ${settlement.error}. Retry or cancel it.`,
 				requestKey: getRequestKey(request),
+				canDismiss: settlement.dismissible,
 			};
 		case "canceled":
 			return failed(request.kind === "twap" ? t`Canceled. The TWAP did not start.` : t`Canceled. Nothing was placed.`);
@@ -286,13 +332,10 @@ function foundAny(lookup: OrderLookup): boolean {
 }
 
 export function describeInspection(inspection: Extract<Inspection, { kind: "inspected" }>): string {
-	const { request, lookup, canStillExecute } = inspection;
+	const { request, lookup, remainingMs } = inspection;
 	const found = describeInspectedLookup(lookup, request.legs);
-	if (!canStillExecute) {
-		return t`The exchange never confirmed this request. ${found} Dismiss it? Your next order on this market will be sent as a new one.`;
-	}
-	const expiry = new Date(request.expiresAfter).toLocaleTimeString();
-	return t`The exchange never confirmed this request. ${found} It can still execute until ${expiry}. Dismiss it? Your next order on this market will be sent as a new one.`;
+	const when = isLive(remainingMs) ? describeRemaining(remainingMs) : t`It can no longer execute.`;
+	return t`The exchange never confirmed this request. ${found} ${when} Dismiss it? Your next order on this market will be sent as a new one.`;
 }
 
 function describeInspectedLookup(lookup: Lookup, legs: PlanLeg[]): string {
