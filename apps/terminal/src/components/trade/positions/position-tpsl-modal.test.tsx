@@ -1,6 +1,14 @@
+import {
+	connectAndPush,
+	installFakeBrowser,
+	mountMarkFeed,
+	removeFakeBrowser,
+	server,
+	setHidden,
+} from "@hypeterminal/hl-react/testing/fake-socket-feed";
 import type { ReactNode } from "react";
 import { renderToString } from "react-dom/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PositionTpSlModal } from "@/components/trade/positions/position-tpsl-modal";
 
 const typedOverPrefill = vi.hoisted(() => new Map<string, string>());
@@ -200,5 +208,69 @@ describe("position tp/sl modal", () => {
 		expect(confirm.disabled).toBe(true);
 		expect(html).toContain("Enter a valid SL price");
 		expect(html).not.toContain("SL must be below mark");
+	});
+
+	describe("on the real subscription store", () => {
+		const mockedFeed = feed.useSubscription;
+
+		beforeEach(installFakeBrowser);
+		afterEach(() => {
+			feed.useSubscription = mockedFeed;
+			removeFakeBrowser();
+		});
+
+		async function readStore() {
+			const live = await mountMarkFeed();
+			feed.useSubscription = () => {
+				const entry = live.entry();
+				return {
+					...liveMark,
+					data: entry?.data as { ctx: { markPx: string } } | undefined,
+					status: entry?.status ?? "idle",
+					isStale: entry?.isStale ?? false,
+				};
+			};
+			return live;
+		}
+
+		async function submitIfEnabled() {
+			render();
+			if (!confirm.disabled) await confirm.onClick?.();
+		}
+
+		it("sends no stop while the socket is down and sends it once a new mark arrives", async () => {
+			const live = await readStore();
+			await connectAndPush("80.276");
+			server().drop();
+			await vi.advanceTimersByTimeAsync(0);
+			await submitIfEnabled();
+			expect(exchange.placeOrder).not.toHaveBeenCalled();
+			expect(confirm.disabled).toBe(true);
+
+			await vi.advanceTimersByTimeAsync(1_000);
+			await connectAndPush("85");
+			await submitIfEnabled();
+			expect(exchange.placeOrder).toHaveBeenCalledTimes(1);
+			live.release();
+		});
+
+		it("sends no stop on an expired mark the tab buffered while hidden", async () => {
+			const live = await readStore();
+			await connectAndPush("80");
+			setHidden(true);
+			server().pushMark("80.276");
+			await vi.advanceTimersByTimeAsync(25_001);
+			setHidden(false);
+			await submitIfEnabled();
+			expect(exchange.placeOrder).not.toHaveBeenCalled();
+			expect(confirm.disabled).toBe(true);
+
+			server().drop();
+			await vi.advanceTimersByTimeAsync(1_000);
+			await connectAndPush("85");
+			await submitIfEnabled();
+			expect(exchange.placeOrder).toHaveBeenCalledTimes(1);
+			live.release();
+		});
 	});
 });
