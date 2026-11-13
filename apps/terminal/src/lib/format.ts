@@ -137,12 +137,6 @@ export interface FormatPriceOptions extends FormatOptions {
 	trimZeros?: boolean;
 }
 
-/**
- * Format a price at the market's `priceDecimals`, or 2 decimals when none is given.
- *
- * @example formatPrice(88140.123, { decimals: 1 }) -> "$88,140.1" (BTC perp)
- * @example formatPrice("0.00000032", { decimals: 8 }) -> "$0.00000032" (BID spot)
- */
 export function formatPrice(value: string | number | null | undefined, opts?: FormatPriceOptions): string {
 	const parsed = parseNumberInput(value);
 	if (!isValidNumber(parsed.value)) return FALLBACK_VALUE_PLACEHOLDER;

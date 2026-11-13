@@ -25,8 +25,7 @@ export function getTokenDisplayNames(tokens: readonly RawToken[]): string[] {
 	for (const alias of aliases) claims.set(alias, (claims.get(alias) ?? 0) + 1);
 	return tokens.map((token, index) => {
 		const alias = aliases[index];
-		if (alias === token.name || realNames.has(alias) || claims.get(alias) !== 1) return token.name;
-		return alias;
+		return realNames.has(alias) || claims.get(alias) !== 1 ? token.name : alias;
 	});
 }
 

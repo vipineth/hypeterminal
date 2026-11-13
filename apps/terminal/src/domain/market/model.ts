@@ -214,12 +214,13 @@ function mintAssetId(value: number): AssetId {
 }
 
 function toSpotToken(token: SdkToken, displayName: string): SpotToken {
+	const underlying = getUnderlyingAsset(token) ?? token.name;
 	return {
 		...token,
 		displayName,
-		iconUrl: getIconUrlFromMarketName(getUnderlyingAsset(token) ?? token.name, "spot"),
+		iconUrl: getIconUrlFromMarketName(underlying, "spot"),
 		transferDecimals: token.weiDecimals + (token.evmContract?.evm_extra_wei_decimals ?? 0),
-		isWrapped: displayName !== token.name,
+		isWrapped: underlying !== token.name,
 	};
 }
 
