@@ -805,17 +805,18 @@ describe("order legs the ticket reports and retries", () => {
 });
 
 describe("twap the ticket sends once", () => {
-	const TWAP_ID = 20459;
+	const STARTED_TWAP_ID = 20459;
+	const OTHER_TWAP_ID = 20460;
 
 	function timedOut() {
 		return new HttpRequestError({ detail: "Request timed out after 10000 ms" });
 	}
 
 	function started() {
-		return { response: { data: { status: { running: { twapId: TWAP_ID } } } } };
+		return { response: { data: { status: { running: { twapId: STARTED_TWAP_ID } } } } };
 	}
 
-	function historyRecord(sz: string, twapId = TWAP_ID) {
+	function historyRecord(sz: string, twapId = OTHER_TWAP_ID) {
 		const state = {
 			coin: "SOL",
 			side: "B",
@@ -903,7 +904,7 @@ describe("twap the ticket sends once", () => {
 		vi.useFakeTimers();
 		typeSizeHere("7");
 		exchange.placeOrder.mockRejectedValueOnce(timedOut()).mockResolvedValueOnce(started());
-		info.twapHistory.mockResolvedValue([]);
+		info.twapHistory.mockImplementation(async () => [historyRecord("70")]);
 		await pressSubmitPastReconcile();
 		expect(lastQueueUpdate()).toEqual({ status: "failed", error: "Request timed out after 10000 ms" });
 		await pressSubmit();
@@ -916,7 +917,7 @@ describe("twap the ticket sends once", () => {
 		vi.useFakeTimers();
 		typeSizeHere("8");
 		exchange.placeOrder.mockResolvedValueOnce(started()).mockRejectedValueOnce(timedOut());
-		info.twapHistory.mockImplementation(async () => [historyRecord("8")]);
+		info.twapHistory.mockImplementation(async () => [historyRecord("8", STARTED_TWAP_ID)]);
 		await pressSubmit();
 		await pressSubmitPastReconcile();
 		expect(lastQueueUpdate()).toEqual({ status: "failed", error: "Request timed out after 10000 ms" });

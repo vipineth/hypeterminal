@@ -1,11 +1,9 @@
-import { t } from "@lingui/core/macro";
 import type { ExchangeOrder, LimitTif, OrderType } from "@/config/trade";
 import type { MarketKind } from "@/domain/market";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
-import { type TpSl, throwIfResponseError } from "@/domain/trade/orders";
+import type { TpSl } from "@/domain/trade/orders";
 import { buildTwapPlan } from "@/domain/trade/twap";
 import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
-import { useExchange } from "@/lib/hyperliquid";
 import { isPositive, truncateDecimals } from "@/lib/trade/numbers";
 import type { Side } from "@/lib/trade/types";
 import { useOrderEntryActions } from "@/stores/use-order-entry-store";
@@ -70,12 +68,9 @@ function findTriggerPrice(orders: ExchangeOrder[], tpsl: TpSl): string | undefin
 }
 
 export function useOrderSubmit(): UseOrderSubmitResult {
-	const { submitPlan, isSubmitting: isSubmittingOrder } = useSubmitPlan();
-	const { mutateAsync: placeTwapOrder, isPending: isSubmittingTwap } = useExchange("twapOrder");
+	const { submitPlan, submitTwap: sendTwap, isSubmitting } = useSubmitPlan();
 	const { addOrder, updateOrder } = useOrderQueueActions();
 	const { resetForm } = useOrderEntryActions();
-
-	const isSubmitting = isSubmittingOrder || isSubmittingTwap;
 
 	async function submitTwap(input: OrderSubmitInput): Promise<boolean> {
 		const plan = buildTwapPlan({
@@ -101,16 +96,14 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 			return false;
 		}
 
-		try {
-			const result = await placeTwapOrder(plan.action);
-			throwIfResponseError(result.response?.data?.status);
-			updateOrder(orderId, { status: "success", outcome: "twapStarted" });
-			resetForm();
-			return true;
-		} catch (error) {
-			updateOrder(orderId, { status: "failed", error: error instanceof Error ? error.message : t`Order failed` });
+		const result = await sendTwap(plan.action);
+		if (!result.ok) {
+			updateOrder(orderId, { status: "failed", error: result.error });
 			return false;
 		}
+		updateOrder(orderId, { status: "success", outcome: result.outcome });
+		resetForm();
+		return true;
 	}
 
 	async function submitEntry(input: OrderSubmitInput): Promise<boolean> {

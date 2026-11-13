@@ -1930,9 +1930,13 @@ msgid "Not connected"
 msgstr "Not connected"
 
 #. placeholder {0}: describeLegStates(states, legs)
-#: src/hooks/trade/use-submit-plan.ts:71
+#: src/hooks/trade/use-submit-plan.ts:119
 msgid "Not sent again. {0}"
 msgstr "Not sent again. {0}"
+
+#: src/hooks/trade/use-submit-plan.ts:82
+msgid "Not sent again. The exchange already has this TWAP. Check the TWAP tab."
+msgstr "Not sent again. The exchange already has this TWAP. Check the TWAP tab."
 
 #: src/components/trade/header/top-nav.tsx:
 #~ msgid "Notifications"
@@ -2042,8 +2046,8 @@ msgstr "Order Book"
 msgid "Order book in quote asset"
 msgstr "Order book in quote asset"
 
-#: src/hooks/trade/use-order-submit.ts:111
-#: src/hooks/trade/use-submit-plan.ts:92
+#: src/hooks/trade/use-submit-plan.ts:95
+#: src/hooks/trade/use-submit-plan.ts:140
 msgid "Order failed"
 msgstr "Order failed"
 
@@ -2059,11 +2063,11 @@ msgstr "Order History"
 msgid "Order Queue"
 msgstr "Order Queue"
 
-#: src/hooks/trade/use-submit-plan.ts:101
+#: src/hooks/trade/use-submit-plan.ts:149
 msgid "Order status unknown: {message}. Check open orders before you try again."
 msgstr "Order status unknown: {message}. Check open orders before you try again."
 
-#: src/hooks/trade/use-submit-plan.ts:68
+#: src/hooks/trade/use-submit-plan.ts:116
 msgid "Order status unknown. Check open orders before you try again."
 msgstr "Order status unknown. Check open orders before you try again."
 
@@ -3152,7 +3156,7 @@ msgstr "This link was created for a different site."
 msgid "This mobile link expired."
 msgstr "This mobile link expired."
 
-#: src/hooks/trade/use-submit-plan.ts:49
+#: src/hooks/trade/use-submit-plan.ts:53
 msgid "This order is already being sent"
 msgstr "This order is already being sent"
 
@@ -3398,6 +3402,14 @@ msgstr "TWAP order value too small. Min is ${min}, which is ${TWAP_MIN_NOTIONAL_
 #: src/components/trade/mobile/mobile-twap-tab.tsx:66
 msgid "TWAP Orders"
 msgstr "TWAP Orders"
+
+#: src/hooks/trade/use-submit-plan.ts:101
+msgid "TWAP status unknown: {message}. Check the TWAP tab before you try again."
+msgstr "TWAP status unknown: {message}. Check the TWAP tab before you try again."
+
+#: src/hooks/trade/use-submit-plan.ts:79
+msgid "TWAP status unknown. Check the TWAP tab before you try again."
+msgstr "TWAP status unknown. Check the TWAP tab before you try again."
 
 #: src/components/trade/mobile/mobile-trade-ticket-body.tsx:245
 msgid "TWAP, Scale & more"

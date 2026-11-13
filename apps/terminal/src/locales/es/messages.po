@@ -1926,8 +1926,12 @@ msgid "Not connected"
 msgstr "No conectado"
 
 #. placeholder {0}: describeLegStates(states, legs)
-#: src/hooks/trade/use-submit-plan.ts:71
+#: src/hooks/trade/use-submit-plan.ts:119
 msgid "Not sent again. {0}"
+msgstr ""
+
+#: src/hooks/trade/use-submit-plan.ts:82
+msgid "Not sent again. The exchange already has this TWAP. Check the TWAP tab."
 msgstr ""
 
 #: src/components/trade/header/top-nav.tsx:
@@ -2038,8 +2042,8 @@ msgstr "Libro de órdenes"
 msgid "Order book in quote asset"
 msgstr ""
 
-#: src/hooks/trade/use-order-submit.ts:111
-#: src/hooks/trade/use-submit-plan.ts:92
+#: src/hooks/trade/use-submit-plan.ts:95
+#: src/hooks/trade/use-submit-plan.ts:140
 msgid "Order failed"
 msgstr "Orden fallida"
 
@@ -2055,11 +2059,11 @@ msgstr ""
 msgid "Order Queue"
 msgstr "Cola de órdenes"
 
-#: src/hooks/trade/use-submit-plan.ts:101
+#: src/hooks/trade/use-submit-plan.ts:149
 msgid "Order status unknown: {message}. Check open orders before you try again."
 msgstr ""
 
-#: src/hooks/trade/use-submit-plan.ts:68
+#: src/hooks/trade/use-submit-plan.ts:116
 msgid "Order status unknown. Check open orders before you try again."
 msgstr ""
 
@@ -3148,7 +3152,7 @@ msgstr ""
 msgid "This mobile link expired."
 msgstr ""
 
-#: src/hooks/trade/use-submit-plan.ts:49
+#: src/hooks/trade/use-submit-plan.ts:53
 msgid "This order is already being sent"
 msgstr ""
 
@@ -3394,6 +3398,14 @@ msgstr ""
 #: src/components/trade/mobile/mobile-twap-tab.tsx:66
 msgid "TWAP Orders"
 msgstr "Órdenes TWAP"
+
+#: src/hooks/trade/use-submit-plan.ts:101
+msgid "TWAP status unknown: {message}. Check the TWAP tab before you try again."
+msgstr ""
+
+#: src/hooks/trade/use-submit-plan.ts:79
+msgid "TWAP status unknown. Check the TWAP tab before you try again."
+msgstr ""
 
 #: src/components/trade/mobile/mobile-trade-ticket-body.tsx:245
 msgid "TWAP, Scale & more"

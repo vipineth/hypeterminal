@@ -1,5 +1,6 @@
 import { t } from "@lingui/core/macro";
-import { TransportError } from "@nktkas/hyperliquid";
+import { TransportError, type TwapHistoryResponse, type TwapOrderParameters } from "@nktkas/hyperliquid";
+import Big from "big.js";
 import { useState } from "react";
 import { useConnection } from "wagmi";
 import {
@@ -28,33 +29,80 @@ export type SubmitPlanInput = Pick<OrderPlan, "orders" | "grouping"> & { errors?
 
 interface UseSubmitPlanResult {
 	submitPlan: (plan: SubmitPlanInput) => Promise<OrderResult>;
+	submitTwap: (action: TwapOrderParameters) => Promise<OrderResult>;
 	isSubmitting: boolean;
 }
 
 const RECONCILE_DELAYS_MS = [1000, 2000, 4000];
 const STATUS_READ_TIMEOUT_MS = 3000;
+const TWAP_CLOCK_SKEW_MS = 5 * 60 * 1000;
 
 const unsettledPlanIds = new Map<string, string>();
 const sendingPlanKeys = new Set<string>();
+const unsettledTwapSince = new Map<string, number>();
+const confirmedTwapIds = new Set<number>();
 
 export function useSubmitPlan(): UseSubmitPlanResult {
 	const { address } = useConnection();
 	const { mutateAsync: placeOrder } = useExchange("order");
+	const { mutateAsync: placeTwapOrder } = useExchange("twapOrder");
 	const [activeSubmits, setActiveSubmits] = useState(0);
 
-	async function submitPlan(plan: SubmitPlanInput): Promise<OrderResult> {
-		if (plan.errors && plan.errors.length > 0) {
-			return { ok: false, error: plan.errors.join("; ") };
-		}
-		const planKey = `${address ?? ""}:${getPlanKey(plan)}`;
-		if (sendingPlanKeys.has(planKey)) return { ok: false, error: t`This order is already being sent` };
-		sendingPlanKeys.add(planKey);
+	async function sendOnce(key: string, send: (key: string) => Promise<OrderResult>): Promise<OrderResult> {
+		const walletKey = `${address ?? ""}:${key}`;
+		if (sendingPlanKeys.has(walletKey)) return { ok: false, error: t`This order is already being sent` };
+		sendingPlanKeys.add(walletKey);
 		setActiveSubmits((count) => count + 1);
 		try {
-			return await settlePlan(plan, planKey);
+			return await send(walletKey);
 		} finally {
-			sendingPlanKeys.delete(planKey);
+			sendingPlanKeys.delete(walletKey);
 			setActiveSubmits((count) => count - 1);
+		}
+	}
+
+	function submitPlan(plan: SubmitPlanInput): Promise<OrderResult> {
+		if (plan.errors && plan.errors.length > 0) {
+			return Promise.resolve({ ok: false, error: plan.errors.join("; ") });
+		}
+		return sendOnce(getPlanKey(plan), (planKey) => settlePlan(plan, planKey));
+	}
+
+	function submitTwap(action: TwapOrderParameters): Promise<OrderResult> {
+		return sendOnce(JSON.stringify(action), (twapKey) => settleTwap(action, twapKey));
+	}
+
+	async function settleTwap(action: TwapOrderParameters, twapKey: string): Promise<OrderResult> {
+		const heldSince = unsettledTwapSince.get(twapKey);
+		if (heldSince !== undefined) {
+			const history = await readTwapHistory(address);
+			if (!history) return { ok: false, error: t`TWAP status unknown. Check the TWAP tab before you try again.` };
+			if (hasStartedTwap(history, action, heldSince)) {
+				unsettledTwapSince.delete(twapKey);
+				return { ok: false, error: t`Not sent again. The exchange already has this TWAP. Check the TWAP tab.` };
+			}
+		}
+
+		const since = heldSince ?? Date.now();
+		unsettledTwapSince.set(twapKey, since);
+		try {
+			const result = await placeTwapOrder(action);
+			const twapId = result.response?.data?.status?.running?.twapId;
+			if (twapId !== undefined) confirmedTwapIds.add(twapId);
+			unsettledTwapSince.delete(twapKey);
+			return { ok: true, outcome: "twapStarted" };
+		} catch (error) {
+			const message = error instanceof Error ? error.message : t`Order failed`;
+			if (!(error instanceof TransportError)) {
+				unsettledTwapSince.delete(twapKey);
+				return { ok: false, error: message };
+			}
+			const history = await pollTwapHistory(action, since, address);
+			if (!history)
+				return { ok: false, error: t`TWAP status unknown: ${message}. Check the TWAP tab before you try again.` };
+			if (!hasStartedTwap(history, action, since)) return { ok: false, error: message };
+			unsettledTwapSince.delete(twapKey);
+			return { ok: true, outcome: "twapStarted" };
 		}
 	}
 
@@ -106,7 +154,7 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 		return reportLegStates(states, legs);
 	}
 
-	return { submitPlan, isSubmitting: activeSubmits > 0 };
+	return { submitPlan, submitTwap, isSubmitting: activeSubmits > 0 };
 }
 
 async function pollLegStates(orders: CloidOrder[], user: `0x${string}` | undefined): Promise<LegState[] | null> {
@@ -126,6 +174,43 @@ async function readLegStates(orders: CloidOrder[], user: `0x${string}` | undefin
 	try {
 		const lookups = await Promise.all(orders.map((order) => info.orderStatus({ user, oid: order.c }, signal)));
 		return lookups.map(lookupToLegState);
+	} catch {
+		return null;
+	}
+}
+
+function hasStartedTwap(history: TwapHistoryResponse, { twap }: TwapOrderParameters, since: number): boolean {
+	const side = twap.b ? "B" : "A";
+	return history.some(
+		({ state, twapId }) =>
+			(twapId === undefined || !confirmedTwapIds.has(twapId)) &&
+			state.timestamp >= since - TWAP_CLOCK_SKEW_MS &&
+			state.side === side &&
+			state.minutes === twap.m &&
+			state.reduceOnly === twap.r &&
+			state.randomize === twap.t &&
+			Big(state.sz).eq(twap.s),
+	);
+}
+
+async function pollTwapHistory(
+	action: TwapOrderParameters,
+	since: number,
+	user: `0x${string}` | undefined,
+): Promise<TwapHistoryResponse | null> {
+	let latest: TwapHistoryResponse | null = null;
+	for (const delay of RECONCILE_DELAYS_MS) {
+		await new Promise((resolve) => setTimeout(resolve, delay));
+		latest = (await readTwapHistory(user)) ?? latest;
+		if (latest && hasStartedTwap(latest, action, since)) return latest;
+	}
+	return latest;
+}
+
+async function readTwapHistory(user: `0x${string}` | undefined): Promise<TwapHistoryResponse | null> {
+	if (!user) return null;
+	try {
+		return await getInfoClient().twapHistory({ user }, AbortSignal.timeout(STATUS_READ_TIMEOUT_MS));
 	} catch {
 		return null;
 	}
