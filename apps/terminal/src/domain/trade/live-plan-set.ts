@@ -41,10 +41,16 @@ interface LegSpec {
 	kind: LegKind;
 }
 
+interface ScaleSpec {
+	totalSize: string;
+	start: Big;
+	end: Big;
+}
+
 interface PlanSpec {
 	grouping: OrderPlan["grouping"];
 	legs: LegSpec[];
-	totalSize?: string;
+	scale?: ScaleSpec;
 }
 
 export interface PlanCase {
@@ -66,8 +72,7 @@ const PRICE_SIG_FIGS = 5;
 const SLIPPAGE_BPS = 250;
 const SWAP_SLIPPAGE_BPS = 100;
 const MIN_CASE_NOTIONAL = 200;
-const SCALE_LEVELS = 5;
-const SCALE_EXTRA_LOTS = 3;
+const SCALE_LEVEL_COUNTS = [3, 4, 5, 7, 10, 20];
 
 export function listLiveMarkets(snapshot: LiveMetaSnapshot): LiveMarket[] {
 	const markets: LiveMarket[] = [];
@@ -211,28 +216,38 @@ function single(leg: LegSpec): PlanSpec {
 	return { grouping: "na", legs: [leg] };
 }
 
-function scaleCase(market: LiveMarket, side: Side, size: Big): PlanCase {
+function scaleCase(market: LiveMarket, side: Side, size: Big, levels: number, descending: boolean): PlanCase {
 	const lot = Big(10).pow(-market.szDecimals);
-	const total = size.plus(lot.times(SCALE_EXTRA_LOTS));
-	const start = scaled(market.markPx, side === "buy" ? "0.95" : "1.01");
-	const end = scaled(market.markPx, side === "buy" ? "0.99" : "1.05");
-	const step = end.minus(start).div(SCALE_LEVELS - 1);
+	const total = size.times(levels).plus(lot.times(levels - 1));
+	const low = ceilToTick(scaled(market.markPx, side === "buy" ? "0.95" : "1.01"), market);
+	const high = ceilToTick(scaled(market.markPx, side === "buy" ? "0.99" : "1.05"), market);
+	const [start, end] = descending ? [high, low] : [low, high];
+	const span = end.minus(start);
 	return {
-		label: `${market.kind === "spot" ? "spot" : "perp"} scale`,
+		label: `${market.kind === "spot" ? "spot" : "perp"} scale ${levels} legs ${descending ? "down" : "up"}`,
 		market,
 		side,
 		intent: entry(market, side, total, {
 			orderType: "scale",
 			scaleStartPriceInput: start.toFixed(),
 			scaleEndPriceInput: end.toFixed(),
-			scaleLevelsNum: SCALE_LEVELS,
+			scaleLevelsNum: levels,
 		}),
 		expected: {
 			grouping: "na",
-			totalSize: total.toFixed(),
-			legs: Array.from({ length: SCALE_LEVELS }, (_, i) => limitLeg(side, null, false, start.plus(step.times(i)))),
+			scale: { totalSize: total.toFixed(), start, end },
+			legs: Array.from({ length: levels }, (_, i) =>
+				limitLeg(side, null, false, start.plus(span.times(i).div(levels - 1))),
+			),
 		},
 	};
+}
+
+function scaleCases(market: LiveMarket, side: Side, size: Big): PlanCase[] {
+	return SCALE_LEVEL_COUNTS.flatMap((levels) => [
+		scaleCase(market, side, size, levels, false),
+		scaleCase(market, side, size, levels, true),
+	]);
 }
 
 function perpCases(market: LiveMarket, side: Side): PlanCase[] {
@@ -310,7 +325,7 @@ function perpCases(market: LiveMarket, side: Side): PlanCase[] {
 			}),
 			single(triggerLeg(side, sz, "tp", takeTrigger, takeLimit)),
 		),
-		scaleCase(market, side, size),
+		...scaleCases(market, side, size),
 		perpCase(
 			"market close",
 			{
@@ -384,7 +399,7 @@ function spotCases(market: LiveMarket, side: Side): PlanCase[] {
 			entry(market, side, size, { orderType: "limit", price: limit.toNumber(), limitPriceInput: limit.toFixed() }),
 			single(limitLeg(side, sz, false, limit)),
 		),
-		scaleCase(market, side, size),
+		...scaleCases(market, side, size),
 		spotCase(
 			"swap",
 			{
@@ -433,6 +448,15 @@ function maxPriceDecimals(market: LiveMarket): number {
 	return Math.max((market.kind === "spot" ? SPOT_PRICE_DECIMALS : PERP_PRICE_DECIMALS) - market.szDecimals, 0);
 }
 
+function priceTick(price: Big, market: LiveMarket): Big {
+	return Big(10).pow(Math.max(price.e - (PRICE_SIG_FIGS - 1), -maxPriceDecimals(market)));
+}
+
+function ceilToTick(price: Big, market: LiveMarket): Big {
+	const tick = priceTick(price, market);
+	return price.div(tick).round(0, Big.roundUp).times(tick);
+}
+
 function isRepresentable(spec: PriceSpec, market: LiveMarket): boolean {
 	return spec.rounding === "up" || spec.ref.gte(Big(10).pow(-maxPriceDecimals(market)));
 }
@@ -449,7 +473,7 @@ function checkPrice(label: string, price: string, spec: PriceSpec, market: LiveM
 	const maxDecimals = maxPriceDecimals(market);
 	const value = Big(price);
 	const diff = value.minus(spec.ref);
-	const tick = Big(10).pow(Math.max(spec.ref.e - (PRICE_SIG_FIGS - 1), -maxDecimals));
+	const tick = priceTick(spec.ref, market);
 	const problems: string[] = [];
 	if (value.lte(0)) problems.push(`${label} ${price} is not positive`);
 	if (decimalsOf(price) > maxDecimals) problems.push(`${label} ${price} has more than ${maxDecimals} decimals`);
@@ -459,7 +483,10 @@ function checkPrice(label: string, price: string, spec: PriceSpec, market: LiveM
 	if (spec.rounding === "up" ? diff.lt(0) : diff.gt(0)) {
 		problems.push(`${label} ${price} rounds ${spec.rounding === "up" ? "below" : "above"} ${spec.ref.toFixed()}`);
 	}
-	if (diff.abs().gt(tick)) problems.push(`${label} ${price} is more than one tick from ${spec.ref.toFixed()}`);
+	if (diff.abs().gte(tick)) problems.push(`${label} ${price} is a tick or more from ${spec.ref.toFixed()}`);
+	if (spec.ref.mod(tick).eq(0) && !diff.eq(0)) {
+		problems.push(`${label} ${price} moved the valid price ${spec.ref.toFixed()}`);
+	}
 	return problems;
 }
 
@@ -493,7 +520,8 @@ function checkLeg(order: ExchangeOrder, leg: LegSpec, market: LiveMarket): strin
 	return problems;
 }
 
-function checkScaleTotal(orders: ExchangeOrder[], totalSize: string, market: LiveMarket): string[] {
+function checkScale(orders: ExchangeOrder[], scale: ScaleSpec, side: Side, market: LiveMarket): string[] {
+	const { totalSize } = scale;
 	const lots = Big(10).pow(market.szDecimals);
 	const totalLots = Big(totalSize).times(lots);
 	const baseLots = totalLots.div(orders.length).round(0, Big.roundDown);
@@ -505,6 +533,11 @@ function checkScaleTotal(orders: ExchangeOrder[], totalSize: string, market: Liv
 		if (legLots.lt(baseLots) || legLots.gt(baseLots.plus(1))) {
 			problems.push(`scale leg ${order.s} is more than one lot from an even split of ${totalSize}`);
 		}
+	}
+	const midNotional = Big(totalSize).times(scale.start.plus(scale.end).div(2));
+	const wireNotional = orders.reduce((total, order) => total.plus(Big(order.s).times(order.p)), Big(0));
+	if (side === "buy" && wireNotional.gt(midNotional)) {
+		problems.push(`scale buy sends ${wireNotional.toFixed()}, more than size times mid ${midNotional.toFixed()}`);
 	}
 	return problems;
 }
@@ -526,8 +559,8 @@ export function checkCase(planCase: PlanCase, plan: OrderPlan): string[] {
 	const problems = plan.orders.flatMap((order, i) =>
 		checkLeg(order, expected.legs[i], market).map((problem) => `${where} leg ${i}: ${problem}`),
 	);
-	if (expected.totalSize) {
-		problems.push(...checkScaleTotal(plan.orders, expected.totalSize, market).map((p) => `${where}: ${p}`));
+	if (expected.scale) {
+		problems.push(...checkScale(plan.orders, expected.scale, planCase.side, market).map((p) => `${where}: ${p}`));
 	}
 	return problems;
 }
