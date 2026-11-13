@@ -1,6 +1,5 @@
 import type { CandleType } from "klinecharts";
 import type { ChartingLibraryFeatureset, ResolutionString, TimeFrameItem } from "@/types/charting_library";
-import { DEFAULT_QUOTE_TOKEN } from "./app";
 
 export const CHART_LIBRARY_PATH = "/charting_library/";
 
@@ -17,7 +16,6 @@ export const CHART_DEFAULT_SYMBOL = "AAVE/USDC";
 export const CHART_DEFAULT_INTERVAL = "60";
 export const CHART_DEFAULT_THEME = "dark" as const;
 export const CHART_EXCHANGE = "Hyperliquid";
-export const CHART_QUOTE_ASSET = DEFAULT_QUOTE_TOKEN;
 export const CHART_SESSION = "24x7";
 export const CHART_TIMEZONE = "Etc/UTC";
 export const CHART_DEFAULT_PRICESCALE = 100;

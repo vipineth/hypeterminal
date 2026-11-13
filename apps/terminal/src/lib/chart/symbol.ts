@@ -1,4 +1,6 @@
-import { CHART_DEFAULT_PRICESCALE, CHART_QUOTE_ASSET } from "@/config/chart";
+import { CHART_DEFAULT_PRICESCALE } from "@/config/chart";
+import { PERP_MARKET_NAME_SEPARATOR } from "@/domain/market/display";
+import type { Market } from "@/domain/market/model";
 
 export function coinFromSymbolName(symbolName: string): string {
 	const trimmed = symbolName.trim();
@@ -19,8 +21,9 @@ export function coinFromSymbolName(symbolName: string): string {
 	return trimmed;
 }
 
-export function symbolFromCoin(coin: string): string {
-	return `${coin}/${CHART_QUOTE_ASSET}`;
+export function chartSymbolLabel(market: Market): string {
+	if (market.kind === "spot") return market.pairName;
+	return `${market.name}${PERP_MARKET_NAME_SEPARATOR}${market.quote.displayName}`;
 }
 
 function inferDecimalPlaces(value: string): number {

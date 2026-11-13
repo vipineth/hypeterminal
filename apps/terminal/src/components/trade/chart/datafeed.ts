@@ -4,7 +4,7 @@ import type { Market } from "@/domain/market/model";
 import { candleSnapshotToBar, filterAndSortBars } from "@/lib/chart/candle";
 import { resolutionToInterval } from "@/lib/chart/resolution";
 import { getCandleStore, streamKey } from "@/lib/chart/store";
-import { coinFromSymbolName, inferPriceScaleFromMids, symbolFromCoin } from "@/lib/chart/symbol";
+import { chartSymbolLabel, coinFromSymbolName, inferPriceScaleFromMids } from "@/lib/chart/symbol";
 import { getInfoClient } from "@/lib/hyperliquid";
 import type {
 	Bar,
@@ -105,14 +105,13 @@ export function createDatafeed(getMarket: (coin: string) => Market | undefined):
 
 			void (async () => {
 				const coin = coinFromSymbolName(symbolName);
-				const displayName = symbolFromCoin(coin);
-
 				const market = getMarket(coin);
 				if (!market || market.isDelisted) {
 					onError(t`Unknown symbol: ${symbolName}`);
 					return;
 				}
 
+				const displayName = chartSymbolLabel(market);
 				const pricescale = await inferPriceScale(market);
 
 				const symbolInfo: LibrarySymbolInfo = {
