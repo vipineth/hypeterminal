@@ -46,7 +46,6 @@ async function roundTrip(ctx: ScenarioContext, sendAsset: SendAsset): Promise<vo
 export const transferScenarios: Scenario[] = [
 	{
 		name: "usd class transfer",
-		signer: "principal",
 		scope: "account",
 		source: "sdk",
 		run: async (ctx) => {
@@ -59,21 +58,18 @@ export const transferScenarios: Scenario[] = [
 	},
 	{
 		name: "dex sendAsset",
-		signer: "principal",
 		scope: "perp",
 		source: "app",
 		run: (ctx) => roundTrip(ctx, (params) => ctx.h.principal.sendAsset(params)),
 	},
 	{
 		name: "agentSendAsset",
-		signer: "agent",
 		scope: "perp",
 		source: "sdk",
 		run: (ctx) => roundTrip(ctx, (params) => ctx.h.agent.agentSendAsset(params)),
 	},
 	{
 		name: "abstraction switch",
-		signer: "principal",
 		scope: "account",
 		source: "sdk",
 		run: async (ctx) => {
@@ -91,7 +87,6 @@ export const transferScenarios: Scenario[] = [
 	},
 	{
 		name: "agentSetAbstraction",
-		signer: "agent",
 		scope: "account",
 		source: "sdk",
 		run: async (ctx) => {

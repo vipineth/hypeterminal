@@ -43,7 +43,6 @@ function expectedScaleLevels(start: string, end: string): string[] {
 export const orderScenarios: Scenario[] = [
 	{
 		name: "market",
-		signer: "agent",
 		scope: "perp",
 		source: "app",
 		run: async (ctx) => {
@@ -52,7 +51,6 @@ export const orderScenarios: Scenario[] = [
 	},
 	{
 		name: "limit",
-		signer: "agent",
 		scope: "perp",
 		source: "app",
 		run: async (ctx) => {
@@ -61,7 +59,6 @@ export const orderScenarios: Scenario[] = [
 	},
 	{
 		name: "post-only",
-		signer: "agent",
 		scope: "perp",
 		source: "app",
 		run: async (ctx) => {
@@ -76,7 +73,6 @@ export const orderScenarios: Scenario[] = [
 	},
 	{
 		name: "ioc",
-		signer: "agent",
 		scope: "perp",
 		source: "app",
 		run: async (ctx) => {
@@ -90,7 +86,6 @@ export const orderScenarios: Scenario[] = [
 	},
 	{
 		name: "reduce-only",
-		signer: "agent",
 		scope: "perp",
 		source: "app",
 		run: async (ctx) => {
@@ -103,7 +98,6 @@ export const orderScenarios: Scenario[] = [
 	},
 	{
 		name: "scale",
-		signer: "agent",
 		scope: "perp",
 		source: "app",
 		run: async (ctx) => {
@@ -126,7 +120,6 @@ export const orderScenarios: Scenario[] = [
 	},
 	{
 		name: "twap",
-		signer: "agent",
 		scope: "perp",
 		source: "app",
 		run: async (ctx) => {
@@ -162,7 +155,6 @@ export const orderScenarios: Scenario[] = [
 	},
 	{
 		name: "cancel",
-		signer: "agent",
 		scope: "perp",
 		source: "app",
 		run: async (ctx) => {
@@ -174,7 +166,6 @@ export const orderScenarios: Scenario[] = [
 	},
 	{
 		name: "cancel all",
-		signer: "agent",
 		scope: "perp",
 		source: "app",
 		run: async (ctx) => {
@@ -188,7 +179,6 @@ export const orderScenarios: Scenario[] = [
 	},
 	{
 		name: "modify",
-		signer: "agent",
 		scope: "perp",
 		source: "sdk",
 		run: async (ctx) => {

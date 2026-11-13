@@ -104,8 +104,6 @@ function testnetInfo(request: { type: string; dex?: string; user?: string }): un
 				.map((order) => ({ coin: order.coin, oid: order.oid, side: "B", limitPx: "1", sz: "1", isTrigger: false, orderType: "Limit", tif: "Gtc" }));
 		case "twapHistory":
 			return [];
-		case "extraAgents":
-			return account.agent.signsFor === request.user?.toLowerCase() ? [{ name: "hl-live", address: account.agent.address, validUntil: 0 }] : [];
 		case "userRole":
 			return request.user?.toLowerCase() === account.agent.address ? { role: "agent", data: { user: account.agent.signsFor } } : { role: "user" };
 		default:

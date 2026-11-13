@@ -10,7 +10,6 @@ const ROUND_DOWN = 0;
 export const spotScenarios: Scenario[] = [
 	{
 		name: "spot buy and sell",
-		signer: "agent",
 		scope: "spot",
 		source: "app",
 		run: async (ctx) => {

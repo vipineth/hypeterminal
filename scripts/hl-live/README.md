@@ -36,13 +36,14 @@ The harness runs only on a testnet-only principal, a key that has never held any
 
 It stops with exit 2 if any of them shows value, if a read fails, or if a response is not the shape it expects: a dex list without the main dex first, or an amount that is not a decimal string. A key that holds mainnet funds can't run the harness. The guard can't see value off `/info`: HyperEVM balances, and Arbitrum bridge deposits or withdrawals still in flight.
 
-By default the harness reads `HL_LIVE_PRINCIPAL_KEY` and `HL_LIVE_AGENT_KEY`, from the environment first, then from `apps/terminal/.env.local` in the main checkout. `HL_ENV_FILE` points it at another file. `HL_PRINCIPAL=2` selects `HL_TESTNET_PRINCIPAL2_KEY` with `HL_TESTNET_AGENT2_KEY`, and `HL_PRINCIPAL=1` selects `HL_TESTNET_PRINCIPAL_KEY` with `HL_TESTNET_AGENT_KEY`. `HL_PRINCIPAL=fresh` uses new random keys, which is how you check the unfunded stop.
+By default the harness reads `HL_LIVE_PRINCIPAL_KEY` and `HL_LIVE_AGENT_KEY`, from the environment first, then from `apps/terminal/.env.local` in the main checkout. `HL_ENV_FILE` points it at another file. `HL_PRINCIPAL=2` selects `HL_TESTNET_PRINCIPAL2_KEY` with `HL_TESTNET_AGENT2_KEY`, and `HL_PRINCIPAL=1` selects `HL_TESTNET_PRINCIPAL_KEY` with `HL_TESTNET_AGENT_KEY`. `HL_PRINCIPAL=fresh` uses new random keys, which is how you check the unapproved-agent stop.
 
 Each principal has its own agent named `hl-live`. Hyperliquid binds an agent address to one principal, so two principals can't share one. The `hl-live` agent is not the app's `HypeTerminal` agent, so a run never replaces the agent another session uses.
 
 ## Safety
 
-- `createHarness` throws unless `transport.isTestnet` is true. Both signers check the transport again on every signature.
+- `openHarness` throws unless `transport.isTestnet` is true. Both signers check the transport again on every signature.
+- `openHarness` reads `userRole` for the agent address before it builds any signer, and refuses unless the agent signs for the configured principal. Recovery, cleanup and every scenario take that harness, so nothing signs through an agent bound to another account. The run stops with exit 2 instead.
 - The principal signs only `UsdClassTransfer`, `SendAsset` and `UserSetAbstraction`, and only when the payload says `hyperliquidChain: "Testnet"`. It can never approve an agent, approve a builder fee or withdraw.
 - The agent signs only L1 `Agent` payloads with source `b`, which is testnet.
 - `harness.test.ts` proves a mainnet transport refuses to sign and sends nothing.

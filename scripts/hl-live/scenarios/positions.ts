@@ -61,7 +61,6 @@ export async function resetLeverage(ctx: ScenarioContext): Promise<void> {
 export const positionScenarios: Scenario[] = [
 	{
 		name: "tpsl normalTpsl",
-		signer: "agent",
 		scope: "perp",
 		source: "app",
 		run: async (ctx) => {
@@ -84,7 +83,6 @@ export const positionScenarios: Scenario[] = [
 	},
 	{
 		name: "tpsl positionTpsl",
-		signer: "agent",
 		scope: "perp",
 		source: "app",
 		run: async (ctx) => {
@@ -105,7 +103,6 @@ export const positionScenarios: Scenario[] = [
 	},
 	{
 		name: "close",
-		signer: "agent",
 		scope: "perp",
 		source: "app",
 		run: async (ctx) => {
@@ -119,7 +116,6 @@ export const positionScenarios: Scenario[] = [
 	},
 	{
 		name: "reverse",
-		signer: "agent",
 		scope: "perp",
 		source: "app",
 		run: async (ctx) => {
@@ -130,7 +126,6 @@ export const positionScenarios: Scenario[] = [
 	},
 	{
 		name: "leverage update",
-		signer: "agent",
 		scope: "perp",
 		source: "app",
 		run: async (ctx) => {
@@ -147,7 +142,6 @@ export const positionScenarios: Scenario[] = [
 	},
 	{
 		name: "isolated margin",
-		signer: "agent",
 		scope: "perp",
 		source: "sdk",
 		run: async (ctx) => {

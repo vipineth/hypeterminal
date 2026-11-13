@@ -228,13 +228,23 @@ export function agentWallet(account: PrivateKeyAccount, transport: HttpTransport
 	};
 }
 
-export function createHarness(transport: HttpTransport, keys: HarnessKeys): Harness {
+export class AgentNotApproved extends Error {}
+
+export async function openHarness(transport: HttpTransport, keys: HarnessKeys): Promise<Harness> {
 	assertTestnet(transport);
 	const principalAccount = privateKeyToAccount(keys.principalKey);
 	const agentAccount = privateKeyToAccount(keys.agentKey);
+	const info = new InfoClient({ transport });
+	const role = await info.userRole({ user: agentAccount.address });
+	const signsFor = role.role === "agent" ? role.data.user : null;
+	if (signsFor?.toLowerCase() !== principalAccount.address.toLowerCase()) {
+		throw new AgentNotApproved(
+			`agent ${agentAccount.address} signs for ${signsFor ?? `no account (role ${role.role})`}, not principal ${principalAccount.address}. Approve the agent for this principal first.`,
+		);
+	}
 	return {
 		transport,
-		info: new InfoClient({ transport }),
+		info,
 		principal: new ExchangeClient({ transport, wallet: principalWallet(principalAccount, transport) }),
 		agent: new ExchangeClient({ transport, wallet: agentWallet(agentAccount, transport) }),
 		user: principalAccount.address,

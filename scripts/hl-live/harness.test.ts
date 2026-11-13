@@ -1,7 +1,7 @@
 import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { agentWallet, createHarness, loadKeys, principalWallet, SigningRefused } from "./harness";
+import { AgentNotApproved, agentWallet, loadKeys, openHarness, principalWallet, SigningRefused } from "./harness";
 
 const keys = { principalKey: generatePrivateKey(), agentKey: generatePrivateKey() };
 const principal = privateKeyToAccount(keys.principalKey);
@@ -9,6 +9,7 @@ const agent = privateKeyToAccount(keys.agentKey);
 const order = { a: 0, b: true, p: "100000", s: "0.001", r: false, t: { limit: { tif: "Gtc" as const } } };
 
 let requests: string[];
+let agentRole: unknown;
 
 async function failure(promise: Promise<unknown>): Promise<string> {
 	try {
@@ -23,8 +24,11 @@ async function failure(promise: Promise<unknown>): Promise<string> {
 
 beforeEach(() => {
 	requests = [];
-	vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
-		requests.push(input instanceof Request ? input.url : String(input));
+	agentRole = { role: "agent", data: { user: principal.address.toLowerCase() } };
+	vi.spyOn(globalThis, "fetch").mockImplementation(async (input, init) => {
+		const url = input instanceof Request ? input.url : String(input);
+		requests.push(url);
+		if (url.endsWith("/info") && JSON.parse(String(init?.body)).type === "userRole") return Response.json(agentRole);
 		return Response.json({ status: "ok", response: { type: "default" } });
 	});
 });
@@ -36,8 +40,9 @@ afterEach(() => {
 describe("mainnet transport", () => {
 	const mainnet = new HttpTransport();
 
-	it("cannot build a harness", () => {
-		expect(() => createHarness(mainnet, keys)).toThrow(SigningRefused);
+	it("cannot build a harness and sends nothing", async () => {
+		await expect(openHarness(mainnet, keys)).rejects.toThrow(SigningRefused);
+		expect(requests).toEqual([]);
 	});
 
 	it("refuses to sign an agent order and sends nothing", async () => {
@@ -102,6 +107,27 @@ describe("testnet transport", () => {
 			message: { source: "a", connectionId: `0x${"00".repeat(32)}` },
 		} as const;
 		expect(await failure(wallet.signTypedData(params as never))).toMatch(/agent refuses Agent with source a/);
+	});
+});
+
+describe("agent binding", () => {
+	const testnet = new HttpTransport({ isTestnet: true });
+	const other = "0x00000000000000000000000000000000000000bb";
+
+	it("opens a harness whose agent signs for the principal", async () => {
+		const h = await openHarness(testnet, keys);
+		await h.agent.order({ orders: [order], grouping: "na" });
+		expect(requests).toEqual(["https://api.hyperliquid-testnet.xyz/info", "https://api.hyperliquid-testnet.xyz/exchange"]);
+	});
+
+	it.each([
+		["another account", { role: "agent", data: { user: other } }, other],
+		["no account", { role: "user" }, "no account"],
+	])("never yields a harness when the agent signs for %s", async (_label, role, named) => {
+		agentRole = role;
+		await expect(openHarness(testnet, keys)).rejects.toThrow(AgentNotApproved);
+		await expect(openHarness(testnet, keys)).rejects.toThrow(named);
+		expect(requests.every((url) => url.endsWith("/info"))).toBe(true);
 	});
 });
 

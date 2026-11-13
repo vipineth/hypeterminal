@@ -7,7 +7,7 @@ import { toSafeBig } from "@/lib/trade/numbers";
 import { acquireLock, cleanVenue, enterUnified, loadVenue, recoverAccount, SPOT_DEX, spotBalance, type VenueSpec } from "./account";
 import { errorMessage, validateOrder } from "./assert";
 import { collectDrift, DRIFT_SNAPSHOT_PATH, type DriftShape, diffDrift, fetchDriftInputs, mergeDrift } from "./drift";
-import { createHarness, type Harness, loadKeys, mainnetHoldings } from "./harness";
+import { AgentNotApproved, type Harness, loadKeys, mainnetHoldings, openHarness } from "./harness";
 import { lotSize, readonlyPlans, marketOrderProblems, TWAP_NOTIONAL, twapPlan } from "./plans";
 import { type Scenario, type Scope, Unsupported } from "./scenarios/common";
 import { orderScenarios } from "./scenarios/orders";
@@ -53,7 +53,7 @@ function elapsed(start: number): string {
 	return `${((performance.now() - start) / 1000).toFixed(1)}s`;
 }
 
-async function runScenario(h: Harness, scenario: Scenario, spec: VenueSpec, agentApproved: boolean): Promise<Result[]> {
+async function runScenario(h: Harness, scenario: Scenario, spec: VenueSpec): Promise<Result[]> {
 	const started = performance.now();
 	const result = (status: Result["status"], detail = "", name = scenario.name): Result => ({
 		scenario: name,
@@ -63,9 +63,6 @@ async function runScenario(h: Harness, scenario: Scenario, spec: VenueSpec, agen
 		ms: performance.now() - started,
 		source: name === scenario.name ? scenario.source : undefined,
 	});
-	if (scenario.signer === "agent" && !agentApproved) {
-		return [result("fail", `agent ${h.agentAddress} is not approved for ${h.user}, approve hl-live first`)];
-	}
 	let outcome: Result;
 	try {
 		await scenario.run({ h, venue: await loadVenue(h.info, spec) });
@@ -116,16 +113,16 @@ function runVenues(): RunVenues {
 	};
 }
 
-async function runPasses(h: Harness, { main, spot, builder }: RunVenues, agentApproved: boolean, results: Result[]): Promise<void> {
+async function runPasses(h: Harness, { main, spot, builder }: RunVenues, results: Result[]): Promise<void> {
 	const only = values.only ? new Set(values.only.split(",")) : null;
 	const selected = SCENARIOS.filter((scenario) => !only || only.has(scenario.name));
 	const venuesFor: Record<Scope, VenueSpec[]> = { perp: [main], spot: [spot], account: [main] };
 
-	if (agentApproved) await resetLeverage({ h, venue: await loadVenue(h.info, main) });
+	await resetLeverage({ h, venue: await loadVenue(h.info, main) });
 
 	for (const scenario of selected) {
 		for (const spec of venuesFor[scenario.scope]) {
-			for (const result of await runScenario(h, scenario, spec, agentApproved)) {
+			for (const result of await runScenario(h, scenario, spec)) {
 				printResult(result);
 				results.push(result);
 			}
@@ -139,7 +136,7 @@ async function runPasses(h: Harness, { main, spot, builder }: RunVenues, agentAp
 	});
 	if (entered) {
 		for (const scenario of selected.filter((entry) => entry.scope === "perp")) {
-			for (const result of await runScenario(h, scenario, builder, agentApproved)) {
+			for (const result of await runScenario(h, scenario, builder)) {
 				printResult(result);
 				results.push(result);
 			}
@@ -159,7 +156,15 @@ async function runTestnet(): Promise<number> {
 		console.log(`STOP principal ${user} is not a testnet-only key: ${holdings.join(", ")}. Give the harness a key that holds nothing on mainnet.`);
 		return 2;
 	}
-	const h = createHarness(new HttpTransport({ isTestnet: true, timeout: 30_000 }), keys);
+	const opened = await openHarness(new HttpTransport({ isTestnet: true, timeout: 30_000 }), keys).catch((error: unknown) => {
+		if (error instanceof AgentNotApproved) return error;
+		throw error;
+	});
+	if (opened instanceof AgentNotApproved) {
+		console.log(`STOP ${opened.message}`);
+		return 2;
+	}
+	const h = opened;
 	const releaseLock = acquireLock(h.user);
 	try {
 		const venues = runVenues();
@@ -175,11 +180,9 @@ async function runTestnet(): Promise<number> {
 			console.log(`STOP principal ${h.user} holds ${funded.toFixed(2)} testnet USDC, needs ${MIN_FUNDING_USDC}. Fund it from the testnet faucet or with a testnet usdSend, then rerun.`);
 			return 2;
 		}
-		const agents = await h.info.extraAgents({ user: h.user });
-		const agentApproved = agents.some((agent) => agent.address.toLowerCase() === h.agentAddress.toLowerCase());
-		console.log(`testnet principal ${h.user}, ${funded.toFixed(2)} USDC, agent ${h.agentAddress} ${agentApproved ? "approved" : "NOT approved"}, mainnet holdings none`);
+		console.log(`testnet principal ${h.user}, ${funded.toFixed(2)} USDC, agent ${h.agentAddress} signs for it, mainnet holdings none`);
 
-		await step(results, "run", "account", () => runPasses(h, venues, agentApproved, results));
+		await step(results, "run", "account", () => runPasses(h, venues, results));
 		const count = (status: Result["status"]) => results.filter((result) => result.status === status).length;
 		console.log(`${count("pass")} passed, ${count("fail")} failed, ${count("unsupported")} unsupported by testnet, in ${elapsed(started)}`);
 		return count("fail") === 0 ? 0 : 1;

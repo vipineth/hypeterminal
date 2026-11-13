@@ -18,7 +18,6 @@ export interface ScenarioContext {
 
 export interface Scenario {
 	name: string;
-	signer: "agent" | "principal";
 	scope: Scope;
 	source: "app" | "sdk";
 	run(ctx: ScenarioContext): Promise<void>;
