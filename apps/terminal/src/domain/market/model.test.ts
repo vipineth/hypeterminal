@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import type { IRequestTransport } from "@nktkas/hyperliquid";
 import { SymbolConverter } from "@nktkas/hyperliquid/utils";
+import Big from "big.js";
 import { describe, expect, it } from "vitest";
 import { getMarketCapabilities } from "@/domain/market/capabilities";
 import { getPositionDex } from "@/domain/market/dex";
@@ -13,8 +14,9 @@ import {
 	type PerpMarket,
 	parseMarkets,
 } from "@/domain/market/model";
+import { formatPrice } from "@/lib/format";
 
-const snapshot: MetaPayloads = JSON.parse(
+const snapshot: MetaPayloads & { spotMarkPxs: string[] } = JSON.parse(
 	readFileSync(new URL("../../../fixtures/hl-mainnet-meta.json", import.meta.url), "utf8"),
 );
 const model = parseMarkets(snapshot);
@@ -38,6 +40,10 @@ function perp(name: string) {
 	const market = model.byName.get(name);
 	if (!market || !isPerpLike(market)) throw new Error(`${name} is not a parsed perp market`);
 	return market;
+}
+
+function duplicates(values: readonly string[]) {
+	return values.filter((value, index) => values.indexOf(value) !== index);
 }
 
 function issuesOf(kind: ParseIssue["kind"], issues: readonly ParseIssue[]) {
@@ -311,6 +317,68 @@ describe("parse issues instead of silent guesses", () => {
 		const shadowed = model.tokens.filter((token) => model.tokenByName.get(token.name) !== token);
 
 		expect(shadowed).toEqual([]);
+	});
+
+	it("never publishes a builder coin from the main slot or a main coin from a builder slot", () => {
+		const swapped = copySnapshot();
+		[swapped.allPerpMetas[0], swapped.allPerpMetas[dexSlot("xyz")]] = [
+			swapped.allPerpMetas[dexSlot("xyz")],
+			swapped.allPerpMetas[0],
+		];
+		const parsed = parseMarkets(swapped);
+		const renumbered = parsed.markets.filter((market) => model.byName.get(market.name)?.assetId !== market.assetId);
+		const mismatches = issuesOf("assetPrefixMismatch", parsed.issues);
+
+		expect(renumbered.map((market) => `${market.name}=${market.assetId}`)).toEqual([]);
+		expect(parsed.byName.has("xyz:NVDA")).toBe(false);
+		expect(parsed.byName.has("BTC")).toBe(false);
+		expect(mismatches).toContainEqual({ kind: "assetPrefixMismatch", dex: "", coin: "xyz:NVDA" });
+		expect(mismatches).toContainEqual({ kind: "assetPrefixMismatch", dex: "xyz", coin: "BTC" });
+	});
+});
+
+describe("labels", () => {
+	it("gives every token its own display name", () => {
+		expect(duplicates(model.tokens.map((token) => token.displayName))).toEqual([]);
+	});
+
+	it("gives every listed spot market its own pair name", () => {
+		const spotPairs = model.listed.filter((market) => market.kind === "spot").map((market) => market.pairName);
+
+		expect(duplicates(spotPairs)).toEqual([]);
+	});
+
+	it("keeps a wrapped token's real name when its unwrapped name belongs to another token", () => {
+		expect(spot("@18").pairName).toBe("ANSEM/USDC");
+		expect(spot("@699").pairName).toBe("UANSEM/USDC");
+		expect(spot("@703").pairName).toBe("SPYX/USDC");
+		expect(spot("@189").pairName).toBe("USPYX/USDC");
+		expect(spot("@142").pairName).toBe("BTC/USDC");
+		expect(spot("@234").pairName).toBe("BTC/USDH");
+	});
+
+	it("finds a token by its API name, never by its display name", () => {
+		expect(model.tokenByName.get("UBTC")?.index).toBe(197);
+		expect(model.tokenByName.get("BTC")).toBeUndefined();
+	});
+});
+
+describe("price precision", () => {
+	it("shows every positive spot mark as a nonzero price", () => {
+		const zeroed = model.listed.filter((market) => {
+			if (market.kind !== "spot") return false;
+			const mark = snapshot.spotMarkPxs[market.ctxIndex];
+			return Big(mark).gt(0) && formatPrice(mark, { decimals: market.priceDecimals }) === "$0";
+		});
+
+		expect(zeroed.map((market) => market.pairName)).toEqual([]);
+	});
+
+	it("allows 8 price decimals less szDecimals on spot and 6 less on perps", () => {
+		expect(spot("@33").priceDecimals).toBe(8);
+		expect(spot("@232").priceDecimals).toBe(6);
+		expect(perp("BTC").priceDecimals).toBe(1);
+		expect(perp("xyz:NVDA").priceDecimals).toBe(6 - perp("xyz:NVDA").szDecimals);
 	});
 });
 
