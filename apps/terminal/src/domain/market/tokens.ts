@@ -18,8 +18,16 @@ export function getUnderlyingAsset(token: RawToken): string | undefined {
 	return token.name;
 }
 
-export function getTokenDisplayName(token: RawToken): string {
-	return getUnderlyingAsset(token) ?? token.name;
+export function getTokenDisplayNames(tokens: readonly RawToken[]): string[] {
+	const realNames = new Set(tokens.map((token) => token.name));
+	const aliases = tokens.map((token) => getUnderlyingAsset(token) ?? token.name);
+	const claims = new Map<string, number>();
+	for (const alias of aliases) claims.set(alias, (claims.get(alias) ?? 0) + 1);
+	return tokens.map((token, index) => {
+		const alias = aliases[index];
+		if (alias === token.name || realNames.has(alias) || claims.get(alias) !== 1) return token.name;
+		return alias;
+	});
 }
 
 export function getIconUrlFromMarketName(tokenName: string, kind?: MarketKind) {

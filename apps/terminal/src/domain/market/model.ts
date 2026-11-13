@@ -6,7 +6,7 @@ import {
 	HL_SPOT_PRICE_MAX_DECIMALS,
 } from "@/config/trade";
 import { BUILDER_DEX_SEPARATOR, PERP_MARKET_NAME_SEPARATOR, SPOT_MARKET_NAME_SEPARATOR } from "@/domain/market/display";
-import { getIconUrlFromMarketName, getTokenDisplayName, getUnderlyingAsset } from "@/domain/market/tokens";
+import { getIconUrlFromMarketName, getTokenDisplayNames, getUnderlyingAsset } from "@/domain/market/tokens";
 
 type SdkPerpAsset = MetaResponse["universe"][number];
 type SdkToken = SpotMetaResponse["tokens"][number];
@@ -119,7 +119,8 @@ export function getDefaultLeverage(market: Market | undefined): number {
 
 export function parseMarkets({ perpDexs, allPerpMetas, spotMeta }: MetaPayloads): MarketModel {
 	const issues: ParseIssue[] = [];
-	const tokens = spotMeta.tokens.map(toSpotToken);
+	const displayNames = getTokenDisplayNames(spotMeta.tokens);
+	const tokens = spotMeta.tokens.map((token, index) => toSpotToken(token, displayNames[index]));
 	const tokenByIndex = indexTokens(tokens, issues);
 	const dexes = parseDexes(perpDexs, allPerpMetas, tokenByIndex, issues);
 
@@ -212,8 +213,7 @@ function mintAssetId(value: number): AssetId {
 	return value as AssetId;
 }
 
-function toSpotToken(token: SdkToken): SpotToken {
-	const displayName = getTokenDisplayName(token);
+function toSpotToken(token: SdkToken, displayName: string): SpotToken {
 	return {
 		...token,
 		displayName,
