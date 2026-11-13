@@ -38,6 +38,8 @@ const form = vi.hoisted(() => ({
 	scaleStart: "",
 	scaleEnd: "",
 	scaleLevels: 5,
+	reduceOnly: false,
+	twapMinutes: null as number | null,
 	tpSlEnabled: false,
 	tpPrice: "",
 	slPrice: "",
@@ -90,7 +92,7 @@ vi.mock("@/stores/use-order-entry-store", () => ({
 	useOrderSide: () => form.side,
 	useOrderType: () => form.orderType,
 	useSizeMode: () => form.sizeMode,
-	useReduceOnly: () => false,
+	useReduceOnly: () => form.reduceOnly,
 	useOrderSize: () => form.size,
 	useOrderSizeUnit: () =>
 		form.sizeUnit ?? { mode: form.sizeMode, assetId: form.market.assetId, szDecimals: form.market.szDecimals },
@@ -99,7 +101,7 @@ vi.mock("@/stores/use-order-entry-store", () => ({
 	useScaleStart: () => form.scaleStart,
 	useScaleEnd: () => form.scaleEnd,
 	useScaleLevels: () => form.scaleLevels,
-	useTwapMinutes: () => null,
+	useTwapMinutes: () => form.twapMinutes,
 	useTwapRandomize: () => false,
 	useTpSlEnabled: () => form.tpSlEnabled,
 	useTpPrice: () => form.tpPrice,
@@ -167,6 +169,8 @@ describe("spot trade ticket", () => {
 		form.limitPrice = "0.0026434";
 		form.scaleStart = "";
 		form.scaleEnd = "";
+		form.reduceOnly = false;
+		form.twapMinutes = null;
 		form.tpSlEnabled = false;
 		form.tpPrice = "";
 		form.slPrice = "";
@@ -236,6 +240,8 @@ describe("perp trade ticket", () => {
 		form.size = "1";
 		form.limitPrice = "80.276";
 		form.triggerPrice = "";
+		form.reduceOnly = false;
+		form.twapMinutes = null;
 		form.tpSlEnabled = true;
 		form.tpPrice = "";
 		form.slPrice = "";
@@ -299,6 +305,8 @@ describe("size the ticket sends after the size field changes context", () => {
 		form.baseBalance = "0";
 		form.size = "";
 		form.limitPrice = "0.0026434";
+		form.reduceOnly = false;
+		form.twapMinutes = null;
 		form.tpSlEnabled = false;
 		form.sizeUnit = null;
 		form.maxTradeSzs = [100, 100];
@@ -380,5 +388,66 @@ describe("size the ticket sends after the size field changes context", () => {
 		await pressSubmit();
 		const [orders] = sentOrders();
 		expect(wireNotional(orders)).toBeLessThanOrEqual(1000.005);
+	});
+});
+
+describe("order flags a market cannot take", () => {
+	beforeEach(() => {
+		form.market = SOL_PERP;
+		form.side = "buy";
+		form.orderType = "limit";
+		form.sizeMode = "base";
+		form.quoteBalance = "10000";
+		form.baseBalance = "0";
+		form.size = "";
+		form.limitPrice = "80.276";
+		form.triggerPrice = "";
+		form.reduceOnly = true;
+		form.twapMinutes = 30;
+		form.tpSlEnabled = true;
+		form.tpPrice = "90";
+		form.slPrice = "70";
+		form.sizeUnit = null;
+		form.maxTradeSzs = [100, 100];
+		exchange.placeOrder.mockReset();
+		exchange.placeOrder.mockResolvedValue({ response: { data: { statuses: [{ resting: { oid: 1 } }] } } });
+	});
+
+	function switchToSpot() {
+		form.market = { ...POINTS_USDC, markPx: "30" };
+		form.limitPrice = "30";
+		typeSizeHere("100");
+	}
+
+	it("sends reduce-only and tp/sl on a perp", async () => {
+		typeSizeHere("1");
+		await pressSubmit();
+		const [orders] = sentOrders();
+		expect(orders.map((order: { r: boolean }) => order.r)).toEqual([true, true, true]);
+		expect(exchange.placeOrder.mock.calls[0][0].grouping).toBe("normalTpsl");
+	});
+
+	it("never sends a perp's hidden reduce-only on a spot limit", async () => {
+		switchToSpot();
+		form.tpSlEnabled = false;
+		await pressSubmit();
+		expect(sentOrders()).toEqual([[{ a: 10008, b: true, p: "30", s: "100", r: false, t: { limit: { tif: "Gtc" } } }]]);
+	});
+
+	it("never sends a perp's hidden reduce-only on a spot twap", async () => {
+		switchToSpot();
+		form.orderType = "twap";
+		await pressSubmit();
+		expect(exchange.placeOrder.mock.calls[0][0].twap).toMatchObject({ a: 10008, s: "100", r: false });
+	});
+
+	it("never sends a perp's hidden tp/sl on a spot limit", async () => {
+		switchToSpot();
+		form.reduceOnly = false;
+		await pressSubmit();
+		expect(exchange.placeOrder.mock.calls[0][0]).toMatchObject({
+			orders: [{ a: 10008, b: true, p: "30", s: "100", r: false, t: { limit: { tif: "Gtc" } } }],
+			grouping: "na",
+		});
 	});
 });
