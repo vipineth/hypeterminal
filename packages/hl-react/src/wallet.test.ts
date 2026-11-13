@@ -44,10 +44,24 @@ const SAMPLE_VALUES: Record<string, unknown> = {
 	string: "1",
 	address: "0x16f05e773ce03b84fbb6c55b0642b0b7c6a1acbb",
 	bool: true,
-	bytes: "0x",
-	uint32: 1,
-	uint64: 1,
+	bytes: "0xdeadbeef",
+	uint32: 42161,
+	uint64: 1_763_000_000_000,
 };
+
+const DOMAIN = {
+	name: "HyperliquidSignTransaction",
+	version: "1",
+	chainId: Number(SIGNATURE_CHAIN_ID),
+	verifyingContract: zeroAddress,
+};
+
+const EIP712_DOMAIN_FIELDS: TypedField[] = [
+	{ name: "name", type: "string" },
+	{ name: "version", type: "string" },
+	{ name: "chainId", type: "uint256" },
+	{ name: "verifyingContract", type: "address" },
+];
 
 const USER_SIGNED_TYPES = Object.entries(exchange)
 	.filter(([name]) => name.endsWith("Types"))
@@ -141,12 +155,7 @@ describe("toHyperliquidWallet", () => {
 				expect(typedData.primaryType).toBe(primaryType);
 				expect(typedData.types[primaryType]).toEqual(typeMap[primaryType]);
 				expect(typedData.types.EIP712Domain).toBeDefined();
-				expect(typedData.domain).toEqual({
-					name: "HyperliquidSignTransaction",
-					version: "1",
-					chainId: Number(SIGNATURE_CHAIN_ID),
-					verifyingContract: zeroAddress,
-				});
+				expect(typedData.domain).toEqual(DOMAIN);
 				expect(Object.keys(typedData.message).sort()).toEqual(typeMap[primaryType].map((f) => f.name).sort());
 				expect(signature).toEqual({ r: `0x${"11".repeat(32)}`, s: `0x${"22".repeat(32)}`, v: 27 });
 			},
@@ -169,7 +178,35 @@ describe("toHyperliquidWallet", () => {
 		});
 	});
 
-	it("returns a signature that recovers to the signing key", async () => {
+	it.each(USER_SIGNED_TYPES)(
+		"returns a $primaryType signature that recovers to the signing key",
+		async ({ primaryType, typeMap }) => {
+			const account = privateKeyToAccount(generatePrivateKey());
+			const provider = createProvider((typedData) =>
+				account.signTypedData(typedData as Parameters<typeof account.signTypedData>[0]),
+			);
+			const walletClient = createWalletClient({ account: account.address, transport: custom(provider) });
+			const action = sampleAction(typeMap[primaryType]);
+
+			const { r, s, v } = await signUserSignedAction({
+				wallet: adapt(walletClient, account.address),
+				action,
+				types: typeMap,
+			});
+
+			const digest = keccak256(
+				concat([
+					"0x1901",
+					hashStruct({ EIP712Domain: EIP712_DOMAIN_FIELDS }, "EIP712Domain", DOMAIN),
+					hashStruct(typeMap, primaryType, action),
+				]),
+			);
+			const recovered = await recoverAddress({ hash: digest, signature: concat([r, s, toHex(v)]) });
+			expect(recovered).toBe(account.address);
+		},
+	);
+
+	it("returns a UsdSend signature that recovers against hand-encoded EIP-712", async () => {
 		const account = privateKeyToAccount(generatePrivateKey());
 		const provider = createProvider((typedData) => account.sign({ hash: hashTypedDataJson(typedData) }));
 		const walletClient = createWalletClient({ account: account.address, transport: custom(provider) });
