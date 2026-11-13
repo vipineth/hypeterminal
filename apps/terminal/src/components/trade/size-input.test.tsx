@@ -65,6 +65,12 @@ vi.mock("@/lib/hyperliquid", async (importOriginal) => ({
 	useAgentRegistration: () => ({ register: async () => {}, status: "ready" }),
 	useExchange: () => ({ mutateAsync: async () => {}, isPending: false }),
 	useSubscription: () => ({ data: undefined, status: "idle", isStale: false }),
+	useHyperliquid: () => ({ builderConfig: undefined }),
+}));
+
+vi.mock("@hypeterminal/hl-react", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@hypeterminal/hl-react")>()),
+	useHyperliquidClients: () => ({ trading: null }),
 }));
 
 vi.mock("@/hooks/trade/use-fee-rates", () => ({

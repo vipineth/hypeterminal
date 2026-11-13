@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { OrderOutcome } from "@/lib/trade/extract-order-status";
+import type { OrderOutcome, OrderResult } from "@/lib/trade/extract-order-status";
 
 export interface OrderQueueItem {
 	id: string;
@@ -10,9 +10,11 @@ export interface OrderQueueItem {
 	orderType?: "market" | "limit" | "trigger" | "scale" | "twap";
 	tpPrice?: string;
 	slPrice?: string;
-	status: "pending" | "success" | "failed";
+	status: "pending" | "success" | "failed" | "unsettled";
 	outcome?: OrderOutcome;
+	detail?: string;
 	error?: string;
+	requestKey?: string;
 	createdAt: number;
 	completedAt?: number;
 }
@@ -22,6 +24,7 @@ interface OrderQueueStore {
 	actions: {
 		addOrder: (order: Omit<OrderQueueItem, "id" | "createdAt">) => string;
 		updateOrder: (id: string, update: Partial<Omit<OrderQueueItem, "id">>) => void;
+		updateByRequestKey: (requestKey: string, update: Partial<Omit<OrderQueueItem, "id">>) => void;
 		removeOrder: (id: string) => void;
 	};
 }
@@ -49,15 +52,12 @@ const useOrderQueueStore = create<OrderQueueStore>()((set) => ({
 		},
 		updateOrder: (id, update) => {
 			set((state) => ({
-				orders: state.orders.map((order) =>
-					order.id === id
-						? {
-								...order,
-								...update,
-								completedAt: update.status === "success" || update.status === "failed" ? Date.now() : order.completedAt,
-							}
-						: order,
-				),
+				orders: state.orders.map((order) => (order.id === id ? applyUpdate(order, update) : order)),
+			}));
+		},
+		updateByRequestKey: (requestKey, update) => {
+			set((state) => ({
+				orders: state.orders.map((order) => (order.requestKey === requestKey ? applyUpdate(order, update) : order)),
 			}));
 		},
 		removeOrder: (id) => {
@@ -67,6 +67,17 @@ const useOrderQueueStore = create<OrderQueueStore>()((set) => ({
 		},
 	},
 }));
+
+function applyUpdate(order: OrderQueueItem, update: Partial<Omit<OrderQueueItem, "id">>): OrderQueueItem {
+	const completed = update.status === "success" || update.status === "failed";
+	return { ...order, ...update, completedAt: completed ? Date.now() : order.completedAt };
+}
+
+export function resultToQueueUpdate(result: OrderResult): Partial<Omit<OrderQueueItem, "id">> {
+	if (result.ok) return { status: "success", outcome: result.outcome, detail: result.detail, error: undefined };
+	if (result.requestKey) return { status: "unsettled", error: result.error, requestKey: result.requestKey };
+	return { status: "failed", error: result.error, outcome: undefined, detail: undefined };
+}
 
 export function useOrderQueue() {
 	return useOrderQueueStore((state) => state.orders);

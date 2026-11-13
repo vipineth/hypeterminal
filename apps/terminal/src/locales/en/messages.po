@@ -18,36 +18,45 @@ msgstr ""
 msgid "{0} more wallets"
 msgstr "{0} more wallets"
 
+#. placeholder {0}: result.error
+#: src/lib/trade/extract-order-status.ts:235
+msgid "{0}. It will not be sent again. Check open orders."
+msgstr "{0}. It will not be sent again. Check open orders."
+
+#: src/lib/trade/extract-order-status.ts:77
+msgid "{filled} of {total} legs filled, {resting} placed"
+msgstr "{filled} of {total} legs filled, {resting} placed"
+
 #: src/components/trade/tradebox/bridge-tab.tsx:
 #~ msgid "{formatted} USDC deposited to Hyperliquid"
 #~ msgstr "{formatted} USDC deposited to Hyperliquid"
 
-#: src/lib/trade/extract-order-status.ts:99
+#: src/lib/trade/extract-order-status.ts:101
 msgid "{name} canceled"
 msgstr "{name} canceled"
 
-#: src/lib/trade/extract-order-status.ts:108
+#: src/lib/trade/extract-order-status.ts:110
 msgid "{name} filled"
 msgstr "{name} filled"
 
-#: src/lib/trade/extract-order-status.ts:101
+#: src/lib/trade/extract-order-status.ts:103
 msgid "{name} not found on the exchange"
 msgstr "{name} not found on the exchange"
 
-#: src/lib/trade/extract-order-status.ts:107
+#: src/lib/trade/extract-order-status.ts:109
 msgid "{name} placed"
 msgstr "{name} placed"
 
-#: src/lib/trade/extract-order-status.ts:97
+#: src/lib/trade/extract-order-status.ts:99
 msgid "{name} rejected"
 msgstr "{name} rejected"
 
 #. placeholder {0}: state.reason
-#: src/lib/trade/extract-order-status.ts:97
+#: src/lib/trade/extract-order-status.ts:99
 msgid "{name} rejected: {0}"
 msgstr "{name} rejected: {0}"
 
-#: src/lib/trade/extract-order-status.ts:106
+#: src/lib/trade/extract-order-status.ts:108
 msgid "{name} set"
 msgstr "{name} set"
 
@@ -56,7 +65,7 @@ msgid "{p}%"
 msgstr "{p}%"
 
 #. placeholder {0}: states.length
-#: src/lib/trade/extract-order-status.ts:87
+#: src/lib/trade/extract-order-status.ts:89
 msgid "{placedScaleLegs} of {0} legs placed"
 msgstr "{placedScaleLegs} of {0} legs placed"
 
@@ -432,6 +441,7 @@ msgstr "Camera permission was denied."
 #: src/components/trade/tradebox/deposit-modal.tsx:150
 #: src/components/trade/tradebox/deposit-modal.tsx:205
 #: src/components/trade/tradebox/margin-mode-modal.tsx:216
+#: src/components/trade/tradebox/order-toast.tsx:180
 #: src/routes/mobile-agent-sync.tsx:413
 msgid "Cancel"
 msgstr "Cancel"
@@ -464,6 +474,14 @@ msgstr "Cancel selected orders"
 msgid "Cancel TWAP order"
 msgstr "Cancel TWAP order"
 
+#: src/lib/trade/extract-order-status.ts:198
+msgid "Canceled. Nothing was placed."
+msgstr "Canceled. Nothing was placed."
+
+#: src/lib/trade/extract-order-status.ts:198
+msgid "Canceled. The TWAP did not start."
+msgstr "Canceled. The TWAP did not start."
+
 #: src/components/trade/mobile/mobile-orders-tab.tsx:165
 #: src/components/trade/positions/orders-tab.tsx:215
 #: src/components/trade/positions/orders-tab.tsx:224
@@ -474,6 +492,10 @@ msgstr "Canceling..."
 #: src/components/trade/positions/twap-tab.tsx:
 #~ msgid "cancelled"
 #~ msgstr "cancelled"
+
+#: src/lib/trade/extract-order-status.ts:178
+msgid "Cannot cancel: another agent key signed this order. It expires at {expiry}."
+msgstr "Cannot cancel: another agent key signed this order. It expires at {expiry}."
 
 #: src/components/trade/tradebox/margin-mode-modal.tsx:200
 msgid "Cannot switch to Isolated mode with an open position. Close your position first."
@@ -909,7 +931,7 @@ msgid "Disconnected"
 msgstr "Disconnected"
 
 #: src/components/trade/mobile/offline-banner.tsx:86
-#: src/components/trade/tradebox/order-toast.tsx:134
+#: src/components/trade/tradebox/order-toast.tsx:156
 msgid "Dismiss"
 msgstr "Dismiss"
 
@@ -1020,7 +1042,7 @@ msgstr "Enter trigger price"
 
 #: src/components/trade/mobile/mobile-position-card.tsx:159
 #: src/components/trade/positions/positions-tab.tsx:188
-#: src/lib/trade/extract-order-status.ts:115
+#: src/lib/trade/extract-order-status.ts:117
 msgid "Entry"
 msgstr "Entry"
 
@@ -1090,7 +1112,7 @@ msgstr "Expires {expiresAtLabel}."
 msgid "Explorer"
 msgstr "Explorer"
 
-#: src/components/trade/tradebox/order-toast.tsx:193
+#: src/components/trade/tradebox/order-toast.tsx:282
 msgid "failed"
 msgstr "failed"
 
@@ -1211,7 +1233,7 @@ msgstr "Fees"
 msgid "Fill status"
 msgstr "Fill status"
 
-#: src/components/trade/tradebox/order-toast.tsx:46
+#: src/components/trade/tradebox/order-toast.tsx:49
 msgid "Filled"
 msgstr "Filled"
 
@@ -1384,6 +1406,22 @@ msgstr "IOC (Immediate Or Cancel)"
 msgid "Isolated"
 msgstr "Isolated"
 
+#: src/lib/trade/extract-order-status.ts:158
+msgid "it filled"
+msgstr "it filled"
+
+#: src/lib/trade/extract-order-status.ts:160
+msgid "it partly filled"
+msgstr "it partly filled"
+
+#: src/lib/trade/extract-order-status.ts:162
+msgid "it was placed"
+msgstr "it was placed"
+
+#: src/lib/trade/extract-order-status.ts:164
+msgid "it was set"
+msgstr "it was set"
+
 #: src/components/trade/components/global-settings-dialog.tsx:
 #~ msgid "Language"
 #~ msgstr "Language"
@@ -1401,7 +1439,7 @@ msgid "Learn more"
 msgstr "Learn more"
 
 #. placeholder {0}: leg.price
-#: src/lib/trade/extract-order-status.ts:121
+#: src/lib/trade/extract-order-status.ts:123
 msgid "Leg {legNumber} at {0}"
 msgstr "Leg {legNumber} at {0}"
 
@@ -1925,18 +1963,48 @@ msgstr "No wallet connected"
 msgid "No wallets found"
 msgstr "No wallets found"
 
+#. placeholder {0}: settlement.error
+#: src/lib/trade/extract-order-status.ts:192
+msgid "Not confirmed: {0}. Retry or cancel it."
+msgstr "Not confirmed: {0}. Retry or cancel it."
+
+#: src/components/trade/tradebox/order-toast.tsx:194
+msgid "Not confirmed. Retry or cancel it."
+msgstr "Not confirmed. Retry or cancel it."
+
 #: src/lib/errors/definitions/connection.ts:21
 msgid "Not connected"
 msgstr "Not connected"
 
+#: src/lib/trade/extract-order-status.ts:243
+msgid "Not placed. The request expired before the exchange took it."
+msgstr "Not placed. The request expired before the exchange took it."
+
 #. placeholder {0}: describeLegStates(states, legs)
 #: src/hooks/trade/use-submit-plan.ts:126
-msgid "Not sent again. {0}"
-msgstr "Not sent again. {0}"
+#~ msgid "Not sent again. {0}"
+#~ msgstr "Not sent again. {0}"
 
 #: src/hooks/trade/use-submit-plan.ts:84
-msgid "Not sent again. The exchange already has this TWAP. Check the TWAP tab."
-msgstr "Not sent again. The exchange already has this TWAP. Check the TWAP tab."
+#~ msgid "Not sent again. The exchange already has this TWAP. Check the TWAP tab."
+#~ msgstr "Not sent again. The exchange already has this TWAP. Check the TWAP tab."
+
+#. placeholder {0}: outcome.error
+#: src/lib/trade/extract-order-status.ts:134
+msgid "Not sent: {0}"
+msgstr "Not sent: {0}"
+
+#: src/lib/trade/extract-order-status.ts:144
+msgid "Not sent. An earlier order on this market is not confirmed yet. Retry or cancel it first."
+msgstr "Not sent. An earlier order on this market is not confirmed yet. Retry or cancel it first."
+
+#: src/lib/trade/extract-order-status.ts:151
+msgid "Not sent. An earlier order on this market was still unconfirmed: {what}. Press again to send a new order."
+msgstr "Not sent. An earlier order on this market was still unconfirmed: {what}. Press again to send a new order."
+
+#: src/lib/trade/extract-order-status.ts:240
+msgid "Not started. The request expired before the exchange took it."
+msgstr "Not started. The request expired before the exchange took it."
 
 #: src/components/trade/header/top-nav.tsx:
 #~ msgid "Notifications"
@@ -2033,7 +2101,7 @@ msgstr "Oracle"
 msgid "ORACLE"
 msgstr "ORACLE"
 
-#: src/lib/trade/extract-order-status.ts:123
+#: src/lib/trade/extract-order-status.ts:125
 msgid "Order"
 msgstr "Order"
 
@@ -2048,8 +2116,8 @@ msgstr "Order book in quote asset"
 
 #: src/hooks/trade/use-submit-plan.ts:96
 #: src/hooks/trade/use-submit-plan.ts:147
-msgid "Order failed"
-msgstr "Order failed"
+#~ msgid "Order failed"
+#~ msgstr "Order failed"
 
 #: src/components/trade/tradebox/bridge/success-screen.tsx:127
 msgid "Order filled"
@@ -2059,17 +2127,21 @@ msgstr "Order filled"
 msgid "Order History"
 msgstr "Order History"
 
-#: src/components/trade/tradebox/order-toast.tsx:183
+#: src/components/trade/tradebox/order-toast.tsx:267
 msgid "Order Queue"
 msgstr "Order Queue"
 
+#: src/lib/trade/extract-order-status.ts:229
+msgid "Order sent. Its status could not be read. It will not be sent again. Check open orders."
+msgstr "Order sent. Its status could not be read. It will not be sent again. Check open orders."
+
 #: src/hooks/trade/use-submit-plan.ts:159
-msgid "Order status unknown: {message}. Check open orders before you try again."
-msgstr "Order status unknown: {message}. Check open orders before you try again."
+#~ msgid "Order status unknown: {message}. Check open orders before you try again."
+#~ msgstr "Order status unknown: {message}. Check open orders before you try again."
 
 #: src/hooks/trade/use-submit-plan.ts:123
-msgid "Order status unknown. Check open orders before you try again."
-msgstr "Order status unknown. Check open orders before you try again."
+#~ msgid "Order status unknown. Check open orders before you try again."
+#~ msgstr "Order status unknown. Check open orders before you try again."
 
 #: src/components/trade/tradebox/bridge/success-screen.tsx:120
 msgid "Order submitted"
@@ -2147,6 +2219,10 @@ msgstr "Pairing code"
 msgid "Pairing code does not match this link."
 msgstr "Pairing code does not match this link."
 
+#: src/components/trade/tradebox/order-toast.tsx:51
+msgid "Partly filled"
+msgstr "Partly filled"
+
 #: src/routes/mobile-agent-sync.tsx:447
 msgid "Paste code"
 msgstr "Paste code"
@@ -2168,7 +2244,7 @@ msgstr "Paste WalletConnect URI"
 msgid "Payment"
 msgstr "Payment"
 
-#: src/components/trade/tradebox/order-toast.tsx:188
+#: src/components/trade/tradebox/order-toast.tsx:272
 msgid "pending"
 msgstr "pending"
 
@@ -2245,7 +2321,7 @@ msgstr "Place {0} Order"
 msgid "Place Limit Close"
 msgstr "Place Limit Close"
 
-#: src/components/trade/tradebox/order-toast.tsx:48
+#: src/components/trade/tradebox/order-toast.tsx:53
 msgid "Placed"
 msgstr "Placed"
 
@@ -2465,6 +2541,7 @@ msgstr "Resetting..."
 #: src/components/trade/mobile/offline-banner.tsx:80
 #: src/components/trade/tradebox/deposit-modal.tsx:153
 #: src/components/trade/tradebox/deposit-modal.tsx:208
+#: src/components/trade/tradebox/order-toast.tsx:177
 msgid "Retry"
 msgstr "Retry"
 
@@ -2481,7 +2558,7 @@ msgstr "Risk/Reward"
 msgid "RO"
 msgstr "RO"
 
-#: src/components/trade/tradebox/order-toast.tsx:52
+#: src/components/trade/tradebox/order-toast.tsx:57
 msgid "Running"
 msgstr "Running"
 
@@ -2647,7 +2724,7 @@ msgstr "Sending..."
 msgid "sent to Hyperliquid"
 msgstr "sent to Hyperliquid"
 
-#: src/components/trade/tradebox/order-toast.tsx:50
+#: src/components/trade/tradebox/order-toast.tsx:55
 msgid "Set"
 msgstr "Set"
 
@@ -2776,7 +2853,7 @@ msgstr "Signer not ready"
 #: src/components/trade/positions/position-tpsl-modal.tsx:116
 #: src/components/trade/positions/positions-tab.tsx:178
 #: src/components/trade/positions/twap-tab.tsx:84
-#: src/components/trade/tradebox/order-toast.tsx:103
+#: src/components/trade/tradebox/order-toast.tsx:117
 #: src/components/trade/tradebox/trade-form-fields.tsx:212
 msgid "Size"
 msgstr "Size"
@@ -2923,7 +3000,7 @@ msgstr "Status"
 msgid "Stop Limit"
 msgstr "Stop Limit"
 
-#: src/lib/trade/extract-order-status.ts:119
+#: src/lib/trade/extract-order-status.ts:121
 msgid "Stop loss"
 msgstr "Stop loss"
 
@@ -3076,7 +3153,7 @@ msgstr "Sync ID"
 #~ msgid "Take Market"
 #~ msgstr "Take Market"
 
-#: src/lib/trade/extract-order-status.ts:117
+#: src/lib/trade/extract-order-status.ts:119
 msgid "Take profit"
 msgstr "Take profit"
 
@@ -3126,6 +3203,10 @@ msgstr "Testnet"
 msgid "The page you are looking for does not exist."
 msgstr "The page you are looking for does not exist."
 
+#: src/lib/trade/extract-order-status.ts:166
+msgid "the TWAP started"
+msgstr "the TWAP started"
+
 #: src/components/pages/builder-page.tsx:
 #~ msgid "This action must be signed by your main wallet (not an agent/API wallet). The builder must have at least 100 USDC in perps account value."
 #~ msgstr "This action must be signed by your main wallet (not an agent/API wallet). The builder must have at least 100 USDC in perps account value."
@@ -3156,13 +3237,18 @@ msgstr "This link was created for a different site."
 msgid "This mobile link expired."
 msgstr "This mobile link expired."
 
-#: src/hooks/trade/use-submit-plan.ts:53
+#: src/lib/trade/extract-order-status.ts:132
+#: src/lib/trade/extract-order-status.ts:173
 msgid "This order is already being sent"
 msgstr "This order is already being sent"
 
 #: src/routes/mobile-agent-sync.tsx:679
 msgid "This phone link is not approved on Hyperliquid."
 msgstr "This phone link is not approved on Hyperliquid."
+
+#: src/lib/trade/extract-order-status.ts:175
+msgid "This request was already settled. Check open orders."
+msgstr "This request was already settled. Check open orders."
 
 #: src/components/trade/tradebox/trade-form-tif.tsx:21
 msgid "TIF"
@@ -3391,6 +3477,11 @@ msgstr "Try Again"
 msgid "TWAP"
 msgstr "TWAP"
 
+#. placeholder {0}: status.description
+#: src/lib/trade/extract-order-status.ts:215
+msgid "TWAP failed: {0}"
+msgstr "TWAP failed: {0}"
+
 #: src/lib/errors/definitions/twap.ts:16
 msgid "TWAP minutes must be {TWAP_MINUTES_MIN}-{TWAP_MINUTES_MAX}"
 msgstr "TWAP minutes must be {TWAP_MINUTES_MIN}-{TWAP_MINUTES_MAX}"
@@ -3403,13 +3494,21 @@ msgstr "TWAP order value too small. Min is ${min}, which is ${TWAP_MIN_NOTIONAL_
 msgid "TWAP Orders"
 msgstr "TWAP Orders"
 
+#: src/lib/trade/extract-order-status.ts:224
+msgid "TWAP sent but not listed yet. It will not be sent again. Check the TWAP tab."
+msgstr "TWAP sent but not listed yet. It will not be sent again. Check the TWAP tab."
+
+#: src/lib/trade/extract-order-status.ts:221
+msgid "TWAP sent. Its status could not be read. It will not be sent again. Check the TWAP tab."
+msgstr "TWAP sent. Its status could not be read. It will not be sent again. Check the TWAP tab."
+
 #: src/hooks/trade/use-submit-plan.ts:106
-msgid "TWAP status unknown: {message}. Check the TWAP tab before you try again."
-msgstr "TWAP status unknown: {message}. Check the TWAP tab before you try again."
+#~ msgid "TWAP status unknown: {message}. Check the TWAP tab before you try again."
+#~ msgstr "TWAP status unknown: {message}. Check the TWAP tab before you try again."
 
 #: src/hooks/trade/use-submit-plan.ts:79
-msgid "TWAP status unknown. Check the TWAP tab before you try again."
-msgstr "TWAP status unknown. Check the TWAP tab before you try again."
+#~ msgid "TWAP status unknown. Check the TWAP tab before you try again."
+#~ msgstr "TWAP status unknown. Check the TWAP tab before you try again."
 
 #: src/components/trade/mobile/mobile-trade-ticket-body.tsx:245
 msgid "TWAP, Scale & more"
@@ -3430,6 +3529,14 @@ msgstr "Type"
 #: src/components/trade/positions/positions-tab.tsx:
 #~ msgid "Unable to close position."
 #~ msgstr "Unable to close position."
+
+#: src/components/trade/tradebox/order-toast.tsx:277
+msgid "unconfirmed"
+msgstr "unconfirmed"
+
+#: src/components/trade/tradebox/order-toast.tsx:108
+msgid "Unconfirmed order"
+msgstr "Unconfirmed order"
 
 #: src/lib/errors/format.ts:12
 msgid "Unknown error"
@@ -3539,6 +3646,11 @@ msgstr "Wallet ({0})"
 #: src/hooks/hyperliquid/use-trading-agent.ts:
 #~ msgid "Wallet client not ready"
 #~ msgstr "Wallet client not ready"
+
+#: src/hooks/trade/use-submit-plan.ts:77
+#: src/hooks/trade/use-submit-plan.ts:119
+msgid "Wallet is required for exchange actions"
+msgstr "Wallet is required for exchange actions"
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:256
 #: src/components/trade/tradebox/bridge/shared-ui.tsx:74

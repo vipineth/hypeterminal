@@ -10,9 +10,10 @@ import type { ReactNode } from "react";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PositionTpSlModal } from "@/components/trade/positions/position-tpsl-modal";
+import { createFakeExchange, createMemoryLocks, createMemoryStorage, type FakeExchange } from "@/test/fake-exchange";
 
 const typedOverPrefill = vi.hoisted(() => new Map<string, string>());
-const exchange = vi.hoisted(() => ({ placeOrder: vi.fn() }));
+const net = vi.hoisted(() => ({ venue: null as unknown as FakeExchange }));
 const confirm = vi.hoisted(() => ({ onClick: null as null | (() => Promise<void>), disabled: true }));
 const liveMark = vi.hoisted(() => ({
 	markPx: undefined as string | undefined,
@@ -54,14 +55,29 @@ vi.mock("@/components/trade/components/asset-display", () => ({
 	AssetDisplay: () => null,
 }));
 
-vi.mock("@/lib/hyperliquid", async (importOriginal) => ({
-	...(await importOriginal<typeof import("@/lib/hyperliquid")>()),
-	useExchange: () => ({ mutateAsync: exchange.placeOrder, isPending: false }),
-	useSubscription: (method: string, params: unknown) => {
-		liveMark.subscribed.push([method, params]);
-		return feed.useSubscription();
-	},
+vi.mock("@hypeterminal/hl-react", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@hypeterminal/hl-react")>()),
+	useHyperliquidClients: () => ({ trading: net.venue.trading }),
 }));
+
+vi.mock("@/lib/trade/browser-env", () => ({
+	getBrowserStorage: () => createMemoryStorage(),
+	getBrowserLocks: () => createMemoryLocks(),
+	subscribeToStorageEvents: () => () => {},
+}));
+
+vi.mock("@/lib/hyperliquid", async (importOriginal) => {
+	const { DEFAULT_BUILDER_CONFIG } = await import("@/config/hyperliquid");
+	return {
+		...(await importOriginal<typeof import("@/lib/hyperliquid")>()),
+		useSubscription: (method: string, params: unknown) => {
+			liveMark.subscribed.push([method, params]);
+			return feed.useSubscription();
+		},
+		useHyperliquid: () => ({ builderConfig: DEFAULT_BUILDER_CONFIG, isTestnet: true }),
+		getInfoClient: () => net.venue.info,
+	};
+});
 
 const SOL_SHORT = {
 	coin: "SOL",
@@ -107,42 +123,37 @@ describe("position tp/sl modal", () => {
 		liveMark.status = "active";
 		liveMark.isStale = false;
 		liveMark.subscribed = [];
-		exchange.placeOrder.mockReset();
-		exchange.placeOrder.mockResolvedValue({
-			response: { data: { statuses: ["waitingForTrigger", "waitingForTrigger"] } },
-		});
+		net.venue = createFakeExchange();
 	});
 
 	it("sends a short's tp and sl from the typed strings a number cannot hold", async () => {
 		typedOverPrefill.set("70.0000", "74.999999999999999");
 		typedOverPrefill.set("90.0000", "84.999999999999999");
 		await pressConfirm();
-		expect(exchange.placeOrder.mock.calls).toEqual([
-			[
-				{
-					orders: [
-						{
-							a: 5,
-							b: true,
-							p: "74.999",
-							s: "0",
-							r: true,
-							t: { trigger: { isMarket: true, triggerPx: "74.999", tpsl: "tp" } },
-							c: expect.stringMatching(/^0x[0-9a-f]{32}$/),
-						},
-						{
-							a: 5,
-							b: true,
-							p: "84.999",
-							s: "0",
-							r: true,
-							t: { trigger: { isMarket: true, triggerPx: "85", tpsl: "sl" } },
-							c: expect.stringMatching(/^0x[0-9a-f]{32}$/),
-						},
-					],
-					grouping: "positionTpsl",
-				},
-			],
+		expect(net.venue.orderRequests().map((body) => body.action)).toEqual([
+			expect.objectContaining({
+				orders: [
+					{
+						a: 5,
+						b: true,
+						p: "74.999",
+						s: "0",
+						r: true,
+						t: { trigger: { isMarket: true, triggerPx: "74.999", tpsl: "tp" } },
+						c: expect.stringMatching(/^0x[0-9a-f]{32}$/),
+					},
+					{
+						a: 5,
+						b: true,
+						p: "84.999",
+						s: "0",
+						r: true,
+						t: { trigger: { isMarket: true, triggerPx: "85", tpsl: "sl" } },
+						c: expect.stringMatching(/^0x[0-9a-f]{32}$/),
+					},
+				],
+				grouping: "positionTpsl",
+			}),
 		]);
 	});
 
@@ -250,13 +261,13 @@ describe("position tp/sl modal", () => {
 			server().drop();
 			await vi.advanceTimersByTimeAsync(0);
 			await submitIfEnabled();
-			expect(exchange.placeOrder).not.toHaveBeenCalled();
+			expect(net.venue.orderRequests()).toHaveLength(0);
 			expect(confirm.disabled).toBe(true);
 
 			await vi.advanceTimersByTimeAsync(1_000);
 			await connectAndPush("85");
 			await submitIfEnabled();
-			expect(exchange.placeOrder).toHaveBeenCalledTimes(1);
+			expect(net.venue.orderRequests()).toHaveLength(1);
 			live.release();
 		});
 
@@ -268,14 +279,14 @@ describe("position tp/sl modal", () => {
 			await vi.advanceTimersByTimeAsync(25_001);
 			setHidden(false);
 			await submitIfEnabled();
-			expect(exchange.placeOrder).not.toHaveBeenCalled();
+			expect(net.venue.orderRequests()).toHaveLength(0);
 			expect(confirm.disabled).toBe(true);
 
 			server().drop();
 			await vi.advanceTimersByTimeAsync(1_000);
 			await connectAndPush("85");
 			await submitIfEnabled();
-			expect(exchange.placeOrder).toHaveBeenCalledTimes(1);
+			expect(net.venue.orderRequests()).toHaveLength(1);
 			live.release();
 		});
 	});

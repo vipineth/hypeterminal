@@ -222,15 +222,15 @@ function twapBodies() {
 }
 
 function sentOrders() {
-	return orderBodies().map(({ action }) => (action.orders as { c?: string }[]).map(withoutCloid));
+	return orderBodies().map(({ action }) => (action.orders as WireOrder[]).map(withoutCloid));
 }
 
-function withoutCloid({ c: _cloid, ...order }: { c?: string }) {
+function withoutCloid<T extends { c?: string }>({ c: _cloid, ...order }: T) {
 	return order;
 }
 
 function sentCloids(): string[][] {
-	return orderBodies().map(({ action }) => (action.orders as { c?: string }[]).map((order) => order.c ?? ""));
+	return orderBodies().map(({ action }) => (action.orders as WireOrder[]).map((order) => order.c ?? ""));
 }
 
 function distinctOrderNonces(): number {
@@ -265,7 +265,7 @@ beforeEach(async () => {
 	queue.addOrder.mockClear();
 	queue.updateOrder.mockClear();
 	queue.updateByRequestKey.mockClear();
-	useTradeTicket ??= await loadTicket();
+	useTradeTicket = await loadTicket();
 });
 
 afterEach(() => {

@@ -104,15 +104,6 @@ function getLegRole(
 	return legCount > 1 ? "scaleLeg" : "order";
 }
 
-export function getPlanKey({ orders, grouping }: PlanLegs): string {
-	return JSON.stringify({ grouping, orders: orders.map(withoutMarketPrice) });
-}
-
-function withoutMarketPrice(order: ExchangeOrder) {
-	const isMarket = "limit" in order.t && order.t.limit.tif === "FrontendMarket";
-	return isMarket ? { ...order, p: undefined } : order;
-}
-
 const PLAN_ID_BYTES = 14;
 
 export function createPlanId(): string {

@@ -1,10 +1,13 @@
 import { Button } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
-import { CheckIcon, LightningIcon, SpinnerGapIcon, XIcon } from "@phosphor-icons/react";
+import { CheckIcon, LightningIcon, QuestionIcon, SpinnerGapIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect } from "react";
 import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/time";
+import { usePendingRequests, useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { cn } from "@/lib/cn";
 import type { OrderOutcome } from "@/lib/trade/extract-order-status";
+import { getRequestKey } from "@/lib/trade/order-sender";
+import type { PendingRequest } from "@/lib/trade/pending-requests";
 import { type OrderQueueItem, useOrderQueue, useOrderQueueActions } from "@/stores/use-order-queue-store";
 
 const ORDER_TOAST_WIDTH = "w-80";
@@ -44,6 +47,8 @@ function getOutcomeLabel(outcome: OrderOutcome): string {
 	switch (outcome) {
 		case "filled":
 			return t`Filled`;
+		case "partiallyFilled":
+			return t`Partly filled`;
 		case "resting":
 			return t`Placed`;
 		case "triggerSet":
@@ -53,7 +58,14 @@ function getOutcomeLabel(outcome: OrderOutcome): string {
 	}
 }
 
-function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () => void }) {
+interface Props {
+	order: OrderQueueItem;
+	onRemove: () => void;
+	onRetry: (requestKey: string) => void;
+	onCancel: (requestKey: string) => void;
+}
+
+function OrderItem({ order, onRemove, onRetry, onCancel }: Props) {
 	useAutoRemove(order, onRemove);
 
 	const sideColor = order.side === "buy" ? "text-success" : "text-error";
@@ -74,11 +86,13 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 					order.status === "pending" && "bg-brand-soft border border-stroke-brand-strong/30",
 					order.status === "success" && "bg-success-soft border border-stroke-success-strong/30",
 					order.status === "failed" && "bg-error-soft border border-stroke-error-strong/30",
+					order.status === "unsettled" && "bg-warning-soft border border-stroke-warning-strong/30",
 				)}
 			>
 				{order.status === "pending" && <SpinnerGapIcon className="size-4 animate-spin text-brand" />}
 				{order.status === "success" && <CheckIcon className="size-4 text-success" />}
 				{order.status === "failed" && <XIcon className="size-4 text-error" />}
+				{order.status === "unsettled" && <QuestionIcon className="size-4 text-warning" />}
 			</div>
 
 			<div className="flex-1 min-w-0 space-y-0.5">
@@ -91,7 +105,7 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 					<span className={cn("px-1.5 py-0.5 rounded text-xs font-bold uppercase tracking-wide", sideBg, sideColor)}>
 						{order.side}
 					</span>
-					<span className="text-xs font-medium text-fg">{order.market}</span>
+					<span className="text-xs font-medium text-fg">{order.market || t`Unconfirmed order`}</span>
 					{order.status === "success" && order.outcome && (
 						<span className={cn("text-xs font-medium", order.outcome === "filled" ? "text-success" : "text-fg-muted")}>
 							{getOutcomeLabel(order.outcome)}
@@ -122,7 +136,15 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 						)}
 					</div>
 				)}
-				{order.error && <div className="text-xs text-error">{order.error}</div>}
+				{order.status === "success" && order.detail && <div className="text-xs text-fg-muted">{order.detail}</div>}
+				{order.error && (
+					<div className={cn("text-xs", order.status === "unsettled" ? "text-warning" : "text-error")}>
+						{order.error}
+					</div>
+				)}
+				{order.status === "unsettled" && order.requestKey && (
+					<RequestActions requestKey={order.requestKey} onRetry={onRetry} onCancel={onCancel} />
+				)}
 			</div>
 
 			{order.status === "failed" && (
@@ -140,6 +162,41 @@ function OrderItem({ order, onRemove }: { order: OrderQueueItem; onRemove: () =>
 	);
 }
 
+function RequestActions({
+	requestKey,
+	onRetry,
+	onCancel,
+}: {
+	requestKey: string;
+	onRetry: (requestKey: string) => void;
+	onCancel: (requestKey: string) => void;
+}) {
+	return (
+		<div className="flex items-center gap-1.5 pt-1">
+			<Button variant="outline" intent="neutral" size="xxs" className="rounded-xs" onClick={() => onRetry(requestKey)}>
+				{t`Retry`}
+			</Button>
+			<Button variant="ghost" intent="error" size="xxs" className="rounded-xs" onClick={() => onCancel(requestKey)}>
+				{t`Cancel`}
+			</Button>
+		</div>
+	);
+}
+
+function toQueueItem(request: PendingRequest): OrderQueueItem {
+	return {
+		id: getRequestKey(request),
+		market: request.label?.market ?? "",
+		side: request.label?.side ?? "buy",
+		size: request.label?.size ?? "",
+		orderType: request.kind === "twap" ? "twap" : undefined,
+		status: "unsettled",
+		error: t`Not confirmed. Retry or cancel it.`,
+		requestKey: getRequestKey(request),
+		createdAt: request.createdAt,
+	};
+}
+
 function CountdownBar({ order }: { order: OrderQueueItem }) {
 	if (order.status !== "success") return null;
 
@@ -154,13 +211,35 @@ function CountdownBar({ order }: { order: OrderQueueItem }) {
 }
 
 export function OrderToast() {
-	const orders = useOrderQueue();
-	const { removeOrder } = useOrderQueueActions();
+	const queued = useOrderQueue();
+	const pendingRequests = usePendingRequests();
+	const { addOrder, removeOrder } = useOrderQueueActions();
+	const { retryRequest, cancelRequest } = useSubmitPlan();
+
+	const queuedKeys = new Set(queued.map((order) => order.requestKey));
+	const leftOver = pendingRequests.filter((request) => !queuedKeys.has(getRequestKey(request))).map(toQueueItem);
+	const orders = [...leftOver, ...queued];
 	if (orders.length === 0) return null;
+
+	function adopt(requestKey: string) {
+		const order = leftOver.find((item) => item.requestKey === requestKey);
+		if (order) addOrder({ ...order, status: "pending" });
+	}
+
+	function handleRetry(requestKey: string) {
+		adopt(requestKey);
+		void retryRequest(requestKey);
+	}
+
+	function handleCancel(requestKey: string) {
+		adopt(requestKey);
+		void cancelRequest(requestKey);
+	}
 
 	const pendingCount = orders.filter((o) => o.status === "pending").length;
 	const successCount = orders.filter((o) => o.status === "success").length;
 	const failedCount = orders.filter((o) => o.status === "failed").length;
+	const unsettledCount = orders.filter((o) => o.status === "unsettled").length;
 
 	return (
 		<div
@@ -174,7 +253,12 @@ export function OrderToast() {
 
 				pendingCount > 0 && "ring-1 ring-stroke-brand-strong/30",
 				failedCount > 0 && pendingCount === 0 && "ring-1 ring-stroke-error-strong/30",
-				successCount > 0 && pendingCount === 0 && failedCount === 0 && "ring-1 ring-stroke-success-strong/30",
+				unsettledCount > 0 && pendingCount === 0 && failedCount === 0 && "ring-1 ring-stroke-warning-strong/30",
+				successCount > 0 &&
+					pendingCount === 0 &&
+					failedCount === 0 &&
+					unsettledCount === 0 &&
+					"ring-1 ring-stroke-success-strong/30",
 			)}
 		>
 			<div className="px-3 py-2 border-b border-stroke-weak/40 bg-surface flex items-center justify-between">
@@ -188,6 +272,11 @@ export function OrderToast() {
 							{pendingCount} {t`pending`}
 						</span>
 					)}
+					{unsettledCount > 0 && (
+						<span className="px-1.5 py-0.5 rounded text-xs font-medium bg-warning-soft text-warning border border-stroke-warning-strong/30">
+							{unsettledCount} {t`unconfirmed`}
+						</span>
+					)}
 					{failedCount > 0 && (
 						<span className="px-1.5 py-0.5 rounded text-xs font-medium bg-error-soft text-error border border-stroke-error-strong/30">
 							{failedCount} {t`failed`}
@@ -199,7 +288,12 @@ export function OrderToast() {
 			<div className={cn("divide-y divide-stroke-weak/30 overflow-y-auto", ORDER_TOAST_LIST_MAX_HEIGHT)}>
 				{orders.map((order) => (
 					<div key={order.id} className="relative">
-						<OrderItem order={order} onRemove={() => removeOrder(order.id)} />
+						<OrderItem
+							order={order}
+							onRemove={() => removeOrder(order.id)}
+							onRetry={handleRetry}
+							onCancel={handleCancel}
+						/>
 						<CountdownBar order={order} />
 					</div>
 				))}

@@ -5,16 +5,16 @@ export interface ExchangeClock {
 	warm(): void;
 }
 
-export function createExchangeClock(readServerTime: () => Promise<number>, localNow: () => number): ExchangeClock {
-	let sample: { offsetMs: number; takenAt: number } | null = null;
+export function createExchangeClock(readServerTime: () => Promise<number>, elapsed: () => number): ExchangeClock {
+	let sample: { serverTime: number; takenAt: number } | null = null;
 	let refreshing: Promise<void> | null = null;
 
 	function refresh(): Promise<void> {
 		refreshing ??= (async () => {
-			const sentAt = localNow();
+			const sentAt = elapsed();
 			const serverTime = await readServerTime();
-			const receivedAt = localNow();
-			sample = { offsetMs: serverTime - (sentAt + receivedAt) / 2, takenAt: receivedAt };
+			const receivedAt = elapsed();
+			sample = { serverTime: serverTime + (receivedAt - sentAt) / 2, takenAt: receivedAt };
 		})().finally(() => {
 			refreshing = null;
 		});
@@ -23,9 +23,9 @@ export function createExchangeClock(readServerTime: () => Promise<number>, local
 
 	async function now(): Promise<number> {
 		if (!sample) await refresh();
-		else if (localNow() - sample.takenAt > SAMPLE_TTL_MS) refresh().catch(() => {});
+		else if (elapsed() - sample.takenAt > SAMPLE_TTL_MS) refresh().catch(() => {});
 		if (!sample) throw new Error("Exchange clock unavailable");
-		return Math.round(localNow() + sample.offsetMs);
+		return Math.round(sample.serverTime + elapsed() - sample.takenAt);
 	}
 
 	function warm() {

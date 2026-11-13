@@ -5,14 +5,16 @@ import type { TpSl } from "@/domain/trade/orders";
 import { buildTwapPlan } from "@/domain/trade/twap";
 import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { isPositive, truncateDecimals } from "@/lib/trade/numbers";
+import type { RequestLabel } from "@/lib/trade/pending-requests";
 import type { Side } from "@/lib/trade/types";
 import { useOrderEntryActions } from "@/stores/use-order-entry-store";
-import { useOrderQueueActions } from "@/stores/use-order-queue-store";
+import { resultToQueueUpdate, useOrderQueueActions } from "@/stores/use-order-queue-store";
 
 interface SubmitMarket {
 	assetId: number;
 	szDecimals: number;
 	kind: MarketKind;
+	name: string;
 }
 
 export interface OrderSubmitInput {
@@ -67,6 +69,14 @@ function findTriggerPrice(orders: ExchangeOrder[], tpsl: TpSl): string | undefin
 	return undefined;
 }
 
+function getLabel(input: OrderSubmitInput): RequestLabel {
+	return {
+		market: input.baseToken,
+		side: input.side,
+		size: truncateDecimals(input.sizeValue, input.market.szDecimals),
+	};
+}
+
 export function useOrderSubmit(): UseOrderSubmitResult {
 	const { submitPlan, submitTwap: sendTwap, isSubmitting } = useSubmitPlan();
 	const { addOrder, updateOrder } = useOrderQueueActions();
@@ -83,27 +93,18 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 			randomize: input.twapRandomize,
 		});
 
-		const orderId = addOrder({
-			market: input.baseToken,
-			side: input.side,
-			size: truncateDecimals(input.sizeValue, input.market.szDecimals),
-			orderType: "twap",
-			status: "pending",
-		});
+		const label = getLabel(input);
+		const orderId = addOrder({ ...label, orderType: "twap", status: "pending" });
 
 		if (!plan.action) {
 			updateOrder(orderId, { status: "failed", error: plan.errors.join("; ") });
 			return false;
 		}
 
-		const result = await sendTwap(plan.action);
-		if (!result.ok) {
-			updateOrder(orderId, { status: "failed", error: result.error });
-			return false;
-		}
-		updateOrder(orderId, { status: "success", outcome: result.outcome });
-		resetForm();
-		return true;
+		const result = await sendTwap(plan.action, { coin: input.market.name, label });
+		updateOrder(orderId, resultToQueueUpdate(result));
+		if (result.ok) resetForm();
+		return result.ok;
 	}
 
 	async function submitEntry(input: OrderSubmitInput): Promise<boolean> {
@@ -135,10 +136,9 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 		const hasTp = tpSlEnabled && canUseTpSl && isPositive(tpPriceInput);
 		const hasSl = tpSlEnabled && canUseTpSl && isPositive(slPriceInput);
 
+		const label = getLabel(input);
 		const orderId = addOrder({
-			market: input.baseToken,
-			side: input.side,
-			size: truncateDecimals(input.sizeValue, market.szDecimals),
+			...label,
 			price: plan.orders[0] && getQueuePrice(plan.orders[0]),
 			orderType: getQueueOrderType(input),
 			tpPrice: hasTp ? findTriggerPrice(plan.orders, "tp") : undefined,
@@ -146,12 +146,8 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 			status: "pending",
 		});
 
-		const result = await submitPlan(plan);
-		if (result.ok) {
-			updateOrder(orderId, { status: "success", outcome: result.outcome });
-		} else {
-			updateOrder(orderId, { status: "failed", error: result.error });
-		}
+		const result = await submitPlan(plan, label);
+		updateOrder(orderId, resultToQueueUpdate(result));
 		if (plan.errors.length === 0) resetForm();
 		return result.ok;
 	}

@@ -286,18 +286,6 @@ function buildTpSlOrder(orders: ExchangeOrder[], params: TpSlOrderParams): void 
 	});
 }
 
-function extractResponseError(status: unknown): string | null {
-	if (status && typeof status === "object" && "error" in status && typeof status.error === "string") {
-		return status.error;
-	}
-	return null;
-}
-
-export function throwIfResponseError(status: unknown): void {
-	const error = extractResponseError(status);
-	if (error) throw new Error(error);
-}
-
 export function getDefaultLeverage(maxLeverage: number): number {
 	if (maxLeverage <= DEFAULT_LEVERAGE_FALLBACK) return maxLeverage;
 	return Math.floor(maxLeverage / 2);
