@@ -59,8 +59,8 @@ export function DepositForm({
 	onSubmit,
 }: Props) {
 	function handleBalanceClick() {
-		if (balance.status === "ready") onAmountChange(balance.formatted);
 		if (balance.status === "error") onRetryBalance();
+		if (balance.status === "ready" || balance.status === "refreshing") onAmountChange(balance.formatted);
 	}
 
 	return (

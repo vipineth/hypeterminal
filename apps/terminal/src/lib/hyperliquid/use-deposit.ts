@@ -62,7 +62,7 @@ function useArbitrumChain() {
 }
 
 function useUsdcBalance(address: `0x${string}` | undefined, enabled: boolean) {
-	const { data, isError, refetch } = useReadContract({
+	const read = useReadContract({
 		address: CONTRACTS.arbitrum.usdc,
 		abi: erc20Abi,
 		functionName: "balanceOf",
@@ -71,7 +71,7 @@ function useUsdcBalance(address: `0x${string}` | undefined, enabled: boolean) {
 		query: { enabled },
 	});
 
-	return { balance: getUsdcBalance({ data, isError }), refetch };
+	return { balance: getUsdcBalance(read), refetch: read.refetch };
 }
 
 export function useDeposit(): UseDepositResult {
@@ -80,7 +80,14 @@ export function useDeposit(): UseDepositResult {
 	const { balance, refetch } = useUsdcBalance(address, chain.isArbitrum && !!address);
 
 	const { mutate: write, data: hash, isPending, error: writeError, reset } = useWriteContract();
-	const { isLoading: isConfirming, isSuccess, error: confirmError } = useWaitForTransactionReceipt({ hash });
+	const {
+		isLoading: isConfirming,
+		isSuccess,
+		error: confirmError,
+	} = useWaitForTransactionReceipt({
+		hash,
+		chainId: ARBITRUM_CHAIN_ID,
+	});
 
 	const error = writeError ?? confirmError ?? null;
 	const status = deriveStatus(isPending, isConfirming, isSuccess, error);

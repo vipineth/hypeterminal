@@ -1303,7 +1303,7 @@ msgstr ""
 msgid "Insufficient <0/> balance"
 msgstr ""
 
-#: src/lib/trade/deposit-validation.ts:35
+#: src/lib/trade/deposit-validation.ts:38
 #: src/lib/trade/withdraw-validation.ts:15
 msgid "Insufficient balance"
 msgstr ""
@@ -1316,7 +1316,7 @@ msgstr ""
 msgid "Insufficient funds for gas"
 msgstr ""
 
-#: src/lib/trade/deposit-validation.ts:38
+#: src/lib/trade/deposit-validation.ts:41
 #: src/lib/trade/withdraw-validation.ts:13
 msgid "Invalid amount"
 msgstr ""
@@ -1675,7 +1675,7 @@ msgstr ""
 #~ msgid "Minimum deposit is {0} USDC"
 #~ msgstr ""
 
-#: src/lib/trade/deposit-validation.ts:33
+#: src/lib/trade/deposit-validation.ts:36
 msgid "Minimum deposit is 5 USDC"
 msgstr ""
 
