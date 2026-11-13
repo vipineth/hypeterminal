@@ -23,7 +23,6 @@ export interface OrderSubmitInput {
 	side: Side;
 	orderType: OrderType;
 	sizeValue: number;
-	price: number;
 	markPx: number;
 	slippageBps: number;
 	reduceOnly: boolean;
@@ -119,7 +118,6 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 			szDecimals: market.szDecimals,
 			marketKind: market.kind,
 			markPx: input.markPx,
-			price: input.price,
 			slippageBps: input.slippageBps,
 			reduceOnly: input.reduceOnly,
 			tif: input.tif,

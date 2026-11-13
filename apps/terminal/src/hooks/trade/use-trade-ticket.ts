@@ -246,7 +246,6 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 			side,
 			orderType,
 			sizeValue,
-			price,
 			markPx,
 			slippageBps,
 			reduceOnly,

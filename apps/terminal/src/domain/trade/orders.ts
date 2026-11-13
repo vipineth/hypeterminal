@@ -52,7 +52,6 @@ export interface EntryOrderParams {
 	szDecimals: number;
 	marketKind: MarketKind;
 	markPx: number;
-	price: number;
 	slippageBps: number;
 	reduceOnly: boolean;
 	tif: LimitTif;
@@ -81,7 +80,6 @@ export function buildOrders(params: EntryOrderParams): OrderBuildResult {
 		szDecimals,
 		marketKind,
 		markPx,
-		price,
 		slippageBps,
 		reduceOnly,
 		tif,
@@ -134,7 +132,7 @@ export function buildOrders(params: EntryOrderParams): OrderBuildResult {
 			orderType,
 			formattedSize,
 			markPx,
-			price,
+			limitPriceInput,
 			slippageBps,
 			reduceOnly,
 			tif,
@@ -231,7 +229,7 @@ interface StandardOrderParams {
 	orderType: OrderType;
 	formattedSize: string;
 	markPx: number;
-	price: number;
+	limitPriceInput: string;
 	slippageBps: number;
 	reduceOnly: boolean;
 	tif: LimitTif;
@@ -240,7 +238,9 @@ interface StandardOrderParams {
 function buildStandardOrder(orders: ExchangeOrder[], params: StandardOrderParams): void {
 	const side = params.isBuy ? "buy" : "sell";
 	const isMarket = params.orderType === "market";
-	const orderPrice = getExecutedPrice(params.orderType, side, params.markPx, params.slippageBps, params.price);
+	const orderPrice = isMarket
+		? getExecutedPrice("market", side, params.markPx, params.slippageBps, params.markPx)
+		: params.limitPriceInput;
 
 	orders.push({
 		a: params.assetId,

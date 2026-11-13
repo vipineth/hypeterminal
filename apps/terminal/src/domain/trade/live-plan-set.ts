@@ -170,7 +170,6 @@ function entry(market: LiveMarket, side: Side, size: Big, fields: Partial<EntryO
 		szDecimals: market.szDecimals,
 		marketKind: market.kind,
 		markPx: market.markPx.toNumber(),
-		price: market.markPx.toNumber(),
 		slippageBps: SLIPPAGE_BPS,
 		reduceOnly: false,
 		tif: "Gtc",
@@ -277,7 +276,7 @@ function perpCases(market: LiveMarket, side: Side): PlanCase[] {
 		perpCase("market", entry(market, side, size, {}), single(marketLeg(market, side, sz, false))),
 		perpCase(
 			"limit",
-			entry(market, side, size, { orderType: "limit", price: limit.toNumber(), limitPriceInput: limit.toFixed() }),
+			entry(market, side, size, { orderType: "limit", limitPriceInput: limit.toFixed() }),
 			single(limitLeg(side, sz, false, limit)),
 		),
 		perpCase(
@@ -396,7 +395,7 @@ function spotCases(market: LiveMarket, side: Side): PlanCase[] {
 		spotCase("market", entry(market, side, size, {}), single(marketLeg(market, side, sz, false))),
 		spotCase(
 			"limit",
-			entry(market, side, size, { orderType: "limit", price: limit.toNumber(), limitPriceInput: limit.toFixed() }),
+			entry(market, side, size, { orderType: "limit", limitPriceInput: limit.toFixed() }),
 			single(limitLeg(side, sz, false, limit)),
 		),
 		...scaleCases(market, side, size),

@@ -20,7 +20,6 @@ const ENTRY_BASE = {
 	szDecimals: 3,
 	marketKind: "perp" as const,
 	markPx: 100,
-	price: 100,
 	slippageBps: 50,
 	reduceOnly: false,
 	tif: "Gtc" as const,
@@ -63,7 +62,13 @@ describe("buildOrderPlan entry (characterization)", () => {
 	});
 
 	it("builds a limit sell at the exact limit price with the chosen tif", () => {
-		const plan = buildOrderPlan({ ...ENTRY_BASE, side: "sell", orderType: "limit", price: 105, tif: "Gtc" });
+		const plan = buildOrderPlan({
+			...ENTRY_BASE,
+			side: "sell",
+			orderType: "limit",
+			limitPriceInput: "105",
+			tif: "Gtc",
+		});
 		expect(plan.orders).toEqual([{ a: 0, b: false, p: "105", s: "1.5", r: false, t: { limit: { tif: "Gtc" } } }]);
 		expect(plan.grouping).toBe("na");
 	});
@@ -171,7 +176,7 @@ describe("buildOrderPlan entry (characterization)", () => {
 			side: "sell",
 			szDecimals: 0,
 			sizeValue: 1000,
-			price: 0.012345,
+			limitPriceInput: "0.012345",
 		});
 		expect(plan.orders[0].p).toBe("0.012345");
 	});
@@ -293,7 +298,6 @@ describe("buildOrders grouping (characterization)", () => {
 			szDecimals: 3,
 			marketKind: "perp",
 			markPx: 100,
-			price: 100,
 			slippageBps: 50,
 			reduceOnly: false,
 			tif: "Gtc",
@@ -387,7 +391,6 @@ describe("order wire format", () => {
 			orderType: "limit",
 			szDecimals: 0,
 			sizeValue: 100,
-			price: 0.15,
 			limitPriceInput: "0.15",
 		});
 		const reverse = buildOrderPlan({
@@ -419,8 +422,8 @@ describe("order wire format", () => {
 
 	it("rounds limit prices toward the passive side", () => {
 		const limit = { ...ENTRY_BASE, orderType: "limit" as const, szDecimals: 2, sizeValue: 10 };
-		const buy = buildOrderPlan({ ...limit, side: "buy", price: 1.234567, limitPriceInput: "1.234567" });
-		const sell = buildOrderPlan({ ...limit, side: "sell", price: 1.234541, limitPriceInput: "1.234541" });
+		const buy = buildOrderPlan({ ...limit, side: "buy", limitPriceInput: "1.234567" });
+		const sell = buildOrderPlan({ ...limit, side: "sell", limitPriceInput: "1.234541" });
 		expect(buy.orders[0].p).toBe("1.2345");
 		expect(sell.orders[0].p).toBe("1.2346");
 	});
@@ -431,14 +434,12 @@ describe("order wire format", () => {
 			...spot,
 			szDecimals: 2,
 			sizeValue: 1000,
-			price: 0.0123456,
 			limitPriceInput: "0.0123456",
 		});
 		const sz0 = buildOrderPlan({
 			...spot,
 			szDecimals: 0,
 			sizeValue: 1e7,
-			price: 0.000012345678,
 			limitPriceInput: "0.000012345678",
 		});
 		expect(sz2.orders[0].p).toBe("0.012345");
@@ -528,7 +529,7 @@ describe("order wire format", () => {
 	});
 
 	it("blocks an opening order under the minimum notional on its wire price", () => {
-		const plan = buildOrderPlan({ ...ENTRY_BASE, szDecimals: 0, sizeValue: 1, markPx: 5, price: 5, slippageBps: 250 });
+		const plan = buildOrderPlan({ ...ENTRY_BASE, szDecimals: 0, sizeValue: 1, markPx: 5, slippageBps: 250 });
 		expect(plan.orders).toEqual([]);
 		expect(plan.errors).toEqual([ORDER_PLAN_ERRORS.belowMinNotional]);
 	});
@@ -554,7 +555,7 @@ describe("order wire format", () => {
 	});
 
 	it("blocks a price that is not a positive tick", () => {
-		const plan = buildOrderPlan({ ...ENTRY_BASE, orderType: "limit", price: 0, limitPriceInput: "0" });
+		const plan = buildOrderPlan({ ...ENTRY_BASE, orderType: "limit", limitPriceInput: "0" });
 		expect(plan.orders).toEqual([]);
 		expect(plan.errors).toEqual([ORDER_PLAN_ERRORS.invalidPrice]);
 	});
