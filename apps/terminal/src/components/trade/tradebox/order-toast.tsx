@@ -6,7 +6,7 @@ import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/time";
 import { usePendingRequests, useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { cn } from "@/lib/cn";
 import type { OrderOutcome } from "@/lib/trade/extract-order-status";
-import { getRequestKey, type Lookup } from "@/lib/trade/order-sender";
+import { getRequestKey, type Lookup, type OrderSubmission } from "@/lib/trade/order-sender";
 import type { PendingRequest } from "@/lib/trade/pending-requests";
 import {
 	type OrderQueueItem,
@@ -69,7 +69,7 @@ interface RowActions {
 	previewDismiss: (requestKey: string) => void;
 	keep: (requestKey: string) => void;
 	dismiss: (requestKey: string, lookup: Lookup) => void;
-	sendRejectedLegs: (order: OrderQueueItem) => void;
+	sendRejectedLegs: (rowId: string, offer: OrderSubmission) => void;
 }
 
 interface Props {
@@ -81,6 +81,7 @@ interface Props {
 function OrderItem({ order, onRemove, actions }: Props) {
 	useAutoRemove(order, onRemove);
 
+	const { offer } = order;
 	const sideColor = order.side === "buy" ? "text-success" : "text-error";
 	const sideBg = order.side === "buy" ? "bg-success-soft" : "bg-error-soft";
 	const orderTypeLabel = getOrderTypeLabel(order.orderType);
@@ -159,14 +160,14 @@ function OrderItem({ order, onRemove, actions }: Props) {
 				{order.status === "unsettled" && order.requestKey && (
 					<RequestActions requestKey={order.requestKey} confirm={order.confirmDismiss} actions={actions} />
 				)}
-				{order.status === "failed" && order.offer && (
+				{order.status === "failed" && offer && (
 					<div className="pt-1">
 						<Button
 							variant="outline"
 							intent="neutral"
 							size="xxs"
 							className="rounded-xs"
-							onClick={() => actions.sendRejectedLegs(order)}
+							onClick={() => actions.sendRejectedLegs(order.id, offer)}
 						>
 							{t`Send only the rejected legs`}
 						</Button>
@@ -312,10 +313,9 @@ export function OrderToast() {
 		);
 	}
 
-	async function handleSendRejectedLegs(order: OrderQueueItem) {
-		if (!order.offer) return;
-		updateOrder(order.id, { status: "pending", error: undefined, offer: undefined });
-		updateOrder(order.id, resultToQueueUpdate(await sendRejectedLegs(order.offer)));
+	async function handleSendRejectedLegs(rowId: string, offer: OrderSubmission) {
+		updateOrder(rowId, { status: "pending", error: undefined, offer: undefined });
+		updateOrder(rowId, resultToQueueUpdate(await sendRejectedLegs(offer)));
 	}
 
 	const actions: RowActions = {
@@ -336,8 +336,8 @@ export function OrderToast() {
 		dismiss(requestKey, lookup) {
 			void dismissRequest(requestKey, lookup);
 		},
-		sendRejectedLegs(order) {
-			void handleSendRejectedLegs(order);
+		sendRejectedLegs(rowId, offer) {
+			void handleSendRejectedLegs(rowId, offer);
 		},
 	};
 
