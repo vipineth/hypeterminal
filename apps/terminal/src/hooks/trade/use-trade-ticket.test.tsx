@@ -366,6 +366,12 @@ describe("perp ticket tp/sl against the live mark and the sent entry price", () 
 		expect(renderTicket().validation.errors).toEqual(["Waiting for live mark price"]);
 	});
 
+	it("reads a builder market's live mark under its prefixed name", () => {
+		form.market = { ...SOL_PERP, kind: "builderPerp", name: "xyz:NVDA", markPx: "180" };
+		form.tpPrice = "200";
+		expect(renderTicket().validation.errors).toEqual([]);
+	});
+
 	it("never sends a long's stop on the same price as the buy limit it sends", () => {
 		form.orderType = "limit";
 		form.limitPrice = "80.2769";
