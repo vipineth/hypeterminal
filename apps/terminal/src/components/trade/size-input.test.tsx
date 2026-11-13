@@ -3,8 +3,9 @@ import { renderToString } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MobileTradeTicketBody } from "@/components/trade/mobile/mobile-trade-ticket-body";
 import { TradeFormFields } from "@/components/trade/tradebox/trade-form-fields";
-import { getSizeValueFromInput } from "@/domain/trade/order/size";
+import { getSizeFromInput } from "@/domain/trade/order/size";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
+import { spotMarket } from "@/test/markets";
 import { typeKeys } from "@/test/type-keys";
 
 const PURR_USDC = vi.hoisted(() => ({
@@ -167,16 +168,14 @@ function shownSize(ticket: () => React.ReactElement, size: string, typedIn: Size
 }
 
 function sendLimitBuyAt(price: string, sizeInput: string) {
-	const sizeValue = getSizeValueFromInput({ sizeInput, sizeMode: "quote", price: Number(price), szDecimals: 0 });
+	const sizeValue = getSizeFromInput({ sizeInput, sizeMode: "quote", price: Number(price), szDecimals: 0 });
 	return buildOrderPlan({
 		kind: "entry",
-		assetId: PURR_USDC.assetId,
+		market: spotMarket(PURR_USDC.assetId, 0, "PURR"),
 		side: "buy",
 		orderType: "limit",
 		sizeValue,
-		szDecimals: 0,
-		marketKind: "spot",
-		markPx: Number(price),
+		markPx: price,
 		limitPriceInput: price,
 		slippageBps: 250,
 		reduceOnly: false,

@@ -1,7 +1,7 @@
 import { formatPercent, formatToken, formatUSD } from "@/lib/format";
 
 interface Args {
-	size: number;
+	size: string;
 	szDecimals: number;
 	coin: string;
 	unrealizedPnl: number;

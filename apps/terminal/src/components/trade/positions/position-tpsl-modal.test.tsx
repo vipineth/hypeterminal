@@ -11,6 +11,7 @@ import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PositionTpSlModal } from "@/components/trade/positions/position-tpsl-modal";
 import { createFakeExchange, createMemoryKeyValue, createMemoryLocks, type FakeExchange } from "@/test/fake-exchange";
+import { perpMarket } from "@/test/markets";
 
 const typedOverPrefill = vi.hoisted(() => new Map<string, string>());
 const net = vi.hoisted(() => ({ venue: null as unknown as FakeExchange }));
@@ -81,14 +82,13 @@ vi.mock("@/lib/hyperliquid", async (importOriginal) => {
 
 const SOL_SHORT = {
 	coin: "SOL",
-	assetId: 5,
+	market: perpMarket(5, 2, "SOL"),
 	isLong: false,
 	size: 1,
 	entryPx: 80.276,
 	markPx: 80.276,
 	unrealizedPnl: 0,
 	roe: 0,
-	szDecimals: 2,
 	existingTpPrice: 70,
 	existingSlPrice: 90,
 };
@@ -96,7 +96,6 @@ const SOL_SHORT = {
 const NVDA_LONG = {
 	...SOL_SHORT,
 	coin: "xyz:NVDA",
-	assetId: 110000,
 	isLong: true,
 	entryPx: 180,
 	markPx: 180,

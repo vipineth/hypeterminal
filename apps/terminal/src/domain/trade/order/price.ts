@@ -1,6 +1,6 @@
 import Big from "big.js";
 import type { OrderType } from "@/config/trade";
-import { toBig } from "@/lib/trade/numbers";
+import { type Numeric, toBig } from "@/lib/trade/numbers";
 import {
 	isScaleOrderType,
 	isStopOrderType,
@@ -35,10 +35,9 @@ export function getOrderPrice(
 	return toBig(limitPriceInput)?.toNumber() ?? 0;
 }
 
-export function getMarketPrice(side: Side, markPx: number, slippageBps: number): number {
+export function getMarketPrice(side: Side, markPx: Numeric, slippageBps: number): string {
 	const px = toBig(markPx);
-	const slip = toBig(slippageBps);
-	if (!px || !slip) return markPx;
-	const multiplier = side === "buy" ? Big(1).plus(slip.div(10000)) : Big(1).minus(slip.div(10000));
-	return px.times(multiplier).toNumber();
+	const slip = toBig(slippageBps)?.div(10000);
+	if (!px || !slip) return px?.toFixed() ?? "";
+	return px.times(side === "buy" ? Big(1).plus(slip) : Big(1).minus(slip)).toFixed();
 }

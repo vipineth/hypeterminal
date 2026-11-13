@@ -65,7 +65,8 @@ export function MobilePositionsTab({ coin }: Props) {
 	const tpSlOrdersByCoin = useMemo(() => buildTpSlOrdersByCoin(openOrders), [openOrders]);
 
 	async function handleClosePosition(data: ClosePositionData) {
-		const { assetId, size, markPx, szDecimals, isLong, coin, unrealizedPnl, roe } = data;
+		const { market, size, markPx, isLong, coin, unrealizedPnl, roe } = data;
+		const { assetId } = market;
 		if (closingAssetIds.has(assetId)) return;
 		setCloseErrors((prev) => {
 			if (!prev.has(assetId)) return prev;
@@ -81,9 +82,8 @@ export function MobilePositionsTab({ coin }: Props) {
 
 		const plan = buildOrderPlan({
 			kind: "marketClose",
-			assetId,
+			market,
 			size,
-			szDecimals,
 			isLong,
 			markPx,
 			slippageBps,
@@ -92,7 +92,7 @@ export function MobilePositionsTab({ coin }: Props) {
 		const result = await submitPlan(plan);
 		if (result.ok) {
 			toast.success(t`Position closed — ${coin}`, {
-				description: buildClosePositionDescription({ size, szDecimals, coin, unrealizedPnl, roe }),
+				description: buildClosePositionDescription({ size, szDecimals: market.szDecimals, coin, unrealizedPnl, roe }),
 			});
 		} else {
 			const message = result.error || t`Failed to close position`;

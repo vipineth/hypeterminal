@@ -2,6 +2,14 @@ import type { MetaResponse, PerpDexsResponse, SpotMetaResponse } from "@nktkas/h
 import Big from "big.js";
 import type { ExchangeOrder } from "@/config/trade";
 import type { MarketKind } from "@/domain/market";
+import {
+	isListed,
+	isPerpLike,
+	type ListedMarket,
+	type PerpLikeMarket,
+	parseMarkets,
+	type SpotMarket,
+} from "@/domain/market/model";
 import type { EntryOrderIntent, OrderIntent, OrderPlan } from "@/domain/trade/order-intent";
 import type { TwapIntent, TwapPlan } from "@/domain/trade/twap";
 import type { Side } from "@/lib/trade/types";
@@ -21,6 +29,7 @@ export interface LiveMarket {
 	szDecimals: number;
 	kind: MarketKind;
 	markPx: Big;
+	market: ListedMarket;
 }
 
 type Rounding = "up" | "down";
@@ -74,7 +83,14 @@ const MIN_CASE_NOTIONAL = 200;
 const SCALE_LEVEL_COUNTS = [3, 4, 5, 7, 10, 20];
 
 export function listLiveMarkets(snapshot: LiveMetaSnapshot): LiveMarket[] {
+	const parsed = parseMarkets(snapshot);
 	const markets: LiveMarket[] = [];
+
+	function parsedMarket(name: string): ListedMarket {
+		const market = parsed.byName.get(name);
+		if (!market || !isListed(market)) throw new Error(`parseMarkets has no listed market ${name}`);
+		return market;
+	}
 
 	snapshot.allPerpMetas.forEach((meta, dexIndex) => {
 		meta.universe.forEach((asset, assetIndex) => {
@@ -86,6 +102,7 @@ export function listLiveMarkets(snapshot: LiveMetaSnapshot): LiveMarket[] {
 				szDecimals: asset.szDecimals,
 				kind: dexIndex === 0 ? "perp" : "builderPerp",
 				markPx,
+				market: parsedMarket(asset.name),
 			});
 		});
 	});
@@ -101,6 +118,7 @@ export function listLiveMarkets(snapshot: LiveMetaSnapshot): LiveMarket[] {
 			szDecimals: base.szDecimals,
 			kind: "spot",
 			markPx,
+			market: parsedMarket(pair.name),
 		});
 	}
 
@@ -120,16 +138,25 @@ export function buildTwapCases(snapshot: LiveMetaSnapshot): TwapCase[] {
 		(["buy", "sell"] as const).map((side) => ({
 			market,
 			intent: {
-				assetId: market.assetId,
+				market: market.market,
 				side,
-				sizeValue: caseSize(market).toNumber(),
-				szDecimals: market.szDecimals,
+				sizeValue: caseSize(market).toFixed(),
 				reduceOnly: side === "sell",
 				minutes: 30,
 				randomize: false,
 			},
 		})),
 	);
+}
+
+function perpMarket(market: LiveMarket): ListedMarket & PerpLikeMarket {
+	if (!isPerpLike(market.market)) throw new Error(`${market.name} is not a perp market`);
+	return market.market;
+}
+
+function spotMarket(market: LiveMarket): SpotMarket {
+	if (market.market.kind !== "spot") throw new Error(`${market.name} is not a spot market`);
+	return market.market;
 }
 
 function opposite(side: Side): Side {
@@ -162,13 +189,11 @@ function slipped(market: LiveMarket, side: Side, bps: number): Big {
 function entry(market: LiveMarket, side: Side, size: Big, fields: Partial<EntryOrderIntent>): EntryOrderIntent {
 	return {
 		kind: "entry",
-		assetId: market.assetId,
+		market: market.market,
 		side,
 		orderType: "market",
-		sizeValue: size.toNumber(),
-		szDecimals: market.szDecimals,
-		marketKind: market.kind,
-		markPx: market.markPx.toNumber(),
+		sizeValue: size.toFixed(),
+		markPx: market.markPx.toFixed(),
 		slippageBps: SLIPPAGE_BPS,
 		reduceOnly: false,
 		tif: "Gtc",
@@ -269,7 +294,7 @@ function perpCases(market: LiveMarket, side: Side): PlanCase[] {
 	const entrySl = scaled(market.markPx, isBuy ? "0.9012345" : "1.1012345");
 	const closeLimit = scaled(market.markPx, isBuy ? "0.9812345" : "1.0212345");
 	const isLong = !isBuy;
-	const position = { assetId: market.assetId, szDecimals: market.szDecimals, isLong };
+	const position = { market: perpMarket(market), isLong };
 	const perpCase = (label: string, intent: OrderIntent, expected: PlanCase["expected"]): PlanCase => ({
 		label: `perp ${label}`,
 		market,
@@ -336,15 +361,15 @@ function perpCases(market: LiveMarket, side: Side): PlanCase[] {
 			{
 				kind: "marketClose",
 				...position,
-				size: size.toNumber(),
-				markPx: market.markPx.toNumber(),
+				size: sz,
+				markPx: market.markPx.toFixed(),
 				slippageBps: SLIPPAGE_BPS,
 			},
 			single(marketLeg(market, side, sz, true)),
 		),
 		perpCase(
 			"limit close",
-			{ kind: "limitClose", ...position, size: size.toNumber(), price: closeLimit.toNumber() },
+			{ kind: "limitClose", ...position, size: sz, price: closeLimit.toFixed() },
 			single(limitLeg(side, sz, true, closeLimit)),
 		),
 		perpCase(
@@ -352,8 +377,8 @@ function perpCases(market: LiveMarket, side: Side): PlanCase[] {
 			{
 				kind: "reverse",
 				...position,
-				size: size.toNumber(),
-				markPx: market.markPx.toNumber(),
+				size: sz,
+				markPx: market.markPx.toFixed(),
 				slippageBps: SLIPPAGE_BPS,
 			},
 			single(marketLeg(market, side, size.times(2).toFixed(), false)),
@@ -412,11 +437,10 @@ function spotCases(market: LiveMarket, side: Side): PlanCase[] {
 			"swap",
 			{
 				kind: "swap",
-				assetId: market.assetId,
+				market: spotMarket(market),
 				isBuy: side === "buy",
-				sizeValue: size.toNumber(),
-				szDecimals: market.szDecimals,
-				markPx: market.markPx.toNumber(),
+				sizeValue: sz,
+				markPx: market.markPx.toFixed(),
 				slippageBps: SWAP_SLIPPAGE_BPS,
 			},
 			single({

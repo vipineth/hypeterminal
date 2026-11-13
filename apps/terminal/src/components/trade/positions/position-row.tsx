@@ -2,6 +2,7 @@ import { TableCell, TableRow, Tooltip } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { PencilIcon, PlusIcon } from "@phosphor-icons/react";
 import { LIQ_WARNING_PROXIMITY } from "@/config/trade";
+import { isPerpLike } from "@/domain/market/model";
 import { cn } from "@/lib/cn";
 import { formatLiquidationPrice, formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
 import type { Position } from "@/lib/hyperliquid";
@@ -50,8 +51,8 @@ export function PositionRow({
 	const isLong = size > 0;
 	const absSize = Math.abs(size);
 	const market = markets.getMarket(p.coin);
-	const assetId = market?.assetId;
-	const szDecimals = market?.szDecimals ?? 4;
+	const perpMarket = market && isPerpLike(market) ? market : undefined;
+	const szDecimals = market?.szDecimals;
 	const markPx = toBig(markPxRaw)?.toNumber() ?? Number.NaN;
 	const displayName = market?.pairName ?? p.coin;
 
@@ -66,7 +67,7 @@ export function PositionRow({
 	const unrealizedPnl = toBig(p.unrealizedPnl)?.toNumber() ?? Number.NaN;
 	const roe = toBig(p.returnOnEquity)?.toNumber() ?? Number.NaN;
 	const cumFunding = toBig(p.cumFunding.sinceOpen)?.toNumber() ?? Number.NaN;
-	const canClose = isPositive(absSize) && typeof assetId === "number" && isPositive(markPx);
+	const canClose = isPositive(absSize) && perpMarket !== undefined && isPositive(markPx);
 
 	const pnlClass = getValueColorClass(unrealizedPnl);
 	const fundingClass = getValueColorClass(cumFunding ? -cumFunding : null);
@@ -108,13 +109,12 @@ export function PositionRow({
 	}
 
 	function buildCloseData(): ClosePositionData | null {
-		if (!canClose || typeof assetId !== "number") return null;
+		if (!canClose || !perpMarket) return null;
 		return {
-			assetId,
+			market: perpMarket,
 			coin: p.coin,
-			size: absSize,
-			markPx,
-			szDecimals,
+			size: toBig(p.szi)?.abs().toFixed() ?? "0",
+			markPx: markPxRaw ?? "",
 			isLong,
 			unrealizedPnl,
 			roe,
@@ -127,17 +127,16 @@ export function PositionRow({
 	}
 
 	function handleLimitClose() {
-		if (!canClose || typeof assetId !== "number") return;
+		if (!canClose || !perpMarket) return;
 		onLimitClose({
 			coin: p.coin,
-			assetId,
+			market: perpMarket,
 			isLong,
 			size: absSize,
 			entryPx,
 			markPx,
 			unrealizedPnl,
 			roe,
-			szDecimals,
 		});
 	}
 
@@ -147,17 +146,16 @@ export function PositionRow({
 	}
 
 	function handleOpenTpSl() {
-		if (typeof assetId !== "number") return;
+		if (!perpMarket) return;
 		onOpenTpSl({
 			coin: p.coin,
-			assetId,
+			market: perpMarket,
 			isLong,
 			size: absSize,
 			entryPx,
 			markPx,
 			unrealizedPnl,
 			roe,
-			szDecimals,
 			existingTpPrice: tpSlInfo?.tpPrice,
 			existingSlPrice: tpSlInfo?.slPrice,
 			existingTpOrderId: tpSlInfo?.tpOrderId,
@@ -247,7 +245,7 @@ export function PositionRow({
 					<button
 						type="button"
 						onClick={handleOpenTpSl}
-						disabled={typeof assetId !== "number"}
+						disabled={!perpMarket}
 						className={cn(
 							"group inline-flex items-center gap-1.5 cursor-pointer transition-opacity disabled:cursor-not-allowed disabled:opacity-50",
 							!hasTpSl && "text-fg-disabled hover:text-fg-muted",

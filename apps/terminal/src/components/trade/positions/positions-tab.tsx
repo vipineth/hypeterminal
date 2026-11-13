@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useConnection } from "wagmi";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { HL_ALL_DEXS } from "@/config/app";
+import { isListed } from "@/domain/market/model";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { cn } from "@/lib/cn";
@@ -70,8 +71,9 @@ export function PositionsTab() {
 	const tpSlOrdersByCoin = useMemo(() => buildTpSlOrdersByCoin(openOrders), [openOrders]);
 
 	async function submitCloseOrReverse(intent: CloseIntent, data: ClosePositionData) {
-		const { assetId, size, markPx, szDecimals, isLong, coin, unrealizedPnl, roe } = data;
-		if (closingAssetIds.has(assetId)) return;
+		const { market, size, markPx, isLong, coin, unrealizedPnl, roe } = data;
+		const { assetId } = market;
+		if (closingAssetIds.has(assetId) || (intent === "reverse" && !isListed(market))) return;
 
 		setActionError(null);
 		setClosingAssetIds((prev) => {
@@ -80,15 +82,10 @@ export function PositionsTab() {
 			return next;
 		});
 
-		const plan = buildOrderPlan({
-			kind: intent === "close" ? "marketClose" : "reverse",
-			assetId,
-			size,
-			szDecimals,
-			isLong,
-			markPx,
-			slippageBps,
-		});
+		const plan =
+			intent === "reverse" && isListed(market)
+				? buildOrderPlan({ kind: "reverse", market, size, isLong, markPx, slippageBps })
+				: buildOrderPlan({ kind: "marketClose", market, size, isLong, markPx, slippageBps });
 
 		const title = intent === "close" ? t`Position closed — ${coin}` : t`Position reversed — ${coin}`;
 		const failureMessage = intent === "close" ? t`Failed to close position` : t`Failed to reverse position`;
@@ -96,7 +93,7 @@ export function PositionsTab() {
 		const result = await submitPlan(plan);
 		if (result.ok) {
 			toast.success(title, {
-				description: buildClosePositionDescription({ size, szDecimals, coin, unrealizedPnl, roe }),
+				description: buildClosePositionDescription({ size, szDecimals: market.szDecimals, coin, unrealizedPnl, roe }),
 			});
 		} else {
 			const message = result.error || failureMessage;

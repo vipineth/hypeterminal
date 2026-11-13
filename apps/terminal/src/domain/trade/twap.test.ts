@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { ORDER_PLAN_ERRORS } from "@/domain/trade/orders";
 import { buildTwapPlan } from "@/domain/trade/twap";
+import { perpMarket } from "@/test/markets";
 
 const TWAP_BASE = {
-	assetId: 173,
+	market: perpMarket(173, 0),
 	side: "buy" as const,
-	sizeValue: 100,
-	szDecimals: 0,
+	sizeValue: "100",
 	reduceOnly: false,
 	minutes: 30,
 	randomize: false,
@@ -21,7 +21,7 @@ describe("buildTwapPlan", () => {
 	});
 
 	it("carries sell side, reduce-only and randomize through", () => {
-		const plan = buildTwapPlan({ ...TWAP_BASE, side: "sell", sizeValue: 250, reduceOnly: true, randomize: true });
+		const plan = buildTwapPlan({ ...TWAP_BASE, side: "sell", sizeValue: "250", reduceOnly: true, randomize: true });
 		expect(plan.action).toEqual({ twap: { a: 173, b: false, s: "250", r: true, m: 30, t: true } });
 	});
 
@@ -31,7 +31,7 @@ describe("buildTwapPlan", () => {
 	});
 
 	it("refuses a size that truncates to zero lots", () => {
-		expect(buildTwapPlan({ ...TWAP_BASE, sizeValue: 0.4 })).toEqual({
+		expect(buildTwapPlan({ ...TWAP_BASE, sizeValue: "0.4" })).toEqual({
 			action: null,
 			errors: [ORDER_PLAN_ERRORS.invalidSize],
 		});

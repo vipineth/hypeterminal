@@ -31,7 +31,7 @@ export function PositionTpSlModal({ open, onOpenChange, position }: Props) {
 		<Modal open={open} onOpenChange={onOpenChange}>
 			<ModalPopup size="sm" showClose={false} aria-label={getTpSlModalAriaLabel(position)}>
 				<PositionTpSlModalBody
-					key={`${position.assetId}:${open ? "open" : "closed"}`}
+					key={`${position.market.assetId}:${open ? "open" : "closed"}`}
 					position={position}
 					onOpenChange={onOpenChange}
 				/>
@@ -46,7 +46,7 @@ interface BodyProps {
 }
 
 function PositionTpSlModalBody({ position, onOpenChange }: BodyProps) {
-	const decimals = szDecimalsToPriceDecimals(position.szDecimals);
+	const decimals = szDecimalsToPriceDecimals(position.market.szDecimals);
 	const [tpPriceInput, setTpPriceInput] = useState(
 		position.existingTpPrice ? position.existingTpPrice.toFixed(decimals) : "",
 	);
@@ -73,8 +73,7 @@ function PositionTpSlModalBody({ position, onOpenChange }: BodyProps) {
 
 		const plan = buildOrderPlan({
 			kind: "positionTpsl",
-			assetId: position.assetId,
-			szDecimals: position.szDecimals,
+			market: position.market,
 			isLong: position.isLong,
 			tpPriceInput: hasTp ? tpPriceInput : null,
 			slPriceInput: hasSl ? slPriceInput : null,
@@ -114,19 +113,19 @@ function PositionTpSlModalBody({ position, onOpenChange }: BodyProps) {
 					<InfoRow
 						className="p-0"
 						label={t`Size`}
-						value={`${formatToken(position.size, position.szDecimals)} ${position.coin}`}
+						value={`${formatToken(position.size, position.market.szDecimals)} ${position.coin}`}
 						valueClassName="font-medium"
 					/>
 					<InfoRow
 						className="p-0"
 						label={t`Entry Price`}
-						value={formatPrice(position.entryPx, { szDecimals: position.szDecimals })}
+						value={formatPrice(position.entryPx, { szDecimals: position.market.szDecimals })}
 						valueClassName="font-medium"
 					/>
 					<InfoRow
 						className="p-0"
 						label={t`Mark Price`}
-						value={formatPrice(markPx, { szDecimals: position.szDecimals })}
+						value={formatPrice(markPx, { szDecimals: position.market.szDecimals })}
 						valueClassName="font-medium text-warning"
 					/>
 					<InfoRow
@@ -148,7 +147,7 @@ function PositionTpSlModalBody({ position, onOpenChange }: BodyProps) {
 					side={side}
 					referencePrice={position.entryPx}
 					size={size}
-					szDecimals={position.szDecimals}
+					szDecimals={position.market.szDecimals}
 					tpPrice={tpPriceInput}
 					slPrice={slPriceInput}
 					onTpPriceChange={setTpPriceInput}
@@ -193,7 +192,7 @@ function getPositionTriggerError(
 ): string | null {
 	if (markPx === null || !isPositive(triggerPx)) return null;
 	const side = position.isLong ? "buy" : "sell";
-	const verdict = checkTrigger({ triggerPx, referencePx: markPx, side, tpsl, szDecimals: position.szDecimals });
+	const verdict = checkTrigger({ triggerPx, referencePx: markPx, side, tpsl, szDecimals: position.market.szDecimals });
 	return getTriggerMessage({ verdict, tpsl, side, source: "mark" });
 }
 

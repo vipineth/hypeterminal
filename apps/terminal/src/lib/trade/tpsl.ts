@@ -1,10 +1,10 @@
 import Big from "big.js";
+import type { Market } from "@/domain/market/model";
 import {
 	formatPriceForOrder,
 	formatTriggerPxForOrder,
 	OrderBuildError,
 	type TpSl,
-	type WireMarket,
 } from "@/domain/trade/orders";
 import { type Numeric, toBig, toSafeBig } from "./numbers";
 import type { Side } from "./types";
@@ -112,7 +112,7 @@ function formatEntryLimit(limitPriceInput: string, side: Side, szDecimals: numbe
 	}
 }
 
-function perpMarket(szDecimals: number): WireMarket {
+function perpMarket(szDecimals: number): Pick<Market, "kind" | "szDecimals"> {
 	return { szDecimals, kind: "perp" };
 }
 

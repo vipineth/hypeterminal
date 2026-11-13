@@ -5,7 +5,7 @@ import { SCALE_LEVELS_MAX, SCALE_LEVELS_MIN } from "@/config/trade";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import { validateSpotOrder } from "@/lib/errors/stacks/spot-order";
-import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
+import type { SpotMarketInfo, UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 import type { SizeMode } from "@/lib/trade/types";
 
 const form = vi.hoisted(() => ({
@@ -52,7 +52,7 @@ const HYPE_USDC = {
 	szDecimals: 2,
 	base: { name: "HYPE", displayName: "HYPE" },
 	quote: { name: "USDC", displayName: "USDC" },
-} as unknown as UnifiedMarketInfo;
+} as unknown as SpotMarketInfo;
 
 const MARK = 100;
 const LIMIT = 200;
@@ -83,13 +83,11 @@ function submitLimitBuy(sizeMode: SizeMode, sizeInput: string) {
 	const entry = renderOrderEntry(HYPE_USDC, sizeMode, sizeInput);
 	const plan = buildOrderPlan({
 		kind: "entry",
-		assetId: HYPE_USDC.assetId,
+		market: HYPE_USDC,
 		side: "buy",
 		orderType: "limit",
-		sizeValue: entry.sizeValue,
-		szDecimals: HYPE_USDC.szDecimals,
-		marketKind: "spot",
-		markPx: MARK,
+		sizeValue: entry.orderSize,
+		markPx: String(MARK),
 		slippageBps: 250,
 		reduceOnly: false,
 		tif: "Gtc",
@@ -168,16 +166,14 @@ const SCALE_RANGES = [
 
 const SCALE_QUOTES = ["270", "999.99", "1234.56", "5000"];
 
-function buildScaleBuy(market: UnifiedMarketInfo, entry: OrderEntry, levels: number) {
+function buildScaleBuy(market: SpotMarketInfo, entry: OrderEntry, levels: number) {
 	return buildOrderPlan({
 		kind: "entry",
-		assetId: market.assetId,
+		market,
 		side: "buy",
 		orderType: "scale",
-		sizeValue: entry.sizeValue,
-		szDecimals: market.szDecimals,
-		marketKind: "spot",
-		markPx: MARK,
+		sizeValue: entry.orderSize,
+		markPx: String(MARK),
 		slippageBps: 250,
 		reduceOnly: false,
 		tif: "Gtc",

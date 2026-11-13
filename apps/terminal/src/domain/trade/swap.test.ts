@@ -1,27 +1,28 @@
 import Big from "big.js";
 import { describe, expect, it } from "vitest";
 import { ORDER_MIN_NOTIONAL_USD } from "@/config/trade";
+import type { SpotMarket } from "@/domain/market/model";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { getSwapQuote } from "@/domain/trade/swap";
+import { spotMarket } from "@/test/markets";
 
 interface SwapMarket {
-	assetId: number;
+	market: SpotMarket;
 	markPx: string;
 	szDecimals: number;
 }
 
-const JEFF_USDC: SwapMarket = { assetId: 10004, markPx: "2.1164", szDecimals: 0 };
-const HFUN_USDC: SwapMarket = { assetId: 10001, markPx: "10.714", szDecimals: 2 };
+const JEFF_USDC: SwapMarket = { market: spotMarket(10004, 0, "JEFF"), markPx: "2.1164", szDecimals: 0 };
+const HFUN_USDC: SwapMarket = { market: spotMarket(10001, 2, "HFUN"), markPx: "10.714", szDecimals: 2 };
 
 function swap(market: SwapMarket, amount: string, isBuying: boolean) {
 	const quote = getSwapQuote({ amount, markPx: market.markPx, szDecimals: market.szDecimals, isBuying });
 	const plan = buildOrderPlan({
 		kind: "swap",
-		assetId: market.assetId,
+		market: market.market,
 		isBuy: isBuying,
 		sizeValue: quote.orderSize,
-		szDecimals: market.szDecimals,
-		markPx: Number(market.markPx),
+		markPx: market.markPx,
 		slippageBps: 100,
 	});
 	return { wireSize: plan.orders[0]?.s, estimatedReceive: quote.estimatedReceive };

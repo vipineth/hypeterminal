@@ -12,7 +12,7 @@ interface SwapQuoteInput {
 }
 
 interface SwapQuote {
-	orderSize: number;
+	orderSize: string;
 	estimatedReceive: number;
 }
 
@@ -50,12 +50,10 @@ export function getSwapSide(fromToken: string, spotMarket: SpotMarketInfo): bool
 export function getSwapQuote({ amount, markPx, szDecimals, isBuying }: SwapQuoteInput): SwapQuote {
 	const amountBig = toBig(amount);
 	const mark = toBig(markPx);
-	if (!amountBig || !mark || amountBig.lte(0) || mark.lte(0)) return { orderSize: 0, estimatedReceive: 0 };
+	if (!amountBig || !mark || amountBig.lte(0) || mark.lte(0)) return { orderSize: "0", estimatedReceive: 0 };
 
-	if (isBuying) {
-		const size = amountBig.div(mark).round(szDecimals, Big.roundDown).toNumber();
-		return { orderSize: size, estimatedReceive: size };
-	}
-	const size = amountBig.round(szDecimals, Big.roundDown);
-	return { orderSize: size.toNumber(), estimatedReceive: size.times(mark).toNumber() };
+	const size = isBuying
+		? amountBig.div(mark).round(szDecimals, Big.roundDown)
+		: amountBig.round(szDecimals, Big.roundDown);
+	return { orderSize: size.toFixed(), estimatedReceive: (isBuying ? size : size.times(mark)).toNumber() };
 }

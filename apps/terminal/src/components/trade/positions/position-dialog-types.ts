@@ -1,13 +1,14 @@
+import type { PerpLikeMarket } from "@/domain/market/model";
+
 export interface TpSlPositionData {
 	coin: string;
-	assetId: number;
+	market: PerpLikeMarket;
 	isLong: boolean;
 	size: number;
 	entryPx: number;
 	markPx: number;
 	unrealizedPnl: number;
 	roe: number;
-	szDecimals: number;
 	existingTpPrice?: number;
 	existingSlPrice?: number;
 	existingTpOrderId?: number;
@@ -15,11 +16,10 @@ export interface TpSlPositionData {
 }
 
 export interface ClosePositionData {
-	assetId: number;
+	market: PerpLikeMarket;
 	coin: string;
-	size: number;
-	markPx: number;
-	szDecimals: number;
+	size: string;
+	markPx: string;
 	isLong: boolean;
 	unrealizedPnl: number;
 	roe: number;
@@ -27,12 +27,11 @@ export interface ClosePositionData {
 
 export interface LimitClosePositionData {
 	coin: string;
-	assetId: number;
+	market: PerpLikeMarket;
 	isLong: boolean;
 	size: number;
 	entryPx: number;
 	markPx: number;
 	unrealizedPnl: number;
 	roe: number;
-	szDecimals: number;
 }

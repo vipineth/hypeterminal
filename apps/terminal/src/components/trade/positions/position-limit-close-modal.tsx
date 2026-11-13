@@ -28,7 +28,7 @@ export function PositionLimitCloseModal({ open, onOpenChange, position }: Props)
 		<Modal open={open} onOpenChange={onOpenChange}>
 			<ModalPopup size="sm" showClose={false}>
 				<PositionLimitCloseModalBody
-					key={`${position.assetId}:${open ? "open" : "closed"}`}
+					key={`${position.market.assetId}:${open ? "open" : "closed"}`}
 					position={position}
 					onOpenChange={onOpenChange}
 				/>
@@ -43,9 +43,9 @@ interface BodyProps {
 }
 
 function PositionLimitCloseModalBody({ position, onOpenChange }: BodyProps) {
-	const priceDecimalsInit = szDecimalsToPriceDecimals(position.szDecimals);
+	const priceDecimalsInit = szDecimalsToPriceDecimals(position.market.szDecimals);
 	const [priceInput, setPriceInput] = useState(() => position.markPx.toFixed(priceDecimalsInit));
-	const [sizeInput, setSizeInput] = useState(() => truncateDecimals(position.size, position.szDecimals));
+	const [sizeInput, setSizeInput] = useState(() => truncateDecimals(position.size, position.market.szDecimals));
 	const [submitError, setSubmitError] = useState<string | null>(null);
 
 	const { submitPlan, isSubmitting } = useSubmitPlan();
@@ -75,11 +75,10 @@ function PositionLimitCloseModalBody({ position, onOpenChange }: BodyProps) {
 
 		const plan = buildOrderPlan({
 			kind: "limitClose",
-			assetId: position.assetId,
-			size: sizeNum,
-			szDecimals: position.szDecimals,
+			market: position.market,
+			size: sizeInput,
 			isLong: position.isLong,
-			price: priceNum,
+			price: priceInput,
 		});
 
 		setSubmitError(null);
@@ -95,10 +94,10 @@ function PositionLimitCloseModalBody({ position, onOpenChange }: BodyProps) {
 	}
 
 	function handleMaxSize() {
-		setSizeInput(truncateDecimals(position.size, position.szDecimals));
+		setSizeInput(truncateDecimals(position.size, position.market.szDecimals));
 	}
 
-	const priceDecimals = szDecimalsToPriceDecimals(position.szDecimals);
+	const priceDecimals = szDecimalsToPriceDecimals(position.market.szDecimals);
 	const visibleError = submitError;
 
 	return (
@@ -112,19 +111,19 @@ function PositionLimitCloseModalBody({ position, onOpenChange }: BodyProps) {
 					<InfoRow
 						className="p-0"
 						label={t`Size`}
-						value={`${formatToken(position.size, position.szDecimals)} ${position.coin}`}
+						value={`${formatToken(position.size, position.market.szDecimals)} ${position.coin}`}
 						valueClassName="font-medium tabular-nums"
 					/>
 					<InfoRow
 						className="p-0"
 						label={t`Entry Price`}
-						value={formatPrice(position.entryPx, { szDecimals: position.szDecimals })}
+						value={formatPrice(position.entryPx, { szDecimals: position.market.szDecimals })}
 						valueClassName="font-medium tabular-nums"
 					/>
 					<InfoRow
 						className="p-0"
 						label={t`Mark Price`}
-						value={formatPrice(liveMarkPx, { szDecimals: position.szDecimals })}
+						value={formatPrice(liveMarkPx, { szDecimals: position.market.szDecimals })}
 						valueClassName="font-medium tabular-nums text-warning"
 					/>
 					<InfoRow
@@ -150,7 +149,7 @@ function PositionLimitCloseModalBody({ position, onOpenChange }: BodyProps) {
 					placeholder="0.00"
 					maxAllowedDecimals={priceDecimals}
 					midPrice={liveMarkPx}
-					szDecimals={position.szDecimals}
+					szDecimals={position.market.szDecimals}
 					inputSize="sm"
 					className="w-full"
 				/>
@@ -162,7 +161,7 @@ function PositionLimitCloseModalBody({ position, onOpenChange }: BodyProps) {
 							<>
 								{t`Available`}:{" "}
 								<span className="underline decoration-dashed underline-offset-2 decoration-stroke-weak">
-									{formatToken(position.size, position.szDecimals)} {position.coin}
+									{formatToken(position.size, position.market.szDecimals)} {position.coin}
 								</span>
 							</>
 						}
@@ -170,7 +169,7 @@ function PositionLimitCloseModalBody({ position, onOpenChange }: BodyProps) {
 						value={sizeInput}
 						onChange={(e) => setSizeInput(e.target.value)}
 						placeholder="0.00"
-						maxAllowedDecimals={position.szDecimals}
+						maxAllowedDecimals={position.market.szDecimals}
 						inputSize="sm"
 						className="w-full"
 					/>

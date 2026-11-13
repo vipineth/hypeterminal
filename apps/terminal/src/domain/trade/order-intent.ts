@@ -1,5 +1,6 @@
 import Big from "big.js";
 import type { ExchangeOrder } from "@/config/trade";
+import type { ListedMarket, PerpLikeMarket, SpotMarket } from "@/domain/market/model";
 import { getMarketPrice } from "@/domain/trade/order/price";
 import {
 	buildOrders,
@@ -11,8 +12,9 @@ import {
 	ORDER_PLAN_ERRORS,
 	OrderBuildError,
 	type OrderPlanError,
+	type SizeWire,
 	type TpSl,
-	type WireMarket,
+	type WireOrder,
 } from "@/domain/trade/orders";
 import { toSafeBig } from "@/lib/trade/numbers";
 import { isTwapOrderType } from "@/lib/trade/order-types";
@@ -29,8 +31,7 @@ export type EntryOrderIntent = EntryOrderParams & { kind: "entry" };
 
 export type PositionTpSlIntent = {
 	kind: "positionTpsl";
-	assetId: number;
-	szDecimals: number;
+	market: PerpLikeMarket;
 	isLong: boolean;
 	tpPriceInput: string | null;
 	slPriceInput: string | null;
@@ -38,40 +39,36 @@ export type PositionTpSlIntent = {
 
 export type MarketCloseIntent = {
 	kind: "marketClose";
-	assetId: number;
-	size: number;
-	szDecimals: number;
+	market: PerpLikeMarket;
+	size: string;
 	isLong: boolean;
-	markPx: number;
+	markPx: string;
 	slippageBps: number;
 };
 
 export type LimitCloseIntent = {
 	kind: "limitClose";
-	assetId: number;
-	size: number;
-	szDecimals: number;
+	market: PerpLikeMarket;
+	size: string;
 	isLong: boolean;
-	price: number;
+	price: string;
 };
 
 export type ReverseIntent = {
 	kind: "reverse";
-	assetId: number;
-	size: number;
-	szDecimals: number;
+	market: PerpLikeMarket & ListedMarket;
+	size: string;
 	isLong: boolean;
-	markPx: number;
+	markPx: string;
 	slippageBps: number;
 };
 
 export type SwapIntent = {
 	kind: "swap";
-	assetId: number;
+	market: SpotMarket;
 	isBuy: boolean;
-	sizeValue: number;
-	szDecimals: number;
-	markPx: number;
+	sizeValue: string;
+	markPx: string;
 	slippageBps: number;
 };
 
@@ -83,13 +80,13 @@ export type OrderIntent =
 	| ReverseIntent
 	| SwapIntent;
 
-type PlanLegs = Pick<OrderPlan, "orders" | "grouping">;
+type PlanLegs = { orders: WireOrder[]; grouping: OrderPlan["grouping"] };
 
 export type PlanLegRole = "entry" | "takeProfit" | "stopLoss" | "order" | "scaleLeg";
 
 export type PlanLeg = { role: PlanLegRole; price: string };
 
-export function describePlanLegs({ orders, grouping }: PlanLegs): PlanLeg[] {
+export function describePlanLegs({ orders, grouping }: Pick<OrderPlan, "orders" | "grouping">): PlanLeg[] {
 	return orders.map((order, index) => ({ role: getLegRole(order, index, grouping, orders.length), price: order.p }));
 }
 
@@ -155,43 +152,38 @@ function getCloseSide(isLong: boolean): Side {
 	return isLong ? "sell" : "buy";
 }
 
-function perpMarket(szDecimals: number): WireMarket {
-	return { szDecimals, kind: "perp" };
-}
-
 function buildEntryPlan(intent: EntryOrderIntent): PlanLegs {
 	if (isTwapOrderType(intent.orderType)) throw new OrderBuildError(ORDER_PLAN_ERRORS.twapNotSupported);
 	return buildOrders(intent);
 }
 
-function buildPositionTpSlPlan(intent: PositionTpSlIntent): PlanLegs {
-	const orders: ExchangeOrder[] = [];
-	const isBuy = !intent.isLong;
-	const market = perpMarket(intent.szDecimals);
+function buildPositionTpSlPlan({ market, isLong, tpPriceInput, slPriceInput }: PositionTpSlIntent): PlanLegs {
+	const orders: WireOrder[] = [];
+	const isBuy = !isLong;
 
-	if (intent.tpPriceInput !== null) {
-		orders.push(buildPositionTpSlOrder(intent.assetId, market, isBuy, intent.tpPriceInput, "tp"));
+	if (tpPriceInput !== null) {
+		orders.push(buildPositionTpSlOrder(market, isBuy, tpPriceInput, "tp"));
 	}
 
-	if (intent.slPriceInput !== null) {
-		orders.push(buildPositionTpSlOrder(intent.assetId, market, isBuy, intent.slPriceInput, "sl"));
+	if (slPriceInput !== null) {
+		orders.push(buildPositionTpSlOrder(market, isBuy, slPriceInput, "sl"));
 	}
 
 	if (orders.length === 0) throw new OrderBuildError(ORDER_PLAN_ERRORS.noTpSl);
 	return { orders, grouping: "positionTpsl" };
 }
 
-function buildMarketClosePlan({ assetId, size, szDecimals, isLong, markPx, slippageBps }: MarketCloseIntent): PlanLegs {
+function buildMarketClosePlan({ market, size, isLong, markPx, slippageBps }: MarketCloseIntent): PlanLegs {
 	const side = getCloseSide(isLong);
 	const orderPrice = getMarketPrice(side, markPx, slippageBps);
 
 	return {
 		orders: [
 			{
-				a: assetId,
+				a: market.assetId,
 				b: side === "buy",
-				p: formatPriceForOrder(orderPrice, perpMarket(szDecimals), side, "aggressive"),
-				s: formatSizeForOrder(size, szDecimals),
+				p: formatPriceForOrder(orderPrice, market, side, "aggressive"),
+				s: formatSizeForOrder(size, market),
 				r: true,
 				t: { limit: { tif: "FrontendMarket" } },
 			},
@@ -200,16 +192,16 @@ function buildMarketClosePlan({ assetId, size, szDecimals, isLong, markPx, slipp
 	};
 }
 
-function buildLimitClosePlan({ assetId, size, szDecimals, isLong, price }: LimitCloseIntent): PlanLegs {
+function buildLimitClosePlan({ market, size, isLong, price }: LimitCloseIntent): PlanLegs {
 	const side = getCloseSide(isLong);
 
 	return {
 		orders: [
 			{
-				a: assetId,
+				a: market.assetId,
 				b: side === "buy",
-				p: formatPriceForOrder(price, perpMarket(szDecimals), side, "passive"),
-				s: formatSizeForOrder(size, szDecimals),
+				p: formatPriceForOrder(price, market, side, "passive"),
+				s: formatSizeForOrder(size, market),
 				r: true,
 				t: { limit: { tif: "Gtc" } },
 			},
@@ -218,17 +210,17 @@ function buildLimitClosePlan({ assetId, size, szDecimals, isLong, price }: Limit
 	};
 }
 
-function buildReversePlan({ assetId, size, szDecimals, isLong, markPx, slippageBps }: ReverseIntent): PlanLegs {
+function buildReversePlan({ market, size, isLong, markPx, slippageBps }: ReverseIntent): PlanLegs {
 	const side = getCloseSide(isLong);
 	const orderPrice = getMarketPrice(side, markPx, slippageBps);
 
 	return {
 		orders: [
 			{
-				a: assetId,
+				a: market.assetId,
 				b: side === "buy",
-				p: formatPriceForOrder(orderPrice, perpMarket(szDecimals), side, "aggressive"),
-				s: formatSizeForOrder(Big(size).times(2), szDecimals),
+				p: formatPriceForOrder(orderPrice, market, side, "aggressive"),
+				s: formatSizeForOrder(toSafeBig(size).times(2), market),
 				r: false,
 				t: { limit: { tif: "FrontendMarket" } },
 			},
@@ -237,7 +229,7 @@ function buildReversePlan({ assetId, size, szDecimals, isLong, markPx, slippageB
 	};
 }
 
-function buildSwapPlan({ assetId, isBuy, sizeValue, szDecimals, markPx, slippageBps }: SwapIntent): PlanLegs {
+function buildSwapPlan({ market, isBuy, sizeValue, markPx, slippageBps }: SwapIntent): PlanLegs {
 	const slippageMultiplier = Big(1).plus(Big(slippageBps).div(10000));
 	const mark = toSafeBig(markPx);
 	const price = isBuy ? mark.times(slippageMultiplier) : mark.div(slippageMultiplier);
@@ -245,10 +237,10 @@ function buildSwapPlan({ assetId, isBuy, sizeValue, szDecimals, markPx, slippage
 	return {
 		orders: [
 			{
-				a: assetId,
+				a: market.assetId,
 				b: isBuy,
-				p: formatPriceForOrder(price, { szDecimals, kind: "spot" }, isBuy ? "buy" : "sell", "aggressive"),
-				s: formatSizeForOrder(sizeValue, szDecimals),
+				p: formatPriceForOrder(price, market, isBuy ? "buy" : "sell", "aggressive"),
+				s: formatSizeForOrder(sizeValue, market),
 				r: false,
 				t: { limit: { tif: "FrontendMarket" } },
 			},
@@ -257,19 +249,13 @@ function buildSwapPlan({ assetId, isBuy, sizeValue, szDecimals, markPx, slippage
 	};
 }
 
-function buildPositionTpSlOrder(
-	assetId: number,
-	market: WireMarket,
-	isBuy: boolean,
-	triggerPrice: string,
-	tpsl: TpSl,
-): ExchangeOrder {
+function buildPositionTpSlOrder(market: PerpLikeMarket, isBuy: boolean, triggerPrice: string, tpsl: TpSl): WireOrder {
 	const side = isBuy ? "buy" : "sell";
 	return {
-		a: assetId,
+		a: market.assetId,
 		b: isBuy,
 		p: formatPriceForOrder(triggerPrice, market, side, "passive"),
-		s: "0",
+		s: "0" as SizeWire,
 		r: true,
 		t: { trigger: { isMarket: true, triggerPx: formatTriggerPxForOrder(triggerPrice, market, side, tpsl), tpsl } },
 	};

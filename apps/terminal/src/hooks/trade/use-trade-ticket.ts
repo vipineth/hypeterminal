@@ -4,6 +4,7 @@ import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/app";
 import { APPROVAL_ERROR_DISMISS_MS } from "@/config/time";
 import { getPositionDex } from "@/domain/market";
+import { isListed } from "@/domain/market/model";
 import { getMarketQuoteToken } from "@/domain/trade/balances";
 import { getLiquidationInfo, getOrderMetrics } from "@/domain/trade/order/metrics";
 import { getOrderPrice } from "@/domain/trade/order/price";
@@ -229,15 +230,15 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 
 	async function handleSubmit() {
 		if (!validation.canSubmit || isSubmitting) return;
-		if (!market || !baseToken || typeof market.assetId !== "number") return;
+		if (!market || !isListed(market) || !baseToken) return;
 
 		const submitted = await submitOrder({
-			market: { assetId: market.assetId, szDecimals: market.szDecimals, kind: market.kind, name: market.name },
+			market,
 			baseToken,
 			side,
 			orderType,
-			sizeValue,
-			markPx,
+			sizeValue: entry.orderSize,
+			markPx: market.markPx ?? "",
 			slippageBps,
 			reduceOnly,
 			tif,

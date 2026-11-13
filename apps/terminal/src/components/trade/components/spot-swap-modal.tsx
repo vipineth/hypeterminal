@@ -16,7 +16,7 @@ import { useAutoCloseSuccess } from "@/hooks/ui/use-auto-close-success";
 import { cn } from "@/lib/cn";
 import { formatToken } from "@/lib/format";
 import { useMarketsInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
-import { toNumber, toNumberOrZero } from "@/lib/trade/numbers";
+import { isPositive, toNumber, toNumberOrZero } from "@/lib/trade/numbers";
 import {
 	useSwapModalActions,
 	useSwapModalFromToken,
@@ -149,17 +149,16 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 	);
 
 	const handleSubmit = useCallback(async () => {
-		if (!spotMarket || orderSize <= 0 || isSubmitting) return;
+		if (!spotMarket || !isPositive(orderSize) || isSubmitting) return;
 
 		setError(null);
 
 		const plan = buildOrderPlan({
 			kind: "swap",
-			assetId: spotMarket.assetId,
+			market: spotMarket,
 			isBuy: isBuying,
 			sizeValue: orderSize,
-			szDecimals,
-			markPx,
+			markPx: spotMarket.markPx ?? "",
 			slippageBps: DEFAULT_SLIPPAGE_BPS,
 		});
 
@@ -169,11 +168,11 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 		} else {
 			setError(result.error || t`Swap failed`);
 		}
-	}, [spotMarket, orderSize, isSubmitting, isBuying, markPx, szDecimals, submitPlan, triggerAutoClose]);
+	}, [spotMarket, orderSize, isSubmitting, isBuying, submitPlan, triggerAutoClose]);
 
 	const insufficientBalance = amountValue > fromBalance;
 	const noPairAvailable = fromToken && toToken && !spotMarket;
-	const canSubmit = amountValue > 0 && !insufficientBalance && orderSize > 0 && !showSuccess && spotMarket;
+	const canSubmit = amountValue > 0 && !insufficientBalance && isPositive(orderSize) && !showSuccess && spotMarket;
 	const isDisabled = isSubmitting || showSuccess;
 
 	return (

@@ -10,8 +10,8 @@ import {
 import {
 	getMaxSizeForOrderEntry,
 	getOrderValue,
+	getSizeFromInput,
 	getSizeUnit,
-	getSizeValueFromInput,
 	QUOTE_SIZE_DECIMALS,
 	readSizeInput,
 } from "@/domain/trade/order/size";
@@ -47,6 +47,7 @@ export interface OrderEntryDerived {
 	availableBalanceToken: string;
 	spotBalance: SpotBalanceData;
 	maxSize: number;
+	orderSize: string;
 	sizeValue: number;
 	orderValue: number;
 	sideLabels: SideLabels;
@@ -92,12 +93,13 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 	});
 
 	const sizeInput = readSizeInput(inputs.size, inputs.sizeUnit, getSizeUnit(inputs.market, inputs.sizeMode));
-	const sizeValue = getSizeValueFromInput({
+	const orderSize = getSizeFromInput({
 		sizeInput,
 		sizeMode: inputs.sizeMode,
 		price: inputs.conversionPrice,
 		szDecimals,
 	});
+	const sizeValue = Number(orderSize);
 
 	const orderValue = getOrderValue(sizeValue, inputs.conversionPrice);
 	const sideLabels = getSideLabels(isSpotMarket);
@@ -116,6 +118,7 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 		availableBalanceToken,
 		spotBalance,
 		maxSize,
+		orderSize,
 		sizeValue,
 		orderValue,
 		sideLabels,

@@ -96,16 +96,19 @@ export function getMaxSizeForOrderEntry(input: OrderEntryMaxSizeInput): number {
 	return maxTradeSize > 0 ? maxTradeSize : 0;
 }
 
-export function getSizeValueFromInput(input: SizeValueInput): number {
+export function getSizeFromInput(input: SizeValueInput): string {
 	const inputVal = toBig(input.sizeInput);
-	if (!inputVal || inputVal.lte(0)) return 0;
+	if (!inputVal || inputVal.lte(0)) return "0";
 
-	if (input.sizeMode === "base") return inputVal.toNumber();
+	if (input.sizeMode === "base") return inputVal.toFixed();
 
 	const px = toBig(input.price);
-	if (!px || px.lte(0)) return 0;
-	const converted = floorToDecimals(inputVal.div(px).toNumber(), input.szDecimals);
-	return Number.isFinite(converted) ? converted : 0;
+	if (!px || px.lte(0)) return "0";
+	return inputVal.div(px).round(input.szDecimals, Big.roundDown).toFixed();
+}
+
+export function getSizeValueFromInput(input: SizeValueInput): number {
+	return Number(getSizeFromInput(input));
 }
 
 export function getOrderValue(sizeValue: number, price: number): number {

@@ -1,5 +1,5 @@
 import type { ExchangeOrder, LimitTif, OrderType } from "@/config/trade";
-import type { MarketKind } from "@/domain/market";
+import type { ListedMarket } from "@/domain/market/model";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
 import type { TpSl } from "@/domain/trade/orders";
 import { buildTwapPlan } from "@/domain/trade/twap";
@@ -10,20 +10,13 @@ import type { Side } from "@/lib/trade/types";
 import { useOrderEntryActions } from "@/stores/use-order-entry-store";
 import { resultToQueueUpdate, shouldClearTicket, useOrderQueueActions } from "@/stores/use-order-queue-store";
 
-interface SubmitMarket {
-	assetId: number;
-	szDecimals: number;
-	kind: MarketKind;
-	name: string;
-}
-
 export interface OrderSubmitInput {
-	market: SubmitMarket;
+	market: ListedMarket;
 	baseToken: string;
 	side: Side;
 	orderType: OrderType;
-	sizeValue: number;
-	markPx: number;
+	sizeValue: string;
+	markPx: string;
 	slippageBps: number;
 	reduceOnly: boolean;
 	tif: LimitTif;
@@ -84,10 +77,9 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 
 	async function submitTwap(input: OrderSubmitInput): Promise<boolean> {
 		const plan = buildTwapPlan({
-			assetId: input.market.assetId,
+			market: input.market,
 			side: input.side,
 			sizeValue: input.sizeValue,
-			szDecimals: input.market.szDecimals,
 			reduceOnly: input.reduceOnly,
 			minutes: input.twapMinutesNum,
 			randomize: input.twapRandomize,
@@ -112,12 +104,10 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 
 		const plan = buildOrderPlan({
 			kind: "entry",
-			assetId: market.assetId,
+			market,
 			side: input.side,
 			orderType: input.orderType,
 			sizeValue: input.sizeValue,
-			szDecimals: market.szDecimals,
-			marketKind: market.kind,
 			markPx: input.markPx,
 			slippageBps: input.slippageBps,
 			reduceOnly: input.reduceOnly,

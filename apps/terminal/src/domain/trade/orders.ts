@@ -12,7 +12,7 @@ import {
 	SCALE_LEVELS_MAX,
 	SCALE_LEVELS_MIN,
 } from "@/config/trade";
-import type { MarketKind } from "@/domain/market";
+import type { AssetId, ListedMarket, Market } from "@/domain/market/model";
 import { getMarketPrice } from "@/domain/trade/order/price";
 import { clampInt, isPositive, type Numeric, toBig, toSafeBig } from "@/lib/trade/numbers";
 import { isScaleOrderType, isStopOrderType, isTriggerOrderType, usesLimitPrice } from "@/lib/trade/order-types";
@@ -37,23 +37,25 @@ export class OrderBuildError extends Error {
 	}
 }
 
-export interface WireMarket {
-	szDecimals: number;
-	kind: MarketKind;
-}
+declare const priceWireBrand: unique symbol;
+declare const sizeWireBrand: unique symbol;
+export type PriceWire = string & { readonly [priceWireBrand]: true };
+export type SizeWire = string & { readonly [sizeWireBrand]: true };
+
+export type WireOrder = Omit<ExchangeOrder, "a" | "p" | "s"> & { a: AssetId; p: PriceWire; s: SizeWire };
+
+type PricedMarket = Pick<Market, "kind" | "szDecimals">;
 
 export type PriceRounding = "passive" | "aggressive";
 
 export type TpSl = "tp" | "sl";
 
 export interface EntryOrderParams {
-	assetId: number;
+	market: ListedMarket;
 	side: Side;
 	orderType: OrderType;
-	sizeValue: number;
-	szDecimals: number;
-	marketKind: MarketKind;
-	markPx: number;
+	sizeValue: string;
+	markPx: string;
 	slippageBps: number;
 	reduceOnly: boolean;
 	tif: LimitTif;
@@ -69,18 +71,16 @@ export interface EntryOrderParams {
 }
 
 export interface OrderBuildResult {
-	orders: ExchangeOrder[];
+	orders: WireOrder[];
 	grouping: "normalTpsl" | "positionTpsl" | "na";
 }
 
 export function buildOrders(params: EntryOrderParams): OrderBuildResult {
 	const {
-		assetId,
+		market,
 		side,
 		orderType,
 		sizeValue,
-		szDecimals,
-		marketKind,
 		markPx,
 		slippageBps,
 		reduceOnly,
@@ -96,15 +96,13 @@ export function buildOrders(params: EntryOrderParams): OrderBuildResult {
 		slPriceInput,
 	} = params;
 
-	const market: WireMarket = { szDecimals, kind: marketKind };
-	const orders: ExchangeOrder[] = [];
+	const orders: WireOrder[] = [];
 	const hasTp = tpSlEnabled && canUseTpSl && isPositive(tpPriceInput);
 	const hasSl = tpSlEnabled && canUseTpSl && isPositive(slPriceInput);
 	const isBuy = side === "buy";
 
 	if (isScaleOrderType(orderType)) {
 		buildScaleOrders(orders, {
-			assetId,
 			market,
 			isBuy,
 			sizeValue,
@@ -116,19 +114,17 @@ export function buildOrders(params: EntryOrderParams): OrderBuildResult {
 		});
 	} else if (isTriggerOrderType(orderType)) {
 		buildTriggerOrder(orders, {
-			assetId,
 			market,
 			isBuy,
-			formattedSize: formatSizeForOrder(sizeValue, szDecimals),
+			formattedSize: formatSizeForOrder(sizeValue, market),
 			triggerPriceInput,
 			limitPriceInput,
 			isStopOrder: isStopOrderType(orderType),
 			usesLimitPriceForOrder: usesLimitPrice(orderType),
 		});
 	} else {
-		const formattedSize = formatSizeForOrder(sizeValue, szDecimals);
+		const formattedSize = formatSizeForOrder(sizeValue, market);
 		buildStandardOrder(orders, {
-			assetId,
 			market,
 			isBuy,
 			orderType,
@@ -141,10 +137,10 @@ export function buildOrders(params: EntryOrderParams): OrderBuildResult {
 		});
 
 		if (hasTp) {
-			buildTpSlOrder(orders, { assetId, market, isBuy: !isBuy, formattedSize, triggerPrice: tpPriceInput, tpsl: "tp" });
+			buildTpSlOrder(orders, { market, isBuy: !isBuy, formattedSize, triggerPrice: tpPriceInput, tpsl: "tp" });
 		}
 		if (hasSl) {
-			buildTpSlOrder(orders, { assetId, market, isBuy: !isBuy, formattedSize, triggerPrice: slPriceInput, tpsl: "sl" });
+			buildTpSlOrder(orders, { market, isBuy: !isBuy, formattedSize, triggerPrice: slPriceInput, tpsl: "sl" });
 		}
 	}
 
@@ -152,10 +148,9 @@ export function buildOrders(params: EntryOrderParams): OrderBuildResult {
 }
 
 interface ScaleOrderParams {
-	assetId: number;
-	market: WireMarket;
+	market: Market;
 	isBuy: boolean;
-	sizeValue: number;
+	sizeValue: string;
 	reduceOnly: boolean;
 	tif: LimitTif;
 	scaleStartPriceInput: string;
@@ -168,7 +163,7 @@ BigDividingDown.RM = Big.roundDown;
 const BigDividingUp = Big();
 BigDividingUp.RM = Big.roundUp;
 
-function buildScaleOrders(orders: ExchangeOrder[], params: ScaleOrderParams): void {
+function buildScaleOrders(orders: WireOrder[], params: ScaleOrderParams): void {
 	const levels = clampInt(Math.round(params.scaleLevelsNum ?? SCALE_LEVELS_MIN), SCALE_LEVELS_MIN, SCALE_LEVELS_MAX);
 	const steps = levels - 1;
 	const start = toSafeBig(params.scaleStartPriceInput);
@@ -181,10 +176,10 @@ function buildScaleOrders(orders: ExchangeOrder[], params: ScaleOrderParams): vo
 	for (let i = 0; i < levels; i += 1) {
 		const price = new PassiveBig(start.times(steps).plus(span.times(i))).div(steps);
 		orders.push({
-			a: params.assetId,
+			a: params.market.assetId,
 			b: params.isBuy,
 			p: formatPriceForOrder(price, params.market, side, "passive"),
-			s: formatSizeForOrder(legSizes[i], params.market.szDecimals),
+			s: formatSizeForOrder(legSizes[i], params.market),
 			r: params.reduceOnly,
 			t: { limit: { tif: params.tif } },
 		});
@@ -200,23 +195,22 @@ function allocateScaleSizes(total: Numeric, levels: number, szDecimals: number):
 }
 
 interface TriggerOrderParams {
-	assetId: number;
-	market: WireMarket;
+	market: Market;
 	isBuy: boolean;
-	formattedSize: string;
+	formattedSize: SizeWire;
 	triggerPriceInput: string;
 	limitPriceInput: string;
 	isStopOrder: boolean;
 	usesLimitPriceForOrder: boolean;
 }
 
-function buildTriggerOrder(orders: ExchangeOrder[], params: TriggerOrderParams): void {
+function buildTriggerOrder(orders: WireOrder[], params: TriggerOrderParams): void {
 	const side = params.isBuy ? "buy" : "sell";
 	const tpsl = params.isStopOrder ? "sl" : "tp";
 	const limitPriceInput = params.usesLimitPriceForOrder ? params.limitPriceInput : params.triggerPriceInput;
 
 	orders.push({
-		a: params.assetId,
+		a: params.market.assetId,
 		b: params.isBuy,
 		p: formatPriceForOrder(limitPriceInput, params.market, side, "passive"),
 		s: params.formattedSize,
@@ -232,25 +226,24 @@ function buildTriggerOrder(orders: ExchangeOrder[], params: TriggerOrderParams):
 }
 
 interface StandardOrderParams {
-	assetId: number;
-	market: WireMarket;
+	market: Market;
 	isBuy: boolean;
 	orderType: OrderType;
-	formattedSize: string;
-	markPx: number;
+	formattedSize: SizeWire;
+	markPx: string;
 	limitPriceInput: string;
 	slippageBps: number;
 	reduceOnly: boolean;
 	tif: LimitTif;
 }
 
-function buildStandardOrder(orders: ExchangeOrder[], params: StandardOrderParams): void {
+function buildStandardOrder(orders: WireOrder[], params: StandardOrderParams): void {
 	const side = params.isBuy ? "buy" : "sell";
 	const isMarket = params.orderType === "market";
 	const orderPrice = isMarket ? getMarketPrice(side, params.markPx, params.slippageBps) : params.limitPriceInput;
 
 	orders.push({
-		a: params.assetId,
+		a: params.market.assetId,
 		b: params.isBuy,
 		p: formatPriceForOrder(orderPrice, params.market, side, isMarket ? "aggressive" : "passive"),
 		s: params.formattedSize,
@@ -260,18 +253,17 @@ function buildStandardOrder(orders: ExchangeOrder[], params: StandardOrderParams
 }
 
 interface TpSlOrderParams {
-	assetId: number;
-	market: WireMarket;
+	market: Market;
 	isBuy: boolean;
-	formattedSize: string;
+	formattedSize: SizeWire;
 	triggerPrice: string;
 	tpsl: TpSl;
 }
 
-function buildTpSlOrder(orders: ExchangeOrder[], params: TpSlOrderParams): void {
+function buildTpSlOrder(orders: WireOrder[], params: TpSlOrderParams): void {
 	const side = params.isBuy ? "buy" : "sell";
 	orders.push({
-		a: params.assetId,
+		a: params.market.assetId,
 		b: params.isBuy,
 		p: formatPriceForOrder(params.triggerPrice, params.market, side, "passive"),
 		s: params.formattedSize,
@@ -304,16 +296,16 @@ function formatWithSdk(format: () => string, reason: OrderPlanError): string {
 	}
 }
 
-export function formatPriceForOrder(price: Numeric, market: WireMarket, side: Side, rounding: PriceRounding): string {
+export function formatPriceForOrder(price: Numeric, market: PricedMarket, side: Side, rounding: PriceRounding): PriceWire {
 	return formatPriceOnTick(price, market, (side === "buy") === (rounding === "aggressive"));
 }
 
-export function formatTriggerPxForOrder(price: Numeric, market: WireMarket, side: Side, tpsl: TpSl): string {
+export function formatTriggerPxForOrder(price: Numeric, market: PricedMarket, side: Side, tpsl: TpSl): PriceWire {
 	const firesOnRise = (side === "buy") === (tpsl === "sl");
 	return formatPriceOnTick(price, market, firesOnRise);
 }
 
-function formatPriceOnTick(price: Numeric, market: WireMarket, roundsUp: boolean): string {
+function formatPriceOnTick(price: Numeric, market: PricedMarket, roundsUp: boolean): PriceWire {
 	const value = toBig(price);
 	if (!value?.gt(0)) throw new OrderBuildError(ORDER_PLAN_ERRORS.invalidPrice);
 
@@ -325,11 +317,14 @@ function formatPriceOnTick(price: Numeric, market: WireMarket, roundsUp: boolean
 		? onDecimals
 		: onDecimals.prec(HL_PRICE_MAX_SIG_FIGS, mode);
 
-	return formatWithSdk(() => formatPrice(onTick.toFixed(), market.szDecimals, type), ORDER_PLAN_ERRORS.invalidPrice);
+	return formatWithSdk(
+		() => formatPrice(onTick.toFixed(), market.szDecimals, type),
+		ORDER_PLAN_ERRORS.invalidPrice,
+	) as PriceWire;
 }
 
-export function formatSizeForOrder(size: Numeric, szDecimals: number): string {
+export function formatSizeForOrder(size: Numeric, market: Market): SizeWire {
 	const value = toBig(size);
 	if (!value?.gt(0)) throw new OrderBuildError(ORDER_PLAN_ERRORS.invalidSize);
-	return formatWithSdk(() => formatSize(value.toFixed(), szDecimals), ORDER_PLAN_ERRORS.invalidSize);
+	return formatWithSdk(() => formatSize(value.toFixed(), market.szDecimals), ORDER_PLAN_ERRORS.invalidSize) as SizeWire;
 }

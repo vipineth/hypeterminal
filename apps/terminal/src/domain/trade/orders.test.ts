@@ -10,16 +10,15 @@ import {
 	getDefaultLeverage,
 	ORDER_PLAN_ERRORS,
 } from "@/domain/trade/orders";
+import { perpMarket, spotMarket } from "@/test/markets";
 
 const ENTRY_BASE = {
 	kind: "entry" as const,
-	assetId: 0,
+	market: perpMarket(0, 3),
 	side: "buy" as const,
 	orderType: "market" as const,
-	sizeValue: 1.5,
-	szDecimals: 3,
-	marketKind: "perp" as const,
-	markPx: 100,
+	sizeValue: "1.5",
+	markPx: "100",
 	slippageBps: 50,
 	reduceOnly: false,
 	tif: "Gtc" as const,
@@ -36,13 +35,13 @@ const ENTRY_BASE = {
 
 describe("getMarketPrice (characterization)", () => {
 	it("applies positive slippage for market buy", () => {
-		expect(getMarketPrice("buy", 100, 50)).toBe(100.5);
+		expect(getMarketPrice("buy", 100, 50)).toBe("100.5");
 	});
 	it("applies negative slippage for market sell", () => {
-		expect(getMarketPrice("sell", 100, 50)).toBe(99.5);
+		expect(getMarketPrice("sell", 100, 50)).toBe("99.5");
 	});
 	it("returns mark price when slippage is zero", () => {
-		expect(getMarketPrice("buy", 100, 0)).toBe(100);
+		expect(getMarketPrice("buy", 100, 0)).toBe("100");
 	});
 });
 
@@ -82,7 +81,7 @@ describe("buildOrderPlan entry (characterization)", () => {
 		const plan = buildOrderPlan({
 			...ENTRY_BASE,
 			orderType: "scale",
-			sizeValue: 3,
+			sizeValue: "3",
 			scaleStartPriceInput: "100",
 			scaleEndPriceInput: "110",
 			scaleLevelsNum: 3,
@@ -154,7 +153,7 @@ describe("buildOrderPlan entry (characterization)", () => {
 		const plan = buildOrderPlan({
 			...ENTRY_BASE,
 			orderType: "scale",
-			sizeValue: 3,
+			sizeValue: "3",
 			scaleStartPriceInput: "100",
 			scaleEndPriceInput: "110",
 			scaleLevelsNum: 3,
@@ -170,8 +169,8 @@ describe("buildOrderPlan entry (characterization)", () => {
 			...ENTRY_BASE,
 			orderType: "limit",
 			side: "sell",
-			szDecimals: 0,
-			sizeValue: 1000,
+			market: perpMarket(0, 0),
+			sizeValue: "1000",
 			limitPriceInput: "0.012345",
 		});
 		expect(plan.orders[0].p).toBe("0.012345");
@@ -181,18 +180,17 @@ describe("buildOrderPlan entry (characterization)", () => {
 describe("buildOrderPlan swap (characterization — byte-exact spot swap math)", () => {
 	const SWAP_BASE = {
 		kind: "swap" as const,
-		assetId: 0,
+		market: spotMarket(10000, 3),
 		isBuy: true,
-		sizeValue: 1.5,
-		szDecimals: 3,
-		markPx: 100,
+		sizeValue: "1.5",
+		markPx: "100",
 		slippageBps: 100,
 	};
 
 	it("prices a buy at markPx * (1 + bps/10000)", () => {
 		const plan = buildOrderPlan(SWAP_BASE);
 		expect(plan.orders).toEqual([
-			{ a: 0, b: true, p: "101", s: "1.5", r: false, t: { limit: { tif: "FrontendMarket" } } },
+			{ a: 10000, b: true, p: "101", s: "1.5", r: false, t: { limit: { tif: "FrontendMarket" } } },
 		]);
 		expect(plan.grouping).toBe("na");
 	});
@@ -200,7 +198,7 @@ describe("buildOrderPlan swap (characterization — byte-exact spot swap math)",
 	it("prices a sell at markPx / (1 + bps/10000), rounded down to the spot tick", () => {
 		const plan = buildOrderPlan({ ...SWAP_BASE, isBuy: false });
 		expect(plan.orders[0]).toEqual({
-			a: 0,
+			a: 10000,
 			b: false,
 			p: "99.009",
 			s: "1.5",
@@ -214,11 +212,10 @@ describe("buildOrderPlan close/reverse/tpsl (characterization)", () => {
 	it("market-closes a long as a reduce-only sell at slippage-adjusted price", () => {
 		const plan = buildOrderPlan({
 			kind: "marketClose",
-			assetId: 0,
-			size: 1.5,
-			szDecimals: 3,
+			market: perpMarket(0, 3),
+			size: "1.5",
 			isLong: true,
-			markPx: 100,
+			markPx: "100",
 			slippageBps: 50,
 		});
 		expect(plan.orders).toEqual([
@@ -230,11 +227,10 @@ describe("buildOrderPlan close/reverse/tpsl (characterization)", () => {
 	it("reverses a long by doubling size with reduceOnly false", () => {
 		const plan = buildOrderPlan({
 			kind: "reverse",
-			assetId: 0,
-			size: 1.5,
-			szDecimals: 3,
+			market: perpMarket(0, 3),
+			size: "1.5",
 			isLong: true,
-			markPx: 100,
+			markPx: "100",
 			slippageBps: 50,
 		});
 		expect(plan.orders).toEqual([
@@ -245,11 +241,10 @@ describe("buildOrderPlan close/reverse/tpsl (characterization)", () => {
 	it("limit-closes a short as a reduce-only buy at Gtc", () => {
 		const plan = buildOrderPlan({
 			kind: "limitClose",
-			assetId: 0,
-			size: 1.5,
-			szDecimals: 3,
+			market: perpMarket(0, 3),
+			size: "1.5",
 			isLong: false,
-			price: 100,
+			price: "100",
 		});
 		expect(plan.orders).toEqual([{ a: 0, b: true, p: "100", s: "1.5", r: true, t: { limit: { tif: "Gtc" } } }]);
 	});
@@ -257,8 +252,7 @@ describe("buildOrderPlan close/reverse/tpsl (characterization)", () => {
 	it("builds position tp+sl triggers with zero size and positionTpsl grouping", () => {
 		const plan = buildOrderPlan({
 			kind: "positionTpsl",
-			assetId: 0,
-			szDecimals: 3,
+			market: perpMarket(0, 3),
 			isLong: true,
 			tpPriceInput: "110",
 			slPriceInput: "90",
@@ -273,8 +267,7 @@ describe("buildOrderPlan close/reverse/tpsl (characterization)", () => {
 	it("reports an error when position tpsl has no prices", () => {
 		const plan = buildOrderPlan({
 			kind: "positionTpsl",
-			assetId: 0,
-			szDecimals: 3,
+			market: perpMarket(0, 3),
 			isLong: true,
 			tpPriceInput: null,
 			slPriceInput: null,
@@ -287,13 +280,11 @@ describe("buildOrderPlan close/reverse/tpsl (characterization)", () => {
 describe("buildOrders grouping (characterization)", () => {
 	it("returns na grouping for a plain market order", () => {
 		const result = buildOrders({
-			assetId: 0,
+			market: perpMarket(0, 3),
 			side: "buy",
 			orderType: "market",
-			sizeValue: 1.5,
-			szDecimals: 3,
-			marketKind: "perp",
-			markPx: 100,
+			sizeValue: "1.5",
+			markPx: "100",
 			slippageBps: 50,
 			reduceOnly: false,
 			tif: "Gtc",
@@ -320,7 +311,7 @@ describe("orders", () => {
 	});
 
 	it("formats order prices to the tick in the requested direction", () => {
-		const perp = { szDecimals: 0, kind: "perp" as const };
+		const perp = perpMarket(0, 0);
 		expect(formatPriceForOrder(100, perp, "buy", "passive")).toBe("100");
 		expect(formatPriceForOrder(1234.56, perp, "buy", "passive")).toBe("1234.5");
 		expect(formatPriceForOrder(1234.56, perp, "buy", "aggressive")).toBe("1234.6");
@@ -331,8 +322,8 @@ describe("orders", () => {
 	});
 
 	it("formats order sizes using size decimals", () => {
-		expect(formatSizeForOrder(1.234567, 3)).toBe("1.234");
-		expect(formatSizeForOrder(1.2, 0)).toBe("1");
+		expect(formatSizeForOrder(1.234567, perpMarket(0, 3))).toBe("1.234");
+		expect(formatSizeForOrder(1.2, perpMarket(0, 0))).toBe("1");
 	});
 });
 
@@ -340,7 +331,7 @@ function sumSizes(sizes: string[]): number {
 	return sizes.reduce((total, size) => total + Number(size), 0);
 }
 
-const PERP_SZ0 = { szDecimals: 0, kind: "perp" } as const;
+const PERP_SZ0 = perpMarket(0, 0);
 
 const SCALE_DIRECTIONS = [
 	["buy", "10", "11"],
@@ -358,8 +349,8 @@ function scalePrices(side: "buy" | "sell", start: string, end: string, levels: n
 		...ENTRY_BASE,
 		side,
 		orderType: "scale",
-		szDecimals: 0,
-		sizeValue: levels * 10,
+		market: perpMarket(0, 0),
+		sizeValue: String(levels * 10),
 		scaleStartPriceInput: start,
 		scaleEndPriceInput: end,
 		scaleLevelsNum: levels,
@@ -369,17 +360,16 @@ function scalePrices(side: "buy" | "sell", start: string, end: string, levels: n
 
 describe("order wire format", () => {
 	it.each([
-		[10, "10"],
-		[100, "100"],
-		[250, "250"],
-	])("closes a %d DOGE long at szDecimals 0 with the full size", (size, wireSize) => {
+		["10", "10"],
+		["100", "100"],
+		["250", "250"],
+	])("closes a %s DOGE long at szDecimals 0 with the full size", (size, wireSize) => {
 		const plan = buildOrderPlan({
 			kind: "marketClose",
-			assetId: 12,
+			market: perpMarket(12, 0),
 			size,
-			szDecimals: 0,
 			isLong: true,
-			markPx: 0.064543,
+			markPx: "0.064543",
 			slippageBps: 250,
 		});
 		expect(plan.orders).toEqual([
@@ -391,17 +381,16 @@ describe("order wire format", () => {
 		const entry = buildOrderPlan({
 			...ENTRY_BASE,
 			orderType: "limit",
-			szDecimals: 0,
-			sizeValue: 100,
+			market: perpMarket(0, 0),
+			sizeValue: "100",
 			limitPriceInput: "0.15",
 		});
 		const reverse = buildOrderPlan({
 			kind: "reverse",
-			assetId: 173,
-			size: 250,
-			szDecimals: 0,
+			market: perpMarket(173, 0),
+			size: "250",
 			isLong: false,
-			markPx: 0.16,
+			markPx: "0.16",
 			slippageBps: 250,
 		});
 		expect(entry.orders[0].s).toBe("100");
@@ -411,11 +400,10 @@ describe("order wire format", () => {
 	it("rounds a sub-dollar market price to 6 - szDecimals decimals, away from the book", () => {
 		const dydx = {
 			...ENTRY_BASE,
-			assetId: 4,
-			szDecimals: 1,
-			sizeValue: 200,
-			markPx: 0.09017,
-			price: 0.09017,
+			market: perpMarket(4, 1),
+			sizeValue: "200",
+			markPx: "0.09017",
+			price: "0.09017",
 			slippageBps: 250,
 		};
 		expect(buildOrderPlan(dydx).orders[0].p).toBe("0.09243");
@@ -423,7 +411,7 @@ describe("order wire format", () => {
 	});
 
 	it("rounds limit prices toward the passive side", () => {
-		const limit = { ...ENTRY_BASE, orderType: "limit" as const, szDecimals: 2, sizeValue: 10 };
+		const limit = { ...ENTRY_BASE, market: perpMarket(0, 2), orderType: "limit" as const, sizeValue: "10" };
 		const buy = buildOrderPlan({ ...limit, side: "buy", limitPriceInput: "1.234567" });
 		const sell = buildOrderPlan({ ...limit, side: "sell", limitPriceInput: "1.234541" });
 		expect(buy.orders[0].p).toBe("1.2345");
@@ -431,17 +419,17 @@ describe("order wire format", () => {
 	});
 
 	it("uses the spot 8 - szDecimals decimal rule for spot markets", () => {
-		const spot = { ...ENTRY_BASE, orderType: "limit" as const, marketKind: "spot" as const, assetId: 10107 };
+		const spot = { ...ENTRY_BASE, orderType: "limit" as const };
 		const sz2 = buildOrderPlan({
 			...spot,
-			szDecimals: 2,
-			sizeValue: 1000,
+			market: spotMarket(10107, 2),
+			sizeValue: "1000",
 			limitPriceInput: "0.0123456",
 		});
 		const sz0 = buildOrderPlan({
 			...spot,
-			szDecimals: 0,
-			sizeValue: 1e7,
+			market: spotMarket(10107, 0),
+			sizeValue: "10000000",
 			limitPriceInput: "0.000012345678",
 		});
 		expect(sz2.orders[0].p).toBe("0.012345");
@@ -451,8 +439,7 @@ describe("order wire format", () => {
 	it("rounds a long's position TP trigger up, its SL trigger down, and both limit prices passively", () => {
 		const plan = buildOrderPlan({
 			kind: "positionTpsl",
-			assetId: 5,
-			szDecimals: 2,
+			market: perpMarket(5, 2),
 			isLong: true,
 			tpPriceInput: "120.123456",
 			slPriceInput: "90.123456",
@@ -469,8 +456,8 @@ describe("order wire format", () => {
 		const plan = buildOrderPlan({
 			...ENTRY_BASE,
 			orderType: "scale",
-			szDecimals: 0,
-			sizeValue: 18,
+			market: perpMarket(0, 0),
+			sizeValue: "18",
 			scaleStartPriceInput: "100",
 			scaleEndPriceInput: "104",
 			scaleLevelsNum: 5,
@@ -532,8 +519,8 @@ describe("order wire format", () => {
 		const plan = buildOrderPlan({
 			...ENTRY_BASE,
 			orderType: "scale",
-			szDecimals: 2,
-			sizeValue: 4,
+			market: perpMarket(0, 2),
+			sizeValue: "4",
 			scaleStartPriceInput: "1",
 			scaleEndPriceInput: "20",
 			scaleLevelsNum: 2,
@@ -543,7 +530,13 @@ describe("order wire format", () => {
 	});
 
 	it("blocks an opening order under the minimum notional on its wire price", () => {
-		const plan = buildOrderPlan({ ...ENTRY_BASE, szDecimals: 0, sizeValue: 1, markPx: 5, slippageBps: 250 });
+		const plan = buildOrderPlan({
+			...ENTRY_BASE,
+			market: perpMarket(0, 0),
+			sizeValue: "1",
+			markPx: "5",
+			slippageBps: 250,
+		});
 		expect(plan.orders).toEqual([]);
 		expect(plan.errors).toEqual([ORDER_PLAN_ERRORS.belowMinNotional]);
 	});
@@ -551,11 +544,10 @@ describe("order wire format", () => {
 	it("lets a reduce-only close under the minimum notional through", () => {
 		const plan = buildOrderPlan({
 			kind: "marketClose",
-			assetId: 7,
-			size: 1,
-			szDecimals: 0,
+			market: perpMarket(7, 0),
+			size: "1",
 			isLong: true,
-			markPx: 5,
+			markPx: "5",
 			slippageBps: 250,
 		});
 		expect(plan.errors).toEqual([]);
@@ -563,7 +555,7 @@ describe("order wire format", () => {
 	});
 
 	it("blocks a size that truncates to zero lots", () => {
-		const plan = buildOrderPlan({ ...ENTRY_BASE, szDecimals: 0, sizeValue: 0.4 });
+		const plan = buildOrderPlan({ ...ENTRY_BASE, market: perpMarket(0, 0), sizeValue: "0.4" });
 		expect(plan.orders).toEqual([]);
 		expect(plan.errors).toEqual([ORDER_PLAN_ERRORS.invalidSize]);
 	});
@@ -575,7 +567,7 @@ describe("order wire format", () => {
 	});
 
 	it("rejects TWAP instead of building a limit order", () => {
-		const plan = buildOrderPlan({ ...ENTRY_BASE, orderType: "twap", sizeValue: 3 });
+		const plan = buildOrderPlan({ ...ENTRY_BASE, orderType: "twap", sizeValue: "3" });
 		expect(plan.orders).toEqual([]);
 		expect(plan.errors).toEqual([ORDER_PLAN_ERRORS.twapNotSupported]);
 	});
@@ -586,16 +578,14 @@ describe("trigger prices fire no earlier than the typed level", () => {
 	const ABOVE_TICK_MID = "0.0645431";
 	const DOGE_ENTRY = {
 		...ENTRY_BASE,
-		assetId: 12,
-		szDecimals: 0,
-		sizeValue: 1000,
+		market: perpMarket(12, 0),
+		sizeValue: "1000",
 		orderType: "limit" as const,
 		limitPriceInput: "0.0645",
 	};
 	const DOGE_POSITION = {
 		kind: "positionTpsl" as const,
-		assetId: 12,
-		szDecimals: 0,
+		market: perpMarket(12, 0),
 		tpPriceInput: null,
 		slPriceInput: null,
 	};
@@ -728,5 +718,27 @@ describe("trigger prices fire no earlier than the typed level", () => {
 			r: true,
 			t: { trigger: { triggerPx: expected.triggerPx, tpsl: expected.tpsl } },
 		});
+	});
+});
+
+describe("intent types", () => {
+	it("rejects number sizes and prices, spot position intents and unlisted entry markets at compile time", () => {
+		const delisted = { ...perpMarket(3, 2), isDelisted: true };
+		const spot = spotMarket(10107, 2);
+
+		// @ts-expect-error a size must be the exact string, not a number
+		buildOrderPlan({ ...ENTRY_BASE, sizeValue: 1.5 });
+		// @ts-expect-error a mark price must be the exact string, not a number
+		buildOrderPlan({ ...ENTRY_BASE, markPx: 100 });
+		// @ts-expect-error a spot market has no position to close
+		buildOrderPlan({ kind: "marketClose", market: spot, size: "1", isLong: true, markPx: "1", slippageBps: 50 });
+		// @ts-expect-error a delisted market takes no new entry
+		buildOrderPlan({ ...ENTRY_BASE, market: delisted });
+		// @ts-expect-error a reverse opens a new position, so the market must be listed
+		buildOrderPlan({ kind: "reverse", market: delisted, size: "1", isLong: true, markPx: "1", slippageBps: 50 });
+
+		expect(
+			buildOrderPlan({ kind: "limitClose", market: delisted, size: "1", isLong: true, price: "1" }).errors,
+		).toEqual([]);
 	});
 });

@@ -4,6 +4,7 @@ import { CrosshairIcon, PencilIcon, PlusIcon, XIcon } from "@phosphor-icons/reac
 import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { LIQ_WARNING_PROXIMITY } from "@/config/trade";
+import { isPerpLike } from "@/domain/market/model";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
 import type { Position } from "@/lib/hyperliquid";
@@ -48,8 +49,8 @@ export function MobilePositionCard({
 	const absSize = Math.abs(size);
 	const market = markets.getMarket(p.coin);
 	const displayName = market?.pairName ?? p.coin;
-	const assetId = market?.assetId;
-	const szDecimals = market?.szDecimals ?? 4;
+	const perpMarket = market && isPerpLike(market) ? market : undefined;
+	const szDecimals = market?.szDecimals;
 	const markPx = toBig(markPxRaw)?.toNumber() ?? Number.NaN;
 	const entryPx = toBig(p.entryPx)?.toNumber() ?? Number.NaN;
 	const unrealizedPnl = toBig(p.unrealizedPnl)?.toNumber() ?? Number.NaN;
@@ -65,18 +66,17 @@ export function MobilePositionCard({
 	const fundingValue = formatUSD(fundingRaw != null ? -fundingRaw : null, { signDisplay: "exceptZero" });
 	const fundingClass = getValueColorClass(fundingRaw != null ? -fundingRaw : 0);
 
-	const canClose = isPositive(absSize) && typeof assetId === "number" && isPositive(markPx);
+	const canClose = isPositive(absSize) && perpMarket !== undefined && isPositive(markPx);
 	const pnlClass = getValueColorClass(unrealizedPnl);
 	const hasTpSl = !!(tpSlInfo?.tpPrice || tpSlInfo?.slPrice);
 
 	function handleClose() {
-		if (!canClose || typeof assetId !== "number") return;
+		if (!canClose || !perpMarket) return;
 		onClose({
-			assetId,
+			market: perpMarket,
 			coin: p.coin,
-			size: absSize,
-			markPx,
-			szDecimals,
+			size: toBig(p.szi)?.abs().toFixed() ?? "0",
+			markPx: markPxRaw ?? "",
 			isLong,
 			unrealizedPnl,
 			roe,
@@ -84,32 +84,30 @@ export function MobilePositionCard({
 	}
 
 	function handleLimitClose() {
-		if (!canClose || typeof assetId !== "number") return;
+		if (!canClose || !perpMarket) return;
 		onLimitClose({
 			coin: p.coin,
-			assetId,
+			market: perpMarket,
 			isLong,
 			size: absSize,
 			entryPx,
 			markPx,
 			unrealizedPnl,
 			roe,
-			szDecimals,
 		});
 	}
 
 	function handleOpenTpSl() {
-		if (typeof assetId !== "number") return;
+		if (!perpMarket) return;
 		onOpenTpSl({
 			coin: p.coin,
-			assetId,
+			market: perpMarket,
 			isLong,
 			size: absSize,
 			entryPx,
 			markPx,
 			unrealizedPnl,
 			roe,
-			szDecimals,
 			existingTpPrice: tpSlInfo?.tpPrice,
 			existingSlPrice: tpSlInfo?.slPrice,
 			existingTpOrderId: tpSlInfo?.tpOrderId,
@@ -204,7 +202,7 @@ export function MobilePositionCard({
 							size="xs"
 							className="flex-1 justify-center touch-target"
 							onClick={handleOpenTpSl}
-							disabled={typeof assetId !== "number"}
+							disabled={!perpMarket}
 							iconLeft={hasTpSl ? <CrosshairIcon className="size-3.5" /> : <PlusIcon className="size-3.5" />}
 						>
 							{hasTpSl ? (
