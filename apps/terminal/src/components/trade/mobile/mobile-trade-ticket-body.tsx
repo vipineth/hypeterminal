@@ -64,7 +64,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 					<DrawerTitle
 						className={cn("flex-none text-sm font-semibold", side === "buy" ? "text-market-up" : "text-market-down")}
 					>
-						{sideLabel} {entry.baseToken}
+						{sideLabel} {entry.assetLabel}
 					</DrawerTitle>
 					<div className="text-2xs tabular-nums text-fg-muted">
 						{t`Mark`} {formatPrice(market?.markPx, { decimals: priceDecimals })}
@@ -282,7 +282,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 						ticket.isSubmitting || ticket.isRegistering ? <SpinnerGapIcon className="size-3 animate-spin" /> : undefined
 					}
 				>
-					{isSubmitAction ? `${sideLabel} ${entry.baseToken}` : buttonContent.text}
+					{isSubmitAction ? `${sideLabel} ${entry.assetLabel}` : buttonContent.text}
 				</Button>
 			</div>
 

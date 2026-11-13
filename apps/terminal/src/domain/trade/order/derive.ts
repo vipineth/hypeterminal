@@ -38,6 +38,7 @@ export interface OrderEntryInputs {
 export interface OrderEntryDerived {
 	isSpotMarket: boolean;
 	baseToken: string;
+	assetLabel: string;
 	quoteToken: string;
 	capabilities: MarketCapabilities;
 	szDecimals: number;
@@ -76,6 +77,7 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 	const { baseToken, quoteToken } = inputs.market
 		? getBaseQuoteFromPairName(inputs.market.pairName, inputs.market.kind)
 		: { baseToken: "", quoteToken: "" };
+	const assetLabel = inputs.market?.kind === "builderPerp" ? inputs.market.name : baseToken;
 	const spotBalance = getSpotBalanceData(inputs.spotBalances, inputs.market, inputs.spotAvailableAfterMaintenance);
 	const availableBalanceToken = getAvailableBalanceToken(inputs.market, inputs.side);
 
@@ -109,6 +111,7 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 	return {
 		isSpotMarket,
 		baseToken,
+		assetLabel,
 		quoteToken,
 		capabilities,
 		szDecimals,
