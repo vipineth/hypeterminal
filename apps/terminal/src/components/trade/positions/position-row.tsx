@@ -2,7 +2,7 @@ import { TableCell, TableRow, Tooltip } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { PencilIcon, PlusIcon } from "@phosphor-icons/react";
 import { LIQ_WARNING_PROXIMITY } from "@/config/trade";
-import { isPerpLike } from "@/domain/market/model";
+import { isListed, isPerpLike } from "@/domain/market/model";
 import { cn } from "@/lib/cn";
 import { formatLiquidationPrice, formatPercent, formatPrice, formatToken, formatUSD } from "@/lib/format";
 import type { Position } from "@/lib/hyperliquid";
@@ -258,6 +258,7 @@ export function PositionRow({
 			<TableCell size="dense" className={cn(positionsPanelTableCellClass, "text-right")}>
 				<PositionActionsDropdown
 					canClose={canClose}
+					canReverse={perpMarket !== undefined && isListed(perpMarket)}
 					isRowClosing={isRowClosing}
 					onMarketClose={handleClose}
 					onLimitClose={handleLimitClose}
