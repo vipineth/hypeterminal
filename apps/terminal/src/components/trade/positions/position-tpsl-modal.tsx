@@ -78,8 +78,8 @@ function PositionTpSlModalBody({ position, onOpenChange }: BodyProps) {
 			assetId: position.assetId,
 			szDecimals: position.szDecimals,
 			isLong: position.isLong,
-			tpPriceNum: hasTp ? tpPriceNum : null,
-			slPriceNum: hasSl ? slPriceNum : null,
+			tpPriceInput: hasTp ? tpPriceInput : null,
+			slPriceInput: hasSl ? slPriceInput : null,
 		});
 
 		if (plan.errors.length > 0) return;

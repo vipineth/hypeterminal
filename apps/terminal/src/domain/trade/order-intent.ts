@@ -12,7 +12,7 @@ import {
 	type OrderPlanError,
 	type WireMarket,
 } from "@/domain/trade/orders";
-import { isPositive, toSafeBig } from "@/lib/trade/numbers";
+import { toSafeBig } from "@/lib/trade/numbers";
 import { isTwapOrderType } from "@/lib/trade/order-types";
 import type { Side } from "@/lib/trade/types";
 
@@ -30,8 +30,8 @@ export type PositionTpSlIntent = {
 	assetId: number;
 	szDecimals: number;
 	isLong: boolean;
-	tpPriceNum: number | null;
-	slPriceNum: number | null;
+	tpPriceInput: string | null;
+	slPriceInput: string | null;
 };
 
 export type MarketCloseIntent = {
@@ -135,12 +135,12 @@ function buildPositionTpSlPlan(intent: PositionTpSlIntent): PlanLegs {
 	const isBuy = !intent.isLong;
 	const market = perpMarket(intent.szDecimals);
 
-	if (intent.tpPriceNum && isPositive(intent.tpPriceNum)) {
-		orders.push(buildPositionTpSlOrder(intent.assetId, market, isBuy, intent.tpPriceNum, "tp"));
+	if (intent.tpPriceInput !== null) {
+		orders.push(buildPositionTpSlOrder(intent.assetId, market, isBuy, intent.tpPriceInput, "tp"));
 	}
 
-	if (intent.slPriceNum && isPositive(intent.slPriceNum)) {
-		orders.push(buildPositionTpSlOrder(intent.assetId, market, isBuy, intent.slPriceNum, "sl"));
+	if (intent.slPriceInput !== null) {
+		orders.push(buildPositionTpSlOrder(intent.assetId, market, isBuy, intent.slPriceInput, "sl"));
 	}
 
 	if (orders.length === 0) throw new OrderBuildError(ORDER_PLAN_ERRORS.noTpSl);
@@ -227,7 +227,7 @@ function buildPositionTpSlOrder(
 	assetId: number,
 	market: WireMarket,
 	isBuy: boolean,
-	triggerPrice: number,
+	triggerPrice: string,
 	tpsl: "tp" | "sl",
 ): ExchangeOrder {
 	const triggerPx = formatPriceForOrder(triggerPrice, market, isBuy ? "buy" : "sell", "passive");

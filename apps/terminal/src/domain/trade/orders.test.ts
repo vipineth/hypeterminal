@@ -260,8 +260,8 @@ describe("buildOrderPlan close/reverse/tpsl (characterization)", () => {
 			assetId: 0,
 			szDecimals: 3,
 			isLong: true,
-			tpPriceNum: 110,
-			slPriceNum: 90,
+			tpPriceInput: "110",
+			slPriceInput: "90",
 		});
 		expect(plan.orders).toEqual([
 			{ a: 0, b: false, p: "110", s: "0", r: true, t: { trigger: { isMarket: true, triggerPx: "110", tpsl: "tp" } } },
@@ -276,8 +276,8 @@ describe("buildOrderPlan close/reverse/tpsl (characterization)", () => {
 			assetId: 0,
 			szDecimals: 3,
 			isLong: true,
-			tpPriceNum: null,
-			slPriceNum: null,
+			tpPriceInput: null,
+			slPriceInput: null,
 		});
 		expect(plan.orders).toEqual([]);
 		expect(plan.errors).toEqual([ORDER_PLAN_ERRORS.noTpSl]);
@@ -454,8 +454,8 @@ describe("order wire format", () => {
 			assetId: 5,
 			szDecimals: 2,
 			isLong: true,
-			tpPriceNum: 120.123456,
-			slPriceNum: 90.123456,
+			tpPriceInput: "120.123456",
+			slPriceInput: "90.123456",
 		});
 		expect(plan.orders.map((order) => order.p)).toEqual(["120.13", "90.124"]);
 		expect(plan.orders.map((order) => order.s)).toEqual(["0", "0"]);

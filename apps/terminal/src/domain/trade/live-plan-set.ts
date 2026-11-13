@@ -357,8 +357,8 @@ function perpCases(market: LiveMarket, side: Side): PlanCase[] {
 			{
 				kind: "positionTpsl",
 				...position,
-				tpPriceNum: closeTp(market, side).toNumber(),
-				slPriceNum: closeSl(market, side).toNumber(),
+				tpPriceInput: closeTp(market, side).toFixed(),
+				slPriceInput: closeSl(market, side).toFixed(),
 			},
 			{
 				grouping: "positionTpsl",
