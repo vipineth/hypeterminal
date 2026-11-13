@@ -6,7 +6,7 @@ export interface FakeAccount {
 	collateral: Record<string, number>;
 	positions: { coin: string; szi: number }[];
 	orders: { coin: string; oid: number }[];
-	agents: string[];
+	agent: { address: string; signsFor: string };
 	exchange: string[];
 }
 
@@ -79,7 +79,7 @@ function perpState(dex: string) {
 	};
 }
 
-function testnetInfo(request: { type: string; dex?: string }): unknown {
+function testnetInfo(request: { type: string; dex?: string; user?: string }): unknown {
 	const dex = request.dex ?? "";
 	switch (request.type) {
 		case "userAbstraction":
@@ -105,7 +105,9 @@ function testnetInfo(request: { type: string; dex?: string }): unknown {
 		case "twapHistory":
 			return [];
 		case "extraAgents":
-			return account.agents.map((address) => ({ name: "hl-live", address, validUntil: 0 }));
+			return account.agent.signsFor === request.user?.toLowerCase() ? [{ name: "hl-live", address: account.agent.address, validUntil: 0 }] : [];
+		case "userRole":
+			return request.user?.toLowerCase() === account.agent.address ? { role: "agent", data: { user: account.agent.signsFor } } : { role: "user" };
 		default:
 			throw new Error(`the fake testnet has no ${request.type}`);
 	}

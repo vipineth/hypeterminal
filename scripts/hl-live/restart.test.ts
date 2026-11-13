@@ -8,9 +8,12 @@ import type { FakeAccount } from "./fake-hl";
 
 const here = dirname(new URL(import.meta.url).pathname);
 
-function restart(seed: Partial<FakeAccount>, args = ["--only", "none"]) {
+const OTHER_ACCOUNT = "0x00000000000000000000000000000000000000bb";
+
+function restart(seed: Partial<FakeAccount>, args = ["--only", "none"], agentSignsFor?: string) {
 	const principalKey = generatePrivateKey();
 	const agentKey = generatePrivateKey();
+	const agentAddress = privateKeyToAccount(agentKey).address.toLowerCase();
 	const dir = mkdtempSync(join(tmpdir(), "hl-live-restart-"));
 	const statePath = join(dir, "account.json");
 	const account: FakeAccount = {
@@ -19,7 +22,7 @@ function restart(seed: Partial<FakeAccount>, args = ["--only", "none"]) {
 		collateral: { "": 500 },
 		positions: [],
 		orders: [],
-		agents: [privateKeyToAccount(agentKey).address],
+		agent: { address: agentAddress, signsFor: agentSignsFor ?? privateKeyToAccount(principalKey).address.toLowerCase() },
 		exchange: [],
 		...seed,
 	};
@@ -45,7 +48,8 @@ describe("restart after a killed run", () => {
 	});
 
 	it("stops an unfunded key with no exchange request", () => {
-		const { code, after } = restart({ spotUsdc: 0, collateral: { "": 0 }, agents: [] });
+		const { code, output, after } = restart({ spotUsdc: 0, collateral: { "": 0 } });
+		expect(output).toMatch(/needs 100/);
 		expect(code).toBe(2);
 		expect(after.exchange).toEqual([]);
 	});
@@ -73,5 +77,22 @@ describe("restart after a killed run", () => {
 		const { after } = restart({ spotUsdc: 30, collateral: { "": 799, xyz: 1 } }, ["--builder", "xyz:NVDA", "--only", "dex sendAsset"]);
 		expect(after.collateral.xyz).toBe(0);
 		expect(after.collateral[""] + after.spotUsdc).toBe(830);
+	});
+
+	it("signs nothing when the agent signs for another account", () => {
+		const { code, output, after } = restart(
+			{
+				mode: "unifiedAccount",
+				spotUsdc: 400,
+				collateral: { "": 0, xyz: 1 },
+				positions: [{ coin: "DOGE", szi: 1 }, { coin: "xyz:NVDA", szi: 0.5 }],
+				orders: [{ coin: "DOGE", oid: 7 }],
+			},
+			[],
+			OTHER_ACCOUNT,
+		);
+		expect(after.exchange).toEqual([]);
+		expect(output).toContain(OTHER_ACCOUNT);
+		expect(code).toBe(2);
 	});
 });
