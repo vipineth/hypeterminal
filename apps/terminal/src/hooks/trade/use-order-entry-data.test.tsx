@@ -49,18 +49,6 @@ const HYPE_USDC = {
 	],
 } as unknown as UnifiedMarketInfo;
 
-const POINTS_USDC = {
-	kind: "spot",
-	name: "@8",
-	pairName: "POINTS/USDC",
-	assetId: 10008,
-	szDecimals: 0,
-	tokensInfo: [
-		{ name: "POINTS", displayName: "POINTS" },
-		{ name: "USDC", displayName: "USDC" },
-	],
-} as unknown as UnifiedMarketInfo;
-
 const MARK = 100;
 const LIMIT = 200;
 const QUOTE_BALANCE = 150;
@@ -215,7 +203,7 @@ describe("quote-sized scale buys", () => {
 	it("never send more than the typed USDC or the order value the balance check uses", () => {
 		const misses: string[] = [];
 		let sent = 0;
-		for (const market of [POINTS_USDC, HYPE_USDC]) {
+		for (const market of [{ ...HYPE_USDC, szDecimals: 0 }, HYPE_USDC]) {
 			for (let levels = SCALE_LEVELS_MIN; levels <= SCALE_LEVELS_MAX; levels += 1) {
 				for (const [start, end] of SCALE_RANGES) {
 					for (const quote of SCALE_QUOTES) {
