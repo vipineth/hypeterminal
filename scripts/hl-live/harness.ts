@@ -6,7 +6,7 @@ import { createWalletClient, custom, type Hex, type TypedDataDomain } from "viem
 import { generatePrivateKey, type PrivateKeyAccount, privateKeyToAccount } from "viem/accounts";
 import { createL1AgentWallet } from "../../packages/hl-react/src/signing/l1-agent-wallet.ts";
 import { toHyperliquidWallet } from "../../packages/hl-react/src/wallet.ts";
-import { toSafeBig } from "@/lib/trade/numbers";
+import { z } from "zod";
 
 const SIGNATURE_CHAIN_ID = "0x66eee";
 const KEY_PATTERN = /^0x[0-9a-fA-F]{64}$/;
@@ -92,13 +92,64 @@ export function loadKeys(env: NodeJS.ProcessEnv = process.env): HarnessKeys {
 	return { principalKey: parseKey(names.principal, read(names.principal)), agentKey: parseKey(names.agent, read(names.agent)) };
 }
 
+const decimal = z.string().regex(/^-?\d+(\.\d+)?$/);
+
+const mainnetReads = {
+	spotClearinghouseState: z.object({ balances: z.array(z.object({ coin: z.string(), total: decimal })) }),
+	perpDexs: z.tuple([z.null()], z.object({ name: z.string().min(1) })),
+	clearinghouseState: z.object({ marginSummary: z.object({ accountValue: decimal }), assetPositions: z.array(z.unknown()) }),
+	delegatorSummary: z.object({ delegated: decimal, undelegated: decimal, totalPendingWithdrawal: decimal, nPendingWithdrawals: z.number().int() }),
+	userVaultEquities: z.array(z.object({ vaultAddress: z.string(), equity: decimal })),
+	subAccounts: z.array(z.object({ name: z.string(), subAccountUser: z.string() })).nullable(),
+	borrowLendUserState: z.object({
+		tokenToState: z.array(z.tuple([z.number(), z.object({ borrow: z.object({ value: decimal }), supply: z.object({ value: decimal }) })])),
+	}),
+	referral: z.object({ unclaimedRewards: decimal, builderRewards: decimal }),
+	leadingVaults: z.array(z.object({ address: z.string(), name: z.string() })),
+};
+
+type MainnetRead = keyof typeof mainnetReads;
+
+async function strictRead<K extends MainnetRead>(read: K, response: Promise<unknown>): Promise<z.infer<(typeof mainnetReads)[K]>> {
+	const parsed = mainnetReads[read].safeParse(await response);
+	if (!parsed.success) throw new Error(`mainnet ${read} is not the expected shape: ${z.prettifyError(parsed.error)}`);
+	return parsed.data as z.infer<(typeof mainnetReads)[K]>;
+}
+
+function isZero(value: string): boolean {
+	return /^-?0+(\.0+)?$/.test(value);
+}
+
 export async function mainnetHoldings(mainnet: InfoClient, user: Hex): Promise<string[]> {
-	const [spot, dexs] = await Promise.all([mainnet.spotClearinghouseState({ user }), mainnet.perpDexs()]);
-	const holdings = spot.balances.filter((balance) => !toSafeBig(balance.total).eq(0)).map((balance) => `${balance.total} ${balance.coin} in spot`);
+	const [spot, dexs, stake, vaults, subAccounts, lending, referral, leading] = await Promise.all([
+		strictRead("spotClearinghouseState", mainnet.spotClearinghouseState({ user })),
+		strictRead("perpDexs", mainnet.perpDexs()),
+		strictRead("delegatorSummary", mainnet.delegatorSummary({ user })),
+		strictRead("userVaultEquities", mainnet.userVaultEquities({ user })),
+		strictRead("subAccounts", mainnet.subAccounts({ user })),
+		strictRead("borrowLendUserState", mainnet.borrowLendUserState({ user })),
+		strictRead("referral", mainnet.referral({ user })),
+		strictRead("leadingVaults", mainnet.leadingVaults({ user })),
+	]);
+	const holdings = [
+		...spot.balances.filter((balance) => !isZero(balance.total)).map((balance) => `${balance.total} ${balance.coin} in spot`),
+		...(isZero(stake.delegated) ? [] : [`${stake.delegated} HYPE staked`]),
+		...(isZero(stake.undelegated) ? [] : [`${stake.undelegated} HYPE undelegated in staking`]),
+		...(isZero(stake.totalPendingWithdrawal) && stake.nPendingWithdrawals === 0 ? [] : [`${stake.totalPendingWithdrawal} HYPE pending withdrawal from staking`]),
+		...vaults.filter((vault) => !isZero(vault.equity)).map((vault) => `${vault.equity} USDC in vault ${vault.vaultAddress}`),
+		...(subAccounts ?? []).map((account) => `sub-account ${account.name} ${account.subAccountUser}`),
+		...lending.tokenToState.flatMap(([token, state]) => [
+			...(isZero(state.supply.value) ? [] : [`${state.supply.value} of token ${token} supplied`]),
+			...(isZero(state.borrow.value) ? [] : [`${state.borrow.value} of token ${token} borrowed`]),
+		]),
+		...(isZero(referral.unclaimedRewards) ? [] : [`${referral.unclaimedRewards} USDC unclaimed referral rewards`]),
+		...(isZero(referral.builderRewards) ? [] : [`${referral.builderRewards} USDC builder rewards`]),
+		...leading.map((vault) => `leads vault ${vault.name} ${vault.address}`),
+	];
 	for (const dex of dexs.map((entry) => entry?.name ?? "")) {
-		const state = await mainnet.clearinghouseState({ user, dex });
+		const state = await strictRead("clearinghouseState", mainnet.clearinghouseState({ user, dex }));
 		const where = dex || "the main dex";
-		if (!toSafeBig(state.marginSummary.accountValue).eq(0)) holdings.push(`${state.marginSummary.accountValue} USDC on ${where}`);
+		if (!isZero(state.marginSummary.accountValue)) holdings.push(`${state.marginSummary.accountValue} USDC on ${where}`);
 		if (state.assetPositions.length > 0) holdings.push(`${state.assetPositions.length} positions on ${where}`);
 	}
 	return holdings;

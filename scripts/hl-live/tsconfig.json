@@ -17,6 +17,9 @@
 			"viem/*": [
 				"./../../apps/terminal/node_modules/viem/*"
 			],
+			"zod": [
+				"./../../apps/terminal/node_modules/zod"
+			],
 			"vitest": [
 				"./../../apps/terminal/node_modules/vitest"
 			]
