@@ -27,13 +27,7 @@ import {
 	type TpSlContext,
 	tpSlLiveMarkValidator,
 } from "../definitions/tpsl";
-import {
-	stopTriggerAboveMarkValidator,
-	stopTriggerBelowMarkValidator,
-	type TriggerContext,
-	tpTriggerAboveMarkValidator,
-	tpTriggerBelowMarkValidator,
-} from "../definitions/trigger";
+import { type TriggerContext, triggerLiveMarkValidator, triggerPriceValidator } from "../definitions/trigger";
 import { type TwapContext, twapMinNotionalValidator, twapMinutesRangeValidator } from "../definitions/twap";
 import { runValidators, type ValidationError, type Validator } from "../types";
 
@@ -72,10 +66,8 @@ const perpOrderValidators: Validator<PerpOrderContext>[] = [
 	tpSlLiveMarkValidator,
 	tpPriceValidator,
 	slPriceValidator,
-	stopTriggerAboveMarkValidator,
-	stopTriggerBelowMarkValidator,
-	tpTriggerAboveMarkValidator,
-	tpTriggerBelowMarkValidator,
+	triggerLiveMarkValidator,
+	triggerPriceValidator,
 	enterPriceRangeValidator,
 	scaleLevelsRangeValidator,
 	scaleStartEndDifferValidator,

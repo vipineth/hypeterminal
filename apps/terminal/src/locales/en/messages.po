@@ -949,6 +949,10 @@ msgstr "Enter a valid SL price"
 msgid "Enter a valid TP price"
 msgstr "Enter a valid TP price"
 
+#: src/lib/errors/definitions/trigger.ts:32
+msgid "Enter a valid trigger price"
+msgstr "Enter a valid trigger price"
+
 #: src/lib/errors/definitions/order-input.ts:21
 #: src/lib/errors/definitions/spot-input.ts:17
 msgid "Enter limit price"
@@ -1068,7 +1072,7 @@ msgstr "Failed to connect with custom address"
 msgid "Failed to copy"
 msgstr "Failed to copy"
 
-#: src/hooks/trade/use-trade-ticket.ts:226
+#: src/hooks/trade/use-trade-ticket.ts:224
 msgid "Failed to enable trading"
 msgstr "Failed to enable trading"
 
@@ -2868,11 +2872,11 @@ msgstr "Stop Loss"
 msgid "Stop Market"
 msgstr "Stop Market"
 
-#: src/lib/errors/definitions/trigger.ts:20
+#: src/lib/errors/definitions/trigger.ts:33
 msgid "Stop trigger must be above mark"
 msgstr "Stop trigger must be above mark"
 
-#: src/lib/errors/definitions/trigger.ts:34
+#: src/lib/errors/definitions/trigger.ts:33
 msgid "Stop trigger must be below mark"
 msgstr "Stop trigger must be below mark"
 
@@ -3029,11 +3033,11 @@ msgstr "Take Profit Limit"
 msgid "Take Profit Market"
 msgstr "Take Profit Market"
 
-#: src/lib/errors/definitions/trigger.ts:48
+#: src/lib/errors/definitions/trigger.ts:34
 msgid "Take profit trigger must be above mark"
 msgstr "Take profit trigger must be above mark"
 
-#: src/lib/errors/definitions/trigger.ts:62
+#: src/lib/errors/definitions/trigger.ts:34
 msgid "Take profit trigger must be below mark"
 msgstr "Take profit trigger must be below mark"
 
@@ -3434,6 +3438,7 @@ msgstr "Volume"
 
 #: src/components/trade/positions/position-tpsl-modal.tsx:201
 #: src/lib/errors/definitions/tpsl.ts:86
+#: src/lib/errors/definitions/trigger.ts:42
 msgid "Waiting for live mark price"
 msgstr "Waiting for live mark price"
 

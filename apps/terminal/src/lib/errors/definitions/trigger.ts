@@ -1,69 +1,56 @@
 import { t } from "@lingui/core/macro";
 import { isPositive } from "@/lib/trade/numbers";
+import { checkTrigger, type TriggerVerdict } from "@/lib/trade/tpsl";
 import type { Side } from "@/lib/trade/types";
 import { createValidator, type Validator } from "../types";
 
 export interface TriggerContext {
 	usesTriggerPrice: boolean;
-	triggerPriceNum: number | null;
-	markPx: number;
+	triggerPriceInput: string;
+	liveMarkPx: string | null;
 	side: Side;
 	stopOrder: boolean;
-	takeProfitOrder: boolean;
+	szDecimals: number;
 }
 
-export const stopTriggerAboveMarkValidator: Validator<TriggerContext> = createValidator({
-	id: "stop-trigger-above-mark",
-	code: "TRG_001",
+function hasTriggerInput(ctx: TriggerContext): boolean {
+	return ctx.usesTriggerPrice && isPositive(ctx.triggerPriceInput);
+}
+
+function checkTriggerOrder(ctx: TriggerContext): TriggerVerdict | null {
+	if (!hasTriggerInput(ctx) || ctx.liveMarkPx === null) return null;
+	return checkTrigger({
+		triggerPx: ctx.triggerPriceInput,
+		referencePx: ctx.liveMarkPx,
+		side: ctx.side === "buy" ? "sell" : "buy",
+		tpsl: ctx.stopOrder ? "sl" : "tp",
+		szDecimals: ctx.szDecimals,
+	});
+}
+
+function getTriggerOrderMessage(ctx: TriggerContext): string {
+	if (checkTriggerOrder(ctx) === "invalid") return t`Enter a valid trigger price`;
+	if (ctx.stopOrder) return ctx.side === "buy" ? t`Stop trigger must be above mark` : t`Stop trigger must be below mark`;
+	return ctx.side === "buy" ? t`Take profit trigger must be below mark` : t`Take profit trigger must be above mark`;
+}
+
+export const triggerLiveMarkValidator: Validator<TriggerContext> = createValidator({
+	id: "trigger-live-mark",
+	code: "TRG_005",
 	category: "trigger",
 	priority: 300,
-	getMessage: () => t`Stop trigger must be above mark`,
-	validate: (ctx) => {
-		if (!ctx.usesTriggerPrice || !isPositive(ctx.triggerPriceNum) || ctx.markPx <= 0) return true;
-		if (!ctx.stopOrder) return true;
-		if (ctx.side !== "buy") return true;
-		return ctx.triggerPriceNum > ctx.markPx;
-	},
+	getMessage: () => t`Waiting for live mark price`,
+	validate: (ctx) => !hasTriggerInput(ctx) || ctx.liveMarkPx !== null,
 });
 
-export const stopTriggerBelowMarkValidator: Validator<TriggerContext> = createValidator({
-	id: "stop-trigger-below-mark",
-	code: "TRG_002",
+export const triggerPriceValidator: Validator<TriggerContext> = createValidator({
+	id: "trigger-price-crossed",
+	code: "TRG_001",
 	category: "trigger",
 	priority: 301,
-	getMessage: () => t`Stop trigger must be below mark`,
+	getMessage: getTriggerOrderMessage,
 	validate: (ctx) => {
-		if (!ctx.usesTriggerPrice || !isPositive(ctx.triggerPriceNum) || ctx.markPx <= 0) return true;
-		if (!ctx.stopOrder) return true;
-		if (ctx.side !== "sell") return true;
-		return ctx.triggerPriceNum < ctx.markPx;
-	},
-});
-
-export const tpTriggerAboveMarkValidator: Validator<TriggerContext> = createValidator({
-	id: "tp-trigger-above-mark",
-	code: "TRG_003",
-	category: "trigger",
-	priority: 302,
-	getMessage: () => t`Take profit trigger must be above mark`,
-	validate: (ctx) => {
-		if (!ctx.usesTriggerPrice || !isPositive(ctx.triggerPriceNum) || ctx.markPx <= 0) return true;
-		if (!ctx.takeProfitOrder) return true;
-		if (ctx.side !== "sell") return true;
-		return ctx.triggerPriceNum > ctx.markPx;
-	},
-});
-
-export const tpTriggerBelowMarkValidator: Validator<TriggerContext> = createValidator({
-	id: "tp-trigger-below-mark",
-	code: "TRG_004",
-	category: "trigger",
-	priority: 303,
-	getMessage: () => t`Take profit trigger must be below mark`,
-	validate: (ctx) => {
-		if (!ctx.usesTriggerPrice || !isPositive(ctx.triggerPriceNum) || ctx.markPx <= 0) return true;
-		if (!ctx.takeProfitOrder) return true;
-		if (ctx.side !== "buy") return true;
-		return ctx.triggerPriceNum < ctx.markPx;
+		const verdict = checkTriggerOrder(ctx);
+		return verdict === null || verdict === "uncrossed";
 	},
 });

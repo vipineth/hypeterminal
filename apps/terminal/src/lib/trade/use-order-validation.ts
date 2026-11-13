@@ -30,8 +30,8 @@ export interface PerpOrderFields {
 	maxSize: number;
 	usesTriggerPrice: boolean;
 	triggerPriceNum: number | null;
+	triggerPriceInput: string;
 	stopOrder: boolean;
-	takeProfitOrder: boolean;
 	scaleOrder: boolean;
 	twapOrder: boolean;
 	scaleStartPriceNum: number | null;

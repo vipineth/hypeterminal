@@ -24,7 +24,6 @@ import {
 	canUseTpSl as canUseTpSlForOrder,
 	isScaleOrderType,
 	isStopOrderType,
-	isTakeProfitOrderType,
 	isTakerOrderType,
 	isTriggerOrderType,
 	isTwapOrderType,
@@ -99,7 +98,6 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 	const tif = useTif();
 
 	const stopOrder = isStopOrderType(orderType);
-	const takeProfitOrder = isTakeProfitOrderType(orderType);
 	const triggerOrder = isTriggerOrderType(orderType);
 	const twapOrder = isTwapOrderType(orderType);
 	const scaleOrder = isScaleOrderType(orderType);
@@ -187,8 +185,8 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 					maxSize,
 					usesTriggerPrice: usesTriggerPriceForOrder(orderType),
 					triggerPriceNum,
+					triggerPriceInput,
 					stopOrder,
-					takeProfitOrder,
 					scaleOrder,
 					twapOrder,
 					scaleStartPriceNum,

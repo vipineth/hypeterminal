@@ -403,6 +403,80 @@ describe("perp ticket tp/sl against the live mark and the sent entry price", () 
 	});
 });
 
+describe("perp ticket trigger orders against the live mark", () => {
+	beforeEach(() => {
+		form.market = { ...SOL_PERP, markPx: "100" };
+		form.side = "buy";
+		form.orderType = "stopMarket";
+		form.sizeMode = "base";
+		form.size = "1";
+		form.limitPrice = "";
+		form.triggerPrice = "";
+		form.reduceOnly = false;
+		form.twapMinutes = null;
+		form.tpSlEnabled = false;
+		form.tpPrice = "";
+		form.slPrice = "";
+		form.sizeUnit = null;
+		form.maxTradeSzs = [100, 100];
+	});
+
+	it("blocks a stop the live mark has crossed while the cached mark has not", () => {
+		form.market = { ...SOL_PERP, markPx: "90" };
+		liveFeed.markPx = "100";
+		form.triggerPrice = "95";
+		expect(renderTicket().validation.errors).toEqual(["Stop trigger must be above mark"]);
+	});
+
+	it("waits for a live mark before sending a trigger order", () => {
+		form.market = { ...SOL_PERP, markPx: "0" };
+		liveFeed.status = "subscribing";
+		form.triggerPrice = "105";
+		expect(renderTicket().validation.errors).toEqual(["Waiting for live mark price"]);
+		form.market = { ...SOL_PERP, markPx: "100" };
+		liveFeed.status = "active";
+		liveFeed.isStale = true;
+		expect(renderTicket().validation.errors).toEqual(["Waiting for live mark price"]);
+	});
+
+	it("tells each trigger order which side of mark its trigger belongs on", () => {
+		const cases = [
+			["buy", "stopMarket", "95", "Stop trigger must be above mark"],
+			["sell", "stopMarket", "105", "Stop trigger must be below mark"],
+			["buy", "takeProfitMarket", "105", "Take profit trigger must be below mark"],
+			["sell", "takeProfitMarket", "95", "Take profit trigger must be above mark"],
+		];
+		for (const [side, orderType, triggerPrice, message] of cases) {
+			Object.assign(form, { side, orderType, triggerPrice });
+			expect(renderTicket().validation.errors).toEqual([message]);
+		}
+	});
+
+	it("blocks a trigger sitting exactly on mark", () => {
+		form.triggerPrice = "100";
+		expect(renderTicket().validation.errors).toEqual(["Stop trigger must be above mark"]);
+		form.side = "sell";
+		form.orderType = "takeProfitMarket";
+		expect(renderTicket().validation.errors).toEqual(["Take profit trigger must be above mark"]);
+	});
+
+	it("sends a take profit trigger whose typed string rounds above mark", async () => {
+		form.side = "sell";
+		form.orderType = "takeProfitMarket";
+		form.triggerPrice = "100.00000000000000001";
+		await pressSubmit();
+		const [[order]] = sentOrders();
+		expect(order).toMatchObject({ t: { trigger: { triggerPx: "100.01", tpsl: "tp" } } });
+	});
+
+	it("names a stop trigger that rounds to zero as invalid", () => {
+		form.market = { ...SOL_PERP, markPx: "0.5" };
+		form.side = "sell";
+		form.triggerPrice = "0.00001";
+		expect(renderTicket().validation.errors).toContain("Enter a valid trigger price");
+	});
+});
+
 describe("size the ticket sends after the size field changes context", () => {
 	beforeEach(() => {
 		form.market = POINTS_USDC;
