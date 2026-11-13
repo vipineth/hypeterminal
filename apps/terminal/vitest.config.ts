@@ -7,5 +7,6 @@ export default defineConfig({
 	test: {
 		environment: "node",
 		setupFiles: ["./vitest.setup.ts"],
+		include: ["**/*.{test,spec}.?(c|m)[jt]s?(x)", "../../scripts/hl-live/**/*.test.ts"],
 	},
 });

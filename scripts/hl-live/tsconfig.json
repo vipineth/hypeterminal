@@ -1,0 +1,38 @@
+{
+	"extends": "../../apps/terminal/tsconfig.json",
+	"compilerOptions": {
+		"paths": {
+			"@/*": [
+				"./../../apps/terminal/src/*"
+			],
+			"@nktkas/hyperliquid": [
+				"./../../apps/terminal/node_modules/@nktkas/hyperliquid"
+			],
+			"@nktkas/hyperliquid/*": [
+				"./../../apps/terminal/node_modules/@nktkas/hyperliquid/esm/*/mod"
+			],
+			"viem": [
+				"./../../apps/terminal/node_modules/viem"
+			],
+			"viem/*": [
+				"./../../apps/terminal/node_modules/viem/*"
+			],
+			"vitest": [
+				"./../../apps/terminal/node_modules/vitest"
+			]
+		},
+		"types": [
+			"node"
+		],
+		"typeRoots": [
+			"./../../apps/terminal/node_modules/@types"
+		]
+	},
+	"include": [
+		"./*.ts",
+		"./scenarios/*.ts"
+	],
+	"files": [
+		"./../../apps/terminal/node_modules/vite/client.d.ts"
+	]
+}
