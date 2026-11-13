@@ -63,14 +63,26 @@ export type PartialPlan = z.infer<typeof partialPlanSchema>;
 export type SlotRecord = z.infer<typeof slotRecordSchema>;
 export type Dismissal = { request: PendingRequest; dismissedAt: number; lookup: unknown };
 
-export type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem" | "key" | "length">;
+export interface KeyValueStore {
+	get(key: string): Promise<unknown>;
+	set(key: string, value: unknown): Promise<void>;
+	keys(): Promise<string[]>;
+}
+
+export interface ChangeBus {
+	post(slot: string): void;
+	subscribe(listener: (slot: string) => void): () => void;
+}
+
+const SILENT_BUS: ChangeBus = { post() {}, subscribe: () => () => {} };
 
 export interface RequestStore {
-	read(slot: string): SlotRecord | null;
-	write(slot: string, record: SlotRecord): boolean;
-	recordDismissal(dismissal: Dismissal): boolean;
-	isWritable(): boolean;
-	list(slotPrefix: string): PendingRequest[];
+	read(slot: string): Promise<SlotRecord | null>;
+	write(slot: string, record: SlotRecord): Promise<boolean>;
+	recordDismissal(dismissal: Dismissal): Promise<boolean>;
+	isWritable(): Promise<boolean>;
+	pending(): PendingRequest[];
+	refresh(): Promise<void>;
 	subscribe(listener: () => void): () => void;
 }
 
@@ -82,84 +94,81 @@ export function getRequestSlot(network: string, user: string, asset: number): st
 	return `${getUserSlotPrefix(network, user)}${asset}`;
 }
 
-export function createRequestStore(
-	getStorage: () => StorageLike | null,
-	onExternalChange: (listener: () => void) => () => void = () => () => {},
-): RequestStore {
+export function createRequestStore(getStore: () => KeyValueStore | null, bus: ChangeBus = SILENT_BUS): RequestStore {
 	const listeners = new Set<() => void>();
+	let cached = new Map<string, PendingRequest>();
+	let pendingList: PendingRequest[] = [];
 
-	function read(slot: string): SlotRecord | null {
+	function notify() {
+		pendingList = [...cached.values()].sort((a, b) => a.createdAt - b.createdAt);
+		for (const listener of listeners) listener();
+	}
+
+	function cache(slot: string, record: SlotRecord | null) {
+		if (record?.state === "pending") cached.set(slot, record.request);
+		else cached.delete(slot);
+		notify();
+	}
+
+	async function read(slot: string): Promise<SlotRecord | null> {
 		try {
-			const raw = getStorage()?.getItem(KEY_PREFIX + slot);
-			return raw ? slotRecordSchema.parse(JSON.parse(raw)) : null;
+			const raw = await getStore()?.get(KEY_PREFIX + slot);
+			return raw === undefined || raw === null ? null : slotRecordSchema.parse(raw);
 		} catch {
 			return null;
 		}
 	}
 
-	function save(key: string, value: unknown): boolean {
-		const storage = getStorage();
-		if (!storage) return false;
+	async function save(key: string, value: unknown): Promise<boolean> {
+		const store = getStore();
+		if (!store) return false;
 		try {
-			storage.setItem(key, JSON.stringify(value));
-		} catch {
-			return false;
-		}
-		return true;
-	}
-
-	function write(slot: string, record: SlotRecord): boolean {
-		if (!save(KEY_PREFIX + slot, record)) return false;
-		for (const listener of listeners) listener();
-		return true;
-	}
-
-	function recordDismissal(dismissal: Dismissal): boolean {
-		return save(`${DISMISSAL_PREFIX}${dismissal.request.slot}#${dismissal.request.nonce}`, dismissal);
-	}
-
-	function isWritable(): boolean {
-		const storage = getStorage();
-		if (!storage) return false;
-		try {
-			storage.setItem(PROBE_KEY, "1");
-			storage.removeItem(PROBE_KEY);
+			await store.set(key, value);
 			return true;
 		} catch {
 			return false;
 		}
 	}
 
-	function storedSlots(): string[] {
-		const slots: string[] = [];
-		const storage = getStorage();
-		try {
-			for (let index = 0; storage && index < storage.length; index++) {
-				const key = storage.key(index);
-				if (key?.startsWith(KEY_PREFIX)) slots.push(key.slice(KEY_PREFIX.length));
-			}
-		} catch {}
-		return slots;
+	async function write(slot: string, record: SlotRecord): Promise<boolean> {
+		if (!(await save(KEY_PREFIX + slot, record))) return false;
+		cache(slot, record);
+		bus.post(slot);
+		return true;
 	}
 
-	function list(slotPrefix: string): PendingRequest[] {
-		return storedSlots()
-			.filter((slot) => slot.startsWith(slotPrefix))
-			.flatMap((slot) => {
-				const record = read(slot);
-				return record?.state === "pending" ? [record.request] : [];
-			})
-			.sort((a, b) => a.createdAt - b.createdAt);
+	function recordDismissal(dismissal: Dismissal): Promise<boolean> {
+		return save(`${DISMISSAL_PREFIX}${dismissal.request.slot}#${dismissal.request.nonce}`, dismissal);
+	}
+
+	function isWritable(): Promise<boolean> {
+		return save(PROBE_KEY, Date.now());
+	}
+
+	async function refresh() {
+		let keys: string[] = [];
+		try {
+			keys = (await getStore()?.keys()) ?? [];
+		} catch {}
+		const slots = keys.filter((key) => key.startsWith(KEY_PREFIX)).map((key) => key.slice(KEY_PREFIX.length));
+		const fresh = new Map<string, PendingRequest>();
+		for (const slot of slots) {
+			const record = await read(slot);
+			if (record?.state === "pending") fresh.set(slot, record.request);
+		}
+		cached = fresh;
+		notify();
 	}
 
 	function subscribe(listener: () => void) {
 		listeners.add(listener);
-		const unsubscribeExternal = onExternalChange(listener);
+		const unsubscribeBus = bus.subscribe(async (slot) => cache(slot, await read(slot)));
+		void refresh();
 		return () => {
 			listeners.delete(listener);
-			unsubscribeExternal();
+			unsubscribeBus();
 		};
 	}
 
-	return { read, write, recordDismissal, isWritable, list, subscribe };
+	return { read, write, recordDismissal, isWritable, pending: () => pendingList, refresh, subscribe };
 }

@@ -14,12 +14,22 @@ import {
 	type Submission,
 	type SubmitOutcome,
 } from "@/lib/trade/order-sender";
-import { createRequestStore, getRequestSlot, type RequestStore, type StorageLike } from "@/lib/trade/pending-requests";
+import {
+	createRequestStore,
+	getRequestSlot,
+	type ChangeBus,
+	type KeyValueStore,
+	type RequestStore,
+	type SlotRecord,
+} from "@/lib/trade/pending-requests";
 import {
 	comesBackUp,
 	createFakeExchange,
 	createMemoryLocks,
-	createMemoryStorage,
+	createMemoryBus,
+	createMemoryKeyValue,
+	failingWrites,
+	type MemoryKeyValue,
 	type FakeExchange,
 	goesDownOnFirstSend,
 	OTHER_AGENT_KEY,
@@ -66,19 +76,19 @@ function signerFor(venue: FakeExchange, key = TEST_AGENT_KEY, user: `0x${string}
 
 function openTab(
 	venue: FakeExchange,
-	storage: StorageLike | null,
+	storage: KeyValueStore | null,
 	locks: LockManagerLike | null,
-	options: { clock?: ExchangeClock; sleep?: (ms: number) => Promise<void> } = {},
+	options: { clock?: ExchangeClock; sleep?: (ms: number) => Promise<void>; bus?: ChangeBus } = {},
 ) {
-	const store = createRequestStore(() => storage);
+	const store = createRequestStore(() => storage, options.bus);
 	const clock = options.clock ?? createExchangeClock(async () => (await venue.info.exchangeStatus()).time, Date.now);
 	const sleep = options.sleep ?? (async () => {});
 	const sender = createOrderSender({ info: () => venue.info, store, clock, locks: () => locks, sleep });
 	return { store, sender, clock };
 }
 
-function pendingNonce(store: RequestStore): number | null {
-	const current = store.read(SLOT);
+async function pendingNonce(store: RequestStore): Promise<number | null> {
+	const current = await store.read(SLOT);
 	return current?.state === "pending" ? current.request.nonce : null;
 }
 
@@ -122,13 +132,13 @@ describe("classifyReply", () => {
 
 describe("order sender", () => {
 	let venue: FakeExchange;
-	let storage: Storage;
+	let storage: MemoryKeyValue;
 	let locks: LockManagerLike;
 
 	beforeEach(() => {
 		vi.useFakeTimers({ toFake: ["Date"], now: new Date("2026-11-14T12:00:00Z") });
 		venue = createFakeExchange();
-		storage = createMemoryStorage();
+		storage = createMemoryKeyValue();
 		locks = createMemoryLocks();
 	});
 
@@ -139,11 +149,14 @@ describe("order sender", () => {
 	it("persists the signed request before its first byte reaches the exchange", async () => {
 		const { store, sender } = openTab(venue, storage, locks);
 		const storedAtArrival: (number | undefined)[] = [];
-		venue.state.onArrive = (body) => storedAtArrival.push(pendingNonce(store) === body.nonce ? body.nonce : undefined);
+		venue.state.onArrive = (body) => {
+			const stored = storage.items.get(`hypeterminal:pending-request:v2:${SLOT}`) as SlotRecord | undefined;
+			storedAtArrival.push(stored?.state === "pending" && stored.request.nonce === body.nonce ? body.nonce : undefined);
+		};
 		const outcome = await sender.submit(signerFor(venue), marketBuy());
 		expect(outcome.kind).toBe("sent");
 		expect(storedAtArrival).toEqual([venue.orderRequests()[0].nonce]);
-		expect(pendingNonce(store)).toBeNull();
+		expect(await pendingNonce(store)).toBeNull();
 	});
 
 	it("expires a request 30 s past the exchange clock when the device clock runs 6 minutes behind", async () => {
@@ -169,7 +182,7 @@ describe("order sender", () => {
 		const outcome = await sender.submit(signerFor(venue), marketBuy());
 		expect(outcome).toEqual({ kind: "failed", error: "Failed to fetch" });
 		expect(venue.exchangeRequests).toEqual([]);
-		expect(store.read(SLOT)).toBeNull();
+		expect(await store.read(SLOT)).toBeNull();
 	});
 
 	it("resends the stored body byte for byte after a lost reply, and one order executes", async () => {
@@ -183,7 +196,7 @@ describe("order sender", () => {
 		expect(venue.exchangeRequests).toHaveLength(2);
 		expect(new Set(venue.exchangeRequests).size).toBe(1);
 		expect(venue.state.placedLegs).toBe(1);
-		expect(pendingNonce(store)).toBeNull();
+		expect(await pendingNonce(store)).toBeNull();
 	});
 
 	it("lets an original still in transit land at most once beside its resend", async () => {
@@ -215,6 +228,7 @@ describe("order sender", () => {
 		const first = openTab(venue, storage, locks);
 		const outcome = await first.sender.submit(signerFor(venue), marketBuy());
 		const later = openTab(venue, storage, locks);
+		await later.store.refresh();
 		vi.setSystemTime(Date.now() + IN_FLIGHT_GRACE_MS);
 		expect(later.sender.list(TEST_USER).map((request) => request.nonce)).toEqual([sentRequest(outcome).nonce]);
 		expect(later.sender.list("0x0000000000000000000000000000000000000002")).toEqual([]);
@@ -259,7 +273,7 @@ describe("order sender", () => {
 		const otherUser = "0x0000000000000000000000000000000000000002";
 		const outcome = await sender.submit(signerFor(venue, TEST_AGENT_KEY, otherUser), marketBuy());
 		expect(outcome).toMatchObject({ kind: "sent", settlement: { kind: "answered" } });
-		expect(pendingNonce(store)).not.toBeNull();
+		expect(await pendingNonce(store)).not.toBeNull();
 		expect(distinctNonces(venue)).toBe(2);
 	});
 
@@ -303,7 +317,7 @@ describe("order sender", () => {
 			{ status: "err", response: `Invalid nonce: duplicate nonce ${request.nonce}` },
 		]);
 		expect(venue.state.placedLegs).toBe(0);
-		expect(pendingNonce(store)).toBeNull();
+		expect(await pendingNonce(store)).toBeNull();
 	});
 
 	it("refuses to cancel a request another agent key signed", async () => {
@@ -314,7 +328,7 @@ describe("order sender", () => {
 		const { request } = first.settlement;
 		const canceled = await sender.cancel(signerFor(venue, OTHER_AGENT_KEY), `${request.slot}#${request.nonce}`);
 		expect(canceled.kind).toBe("foreignSigner");
-		expect(pendingNonce(store)).toBe(request.nonce);
+		expect(await pendingNonce(store)).toBe(request.nonce);
 	});
 
 	it("settles a nonce the signer has moved past as too low and looks the order up", async () => {
@@ -341,7 +355,7 @@ describe("order sender", () => {
 			vi.setSystemTime(Date.now() + later);
 			expect(await sender.retry(keyOf(first))).toMatchObject({ kind: "pending", error: REVOKED });
 		}
-		expect(pendingNonce(store)).toBe(sentRequest(first).nonce);
+		expect(await pendingNonce(store)).toBe(sentRequest(first).nonce);
 	});
 
 	it("blocks a new press when an order landed before its agent key was revoked", async () => {
@@ -400,23 +414,35 @@ describe("order sender", () => {
 	});
 });
 
-function fullStorage(): Storage {
-	const inner = createMemoryStorage();
-	return Object.assign(Object.create(inner), {
-		setItem: () => {
-			throw new DOMException("The quota has been exceeded.", "QuotaExceededError");
-		},
-	});
+function fullStorage(): KeyValueStore {
+	return failingWrites(createMemoryKeyValue());
 }
 
-function storageFullFor(prefix: string): Storage {
-	const inner = createMemoryStorage();
-	return Object.assign(Object.create(inner), {
-		setItem(key: string, value: string) {
-			if (key.startsWith(prefix)) throw new DOMException("The quota has been exceeded.", "QuotaExceededError");
-			inner.setItem(key, value);
-		},
+function storageFullFor(prefix: string): KeyValueStore {
+	return failingWrites(createMemoryKeyValue(), prefix);
+}
+
+function gate(): [Promise<void>, () => void] {
+	let release = () => {};
+	const opened = new Promise<void>((resolve) => {
+		release = resolve;
 	});
+	return [opened, release];
+}
+
+function pausedAtFirstSettle(base: KeyValueStore, until: Promise<void>): KeyValueStore {
+	let paused = false;
+	return {
+		get: (key) => base.get(key),
+		keys: () => base.keys(),
+		async set(key, value) {
+			if (!paused && (value as SlotRecord | null)?.state === "settled") {
+				paused = true;
+				await until;
+			}
+			await base.set(key, value);
+		},
+	};
 }
 
 function scale(prices: string[], { buy = true, asset = SOL } = {}): OrderSubmission {
@@ -523,7 +549,7 @@ describe("order sender in a browser that cannot keep its records", () => {
 	});
 
 	it("sends nothing without Web Locks, so two tabs cannot both sign", async () => {
-		const storage = createMemoryStorage();
+		const storage = createMemoryKeyValue();
 		const tabA = openTab(venue, storage, null);
 		const tabB = openTab(venue, storage, null);
 		const outcomes = await Promise.all([
@@ -536,18 +562,18 @@ describe("order sender in a browser that cannot keep its records", () => {
 		]);
 		expect(reportSubmit(outcomes[0])).toMatchObject({ status: "notSent", error: expect.stringMatching(/HTTPS/) });
 		expect(venue.exchangeRequests).toEqual([]);
-		expect(tabA.store.read(SLOT)).toBeNull();
+		expect(await tabA.store.read(SLOT)).toBeNull();
 	});
 });
 
 describe("order sender with a press that waited on the slot", () => {
 	let venue: FakeExchange;
-	let storage: Storage;
+	let storage: MemoryKeyValue;
 
 	beforeEach(() => {
 		vi.useFakeTimers({ toFake: ["Date"], now: new Date("2026-11-14T12:00:00Z") });
 		venue = createFakeExchange();
-		storage = createMemoryStorage();
+		storage = createMemoryKeyValue();
 	});
 
 	afterEach(() => {
@@ -585,13 +611,13 @@ describe("order sender with a press that waited on the slot", () => {
 
 describe("order sender settling only on the exchange's reply", () => {
 	let venue: FakeExchange;
-	let storage: Storage;
+	let storage: MemoryKeyValue;
 	let locks: LockManagerLike;
 
 	beforeEach(() => {
 		vi.useFakeTimers({ toFake: ["Date"], now: new Date("2026-11-14T12:00:00Z") });
 		venue = createFakeExchange();
-		storage = createMemoryStorage();
+		storage = createMemoryKeyValue();
 		locks = createMemoryLocks();
 	});
 
@@ -688,7 +714,7 @@ describe("order sender settling only on the exchange's reply", () => {
 			canStillExecute: false,
 			lookup: { kind: "order", statuses: [{ status: "unknownOid" }] },
 		});
-		expect(pendingNonce(store)).toBe(sentRequest(first).nonce);
+		expect(await pendingNonce(store)).toBe(sentRequest(first).nonce);
 		if (inspection.kind !== "inspected") throw new Error("expected an inspection");
 		const dismissedAt = Date.now();
 		const dismissed = await sender.dismiss(keyOf(first), inspection.lookup);
@@ -696,8 +722,8 @@ describe("order sender settling only on the exchange's reply", () => {
 		const next = await sender.submit(signerFor(venue, OTHER_AGENT_KEY), marketBuy());
 		expect(next).toMatchObject({ kind: "sent", settlement: { kind: "answered" } });
 		expect(venue.state.placedLegs).toBe(1);
-		expect(pendingNonce(store)).toBeNull();
-		expect(JSON.parse(storage.getItem(`hypeterminal:dismissed-request:v1:${keyOf(first)}`) ?? "null")).toMatchObject({
+		expect(await pendingNonce(store)).toBeNull();
+		expect(await storage.get(`hypeterminal:dismissed-request:v1:${keyOf(first)}`)).toMatchObject({
 			request: { nonce: sentRequest(first).nonce },
 			dismissedAt,
 			lookup: { kind: "order", statuses: [{ status: "unknownOid" }] },
@@ -712,7 +738,7 @@ describe("order sender settling only on the exchange's reply", () => {
 		expect(await sender.inspect(keyOf(first))).toMatchObject({
 			lookup: { statuses: [{ status: "unknownOid" }] },
 		});
-		expect(pendingNonce(store)).toBe(sentRequest(first).nonce);
+		expect(await pendingNonce(store)).toBe(sentRequest(first).nonce);
 		expect(await sender.submit(signerFor(venue), marketBuy())).toMatchObject({ kind: "blocked" });
 	});
 
@@ -737,7 +763,7 @@ describe("order sender settling only on the exchange's reply", () => {
 		venue.state.rejectWith = REVOKED;
 		const canceled = await sender.cancel(signerFor(venue), keyOf(first));
 		expect(canceled).toMatchObject({ kind: "pending", error: REVOKED });
-		expect(pendingNonce(store)).toBe(sentRequest(first).nonce);
+		expect(await pendingNonce(store)).toBe(sentRequest(first).nonce);
 		venue.state.rejectWith = null;
 		venue.deliverInTransit();
 		expect(venue.state.placedLegs).toBe(1);
@@ -757,10 +783,32 @@ describe("order sender settling only on the exchange's reply", () => {
 		venue.nextExchangeRequests("deliver", "lost", "lost", "lost", "lost");
 		const pressB = await tabB.sender.submit(signerFor(venue), marketBuy());
 		const requestB = sentRequest(pressB);
-		expect(pendingNonce(tabB.store)).toBe(requestB.nonce);
+		expect(await pendingNonce(tabB.store)).toBe(requestB.nonce);
 		release();
 		expect(await pressA).toMatchObject({ kind: "sent", settlement: { kind: "consumed" } });
-		expect(pendingNonce(tabA.store)).toBe(requestB.nonce);
+		expect(await pendingNonce(tabA.store)).toBe(requestB.nonce);
+	});
+
+	it("never lets a settlement that read the slot before another tab's write land on top of it", async () => {
+		const [aWrite, releaseAWrite] = gate();
+		const [bWrite, releaseBWrite] = gate();
+		const [aSleep, releaseASleep] = gate();
+		const tabA = openTab(venue, pausedAtFirstSettle(storage, aWrite), locks, { sleep: () => aSleep });
+		const tabB = openTab(venue, pausedAtFirstSettle(storage, bWrite), locks);
+		venue.nextExchangeRequests("lost", "deliver", "deliver", "lost", "lost", "lost", "lost");
+		const pressA = tabA.sender.submit(signerFor(venue), marketBuy());
+		await vi.waitFor(() => expect(venue.exchangeRequests).toHaveLength(1));
+		vi.setSystemTime(Date.now() + 31_000);
+		const pressB = tabB.sender.submit(signerFor(venue), marketBuy());
+		await vi.waitFor(() => expect(venue.exchangeRequests).toHaveLength(2));
+		releaseASleep();
+		await vi.waitFor(() => expect(venue.exchangeRequests).toHaveLength(3));
+		await new Promise((resolve) => setTimeout(resolve, 20));
+		releaseBWrite();
+		const requestB = sentRequest(await pressB);
+		releaseAWrite();
+		expect(await pressA).toMatchObject({ kind: "sent", settlement: { kind: "consumed" } });
+		expect(await pendingNonce(tabB.store)).toBe(requestB.nonce);
 	});
 
 	it("never acts on a newer request from a row whose own request has settled", async () => {
@@ -774,19 +822,19 @@ describe("order sender settling only on the exchange's reply", () => {
 		expect(await sender.retry(keyOf(first))).toEqual({ kind: "missing" });
 		expect(await sender.cancel(signerFor(venue), keyOf(first))).toEqual({ kind: "missing" });
 		expect(venue.exchangeRequests).toHaveLength(sentBefore);
-		expect(pendingNonce(store)).toBe(sentRequest(second).nonce);
+		expect(await pendingNonce(store)).toBe(sentRequest(second).nonce);
 	});
 });
 
 describe("order sender with twaps", () => {
 	let venue: FakeExchange;
-	let storage: Storage;
+	let storage: MemoryKeyValue;
 	let locks: LockManagerLike;
 
 	beforeEach(() => {
 		vi.useFakeTimers({ toFake: ["Date"], now: new Date("2026-11-14T12:00:00Z") });
 		venue = createFakeExchange();
-		storage = createMemoryStorage();
+		storage = createMemoryKeyValue();
 		locks = createMemoryLocks();
 	});
 
@@ -853,13 +901,13 @@ describe("order sender with twaps", () => {
 
 describe("order sender after a partial result", () => {
 	let venue: FakeExchange;
-	let storage: Storage;
+	let storage: MemoryKeyValue;
 	let locks: LockManagerLike;
 
 	beforeEach(() => {
 		vi.useFakeTimers({ toFake: ["Date"], now: new Date("2026-11-14T12:00:00Z") });
 		venue = createFakeExchange();
-		storage = createMemoryStorage();
+		storage = createMemoryKeyValue();
 		locks = createMemoryLocks();
 		venue.state.legOutcome = (order) =>
 			order.p === "95" || order.p === "97" ? { status: { error: "bad price" }, lookup: "rejected" } : undefined;
@@ -904,7 +952,7 @@ describe("order sender after a partial result", () => {
 		expect(reportSubmit(sent)).toEqual({ ok: true, outcome: "filled" });
 		expect(sentPrices(venue)).toEqual(["90", "95", "96"]);
 		expect(venue.state.placedLegs).toBe(2);
-		expect(store.read(SLOT)).toMatchObject({ state: "settled", partial: null });
+		expect(await store.read(SLOT)).toMatchObject({ state: "settled", partial: null });
 		expect(await sender.submit(signerFor(venue), offer)).toEqual({ kind: "refused", reason: "offerStale" });
 	});
 
@@ -946,12 +994,12 @@ describe("order sender after a partial result", () => {
 
 describe("order sender seen from another tab", () => {
 	let venue: FakeExchange;
-	let storage: Storage;
+	let storage: MemoryKeyValue;
 	let locks: LockManagerLike;
 
 	beforeEach(() => {
 		venue = createFakeExchange();
-		storage = createMemoryStorage();
+		storage = createMemoryKeyValue();
 		locks = createMemoryLocks();
 	});
 
@@ -959,22 +1007,31 @@ describe("order sender seen from another tab", () => {
 		vi.useRealTimers();
 	});
 
-	it("leaves another tab's normal send out of its list while it is in flight", async () => {
+	it("leaves another tab's send out of its list while it is in flight", async () => {
 		vi.useFakeTimers({ toFake: ["Date"], now: new Date("2026-11-14T12:00:00Z") });
-		const tabA = openTab(venue, storage, locks);
-		const tabB = openTab(venue, storage, locks);
-		const seenInB: number[] = [];
-		venue.state.onArrive = () => seenInB.push(tabB.sender.list(TEST_USER).length);
-		const outcome = await tabA.sender.submit(signerFor(venue), marketBuy());
-		expect(outcome).toMatchObject({ kind: "sent", settlement: { kind: "answered" } });
-		expect(seenInB).toEqual([0]);
+		const bus = createMemoryBus();
+		let release = () => {};
+		const gate = new Promise<void>((resolve) => {
+			release = resolve;
+		});
+		const tabA = openTab(venue, storage, locks, { bus: bus.join(), sleep: () => gate });
+		const tabB = openTab(venue, storage, locks, { bus: bus.join() });
+		const unsubscribe = tabB.sender.subscribe(() => {});
+		venue.nextExchangeRequests("lost");
+		const pressA = tabA.sender.submit(signerFor(venue), marketBuy());
+		await vi.waitFor(() => expect(tabB.store.pending()).toHaveLength(1));
 		expect(tabB.sender.list(TEST_USER)).toEqual([]);
+		release();
+		expect(await pressA).toMatchObject({ kind: "sent", settlement: { kind: "answered" } });
+		await vi.waitFor(() => expect(tabB.store.pending()).toHaveLength(0));
+		unsubscribe();
 	});
 
 	it("shows another tab's unconfirmed request once the grace period ends, and tells its listeners", async () => {
 		vi.useFakeTimers({ now: new Date("2026-11-14T12:00:00Z") });
-		const tabA = openTab(venue, storage, locks);
-		const tabB = openTab(venue, storage, locks);
+		const bus = createMemoryBus();
+		const tabA = openTab(venue, storage, locks, { bus: bus.join() });
+		const tabB = openTab(venue, storage, locks, { bus: bus.join() });
 		const notified = vi.fn();
 		const unsubscribe = tabB.sender.subscribe(notified);
 		venue.state.exchangeDown = true;

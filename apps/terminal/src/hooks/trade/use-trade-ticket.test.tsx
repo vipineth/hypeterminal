@@ -6,7 +6,7 @@ import {
 	comesBackUp,
 	createFakeExchange,
 	createMemoryLocks,
-	createMemoryStorage,
+	createMemoryKeyValue,
 	type FakeExchange,
 	goesDownOnFirstSend,
 	type LegOutcome,
@@ -63,7 +63,7 @@ const form = vi.hoisted(() => ({
 const liveFeed = vi.hoisted(() => ({ markPx: null as string | null, status: "active", isStale: false }));
 const net = vi.hoisted(() => ({
 	venue: null as unknown as FakeExchange,
-	storage: null as unknown as Storage,
+	storage: null as unknown as ReturnType<typeof createMemoryKeyValue>,
 	locks: null as unknown as LockManagerLike,
 	address: "0x0000000000000000000000000000000000000001" as `0x${string}`,
 }));
@@ -92,9 +92,9 @@ vi.mock("@hypeterminal/hl-react", async (importOriginal) => ({
 }));
 
 vi.mock("@/lib/trade/browser-env", () => ({
-	getBrowserStorage: () => net.storage,
+	getBrowserKeyValue: () => net.storage,
 	getBrowserLocks: () => net.locks,
-	subscribeToStorageEvents: () => () => {},
+	getBrowserChangeBus: () => ({ post() {}, subscribe: () => () => {} }),
 }));
 
 vi.mock("@/lib/hyperliquid", async (importOriginal) => {
@@ -266,7 +266,7 @@ function wireNotional(orders: { p: string; s: string }[]): number {
 
 beforeEach(async () => {
 	net.venue = createFakeExchange();
-	net.storage = createMemoryStorage();
+	net.storage = createMemoryKeyValue();
 	net.locks = createMemoryLocks();
 	net.address = "0x0000000000000000000000000000000000000001";
 	queue.addOrder.mockClear();

@@ -148,10 +148,10 @@ export function createOrderSender(env: SenderEnv) {
 		for (const listener of busyListeners) listener();
 	}
 
-	function safeguards(): { kind: "safe"; locks: LockManagerLike } | Refused {
+	async function safeguards(): Promise<{ kind: "safe"; locks: LockManagerLike } | Refused> {
 		const locks = env.locks();
 		if (!locks) return { kind: "refused", reason: "locks" };
-		if (!env.store.isWritable()) return { kind: "refused", reason: "storage" };
+		if (!(await env.store.isWritable())) return { kind: "refused", reason: "storage" };
 		return { kind: "safe", locks };
 	}
 
@@ -160,11 +160,11 @@ export function createOrderSender(env: SenderEnv) {
 		run: (inSlot: <R>(locked: () => Promise<R>) => Promise<R>) => Promise<T>,
 	): Promise<T | Busy | Refused> {
 		if (sending.has(slot)) return { kind: "busy" };
-		const guard = safeguards();
-		if (guard.kind === "refused") return guard;
 		sending.add(slot);
 		emitBusy();
 		try {
+			const guard = await safeguards();
+			if (guard.kind === "refused") return guard;
 			return await run((locked) => guard.locks.request(`hypeterminal:pending-request:${slot}`, locked));
 		} finally {
 			sending.delete(slot);
@@ -176,11 +176,11 @@ export function createOrderSender(env: SenderEnv) {
 		const asset = Number(submission.kind === "order" ? submission.params.orders[0].a : submission.params.twap.a);
 		const slot = getRequestSlot(network(), signer.user, asset);
 		return exclusive(slot, async (inSlot) => {
-			const seen = stampOf(env.store.read(slot));
+			const seen = stampOf(await env.store.read(slot));
 			const claim = await inSlot(() => claimSlot(slot, seen, asset, signer, submission));
 			if (claim.kind !== "signed") return claim;
 			const settlement = await settle(claim.request, true);
-			return { kind: "sent", settlement: await inSlot(async () => record(settlement)) };
+			return { kind: "sent", settlement: await inSlot(() => record(settlement)) };
 		});
 	}
 
@@ -191,15 +191,15 @@ export function createOrderSender(env: SenderEnv) {
 		signer: Signer,
 		submission: Submission,
 	): Promise<{ kind: "signed"; request: PendingRequest } | SubmitOutcome> {
-		const current = env.store.read(slot);
+		const current = await env.store.read(slot);
 		if (stampOf(current) !== seen) {
 			return { kind: "refused", reason: "slotMoved", to: current?.state === "pending" ? "pending" : "settled" };
 		}
 		if (current?.state === "pending") {
-			const earlier = record(await settle(current.request, false));
+			const earlier = await record(await settle(current.request, false));
 			if (!placedNothing(earlier)) return { kind: "blocked", earlier };
 		}
-		const settled = env.store.read(slot);
+		const settled = await env.store.read(slot);
 		let parent: PendingRequest["parent"] = null;
 		if (submission.kind === "order" && submission.parent) {
 			parent = parentOf(settled, submission.parent);
@@ -212,7 +212,7 @@ export function createOrderSender(env: SenderEnv) {
 			const knownIds = submission.kind === "twap" ? await readTwapIds(signer.user) : [];
 			if (!knownIds) return { kind: "refused", reason: "twapHistory" };
 			const request = await signRequest(slot, asset, signer, submission, { knownIds, parent });
-			if (!env.store.write(slot, { state: "pending", request })) return { kind: "refused", reason: "storage" };
+			if (!(await env.store.write(slot, { state: "pending", request }))) return { kind: "refused", reason: "storage" };
 			return { kind: "signed", request };
 		} catch (error) {
 			return { kind: "failed", error: errorMessage(error) };
@@ -275,12 +275,12 @@ export function createOrderSender(env: SenderEnv) {
 		return { kind: "pending", request, error };
 	}
 
-	function record(settlement: Settlement): Settlement {
+	async function record(settlement: Settlement): Promise<Settlement> {
 		if (settlement.kind === "pending") return settlement;
 		const { request } = settlement;
-		const current = env.store.read(request.slot);
+		const current = await env.store.read(request.slot);
 		if (current?.state !== "pending" || current.request.nonce !== request.nonce) return settlement;
-		env.store.write(request.slot, {
+		await env.store.write(request.slot, {
 			state: "settled",
 			nonce: request.nonce,
 			settledAt: Date.now(),
@@ -302,15 +302,15 @@ export function createOrderSender(env: SenderEnv) {
 		return requestKey.slice(0, requestKey.lastIndexOf("#"));
 	}
 
-	function storedRequest(requestKey: string): PendingRequest | null {
-		const current = env.store.read(slotOf(requestKey));
+	async function storedRequest(requestKey: string): Promise<PendingRequest | null> {
+		const current = await env.store.read(slotOf(requestKey));
 		return current?.state === "pending" && getRequestKey(current.request) === requestKey ? current.request : null;
 	}
 
 	function retry(requestKey: string): Promise<RequestOutcome> {
 		return exclusive(slotOf(requestKey), (inSlot) =>
 			inSlot(async (): Promise<RequestOutcome> => {
-				const request = storedRequest(requestKey);
+				const request = await storedRequest(requestKey);
 				return request ? record(await settle(request, false)) : { kind: "missing" };
 			}),
 		);
@@ -319,7 +319,7 @@ export function createOrderSender(env: SenderEnv) {
 	function cancel(signer: Signer, requestKey: string): Promise<RequestOutcome> {
 		return exclusive(slotOf(requestKey), (inSlot) =>
 			inSlot(async (): Promise<RequestOutcome> => {
-				const request = storedRequest(requestKey);
+				const request = await storedRequest(requestKey);
 				if (!request) return { kind: "missing" };
 				if ((await getWalletAddress(signer.config.wallet)).toLowerCase() !== request.signer) {
 					return { kind: "foreignSigner", request };
@@ -343,7 +343,7 @@ export function createOrderSender(env: SenderEnv) {
 	function inspect(requestKey: string): Promise<Inspection> {
 		return exclusive(slotOf(requestKey), (inSlot) =>
 			inSlot(async (): Promise<Inspection> => {
-				const request = storedRequest(requestKey);
+				const request = await storedRequest(requestKey);
 				if (!request) return { kind: "missing" };
 				const lookup = await lookUp(request, [0]);
 				return { kind: "inspected", request, lookup, canStillExecute: await canStillExecute(request) };
@@ -354,9 +354,9 @@ export function createOrderSender(env: SenderEnv) {
 	function dismiss(requestKey: string, lookup: Lookup): Promise<RequestOutcome> {
 		return exclusive(slotOf(requestKey), (inSlot) =>
 			inSlot(async (): Promise<RequestOutcome> => {
-				const request = storedRequest(requestKey);
+				const request = await storedRequest(requestKey);
 				if (!request) return { kind: "missing" };
-				if (!env.store.recordDismissal({ request, dismissedAt: Date.now(), lookup })) {
+				if (!(await env.store.recordDismissal({ request, dismissedAt: Date.now(), lookup }))) {
 					return { kind: "refused", reason: "storage" };
 				}
 				return record({ kind: "dismissed", request, lookup });
@@ -423,9 +423,12 @@ export function createOrderSender(env: SenderEnv) {
 
 	function list(user: string): PendingRequest[] {
 		const graceStart = Date.now() - IN_FLIGHT_GRACE_MS;
+		const prefix = getUserSlotPrefix(network(), user);
 		return env.store
-			.list(getUserSlotPrefix(network(), user))
-			.filter((request) => !sending.has(request.slot) && request.createdAt <= graceStart);
+			.pending()
+			.filter(
+				(request) => request.slot.startsWith(prefix) && !sending.has(request.slot) && request.createdAt <= graceStart,
+			);
 	}
 
 	async function poll<T>(

@@ -1,6 +1,7 @@
 import { ExchangeClient, HttpRequestError, InfoClient, type IRequestTransport } from "@nktkas/hyperliquid";
 import { keccak256, stringToHex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
+import type { ChangeBus, KeyValueStore } from "@/lib/trade/pending-requests";
 
 export const TEST_USER = "0x0000000000000000000000000000000000000001";
 export const TEST_AGENT_KEY = keccak256(stringToHex("hypeterminal fake exchange agent"));
@@ -194,20 +195,54 @@ export function createFakeExchange({ coins = DEFAULT_COINS }: { coins?: Record<n
 
 export type FakeExchange = ReturnType<typeof createFakeExchange>;
 
-export function createMemoryStorage(): Storage {
-	const items = new Map<string, string>();
+export function createMemoryKeyValue() {
+	const items = new Map<string, unknown>();
 	return {
-		get length() {
-			return items.size;
+		items,
+		async get(key: string): Promise<unknown> {
+			await Promise.resolve();
+			return structuredClone(items.get(key));
 		},
-		clear: () => items.clear(),
-		getItem: (key) => items.get(key) ?? null,
-		key: (index) => [...items.keys()][index] ?? null,
-		removeItem: (key) => {
-			items.delete(key);
+		async set(key: string, value: unknown) {
+			await Promise.resolve();
+			items.set(key, structuredClone(value));
 		},
-		setItem: (key, value) => {
-			items.set(key, String(value));
+		async keys() {
+			return [...items.keys()];
+		},
+	};
+}
+
+export type MemoryKeyValue = ReturnType<typeof createMemoryKeyValue>;
+
+export function failingWrites(store: KeyValueStore, keyPrefix = ""): KeyValueStore {
+	return {
+		get: (key) => store.get(key),
+		keys: () => store.keys(),
+		async set(key, value) {
+			if (key.startsWith(keyPrefix)) throw new DOMException("The quota has been exceeded.", "QuotaExceededError");
+			await store.set(key, value);
+		},
+	};
+}
+
+export function createMemoryBus() {
+	const endpoints = new Set<{ owner: object; listener: (slot: string) => void }>();
+	return {
+		join(): ChangeBus {
+			const owner = {};
+			return {
+				post(slot) {
+					for (const endpoint of endpoints) {
+						if (endpoint.owner !== owner) queueMicrotask(() => endpoint.listener(slot));
+					}
+				},
+				subscribe(listener) {
+					const endpoint = { owner, listener };
+					endpoints.add(endpoint);
+					return () => endpoints.delete(endpoint);
+				},
+			};
 		},
 	};
 }

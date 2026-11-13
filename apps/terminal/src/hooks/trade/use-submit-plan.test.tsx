@@ -1,11 +1,17 @@
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { LockManagerLike } from "@/lib/trade/order-sender";
-import { createFakeExchange, createMemoryLocks, createMemoryStorage, type FakeExchange } from "@/test/fake-exchange";
+import {
+	createFakeExchange,
+	createMemoryKeyValue,
+	createMemoryLocks,
+	type FakeExchange,
+	type MemoryKeyValue,
+} from "@/test/fake-exchange";
 
 const net = vi.hoisted(() => ({
 	venue: null as unknown as FakeExchange,
-	storage: null as unknown as Storage,
+	storage: null as unknown as MemoryKeyValue,
 	locks: null as unknown as LockManagerLike,
 }));
 const queue = vi.hoisted(() => ({
@@ -25,9 +31,9 @@ vi.mock("@hypeterminal/hl-react", async (importOriginal) => ({
 }));
 
 vi.mock("@/lib/trade/browser-env", () => ({
-	getBrowserStorage: () => net.storage,
+	getBrowserKeyValue: () => net.storage,
 	getBrowserLocks: () => net.locks,
-	subscribeToStorageEvents: () => () => {},
+	getBrowserChangeBus: () => ({ post() {}, subscribe: () => () => {} }),
 }));
 
 vi.mock("@/stores/use-order-queue-store", async (importOriginal) => ({
@@ -78,7 +84,7 @@ describe("retry and cancel on an unconfirmed order", () => {
 	beforeEach(() => {
 		vi.useFakeTimers();
 		net.venue = createFakeExchange();
-		net.storage = createMemoryStorage();
+		net.storage = createMemoryKeyValue();
 		net.locks = createMemoryLocks();
 		queue.updateByRequestKey.mockClear();
 	});
@@ -189,12 +195,11 @@ describe("retry and cancel on an unconfirmed order", () => {
 });
 
 function storedDismissal(requestKey: string) {
-	return JSON.parse(net.storage.getItem(`hypeterminal:dismissed-request:v1:${requestKey}`) ?? "null");
+	return net.storage.items.get(`hypeterminal:dismissed-request:v1:${requestKey}`) as { request: { nonce: number } };
 }
 
 function storedSlot() {
-	return JSON.parse(
-		net.storage.getItem("hypeterminal:pending-request:v2:testnet:0x0000000000000000000000000000000000000001:5") ??
-			"null",
-	);
+	return net.storage.items.get(
+		"hypeterminal:pending-request:v2:testnet:0x0000000000000000000000000000000000000001:5",
+	) as { state: string; nonce: number; request: { label: unknown } };
 }

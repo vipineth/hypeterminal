@@ -5,7 +5,7 @@ import { useEffect, useSyncExternalStore } from "react";
 import { useConnection } from "wagmi";
 import { assignCloids, createPlanId, describePlanLegs, type OrderPlan } from "@/domain/trade/order-intent";
 import { getInfoClient, useHyperliquid } from "@/lib/hyperliquid";
-import { getBrowserLocks, getBrowserStorage, subscribeToStorageEvents } from "@/lib/trade/browser-env";
+import { getBrowserChangeBus, getBrowserKeyValue, getBrowserLocks } from "@/lib/trade/browser-env";
 import { createExchangeClock } from "@/lib/trade/exchange-clock";
 import {
 	describeInspection,
@@ -31,7 +31,7 @@ const NO_REQUESTS: PendingRequest[] = [];
 
 const sender = createOrderSender({
 	info: getInfoClient,
-	store: createRequestStore(getBrowserStorage, subscribeToStorageEvents),
+	store: createRequestStore(getBrowserKeyValue, getBrowserChangeBus()),
 	clock: createExchangeClock(
 		async () => (await getInfoClient().exchangeStatus(AbortSignal.timeout(CLOCK_READ_TIMEOUT_MS))).time,
 		() => performance.now(),

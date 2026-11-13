@@ -10,7 +10,7 @@ import type { ReactNode } from "react";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PositionTpSlModal } from "@/components/trade/positions/position-tpsl-modal";
-import { createFakeExchange, createMemoryLocks, createMemoryStorage, type FakeExchange } from "@/test/fake-exchange";
+import { createFakeExchange, createMemoryKeyValue, createMemoryLocks, type FakeExchange } from "@/test/fake-exchange";
 
 const typedOverPrefill = vi.hoisted(() => new Map<string, string>());
 const net = vi.hoisted(() => ({ venue: null as unknown as FakeExchange }));
@@ -61,9 +61,9 @@ vi.mock("@hypeterminal/hl-react", async (importOriginal) => ({
 }));
 
 vi.mock("@/lib/trade/browser-env", () => ({
-	getBrowserStorage: () => createMemoryStorage(),
+	getBrowserKeyValue: () => createMemoryKeyValue(),
 	getBrowserLocks: () => createMemoryLocks(),
-	subscribeToStorageEvents: () => () => {},
+	getBrowserChangeBus: () => ({ post() {}, subscribe: () => () => {} }),
 }));
 
 vi.mock("@/lib/hyperliquid", async (importOriginal) => {
