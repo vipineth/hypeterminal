@@ -4,7 +4,7 @@ import { HttpTransport, InfoClient } from "@nktkas/hyperliquid";
 import { privateKeyToAccount } from "viem/accounts";
 import { listLiveMarkets, type LiveMetaSnapshot } from "@/domain/trade/live-plan-set";
 import { toSafeBig } from "@/lib/trade/numbers";
-import { acquireLock, cleanVenue, exitUnified, enterUnified, loadVenue, SPOT_DEX, spotBalance, type VenueSpec } from "./account";
+import { acquireLock, cleanVenue, enterUnified, loadVenue, recoverAccount, SPOT_DEX, spotBalance, type VenueSpec } from "./account";
 import { errorMessage, validateOrder } from "./assert";
 import { collectDrift, DRIFT_SNAPSHOT_PATH, type DriftShape, diffDrift, fetchDriftInputs, mergeDrift } from "./drift";
 import { createHarness, type Harness, loadKeys, mainnetHoldings } from "./harness";
@@ -101,23 +101,26 @@ async function step(results: Result[], scenario: string, venue: string, action: 
 	}
 }
 
-async function runPasses(h: Harness, agentApproved: boolean, results: Result[]): Promise<void> {
-	const main: VenueSpec = { label: "main", dex: "", coin: values.main };
-	const spot: VenueSpec = { label: "spot", dex: SPOT_DEX, coin: values.spot };
-	const builderCoin = values.builder;
-	const builder: VenueSpec | null = builderCoin ? { label: builderCoin.split(":")[0], dex: builderCoin.split(":")[0], coin: builderCoin } : null;
+interface RunVenues {
+	main: VenueSpec;
+	spot: VenueSpec;
+	builder: VenueSpec | null;
+}
+
+function runVenues(): RunVenues {
+	const builderDex = values.builder.split(":")[0];
+	return {
+		main: { label: "main", dex: "", coin: values.main },
+		spot: { label: "spot", dex: SPOT_DEX, coin: values.spot },
+		builder: values.builder ? { label: builderDex, dex: builderDex, coin: values.builder } : null,
+	};
+}
+
+async function runPasses(h: Harness, { main, spot, builder }: RunVenues, agentApproved: boolean, results: Result[]): Promise<void> {
 	const only = values.only ? new Set(values.only.split(",")) : null;
 	const selected = SCENARIOS.filter((scenario) => !only || only.has(scenario.name));
 	const venuesFor: Record<Scope, VenueSpec[]> = { perp: [main], spot: [spot], account: [main] };
 
-	for (const spec of builder ? [main, spot, builder] : [main, spot]) {
-		await step(results, "cleanup before the run", spec.label, () => cleanVenue(h, spec));
-	}
-	await step(results, "leave unified", "account", () => exitUnified(h));
-	if (results.length > 0) {
-		console.log("STOP the account is not clean, so no scenario ran. The next run retries the cleanup.");
-		return;
-	}
 	if (agentApproved) await resetLeverage({ h, venue: await loadVenue(h.info, main) });
 
 	for (const scenario of selected) {
@@ -142,7 +145,7 @@ async function runPasses(h: Harness, agentApproved: boolean, results: Result[]):
 			}
 		}
 	}
-	await step(results, "leave unified", "account", () => exitUnified(h));
+	await step(results, "leave unified", "account", () => recoverAccount(h, [builder]));
 }
 
 async function runTestnet(): Promise<number> {
@@ -159,6 +162,13 @@ async function runTestnet(): Promise<number> {
 	const h = createHarness(new HttpTransport({ isTestnet: true, timeout: 30_000 }), keys);
 	const releaseLock = acquireLock(h.user);
 	try {
+		const venues = runVenues();
+		const results: Result[] = [];
+		const known = [venues.main, venues.spot, ...(venues.builder ? [venues.builder] : [])];
+		if (!(await step(results, "recover the account", "account", () => recoverAccount(h, known)))) {
+			console.log("STOP the account is not clean, so no scenario ran. The next run retries the recovery.");
+			return 1;
+		}
 		const perp = toSafeBig((await h.info.clearinghouseState({ user: h.user })).marginSummary.accountValue);
 		const funded = perp.plus(toSafeBig(await spotBalance(h, "USDC")));
 		if (funded.lt(MIN_FUNDING_USDC)) {
@@ -169,8 +179,7 @@ async function runTestnet(): Promise<number> {
 		const agentApproved = agents.some((agent) => agent.address.toLowerCase() === h.agentAddress.toLowerCase());
 		console.log(`testnet principal ${h.user}, ${funded.toFixed(2)} USDC, agent ${h.agentAddress} ${agentApproved ? "approved" : "NOT approved"}, mainnet holdings none`);
 
-		const results: Result[] = [];
-		await step(results, "run", "account", () => runPasses(h, agentApproved, results));
+		await step(results, "run", "account", () => runPasses(h, venues, agentApproved, results));
 		const count = (status: Result["status"]) => results.filter((result) => result.status === status).length;
 		console.log(`${count("pass")} passed, ${count("fail")} failed, ${count("unsupported")} unsupported by testnet, in ${elapsed(started)}`);
 		return count("fail") === 0 ? 0 : 1;

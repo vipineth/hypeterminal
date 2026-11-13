@@ -11,7 +11,7 @@ These scripts send every trading action HypeTerminal supports to Hyperliquid tes
 | `bun scripts/hl-live/run.ts --drift` | Compares live mainnet `perpDexs` fields, `meta` fields, `marginMode` values and `userAbstraction` values with `drift-snapshot.json`. Fails on any new field or value. | Never |
 | `bun scripts/hl-live/run.ts --write-drift-snapshot` | Adds the live values to the snapshot after you have handled them in the app. | Never |
 | `bun scripts/hl-live/scan-wire.ts` | HL-1's scan of every mainnet market against the plan set. | Never |
-| `pnpm --filter terminal test hl-live` | Unit tests for the signers, the assertion helpers and the drift check. | Throwaway keys, no network |
+| `pnpm --filter terminal test hl-live` | Unit tests for the signers, the mainnet guard, the intent checks, the assertion helpers and the drift check. `restart.test.ts` runs `run.ts --testnet` against `fake-hl.ts`, an in-memory Hyperliquid, from the state a killed run leaves. | Throwaway keys, no network |
 
 `--testnet` takes these options.
 
@@ -19,11 +19,22 @@ These scripts send every trading action HypeTerminal supports to Hyperliquid tes
 - `--main DOGE` and `--spot PURR/USDC` choose the markets.
 - `--builder xyz:NVDA` adds the builder pass. It is off by default, because every testnet builder dex rejects new orders today and the pass enters unified mode, the riskiest step of a run. Turn it on once a testnet builder dex accepts orders.
 
-Exit code 0 means every scenario passed or was recorded as unsupported by testnet. Exit 1 means a scenario or a cleanup failed. A cleanup failure is its own `FAIL cleanup after <scenario>` line, and the run carries on to the summary. Exit 2 means the run stopped before trading, on a key that holds mainnet funds or an unfunded principal.
+Exit code 0 means every scenario passed or was recorded as unsupported by testnet. Exit 1 means a scenario or a cleanup failed. A cleanup failure is its own `FAIL cleanup after <scenario>` line, and the run carries on to the summary. Exit 2 means the run stopped before trading, on a key that holds mainnet funds or an unfunded principal. The unfunded stop comes after recovery.
 
 ## Keys
 
-The harness runs only on a testnet-only principal, a key that has never held anything on mainnet. Before it signs anything, a run reads the principal's mainnet `spotClearinghouseState` and `clearinghouseState` on every mainnet perp dex. It stops with exit 2 if any of them shows a balance or a position, or if the read fails. A key that holds mainnet funds can't run the harness.
+The harness runs only on a testnet-only principal, a key that has never held anything on mainnet. Before it signs anything, a run reads the principal's mainnet holdings from `/info`.
+
+- `spotClearinghouseState`: any token balance.
+- `clearinghouseState` on every dex `perpDexs` lists: any account value or position.
+- `delegatorSummary`: staked, undelegated or pending-withdrawal HYPE.
+- `userVaultEquities`: equity in any vault.
+- `leadingVaults`: any vault the key leads.
+- `subAccounts`: any sub-account, funded or not.
+- `borrowLendUserState`: any supplied or borrowed token.
+- `referral`: unclaimed referral rewards or builder rewards.
+
+It stops with exit 2 if any of them shows value, if a read fails, or if a response is not the shape it expects: a dex list without the main dex first, or an amount that is not a decimal string. A key that holds mainnet funds can't run the harness. The guard can't see value off `/info`: HyperEVM balances, and Arbitrum bridge deposits or withdrawals still in flight.
 
 By default the harness reads `HL_LIVE_PRINCIPAL_KEY` and `HL_LIVE_AGENT_KEY`, from the environment first, then from `apps/terminal/.env.local` in the main checkout. `HL_ENV_FILE` points it at another file. `HL_PRINCIPAL=2` selects `HL_TESTNET_PRINCIPAL2_KEY` with `HL_TESTNET_AGENT2_KEY`, and `HL_PRINCIPAL=1` selects `HL_TESTNET_PRINCIPAL_KEY` with `HL_TESTNET_AGENT_KEY`. `HL_PRINCIPAL=fresh` uses new random keys, which is how you check the unfunded stop.
 
@@ -43,7 +54,8 @@ Each principal has its own agent named `hl-live`. Hyperliquid binds an agent add
 - Orders go out byte for byte as the app builds them, with no cloid. The harness finds its orders by the `oid` in each response.
 - The leverage on the harness markets ends at 5x cross.
 - The abstraction scenario, and the builder pass when it is on, switch the account to `unifiedAccount` and back. Hyperliquid has no way back to `default`, so the account ends in `disabled`, which is the same standard mode. Unified moves all perp USDC into spot. On the way out the harness keeps 30 USDC in spot and moves the rest back to perp with `sendAsset`, the call the app's transfer modal makes. It reads the live mode and balances and keeps no state on disk, so the next start restores a killed run, on CI as well as locally.
-- A run starts by closing anything left on the harness markets, then leaving unified if the account is still in it. If either fails, no scenario runs and the run reports why.
+- A run starts by recovering the account from its live state, before the funding check, so a killed run that left the account in unified mode with under 100 USDC still recovers. Recovery closes positions, cancels orders and stops TWAPs on this run's markets. If the account reads `unifiedAccount`, an earlier run was killed inside a unified window. The harness opens that window only from a flat account, so recovery also sweeps every perp dex and cleans every position, order and TWAP it finds there, whatever markets this run was started with. It then moves any USDC left on this run's builder dex, or on any builder dex the sweep found, back to spot in unified mode or to perp otherwise. Last it leaves unified and restores the spot float. The builder pass ends with the same recovery. If any of that fails, no scenario runs and the run reports why. Recovery keeps nothing on disk.
+- A builder `sendAsset` round trip refuses to start when the builder dex already holds USDC, so a balance an earlier run stranded is never taken as the baseline.
 - A 429 on an `/info` read is retried with backoff up to five times. `/exchange` requests are never retried.
 - The harness switches to unified only from standard mode, and only when the principal has no running TWAP, no position on any perp dex, and no open order. It reads positions from `clearinghouseState` on every perp dex, and orders from `frontendOpenOrders` with `ALL_DEXS` plus every dex that holds collateral. Hyperliquid refuses to leave unified while anything is open, so another session trading the same principal would strand it there. Give the harness a principal nobody else trades. Until then, the abstraction scenarios fail with that reason whenever someone else has activity on the account.
 - Only one run per principal at a time. A lock file in the OS temp dir stops a second run.
@@ -68,10 +80,10 @@ Each principal has its own agent named `hl-live`. Hyperliquid binds an agent add
 Each check compares what Hyperliquid reports against the scenario's intent, not against the app's own output, so a builder bug can't move the expected value with it.
 
 - A limit order rests at the input price, which the scenario puts on the tick first, with the intended lot size, side and TIF.
-- Every market, close, reverse and swap order caps its price at mark plus or minus 250 bps, within one tick and 10 bps.
+- Every market, close, reverse and swap order goes out as `FrontendMarket` and caps its price at mark plus or minus 250 bps, within one tick and 10 bps.
 - Each scale level rests at its interpolated price, within one tick.
 - An IOC that can't fill is rejected and leaves nothing open.
-- A TWAP's side, size and minutes match in `twapHistory`.
+- A TWAP's side, size, minutes, reduce-only and randomize flags match in `twapHistory`.
 - Each TP and SL matches a distinct open trigger by kind, side, trigger price and size.
 
 A scenario is reported as `SKIP` only when testnet itself can't support it, and the line says why. The causes measured on 2026-11-13 are listed below.

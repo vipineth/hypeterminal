@@ -4,7 +4,7 @@ import { join } from "node:path";
 import type { InfoClient } from "@nktkas/hyperliquid";
 import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
 import { DEFAULT_QUOTE_TOKEN, HL_ALL_DEXS } from "@/config/app";
-import { getBuilderPerpAssetId, getPerpAssetId, getSpotAssetId } from "@/lib/hyperliquid/markets/helper";
+import { getBuilderPerpAssetId, getDexFromName, getPerpAssetId, getSpotAssetId } from "@/lib/hyperliquid/markets/helper";
 import { toSafeBig } from "@/lib/trade/numbers";
 import { formatTokenId } from "@/lib/trade/token-id";
 import { errorMessage, positionSize } from "./assert";
@@ -79,13 +79,17 @@ export async function spotBalance(h: Harness, coin: string): Promise<string> {
 	return balances.find((balance) => balance.coin === coin)?.total ?? "0";
 }
 
-export async function activeTwapIds(h: Harness, coin?: string): Promise<number[]> {
+async function activeTwaps(h: Harness): Promise<{ twapId: number; coin: string }[]> {
 	const history = await h.info.twapHistory({ user: h.user });
-	const latest = new Map<number, string>();
+	const latest = new Map<number, { status: string; coin: string }>();
 	for (const entry of [...history].sort((a, b) => a.time - b.time)) {
-		if (entry.twapId !== undefined && (coin === undefined || entry.state.coin === coin)) latest.set(entry.twapId, entry.status.status);
+		if (entry.twapId !== undefined) latest.set(entry.twapId, { status: entry.status.status, coin: entry.state.coin });
 	}
-	return [...latest].filter(([, status]) => status === "activated").map(([twapId]) => twapId);
+	return [...latest].filter(([, twap]) => twap.status === "activated").map(([twapId, twap]) => ({ twapId, coin: twap.coin }));
+}
+
+export async function activeTwapIds(h: Harness, coin?: string): Promise<number[]> {
+	return (await activeTwaps(h)).filter((twap) => coin === undefined || twap.coin === coin).map((twap) => twap.twapId);
 }
 
 function aggressivePrice(venue: Venue, isBuy: boolean): string {
@@ -174,33 +178,68 @@ export function acquireLock(user: string): () => void {
 	};
 }
 
-async function openActivity(h: Harness): Promise<string[]> {
-	const found: string[] = [];
-	const twaps = await activeTwapIds(h);
-	if (twaps.length > 0) found.push(`${twaps.length} running twaps`);
+interface AccountScan {
+	twapCoins: string[];
+	positions: { dex: string; coins: string[] }[];
+	orders: { dex: string; coins: string[] }[];
+	collateralDexes: string[];
+}
+
+async function scanAccount(h: Harness): Promise<AccountScan> {
+	const twapCoins = (await activeTwaps(h)).map((twap) => twap.coin);
 	const dexes = (await h.info.perpDexs()).map((dex) => dex?.name ?? "");
-	const orderDexes = new Set<string>([HL_ALL_DEXS]);
+	const positions: AccountScan["positions"] = [];
+	const collateralDexes: string[] = [];
 	for (let start = 0; start < dexes.length; start += SWEEP_BATCH) {
 		await Promise.all(
 			dexes.slice(start, start + SWEEP_BATCH).map(async (dex) => {
 				const state = await h.info.clearinghouseState({ user: h.user, dex });
-				if (state.assetPositions.length > 0) found.push(`${state.assetPositions.length} positions on ${dex || "the main dex"}`);
-				if (dex !== "" && !toSafeBig(state.marginSummary.accountValue).eq(0)) orderDexes.add(dex);
+				if (state.assetPositions.length > 0) positions.push({ dex, coins: state.assetPositions.map((entry) => entry.position.coin) });
+				if (dex !== "" && !toSafeBig(state.marginSummary.accountValue).eq(0)) collateralDexes.push(dex);
 			}),
 		);
 	}
-	for (const dex of orderDexes) {
-		const orders = await h.info.frontendOpenOrders({ user: h.user, dex });
-		if (orders.length > 0) found.push(`${orders.length} orders on ${dex === HL_ALL_DEXS ? "all dexes" : dex}`);
+	const orders: AccountScan["orders"] = [];
+	for (const dex of [HL_ALL_DEXS, ...collateralDexes]) {
+		const open = await h.info.frontendOpenOrders({ user: h.user, dex });
+		if (open.length > 0) orders.push({ dex, coins: open.map((order) => order.coin) });
 	}
-	return found;
+	return { twapCoins, positions, orders, collateralDexes };
+}
+
+function describeActivity(scan: AccountScan): string[] {
+	return [
+		...(scan.twapCoins.length > 0 ? [`${scan.twapCoins.length} running twaps`] : []),
+		...scan.positions.map(({ dex, coins }) => `${coins.length} positions on ${dex || "the main dex"}`),
+		...scan.orders.map(({ dex, coins }) => `${coins.length} orders on ${dex === HL_ALL_DEXS ? "all dexes" : dex}`),
+	];
+}
+
+function venueForCoin(coin: string): VenueSpec {
+	const dex = getDexFromName(coin);
+	if (dex) return { label: dex, dex, coin };
+	if (coin.startsWith("@") || coin.includes("/")) return { label: SPOT_DEX, dex: SPOT_DEX, coin };
+	return { label: "main", dex: "", coin };
+}
+
+function scannedVenues(scan: AccountScan): VenueSpec[] {
+	const coins = [...scan.twapCoins, ...scan.positions.flatMap((entry) => entry.coins), ...scan.orders.flatMap((entry) => entry.coins)];
+	return coins.map(venueForCoin);
+}
+
+function uniqueVenues(venues: VenueSpec[]): VenueSpec[] {
+	return [...new Map(venues.map((venue) => [`${venue.dex}|${venue.coin}`, venue])).values()];
+}
+
+function isBuilderDex(dex: string): boolean {
+	return dex !== "" && dex !== SPOT_DEX;
 }
 
 export async function enterUnified(h: Harness, switchMode = () => h.principal.userSetAbstraction({ user: h.user, abstraction: "unifiedAccount" })): Promise<void> {
 	if ((await h.info.userAbstraction({ user: h.user })) === "unifiedAccount") {
 		throw new Error("refusing to switch to unified: the account is already unifiedAccount, so an earlier run never left it. The next run's start leaves it first.");
 	}
-	const activity = await openActivity(h);
+	const activity = describeActivity(await scanAccount(h));
 	if (activity.length > 0) {
 		throw new Error(
 			`refusing to switch to unified: the principal holds ${activity.join(", ")}, and Hyperliquid will not leave unified until they close. Use a principal no other session trades.`,
@@ -229,8 +268,13 @@ async function moveUsdc(h: Harness, amount: string, direction: "toSpot" | "toPer
 
 export async function restoreUsdcSplit(h: Harness): Promise<void> {
 	const gap = toSafeBig(SPOT_FLOAT_USDC).minus(toSafeBig(await spotBalance(h, "USDC"))).round(USDC_DECIMALS, ROUND_DOWN);
-	if (gap.abs().lt(SPLIT_TOLERANCE_USDC)) return;
-	await moveUsdc(h, gap.abs().toFixed(), gap.gt(0) ? "toSpot" : "toPerp");
+	if (gap.lte(0)) {
+		if (gap.abs().gte(SPLIT_TOLERANCE_USDC)) await moveUsdc(h, gap.abs().toFixed(), "toPerp");
+		return;
+	}
+	const perp = toSafeBig((await h.info.clearinghouseState({ user: h.user })).withdrawable);
+	const topUp = (gap.lt(perp) ? gap : perp).round(USDC_DECIMALS, ROUND_DOWN);
+	if (topUp.gte(SPLIT_TOLERANCE_USDC)) await moveUsdc(h, topUp.toFixed(), "toSpot");
 }
 
 export async function exitUnified(h: Harness): Promise<void> {
@@ -240,4 +284,32 @@ export async function exitUnified(h: Harness): Promise<void> {
 		if (mode !== "disabled") throw new Error(`expected disabled after leaving unified, read ${mode}`);
 	}
 	await restoreUsdcSplit(h);
+}
+
+async function returnCollateral(h: Harness, dex: string, unified: boolean): Promise<void> {
+	const { withdrawable } = await h.info.clearinghouseState({ user: h.user, dex });
+	if (toSafeBig(withdrawable).eq(0)) return;
+	await h.principal.sendAsset({
+		destination: h.user,
+		sourceDex: dex,
+		destinationDex: unified ? SPOT_DEX : "",
+		token: await usdcTokenId(h),
+		amount: withdrawable,
+	});
+}
+
+export async function recoverAccount(h: Harness, known: VenueSpec[]): Promise<void> {
+	const unified = (await h.info.userAbstraction({ user: h.user })) === "unifiedAccount";
+	const scan = unified ? await scanAccount(h) : null;
+	const venues = uniqueVenues([...known, ...(scan ? scannedVenues(scan) : [])]);
+	const failures: string[] = [];
+	for (const venue of venues) {
+		await cleanVenue(h, venue).catch((error: unknown) => failures.push(errorMessage(error)));
+	}
+	const builderDexes = new Set([...venues.map((venue) => venue.dex).filter(isBuilderDex), ...(scan?.collateralDexes ?? [])]);
+	for (const dex of builderDexes) {
+		await returnCollateral(h, dex, unified).catch((error: unknown) => failures.push(`returning ${dex} collateral: ${errorMessage(error)}`));
+	}
+	if (failures.length > 0) throw new Error(failures.join("; "));
+	await exitUnified(h);
 }

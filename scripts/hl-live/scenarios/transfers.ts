@@ -27,6 +27,9 @@ async function roundTrip(ctx: ScenarioContext, sendAsset: SendAsset): Promise<vo
 	const move = (sourceDex: string, destinationDex: string) =>
 		sendAsset({ destination: ctx.h.user, sourceDex, destinationDex, token, amount: AMOUNT });
 	const before = await venueUsdc(ctx, target);
+	if (target !== SPOT_DEX && !toSafeBig(before).eq(0)) {
+		throw new Error(`${target} already holds ${before} USDC before the round trip, so an earlier transfer stranded it and recovery did not return it`);
+	}
 	try {
 		await move(home, target);
 	} catch (error) {

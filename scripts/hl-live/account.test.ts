@@ -23,10 +23,12 @@ function fakeHarness(account: Account) {
 			perpDexs: async () => (account.dexes ?? [""]).map((name) => (name === "" ? null : { name })),
 			twapHistory: async () =>
 				(account.twaps ?? []).map(({ twapId, status }) => ({ time: 1, twapId, state: { coin: "DOGE" }, status: { status } })),
-			clearinghouseState: async ({ dex }: { dex: string }) => {
+			clearinghouseState: async ({ dex = "" }: { dex?: string }) => {
 				calls.push(`clearinghouseState ${dex}`);
+				const value = account.collateral?.[dex] ?? (dex === "" ? (account.perpUsdc ?? "0") : "0");
 				return {
-					marginSummary: { accountValue: account.collateral?.[dex] ?? (dex === "" ? (account.perpUsdc ?? "0") : "0") },
+					marginSummary: { accountValue: value },
+					withdrawable: value,
 					assetPositions: Array.from({ length: account.positions?.[dex] ?? 0 }, () => ({ position: { coin: "X", szi: "1" } })),
 				};
 			},
@@ -63,10 +65,21 @@ describe("exitUnified", () => {
 });
 
 describe("restoreUsdcSplit", () => {
+	const sends = (calls: string[]) => calls.filter((call) => call.startsWith("sendAsset"));
+
 	it("tops spot up to the float from perp", async () => {
-		const { h, calls } = fakeHarness({ mode: "default", spotUsdc: "12.5" });
+		const { h, calls } = fakeHarness({ mode: "default", spotUsdc: "12.5", perpUsdc: "100" });
 		await restoreUsdcSplit(h);
-		expect(calls).toEqual(['sendAsset 17.5 USDC:0xusdc from "" to "spot"']);
+		expect(sends(calls)).toEqual(['sendAsset 17.5 USDC:0xusdc from "" to "spot"']);
+	});
+
+	it("tops up only what perp holds, and signs nothing for an unfunded key", async () => {
+		const short = fakeHarness({ mode: "disabled", spotUsdc: "0", perpUsdc: "10" });
+		await restoreUsdcSplit(short.h);
+		expect(sends(short.calls)).toEqual(['sendAsset 10 USDC:0xusdc from "" to "spot"']);
+		const empty = fakeHarness({ mode: "disabled", spotUsdc: "0", perpUsdc: "0" });
+		await restoreUsdcSplit(empty.h);
+		expect(sends(empty.calls)).toEqual([]);
 	});
 });
 
