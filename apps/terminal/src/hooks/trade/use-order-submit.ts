@@ -58,6 +58,10 @@ function getQueueOrderType(input: OrderSubmitInput): QueueOrderType {
 	return "market";
 }
 
+function getQueuePrice({ p, t }: ExchangeOrder): string {
+	return "trigger" in t && t.trigger.isMarket ? String(t.trigger.triggerPx) : p;
+}
+
 function findTriggerPrice(orders: ExchangeOrder[], tpsl: TpSl): string | undefined {
 	for (const { t } of orders) {
 		if ("trigger" in t && t.trigger.tpsl === tpsl) return String(t.trigger.triggerPx);
@@ -142,7 +146,7 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 			market: input.baseToken,
 			side: input.side,
 			size: truncateDecimals(input.sizeValue, market.szDecimals),
-			price: plan.orders[0]?.p,
+			price: plan.orders[0] && getQueuePrice(plan.orders[0]),
 			orderType: getQueueOrderType(input),
 			tpPrice: hasTp ? findTriggerPrice(plan.orders, "tp") : undefined,
 			slPrice: hasSl ? findTriggerPrice(plan.orders, "sl") : undefined,
