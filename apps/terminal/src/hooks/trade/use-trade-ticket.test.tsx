@@ -34,6 +34,7 @@ const form = vi.hoisted(() => ({
 	baseBalance: "0",
 	size: "10000",
 	limitPrice: "0.0026434",
+	triggerPrice: "",
 	scaleStart: "",
 	scaleEnd: "",
 	scaleLevels: 5,
@@ -90,7 +91,7 @@ vi.mock("@/stores/use-order-entry-store", () => ({
 	useReduceOnly: () => false,
 	useOrderSize: () => form.size,
 	useLimitPrice: () => form.limitPrice,
-	useTriggerPrice: () => "",
+	useTriggerPrice: () => form.triggerPrice,
 	useScaleStart: () => form.scaleStart,
 	useScaleEnd: () => form.scaleEnd,
 	useScaleLevels: () => form.scaleLevels,
@@ -214,6 +215,7 @@ describe("perp trade ticket", () => {
 		form.sizeMode = "base";
 		form.size = "1";
 		form.limitPrice = "80.276";
+		form.triggerPrice = "";
 		form.tpSlEnabled = true;
 		form.tpPrice = "";
 		form.slPrice = "";
@@ -251,5 +253,16 @@ describe("perp trade ticket", () => {
 		form.slPrice = "84.999999999999999";
 		await pressSubmit();
 		expect(queue.addOrder).toHaveBeenLastCalledWith(expect.objectContaining({ tpPrice: "74.999", slPrice: "85" }));
+	});
+
+	it("shows a stop market's sent trigger in the order toast", async () => {
+		form.side = "buy";
+		form.orderType = "stopMarket";
+		form.tpSlEnabled = false;
+		form.triggerPrice = "85.0001";
+		await pressSubmit();
+		const [[stop]] = sentOrders();
+		expect(stop).toMatchObject({ p: "85", t: { trigger: { triggerPx: "85.001", tpsl: "sl" } } });
+		expect(queue.addOrder).toHaveBeenLastCalledWith(expect.objectContaining({ price: "85.001" }));
 	});
 });
