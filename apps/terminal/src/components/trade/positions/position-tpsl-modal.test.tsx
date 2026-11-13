@@ -13,7 +13,7 @@ vi.mock("react", async (importOriginal) => {
 		const typed = typeof initial === "string" ? typedOverPrefill.get(initial) : undefined;
 		return react.useState(typed ?? initial);
 	}
-	return { ...react, default: react, useState };
+	return { ...react, useState };
 });
 
 vi.mock("@hypeterminal/ui", async (importOriginal) => ({
