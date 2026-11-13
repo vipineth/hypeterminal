@@ -93,7 +93,6 @@ export interface MarketModel {
 const SPOT_ASSET_ID_BASE = 10_000;
 const BUILDER_PERP_ASSET_ID_BASE = 100_000;
 const BUILDER_PERP_SLOTS_PER_DEX = 10_000;
-const MARGIN_MODES: readonly string[] = ["noCross", "strictIsolated"] satisfies MarginMode[];
 
 export function isListed(market: Market): market is ListedMarket {
 	return !market.isDelisted;
@@ -120,19 +119,14 @@ export function parseMarkets({ perpDexs, allPerpMetas, spotMeta }: MetaPayloads)
 
 	const markets: Market[] = [];
 	const byName = new Map<string, Market>();
-	const assetIds = new Set<number>();
+	const spotIndices = new Set<number>();
 
 	function add(market: Market) {
 		if (byName.has(market.name)) {
 			issues.push({ kind: "duplicateCoin", coin: market.name });
 			return;
 		}
-		if (assetIds.has(market.assetId)) {
-			issues.push({ kind: "duplicateAssetId", coin: market.name, assetId: market.assetId });
-			return;
-		}
 		byName.set(market.name, market);
-		assetIds.add(market.assetId);
 		markets.push(market);
 	}
 
@@ -152,6 +146,11 @@ export function parseMarkets({ perpDexs, allPerpMetas, spotMeta }: MetaPayloads)
 			}
 			continue;
 		}
+		if (spotIndices.has(pair.index)) {
+			issues.push({ kind: "duplicateAssetId", coin: pair.name, assetId: SPOT_ASSET_ID_BASE + pair.index });
+			continue;
+		}
+		spotIndices.add(pair.index);
 		add({
 			kind: "spot",
 			name: pair.name,
@@ -228,9 +227,7 @@ function indexTokens(tokens: readonly SpotToken[], issues: ParseIssue[]): Map<nu
 function indexTokenNames(tokens: readonly SpotToken[]): Map<string, SpotToken> {
 	const byName = new Map<string, SpotToken>();
 	for (const token of tokens) {
-		if (!byName.has(token.name)) byName.set(token.name, token);
-	}
-	for (const token of tokens) {
+		if (byName.get(token.name)?.name !== token.name) byName.set(token.name, token);
 		if (!byName.has(token.displayName)) byName.set(token.displayName, token);
 	}
 	return byName;
@@ -270,7 +267,8 @@ function toPerpMarket(asset: SdkPerpAsset, position: number, dex: Dex, issues: P
 	const marginMode = normalizeMarginMode(asset, issues);
 	const isMain = dex.index === 0;
 	const shortName = isMain ? asset.name : asset.name.slice(dex.name.length + BUILDER_DEX_SEPARATOR.length);
-	const fields = {
+	return {
+		kind: isMain ? "perp" : "builderPerp",
 		name: asset.name,
 		assetId: mintAssetId(
 			isMain ? position : BUILDER_PERP_ASSET_ID_BASE + dex.index * BUILDER_PERP_SLOTS_PER_DEX + position,
@@ -287,13 +285,12 @@ function toPerpMarket(asset: SdkPerpAsset, position: number, dex: Dex, issues: P
 		crossAllowed: marginMode === undefined,
 		isDelisted: asset.isDelisted === true,
 	};
-	return isMain ? { kind: "perp", ...fields } : { kind: "builderPerp", ...fields };
 }
 
 function normalizeMarginMode(asset: SdkPerpAsset, issues: ParseIssue[]): MarginMode | undefined {
 	const mode: string | undefined = asset.marginMode;
 	if (mode === undefined) return asset.onlyIsolated === true ? "noCross" : undefined;
-	if (MARGIN_MODES.includes(mode)) return mode as MarginMode;
+	if (mode === "noCross" || mode === "strictIsolated") return mode;
 	issues.push({ kind: "unknownMarginMode", coin: asset.name, marginMode: mode });
 	return "noCross";
 }
