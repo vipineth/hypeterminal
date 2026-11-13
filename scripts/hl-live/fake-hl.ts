@@ -37,12 +37,17 @@ const mainnetReads: Record<string, unknown> = {
 	leadingVaults: [],
 };
 
-const path = process.env.FAKE_HL_STATE;
-if (!path) throw new Error("FAKE_HL_STATE must name the fake account file");
+function statePath(): string {
+	const path = process.env.FAKE_HL_STATE;
+	if (!path) throw new Error("FAKE_HL_STATE must name the fake account file");
+	return path;
+}
+
+const path = statePath();
 const account = JSON.parse(readFileSync(path, "utf8")) as FakeAccount;
 
 function save(): void {
-	writeFileSync(path as string, JSON.stringify(account));
+	writeFileSync(path, JSON.stringify(account));
 }
 
 function coinOfAsset(asset: number): string {

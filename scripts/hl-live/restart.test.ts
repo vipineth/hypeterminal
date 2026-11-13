@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
@@ -11,7 +11,8 @@ const here = dirname(new URL(import.meta.url).pathname);
 function restart(seed: Partial<FakeAccount>, args = ["--only", "none"]) {
 	const principalKey = generatePrivateKey();
 	const agentKey = generatePrivateKey();
-	const statePath = join(mkdtempSync(join(tmpdir(), "hl-live-restart-")), "account.json");
+	const dir = mkdtempSync(join(tmpdir(), "hl-live-restart-"));
+	const statePath = join(dir, "account.json");
 	const account: FakeAccount = {
 		mode: "disabled",
 		spotUsdc: 30,
@@ -30,7 +31,9 @@ function restart(seed: Partial<FakeAccount>, args = ["--only", "none"]) {
 		env: { ...env, HL_ENV_FILE: "/dev/null", HL_LIVE_PRINCIPAL_KEY: principalKey, HL_LIVE_AGENT_KEY: agentKey, FAKE_HL_STATE: statePath },
 		timeout: 60_000,
 	});
-	return { code: run.status, output: `${run.stdout}${run.stderr}`, after: JSON.parse(readFileSync(statePath, "utf8")) as FakeAccount };
+	const after = JSON.parse(readFileSync(statePath, "utf8")) as FakeAccount;
+	rmSync(dir, { recursive: true });
+	return { code: run.status, output: `${run.stdout}${run.stderr}`, after };
 }
 
 describe("restart after a killed run", () => {

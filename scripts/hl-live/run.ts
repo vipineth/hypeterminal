@@ -145,7 +145,7 @@ async function runPasses(h: Harness, { main, spot, builder }: RunVenues, agentAp
 			}
 		}
 	}
-	await step(results, "leave unified", "account", () => recoverAccount(h, [builder]));
+	await step(results, "recover after the builder pass", "account", () => recoverAccount(h, [builder]));
 }
 
 async function runTestnet(): Promise<number> {
