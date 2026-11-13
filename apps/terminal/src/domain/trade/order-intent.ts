@@ -1,6 +1,6 @@
 import Big from "big.js";
 import type { ExchangeOrder } from "@/config/trade";
-import { getExecutedPrice } from "@/domain/trade/order/price";
+import { getMarketPrice } from "@/domain/trade/order/price";
 import {
 	buildOrders,
 	type EntryOrderParams,
@@ -149,7 +149,7 @@ function buildPositionTpSlPlan(intent: PositionTpSlIntent): PlanLegs {
 
 function buildMarketClosePlan({ assetId, size, szDecimals, isLong, markPx, slippageBps }: MarketCloseIntent): PlanLegs {
 	const side = getCloseSide(isLong);
-	const orderPrice = getExecutedPrice("market", side, markPx, slippageBps, markPx);
+	const orderPrice = getMarketPrice(side, markPx, slippageBps);
 
 	return {
 		orders: [
@@ -186,7 +186,7 @@ function buildLimitClosePlan({ assetId, size, szDecimals, isLong, price }: Limit
 
 function buildReversePlan({ assetId, size, szDecimals, isLong, markPx, slippageBps }: ReverseIntent): PlanLegs {
 	const side = getCloseSide(isLong);
-	const orderPrice = getExecutedPrice("market", side, markPx, slippageBps, markPx);
+	const orderPrice = getMarketPrice(side, markPx, slippageBps);
 
 	return {
 		orders: [

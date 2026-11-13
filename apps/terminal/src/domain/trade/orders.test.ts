@@ -1,7 +1,7 @@
 import Big from "big.js";
 import { describe, expect, it } from "vitest";
 import { SCALE_LEVELS_MAX, SCALE_LEVELS_MIN } from "@/config/trade";
-import { getExecutedPrice } from "@/domain/trade/order/price";
+import { getMarketPrice } from "@/domain/trade/order/price";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
 import {
 	buildOrders,
@@ -34,19 +34,15 @@ const ENTRY_BASE = {
 	slPriceNum: null,
 };
 
-describe("getExecutedPrice (characterization)", () => {
+describe("getMarketPrice (characterization)", () => {
 	it("applies positive slippage for market buy", () => {
-		expect(getExecutedPrice("market", "buy", 100, 50, 100)).toBe(100.5);
+		expect(getMarketPrice("buy", 100, 50)).toBe(100.5);
 	});
 	it("applies negative slippage for market sell", () => {
-		expect(getExecutedPrice("market", "sell", 100, 50, 100)).toBe(99.5);
-	});
-	it("returns the limit price unchanged for non-market orders", () => {
-		expect(getExecutedPrice("limit", "buy", 100, 50, 105)).toBe(105);
-		expect(getExecutedPrice("limit", "sell", 100, 50, 105)).toBe(105);
+		expect(getMarketPrice("sell", 100, 50)).toBe(99.5);
 	});
 	it("returns mark price when slippage is zero", () => {
-		expect(getExecutedPrice("market", "buy", 100, 0, 100)).toBe(100);
+		expect(getMarketPrice("buy", 100, 0)).toBe(100);
 	});
 });
 

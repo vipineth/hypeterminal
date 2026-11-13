@@ -13,7 +13,7 @@ import {
 	SCALE_LEVELS_MIN,
 } from "@/config/trade";
 import type { MarketKind } from "@/domain/market";
-import { getExecutedPrice } from "@/domain/trade/order/price";
+import { getMarketPrice } from "@/domain/trade/order/price";
 import { clampInt, isPositive, type Numeric, toBig, toSafeBig } from "@/lib/trade/numbers";
 import { isScaleOrderType, isStopOrderType, isTriggerOrderType, usesLimitPrice } from "@/lib/trade/order-types";
 import type { Side } from "@/lib/trade/types";
@@ -238,9 +238,7 @@ interface StandardOrderParams {
 function buildStandardOrder(orders: ExchangeOrder[], params: StandardOrderParams): void {
 	const side = params.isBuy ? "buy" : "sell";
 	const isMarket = params.orderType === "market";
-	const orderPrice = isMarket
-		? getExecutedPrice("market", side, params.markPx, params.slippageBps, params.markPx)
-		: params.limitPriceInput;
+	const orderPrice = isMarket ? getMarketPrice(side, params.markPx, params.slippageBps) : params.limitPriceInput;
 
 	orders.push({
 		a: params.assetId,
