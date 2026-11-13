@@ -13,6 +13,7 @@ const HASH = "0x1111111111111111111111111111111111111111111111111111111111111111
 const ADDRESS = "0x5b5d51203a0f9079f8aeb098a6523a13f298c060";
 const BLOCK = "0x10";
 const TWENTY_USDC = encodeFunctionResult({ abi: erc20Abi, functionName: "balanceOf", result: 20_000_000n });
+const ZERO_USDC = encodeFunctionResult({ abi: erc20Abi, functionName: "balanceOf", result: 0n });
 
 vi.mock("wagmi", async (importOriginal) => ({
 	...(await importOriginal<typeof import("wagmi")>()),
@@ -143,6 +144,30 @@ describe("useDeposit balance", () => {
 		const deposit = renderDeposit(ARBITRUM_CHAIN_ID, queryClient);
 		expect(deposit.balance.status).toBe("refreshing");
 		expect(deposit.validate("10").valid).toBe(false);
+	});
+
+	it("blocks a repeat deposit until the balance read after reset settles", async () => {
+		const queryClient = createQueryClient();
+		const balanceQuery = await cacheTwentyUsdc(queryClient);
+
+		let settle: (result: Hex) => void = () => {};
+		const read = new Promise<Hex>((resolve) => {
+			settle = resolve;
+		});
+		stubRpc(async (_method, params) => answerCall(params, await read));
+
+		renderDeposit(ARBITRUM_CHAIN_ID, queryClient).reset();
+
+		const refreshing = renderDeposit(ARBITRUM_CHAIN_ID, queryClient);
+		expect(refreshing.balance).toMatchObject({ status: "refreshing", formatted: "20" });
+		expect(refreshing.validate("20").valid).toBe(false);
+
+		settle(ZERO_USDC);
+		await balanceQuery.promise;
+
+		const settled = renderDeposit(ARBITRUM_CHAIN_ID, queryClient);
+		expect(settled.balance).toMatchObject({ status: "ready", formatted: "0" });
+		expect(settled.validate("20")).toEqual({ valid: false, error: "Insufficient balance" });
 	});
 });
 

@@ -79,7 +79,7 @@ export function useDeposit(): UseDepositResult {
 	const chain = useArbitrumChain();
 	const { balance, refetch } = useUsdcBalance(address, chain.isArbitrum && !!address);
 
-	const { mutate: write, data: hash, isPending, error: writeError, reset } = useWriteContract();
+	const { mutate: write, data: hash, isPending, error: writeError, reset: resetWrite } = useWriteContract();
 	const {
 		isLoading: isConfirming,
 		isSuccess,
@@ -110,6 +110,11 @@ export function useDeposit(): UseDepositResult {
 		},
 		[address, write, refetch],
 	);
+
+	const reset = useCallback(() => {
+		resetWrite();
+		if (address) refetch();
+	}, [address, resetWrite, refetch]);
 
 	return {
 		...chain,
