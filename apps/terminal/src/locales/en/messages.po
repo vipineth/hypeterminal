@@ -19,7 +19,7 @@ msgid "{0} more wallets"
 msgstr "{0} more wallets"
 
 #. placeholder {0}: result.error
-#: src/lib/trade/extract-order-status.ts:313
+#: src/lib/trade/extract-order-status.ts:325
 msgid "{0}. It will not be sent again. Check open orders."
 msgstr "{0}. It will not be sent again. Check open orders."
 
@@ -133,15 +133,15 @@ msgstr "7 days"
 #~ msgid "A crypto wallet lets you store and manage your digital assets securely."
 #~ msgstr "A crypto wallet lets you store and manage your digital assets securely."
 
-#: src/lib/trade/extract-order-status.ts:347
+#: src/lib/trade/extract-order-status.ts:359
 msgid "A lookup did not find it, which does not prove it never executed."
 msgstr "A lookup did not find it, which does not prove it never executed."
 
-#: src/lib/trade/extract-order-status.ts:350
+#: src/lib/trade/extract-order-status.ts:362
 msgid "A lookup found it: {what}."
 msgstr "A lookup found it: {what}."
 
-#: src/lib/trade/extract-order-status.ts:343
+#: src/lib/trade/extract-order-status.ts:355
 msgid "A matching TWAP is in your history, but it can't be confirmed as this one."
 msgstr "A matching TWAP is in your history, but it can't be confirmed as this one."
 
@@ -1462,7 +1462,7 @@ msgstr "IOC (Immediate Or Cancel)"
 msgid "Isolated"
 msgstr "Isolated"
 
-#: src/lib/trade/extract-order-status.ts:334
+#: src/lib/trade/extract-order-status.ts:346
 msgid "It can no longer execute."
 msgstr "It can no longer execute."
 
@@ -1494,7 +1494,7 @@ msgstr "it was placed"
 msgid "it was set"
 msgstr "it was set"
 
-#: src/lib/trade/extract-order-status.ts:346
+#: src/lib/trade/extract-order-status.ts:358
 msgid "Its status could not be read."
 msgstr "Its status could not be read."
 
@@ -1990,7 +1990,7 @@ msgstr "No market"
 msgid "No markets found."
 msgstr "No markets found."
 
-#: src/lib/trade/extract-order-status.ts:341
+#: src/lib/trade/extract-order-status.ts:353
 msgid "No matching TWAP is in your history."
 msgstr "No matching TWAP is in your history."
 
@@ -2271,7 +2271,7 @@ msgstr "Order History"
 msgid "Order Queue"
 msgstr "Order Queue"
 
-#: src/lib/trade/extract-order-status.ts:308
+#: src/lib/trade/extract-order-status.ts:317
 msgid "Order sent. Its status could not be read. It will not be sent again. Check open orders."
 msgstr "Order sent. Its status could not be read. It will not be sent again. Check open orders."
 
@@ -2901,7 +2901,7 @@ msgstr "Set to {p}%"
 msgid "Settings"
 msgstr "Settings"
 
-#: src/lib/trade/extract-order-status.ts:344
+#: src/lib/trade/extract-order-status.ts:356
 msgid "Several matching TWAPs are in your history."
 msgstr "Several matching TWAPs are in your history."
 
@@ -3351,7 +3351,7 @@ msgstr "That pending order changed before it was dismissed. Press again to check
 #~ msgid "The builder at {0}...{1} can now charge up to {maxFeeRate}% fee on orders placed on your behalf."
 #~ msgstr "The builder at {0}...{1} can now charge up to {maxFeeRate}% fee on orders placed on your behalf."
 
-#: src/lib/trade/extract-order-status.ts:335
+#: src/lib/trade/extract-order-status.ts:347
 msgid "The exchange never confirmed this request. {found} {when} Dismiss it? Your next order on this market will be sent as a new one."
 msgstr "The exchange never confirmed this request. {found} {when} Dismiss it? Your next order on this market will be sent as a new one."
 
@@ -3670,7 +3670,7 @@ msgstr "TWAP Orders"
 #~ msgid "TWAP sent but not listed yet. It will not be sent again. Check the TWAP tab."
 #~ msgstr "TWAP sent but not listed yet. It will not be sent again. Check the TWAP tab."
 
-#: src/lib/trade/extract-order-status.ts:318
+#: src/lib/trade/extract-order-status.ts:330
 msgid "TWAP sent. Its status could not be read. It will not be sent again. Check the TWAP tab."
 msgstr "TWAP sent. Its status could not be read. It will not be sent again. Check the TWAP tab."
 
@@ -3678,7 +3678,7 @@ msgstr "TWAP sent. Its status could not be read. It will not be sent again. Chec
 #~ msgid "TWAP status unknown: {message}. Check the TWAP tab before you try again."
 #~ msgstr "TWAP status unknown: {message}. Check the TWAP tab before you try again."
 
-#: src/lib/trade/extract-order-status.ts:321
+#: src/lib/trade/extract-order-status.ts:333
 msgid "TWAP status unknown. A matching TWAP appeared in your history, but it can't be confirmed as this one. It will not be sent again. Check the TWAP tab."
 msgstr "TWAP status unknown. A matching TWAP appeared in your history, but it can't be confirmed as this one. It will not be sent again. Check the TWAP tab."
 
@@ -3686,7 +3686,7 @@ msgstr "TWAP status unknown. A matching TWAP appeared in your history, but it ca
 #~ msgid "TWAP status unknown. Check the TWAP tab before you try again."
 #~ msgstr "TWAP status unknown. Check the TWAP tab before you try again."
 
-#: src/lib/trade/extract-order-status.ts:324
+#: src/lib/trade/extract-order-status.ts:336
 msgid "TWAP status unknown. It will not be sent again. Check the TWAP tab."
 msgstr "TWAP status unknown. It will not be sent again. Check the TWAP tab."
 
@@ -3945,7 +3945,7 @@ msgstr "Your funds were successfully deposited."
 msgid "Your transaction is being processed"
 msgstr "Your transaction is being processed"
 
-#: src/lib/trade/extract-order-status.ts:340
+#: src/lib/trade/extract-order-status.ts:352
 msgid "Your TWAP history could not be read."
 msgstr "Your TWAP history could not be read."
 

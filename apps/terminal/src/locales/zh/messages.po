@@ -19,7 +19,7 @@ msgid "{0} more wallets"
 msgstr ""
 
 #. placeholder {0}: result.error
-#: src/lib/trade/extract-order-status.ts:313
+#: src/lib/trade/extract-order-status.ts:325
 msgid "{0}. It will not be sent again. Check open orders."
 msgstr ""
 
@@ -133,15 +133,15 @@ msgstr ""
 #~ msgid "A crypto wallet lets you store and manage your digital assets securely."
 #~ msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:347
+#: src/lib/trade/extract-order-status.ts:359
 msgid "A lookup did not find it, which does not prove it never executed."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:350
+#: src/lib/trade/extract-order-status.ts:362
 msgid "A lookup found it: {what}."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:343
+#: src/lib/trade/extract-order-status.ts:355
 msgid "A matching TWAP is in your history, but it can't be confirmed as this one."
 msgstr ""
 
@@ -1462,7 +1462,7 @@ msgstr ""
 msgid "Isolated"
 msgstr "逐仓"
 
-#: src/lib/trade/extract-order-status.ts:334
+#: src/lib/trade/extract-order-status.ts:346
 msgid "It can no longer execute."
 msgstr ""
 
@@ -1494,7 +1494,7 @@ msgstr ""
 msgid "it was set"
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:346
+#: src/lib/trade/extract-order-status.ts:358
 msgid "Its status could not be read."
 msgstr ""
 
@@ -1986,7 +1986,7 @@ msgstr "无市场"
 msgid "No markets found."
 msgstr "未找到市场。"
 
-#: src/lib/trade/extract-order-status.ts:341
+#: src/lib/trade/extract-order-status.ts:353
 msgid "No matching TWAP is in your history."
 msgstr ""
 
@@ -2267,7 +2267,7 @@ msgstr ""
 msgid "Order Queue"
 msgstr "订单队列"
 
-#: src/lib/trade/extract-order-status.ts:308
+#: src/lib/trade/extract-order-status.ts:317
 msgid "Order sent. Its status could not be read. It will not be sent again. Check open orders."
 msgstr ""
 
@@ -2897,7 +2897,7 @@ msgstr ""
 msgid "Settings"
 msgstr "设置"
 
-#: src/lib/trade/extract-order-status.ts:344
+#: src/lib/trade/extract-order-status.ts:356
 msgid "Several matching TWAPs are in your history."
 msgstr ""
 
@@ -3347,7 +3347,7 @@ msgstr ""
 #~ msgid "The builder at {0}...{1} can now charge up to {maxFeeRate}% fee on orders placed on your behalf."
 #~ msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:335
+#: src/lib/trade/extract-order-status.ts:347
 msgid "The exchange never confirmed this request. {found} {when} Dismiss it? Your next order on this market will be sent as a new one."
 msgstr ""
 
@@ -3666,7 +3666,7 @@ msgstr "TWAP 订单"
 #~ msgid "TWAP sent but not listed yet. It will not be sent again. Check the TWAP tab."
 #~ msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:318
+#: src/lib/trade/extract-order-status.ts:330
 msgid "TWAP sent. Its status could not be read. It will not be sent again. Check the TWAP tab."
 msgstr ""
 
@@ -3674,7 +3674,7 @@ msgstr ""
 #~ msgid "TWAP status unknown: {message}. Check the TWAP tab before you try again."
 #~ msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:321
+#: src/lib/trade/extract-order-status.ts:333
 msgid "TWAP status unknown. A matching TWAP appeared in your history, but it can't be confirmed as this one. It will not be sent again. Check the TWAP tab."
 msgstr ""
 
@@ -3682,7 +3682,7 @@ msgstr ""
 #~ msgid "TWAP status unknown. Check the TWAP tab before you try again."
 #~ msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:324
+#: src/lib/trade/extract-order-status.ts:336
 msgid "TWAP status unknown. It will not be sent again. Check the TWAP tab."
 msgstr ""
 
@@ -3941,7 +3941,7 @@ msgstr ""
 msgid "Your transaction is being processed"
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:340
+#: src/lib/trade/extract-order-status.ts:352
 msgid "Your TWAP history could not be read."
 msgstr ""
 
