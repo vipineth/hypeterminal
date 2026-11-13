@@ -1,13 +1,19 @@
 import type { ReactNode } from "react";
 import { renderToString } from "react-dom/server";
+import { privateKeyToAccount } from "viem/accounts";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { OrderToast } from "@/components/trade/tradebox/order-toast";
-import { privateKeyToAccount } from "viem/accounts";
 import { reportSubmit } from "@/lib/trade/extract-order-status";
 import { createOrderSender, type Signer } from "@/lib/trade/order-sender";
 import { createRequestStore, type PendingRequest } from "@/lib/trade/pending-requests";
 import { type OrderQueueItem, resultToQueueUpdate } from "@/stores/use-order-queue-store";
-import { createFakeExchange, createMemoryKeyValue, createMemoryLocks, TEST_AGENT_KEY, TEST_USER } from "@/test/fake-exchange";
+import {
+	createFakeExchange,
+	createMemoryKeyValue,
+	createMemoryLocks,
+	TEST_AGENT_KEY,
+	TEST_USER,
+} from "@/test/fake-exchange";
 
 const view = vi.hoisted(() => ({
 	queued: [] as OrderQueueItem[],
@@ -311,7 +317,9 @@ describe("order toast", () => {
 		} as OrderQueueItem;
 		view.queued = [row];
 		view.pending = [];
-		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "").replaceAll("&#x27;", "'");
+		const html = renderToString(<OrderToast />)
+			.replaceAll("<!-- -->", "")
+			.replaceAll("&#x27;", "'");
 		expect(html).toContain("Can't read a pending order for this market.");
 		buttonsNamed("Dismiss pending order")[0].onClick?.();
 		expect(actions.updateOrder).toHaveBeenCalledWith("row-3", { confirmUnreadable: true });
@@ -320,13 +328,17 @@ describe("order toast", () => {
 		expect(renderToString(<OrderToast />)).toContain("It may still execute.");
 		buttonsNamed("Yes, dismiss it")[0].onClick?.();
 		await vi.waitFor(() => expect(actions.dismissUnreadable).toHaveBeenCalledWith(unreadable.slot, unreadable.raw));
-		await vi.waitFor(() => expect(actions.updateOrder).toHaveBeenLastCalledWith("row-3", expect.objectContaining({ status: "unknown" })));
+		await vi.waitFor(() =>
+			expect(actions.updateOrder).toHaveBeenLastCalledWith("row-3", expect.objectContaining({ status: "unknown" })),
+		);
 	});
 });
 
 function lastUpdateFor(requestKey: string): Partial<OrderQueueItem> {
-	const calls = actions.updateByRequestKey.mock.calls.filter(([key]) => key === requestKey);
-	return calls.reduce((row, [, update]) => ({ ...row, ...update }), {} as Partial<OrderQueueItem>);
+	const updates = actions.updateByRequestKey.mock.calls
+		.filter(([key]) => key === requestKey)
+		.map(([, update]) => update);
+	return Object.assign({}, ...updates);
 }
 
 async function pressHeldScale() {
@@ -369,4 +381,3 @@ async function pressHeldScale() {
 	await sender.submit(signer, scale(["90", "95"]));
 	return sender.submit(signer, scale(["90", "96"]));
 }
-

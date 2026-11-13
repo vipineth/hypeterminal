@@ -3,7 +3,13 @@ import { privateKeyToAccount } from "viem/accounts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Signer } from "@/lib/trade/order-sender";
 import type { KeyValueStore } from "@/lib/trade/pending-requests";
-import { createFakeExchange, createMemoryLocks, type FakeExchange, TEST_AGENT_KEY, TEST_USER } from "@/test/fake-exchange";
+import {
+	createFakeExchange,
+	createMemoryLocks,
+	type FakeExchange,
+	TEST_AGENT_KEY,
+	TEST_USER,
+} from "@/test/fake-exchange";
 
 const RECORD_PREFIX = "hypeterminal:pending-request:v2:";
 
@@ -33,7 +39,9 @@ function marketBuy(cloid: `0x${string}`) {
 	return {
 		kind: "order" as const,
 		params: {
-			orders: [{ a: 5, b: true, p: "90", s: "1", r: false, t: { limit: { tif: "FrontendMarket" as const } }, c: cloid }],
+			orders: [
+				{ a: 5, b: true, p: "90", s: "1", r: false, t: { limit: { tif: "FrontendMarket" as const } }, c: cloid },
+			],
 			grouping: "na" as const,
 		},
 		legs: [{ role: "order" as const, price: "90" }],

@@ -3,7 +3,7 @@ import { t } from "@lingui/core/macro";
 import { CheckIcon, LightningIcon, QuestionIcon, SpinnerGapIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect } from "react";
 import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/time";
-import { usePendingRequests, useSubmitPlan } from "@/hooks/trade/use-submit-plan";
+import { type DismissPreview, usePendingRequests, useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { cn } from "@/lib/cn";
 import type { OrderOutcome, OrderResult, UnreadableSlot } from "@/lib/trade/extract-order-status";
 import { getRequestKey, type Lookup } from "@/lib/trade/order-sender";
@@ -318,12 +318,8 @@ function UnreadableActions({
 	);
 }
 
-async function outcomeOf(act: () => Promise<OrderResult>): Promise<OrderResult> {
-	try {
-		return await act();
-	} catch (error) {
-		return { ok: false, status: "notSent", error: error instanceof Error ? error.message : String(error) };
-	}
+function notSentBecause(error: unknown): OrderResult {
+	return { ok: false, status: "notSent", error: error instanceof Error ? error.message : String(error) };
 }
 
 function toQueueItem(request: PendingRequest): OrderQueueItem {
@@ -372,27 +368,25 @@ export function OrderToast() {
 	async function runRequestAction(requestKey: string, act: () => Promise<OrderResult>) {
 		adopt(requestKey, "pending");
 		updateByRequestKey(requestKey, { status: "pending", confirmDismiss: undefined });
-		updateByRequestKey(requestKey, requestResultToQueueUpdate(await outcomeOf(act)));
+		updateByRequestKey(requestKey, requestResultToQueueUpdate(await act().catch(notSentBecause)));
 	}
 
 	async function handlePreviewDismiss(requestKey: string) {
 		updateByRequestKey(requestKey, { status: "pending" });
-		try {
-			const preview = await previewDismiss(requestKey);
-			updateByRequestKey(
-				requestKey,
-				preview.kind === "confirm"
-					? { status: "unsettled", confirmDismiss: { text: preview.text, lookup: preview.lookup } }
-					: requestResultToQueueUpdate(preview.result),
-			);
-		} catch (error) {
-			updateByRequestKey(requestKey, requestResultToQueueUpdate(await outcomeOf(() => Promise.reject(error))));
-		}
+		const preview = await previewDismiss(requestKey).catch(
+			(error): DismissPreview => ({ kind: "result", result: notSentBecause(error) }),
+		);
+		updateByRequestKey(
+			requestKey,
+			preview.kind === "confirm"
+				? { status: "unsettled", confirmDismiss: { text: preview.text, lookup: preview.lookup } }
+				: requestResultToQueueUpdate(preview.result),
+		);
 	}
 
-	async function handleDismissUnreadable(rowId: string, unreadable: UnreadableSlot) {
+	async function handleDismissUnreadable(rowId: string, { slot, raw }: UnreadableSlot) {
 		updateOrder(rowId, { status: "pending", confirmUnreadable: undefined });
-		updateOrder(rowId, resultToQueueUpdate(await outcomeOf(() => dismissUnreadable(unreadable.slot, unreadable.raw))));
+		updateOrder(rowId, resultToQueueUpdate(await dismissUnreadable(slot, raw).catch(notSentBecause)));
 	}
 
 	const actions: RowActions = {

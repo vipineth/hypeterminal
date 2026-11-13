@@ -15,7 +15,13 @@ import {
 	reportSubmit,
 	reportUnreadableOutcome,
 } from "@/lib/trade/extract-order-status";
-import { createOrderSender, getRequestKey, type Lookup, type Signer, type SubmitOutcome } from "@/lib/trade/order-sender";
+import {
+	createOrderSender,
+	getRequestKey,
+	type Lookup,
+	type Signer,
+	type SubmitOutcome,
+} from "@/lib/trade/order-sender";
 import { createRequestStore, type PendingRequest, type RequestLabel } from "@/lib/trade/pending-requests";
 import { resultToQueueUpdate, useOrderQueueActions } from "@/stores/use-order-queue-store";
 

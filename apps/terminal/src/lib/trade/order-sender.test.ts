@@ -1,7 +1,7 @@
 import { privateKeyToAccount } from "viem/accounts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { describeInspection, reportRequestOutcome, reportSubmit } from "@/lib/trade/extract-order-status";
 import { createExchangeClock, type ExchangeClock } from "@/lib/trade/exchange-clock";
+import { describeInspection, reportRequestOutcome, reportSubmit } from "@/lib/trade/extract-order-status";
 import {
 	classifyReply,
 	createOrderSender,
@@ -16,24 +16,24 @@ import {
 	type SubmitOutcome,
 } from "@/lib/trade/order-sender";
 import {
+	type ChangeBus,
 	createRequestStore,
 	getRequestSlot,
-	pendingRecord,
-	type ChangeBus,
 	type KeyValueStore,
+	pendingRecord,
 	type RequestStore,
 	type SlotRecord,
 } from "@/lib/trade/pending-requests";
 import {
 	comesBackUp,
 	createFakeExchange,
-	createMemoryLocks,
 	createMemoryBus,
 	createMemoryKeyValue,
-	failingWrites,
-	type MemoryKeyValue,
+	createMemoryLocks,
 	type FakeExchange,
+	failingWrites,
 	goesDownOnFirstSend,
+	type MemoryKeyValue,
 	OTHER_AGENT_KEY,
 	TEST_AGENT_KEY,
 	TEST_USER,
@@ -1196,7 +1196,8 @@ describe("order sender over a record it cannot read", () => {
 		rewriteStoredRequest(storage, (request) => ({ ...request, kind: "orderV2" }));
 		const { sender } = openTab(venue, storage, locks);
 		const press = await sender.submit(signerFor(venue), marketBuy());
-		if (press.kind !== "refused" || press.reason !== "unreadableRecord") throw new Error("expected an unreadable refusal");
+		if (press.kind !== "refused" || press.reason !== "unreadableRecord")
+			throw new Error("expected an unreadable refusal");
 		expect(await sender.dismissUnreadable(press.slot, "{}")).toEqual({ kind: "missing" });
 		expect(await sender.dismissUnreadable(press.slot, press.raw)).toEqual({ kind: "cleared", slot: SLOT });
 		expect([...storage.items.values()]).toContainEqual(expect.objectContaining({ slot: SLOT, raw: press.raw }));
@@ -1390,7 +1391,9 @@ function lookupOf(inspection: Awaited<ReturnType<ReturnType<typeof createOrderSe
 	return inspection.kind === "inspected" ? inspection.lookup : { kind: "order", statuses: null };
 }
 
-function storedSlotEntry(storage: MemoryKeyValue): [string, Record<string, unknown> & { request: Record<string, unknown> }] {
+function storedSlotEntry(
+	storage: MemoryKeyValue,
+): [string, Record<string, unknown> & { request: Record<string, unknown> }] {
 	const entry = [...storage.items].find(([key]) => key.endsWith(`:${SLOT}`));
 	if (!entry) throw new Error("no stored record for the slot");
 	return entry as [string, Record<string, unknown> & { request: Record<string, unknown> }];

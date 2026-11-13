@@ -326,8 +326,7 @@ export function createOrderSender(env: SenderEnv) {
 	}
 
 	async function isPastExpiry(request: PendingRequest): Promise<boolean> {
-		const remainingMs = await remainingFor(request);
-		return remainingMs !== null && remainingMs <= 0;
+		return !canStillExecute(await remainingFor(request));
 	}
 
 	async function isForeign(signer: Signer, request: PendingRequest): Promise<boolean> {
@@ -349,7 +348,10 @@ export function createOrderSender(env: SenderEnv) {
 	async function confirmByLookup(hold: Hold): Promise<Hold> {
 		const statuses = await readOrderStatuses(hold);
 		if (!statuses) return hold;
-		return { ...hold, fates: mergeFates(hold.fates, lookupFates({ kind: "order", statuses }, hold.fates.length, "unknown")) };
+		return {
+			...hold,
+			fates: mergeFates(hold.fates, lookupFates({ kind: "order", statuses }, hold.fates.length, "unknown")),
+		};
 	}
 
 	async function dismissGate(
@@ -357,7 +359,7 @@ export function createOrderSender(env: SenderEnv) {
 		signer: Signer | null,
 	): Promise<{ kind: "allowed"; remainingMs: number | null } | Settlement | Live> {
 		const remainingMs = await remainingFor(request);
-		if (remainingMs !== null && remainingMs <= 0) {
+		if (!canStillExecute(remainingMs)) {
 			const resent = await record(await settle(request, false));
 			return resent.kind === "pending" ? { kind: "allowed", remainingMs } : resent;
 		}
@@ -584,6 +586,10 @@ export type OrderSender = ReturnType<typeof createOrderSender>;
 function stampOf(record: SlotRecord | null): string {
 	if (!record) return "empty";
 	return record.state === "settled" ? `settled:${record.nonce}` : `pending:${record.request.nonce}`;
+}
+
+export function canStillExecute(remainingMs: number | null): boolean {
+	return remainingMs === null || remainingMs > 0;
 }
 
 export function placedNothing(settlement: Settlement): boolean {

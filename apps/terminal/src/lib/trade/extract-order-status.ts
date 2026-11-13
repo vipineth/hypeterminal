@@ -9,6 +9,7 @@ import {
 	toLegState,
 } from "@/lib/trade/leg-state";
 import {
+	canStillExecute,
 	getRequestKey,
 	type Held,
 	type Inspection,
@@ -221,7 +222,7 @@ export function reportRequestOutcome(outcome: RequestOutcome): OrderResult {
 		case "missing":
 			return unknown(t`This request was already settled. Check open orders.`);
 		case "foreignSigner": {
-			const error = isLive(outcome.remainingMs)
+			const error = canStillExecute(outcome.remainingMs)
 				? t`Cannot cancel: another agent key signed this order. ${describeRemaining(outcome.remainingMs)}`
 				: t`Cannot cancel: another agent key signed this order.`;
 			return { ok: false, status: "unsettled", error, requestKey: getRequestKey(outcome.request), canDismiss: true };
@@ -250,10 +251,6 @@ export function reportUnreadableOutcome(outcome: UnreadableOutcome): OrderResult
 		case "cleared":
 			return unknown(t`Dismissed. The order it could not read may have executed. Check open orders.`);
 	}
-}
-
-function isLive(remainingMs: number | null): boolean {
-	return remainingMs === null || remainingMs > 0;
 }
 
 function describeRemaining(remainingMs: number | null): string {
@@ -334,7 +331,7 @@ function foundAny(lookup: OrderLookup): boolean {
 export function describeInspection(inspection: Extract<Inspection, { kind: "inspected" }>): string {
 	const { request, lookup, remainingMs } = inspection;
 	const found = describeInspectedLookup(lookup, request.legs);
-	const when = isLive(remainingMs) ? describeRemaining(remainingMs) : t`It can no longer execute.`;
+	const when = canStillExecute(remainingMs) ? describeRemaining(remainingMs) : t`It can no longer execute.`;
 	return t`The exchange never confirmed this request. ${found} ${when} Dismiss it? Your next order on this market will be sent as a new one.`;
 }
 

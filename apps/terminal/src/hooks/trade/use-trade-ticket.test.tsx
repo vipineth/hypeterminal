@@ -5,8 +5,8 @@ import type { LockManagerLike } from "@/lib/trade/order-sender";
 import {
 	comesBackUp,
 	createFakeExchange,
-	createMemoryLocks,
 	createMemoryKeyValue,
+	createMemoryLocks,
 	type FakeExchange,
 	goesDownOnFirstSend,
 	type LegOutcome,
