@@ -181,9 +181,9 @@ vi.mock("@/stores/use-order-entry-store", () => ({
 
 type Ticket = ReturnType<typeof useTradeTicket>;
 
-interface Props {
-	onTicket: (ticket: Ticket) => void;
-	render: UseTradeTicket;
+interface Props<T> {
+	onTicket: (value: T) => void;
+	render: () => T;
 }
 
 function typeSizeHere(size: string) {
@@ -191,9 +191,16 @@ function typeSizeHere(size: string) {
 	form.sizeUnit = { mode: form.sizeMode, assetId: form.market.assetId, szDecimals: form.market.szDecimals };
 }
 
-function TicketProbe({ onTicket, render }: Props) {
+function TicketProbe<T>({ onTicket, render }: Props<T>) {
 	onTicket(render());
 	return null;
+}
+
+async function renderSubmitPlan() {
+	const { useSubmitPlan } = await import("@/hooks/trade/use-submit-plan");
+	const hooks: ReturnType<typeof useSubmitPlan>[] = [];
+	renderToString(<TicketProbe render={useSubmitPlan} onTicket={(hook) => hooks.push(hook)} />);
+	return hooks[0];
 }
 
 function renderTicket(render: UseTradeTicket = useTradeTicket): Ticket {
@@ -914,6 +921,71 @@ describe("order legs the ticket reports and retries", () => {
 		expect(net.venue.state.placedLegs).toBe(1);
 	});
 
+	it("gives a press blocked by an unconfirmed order its own not-sent row and keeps the ticket", async () => {
+		vi.useFakeTimers();
+		marketOrder("1");
+		net.venue.nextExchangeRequests("lost", "lost", "lost", "lost");
+		await pressSubmitPastRetries();
+		const buyRow = lastQueueUpdate();
+		expect(buyRow).toMatchObject({ status: "unsettled", requestKey: expect.stringMatching(/#\d+$/) });
+		formActions.resetForm.mockClear();
+		form.side = "sell";
+		typeSizeHere("5");
+		net.venue.nextExchangeRequests("lost");
+		await pressSubmitPastRetries();
+		const sellRow = lastQueueUpdate();
+		expect(sellRow).toEqual({
+			status: "failed",
+			error: "Not sent. An earlier order on this market is not confirmed yet. Retry, cancel or dismiss it first.",
+		});
+		expect(sellRow.requestKey).toBeUndefined();
+		expect(formActions.resetForm).not.toHaveBeenCalled();
+		expect(queue.updateByRequestKey).toHaveBeenCalledWith(
+			buyRow.requestKey,
+			expect.objectContaining({ status: "unsettled" }),
+		);
+		expect(
+			sentOrders()
+				.flat()
+				.filter((order) => order.b === false),
+		).toEqual([]);
+	});
+
+	it("holds a corrected scale resubmit and sends only the rejected leg at the ticket's new price", async () => {
+		form.orderType = "scale";
+		form.tpSlEnabled = false;
+		form.scaleStart = "82";
+		form.scaleEnd = "79";
+		form.scaleLevels = 2;
+		typeSizeHere("2");
+		answerLegs(filledLeg, rejectedLeg("Order price cannot be more than 80% away from the reference price"));
+		formActions.resetForm.mockClear();
+		await pressSubmit();
+		expect(lastQueueUpdate()).toMatchObject({ status: "failed" });
+		expect(formActions.resetForm).not.toHaveBeenCalled();
+		net.venue.state.legOutcome = null;
+		form.scaleEnd = "80";
+		await pressSubmit();
+		const held = lastQueueUpdate();
+		expect(held).toMatchObject({
+			status: "failed",
+			error:
+				"Not sent. Your last order on this market partly went through: Leg 1 placed, Leg 2 rejected. Sending it again would place the same legs twice.",
+		});
+		expect(orderBodies()).toHaveLength(1);
+		const [firstLeg, rejectedLegPrice] = sentOrders()[0].map((order) => order.p);
+		expect(held.offer.params.orders.map((order: WireOrder) => order.p)).not.toContain(firstLeg);
+		const sent = await (await renderSubmitPlan()).sendRejectedLegs(held.offer);
+		expect(sent).toEqual({ ok: true, outcome: "resting" });
+		expect(
+			sentOrders()
+				.flat()
+				.map((order) => order.p),
+		).toEqual([firstLeg, rejectedLegPrice, held.offer.params.orders[0].p]);
+		expect(held.offer.params.orders[0].p).not.toBe(rejectedLegPrice);
+		expect(net.venue.state.placedLegs).toBe(2);
+	});
+
 	it("reports a scale order with filled and resting legs as partly filled", async () => {
 		form.orderType = "scale";
 		form.tpSlEnabled = false;
@@ -963,23 +1035,31 @@ describe("twap the ticket sends once", () => {
 		expect(twapBodies()[0].action.twap).toMatchObject({ a: 5, b: true, s: "4", m: 30 });
 	});
 
-	it("reports a timed-out twap the exchange started as started", async () => {
+	it("calls a timed-out twap that history matches unknown, since history cannot say whose it is", async () => {
 		vi.useFakeTimers();
 		typeSizeHere("5");
 		net.venue.nextExchangeRequests("noReply");
 		await pressSubmitPastRetries();
-		expect(lastQueueUpdate()).toEqual({ status: "success", outcome: "twapStarted" });
+		expect(lastQueueUpdate()).toEqual({
+			status: "unknown",
+			error:
+				"TWAP status unknown. A matching TWAP appeared in your history, but it can't be confirmed as this one. It will not be sent again. Check the TWAP tab.",
+		});
 		expect(net.venue.state.startedTwaps).toBe(1);
 	});
 
-	it("reports a timed-out twap the exchange started as started when the device clock runs 6 minutes ahead", async () => {
+	it("still finds a timed-out twap in history when the device clock runs 6 minutes ahead", async () => {
 		vi.useFakeTimers();
 		net.venue.state.clockSkewMs = -6 * 60 * 1000;
 		useTradeTicket = await loadTicket();
 		typeSizeHere("5");
 		net.venue.nextExchangeRequests("noReply");
 		await pressSubmitPastRetries();
-		expect(lastQueueUpdate()).toEqual({ status: "success", outcome: "twapStarted" });
+		expect(lastQueueUpdate()).toEqual({
+			status: "unknown",
+			error:
+				"TWAP status unknown. A matching TWAP appeared in your history, but it can't be confirmed as this one. It will not be sent again. Check the TWAP tab.",
+		});
 	});
 
 	it("never reports a twap from another coin or an earlier press as this one", async () => {
@@ -1003,13 +1083,17 @@ describe("twap the ticket sends once", () => {
 		expect(net.venue.state.startedTwaps).toBe(0);
 	});
 
-	it("reports a twap the exchange started with an error as failed", async () => {
+	it("never reports a matching history record's error as this twap's outcome", async () => {
 		vi.useFakeTimers();
 		typeSizeHere("7");
 		net.venue.state.twapStatus = { status: "error", description: "Insufficient margin" };
 		net.venue.nextExchangeRequests("noReply");
 		await pressSubmitPastRetries();
-		expect(lastQueueUpdate()).toEqual({ status: "failed", error: "TWAP failed: Insufficient margin" });
+		expect(lastQueueUpdate()).toEqual({
+			status: "unknown",
+			error:
+				"TWAP status unknown. A matching TWAP appeared in your history, but it can't be confirmed as this one. It will not be sent again. Check the TWAP tab.",
+		});
 	});
 
 	it("starts a timed-out twap the exchange never saw exactly once", async () => {

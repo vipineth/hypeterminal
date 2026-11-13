@@ -6,9 +6,14 @@ import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/time";
 import { usePendingRequests, useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { cn } from "@/lib/cn";
 import type { OrderOutcome } from "@/lib/trade/extract-order-status";
-import { getRequestKey } from "@/lib/trade/order-sender";
+import { getRequestKey, type Lookup } from "@/lib/trade/order-sender";
 import type { PendingRequest } from "@/lib/trade/pending-requests";
-import { type OrderQueueItem, useOrderQueue, useOrderQueueActions } from "@/stores/use-order-queue-store";
+import {
+	type OrderQueueItem,
+	resultToQueueUpdate,
+	useOrderQueue,
+	useOrderQueueActions,
+} from "@/stores/use-order-queue-store";
 
 const ORDER_TOAST_WIDTH = "w-80";
 const ORDER_TOAST_LIST_MAX_HEIGHT = "max-h-72";
@@ -58,14 +63,22 @@ function getOutcomeLabel(outcome: OrderOutcome): string {
 	}
 }
 
+interface RowActions {
+	retry: (requestKey: string) => void;
+	cancel: (requestKey: string) => void;
+	previewDismiss: (requestKey: string) => void;
+	keep: (requestKey: string) => void;
+	dismiss: (requestKey: string, lookup: Lookup) => void;
+	sendRejectedLegs: (order: OrderQueueItem) => void;
+}
+
 interface Props {
 	order: OrderQueueItem;
 	onRemove: () => void;
-	onRetry: (requestKey: string) => void;
-	onCancel: (requestKey: string) => void;
+	actions: RowActions;
 }
 
-function OrderItem({ order, onRemove, onRetry, onCancel }: Props) {
+function OrderItem({ order, onRemove, actions }: Props) {
 	useAutoRemove(order, onRemove);
 
 	const sideColor = order.side === "buy" ? "text-success" : "text-error";
@@ -86,13 +99,16 @@ function OrderItem({ order, onRemove, onRetry, onCancel }: Props) {
 					order.status === "pending" && "bg-brand-soft border border-stroke-brand-strong/30",
 					order.status === "success" && "bg-success-soft border border-stroke-success-strong/30",
 					order.status === "failed" && "bg-error-soft border border-stroke-error-strong/30",
-					order.status === "unsettled" && "bg-warning-soft border border-stroke-warning-strong/30",
+					(order.status === "unsettled" || order.status === "unknown") &&
+						"bg-warning-soft border border-stroke-warning-strong/30",
 				)}
 			>
 				{order.status === "pending" && <SpinnerGapIcon className="size-4 animate-spin text-brand" />}
 				{order.status === "success" && <CheckIcon className="size-4 text-success" />}
 				{order.status === "failed" && <XIcon className="size-4 text-error" />}
-				{order.status === "unsettled" && <QuestionIcon className="size-4 text-warning" />}
+				{(order.status === "unsettled" || order.status === "unknown") && (
+					<QuestionIcon className="size-4 text-warning" />
+				)}
 			</div>
 
 			<div className="flex-1 min-w-0 space-y-0.5">
@@ -138,16 +154,27 @@ function OrderItem({ order, onRemove, onRetry, onCancel }: Props) {
 				)}
 				{order.status === "success" && order.detail && <div className="text-xs text-fg-muted">{order.detail}</div>}
 				{order.error && (
-					<div className={cn("text-xs", order.status === "unsettled" ? "text-warning" : "text-error")}>
-						{order.error}
-					</div>
+					<div className={cn("text-xs", order.status === "failed" ? "text-error" : "text-warning")}>{order.error}</div>
 				)}
 				{order.status === "unsettled" && order.requestKey && (
-					<RequestActions requestKey={order.requestKey} onRetry={onRetry} onCancel={onCancel} />
+					<RequestActions requestKey={order.requestKey} confirm={order.confirmDismiss} actions={actions} />
+				)}
+				{order.status === "failed" && order.offer && (
+					<div className="pt-1">
+						<Button
+							variant="outline"
+							intent="neutral"
+							size="xxs"
+							className="rounded-xs"
+							onClick={() => actions.sendRejectedLegs(order)}
+						>
+							{t`Send only the rejected legs`}
+						</Button>
+					</div>
 				)}
 			</div>
 
-			{order.status === "failed" && (
+			{(order.status === "failed" || order.status === "unknown") && (
 				<Button
 					variant="ghost"
 					intent="neutral"
@@ -164,20 +191,68 @@ function OrderItem({ order, onRemove, onRetry, onCancel }: Props) {
 
 function RequestActions({
 	requestKey,
-	onRetry,
-	onCancel,
+	confirm,
+	actions,
 }: {
 	requestKey: string;
-	onRetry: (requestKey: string) => void;
-	onCancel: (requestKey: string) => void;
+	confirm: OrderQueueItem["confirmDismiss"];
+	actions: RowActions;
 }) {
+	if (confirm) {
+		return (
+			<div className="space-y-1 pt-1">
+				<div className="text-xs text-fg">{confirm.text}</div>
+				<div className="flex items-center gap-1.5">
+					<Button
+						variant="outline"
+						intent="error"
+						size="xxs"
+						className="rounded-xs"
+						onClick={() => actions.dismiss(requestKey, confirm.lookup)}
+					>
+						{t`Yes, dismiss it`}
+					</Button>
+					<Button
+						variant="ghost"
+						intent="neutral"
+						size="xxs"
+						className="rounded-xs"
+						onClick={() => actions.keep(requestKey)}
+					>
+						{t`Keep it`}
+					</Button>
+				</div>
+			</div>
+		);
+	}
 	return (
 		<div className="flex items-center gap-1.5 pt-1">
-			<Button variant="outline" intent="neutral" size="xxs" className="rounded-xs" onClick={() => onRetry(requestKey)}>
+			<Button
+				variant="outline"
+				intent="neutral"
+				size="xxs"
+				className="rounded-xs"
+				onClick={() => actions.retry(requestKey)}
+			>
 				{t`Retry`}
 			</Button>
-			<Button variant="ghost" intent="error" size="xxs" className="rounded-xs" onClick={() => onCancel(requestKey)}>
+			<Button
+				variant="ghost"
+				intent="error"
+				size="xxs"
+				className="rounded-xs"
+				onClick={() => actions.cancel(requestKey)}
+			>
 				{t`Cancel`}
+			</Button>
+			<Button
+				variant="ghost"
+				intent="neutral"
+				size="xxs"
+				className="rounded-xs"
+				onClick={() => actions.previewDismiss(requestKey)}
+			>
+				{t`Dismiss`}
 			</Button>
 		</div>
 	);
@@ -213,33 +288,63 @@ function CountdownBar({ order }: { order: OrderQueueItem }) {
 export function OrderToast() {
 	const queued = useOrderQueue();
 	const pendingRequests = usePendingRequests();
-	const { addOrder, removeOrder } = useOrderQueueActions();
-	const { retryRequest, cancelRequest } = useSubmitPlan();
+	const { addOrder, updateOrder, updateByRequestKey, removeOrder } = useOrderQueueActions();
+	const { retryRequest, cancelRequest, previewDismiss, dismissRequest, sendRejectedLegs } = useSubmitPlan();
 
 	const queuedKeys = new Set(queued.map((order) => order.requestKey));
 	const leftOver = pendingRequests.filter((request) => !queuedKeys.has(getRequestKey(request))).map(toQueueItem);
 	const orders = [...leftOver, ...queued];
 	if (orders.length === 0) return null;
 
-	function adopt(requestKey: string) {
+	function adopt(requestKey: string, status: OrderQueueItem["status"]) {
 		const order = leftOver.find((item) => item.requestKey === requestKey);
-		if (order) addOrder({ ...order, status: "pending" });
+		if (order) addOrder({ ...order, status });
 	}
 
-	function handleRetry(requestKey: string) {
-		adopt(requestKey);
-		void retryRequest(requestKey);
+	async function handlePreviewDismiss(requestKey: string) {
+		adopt(requestKey, "unsettled");
+		const preview = await previewDismiss(requestKey);
+		updateByRequestKey(
+			requestKey,
+			preview.kind === "confirm"
+				? { confirmDismiss: { text: preview.text, lookup: preview.lookup } }
+				: resultToQueueUpdate(preview.result),
+		);
 	}
 
-	function handleCancel(requestKey: string) {
-		adopt(requestKey);
-		void cancelRequest(requestKey);
+	async function handleSendRejectedLegs(order: OrderQueueItem) {
+		if (!order.offer) return;
+		updateOrder(order.id, { status: "pending", error: undefined, offer: undefined });
+		updateOrder(order.id, resultToQueueUpdate(await sendRejectedLegs(order.offer)));
 	}
+
+	const actions: RowActions = {
+		retry(requestKey) {
+			adopt(requestKey, "pending");
+			void retryRequest(requestKey);
+		},
+		cancel(requestKey) {
+			adopt(requestKey, "pending");
+			void cancelRequest(requestKey);
+		},
+		previewDismiss(requestKey) {
+			void handlePreviewDismiss(requestKey);
+		},
+		keep(requestKey) {
+			updateByRequestKey(requestKey, { confirmDismiss: undefined });
+		},
+		dismiss(requestKey, lookup) {
+			void dismissRequest(requestKey, lookup);
+		},
+		sendRejectedLegs(order) {
+			void handleSendRejectedLegs(order);
+		},
+	};
 
 	const pendingCount = orders.filter((o) => o.status === "pending").length;
 	const successCount = orders.filter((o) => o.status === "success").length;
 	const failedCount = orders.filter((o) => o.status === "failed").length;
-	const unsettledCount = orders.filter((o) => o.status === "unsettled").length;
+	const unsettledCount = orders.filter((o) => o.status === "unsettled" || o.status === "unknown").length;
 
 	return (
 		<div
@@ -288,12 +393,7 @@ export function OrderToast() {
 			<div className={cn("divide-y divide-stroke-weak/30 overflow-y-auto", ORDER_TOAST_LIST_MAX_HEIGHT)}>
 				{orders.map((order) => (
 					<div key={order.id} className="relative">
-						<OrderItem
-							order={order}
-							onRemove={() => removeOrder(order.id)}
-							onRetry={handleRetry}
-							onCancel={handleCancel}
-						/>
+						<OrderItem order={order} onRemove={() => removeOrder(order.id)} actions={actions} />
 						<CountdownBar order={order} />
 					</div>
 				))}

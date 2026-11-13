@@ -8,15 +8,18 @@ import { getInfoClient, useHyperliquid } from "@/lib/hyperliquid";
 import { getBrowserLocks, getBrowserStorage, subscribeToStorageEvents } from "@/lib/trade/browser-env";
 import { createExchangeClock } from "@/lib/trade/exchange-clock";
 import {
+	describeInspection,
 	type OrderResult,
 	reportRequestOutcome,
 	reportSettlement,
 	reportSubmit,
 } from "@/lib/trade/extract-order-status";
 import {
-	type CancelOutcome,
 	createOrderSender,
 	getRequestKey,
+	type Lookup,
+	type OrderSubmission,
+	type RequestOutcome,
 	type Signer,
 	type SubmitOutcome,
 } from "@/lib/trade/order-sender";
@@ -47,6 +50,10 @@ function readPendingRequests(user: string | undefined): PendingRequest[] {
 
 export type SubmitPlanInput = Pick<OrderPlan, "orders" | "grouping"> & { errors?: string[] };
 
+export type DismissPreview =
+	| { kind: "confirm"; text: string; lookup: Lookup }
+	| { kind: "result"; result: OrderResult };
+
 function labelFromLeg(leg: OrderPlan["orders"][number]): RequestLabel {
 	return { market: "", side: leg.b ? "buy" : "sell", size: leg.s };
 }
@@ -54,8 +61,11 @@ function labelFromLeg(leg: OrderPlan["orders"][number]): RequestLabel {
 interface UseSubmitPlanResult {
 	submitPlan: (plan: SubmitPlanInput, label?: RequestLabel) => Promise<OrderResult>;
 	submitTwap: (action: TwapOrderParameters, target: { coin: string; label: RequestLabel }) => Promise<OrderResult>;
+	sendRejectedLegs: (offer: OrderSubmission) => Promise<OrderResult>;
 	retryRequest: (requestKey: string) => Promise<OrderResult>;
 	cancelRequest: (requestKey: string) => Promise<OrderResult>;
+	previewDismiss: (requestKey: string) => Promise<DismissPreview>;
+	dismissRequest: (requestKey: string, lookup: Lookup) => Promise<OrderResult>;
 	isSubmitting: boolean;
 }
 
@@ -78,7 +88,7 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 
 	async function send(submit: (signer: Signer) => Promise<SubmitOutcome>): Promise<OrderResult> {
 		const signer = getSigner();
-		if (!signer) return { ok: false, error: t`Wallet is required for exchange actions` };
+		if (!signer) return { ok: false, status: "notSent", error: t`Wallet is required for exchange actions` };
 		const outcome = await submit(signer);
 		if (outcome.kind === "blocked") {
 			const earlierKey = getRequestKey(outcome.earlier.request);
@@ -89,7 +99,7 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 
 	function submitPlan(plan: SubmitPlanInput, label?: RequestLabel): Promise<OrderResult> {
 		if (plan.errors && plan.errors.length > 0) {
-			return Promise.resolve({ ok: false, error: plan.errors.join("; ") });
+			return Promise.resolve({ ok: false, status: "notSent", error: plan.errors.join("; ") });
 		}
 		return send((signer) =>
 			sender.submit(signer, {
@@ -105,10 +115,16 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 		return send((signer) => sender.submit(signer, { kind: "twap", params: action, ...target }));
 	}
 
-	async function settleRequest(requestKey: string, act: () => Promise<CancelOutcome>): Promise<OrderResult> {
+	function sendRejectedLegs(offer: OrderSubmission): Promise<OrderResult> {
+		const orders = assignCloids(offer.params.orders, createPlanId());
+		return send((signer) => sender.submit(signer, { ...offer, params: { ...offer.params, orders } }));
+	}
+
+	async function settleRequest(requestKey: string, act: () => Promise<RequestOutcome>): Promise<OrderResult> {
 		const outcome = await act();
 		const result = reportRequestOutcome(outcome);
-		if (outcome.kind !== "busy") updateByRequestKey(requestKey, resultToQueueUpdate(result));
+		if (outcome.kind !== "busy" && outcome.kind !== "refused")
+			updateByRequestKey(requestKey, resultToQueueUpdate(result));
 		return result;
 	}
 
@@ -118,11 +134,34 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 
 	function cancelRequest(requestKey: string): Promise<OrderResult> {
 		const signer = getSigner();
-		if (!signer) return Promise.resolve({ ok: false, error: t`Wallet is required for exchange actions` });
+		if (!signer) {
+			return Promise.resolve({ ok: false, status: "notSent", error: t`Wallet is required for exchange actions` });
+		}
 		return settleRequest(requestKey, () => sender.cancel(signer, requestKey));
 	}
 
-	return { submitPlan, submitTwap, retryRequest, cancelRequest, isSubmitting };
+	async function previewDismiss(requestKey: string): Promise<DismissPreview> {
+		const inspection = await sender.inspect(requestKey);
+		if (inspection.kind === "inspected") {
+			return { kind: "confirm", text: describeInspection(inspection), lookup: inspection.lookup };
+		}
+		return { kind: "result", result: reportRequestOutcome(inspection) };
+	}
+
+	function dismissRequest(requestKey: string, lookup: Lookup): Promise<OrderResult> {
+		return settleRequest(requestKey, () => sender.dismiss(requestKey, lookup));
+	}
+
+	return {
+		submitPlan,
+		submitTwap,
+		sendRejectedLegs,
+		retryRequest,
+		cancelRequest,
+		previewDismiss,
+		dismissRequest,
+		isSubmitting,
+	};
 }
 
 export function usePendingRequests(): PendingRequest[] {

@@ -1,57 +1,55 @@
 import { t } from "@lingui/core/macro";
-import type { OrderStatusResponse } from "@nktkas/hyperliquid";
 import type { PlanLeg } from "@/domain/trade/order-intent";
 import {
-	type CancelOutcome,
+	isRecord,
+	type LegState,
+	lookupToLegState,
+	type PlacedOutcome,
+	readStatuses,
+	toLegState,
+} from "@/lib/trade/leg-state";
+import {
 	getRequestKey,
+	type Held,
+	type Inspection,
 	type Lookup,
+	type OrderLookup,
+	type Refused,
+	type RequestOutcome,
+	type OrderSubmission,
 	type Settlement,
 	type SubmitOutcome,
+	type TwapRecord,
 } from "@/lib/trade/order-sender";
-import type { PendingRequest } from "@/lib/trade/pending-requests";
+import type { PartialPlan } from "@/lib/trade/pending-requests";
 
 export type OrderOutcome = "filled" | "partiallyFilled" | "resting" | "triggerSet" | "twapStarted";
 
 export type OrderResult =
 	| { ok: true; outcome: OrderOutcome; detail?: string }
-	| { ok: false; error: string; requestKey?: string };
-
-type PlacedOutcome = Exclude<OrderOutcome, "twapStarted" | "partiallyFilled">;
-
-export type LegState =
-	| { status: "placed"; outcome: PlacedOutcome }
-	| { status: "rejected"; reason?: string }
-	| { status: "canceled" }
-	| { status: "missing" };
+	| { ok: false; status: "failed" | "unknown"; error: string }
+	| { ok: false; status: "notSent"; error: string; offer?: OrderSubmission }
+	| { ok: false; status: "unsettled"; error: string; requestKey: string };
 
 export const NO_EXCHANGE_RESPONSE = "No response from exchange";
 
 const UNNAMED_LEG: PlanLeg = { role: "order", price: "" };
 
+function failed(error: string): OrderResult {
+	return { ok: false, status: "failed", error };
+}
+
+function unknown(error: string): OrderResult {
+	return { ok: false, status: "unknown", error };
+}
+
+function notSent(error: string): OrderResult {
+	return { ok: false, status: "notSent", error };
+}
+
 export function interpretOrderStatuses(statuses: unknown[], legs: PlanLeg[]): OrderResult {
-	if (statuses.length === 0) return { ok: false, error: NO_EXCHANGE_RESPONSE };
+	if (statuses.length === 0) return failed(NO_EXCHANGE_RESPONSE);
 	return summarizeLegStates(statuses.map(toLegState), legs);
-}
-
-function toLegState(status: unknown): LegState {
-	if (status === "waitingForTrigger") return { status: "placed", outcome: "triggerSet" };
-	if (status === "waitingForFill") return { status: "placed", outcome: "resting" };
-	if (isRecord(status)) {
-		if (typeof status.error === "string") return { status: "rejected", reason: status.error };
-		if ("resting" in status) return { status: "placed", outcome: "resting" };
-	}
-	return { status: "placed", outcome: "filled" };
-}
-
-export function lookupToLegState(lookup: OrderStatusResponse): LegState {
-	if (lookup.status === "unknownOid") return { status: "missing" };
-	const { status, order } = lookup.order;
-	if (status === "filled") return { status: "placed", outcome: "filled" };
-	if (status === "open" || status === "triggered") {
-		return { status: "placed", outcome: order.isTrigger ? "triggerSet" : "resting" };
-	}
-	if (status === "rejected" || status.endsWith("Rejected")) return { status: "rejected" };
-	return { status: "canceled" };
 }
 
 function summarizeLegStates(states: LegState[], legs: PlanLeg[]): OrderResult {
@@ -59,8 +57,8 @@ function summarizeLegStates(states: LegState[], legs: PlanLeg[]): OrderResult {
 	if (placed.length === states.length) return summarizePlaced(states, legs);
 	const reasons = new Set(states.map((state) => (state.status === "rejected" ? state.reason : undefined)));
 	const [onlyReason] = reasons;
-	if (reasons.size === 1 && onlyReason) return { ok: false, error: onlyReason };
-	return { ok: false, error: describeLegStates(states, legs) };
+	if (reasons.size === 1 && onlyReason) return failed(onlyReason);
+	return failed(describeLegStates(states, legs));
 }
 
 function summarizePlaced(states: LegState[], legs: PlanLeg[]): OrderResult {
@@ -121,7 +119,7 @@ function getLegName(leg: PlanLeg, index: number): string {
 		case "stopLoss":
 			return t`Stop loss`;
 		case "scaleLeg":
-			return t`Leg ${legNumber} at ${leg.price}`;
+			return leg.price ? t`Leg ${legNumber} at ${leg.price}` : t`Leg ${legNumber}`;
 		case "order":
 			return t`Order`;
 	}
@@ -130,9 +128,13 @@ function getLegName(leg: PlanLeg, index: number): string {
 export function reportSubmit(outcome: SubmitOutcome): OrderResult {
 	switch (outcome.kind) {
 		case "busy":
-			return { ok: false, error: t`This order is already being sent` };
+			return notSent(t`This order is already being sent`);
+		case "refused":
+			return notSent(describeRefusal(outcome));
 		case "failed":
-			return { ok: false, error: t`Not sent: ${outcome.error}` };
+			return notSent(t`Not sent: ${outcome.error}`);
+		case "held":
+			return reportHeld(outcome);
 		case "blocked":
 			return reportBlocked(outcome.earlier);
 		case "sent":
@@ -140,17 +142,58 @@ export function reportSubmit(outcome: SubmitOutcome): OrderResult {
 	}
 }
 
+function describeRefusal(refusal: Refused): string {
+	switch (refusal.reason) {
+		case "storage":
+			return t`Can't save order state in this browser. Enable site storage to trade.`;
+		case "locks":
+			return t`This browser can't keep orders from different tabs apart. Use an up-to-date browser over HTTPS to trade.`;
+		case "twapHistory":
+			return t`Not sent. Your TWAP history could not be read, so this TWAP could not be tracked. Try again.`;
+		case "slotMoved":
+			return refusal.to === "pending"
+				? t`Not sent. Another order on this market was just sent from another tab. Press again to send a new one.`
+				: t`Not sent. Another order on this market just went through. Press again to send a new one.`;
+	}
+}
+
+function reportHeld({ partial, offer }: Held): OrderResult {
+	const summary = describePartial(partial);
+	if (!offer) {
+		return notSent(
+			t`Not sent. Your last order on this market partly went through: ${summary}. Sending it again would place the same legs twice. Set the rejected take profit or stop loss on the position instead.`,
+		);
+	}
+	return {
+		ok: false,
+		status: "notSent",
+		error: t`Not sent. Your last order on this market partly went through: ${summary}. Sending it again would place the same legs twice.`,
+		offer,
+	};
+}
+
+function describePartial(partial: PartialPlan): string {
+	return partial.fates
+		.map((fate, index) => {
+			const name = getLegName({ role: partial.roles[index] ?? "order", price: "" }, index);
+			if (fate === "placed") return t`${name} placed`;
+			if (fate === "rejected") return t`${name} rejected`;
+			return t`${name} not confirmed`;
+		})
+		.join(", ");
+}
+
 function reportBlocked(earlier: Settlement): OrderResult {
 	if (earlier.kind === "pending") {
-		const error = t`Not sent. An earlier order on this market is not confirmed yet. Retry or cancel it first.`;
-		return { ok: false, error, requestKey: getRequestKey(earlier.request) };
+		return notSent(
+			t`Not sent. An earlier order on this market is not confirmed yet. Retry, cancel or dismiss it first.`,
+		);
 	}
 	const result = reportSettlement(earlier);
 	const what = result.ok ? describeOutcome(result.outcome) : result.error;
-	return {
-		ok: false,
-		error: t`Not sent. An earlier order on this market was still unconfirmed: ${what}. Press again to send a new order.`,
-	};
+	return notSent(
+		t`Not sent. An earlier order on this market was still unconfirmed: ${what}. Press again to send a new order.`,
+	);
 }
 
 function describeOutcome(outcome: OrderOutcome): string {
@@ -168,16 +211,18 @@ function describeOutcome(outcome: OrderOutcome): string {
 	}
 }
 
-export function reportRequestOutcome(outcome: CancelOutcome): OrderResult {
+export function reportRequestOutcome(outcome: RequestOutcome): OrderResult {
 	switch (outcome.kind) {
 		case "busy":
-			return { ok: false, error: t`This order is already being sent` };
+			return notSent(t`This order is already being sent`);
+		case "refused":
+			return notSent(describeRefusal(outcome));
 		case "missing":
-			return { ok: false, error: t`This request was already settled. Check open orders.` };
+			return unknown(t`This request was already settled. Check open orders.`);
 		case "foreignSigner": {
 			const expiry = new Date(outcome.request.expiresAfter).toLocaleTimeString();
 			const error = t`Cannot cancel: another agent key signed this order. It expires at ${expiry}.`;
-			return { ok: false, error, requestKey: getRequestKey(outcome.request) };
+			return { ok: false, status: "unsettled", error, requestKey: getRequestKey(outcome.request) };
 		}
 		default:
 			return reportSettlement(outcome);
@@ -190,79 +235,95 @@ export function reportSettlement(settlement: Settlement): OrderResult {
 		case "pending":
 			return {
 				ok: false,
+				status: "unsettled",
 				error: t`Not confirmed: ${settlement.error}. Retry or cancel it.`,
 				requestKey: getRequestKey(request),
 			};
 		case "canceled":
-			return {
-				ok: false,
-				error: request.kind === "twap" ? t`Canceled. The TWAP did not start.` : t`Canceled. Nothing was placed.`,
-			};
+			return failed(request.kind === "twap" ? t`Canceled. The TWAP did not start.` : t`Canceled. Nothing was placed.`);
 		case "answered":
 			return request.kind === "twap"
 				? reportTwapReply(settlement.response)
 				: interpretOrderStatuses(readStatuses(settlement.response), request.legs);
 		case "consumed":
-			if (settlement.rejection && foundNothing(settlement.lookup)) return { ok: false, error: settlement.rejection };
 			return reportLookup(settlement.lookup, request.legs);
 		case "expired":
-		case "lapsed":
-			if (!foundNothing(settlement.lookup)) return reportLookup(settlement.lookup, request.legs);
-			if (settlement.rejection) return { ok: false, error: t`Not sent: ${settlement.rejection}` };
-			return reportExpired(request.kind);
+			if (settlement.lookup && foundAny(settlement.lookup)) return reportOrderLookup(settlement.lookup, request.legs);
+			if (request.kind === "twap") return failed(t`Not started. The request expired before the exchange took it.`);
+			return failed(t`Not placed. The request expired before the exchange took it.`);
+		case "dismissed":
+			if (settlement.lookup.kind === "order" && foundAny(settlement.lookup)) {
+				const found = reportOrderLookup(settlement.lookup, request.legs);
+				if (found.ok)
+					return {
+						...found,
+						detail: t`Found by lookup after you dismissed it. The exchange never confirmed the request.`,
+					};
+				return found;
+			}
+			if (request.kind === "twap") return unknown(t`Dismissed without confirmation. Check the TWAP tab.`);
+			return unknown(t`Dismissed without confirmation. It may have executed. Check open orders.`);
 	}
 }
 
 function reportLookup(lookup: Lookup, legs: PlanLeg[]): OrderResult {
-	if (lookup.kind === "twap") {
-		if (lookup.match) {
-			const { status } = lookup.match;
-			if (status.status === "error") return { ok: false, error: t`TWAP failed: ${status.description}` };
-			return { ok: true, outcome: "twapStarted" };
-		}
-		if (!lookup.readable) {
-			return {
-				ok: false,
-				error: t`TWAP sent. Its status could not be read. It will not be sent again. Check the TWAP tab.`,
-			};
-		}
-		return { ok: false, error: t`TWAP sent but not listed yet. It will not be sent again. Check the TWAP tab.` };
-	}
+	return lookup.kind === "twap" ? reportTwapLookup(lookup.matches) : reportOrderLookup(lookup, legs);
+}
+
+function reportOrderLookup(lookup: OrderLookup, legs: PlanLeg[]): OrderResult {
 	if (!lookup.statuses) {
-		return {
-			ok: false,
-			error: t`Order sent. Its status could not be read. It will not be sent again. Check open orders.`,
-		};
+		return unknown(t`Order sent. Its status could not be read. It will not be sent again. Check open orders.`);
 	}
 	const states = lookup.statuses.map(lookupToLegState);
 	const result = summarizeLegStates(states, legs);
 	if (result.ok || !states.some((state) => state.status === "missing")) return result;
-	return { ok: false, error: t`${result.error}. It will not be sent again. Check open orders.` };
+	return unknown(t`${result.error}. It will not be sent again. Check open orders.`);
 }
 
-function foundNothing(lookup: Lookup): boolean {
-	if (lookup.kind === "twap") return lookup.match === null;
-	return lookup.statuses?.every((status) => status.status === "unknownOid") === true;
+function reportTwapLookup(matches: TwapRecord[] | null): OrderResult {
+	if (!matches)
+		return unknown(t`TWAP sent. Its status could not be read. It will not be sent again. Check the TWAP tab.`);
+	if (matches.length === 1) {
+		return unknown(
+			t`TWAP status unknown. A matching TWAP appeared in your history, but it can't be confirmed as this one. It will not be sent again. Check the TWAP tab.`,
+		);
+	}
+	return unknown(t`TWAP status unknown. It will not be sent again. Check the TWAP tab.`);
 }
 
-function reportExpired(kind: PendingRequest["kind"]): OrderResult {
-	if (kind === "twap") return { ok: false, error: t`Not started. The request expired before the exchange took it.` };
-	return { ok: false, error: t`Not placed. The request expired before the exchange took it.` };
+function foundAny(lookup: OrderLookup): boolean {
+	return lookup.statuses?.some((status) => status.status !== "unknownOid") === true;
+}
+
+export function describeInspection(inspection: Extract<Inspection, { kind: "inspected" }>): string {
+	const { request, lookup, canStillExecute } = inspection;
+	const found = describeInspectedLookup(lookup, request.legs);
+	if (!canStillExecute) {
+		return t`The exchange never confirmed this request. ${found} Dismiss it? Your next order on this market will be sent as a new one.`;
+	}
+	const expiry = new Date(request.expiresAfter).toLocaleTimeString();
+	return t`The exchange never confirmed this request. ${found} It can still execute until ${expiry}. Dismiss it? Your next order on this market will be sent as a new one.`;
+}
+
+function describeInspectedLookup(lookup: Lookup, legs: PlanLeg[]): string {
+	if (lookup.kind === "twap") {
+		if (!lookup.matches) return t`Your TWAP history could not be read.`;
+		if (lookup.matches.length === 0) return t`No matching TWAP is in your history.`;
+		if (lookup.matches.length === 1)
+			return t`A matching TWAP is in your history, but it can't be confirmed as this one.`;
+		return t`Several matching TWAPs are in your history.`;
+	}
+	if (!lookup.statuses) return t`Its status could not be read.`;
+	if (!foundAny(lookup)) return t`A lookup did not find it, which does not prove it never executed.`;
+	const result = reportOrderLookup(lookup, legs);
+	const what = result.ok ? describeOutcome(result.outcome) : result.error;
+	return t`A lookup found it: ${what}.`;
 }
 
 function reportTwapReply(response: unknown): OrderResult {
 	const data = isRecord(response) && isRecord(response.data) ? response.data : null;
 	const status = data && isRecord(data.status) ? data.status : null;
-	if (status && typeof status.error === "string") return { ok: false, error: status.error };
+	if (status && typeof status.error === "string") return failed(status.error);
 	if (status && "running" in status) return { ok: true, outcome: "twapStarted" };
-	return { ok: false, error: NO_EXCHANGE_RESPONSE };
-}
-
-function readStatuses(response: unknown): unknown[] {
-	const data = isRecord(response) && isRecord(response.data) ? response.data : null;
-	return data && Array.isArray(data.statuses) ? data.statuses : [];
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null;
+	return failed(NO_EXCHANGE_RESPONSE);
 }

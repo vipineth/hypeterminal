@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { OrderOutcome, OrderResult } from "@/lib/trade/extract-order-status";
+import type { Lookup, OrderSubmission } from "@/lib/trade/order-sender";
 
 export interface OrderQueueItem {
 	id: string;
@@ -10,11 +11,13 @@ export interface OrderQueueItem {
 	orderType?: "market" | "limit" | "trigger" | "scale" | "twap";
 	tpPrice?: string;
 	slPrice?: string;
-	status: "pending" | "success" | "failed" | "unsettled";
+	status: "pending" | "success" | "failed" | "unknown" | "unsettled";
 	outcome?: OrderOutcome;
 	detail?: string;
 	error?: string;
 	requestKey?: string;
+	offer?: OrderSubmission;
+	confirmDismiss?: { text: string; lookup: Lookup };
 	createdAt: number;
 	completedAt?: number;
 }
@@ -69,14 +72,31 @@ const useOrderQueueStore = create<OrderQueueStore>()((set) => ({
 }));
 
 function applyUpdate(order: OrderQueueItem, update: Partial<Omit<OrderQueueItem, "id">>): OrderQueueItem {
-	const completed = update.status === "success" || update.status === "failed";
+	const completed = update.status === "success" || update.status === "failed" || update.status === "unknown";
 	return { ...order, ...update, completedAt: completed ? Date.now() : order.completedAt };
 }
 
 export function resultToQueueUpdate(result: OrderResult): Partial<Omit<OrderQueueItem, "id">> {
-	if (result.ok) return { status: "success", outcome: result.outcome, detail: result.detail, error: undefined };
-	if (result.requestKey) return { status: "unsettled", error: result.error, requestKey: result.requestKey };
-	return { status: "failed", error: result.error, outcome: undefined, detail: undefined };
+	const cleared = {
+		confirmDismiss: undefined,
+		offer: undefined,
+		outcome: undefined,
+		detail: undefined,
+		error: undefined,
+	};
+	if (result.ok) return { ...cleared, status: "success", outcome: result.outcome, detail: result.detail };
+	switch (result.status) {
+		case "unsettled":
+			return { ...cleared, status: "unsettled", error: result.error, requestKey: result.requestKey };
+		case "notSent":
+			return { ...cleared, status: "failed", error: result.error, offer: result.offer };
+		default:
+			return { ...cleared, status: result.status, error: result.error };
+	}
+}
+
+export function shouldClearTicket(result: OrderResult): boolean {
+	return result.ok || result.status === "unknown" || result.status === "unsettled";
 }
 
 export function useOrderQueue() {

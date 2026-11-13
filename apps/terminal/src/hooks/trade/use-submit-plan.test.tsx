@@ -90,7 +90,7 @@ describe("retry and cancel on an unconfirmed order", () => {
 	async function sendUnconfirmed(hook: SubmitPlanHook): Promise<string> {
 		net.venue.nextExchangeRequests("inTransit", "lost", "lost", "lost");
 		const result = await settle(hook.submitPlan(MARKET_BUY));
-		if (result.ok || !result.requestKey) throw new Error("expected an unconfirmed order");
+		if (result.ok || result.status !== "unsettled") throw new Error("expected an unconfirmed order");
 		return result.requestKey;
 	}
 
@@ -113,7 +113,7 @@ describe("retry and cancel on an unconfirmed order", () => {
 		const requestKey = await sendUnconfirmed(hook);
 		const result = await settle(hook.cancelRequest(requestKey));
 		const [lateArrival] = net.venue.deliverInTransit();
-		expect(result).toEqual({ ok: false, error: "Canceled. Nothing was placed." });
+		expect(result).toEqual({ ok: false, status: "failed", error: "Canceled. Nothing was placed." });
 		expect(lateArrival).toMatchObject({
 			status: "err",
 			response: expect.stringMatching(/^Invalid nonce: duplicate nonce/),
@@ -126,11 +126,7 @@ describe("retry and cancel on an unconfirmed order", () => {
 		net.venue.nextExchangeRequests("lost", "lost", "lost", "lost");
 		const closeShort = { grouping: "na" as const, orders: [{ ...MARKET_BUY.orders[0], s: "2.5", r: true }] };
 		await settle(hook.submitPlan(closeShort));
-		const stored = JSON.parse(
-			net.storage.getItem("hypeterminal:pending-request:v1:testnet:0x0000000000000000000000000000000000000001:5") ??
-				"{}",
-		);
-		expect(stored.label).toEqual({ market: "", side: "buy", size: "2.5" });
+		expect(storedSlot().request.label).toEqual({ market: "", side: "buy", size: "2.5" });
 	});
 
 	it("says a request is already settled when Retry finds it gone", async () => {
@@ -139,8 +135,62 @@ describe("retry and cancel on an unconfirmed order", () => {
 		await settle(hook.retryRequest(requestKey));
 		expect(await settle(hook.retryRequest(requestKey))).toEqual({
 			ok: false,
+			status: "unknown",
 			error: "This request was already settled. Check open orders.",
 		});
 		expect(net.venue.state.placedLegs).toBe(1);
 	});
+
+	it("dismisses an unconfirmed order only after showing what a lookup says, and records the dismissal", async () => {
+		const hook = await mountSubmitPlan();
+		net.venue.nextExchangeRequests("lost", "lost", "lost", "lost");
+		const result = await settle(hook.submitPlan(MARKET_BUY));
+		if (result.ok || result.status !== "unsettled") throw new Error("expected an unconfirmed order");
+		const preview = await settle(hook.previewDismiss(result.requestKey));
+		if (preview.kind !== "confirm") throw new Error("expected a confirmation");
+		expect(preview.text).toMatch(
+			/^The exchange never confirmed this request\. A lookup did not find it, which does not prove it never executed\. It can still execute until .+\. Dismiss it\? Your next order on this market will be sent as a new one\.$/,
+		);
+		expect(storedSlot().state).toBe("pending");
+		const dismissed = await settle(hook.dismissRequest(result.requestKey, preview.lookup));
+		expect(dismissed).toEqual({
+			ok: false,
+			status: "unknown",
+			error: "Dismissed without confirmation. It may have executed. Check open orders.",
+		});
+		expect(storedSlot()).toMatchObject({
+			state: "dismissed",
+			lookup: { kind: "order", statuses: [{ status: "unknownOid" }] },
+		});
+		expect(queue.updateByRequestKey).toHaveBeenLastCalledWith(
+			result.requestKey,
+			expect.objectContaining({ status: "unknown" }),
+		);
+		const next = await settle(hook.submitPlan(MARKET_BUY));
+		expect(next).toEqual({ ok: true, outcome: "filled" });
+	});
+
+	it("reports a dismissed order a lookup found as filled, never as nothing placed", async () => {
+		const hook = await mountSubmitPlan();
+		net.venue.nextExchangeRequests("noReply");
+		net.venue.state.onSend = () => {
+			net.venue.state.exchangeDown = true;
+			net.venue.state.onSend = null;
+		};
+		const result = await settle(hook.submitPlan(MARKET_BUY));
+		if (result.ok || result.status !== "unsettled") throw new Error("expected an unconfirmed order");
+		const preview = await settle(hook.previewDismiss(result.requestKey));
+		if (preview.kind !== "confirm") throw new Error("expected a confirmation");
+		expect(preview.text).toContain("A lookup found it: it filled.");
+		const dismissed = await settle(hook.dismissRequest(result.requestKey, preview.lookup));
+		expect(dismissed).toMatchObject({ ok: true, outcome: "filled" });
+		expect(net.venue.state.placedLegs).toBe(1);
+	});
 });
+
+function storedSlot() {
+	return JSON.parse(
+		net.storage.getItem("hypeterminal:pending-request:v2:testnet:0x0000000000000000000000000000000000000001:5") ??
+			"null",
+	);
+}

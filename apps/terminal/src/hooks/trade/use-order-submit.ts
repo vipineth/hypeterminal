@@ -8,7 +8,7 @@ import { isPositive, truncateDecimals } from "@/lib/trade/numbers";
 import type { RequestLabel } from "@/lib/trade/pending-requests";
 import type { Side } from "@/lib/trade/types";
 import { useOrderEntryActions } from "@/stores/use-order-entry-store";
-import { resultToQueueUpdate, useOrderQueueActions } from "@/stores/use-order-queue-store";
+import { resultToQueueUpdate, shouldClearTicket, useOrderQueueActions } from "@/stores/use-order-queue-store";
 
 interface SubmitMarket {
 	assetId: number;
@@ -103,7 +103,7 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 
 		const result = await sendTwap(plan.action, { coin: input.market.name, label });
 		updateOrder(orderId, resultToQueueUpdate(result));
-		if (result.ok) resetForm();
+		if (shouldClearTicket(result)) resetForm();
 		return result.ok;
 	}
 
@@ -148,7 +148,7 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 
 		const result = await submitPlan(plan, label);
 		updateOrder(orderId, resultToQueueUpdate(result));
-		if (plan.errors.length === 0) resetForm();
+		if (shouldClearTicket(result)) resetForm();
 		return result.ok;
 	}
 

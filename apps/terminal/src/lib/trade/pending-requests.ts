@@ -1,18 +1,26 @@
 import { z } from "zod";
 
-const KEY_PREFIX = "hypeterminal:pending-request:v1:";
+const KEY_PREFIX = "hypeterminal:pending-request:v2:";
+const PROBE_KEY = "hypeterminal:pending-request:probe";
 
 const hexSchema = z.custom<`0x${string}`>((value) => typeof value === "string" && /^0x[0-9a-fA-F]+$/.test(value));
 
-const legSchema = z.object({
-	role: z.enum(["entry", "takeProfit", "stopLoss", "order", "scaleLeg"]),
-	price: z.string(),
-});
+const roleSchema = z.enum(["entry", "takeProfit", "stopLoss", "order", "scaleLeg"]);
+
+const legSchema = z.object({ role: roleSchema, price: z.string() });
 
 const labelSchema = z.object({
 	market: z.string(),
 	side: z.enum(["buy", "sell"]),
 	size: z.string(),
+});
+
+const partialPlanSchema = z.object({
+	roles: z.array(roleSchema),
+	buy: z.boolean(),
+	grouping: z.enum(["na", "normalTpsl", "positionTpsl"]),
+	fates: z.array(z.enum(["placed", "rejected", "unknown"])),
+	settledAt: z.number(),
 });
 
 const pendingRequestSchema = z.object({
@@ -27,22 +35,44 @@ const pendingRequestSchema = z.object({
 	cloids: z.array(hexSchema),
 	legs: z.array(legSchema).catch([]),
 	twap: z
-		.object({ coin: z.string(), knownIds: z.array(z.number()).nullable() })
+		.object({ coin: z.string(), knownIds: z.array(z.number()) })
+		.nullable()
+		.catch(null),
+	parent: z
+		.object({ plan: partialPlanSchema, indices: z.array(z.number().int()) })
 		.nullable()
 		.catch(null),
 	label: labelSchema.catch({ market: "", side: "buy", size: "" }),
 	createdAt: z.number().catch(0),
 });
 
+const slotRecordSchema = z.discriminatedUnion("state", [
+	z.object({ state: z.literal("pending"), request: pendingRequestSchema }),
+	z.object({
+		state: z.literal("settled"),
+		nonce: z.number().int(),
+		settledAt: z.number(),
+		partial: partialPlanSchema.nullable().catch(null),
+	}),
+	z.object({
+		state: z.literal("dismissed"),
+		request: pendingRequestSchema,
+		dismissedAt: z.number(),
+		lookup: z.unknown(),
+	}),
+]);
+
 export type PendingRequest = z.infer<typeof pendingRequestSchema>;
 export type RequestLabel = z.infer<typeof labelSchema>;
+export type PartialPlan = z.infer<typeof partialPlanSchema>;
+export type SlotRecord = z.infer<typeof slotRecordSchema>;
 
 export type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem" | "key" | "length">;
 
 export interface RequestStore {
-	get(slot: string): PendingRequest | null;
-	put(request: PendingRequest): void;
-	remove(request: PendingRequest): void;
+	read(slot: string): SlotRecord | null;
+	write(slot: string, record: SlotRecord): boolean;
+	isWritable(): boolean;
 	list(slotPrefix: string): PendingRequest[];
 	subscribe(listener: () => void): () => void;
 }
@@ -59,56 +89,39 @@ export function createRequestStore(
 	getStorage: () => StorageLike | null,
 	onExternalChange: (listener: () => void) => () => void = () => () => {},
 ): RequestStore {
-	const unsaved = new Map<string, string>();
 	const listeners = new Set<() => void>();
 
-	function notify() {
-		for (const listener of listeners) listener();
-	}
-
-	function read(slot: string): string | null {
+	function read(slot: string): SlotRecord | null {
 		try {
-			return getStorage()?.getItem(KEY_PREFIX + slot) ?? unsaved.get(slot) ?? null;
-		} catch {
-			return unsaved.get(slot) ?? null;
-		}
-	}
-
-	function get(slot: string): PendingRequest | null {
-		const raw = read(slot);
-		if (!raw) return null;
-		try {
-			return pendingRequestSchema.parse(JSON.parse(raw));
+			const raw = getStorage()?.getItem(KEY_PREFIX + slot);
+			return raw ? slotRecordSchema.parse(JSON.parse(raw)) : null;
 		} catch {
 			return null;
 		}
 	}
 
-	function put(request: PendingRequest) {
-		const raw = JSON.stringify(request);
-		if (save(request.slot, raw)) unsaved.delete(request.slot);
-		else unsaved.set(request.slot, raw);
-		notify();
-	}
-
-	function save(slot: string, raw: string): boolean {
+	function write(slot: string, record: SlotRecord): boolean {
 		const storage = getStorage();
 		if (!storage) return false;
 		try {
-			storage.setItem(KEY_PREFIX + slot, raw);
+			storage.setItem(KEY_PREFIX + slot, JSON.stringify(record));
+		} catch {
+			return false;
+		}
+		for (const listener of listeners) listener();
+		return true;
+	}
+
+	function isWritable(): boolean {
+		const storage = getStorage();
+		if (!storage) return false;
+		try {
+			storage.setItem(PROBE_KEY, "1");
+			storage.removeItem(PROBE_KEY);
 			return true;
 		} catch {
 			return false;
 		}
-	}
-
-	function remove(request: PendingRequest) {
-		if (get(request.slot)?.nonce !== request.nonce) return;
-		unsaved.delete(request.slot);
-		try {
-			getStorage()?.removeItem(KEY_PREFIX + request.slot);
-		} catch {}
-		notify();
 	}
 
 	function storedSlots(): string[] {
@@ -124,10 +137,12 @@ export function createRequestStore(
 	}
 
 	function list(slotPrefix: string): PendingRequest[] {
-		const slots = new Set([...storedSlots(), ...unsaved.keys()]);
-		return [...slots]
+		return storedSlots()
 			.filter((slot) => slot.startsWith(slotPrefix))
-			.flatMap((slot) => get(slot) ?? [])
+			.flatMap((slot) => {
+				const record = read(slot);
+				return record?.state === "pending" ? [record.request] : [];
+			})
 			.sort((a, b) => a.createdAt - b.createdAt);
 	}
 
@@ -140,5 +155,5 @@ export function createRequestStore(
 		};
 	}
 
-	return { get, put, remove, list, subscribe };
+	return { read, write, isWritable, list, subscribe };
 }
