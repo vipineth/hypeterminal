@@ -65,11 +65,13 @@ export function parseMarkets({ perpDexs, allPerpMetas, spotMeta }: MetaPayloads)
 		};
 	});
 
+	const tokenByIndex = new Map(spotTokens.map((token) => [token.index, token]));
+
 	if (spotTokens.length > 0) {
 		for (const pair of spotMeta.universe) {
 			const tokensInfo: SpotToken[] = [];
 			for (const idx of pair.tokens) {
-				const token = spotTokens[idx];
+				const token = tokenByIndex.get(idx);
 				if (token) tokensInfo.push(token);
 			}
 
@@ -100,7 +102,7 @@ export function parseMarkets({ perpDexs, allPerpMetas, spotMeta }: MetaPayloads)
 			if (!meta || !dexInfo) continue;
 
 			const dexName = dexInfo.name;
-			const quoteToken = spotTokens[meta.collateralToken];
+			const quoteToken = tokenByIndex.get(meta.collateralToken);
 
 			for (let assetIndex = 0; assetIndex < meta.universe.length; assetIndex++) {
 				const asset = meta.universe[assetIndex];
