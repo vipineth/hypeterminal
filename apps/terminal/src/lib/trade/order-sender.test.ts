@@ -192,6 +192,15 @@ describe("order sender", () => {
 		expect(later.sender.list("0x0000000000000000000000000000000000000002")).toEqual([]);
 	});
 
+	it("leaves a request out of its tab's list while that tab is still sending it", async () => {
+		const { sender } = openTab(venue, storage, locks);
+		const listedDuringSend: number[] = [];
+		venue.state.onArrive = () => listedDuringSend.push(sender.list(TEST_USER).length);
+		venue.nextExchangeRequests("noReply");
+		await sender.submit(signerFor(venue), marketBuy());
+		expect(listedDuringSend).toEqual([0, 0]);
+	});
+
 	it("sends one signed body when two tabs press at the same moment", async () => {
 		const tabA = openTab(venue, storage, locks);
 		const tabB = openTab(venue, storage, locks);

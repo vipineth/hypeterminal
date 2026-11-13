@@ -336,7 +336,7 @@ export function createOrderSender(env: SenderEnv) {
 	}
 
 	function list(user: string): PendingRequest[] {
-		return env.store.list(getUserSlotPrefix(network(), user));
+		return env.store.list(getUserSlotPrefix(network(), user)).filter((request) => !sending.has(request.slot));
 	}
 
 	async function poll<T>(
@@ -358,7 +358,14 @@ export function createOrderSender(env: SenderEnv) {
 		retry,
 		cancel,
 		list,
-		subscribe: env.store.subscribe,
+		subscribe(listener: () => void) {
+			const unsubscribeStore = env.store.subscribe(listener);
+			busyListeners.add(listener);
+			return () => {
+				unsubscribeStore();
+				busyListeners.delete(listener);
+			};
+		},
 		warmClock: env.clock.warm,
 		isBusy: () => sending.size > 0,
 		subscribeBusy(listener: () => void) {
