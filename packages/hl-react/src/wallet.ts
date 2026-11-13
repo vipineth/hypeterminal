@@ -1,32 +1,40 @@
 import type { AbstractViemJsonRpcAccount, AbstractWallet } from "@nktkas/hyperliquid/signing";
-import type { Account, WalletClient } from "viem";
+import { type Account, serializeTypedData, type WalletClient } from "viem";
 
 type SignTypedDataParams = Parameters<AbstractViemJsonRpcAccount["signTypedData"]>[0];
 
-type FullWalletClient = WalletClient & {
-	getAddresses: () => Promise<`0x${string}`[]>;
-	getChainId: () => Promise<number>;
-};
-
-type WalletClientLike = Pick<WalletClient, "signTypedData"> & {
+type WalletClientLike = Pick<WalletClient, "request"> & {
 	account?: Account | null;
 	getAddresses?: () => Promise<`0x${string}`[]>;
 	getChainId?: () => Promise<number>;
 };
 
-function isFullWalletClient(value: unknown): value is FullWalletClient {
-	if (!value || typeof value !== "object") return false;
-	const obj = value as Record<string, unknown>;
-	return (
-		typeof obj.signTypedData === "function" &&
-		typeof obj.getAddresses === "function" &&
-		typeof obj.getChainId === "function"
-	);
-}
+type FullWalletClient = WalletClientLike & {
+	getAddresses: () => Promise<`0x${string}`[]>;
+	getChainId: () => Promise<number>;
+};
 
 function isWalletClientLike(value: unknown): value is WalletClientLike {
 	if (!value || typeof value !== "object") return false;
-	return "signTypedData" in value && typeof (value as WalletClientLike).signTypedData === "function";
+	return "request" in value && typeof value.request === "function";
+}
+
+function isFullWalletClient(value: unknown): value is FullWalletClient {
+	return (
+		isWalletClientLike(value) && typeof value.getAddresses === "function" && typeof value.getChainId === "function"
+	);
+}
+
+// viem's signTypedData rejects struct names containing ":" (2.57.15-2.57.16), and every
+// Hyperliquid user-signed type is "HyperliquidTransaction:*", so the request goes to the wallet directly.
+function signWithWallet(client: WalletClientLike, account: `0x${string}`, params: SignTypedDataParams) {
+	return client.request(
+		{
+			method: "eth_signTypedData_v4",
+			params: [account, serializeTypedData(params as Parameters<typeof serializeTypedData>[0])],
+		},
+		{ retryCount: 0 },
+	);
 }
 
 export function toHyperliquidWallet(
@@ -38,15 +46,7 @@ export function toHyperliquidWallet(
 		const account = accountOverride ?? client.account?.address;
 		if (!account) return null;
 		return {
-			signTypedData: async (params: SignTypedDataParams) => {
-				return client.signTypedData({
-					account,
-					domain: params.domain as Parameters<WalletClient["signTypedData"]>[0]["domain"],
-					types: params.types as Parameters<WalletClient["signTypedData"]>[0]["types"],
-					primaryType: params.primaryType,
-					message: params.message,
-				});
-			},
+			signTypedData: (params: SignTypedDataParams) => signWithWallet(client, account, params),
 			getAddresses: () => client.getAddresses(),
 			getChainId: () => client.getChainId(),
 		} satisfies AbstractViemJsonRpcAccount;
@@ -61,14 +61,6 @@ export function toHyperliquidWallet(
 
 	return {
 		address: accountAddress,
-		signTypedData: async (params: SignTypedDataParams) => {
-			return client.signTypedData({
-				account: client.account ?? accountAddress,
-				domain: params.domain as Parameters<WalletClient["signTypedData"]>[0]["domain"],
-				types: params.types as Parameters<WalletClient["signTypedData"]>[0]["types"],
-				primaryType: params.primaryType,
-				message: params.message,
-			});
-		},
+		signTypedData: (params: SignTypedDataParams) => signWithWallet(client, accountAddress, params),
 	};
 }
