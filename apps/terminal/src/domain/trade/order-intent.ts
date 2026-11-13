@@ -85,6 +85,47 @@ export type OrderIntent =
 
 type PlanLegs = Pick<OrderPlan, "orders" | "grouping">;
 
+export type PlanLegRole = "entry" | "takeProfit" | "stopLoss" | "order" | "scaleLeg";
+
+export type PlanLeg = { role: PlanLegRole; price: string };
+
+export function describePlanLegs({ orders, grouping }: PlanLegs): PlanLeg[] {
+	return orders.map((order, index) => ({ role: getLegRole(order, index, grouping, orders.length), price: order.p }));
+}
+
+function getLegRole(
+	order: ExchangeOrder,
+	index: number,
+	grouping: OrderPlan["grouping"],
+	legCount: number,
+): PlanLegRole {
+	if (grouping === "normalTpsl" && index === 0) return "entry";
+	if (grouping !== "na" && "trigger" in order.t) return order.t.trigger.tpsl === "tp" ? "takeProfit" : "stopLoss";
+	return legCount > 1 ? "scaleLeg" : "order";
+}
+
+export function getPlanKey({ orders, grouping }: PlanLegs): string {
+	return JSON.stringify({ grouping, orders: orders.map(withoutMarketPrice) });
+}
+
+function withoutMarketPrice(order: ExchangeOrder) {
+	const isMarket = "limit" in order.t && order.t.limit.tif === "FrontendMarket";
+	return isMarket ? { ...order, p: undefined } : order;
+}
+
+const PLAN_ID_BYTES = 14;
+
+export function createPlanId(): string {
+	const bytes = crypto.getRandomValues(new Uint8Array(PLAN_ID_BYTES));
+	return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+export type CloidOrder = ExchangeOrder & { c: `0x${string}` };
+
+export function assignCloids(orders: ExchangeOrder[], planId: string): CloidOrder[] {
+	return orders.map((order, index) => ({ ...order, c: `0x${planId}${index.toString(16).padStart(4, "0")}` }));
+}
+
 export function buildOrderPlan(intent: OrderIntent): OrderPlan {
 	try {
 		const { orders, grouping } = buildPlanLegs(intent);

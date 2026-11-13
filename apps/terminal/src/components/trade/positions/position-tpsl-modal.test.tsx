@@ -33,6 +33,10 @@ vi.mock("react", async (importOriginal) => {
 	return { ...react, useState };
 });
 
+vi.mock("wagmi", () => ({
+	useConnection: () => ({ address: "0x0000000000000000000000000000000000000001" }),
+}));
+
 vi.mock("@hypeterminal/ui", async (importOriginal) => ({
 	...(await importOriginal<typeof import("@hypeterminal/ui")>()),
 	ModalPopup: ({ children }: { children: ReactNode }) => children,
@@ -124,6 +128,7 @@ describe("position tp/sl modal", () => {
 							s: "0",
 							r: true,
 							t: { trigger: { isMarket: true, triggerPx: "74.999", tpsl: "tp" } },
+							c: expect.stringMatching(/^0x[0-9a-f]{32}$/),
 						},
 						{
 							a: 5,
@@ -132,6 +137,7 @@ describe("position tp/sl modal", () => {
 							s: "0",
 							r: true,
 							t: { trigger: { isMarket: true, triggerPx: "85", tpsl: "sl" } },
+							c: expect.stringMatching(/^0x[0-9a-f]{32}$/),
 						},
 					],
 					grouping: "positionTpsl",
