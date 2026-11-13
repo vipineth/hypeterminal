@@ -47,6 +47,10 @@ function readPendingRequests(user: string | undefined): PendingRequest[] {
 
 export type SubmitPlanInput = Pick<OrderPlan, "orders" | "grouping"> & { errors?: string[] };
 
+function labelFromLeg(leg: OrderPlan["orders"][number]): RequestLabel {
+	return { market: "", side: leg.b ? "buy" : "sell", size: leg.s };
+}
+
 interface UseSubmitPlanResult {
 	submitPlan: (plan: SubmitPlanInput, label?: RequestLabel) => Promise<OrderResult>;
 	submitTwap: (action: TwapOrderParameters, target: { coin: string; label?: RequestLabel }) => Promise<OrderResult>;
@@ -92,14 +96,23 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 				kind: "order",
 				params: { orders: assignCloids(plan.orders, createPlanId()), grouping: plan.grouping, builder: builderConfig },
 				legs: describePlanLegs(plan),
-				label: label ?? null,
+				label: label ?? labelFromLeg(plan.orders[0]),
 			}),
 		);
 	}
 
 	function submitTwap(action: TwapOrderParameters, target: { coin: string; label?: RequestLabel }) {
 		return send((signer) =>
-			sender.submit(signer, { kind: "twap", params: action, coin: target.coin, label: target.label ?? null }),
+			sender.submit(signer, {
+				kind: "twap",
+				params: action,
+				coin: target.coin,
+				label: target.label ?? {
+					market: target.coin,
+					side: action.twap.b ? "buy" : "sell",
+					size: String(action.twap.s),
+				},
+			}),
 		);
 	}
 

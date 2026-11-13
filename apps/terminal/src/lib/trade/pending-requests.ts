@@ -25,7 +25,7 @@ const pendingRequestSchema = z.object({
 	cloids: z.array(z.string()),
 	legs: z.array(legSchema),
 	twap: z.object({ coin: z.string(), knownIds: z.array(z.number()).nullable() }).nullable(),
-	label: labelSchema.nullable(),
+	label: labelSchema,
 	createdAt: z.number(),
 });
 

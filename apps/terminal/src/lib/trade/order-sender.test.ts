@@ -41,7 +41,7 @@ function marketBuy(asset = SOL): Submission {
 			grouping: "na",
 		},
 		legs: [{ role: "order", price: "90" }],
-		label: null,
+		label: { market: "SOL", side: "buy", size: "1" },
 	};
 }
 
@@ -50,7 +50,7 @@ function twapBuy(): Submission {
 		kind: "twap",
 		params: { twap: { a: SOL, b: true, s: "4", r: false, m: 30, t: false } },
 		coin: "SOL",
-		label: null,
+		label: { market: "SOL", side: "buy", size: "4" },
 	};
 }
 

@@ -73,8 +73,8 @@ type OrderSubmissionParams = Pick<OrderParameters, "grouping" | "builder"> & { o
 type TwapParams = Pick<TwapOrderParameters, "twap">;
 
 export type Submission =
-	| { kind: "order"; params: OrderSubmissionParams; legs: PlanLeg[]; label: RequestLabel | null }
-	| { kind: "twap"; params: TwapParams; coin: string; label: RequestLabel | null };
+	| { kind: "order"; params: OrderSubmissionParams; legs: PlanLeg[]; label: RequestLabel }
+	| { kind: "twap"; params: TwapParams; coin: string; label: RequestLabel };
 
 export interface Signer {
 	user: `0x${string}`;

@@ -121,6 +121,18 @@ describe("retry and cancel on an unconfirmed order", () => {
 		expect(net.venue.state.placedLegs).toBe(0);
 	});
 
+	it("labels an unconfirmed close by its side and size so a later tab can show it", async () => {
+		const hook = await mountSubmitPlan();
+		net.venue.nextExchangeRequests("lost", "lost", "lost", "lost");
+		const closeShort = { grouping: "na" as const, orders: [{ ...MARKET_BUY.orders[0], s: "2.5", r: true }] };
+		await settle(hook.submitPlan(closeShort));
+		const stored = JSON.parse(
+			net.storage.getItem("hypeterminal:pending-request:v1:testnet:0x0000000000000000000000000000000000000001:5") ??
+				"{}",
+		);
+		expect(stored.label).toEqual({ market: "", side: "buy", size: "2.5" });
+	});
+
 	it("says a request is already settled when Retry finds it gone", async () => {
 		const hook = await mountSubmitPlan();
 		const requestKey = await sendUnconfirmed(hook);

@@ -186,9 +186,9 @@ function RequestActions({
 function toQueueItem(request: PendingRequest): OrderQueueItem {
 	return {
 		id: getRequestKey(request),
-		market: request.label?.market ?? "",
-		side: request.label?.side ?? "buy",
-		size: request.label?.size ?? "",
+		market: request.label.market,
+		side: request.label.side,
+		size: request.label.size,
 		orderType: request.kind === "twap" ? "twap" : undefined,
 		status: "unsettled",
 		error: t`Not confirmed. Retry or cancel it.`,

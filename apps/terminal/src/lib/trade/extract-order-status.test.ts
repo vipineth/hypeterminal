@@ -38,7 +38,7 @@ function request(kind: "order" | "twap", legs: PlanLeg[] = ORDER): PendingReques
 		cloids: [],
 		legs,
 		twap: kind === "twap" ? { coin: "SOL", knownIds: [] } : null,
-		label: null,
+		label: { market: "SOL", side: "buy", size: "1" },
 		createdAt: 0,
 	};
 }
