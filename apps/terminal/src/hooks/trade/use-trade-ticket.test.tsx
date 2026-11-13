@@ -216,7 +216,7 @@ describe("perp trade ticket", () => {
 		exchange.placeOrder.mockResolvedValue({ response: { data: { statuses: [{ resting: { oid: 1 } }] } } });
 	});
 
-	it("never sends a short's tp or sl above a typed trigger that a number cannot hold", async () => {
+	it("sends a short's tp and sl from the typed strings a number cannot hold", async () => {
 		form.tpPrice = "74.999999999999999";
 		form.slPrice = "84.999999999999999";
 		await pressSubmit();
@@ -236,7 +236,7 @@ describe("perp trade ticket", () => {
 				p: "84.999",
 				s: "1",
 				r: true,
-				t: { trigger: { isMarket: true, triggerPx: "84.999", tpsl: "sl" } },
+				t: { trigger: { isMarket: true, triggerPx: "85", tpsl: "sl" } },
 			},
 		]);
 	});

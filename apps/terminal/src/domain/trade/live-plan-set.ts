@@ -200,14 +200,21 @@ function limitLeg(side: Side, size: string | null, reduceOnly: boolean, price: B
 	return { side, size, reduceOnly, price: { ref: price, rounding: passive(side) }, kind: { tif: "Gtc" } };
 }
 
-function triggerLeg(side: Side, size: string, tpsl: "tp" | "sl", trigger: Big, limit?: Big): LegSpec {
-	const triggerSpec = { ref: trigger, rounding: passive(side) };
+function triggerLeg(
+	market: LiveMarket,
+	side: Side,
+	size: string,
+	tpsl: "tp" | "sl",
+	trigger: Big,
+	limit?: Big,
+): LegSpec {
+	const firesOnRise = trigger.gt(market.markPx);
 	return {
 		side,
 		size,
 		reduceOnly: true,
-		price: limit ? { ref: limit, rounding: passive(side) } : triggerSpec,
-		kind: { tpsl, isMarket: !limit, trigger: triggerSpec },
+		price: { ref: limit ?? trigger, rounding: passive(side) },
+		kind: { tpsl, isMarket: !limit, trigger: { ref: trigger, rounding: firesOnRise ? "up" : "down" } },
 	};
 }
 
@@ -291,15 +298,15 @@ function perpCases(market: LiveMarket, side: Side): PlanCase[] {
 				grouping: "normalTpsl",
 				legs: [
 					marketLeg(market, side, sz, false),
-					triggerLeg(exit, sz, "tp", entryTp),
-					triggerLeg(exit, sz, "sl", entrySl),
+					triggerLeg(market, exit, sz, "tp", entryTp),
+					triggerLeg(market, exit, sz, "sl", entrySl),
 				],
 			},
 		),
 		perpCase(
 			"stop market",
 			entry(market, side, size, { orderType: "stopMarket", triggerPriceInput: stopTrigger.toFixed() }),
-			single(triggerLeg(side, sz, "sl", stopTrigger)),
+			single(triggerLeg(market, side, sz, "sl", stopTrigger)),
 		),
 		perpCase(
 			"stop limit",
@@ -308,12 +315,12 @@ function perpCases(market: LiveMarket, side: Side): PlanCase[] {
 				triggerPriceInput: stopTrigger.toFixed(),
 				limitPriceInput: stopLimit.toFixed(),
 			}),
-			single(triggerLeg(side, sz, "sl", stopTrigger, stopLimit)),
+			single(triggerLeg(market, side, sz, "sl", stopTrigger, stopLimit)),
 		),
 		perpCase(
 			"take profit market",
 			entry(market, side, size, { orderType: "takeProfitMarket", triggerPriceInput: takeTrigger.toFixed() }),
-			single(triggerLeg(side, sz, "tp", takeTrigger)),
+			single(triggerLeg(market, side, sz, "tp", takeTrigger)),
 		),
 		perpCase(
 			"take profit limit",
@@ -322,7 +329,7 @@ function perpCases(market: LiveMarket, side: Side): PlanCase[] {
 				triggerPriceInput: takeTrigger.toFixed(),
 				limitPriceInput: takeLimit.toFixed(),
 			}),
-			single(triggerLeg(side, sz, "tp", takeTrigger, takeLimit)),
+			single(triggerLeg(market, side, sz, "tp", takeTrigger, takeLimit)),
 		),
 		...scaleCases(market, side, size),
 		perpCase(
@@ -362,7 +369,10 @@ function perpCases(market: LiveMarket, side: Side): PlanCase[] {
 			},
 			{
 				grouping: "positionTpsl",
-				legs: [triggerLeg(side, "0", "tp", closeTp(market, side)), triggerLeg(side, "0", "sl", closeSl(market, side))],
+				legs: [
+					triggerLeg(market, side, "0", "tp", closeTp(market, side)),
+					triggerLeg(market, side, "0", "sl", closeSl(market, side)),
+				],
 			},
 		),
 		perpCase("twap", entry(market, side, size, { orderType: "twap" }), "rejected"),

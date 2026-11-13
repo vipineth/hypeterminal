@@ -69,7 +69,7 @@ describe("position tp/sl modal", () => {
 		});
 	});
 
-	it("never sends a short's tp or sl above a typed trigger that a number cannot hold", async () => {
+	it("sends a short's tp and sl from the typed strings a number cannot hold", async () => {
 		typedOverPrefill.set("70.0000", "74.999999999999999");
 		typedOverPrefill.set("90.0000", "84.999999999999999");
 		await pressConfirm();
@@ -91,7 +91,7 @@ describe("position tp/sl modal", () => {
 							p: "84.999",
 							s: "0",
 							r: true,
-							t: { trigger: { isMarket: true, triggerPx: "84.999", tpsl: "sl" } },
+							t: { trigger: { isMarket: true, triggerPx: "85", tpsl: "sl" } },
 						},
 					],
 					grouping: "positionTpsl",

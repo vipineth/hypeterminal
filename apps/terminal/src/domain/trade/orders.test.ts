@@ -448,7 +448,7 @@ describe("order wire format", () => {
 		expect(sz0.orders[0].p).toBe("0.00001234");
 	});
 
-	it("rounds position TP/SL triggers passively for the closing side", () => {
+	it("rounds a long's position TP trigger up, its SL trigger down, and both limit prices passively", () => {
 		const plan = buildOrderPlan({
 			kind: "positionTpsl",
 			assetId: 5,
@@ -458,6 +458,10 @@ describe("order wire format", () => {
 			slPriceInput: "90.123456",
 		});
 		expect(plan.orders.map((order) => order.p)).toEqual(["120.13", "90.124"]);
+		expect(plan.orders.map((order) => ("trigger" in order.t ? order.t.trigger.triggerPx : null))).toEqual([
+			"120.13",
+			"90.123",
+		]);
 		expect(plan.orders.map((order) => order.s)).toEqual(["0", "0"]);
 	});
 
@@ -574,5 +578,155 @@ describe("order wire format", () => {
 		const plan = buildOrderPlan({ ...ENTRY_BASE, orderType: "twap", sizeValue: 3 });
 		expect(plan.orders).toEqual([]);
 		expect(plan.errors).toEqual([ORDER_PLAN_ERRORS.twapNotSupported]);
+	});
+});
+
+describe("trigger prices fire no earlier than the typed level", () => {
+	const BELOW_TICK_MID = "0.0645429";
+	const ABOVE_TICK_MID = "0.0645431";
+	const DOGE_ENTRY = {
+		...ENTRY_BASE,
+		assetId: 12,
+		szDecimals: 0,
+		sizeValue: 1000,
+		orderType: "limit" as const,
+		limitPriceInput: "0.0645",
+	};
+	const DOGE_POSITION = {
+		kind: "positionTpsl" as const,
+		assetId: 12,
+		szDecimals: 0,
+		tpPriceInput: null,
+		slPriceInput: null,
+	};
+	const ATTACHED = { ...DOGE_ENTRY, tpSlEnabled: true, canUseTpSl: true };
+
+	it.each([
+		{
+			label: "position long SL rounds down",
+			intent: { ...DOGE_POSITION, isLong: true, slPriceInput: BELOW_TICK_MID },
+			leg: 0,
+			expected: { b: false, p: "0.064543", tpsl: "sl", triggerPx: "0.064542" },
+		},
+		{
+			label: "position short SL rounds up",
+			intent: { ...DOGE_POSITION, isLong: false, slPriceInput: ABOVE_TICK_MID },
+			leg: 0,
+			expected: { b: true, p: "0.064543", tpsl: "sl", triggerPx: "0.064544" },
+		},
+		{
+			label: "position long TP rounds up",
+			intent: { ...DOGE_POSITION, isLong: true, tpPriceInput: ABOVE_TICK_MID },
+			leg: 0,
+			expected: { b: false, p: "0.064544", tpsl: "tp", triggerPx: "0.064544" },
+		},
+		{
+			label: "position short TP rounds down",
+			intent: { ...DOGE_POSITION, isLong: false, tpPriceInput: BELOW_TICK_MID },
+			leg: 0,
+			expected: { b: true, p: "0.064542", tpsl: "tp", triggerPx: "0.064542" },
+		},
+		{
+			label: "attached long SL rounds down",
+			intent: { ...ATTACHED, side: "buy" as const, slPriceInput: BELOW_TICK_MID },
+			leg: 1,
+			expected: { b: false, p: "0.064543", tpsl: "sl", triggerPx: "0.064542" },
+		},
+		{
+			label: "attached short SL rounds up",
+			intent: { ...ATTACHED, side: "sell" as const, slPriceInput: ABOVE_TICK_MID },
+			leg: 1,
+			expected: { b: true, p: "0.064543", tpsl: "sl", triggerPx: "0.064544" },
+		},
+		{
+			label: "attached long TP rounds up",
+			intent: { ...ATTACHED, side: "buy" as const, tpPriceInput: ABOVE_TICK_MID },
+			leg: 1,
+			expected: { b: false, p: "0.064544", tpsl: "tp", triggerPx: "0.064544" },
+		},
+		{
+			label: "attached short TP rounds down",
+			intent: { ...ATTACHED, side: "sell" as const, tpPriceInput: BELOW_TICK_MID },
+			leg: 1,
+			expected: { b: true, p: "0.064542", tpsl: "tp", triggerPx: "0.064542" },
+		},
+		{
+			label: "standalone buy stop rounds up",
+			intent: {
+				...DOGE_ENTRY,
+				side: "buy" as const,
+				orderType: "stopMarket" as const,
+				triggerPriceInput: ABOVE_TICK_MID,
+			},
+			leg: 0,
+			expected: { b: true, p: "0.064543", tpsl: "sl", triggerPx: "0.064544" },
+		},
+		{
+			label: "standalone sell stop rounds down",
+			intent: {
+				...DOGE_ENTRY,
+				side: "sell" as const,
+				orderType: "stopMarket" as const,
+				triggerPriceInput: BELOW_TICK_MID,
+			},
+			leg: 0,
+			expected: { b: false, p: "0.064543", tpsl: "sl", triggerPx: "0.064542" },
+		},
+		{
+			label: "standalone buy stop limit rounds up",
+			intent: {
+				...DOGE_ENTRY,
+				side: "buy" as const,
+				orderType: "stopLimit" as const,
+				triggerPriceInput: ABOVE_TICK_MID,
+				limitPriceInput: "0.0650001",
+			},
+			leg: 0,
+			expected: { b: true, p: "0.065", tpsl: "sl", triggerPx: "0.064544" },
+		},
+		{
+			label: "standalone sell stop limit rounds down",
+			intent: {
+				...DOGE_ENTRY,
+				side: "sell" as const,
+				orderType: "stopLimit" as const,
+				triggerPriceInput: BELOW_TICK_MID,
+				limitPriceInput: "0.0640001",
+			},
+			leg: 0,
+			expected: { b: false, p: "0.064001", tpsl: "sl", triggerPx: "0.064542" },
+		},
+		{
+			label: "standalone buy take profit rounds down",
+			intent: {
+				...DOGE_ENTRY,
+				side: "buy" as const,
+				orderType: "takeProfitMarket" as const,
+				triggerPriceInput: BELOW_TICK_MID,
+			},
+			leg: 0,
+			expected: { b: true, p: "0.064542", tpsl: "tp", triggerPx: "0.064542" },
+		},
+		{
+			label: "standalone sell take profit rounds up",
+			intent: {
+				...DOGE_ENTRY,
+				side: "sell" as const,
+				orderType: "takeProfitMarket" as const,
+				triggerPriceInput: ABOVE_TICK_MID,
+			},
+			leg: 0,
+			expected: { b: false, p: "0.064544", tpsl: "tp", triggerPx: "0.064544" },
+		},
+	])("$label", ({ intent, leg, expected }) => {
+		const plan = buildOrderPlan(intent);
+		expect(plan.errors).toEqual([]);
+		expect(plan.orders[leg]).toMatchObject({
+			a: 12,
+			b: expected.b,
+			p: expected.p,
+			r: true,
+			t: { trigger: { triggerPx: expected.triggerPx, tpsl: expected.tpsl } },
+		});
 	});
 });
