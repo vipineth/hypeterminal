@@ -183,9 +183,7 @@ export function NumberInput({
 			const inputValue = e.target.value;
 
 			const isIntermediateState =
-				inputValue === "" ||
-				inputValue === "-" ||
-				(allowDecimals && (inputValue === "." || inputValue === "-."));
+				inputValue === "" || inputValue === "-" || (allowDecimals && (inputValue === "." || inputValue === "-."));
 
 			if (isIntermediateState) {
 				onChange?.(e);

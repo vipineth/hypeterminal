@@ -439,7 +439,7 @@ export function createOrderSender(env: SenderEnv) {
 				if (!request) return { kind: "missing" };
 				const gate = await dismissGate(request, signer);
 				if (gate.kind !== "allowed") return gate;
-				if (!(await env.store.recordDismissal(requestKey, { request, dismissedAt: Date.now(), lookup }))) {
+				if (!(await env.store.recordDismissal({ kind: "request", request, dismissedAt: Date.now(), lookup }))) {
 					return { kind: "refused", reason: "storage" };
 				}
 				return record({ kind: "dismissed", request, lookup });
@@ -453,7 +453,7 @@ export function createOrderSender(env: SenderEnv) {
 				if ((await unreadableAt(slot)) !== raw) return { kind: "missing" };
 				const dismissedAt = Date.now();
 				const saved =
-					(await env.store.recordDismissal(`${slot}#unreadable-${dismissedAt}`, { slot, raw, dismissedAt })) &&
+					(await env.store.recordDismissal({ kind: "unreadable", slot, raw, dismissedAt })) &&
 					(await env.store.write(slot, settledRecord(null, [])));
 				return saved ? { kind: "cleared", slot } : { kind: "refused", reason: "storage" };
 			}),

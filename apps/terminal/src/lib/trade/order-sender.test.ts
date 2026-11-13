@@ -1362,29 +1362,17 @@ describe("order sender listing a request that blocks the market", () => {
 });
 
 function holdFirstReply(venue: FakeExchange, onArrive: () => void, until: Promise<void>) {
-	const send = venue.transport.request.bind(venue.transport);
-	let first = true;
-	venue.transport.request = (async (endpoint: string, payload: unknown, signal?: AbortSignal) => {
-		const reply = await send(endpoint as "exchange", payload, signal);
-		if (endpoint === "exchange" && first) {
-			first = false;
-			onArrive();
-			await until;
-		}
-		return reply;
-	}) as typeof venue.transport.request;
+	venue.state.onReply = async () => {
+		venue.state.onReply = null;
+		onArrive();
+		await until;
+	};
 }
 
 function answerOnlyFirstLeg(venue: FakeExchange) {
-	const send = venue.transport.request.bind(venue.transport);
-	venue.transport.request = (async (endpoint: string, payload: unknown, signal?: AbortSignal) => {
-		const reply = (await send(endpoint as "exchange", payload, signal)) as {
-			response?: { data?: { statuses?: unknown[] } };
-		};
-		const statuses = reply?.response?.data?.statuses;
-		if (endpoint === "exchange" && statuses) statuses.splice(1);
-		return reply;
-	}) as typeof venue.transport.request;
+	venue.state.onReply = (reply) => {
+		(reply as { response?: { data?: { statuses?: unknown[] } } }).response?.data?.statuses?.splice(1);
+	};
 }
 
 function lookupOf(inspection: Awaited<ReturnType<ReturnType<typeof createOrderSender>["inspect"]>>): Lookup {

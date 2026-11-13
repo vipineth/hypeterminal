@@ -3,7 +3,7 @@ import { renderToString } from "react-dom/server";
 import { privateKeyToAccount } from "viem/accounts";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { OrderToast } from "@/components/trade/tradebox/order-toast";
-import { reportSubmit } from "@/lib/trade/extract-order-status";
+import { type OrderResult, reportSubmit } from "@/lib/trade/extract-order-status";
 import { createOrderSender, type Signer } from "@/lib/trade/order-sender";
 import { createRequestStore, type PendingRequest } from "@/lib/trade/pending-requests";
 import { type OrderQueueItem, resultToQueueUpdate } from "@/stores/use-order-queue-store";
@@ -26,8 +26,8 @@ const actions = vi.hoisted(() => ({
 	updateOrder: vi.fn(),
 	updateByRequestKey: vi.fn(),
 	removeOrder: vi.fn(),
-	retryRequest: vi.fn(async () => ({ ok: true })),
-	cancelRequest: vi.fn(async () => ({ ok: true })),
+	retryRequest: vi.fn(async (_requestKey: string): Promise<OrderResult> => ({ ok: true, outcome: "filled" })),
+	cancelRequest: vi.fn(async (_requestKey: string): Promise<OrderResult> => ({ ok: true, outcome: "filled" })),
 	previewDismiss: vi.fn(async () => ({
 		kind: "confirm",
 		text: "The exchange never confirmed this request.",
@@ -239,7 +239,7 @@ describe("order toast", () => {
 			ok: false,
 			status: "notSent",
 			error: "Wallet is required for exchange actions",
-		} as never);
+		});
 		view.queued = [];
 		renderToString(<OrderToast />);
 		buttonsNamed("Cancel")[0].onClick?.();
@@ -262,7 +262,7 @@ describe("order toast", () => {
 	it("puts a leftover row back with the refusal when its Retry is refused", async () => {
 		const leftOverKey = `${LEFT_FROM_BEFORE_RELOAD.slot}#${LEFT_FROM_BEFORE_RELOAD.nonce}`;
 		const refusal = "Can't save order state in this browser. Enable site storage to trade.";
-		actions.retryRequest.mockResolvedValueOnce({ ok: false, status: "notSent", error: refusal } as never);
+		actions.retryRequest.mockResolvedValueOnce({ ok: false, status: "notSent", error: refusal });
 		view.queued = [];
 		renderToString(<OrderToast />);
 		buttonsNamed("Retry")[0].onClick?.();
@@ -306,7 +306,7 @@ describe("order toast", () => {
 
 	it("offers a confirmed Dismiss on a press refused over a pending order it can't read", async () => {
 		const unreadable = { slot: LEFT_FROM_BEFORE_RELOAD.slot, raw: '{"state":"pending"}' };
-		const refused = reportSubmit({ kind: "refused", reason: "unreadableRecord", ...unreadable } as never);
+		const refused = reportSubmit({ kind: "refused", reason: "unreadableRecord", ...unreadable });
 		const row = {
 			id: "row-3",
 			market: "ETH",

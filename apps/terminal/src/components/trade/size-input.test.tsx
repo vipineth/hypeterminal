@@ -3,8 +3,8 @@ import { renderToString } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MobileTradeTicketBody } from "@/components/trade/mobile/mobile-trade-ticket-body";
 import { TradeFormFields } from "@/components/trade/tradebox/trade-form-fields";
-import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { getSizeValueFromInput } from "@/domain/trade/order/size";
+import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { typeKeys } from "@/test/type-keys";
 
 const PURR_USDC = vi.hoisted(() => ({

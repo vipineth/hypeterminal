@@ -63,6 +63,10 @@ export type RequestLabel = z.infer<typeof labelSchema>;
 export type Hold = z.infer<typeof holdSchema>;
 export type SlotRecord = z.infer<typeof slotRecordSchema>;
 
+export type Dismissal =
+	| { kind: "request"; request: PendingRequest; dismissedAt: number; lookup: unknown }
+	| { kind: "unreadable"; slot: string; raw: string; dismissedAt: number };
+
 export function pendingRecord(request: PendingRequest, holds: Hold[]): SlotRecord {
 	return { version: RECORD_VERSION, state: "pending", request, holds };
 }
@@ -100,7 +104,7 @@ export class UnreadableRecord extends Error {
 export interface RequestStore {
 	read(slot: string): Promise<SlotRecord | null>;
 	write(slot: string, record: SlotRecord): Promise<boolean>;
-	recordDismissal(id: string, dismissal: unknown): Promise<boolean>;
+	recordDismissal(dismissal: Dismissal): Promise<boolean>;
 	isWritable(): Promise<boolean>;
 	pending(): PendingRequest[];
 	refresh(): Promise<void>;
@@ -179,7 +183,11 @@ export function createRequestStore(getStore: () => KeyValueStore | null, bus: Ch
 		return true;
 	}
 
-	function recordDismissal(id: string, dismissal: unknown): Promise<boolean> {
+	function recordDismissal(dismissal: Dismissal): Promise<boolean> {
+		const id =
+			dismissal.kind === "request"
+				? `${dismissal.request.slot}#${dismissal.request.nonce}`
+				: `${dismissal.slot}#unreadable-${dismissal.dismissedAt}`;
 		return save(DISMISSAL_PREFIX + id, dismissal);
 	}
 

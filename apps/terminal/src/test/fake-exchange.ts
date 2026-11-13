@@ -58,6 +58,7 @@ export function createFakeExchange({ coins = DEFAULT_COINS }: { coins?: Record<n
 		legOutcome: null as null | ((order: WireOrder, index: number) => LegOutcome | undefined),
 		onArrive: null as null | ((body: Body) => void),
 		onSend: null as null | ((body: Body) => void),
+		onReply: null as null | ((reply: unknown) => Promise<void> | void),
 	};
 
 	function exchangeNow() {
@@ -163,6 +164,7 @@ export function createFakeExchange({ coins = DEFAULT_COINS }: { coins?: Record<n
 			}
 			const reply = process(payload as Body);
 			if (fate === "noReply" || state.exchangeDown) throw timedOut();
+			await state.onReply?.(reply);
 			return reply as T;
 		},
 	};
