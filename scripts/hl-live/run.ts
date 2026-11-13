@@ -77,6 +77,16 @@ async function runScenario(h: Harness, scenario: Scenario, spec: VenueSpec, agen
 	}
 }
 
+async function leaveUnified(h: Harness): Promise<boolean> {
+	try {
+		await exitUnified(h);
+		return false;
+	} catch (error) {
+		console.log(`STOP the account is still unifiedAccount: ${errorMessage(error)}. The next run restores it once the account holds no orders or positions.`);
+		return true;
+	}
+}
+
 function printResult({ scenario, venue, status, detail, ms }: Result): void {
 	const label = { pass: "PASS", fail: "FAIL", unsupported: "SKIP" }[status];
 	console.log(`${label} ${scenario} @ ${venue} (${(ms / 1000).toFixed(1)}s)${detail ? ` ${detail}` : ""}`);
@@ -108,7 +118,8 @@ async function runTestnet(): Promise<number> {
 		const selected = SCENARIOS.filter((scenario) => !only || only.has(scenario.name));
 		const venuesFor: Record<Scope, VenueSpec[]> = { perp: [main], spot: [spot], account: [main] };
 
-		await exitUnified(h);
+		const stuck = await leaveUnified(h);
+		if (stuck) return 1;
 		for (const spec of [main, spot]) await cleanVenue(h, spec);
 		const spotUsdc = toSafeBig(await spotBalance(h, "USDC"));
 		if (spotUsdc.lt(SPOT_FLOAT_MIN)) {
@@ -134,8 +145,12 @@ async function runTestnet(): Promise<number> {
 					printResult(result);
 					results.push(result);
 				}
+			} catch (error) {
+				const result: Result = { scenario: "builder pass", venue: builder.label, status: "fail", detail: errorMessage(error), ms: 0 };
+				printResult(result);
+				results.push(result);
 			} finally {
-				await exitUnified(h);
+				if (await leaveUnified(h)) results.push({ scenario: "leave unified", venue: "account", status: "fail", detail: "", ms: 0 });
 			}
 		}
 

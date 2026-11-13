@@ -5,7 +5,7 @@ import type { InfoClient } from "@nktkas/hyperliquid";
 import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
 import { getBuilderPerpAssetId, getPerpAssetId, getSpotAssetId } from "@/lib/hyperliquid/markets/helper";
 import { toSafeBig } from "@/lib/trade/numbers";
-import { errorMessage, positionSize } from "./assert";
+import { errorMessage, isHarnessCloid, positionSize } from "./assert";
 import type { Harness } from "./harness";
 import type { PlanMarket } from "./plans";
 
@@ -172,7 +172,22 @@ export function acquireLock(user: string): () => void {
 	};
 }
 
+async function assertNoForeignActivity(h: Harness): Promise<void> {
+	const [orders, state] = await Promise.all([
+		h.info.frontendOpenOrders({ user: h.user }),
+		h.info.clearinghouseState({ user: h.user }),
+	]);
+	const foreignOrders = orders.filter((order) => !isHarnessCloid(order.cloid)).length;
+	const positions = state.assetPositions.length;
+	if (foreignOrders + positions > 0) {
+		throw new Error(
+			`refusing to switch to unified: the principal holds ${foreignOrders} orders and ${positions} positions the harness did not open, and Hyperliquid will not leave unified until they close. Use a principal no other session trades.`,
+		);
+	}
+}
+
 export async function enterUnified(h: Harness, switchMode = () => h.principal.userSetAbstraction({ user: h.user, abstraction: "unifiedAccount" })): Promise<void> {
+	await assertNoForeignActivity(h);
 	const spotUsdcBefore = await spotBalance(h, "USDC");
 	writeFileSync(statePath(h.user, "unified.json"), JSON.stringify({ spotUsdcBefore }));
 	await switchMode();
