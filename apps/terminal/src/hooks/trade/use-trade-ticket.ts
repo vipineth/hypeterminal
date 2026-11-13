@@ -84,7 +84,7 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 	const { takerRate, makerRate } = useFeeRates(market?.kind);
 	const selectedPrice = useSelectedPrice();
 	const orderType = useOrderType();
-	const reduceOnly = useReduceOnly();
+	const storedReduceOnly = useReduceOnly();
 	const limitPriceInput = useLimitPrice();
 	const triggerPriceInput = useTriggerPrice();
 	const scaleStartPriceInput = useScaleStart();
@@ -103,7 +103,8 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 	const twapOrder = isTwapOrderType(orderType);
 	const scaleOrder = isScaleOrderType(orderType);
 	const usesLimitPrice = usesLimitPriceForOrder(orderType);
-	const canUseTpSl = canUseTpSlForOrder(orderType);
+	const canUseTpSl = entry.capabilities.hasTpSl && canUseTpSlForOrder(orderType);
+	const reduceOnly = entry.capabilities.hasReduceOnly && storedReduceOnly;
 
 	const { setOrderType, setLimitPrice } = useOrderEntryActions();
 
