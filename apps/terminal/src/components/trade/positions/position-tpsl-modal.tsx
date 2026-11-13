@@ -8,7 +8,7 @@ import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { cn } from "@/lib/cn";
 import { formatPercent, formatPrice, formatToken, formatUSD, szDecimalsToPriceDecimals } from "@/lib/format";
-import { useMarketsInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
+import { useSubscription } from "@/lib/hyperliquid";
 import { isPositive, toNumber } from "@/lib/trade/numbers";
 import { isTriggerUncrossed } from "@/lib/trade/tpsl";
 import { getValueColorClass } from "@/lib/ui/value-color";
@@ -54,8 +54,8 @@ function PositionTpSlModalBody({ position, onOpenChange }: BodyProps) {
 	const [submitError, setSubmitError] = useState<string | null>(null);
 
 	const { submitPlan, isSubmitting } = useSubmitPlan();
-	const { getMarketInfo } = useMarketsInfo();
-	const markPx = getMarketInfo(position.coin)?.markPx;
+	const { data: liveCtxEvent } = useSubscription("activeAssetCtx", { coin: position.coin });
+	const markPx = liveCtxEvent?.ctx.markPx;
 
 	const tpPriceNum = toNumber(tpPriceInput);
 	const slPriceNum = toNumber(slPriceInput);

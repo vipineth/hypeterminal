@@ -37,10 +37,7 @@ vi.mock("@/components/trade/components/asset-display", () => ({
 vi.mock("@/lib/hyperliquid", async (importOriginal) => ({
 	...(await importOriginal<typeof import("@/lib/hyperliquid")>()),
 	useExchange: () => ({ mutateAsync: exchange.placeOrder, isPending: false }),
-}));
-
-vi.mock("@/lib/hyperliquid/hooks/useMarketsInfo", () => ({
-	useMarketsInfo: () => ({ getMarketInfo: () => ({ markPx: liveMark.markPx }) }),
+	useSubscription: () => ({ data: liveMark.markPx ? { coin: "SOL", ctx: { markPx: liveMark.markPx } } : undefined }),
 }));
 
 const SOL_SHORT = {
