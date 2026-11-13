@@ -50,7 +50,7 @@ const form = vi.hoisted(() => ({
 
 const liveFeed = vi.hoisted(() => ({ markPx: null as string | null, status: "active", isStale: false }));
 const exchange = vi.hoisted(() => ({ placeOrder: vi.fn() }));
-const info = vi.hoisted(() => ({ orderStatus: vi.fn() }));
+const info = vi.hoisted(() => ({ orderStatus: vi.fn(), twapHistory: vi.fn() }));
 const formActions = vi.hoisted(() => ({ resetForm: vi.fn() }));
 const queue = vi.hoisted(() => ({ addOrder: vi.fn(() => "order-1"), updateOrder: vi.fn(), removeOrder: vi.fn() }));
 
@@ -801,5 +801,124 @@ describe("order legs the ticket reports and retries", () => {
 			status: "failed",
 			error: "Order status unknown. Check open orders before you try again.",
 		});
+	});
+});
+
+describe("twap the ticket sends once", () => {
+	const TWAP_ID = 20459;
+
+	function timedOut() {
+		return new HttpRequestError({ detail: "Request timed out after 10000 ms" });
+	}
+
+	function started() {
+		return { response: { data: { status: { running: { twapId: TWAP_ID } } } } };
+	}
+
+	function historyRecord(sz: string, twapId = TWAP_ID) {
+		const state = {
+			coin: "SOL",
+			side: "B",
+			sz,
+			executedSz: "0.0",
+			executedNtl: "0.0",
+			minutes: 30,
+			reduceOnly: false,
+			randomize: false,
+			timestamp: Date.now(),
+		};
+		return { time: Math.floor(Date.now() / 1000), state, status: { status: "activated" }, twapId };
+	}
+
+	function lastQueueUpdate() {
+		return queue.updateOrder.mock.lastCall?.[1];
+	}
+
+	async function pressSubmitPastReconcile() {
+		const submitted = pressSubmit();
+		await vi.advanceTimersByTimeAsync(7000);
+		await submitted;
+	}
+
+	beforeEach(() => {
+		form.market = SOL_PERP;
+		form.side = "buy";
+		form.orderType = "twap";
+		form.sizeMode = "base";
+		form.limitPrice = "80.276";
+		form.reduceOnly = false;
+		form.twapMinutes = 30;
+		form.tpSlEnabled = false;
+		form.sizeUnit = null;
+		form.maxTradeSzs = [100, 100];
+		exchange.placeOrder.mockReset();
+		info.twapHistory.mockReset();
+		queue.updateOrder.mockReset();
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	it("sends a double-clicked twap once", async () => {
+		typeSizeHere("4");
+		exchange.placeOrder.mockResolvedValue(started());
+		const ticket = renderTicket();
+		await Promise.all([ticket.buttonContent.action(), ticket.buttonContent.action()]);
+		expect(exchange.placeOrder).toHaveBeenCalledTimes(1);
+		expect(exchange.placeOrder.mock.calls[0][0].twap).toMatchObject({ a: 5, b: true, s: "4", m: 30 });
+	});
+
+	it("reports a timed-out twap the exchange started as started", async () => {
+		vi.useFakeTimers();
+		typeSizeHere("5");
+		exchange.placeOrder.mockRejectedValue(timedOut());
+		info.twapHistory.mockResolvedValueOnce([]).mockImplementation(async () => [historyRecord("5.0")]);
+		await pressSubmitPastReconcile();
+		expect(exchange.placeOrder).toHaveBeenCalledTimes(1);
+		expect(lastQueueUpdate()).toEqual({ status: "success", outcome: "twapStarted" });
+	});
+
+	it("never resends a timed-out twap the exchange started while it could not be checked", async () => {
+		vi.useFakeTimers();
+		typeSizeHere("6");
+		exchange.placeOrder.mockRejectedValue(timedOut());
+		info.twapHistory.mockRejectedValue(new HttpRequestError({ detail: "Failed to fetch" }));
+		await pressSubmitPastReconcile();
+		expect(lastQueueUpdate()).toEqual({
+			status: "failed",
+			error: "TWAP status unknown: Request timed out after 10000 ms. Check the TWAP tab before you try again.",
+		});
+		info.twapHistory.mockReset();
+		info.twapHistory.mockImplementation(async () => [historyRecord("6")]);
+		await pressSubmit();
+		expect(exchange.placeOrder).toHaveBeenCalledTimes(1);
+		expect(lastQueueUpdate()).toEqual({
+			status: "failed",
+			error: "Not sent again. The exchange already has this TWAP. Check the TWAP tab.",
+		});
+	});
+
+	it("resends a timed-out twap the exchange never saw", async () => {
+		vi.useFakeTimers();
+		typeSizeHere("7");
+		exchange.placeOrder.mockRejectedValueOnce(timedOut()).mockResolvedValueOnce(started());
+		info.twapHistory.mockResolvedValue([]);
+		await pressSubmitPastReconcile();
+		expect(lastQueueUpdate()).toEqual({ status: "failed", error: "Request timed out after 10000 ms" });
+		await pressSubmit();
+		expect(exchange.placeOrder).toHaveBeenCalledTimes(2);
+		expect(exchange.placeOrder.mock.calls[1][0]).toEqual(exchange.placeOrder.mock.calls[0][0]);
+		expect(lastQueueUpdate()).toEqual({ status: "success", outcome: "twapStarted" });
+	});
+
+	it("does not mistake a twap this app already started for a timed-out one", async () => {
+		vi.useFakeTimers();
+		typeSizeHere("8");
+		exchange.placeOrder.mockResolvedValueOnce(started()).mockRejectedValueOnce(timedOut());
+		info.twapHistory.mockImplementation(async () => [historyRecord("8")]);
+		await pressSubmit();
+		await pressSubmitPastReconcile();
+		expect(lastQueueUpdate()).toEqual({ status: "failed", error: "Request timed out after 10000 ms" });
 	});
 });
