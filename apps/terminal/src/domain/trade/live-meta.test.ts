@@ -19,10 +19,12 @@ describe(`live mainnet meta from ${snapshot.fetchedAt}`, () => {
 
 	it.each(labels)("%s: every market and side passes tick, lot and order kind rules", (label) => {
 		const labelCases = cases.filter((planCase) => planCase.label === label);
-		const violations = labelCases.flatMap((planCase) => checkCase(planCase, buildOrderPlan(planCase.intent)));
-		expect({ plans: labelCases.length, violations: violations.length, first: violations.slice(0, 5) }).toEqual({
+		const invalid = labelCases
+			.map((planCase) => checkCase(planCase, buildOrderPlan(planCase.intent)))
+			.filter((problems) => problems.length > 0);
+		expect({ plans: labelCases.length, invalid: invalid.length, first: invalid.slice(0, 3) }).toEqual({
 			plans: labelCases.length,
-			violations: 0,
+			invalid: 0,
 			first: [],
 		});
 	});
