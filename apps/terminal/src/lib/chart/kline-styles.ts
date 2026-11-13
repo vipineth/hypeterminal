@@ -15,18 +15,11 @@ function formatTooltipTs(ts: number): string {
 	return `${d.getMonth() + 1}/${d.getDate()}/${String(d.getFullYear()).slice(2)} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
-function formatPrice(n: number): string {
-	if (n >= 1) return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-	const s = n.toString();
-	const dot = s.indexOf(".");
-	if (dot === -1) return n.toLocaleString("en-US", { minimumFractionDigits: 2 });
-	let zeros = 0;
-	for (let i = dot + 1; i < s.length; i++) {
-		if (s[i] === "0") zeros++;
-		else break;
-	}
-	const decimals = Math.max(2, zeros + 4);
-	return n.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+function formatPrice(n: number, priceDecimals: number): string {
+	return n.toLocaleString("en-US", {
+		minimumFractionDigits: Math.min(2, priceDecimals),
+		maximumFractionDigits: priceDecimals,
+	});
 }
 
 function formatVolume(n: number): string {
@@ -36,6 +29,7 @@ function formatVolume(n: number): string {
 }
 
 interface KlineStyleOptions {
+	priceDecimals: number;
 	yAxisInside?: boolean;
 	// Theme is read implicitly via CSS custom properties on `document.documentElement`,
 	// so this argument has no effect on the returned styles. It exists so callers can
@@ -48,7 +42,7 @@ export const TRANSPARENT_OVERLAY_STYLES = {
 	polygon: { color: "transparent", borderColor: "transparent", borderSize: 0 },
 };
 
-export function buildKlineStyles(candleType: CandleType, options?: KlineStyleOptions): DeepPartial<Styles> {
+export function buildKlineStyles(candleType: CandleType, options: KlineStyleOptions): DeepPartial<Styles> {
 	const colors = getChartColors();
 
 	const textSecondary = colorToHex(colors.textSecondary);
@@ -159,19 +153,19 @@ export function buildKlineStyles(candleType: CandleType, options?: KlineStyleOpt
 							},
 							{
 								title: { text: "O ", color: textTertiary },
-								value: { text: formatPrice(current.open), color: candleColor },
+								value: { text: formatPrice(current.open, options.priceDecimals), color: candleColor },
 							},
 							{
 								title: { text: "H ", color: textTertiary },
-								value: { text: formatPrice(current.high), color: candleColor },
+								value: { text: formatPrice(current.high, options.priceDecimals), color: candleColor },
 							},
 							{
 								title: { text: "L ", color: textTertiary },
-								value: { text: formatPrice(current.low), color: candleColor },
+								value: { text: formatPrice(current.low, options.priceDecimals), color: candleColor },
 							},
 							{
 								title: { text: "C ", color: textTertiary },
-								value: { text: formatPrice(current.close), color: candleColor },
+								value: { text: formatPrice(current.close, options.priceDecimals), color: candleColor },
 							},
 							{
 								title: { text: "Vol ", color: textTertiary },
@@ -201,9 +195,9 @@ export function buildKlineStyles(candleType: CandleType, options?: KlineStyleOpt
 		xAxis: { show: true, axisLine, tickLine, tickText },
 		yAxis: {
 			show: true,
-			axisLine: options?.yAxisInside ? { show: false } : axisLine,
-			tickLine: options?.yAxisInside ? { show: false } : tickLine,
-			tickText: options?.yAxisInside ? { ...tickText, marginStart: 2, marginEnd: 2 } : tickText,
+			axisLine: options.yAxisInside ? { show: false } : axisLine,
+			tickLine: options.yAxisInside ? { show: false } : tickLine,
+			tickText: options.yAxisInside ? { ...tickText, marginStart: 2, marginEnd: 2 } : tickText,
 		},
 		separator: { color: strokeWeakLayerRgba(colors.border, chartPaneSeparatorAlpha), size: 1 },
 		crosshair: {

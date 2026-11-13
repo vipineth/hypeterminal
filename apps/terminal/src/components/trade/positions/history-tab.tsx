@@ -7,7 +7,7 @@ import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/app";
 import { MAX_HISTORY_ROWS } from "@/config/trade";
 import { cn } from "@/lib/cn";
 import { getExplorerTxUrl } from "@/lib/explorer";
-import { formatDateTimeShort, formatNumber, formatToken, formatUSD } from "@/lib/format";
+import { formatDateTimeShort, formatNumber, formatPrice, formatToken, formatUSD } from "@/lib/format";
 import { useMarkets, useSubscription } from "@/lib/hyperliquid";
 import { toNumber } from "@/lib/trade/numbers";
 import { getValueColorClass } from "@/lib/ui/value-color";
@@ -120,6 +120,7 @@ export function HistoryTab() {
 							</TableHeader>
 							<TableBody className={positionsPanelTableBodyClass}>
 								{fills.map((fill, i) => {
+									const market = markets.getMarket(fill.coin);
 									const fee = toNumber(fill.fee);
 									const feeClass = getValueColorClass(fee);
 									const closedPnl = toNumber(fill.closedPnl);
@@ -152,13 +153,13 @@ export function HistoryTab() {
 												size="dense"
 												className={cn(positionsPanelTableCellClass, "text-right tabular-nums text-fg")}
 											>
-												{formatUSD(fill.px)}
+												{formatPrice(fill.px, { decimals: market?.priceDecimals })}
 											</TableCell>
 											<TableCell
 												size="dense"
 												className={cn(positionsPanelTableCellClass, "text-right tabular-nums text-fg")}
 											>
-												{formatNumber(fill.sz, markets.getMarket(fill.coin)?.szDecimals)}
+												{formatNumber(fill.sz, market?.szDecimals)}
 											</TableCell>
 											<TableCell size="dense" className={cn(positionsPanelTableCellClass, "text-right tabular-nums")}>
 												<span className={feeClass}>

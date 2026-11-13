@@ -5,7 +5,7 @@ import { useConnection } from "wagmi";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/app";
 import { MAX_HISTORY_ROWS } from "@/config/trade";
 import { cn } from "@/lib/cn";
-import { formatDateTime, formatToken, formatUSD } from "@/lib/format";
+import { formatDateTime, formatPrice, formatToken } from "@/lib/format";
 import { useMarkets, useSubscription } from "@/lib/hyperliquid";
 import { getSideLabel } from "@/lib/trade/open-orders";
 import { useExchangeScope } from "@/providers/exchange-scope";
@@ -108,7 +108,10 @@ export function MobileOrdersHistoryTab({ className }: Props) {
 
 								<div className="grid grid-cols-3 divide-x divide-stroke-weak">
 									<MetricCell label={t`Type`} value={order.orderType} />
-									<MetricCell label={t`Price`} value={formatUSD(order.limitPx, { compact: false })} />
+									<MetricCell
+										label={t`Price`}
+										value={formatPrice(order.limitPx, { decimals: market?.priceDecimals })}
+									/>
 									<MetricCell label={t`Size`} value={formatToken(order.origSz, market?.szDecimals)} />
 								</div>
 

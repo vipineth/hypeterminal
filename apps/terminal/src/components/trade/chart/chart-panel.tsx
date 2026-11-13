@@ -30,6 +30,7 @@ export function ChartPanel() {
 					<Suspense fallback={<ChartLoadingFallback />}>
 						<KlineChart
 							symbol={selectedMarket.name}
+							priceDecimals={selectedMarket.priceDecimals}
 							positionDex={getPositionDex(selectedMarket)}
 							theme={chartTheme}
 							onChartSourceChange={setChartType}

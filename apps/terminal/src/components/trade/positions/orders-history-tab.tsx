@@ -4,7 +4,7 @@ import { useConnection } from "wagmi";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { MAX_HISTORY_ROWS } from "@/config/trade";
 import { cn } from "@/lib/cn";
-import { formatDateTime, formatToken, formatUSD } from "@/lib/format";
+import { formatDateTime, formatPrice, formatToken } from "@/lib/format";
 import { useMarkets, useSubscription } from "@/lib/hyperliquid";
 import { useExchangeScope } from "@/providers/exchange-scope";
 import { useMarketActions } from "@/stores/use-market-store";
@@ -141,7 +141,7 @@ export function OrdersHistoryTab() {
 												size="dense"
 												className={cn(positionsPanelTableCellClass, "text-right tabular-nums text-fg")}
 											>
-												{formatUSD(order.limitPx, { compact: false })}
+												{formatPrice(order.limitPx, { decimals: market?.priceDecimals })}
 											</TableCell>
 											<TableCell
 												size="dense"

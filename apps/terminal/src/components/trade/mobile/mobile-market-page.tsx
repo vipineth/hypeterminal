@@ -51,6 +51,7 @@ export function MobileMarketPage() {
 							{market && (
 								<KlineChart
 									symbol={market.name}
+									priceDecimals={market.priceDecimals}
 									positionDex={getPositionDex(market)}
 									theme={theme === "dark" ? "dark" : "light"}
 									yAxisInside

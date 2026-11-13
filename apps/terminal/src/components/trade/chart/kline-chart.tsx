@@ -18,6 +18,7 @@ import { useKlinePositionOverlays } from "./use-kline-position-overlays";
 
 interface Props {
 	symbol?: string;
+	priceDecimals: number;
 	positionDex?: string;
 	theme?: "light" | "dark";
 	yAxisInside?: boolean;
@@ -60,6 +61,7 @@ async function fetchCandlesWithRetry(params: CandleSnapshotParams, shouldContinu
 
 export function KlineChart({
 	symbol = "",
+	priceDecimals,
 	positionDex,
 	theme,
 	yAxisInside = false,
@@ -105,11 +107,14 @@ export function KlineChart({
 		chartRef.current = chart;
 
 		chart.setStyles(
-			buildKlineStyles(chartStyleRef.current.candleType, { yAxisInside: chartStyleRef.current.yAxisInside }),
+			buildKlineStyles(chartStyleRef.current.candleType, {
+				priceDecimals,
+				yAxisInside: chartStyleRef.current.yAxisInside,
+			}),
 		);
 		chart.createIndicator(VOLUME_INDICATOR_NAME);
 
-		chart.setSymbol({ ticker: symbol });
+		chart.setSymbol({ ticker: symbol, pricePrecision: priceDecimals });
 		chart.setPeriod(candleIntervalToPeriod(activeInterval.candleInterval));
 		chart.setDataLoader({
 			getBars: ({ type, timestamp, callback }) => {
@@ -154,14 +159,14 @@ export function KlineChart({
 			candleBufferRef.current = [];
 			dispose(container);
 		};
-	}, [symbol, activeInterval]);
+	}, [symbol, priceDecimals, activeInterval]);
 
 	useEffect(() => {
 		const chart = chartRef.current;
 		if (!chart) return;
-		chart.setStyles(buildKlineStyles(activeCandleType, { yAxisInside, theme }));
+		chart.setStyles(buildKlineStyles(activeCandleType, { priceDecimals, yAxisInside, theme }));
 		chart.overrideYAxis({ inside: yAxisInside });
-	}, [activeCandleType, yAxisInside, theme]);
+	}, [activeCandleType, priceDecimals, yAxisInside, theme]);
 
 	useEffect(() => {
 		isHiddenRef.current = document.visibilityState === "hidden";

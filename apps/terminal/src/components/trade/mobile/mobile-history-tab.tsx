@@ -6,7 +6,7 @@ import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/app";
 import { MAX_HISTORY_ROWS } from "@/config/trade";
 import { cn } from "@/lib/cn";
 import { getExplorerTxUrl } from "@/lib/explorer";
-import { formatDateTimeShort, formatNumber, formatToken, formatUSD } from "@/lib/format";
+import { formatDateTimeShort, formatNumber, formatPrice, formatToken, formatUSD } from "@/lib/format";
 import { useMarkets, useSubscription } from "@/lib/hyperliquid";
 import { toNumber } from "@/lib/trade/numbers";
 import { getValueColorClass } from "@/lib/ui/value-color";
@@ -70,11 +70,12 @@ export function MobileHistoryTab({ className }: Props) {
 				</div>
 				<div className="flex-1 min-h-0 overflow-y-auto px-3 pb-3 space-y-2">
 					{fills.map((fill) => {
+						const market = markets.getMarket(fill.coin);
 						const fee = toNumber(fill.fee);
 						const closedPnl = toNumber(fill.closedPnl);
 						const showPnl = closedPnl !== null && closedPnl !== 0;
 						const isLiquidation = !!fill.liquidation;
-						const isBuy = fill.dir.startsWith("Open Long") || fill.dir.startsWith("Close Short");
+						const isBuy = fill.side === "B";
 						const explorerUrl = getExplorerTxUrl(fill.hash);
 
 						return (
@@ -107,8 +108,8 @@ export function MobileHistoryTab({ className }: Props) {
 								</div>
 
 								<div className="grid grid-cols-3 divide-x divide-stroke-weak">
-									<MetricCell label={t`Price`} value={formatUSD(fill.px)} />
-									<MetricCell label={t`Size`} value={formatNumber(fill.sz, markets.getMarket(fill.coin)?.szDecimals)} />
+									<MetricCell label={t`Price`} value={formatPrice(fill.px, { decimals: market?.priceDecimals })} />
+									<MetricCell label={t`Size`} value={formatNumber(fill.sz, market?.szDecimals)} />
 									<MetricCell
 										label={t`Fee`}
 										value={formatToken(fill.fee, { symbol: fill.feeToken })}

@@ -4,7 +4,7 @@ import { ArrowSquareOutIcon, FireIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { get24hChange, getOiUsd } from "@/domain/market";
 import { cn } from "@/lib/cn";
-import { formatClockDuration, formatPercent, formatUSD, shortenAddress } from "@/lib/format";
+import { formatClockDuration, formatPercent, formatPrice, formatUSD, shortenAddress } from "@/lib/format";
 import { getExplorerTokenUrl, type UnifiedMarketInfo, useSelectedMarketInfo, useSubscription } from "@/lib/hyperliquid";
 import { toBig } from "@/lib/trade/numbers";
 import { getValueColorClass } from "@/lib/ui/value-color";
@@ -97,7 +97,8 @@ export function MarketOverview() {
 	const oiUsd = getOiUsd(perpCtx?.openInterest, perpCtx?.markPx);
 	const spotTokenAddress = getSpotTokenAddress(selectedMarketInfo);
 
-	const heroPrice = markPxForDisplay != null ? formatUSD(markPxForDisplay, { compact: false }) : "—";
+	const priceDecimals = selectedMarketInfo?.priceDecimals;
+	const heroPrice = markPxForDisplay != null ? formatPrice(markPxForDisplay, { decimals: priceDecimals }) : "—";
 	const changePct = change24h !== null ? formatPercent(change24h / 100, { signDisplay: "exceptZero" }) : "—";
 
 	return (
@@ -120,7 +121,7 @@ export function MarketOverview() {
 			{!isSpot && (
 				<>
 					<StatDivider />
-					<StatBlock layout="inline" label={t`ORACLE`} value={formatUSD(oraclePx)} />
+					<StatBlock layout="inline" label={t`ORACLE`} value={formatPrice(oraclePx, { decimals: priceDecimals })} />
 					<StatDivider />
 					<StatBlock
 						layout="inline"

@@ -11,10 +11,11 @@ import { useGlobalSettings, useGlobalSettingsActions } from "@/stores/use-global
 interface Props {
 	trade: ProcessedTrade;
 	szDecimals: number;
+	priceDecimals: number;
 	showInQuote: boolean;
 }
 
-const TradeRow = memo(function TradeRow({ trade, szDecimals, showInQuote }: Props) {
+const TradeRow = memo(function TradeRow({ trade, szDecimals, priceDecimals, showInQuote }: Props) {
 	const sizeDisplay = showInQuote ? formatNumber(trade.price * trade.size, 2) : formatNumber(trade.size, szDecimals);
 
 	return (
@@ -32,7 +33,7 @@ const TradeRow = memo(function TradeRow({ trade, szDecimals, showInQuote }: Prop
 				<ArrowSquareOutIcon className="size-2.5 opacity-100 hover:opacity-80" aria-hidden="true" />
 			</div>
 			<div className={cn("text-right font-medium", trade.side === "buy" ? "text-success" : "text-error")}>
-				{formatNumber(trade.price, 2)}
+				{formatNumber(trade.price, priceDecimals)}
 			</div>
 			<div className="text-right text-fg">{sizeDisplay}</div>
 		</a>
@@ -59,6 +60,7 @@ export function TradesPanel() {
 	}, [selectedMarket]);
 
 	const szDecimals = selectedMarket?.szDecimals ?? 4;
+	const priceDecimals = selectedMarket?.priceDecimals ?? 2;
 	const processed = useMemo(() => processTrades(trades ?? []), [trades]);
 	const displayAsset = showOrderbookInQuote ? quoteToken : baseToken;
 	const toggleAssetDisplay = () => setShowOrderbookInQuote(!showOrderbookInQuote);
@@ -91,7 +93,13 @@ export function TradesPanel() {
 				<div className="flex-1 min-h-0 overflow-y-auto">
 					<div className="px-2 py-1 space-y-px">
 						{processed.map((trade) => (
-							<TradeRow key={trade.id} trade={trade} szDecimals={szDecimals} showInQuote={showOrderbookInQuote} />
+							<TradeRow
+								key={trade.id}
+								trade={trade}
+								szDecimals={szDecimals}
+								priceDecimals={priceDecimals}
+								showInQuote={showOrderbookInQuote}
+							/>
 						))}
 					</div>
 				</div>
