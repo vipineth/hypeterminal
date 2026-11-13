@@ -168,7 +168,7 @@ function describeRefusal(refusal: Refused): string {
 
 function reportHeld({ hold }: Held): OrderResult {
 	return notSent(
-		t`Not sent. Your last order on this market partly went through: ${describeHold(hold)}. Sending the same order again could place those legs twice. Check open orders and send only the missing legs as a new order.`,
+		t`Not sent. Your last order on this market: ${describeHold(hold)}. Sending the same order again could place those legs twice. Check open orders and send only the missing legs as a new order.`,
 	);
 }
 

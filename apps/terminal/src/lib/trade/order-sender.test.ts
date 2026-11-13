@@ -1033,8 +1033,49 @@ describe("order sender holding a market after a partial result", () => {
 		const corrected = await tabA.sender.submit(signerFor(venue), scale(["90", "96"]));
 		expect(venue.state.placedLegs).toBe(1);
 		expect(corrected).toMatchObject({ kind: "held" });
+		expect(reportSubmit(corrected)).toMatchObject({
+			error: expect.stringContaining("Leg 1 at 90 placed, Leg 2 at 95 rejected."),
+		});
 		expect(await tabA.sender.submit(signerFor(venue), scale(["96"]))).toMatchObject({ kind: "sent" });
 		expect(venue.state.placedLegs).toBe(2);
+	});
+
+	it("keeps holding a plan another tab left unconfirmed even once its own reply shows every leg placed", async () => {
+		const tabA = openTab(venue, storage, locks);
+		const tabB = openTab(venue, storage, locks);
+		const [replyHeld, releaseReply] = gate();
+		const [arrived, markArrived] = gate();
+		holdFirstReply(venue, markArrived, replyHeld);
+		const pressA = tabA.sender.submit(signerFor(venue), scale(["90", "91"]));
+		await arrived;
+		venue.state.lookupLag = 100;
+		expect(await tabB.sender.submit(signerFor(venue), scale(["90", "92"]))).toMatchObject({ kind: "blocked" });
+		releaseReply();
+		expect(reportSubmit(await pressA)).toEqual({ ok: true, outcome: "filled" });
+		const again = await tabB.sender.submit(signerFor(venue), scale(["90", "92"]));
+		expect(venue.state.placedLegs).toBe(2);
+		expect(reportSubmit(again)).toMatchObject({
+			error: expect.stringContaining("Leg 1 at 90 placed, Leg 2 at 91 placed."),
+		});
+	});
+
+	it("keeps holding when the exchange clock cannot be read as it checks the hold", async () => {
+		let clockDown = false;
+		const clock: ExchangeClock = {
+			async now() {
+				if (!clockDown) return Date.now();
+				clockDown = false;
+				throw new Error("Exchange clock unavailable");
+			},
+			estimate: () => Date.now(),
+			warm() {},
+		};
+		const { sender } = openTab(venue, storage, locks, { clock });
+		await sender.submit(signerFor(venue), scale(["90", "95"]));
+		vi.setSystemTime(Date.now() + PARTIAL_HOLD_MS + 1000);
+		clockDown = true;
+		expect(await sender.submit(signerFor(venue), scale(["90", "96"]))).toMatchObject({ kind: "held" });
+		expect(venue.state.placedLegs).toBe(1);
 	});
 
 	it("holds a corrected plan while no leg of the last one could be confirmed", async () => {
@@ -1080,7 +1121,7 @@ describe("order sender holding a market after a partial result", () => {
 			ok: false,
 			status: "notSent",
 			error:
-				"Not sent. Your last order on this market partly went through: Leg 1 at 90 placed, Leg 2 at 95 rejected. Sending the same order again could place those legs twice. Check open orders and send only the missing legs as a new order.",
+				"Not sent. Your last order on this market: Leg 1 at 90 placed, Leg 2 at 95 rejected. Sending the same order again could place those legs twice. Check open orders and send only the missing legs as a new order.",
 		});
 		expect(corrected).not.toHaveProperty("offer");
 		expect(venue.orderRequests()).toHaveLength(1);
@@ -1137,6 +1178,7 @@ describe("order sender holding a market after a partial result", () => {
 		await sender.submit(signerFor(venue), scale(["90", "95"]));
 		expect(await sender.submit(signerFor(venue), scale(["90", "96"], { buy: false }))).toMatchObject({ kind: "sent" });
 		expect(await sender.submit(signerFor(venue), scale(["91"]))).toMatchObject({ kind: "sent" });
+		expect(await sender.submit(signerFor(venue), entryWithTakeProfit("100"))).toMatchObject({ kind: "sent" });
 	});
 });
 
@@ -1345,6 +1387,17 @@ describe("order sender listing a request that blocks the market", () => {
 		expect(tabB.sender.list(TEST_USER).map(getRequestKey)).toEqual([keyOf(first)]);
 		expect(listedBeforePress).toEqual([keyOf(first)]);
 		expect(press).toMatchObject({ kind: "blocked", earlier: { kind: "pending" } });
+	});
+
+	it("lists an old unconfirmed request when the device clock runs an hour behind the exchange", async () => {
+		venue.state.clockSkewMs = 60 * 60_000;
+		venue.nextExchangeRequests("lost", "lost", "lost", "lost");
+		const first = await openTab(venue, storage, locks).sender.submit(signerFor(venue), marketBuy());
+		vi.setSystemTime(Date.now() + 60_000);
+		const tabB = openTab(venue, storage, locks);
+		await tabB.store.refresh();
+		await tabB.clock.now();
+		expect(tabB.sender.list(TEST_USER).map(getRequestKey)).toEqual([keyOf(first)]);
 	});
 
 	it("lists another tab's request at once when it blocks a press here", async () => {

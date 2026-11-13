@@ -358,7 +358,7 @@ describe("reportSubmit", () => {
 			ok: false,
 			status: "notSent",
 			error:
-				"Not sent. Your last order on this market partly went through: Leg 1 at 90 placed, Leg 2 at 95 rejected, Leg 3 at 97 not confirmed. Sending the same order again could place those legs twice. Check open orders and send only the missing legs as a new order.",
+				"Not sent. Your last order on this market: Leg 1 at 90 placed, Leg 2 at 95 rejected, Leg 3 at 97 not confirmed. Sending the same order again could place those legs twice. Check open orders and send only the missing legs as a new order.",
 		});
 	});
 

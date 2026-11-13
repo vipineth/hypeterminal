@@ -963,7 +963,7 @@ describe("order legs the ticket reports and retries", () => {
 		expect(held).toMatchObject({
 			status: "failed",
 			error: expect.stringMatching(
-				/^Not sent\. Your last order on this market partly went through: Leg 1 at \S+ placed, Leg 2 at \S+ rejected\. /,
+				/^Not sent\. Your last order on this market: Leg 1 at \S+ placed, Leg 2 at \S+ rejected\. /,
 			),
 		});
 		expect(orderBodies()).toHaveLength(1);
