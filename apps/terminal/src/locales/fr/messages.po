@@ -1926,11 +1926,11 @@ msgid "Not connected"
 msgstr "Non connecté"
 
 #. placeholder {0}: describeLegStates(states, legs)
-#: src/hooks/trade/use-submit-plan.ts:119
+#: src/hooks/trade/use-submit-plan.ts:126
 msgid "Not sent again. {0}"
 msgstr ""
 
-#: src/hooks/trade/use-submit-plan.ts:82
+#: src/hooks/trade/use-submit-plan.ts:84
 msgid "Not sent again. The exchange already has this TWAP. Check the TWAP tab."
 msgstr ""
 
@@ -2042,8 +2042,8 @@ msgstr "Carnet d'ordres"
 msgid "Order book in quote asset"
 msgstr ""
 
-#: src/hooks/trade/use-submit-plan.ts:95
-#: src/hooks/trade/use-submit-plan.ts:140
+#: src/hooks/trade/use-submit-plan.ts:96
+#: src/hooks/trade/use-submit-plan.ts:147
 msgid "Order failed"
 msgstr "Ordre échoué"
 
@@ -2059,11 +2059,11 @@ msgstr ""
 msgid "Order Queue"
 msgstr "File d'ordres"
 
-#: src/hooks/trade/use-submit-plan.ts:149
+#: src/hooks/trade/use-submit-plan.ts:159
 msgid "Order status unknown: {message}. Check open orders before you try again."
 msgstr ""
 
-#: src/hooks/trade/use-submit-plan.ts:116
+#: src/hooks/trade/use-submit-plan.ts:123
 msgid "Order status unknown. Check open orders before you try again."
 msgstr ""
 
@@ -3399,7 +3399,7 @@ msgstr ""
 msgid "TWAP Orders"
 msgstr "Ordres TWAP"
 
-#: src/hooks/trade/use-submit-plan.ts:101
+#: src/hooks/trade/use-submit-plan.ts:106
 msgid "TWAP status unknown: {message}. Check the TWAP tab before you try again."
 msgstr ""
 

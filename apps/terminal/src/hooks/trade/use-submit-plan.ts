@@ -77,7 +77,9 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 		if (heldSince !== undefined) {
 			const history = await readTwapHistory(address);
 			if (!history) return { ok: false, error: t`TWAP status unknown. Check the TWAP tab before you try again.` };
-			if (hasStartedTwap(history, action, heldSince)) {
+			const landed = findStartedTwap(history, action, heldSince);
+			if (landed) {
+				confirmTwap(landed.twapId);
 				unsettledTwapSince.delete(twapKey);
 				return { ok: false, error: t`Not sent again. The exchange already has this TWAP. Check the TWAP tab.` };
 			}
@@ -87,8 +89,7 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 		unsettledTwapSince.set(twapKey, since);
 		try {
 			const result = await placeTwapOrder(action);
-			const twapId = result.response?.data?.status?.running?.twapId;
-			if (twapId !== undefined) confirmedTwapIds.add(twapId);
+			confirmTwap(result.response?.data?.status?.running?.twapId);
 			unsettledTwapSince.delete(twapKey);
 			return { ok: true, outcome: "twapStarted" };
 		} catch (error) {
@@ -97,10 +98,15 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 				unsettledTwapSince.delete(twapKey);
 				return { ok: false, error: message };
 			}
-			const history = await pollTwapHistory(action, since, address);
+			const history = await pollUntil(
+				() => readTwapHistory(address),
+				(latest) => !!findStartedTwap(latest, action, since),
+			);
 			if (!history)
 				return { ok: false, error: t`TWAP status unknown: ${message}. Check the TWAP tab before you try again.` };
-			if (!hasStartedTwap(history, action, since)) return { ok: false, error: message };
+			const landed = findStartedTwap(history, action, since);
+			if (!landed) return { ok: false, error: message };
+			confirmTwap(landed.twapId);
 			unsettledTwapSince.delete(twapKey);
 			return { ok: true, outcome: "twapStarted" };
 		}
@@ -145,7 +151,10 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 	}
 
 	async function reconcileUnknownOutcome(orders: CloidOrder[], legs: PlanLeg[], message: string): Promise<PlanReport> {
-		const states = await pollLegStates(orders, address);
+		const states = await pollUntil(
+			() => readLegStates(orders, address),
+			(latest) => latest.every((state) => state.status !== "missing"),
+		);
 		if (!states) {
 			const error = t`Order status unknown: ${message}. Check open orders before you try again.`;
 			return { result: { ok: false, error }, settled: false };
@@ -157,12 +166,12 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 	return { submitPlan, submitTwap, isSubmitting: activeSubmits > 0 };
 }
 
-async function pollLegStates(orders: CloidOrder[], user: `0x${string}` | undefined): Promise<LegState[] | null> {
-	let latest: LegState[] | null = null;
+async function pollUntil<T>(read: () => Promise<T | null>, isSettled: (latest: T) => boolean): Promise<T | null> {
+	let latest: T | null = null;
 	for (const delay of RECONCILE_DELAYS_MS) {
 		await new Promise((resolve) => setTimeout(resolve, delay));
-		latest = (await readLegStates(orders, user)) ?? latest;
-		if (latest?.every((state) => state.status !== "missing")) return latest;
+		latest = (await read()) ?? latest;
+		if (latest && isSettled(latest)) return latest;
 	}
 	return latest;
 }
@@ -179,9 +188,17 @@ async function readLegStates(orders: CloidOrder[], user: `0x${string}` | undefin
 	}
 }
 
-function hasStartedTwap(history: TwapHistoryResponse, { twap }: TwapOrderParameters, since: number): boolean {
+function confirmTwap(twapId: number | undefined) {
+	if (twapId !== undefined) confirmedTwapIds.add(twapId);
+}
+
+function findStartedTwap(
+	history: TwapHistoryResponse,
+	{ twap }: TwapOrderParameters,
+	since: number,
+): TwapHistoryResponse[number] | undefined {
 	const side = twap.b ? "B" : "A";
-	return history.some(
+	return history.find(
 		({ state, twapId }) =>
 			(twapId === undefined || !confirmedTwapIds.has(twapId)) &&
 			state.timestamp >= since - TWAP_CLOCK_SKEW_MS &&
@@ -191,20 +208,6 @@ function hasStartedTwap(history: TwapHistoryResponse, { twap }: TwapOrderParamet
 			state.randomize === twap.t &&
 			Big(state.sz).eq(twap.s),
 	);
-}
-
-async function pollTwapHistory(
-	action: TwapOrderParameters,
-	since: number,
-	user: `0x${string}` | undefined,
-): Promise<TwapHistoryResponse | null> {
-	let latest: TwapHistoryResponse | null = null;
-	for (const delay of RECONCILE_DELAYS_MS) {
-		await new Promise((resolve) => setTimeout(resolve, delay));
-		latest = (await readTwapHistory(user)) ?? latest;
-		if (latest && hasStartedTwap(latest, action, since)) return latest;
-	}
-	return latest;
 }
 
 async function readTwapHistory(user: `0x${string}` | undefined): Promise<TwapHistoryResponse | null> {

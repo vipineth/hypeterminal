@@ -806,7 +806,7 @@ describe("order legs the ticket reports and retries", () => {
 
 describe("twap the ticket sends once", () => {
 	const STARTED_TWAP_ID = 20459;
-	const OTHER_TWAP_ID = 20460;
+	let nextTwapId = 30000;
 
 	function timedOut() {
 		return new HttpRequestError({ detail: "Request timed out after 10000 ms" });
@@ -816,7 +816,7 @@ describe("twap the ticket sends once", () => {
 		return { response: { data: { status: { running: { twapId: STARTED_TWAP_ID } } } } };
 	}
 
-	function historyRecord(sz: string, twapId = OTHER_TWAP_ID) {
+	function historyRecord(sz: string, twapId = nextTwapId++, startedAt = Date.now()) {
 		const state = {
 			coin: "SOL",
 			side: "B",
@@ -826,9 +826,9 @@ describe("twap the ticket sends once", () => {
 			minutes: 30,
 			reduceOnly: false,
 			randomize: false,
-			timestamp: Date.now(),
+			timestamp: startedAt,
 		};
-		return { time: Math.floor(Date.now() / 1000), state, status: { status: "activated" }, twapId };
+		return { time: Math.floor(startedAt / 1000), state, status: { status: "activated" }, twapId };
 	}
 
 	function lastQueueUpdate() {
@@ -904,7 +904,10 @@ describe("twap the ticket sends once", () => {
 		vi.useFakeTimers();
 		typeSizeHere("7");
 		exchange.placeOrder.mockRejectedValueOnce(timedOut()).mockResolvedValueOnce(started());
-		info.twapHistory.mockImplementation(async () => [historyRecord("70")]);
+		info.twapHistory.mockImplementation(async () => [
+			historyRecord("70"),
+			historyRecord("7", nextTwapId++, Date.now() - 6 * 60 * 1000),
+		]);
 		await pressSubmitPastReconcile();
 		expect(lastQueueUpdate()).toEqual({ status: "failed", error: "Request timed out after 10000 ms" });
 		await pressSubmit();
@@ -913,13 +916,26 @@ describe("twap the ticket sends once", () => {
 		expect(lastQueueUpdate()).toEqual({ status: "success", outcome: "twapStarted" });
 	});
 
-	it("does not mistake a twap this app already started for a timed-out one", async () => {
+	it("does not mistake a twap the exchange confirmed for a later timed-out one", async () => {
 		vi.useFakeTimers();
 		typeSizeHere("8");
 		exchange.placeOrder.mockResolvedValueOnce(started()).mockRejectedValueOnce(timedOut());
 		info.twapHistory.mockImplementation(async () => [historyRecord("8", STARTED_TWAP_ID)]);
 		await pressSubmit();
 		await pressSubmitPastReconcile();
+		expect(lastQueueUpdate()).toEqual({ status: "failed", error: "Request timed out after 10000 ms" });
+	});
+
+	it("does not mistake a twap a reconcile found for a later timed-out one", async () => {
+		vi.useFakeTimers();
+		typeSizeHere("9");
+		const found = historyRecord("9");
+		exchange.placeOrder.mockRejectedValue(timedOut());
+		info.twapHistory.mockImplementation(async () => [found]);
+		await pressSubmitPastReconcile();
+		expect(lastQueueUpdate()).toEqual({ status: "success", outcome: "twapStarted" });
+		await pressSubmitPastReconcile();
+		expect(exchange.placeOrder).toHaveBeenCalledTimes(2);
 		expect(lastQueueUpdate()).toEqual({ status: "failed", error: "Request timed out after 10000 ms" });
 	});
 });

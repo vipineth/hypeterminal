@@ -1930,11 +1930,11 @@ msgid "Not connected"
 msgstr "Not connected"
 
 #. placeholder {0}: describeLegStates(states, legs)
-#: src/hooks/trade/use-submit-plan.ts:119
+#: src/hooks/trade/use-submit-plan.ts:126
 msgid "Not sent again. {0}"
 msgstr "Not sent again. {0}"
 
-#: src/hooks/trade/use-submit-plan.ts:82
+#: src/hooks/trade/use-submit-plan.ts:84
 msgid "Not sent again. The exchange already has this TWAP. Check the TWAP tab."
 msgstr "Not sent again. The exchange already has this TWAP. Check the TWAP tab."
 
@@ -2046,8 +2046,8 @@ msgstr "Order Book"
 msgid "Order book in quote asset"
 msgstr "Order book in quote asset"
 
-#: src/hooks/trade/use-submit-plan.ts:95
-#: src/hooks/trade/use-submit-plan.ts:140
+#: src/hooks/trade/use-submit-plan.ts:96
+#: src/hooks/trade/use-submit-plan.ts:147
 msgid "Order failed"
 msgstr "Order failed"
 
@@ -2063,11 +2063,11 @@ msgstr "Order History"
 msgid "Order Queue"
 msgstr "Order Queue"
 
-#: src/hooks/trade/use-submit-plan.ts:149
+#: src/hooks/trade/use-submit-plan.ts:159
 msgid "Order status unknown: {message}. Check open orders before you try again."
 msgstr "Order status unknown: {message}. Check open orders before you try again."
 
-#: src/hooks/trade/use-submit-plan.ts:116
+#: src/hooks/trade/use-submit-plan.ts:123
 msgid "Order status unknown. Check open orders before you try again."
 msgstr "Order status unknown. Check open orders before you try again."
 
@@ -3403,7 +3403,7 @@ msgstr "TWAP order value too small. Min is ${min}, which is ${TWAP_MIN_NOTIONAL_
 msgid "TWAP Orders"
 msgstr "TWAP Orders"
 
-#: src/hooks/trade/use-submit-plan.ts:101
+#: src/hooks/trade/use-submit-plan.ts:106
 msgid "TWAP status unknown: {message}. Check the TWAP tab before you try again."
 msgstr "TWAP status unknown: {message}. Check the TWAP tab before you try again."
 
