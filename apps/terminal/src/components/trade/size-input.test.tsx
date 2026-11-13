@@ -217,9 +217,9 @@ describe.each(Object.entries(TICKETS))("%s size input on a whole-lot market", (_
 		expect(shownSize(ticket, "27.21", { mode: "quote", assetId: PURR_USDC.assetId, szDecimals: 0 })).toBe("");
 	});
 
-	it("shows nothing for a size typed on another market", () => {
+	it("shows nothing for a size typed on another whole-lot market", () => {
 		form.sizeMode = "base";
-		expect(shownSize(ticket, "1.5", { mode: "base", assetId: 5, szDecimals: 2 })).toBe("");
+		expect(shownSize(ticket, "27", { mode: "base", assetId: 10008, szDecimals: 0 })).toBe("");
 	});
 
 	it("shows nothing for a size typed before the market's lot size changed", () => {

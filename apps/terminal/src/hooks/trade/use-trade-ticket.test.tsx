@@ -130,6 +130,11 @@ function TicketProbe({ onTicket }: Props) {
 	return null;
 }
 
+function typeSizeHere(size: string) {
+	form.size = size;
+	form.sizeUnit = { mode: form.sizeMode, assetId: form.market.assetId, szDecimals: form.market.szDecimals };
+}
+
 function renderTicket(): Ticket {
 	const tickets: Ticket[] = [];
 	renderToString(<TicketProbe onTicket={(ticket) => tickets.push(ticket)} />);
@@ -305,7 +310,7 @@ describe("size the ticket sends after the size field changes context", () => {
 		form.market = { ...POINTS_USDC, markPx: "30" };
 		form.limitPrice = "30";
 		form.sizeMode = "quote";
-		form.size = "27.21";
+		typeSizeHere("27.21");
 		expect(renderTicket().buttonContent.disabled).toBe(true);
 		renderTicket().handleSizeModeToggle();
 		await renderTicket().buttonContent.action();
@@ -315,7 +320,7 @@ describe("size the ticket sends after the size field changes context", () => {
 	it("still sends 1 SOL after toggling 1 SOL to USDC", async () => {
 		form.market = SOL_PERP;
 		form.limitPrice = "80.271";
-		form.size = "1";
+		typeSizeHere("1");
 		renderTicket().handleSizeModeToggle();
 		expect(form.sizeMode).toBe("quote");
 		await pressSubmit();
@@ -323,7 +328,7 @@ describe("size the ticket sends after the size field changes context", () => {
 	});
 
 	it("sends nothing rather than 9998 after toggling 10000 POINTS to a USDC amount that cannot buy exactly 10000", async () => {
-		form.size = "10000";
+		typeSizeHere("10000");
 		renderTicket().handleSizeModeToggle();
 		await renderTicket().buttonContent.action();
 		expect(sentOrders()).toEqual([]);
