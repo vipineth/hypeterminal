@@ -85,7 +85,6 @@ export function NumberInput({
 	onLabelValueClick,
 	...props
 }: Props) {
-	const effectiveAllowDecimals = allowDecimals && (maxAllowedDecimals === undefined || maxAllowedDecimals > 0);
 	const hasMax = maxLabel != null && onMaxClick != null;
 	const hasSuffix = !hasMax && suffix != null;
 
@@ -119,7 +118,7 @@ export function NumberInput({
 				if (max !== undefined && newValue > max) newValue = max;
 				if (!allowNegative && newValue < 0) newValue = 0;
 
-				const newValueStr = effectiveAllowDecimals ? String(newValue) : String(Math.round(newValue));
+				const newValueStr = allowDecimals ? String(newValue) : String(Math.round(newValue));
 				const syntheticEvent = createSyntheticEvent(input, newValueStr);
 				onChange?.(syntheticEvent);
 				onKeyDown?.(e);
@@ -139,7 +138,7 @@ export function NumberInput({
 			}
 
 			const isDigit = /^[0-9]$/.test(e.key);
-			const isDecimal = e.key === "." && effectiveAllowDecimals;
+			const isDecimal = e.key === "." && allowDecimals;
 			const isMinus = e.key === "-" && allowNegative;
 
 			if (!isDigit && !isDecimal && !isMinus) {
@@ -162,7 +161,7 @@ export function NumberInput({
 
 			onKeyDown?.(e);
 		},
-		[effectiveAllowDecimals, allowNegative, min, max, step, onChange, onKeyDown, createSyntheticEvent],
+		[allowDecimals, allowNegative, min, max, step, onChange, onKeyDown, createSyntheticEvent],
 	);
 
 	const validateInputValue = useCallback(
@@ -172,25 +171,25 @@ export function NumberInput({
 			const isIntermediateState =
 				inputValue === "" ||
 				inputValue === "-" ||
-				(effectiveAllowDecimals && (inputValue === "." || inputValue === "-."));
+				(allowDecimals && (inputValue === "." || inputValue === "-."));
 
 			if (isIntermediateState) {
 				onChange?.(e);
 				return;
 			}
 
-			if (!isValidNumberFormat(inputValue, effectiveAllowDecimals, allowNegative)) return;
+			if (!isValidNumberFormat(inputValue, allowDecimals, allowNegative)) return;
 			if (exceedsDecimalLimit(inputValue, maxAllowedDecimals)) return;
 
 			onChange?.(e);
 		},
-		[effectiveAllowDecimals, allowNegative, maxAllowedDecimals, onChange],
+		[allowDecimals, allowNegative, maxAllowedDecimals, onChange],
 	);
 
 	const inputEl = (
 		<BaseInput
 			type="text"
-			inputMode={effectiveAllowDecimals ? "decimal" : "numeric"}
+			inputMode={allowDecimals ? "decimal" : "numeric"}
 			data-slot="input"
 			data-size={inputSize}
 			value={value}
