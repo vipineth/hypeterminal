@@ -114,6 +114,9 @@ describe("spot trade ticket", () => {
 		form.orderType = "limit";
 		form.size = "10000";
 		form.limitPrice = "0.0026434";
+		form.scaleStart = "";
+		form.scaleEnd = "";
+		formActions.resetForm.mockReset();
 		exchange.placeOrder.mockReset();
 		exchange.placeOrder.mockResolvedValue({ response: { data: { statuses: [{ resting: { oid: 1 } }] } } });
 	});
@@ -123,5 +126,20 @@ describe("spot trade ticket", () => {
 		expect(sentOrders()).toEqual([
 			[{ a: 10008, b: true, p: "0.0026434", s: "10000", r: false, t: { limit: { tif: "Gtc" } } }],
 		]);
+	});
+
+	it("clears the form after it sends the order", async () => {
+		await pressSubmit();
+		expect(sentOrders()).toHaveLength(1);
+		expect(formActions.resetForm).toHaveBeenCalledTimes(1);
+	});
+
+	it("keeps the form when every scale leg is under the minimum and nothing is sent", async () => {
+		form.orderType = "scale";
+		form.scaleStart = "0.0026";
+		form.scaleEnd = "0.0027";
+		await pressSubmit();
+		expect(sentOrders()).toEqual([]);
+		expect(formActions.resetForm).not.toHaveBeenCalled();
 	});
 });
