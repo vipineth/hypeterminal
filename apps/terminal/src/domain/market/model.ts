@@ -133,6 +133,10 @@ export function parseMarkets({ perpDexs, allPerpMetas, spotMeta }: MetaPayloads)
 	const mainDex = dexes.find((dex) => dex.index === 0);
 	if (mainDex) {
 		allPerpMetas[0].universe.forEach((asset, position) => {
+			if (asset.name.includes(BUILDER_DEX_SEPARATOR)) {
+				issues.push({ kind: "assetPrefixMismatch", dex: mainDex.name, coin: asset.name });
+				return;
+			}
 			add(toPerpMarket(asset, position, mainDex, issues));
 		});
 	}
