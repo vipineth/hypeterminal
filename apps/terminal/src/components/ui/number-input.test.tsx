@@ -43,3 +43,26 @@ describe("NumberInput typing", () => {
 		expect(typeInto(0, "1.5")).toBe("1.");
 	});
 });
+
+function stepInto(maxAllowedDecimals: number | undefined, key: "ArrowUp" | "ArrowDown", initialValue: string): string {
+	return typeKeys(
+		(value, commit) => {
+			renderToString(
+				<NumberInput value={value} maxAllowedDecimals={maxAllowedDecimals} onChange={(e) => commit(e.target.value)} />,
+			);
+			return rendered.props;
+		},
+		[key],
+		initialValue,
+	);
+}
+
+describe("NumberInput arrow stepping", () => {
+	it("steps 128.01 down to 127.01, not 127.00999999999999", () => {
+		expect(stepInto(2, "ArrowDown", "128.01")).toBe("127.01");
+	});
+
+	it("steps an uncapped 1.2701 up to 2.2701, not 2.2701000000000002", () => {
+		expect(stepInto(undefined, "ArrowUp", "1.2701")).toBe("2.2701");
+	});
+});

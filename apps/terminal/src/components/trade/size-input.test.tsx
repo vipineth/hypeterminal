@@ -3,6 +3,8 @@ import { renderToString } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MobileTradeTicketBody } from "@/components/trade/mobile/mobile-trade-ticket-body";
 import { TradeFormFields } from "@/components/trade/tradebox/trade-form-fields";
+import { buildOrderPlan } from "@/domain/trade/order-intent";
+import { getSizeValueFromInput } from "@/domain/trade/order/size";
 import { typeKeys } from "@/test/type-keys";
 
 const PURR_USDC = vi.hoisted(() => ({
@@ -18,7 +20,18 @@ const PURR_USDC = vi.hoisted(() => ({
 	],
 }));
 
-const form = vi.hoisted(() => ({ sizeMode: "quote", size: "", setSize: (_size: string) => {} }));
+interface SizeUnit {
+	mode: string;
+	assetId: number;
+	szDecimals: number;
+}
+
+const form = vi.hoisted(() => ({
+	sizeMode: "quote",
+	size: "",
+	sizeUnit: null as SizeUnit | null,
+	setSize: (_size: string) => {},
+}));
 const rendered = vi.hoisted(() => ({ inputs: [] as React.ComponentProps<"input">[] }));
 
 vi.mock("@base-ui/react/input", () => ({
@@ -78,6 +91,8 @@ vi.mock("@/stores/use-order-entry-store", () => ({
 	useSizeMode: () => form.sizeMode,
 	useReduceOnly: () => false,
 	useOrderSize: () => form.size,
+	useOrderSizeUnit: () =>
+		form.sizeUnit ?? { mode: form.sizeMode, assetId: PURR_USDC.assetId, szDecimals: PURR_USDC.szDecimals },
 	useLimitPrice: () => "",
 	useTriggerPrice: () => "",
 	useScaleStart: () => "",
@@ -93,7 +108,10 @@ vi.mock("@/stores/use-order-entry-store", () => ({
 		resetForm: () => {},
 		setOrderType: () => {},
 		setSizeMode: () => {},
-		setSize: (size: string) => form.setSize(size),
+		setSize: (size: string, unit?: SizeUnit) => {
+			form.sizeUnit = unit ?? form.sizeUnit;
+			form.setSize(size);
+		},
 		setLimitPrice: () => {},
 		setTriggerPrice: () => {},
 		setReduceOnly: () => {},
@@ -116,25 +134,63 @@ const TICKETS = {
 	mobile: () => <MobileTradeTicketBody onSubmitted={() => {}} />,
 };
 
+function renderSizeInput(ticket: () => React.ReactElement): React.ComponentProps<"input"> {
+	rendered.inputs = [];
+	renderToString(ticket());
+	const sizeInputs = rendered.inputs.filter((input) => input.placeholder === "0.00");
+	expect(sizeInputs).toHaveLength(1);
+	return sizeInputs[0];
+}
+
 function typeSize(ticket: () => React.ReactElement, keys: string[], initialValue = ""): string {
-	return typeKeys(
+	form.size = typeKeys(
 		(value, commit) => {
 			form.size = value;
 			form.setSize = commit;
-			rendered.inputs = [];
-			renderToString(ticket());
-			const sizeInputs = rendered.inputs.filter((input) => input.placeholder === "0.00");
-			expect(sizeInputs).toHaveLength(1);
-			return sizeInputs[0];
+			return renderSizeInput(ticket);
 		},
 		keys,
 		initialValue,
 	);
+	return String(renderSizeInput(ticket).value);
+}
+
+function shownSize(ticket: () => React.ReactElement, size: string, typedIn: SizeUnit): string {
+	form.size = size;
+	form.sizeUnit = typedIn;
+	return String(renderSizeInput(ticket).value);
+}
+
+function sendLimitBuyAt(price: string, sizeInput: string) {
+	const sizeValue = getSizeValueFromInput({ sizeInput, sizeMode: "quote", price: Number(price), szDecimals: 0 });
+	return buildOrderPlan({
+		kind: "entry",
+		assetId: PURR_USDC.assetId,
+		side: "buy",
+		orderType: "limit",
+		sizeValue,
+		szDecimals: 0,
+		marketKind: "spot",
+		markPx: Number(price),
+		limitPriceInput: price,
+		slippageBps: 250,
+		reduceOnly: false,
+		tif: "Gtc",
+		triggerPriceInput: "",
+		scaleStartPriceInput: "",
+		scaleEndPriceInput: "",
+		scaleLevelsNum: null,
+		tpSlEnabled: false,
+		canUseTpSl: false,
+		tpPriceInput: "",
+		slPriceInput: "",
+	}).orders;
 }
 
 describe.each(Object.entries(TICKETS))("%s size input on a whole-lot market", (_name, ticket) => {
 	beforeEach(() => {
 		form.sizeMode = "quote";
+		form.sizeUnit = null;
 	});
 
 	it("keeps 27.21 typed as USDC", () => {
@@ -148,5 +204,26 @@ describe.each(Object.entries(TICKETS))("%s size input on a whole-lot market", (_
 	it("caps a base size at whole lots without dropping the point", () => {
 		form.sizeMode = "base";
 		expect(typeSize(ticket, [..."27.21"])).toBe("27.");
+	});
+
+	it("steps 128.01 USDC down to 127.01, which still buys 100 lots at 1.2701", () => {
+		const stepped = typeSize(ticket, ["ArrowDown"], "128.01");
+		expect(stepped).toBe("127.01");
+		expect(sendLimitBuyAt("1.2701", stepped)[0].s).toBe("100");
+	});
+
+	it("shows nothing for a USDC size once the field is in PURR", () => {
+		form.sizeMode = "base";
+		expect(shownSize(ticket, "27.21", { mode: "quote", assetId: PURR_USDC.assetId, szDecimals: 0 })).toBe("");
+	});
+
+	it("shows nothing for a size typed on another market", () => {
+		form.sizeMode = "base";
+		expect(shownSize(ticket, "1.5", { mode: "base", assetId: 5, szDecimals: 2 })).toBe("");
+	});
+
+	it("shows nothing for a size typed before the market's lot size changed", () => {
+		form.sizeMode = "base";
+		expect(shownSize(ticket, "1.5", { mode: "base", assetId: PURR_USDC.assetId, szDecimals: 2 })).toBe("");
 	});
 });

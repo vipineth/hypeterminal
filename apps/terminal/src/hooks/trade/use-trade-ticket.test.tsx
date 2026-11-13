@@ -41,6 +41,8 @@ const form = vi.hoisted(() => ({
 	tpSlEnabled: false,
 	tpPrice: "",
 	slPrice: "",
+	sizeUnit: null as { mode: string; assetId: number; szDecimals: number } | null,
+	maxTradeSzs: [100, 100],
 }));
 
 const exchange = vi.hoisted(() => ({ placeOrder: vi.fn() }));
@@ -81,7 +83,7 @@ vi.mock("@/hooks/trade/use-account-balances", () => ({
 }));
 
 vi.mock("@/hooks/trade/use-asset-leverage", () => ({
-	useAssetLeverage: () => ({ maxTradeSzs: [100, 100], availableToTrade: [10000, 10000] }),
+	useAssetLeverage: () => ({ maxTradeSzs: form.maxTradeSzs, availableToTrade: [10000, 10000] }),
 }));
 
 vi.mock("@/stores/use-order-entry-store", () => ({
@@ -90,6 +92,8 @@ vi.mock("@/stores/use-order-entry-store", () => ({
 	useSizeMode: () => form.sizeMode,
 	useReduceOnly: () => false,
 	useOrderSize: () => form.size,
+	useOrderSizeUnit: () =>
+		form.sizeUnit ?? { mode: form.sizeMode, assetId: form.market.assetId, szDecimals: form.market.szDecimals },
 	useLimitPrice: () => form.limitPrice,
 	useTriggerPrice: () => form.triggerPrice,
 	useScaleStart: () => form.scaleStart,
@@ -104,8 +108,13 @@ vi.mock("@/stores/use-order-entry-store", () => ({
 	useOrderEntryActions: () => ({
 		resetForm: formActions.resetForm,
 		setOrderType: () => {},
-		setSizeMode: () => {},
-		setSize: () => {},
+		setSizeMode: (mode: string) => {
+			form.sizeMode = mode;
+		},
+		setSize: (size: string, unit?: typeof form.sizeUnit) => {
+			form.size = size;
+			form.sizeUnit = unit ?? form.sizeUnit;
+		},
 		setLimitPrice: () => {},
 	}),
 }));
@@ -121,10 +130,14 @@ function TicketProbe({ onTicket }: Props) {
 	return null;
 }
 
-async function pressSubmit() {
+function renderTicket(): Ticket {
 	const tickets: Ticket[] = [];
 	renderToString(<TicketProbe onTicket={(ticket) => tickets.push(ticket)} />);
-	const [ticket] = tickets;
+	return tickets[0];
+}
+
+async function pressSubmit() {
+	const ticket = renderTicket();
 	expect(ticket.buttonContent.disabled).toBe(false);
 	await ticket.buttonContent.action();
 }
@@ -152,6 +165,8 @@ describe("spot trade ticket", () => {
 		form.tpSlEnabled = false;
 		form.tpPrice = "";
 		form.slPrice = "";
+		form.sizeUnit = null;
+		form.maxTradeSzs = [100, 100];
 		formActions.resetForm.mockReset();
 		exchange.placeOrder.mockReset();
 		exchange.placeOrder.mockResolvedValue({ response: { data: { statuses: [{ resting: { oid: 1 } }] } } });
@@ -219,6 +234,8 @@ describe("perp trade ticket", () => {
 		form.tpSlEnabled = true;
 		form.tpPrice = "";
 		form.slPrice = "";
+		form.sizeUnit = null;
+		form.maxTradeSzs = [100, 100];
 		exchange.placeOrder.mockReset();
 		exchange.placeOrder.mockResolvedValue({ response: { data: { statuses: [{ resting: { oid: 1 } }] } } });
 	});
@@ -264,5 +281,99 @@ describe("perp trade ticket", () => {
 		const [[stop]] = sentOrders();
 		expect(stop).toMatchObject({ p: "85", t: { trigger: { triggerPx: "85.001", tpsl: "sl" } } });
 		expect(queue.addOrder).toHaveBeenLastCalledWith(expect.objectContaining({ price: "85.001" }));
+	});
+});
+
+describe("size the ticket sends after the size field changes context", () => {
+	beforeEach(() => {
+		form.market = POINTS_USDC;
+		form.side = "buy";
+		form.orderType = "limit";
+		form.sizeMode = "base";
+		form.quoteBalance = "1000";
+		form.baseBalance = "0";
+		form.size = "";
+		form.limitPrice = "0.0026434";
+		form.tpSlEnabled = false;
+		form.sizeUnit = null;
+		form.maxTradeSzs = [100, 100];
+		exchange.placeOrder.mockReset();
+		exchange.placeOrder.mockResolvedValue({ response: { data: { statuses: [{ resting: { oid: 1 } }] } } });
+	});
+
+	it("sends nothing after toggling a USDC size that buys no whole lot", async () => {
+		form.market = { ...POINTS_USDC, markPx: "30" };
+		form.limitPrice = "30";
+		form.sizeMode = "quote";
+		form.size = "27.21";
+		expect(renderTicket().buttonContent.disabled).toBe(true);
+		renderTicket().handleSizeModeToggle();
+		await renderTicket().buttonContent.action();
+		expect(sentOrders()).toEqual([]);
+	});
+
+	it("still sends 1 SOL after toggling 1 SOL to USDC", async () => {
+		form.market = SOL_PERP;
+		form.limitPrice = "80.271";
+		form.size = "1";
+		renderTicket().handleSizeModeToggle();
+		expect(form.sizeMode).toBe("quote");
+		await pressSubmit();
+		expect(sentOrders()[0][0]).toMatchObject({ p: "80.271", s: "1" });
+	});
+
+	it("sends nothing rather than 9998 after toggling 10000 POINTS to a USDC amount that cannot buy exactly 10000", async () => {
+		form.size = "10000";
+		renderTicket().handleSizeModeToggle();
+		await renderTicket().buttonContent.action();
+		expect(sentOrders()).toEqual([]);
+	});
+
+	it("sends nothing on SOL for a size typed on POINTS", async () => {
+		form.size = "100";
+		form.sizeUnit = { mode: "base", assetId: POINTS_USDC.assetId, szDecimals: POINTS_USDC.szDecimals };
+		form.market = SOL_PERP;
+		form.limitPrice = "80.276";
+		await renderTicket().buttonContent.action();
+		expect(sentOrders()).toEqual([]);
+	});
+
+	it("sends the max perp size when Max is pressed in USDC", async () => {
+		form.market = SOL_PERP;
+		form.limitPrice = "80.271";
+		form.sizeMode = "quote";
+		form.maxTradeSzs = [1, 1];
+		renderTicket().handleSizePercentApply(100);
+		await pressSubmit();
+		expect(sentOrders()[0][0]).toMatchObject({ p: "80.271", s: "1" });
+	});
+
+	it("sends the whole spot balance when Max is pressed in USDC on a sell", async () => {
+		form.market = { ...POINTS_USDC, markPx: "30.004" };
+		form.side = "sell";
+		form.baseBalance = "1";
+		form.limitPrice = "30.004";
+		form.sizeMode = "quote";
+		renderTicket().handleSizePercentApply(100);
+		await pressSubmit();
+		expect(sentOrders()[0][0]).toMatchObject({ b: false, p: "30.004", s: "1" });
+	});
+
+	it("never sells more than the balance when Max in USDC cannot buy the whole balance exactly", async () => {
+		form.side = "sell";
+		form.baseBalance = "10000";
+		form.sizeMode = "quote";
+		renderTicket().handleSizePercentApply(100);
+		await pressSubmit();
+		expect(sentOrders()[0][0]).toMatchObject({ b: false, s: "9998" });
+	});
+
+	it("keeps a USDC Max buy within a balance that has more than two decimals", async () => {
+		form.quoteBalance = "1000.005";
+		form.sizeMode = "quote";
+		renderTicket().handleSizePercentApply(100);
+		await pressSubmit();
+		const [orders] = sentOrders();
+		expect(wireNotional(orders)).toBeLessThanOrEqual(1000.005);
 	});
 });
