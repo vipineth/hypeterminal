@@ -18,9 +18,15 @@ function createStorage(): HighWaterStorage {
 	};
 }
 
-function createOrigin() {
+const QUOTA_FULL: HighWaterStorage = {
+	getItem: () => null,
+	setItem: () => {
+		throw new DOMException("The quota has been exceeded.", "QuotaExceededError");
+	},
+};
+
+function createOrigin(storage = createStorage()) {
 	const held = new Map<string, symbol>();
-	const storage = createStorage();
 	function openTab() {
 		const tab = Symbol("tab");
 		const locks: LaneLocks = {
@@ -160,6 +166,20 @@ describe("createNonceManager", () => {
 		verdicts.push(submit(await take(origin.openTab().nextNonce)));
 
 		expect(verdicts.filter((verdict) => verdict !== "accepted")).toEqual([]);
+	});
+
+	it("never reissues a nonce when a tab takes over a lane whose holder could not save its mark", async () => {
+		vi.spyOn(Math, "random").mockReturnValue(0);
+		const origin = createOrigin(QUOTA_FULL);
+		const [closing, reopened] = [origin.openTab(), origin.openTab()];
+		const submit = createExchange();
+
+		const verdicts = [submit(await take(closing.nextNonce))];
+		closing.close();
+		vi.advanceTimersByTime(1);
+		verdicts.push(submit(await take(reopened.nextNonce)));
+
+		expect(verdicts).toEqual(["accepted", "accepted"]);
 	});
 
 	it("never runs more than one stride ahead of the clock under sustained load", async () => {
