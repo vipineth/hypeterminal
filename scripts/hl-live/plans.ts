@@ -135,24 +135,25 @@ function marketMark(intent: OrderIntent): number | null {
 	return null;
 }
 
-export function slippageCapProblems(intent: OrderIntent, built: OrderPlan): string[] {
+export function marketOrderProblems(intent: OrderIntent, built: OrderPlan): string[] {
 	const markPx = marketMark(intent);
 	if (markPx === null) return [];
 	const kind = intent.kind === "swap" || (intent.kind === "entry" && intent.marketKind === "spot") ? "spot" : "perp";
 	return built.orders.flatMap((order) => {
-		if (!("limit" in order.t) || order.t.limit.tif !== "FrontendMarket") return [];
+		if (!("limit" in order.t)) return [];
+		const problems = order.t.limit.tif === "FrontendMarket" ? [] : [`market order sent as ${order.t.limit.tif}, not FrontendMarket`];
 		const band = toSafeBig(SLIPPAGE_BPS).div(10_000);
 		const target = toSafeBig(markPx).times(order.b ? band.plus(1) : toSafeBig(1).minus(band));
 		const step = priceStep(target, intent.szDecimals, kind);
-		if (priceWithin(order.p, target, step, CAP_SLACK_BPS)) return [];
-		return [`${order.b ? "buy" : "sell"} cap ${order.p} is not mark ${markPx} ${order.b ? "+" : "-"} ${SLIPPAGE_BPS} bps (${target.toFixed()})`];
+		if (priceWithin(order.p, target, step, CAP_SLACK_BPS)) return problems;
+		return [...problems, `${order.b ? "buy" : "sell"} cap ${order.p} is not mark ${markPx} ${order.b ? "+" : "-"} ${SLIPPAGE_BPS} bps (${target.toFixed()})`];
 	});
 }
 
 export function plan(intent: OrderIntent): OrderPlan {
 	const built = buildOrderPlan(intent);
 	if (built.errors.length > 0) throw new Error(`the app refused to build the plan: ${built.errors.join(", ")}`);
-	const problems = slippageCapProblems(intent, built);
+	const problems = marketOrderProblems(intent, built);
 	if (problems.length > 0) throw new Error(problems.join("; "));
 	return built;
 }

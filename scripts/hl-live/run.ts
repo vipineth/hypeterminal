@@ -8,7 +8,7 @@ import { acquireLock, cleanVenue, exitUnified, enterUnified, loadVenue, SPOT_DEX
 import { errorMessage, validateOrder } from "./assert";
 import { collectDrift, DRIFT_SNAPSHOT_PATH, type DriftShape, diffDrift, fetchDriftInputs, mergeDrift } from "./drift";
 import { createHarness, type Harness, loadKeys, mainnetHoldings } from "./harness";
-import { lotSize, readonlyPlans, slippageCapProblems, TWAP_NOTIONAL, twapPlan } from "./plans";
+import { lotSize, readonlyPlans, marketOrderProblems, TWAP_NOTIONAL, twapPlan } from "./plans";
 import { type Scenario, type Scope, Unsupported } from "./scenarios/common";
 import { orderScenarios } from "./scenarios/orders";
 import { positionScenarios, resetLeverage } from "./scenarios/positions";
@@ -217,7 +217,7 @@ async function runReadonly(): Promise<number> {
 				blocked.push(`${market.name} ${label}: ${plan.errors.join(", ")} (mark ${planMarket.markPx})`);
 				continue;
 			}
-			for (const problem of slippageCapProblems(intent, plan)) problems.push(`${market.name} ${label}: ${problem}`);
+			for (const problem of marketOrderProblems(intent, plan)) problems.push(`${market.name} ${label}: ${problem}`);
 			for (const order of plan.orders) {
 				for (const problem of validateOrder(order, market.kind, market.szDecimals, planMarket.markPx)) {
 					problems.push(`${market.name} ${label}: ${problem}`);

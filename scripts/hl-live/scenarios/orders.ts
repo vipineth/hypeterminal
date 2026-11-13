@@ -136,13 +136,20 @@ export const orderScenarios: Scenario[] = [
 			if (!built.action) throw new Error(`the app refused to build the twap: ${built.errors.join(", ")}`);
 			const response = await ctx.h.agent.twapOrder(built.action);
 			const twapId = response.response.data.status.running.twapId;
-			let state: { coin: string; side: string; sz: string; minutes: number; reduceOnly: boolean } | undefined;
+			let state: { coin: string; side: string; sz: string; minutes: number; reduceOnly: boolean; randomize: boolean } | undefined;
 			await waitFor(`twap ${twapId} never showed in twapHistory`, async () => {
 				state = (await ctx.h.info.twapHistory({ user: ctx.h.user })).find((entry) => entry.twapId === twapId)?.state;
 				return state !== undefined;
 			});
-			const actual = { coin: state?.coin, side: state?.side, sz: toSafeBig(state?.sz).toFixed(), minutes: state?.minutes, reduceOnly: state?.reduceOnly };
-			const expected = { coin: venue.coin, side: "B", sz: toSafeBig(size).toFixed(), minutes: TWAP_MINUTES, reduceOnly: false };
+			const actual = {
+				coin: state?.coin,
+				side: state?.side,
+				sz: toSafeBig(state?.sz).toFixed(),
+				minutes: state?.minutes,
+				reduceOnly: state?.reduceOnly,
+				randomize: state?.randomize,
+			};
+			const expected = { coin: venue.coin, side: "B", sz: toSafeBig(size).toFixed(), minutes: TWAP_MINUTES, reduceOnly: false, randomize: false };
 			if (JSON.stringify(actual) !== JSON.stringify(expected)) throw new Error(`twap state is ${JSON.stringify(actual)}, expected ${JSON.stringify(expected)}`);
 			const assetId = (await appMarkets(ctx)).byName.get(venue.coin)?.assetId;
 			if (typeof assetId !== "number") throw new Error(`the app finds no asset id for ${venue.coin}`);
