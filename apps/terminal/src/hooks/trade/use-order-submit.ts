@@ -2,7 +2,7 @@ import { t } from "@lingui/core/macro";
 import type { ExchangeOrder, LimitTif, OrderType } from "@/config/trade";
 import type { MarketKind } from "@/domain/market";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
-import { throwIfResponseError } from "@/domain/trade/orders";
+import { type TpSl, throwIfResponseError } from "@/domain/trade/orders";
 import { buildTwapPlan } from "@/domain/trade/twap";
 import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { useExchange } from "@/lib/hyperliquid";
@@ -58,8 +58,11 @@ function getQueueOrderType(input: OrderSubmitInput): QueueOrderType {
 	return "market";
 }
 
-function findTriggerPrice(orders: ExchangeOrder[], tpsl: "tp" | "sl"): string | undefined {
-	return orders.find((order) => "trigger" in order.t && order.t.trigger.tpsl === tpsl)?.p;
+function findTriggerPrice(orders: ExchangeOrder[], tpsl: TpSl): string | undefined {
+	for (const { t } of orders) {
+		if ("trigger" in t && t.trigger.tpsl === tpsl) return String(t.trigger.triggerPx);
+	}
+	return undefined;
 }
 
 export function useOrderSubmit(): UseOrderSubmitResult {
