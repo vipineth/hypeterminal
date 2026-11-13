@@ -1,6 +1,19 @@
 import { DEFAULT_QUOTE_TOKEN } from "@/config/app";
 import type { SpotMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 import type { SpotToken } from "@/lib/hyperliquid/markets";
+import { toNumber, toNumberOrZero } from "@/lib/trade/numbers";
+
+interface SwapQuoteInput {
+	amount: string;
+	markPx: string | undefined;
+	szDecimals: number;
+	isBuying: boolean;
+}
+
+interface SwapQuote {
+	orderSize: number;
+	estimatedReceive: number;
+}
 
 export function getAvailablePairTokens(token: string, spotMarkets: SpotMarketInfo[]): SpotToken[] {
 	const tokenMap = new Map<string, SpotToken>();
@@ -48,4 +61,16 @@ export function findSpotPair(tokenA: string, tokenB: string, spotMarkets: SpotMa
 export function getSwapSide(fromToken: string, spotMarket: SpotMarketInfo): boolean {
 	const baseToken = spotMarket.tokensInfo[0]?.name;
 	return fromToken !== baseToken;
+}
+
+export function getSwapQuote({ amount, markPx, isBuying }: SwapQuoteInput): SwapQuote {
+	const amountValue = toNumber(amount) ?? 0;
+	const mark = toNumberOrZero(markPx);
+	if (amountValue <= 0 || mark <= 0) return { orderSize: 0, estimatedReceive: 0 };
+
+	if (isBuying) {
+		const size = amountValue / mark;
+		return { orderSize: size, estimatedReceive: size };
+	}
+	return { orderSize: amountValue, estimatedReceive: amountValue * mark };
 }

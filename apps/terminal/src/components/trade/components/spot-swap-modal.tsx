@@ -9,7 +9,7 @@ import { DEFAULT_QUOTE_TOKEN } from "@/config/app";
 import { SWAP_SUCCESS_DURATION_MS } from "@/config/time";
 import { getSpotAvailable, getSpotBalance } from "@/domain/trade/balances";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
-import { findSpotPair, getAvailablePairTokens, getSwapSide } from "@/domain/trade/swap";
+import { findSpotPair, getAvailablePairTokens, getSwapQuote, getSwapSide } from "@/domain/trade/swap";
 import { useDefaultDexBalances } from "@/hooks/trade/use-account-balances";
 import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { useAutoCloseSuccess } from "@/hooks/ui/use-auto-close-success";
@@ -96,18 +96,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 
 	const amountValue = toNumber(amount) ?? 0;
 
-	const { estimatedReceive, orderSize } = useMemo(() => {
-		if (amountValue <= 0 || markPx <= 0) {
-			return { estimatedReceive: 0, orderSize: 0 };
-		}
-
-		if (isBuying) {
-			const size = amountValue / markPx;
-			return { estimatedReceive: size, orderSize: size };
-		}
-		const receive = amountValue * markPx;
-		return { estimatedReceive: receive, orderSize: amountValue };
-	}, [amountValue, markPx, isBuying]);
+	const { estimatedReceive, orderSize } = getSwapQuote({ amount, markPx: spotMarket?.markPx, szDecimals, isBuying });
 
 	const rate = useMemo(() => {
 		if (markPx <= 0) return 0;
