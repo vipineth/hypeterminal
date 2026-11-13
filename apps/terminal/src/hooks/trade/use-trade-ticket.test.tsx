@@ -16,7 +16,17 @@ const POINTS_USDC = vi.hoisted(() => ({
 	],
 }));
 
+const SOL_PERP = vi.hoisted(() => ({
+	kind: "perp",
+	name: "SOL",
+	pairName: "SOL-USDC",
+	assetId: 5,
+	szDecimals: 2,
+	markPx: "80.276",
+}));
+
 const form = vi.hoisted(() => ({
+	market: POINTS_USDC as typeof POINTS_USDC | typeof SOL_PERP,
 	side: "buy",
 	orderType: "limit",
 	sizeMode: "base",
@@ -27,6 +37,9 @@ const form = vi.hoisted(() => ({
 	scaleStart: "",
 	scaleEnd: "",
 	scaleLevels: 5,
+	tpSlEnabled: false,
+	tpPrice: "",
+	slPrice: "",
 }));
 
 const exchange = vi.hoisted(() => ({ placeOrder: vi.fn() }));
@@ -40,7 +53,7 @@ vi.mock("wagmi", () => ({
 
 vi.mock("@/lib/hyperliquid", async (importOriginal) => ({
 	...(await importOriginal<typeof import("@/lib/hyperliquid")>()),
-	useSelectedMarketInfo: () => ({ data: POINTS_USDC }),
+	useSelectedMarketInfo: () => ({ data: form.market }),
 	useUserPositions: () => ({ getPosition: () => null }),
 	useAgentStatus: () => ({ isReady: true, isLoading: false }),
 	useAgentRegistration: () => ({ register: async () => {}, status: "ready" }),
@@ -62,7 +75,7 @@ vi.mock("@/hooks/trade/use-account-balances", () => ({
 }));
 
 vi.mock("@/hooks/trade/use-asset-leverage", () => ({
-	useAssetLeverage: () => ({ maxTradeSzs: null, availableToTrade: null }),
+	useAssetLeverage: () => ({ maxTradeSzs: [100, 100], availableToTrade: [10000, 10000] }),
 }));
 
 vi.mock("@/stores/use-order-entry-store", () => ({
@@ -78,9 +91,9 @@ vi.mock("@/stores/use-order-entry-store", () => ({
 	useScaleLevels: () => form.scaleLevels,
 	useTwapMinutes: () => null,
 	useTwapRandomize: () => false,
-	useTpSlEnabled: () => false,
-	useTpPrice: () => "",
-	useSlPrice: () => "",
+	useTpSlEnabled: () => form.tpSlEnabled,
+	useTpPrice: () => form.tpPrice,
+	useSlPrice: () => form.slPrice,
 	useTif: () => "Gtc",
 	useOrderEntryActions: () => ({
 		resetForm: formActions.resetForm,
@@ -120,6 +133,7 @@ function wireNotional(orders: { p: string; s: string }[]): number {
 
 describe("spot trade ticket", () => {
 	beforeEach(() => {
+		form.market = POINTS_USDC;
 		form.side = "buy";
 		form.orderType = "limit";
 		form.sizeMode = "base";
@@ -129,6 +143,9 @@ describe("spot trade ticket", () => {
 		form.limitPrice = "0.0026434";
 		form.scaleStart = "";
 		form.scaleEnd = "";
+		form.tpSlEnabled = false;
+		form.tpPrice = "";
+		form.slPrice = "";
 		formActions.resetForm.mockReset();
 		exchange.placeOrder.mockReset();
 		exchange.placeOrder.mockResolvedValue({ response: { data: { statuses: [{ resting: { oid: 1 } }] } } });
@@ -181,5 +198,46 @@ describe("spot trade ticket", () => {
 		const [orders] = sentOrders();
 		expect(orders.map((order: { p: string }) => order.p)).toEqual(["20", "17.5", "15", "12.5", "10"]);
 		expect(wireNotional(orders)).toBeLessThanOrEqual(270);
+	});
+});
+
+describe("perp trade ticket", () => {
+	beforeEach(() => {
+		form.market = SOL_PERP;
+		form.side = "sell";
+		form.orderType = "limit";
+		form.sizeMode = "base";
+		form.size = "1";
+		form.limitPrice = "80.276";
+		form.tpSlEnabled = true;
+		form.tpPrice = "";
+		form.slPrice = "";
+		exchange.placeOrder.mockReset();
+		exchange.placeOrder.mockResolvedValue({ response: { data: { statuses: [{ resting: { oid: 1 } }] } } });
+	});
+
+	it("never sends a short's tp or sl above a typed trigger that a number cannot hold", async () => {
+		form.tpPrice = "74.999999999999999";
+		form.slPrice = "84.999999999999999";
+		await pressSubmit();
+		const [orders] = sentOrders();
+		expect(orders.slice(1)).toEqual([
+			{
+				a: 5,
+				b: true,
+				p: "74.999",
+				s: "1",
+				r: true,
+				t: { trigger: { isMarket: true, triggerPx: "74.999", tpsl: "tp" } },
+			},
+			{
+				a: 5,
+				b: true,
+				p: "84.999",
+				s: "1",
+				r: true,
+				t: { trigger: { isMarket: true, triggerPx: "84.999", tpsl: "sl" } },
+			},
+		]);
 	});
 });
