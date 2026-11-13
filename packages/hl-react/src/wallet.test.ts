@@ -151,6 +151,22 @@ describe("toHyperliquidWallet", () => {
 				expect(signature).toEqual({ r: `0x${"11".repeat(32)}`, s: `0x${"22".repeat(32)}`, v: 27 });
 			},
 		);
+
+		it("prompts the wallet once when signing fails with a retryable error", async () => {
+			const clients = createClients(() => {
+				throw Object.assign(new Error("Internal JSON-RPC error"), { code: -32603 });
+			});
+
+			await expect(
+				signUserSignedAction({
+					wallet: adapt(clients[clientKey]),
+					action: sampleAction(exchange.UsdSendTypes["HyperliquidTransaction:UsdSend"]),
+					types: exchange.UsdSendTypes,
+				}),
+			).rejects.toThrow();
+
+			expect(clients.provider.calls.filter((call) => call.method === "eth_signTypedData_v4")).toHaveLength(1);
+		});
 	});
 
 	it("returns a signature that recovers to the signing key", async () => {
