@@ -13,15 +13,9 @@ import {
 	reportRequestOutcome,
 	reportSettlement,
 	reportSubmit,
+	reportUnreadableOutcome,
 } from "@/lib/trade/extract-order-status";
-import {
-	createOrderSender,
-	getRequestKey,
-	type Lookup,
-	type RequestOutcome,
-	type Signer,
-	type SubmitOutcome,
-} from "@/lib/trade/order-sender";
+import { createOrderSender, getRequestKey, type Lookup, type Signer, type SubmitOutcome } from "@/lib/trade/order-sender";
 import { createRequestStore, type PendingRequest, type RequestLabel } from "@/lib/trade/pending-requests";
 import { resultToQueueUpdate, useOrderQueueActions } from "@/stores/use-order-queue-store";
 
@@ -64,6 +58,8 @@ interface UseSubmitPlanResult {
 	cancelRequest: (requestKey: string) => Promise<OrderResult>;
 	previewDismiss: (requestKey: string) => Promise<DismissPreview>;
 	dismissRequest: (requestKey: string, lookup: Lookup) => Promise<OrderResult>;
+	dismissUnreadable: (slot: string, raw: string) => Promise<OrderResult>;
+	canCancel: boolean;
 	isSubmitting: boolean;
 }
 
@@ -113,36 +109,30 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 		return send((signer) => sender.submit(signer, { kind: "twap", params: action, ...target }));
 	}
 
-	async function settleRequest(requestKey: string, act: () => Promise<RequestOutcome>): Promise<OrderResult> {
-		const outcome = await act();
-		const result = reportRequestOutcome(outcome);
-		if (outcome.kind !== "busy" && outcome.kind !== "refused")
-			updateByRequestKey(requestKey, resultToQueueUpdate(result));
-		return result;
+	async function retryRequest(requestKey: string): Promise<OrderResult> {
+		return reportRequestOutcome(await sender.retry(requestKey));
 	}
 
-	function retryRequest(requestKey: string): Promise<OrderResult> {
-		return settleRequest(requestKey, () => sender.retry(requestKey));
-	}
-
-	function cancelRequest(requestKey: string): Promise<OrderResult> {
+	async function cancelRequest(requestKey: string): Promise<OrderResult> {
 		const signer = getSigner();
-		if (!signer) {
-			return Promise.resolve({ ok: false, status: "notSent", error: t`Wallet is required for exchange actions` });
-		}
-		return settleRequest(requestKey, () => sender.cancel(signer, requestKey));
+		if (!signer) return { ok: false, status: "notSent", error: t`Wallet is required for exchange actions` };
+		return reportRequestOutcome(await sender.cancel(signer, requestKey));
 	}
 
 	async function previewDismiss(requestKey: string): Promise<DismissPreview> {
-		const inspection = await sender.inspect(requestKey);
+		const inspection = await sender.inspect(requestKey, getSigner());
 		if (inspection.kind === "inspected") {
 			return { kind: "confirm", text: describeInspection(inspection), lookup: inspection.lookup };
 		}
 		return { kind: "result", result: reportRequestOutcome(inspection) };
 	}
 
-	function dismissRequest(requestKey: string, lookup: Lookup): Promise<OrderResult> {
-		return settleRequest(requestKey, () => sender.dismiss(requestKey, lookup));
+	async function dismissRequest(requestKey: string, lookup: Lookup): Promise<OrderResult> {
+		return reportRequestOutcome(await sender.dismiss(requestKey, lookup, getSigner()));
+	}
+
+	async function dismissUnreadable(slot: string, raw: string): Promise<OrderResult> {
+		return reportUnreadableOutcome(await sender.dismissUnreadable(slot, raw));
 	}
 
 	return {
@@ -152,6 +142,8 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 		cancelRequest,
 		previewDismiss,
 		dismissRequest,
+		dismissUnreadable,
+		canCancel: getSigner() !== null,
 		isSubmitting,
 	};
 }

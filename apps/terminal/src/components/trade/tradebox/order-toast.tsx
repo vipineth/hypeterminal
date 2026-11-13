@@ -5,11 +5,12 @@ import { useEffect } from "react";
 import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/time";
 import { usePendingRequests, useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { cn } from "@/lib/cn";
-import type { OrderOutcome } from "@/lib/trade/extract-order-status";
+import type { OrderOutcome, OrderResult, UnreadableSlot } from "@/lib/trade/extract-order-status";
 import { getRequestKey, type Lookup } from "@/lib/trade/order-sender";
 import type { PendingRequest } from "@/lib/trade/pending-requests";
 import {
 	type OrderQueueItem,
+	requestResultToQueueUpdate,
 	resultToQueueUpdate,
 	useOrderQueue,
 	useOrderQueueActions,
@@ -69,15 +70,18 @@ interface RowActions {
 	previewDismiss: (requestKey: string) => void;
 	keep: (requestKey: string) => void;
 	dismiss: (requestKey: string, lookup: Lookup) => void;
+	confirmUnreadable: (rowId: string, confirm: boolean) => void;
+	dismissUnreadable: (rowId: string, unreadable: UnreadableSlot) => void;
 }
 
 interface Props {
 	order: OrderQueueItem;
 	onRemove: () => void;
 	actions: RowActions;
+	canCancel: boolean;
 }
 
-function OrderItem({ order, onRemove, actions }: Props) {
+function OrderItem({ order, onRemove, actions, canCancel }: Props) {
 	useAutoRemove(order, onRemove);
 
 	const sideColor = order.side === "buy" ? "text-success" : "text-error";
@@ -156,7 +160,16 @@ function OrderItem({ order, onRemove, actions }: Props) {
 					<div className={cn("text-xs", order.status === "failed" ? "text-error" : "text-warning")}>{order.error}</div>
 				)}
 				{order.status === "unsettled" && order.requestKey && (
-					<RequestActions requestKey={order.requestKey} confirm={order.confirmDismiss} actions={actions} />
+					<RequestActions
+						requestKey={order.requestKey}
+						confirm={order.confirmDismiss}
+						canDismiss={order.canDismiss === true}
+						canCancel={canCancel}
+						actions={actions}
+					/>
+				)}
+				{order.status === "failed" && order.unreadable && (
+					<UnreadableActions order={order} unreadable={order.unreadable} actions={actions} />
 				)}
 			</div>
 
@@ -178,10 +191,14 @@ function OrderItem({ order, onRemove, actions }: Props) {
 function RequestActions({
 	requestKey,
 	confirm,
+	canDismiss,
+	canCancel,
 	actions,
 }: {
 	requestKey: string;
 	confirm: OrderQueueItem["confirmDismiss"];
+	canDismiss: boolean;
+	canCancel: boolean;
 	actions: RowActions;
 }) {
 	if (confirm) {
@@ -227,21 +244,86 @@ function RequestActions({
 				intent="error"
 				size="xxs"
 				className="rounded-xs"
+				disabled={!canCancel}
 				onClick={() => actions.cancel(requestKey)}
 			>
 				{t`Cancel`}
 			</Button>
-			<Button
-				variant="ghost"
-				intent="neutral"
-				size="xxs"
-				className="rounded-xs"
-				onClick={() => actions.previewDismiss(requestKey)}
-			>
-				{t`Dismiss`}
-			</Button>
+			{canDismiss && (
+				<Button
+					variant="ghost"
+					intent="neutral"
+					size="xxs"
+					className="rounded-xs"
+					onClick={() => actions.previewDismiss(requestKey)}
+				>
+					{t`Dismiss`}
+				</Button>
+			)}
+			{!canCancel && <span className="text-xs text-fg-muted">{t`Connect your trading wallet to cancel it.`}</span>}
 		</div>
 	);
+}
+
+function UnreadableActions({
+	order,
+	unreadable,
+	actions,
+}: {
+	order: OrderQueueItem;
+	unreadable: UnreadableSlot;
+	actions: RowActions;
+}) {
+	if (!order.confirmUnreadable) {
+		return (
+			<div className="pt-1">
+				<Button
+					variant="outline"
+					intent="neutral"
+					size="xxs"
+					className="rounded-xs"
+					onClick={() => actions.confirmUnreadable(order.id, true)}
+				>
+					{t`Dismiss pending order`}
+				</Button>
+			</div>
+		);
+	}
+	return (
+		<div className="space-y-1 pt-1">
+			<div className="text-xs text-fg">
+				{t`It may still execute. Dismiss it? Your next order on this market will be sent as a new one.`}
+			</div>
+			<div className="flex items-center gap-1.5">
+				<Button
+					variant="outline"
+					intent="error"
+					size="xxs"
+					className="rounded-xs"
+					onClick={() => actions.dismissUnreadable(order.id, unreadable)}
+				>
+					{t`Yes, dismiss it`}
+				</Button>
+				<Button
+					variant="ghost"
+					intent="neutral"
+					size="xxs"
+					className="rounded-xs"
+					onClick={() => actions.confirmUnreadable(order.id, false)}
+				>
+					{t`Keep it`}
+				</Button>
+			</div>
+		</div>
+	);
+}
+
+async function outcomeOf(act: () => Promise<OrderResult>): Promise<OrderResult> {
+	try {
+		return await act();
+	} catch (error) {
+		return { ok: false, status: "notSent", error: error instanceof Error ? error.message : String(error) };
+	}
 }
 
 function toQueueItem(request: PendingRequest): OrderQueueItem {
@@ -274,8 +356,8 @@ function CountdownBar({ order }: { order: OrderQueueItem }) {
 export function OrderToast() {
 	const queued = useOrderQueue();
 	const pendingRequests = usePendingRequests();
-	const { addOrder, updateByRequestKey, removeOrder } = useOrderQueueActions();
-	const { retryRequest, cancelRequest, previewDismiss, dismissRequest } = useSubmitPlan();
+	const { addOrder, updateOrder, updateByRequestKey, removeOrder } = useOrderQueueActions();
+	const { retryRequest, cancelRequest, previewDismiss, dismissRequest, dismissUnreadable, canCancel } = useSubmitPlan();
 
 	const queuedKeys = new Set(queued.map((order) => order.requestKey));
 	const leftOver = pendingRequests.filter((request) => !queuedKeys.has(getRequestKey(request))).map(toQueueItem);
@@ -287,25 +369,38 @@ export function OrderToast() {
 		if (order) addOrder({ ...order, status });
 	}
 
+	async function runRequestAction(requestKey: string, act: () => Promise<OrderResult>) {
+		adopt(requestKey, "pending");
+		updateByRequestKey(requestKey, { status: "pending", confirmDismiss: undefined });
+		updateByRequestKey(requestKey, requestResultToQueueUpdate(await outcomeOf(act)));
+	}
+
 	async function handlePreviewDismiss(requestKey: string) {
-		adopt(requestKey, "unsettled");
-		const preview = await previewDismiss(requestKey);
-		updateByRequestKey(
-			requestKey,
-			preview.kind === "confirm"
-				? { confirmDismiss: { text: preview.text, lookup: preview.lookup } }
-				: resultToQueueUpdate(preview.result),
-		);
+		updateByRequestKey(requestKey, { status: "pending" });
+		try {
+			const preview = await previewDismiss(requestKey);
+			updateByRequestKey(
+				requestKey,
+				preview.kind === "confirm"
+					? { status: "unsettled", confirmDismiss: { text: preview.text, lookup: preview.lookup } }
+					: requestResultToQueueUpdate(preview.result),
+			);
+		} catch (error) {
+			updateByRequestKey(requestKey, requestResultToQueueUpdate(await outcomeOf(() => Promise.reject(error))));
+		}
+	}
+
+	async function handleDismissUnreadable(rowId: string, unreadable: UnreadableSlot) {
+		updateOrder(rowId, { status: "pending", confirmUnreadable: undefined });
+		updateOrder(rowId, resultToQueueUpdate(await outcomeOf(() => dismissUnreadable(unreadable.slot, unreadable.raw))));
 	}
 
 	const actions: RowActions = {
 		retry(requestKey) {
-			adopt(requestKey, "pending");
-			void retryRequest(requestKey);
+			void runRequestAction(requestKey, () => retryRequest(requestKey));
 		},
 		cancel(requestKey) {
-			adopt(requestKey, "pending");
-			void cancelRequest(requestKey);
+			void runRequestAction(requestKey, () => cancelRequest(requestKey));
 		},
 		previewDismiss(requestKey) {
 			void handlePreviewDismiss(requestKey);
@@ -314,7 +409,13 @@ export function OrderToast() {
 			updateByRequestKey(requestKey, { confirmDismiss: undefined });
 		},
 		dismiss(requestKey, lookup) {
-			void dismissRequest(requestKey, lookup);
+			void runRequestAction(requestKey, () => dismissRequest(requestKey, lookup));
+		},
+		confirmUnreadable(rowId, confirm) {
+			updateOrder(rowId, { confirmUnreadable: confirm || undefined });
+		},
+		dismissUnreadable(rowId, unreadable) {
+			void handleDismissUnreadable(rowId, unreadable);
 		},
 	};
 
@@ -370,7 +471,7 @@ export function OrderToast() {
 			<div className={cn("divide-y divide-stroke-weak/30 overflow-y-auto", ORDER_TOAST_LIST_MAX_HEIGHT)}>
 				{orders.map((order) => (
 					<div key={order.id} className="relative">
-						<OrderItem order={order} onRemove={() => removeOrder(order.id)} actions={actions} />
+						<OrderItem order={order} onRemove={() => removeOrder(order.id)} actions={actions} canCancel={canCancel} />
 						<CountdownBar order={order} />
 					</div>
 				))}
