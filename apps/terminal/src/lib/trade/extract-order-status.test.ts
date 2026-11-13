@@ -1,33 +1,120 @@
+import { ApiRequestError, HttpRequestError } from "@nktkas/hyperliquid";
 import { describe, expect, it } from "vitest";
-import { interpretOrderStatuses, NO_EXCHANGE_RESPONSE } from "@/lib/trade/extract-order-status";
+import type { PlanLeg } from "@/domain/trade/order-intent";
+import { interpretOrderStatuses, NO_EXCHANGE_RESPONSE, readThrownStatuses } from "@/lib/trade/extract-order-status";
 
-describe("interpretOrderStatuses (unified result handling)", () => {
-	it("treats a status-level error as a failure (the positions-tab bug this fixes)", () => {
-		expect(interpretOrderStatuses([{ error: "Insufficient margin" }])).toEqual({
+const ORDER: PlanLeg[] = [{ role: "order", price: "80.276" }];
+const ENTRY_WITH_TP: PlanLeg[] = [
+	{ role: "entry", price: "80.276" },
+	{ role: "takeProfit", price: "90" },
+];
+const POSITION_TP_SL: PlanLeg[] = [
+	{ role: "takeProfit", price: "90" },
+	{ role: "stopLoss", price: "70" },
+];
+const SCALE: PlanLeg[] = ["80", "79.5", "79", "78.5", "78"].map((price) => ({ role: "scaleLeg", price }));
+
+const FILLED = { filled: { totalSz: "1", avgPx: "80.276", oid: 11 } };
+const RESTING = { resting: { oid: 12 } };
+const TP_REJECTED = { error: "Invalid TP/SL price. asset=5" };
+
+const POST_ONLY_REJECTION = {
+	status: "ok",
+	response: {
+		type: "order",
+		data: {
+			statuses: [{ error: "Post only order would have immediately matched, bbo was 1922.9@1923.7. asset=4" }],
+		},
+	},
+};
+
+describe("interpretOrderStatuses", () => {
+	it("reports success when every leg is placed", () => {
+		expect(interpretOrderStatuses([FILLED, "waitingForTrigger"], ENTRY_WITH_TP)).toEqual({
+			result: { ok: true, outcome: "filled" },
+			settled: true,
+		});
+		expect(interpretOrderStatuses([RESTING, "waitingForFill"], ENTRY_WITH_TP).result).toEqual({
+			ok: true,
+			outcome: "resting",
+		});
+		expect(interpretOrderStatuses(["waitingForTrigger"], ORDER).result).toEqual({ ok: true, outcome: "triggerSet" });
+	});
+
+	it("reports one failure when every leg is rejected for the same reason", () => {
+		const margin = { error: "Insufficient margin to place order. asset=5" };
+		expect(interpretOrderStatuses([margin, margin], ENTRY_WITH_TP)).toEqual({
+			result: { ok: false, error: "Insufficient margin to place order. asset=5" },
+			settled: true,
+		});
+		expect(interpretOrderStatuses([margin], ORDER).result).toEqual({
 			ok: false,
-			error: "Insufficient margin",
+			error: "Insufficient margin to place order. asset=5",
 		});
 	});
 
-	it("joins multiple status errors", () => {
-		expect(interpretOrderStatuses([{ error: "a" }, { error: "b" }])).toEqual({ ok: false, error: "a; b" });
+	it("names each rejected leg when the reasons differ", () => {
+		expect(interpretOrderStatuses([{ error: "a" }, { error: "b" }], ENTRY_WITH_TP).result).toEqual({
+			ok: false,
+			error: "Entry rejected: a. Take profit rejected: b",
+		});
+	});
+
+	it("reports an entry that fills with a rejected take profit per leg", () => {
+		expect(interpretOrderStatuses([FILLED, TP_REJECTED], ENTRY_WITH_TP)).toEqual({
+			result: { ok: false, error: "Entry filled. Take profit rejected: Invalid TP/SL price. asset=5" },
+			settled: false,
+		});
+	});
+
+	it("reports a resting entry with a rejected take profit per leg", () => {
+		expect(interpretOrderStatuses([RESTING, TP_REJECTED], ENTRY_WITH_TP).result).toEqual({
+			ok: false,
+			error: "Entry placed. Take profit rejected: Invalid TP/SL price. asset=5",
+		});
+	});
+
+	it("reports a position take profit that is set beside a rejected stop loss", () => {
+		expect(interpretOrderStatuses(["waitingForTrigger", { error: "bad sl" }], POSITION_TP_SL).result).toEqual({
+			ok: false,
+			error: "Take profit set. Stop loss rejected: bad sl",
+		});
+	});
+
+	it("names the one scale leg the exchange rejected", () => {
+		const statuses = [RESTING, RESTING, { error: "Post only order would have immediately matched" }, RESTING, RESTING];
+		expect(interpretOrderStatuses(statuses, SCALE).result).toEqual({
+			ok: false,
+			error: "4 of 5 legs placed. Leg 3 at 79 rejected: Post only order would have immediately matched",
+		});
 	});
 
 	it("fails an empty response instead of reporting silent success", () => {
-		expect(interpretOrderStatuses([])).toEqual({ ok: false, error: NO_EXCHANGE_RESPONSE });
-	});
-
-	it("reports filled and resting outcomes", () => {
-		expect(interpretOrderStatuses([{ filled: { totalSz: "1" } }])).toEqual({ ok: true, outcome: "filled" });
-		expect(interpretOrderStatuses([{ resting: { oid: 1 } }])).toEqual({ ok: true, outcome: "resting" });
-		expect(interpretOrderStatuses(["waitingForFill"])).toEqual({ ok: true, outcome: "resting" });
-		expect(interpretOrderStatuses(["waitingForTrigger"])).toEqual({ ok: true, outcome: "triggerSet" });
-	});
-
-	it("lets any error win over a resting sibling", () => {
-		expect(interpretOrderStatuses([{ resting: { oid: 1 } }, { error: "rejected" }])).toEqual({
-			ok: false,
-			error: "rejected",
+		expect(interpretOrderStatuses([], ORDER)).toEqual({
+			result: { ok: false, error: NO_EXCHANGE_RESPONSE },
+			settled: false,
 		});
+	});
+});
+
+describe("readThrownStatuses", () => {
+	it("reads the per-leg statuses the SDK throws when one bulk leg errors", () => {
+		const thrown = new ApiRequestError(POST_ONLY_REJECTION, "order 0: Post only order would have immediately matched");
+		expect(readThrownStatuses(thrown)).toEqual(POST_ONLY_REJECTION.response.data.statuses);
+	});
+
+	it("reads a thrown fill beside a rejected take profit as a partial result", () => {
+		const response = { status: "ok", response: { type: "order", data: { statuses: [FILLED, TP_REJECTED] } } };
+		const statuses = readThrownStatuses(new ApiRequestError(response, "order 1: Invalid TP/SL price. asset=5"));
+		expect(interpretOrderStatuses(statuses ?? [], ENTRY_WITH_TP).result).toEqual({
+			ok: false,
+			error: "Entry filled. Take profit rejected: Invalid TP/SL price. asset=5",
+		});
+	});
+
+	it("finds no statuses in a whole-request rejection or a transport failure", () => {
+		const rejected = { status: "err", response: "User or API Wallet 0x1 does not exist." };
+		expect(readThrownStatuses(new ApiRequestError(rejected, rejected.response))).toBeNull();
+		expect(readThrownStatuses(new HttpRequestError({ detail: "Request timed out after 10000 ms" }))).toBeNull();
 	});
 });

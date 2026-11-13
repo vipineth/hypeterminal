@@ -1,6 +1,7 @@
+import { ApiRequestError, HttpRequestError } from "@nktkas/hyperliquid";
 import Big from "big.js";
 import { renderToString } from "react-dom/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useTradeTicket } from "@/hooks/trade/use-trade-ticket";
 
 const POINTS_USDC = vi.hoisted(() => ({
@@ -49,6 +50,7 @@ const form = vi.hoisted(() => ({
 
 const liveFeed = vi.hoisted(() => ({ markPx: null as string | null, status: "active", isStale: false }));
 const exchange = vi.hoisted(() => ({ placeOrder: vi.fn() }));
+const info = vi.hoisted(() => ({ orderStatus: vi.fn() }));
 const formActions = vi.hoisted(() => ({ resetForm: vi.fn() }));
 const queue = vi.hoisted(() => ({ addOrder: vi.fn(() => "order-1"), updateOrder: vi.fn(), removeOrder: vi.fn() }));
 
@@ -77,6 +79,7 @@ vi.mock("@/lib/hyperliquid", async (importOriginal) => ({
 		status: liveFeed.status,
 		isStale: liveFeed.isStale,
 	}),
+	getInfoClient: () => info,
 }));
 
 vi.mock("@/hooks/trade/use-fee-rates", () => ({
@@ -159,7 +162,15 @@ async function pressSubmit() {
 }
 
 function sentOrders() {
-	return exchange.placeOrder.mock.calls.map(([action]) => action.orders);
+	return exchange.placeOrder.mock.calls.map(([action]) => action.orders.map(withoutCloid));
+}
+
+function withoutCloid({ c: _cloid, ...order }: { c?: string }) {
+	return order;
+}
+
+function sentCloids(): string[][] {
+	return exchange.placeOrder.mock.calls.map(([action]) => action.orders.map((order: { c?: string }) => order.c));
 }
 
 beforeEach(() => {
@@ -630,6 +641,165 @@ describe("order flags a market cannot take", () => {
 		expect(exchange.placeOrder.mock.calls[0][0]).toMatchObject({
 			orders: [{ a: 10008, b: true, p: "30", s: "100", r: false, t: { limit: { tif: "Gtc" } } }],
 			grouping: "na",
+		});
+	});
+});
+
+describe("order legs the ticket reports and retries", () => {
+	const TP_REASON = "Invalid TP/SL price. asset=5";
+	const FILLED = { filled: { totalSz: "1", avgPx: "80.276", oid: 11 } };
+	const UNKNOWN_OID = { status: "unknownOid" };
+
+	function entryFilledTpRejected() {
+		const response = { status: "ok", response: { type: "order", data: { statuses: [FILLED, { error: TP_REASON }] } } };
+		return new ApiRequestError(response, `order 1: ${TP_REASON}`);
+	}
+
+	function timedOut() {
+		return new HttpRequestError({ detail: "Request timed out after 10000 ms" });
+	}
+
+	function lookup(status: string, isTrigger = false) {
+		return { status: "order", order: { status, statusTimestamp: 0, order: { isTrigger } } };
+	}
+
+	function filledWith(...rest: unknown[]) {
+		return { response: { data: { statuses: [FILLED, ...rest] } } };
+	}
+
+	function lastQueueUpdate() {
+		return queue.updateOrder.mock.lastCall?.[1];
+	}
+
+	async function pressSubmitPastReconcile() {
+		const submitted = pressSubmit();
+		await vi.advanceTimersByTimeAsync(7000);
+		await submitted;
+	}
+
+	beforeEach(() => {
+		form.market = SOL_PERP;
+		form.side = "buy";
+		form.orderType = "limit";
+		form.sizeMode = "base";
+		form.limitPrice = "80.276";
+		form.triggerPrice = "";
+		form.reduceOnly = false;
+		form.twapMinutes = null;
+		form.tpSlEnabled = true;
+		form.tpPrice = "90";
+		form.slPrice = "";
+		form.sizeUnit = null;
+		form.maxTradeSzs = [100, 100];
+		exchange.placeOrder.mockReset();
+		info.orderStatus.mockReset();
+		queue.updateOrder.mockReset();
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	it("reports an entry that fills with a rejected take profit per leg", async () => {
+		typeSizeHere("1");
+		exchange.placeOrder.mockRejectedValue(entryFilledTpRejected());
+		await pressSubmit();
+		expect(lastQueueUpdate()).toEqual({ status: "failed", error: `Entry filled. Take profit rejected: ${TP_REASON}` });
+	});
+
+	it("gives every leg its own cloid from one plan id", async () => {
+		typeSizeHere("3");
+		form.slPrice = "70";
+		exchange.placeOrder.mockResolvedValue(filledWith("waitingForTrigger", "waitingForTrigger"));
+		await pressSubmit();
+		const [cloids] = sentCloids();
+		expect(cloids).toHaveLength(3);
+		for (const cloid of cloids) expect(cloid).toMatch(/^0x[0-9a-f]{32}$/);
+		expect(new Set(cloids).size).toBe(3);
+		expect(new Set(cloids.map((cloid) => cloid.slice(0, 30))).size).toBe(1);
+	});
+
+	it("sends nothing when the same plan is retried after its entry filled", async () => {
+		typeSizeHere("2");
+		exchange.placeOrder.mockRejectedValue(entryFilledTpRejected());
+		info.orderStatus
+			.mockResolvedValueOnce(lookup("filled"))
+			.mockResolvedValueOnce(lookup("badTriggerPxRejected", true));
+		await pressSubmit();
+		await pressSubmit();
+		expect(exchange.placeOrder).toHaveBeenCalledTimes(1);
+		expect(info.orderStatus.mock.calls.map(([params]) => params.oid)).toEqual(sentCloids()[0]);
+		expect(lastQueueUpdate()).toEqual({
+			status: "failed",
+			error: "Not sent again. Entry filled. Take profit rejected",
+		});
+	});
+
+	it("sends a double-clicked market order once", async () => {
+		form.orderType = "market";
+		form.tpSlEnabled = false;
+		typeSizeHere("4");
+		exchange.placeOrder.mockResolvedValue(filledWith());
+		const ticket = renderTicket();
+		await Promise.all([ticket.buttonContent.action(), ticket.buttonContent.action()]);
+		expect(exchange.placeOrder).toHaveBeenCalledTimes(1);
+	});
+
+	it("reports a timed-out order the exchange filled as filled", async () => {
+		vi.useFakeTimers();
+		form.orderType = "market";
+		form.tpSlEnabled = false;
+		typeSizeHere("5");
+		exchange.placeOrder.mockRejectedValue(timedOut());
+		info.orderStatus.mockResolvedValueOnce(UNKNOWN_OID).mockResolvedValue(lookup("filled"));
+		await pressSubmitPastReconcile();
+		expect(lastQueueUpdate()).toEqual({ status: "success", outcome: "filled" });
+	});
+
+	it("retries a timed-out plan the exchange never saw with the same cloids", async () => {
+		vi.useFakeTimers();
+		typeSizeHere("6");
+		exchange.placeOrder.mockRejectedValueOnce(timedOut()).mockResolvedValueOnce(filledWith("waitingForTrigger"));
+		info.orderStatus.mockResolvedValue(UNKNOWN_OID);
+		await pressSubmitPastReconcile();
+		expect(lastQueueUpdate()).toEqual({ status: "failed", error: "Request timed out after 10000 ms" });
+		await pressSubmit();
+		const [firstCloids, retryCloids] = sentCloids();
+		expect(firstCloids[0]).toMatch(/^0x[0-9a-f]{32}$/);
+		expect(retryCloids).toEqual(firstCloids);
+		expect(lastQueueUpdate()).toEqual({ status: "success", outcome: "filled" });
+	});
+
+	it("gives an identical order new cloids once the first one filled", async () => {
+		form.orderType = "market";
+		form.tpSlEnabled = false;
+		typeSizeHere("7");
+		exchange.placeOrder.mockResolvedValue(filledWith());
+		await pressSubmit();
+		await pressSubmit();
+		const [first, second] = sentCloids();
+		expect(first[0]).toMatch(/^0x[0-9a-f]{32}$/);
+		expect(second).not.toEqual(first);
+	});
+
+	it("never resends a timed-out order while the exchange cannot be reached to check it", async () => {
+		vi.useFakeTimers();
+		form.orderType = "market";
+		form.tpSlEnabled = false;
+		typeSizeHere("8");
+		const offline = new HttpRequestError({ detail: "Failed to fetch" });
+		exchange.placeOrder.mockRejectedValue(offline);
+		info.orderStatus.mockRejectedValue(offline);
+		await pressSubmitPastReconcile();
+		expect(lastQueueUpdate()).toEqual({
+			status: "failed",
+			error: "Order status unknown: Failed to fetch. Check open orders before you try again.",
+		});
+		await pressSubmit();
+		expect(exchange.placeOrder).toHaveBeenCalledTimes(1);
+		expect(lastQueueUpdate()).toEqual({
+			status: "failed",
+			error: "Order status unknown. Check open orders before you try again.",
 		});
 	});
 });
