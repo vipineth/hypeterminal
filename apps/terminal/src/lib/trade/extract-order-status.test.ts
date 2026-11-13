@@ -157,6 +157,7 @@ describe("reportSettlement", () => {
 			kind: "consumed",
 			request: request("order", legs),
 			lookup: orderLookup(found("filled"), found("canceled"), found("badAloPxRejected")),
+			rejection: null,
 		};
 		expect(reportSettlement(settlement)).toEqual({
 			ok: false,
@@ -165,7 +166,12 @@ describe("reportSettlement", () => {
 	});
 
 	it("says a consumed order the exchange has not listed will not be sent again", () => {
-		const settlement: Settlement = { kind: "consumed", request: request("order"), lookup: orderLookup(UNKNOWN) };
+		const settlement: Settlement = {
+			kind: "consumed",
+			request: request("order"),
+			lookup: orderLookup(UNKNOWN),
+			rejection: null,
+		};
 		expect(reportSettlement(settlement)).toEqual({
 			ok: false,
 			error: "Order not found on the exchange. It will not be sent again. Check open orders.",
@@ -173,10 +179,50 @@ describe("reportSettlement", () => {
 	});
 
 	it("says an expired order placed nothing once its lookup confirms it", () => {
-		const settlement: Settlement = { kind: "expired", request: request("order"), lookup: orderLookup(UNKNOWN) };
+		const settlement: Settlement = {
+			kind: "expired",
+			request: request("order"),
+			lookup: orderLookup(UNKNOWN),
+			rejection: null,
+		};
 		expect(reportSettlement(settlement)).toEqual({
 			ok: false,
 			error: "Not placed. The request expired before the exchange took it.",
+		});
+	});
+
+	it("reports the exchange's reason when a rejection consumed the nonce and nothing was found", () => {
+		const settlement: Settlement = {
+			kind: "consumed",
+			request: request("order"),
+			lookup: orderLookup(UNKNOWN),
+			rejection: "Asset 899999 is out of range.",
+		};
+		expect(reportSettlement(settlement)).toEqual({ ok: false, error: "Asset 899999 is out of range." });
+	});
+
+	it("tells the user why a request lapsed when every send was refused", () => {
+		const reason = "User or API Wallet 0x6117f1250ff313fa510bf05b8b2e359411c431d7 does not exist.";
+		const settlement: Settlement = {
+			kind: "lapsed",
+			request: request("order"),
+			lookup: orderLookup(UNKNOWN),
+			rejection: reason,
+		};
+		expect(reportSettlement(settlement)).toEqual({ ok: false, error: `Not sent: ${reason}` });
+	});
+
+	it("reports a TWAP found after an expired or lapsed request as started, never as not started", () => {
+		const settlement: Settlement = {
+			kind: "lapsed",
+			request: request("twap"),
+			lookup: twapMatch({ status: "activated" }),
+			rejection: "User or API Wallet 0x1 does not exist.",
+		};
+		expect(reportSettlement(settlement)).toEqual({ ok: true, outcome: "twapStarted" });
+		expect(reportSettlement({ ...settlement, kind: "expired", rejection: null })).toEqual({
+			ok: true,
+			outcome: "twapStarted",
 		});
 	});
 
@@ -185,6 +231,7 @@ describe("reportSettlement", () => {
 			kind: "consumed",
 			request: request("twap"),
 			lookup: twapMatch({ status: "error", description: "Insufficient margin" }),
+			rejection: null,
 		};
 		expect(reportSettlement(settlement)).toEqual({ ok: false, error: "TWAP failed: Insufficient margin" });
 		expect(reportSettlement({ ...settlement, lookup: twapMatch({ status: "activated" }) } as Settlement)).toEqual({
@@ -212,7 +259,12 @@ describe("reportSubmit", () => {
 	});
 
 	it("says nothing was sent and the earlier order filled when the earlier one settles on this press", () => {
-		const earlier: Settlement = { kind: "consumed", request: request("order"), lookup: orderLookup(found("filled")) };
+		const earlier: Settlement = {
+			kind: "consumed",
+			request: request("order"),
+			lookup: orderLookup(found("filled")),
+			rejection: null,
+		};
 		expect(reportSubmit({ kind: "blocked", earlier })).toEqual({
 			ok: false,
 			error:

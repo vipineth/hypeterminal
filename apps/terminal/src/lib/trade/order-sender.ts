@@ -27,8 +27,11 @@ const LAPSE_MARGIN_MS = 5000;
 
 type Reply =
 	| { kind: "ok"; response: unknown }
-	| { kind: "duplicate" | "tooLow" | "expired" }
-	| { kind: "rejected" | "unreachable"; error: string };
+	| { kind: "duplicate" }
+	| { kind: "tooLow" }
+	| { kind: "expired" }
+	| { kind: "rejected"; error: string }
+	| { kind: "unreachable"; error: string };
 
 const SETTLING_ERRORS = [
 	{ kind: "duplicate", pattern: /^Invalid nonce: duplicate nonce \d+$/ },
@@ -53,8 +56,9 @@ export type Lookup =
 export type Settlement =
 	| { kind: "pending"; request: PendingRequest; error: string }
 	| { kind: "answered"; request: PendingRequest; response: unknown }
-	| { kind: "consumed"; request: PendingRequest; lookup: Lookup }
-	| { kind: "expired"; request: PendingRequest; lookup: Lookup }
+	| { kind: "consumed"; request: PendingRequest; lookup: Lookup; rejection: string | null }
+	| { kind: "expired"; request: PendingRequest; lookup: Lookup; rejection: null }
+	| { kind: "lapsed"; request: PendingRequest; lookup: Lookup; rejection: string }
 	| { kind: "canceled"; request: PendingRequest };
 
 type Busy = { kind: "busy" };
@@ -187,7 +191,7 @@ export function createOrderSender(env: SenderEnv) {
 		return {
 			slot,
 			kind: submission.kind,
-			user: user.toLowerCase(),
+			user: user.toLowerCase() as `0x${string}`,
 			signer: (await getWalletAddress(config.wallet)).toLowerCase(),
 			asset,
 			body: JSON.stringify(body),
@@ -204,18 +208,27 @@ export function createOrderSender(env: SenderEnv) {
 	async function settle(request: PendingRequest, firstSend: boolean): Promise<Settlement> {
 		const delays = firstSend ? [0, ...AUTO_RESEND_DELAYS_MS] : [0];
 		let error = "";
+		let rejection: string | null = null;
 		for (const [attempt, delay] of delays.entries()) {
 			if (delay > 0) await sleep(delay);
 			const timeoutMs = firstSend && attempt === 0 ? null : READ_TIMEOUT_MS;
 			const reply = await send(JSON.parse(request.body), timeoutMs);
 			if (reply.kind === "ok") return finish(request, { kind: "answered", request, response: reply.response });
 			if (reply.kind === "duplicate" || reply.kind === "tooLow") {
-				return finish(request, { kind: "consumed", request, lookup: await lookUp(request, LOOKUP_DELAYS_MS) });
+				const lookup = await lookUp(request, LOOKUP_DELAYS_MS);
+				return finish(request, { kind: "consumed", request, lookup, rejection });
 			}
-			if (reply.kind === "expired" || (reply.kind === "rejected" && (await hasLapsed(request)))) {
-				return finish(request, { kind: "expired", request, lookup: await lookUp(request, [0]) });
+			if (reply.kind === "expired") {
+				return finish(request, { kind: "expired", request, lookup: await lookUp(request, [0]), rejection: null });
 			}
-			if (reply.kind === "rejected" || reply.kind === "unreachable") error = reply.error;
+			if (reply.kind === "rejected") {
+				rejection = reply.error;
+				if (await hasLapsed(request)) {
+					const lookup = await lookUp(request, LOOKUP_DELAYS_MS);
+					return finish(request, { kind: "lapsed", request, lookup, rejection: reply.error });
+				}
+			}
+			error = reply.error;
 		}
 		return { kind: "pending", request, error };
 	}
@@ -277,9 +290,10 @@ export function createOrderSender(env: SenderEnv) {
 				const reply = await send(cancelBody, READ_TIMEOUT_MS);
 				if (reply.kind === "ok") return finish(request, { kind: "canceled", request });
 				if (reply.kind === "duplicate" || reply.kind === "tooLow") {
-					return finish(request, { kind: "consumed", request, lookup: await lookUp(request, LOOKUP_DELAYS_MS) });
+					const lookup = await lookUp(request, LOOKUP_DELAYS_MS);
+					return finish(request, { kind: "consumed", request, lookup, rejection: null });
 				}
-				return { kind: "pending", request, error: "error" in reply ? reply.error : reply.kind };
+				return { kind: "pending", request, error: reply.kind === "expired" ? "Action already expired" : reply.error };
 			}),
 		);
 	}
@@ -313,24 +327,22 @@ export function createOrderSender(env: SenderEnv) {
 		const signal = AbortSignal.timeout(READ_TIMEOUT_MS);
 		try {
 			return await Promise.all(
-				request.cloids.map((cloid) =>
-					env.info().orderStatus({ user: request.user as `0x${string}`, oid: cloid as `0x${string}` }, signal),
-				),
+				request.cloids.map((cloid) => env.info().orderStatus({ user: request.user, oid: cloid }, signal)),
 			);
 		} catch {
 			return null;
 		}
 	}
 
-	async function readTwapHistory(user: string): Promise<TwapHistoryResponse | null> {
+	async function readTwapHistory(user: `0x${string}`): Promise<TwapHistoryResponse | null> {
 		try {
-			return await env.info().twapHistory({ user: user as `0x${string}` }, AbortSignal.timeout(READ_TIMEOUT_MS));
+			return await env.info().twapHistory({ user }, AbortSignal.timeout(READ_TIMEOUT_MS));
 		} catch {
 			return null;
 		}
 	}
 
-	async function readTwapIds(user: string): Promise<number[] | null> {
+	async function readTwapIds(user: `0x${string}`): Promise<number[] | null> {
 		const history = await readTwapHistory(user);
 		return history ? history.flatMap(({ twapId }) => (twapId === undefined ? [] : [twapId])) : null;
 	}
@@ -379,14 +391,15 @@ export type OrderSender = ReturnType<typeof createOrderSender>;
 
 export function placedNothing(settlement: Settlement): boolean {
 	if (settlement.kind === "canceled") return true;
-	if (settlement.kind !== "expired") return false;
+	if (settlement.kind !== "expired" && settlement.kind !== "lapsed") return false;
 	const { lookup } = settlement;
-	if (lookup.kind === "twap") return lookup.match === null;
+	if (lookup.kind === "twap") return lookup.match === null && (settlement.kind === "expired" || lookup.readable);
 	return lookup.statuses?.every((status) => status.status === "unknownOid") === true;
 }
 
 export function findOurTwap(history: TwapHistoryResponse, request: PendingRequest): TwapRecord | null {
 	if (!request.twap?.knownIds) return null;
+	const { coin } = request.twap;
 	const known = new Set(request.twap.knownIds);
 	const { twap } = (JSON.parse(request.body) as { action: TwapParams }).action;
 	const side = twap.b ? "B" : "A";
@@ -395,7 +408,7 @@ export function findOurTwap(history: TwapHistoryResponse, request: PendingReques
 			({ twapId, state }) =>
 				twapId !== undefined &&
 				!known.has(twapId) &&
-				state.coin === request.twap?.coin &&
+				state.coin === coin &&
 				state.side === side &&
 				Big(state.sz).eq(twap.s) &&
 				state.minutes === twap.m &&

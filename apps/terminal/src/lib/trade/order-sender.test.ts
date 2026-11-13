@@ -315,9 +315,42 @@ describe("order sender", () => {
 		expect((await sender.retry(key)).kind).toBe("pending");
 		vi.setSystemTime(Date.now() + 5_000);
 		const lapsed = await sender.retry(key);
-		expect(lapsed.kind).toBe("expired");
-		expect(lapsed.kind === "expired" && placedNothing(lapsed)).toBe(true);
+		expect(lapsed).toMatchObject({ kind: "lapsed", rejection: venue.state.rejectWith });
+		expect(lapsed.kind === "lapsed" && placedNothing(lapsed)).toBe(true);
 		expect(store.get(SLOT)).toBeNull();
+	});
+
+	it("keeps the exchange's reason when a rejection consumed the nonce", async () => {
+		venue.state.rejectWith = "Asset 899999 is out of range.";
+		venue.state.rejectConsumes = true;
+		const { sender } = openTab(venue, storage, locks);
+		const outcome = await sender.submit(signerFor(venue), marketBuy());
+		expect(outcome).toMatchObject({
+			kind: "sent",
+			settlement: {
+				kind: "consumed",
+				rejection: "Asset 899999 is out of range.",
+				lookup: { statuses: [{ status: "unknownOid" }] },
+			},
+		});
+		expect(venue.state.placedLegs).toBe(0);
+	});
+
+	it("blocks a new press when an order landed before its agent key was revoked", async () => {
+		goesDownOnFirstSend(venue);
+		const { sender } = openTab(venue, storage, locks);
+		const first = await sender.submit(signerFor(venue), marketBuy());
+		expect(first).toMatchObject({ kind: "sent", settlement: { kind: "pending" } });
+		comesBackUp(venue);
+		venue.state.rejectWith = "User or API Wallet 0x6117f1250ff313fa510bf05b8b2e359411c431d7 does not exist.";
+		venue.state.lookupLag = 1;
+		vi.setSystemTime(Date.now() + 36_000);
+		const second = await sender.submit(signerFor(venue), marketBuy());
+		expect(second).toMatchObject({
+			kind: "blocked",
+			earlier: { kind: "lapsed", lookup: { statuses: [{ order: { status: "filled" } }] } },
+		});
+		expect(venue.state.placedLegs).toBe(1);
 	});
 
 	it("attributes only a TWAP that appeared after its snapshot, on its coin, with its params", async () => {

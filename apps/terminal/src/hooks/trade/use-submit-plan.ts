@@ -53,7 +53,7 @@ function labelFromLeg(leg: OrderPlan["orders"][number]): RequestLabel {
 
 interface UseSubmitPlanResult {
 	submitPlan: (plan: SubmitPlanInput, label?: RequestLabel) => Promise<OrderResult>;
-	submitTwap: (action: TwapOrderParameters, target: { coin: string; label?: RequestLabel }) => Promise<OrderResult>;
+	submitTwap: (action: TwapOrderParameters, target: { coin: string; label: RequestLabel }) => Promise<OrderResult>;
 	retryRequest: (requestKey: string) => Promise<OrderResult>;
 	cancelRequest: (requestKey: string) => Promise<OrderResult>;
 	isSubmitting: boolean;
@@ -101,19 +101,8 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 		);
 	}
 
-	function submitTwap(action: TwapOrderParameters, target: { coin: string; label?: RequestLabel }) {
-		return send((signer) =>
-			sender.submit(signer, {
-				kind: "twap",
-				params: action,
-				coin: target.coin,
-				label: target.label ?? {
-					market: target.coin,
-					side: action.twap.b ? "buy" : "sell",
-					size: String(action.twap.s),
-				},
-			}),
-		);
+	function submitTwap(action: TwapOrderParameters, target: { coin: string; label: RequestLabel }) {
+		return send((signer) => sender.submit(signer, { kind: "twap", params: action, ...target }));
 	}
 
 	async function settleRequest(requestKey: string, act: () => Promise<CancelOutcome>): Promise<OrderResult> {

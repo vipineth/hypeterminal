@@ -2,6 +2,8 @@ import { z } from "zod";
 
 const KEY_PREFIX = "hypeterminal:pending-request:v1:";
 
+const hexSchema = z.custom<`0x${string}`>((value) => typeof value === "string" && /^0x[0-9a-fA-F]+$/.test(value));
+
 const legSchema = z.object({
 	role: z.enum(["entry", "takeProfit", "stopLoss", "order", "scaleLeg"]),
 	price: z.string(),
@@ -16,17 +18,20 @@ const labelSchema = z.object({
 const pendingRequestSchema = z.object({
 	slot: z.string(),
 	kind: z.enum(["order", "twap"]),
-	user: z.string(),
+	user: hexSchema,
 	signer: z.string(),
 	asset: z.number().int(),
 	body: z.string(),
 	nonce: z.number().int(),
 	expiresAfter: z.number().int(),
-	cloids: z.array(z.string()),
-	legs: z.array(legSchema),
-	twap: z.object({ coin: z.string(), knownIds: z.array(z.number()).nullable() }).nullable(),
-	label: labelSchema,
-	createdAt: z.number(),
+	cloids: z.array(hexSchema),
+	legs: z.array(legSchema).catch([]),
+	twap: z
+		.object({ coin: z.string(), knownIds: z.array(z.number()).nullable() })
+		.nullable()
+		.catch(null),
+	label: labelSchema.catch({ market: "", side: "buy", size: "" }),
+	createdAt: z.number().catch(0),
 });
 
 export type PendingRequest = z.infer<typeof pendingRequestSchema>;
@@ -81,15 +86,20 @@ export function createRequestStore(
 
 	function put(request: PendingRequest) {
 		const raw = JSON.stringify(request);
-		try {
-			const storage = getStorage();
-			if (!storage) throw new Error("no storage");
-			storage.setItem(KEY_PREFIX + request.slot, raw);
-			unsaved.delete(request.slot);
-		} catch {
-			unsaved.set(request.slot, raw);
-		}
+		if (save(request.slot, raw)) unsaved.delete(request.slot);
+		else unsaved.set(request.slot, raw);
 		notify();
+	}
+
+	function save(slot: string, raw: string): boolean {
+		const storage = getStorage();
+		if (!storage) return false;
+		try {
+			storage.setItem(KEY_PREFIX + slot, raw);
+			return true;
+		} catch {
+			return false;
+		}
 	}
 
 	function remove(request: PendingRequest) {

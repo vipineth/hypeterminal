@@ -8,6 +8,7 @@ import {
 	type Settlement,
 	type SubmitOutcome,
 } from "@/lib/trade/order-sender";
+import type { PendingRequest } from "@/lib/trade/pending-requests";
 
 export type OrderOutcome = "filled" | "partiallyFilled" | "resting" | "triggerSet" | "twapStarted";
 
@@ -202,9 +203,13 @@ export function reportSettlement(settlement: Settlement): OrderResult {
 				? reportTwapReply(settlement.response)
 				: interpretOrderStatuses(readStatuses(settlement.response), request.legs);
 		case "consumed":
+			if (settlement.rejection && foundNothing(settlement.lookup)) return { ok: false, error: settlement.rejection };
 			return reportLookup(settlement.lookup, request.legs);
 		case "expired":
-			return reportExpired(settlement.lookup, request.legs);
+		case "lapsed":
+			if (!foundNothing(settlement.lookup)) return reportLookup(settlement.lookup, request.legs);
+			if (settlement.rejection) return { ok: false, error: t`Not sent: ${settlement.rejection}` };
+			return reportExpired(request.kind);
 	}
 }
 
@@ -235,11 +240,13 @@ function reportLookup(lookup: Lookup, legs: PlanLeg[]): OrderResult {
 	return { ok: false, error: t`${result.error}. It will not be sent again. Check open orders.` };
 }
 
-function reportExpired(lookup: Lookup, legs: PlanLeg[]): OrderResult {
-	if (lookup.kind === "twap")
-		return { ok: false, error: t`Not started. The request expired before the exchange took it.` };
-	const anyFound = lookup.statuses?.some((status) => status.status !== "unknownOid");
-	if (anyFound) return reportLookup(lookup, legs);
+function foundNothing(lookup: Lookup): boolean {
+	if (lookup.kind === "twap") return lookup.match === null;
+	return lookup.statuses?.every((status) => status.status === "unknownOid") === true;
+}
+
+function reportExpired(kind: PendingRequest["kind"]): OrderResult {
+	if (kind === "twap") return { ok: false, error: t`Not started. The request expired before the exchange took it.` };
 	return { ok: false, error: t`Not placed. The request expired before the exchange took it.` };
 }
 

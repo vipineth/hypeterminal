@@ -45,6 +45,8 @@ export function createFakeExchange({ coins = DEFAULT_COINS }: { coins?: Record<n
 		exchangeDown: false,
 		infoDown: false,
 		rejectWith: null as string | null,
+		rejectConsumes: false,
+		lookupLag: 0,
 		clockSkewMs: 0,
 		nonceFloor: 0,
 		nextOid: 1,
@@ -109,12 +111,13 @@ export function createFakeExchange({ coins = DEFAULT_COINS }: { coins?: Record<n
 	function process(body: Body): unknown {
 		state.onArrive?.(body);
 		const { action, nonce, expiresAfter } = body;
-		if (state.rejectWith) return { status: "err", response: state.rejectWith };
+		if (state.rejectWith && !state.rejectConsumes) return { status: "err", response: state.rejectWith };
 		if (processedNonces.has(nonce)) return { status: "err", response: `Invalid nonce: duplicate nonce ${nonce}` };
 		if (nonce <= state.nonceFloor) {
 			return { status: "err", response: `Invalid nonce: nonce too low ${nonce} < ${state.nonceFloor + 1}` };
 		}
 		processedNonces.add(nonce);
+		if (state.rejectWith) return { status: "err", response: state.rejectWith };
 		if (expiresAfter !== undefined && exchangeNow() > expiresAfter) {
 			return { status: "err", response: "Action already expired" };
 		}
@@ -130,6 +133,10 @@ export function createFakeExchange({ coins = DEFAULT_COINS }: { coins?: Record<n
 		if (payload.type === "exchangeStatus") return { time: exchangeNow(), specialStatuses: null };
 		if (payload.type === "twapHistory") return structuredClone(twapHistory);
 		if (payload.type === "orderStatus") {
+			if (state.lookupLag > 0) {
+				state.lookupLag--;
+				return { status: "unknownOid" };
+			}
 			const found = payload.oid ? lookups.get(payload.oid) : undefined;
 			if (!found) return { status: "unknownOid" };
 			return { status: "order", order: { order: found.order, status: found.status, statusTimestamp: exchangeNow() } };
