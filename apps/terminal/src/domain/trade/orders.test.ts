@@ -340,11 +340,17 @@ function sumSizes(sizes: string[]): number {
 	return sizes.reduce((total, size) => total + Number(size), 0);
 }
 
+const PERP_SZ0 = { szDecimals: 0, kind: "perp" } as const;
+
 const SCALE_DIRECTIONS = [
 	["buy", "10", "11"],
 	["buy", "11", "10"],
 	["sell", "10", "11"],
 	["sell", "11", "10"],
+	["buy", "11", "10.999999999999999999997"],
+	["buy", "10.000000000000000000003", "11"],
+	["sell", "10", "10.000000000000000000003"],
+	["sell", "10.999999999999999999997", "10"],
 ] as const;
 
 function scalePrices(side: "buy" | "sell", start: string, end: string, levels: number): string[] {
@@ -476,6 +482,11 @@ describe("order wire format", () => {
 		expect(scalePrices("sell", "11", "10", 4)).toEqual(["11", "10.667", "10.334", "10"]);
 	});
 
+	it("keeps scale legs passive when typed prices carry more decimals than a division keeps", () => {
+		expect(scalePrices("sell", "10", "10.000000000000000000003", 4)).toEqual(["10", "10.001", "10.001", "10.001"]);
+		expect(scalePrices("buy", "11", "10.999999999999999999997", 4)).toEqual(["11", "10.999", "10.999", "10.999"]);
+	});
+
 	it("keeps endpoints and on-tick interior legs exact for both sides in both directions", () => {
 		expect(scalePrices("buy", "10", "11", 7)).toEqual(["10", "10.166", "10.333", "10.5", "10.666", "10.833", "11"]);
 		expect(scalePrices("buy", "11", "10", 7)).toEqual(["11", "10.833", "10.666", "10.5", "10.333", "10.166", "10"]);
@@ -490,7 +501,10 @@ describe("order wire format", () => {
 			const steps = levels - 1;
 			for (const [side, start, end] of SCALE_DIRECTIONS) {
 				const prices = scalePrices(side, start, end, levels);
-				if (prices[0] !== start || prices.at(-1) !== end) misses.push(`${side} ${start}->${end} x${levels}: ${prices}`);
+				const typedEnds = [start, end].map((price) => formatPriceForOrder(price, PERP_SZ0, side, "passive"));
+				if (prices[0] !== typedEnds[0] || prices.at(-1) !== typedEnds[1]) {
+					misses.push(`${side} ${start}->${end} x${levels}: ${prices}`);
+				}
 				prices.forEach((price, i) => {
 					const exactTimesSteps = Big(start).times(steps).plus(Big(end).minus(start).times(i));
 					const low = Big(price)
