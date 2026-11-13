@@ -179,6 +179,16 @@ describe("order sender", () => {
 		expect(distinctNonces(venue)).toBe(1);
 	});
 
+	it("lists a user's unconfirmed request in a tab opened later, so its toast can offer Retry and Cancel", async () => {
+		goesDownOnFirstSend(venue);
+		const first = openTab(venue, storage, locks);
+		const outcome = await first.sender.submit(signerFor(venue), marketBuy());
+		const later = openTab(venue, storage, locks);
+		if (outcome.kind !== "sent") throw new Error("expected a sent request");
+		expect(later.sender.list(TEST_USER).map((request) => request.nonce)).toEqual([outcome.settlement.request.nonce]);
+		expect(later.sender.list("0x0000000000000000000000000000000000000002")).toEqual([]);
+	});
+
 	it("sends one signed body when two tabs press at the same moment", async () => {
 		const tabA = openTab(venue, storage, locks);
 		const tabB = openTab(venue, storage, locks);
