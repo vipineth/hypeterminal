@@ -41,7 +41,7 @@ export const WS_RELIABILITY_LIMITS = {
 			trades: NEVER_STALE,
 			allMids: 20_000,
 			candle: NEVER_STALE,
-			activeAssetCtx: 4_000,
+			activeAssetCtx: 10_000,
 			activeAssetData: 20_000,
 			allDexsAssetCtxs: 60_000,
 			spotAssetCtxs: 60_000,
