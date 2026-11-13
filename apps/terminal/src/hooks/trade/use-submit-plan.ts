@@ -18,7 +18,6 @@ import {
 	createOrderSender,
 	getRequestKey,
 	type Lookup,
-	type OrderSubmission,
 	type RequestOutcome,
 	type Signer,
 	type SubmitOutcome,
@@ -61,7 +60,6 @@ function labelFromLeg(leg: OrderPlan["orders"][number]): RequestLabel {
 interface UseSubmitPlanResult {
 	submitPlan: (plan: SubmitPlanInput, label?: RequestLabel) => Promise<OrderResult>;
 	submitTwap: (action: TwapOrderParameters, target: { coin: string; label: RequestLabel }) => Promise<OrderResult>;
-	sendRejectedLegs: (offer: OrderSubmission) => Promise<OrderResult>;
 	retryRequest: (requestKey: string) => Promise<OrderResult>;
 	cancelRequest: (requestKey: string) => Promise<OrderResult>;
 	previewDismiss: (requestKey: string) => Promise<DismissPreview>;
@@ -115,11 +113,6 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 		return send((signer) => sender.submit(signer, { kind: "twap", params: action, ...target }));
 	}
 
-	function sendRejectedLegs(offer: OrderSubmission): Promise<OrderResult> {
-		const orders = assignCloids(offer.params.orders, createPlanId());
-		return send((signer) => sender.submit(signer, { ...offer, params: { ...offer.params, orders } }));
-	}
-
 	async function settleRequest(requestKey: string, act: () => Promise<RequestOutcome>): Promise<OrderResult> {
 		const outcome = await act();
 		const result = reportRequestOutcome(outcome);
@@ -155,7 +148,6 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 	return {
 		submitPlan,
 		submitTwap,
-		sendRejectedLegs,
 		retryRequest,
 		cancelRequest,
 		previewDismiss,

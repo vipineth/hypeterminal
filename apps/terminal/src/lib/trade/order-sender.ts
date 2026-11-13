@@ -69,10 +69,10 @@ type Busy = { kind: "busy" };
 type Missing = { kind: "missing" };
 
 export type Refused =
-	| { kind: "refused"; reason: "storage" | "locks" | "twapHistory" | "offerStale" }
+	| { kind: "refused"; reason: "storage" | "locks" | "twapHistory" }
 	| { kind: "refused"; reason: "slotMoved"; to: "pending" | "settled" };
 
-export type Held = { kind: "held"; partial: PartialPlan; offer: OrderSubmission | null };
+export type Held = { kind: "held"; partial: PartialPlan };
 
 export type SubmitOutcome =
 	| Busy
@@ -97,10 +97,8 @@ type OrderSubmissionParams = Pick<OrderParameters, "builder"> & {
 
 type TwapParams = Pick<TwapOrderParameters, "twap">;
 
-export type RejectedLegs = { nonce: number; indices: number[] };
-
 export type Submission =
-	| { kind: "order"; params: OrderSubmissionParams; legs: PlanLeg[]; label: RequestLabel; parent?: RejectedLegs }
+	| { kind: "order"; params: OrderSubmissionParams; legs: PlanLeg[]; label: RequestLabel }
 	| { kind: "twap"; params: TwapParams; coin: string; label: RequestLabel };
 
 export type OrderSubmission = Extract<Submission, { kind: "order" }>;
@@ -203,19 +201,12 @@ export function createOrderSender(env: SenderEnv) {
 			const earlier = await record(await settle(current.request, false));
 			if (!placedNothing(earlier)) return { kind: "blocked", earlier };
 		}
-		const settled = await env.store.read(slot);
-		let parent: PendingRequest["parent"] = null;
-		if (submission.kind === "order" && submission.parent) {
-			parent = parentOf(settled, submission.parent);
-			if (!parent) return { kind: "refused", reason: "offerStale" };
-		} else {
-			const held = holdFor(settled, submission);
-			if (held) return held;
-		}
+		const held = holdFor(await env.store.read(slot), submission);
+		if (held) return held;
 		try {
 			const knownIds = submission.kind === "twap" ? await readTwapIds(signer.user) : [];
 			if (!knownIds) return { kind: "refused", reason: "twapHistory" };
-			const request = await signRequest(slot, asset, signer, submission, { knownIds, parent });
+			const request = await signRequest(slot, asset, signer, submission, knownIds);
 			if (!(await env.store.write(slot, { state: "pending", request }))) return { kind: "refused", reason: "storage" };
 			return { kind: "signed", request };
 		} catch (error) {
@@ -228,7 +219,7 @@ export function createOrderSender(env: SenderEnv) {
 		asset: number,
 		{ user, config }: Signer,
 		submission: Submission,
-		extra: { knownIds: number[]; parent: PendingRequest["parent"] },
+		knownIds: number[],
 	): Promise<PendingRequest> {
 		const expiresAfter = (await env.clock.now()) + windowMs;
 		const body = await holdSign(config, (held) =>
@@ -247,8 +238,7 @@ export function createOrderSender(env: SenderEnv) {
 			expiresAfter,
 			cloids: submission.kind === "order" ? submission.params.orders.map((leg) => leg.c) : [],
 			legs: submission.kind === "order" ? submission.legs : [],
-			twap: submission.kind === "twap" ? { coin: submission.coin, knownIds: extra.knownIds } : null,
-			parent: extra.parent,
+			twap: submission.kind === "twap" ? { coin: submission.coin, knownIds } : null,
 			label: submission.label,
 			createdAt: Date.now(),
 		};
@@ -534,8 +524,7 @@ function everyLeg(legCount: number, fate: LegFate): LegFate[] {
 function partialAfter(settlement: Settlement): PartialPlan | null {
 	const fates = legFates(settlement);
 	if (!fates) return null;
-	const { request } = settlement;
-	const plan = request.parent ? mergeFates(request.parent, fates) : planOf(request, fates);
+	const plan = planOf(settlement.request, fates);
 	if (!plan) return null;
 	const isPartial = plan.fates.includes("rejected") && plan.fates.some((fate) => fate !== "rejected");
 	return isPartial ? { ...plan, settledAt: Date.now() } : null;
@@ -545,14 +534,6 @@ function planOf(request: PendingRequest, fates: LegFate[]): Omit<PartialPlan, "s
 	const { action } = JSON.parse(request.body) as { action: OrderSubmissionParams };
 	if (request.legs.length !== fates.length || action.orders.length === 0) return null;
 	return { roles: request.legs.map((leg) => leg.role), buy: action.orders[0].b, grouping: action.grouping, fates };
-}
-
-function mergeFates(parent: NonNullable<PendingRequest["parent"]>, fates: LegFate[]): Omit<PartialPlan, "settledAt"> {
-	const merged = [...parent.plan.fates];
-	parent.indices.forEach((planIndex, index) => {
-		merged[planIndex] = fates[index] ?? "unknown";
-	});
-	return { ...parent.plan, fates: merged };
 }
 
 function holdFor(current: SlotRecord | null, submission: Submission): Held | null {
@@ -565,26 +546,7 @@ function holdFor(current: SlotRecord | null, submission: Submission): Held | nul
 		roles.every((role, index) => role === partial.roles[index]) &&
 		submission.params.orders[0]?.b === partial.buy;
 	if (!sameShape) return null;
-	return { kind: "held", partial, offer: rejectedLegsOf(current.nonce, partial, submission) };
-}
-
-function rejectedLegsOf(nonce: number, partial: PartialPlan, submission: OrderSubmission): OrderSubmission | null {
-	if (partial.grouping === "normalTpsl") return null;
-	const indices = partial.fates.flatMap((fate, index) => (fate === "rejected" ? [index] : []));
-	return {
-		kind: "order",
-		params: { ...submission.params, orders: indices.map((index) => submission.params.orders[index]) },
-		legs: indices.map((index) => submission.legs[index]),
-		label: submission.label,
-		parent: { nonce, indices },
-	};
-}
-
-function parentOf(current: SlotRecord | null, rejected: RejectedLegs): PendingRequest["parent"] {
-	if (current?.state !== "settled" || current.nonce !== rejected.nonce || !current.partial) return null;
-	const { partial } = current;
-	if (!rejected.indices.every((index) => partial.fates[index] === "rejected")) return null;
-	return { plan: partial, indices: rejected.indices };
+	return { kind: "held", partial };
 }
 
 export function findOurTwaps(history: TwapHistoryResponse, request: PendingRequest): TwapRecord[] {

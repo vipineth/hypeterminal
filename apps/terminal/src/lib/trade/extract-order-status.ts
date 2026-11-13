@@ -16,7 +16,6 @@ import {
 	type OrderLookup,
 	type Refused,
 	type RequestOutcome,
-	type OrderSubmission,
 	type Settlement,
 	type SubmitOutcome,
 	type TwapRecord,
@@ -28,7 +27,7 @@ export type OrderOutcome = "filled" | "partiallyFilled" | "resting" | "triggerSe
 export type OrderResult =
 	| { ok: true; outcome: OrderOutcome; detail?: string }
 	| { ok: false; status: "failed" | "unknown"; error: string }
-	| { ok: false; status: "notSent"; error: string; offer?: OrderSubmission }
+	| { ok: false; status: "notSent"; error: string }
 	| { ok: false; status: "unsettled"; error: string; requestKey: string };
 
 export const NO_EXCHANGE_RESPONSE = "No response from exchange";
@@ -154,24 +153,13 @@ function describeRefusal(refusal: Refused): string {
 			return refusal.to === "pending"
 				? t`Not sent. Another order on this market was just sent from another tab. Press again to send a new one.`
 				: t`Not sent. Another order on this market was just settled in another tab. Press again to send a new one.`;
-		case "offerStale":
-			return t`Not sent. The last order on this market changed after these legs were offered. Press submit again to see what is left.`;
 	}
 }
 
-function reportHeld({ partial, offer }: Held): OrderResult {
-	const summary = describePartial(partial);
-	if (!offer) {
-		return notSent(
-			t`Not sent. Your last order on this market partly went through: ${summary}. Sending it again would place the same legs twice. Set the rejected take profit or stop loss on the position instead.`,
-		);
-	}
-	return {
-		ok: false,
-		status: "notSent",
-		error: t`Not sent. Your last order on this market partly went through: ${summary}. Sending it again would place the same legs twice.`,
-		offer,
-	};
+function reportHeld({ partial }: Held): OrderResult {
+	return notSent(
+		t`Not sent. Your last order on this market partly went through: ${describePartial(partial)}. Sending it again would place the same legs twice.`,
+	);
 }
 
 function describePartial(partial: PartialPlan): string {

@@ -28,7 +28,6 @@ const actions = vi.hoisted(() => ({
 		lookup: { kind: "order", statuses: null },
 	})),
 	dismissRequest: vi.fn(async () => ({ ok: true })),
-	sendRejectedLegs: vi.fn(async () => ({ ok: true, outcome: "filled" })),
 	dismissUnreadable: vi.fn(async () => ({ ok: false, status: "unknown", error: "Dismissed." })),
 }));
 
@@ -68,7 +67,6 @@ vi.mock("@/hooks/trade/use-submit-plan", () => ({
 		cancelRequest: actions.cancelRequest,
 		previewDismiss: actions.previewDismiss,
 		dismissRequest: actions.dismissRequest,
-		sendRejectedLegs: actions.sendRejectedLegs,
 		dismissUnreadable: actions.dismissUnreadable,
 		canCancel: view.canCancel,
 	}),
@@ -97,7 +95,6 @@ const LEFT_FROM_BEFORE_RELOAD: PendingRequest = {
 	cloids: [],
 	legs: [{ role: "order", price: "1160" }],
 	twap: null,
-	parent: null,
 	label: { market: "ETH", side: "buy", size: "0.0104" },
 	createdAt: 0,
 };
@@ -190,21 +187,6 @@ describe("order toast", () => {
 		expect(html).toContain("TWAP status unknown.");
 		expect(buttonsNamed("Retry")).toHaveLength(0);
 		expect(buttonsNamed("Cancel")).toHaveLength(0);
-	});
-
-	it("sends only the rejected legs from a held row", () => {
-		const offer = {
-			kind: "order" as const,
-			params: { orders: [], grouping: "na" as const },
-			legs: [],
-			label: { market: "SOL", side: "buy" as const, size: "1" },
-			parent: { nonce: 1, indices: [1] },
-		};
-		view.queued = [{ ...UNCONFIRMED_ROW, status: "failed", requestKey: undefined, error: "Not sent.", offer }];
-		view.pending = [];
-		renderToString(<OrderToast />);
-		buttonsNamed("Send only the rejected legs")[0].onClick?.();
-		expect(actions.sendRejectedLegs).toHaveBeenCalledWith(offer);
 	});
 
 	it("shows an unconfirmed buy left from before a reload beside the sell press it blocked", () => {

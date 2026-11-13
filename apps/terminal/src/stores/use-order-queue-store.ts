@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type { OrderOutcome, OrderResult } from "@/lib/trade/extract-order-status";
-import type { Lookup, OrderSubmission } from "@/lib/trade/order-sender";
+import type { Lookup } from "@/lib/trade/order-sender";
 
 export interface OrderQueueItem {
 	id: string;
@@ -16,7 +16,6 @@ export interface OrderQueueItem {
 	detail?: string;
 	error?: string;
 	requestKey?: string;
-	offer?: OrderSubmission;
 	confirmDismiss?: { text: string; lookup: Lookup };
 	createdAt: number;
 	completedAt?: number;
@@ -79,7 +78,6 @@ function applyUpdate(order: OrderQueueItem, update: Partial<Omit<OrderQueueItem,
 export function resultToQueueUpdate(result: OrderResult): Partial<Omit<OrderQueueItem, "id">> {
 	const cleared = {
 		confirmDismiss: undefined,
-		offer: undefined,
 		outcome: undefined,
 		detail: undefined,
 		error: undefined,
@@ -89,7 +87,7 @@ export function resultToQueueUpdate(result: OrderResult): Partial<Omit<OrderQueu
 		case "unsettled":
 			return { ...cleared, status: "unsettled", error: result.error, requestKey: result.requestKey };
 		case "notSent":
-			return { ...cleared, status: "failed", error: result.error, offer: result.offer };
+			return { ...cleared, status: "failed", error: result.error };
 		default:
 			return { ...cleared, status: result.status, error: result.error };
 	}

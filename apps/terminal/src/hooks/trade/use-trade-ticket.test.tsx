@@ -196,13 +196,6 @@ function TicketProbe<T>({ onTicket, render }: Props<T>) {
 	return null;
 }
 
-async function renderSubmitPlan() {
-	const { useSubmitPlan } = await import("@/hooks/trade/use-submit-plan");
-	const hooks: ReturnType<typeof useSubmitPlan>[] = [];
-	renderToString(<TicketProbe render={useSubmitPlan} onTicket={(hook) => hooks.push(hook)} />);
-	return hooks[0];
-}
-
 function renderTicket(render: UseTradeTicket = useTradeTicket): Ticket {
 	const tickets: Ticket[] = [];
 	renderToString(<TicketProbe render={render} onTicket={(ticket) => tickets.push(ticket)} />);
@@ -951,7 +944,7 @@ describe("order legs the ticket reports and retries", () => {
 		).toEqual([]);
 	});
 
-	it("holds a corrected scale resubmit and sends only the rejected leg at the ticket's new price", async () => {
+	it("holds a corrected scale resubmit and keeps the ticket, so the filled leg is placed once", async () => {
 		form.orderType = "scale";
 		form.tpSlEnabled = false;
 		form.scaleStart = "82";
@@ -973,17 +966,8 @@ describe("order legs the ticket reports and retries", () => {
 				"Not sent. Your last order on this market partly went through: Leg 1 placed, Leg 2 rejected. Sending it again would place the same legs twice.",
 		});
 		expect(orderBodies()).toHaveLength(1);
-		const [firstLeg, rejectedLegPrice] = sentOrders()[0].map((order) => order.p);
-		expect(held.offer.params.orders.map((order: WireOrder) => order.p)).not.toContain(firstLeg);
-		const sent = await (await renderSubmitPlan()).sendRejectedLegs(held.offer);
-		expect(sent).toEqual({ ok: true, outcome: "resting" });
-		expect(
-			sentOrders()
-				.flat()
-				.map((order) => order.p),
-		).toEqual([firstLeg, rejectedLegPrice, held.offer.params.orders[0].p]);
-		expect(held.offer.params.orders[0].p).not.toBe(rejectedLegPrice);
-		expect(net.venue.state.placedLegs).toBe(2);
+		expect(formActions.resetForm).not.toHaveBeenCalled();
+		expect(net.venue.state.placedLegs).toBe(1);
 	});
 
 	it("reports a scale order with filled and resting legs as partly filled", async () => {

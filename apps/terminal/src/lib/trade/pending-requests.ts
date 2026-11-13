@@ -39,10 +39,6 @@ const pendingRequestSchema = z.object({
 		.object({ coin: z.string(), knownIds: z.array(z.number()) })
 		.nullable()
 		.catch(null),
-	parent: z
-		.object({ plan: partialPlanSchema, indices: z.array(z.number().int()) })
-		.nullable()
-		.catch(null),
 	label: labelSchema.catch({ market: "", side: "buy", size: "" }),
 	createdAt: z.number().catch(0),
 });

@@ -502,10 +502,6 @@ function entryWithTakeProfit(takeProfit: string): OrderSubmission {
 	};
 }
 
-function sentPrices(venue: FakeExchange): string[] {
-	return venue.orderRequests().flatMap((body) => (body.action.orders as { p: string }[]).map((leg) => leg.p));
-}
-
 describe("order sender in a browser that cannot keep its records", () => {
 	let venue: FakeExchange;
 
@@ -924,99 +920,6 @@ describe("order sender with twaps", () => {
 	});
 });
 
-describe("order sender after a partial result", () => {
-	let venue: FakeExchange;
-	let storage: MemoryKeyValue;
-	let locks: LockManagerLike;
-
-	beforeEach(() => {
-		vi.useFakeTimers({ toFake: ["Date"], now: new Date("2026-11-14T12:00:00Z") });
-		venue = createFakeExchange();
-		storage = createMemoryKeyValue();
-		locks = createMemoryLocks();
-		venue.state.legOutcome = (order) =>
-			order.p === "95" || order.p === "97" ? { status: { error: "bad price" }, lookup: "rejected" } : undefined;
-	});
-
-	afterEach(() => {
-		vi.useRealTimers();
-	});
-
-	function heldOffer(outcome: SubmitOutcome): OrderSubmission {
-		if (outcome.kind !== "held" || !outcome.offer)
-			throw new Error(`expected a held press with an offer, got ${outcome.kind}`);
-		return outcome.offer;
-	}
-
-	it("holds a corrected resubmit that would place the filled leg again, and offers only the rejected leg", async () => {
-		const { sender } = openTab(venue, storage, locks);
-		const first = await sender.submit(signerFor(venue), scale(["90", "95"]));
-		const corrected = await sender.submit(signerFor(venue), scale(["90", "96"]));
-		expect(sentPrices(venue).filter((price) => price === "90")).toHaveLength(1);
-		expect(reportSubmit(first)).toEqual({
-			ok: false,
-			status: "failed",
-			error: "1 of 2 legs placed. Leg 2 at 95 rejected: bad price",
-		});
-		expect(corrected).toMatchObject({ kind: "held", partial: { fates: ["placed", "rejected"] } });
-		expect(heldOffer(corrected).params.orders.map((leg) => leg.p)).toEqual(["96"]);
-		expect(reportSubmit(corrected)).toMatchObject({
-			status: "notSent",
-			error:
-				"Not sent. Your last order on this market partly went through: Leg 1 placed, Leg 2 rejected. Sending it again would place the same legs twice.",
-		});
-		expect(venue.state.placedLegs).toBe(1);
-		expect(venue.orderRequests()).toHaveLength(1);
-	});
-
-	it("sends only the rejected leg at its corrected price, so the filled leg is placed once", async () => {
-		const { store, sender } = openTab(venue, storage, locks);
-		await sender.submit(signerFor(venue), scale(["90", "95"]));
-		const offer = heldOffer(await sender.submit(signerFor(venue), scale(["90", "96"])));
-		const sent = await sender.submit(signerFor(venue), offer);
-		expect(reportSubmit(sent)).toEqual({ ok: true, outcome: "filled" });
-		expect(sentPrices(venue)).toEqual(["90", "95", "96"]);
-		expect(venue.state.placedLegs).toBe(2);
-		expect(await store.read(SLOT)).toMatchObject({ state: "settled", partial: null });
-		expect(await sender.submit(signerFor(venue), offer)).toEqual({ kind: "refused", reason: "offerStale" });
-	});
-
-	it("keeps holding while a resent leg is rejected again, and then offers only that leg", async () => {
-		const { sender } = openTab(venue, storage, locks);
-		await sender.submit(signerFor(venue), scale(["90", "95", "97"]));
-		const offer = heldOffer(await sender.submit(signerFor(venue), scale(["90", "96", "97"])));
-		expect(offer.params.orders.map((leg) => leg.p)).toEqual(["96", "97"]);
-		await sender.submit(signerFor(venue), offer);
-		const again = await sender.submit(signerFor(venue), scale(["90", "96", "98"]));
-		expect(again).toMatchObject({ kind: "held", partial: { fates: ["placed", "placed", "rejected"] } });
-		expect(heldOffer(again).params.orders.map((leg) => leg.p)).toEqual(["98"]);
-	});
-
-	it("holds an entry whose take profit was rejected without offering a lone take profit", async () => {
-		venue.state.legOutcome = (order) =>
-			"trigger" in order.t ? { status: { error: "Invalid TP/SL price. asset=5" }, lookup: "rejected" } : undefined;
-		const { sender } = openTab(venue, storage, locks);
-		await sender.submit(signerFor(venue), entryWithTakeProfit("100"));
-		const corrected = await sender.submit(signerFor(venue), entryWithTakeProfit("101"));
-		expect(corrected).toMatchObject({ kind: "held", offer: null });
-		expect(venue.state.placedLegs).toBe(1);
-	});
-
-	it("stops holding five minutes after the partial result", async () => {
-		const { sender } = openTab(venue, storage, locks);
-		await sender.submit(signerFor(venue), scale(["90", "95"]));
-		vi.setSystemTime(Date.now() + PARTIAL_HOLD_MS);
-		expect(await sender.submit(signerFor(venue), scale(["90", "96"]))).toMatchObject({ kind: "sent" });
-	});
-
-	it("sends a different order on the same market at once", async () => {
-		const { sender } = openTab(venue, storage, locks);
-		await sender.submit(signerFor(venue), scale(["90", "95"]));
-		expect(await sender.submit(signerFor(venue), scale(["90", "96"], { buy: false }))).toMatchObject({ kind: "sent" });
-		expect(await sender.submit(signerFor(venue), scale(["91"]))).toMatchObject({ kind: "sent" });
-	});
-});
-
 describe("order sender seen from another tab", () => {
 	let venue: FakeExchange;
 	let storage: MemoryKeyValue;
@@ -1210,6 +1113,15 @@ describe("order sender holding a market after a partial result", () => {
 		await sender.submit(signerFor(venue), scale(["90", "95"]));
 		vi.setSystemTime(Date.now() + PARTIAL_HOLD_MS + 1000);
 		expect(await sender.submit(signerFor(venue), scale(["90", "96"]))).toMatchObject({ kind: "sent" });
+	});
+
+	it("holds an entry whose take profit was rejected", async () => {
+		venue.state.legOutcome = (order) =>
+			"trigger" in order.t ? { status: { error: "Invalid TP/SL price. asset=5" }, lookup: "rejected" } : undefined;
+		const { sender } = openTab(venue, storage, locks);
+		await sender.submit(signerFor(venue), entryWithTakeProfit("100"));
+		expect(await sender.submit(signerFor(venue), entryWithTakeProfit("101"))).toMatchObject({ kind: "held" });
+		expect(venue.state.placedLegs).toBe(1);
 	});
 
 	it("sends a different order on the same market at once", async () => {

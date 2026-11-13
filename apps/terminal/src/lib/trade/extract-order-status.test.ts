@@ -39,7 +39,6 @@ function request(kind: "order" | "twap", legs: PlanLeg[] = ORDER): PendingReques
 		cloids: [],
 		legs,
 		twap: kind === "twap" ? { coin: "SOL", knownIds: [] } : null,
-		parent: null,
 		label: { market: "SOL", side: "buy", size: "1" },
 		createdAt: 0,
 	};
@@ -328,12 +327,6 @@ describe("reportSubmit", () => {
 			status: "notSent",
 			error: "Not sent. Another order on this market was just settled in another tab. Press again to send a new one.",
 		});
-		expect(reportSubmit({ kind: "refused", reason: "offerStale" })).toEqual({
-			ok: false,
-			status: "notSent",
-			error:
-				"Not sent. The last order on this market changed after these legs were offered. Press submit again to see what is left.",
-		});
 	});
 
 	it("holds a resubmit after a partial and names the legs that went through", () => {
@@ -344,11 +337,11 @@ describe("reportSubmit", () => {
 			fates: ["placed", "rejected"] as ("placed" | "rejected")[],
 			settledAt: 0,
 		};
-		expect(reportSubmit({ kind: "held", partial, offer: null })).toEqual({
+		expect(reportSubmit({ kind: "held", partial })).toEqual({
 			ok: false,
 			status: "notSent",
 			error:
-				"Not sent. Your last order on this market partly went through: Leg 1 placed, Leg 2 rejected. Sending it again would place the same legs twice. Set the rejected take profit or stop loss on the position instead.",
+				"Not sent. Your last order on this market partly went through: Leg 1 placed, Leg 2 rejected. Sending it again would place the same legs twice.",
 		});
 	});
 });
