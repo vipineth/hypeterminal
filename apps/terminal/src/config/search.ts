@@ -47,7 +47,7 @@ export const marketSearchConfig: SearchConfig<UnifiedMarketInfo> = {
 		},
 		quoteTokenFullName: {
 			extract: (m) => {
-				return m.kind === "perp" ? null : m.quote.fullName;
+				return m.kind === "spot" ? m.quote.fullName : null;
 			},
 			weight: 0.6,
 		},

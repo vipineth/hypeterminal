@@ -61,7 +61,7 @@ export function MarketsProvider({ children }: Props) {
 	const error = spotError ?? dexsError ?? allMetasError ?? null;
 
 	const model = useMemo(
-		() => (spotMeta && perpDexs && allPerpMetas ? parseMarkets({ spotMeta, perpDexs, allPerpMetas }) : EMPTY_MODEL),
+		() => (perpDexs && allPerpMetas ? parseMarkets({ spotMeta, perpDexs, allPerpMetas }) : EMPTY_MODEL),
 		[spotMeta, perpDexs, allPerpMetas],
 	);
 	const markets = useMemo(() => createMarkets(model, isLoading, error), [model, isLoading, error]);

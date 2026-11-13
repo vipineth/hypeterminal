@@ -206,6 +206,52 @@ describe("parseMarkets on the committed mainnet snapshot", () => {
 	});
 });
 
+describe("before spotMeta lands", () => {
+	const early = parseMarkets({ perpDexs: snapshot.perpDexs, allPerpMetas: snapshot.allPerpMetas });
+	const usdcDexes = new Set(
+		snapshot.allPerpMetas.flatMap((meta, index) => (meta.collateralToken === 0 ? [snapshot.perpDexs[index]?.name ?? ""] : [])),
+	);
+
+	function orderFields(market: Market | undefined) {
+		if (!market || !isPerpLike(market)) return market;
+		const { quote, dex, ...fields } = market;
+		return { ...fields, quote: quote.name, quoteDisplayName: quote.displayName, dex: dex.name, dexIndex: dex.index };
+	}
+
+	it("publishes every perp on a USDC dex exactly as the full parse does", () => {
+		const expected = model.markets.filter((market) => isPerpLike(market) && usdcDexes.has(market.dex.name));
+
+		expect(early.markets.map((market) => market.name)).toEqual(expected.map((market) => market.name));
+		expect(early.markets.map(orderFields)).toEqual(expected.map(orderFields));
+		expect(orderFields(early.byName.get("BTC"))).toMatchObject({ assetId: 0, pairName: "BTC-USDC" });
+		expect(early.byName.get("xyz:NVDA")?.assetId).toBe(110002);
+	});
+
+	it("resolves no spot market and no market whose collateral only spotMeta can name", () => {
+		expect(early.markets.filter((market) => market.kind === "spot")).toEqual([]);
+		expect(early.byName.get("@107")).toBeUndefined();
+		expect(early.byName.get("PURR/USDC")).toBeUndefined();
+		expect(early.byName.get("flx:NVDA")).toBeUndefined();
+		expect(early.tokens).toEqual([]);
+		expect(early.tokenByName.get("USDC")).toBeUndefined();
+	});
+
+	it("reports nothing missing while spotMeta is pending", () => {
+		expect(early.issues).toEqual([]);
+	});
+
+	it("reports a token 0 that is not USDC once spotMeta lands", () => {
+		const renamed = copySnapshot();
+		const usdc = renamed.spotMeta.tokens.find((token) => token.index === 0);
+		if (!usdc) throw new Error("fixture lost USDC");
+		usdc.name = "USDX";
+
+		expect(issuesOf("usdcTokenMismatch", parseMarkets(renamed).issues)).toEqual([
+			{ kind: "usdcTokenMismatch", name: "USDX" },
+		]);
+	});
+});
+
 describe("margin policy", () => {
 	it("allows cross only when the normalized margin mode is unset", () => {
 		const perps = model.markets.filter(isPerpLike);

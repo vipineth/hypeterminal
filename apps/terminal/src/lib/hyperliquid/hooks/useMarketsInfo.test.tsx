@@ -3,16 +3,17 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { type MetaPayloads, parseMarkets } from "@/domain/market/model";
 import { type UseMarketsInfoReturn, useMarketsInfoInternal } from "@/lib/hyperliquid/hooks/useMarketsInfo";
-import { MarketsProvider } from "@/lib/hyperliquid/markets/use-markets";
+import { MarketsProvider, type Markets, useMarkets } from "@/lib/hyperliquid/markets/use-markets";
 
 const snapshot = vi.hoisted(
 	(): MetaPayloads => ({ perpDexs: [], allPerpMetas: [], spotMeta: { tokens: [], universe: [] } }),
 );
+const pending = vi.hoisted(() => new Set<string>());
 
 vi.mock("@hypeterminal/hl-react", () => ({
 	useInfo: (method: string) => ({
-		data: method in snapshot ? snapshot[method as keyof MetaPayloads] : undefined,
-		isLoading: false,
+		data: method in snapshot && !pending.has(method) ? snapshot[method as keyof MetaPayloads] : undefined,
+		isLoading: pending.has(method),
 		error: null,
 	}),
 	useSubscription: () => ({ data: undefined }),
@@ -23,22 +24,28 @@ Object.assign(
 	JSON.parse(readFileSync(new URL("../../../../fixtures/hl-mainnet-meta.json", import.meta.url), "utf8")),
 );
 
-const rendered: { info?: UseMarketsInfoReturn } = {};
+let rendered: { info?: UseMarketsInfoReturn; markets?: Markets } = {};
 
 function Probe() {
 	rendered.info = useMarketsInfoInternal();
+	rendered.markets = useMarkets();
 	return null;
 }
 
 function renderMarketsInfo(): UseMarketsInfoReturn {
-	rendered.info = undefined;
+	return renderProviders().info;
+}
+
+function renderProviders() {
+	rendered = {};
 	renderToString(
 		<MarketsProvider>
 			<Probe />
 		</MarketsProvider>,
 	);
-	if (!rendered.info) throw new Error("useMarketsInfoInternal did not render");
-	return rendered.info;
+	const { info, markets } = rendered;
+	if (!info || !markets) throw new Error("the markets providers did not render");
+	return { info, markets };
 }
 
 describe("useMarketsInfo", () => {
@@ -61,5 +68,21 @@ describe("useMarketsInfo", () => {
 
 		expect(info.getMarketInfo("BTC")).toMatchObject({ name: "BTC", assetId: 0, isDelisted: false });
 		expect(info.getMarketInfo("NOT-A-COIN")).toBeUndefined();
+	});
+
+	it("serves perps before spotMeta lands and no spot market until it parses", () => {
+		pending.add("spotMeta");
+		const before = renderProviders();
+		pending.delete("spotMeta");
+
+		expect(before.info.getMarketInfo("BTC")).toMatchObject({ name: "BTC", assetId: 0, pairName: "BTC-USDC" });
+		expect(before.markets.getMarket("io:NVDA")).toMatchObject({ name: "io:NVDA", assetId: 200014 });
+		expect(before.info.getMarketInfo("@107")).toBeUndefined();
+		expect(before.markets.getMarket("@107")).toBeUndefined();
+		expect(before.info.spotMarkets).toEqual([]);
+
+		const after = renderProviders();
+		expect(after.info.getMarketInfo("@107")).toMatchObject({ kind: "spot", assetId: 10107 });
+		expect(after.markets.getMarket("@107")).toMatchObject({ kind: "spot", assetId: 10107 });
 	});
 });

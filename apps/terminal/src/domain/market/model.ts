@@ -1,4 +1,5 @@
 import type { MetaResponse, PerpDexsResponse, SpotMetaResponse } from "@nktkas/hyperliquid";
+import { DEFAULT_QUOTE_TOKEN } from "@/config/app";
 import {
 	DEFAULT_LEVERAGE,
 	DEFAULT_MAX_LEVERAGE,
@@ -23,10 +24,12 @@ export interface SpotToken extends SdkToken {
 	isWrapped: boolean;
 }
 
+export type QuoteToken = Pick<SpotToken, "name" | "displayName">;
+
 export interface Dex {
 	name: string;
 	index: number;
-	collateralToken: SpotToken;
+	collateralToken: QuoteToken;
 }
 
 interface MarketBase {
@@ -35,7 +38,7 @@ interface MarketBase {
 	szDecimals: number;
 	priceDecimals: number;
 	ctxIndex: number;
-	quote: SpotToken;
+	quote: QuoteToken;
 	shortName: string;
 	pairName: string;
 	iconUrl: string;
@@ -60,6 +63,7 @@ export interface BuilderPerpMarket extends MarketBase, PerpFields {
 export interface SpotMarket extends MarketBase {
 	kind: "spot";
 	base: SpotToken;
+	quote: SpotToken;
 	isCanonical: boolean;
 	isDelisted: false;
 }
@@ -78,6 +82,7 @@ export type ParseIssue =
 	| { kind: "duplicateCoin"; coin: string }
 	| { kind: "duplicateAssetId"; coin: string; assetId: number }
 	| { kind: "spotIdentityMismatch"; coin: string; index: number }
+	| { kind: "usdcTokenMismatch"; name: string }
 	| { kind: "unknownMarginMode"; coin: string; marginMode: string };
 
 export interface MetaPayloads {
@@ -85,6 +90,8 @@ export interface MetaPayloads {
 	allPerpMetas: MetaResponse[];
 	spotMeta: SpotMetaResponse;
 }
+
+export type PerpFirstPayloads = Omit<MetaPayloads, "spotMeta"> & { spotMeta?: SpotMetaResponse };
 
 export interface MarketModel {
 	markets: readonly Market[];
@@ -101,6 +108,8 @@ const SPOT_ASSET_ID_BASE = 10_000;
 const BUILDER_PERP_ASSET_ID_BASE = 100_000;
 const BUILDER_PERP_SLOTS_PER_DEX = 10_000;
 const NAMED_SPOT_PAIR_INDEX: ReadonlyMap<string, number> = new Map([["PURR/USDC", 0]]);
+const USDC_TOKEN_INDEX = 0;
+const USDC: QuoteToken = { name: DEFAULT_QUOTE_TOKEN, displayName: DEFAULT_QUOTE_TOKEN };
 
 export function isListed(market: Market): market is ListedMarket {
 	return !market.isDelisted;
@@ -119,12 +128,23 @@ export function getDefaultLeverage(market: Market | undefined): number {
 	return Math.min(DEFAULT_LEVERAGE, getMaxLeverage(market));
 }
 
-export function parseMarkets({ perpDexs, allPerpMetas, spotMeta }: MetaPayloads): MarketModel {
+export function parseMarkets({ perpDexs, allPerpMetas, spotMeta }: PerpFirstPayloads): MarketModel {
 	const issues: ParseIssue[] = [];
-	const displayNames = getTokenDisplayNames(spotMeta.tokens);
-	const tokens = spotMeta.tokens.map((token, index) => toSpotToken(token, displayNames[index]));
+	const sdkTokens = spotMeta?.tokens ?? [];
+	const displayNames = getTokenDisplayNames(sdkTokens);
+	const tokens = sdkTokens.map((token, index) => toSpotToken(token, displayNames[index]));
 	const tokenByIndex = indexTokens(tokens, issues);
-	const dexes = parseDexes(perpDexs, allPerpMetas, tokenByIndex, issues);
+	const usdc = tokenByIndex.get(USDC_TOKEN_INDEX);
+	if (usdc && usdc.name !== USDC.name) issues.push({ kind: "usdcTokenMismatch", name: usdc.name });
+
+	function resolveCollateral(dex: string, tokenIndex: number): QuoteToken | undefined {
+		if (!spotMeta) return tokenIndex === USDC_TOKEN_INDEX ? USDC : undefined;
+		const token = tokenByIndex.get(tokenIndex);
+		if (!token) issues.push({ kind: "collateralMissing", dex, tokenIndex });
+		return token;
+	}
+
+	const dexes = parseDexes(perpDexs, allPerpMetas, resolveCollateral, issues);
 
 	const markets: Market[] = [];
 	const byName = new Map<string, Market>();
@@ -150,7 +170,7 @@ export function parseMarkets({ perpDexs, allPerpMetas, spotMeta }: MetaPayloads)
 		});
 	}
 
-	for (const pair of spotMeta.universe) {
+	for (const pair of spotMeta?.universe ?? []) {
 		const base = tokenByIndex.get(pair.tokens[0]);
 		const quote = tokenByIndex.get(pair.tokens[1]);
 		if (!base || !quote) {
@@ -209,11 +229,7 @@ export function parseMarkets({ perpDexs, allPerpMetas, spotMeta }: MetaPayloads)
 	};
 }
 
-export const EMPTY_MODEL: MarketModel = parseMarkets({
-	perpDexs: [],
-	allPerpMetas: [],
-	spotMeta: { universe: [], tokens: [] },
-});
+export const EMPTY_MODEL: MarketModel = parseMarkets({ perpDexs: [], allPerpMetas: [] });
 
 function mintAssetId(value: number): AssetId {
 	return value as AssetId;
@@ -245,7 +261,7 @@ function indexTokens(tokens: readonly SpotToken[], issues: ParseIssue[]): Map<nu
 function parseDexes(
 	perpDexs: PerpDexsResponse,
 	allPerpMetas: readonly MetaResponse[],
-	tokenByIndex: ReadonlyMap<number, SpotToken>,
+	resolveCollateral: (dex: string, tokenIndex: number) => QuoteToken | undefined,
 	issues: ParseIssue[],
 ): Dex[] {
 	const dexes: Dex[] = [];
@@ -262,11 +278,8 @@ function parseDexes(
 			issues.push({ kind: "dexSlotMismatch", dexIndex: index, dex: entry?.name ?? null });
 			continue;
 		}
-		const collateralToken = tokenByIndex.get(meta.collateralToken);
-		if (!collateralToken) {
-			issues.push({ kind: "collateralMissing", dex: name, tokenIndex: meta.collateralToken });
-			continue;
-		}
+		const collateralToken = resolveCollateral(name, meta.collateralToken);
+		if (!collateralToken) continue;
 		dexes.push({ name, index, collateralToken });
 	}
 	return dexes;
