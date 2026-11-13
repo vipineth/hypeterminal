@@ -6,7 +6,7 @@ These scripts send every trading action HypeTerminal supports to Hyperliquid tes
 
 | Command | What it does | Signs |
 |---|---|---|
-| `bun scripts/hl-live/run.ts --testnet` | Runs every scenario on the main dex, then the perp scenarios on a builder dex. Prints one line per scenario per dex and a final count. | Testnet only |
+| `bun scripts/hl-live/run.ts --testnet` | Runs every scenario on the main dex, and with `--builder` the perp scenarios on a builder dex too. Prints one line per scenario per dex and a final count. | Testnet only |
 | `bun scripts/hl-live/run.ts --readonly` | Builds every scenario's plan for every live mainnet market and checks each order against the SDK's price and size grid. Any request to `/exchange` throws. | Never |
 | `bun scripts/hl-live/run.ts --drift` | Compares live mainnet `perpDexs` fields, `meta` fields, `marginMode` values and `userAbstraction` values with `drift-snapshot.json`. Fails on any new field or value. | Never |
 | `bun scripts/hl-live/run.ts --write-drift-snapshot` | Adds the live values to the snapshot after you have handled them in the app. | Never |
@@ -16,9 +16,10 @@ These scripts send every trading action HypeTerminal supports to Hyperliquid tes
 `--testnet` takes these options.
 
 - `--only "market,close"` runs only the named scenarios.
-- `--main DOGE`, `--spot PURR/USDC` and `--builder xyz:NVDA` choose the markets. `--builder=` skips the builder pass.
+- `--main DOGE` and `--spot PURR/USDC` choose the markets.
+- `--builder xyz:NVDA` adds the builder pass. It is off by default, because every testnet builder dex rejects new orders today and the pass enters unified mode, the riskiest step of a run. Turn it on once a testnet builder dex accepts orders.
 
-Exit code 0 means every scenario passed or was recorded as unsupported by testnet. Exit 1 means a scenario failed. Exit 2 means the run stopped before trading, for example on an unfunded principal.
+Exit code 0 means every scenario passed or was recorded as unsupported by testnet. Exit 1 means a scenario or a cleanup failed. A cleanup failure is its own `FAIL cleanup after <scenario>` line, and the run carries on to the summary. Exit 2 means the run stopped before trading, on a key that holds mainnet funds or an unfunded principal.
 
 ## Keys
 
@@ -41,11 +42,12 @@ Each principal has its own agent named `hl-live`. Hyperliquid binds an agent add
 - It trades only the harness markets: DOGE on the main dex, PURR/USDC on spot, and the builder market. It cancels every order and closes every position on those markets after each scenario and at the start of a run. Don't trade them by hand on the same principal.
 - Orders carry a cloid that starts with `0x686c6c697665`, so you can tell them apart.
 - The leverage on the harness markets ends at 5x cross.
-- The builder pass and the abstraction scenario switch the account to `unifiedAccount` and back. Hyperliquid has no way back to `default`, so the account ends in `disabled`, which is the same standard mode. Unified moves all perp USDC into spot. The harness moves it back and keeps a note in the OS temp dir, so a killed run restores it on the next start.
+- The abstraction scenario, and the builder pass when it is on, switch the account to `unifiedAccount` and back. Hyperliquid has no way back to `default`, so the account ends in `disabled`, which is the same standard mode. Unified moves all perp USDC into spot. On the way out the harness keeps 30 USDC in spot and moves the rest back to perp with `sendAsset`, the call the app's transfer modal makes. It reads the live mode and balances and keeps no state on disk, so the next start restores a killed run, on CI as well as locally.
+- A run starts by closing anything left on the harness markets, then leaving unified if the account is still in it. If either fails, no scenario runs and the run reports why.
 - A 429 on an `/info` read is retried with backoff up to five times. `/exchange` requests are never retried.
-- The harness switches to unified only when the principal holds no orders or positions it did not open. Hyperliquid refuses to leave unified while any order, position or TWAP is open, so another session trading the same principal would strand it there. Give the harness a principal nobody else trades. Until then, the builder pass and the abstraction scenarios fail with that reason whenever someone else has activity on the account.
+- The harness switches to unified only from standard mode, and only when the principal has no running TWAP, no position on any perp dex, and no open order. It reads positions from `clearinghouseState` on every perp dex, and orders from `frontendOpenOrders` with `ALL_DEXS` plus every dex that holds collateral. Hyperliquid refuses to leave unified while anything is open, so another session trading the same principal would strand it there. Give the harness a principal nobody else trades. Until then, the abstraction scenarios fail with that reason whenever someone else has activity on the account.
 - Only one run per principal at a time. A lock file in the OS temp dir stops a second run.
-- Before trading, a run tops spot USDC up to 30 from perp when it holds less than 20, so the spot scenario has funds.
+- Spot USDC is held at 30 so the spot scenario has funds, and the rest stays in perp. A run restores that split at the start and after every unified window.
 - Each run costs about 5 testnet USDC in fees and spread. A PURR dust balance under one lot stays in spot.
 
 ## Scenarios

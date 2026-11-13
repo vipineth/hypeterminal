@@ -3,9 +3,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { InfoClient } from "@nktkas/hyperliquid";
 import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
+import { DEFAULT_QUOTE_TOKEN, HL_ALL_DEXS } from "@/config/app";
 import { getBuilderPerpAssetId, getPerpAssetId, getSpotAssetId } from "@/lib/hyperliquid/markets/helper";
 import { toSafeBig } from "@/lib/trade/numbers";
-import { errorMessage, isHarnessCloid, positionSize } from "./assert";
+import { formatTokenId } from "@/lib/trade/token-id";
+import { errorMessage, positionSize } from "./assert";
 import type { Harness } from "./harness";
 import type { PlanMarket } from "./plans";
 
@@ -20,6 +22,10 @@ export interface Venue extends PlanMarket, VenueSpec {
 }
 
 export const SPOT_DEX = "spot";
+export const SPOT_FLOAT_USDC = 30;
+const SPLIT_TOLERANCE_USDC = 1;
+const USDC_DECIMALS = 6;
+const SWEEP_BATCH = 10;
 const CLEANUP_SLIPPAGE = 0.1;
 const MIN_SPOT_SELL_NOTIONAL = 10;
 const ROUND_DOWN = 0;
@@ -73,11 +79,11 @@ export async function spotBalance(h: Harness, coin: string): Promise<string> {
 	return balances.find((balance) => balance.coin === coin)?.total ?? "0";
 }
 
-export async function activeTwapIds(h: Harness, coin: string): Promise<number[]> {
+export async function activeTwapIds(h: Harness, coin?: string): Promise<number[]> {
 	const history = await h.info.twapHistory({ user: h.user });
 	const latest = new Map<number, string>();
 	for (const entry of [...history].sort((a, b) => a.time - b.time)) {
-		if (entry.twapId !== undefined && entry.state.coin === coin) latest.set(entry.twapId, entry.status.status);
+		if (entry.twapId !== undefined && (coin === undefined || entry.state.coin === coin)) latest.set(entry.twapId, entry.status.status);
 	}
 	return [...latest].filter(([, status]) => status === "activated").map(([twapId]) => twapId);
 }
@@ -147,10 +153,6 @@ export async function cleanVenue(h: Harness, spec: VenueSpec): Promise<void> {
 	if (left.length > 0) throw new Error(`cleanup left ${left.join(", ")} on ${venue.coin}: ${failures.join("; ")}`);
 }
 
-function statePath(user: string, name: string): string {
-	return join(tmpdir(), `hl-live-${user.toLowerCase()}.${name}`);
-}
-
 function isAlive(pid: number): boolean {
 	try {
 		process.kill(pid, 0);
@@ -161,7 +163,7 @@ function isAlive(pid: number): boolean {
 }
 
 export function acquireLock(user: string): () => void {
-	const path = statePath(user, "lock");
+	const path = join(tmpdir(), `hl-live-${user.toLowerCase()}.lock`);
 	if (existsSync(path)) {
 		const pid = Number(readFileSync(path, "utf8"));
 		if (isAlive(pid)) throw new Error(`another harness run (pid ${pid}) holds ${path}, runs on one principal must not overlap`);
@@ -172,39 +174,70 @@ export function acquireLock(user: string): () => void {
 	};
 }
 
-async function assertNoForeignActivity(h: Harness): Promise<void> {
-	const [orders, state] = await Promise.all([
-		h.info.frontendOpenOrders({ user: h.user }),
-		h.info.clearinghouseState({ user: h.user }),
-	]);
-	const foreignOrders = orders.filter((order) => !isHarnessCloid(order.cloid)).length;
-	const positions = state.assetPositions.length;
-	if (foreignOrders + positions > 0) {
-		throw new Error(
-			`refusing to switch to unified: the principal holds ${foreignOrders} orders and ${positions} positions the harness did not open, and Hyperliquid will not leave unified until they close. Use a principal no other session trades.`,
+async function openActivity(h: Harness): Promise<string[]> {
+	const found: string[] = [];
+	const twaps = await activeTwapIds(h);
+	if (twaps.length > 0) found.push(`${twaps.length} running twaps`);
+	const dexes = (await h.info.perpDexs()).map((dex) => dex?.name ?? "");
+	const orderDexes = new Set<string>([HL_ALL_DEXS]);
+	for (let start = 0; start < dexes.length; start += SWEEP_BATCH) {
+		await Promise.all(
+			dexes.slice(start, start + SWEEP_BATCH).map(async (dex) => {
+				const state = await h.info.clearinghouseState({ user: h.user, dex });
+				if (state.assetPositions.length > 0) found.push(`${state.assetPositions.length} positions on ${dex || "the main dex"}`);
+				if (dex !== "" && !toSafeBig(state.marginSummary.accountValue).eq(0)) orderDexes.add(dex);
+			}),
 		);
 	}
+	for (const dex of orderDexes) {
+		const orders = await h.info.frontendOpenOrders({ user: h.user, dex });
+		if (orders.length > 0) found.push(`${orders.length} orders on ${dex === HL_ALL_DEXS ? "all dexes" : dex}`);
+	}
+	return found;
 }
 
 export async function enterUnified(h: Harness, switchMode = () => h.principal.userSetAbstraction({ user: h.user, abstraction: "unifiedAccount" })): Promise<void> {
-	await assertNoForeignActivity(h);
-	const spotUsdcBefore = await spotBalance(h, "USDC");
-	writeFileSync(statePath(h.user, "unified.json"), JSON.stringify({ spotUsdcBefore }));
+	if ((await h.info.userAbstraction({ user: h.user })) === "unifiedAccount") {
+		throw new Error("refusing to switch to unified: the account is already unifiedAccount, so an earlier run never left it. The next run's start leaves it first.");
+	}
+	const activity = await openActivity(h);
+	if (activity.length > 0) {
+		throw new Error(
+			`refusing to switch to unified: the principal holds ${activity.join(", ")}, and Hyperliquid will not leave unified until they close. Use a principal no other session trades.`,
+		);
+	}
 	await switchMode();
 	const mode = await h.info.userAbstraction({ user: h.user });
 	if (mode !== "unifiedAccount") throw new Error(`expected unifiedAccount after the switch, read ${mode}`);
 }
 
+export async function usdcTokenId(h: Harness): Promise<string> {
+	const usdc = (await h.info.spotMeta()).tokens.find((token) => token.name === DEFAULT_QUOTE_TOKEN);
+	if (!usdc) throw new Error(`${DEFAULT_QUOTE_TOKEN} is not a spot token`);
+	return formatTokenId(usdc);
+}
+
+export async function moveUsdc(h: Harness, amount: string, direction: "toSpot" | "toPerp"): Promise<void> {
+	await h.principal.sendAsset({
+		destination: h.user,
+		sourceDex: direction === "toSpot" ? "" : SPOT_DEX,
+		destinationDex: direction === "toSpot" ? SPOT_DEX : "",
+		token: await usdcTokenId(h),
+		amount,
+	});
+}
+
+export async function restoreUsdcSplit(h: Harness): Promise<void> {
+	const gap = toSafeBig(SPOT_FLOAT_USDC).minus(toSafeBig(await spotBalance(h, "USDC"))).round(USDC_DECIMALS, ROUND_DOWN);
+	if (gap.abs().lt(SPLIT_TOLERANCE_USDC)) return;
+	await moveUsdc(h, gap.abs().toFixed(), gap.gt(0) ? "toSpot" : "toPerp");
+}
+
 export async function exitUnified(h: Harness): Promise<void> {
-	const path = statePath(h.user, "unified.json");
-	if (!existsSync(path)) return;
-	const { spotUsdcBefore } = JSON.parse(readFileSync(path, "utf8")) as { spotUsdcBefore: string };
 	if ((await h.info.userAbstraction({ user: h.user })) === "unifiedAccount") {
 		await h.principal.userSetAbstraction({ user: h.user, abstraction: "disabled" });
 		const mode = await h.info.userAbstraction({ user: h.user });
 		if (mode !== "disabled") throw new Error(`expected disabled after leaving unified, read ${mode}`);
 	}
-	const surplus = toSafeBig(await spotBalance(h, "USDC")).minus(toSafeBig(spotUsdcBefore)).round(6, ROUND_DOWN);
-	if (surplus.gt(0)) await h.principal.usdClassTransfer({ amount: surplus.toFixed(), toPerp: true });
-	unlinkSync(path);
+	await restoreUsdcSplit(h);
 }

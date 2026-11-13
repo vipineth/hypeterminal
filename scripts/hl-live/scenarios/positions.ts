@@ -101,10 +101,13 @@ export const positionScenarios: Scenario[] = [
 		run: async (ctx) => {
 			const before = await leverage(ctx);
 			const target = before.value === 3 ? 4 : 3;
-			await ctx.h.agent.updateLeverage({ asset: ctx.venue.assetId, isCross: true, leverage: target });
-			const after = await leverage(ctx);
-			if (after.type !== "cross" || after.value !== target) throw new Error(`expected cross ${target}x, read ${JSON.stringify(after)}`);
-			await resetLeverage(ctx);
+			try {
+				await ctx.h.agent.updateLeverage({ asset: ctx.venue.assetId, isCross: true, leverage: target });
+				const after = await leverage(ctx);
+				if (after.type !== "cross" || after.value !== target) throw new Error(`expected cross ${target}x, read ${JSON.stringify(after)}`);
+			} finally {
+				await resetLeverage(ctx);
+			}
 		},
 	},
 	{

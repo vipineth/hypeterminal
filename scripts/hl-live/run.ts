@@ -16,8 +16,6 @@ import { spotScenarios } from "./scenarios/spot";
 import { transferScenarios } from "./scenarios/transfers";
 
 const MIN_FUNDING_USDC = 100;
-const SPOT_FLOAT_MIN = 20;
-const SPOT_FLOAT_TARGET = 30;
 const DRIFT_SAMPLE_USER = "0x0000000000000000000000000000000000000000";
 
 const SCENARIOS: Scenario[] = [...orderScenarios, ...positionScenarios, ...transferScenarios, ...spotScenarios];
@@ -31,7 +29,7 @@ const { values } = parseArgs({
 		drift: { type: "boolean", default: false },
 		"write-drift-snapshot": { type: "boolean", default: false },
 		main: { type: "string", default: "DOGE" },
-		builder: { type: "string", default: "xyz:NVDA" },
+		builder: { type: "string", default: "" },
 		spot: { type: "string", default: "PURR/USDC" },
 		only: { type: "string" },
 	},
@@ -55,42 +53,94 @@ function elapsed(start: number): string {
 	return `${((performance.now() - start) / 1000).toFixed(1)}s`;
 }
 
-async function runScenario(h: Harness, scenario: Scenario, spec: VenueSpec, agentApproved: boolean): Promise<Result> {
+async function runScenario(h: Harness, scenario: Scenario, spec: VenueSpec, agentApproved: boolean): Promise<Result[]> {
 	const started = performance.now();
-	const result = (status: Result["status"], detail = ""): Result => ({
-		scenario: scenario.name,
+	const result = (status: Result["status"], detail = "", name = scenario.name): Result => ({
+		scenario: name,
 		venue: spec.label,
 		status,
 		detail,
 		ms: performance.now() - started,
 	});
 	if (scenario.signer === "agent" && !agentApproved) {
-		return result("fail", `agent ${h.agentAddress} is not approved for ${h.user}, approve hl-live first`);
+		return [result("fail", `agent ${h.agentAddress} is not approved for ${h.user}, approve hl-live first`)];
 	}
+	let outcome: Result;
 	try {
 		await scenario.run({ h, venue: await loadVenue(h.info, spec) });
-		return result("pass");
+		outcome = result("pass");
 	} catch (error) {
-		if (error instanceof Unsupported) return result("unsupported", error.message);
-		return result("fail", errorMessage(error).split("\n")[0]);
-	} finally {
-		if (scenario.scope !== "account") await cleanVenue(h, spec);
+		outcome = error instanceof Unsupported ? result("unsupported", error.message) : result("fail", errorMessage(error).split("\n")[0]);
 	}
-}
-
-async function leaveUnified(h: Harness): Promise<boolean> {
+	if (scenario.scope === "account") return [outcome];
 	try {
-		await exitUnified(h);
-		return false;
+		await cleanVenue(h, spec);
+		return [outcome];
 	} catch (error) {
-		console.log(`STOP the account is still unifiedAccount: ${errorMessage(error)}. The next run restores it once the account holds no orders or positions.`);
-		return true;
+		return [outcome, result("fail", errorMessage(error), `cleanup after ${scenario.name}`)];
 	}
 }
 
 function printResult({ scenario, venue, status, detail, ms }: Result): void {
 	const label = { pass: "PASS", fail: "FAIL", unsupported: "SKIP" }[status];
 	console.log(`${label} ${scenario} @ ${venue} (${(ms / 1000).toFixed(1)}s)${detail ? ` ${detail}` : ""}`);
+}
+
+async function step(results: Result[], scenario: string, venue: string, action: () => Promise<unknown>): Promise<boolean> {
+	const started = performance.now();
+	try {
+		await action();
+		return true;
+	} catch (error) {
+		const result: Result = { scenario, venue, status: "fail", detail: errorMessage(error), ms: performance.now() - started };
+		printResult(result);
+		results.push(result);
+		return false;
+	}
+}
+
+async function runPasses(h: Harness, agentApproved: boolean, results: Result[]): Promise<void> {
+	const main: VenueSpec = { label: "main", dex: "", coin: values.main };
+	const spot: VenueSpec = { label: "spot", dex: SPOT_DEX, coin: values.spot };
+	const builderCoin = values.builder;
+	const builder: VenueSpec | null = builderCoin ? { label: builderCoin.split(":")[0], dex: builderCoin.split(":")[0], coin: builderCoin } : null;
+	const only = values.only ? new Set(values.only.split(",")) : null;
+	const selected = SCENARIOS.filter((scenario) => !only || only.has(scenario.name));
+	const venuesFor: Record<Scope, VenueSpec[]> = { perp: [main], spot: [spot], account: [main] };
+
+	for (const spec of builder ? [main, spot, builder] : [main, spot]) {
+		await step(results, "cleanup before the run", spec.label, () => cleanVenue(h, spec));
+	}
+	await step(results, "leave unified", "account", () => exitUnified(h));
+	if (results.length > 0) {
+		console.log("STOP the account is not clean, so no scenario ran. The next run retries the cleanup.");
+		return;
+	}
+	if (agentApproved) await resetLeverage({ h, venue: await loadVenue(h.info, main) });
+
+	for (const scenario of selected) {
+		for (const spec of venuesFor[scenario.scope]) {
+			for (const result of await runScenario(h, scenario, spec, agentApproved)) {
+				printResult(result);
+				results.push(result);
+			}
+		}
+	}
+
+	if (!builder) return;
+	const entered = await step(results, "builder pass", builder.label, async () => {
+		await enterUnified(h);
+		await cleanVenue(h, builder);
+	});
+	if (entered) {
+		for (const scenario of selected.filter((entry) => entry.scope === "perp")) {
+			for (const result of await runScenario(h, scenario, builder, agentApproved)) {
+				printResult(result);
+				results.push(result);
+			}
+		}
+	}
+	await step(results, "leave unified", "account", () => exitUnified(h));
 }
 
 async function runTestnet(): Promise<number> {
@@ -110,59 +160,15 @@ async function runTestnet(): Promise<number> {
 		const perp = toSafeBig((await h.info.clearinghouseState({ user: h.user })).marginSummary.accountValue);
 		const funded = perp.plus(toSafeBig(await spotBalance(h, "USDC")));
 		if (funded.lt(MIN_FUNDING_USDC)) {
-			console.log(`STOP principal ${h.user} holds ${funded.toFixed(2)} testnet USDC, needs ${MIN_FUNDING_USDC}. Fund it from the testnet faucet or fund-testnet.mjs, then rerun.`);
+			console.log(`STOP principal ${h.user} holds ${funded.toFixed(2)} testnet USDC, needs ${MIN_FUNDING_USDC}. Fund it from the testnet faucet or with a testnet usdSend, then rerun.`);
 			return 2;
 		}
 		const agents = await h.info.extraAgents({ user: h.user });
 		const agentApproved = agents.some((agent) => agent.address.toLowerCase() === h.agentAddress.toLowerCase());
-		console.log(`testnet principal ${h.user}, ${funded.toFixed(2)} USDC, agent ${h.agentAddress} ${agentApproved ? "approved" : "NOT approved"}`);
-
-		const main: VenueSpec = { label: "main", dex: "", coin: values.main };
-		const spot: VenueSpec = { label: "spot", dex: SPOT_DEX, coin: values.spot };
-		const builderCoin = values.builder;
-		const builder: VenueSpec | null = builderCoin
-			? { label: builderCoin.split(":")[0], dex: builderCoin.split(":")[0], coin: builderCoin }
-			: null;
-		const only = values.only ? new Set(values.only.split(",")) : null;
-		const selected = SCENARIOS.filter((scenario) => !only || only.has(scenario.name));
-		const venuesFor: Record<Scope, VenueSpec[]> = { perp: [main], spot: [spot], account: [main] };
-
-		const stuck = await leaveUnified(h);
-		if (stuck) return 1;
-		for (const spec of [main, spot]) await cleanVenue(h, spec);
-		const spotUsdc = toSafeBig(await spotBalance(h, "USDC"));
-		if (spotUsdc.lt(SPOT_FLOAT_MIN)) {
-			await h.principal.usdClassTransfer({ amount: toSafeBig(SPOT_FLOAT_TARGET).minus(spotUsdc).round(2, 3).toFixed(), toPerp: false });
-		}
-		if (agentApproved) await resetLeverage({ h, venue: await loadVenue(h.info, main) });
+		console.log(`testnet principal ${h.user}, ${funded.toFixed(2)} USDC, agent ${h.agentAddress} ${agentApproved ? "approved" : "NOT approved"}, mainnet holdings none`);
 
 		const results: Result[] = [];
-		for (const scenario of selected) {
-			for (const spec of venuesFor[scenario.scope]) {
-				const result = await runScenario(h, scenario, spec, agentApproved);
-				printResult(result);
-				results.push(result);
-			}
-		}
-
-		if (builder) {
-			try {
-				await enterUnified(h);
-				await cleanVenue(h, builder);
-				for (const scenario of selected.filter((entry) => entry.scope === "perp")) {
-					const result = await runScenario(h, scenario, builder, agentApproved);
-					printResult(result);
-					results.push(result);
-				}
-			} catch (error) {
-				const result: Result = { scenario: "builder pass", venue: builder.label, status: "fail", detail: errorMessage(error), ms: 0 };
-				printResult(result);
-				results.push(result);
-			} finally {
-				if (await leaveUnified(h)) results.push({ scenario: "leave unified", venue: "account", status: "fail", detail: "", ms: 0 });
-			}
-		}
-
+		await step(results, "run", "account", () => runPasses(h, agentApproved, results));
 		const count = (status: Result["status"]) => results.filter((result) => result.status === status).length;
 		console.log(`${count("pass")} passed, ${count("fail")} failed, ${count("unsupported")} unsupported by testnet, in ${elapsed(started)}`);
 		return count("fail") === 0 ? 0 : 1;
