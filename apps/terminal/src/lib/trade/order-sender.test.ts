@@ -1150,6 +1150,11 @@ describe("order sender holding a market after a partial result", () => {
 		venue.state.lookupLag = 1000;
 		const first = await sender.submit(signerFor(venue), scale(["90", "91"]));
 		expect(first).toMatchObject({ settlement: { kind: "answered" } });
+		expect(reportSubmit(first)).toEqual({
+			ok: false,
+			status: "unknown",
+			error: "1 of 2 legs placed. Leg 2 at 91 not found on the exchange. It will not be sent again. Check open orders.",
+		});
 		vi.setSystemTime(Date.now() + PARTIAL_HOLD_MS + 1000);
 		expect(await sender.submit(signerFor(venue), scale(["90", "92"]))).toMatchObject({ kind: "held" });
 		expect(venue.state.placedLegs).toBe(2);

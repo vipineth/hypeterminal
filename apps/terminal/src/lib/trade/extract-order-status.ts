@@ -277,7 +277,7 @@ export function reportSettlement(settlement: Settlement): OrderResult {
 		case "answered":
 			return request.kind === "twap"
 				? reportTwapReply(settlement.response)
-				: interpretOrderStatuses(readStatuses(settlement.response), request.legs);
+				: reportAnswered(readStatuses(settlement.response), request.legs);
 		case "consumed":
 			return reportLookup(settlement.lookup, request.legs);
 		case "expired":
@@ -303,11 +303,23 @@ function reportLookup(lookup: Lookup, legs: PlanLeg[]): OrderResult {
 	return lookup.kind === "twap" ? reportTwapLookup(lookup.matches) : reportOrderLookup(lookup, legs);
 }
 
+function reportAnswered(statuses: unknown[], legs: PlanLeg[]): OrderResult {
+	const states = statuses.map(toLegState);
+	if (states.length === 0 || states.length >= legs.length || states.every((state) => state.status === "rejected")) {
+		return interpretOrderStatuses(statuses, legs);
+	}
+	const unanswered = legs.slice(states.length).map((): LegState => ({ status: "missing" }));
+	return reportLegStates([...states, ...unanswered], legs);
+}
+
 function reportOrderLookup(lookup: OrderLookup, legs: PlanLeg[]): OrderResult {
 	if (!lookup.statuses) {
 		return unknown(t`Order sent. Its status could not be read. It will not be sent again. Check open orders.`);
 	}
-	const states = lookup.statuses.map(lookupToLegState);
+	return reportLegStates(lookup.statuses.map(lookupToLegState), legs);
+}
+
+function reportLegStates(states: LegState[], legs: PlanLeg[]): OrderResult {
 	const result = summarizeLegStates(states, legs);
 	if (result.ok || !states.some((state) => state.status === "missing")) return result;
 	return unknown(t`${result.error}. It will not be sent again. Check open orders.`);
