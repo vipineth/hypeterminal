@@ -63,7 +63,7 @@ Each principal has its own agent named `hl-live`. Hyperliquid binds an agent add
 | `agentSetAbstraction` | agent | SDK wire only | account |
 | spot buy and sell | agent | app | spot |
 
-"app" means the scenario builds its request with the app's own code: `buildOrderPlan` and `buildTwapPlan` for orders, the app's `parseMarkets(...).byName.get(coin).assetId` for cancel and TWAP cancel asset ids, the transfer modal's `sendAsset` call, and `interpretOrderStatuses` to read each response. "SDK wire only" means the app never sends that action, so the scenario only proves the SDK's wire format and testnet's handling. Those lines print `[SDK wire only]`.
+"app" means the scenario builds its request with the app's own code: `buildOrderPlan` and `buildTwapPlan` for orders, the app's `parseMarkets(...).byName.get(coin).assetId` for cancel and TWAP cancel asset ids (the cancel list itself is a copy of the orders tab's, since the app keeps it inside the component), the transfer modal's `sendAsset` call, and `interpretOrderStatuses` to read each response. "SDK wire only" means the app never sends that action, so the scenario only proves the SDK's wire format and testnet's handling. Those lines print `[SDK wire only]`.
 
 Each check compares what Hyperliquid reports against the scenario's intent, not against the app's own output, so a builder bug can't move the expected value with it.
 

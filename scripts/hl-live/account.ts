@@ -217,7 +217,7 @@ export async function usdcTokenId(h: Harness): Promise<string> {
 	return formatTokenId(usdc);
 }
 
-export async function moveUsdc(h: Harness, amount: string, direction: "toSpot" | "toPerp"): Promise<void> {
+async function moveUsdc(h: Harness, amount: string, direction: "toSpot" | "toPerp"): Promise<void> {
 	await h.principal.sendAsset({
 		destination: h.user,
 		sourceDex: direction === "toSpot" ? "" : SPOT_DEX,
