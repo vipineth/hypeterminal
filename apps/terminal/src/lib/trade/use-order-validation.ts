@@ -26,6 +26,7 @@ export interface SpotOrderFields {
 
 export interface PerpOrderFields {
 	orderType: string;
+	isDelisted: boolean;
 	markPx: number;
 	maxSize: number;
 	usesTriggerPrice: boolean;

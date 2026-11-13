@@ -41,7 +41,7 @@ const SOL_PERP = vi.hoisted(() => ({
 }));
 
 const form = vi.hoisted(() => ({
-	market: POINTS_USDC as typeof POINTS_USDC | typeof SOL_PERP,
+	market: POINTS_USDC as typeof POINTS_USDC | (typeof SOL_PERP & { isDelisted?: boolean }),
 	side: "buy",
 	orderType: "limit",
 	sizeMode: "base",
@@ -389,6 +389,17 @@ describe("perp trade ticket", () => {
 				t: { trigger: { isMarket: true, triggerPx: "85", tpsl: "sl" } },
 			},
 		]);
+	});
+
+	it("blocks entry on a delisted market with the reason and sends nothing", async () => {
+		form.market = { ...SOL_PERP, isDelisted: true };
+		form.tpSlEnabled = false;
+		const ticket = renderTicket();
+		await ticket.buttonContent.action();
+
+		expect(ticket.validation.errors[0]).toBe("This market is delisted");
+		expect(ticket.buttonContent.disabled).toBe(true);
+		expect(net.venue.orderRequests()).toHaveLength(0);
 	});
 
 	it("shows the triggers it sends in the order toast", async () => {

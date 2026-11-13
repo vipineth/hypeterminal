@@ -182,6 +182,7 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 				})
 			: perpInput(baseInput, {
 					orderType,
+					isDelisted: market?.isDelisted === true,
 					markPx,
 					maxSize,
 					usesTriggerPrice: usesTriggerPriceForOrder(orderType),

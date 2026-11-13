@@ -9,6 +9,10 @@ interface HasAssetIndex {
 	hasAssetIndex: boolean;
 }
 
+interface HasListing {
+	isDelisted: boolean;
+}
+
 interface HasMarkPrice {
 	markPx: number;
 	orderType: string;
@@ -30,6 +34,15 @@ export const marketNotReadyValidator: Validator<HasAssetIndex> = createValidator
 	priority: 41,
 	getMessage: () => t`Market not ready`,
 	validate: (ctx) => ctx.hasAssetIndex,
+});
+
+export const marketDelistedValidator: Validator<HasListing> = createValidator({
+	id: "market-delisted",
+	code: "MKT_004",
+	category: "market",
+	priority: 5,
+	getMessage: () => t`This market is delisted`,
+	validate: (ctx) => !ctx.isDelisted,
 });
 
 export const noMarkPriceValidator: Validator<HasMarkPrice> = createValidator({

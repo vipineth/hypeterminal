@@ -4,7 +4,12 @@ import {
 	walletLoadingValidator,
 	walletNotConnectedValidator,
 } from "../definitions/connection";
-import { marketNotReadyValidator, noMarketValidator, noMarkPriceValidator } from "../definitions/market";
+import {
+	marketDelistedValidator,
+	marketNotReadyValidator,
+	noMarketValidator,
+	noMarkPriceValidator,
+} from "../definitions/market";
 import {
 	enterLimitPriceValidator,
 	enterSizeValidator,
@@ -39,6 +44,7 @@ export interface PerpOrderContext extends OrderInputContext, TpSlContext, Trigge
 	availableBalance: number;
 	hasMarket: boolean;
 	hasAssetIndex: boolean;
+	isDelisted: boolean;
 	orderType: string;
 }
 
@@ -55,6 +61,7 @@ const perpOrderValidators: Validator<PerpOrderContext>[] = [
 	noBalanceValidator,
 	noMarketValidator,
 	marketNotReadyValidator,
+	marketDelistedValidator,
 	signerNotReadyValidator,
 	noMarkPriceValidator,
 	enterLimitPriceValidator,

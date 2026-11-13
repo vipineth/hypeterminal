@@ -180,7 +180,7 @@ export function useMarketsInfoInternal(options: UseMarketsInfoOptions = {}) {
 	);
 
 	function getMarketInfo(name: string): UnifiedMarketInfo | undefined {
-		return marketByName.get(name);
+		return marketByName.get(name) ?? markets.byName.get(name);
 	}
 
 	return {
