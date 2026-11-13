@@ -14,7 +14,9 @@ export interface TwapIntent {
 	randomize: boolean;
 }
 
-export type TwapPlan = { action: TwapOrderParameters; errors: [] } | { action: null; errors: OrderPlanError[] };
+type TwapAction = TwapOrderParameters & { twap: { s: string } };
+
+export type TwapPlan = { action: TwapAction; errors: [] } | { action: null; errors: OrderPlanError[] };
 
 export function buildTwapPlan(intent: TwapIntent): TwapPlan {
 	try {
