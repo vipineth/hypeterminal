@@ -3,7 +3,7 @@ import type { OrderStatusResponse } from "@nktkas/hyperliquid";
 export type PlacedOutcome = "filled" | "resting" | "triggerSet";
 
 export type LegState =
-	| { status: "placed"; outcome: PlacedOutcome }
+	| { status: "placed"; outcome: PlacedOutcome; filledSz?: string }
 	| { status: "rejected"; reason?: string }
 	| { status: "canceled" }
 	| { status: "missing" };
@@ -16,6 +16,9 @@ export function toLegState(status: unknown): LegState {
 	if (isRecord(status)) {
 		if (typeof status.error === "string") return { status: "rejected", reason: status.error };
 		if ("resting" in status) return { status: "placed", outcome: "resting" };
+		if (isRecord(status.filled) && typeof status.filled.totalSz === "string") {
+			return { status: "placed", outcome: "filled", filledSz: status.filled.totalSz };
+		}
 	}
 	return { status: "placed", outcome: "filled" };
 }

@@ -24,7 +24,8 @@ const holdSchema = z.strictObject({
 	legs: z.array(legSchema),
 	buy: z.boolean(),
 	fates: z.array(z.enum(["placed", "rejected", "unknown"])),
-	since: z.number(),
+	since: z.number().nullable(),
+	label: labelSchema,
 });
 
 const pendingRequestSchema = z.strictObject({
@@ -62,10 +63,12 @@ export type PendingRequest = z.infer<typeof pendingRequestSchema>;
 export type RequestLabel = z.infer<typeof labelSchema>;
 export type Hold = z.infer<typeof holdSchema>;
 export type SlotRecord = z.infer<typeof slotRecordSchema>;
+export type SlotHold = { slot: string; hold: Hold };
 
 export type Dismissal =
 	| { kind: "request"; request: PendingRequest; dismissedAt: number; lookup: unknown }
-	| { kind: "unreadable"; slot: string; raw: string; dismissedAt: number };
+	| { kind: "unreadable"; slot: string; raw: string; dismissedAt: number }
+	| { kind: "hold"; slot: string; hold: Hold; dismissedAt: number };
 
 export function pendingRecord(request: PendingRequest, holds: Hold[]): SlotRecord {
 	return { version: RECORD_VERSION, state: "pending", request, holds };
@@ -106,7 +109,9 @@ export interface RequestStore {
 	write(slot: string, record: SlotRecord): Promise<boolean>;
 	recordDismissal(dismissal: Dismissal): Promise<boolean>;
 	isWritable(): Promise<boolean>;
+	remember(slot: string, record: SlotRecord | null): void;
 	pending(): PendingRequest[];
+	holds(): SlotHold[];
 	refresh(): Promise<void>;
 	subscribe(listener: () => void): () => void;
 }
@@ -122,18 +127,23 @@ export function getRequestSlot(network: string, user: string, asset: number): st
 export function createRequestStore(getStore: () => KeyValueStore | null, bus: ChangeBus = SILENT_BUS): RequestStore {
 	const listeners = new Set<() => void>();
 	const cached = new Map<string, PendingRequest>();
+	const cachedHolds = new Map<string, Hold[]>();
 	const cachedAt = new Map<string, number>();
 	let version = 0;
 	let pendingList: PendingRequest[] = [];
+	let holdList: SlotHold[] = [];
 
 	function notify() {
 		pendingList = [...cached.values()].sort((a, b) => a.signedAt - b.signedAt);
+		holdList = [...cachedHolds].flatMap(([slot, holds]) => holds.map((hold) => ({ slot, hold })));
 		for (const listener of listeners) listener();
 	}
 
 	function place(slot: string, record: SlotRecord | null) {
 		if (record?.state === "pending") cached.set(slot, record.request);
 		else cached.delete(slot);
+		if (record?.holds.length) cachedHolds.set(slot, record.holds);
+		else cachedHolds.delete(slot);
 	}
 
 	function cache(slot: string, record: SlotRecord | null) {
@@ -184,11 +194,7 @@ export function createRequestStore(getStore: () => KeyValueStore | null, bus: Ch
 	}
 
 	function recordDismissal(dismissal: Dismissal): Promise<boolean> {
-		const id =
-			dismissal.kind === "request"
-				? `${dismissal.request.slot}#${dismissal.request.nonce}`
-				: `${dismissal.slot}#unreadable-${dismissal.dismissedAt}`;
-		return save(DISMISSAL_PREFIX + id, dismissal);
+		return save(DISMISSAL_PREFIX + dismissalId(dismissal), dismissal);
 	}
 
 	function isWritable(): Promise<boolean> {
@@ -206,7 +212,9 @@ export function createRequestStore(getStore: () => KeyValueStore | null, bus: Ch
 		const slots = keys.filter((key) => key.startsWith(KEY_PREFIX)).map((key) => key.slice(KEY_PREFIX.length));
 		const records = await Promise.all(slots.map(async (slot) => [slot, await readForList(slot)] as const));
 		const untouched = (slot: string) => (cachedAt.get(slot) ?? 0) <= startedAt;
-		for (const slot of cached.keys()) if (!slots.includes(slot) && untouched(slot)) cached.delete(slot);
+		for (const slot of new Set([...cached.keys(), ...cachedHolds.keys()])) {
+			if (!slots.includes(slot) && untouched(slot)) place(slot, null);
+		}
 		for (const [slot, record] of records) if (record !== undefined && untouched(slot)) place(slot, record);
 		notify();
 	}
@@ -224,7 +232,28 @@ export function createRequestStore(getStore: () => KeyValueStore | null, bus: Ch
 		};
 	}
 
-	return { read, write, recordDismissal, isWritable, pending: () => pendingList, refresh, subscribe };
+	return {
+		read,
+		write,
+		recordDismissal,
+		isWritable,
+		remember: cache,
+		pending: () => pendingList,
+		holds: () => holdList,
+		refresh,
+		subscribe,
+	};
+}
+
+function dismissalId(dismissal: Dismissal): string {
+	switch (dismissal.kind) {
+		case "request":
+			return `${dismissal.request.slot}#${dismissal.request.nonce}`;
+		case "unreadable":
+			return `${dismissal.slot}#unreadable-${dismissal.dismissedAt}`;
+		case "hold":
+			return `${dismissal.slot}#hold-${dismissal.hold.nonce}`;
+	}
 }
 
 function describeRaw(raw: unknown): string {

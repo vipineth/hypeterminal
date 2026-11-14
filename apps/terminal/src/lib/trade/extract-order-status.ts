@@ -2,16 +2,19 @@ import { t } from "@lingui/core/macro";
 import type { PlanLeg } from "@/domain/trade/order-intent";
 import {
 	isRecord,
+	type LegFate,
 	type LegState,
 	lookupToLegState,
 	type PlacedOutcome,
 	readStatuses,
 	toLegState,
 } from "@/lib/trade/leg-state";
+import { toBig } from "@/lib/trade/numbers";
 import {
 	canStillExecute,
 	getRequestKey,
 	type Held,
+	type HoldOutcome,
 	type Inspection,
 	type Lookup,
 	type OrderLookup,
@@ -22,7 +25,7 @@ import {
 	type TwapRecord,
 	type UnreadableOutcome,
 } from "@/lib/trade/order-sender";
-import type { Hold } from "@/lib/trade/pending-requests";
+import type { Hold, PendingRequest } from "@/lib/trade/pending-requests";
 
 export type OrderOutcome = "filled" | "partiallyFilled" | "resting" | "triggerSet" | "twapStarted";
 
@@ -50,21 +53,41 @@ function notSent(error: string): OrderResult {
 	return { ok: false, status: "notSent", error };
 }
 
-export function interpretOrderStatuses(statuses: unknown[], legs: PlanLeg[]): OrderResult {
+export function interpretOrderStatuses(statuses: unknown[], legs: PlanLeg[], sizes: string[] = []): OrderResult {
 	if (statuses.length === 0) return failed(NO_EXCHANGE_RESPONSE);
-	return summarizeLegStates(statuses.map(toLegState), legs);
+	return summarizeLegStates(statuses.map(toLegState), legs, sizes);
 }
 
-function summarizeLegStates(states: LegState[], legs: PlanLeg[]): OrderResult {
+function summarizeLegStates(states: LegState[], legs: PlanLeg[], sizes: string[]): OrderResult {
 	const placed = states.flatMap((state, index) => (state.status === "placed" ? [{ state, index }] : []));
-	if (placed.length === states.length) return summarizePlaced(states, legs);
+	if (placed.length === states.length) return summarizePlaced(states, legs, sizes);
 	const reasons = new Set(states.map((state) => (state.status === "rejected" ? state.reason : undefined)));
 	const [onlyReason] = reasons;
 	if (reasons.size === 1 && onlyReason) return failed(onlyReason);
-	return failed(describeLegStates(states, legs));
+	return failed(describeLegStates(states, legs, sizes));
 }
 
-function summarizePlaced(states: LegState[], legs: PlanLeg[]): OrderResult {
+function summarizePlaced(states: LegState[], legs: PlanLeg[], sizes: string[]): OrderResult {
+	const result = summarizePlacedOutcomes(states, legs);
+	const shortFills = states.flatMap((state, index) => {
+		const short = describeShortFill(getLegName(legs[index] ?? UNNAMED_LEG, index), state, sizes[index]);
+		return short ? [short] : [];
+	});
+	if (!result.ok || shortFills.length === 0) return result;
+	const detail = [result.detail, ...shortFills].filter(Boolean).join(". ");
+	return { ok: true, outcome: "partiallyFilled", detail };
+}
+
+function describeShortFill(name: string, state: LegState, size: string | undefined): string | null {
+	if (state.status !== "placed" || !state.filledSz || !size) return null;
+	const filled = toBig(state.filledSz);
+	const ordered = toBig(size);
+	if (!filled || !ordered || !filled.lt(ordered)) return null;
+	const rest = ordered.minus(filled).toString();
+	return t`${name} partially filled: ${state.filledSz} of ${size}, ${rest} not filled`;
+}
+
+function summarizePlacedOutcomes(states: LegState[], legs: PlanLeg[]): OrderResult {
 	const outcomes = states.flatMap((state, index) => {
 		const role = (legs[index] ?? UNNAMED_LEG).role;
 		const isChild = role === "takeProfit" || role === "stopLoss";
@@ -79,24 +102,24 @@ function summarizePlaced(states: LegState[], legs: PlanLeg[]): OrderResult {
 	return { ok: true, outcome: "partiallyFilled", detail: t`${filled} of ${total} legs filled, ${resting} placed` };
 }
 
-function describeLegStates(states: LegState[], legs: PlanLeg[]): string {
+function describeLegStates(states: LegState[], legs: PlanLeg[], sizes: string[]): string {
 	const placedScaleLegs = states.filter(
 		(state, index) => state.status === "placed" && (legs[index] ?? UNNAMED_LEG).role === "scaleLeg",
 	).length;
 	const sentences = states.flatMap((state, index) => {
 		const leg = legs[index] ?? UNNAMED_LEG;
 		if (state.status === "placed" && leg.role === "scaleLeg") return [];
-		return [describeLegState(leg, index, state)];
+		return [describeLegState(leg, index, state, sizes[index])];
 	});
 	if (placedScaleLegs > 0) sentences.unshift(t`${placedScaleLegs} of ${states.length} legs placed`);
 	return sentences.join(". ");
 }
 
-function describeLegState(leg: PlanLeg, index: number, state: LegState): string {
+function describeLegState(leg: PlanLeg, index: number, state: LegState, size: string | undefined): string {
 	const name = getLegName(leg, index);
 	switch (state.status) {
 		case "placed":
-			return describePlacedLeg(name, leg, state.outcome);
+			return describeShortFill(name, state, size) ?? describePlacedLeg(name, leg, state.outcome);
 		case "rejected":
 			return state.reason ? t`${name} rejected: ${state.reason}` : t`${name} rejected`;
 		case "canceled":
@@ -170,6 +193,38 @@ function reportHeld({ hold }: Held): OrderResult {
 	return notSent(
 		t`Not sent. Your last order on this market: ${describeHold(hold)}. Sending the same order again could place those legs twice. Check open orders and send only the missing legs as a new order.`,
 	);
+}
+
+export function describeHeldMarket(hold: Hold): string {
+	return t`The same order is held on this market. Last result: ${describeHold(hold)}.`;
+}
+
+export function describeHoldDismissal(hold: Hold): string {
+	const none = t`none`;
+	const placed = legNamesWith(hold, "placed") || none;
+	const unknownLegs = legNamesWith(hold, "unknown") || none;
+	return t`Known placed: ${placed}. Unknown: ${unknownLegs}. Dismiss the hold? Sending the same order again may place a leg that was already placed a second time.`;
+}
+
+function legNamesWith(hold: Hold, fate: LegFate): string {
+	return hold.fates
+		.flatMap((legFate, index) => (legFate === fate ? [getLegName(hold.legs[index] ?? UNNAMED_LEG, index)] : []))
+		.join(", ");
+}
+
+export function reportHoldOutcome(outcome: HoldOutcome): OrderResult {
+	switch (outcome.kind) {
+		case "busy":
+			return notSent(t`This market is busy. Try again.`);
+		case "refused":
+			return notSent(describeRefusal(outcome));
+		case "missing":
+			return unknown(t`That hold changed or was released before it was dismissed. Nothing was dismissed.`);
+		case "holdDismissed":
+			return unknown(
+				t`Hold dismissed. Your next order on this market will be sent, even the same one. Check open orders first.`,
+			);
+	}
 }
 
 function describeHold(hold: Hold): string {
@@ -277,7 +332,7 @@ export function reportSettlement(settlement: Settlement): OrderResult {
 		case "answered":
 			return request.kind === "twap"
 				? reportTwapReply(settlement.response)
-				: reportAnswered(readStatuses(settlement.response), request.legs);
+				: reportAnswered(readStatuses(settlement.response), request.legs, orderSizes(request));
 		case "consumed":
 			return reportLookup(settlement.lookup, request.legs);
 		case "expired":
@@ -303,13 +358,18 @@ function reportLookup(lookup: Lookup, legs: PlanLeg[]): OrderResult {
 	return lookup.kind === "twap" ? reportTwapLookup(lookup.matches) : reportOrderLookup(lookup, legs);
 }
 
-function reportAnswered(statuses: unknown[], legs: PlanLeg[]): OrderResult {
+function reportAnswered(statuses: unknown[], legs: PlanLeg[], sizes: string[]): OrderResult {
 	const states = statuses.map(toLegState);
 	if (states.length === 0 || states.length >= legs.length || states.every((state) => state.status === "rejected")) {
-		return interpretOrderStatuses(statuses, legs);
+		return interpretOrderStatuses(statuses, legs, sizes);
 	}
 	const unanswered = legs.slice(states.length).map((): LegState => ({ status: "missing" }));
-	return reportLegStates([...states, ...unanswered], legs);
+	return reportLegStates([...states, ...unanswered], legs, sizes);
+}
+
+function orderSizes(request: PendingRequest): string[] {
+	const { action } = JSON.parse(request.body) as { action?: { orders?: { s: string }[] } };
+	return action?.orders?.map((order) => order.s) ?? [];
 }
 
 function reportOrderLookup(lookup: OrderLookup, legs: PlanLeg[]): OrderResult {
@@ -319,8 +379,8 @@ function reportOrderLookup(lookup: OrderLookup, legs: PlanLeg[]): OrderResult {
 	return reportLegStates(lookup.statuses.map(lookupToLegState), legs);
 }
 
-function reportLegStates(states: LegState[], legs: PlanLeg[]): OrderResult {
-	const result = summarizeLegStates(states, legs);
+function reportLegStates(states: LegState[], legs: PlanLeg[], sizes: string[] = []): OrderResult {
+	const result = summarizeLegStates(states, legs, sizes);
 	if (result.ok || !states.some((state) => state.status === "missing")) return result;
 	return unknown(t`${result.error}. It will not be sent again. Check open orders.`);
 }

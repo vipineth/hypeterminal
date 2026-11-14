@@ -20,6 +20,7 @@ import {
 	pendingRecord,
 	type RequestLabel,
 	type RequestStore,
+	type SlotHold,
 	type SlotRecord,
 	settledRecord,
 	UnreadableRecord,
@@ -106,6 +107,8 @@ export type Inspection =
 	| { kind: "inspected"; request: PendingRequest; lookup: Lookup; remainingMs: number | null };
 
 export type UnreadableOutcome = Busy | Missing | Refused | { kind: "cleared"; slot: string };
+
+export type HoldOutcome = Busy | Missing | Refused | { kind: "holdDismissed"; hold: Hold };
 
 type OrderSubmissionParams = Pick<OrderParameters, "builder"> & {
 	orders: CloidOrder[];
@@ -220,6 +223,7 @@ export function createOrderSender(env: SenderEnv) {
 		if (stampOf(current) !== seen) {
 			return { kind: "refused", reason: "slotMoved", to: current?.state === "pending" ? "pending" : "settled" };
 		}
+		env.store.remember(slot, current);
 		if (current?.state === "pending") {
 			const earlier = await record(await settle(current.request, false));
 			if (!placedNothing(earlier)) {
@@ -227,9 +231,13 @@ export function createOrderSender(env: SenderEnv) {
 				return { kind: "blocked", earlier };
 			}
 		}
-		const holds = await liveHolds((await env.store.read(slot))?.holds ?? [], submission);
+		const latest = await env.store.read(slot);
+		const holds = await liveHolds(latest?.holds ?? [], submission);
 		const held = holds.find((hold) => overlaps(hold, submission));
-		if (held) return { kind: "held", hold: held };
+		if (held) {
+			if (latest?.holds.some((hold) => hold.since === null)) await env.store.write(slot, { ...latest, holds });
+			return { kind: "held", hold: held };
+		}
 		try {
 			const knownIds = submission.kind === "twap" ? await readTwapIds(signer.user) : [];
 			if (!knownIds) return { kind: "refused", reason: "twapHistory" };
@@ -303,7 +311,7 @@ export function createOrderSender(env: SenderEnv) {
 		const { request } = settlement;
 		const current = await env.store.read(request.slot).catch(() => null);
 		if (!current) return settlement;
-		const holds = withResult(current.holds, settlement, (await exchangeNow()) ?? request.expiresAfter);
+		const holds = withResult(current.holds, settlement, await exchangeNow());
 		if (current.state === "pending" && current.request.nonce === request.nonce) {
 			await env.store.write(request.slot, settledRecord(request.nonce, holds));
 		} else if (holds !== current.holds) {
@@ -336,11 +344,13 @@ export function createOrderSender(env: SenderEnv) {
 	async function liveHolds(holds: Hold[], submission: Submission): Promise<Hold[]> {
 		const now = await exchangeNow();
 		const checked = await Promise.all(
-			holds.map((hold) =>
-				windowPassed(hold, now) && overlaps(hold, submission) && hold.fates.includes("unknown")
-					? confirmByLookup(hold)
-					: hold,
-			),
+			holds
+				.map((hold) => (hold.since === null && now !== null ? { ...hold, since: now } : hold))
+				.map((hold) =>
+					windowPassed(hold, now) && overlaps(hold, submission) && hold.fates.includes("unknown")
+						? confirmByLookup(hold)
+						: hold,
+				),
 		);
 		return checked.filter((hold) => !isReleased(hold, now));
 	}
@@ -460,6 +470,22 @@ export function createOrderSender(env: SenderEnv) {
 		);
 	}
 
+	function dismissHold(slot: string, shown: Hold): Promise<HoldOutcome> {
+		return exclusive(slot, (inSlot) =>
+			inSlot(async (): Promise<HoldOutcome> => {
+				const current = await env.store.read(slot);
+				const hold = current?.holds.find(
+					(stored) => stored.nonce === shown.nonce && stored.fates.join() === shown.fates.join(),
+				);
+				if (!current || !hold) return { kind: "missing" };
+				const saved =
+					(await env.store.recordDismissal({ kind: "hold", slot, hold, dismissedAt: Date.now() })) &&
+					(await env.store.write(slot, { ...current, holds: current.holds.filter((stored) => stored !== hold) }));
+				return saved ? { kind: "holdDismissed", hold } : { kind: "refused", reason: "storage" };
+			}),
+		);
+	}
+
 	async function unreadableAt(slot: string): Promise<string | null> {
 		try {
 			await env.store.read(slot);
@@ -528,6 +554,12 @@ export function createOrderSender(env: SenderEnv) {
 			.filter((request) => request.slot.startsWith(prefix) && !sending.has(request.slot) && isVisible(request, now));
 	}
 
+	function listHolds(user: string): SlotHold[] {
+		const now = env.clock.estimate();
+		const prefix = getUserSlotPrefix(network(), user);
+		return env.store.holds().filter(({ slot, hold }) => slot.startsWith(prefix) && !isReleased(hold, now));
+	}
+
 	function isVisible(request: PendingRequest, now: number | null): boolean {
 		return now === null || revealed.has(getRequestKey(request)) || now - request.signedAt >= graceMs;
 	}
@@ -553,7 +585,9 @@ export function createOrderSender(env: SenderEnv) {
 		inspect,
 		dismiss,
 		dismissUnreadable,
+		dismissHold,
 		list,
+		listHolds,
 		subscribe(listener: () => void) {
 			let graceTimer: ReturnType<typeof setTimeout> | undefined;
 			function recheckAfterGrace() {
@@ -633,7 +667,7 @@ function everyLeg(legCount: number, fate: LegFate): LegFate[] {
 	return Array.from({ length: legCount }, () => fate);
 }
 
-function withResult(holds: Hold[], settlement: Settlement, since: number): Hold[] {
+function withResult(holds: Hold[], settlement: Settlement, since: number | null): Hold[] {
 	const fates = legFates(settlement);
 	if (!fates) return holds;
 	const { request } = settlement;
@@ -641,17 +675,18 @@ function withResult(holds: Hold[], settlement: Settlement, since: number): Hold[
 	if (!known) return startsHold(fates) ? [...holds, holdOf(request, fates, since)] : holds;
 	const merged = mergeFates(known.fates, fates);
 	if (merged.every((fate, index) => fate === known.fates[index])) return holds;
-	return holds.map((hold) => (hold === known ? { ...hold, fates: merged, since: Math.max(hold.since, since) } : hold));
+	const start = since === null ? null : Math.max(known.since ?? since, since);
+	return holds.map((hold) => (hold === known ? { ...hold, fates: merged, since: start } : hold));
 }
 
 function startsHold(fates: LegFate[]): boolean {
 	return fates.length > 1 && !fates.every((fate) => fate === "placed") && !fates.every((fate) => fate === "rejected");
 }
 
-function holdOf(request: PendingRequest, fates: LegFate[], since: number): Hold {
+function holdOf(request: PendingRequest, fates: LegFate[], since: number | null): Hold {
 	const { action } = JSON.parse(request.body) as { action: OrderSubmissionParams };
-	const { user, nonce, cloids, legs } = request;
-	return { nonce, user, cloids, legs, buy: action.orders[0].b, fates, since };
+	const { user, nonce, cloids, legs, label } = request;
+	return { nonce, user, cloids, legs, buy: action.orders[0].b, fates, since, label };
 }
 
 function mergeFates(known: LegFate[], learned: LegFate[]): LegFate[] {
@@ -663,7 +698,7 @@ function mergeFates(known: LegFate[], learned: LegFate[]): LegFate[] {
 }
 
 function windowPassed(hold: Hold, now: number | null): boolean {
-	return now !== null && now - hold.since >= PARTIAL_HOLD_MS;
+	return now !== null && hold.since !== null && now - hold.since >= PARTIAL_HOLD_MS;
 }
 
 function isReleased(hold: Hold, now: number | null): boolean {

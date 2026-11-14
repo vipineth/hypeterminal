@@ -3,11 +3,17 @@ import { t } from "@lingui/core/macro";
 import { CheckIcon, LightningIcon, QuestionIcon, SpinnerGapIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect } from "react";
 import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/time";
-import { type DismissPreview, usePendingRequests, useSubmitPlan } from "@/hooks/trade/use-submit-plan";
+import { type DismissPreview, useActiveHolds, usePendingRequests, useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { cn } from "@/lib/cn";
-import type { OrderOutcome, OrderResult, UnreadableSlot } from "@/lib/trade/extract-order-status";
+import {
+	describeHeldMarket,
+	describeHoldDismissal,
+	type OrderOutcome,
+	type OrderResult,
+	type UnreadableSlot,
+} from "@/lib/trade/extract-order-status";
 import { getRequestKey, type Lookup } from "@/lib/trade/order-sender";
-import type { PendingRequest } from "@/lib/trade/pending-requests";
+import type { PendingRequest, SlotHold } from "@/lib/trade/pending-requests";
 import {
 	type OrderQueueItem,
 	requestResultToQueueUpdate,
@@ -72,6 +78,8 @@ interface RowActions {
 	dismiss: (requestKey: string, lookup: Lookup) => void;
 	confirmUnreadable: (rowId: string, confirm: boolean) => void;
 	dismissUnreadable: (rowId: string, unreadable: UnreadableSlot) => void;
+	confirmHold: (row: OrderQueueItem, confirm: boolean) => void;
+	dismissHold: (rowId: string, held: SlotHold) => void;
 }
 
 interface Props {
@@ -170,6 +178,9 @@ function OrderItem({ order, onRemove, actions, canCancel }: Props) {
 				)}
 				{order.status === "failed" && order.unreadable && (
 					<UnreadableActions order={order} unreadable={order.unreadable} actions={actions} />
+				)}
+				{order.status === "unsettled" && order.held && (
+					<HoldActions order={order} held={order.held} actions={actions} />
 				)}
 			</div>
 
@@ -318,6 +329,49 @@ function UnreadableActions({
 	);
 }
 
+function HoldActions({ order, held, actions }: { order: OrderQueueItem; held: SlotHold; actions: RowActions }) {
+	if (!order.confirmHold) {
+		return (
+			<div className="pt-1">
+				<Button
+					variant="outline"
+					intent="neutral"
+					size="xxs"
+					className="rounded-xs"
+					onClick={() => actions.confirmHold(order, true)}
+				>
+					{t`Dismiss hold`}
+				</Button>
+			</div>
+		);
+	}
+	return (
+		<div className="space-y-1 pt-1">
+			<div className="text-xs text-fg">{describeHoldDismissal(held.hold)}</div>
+			<div className="flex items-center gap-1.5">
+				<Button
+					variant="outline"
+					intent="error"
+					size="xxs"
+					className="rounded-xs"
+					onClick={() => actions.dismissHold(order.id, held)}
+				>
+					{t`Yes, dismiss hold`}
+				</Button>
+				<Button
+					variant="ghost"
+					intent="neutral"
+					size="xxs"
+					className="rounded-xs"
+					onClick={() => actions.confirmHold(order, false)}
+				>
+					{t`Keep it`}
+				</Button>
+			</div>
+		</div>
+	);
+}
+
 function notSentBecause(error: unknown): OrderResult {
 	return { ok: false, status: "notSent", error: error instanceof Error ? error.message : String(error) };
 }
@@ -336,6 +390,21 @@ function toQueueItem(request: PendingRequest): OrderQueueItem {
 	};
 }
 
+function toHoldItem(held: SlotHold): OrderQueueItem {
+	return {
+		id: `hold:${held.slot}#${held.hold.nonce}`,
+		...held.hold.label,
+		status: "unsettled",
+		error: describeHeldMarket(held.hold),
+		held,
+		createdAt: 0,
+	};
+}
+
+function holdKeyOf(order: OrderQueueItem): string | undefined {
+	return order.held && toHoldItem(order.held).id;
+}
+
 function CountdownBar({ order }: { order: OrderQueueItem }) {
 	if (order.status !== "success") return null;
 
@@ -352,12 +421,16 @@ function CountdownBar({ order }: { order: OrderQueueItem }) {
 export function OrderToast() {
 	const queued = useOrderQueue();
 	const pendingRequests = usePendingRequests();
+	const activeHolds = useActiveHolds();
 	const { addOrder, updateOrder, updateByRequestKey, removeOrder } = useOrderQueueActions();
-	const { retryRequest, cancelRequest, previewDismiss, dismissRequest, dismissUnreadable, canCancel } = useSubmitPlan();
+	const { retryRequest, cancelRequest, previewDismiss, dismissRequest, dismissUnreadable, dismissHold, canCancel } =
+		useSubmitPlan();
 
 	const queuedKeys = new Set(queued.map((order) => order.requestKey));
 	const leftOver = pendingRequests.filter((request) => !queuedKeys.has(getRequestKey(request))).map(toQueueItem);
-	const orders = [...leftOver, ...queued];
+	const queuedHolds = new Set(queued.map(holdKeyOf));
+	const holdRows = activeHolds.map(toHoldItem).filter((row) => !queuedHolds.has(row.id));
+	const orders = [...leftOver, ...holdRows, ...queued];
 	if (orders.length === 0) return null;
 
 	function adopt(requestKey: string, status: OrderQueueItem["status"]) {
@@ -382,6 +455,11 @@ export function OrderToast() {
 				? { status: "unsettled", confirmDismiss: { text: preview.text, lookup: preview.lookup } }
 				: requestResultToQueueUpdate(preview.result),
 		);
+	}
+
+	async function handleDismissHold(rowId: string, held: SlotHold) {
+		updateOrder(rowId, { status: "pending", confirmHold: undefined });
+		updateOrder(rowId, resultToQueueUpdate(await dismissHold(held).catch(notSentBecause)));
 	}
 
 	async function handleDismissUnreadable(rowId: string, { slot, raw }: UnreadableSlot) {
@@ -410,6 +488,13 @@ export function OrderToast() {
 		},
 		dismissUnreadable(rowId, unreadable) {
 			void handleDismissUnreadable(rowId, unreadable);
+		},
+		confirmHold(row, confirm) {
+			if (holdRows.includes(row)) addOrder({ ...row, confirmHold: confirm || undefined });
+			else updateOrder(row.id, { confirmHold: confirm || undefined });
+		},
+		dismissHold(rowId, held) {
+			void handleDismissHold(rowId, held);
 		},
 	};
 

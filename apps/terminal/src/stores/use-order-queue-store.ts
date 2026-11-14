@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { OrderOutcome, OrderResult, UnreadableSlot } from "@/lib/trade/extract-order-status";
 import type { Lookup } from "@/lib/trade/order-sender";
+import type { SlotHold } from "@/lib/trade/pending-requests";
 
 export interface OrderQueueItem {
 	id: string;
@@ -20,6 +21,8 @@ export interface OrderQueueItem {
 	confirmDismiss?: { text: string; lookup: Lookup };
 	unreadable?: UnreadableSlot;
 	confirmUnreadable?: boolean;
+	held?: SlotHold;
+	confirmHold?: boolean;
 	createdAt: number;
 	completedAt?: number;
 }
@@ -30,6 +33,11 @@ interface OrderQueueStore {
 		addOrder: (order: Omit<OrderQueueItem, "id" | "createdAt">) => string;
 		updateOrder: (id: string, update: Partial<Omit<OrderQueueItem, "id">>) => void;
 		updateByRequestKey: (requestKey: string, update: Partial<Omit<OrderQueueItem, "id">>) => void;
+		upsertByRequestKey: (
+			requestKey: string,
+			base: Pick<OrderQueueItem, "market" | "side" | "size">,
+			update: Partial<Omit<OrderQueueItem, "id">>,
+		) => void;
 		removeOrder: (id: string) => void;
 	};
 }
@@ -65,6 +73,23 @@ const useOrderQueueStore = create<OrderQueueStore>()((set) => ({
 				orders: state.orders.map((order) => (order.requestKey === requestKey ? applyUpdate(order, update) : order)),
 			}));
 		},
+		upsertByRequestKey: (requestKey, base, update) => {
+			set((state) => {
+				if (state.orders.some((order) => order.requestKey === requestKey)) {
+					return {
+						orders: state.orders.map((order) => (order.requestKey === requestKey ? applyUpdate(order, update) : order)),
+					};
+				}
+				const added: OrderQueueItem = {
+					...base,
+					status: "unsettled",
+					requestKey,
+					id: generateOrderId(),
+					createdAt: Date.now(),
+				};
+				return { orders: [...state.orders, applyUpdate(added, update)] };
+			});
+		},
 		removeOrder: (id) => {
 			set((state) => ({
 				orders: state.orders.filter((order) => order.id !== id),
@@ -83,6 +108,8 @@ export function resultToQueueUpdate(result: OrderResult): Partial<Omit<OrderQueu
 		confirmDismiss: undefined,
 		unreadable: undefined,
 		confirmUnreadable: undefined,
+		held: undefined,
+		confirmHold: undefined,
 		outcome: undefined,
 		detail: undefined,
 		error: undefined,

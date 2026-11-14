@@ -10,6 +10,7 @@ import { createExchangeClock } from "@/lib/trade/exchange-clock";
 import {
 	describeInspection,
 	type OrderResult,
+	reportHoldOutcome,
 	reportRequestOutcome,
 	reportSettlement,
 	reportSubmit,
@@ -22,11 +23,17 @@ import {
 	type Signer,
 	type SubmitOutcome,
 } from "@/lib/trade/order-sender";
-import { createRequestStore, type PendingRequest, type RequestLabel } from "@/lib/trade/pending-requests";
+import {
+	createRequestStore,
+	type PendingRequest,
+	type RequestLabel,
+	type SlotHold,
+} from "@/lib/trade/pending-requests";
 import { resultToQueueUpdate, useOrderQueueActions } from "@/stores/use-order-queue-store";
 
 const CLOCK_READ_TIMEOUT_MS = 3000;
 const NO_REQUESTS: PendingRequest[] = [];
+const NO_HOLDS: SlotHold[] = [];
 
 const sender = createOrderSender({
 	info: getInfoClient,
@@ -47,6 +54,15 @@ function readPendingRequests(user: string | undefined): PendingRequest[] {
 	return pendingSnapshot.requests;
 }
 
+let holdSnapshot = { key: "", holds: NO_HOLDS };
+
+function readActiveHolds(user: string | undefined): SlotHold[] {
+	const holds = user ? sender.listHolds(user) : NO_HOLDS;
+	const key = holds.map(({ slot, hold }) => `${slot}#${hold.nonce}:${hold.fates.join()}`).join("|");
+	if (key !== holdSnapshot.key) holdSnapshot = { key, holds };
+	return holdSnapshot.holds;
+}
+
 export type SubmitPlanInput = Pick<OrderPlan, "orders" | "grouping"> & { errors?: string[] };
 
 export type DismissPreview =
@@ -65,6 +81,7 @@ interface UseSubmitPlanResult {
 	previewDismiss: (requestKey: string) => Promise<DismissPreview>;
 	dismissRequest: (requestKey: string, lookup: Lookup) => Promise<OrderResult>;
 	dismissUnreadable: (slot: string, raw: string) => Promise<OrderResult>;
+	dismissHold: (held: SlotHold) => Promise<OrderResult>;
 	canCancel: boolean;
 	isSubmitting: boolean;
 }
@@ -73,7 +90,7 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 	const { address } = useConnection();
 	const { trading } = useHyperliquidClients();
 	const { builderConfig } = useHyperliquid();
-	const { updateByRequestKey } = useOrderQueueActions();
+	const { upsertByRequestKey } = useOrderQueueActions();
 	const isSubmitting = useSyncExternalStore(sender.subscribeBusy, sender.isBusy, sender.isBusy);
 
 	useEffect(() => {
@@ -91,8 +108,8 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 		if (!signer) return { ok: false, status: "notSent", error: t`Wallet is required for exchange actions` };
 		const outcome = await submit(signer);
 		if (outcome.kind === "blocked") {
-			const earlierKey = getRequestKey(outcome.earlier.request);
-			updateByRequestKey(earlierKey, resultToQueueUpdate(reportSettlement(outcome.earlier)));
+			const { request } = outcome.earlier;
+			upsertByRequestKey(getRequestKey(request), request.label, resultToQueueUpdate(reportSettlement(outcome.earlier)));
 		}
 		return reportSubmit(outcome);
 	}
@@ -141,6 +158,10 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 		return reportUnreadableOutcome(await sender.dismissUnreadable(slot, raw));
 	}
 
+	async function dismissHold({ slot, hold }: SlotHold): Promise<OrderResult> {
+		return reportHoldOutcome(await sender.dismissHold(slot, hold));
+	}
+
 	return {
 		submitPlan,
 		submitTwap,
@@ -149,6 +170,7 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 		previewDismiss,
 		dismissRequest,
 		dismissUnreadable,
+		dismissHold,
 		canCancel: getSigner() !== null,
 		isSubmitting,
 	};
@@ -160,5 +182,14 @@ export function usePendingRequests(): PendingRequest[] {
 		sender.subscribe,
 		() => readPendingRequests(address),
 		() => NO_REQUESTS,
+	);
+}
+
+export function useActiveHolds(): SlotHold[] {
+	const { address } = useConnection();
+	return useSyncExternalStore(
+		sender.subscribe,
+		() => readActiveHolds(address),
+		() => NO_HOLDS,
 	);
 }
