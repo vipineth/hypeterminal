@@ -123,6 +123,12 @@ describe("withdrawal cap from a dex", () => {
 		expect(getDexWithdrawCap(state)).toBe("70");
 	});
 
+	it("keeps the exchange's withdrawable on the main dex", () => {
+		const account = accountOf("mainnet-disabled-two-dexes");
+		expect(getVenueLimit(account, MAIN_PERP, usdc)).toEqual({ status: "ready", amount: "64116.532932" });
+		expect(getVenueLimit(account, dexVenue("xyz"), usdc)).toEqual({ status: "ready", amount: "56427.700923" });
+	});
+
 	it("never goes below zero", () => {
 		const state = clearinghouse("0");
 		state.marginSummary = { accountValue: "4", totalMarginUsed: "5", totalNtlPos: "50", totalRawUsd: "4" };

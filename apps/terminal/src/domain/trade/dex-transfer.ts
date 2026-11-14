@@ -84,7 +84,8 @@ export function getVenueLimit(account: AccountState, venue: Venue, token: QuoteT
 	if (venue.kind === "spot") return getSpotLimit(account, token.name);
 	if (!account.perpCurrent) return { status: "pending" };
 	const state = account.dexes.get(venue.dex);
-	return { status: "ready", amount: state ? getDexWithdrawCap(state) : "0" };
+	if (!state) return { status: "ready", amount: "0" };
+	return { status: "ready", amount: venue.dex === MAIN_DEX ? state.withdrawable : getDexWithdrawCap(state) };
 }
 
 export function buildSendAsset(
