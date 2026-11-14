@@ -72,6 +72,7 @@ const queue = vi.hoisted(() => ({
 	addOrder: vi.fn(() => "order-1"),
 	updateOrder: vi.fn(),
 	updateByRequestKey: vi.fn(),
+	upsertByRequestKey: vi.fn(),
 	removeOrder: vi.fn(),
 }));
 
@@ -265,6 +266,7 @@ beforeEach(async () => {
 	queue.addOrder.mockClear();
 	queue.updateOrder.mockClear();
 	queue.updateByRequestKey.mockClear();
+	queue.upsertByRequestKey.mockClear();
 	useTradeTicket = await loadTicket();
 });
 
@@ -865,8 +867,9 @@ describe("order legs the ticket reports and retries", () => {
 		comesBackUp(net.venue);
 		await pressSubmitPastRetries();
 		expect(unconfirmed).toMatchObject({ status: "unsettled", requestKey: expect.stringMatching(/#\d+$/) });
-		expect(queue.updateByRequestKey).toHaveBeenCalledWith(
+		expect(queue.upsertByRequestKey).toHaveBeenCalledWith(
 			unconfirmed.requestKey,
+			expect.anything(),
 			expect.objectContaining({ status: "success", outcome: "filled" }),
 		);
 	});
@@ -933,8 +936,9 @@ describe("order legs the ticket reports and retries", () => {
 		});
 		expect(sellRow.requestKey).toBeUndefined();
 		expect(formActions.resetForm).not.toHaveBeenCalled();
-		expect(queue.updateByRequestKey).toHaveBeenCalledWith(
+		expect(queue.upsertByRequestKey).toHaveBeenCalledWith(
 			buyRow.requestKey,
+			expect.anything(),
 			expect.objectContaining({ status: "unsettled" }),
 		);
 		expect(

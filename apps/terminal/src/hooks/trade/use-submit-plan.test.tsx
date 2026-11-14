@@ -19,6 +19,7 @@ const queue = vi.hoisted(() => ({
 	addOrder: vi.fn(),
 	updateOrder: vi.fn(),
 	updateByRequestKey: vi.fn(),
+	upsertByRequestKey: vi.fn(),
 	removeOrder: vi.fn(),
 }));
 
@@ -76,6 +77,8 @@ const MARKET_BUY = {
 	orders: [{ a: 5, b: true, p: "90", s: "1", r: false, t: { limit: { tif: "FrontendMarket" as const } } }],
 };
 
+const BUY_LABEL = { market: "SOL", side: "buy" as const, size: "1" };
+
 async function settle<T>(promise: Promise<T>): Promise<T> {
 	await vi.advanceTimersByTimeAsync(12_000);
 	return promise;
@@ -89,6 +92,7 @@ describe("retry and cancel on an unconfirmed order", () => {
 		net.locks = createMemoryLocks();
 		net.tradingReady = true;
 		queue.updateByRequestKey.mockClear();
+		queue.upsertByRequestKey.mockClear();
 	});
 
 	afterEach(() => {
@@ -172,6 +176,23 @@ describe("retry and cancel on an unconfirmed order", () => {
 		});
 		const next = await settle(hook.submitPlan(MARKET_BUY));
 		expect(next).toEqual({ ok: true, outcome: "filled" });
+	});
+
+	it("gives a request that blocks a press in another tab its own row, with Dismiss once it is past expiry", async () => {
+		net.venue.nextExchangeRequests("lost", "lost", "lost", "lost");
+		const first = await settle((await mountSubmitPlan()).submitPlan(MARKET_BUY, BUY_LABEL));
+		await vi.advanceTimersByTimeAsync(30_000);
+		const otherTab = await mountSubmitPlan();
+		net.venue.nextExchangeRequests("lost");
+		expect(await settle(otherTab.submitPlan(MARKET_BUY, BUY_LABEL))).toMatchObject({
+			error: "Not sent. An earlier order on this market is not confirmed yet. Retry, cancel or dismiss it first.",
+		});
+		if (first.ok || first.status !== "unsettled") throw new Error("expected an unconfirmed order");
+		expect(queue.upsertByRequestKey).toHaveBeenCalledWith(
+			first.requestKey,
+			BUY_LABEL,
+			expect.objectContaining({ status: "unsettled", requestKey: first.requestKey, canDismiss: true }),
+		);
 	});
 
 	it("reports a dismissed order a lookup found as filled, never as nothing placed", async () => {

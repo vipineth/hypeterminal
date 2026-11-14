@@ -3,9 +3,9 @@ import { renderToString } from "react-dom/server";
 import { privateKeyToAccount } from "viem/accounts";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { OrderToast } from "@/components/trade/tradebox/order-toast";
-import { type OrderResult, reportSubmit } from "@/lib/trade/extract-order-status";
+import { type OrderResult, reportSettlement, reportSubmit } from "@/lib/trade/extract-order-status";
 import { createOrderSender, type Signer } from "@/lib/trade/order-sender";
-import { createRequestStore, type PendingRequest } from "@/lib/trade/pending-requests";
+import { createRequestStore, type PendingRequest, type SlotHold } from "@/lib/trade/pending-requests";
 import { type OrderQueueItem, resultToQueueUpdate } from "@/stores/use-order-queue-store";
 import {
 	createFakeExchange,
@@ -18,6 +18,7 @@ import {
 const view = vi.hoisted(() => ({
 	queued: [] as OrderQueueItem[],
 	pending: [] as PendingRequest[],
+	holds: [] as SlotHold[],
 	buttons: [] as { label: string; onClick?: () => void; disabled?: boolean }[],
 	canCancel: true,
 }));
@@ -35,6 +36,7 @@ const actions = vi.hoisted(() => ({
 	})),
 	dismissRequest: vi.fn(async () => ({ ok: true })),
 	dismissUnreadable: vi.fn(async () => ({ ok: false, status: "unknown", error: "Dismissed." })),
+	dismissHold: vi.fn(async () => ({ ok: false, status: "unknown", error: "Hold dismissed." })),
 }));
 
 vi.mock("@hypeterminal/ui", async (importOriginal) => ({
@@ -68,12 +70,14 @@ vi.mock("@/stores/use-order-queue-store", async (importOriginal) => ({
 
 vi.mock("@/hooks/trade/use-submit-plan", () => ({
 	usePendingRequests: () => view.pending,
+	useActiveHolds: () => view.holds,
 	useSubmitPlan: () => ({
 		retryRequest: actions.retryRequest,
 		cancelRequest: actions.cancelRequest,
 		previewDismiss: actions.previewDismiss,
 		dismissRequest: actions.dismissRequest,
 		dismissUnreadable: actions.dismissUnreadable,
+		dismissHold: actions.dismissHold,
 		canCancel: view.canCancel,
 	}),
 }));
@@ -105,6 +109,23 @@ const LEFT_FROM_BEFORE_RELOAD: PendingRequest = {
 	signedAt: 0,
 };
 
+const HELD_SCALE: SlotHold = {
+	slot: "testnet:0x0000000000000000000000000000000000000001:5",
+	hold: {
+		nonce: 1794596065043,
+		user: "0x0000000000000000000000000000000000000001",
+		cloids: [],
+		legs: [
+			{ role: "scaleLeg", price: "90" },
+			{ role: "scaleLeg", price: "95" },
+		],
+		buy: true,
+		fates: ["placed", "unknown"],
+		since: null,
+		label: { market: "SOL", side: "buy", size: "2" },
+	},
+};
+
 function buttonsNamed(label: string) {
 	return view.buttons.filter((button) => button.label === label);
 }
@@ -113,6 +134,7 @@ describe("order toast", () => {
 	beforeEach(() => {
 		view.queued = [UNCONFIRMED_ROW];
 		view.pending = [LEFT_FROM_BEFORE_RELOAD];
+		view.holds = [];
 		view.buttons = [];
 		view.canCancel = true;
 		vi.clearAllMocks();
@@ -251,6 +273,7 @@ describe("order toast", () => {
 		);
 		view.queued = [{ ...actions.addOrder.mock.calls[0][0], id: "adopted", ...lastUpdateFor(leftOverKey) }];
 		view.pending = [LEFT_FROM_BEFORE_RELOAD];
+		view.holds = [];
 		view.buttons = [];
 		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
 		expect(html).not.toContain("1 pending");
@@ -302,6 +325,54 @@ describe("order toast", () => {
 		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
 		expect(view.buttons.map((button) => button.label)).not.toContain("Send only the rejected legs");
 		expect(html).toContain("Leg 1 at 90 placed, Leg 2 at 95 rejected");
+	});
+
+	it("shows every hold as a row whose confirmed Dismiss names the placed and unknown legs", async () => {
+		view.queued = [];
+		view.pending = [];
+		view.holds = [HELD_SCALE];
+		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		expect(html).toContain(
+			"The same order is held on this market. Last result: Leg 1 at 90 placed, Leg 2 at 95 not confirmed.",
+		);
+		buttonsNamed("Dismiss hold")[0].onClick?.();
+		expect(actions.addOrder).toHaveBeenCalledWith(expect.objectContaining({ held: HELD_SCALE, confirmHold: true }));
+		view.queued = [{ ...actions.addOrder.mock.calls[0][0], id: "row-hold" }];
+		view.buttons = [];
+		expect(renderToString(<OrderToast />)).toContain(
+			"Known placed: Leg 1 at 90. Unknown: Leg 2 at 95. Dismiss the hold? Sending the same order again may place a leg that was already placed a second time.",
+		);
+		expect(buttonsNamed("Dismiss hold")).toHaveLength(0);
+		buttonsNamed("Yes, dismiss hold")[0].onClick?.();
+		await vi.waitFor(() => expect(actions.dismissHold).toHaveBeenCalledWith(HELD_SCALE));
+		await vi.waitFor(() =>
+			expect(actions.updateOrder).toHaveBeenLastCalledWith(
+				"row-hold",
+				expect.objectContaining({ status: "unknown", error: "Hold dismissed.", held: undefined }),
+			),
+		);
+	});
+
+	it("shows an IOC order the exchange filled only in part as partly filled, with the filled size and the rest", () => {
+		const request: PendingRequest = {
+			...LEFT_FROM_BEFORE_RELOAD,
+			body: JSON.stringify({ action: { type: "order", orders: [{ s: "1" }] } }),
+			label: { market: "SOL", side: "buy", size: "1" },
+		};
+		const response = { type: "order", data: { statuses: [{ filled: { totalSz: "0.2", avgPx: "90", oid: 1 } }] } };
+		view.queued = [
+			{
+				id: "row-ioc",
+				...request.label,
+				createdAt: 0,
+				...resultToQueueUpdate(reportSettlement({ kind: "answered", request, response })),
+			} as OrderQueueItem,
+		];
+		view.pending = [];
+		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		expect(html).not.toContain(">Filled<");
+		expect(html).toContain(">Partly filled<");
+		expect(html).toContain("Order partially filled: 0.2 of 1, 0.8 not filled");
 	});
 
 	it("offers a confirmed Dismiss on a press refused over a pending order it can't read", async () => {

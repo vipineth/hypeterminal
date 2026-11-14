@@ -26,6 +26,13 @@ const FILLED = { filled: { totalSz: "1", avgPx: "80.276", oid: 11 } };
 const RESTING = { resting: { oid: 12 } };
 const TP_REJECTED = { error: "Invalid TP/SL price. asset=5" };
 
+function sized(legs: PlanLeg[], sizes: string[]): PendingRequest {
+	return {
+		...request("order", legs),
+		body: JSON.stringify({ action: { orders: sizes.map((size) => ({ s: size })) } }),
+	};
+}
+
 function request(kind: "order" | "twap", legs: PlanLeg[] = ORDER): PendingRequest {
 	return {
 		slot: "testnet:0x0000000000000000000000000000000000000001:5",
@@ -157,6 +164,44 @@ describe("reportSettlement", () => {
 		expect(reportSettlement({ kind: "answered", request: request("order"), response })).toEqual({
 			ok: true,
 			outcome: "filled",
+		});
+	});
+
+	it("reports an IOC order the exchange filled only in part with the filled size and the rest", () => {
+		const partFilled = { filled: { totalSz: "0.2", avgPx: "80.276", oid: 11 } };
+		const response = { type: "order", data: { statuses: [partFilled] } };
+		expect(reportSettlement({ kind: "answered", request: sized(ORDER, ["1"]), response })).toEqual({
+			ok: true,
+			outcome: "partiallyFilled",
+			detail: "Order partially filled: 0.2 of 1, 0.8 not filled",
+		});
+		const whole = { type: "order", data: { statuses: [FILLED] } };
+		expect(reportSettlement({ kind: "answered", request: sized(ORDER, ["1"]), response: whole })).toEqual({
+			ok: true,
+			outcome: "filled",
+		});
+	});
+
+	it("names a partly filled entry beside its rejected take profit", () => {
+		const partFilled = { filled: { totalSz: "0.25", avgPx: "80.276", oid: 11 } };
+		const response = { type: "order", data: { statuses: [partFilled, TP_REJECTED] } };
+		expect(reportSettlement({ kind: "answered", request: sized(ENTRY_WITH_TP, ["1", "1"]), response })).toEqual({
+			ok: false,
+			status: "failed",
+			error: "Entry partially filled: 0.25 of 1, 0.75 not filled. Take profit rejected: Invalid TP/SL price. asset=5",
+		});
+	});
+
+	it("says an earlier order partly filled when a press it blocked reads its reply", () => {
+		const partFilled = { filled: { totalSz: "0.2", avgPx: "80.276", oid: 11 } };
+		const earlier: Settlement = {
+			kind: "answered",
+			request: sized(ORDER, ["1"]),
+			response: { type: "order", data: { statuses: [partFilled] } },
+		};
+		expect(reportSubmit({ kind: "blocked", earlier })).toMatchObject({
+			error:
+				"Not sent. An earlier order on this market was still unconfirmed: it partly filled. Press again to send a new order.",
 		});
 	});
 
@@ -353,6 +398,7 @@ describe("reportSubmit", () => {
 			buy: true,
 			fates: ["placed" as const, "rejected" as const, "unknown" as const],
 			since: 0,
+			label: { market: "SOL", side: "buy" as const, size: "3" },
 		};
 		expect(reportSubmit({ kind: "held", hold })).toEqual({
 			ok: false,
