@@ -136,7 +136,7 @@ export function getSpotAvailable(spot: SpotState, tokenName: string): string {
 	const afterMaintenance = spot.tokenToAvailableAfterMaintenance?.find(([index]) => index === token)?.[1];
 	const available =
 		afterMaintenance != null ? toSafeBig(afterMaintenance) : toSafeBig(balance.total).minus(balance.hold);
-	return available.gt(0) ? available.toString() : "0";
+	return available.gt(0) ? available.toFixed() : "0";
 }
 
 function getSpotTotal(spot: SpotState, tokenName: string): string {
