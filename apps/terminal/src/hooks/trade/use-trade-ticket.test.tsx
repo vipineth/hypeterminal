@@ -14,6 +14,7 @@ import {
 } from "@/test/fake-exchange";
 
 type UseTradeTicket = typeof import("@/hooks/trade/use-trade-ticket").useTradeTicket;
+type SubmitPlanHook = ReturnType<typeof import("@/hooks/trade/use-submit-plan").useSubmitPlan>;
 let useTradeTicket: UseTradeTicket;
 
 const POINTS_USDC = vi.hoisted(() => ({
@@ -989,6 +990,117 @@ describe("order legs the ticket reports and retries", () => {
 			outcome: "partiallyFilled",
 			detail: "1 of 2 legs filled, 1 placed",
 		});
+	});
+});
+
+describe("the order a fresh press signs", () => {
+	const AWAY_REASON = "Order price cannot be more than 80% away from the reference price";
+
+	beforeEach(() => {
+		form.market = SOL_PERP;
+		form.side = "buy";
+		form.orderType = "market";
+		form.sizeMode = "base";
+		form.triggerPrice = "";
+		form.reduceOnly = false;
+		form.twapMinutes = null;
+		form.tpSlEnabled = true;
+		form.tpPrice = "500";
+		form.slPrice = "";
+		form.sizeUnit = null;
+		form.maxTradeSzs = [100, 100];
+		typeSizeHere("1");
+	});
+
+	function takeProfitsIn(bodies: ReturnType<typeof orderBodies>): string[] {
+		return bodies.flatMap(({ action }) =>
+			(action.orders as WireOrder[]).flatMap(({ t }) =>
+				"trigger" in t && t.trigger.tpsl === "tp" ? [t.trigger.triggerPx] : [],
+			),
+		);
+	}
+
+	async function pressRowAction(act: (hook: SubmitPlanHook) => Promise<unknown>) {
+		const { useSubmitPlan } = await import("@/hooks/trade/use-submit-plan");
+		const hooks: SubmitPlanHook[] = [];
+		renderToString(<TicketProbe render={useSubmitPlan} onTicket={(hook) => hooks.push(hook)} />);
+		const acted = act(hooks[0]);
+		await vi.advanceTimersByTimeAsync(12_000);
+		await acted;
+	}
+
+	it("sends no take profit once the field is cleared after the exchange rejected the order", async () => {
+		answerLegs(rejectedLeg(AWAY_REASON), rejectedLeg(AWAY_REASON));
+		await pressSubmit();
+		expect(lastQueueUpdate()).toMatchObject({ status: "failed", error: AWAY_REASON });
+		net.venue.state.legOutcome = null;
+		form.tpPrice = "";
+		form.slPrice = "70";
+		await pressSubmit();
+		const [rejected, cleared] = orderBodies();
+		expect(takeProfitsIn([rejected])).toEqual(["500"]);
+		expect(takeProfitsIn([cleared])).toEqual([]);
+		expect(net.venue.state.placedLegs).toBe(2);
+	});
+
+	it.each([
+		["its reply was lost", () => net.venue.nextExchangeRequests("lost", "lost", "lost", "lost")],
+		[
+			"the exchange refused the whole request",
+			() => {
+				net.venue.state.rejectWith = "Temporary pre-nonce rejection";
+			},
+		],
+	])(
+		"never sends an unconfirmed order's take profit from a press after the field is cleared, when %s",
+		async (_case, failFirstPress) => {
+			vi.useFakeTimers();
+			failFirstPress();
+			await pressSubmitPastRetries();
+			expect(lastQueueUpdate()).toMatchObject({ status: "unsettled" });
+			net.venue.state.rejectWith = null;
+			form.tpPrice = "";
+			form.slPrice = "70";
+			const sentBefore = orderBodies().length;
+			await pressSubmitPastRetries();
+			expect(takeProfitsIn(orderBodies().slice(sentBefore))).toEqual([]);
+			expect(net.venue.state.placedLegs).toBe(0);
+			expect(orderBodies()).toHaveLength(sentBefore);
+			expect(lastQueueUpdate()).toMatchObject({
+				status: "notSent",
+				error: expect.stringContaining("Retry resends that earlier order, not this one."),
+			});
+		},
+	);
+
+	it("resends the earlier order exactly as signed only from its Retry", async () => {
+		vi.useFakeTimers();
+		net.venue.nextExchangeRequests("lost", "lost", "lost", "lost");
+		await pressSubmitPastRetries();
+		const { requestKey } = lastQueueUpdate();
+		const [signed] = orderBodies();
+		form.tpPrice = "";
+		form.slPrice = "70";
+		await pressSubmitPastRetries();
+		expect(net.venue.state.placedLegs).toBe(0);
+		await pressRowAction((hook) => hook.retryRequest(requestKey));
+		expect(orderBodies().at(-1)).toEqual(signed);
+		expect(takeProfitsIn(orderBodies())).toEqual(["500", "500", "500", "500", "500"]);
+		expect(net.venue.state.placedLegs).toBe(2);
+	});
+
+	it("signs the edited ticket once the earlier unconfirmed order is canceled", async () => {
+		vi.useFakeTimers();
+		net.venue.nextExchangeRequests("lost", "lost", "lost", "lost");
+		await pressSubmitPastRetries();
+		const { requestKey } = lastQueueUpdate();
+		form.tpPrice = "";
+		form.slPrice = "70";
+		await pressRowAction((hook) => hook.cancelRequest(requestKey));
+		await pressSubmitPastRetries();
+		const edited = orderBodies().at(-1);
+		expect(edited && takeProfitsIn([edited])).toEqual([]);
+		expect(net.venue.state.placedLegs).toBe(2);
 	});
 });
 

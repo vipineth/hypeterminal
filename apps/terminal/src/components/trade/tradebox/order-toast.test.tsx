@@ -375,6 +375,50 @@ describe("order toast", () => {
 		expect(html).toContain("Order partially filled: 0.2 of 1, 0.8 not filled");
 	});
 
+	it("keeps a hold's open confirm above the refused presses that stack after it", async () => {
+		const refusedRow = {
+			id: "row-refused",
+			market: "SOL",
+			side: "buy",
+			size: "2",
+			createdAt: 0,
+			...resultToQueueUpdate(reportSubmit(await pressHeldScale())),
+		} as OrderQueueItem;
+		const confirmingHold: OrderQueueItem = {
+			id: "row-hold",
+			...HELD_SCALE.hold.label,
+			status: "unsettled",
+			held: HELD_SCALE,
+			confirmHold: true,
+			createdAt: 0,
+		};
+		view.queued = [refusedRow, { ...refusedRow, id: "row-refused-2" }, confirmingHold];
+		view.pending = [];
+		view.holds = [HELD_SCALE];
+		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		const confirmAt = html.indexOf("Known placed: Leg 1 at 90.");
+		expect(confirmAt).toBeGreaterThan(-1);
+		expect(confirmAt).toBeLessThan(html.indexOf("Not sent. Your last order on this market"));
+	});
+
+	it("counts a refused press and a canceled order apart from failed ones", async () => {
+		const request: PendingRequest = { ...LEFT_FROM_BEFORE_RELOAD, label: { market: "SOL", side: "buy", size: "1" } };
+		const rejected = reportSettlement({
+			kind: "answered",
+			request,
+			response: { type: "order", data: { statuses: [{ error: "Insufficient margin to place order. asset=5" }] } },
+		});
+		const rows = [reportSubmit(await pressHeldScale()), reportSettlement({ kind: "canceled", request }), rejected].map(
+			(result, index) => ({ id: `row-${index}`, ...request.label, createdAt: 0, ...resultToQueueUpdate(result) }),
+		);
+		view.queued = rows as OrderQueueItem[];
+		view.pending = [];
+		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		expect(html).toContain("1 failed");
+		expect(html).toContain("1 not sent");
+		expect(html).toContain("1 canceled");
+	});
+
 	it("offers a confirmed Dismiss on a press refused over a pending order it can't read", async () => {
 		const unreadable = { slot: LEFT_FROM_BEFORE_RELOAD.slot, raw: '{"state":"pending"}' };
 		const refused = reportSubmit({ kind: "refused", reason: "unreadableRecord", ...unreadable });
