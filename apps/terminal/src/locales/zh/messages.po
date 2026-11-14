@@ -166,7 +166,8 @@ msgstr ""
 #~ msgid "About Builder Codes"
 #~ msgstr ""
 
-#: src/components/trade/tradebox/account-panel.tsx:116
+#: src/components/trade/components/perps-source-label.tsx:24
+#: src/components/trade/tradebox/account-panel.tsx:68
 msgid "Account"
 msgstr "账户"
 
@@ -174,11 +175,11 @@ msgstr "账户"
 msgid "Account and wallet"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:203
+#: src/components/trade/mobile/mobile-balances-tab.tsx:180
 msgid "Account Balances"
 msgstr "账户余额"
 
-#: src/components/trade/tradebox/account-panel.tsx:123
+#: src/components/trade/tradebox/account-panel.tsx:75
 msgid "Account Equity"
 msgstr ""
 
@@ -186,7 +187,7 @@ msgstr ""
 #~ msgid "Accounts"
 #~ msgstr ""
 
-#: src/components/trade/positions/balances-tab.tsx:269
+#: src/components/trade/positions/balances-tab.tsx:241
 #: src/components/trade/positions/orders-tab.tsx:278
 #: src/components/trade/positions/positions-tab.tsx:215
 #: src/components/trade/positions/twap-tab.tsx:114
@@ -271,10 +272,10 @@ msgstr ""
 msgid "ALO (Add Liquidity Only)"
 msgstr ""
 
-#: src/components/trade/positions/send-modal.tsx:222
-#: src/components/trade/positions/transfer-modal.tsx:144
+#: src/components/trade/positions/send-modal.tsx:208
+#: src/components/trade/positions/transfer-modal.tsx:153
 #: src/components/trade/tradebox/deposit/deposit-form.tsx:72
-#: src/components/trade/tradebox/deposit/withdraw-form.tsx:44
+#: src/components/trade/tradebox/deposit/withdraw-form.tsx:43
 msgid "Amount"
 msgstr ""
 
@@ -302,7 +303,7 @@ msgstr ""
 msgid "Approve in wallet..."
 msgstr ""
 
-#: src/components/trade/positions/balances-tab.tsx:234
+#: src/components/trade/positions/balances-tab.tsx:206
 #: src/components/trade/positions/funding-tab.tsx:77
 #: src/components/trade/positions/history-tab.tsx:79
 #: src/components/trade/positions/orders-history-tab.tsx:77
@@ -320,11 +321,13 @@ msgstr "资产"
 msgid "Auto close"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:150
+#: src/components/trade/mobile/mobile-balances-tab.tsx:127
 #: src/components/trade/mobile/mobile-trade-ticket-body.tsx:127
-#: src/components/trade/positions/balances-tab.tsx:241
+#: src/components/trade/positions/balances-tab.tsx:213
 #: src/components/trade/positions/position-limit-close-modal.tsx:161
-#: src/components/trade/positions/transfer-modal.tsx:147
+#: src/components/trade/positions/send-modal.tsx:122
+#: src/components/trade/positions/transfer-modal.tsx:156
+#: src/components/trade/tradebox/account-panel.tsx:29
 #: src/components/trade/tradebox/trade-form-fields.tsx:131
 msgid "Available"
 msgstr "可用"
@@ -357,7 +360,7 @@ msgstr ""
 #~ msgid "Back to asset selection"
 #~ msgstr ""
 
-#: src/components/trade/tradebox/account-panel.tsx:86
+#: src/components/trade/tradebox/account-panel.tsx:37
 msgid "Balance"
 msgstr "余额"
 
@@ -385,10 +388,10 @@ msgstr ""
 #~ msgid "Breadcrumb"
 #~ msgstr "面包屑导航"
 
-#: src/components/trade/mobile/mobile-account-view.tsx:188
-#: src/components/trade/tradebox/account-panel.tsx:172
-#: src/components/trade/tradebox/account-panel.tsx:175
-#: src/components/trade/tradebox/deposit-modal.tsx:237
+#: src/components/trade/mobile/mobile-account-view.tsx:222
+#: src/components/trade/tradebox/account-panel.tsx:131
+#: src/components/trade/tradebox/account-panel.tsx:134
+#: src/components/trade/tradebox/deposit-modal.tsx:229
 msgid "Bridge"
 msgstr ""
 
@@ -485,8 +488,8 @@ msgstr ""
 #: src/components/trade/positions/position-limit-close-modal.tsx:198
 #: src/components/trade/positions/position-tpsl-modal.tsx:170
 #: src/components/trade/positions/twap-tab.tsx:194
-#: src/components/trade/tradebox/deposit-modal.tsx:150
-#: src/components/trade/tradebox/deposit-modal.tsx:205
+#: src/components/trade/tradebox/deposit-modal.tsx:142
+#: src/components/trade/tradebox/deposit-modal.tsx:197
 #: src/components/trade/tradebox/margin-mode-modal.tsx:216
 #: src/components/trade/tradebox/order-toast.tsx:280
 #: src/routes/mobile-agent-sync.tsx:413
@@ -638,7 +641,7 @@ msgstr ""
 msgid "Confirm Close"
 msgstr ""
 
-#: src/components/trade/tradebox/deposit-modal.tsx:165
+#: src/components/trade/tradebox/deposit-modal.tsx:157
 msgid "Confirm in wallet"
 msgstr ""
 
@@ -685,14 +688,14 @@ msgstr ""
 
 #: src/components/trade/components/wallet-modal.tsx:743
 #: src/components/trade/header/user-menu.tsx:73
-#: src/components/trade/mobile/mobile-account-view.tsx:69
-#: src/components/trade/mobile/mobile-account-view.tsx:75
+#: src/components/trade/mobile/mobile-account-view.tsx:102
+#: src/components/trade/mobile/mobile-account-view.tsx:108
 #: src/components/trade/mobile/mobile-nav-drawer.tsx:143
 #: src/lib/trade/use-button-content.ts:49
 msgid "Connect Wallet"
 msgstr "连接钱包"
 
-#: src/components/trade/tradebox/account-panel.tsx:120
+#: src/components/trade/tradebox/account-panel.tsx:72
 msgid "Connect wallet to view account"
 msgstr "连接钱包查看账户"
 
@@ -720,8 +723,8 @@ msgstr ""
 #~ msgid "Connect your wallet to start trading on Hyperliquid"
 #~ msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:101
-#: src/components/trade/positions/balances-tab.tsx:199
+#: src/components/trade/mobile/mobile-balances-tab.tsx:73
+#: src/components/trade/positions/balances-tab.tsx:172
 msgid "Connect your wallet to view balances."
 msgstr "连接钱包查看余额。"
 
@@ -755,7 +758,7 @@ msgstr "连接钱包查看交易历史。"
 msgid "Connect your wallet to view TWAP orders."
 msgstr "连接钱包查看 TWAP 订单。"
 
-#: src/components/trade/mobile/mobile-account-view.tsx:71
+#: src/components/trade/mobile/mobile-account-view.tsx:104
 msgid "Connect your wallet to view your account, positions, and start trading."
 msgstr ""
 
@@ -802,7 +805,7 @@ msgstr ""
 msgid "Copied!"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-account-view.tsx:103
+#: src/components/trade/mobile/mobile-account-view.tsx:136
 msgid "Copy address"
 msgstr ""
 
@@ -883,7 +886,7 @@ msgstr ""
 msgid "Cross"
 msgstr "全仓"
 
-#: src/components/trade/tradebox/account-panel.tsx:106
+#: src/components/trade/tradebox/account-panel.tsx:50
 msgid "Cross Account Leverage"
 msgstr ""
 
@@ -891,11 +894,11 @@ msgstr ""
 #~ msgid "Cross Leverage"
 #~ msgstr "全仓杠杆"
 
-#: src/components/trade/mobile/mobile-account-view.tsx:109
+#: src/components/trade/mobile/mobile-account-view.tsx:142
 msgid "Cross Margin"
 msgstr ""
 
-#: src/components/trade/tradebox/account-panel.tsx:96
+#: src/components/trade/tradebox/account-panel.tsx:44
 msgid "Cross Margin Ratio"
 msgstr ""
 
@@ -929,23 +932,23 @@ msgstr ""
 
 #: src/components/trade/header/top-nav.tsx:99
 #: src/components/trade/mobile/mobile-nav-drawer.tsx:132
-#: src/components/trade/tradebox/account-panel.tsx:163
-#: src/components/trade/tradebox/account-panel.tsx:166
-#: src/components/trade/tradebox/deposit-modal.tsx:120
-#: src/components/trade/tradebox/deposit-modal.tsx:142
-#: src/components/trade/tradebox/deposit-modal.tsx:163
-#: src/components/trade/tradebox/deposit-modal.tsx:231
+#: src/components/trade/tradebox/account-panel.tsx:122
+#: src/components/trade/tradebox/account-panel.tsx:125
+#: src/components/trade/tradebox/deposit-modal.tsx:112
+#: src/components/trade/tradebox/deposit-modal.tsx:134
+#: src/components/trade/tradebox/deposit-modal.tsx:155
+#: src/components/trade/tradebox/deposit-modal.tsx:223
 #: src/components/trade/tradebox/deposit/deposit-form.tsx:130
 #: src/components/trade/tradebox/trade-form-fields.tsx:149
 #: src/lib/trade/use-button-content.ts:76
 msgid "Deposit"
 msgstr "存款"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:122
+#: src/components/trade/tradebox/deposit-modal.tsx:114
 msgid "Deposit complete"
 msgstr ""
 
-#: src/components/trade/tradebox/deposit-modal.tsx:144
+#: src/components/trade/tradebox/deposit-modal.tsx:136
 msgid "Deposit failed"
 msgstr ""
 
@@ -975,7 +978,7 @@ msgstr ""
 msgid "Destination"
 msgstr ""
 
-#: src/components/trade/positions/send-modal.tsx:193
+#: src/components/trade/positions/send-modal.tsx:179
 msgid "Destination address"
 msgstr ""
 
@@ -991,7 +994,7 @@ msgstr ""
 msgid "Disconnect"
 msgstr "断开连接"
 
-#: src/components/trade/mobile/mobile-account-view.tsx:119
+#: src/components/trade/mobile/mobile-account-view.tsx:152
 msgid "Disconnect wallet"
 msgstr ""
 
@@ -1045,8 +1048,8 @@ msgstr ""
 #~ msgid "Docs"
 #~ msgstr "文档"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:133
-#: src/components/trade/tradebox/deposit-modal.tsx:188
+#: src/components/trade/tradebox/deposit-modal.tsx:125
+#: src/components/trade/tradebox/deposit-modal.tsx:180
 msgid "Done"
 msgstr ""
 
@@ -1169,7 +1172,7 @@ msgstr ""
 
 #: src/components/trade/tradebox/bridge/confirmation-screen.tsx:83
 #: src/components/trade/tradebox/deposit/deposit-form.tsx:107
-#: src/components/trade/tradebox/deposit/withdraw-form.tsx:98
+#: src/components/trade/tradebox/deposit/withdraw-form.tsx:99
 msgid "Estimated time"
 msgstr ""
 
@@ -1231,8 +1234,8 @@ msgstr ""
 msgid "Failed to load balances"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:109
-#: src/components/trade/positions/balances-tab.tsx:201
+#: src/components/trade/mobile/mobile-balances-tab.tsx:81
+#: src/components/trade/positions/balances-tab.tsx:174
 msgid "Failed to load balances."
 msgstr "加载余额失败。"
 
@@ -1332,7 +1335,7 @@ msgstr "已成交"
 msgid "Filter by {0}"
 msgstr "按 {0} 筛选"
 
-#: src/components/trade/positions/transfer-modal.tsx:126
+#: src/components/trade/positions/transfer-modal.tsx:135
 msgid "Flip transfer direction"
 msgstr ""
 
@@ -1348,7 +1351,7 @@ msgstr ""
 msgid "Frequency"
 msgstr ""
 
-#: src/components/trade/components/spot-swap-modal.tsx:198
+#: src/components/trade/components/spot-swap-modal.tsx:203
 #: src/components/trade/tradebox/deposit/deposit-form.tsx:68
 msgid "From"
 msgstr ""
@@ -1414,8 +1417,8 @@ msgstr ""
 msgid "H"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:209
-#: src/components/trade/positions/balances-tab.tsx:217
+#: src/components/trade/mobile/mobile-balances-tab.tsx:186
+#: src/components/trade/positions/balances-tab.tsx:189
 msgid "Hide small"
 msgstr ""
 
@@ -1467,7 +1470,7 @@ msgstr ""
 #~ msgid "Insufficient {fromTokenDisplay} balance"
 #~ msgstr ""
 
-#: src/components/trade/components/spot-swap-modal.tsx:281
+#: src/components/trade/components/spot-swap-modal.tsx:286
 msgid "Insufficient <0/> balance"
 msgstr ""
 
@@ -1654,7 +1657,7 @@ msgstr ""
 msgid "Loading balances across all chains..."
 msgstr ""
 
-#: src/components/trade/positions/balances-tab.tsx:200
+#: src/components/trade/positions/balances-tab.tsx:173
 msgid "Loading balances..."
 msgstr "加载余额中..."
 
@@ -1727,8 +1730,8 @@ msgstr ""
 msgid "Mainnet"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-account-view.tsx:154
-#: src/components/trade/tradebox/account-panel.tsx:101
+#: src/components/trade/mobile/mobile-account-view.tsx:63
+#: src/components/trade/tradebox/account-panel.tsx:48
 msgid "Maintenance Margin"
 msgstr ""
 
@@ -1877,6 +1880,10 @@ msgstr "最大"
 #~ msgid "Max slippage allowed for market orders."
 #~ msgstr "市价单允许的最大滑点。"
 
+#: src/components/trade/positions/send-modal.tsx:119
+msgid "Max unavailable. The exchange checks this amount."
+msgstr ""
+
 #: src/components/trade/components/global-settings-modal.tsx:
 #~ msgid "Maximum slippage tolerance for market orders"
 #~ msgstr ""
@@ -1943,7 +1950,7 @@ msgstr ""
 #~ msgid "More pages"
 #~ msgstr "更多页面"
 
-#: src/components/trade/positions/transfer-modal.tsx:107
+#: src/components/trade/positions/transfer-modal.tsx:116
 msgid "Move USDC between your Perp and Spot accounts."
 msgstr ""
 
@@ -1951,7 +1958,7 @@ msgstr ""
 #~ msgid "Must be signed by main wallet (not agent/API wallet)"
 #~ msgstr ""
 
-#: src/components/trade/tradebox/deposit/withdraw-form.tsx:87
+#: src/components/trade/tradebox/deposit/withdraw-form.tsx:88
 msgid "Net received"
 msgstr ""
 
@@ -1960,7 +1967,7 @@ msgstr ""
 msgid "Network"
 msgstr ""
 
-#: src/components/trade/tradebox/deposit/withdraw-form.tsx:76
+#: src/components/trade/tradebox/deposit/withdraw-form.tsx:77
 msgid "Network fee"
 msgstr ""
 
@@ -2018,8 +2025,8 @@ msgstr ""
 msgid "No balances found"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:117
-#: src/components/trade/positions/balances-tab.tsx:203
+#: src/components/trade/mobile/mobile-balances-tab.tsx:89
+#: src/components/trade/positions/balances-tab.tsx:175
 msgid "No balances found. Deposit funds to start trading."
 msgstr "未找到余额。存入资金开始交易。"
 
@@ -2091,7 +2098,7 @@ msgstr ""
 #~ msgid "No trading pair available for {fromTokenDisplay}/{toTokenDisplay}"
 #~ msgstr ""
 
-#: src/components/trade/components/spot-swap-modal.tsx:292
+#: src/components/trade/components/spot-swap-modal.tsx:297
 msgid "No trading pair available for <0/>/<1/>"
 msgstr ""
 
@@ -2261,6 +2268,10 @@ msgstr ""
 #: src/components/trade/tradebox/bridge-tab.tsx:
 #~ msgid "on"
 #~ msgstr ""
+
+#: src/components/trade/components/account-notice-line.tsx:31
+msgid "One {tokenName} balance backs perps, builder dexes and spot."
+msgstr ""
 
 #: src/components/trade/components/wallet-dialog.tsx:
 #~ msgid "Only you control your funds. No email or password required."
@@ -2475,26 +2486,27 @@ msgstr "待处理"
 #~ msgstr "永续"
 
 #: src/components/trade/chart/token-selector-content.tsx:93
-#: src/components/trade/positions/transfer-modal.tsx:67
-#: src/components/trade/positions/transfer-modal.tsx:68
+#: src/components/trade/positions/transfer-modal.tsx:64
+#: src/components/trade/positions/transfer-modal.tsx:65
 #: src/config/nav.tsx:43
 msgid "Perp"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:217
-#: src/components/trade/positions/balances-tab.tsx:281
+#: src/components/trade/mobile/mobile-balances-tab.tsx:196
+#: src/components/trade/positions/balances-tab.tsx:253
 msgid "Perpetuals"
 msgstr ""
 
-#: src/components/trade/tradebox/account-panel.tsx:131
+#: src/components/trade/components/perps-source-label.tsx:14
+#: src/components/trade/tradebox/account-panel.tsx:84
 msgid "Perps"
 msgstr "永续合约"
 
-#: src/components/trade/positions/send-modal.tsx:174
+#: src/components/trade/positions/send-modal.tsx:160
 msgid "Perps Account"
 msgstr ""
 
-#: src/components/trade/tradebox/account-panel.tsx:139
+#: src/components/trade/tradebox/account-panel.tsx:94
 msgid "Perps Overview"
 msgstr ""
 
@@ -2555,7 +2567,7 @@ msgstr ""
 msgid "Please enter an address"
 msgstr ""
 
-#: src/components/trade/positions/balances-tab.tsx:262
+#: src/components/trade/positions/balances-tab.tsx:234
 #: src/components/trade/positions/history-tab.tsx:110
 #: src/components/trade/positions/positions-tab.tsx:201
 msgid "PNL"
@@ -2569,6 +2581,7 @@ msgstr ""
 #~ msgid "Popular"
 #~ msgstr ""
 
+#: src/components/trade/components/perps-source-label.tsx:22
 #: src/config/nav.tsx:68
 msgid "Portfolio"
 msgstr "投资组合"
@@ -2652,12 +2665,12 @@ msgstr ""
 msgid "Processing"
 msgstr ""
 
-#: src/components/trade/tradebox/deposit-modal.tsx:165
+#: src/components/trade/tradebox/deposit-modal.tsx:157
 msgid "Processing deposit"
 msgstr ""
 
 #: src/components/trade/tradebox/deposit/deposit-form.tsx:125
-#: src/components/trade/tradebox/deposit/withdraw-form.tsx:116
+#: src/components/trade/tradebox/deposit/withdraw-form.tsx:117
 msgid "Processing..."
 msgstr ""
 
@@ -2677,7 +2690,7 @@ msgstr ""
 msgid "Randomize timing"
 msgstr ""
 
-#: src/components/trade/components/spot-swap-modal.tsx:255
+#: src/components/trade/components/spot-swap-modal.tsx:260
 #: src/components/trade/mobile/mobile-funding-tab.tsx:104
 #: src/components/trade/positions/funding-tab.tsx:91
 msgid "Rate"
@@ -2761,8 +2774,8 @@ msgid "Resetting..."
 msgstr ""
 
 #: src/components/trade/mobile/offline-banner.tsx:80
-#: src/components/trade/tradebox/deposit-modal.tsx:153
-#: src/components/trade/tradebox/deposit-modal.tsx:208
+#: src/components/trade/tradebox/deposit-modal.tsx:145
+#: src/components/trade/tradebox/deposit-modal.tsx:200
 #: src/components/trade/tradebox/order-toast.tsx:270
 msgid "Retry"
 msgstr ""
@@ -2918,7 +2931,7 @@ msgstr "选择订单"
 msgid "Select token"
 msgstr "选择代币"
 
-#: src/components/trade/components/spot-swap-modal.tsx:189
+#: src/components/trade/components/spot-swap-modal.tsx:194
 msgid "Select tokens to swap"
 msgstr ""
 
@@ -2938,13 +2951,13 @@ msgstr "卖出"
 #~ msgid "Sell Short"
 #~ msgstr "卖出做空"
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:189
-#: src/components/trade/positions/balances-tab.tsx:189
-#: src/components/trade/positions/send-modal.tsx:251
+#: src/components/trade/mobile/mobile-balances-tab.tsx:166
+#: src/components/trade/positions/balances-tab.tsx:162
+#: src/components/trade/positions/send-modal.tsx:232
 msgid "Send"
 msgstr ""
 
-#: src/components/trade/positions/send-modal.tsx:168
+#: src/components/trade/positions/send-modal.tsx:154
 msgid "Send failed"
 msgstr ""
 
@@ -2952,19 +2965,19 @@ msgstr ""
 #~ msgid "Send only the rejected legs"
 #~ msgstr ""
 
-#: src/components/trade/positions/send-modal.tsx:186
+#: src/components/trade/positions/send-modal.tsx:172
 msgid "Send Tokens"
 msgstr ""
 
-#: src/components/trade/positions/send-modal.tsx:187
+#: src/components/trade/positions/send-modal.tsx:173
 msgid "Send tokens to another account on the Hyperliquid L1."
 msgstr ""
 
-#: src/components/trade/positions/send-modal.tsx:251
+#: src/components/trade/positions/send-modal.tsx:232
 msgid "Sending..."
 msgstr ""
 
-#: src/components/trade/tradebox/deposit-modal.tsx:126
+#: src/components/trade/tradebox/deposit-modal.tsx:118
 msgid "sent to Hyperliquid"
 msgstr ""
 
@@ -3157,7 +3170,7 @@ msgid "Slippage"
 msgstr "滑点"
 
 #: src/components/trade/components/global-settings-modal.tsx:83
-#: src/components/trade/components/spot-swap-modal.tsx:271
+#: src/components/trade/components/spot-swap-modal.tsx:276
 msgid "Slippage tolerance"
 msgstr ""
 
@@ -3197,16 +3210,17 @@ msgstr ""
 #~ msgstr "现货"
 
 #: src/components/trade/chart/token-selector-content.tsx:94
-#: src/components/trade/mobile/mobile-balances-tab.tsx:223
-#: src/components/trade/positions/balances-tab.tsx:294
-#: src/components/trade/positions/transfer-modal.tsx:67
-#: src/components/trade/positions/transfer-modal.tsx:68
-#: src/components/trade/tradebox/account-panel.tsx:126
+#: src/components/trade/components/perps-source-label.tsx:18
+#: src/components/trade/mobile/mobile-balances-tab.tsx:202
+#: src/components/trade/positions/balances-tab.tsx:266
+#: src/components/trade/positions/transfer-modal.tsx:64
+#: src/components/trade/positions/transfer-modal.tsx:65
+#: src/components/trade/tradebox/account-panel.tsx:78
 #: src/config/nav.tsx:49
 msgid "Spot"
 msgstr "现货"
 
-#: src/components/trade/positions/send-modal.tsx:175
+#: src/components/trade/positions/send-modal.tsx:161
 msgid "Spot Account"
 msgstr ""
 
@@ -3287,27 +3301,27 @@ msgstr ""
 #~ msgid "Support"
 #~ msgstr "支持"
 
-#: src/components/trade/components/spot-swap-modal.tsx:183
-#: src/components/trade/components/spot-swap-modal.tsx:327
-#: src/components/trade/mobile/mobile-balances-tab.tsx:177
-#: src/components/trade/positions/balances-tab.tsx:179
+#: src/components/trade/components/spot-swap-modal.tsx:188
+#: src/components/trade/components/spot-swap-modal.tsx:332
+#: src/components/trade/mobile/mobile-balances-tab.tsx:154
+#: src/components/trade/positions/balances-tab.tsx:152
 #: src/components/trade/tradebox/trade-form-fields.tsx:144
 msgid "Swap"
 msgstr ""
 
-#: src/components/trade/components/spot-swap-modal.tsx:226
+#: src/components/trade/components/spot-swap-modal.tsx:231
 msgid "Swap direction"
 msgstr ""
 
-#: src/components/trade/components/spot-swap-modal.tsx:169
+#: src/components/trade/components/spot-swap-modal.tsx:168
 msgid "Swap failed"
 msgstr ""
 
-#: src/components/trade/components/spot-swap-modal.tsx:311
+#: src/components/trade/components/spot-swap-modal.tsx:316
 msgid "Swap submitted"
 msgstr ""
 
-#: src/components/trade/components/spot-swap-modal.tsx:324
+#: src/components/trade/components/spot-swap-modal.tsx:329
 msgid "Swapping..."
 msgstr ""
 
@@ -3565,18 +3579,18 @@ msgstr ""
 msgid "Time In Force"
 msgstr ""
 
-#: src/components/trade/components/spot-swap-modal.tsx:233
-#: src/components/trade/tradebox/deposit/withdraw-form.tsx:40
+#: src/components/trade/components/spot-swap-modal.tsx:238
+#: src/components/trade/tradebox/deposit/withdraw-form.tsx:39
 msgid "To"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:128
-#: src/components/trade/positions/balances-tab.tsx:130
+#: src/components/trade/mobile/mobile-balances-tab.tsx:142
+#: src/components/trade/positions/balances-tab.tsx:142
 msgid "To Perp"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:128
-#: src/components/trade/positions/balances-tab.tsx:130
+#: src/components/trade/mobile/mobile-balances-tab.tsx:142
+#: src/components/trade/positions/balances-tab.tsx:142
 msgid "To Spot"
 msgstr ""
 
@@ -3598,9 +3612,10 @@ msgstr ""
 msgid "TOKEN"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:151
+#: src/components/trade/mobile/mobile-balances-tab.tsx:128
 #: src/components/trade/orderbook/orderbook-panel.tsx:132
-#: src/components/trade/positions/balances-tab.tsx:248
+#: src/components/trade/positions/balances-tab.tsx:220
+#: src/components/trade/tradebox/account-panel.tsx:27
 msgid "Total"
 msgstr "合计"
 
@@ -3677,7 +3692,7 @@ msgid "Trade History"
 msgstr "交易历史"
 
 #. placeholder {0}: spotMarket.pairName
-#: src/components/trade/components/spot-swap-modal.tsx:187
+#: src/components/trade/components/spot-swap-modal.tsx:192
 msgid "Trade via {0} spot market"
 msgstr ""
 
@@ -3717,17 +3732,18 @@ msgstr ""
 msgid "Transaction was rejected"
 msgstr ""
 
-#: src/components/trade/positions/transfer-modal.tsx:179
-#: src/components/trade/tradebox/deposit-modal.tsx:220
+#: src/components/trade/positions/transfer-modal.tsx:189
+#: src/components/trade/tradebox/deposit-modal.tsx:212
 #: src/components/trade/tradebox/deposit/wrong-network-screen.tsx:19
 msgid "Transfer"
 msgstr ""
 
-#: src/components/trade/positions/transfer-modal.tsx:90
+#: src/components/trade/positions/transfer-modal.tsx:87
 msgid "Transfer failed"
 msgstr ""
 
-#: src/components/trade/positions/transfer-modal.tsx:106
+#: src/components/trade/positions/transfer-modal.tsx:104
+#: src/components/trade/positions/transfer-modal.tsx:115
 msgid "Transfer USDC"
 msgstr ""
 
@@ -3735,7 +3751,7 @@ msgstr ""
 #~ msgid "Transfer USDC to your Hyperliquid account to start trading."
 #~ msgstr "将 USDC 转入您的 Hyperliquid 账户以开始交易。"
 
-#: src/components/trade/positions/transfer-modal.tsx:179
+#: src/components/trade/positions/transfer-modal.tsx:189
 msgid "Transferring..."
 msgstr ""
 
@@ -3836,6 +3852,14 @@ msgstr ""
 msgid "Unconfirmed order"
 msgstr ""
 
+#: src/components/trade/components/perps-source-label.tsx:20
+msgid "Unified"
+msgstr ""
+
+#: src/components/trade/positions/transfer-modal.tsx:106
+msgid "Unified accounts share one balance across perps and spot, so there is nothing to move."
+msgstr ""
+
 #: src/lib/errors/format.ts:12
 msgid "Unknown error"
 msgstr ""
@@ -3849,9 +3873,13 @@ msgstr "未知交易对: {symbolName}"
 msgid "Unrealized P&L"
 msgstr ""
 
-#: src/components/trade/tradebox/account-panel.tsx:91
+#: src/components/trade/tradebox/account-panel.tsx:39
 msgid "Unrealized PNL"
 msgstr "未实现盈亏"
+
+#: src/components/trade/components/account-notice-line.tsx:32
+msgid "Unrecognised account mode. Using exchange limits only."
+msgstr ""
 
 #. placeholder {0}: String(resolution)
 #: src/components/trade/chart/datafeed.ts:151
@@ -3872,7 +3900,7 @@ msgstr ""
 msgid "Updated live"
 msgstr "实时更新"
 
-#: src/components/trade/positions/balances-tab.tsx:255
+#: src/components/trade/positions/balances-tab.tsx:227
 msgid "USD Value"
 msgstr "美元价值"
 
@@ -3973,7 +4001,7 @@ msgstr ""
 #~ msgstr ""
 
 #. placeholder {0}: ARBITRUM_NETWORK.estimatedWithdrawTime
-#: src/components/trade/tradebox/deposit-modal.tsx:182
+#: src/components/trade/tradebox/deposit-modal.tsx:174
 msgid "will arrive in {0}"
 msgstr ""
 
@@ -3985,20 +4013,20 @@ msgstr ""
 #~ msgid "will arrive in ~5 min"
 #~ msgstr ""
 
-#: src/components/trade/tradebox/account-panel.tsx:154
-#: src/components/trade/tradebox/account-panel.tsx:157
-#: src/components/trade/tradebox/deposit-modal.tsx:176
-#: src/components/trade/tradebox/deposit-modal.tsx:197
-#: src/components/trade/tradebox/deposit-modal.tsx:234
-#: src/components/trade/tradebox/deposit/withdraw-form.tsx:121
+#: src/components/trade/tradebox/account-panel.tsx:113
+#: src/components/trade/tradebox/account-panel.tsx:116
+#: src/components/trade/tradebox/deposit-modal.tsx:168
+#: src/components/trade/tradebox/deposit-modal.tsx:189
+#: src/components/trade/tradebox/deposit-modal.tsx:226
+#: src/components/trade/tradebox/deposit/withdraw-form.tsx:122
 msgid "Withdraw"
 msgstr "提款"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:199
+#: src/components/trade/tradebox/deposit-modal.tsx:191
 msgid "Withdrawal failed"
 msgstr ""
 
-#: src/components/trade/tradebox/deposit-modal.tsx:178
+#: src/components/trade/tradebox/deposit-modal.tsx:170
 msgid "Withdrawal submitted"
 msgstr ""
 
@@ -4050,6 +4078,10 @@ msgstr ""
 
 #: src/components/trade/mobile/offline-banner.tsx:66
 msgid "You're offline"
+msgstr ""
+
+#: src/components/trade/components/account-notice-line.tsx:23
+msgid "Your account uses DEX abstraction, which Hyperliquid has discontinued. Balances on builder dexes may differ from before."
 msgstr ""
 
 #: src/components/trade/tradebox/bridge-tab.tsx:
