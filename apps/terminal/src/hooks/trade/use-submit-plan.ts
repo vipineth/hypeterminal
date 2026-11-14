@@ -130,7 +130,7 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 			upsertByRequestKey(getRequestKey(request), request.label, resultToQueueUpdate(reportSettlement(earlier)));
 		}
 		const result = reportSubmit(outcome);
-		if (!result.ok && result.status === "failed") bumpCollateralGeneration();
+		if (!result.ok && result.status !== "notSent") bumpCollateralGeneration();
 		return result;
 	}
 

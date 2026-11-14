@@ -286,6 +286,17 @@ describe("collateral after the exchange rejects a submit", () => {
 		expect(await countsNow(snapshot)).toBe(false);
 	});
 
+	it("stops counting a balance received before a submit the exchange never confirmed", async () => {
+		const hook = await mountSubmitPlan();
+		const snapshot = await spotSnapshotReceivedNow();
+
+		net.venue.nextExchangeRequests("inTransit", "lost", "lost", "lost");
+		const result = await settle(hook.submitPlan(MARKET_BUY));
+
+		expect(result).toMatchObject({ ok: false, status: "unsettled" });
+		expect(await countsNow(snapshot)).toBe(false);
+	});
+
 	it("keeps counting it when a submit never reaches the exchange", async () => {
 		net.tradingReady = false;
 		const hook = await mountSubmitPlan();

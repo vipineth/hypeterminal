@@ -21,7 +21,6 @@ export {
 	useAgentWalletActions,
 	useAgentWalletStorage,
 	useApiStatus,
-	useExchange,
 	useHyperliquid,
 	useSubscription,
 	useTradingGuard,
@@ -51,3 +50,4 @@ export {
 } from "./hooks/useMarketsInfo";
 export { useMarkets } from "./markets";
 export { useDeposit } from "./use-deposit";
+export { useExchange } from "./use-exchange";
