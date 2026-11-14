@@ -78,7 +78,7 @@ export type Balances =
 	| { status: "error" }
 	| { status: "ready"; perp: BalanceRow[]; spot: BalanceRow[]; totalUsd: string; isEmpty: boolean };
 
-function getPerpRows(account: ReadyAccount, dexes: readonly Dex[]): BalanceRow[] {
+function getPerpRows(account: ReadyAccount, dexes: readonly Dex[]): BalanceRow[] | null {
 	switch (account.ledger) {
 		case "spotOnly":
 			return [];
@@ -86,13 +86,14 @@ function getPerpRows(account: ReadyAccount, dexes: readonly Dex[]): BalanceRow[]
 			const rows: BalanceRow[] = [];
 			for (const [name, state] of account.dexes) {
 				const accountValue = state.marginSummary.accountValue;
-				const dex = dexes.find((entry) => entry.name === name);
-				if (!dex || !toSafeBig(accountValue).gt(0)) continue;
+				if (!toSafeBig(accountValue).gt(0)) continue;
 				const isMain = name === MAIN_DEX;
+				const asset = isMain ? DEFAULT_QUOTE_TOKEN : dexes.find((entry) => entry.name === name)?.collateralToken.name;
+				if (!asset) return null;
 				rows.push({
 					key: `perp:${name}`,
 					type: "perp",
-					asset: dex.collateralToken.name,
+					asset,
 					dexLabel: isMain ? null : name,
 					available: state.withdrawable,
 					inOrder: state.marginSummary.totalMarginUsed,
@@ -139,6 +140,7 @@ function isVisible(row: BalanceRow, hideSmall: boolean): boolean {
 export function getBalances(account: AccountState, dexes: readonly Dex[], hideSmall: boolean): Balances {
 	if (account.status !== "ready") return account;
 	const perp = getPerpRows(account, dexes);
+	if (!perp) return { status: "loading" };
 	const spot = getSpotRows(account);
 	const totalUsd = [...perp, ...spot].reduce((sum, row) => sum.plus(toSafeBig(row.usdValue)), Big(0)).toFixed();
 	return {

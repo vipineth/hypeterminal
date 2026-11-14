@@ -150,6 +150,27 @@ describe("balance rows", () => {
 		expect(balances.isEmpty).toBe(false);
 	});
 
+	it("shows the main dex row before market data loads", () => {
+		const balances = getBalances(accountOf("mainnet-disabled-main-only", STANDARD), [], false);
+
+		expect(balances).toMatchObject({ status: "ready", isEmpty: false });
+		if (balances.status !== "ready") return;
+		expect(balances.perp.map(rowView)).toEqual([
+			{
+				asset: "USDC",
+				dexLabel: null,
+				available: "2604750.100751",
+				total: "2949301.7768819998",
+				transfer: "toSpot",
+				canSend: true,
+			},
+		]);
+	});
+
+	it("waits for market data before naming a funded builder dex's collateral", () => {
+		expect(getBalances(accountOf("mainnet-disabled-two-dexes", STANDARD), [], false)).toEqual({ status: "loading" });
+	});
+
 	it("passes loading and error through without rows", () => {
 		expect(getBalances({ status: "loading" }, dexes, false)).toEqual({ status: "loading" });
 		expect(getBalances({ status: "error" }, dexes, false)).toEqual({ status: "error" });
