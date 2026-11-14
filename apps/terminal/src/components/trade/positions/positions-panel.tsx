@@ -1,14 +1,13 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@hypeterminal/ui";
-import { Suspense, useMemo, useTransition } from "react";
+import { Suspense, useTransition } from "react";
 import { useConnection } from "wagmi";
 import { Spinner } from "@/components/ui/spinner";
 import { HL_ALL_DEXS } from "@/config/app";
 import { POSITIONS_TABS } from "@/config/trade";
-import { useDefaultDexBalances } from "@/hooks/trade/use-account-balances";
+import { useBalances } from "@/hooks/trade/use-balances";
 import { cn } from "@/lib/cn";
 import { useSubscription, useUserPositions } from "@/lib/hyperliquid";
 import { createLazyComponent } from "@/lib/lazy";
-import { toNumberOrZero } from "@/lib/trade/numbers";
 import { useGlobalSettingsActions, usePositionsActiveTab } from "@/stores/use-global-settings-store";
 
 const tabContentBaseClass = "flex-1 min-h-0 flex flex-col mt-0";
@@ -26,7 +25,7 @@ export function PositionsPanel() {
 	const { setPositionsActiveTab } = useGlobalSettingsActions();
 	const [isPending, startTransition] = useTransition();
 	const { address, isConnected } = useConnection();
-	const { perpSummary, spotBalances } = useDefaultDexBalances();
+	const balances = useBalances();
 	const { positions } = useUserPositions();
 	const { data: ordersEvent } = useSubscription(
 		"openOrders",
@@ -51,18 +50,7 @@ export function PositionsPanel() {
 
 	const tabContentClass = cn(tabContentBaseClass, isPending && "opacity-70");
 
-	const balancesCount = useMemo(() => {
-		if (!isConnected) return null;
-		let count = 0;
-		const perpAccountValue = toNumberOrZero(perpSummary?.accountValue);
-		if (perpAccountValue > 0) count++;
-		if (spotBalances.length) {
-			for (const b of spotBalances) {
-				if (toNumberOrZero(b.total) > 0) count++;
-			}
-		}
-		return count;
-	}, [isConnected, perpSummary?.accountValue, spotBalances]);
+	const balancesCount = isConnected && balances.status === "ready" ? balances.perp.length + balances.spot.length : null;
 
 	function getTabCount(tabValue: string): number | null {
 		if (tabValue === "balances") return balancesCount;

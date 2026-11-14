@@ -42,18 +42,29 @@ export function liveQuote(
 ): QuoteCheck {
 	return {
 		status: "live",
-		quote: { user: user as `0x${string}`, coin, leverage: { type: "cross", value: 10 }, availableToTrade, maxTradeSzs, markPx: "0" },
+		quote: {
+			user: user as `0x${string}`,
+			coin,
+			leverage: { type: "cross", value: 10 },
+			availableToTrade,
+			maxTradeSzs,
+			markPx: "0",
+		},
 		leverage: null,
 	};
 }
 
-function clearinghouse(value: string): AllDexsClearinghouseStateWsEvent["clearinghouseStates"][number][1] {
-	const summary = { accountValue: value, totalNtlPos: "0.0", totalRawUsd: value, totalMarginUsed: "0.0" };
+export function clearinghouse(
+	value: string,
+	withdrawable = value,
+	marginUsed = "0.0",
+): AllDexsClearinghouseStateWsEvent["clearinghouseStates"][number][1] {
+	const summary = { accountValue: value, totalNtlPos: "0.0", totalRawUsd: value, totalMarginUsed: marginUsed };
 	return {
 		marginSummary: summary,
 		crossMarginSummary: summary,
 		crossMaintenanceMarginUsed: "0.0",
-		withdrawable: value,
+		withdrawable,
 		assetPositions: [],
 		time: 0,
 	};

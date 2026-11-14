@@ -1,20 +1,23 @@
 import Big from "big.js";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/app";
+import { SMALL_BALANCE_THRESHOLD_USD } from "@/config/trade";
 import { isAmountWithinBalance } from "@/domain/market/calculations";
 import type {
 	AccountAbstraction,
 	SpotAvailableAfterMaintenance,
 	SpotBalance,
 } from "@/hooks/trade/use-account-balances";
+import type { Dex } from "@/domain/market/model";
 import {
 	type AccountState,
 	getSpotAvailable as getSpotTokenAvailable,
 	getTransferLimit,
+	type ReadyAccount,
 	type SpotState,
 	type TransferLimit,
 } from "@/domain/trade/account-mode";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
-import { toBig, toSafeBig } from "@/lib/trade/numbers";
+import { toSafeBig } from "@/lib/trade/numbers";
 import type { Side } from "@/lib/trade/types";
 
 export type { AccountAbstraction, SpotAvailableAfterMaintenance };
@@ -30,21 +33,6 @@ export interface SpotBalanceData {
 	quoteName: string;
 }
 
-export interface BalanceRow {
-	asset: string;
-	type: "perp" | "spot";
-	available: string;
-	inOrder: string;
-	total: string;
-	usdValue: string;
-	entryNtl: string;
-}
-
-export interface PerpSummary {
-	accountValue?: string | number | null;
-	totalMarginUsed?: string | number | null;
-}
-
 export function getSpotBalance(balances: SpotBalance[] | null | undefined, coin: string): SpotBalance | null {
 	if (!balances?.length) return null;
 	return balances.find((balance) => balance.coin === coin) ?? null;
@@ -53,15 +41,6 @@ export function getSpotBalance(balances: SpotBalance[] | null | undefined, coin:
 export function isQuoteBalanceSharedWithPerps(accountAbstraction: AccountAbstraction | null | undefined): boolean {
 	const mode: string | null | undefined = accountAbstraction;
 	return mode === "unifiedAccount" || mode === "portfolioMargin" || mode === "dexAbstraction";
-}
-
-export function getPerpAvailable(
-	accountValue: string | number | null | undefined,
-	marginUsed: string | number | null | undefined,
-): number {
-	const av = toSafeBig(accountValue);
-	const mu = toSafeBig(marginUsed);
-	return Math.max(0, av.minus(mu).toNumber());
 }
 
 function getAvailableAfterMaintenanceValue(
@@ -134,79 +113,6 @@ export function getAvailableBalanceToken(market: UnifiedMarketInfo | undefined, 
 	return DEFAULT_QUOTE_TOKEN;
 }
 
-export function getPerpBalanceRows(
-	perpSummary: PerpSummary | null | undefined,
-	spotBalances?: SpotBalance[] | null,
-	spotAvailableAfterMaintenance?: SpotAvailableAfterMaintenance | null,
-	accountAbstraction?: AccountAbstraction | null,
-): BalanceRow[] {
-	if (isQuoteBalanceSharedWithPerps(accountAbstraction)) {
-		const quoteBalance = getSpotBalance(spotBalances, DEFAULT_QUOTE_TOKEN);
-		const quoteTotal = toBig(quoteBalance?.total);
-		if (quoteBalance && quoteTotal?.gt(0)) {
-			return [
-				{
-					asset: DEFAULT_QUOTE_TOKEN,
-					type: "perp",
-					available: getSpotAvailableValue(quoteBalance, spotAvailableAfterMaintenance),
-					inOrder: quoteBalance.hold ?? "0",
-					total: quoteBalance.total ?? "0",
-					usdValue: quoteBalance.total ?? "0",
-					entryNtl: quoteBalance.entryNtl ?? "0",
-				},
-			];
-		}
-	}
-
-	const perpAccountValue = toBig(perpSummary?.accountValue);
-	if (!perpAccountValue?.gt(0)) return [];
-
-	return [
-		{
-			asset: DEFAULT_QUOTE_TOKEN,
-			type: "perp",
-			available: String(getPerpAvailable(perpSummary?.accountValue, perpSummary?.totalMarginUsed)),
-			inOrder: perpSummary?.totalMarginUsed?.toString() ?? "0",
-			total: perpSummary?.accountValue?.toString() ?? "0",
-			usdValue: perpSummary?.accountValue?.toString() ?? "0",
-			entryNtl: perpSummary?.accountValue?.toString() ?? "0",
-		},
-	];
-}
-
-export function getSpotBalanceRows(
-	spotBalances: SpotBalance[] | null | undefined,
-	spotAvailableAfterMaintenance?: SpotAvailableAfterMaintenance | null,
-	accountAbstraction?: AccountAbstraction | null,
-): BalanceRow[] {
-	const rows: BalanceRow[] = [];
-	const shouldHideSharedQuote = isQuoteBalanceSharedWithPerps(accountAbstraction);
-
-	for (const balance of spotBalances ?? []) {
-		if (shouldHideSharedQuote && balance.coin === DEFAULT_QUOTE_TOKEN) continue;
-
-		const total = toBig(balance.total);
-		if (!total || total.eq(0)) continue;
-
-		const available = getSpotAvailableValue(balance, spotAvailableAfterMaintenance);
-		const entryNtl = balance.entryNtl ?? "0";
-		const usdValue = balance.coin === DEFAULT_QUOTE_TOKEN ? balance.total : entryNtl;
-
-		rows.push({
-			asset: balance.coin,
-			type: "spot",
-			available,
-			inOrder: balance.hold ?? "0",
-			total: balance.total ?? "0",
-			usdValue,
-			entryNtl,
-		});
-	}
-
-	rows.sort((a, b) => toSafeBig(b.usdValue).cmp(toSafeBig(a.usdValue)));
-	return rows;
-}
-
 export function getNormalizedWithdrawable(
 	withdrawable: string,
 	spotBalances: SpotBalance[] | null | undefined,
@@ -218,14 +124,6 @@ export function getNormalizedWithdrawable(
 		return getSpotAvailableValue(quoteBalance, spotAvailableAfterMaintenance);
 	}
 	return withdrawable;
-}
-
-export function getTotalUsdValue(rows: BalanceRow[]): number {
-	return rows.reduce((sum, row) => Big(sum).plus(toSafeBig(row.usdValue)).toNumber(), 0);
-}
-
-export function filterBalanceRowsByUsdValue(rows: BalanceRow[], minUsd: number): BalanceRow[] {
-	return rows.filter((row) => toSafeBig(row.usdValue).gte(minUsd));
 }
 
 export type SpendPlace = "perp" | "spot";
@@ -253,4 +151,99 @@ export function isWithinSpendLimit(amount: string, limit: TransferLimit): boolea
 		default:
 			return limit satisfies never;
 	}
+}
+
+const MAIN_DEX = "";
+
+export type TransferDirection = "toSpot" | "toPerp";
+
+export interface BalanceRow {
+	key: string;
+	type: "perp" | "spot";
+	asset: string;
+	dexLabel: string | null;
+	available: string;
+	inOrder: string;
+	total: string;
+	usdValue: string;
+	entryNtl: string;
+	transfer: TransferDirection | null;
+	canSend: boolean;
+}
+
+export type Balances =
+	| { status: "loading" }
+	| { status: "error" }
+	| { status: "ready"; perp: BalanceRow[]; spot: BalanceRow[]; totalUsd: string; isEmpty: boolean };
+
+function getPerpRows(account: ReadyAccount, dexes: readonly Dex[]): BalanceRow[] {
+	switch (account.ledger) {
+		case "spotOnly":
+			return [];
+		case "perDex": {
+			const rows: BalanceRow[] = [];
+			for (const [name, state] of account.dexes) {
+				const accountValue = state.marginSummary.accountValue;
+				const dex = dexes.find((entry) => entry.name === name);
+				if (!dex || !toSafeBig(accountValue).gt(0)) continue;
+				const isMain = name === MAIN_DEX;
+				rows.push({
+					key: `perp:${name}`,
+					type: "perp",
+					asset: dex.collateralToken.name,
+					dexLabel: isMain ? null : name,
+					available: state.withdrawable,
+					inOrder: state.marginSummary.totalMarginUsed,
+					total: accountValue,
+					usdValue: accountValue,
+					entryNtl: accountValue,
+					transfer: isMain ? "toSpot" : null,
+					canSend: isMain,
+				});
+			}
+			return rows;
+		}
+		default:
+			return account satisfies never;
+	}
+}
+
+function getSpotRows(account: ReadyAccount): BalanceRow[] {
+	const rows: BalanceRow[] = [];
+	for (const balance of account.spot.balances) {
+		if (toSafeBig(balance.total).eq(0)) continue;
+		const isQuote = balance.coin === DEFAULT_QUOTE_TOKEN;
+		rows.push({
+			key: `spot:${balance.coin}`,
+			type: "spot",
+			asset: balance.coin,
+			dexLabel: null,
+			available: getSpotTokenAvailable(account.spot, balance.coin),
+			inOrder: balance.hold,
+			total: balance.total,
+			usdValue: isQuote ? balance.total : balance.entryNtl,
+			entryNtl: balance.entryNtl,
+			transfer: isQuote && account.ledger === "perDex" ? "toPerp" : null,
+			canSend: true,
+		});
+	}
+	return rows.sort((a, b) => toSafeBig(b.usdValue).cmp(toSafeBig(a.usdValue)));
+}
+
+function isVisible(row: BalanceRow, hideSmall: boolean): boolean {
+	return !hideSmall || toSafeBig(row.usdValue).gte(SMALL_BALANCE_THRESHOLD_USD);
+}
+
+export function getBalances(account: AccountState, dexes: readonly Dex[], hideSmall: boolean): Balances {
+	if (account.status !== "ready") return account;
+	const perp = getPerpRows(account, dexes);
+	const spot = getSpotRows(account);
+	const totalUsd = [...perp, ...spot].reduce((sum, row) => sum.plus(toSafeBig(row.usdValue)), Big(0)).toFixed();
+	return {
+		status: "ready",
+		perp: perp.filter((row) => isVisible(row, hideSmall)),
+		spot: spot.filter((row) => isVisible(row, hideSmall)),
+		totalUsd,
+		isEmpty: perp.length + spot.length === 0,
+	};
 }

@@ -1,19 +1,12 @@
 import { Button, Checkbox, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { ArrowsDownUpIcon, ArrowsLeftRightIcon, PaperPlaneTiltIcon } from "@phosphor-icons/react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useConnection } from "wagmi";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { DEFAULT_QUOTE_TOKEN, HL_ALL_DEXS } from "@/config/app";
-import { SMALL_BALANCE_THRESHOLD_USD } from "@/config/trade";
-import {
-	type BalanceRow,
-	filterBalanceRowsByUsdValue,
-	getPerpBalanceRows,
-	getSpotBalanceRows,
-	getTotalUsdValue,
-} from "@/domain/trade/balances";
-import { useDefaultDexBalances } from "@/hooks/trade/use-account-balances";
+import type { BalanceRow, TransferDirection } from "@/domain/trade/balances";
+import { useBalances } from "@/hooks/trade/use-balances";
 import { cn } from "@/lib/cn";
 import { formatToken, formatUSD } from "@/lib/format";
 import { useSubscription } from "@/lib/hyperliquid";
@@ -38,8 +31,6 @@ import {
 import { SendModal } from "./send-modal";
 import { TransferModal } from "./transfer-modal";
 
-type TransferDirection = "toSpot" | "toPerp";
-
 export function BalancesTab() {
 	const { isConnected } = useConnection();
 	const { getToken } = useMarkets();
@@ -63,20 +54,12 @@ export function BalancesTab() {
 		accountType: "spot",
 	});
 
-	const { perpSummary, spotBalances, spotAvailableAfterMaintenance, accountAbstraction, isLoading, hasError } =
-		useDefaultDexBalances();
+	const balances = useBalances();
 	const { data: allMidsEvent } = useSubscription("allMids", { dex: HL_ALL_DEXS }, { enabled: isConnected });
 	const mids = allMidsEvent?.mids;
 
-	const perpBalances = useMemo(
-		() => getPerpBalanceRows(perpSummary, spotBalances, spotAvailableAfterMaintenance, accountAbstraction),
-		[accountAbstraction, perpSummary, spotBalances, spotAvailableAfterMaintenance],
-	);
-	const spotBalanceRows = useMemo(
-		() => getSpotBalanceRows(spotBalances, spotAvailableAfterMaintenance, accountAbstraction),
-		[accountAbstraction, spotBalances, spotAvailableAfterMaintenance],
-	);
-	const balances = useMemo(() => [...perpBalances, ...spotBalanceRows], [perpBalances, spotBalanceRows]);
+	const perpRows = balances.status === "ready" ? balances.perp : [];
+	const spotRows = balances.status === "ready" ? balances.spot : [];
 
 	function getPnl(row: BalanceRow): { pnl: number; pnlPercent: number } | null {
 		if (row.type === "perp") return null;
@@ -93,21 +76,7 @@ export function BalancesTab() {
 		return { pnl, pnlPercent };
 	}
 
-	const filteredPerpBalances = useMemo(() => {
-		if (!hideSmallBalances) return perpBalances;
-		return filterBalanceRowsByUsdValue(perpBalances, SMALL_BALANCE_THRESHOLD_USD);
-	}, [hideSmallBalances, perpBalances]);
-
-	const filteredSpotBalances = useMemo(() => {
-		if (!hideSmallBalances) return spotBalanceRows;
-		return filterBalanceRowsByUsdValue(spotBalanceRows, SMALL_BALANCE_THRESHOLD_USD);
-	}, [hideSmallBalances, spotBalanceRows]);
-
-	const totalValue = useMemo(() => getTotalUsdValue(balances), [balances]);
-
-	function handleTransferClick(row: BalanceRow) {
-		if (row.asset !== DEFAULT_QUOTE_TOKEN) return;
-		const direction: TransferDirection = row.type === "perp" ? "toSpot" : "toPerp";
+	function handleTransferClick(direction: TransferDirection) {
 		setTransferState({
 			open: true,
 			direction,
@@ -125,17 +94,21 @@ export function BalancesTab() {
 	function renderBalanceRow(row: BalanceRow, index: number) {
 		const token = getToken(row.asset);
 		const decimals = row.type === "perp" ? 2 : (token?.szDecimals ?? 2);
-		const canTransfer = row.asset === DEFAULT_QUOTE_TOKEN && parseFloat(row.available) > 0;
-		const canSwap = row.type === "spot" && parseFloat(row.available) > 0;
-		const transferLabel = row.type === "perp" ? t`To Spot` : t`To Perp`;
+		const hasAvailable = parseFloat(row.available) > 0;
+		const transfer = hasAvailable ? row.transfer : null;
+		const canSwap = row.type === "spot" && hasAvailable;
 		const pnlData = getPnl(row);
 		return (
 			<TableRow
-				key={`${row.type}-${row.asset}`}
+				key={row.key}
 				className={cn(positionsPanelRowHoverClass, index % 2 === 1 && positionsPanelRowStripeClass)}
 			>
 				<TableCell size="dense" className={cn(positionsPanelTableCellClass, "font-medium text-fg")}>
-					<AssetDisplay coin={row.asset} />
+					<AssetDisplay
+						coin={row.asset}
+						subtitle={row.dexLabel ?? undefined}
+						subtitleClassName="text-3xs text-fg-muted"
+					/>
 				</TableCell>
 				<TableCell size="dense" className={cn(positionsPanelTableCellClass, "text-right tabular-nums text-fg")}>
 					{formatToken(row.available, decimals)}
@@ -159,14 +132,14 @@ export function BalancesTab() {
 				</TableCell>
 				<TableCell size="dense" className={cn(positionsPanelTableCellClass, "text-right")}>
 					<div className="flex flex-nowrap items-center justify-end gap-1 whitespace-nowrap">
-						{canTransfer && (
+						{transfer && (
 							<Button
 								variant="link"
-								onClick={() => handleTransferClick(row)}
+								onClick={() => handleTransferClick(transfer)}
 								className="shrink-0 text-xs text-brand hover:text-brand/80 hover:bg-transparent px-1.5 py-0.5 gap-1"
 							>
 								<ArrowsLeftRightIcon className="size-2.5" />
-								{transferLabel}
+								{transfer === "toSpot" ? t`To Spot` : t`To Perp`}
 							</Button>
 						)}
 						{canSwap && (
@@ -179,7 +152,7 @@ export function BalancesTab() {
 								{t`Swap`}
 							</Button>
 						)}
-						{parseFloat(row.available) > 0 && (
+						{row.canSend && hasAvailable && (
 							<Button
 								variant="link"
 								onClick={() => handleSendClick(row)}
@@ -197,10 +170,9 @@ export function BalancesTab() {
 
 	function renderPlaceholder() {
 		if (!isConnected) return <Placeholder>{t`Connect your wallet to view balances.`}</Placeholder>;
-		if (isLoading) return <Placeholder>{t`Loading balances...`}</Placeholder>;
-		if (hasError) return <Placeholder variant="error">{t`Failed to load balances.`}</Placeholder>;
-		if (balances.length === 0)
-			return <Placeholder>{t`No balances found. Deposit funds to start trading.`}</Placeholder>;
+		if (balances.status === "loading") return <Placeholder>{t`Loading balances...`}</Placeholder>;
+		if (balances.status === "error") return <Placeholder variant="error">{t`Failed to load balances.`}</Placeholder>;
+		if (balances.isEmpty) return <Placeholder>{t`No balances found. Deposit funds to start trading.`}</Placeholder>;
 		return null;
 	}
 
@@ -218,9 +190,9 @@ export function BalancesTab() {
 					}
 					className="gap-1.5 items-center"
 				/>
-				{isConnected && !isLoading ? (
+				{isConnected && balances.status === "ready" ? (
 					<span className="tabular-nums text-3xs font-medium text-success">
-						{formatUSD(totalValue, { compact: true })}
+						{formatUSD(balances.totalUsd, { compact: true })}
 					</span>
 				) : null}
 			</div>
@@ -271,7 +243,7 @@ export function BalancesTab() {
 								</TableRow>
 							</TableHeader>
 							<TableBody className={positionsPanelTableBodyClass}>
-								{filteredPerpBalances.length > 0 && (
+								{perpRows.length > 0 && (
 									<>
 										<TableRow className="border-stroke-weak/40 hover:bg-transparent">
 											<TableCell
@@ -281,10 +253,10 @@ export function BalancesTab() {
 												{t`Perpetuals`}
 											</TableCell>
 										</TableRow>
-										{filteredPerpBalances.map((row, i) => renderBalanceRow(row, i))}
+										{perpRows.map((row, i) => renderBalanceRow(row, i))}
 									</>
 								)}
-								{filteredSpotBalances.length > 0 && (
+								{spotRows.length > 0 && (
 									<>
 										<TableRow className="border-stroke-weak/40 hover:bg-transparent">
 											<TableCell
@@ -294,7 +266,7 @@ export function BalancesTab() {
 												{t`Spot`}
 											</TableCell>
 										</TableRow>
-										{filteredSpotBalances.map((row, i) => renderBalanceRow(row, i))}
+										{spotRows.map((row, i) => renderBalanceRow(row, i))}
 									</>
 								)}
 							</TableBody>

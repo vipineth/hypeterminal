@@ -1,105 +1,178 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import {
-	getPerpBalanceRows,
-	getSpotAvailable,
-	getSpotAvailableValue,
-	getSpotBalanceData,
-	getSpotBalanceRows,
-	type SpotAvailableAfterMaintenance,
-} from "@/domain/trade/balances";
-import type { SpotBalance } from "@/hooks/trade/use-account-balances";
+import { type MetaPayloads, parseMarkets } from "@/domain/market/model";
+import { type AccountMode, buildAccountState, type ReadyAccount } from "@/domain/trade/account-mode";
+import { getBalances, getSpendableSpotTokens, getSpendLimit, isWithinSpendLimit } from "@/domain/trade/balances";
+import { type AccountFixture, clearinghouse } from "@/test/account-fixture";
 
-const usdcBalance: SpotBalance = {
-	coin: "USDC",
-	token: 0,
-	total: "8105.34686269",
-	hold: "3140.833333",
-	entryNtl: "0",
-};
+const meta: MetaPayloads = JSON.parse(
+	readFileSync(new URL("../../../fixtures/hl-mainnet-meta.json", import.meta.url), "utf8"),
+);
+const { dexes } = parseMarkets(meta);
 
-const maintenanceAvailable: SpotAvailableAfterMaintenance = [[0, "4947.18019669"]];
+const STANDARD: AccountMode = { kind: "standard", raw: "disabled" };
+const UNIFIED: AccountMode = { kind: "unified" };
+const PORTFOLIO: AccountMode = { kind: "portfolio" };
 
-describe("trade balances", () => {
-	it("uses tokenToAvailableAfterMaintenance for spot available balances when present", () => {
-		expect(getSpotAvailableValue(usdcBalance, maintenanceAvailable)).toBe("4947.18019669");
-		expect(getSpotAvailable(usdcBalance, maintenanceAvailable)).toBeCloseTo(4947.18019669);
+function fixture(name: string): AccountFixture {
+	return JSON.parse(readFileSync(new URL(`./__fixtures__/account/${name}.json`, import.meta.url), "utf8"));
+}
+
+function accountOf(name: string, mode: AccountMode, funded: Record<string, string> = {}): ReadyAccount {
+	const captured = fixture(name);
+	return buildAccountState({
+		user: captured.user,
+		mode,
+		clearinghouseStates: captured.clearinghouseStates.map(([dex, state]) => [
+			dex,
+			funded[dex] ? clearinghouse(funded[dex]) : state,
+		]),
+		spot: captured.spot,
 	});
+}
 
-	it("falls back to total minus hold for older spot payloads", () => {
-		expect(getSpotAvailableValue(usdcBalance)).toBe("4964.51352969");
-		expect(getSpotAvailable(usdcBalance)).toBeCloseTo(4964.51352969);
-	});
+function readyBalances(account: ReadyAccount, hideSmall = false) {
+	const balances = getBalances(account, dexes, hideSmall);
+	if (balances.status !== "ready") throw new Error("expected ready balances");
+	return balances;
+}
 
-	it("uses maintenance-adjusted available values in balance rows", () => {
-		const rows = getSpotBalanceRows([usdcBalance], maintenanceAvailable);
+function rowView(row: ReturnType<typeof readyBalances>["perp"][number]) {
+	return {
+		asset: row.asset,
+		dexLabel: row.dexLabel,
+		available: row.available,
+		total: row.total,
+		transfer: row.transfer,
+		canSend: row.canSend,
+	};
+}
 
-		expect(rows).toEqual([
-			expect.objectContaining({
-				asset: "USDC",
-				available: "4947.18019669",
-				total: "8105.34686269",
-			}),
-		]);
-	});
+describe("balance rows", () => {
+	it("shows one perp row per funded dex for a standard account, labelled by dex", () => {
+		const balances = readyBalances(accountOf("mainnet-disabled-two-dexes", STANDARD));
 
-	it("keeps perps account equity and spot token balances in separate row groups", () => {
-		const perpRows = getPerpBalanceRows({
-			accountValue: "1620.34",
-			totalMarginUsed: "1564.34",
-		});
-		const spotRows = getSpotBalanceRows([usdcBalance], maintenanceAvailable);
-
-		expect(perpRows).toEqual([
-			expect.objectContaining({
-				asset: "USDC",
-				type: "perp",
-				available: "56",
-				total: "1620.34",
-			}),
-		]);
-		expect(spotRows).toHaveLength(1);
-		expect(spotRows[0]).toMatchObject({
-			asset: "USDC",
-			type: "spot",
-			available: "4947.18019669",
-			total: "8105.34686269",
-		});
-	});
-
-	it("classifies shared USDC as perps collateral in unified account mode", () => {
-		const perpRows = getPerpBalanceRows(
+		expect(balances.perp.map(rowView)).toEqual([
 			{
-				accountValue: "1620.34",
-				totalMarginUsed: "1564.34",
+				asset: "USDC",
+				dexLabel: null,
+				available: "64116.532932",
+				total: "121166.943682",
+				transfer: "toSpot",
+				canSend: true,
 			},
-			[usdcBalance],
-			maintenanceAvailable,
-			"unifiedAccount",
-		);
-		const spotRows = getSpotBalanceRows([usdcBalance], maintenanceAvailable, "unifiedAccount");
-
-		expect(perpRows).toEqual([
-			expect.objectContaining({
+			{
 				asset: "USDC",
-				type: "perp",
-				available: "4947.18019669",
-				total: "8105.34686269",
-			}),
+				dexLabel: "io",
+				available: "12761.264984",
+				total: "12761.264984",
+				transfer: null,
+				canSend: false,
+			},
+			{
+				asset: "USDC",
+				dexLabel: "xyz",
+				available: "56427.700923",
+				total: "72546.183129",
+				transfer: null,
+				canSend: false,
+			},
 		]);
-		expect(spotRows).toEqual([]);
+		expect(balances.spot.map(rowView)).toEqual([
+			{
+				asset: "USDC",
+				dexLabel: null,
+				available: "0.00000009",
+				total: "0.00000009",
+				transfer: "toPerp",
+				canSend: true,
+			},
+		]);
+		expect(balances.totalUsd).toBe("206474.39179509");
 	});
 
-	it("uses maintenance-adjusted available values for spot order-entry balances", () => {
-		const data = getSpotBalanceData(
-			[usdcBalance],
-			{
-				kind: "spot",
-				base: { name: "PURR" },
-				quote: { name: "USDC" },
-			} as never,
-			maintenanceAvailable,
-		);
+	it("gives every row a distinct key when several dexes hold USDC", () => {
+		const balances = readyBalances(accountOf("mainnet-disabled-two-dexes", STANDARD));
+		const keys = [...balances.perp, ...balances.spot].map((row) => row.key);
 
-		expect(data.quoteAvailable).toBeCloseTo(4947.18019669);
+		expect(new Set(keys).size).toBe(keys.length);
+	});
+
+	it("names a USDH builder dex row by its own collateral", () => {
+		const balances = readyBalances(accountOf("p3-default", STANDARD, { flx: "250.5" }));
+
+		expect(balances.perp.map(rowView)).toEqual([
+			{ asset: "USDC", dexLabel: null, available: "97.617353", total: "97.617353", transfer: "toSpot", canSend: true },
+			{ asset: "USDH", dexLabel: "flx", available: "250.5", total: "250.5", transfer: null, canSend: false },
+		]);
+	});
+
+	it.each([
+		["unified", UNIFIED],
+		["portfolio", PORTFOLIO],
+	])("shows no perp rows for a %s account and spends spot after maintenance", (_name, mode) => {
+		const balances = readyBalances(accountOf("mainnet-unified-0x8c60", mode, { flx: "900" }));
+
+		expect(balances.perp).toEqual([]);
+		expect(balances.spot.map(rowView)).toEqual([
+			{
+				asset: "USDC",
+				dexLabel: null,
+				available: "66207.01836979",
+				total: "68423.40402379",
+				transfer: null,
+				canSend: true,
+			},
+		]);
+		expect(balances.totalUsd).toBe("68423.40402379");
+	});
+
+	it("hides rows under the small balance threshold and counts only what is shown", () => {
+		const balances = readyBalances(accountOf("mainnet-disabled-two-dexes", STANDARD), true);
+
+		expect(balances.perp).toHaveLength(3);
+		expect(balances.spot).toEqual([]);
+		expect(balances.isEmpty).toBe(false);
+	});
+
+	it("passes loading and error through without rows", () => {
+		expect(getBalances({ status: "loading" }, dexes, false)).toEqual({ status: "loading" });
+		expect(getBalances({ status: "error" }, dexes, false)).toEqual({ status: "error" });
+	});
+});
+
+describe("spend limits", () => {
+	it("limits a perp send to main dex withdrawable for a standard account", () => {
+		const account = accountOf("mainnet-disabled-two-dexes", STANDARD);
+
+		expect(getSpendLimit(account, "perp", "USDC")).toEqual({ status: "ready", amount: "64116.532932" });
+	});
+
+	it("leaves a unified perp send to the exchange", () => {
+		const limit = getSpendLimit(accountOf("mainnet-unified-0x8c60", UNIFIED), "perp", "USDC");
+
+		expect(limit).toEqual({ status: "unverifiedTransferLimit" });
+		expect(isWithinSpendLimit("1000000", limit)).toBe(true);
+		expect(isWithinSpendLimit("0", limit)).toBe(false);
+	});
+
+	it("limits a spot spend to the token's available after maintenance", () => {
+		const limit = getSpendLimit(accountOf("mainnet-unified-0x8c60", UNIFIED), "spot", "USDC");
+
+		expect(limit).toEqual({ status: "ready", amount: "66207.01836979" });
+		expect(isWithinSpendLimit("66207.01836979", limit)).toBe(true);
+		expect(isWithinSpendLimit("66207.0183698", limit)).toBe(false);
+	});
+
+	it("blocks every spend while the account loads", () => {
+		const limit = getSpendLimit({ status: "loading" }, "spot", "USDC");
+
+		expect(limit).toEqual({ status: "pending" });
+		expect(isWithinSpendLimit("1", limit)).toBe(false);
+	});
+
+	it("offers only spot tokens with something available to send", () => {
+		expect(getSpendableSpotTokens(fixture("mainnet-unified-0x8c60").spot)).toEqual(["USDC"]);
+		expect(getSpendableSpotTokens(fixture("mainnet-disabled-main-only").spot)).toEqual([]);
 	});
 });
