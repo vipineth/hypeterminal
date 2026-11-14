@@ -165,15 +165,14 @@ function loadUnified() {
 }
 
 describe("a perp quote from before an account mode change", () => {
-	it("holds a quote that arrived before the account mode until the exchange quotes again", () => {
+	it("counts a quote and spot balance that arrived before the account mode once the mode loads", () => {
 		receiveNvdaQuote("100.0", "10.0");
-		receiveMode("unifiedAccount");
 		receiveSpot("100.0", "100.0");
 		receivePerps();
-		expect(collateralOn(NVDA)).toEqual({ status: "pending", reason: "quote" });
+		receiveMode("unifiedAccount");
 
-		receiveNvdaQuote("100.0", "10.0");
 		expect(collateralOn(NVDA)).toMatchObject({ status: "ready", available: "100.0" });
+		expect(collateralOn(HYPE_USDC)).toMatchObject({ status: "ready", available: "100" });
 	});
 
 	it("drops a quote that arrived before the account mode once the mode changes", () => {

@@ -51,8 +51,8 @@ export function trackCollateralReceipts(store: HyperliquidStore): () => void {
 			if (typeof data !== "object" || data === null || data === previous.subscriptions[key]?.data) continue;
 			const mode = accountModeOf(key, data);
 			if (mode !== null && modes.get(key) !== mode) {
+				if (modes.has(key)) bumpCollateralGeneration();
 				modes.set(key, mode);
-				bumpCollateralGeneration();
 			}
 			receivedAt.set(data, getCollateralGeneration());
 		}
