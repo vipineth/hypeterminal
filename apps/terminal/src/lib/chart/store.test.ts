@@ -1,5 +1,6 @@
 import { installFakeBrowser, removeFakeBrowser, server } from "@hypeterminal/hl-react/testing/fake-socket-feed";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, type Mock, vi } from "vitest";
+import type { CandleStore } from "./store";
 
 afterEach(removeFakeBrowser);
 
@@ -18,7 +19,7 @@ async function mountChart() {
 	return { chart, onTick };
 }
 
-async function expectResumes(chart: Awaited<ReturnType<typeof mountChart>>["chart"], onTick: ReturnType<typeof vi.fn>) {
+async function expectResumes(chart: CandleStore, onTick: Mock) {
 	await vi.advanceTimersByTimeAsync(1_000);
 	expect(server().awaitingAck).toContainEqual(candleSub);
 	server().ack();
