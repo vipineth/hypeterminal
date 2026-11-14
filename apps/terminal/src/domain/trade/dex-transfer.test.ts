@@ -7,13 +7,12 @@ import {
 	dexVenue,
 	getDexWithdrawCap,
 	getFundDexPlan,
-	getFundingPrice,
+	getFundingNeed,
 	getRouteToken,
 	getVenueLimit,
 	MAIN_PERP,
 	SPOT,
 } from "@/domain/trade/dex-transfer";
-import { getOrderMetrics } from "@/domain/trade/order/metrics";
 import { type AccountFixture, clearinghouse, standardAccount, TEST_USER } from "@/test/account-fixture";
 
 const meta: MetaPayloads = JSON.parse(
@@ -150,21 +149,19 @@ describe("fund a dex from the ticket", () => {
 		],
 	};
 
-	it("draws from the larger balance and asks for margin plus fee, rounded up to the cent", () => {
-		expect(getFundDexPlan(shortfall, { margin: 12.3, fee: 0.0401 }, 2)).toEqual({
+	it("draws from the larger balance and rounds the need up to the cent", () => {
+		expect(getFundDexPlan(shortfall, 12.3401, 2)).toEqual({
 			route: { from: MAIN_PERP, to: dexVenue("xyz") },
 			amount: "12.35",
 		});
 	});
 
 	it("never asks for more than the source holds", () => {
-		expect(getFundDexPlan(shortfall, { margin: 500, fee: 0.2 }, 2).amount).toBe("97.62");
+		expect(getFundDexPlan(shortfall, 500.2, 2).amount).toBe("97.62");
 	});
 
 	it("leaves the amount blank when the ticket has no size", () => {
-		expect(
-			getFundDexPlan({ ...shortfall, elsewhere: [{ place: { kind: "spot" }, amount: "5" }] }, { margin: 0, fee: 0 }, 2),
-		).toEqual({
+		expect(getFundDexPlan({ ...shortfall, elsewhere: [{ place: { kind: "spot" }, amount: "5" }] }, 0, 2)).toEqual({
 			route: { from: SPOT, to: dexVenue("xyz") },
 			amount: "",
 		});
@@ -172,34 +169,64 @@ describe("fund a dex from the ticket", () => {
 });
 
 describe("funding need for a market order", () => {
-	it("covers a fill at the slippage price, which the mark price alone did not on testnet", () => {
-		const atMark = getOrderMetrics({ sizeValue: 0.03, price: 378.38, leverage: 10, feeRate: 0.00045 });
-		const atWorst = getOrderMetrics({
-			sizeValue: 0.03,
-			price: getFundingPrice("market", 378.38, 378.38, 250),
-			leverage: 10,
-			feeRate: 0.00045,
-		});
-		const fillAt386 = (0.03 * 386) / 10 + 0.03 * 386 * 0.00045;
+	const shortfall = {
+		kind: "dexEmpty" as const,
+		dex: dex("xyz"),
+		token: usdc,
+		elsewhere: [{ place: { kind: "perp" as const }, amount: "51" }],
+	};
+	const filledUpTo = (funds: number, mark: number, fill: number, feeRate: number) =>
+		Math.floor((funds / (mark / 10 + (fill - mark) + fill * feeRate)) * 1000) / 1000;
 
-		const shortfall = {
-			kind: "dexEmpty" as const,
-			dex: dex("xyz"),
-			token: usdc,
-			elsewhere: [{ place: { kind: "perp" as const }, amount: "51" }],
-		};
-		const markAmount = Number(
-			getFundDexPlan(shortfall, { margin: atMark.marginRequired, fee: atMark.estimatedFee }, 2).amount,
-		);
-		const worstAmount = Number(
-			getFundDexPlan(shortfall, { margin: atWorst.marginRequired, fee: atWorst.estimatedFee }, 2).amount,
-		);
-
-		expect(markAmount).toBeLessThan(fillAt386);
-		expect(worstAmount).toBeGreaterThanOrEqual(fillAt386);
+	it("matches the partial fills testnet gave when only margin at mark was funded", () => {
+		expect(filledUpTo(1.18, 380, 390, 0.00055)).toBe(0.024);
+		expect(filledUpTo(1.15, 380.96, 386, 0.00055)).toBe(0.026);
 	});
 
-	it("keeps a limit order at its own price", () => {
-		expect(getFundingPrice("limit", 370, 378.38, 250)).toBe(370);
+	it("funds enough for the whole size to fill at the slippage price", () => {
+		const need = getFundingNeed({
+			orderType: "market",
+			side: "buy",
+			size: 0.03,
+			price: 380,
+			markPx: 380,
+			leverage: 10,
+			slippageBps: 300,
+			feeRate: 0.00055,
+		});
+		const amount = Number(getFundDexPlan(shortfall, need, 2).amount);
+
+		expect(amount).toBe(1.53);
+		expect(filledUpTo(amount, 380, 391.4, 0.00055)).toBeGreaterThanOrEqual(0.03);
+	});
+
+	it("funds a resting limit buy below mark at margin on mark plus fee", () => {
+		const need = getFundingNeed({
+			orderType: "limit",
+			side: "buy",
+			size: 0.03,
+			price: 370,
+			markPx: 380,
+			leverage: 10,
+			slippageBps: 300,
+			feeRate: 0.00055,
+		});
+
+		expect(getFundDexPlan(shortfall, need, 2).amount).toBe("1.15");
+	});
+
+	it("asks for nothing without a size", () => {
+		const need = getFundingNeed({
+			orderType: "market",
+			side: "sell",
+			size: 0,
+			price: 380,
+			markPx: 380,
+			leverage: 10,
+			slippageBps: 300,
+			feeRate: 0.00055,
+		});
+
+		expect(getFundDexPlan(shortfall, need, 2).amount).toBe("");
 	});
 });

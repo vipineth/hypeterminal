@@ -11,6 +11,7 @@ import {
 import { toSafeBig } from "@/lib/trade/numbers";
 import { isTwapOrderType } from "@/lib/trade/order-types";
 import { formatTokenId } from "@/lib/trade/token-id";
+import type { Side } from "@/lib/trade/types";
 
 export type Venue = { kind: "spot" } | { kind: "perp"; dex: string };
 
@@ -109,15 +110,14 @@ export interface FundDexPlan {
 
 export function getFundDexPlan(
 	shortfall: Extract<Shortfall, { kind: "dexEmpty" }>,
-	order: { margin: number; fee: number },
+	need: number,
 	decimals: number,
 ): FundDexPlan {
 	const richest = [...shortfall.elsewhere].sort((a, b) => toSafeBig(b.amount).cmp(toSafeBig(a.amount)))[0];
 	const from = richest?.place.kind === "perp" ? MAIN_PERP : SPOT;
 	const route = { from, to: dexVenue(shortfall.dex.name) };
-	if (!(order.margin > 0)) return { route, amount: "" };
-	const want = Big(order.margin).plus(order.fee);
-	const rounded = want.round(decimals, Big.roundUp);
+	if (!(need > 0)) return { route, amount: "" };
+	const rounded = Big(need).round(decimals, Big.roundUp);
 	const have = toSafeBig(richest?.amount);
 	return { route, amount: (rounded.gt(have) ? have : rounded).toFixed() };
 }
@@ -149,9 +149,35 @@ export function getTradableDexes(listed: readonly ListedMarket[]): Set<string> {
 	return names;
 }
 
-export function getFundingPrice(orderType: OrderType, price: number, markPx: number, slippageBps: number): number {
-	if (orderType !== "market" && !isTwapOrderType(orderType)) return price;
-	return Big(markPx)
-		.times(Big(1).plus(Big(slippageBps).div(10_000)))
+export interface FundingOrder {
+	orderType: OrderType;
+	side: Side;
+	size: number;
+	price: number;
+	markPx: number;
+	leverage: number;
+	slippageBps: number;
+	feeRate: number;
+}
+
+function getWorstFillPrice({ orderType, side, price, markPx, slippageBps }: FundingOrder): Big {
+	if (orderType !== "market" && !isTwapOrderType(orderType)) return Big(price);
+	const slip = Big(slippageBps).div(10_000);
+	return Big(markPx).times(side === "buy" ? Big(1).plus(slip) : Big(1).minus(slip));
+}
+
+export function getFundingNeed(order: FundingOrder): number {
+	if (!(order.size > 0) || !(order.leverage > 0) || !(order.markPx > 0)) return 0;
+	const size = Big(order.size);
+	const mark = Big(order.markPx);
+	const worst = getWorstFillPrice(order);
+	const marginPrice = worst.gt(mark) ? worst : mark;
+	const adverse = order.side === "buy" ? worst.minus(mark) : mark.minus(worst);
+	const immediateLoss = adverse.gt(0) ? size.times(adverse) : Big(0);
+	return size
+		.times(marginPrice)
+		.div(order.leverage)
+		.plus(immediateLoss)
+		.plus(size.times(worst).times(order.feeRate))
 		.toNumber();
 }

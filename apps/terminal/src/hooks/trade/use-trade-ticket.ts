@@ -2,11 +2,12 @@ import { t } from "@lingui/core/macro";
 import { useEffect, useState } from "react";
 import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/app";
+import { DEFAULT_BUILDER_CONFIG } from "@/config/hyperliquid";
 import { APPROVAL_ERROR_DISMISS_MS } from "@/config/time";
 import { getPositionDex } from "@/domain/market";
 import { isListed } from "@/domain/market/model";
 import { getMarketQuoteToken } from "@/domain/trade/balances";
-import { getFundingPrice } from "@/domain/trade/dex-transfer";
+import { getFundingNeed } from "@/domain/trade/dex-transfer";
 import { getLiquidationInfo, getOrderMetrics } from "@/domain/trade/order/metrics";
 import { getOrderPrice } from "@/domain/trade/order/price";
 import { useFeeRates } from "@/hooks/trade/use-fee-rates";
@@ -60,6 +61,8 @@ import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbo
 interface Options {
 	onSubmitted?: () => void;
 }
+
+const TENTHS_OF_BPS_PER_UNIT = 100_000;
 
 export function useTradeTicket({ onSubmitted }: Options = {}) {
 	const { address, isConnected } = useConnection();
@@ -154,11 +157,15 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 
 	const { marginRequired, estimatedFee } = getOrderMetrics({ sizeValue, price, leverage: entry.leverage, feeRate });
 	const { liqPrice, liqWarning } = getLiquidationInfo({ price, sizeValue, leverage: entry.leverage, side });
-	const funding = getOrderMetrics({
-		sizeValue,
-		price: getFundingPrice(orderType, price, markPx, slippageBps),
+	const fundingNeed = getFundingNeed({
+		orderType,
+		side,
+		size: sizeValue,
+		price,
+		markPx,
 		leverage: entry.leverage,
-		feeRate,
+		slippageBps,
+		feeRate: feeRate + Number(DEFAULT_BUILDER_CONFIG?.f ?? 0) / TENTHS_OF_BPS_PER_UNIT,
 	});
 
 	const needsAgentApproval = !isAgentReady;
@@ -332,7 +339,7 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 		feeRatePercent,
 		marginRequired,
 		estimatedFee,
-		fundingOrder: { margin: funding.marginRequired, fee: funding.estimatedFee },
+		fundingNeed,
 		liqPrice,
 		liqWarning,
 		slippagePercent,

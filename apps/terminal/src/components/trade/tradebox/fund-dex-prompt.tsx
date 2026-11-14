@@ -11,13 +11,13 @@ import { UnifiedAccountModal } from "./unified-account-modal";
 
 interface Props {
 	collateral: Collateral;
-	order: { margin: number; fee: number };
+	need: number;
 	className?: string;
 }
 
 const AMOUNT_DECIMALS = 2;
 
-export function FundDexPrompt({ collateral, order, className }: Props) {
+export function FundDexPrompt({ collateral, need, className }: Props) {
 	const [plan, setPlan] = useState<FundDexPlan | null>(null);
 	const [unifiedOpen, setUnifiedOpen] = useState(false);
 	const account = useAccountState();
@@ -35,7 +35,7 @@ export function FundDexPrompt({ collateral, order, className }: Props) {
 				size="xs"
 				className="w-full"
 				iconLeft={<ArrowsLeftRightIcon className="size-3" />}
-				onClick={() => setPlan(getFundDexPlan(shortfall, order, AMOUNT_DECIMALS))}
+				onClick={() => setPlan(getFundDexPlan(shortfall, need, AMOUNT_DECIMALS))}
 			>
 				{t`Move ${shortfall.token.displayName} to ${dex}`}
 			</Button>
