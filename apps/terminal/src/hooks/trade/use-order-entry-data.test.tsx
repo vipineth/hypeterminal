@@ -21,15 +21,13 @@ const form = vi.hoisted(() => ({
 
 vi.mock("wagmi", () => ({ useConnection: () => ({ isConnected: true }) }));
 
-vi.mock("@/hooks/trade/use-account-balances", () => ({
-	useDefaultDexBalances: () => ({
-		spotBalances: [{ coin: "USDC", token: 0, total: form.quoteBalance, hold: "0", entryNtl: "0" }],
-		spotAvailableAfterMaintenance: null,
-	}),
-}));
+vi.mock("@/hooks/trade/use-account-balances", async () => {
+	const { standardAccount } = await import("@/test/account-fixture");
+	return { useAccountState: () => standardAccount([{ coin: "USDC", token: 0, total: form.quoteBalance }]) };
+});
 
 vi.mock("@/hooks/trade/use-asset-leverage", () => ({
-	useAssetLeverage: () => ({ maxTradeSzs: null, availableToTrade: null }),
+	useAssetLeverage: () => ({ quote: { status: "waiting" } }),
 }));
 
 vi.mock("@/stores/use-order-entry-store", () => ({
@@ -107,6 +105,7 @@ function submitLimitBuy(sizeMode: SizeMode, sizeInput: string) {
 		isReadyToTrade: true,
 		needsAgentApproval: false,
 		availableBalance: entry.availableBalance,
+		collateralPending: entry.collateral.status === "pending",
 		hasMarket: true,
 		hasAssetIndex: true,
 		side: "buy",

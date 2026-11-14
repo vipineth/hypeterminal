@@ -1,7 +1,9 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { type MetaPayloads, parseMarkets } from "@/domain/market/model";
+import { buildAccountState, getTradeCollateral, parseAccountMode } from "@/domain/trade/account-mode";
 import { deriveOrderEntry, type OrderEntryInputs } from "@/domain/trade/order/derive";
+import type { AccountFixture } from "@/test/account-fixture";
 
 const snapshot: MetaPayloads = JSON.parse(
 	readFileSync(new URL("../../../../fixtures/hl-mainnet-meta.json", import.meta.url), "utf8"),
@@ -17,9 +19,7 @@ function entryFor(coin: string) {
 		sizeMode: "base",
 		size: "",
 		sizeUnit: null,
-		spotBalances: null,
-		maxTradeSzs: null,
-		availableToTrade: null,
+		collateral: { status: "pending", reason: "account" },
 	};
 	return deriveOrderEntry(inputs);
 }
@@ -38,20 +38,34 @@ describe("ticket asset label", () => {
 
 describe("builder perp collateral on a standard account", () => {
 	it("never reads spot USDC as xyz margin", () => {
+		const p3: AccountFixture = JSON.parse(
+			readFileSync(new URL("../__fixtures__/account/p3-default.json", import.meta.url), "utf8"),
+		);
+		const account = buildAccountState({
+			user: p3.user,
+			mode: parseAccountMode(p3.webData3UserState.abstraction),
+			clearinghouseStates: p3.clearinghouseStates,
+			spot: { balances: [{ coin: "USDC", token: 0, total: "73414", hold: "0", entryNtl: "0" }] },
+		});
+		const market = model.byName.get("xyz:NVDA");
+		if (!market) throw new Error("xyz:NVDA missing from the snapshot");
 		const entry = deriveOrderEntry({
 			isConnected: true,
-			market: model.byName.get("xyz:NVDA"),
+			market,
 			side: "buy",
 			conversionPrice: 171.07,
 			sizeMode: "base",
 			size: "",
 			sizeUnit: null,
-			spotBalances: [{ coin: "USDC", token: 0, total: "73414", hold: "0", entryNtl: "0" }],
-			maxTradeSzs: [0, 0],
-			availableToTrade: [0, 0],
+			collateral: getTradeCollateral(account, market, "buy", {
+				status: "live",
+				quote: p3.activeAssetData["xyz:NVDA"],
+				leverage: null,
+			}),
 		});
 
 		expect(entry.availableBalance).toBe(0);
 		expect(entry.spotBalance.quoteAvailable).toBe(0);
+		expect(entry.collateral.status === "ready" && entry.collateral.shortfall?.kind).toBe("dexEmpty");
 	});
 });

@@ -1,14 +1,26 @@
+import type { ActiveAssetDataResponse } from "@nktkas/hyperliquid";
 import { useEffect, useRef, useState } from "react";
 import { useConnection } from "wagmi";
 import { getPositionDex } from "@/domain/market";
 import { getMarketCapabilities } from "@/domain/market/capabilities";
 import { getDefaultLeverage, getMaxLeverage } from "@/domain/market/model";
+import type { QuoteCheck } from "@/domain/trade/account-mode";
 import { useExchange, useSelectedMarketInfo, useSubscription, useUserPositions } from "@/lib/hyperliquid";
 import { getMarginModeFromLeverage, type MarginMode } from "@/lib/trade/margin-mode";
-import { toNumber } from "@/lib/trade/numbers";
+import { bumpCollateralGeneration, useCollateralGeneration } from "@/stores/use-collateral-generation-store";
 import { useGlobalSettingsActions, useMarginMode } from "@/stores/use-global-settings-store";
 
 type OperationType = "leverage" | "mode" | null;
+
+interface AppliedLeverage {
+	coin: string;
+	leverage: ActiveAssetDataResponse["leverage"];
+}
+
+interface QuoteStamp {
+	data: ActiveAssetDataResponse | undefined;
+	generation: number;
+}
 
 interface UseAssetLeverageReturn {
 	currentLeverage: number;
@@ -20,10 +32,7 @@ interface UseAssetLeverageReturn {
 	setPendingLeverage: (value: number) => void;
 	confirmLeverage: () => Promise<void>;
 	resetPending: () => void;
-	/** Max trade sizes in base token: [long, short] */
-	maxTradeSzs: [number, number] | null;
-	/** Available to trade in quote token: [long, short] */
-	availableToTrade: [number, number] | null;
+	quote: QuoteCheck;
 	isUpdating: boolean;
 	updateError: Error | null;
 	subscriptionStatus: "idle" | "loading" | "success" | "error";
@@ -52,7 +61,11 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	const baseToken = market ? market.name : undefined;
 	const assetId = market?.assetId;
 
-	const { data: activeAssetData, status: subscriptionStatus } = useSubscription(
+	const {
+		data: activeAssetData,
+		status: subscriptionStatus,
+		isStale: isQuoteStale,
+	} = useSubscription(
 		"activeAssetData",
 		{ coin: baseToken ?? "", user: address ?? "" },
 		{ enabled: isConnected && !!address && !!baseToken && isPerpMarket },
@@ -61,6 +74,11 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	const userPositions = useUserPositions();
 
 	const { mutateAsync: updateLeverage, isPending, error, reset: resetMutation } = useExchange("updateLeverage");
+
+	const generation = useCollateralGeneration();
+	const [stamp, setStamp] = useState<QuoteStamp>({ data: activeAssetData, generation });
+	if (stamp.data !== activeAssetData) setStamp({ data: activeAssetData, generation });
+	const [applied, setApplied] = useState<AppliedLeverage | null>(null);
 
 	const operationTypeRef = useRef<OperationType>(null);
 	const [pendingLeverage, setPendingLeverageState] = useState<number | null>(null);
@@ -134,6 +152,7 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 			isCross: marginMode === "cross",
 			leverage: pendingLeverage,
 		});
+		markApplied(marginMode, pendingLeverage);
 
 		setPendingLeverageState(null);
 	}
@@ -160,6 +179,7 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 			isCross: mode === "cross",
 			leverage: currentLeverage,
 		});
+		markApplied(mode, currentLeverage);
 
 		setStoredMarginMode(mode);
 	}
@@ -190,28 +210,26 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 			isCross: mode === "cross",
 			leverage: clamped,
 		});
+		markApplied(mode, clamped);
 
 		setStoredMarginMode(mode);
 		setPendingLeverageState(null);
 	}
 
-	function computeMaxTradeSzs(): [number, number] | null {
-		const raw = activeAssetData?.maxTradeSzs;
-		if (!raw) return null;
-		const long = toNumber(raw[0]);
-		const short = toNumber(raw[1]);
-		return long !== null && short !== null ? [long, short] : null;
+	function markApplied(mode: MarginMode, value: number) {
+		if (!baseToken) return;
+		const leverage: ActiveAssetDataResponse["leverage"] =
+			mode === "cross" ? { type: "cross", value } : { type: "isolated", value, rawUsd: "0" };
+		setApplied({ coin: baseToken, leverage });
+		bumpCollateralGeneration();
 	}
-	const maxTradeSzs = computeMaxTradeSzs();
 
-	function computeAvailableToTrade(): [number, number] | null {
-		const raw = activeAssetData?.availableToTrade;
-		if (!raw) return null;
-		const long = toNumber(raw[0]);
-		const short = toNumber(raw[1]);
-		return long !== null && short !== null ? [long, short] : null;
+	function computeQuote(): QuoteCheck {
+		const isLive = subscriptionStatus === "active" && !isQuoteStale && stamp.generation === generation;
+		if (!activeAssetData || !isLive) return { status: "waiting" };
+		return { status: "live", quote: activeAssetData, leverage: applied && applied.coin === baseToken ? applied.leverage : null };
 	}
-	const availableToTrade = computeAvailableToTrade();
+	const quote = computeQuote();
 
 	function computeNormalizedStatus(): "idle" | "loading" | "success" | "error" {
 		if (!isConnected || !baseToken) return "idle";
@@ -237,8 +255,7 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		setPendingLeverage,
 		confirmLeverage,
 		resetPending,
-		maxTradeSzs,
-		availableToTrade,
+		quote,
 		isUpdating,
 		updateError,
 		subscriptionStatus: normalizedStatus,

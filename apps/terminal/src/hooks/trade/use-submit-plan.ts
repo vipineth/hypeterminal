@@ -30,6 +30,7 @@ import {
 	type RequestLabel,
 	type SlotHold,
 } from "@/lib/trade/pending-requests";
+import { bumpCollateralGeneration } from "@/stores/use-collateral-generation-store";
 import { resultToQueueUpdate, useOrderQueueActions } from "@/stores/use-order-queue-store";
 
 const CLOCK_READ_TIMEOUT_MS = 3000;
@@ -128,7 +129,9 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 			const { request } = earlier;
 			upsertByRequestKey(getRequestKey(request), request.label, resultToQueueUpdate(reportSettlement(earlier)));
 		}
-		return reportSubmit(outcome);
+		const result = reportSubmit(outcome);
+		if (!result.ok && result.status === "failed") bumpCollateralGeneration();
+		return result;
 	}
 
 	function submitPlan(plan: SubmitPlanInput, label?: RequestLabel): Promise<OrderResult> {

@@ -1,6 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { useMemo } from "react";
 import { ARBITRUM_CHAIN_ID } from "@/config/contracts";
+import type { Collateral } from "@/domain/trade/account-mode";
 import type { RegistrationStatus } from "@/lib/hyperliquid";
 import type { ButtonContent, FormValidationResult, Side } from "@/lib/trade/types";
 
@@ -9,7 +10,7 @@ interface ButtonContentInput {
 	needsChainSwitch: boolean;
 	isSwitchingChain: boolean;
 	switchChain: (chainId: number) => void;
-	availableBalance: number;
+	collateral: Collateral;
 	validation: FormValidationResult;
 	isAgentLoading: boolean;
 	registerStatus: RegistrationStatus;
@@ -67,7 +68,10 @@ export function useButtonContent(input: ButtonContentInput): ButtonContent {
 				variant: "cyan",
 			};
 		}
-		if (input.availableBalance <= 0) {
+		if (input.collateral.status === "pending") {
+			return { text: t`Checking margin…`, action: () => {}, disabled: true, variant: "cyan" };
+		}
+		if (input.collateral.shortfall?.kind === "noFunds") {
 			return {
 				text: t`Deposit`,
 				action: input.onDeposit,
@@ -86,7 +90,7 @@ export function useButtonContent(input: ButtonContentInput): ButtonContent {
 		input.needsChainSwitch,
 		input.isSwitchingChain,
 		input.switchChain,
-		input.availableBalance,
+		input.collateral,
 		input.validation.needsApproval,
 		input.validation.canSubmit,
 		registerText,

@@ -2,12 +2,8 @@ import { getSideLabels, getSizeModeLabel, type SideLabels } from "@/config/ui-te
 import { getBaseQuoteFromPairName } from "@/domain/market";
 import { getMarketCapabilities, type MarketCapabilities } from "@/domain/market/capabilities";
 import type { Market } from "@/domain/market/model";
-import {
-	getAvailableBalanceToken,
-	getSpotBalanceData,
-	type SpotAvailableAfterMaintenance,
-	type SpotBalanceData,
-} from "@/domain/trade/balances";
+import type { Collateral, Shortfall } from "@/domain/trade/account-mode";
+import type { SpotBalanceData } from "@/domain/trade/balances";
 import {
 	getMaxSizeForOrderEntry,
 	getOrderValue,
@@ -16,8 +12,8 @@ import {
 	QUOTE_SIZE_DECIMALS,
 	readSizeInput,
 } from "@/domain/trade/order/size";
-import type { SpotBalance } from "@/hooks/trade/use-account-balances";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
+import { toNumberOrZero } from "@/lib/trade/numbers";
 import type { Side, SizeMode, SizeUnit } from "@/lib/trade/types";
 
 export interface OrderEntryInputs {
@@ -28,12 +24,7 @@ export interface OrderEntryInputs {
 	sizeMode: SizeMode;
 	size: string;
 	sizeUnit: SizeUnit | null;
-	spotBalances: SpotBalance[] | null | undefined;
-	spotAvailableAfterMaintenance?: SpotAvailableAfterMaintenance | null;
-	/** Max trade sizes in base token: [long, short] */
-	maxTradeSzs: [number, number] | null;
-	/** Available to trade in quote token: [long, short] */
-	availableToTrade: [number, number] | null;
+	collateral: Collateral;
 }
 
 export interface OrderEntryDerived {
@@ -47,6 +38,8 @@ export interface OrderEntryDerived {
 	sizeInputDecimals: number;
 	availableBalance: number;
 	availableBalanceToken: string;
+	collateral: Collateral;
+	shortfall: Shortfall | null;
 	spotBalance: SpotBalanceData;
 	maxSize: number;
 	orderSize: string;
@@ -56,17 +49,19 @@ export interface OrderEntryDerived {
 	sizeModeLabel: string;
 }
 
-function getAvailableBalance(
-	isSpotMarket: boolean,
-	isBuy: boolean,
-	spotBalance: SpotBalanceData,
-	availableLong: number,
-	availableShort: number,
-): number {
-	if (isSpotMarket) {
-		return isBuy ? spotBalance.quoteAvailable : spotBalance.baseAvailable;
-	}
-	return isBuy ? availableLong : availableShort;
+function getSpotBalance(
+	market: UnifiedMarketInfo | undefined,
+	side: Side,
+	available: number,
+	quoteToken: string,
+): SpotBalanceData {
+	if (market?.kind !== "spot") return { baseAvailable: 0, quoteAvailable: 0, baseName: "", quoteName: quoteToken };
+	return {
+		baseAvailable: side === "sell" ? available : 0,
+		quoteAvailable: side === "buy" ? available : 0,
+		baseName: market.base.name,
+		quoteName: market.quote.name,
+	};
 }
 
 export function getAssetLabel(market: Pick<Market, "kind" | "name"> | undefined, baseToken: string): string {
@@ -75,7 +70,6 @@ export function getAssetLabel(market: Pick<Market, "kind" | "name"> | undefined,
 
 export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 	const isSpotMarket = inputs.market?.kind === "spot";
-	const isBuy = inputs.side === "buy";
 	const capabilities = getMarketCapabilities(inputs.market);
 	const szDecimals = inputs.market?.szDecimals ?? 0;
 
@@ -83,11 +77,11 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 		? getBaseQuoteFromPairName(inputs.market.pairName, inputs.market.kind)
 		: { baseToken: "", quoteToken: "" };
 	const assetLabel = getAssetLabel(inputs.market, baseToken);
-	const spotBalance = getSpotBalanceData(inputs.spotBalances, inputs.market, inputs.spotAvailableAfterMaintenance);
-	const availableBalanceToken = getAvailableBalanceToken(inputs.market, inputs.side);
-
-	const [availableLong, availableShort] = inputs.availableToTrade ?? [0, 0];
-	const availableBalance = getAvailableBalance(isSpotMarket, isBuy, spotBalance, availableLong, availableShort);
+	const { collateral } = inputs;
+	const isReady = collateral.status === "ready";
+	const availableBalance = isReady ? toNumberOrZero(collateral.available) : 0;
+	const availableBalanceToken = isReady ? collateral.token.displayName : (inputs.market?.quote.displayName ?? quoteToken);
+	const spotBalance = getSpotBalance(inputs.market, inputs.side, availableBalance, quoteToken);
 
 	const maxSize = getMaxSizeForOrderEntry({
 		isConnected: inputs.isConnected,
@@ -96,7 +90,7 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 		price: inputs.conversionPrice,
 		spotBalance,
 		szDecimals,
-		maxTradeSzs: inputs.maxTradeSzs,
+		perpMaxSize: isReady ? toNumberOrZero(collateral.maxSize) : 0,
 	});
 
 	const sizeInput = readSizeInput(inputs.size, inputs.sizeUnit, getSizeUnit(inputs.market, inputs.sizeMode));
@@ -124,6 +118,8 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 		sizeInputDecimals,
 		availableBalance,
 		availableBalanceToken,
+		collateral,
+		shortfall: isReady ? collateral.shortfall : null,
 		spotBalance,
 		maxSize,
 		orderSize,

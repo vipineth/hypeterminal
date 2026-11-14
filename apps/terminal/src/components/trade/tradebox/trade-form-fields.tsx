@@ -80,6 +80,8 @@ export function TradeFormFields({
 		capabilities,
 		availableBalance,
 		availableBalanceToken,
+		collateral,
+		shortfall,
 		maxSize,
 		sizeValue,
 		orderValue,
@@ -92,7 +94,7 @@ export function TradeFormFields({
 
 	const { setLimitPrice, setTriggerPrice, setReduceOnly, setTpSlEnabled } = useOrderEntryActions();
 
-	const isFormDisabled = !isConnected || availableBalance <= 0;
+	const isFormDisabled = !isConnected || shortfall !== null;
 
 	const triggerOrder = isTriggerOrderType(orderType);
 	const twapOrder = isTwapOrderType(orderType);
@@ -113,7 +115,7 @@ export function TradeFormFields({
 	}
 
 	function formatAvailableBalance(): string {
-		if (!isConnected) return FALLBACK_VALUE_PLACEHOLDER;
+		if (!isConnected || collateral.status !== "ready") return FALLBACK_VALUE_PLACEHOLDER;
 		const isBaseToken = isSpotMarket && side === "sell";
 		const decimals = isBaseToken ? szDecimals : 2;
 		return formatToken(availableBalance, { decimals, symbol: availableBalanceToken ?? undefined });
@@ -142,7 +144,7 @@ export function TradeFormFields({
 									{t`Swap`}
 								</Button>
 							) : null}
-							{isConnected && availableBalance <= 0 ? (
+							{isConnected && shortfall?.kind === "noFunds" ? (
 								<Button variant="link" intent="brand" size="xxs" onClick={onDepositClick}>
 									{t`Deposit`}
 								</Button>

@@ -23,6 +23,7 @@ import {
 } from "@/lib/trade/order-types";
 import { useLimitPrice, useOrderEntryActions, useTpSlEnabled, useTriggerPrice } from "@/stores/use-order-entry-store";
 import { WalletModal } from "../components/wallet-modal";
+import { CollateralNotice } from "../tradebox/collateral-notice";
 import { MarginModeModal } from "../tradebox/margin-mode-modal";
 import { TradeFormScale } from "../tradebox/trade-form-scale";
 import { TradeFormTpSl } from "../tradebox/trade-form-tp-sl";
@@ -48,7 +49,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 	const tpSlEnabled = useTpSlEnabled();
 	const { setOrderType, setLimitPrice, setTriggerPrice, setTpSlEnabled } = useOrderEntryActions();
 
-	const isFormDisabled = !ticket.isConnected || entry.availableBalance <= 0;
+	const isFormDisabled = !ticket.isConnected || entry.shortfall !== null;
 	const isSpot = entry.isSpotMarket;
 	const szDecimals = entry.szDecimals;
 	const priceDecimals = market?.priceDecimals;
@@ -125,7 +126,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 						<span className="tabular-nums text-fg-muted">
 							{t`Available`}{" "}
 							<span className="text-fg">
-								{ticket.isConnected
+								{ticket.isConnected && entry.collateral.status === "ready"
 									? formatToken(entry.availableBalance, {
 											decimals: isSpot && side === "sell" ? szDecimals : 2,
 											symbol: entry.availableBalanceToken ?? undefined,
@@ -263,7 +264,8 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 			</div>
 
 			<div className="shrink-0 flex flex-col gap-2 border-t border-stroke-weak/60 px-3 pt-2 pb-3">
-				{validation.errors.length > 0 && ticket.isConnected && entry.availableBalance > 0 && (
+				{ticket.isConnected && <CollateralNotice collateral={entry.collateral} className="text-2xs" />}
+				{validation.errors.length > 0 && ticket.showValidationErrors && (
 					<div className="text-2xs text-error">{validation.errors.join(" • ")}</div>
 				)}
 				{ticket.approvalError && <div className="text-2xs text-error">{ticket.approvalError}</div>}

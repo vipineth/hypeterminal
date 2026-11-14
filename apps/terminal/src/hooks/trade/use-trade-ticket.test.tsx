@@ -36,7 +36,7 @@ const SOL_PERP = vi.hoisted(() => ({
 	szDecimals: 2,
 	markPx: "80.276",
 	quote: { name: "USDC", displayName: "USDC" },
-	dex: { name: "", index: 0 },
+	dex: { name: "", index: 0, collateralToken: { name: "USDC", displayName: "USDC" } },
 	crossAllowed: true,
 }));
 
@@ -59,7 +59,10 @@ const form = vi.hoisted(() => ({
 	tpPrice: "",
 	slPrice: "",
 	sizeUnit: null as { mode: string; assetId: number; szDecimals: number } | null,
-	maxTradeSzs: [100, 100],
+	maxTradeSzs: ["100", "100"] as [string, string],
+	availableToTrade: ["10000", "10000"] as [string, string],
+	mainWithdrawable: "10000",
+	quoteCoin: null as string | null,
 }));
 
 const liveFeed = vi.hoisted(() => ({ markPx: null as string | null, status: "active", isStale: false }));
@@ -135,19 +138,29 @@ vi.mock("@/hooks/trade/use-fee-rates", () => ({
 	useFeeRates: () => ({ takerRate: 0.0007, makerRate: 0.0004 }),
 }));
 
-vi.mock("@/hooks/trade/use-account-balances", () => ({
-	useDefaultDexBalances: () => ({
-		spotBalances: [
-			{ coin: "USDC", token: 0, total: form.quoteBalance, hold: "0", entryNtl: "0" },
-			{ coin: "POINTS", token: 9, total: form.baseBalance, hold: "0", entryNtl: "0" },
-		],
-		spotAvailableAfterMaintenance: null,
-	}),
-}));
+vi.mock("@/hooks/trade/use-account-balances", async () => {
+	const { standardAccount } = await import("@/test/account-fixture");
+	return {
+		useAccountState: () =>
+			standardAccount(
+				[
+					{ coin: "USDC", token: 0, total: form.quoteBalance },
+					{ coin: "POINTS", token: 9, total: form.baseBalance },
+				],
+				form.mainWithdrawable,
+				net.address,
+			),
+	};
+});
 
-vi.mock("@/hooks/trade/use-asset-leverage", () => ({
-	useAssetLeverage: () => ({ maxTradeSzs: form.maxTradeSzs, availableToTrade: [10000, 10000] }),
-}));
+vi.mock("@/hooks/trade/use-asset-leverage", async () => {
+	const { liveQuote } = await import("@/test/account-fixture");
+	return {
+		useAssetLeverage: () => ({
+			quote: liveQuote(form.quoteCoin ?? form.market.name, form.availableToTrade, form.maxTradeSzs, net.address),
+		}),
+	};
+});
 
 vi.mock("@/stores/use-order-entry-store", () => ({
 	useOrderSide: () => form.side,
@@ -294,7 +307,7 @@ describe("spot trade ticket", () => {
 		form.tpPrice = "";
 		form.slPrice = "";
 		form.sizeUnit = null;
-		form.maxTradeSzs = [100, 100];
+		form.maxTradeSzs = ["100", "100"];
 		formActions.resetForm.mockReset();
 	});
 
@@ -363,7 +376,59 @@ describe("perp trade ticket", () => {
 		form.tpPrice = "";
 		form.slPrice = "";
 		form.sizeUnit = null;
-		form.maxTradeSzs = [100, 100];
+		form.maxTradeSzs = ["100", "100"];
+		form.availableToTrade = ["10000", "10000"];
+		form.mainWithdrawable = "10000";
+		form.quoteCoin = null;
+	});
+
+	it("checks margin and sends nothing while the only quote is for another market", async () => {
+		form.quoteCoin = "xyz:NVDA";
+		form.tpSlEnabled = false;
+		const ticket = renderTicket();
+		await ticket.buttonContent.action();
+
+		expect(net.venue.orderRequests()).toHaveLength(0);
+		expect(ticket.buttonContent).toMatchObject({ text: "Checking margin…", disabled: true });
+		expect(ticket.validation.canSubmit).toBe(false);
+	});
+
+	it("names the empty builder dex and the USDC held elsewhere instead of offering Deposit", async () => {
+		form.market = {
+			...SOL_PERP,
+			kind: "builderPerp",
+			name: "xyz:NVDA",
+			pairName: "NVDA-USDC",
+			dex: { name: "xyz", index: 1, collateralToken: { name: "USDC", displayName: "USDC" } },
+		};
+		form.availableToTrade = ["0.0", "0.0"];
+		form.maxTradeSzs = ["0.0", "0.0"];
+		form.quoteBalance = "36.71";
+		form.tpSlEnabled = false;
+		const ticket = renderTicket();
+		await ticket.buttonContent.action();
+
+		expect(net.venue.orderRequests()).toHaveLength(0);
+		expect(ticket.buttonContent.text).not.toBe("Deposit");
+		expect(ticket.buttonContent.disabled).toBe(true);
+		expect(ticket.entry.shortfall).toMatchObject({
+			kind: "dexEmpty",
+			dex: { name: "xyz" },
+			elsewhere: [
+				{ place: { kind: "perp" }, amount: "10000" },
+				{ place: { kind: "spot" }, amount: "36.71" },
+			],
+		});
+	});
+
+	it("offers Deposit only when the collateral token is nowhere in the account", () => {
+		form.availableToTrade = ["0.0", "0.0"];
+		form.mainWithdrawable = "0.0";
+		form.quoteBalance = "0";
+		const ticket = renderTicket();
+
+		expect(ticket.entry.shortfall?.kind).toBe("noFunds");
+		expect(ticket.buttonContent).toMatchObject({ text: "Deposit", disabled: false });
 	});
 
 	it("sends a short's tp and sl from the typed strings a number cannot hold", async () => {
@@ -403,7 +468,7 @@ describe("perp trade ticket", () => {
 	});
 
 	it("sends nothing while the exchange gives no max size for the side", async () => {
-		form.maxTradeSzs = [0, 0];
+		form.maxTradeSzs = ["0", "0"];
 		form.tpSlEnabled = false;
 		const ticket = renderTicket();
 		await ticket.buttonContent.action();
@@ -413,7 +478,7 @@ describe("perp trade ticket", () => {
 	});
 
 	it("names a builder perp's dex in the order toast", async () => {
-		form.market = { ...SOL_PERP, kind: "builderPerp", name: "io:NVDA", pairName: "NVDA-USDC", dex: { name: "io", index: 3 } };
+		form.market = { ...SOL_PERP, kind: "builderPerp", name: "io:NVDA", pairName: "NVDA-USDC", dex: { name: "io", index: 3, collateralToken: { name: "USDC", displayName: "USDC" } } };
 		form.tpSlEnabled = false;
 		await pressSubmit();
 
@@ -454,7 +519,7 @@ describe("perp ticket tp/sl against the live mark and the sent entry price", () 
 		form.tpPrice = "";
 		form.slPrice = "";
 		form.sizeUnit = null;
-		form.maxTradeSzs = [100, 100];
+		form.maxTradeSzs = ["100", "100"];
 	});
 
 	it("blocks a stop the live mark has crossed while the cached mark has not", () => {
@@ -545,7 +610,7 @@ describe("perp ticket trigger orders against the live mark", () => {
 		form.tpPrice = "";
 		form.slPrice = "";
 		form.sizeUnit = null;
-		form.maxTradeSzs = [100, 100];
+		form.maxTradeSzs = ["100", "100"];
 	});
 
 	it("blocks a stop the live mark has crossed while the cached mark has not", () => {
@@ -618,7 +683,7 @@ describe("size the ticket sends after the size field changes context", () => {
 		form.twapMinutes = null;
 		form.tpSlEnabled = false;
 		form.sizeUnit = null;
-		form.maxTradeSzs = [100, 100];
+		form.maxTradeSzs = ["100", "100"];
 	});
 
 	it("sends nothing after toggling a USDC size that buys no whole lot", async () => {
@@ -662,7 +727,7 @@ describe("size the ticket sends after the size field changes context", () => {
 		form.market = SOL_PERP;
 		form.limitPrice = "80.271";
 		form.sizeMode = "quote";
-		form.maxTradeSzs = [1, 1];
+		form.maxTradeSzs = ["1", "1"];
 		renderTicket().handleSizePercentApply(100);
 		await pressSubmit();
 		expect(sentOrders()[0][0]).toMatchObject({ p: "80.271", s: "1" });
@@ -715,7 +780,7 @@ describe("order flags a market cannot take", () => {
 		form.tpPrice = "90";
 		form.slPrice = "70";
 		form.sizeUnit = null;
-		form.maxTradeSzs = [100, 100];
+		form.maxTradeSzs = ["100", "100"];
 	});
 
 	function switchToSpot() {
@@ -789,7 +854,7 @@ describe("order legs the ticket reports and retries", () => {
 		form.tpPrice = "90";
 		form.slPrice = "";
 		form.sizeUnit = null;
-		form.maxTradeSzs = [100, 100];
+		form.maxTradeSzs = ["100", "100"];
 	});
 
 	function marketOrder(size: string) {
@@ -1063,7 +1128,7 @@ describe("the order a fresh press signs", () => {
 		form.tpPrice = "500";
 		form.slPrice = "";
 		form.sizeUnit = null;
-		form.maxTradeSzs = [100, 100];
+		form.maxTradeSzs = ["100", "100"];
 		typeSizeHere("1");
 	});
 
@@ -1223,7 +1288,7 @@ describe("twap the ticket sends once", () => {
 		form.twapMinutes = 30;
 		form.tpSlEnabled = false;
 		form.sizeUnit = null;
-		form.maxTradeSzs = [100, 100];
+		form.maxTradeSzs = ["100", "100"];
 	});
 
 	it("sends a double-clicked twap once while the exchange answers every read", async () => {

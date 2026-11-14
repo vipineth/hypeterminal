@@ -1,4 +1,4 @@
-import { noBalanceValidator } from "../definitions/balance";
+import { collateralPendingValidator, noBalanceValidator } from "../definitions/balance";
 import {
 	signerNotReadyValidator,
 	walletLoadingValidator,
@@ -42,6 +42,7 @@ export interface PerpOrderContext extends OrderInputContext, TpSlContext, Trigge
 	isReadyToTrade: boolean;
 	needsAgentApproval: boolean;
 	availableBalance: number;
+	collateralPending: boolean;
 	hasMarket: boolean;
 	hasAssetIndex: boolean;
 	isDelisted: boolean;
@@ -58,6 +59,7 @@ export interface PerpOrderValidationResult {
 const perpOrderValidators: Validator<PerpOrderContext>[] = [
 	walletNotConnectedValidator,
 	walletLoadingValidator,
+	collateralPendingValidator,
 	noBalanceValidator,
 	noMarketValidator,
 	marketNotReadyValidator,

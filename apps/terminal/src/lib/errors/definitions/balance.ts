@@ -5,6 +5,19 @@ interface HasAvailableBalance {
 	availableBalance: number;
 }
 
+interface HasCollateralStatus {
+	collateralPending: boolean;
+}
+
+export const collateralPendingValidator: Validator<HasCollateralStatus> = createValidator({
+	id: "collateral-pending",
+	code: "BAL_002",
+	category: "balance",
+	priority: 29,
+	getMessage: () => t`Checking margin…`,
+	validate: (ctx) => !ctx.collateralPending,
+});
+
 export const noBalanceValidator: Validator<HasAvailableBalance> = createValidator({
 	id: "no-balance",
 	code: "BAL_001",

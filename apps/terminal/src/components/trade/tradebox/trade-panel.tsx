@@ -3,6 +3,7 @@ import { SpinnerGapIcon } from "@phosphor-icons/react";
 import { useTradeTicket } from "@/hooks/trade/use-trade-ticket";
 import { cn } from "@/lib/cn";
 import { useOrderEntryActions } from "@/stores/use-order-entry-store";
+import { CollateralNotice } from "./collateral-notice";
 import { WalletModal } from "../components/wallet-modal";
 import { MarginModeModal } from "./margin-mode-modal";
 import { OrderToast } from "./order-toast";
@@ -44,7 +45,9 @@ export function TradePanel() {
 				/>
 
 				<div className="flex flex-col gap-3 pt-5 pb-1">
-					{validation.errors.length > 0 && ticket.isConnected && entry.availableBalance > 0 && (
+					{ticket.isConnected && <CollateralNotice collateral={entry.collateral} />}
+
+					{validation.errors.length > 0 && ticket.showValidationErrors && (
 						<div className="text-xs text-error">{validation.errors.join(" • ")}</div>
 					)}
 

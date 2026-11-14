@@ -6,6 +6,7 @@ export interface BaseOrderInput {
 	isConnected: boolean;
 	isWalletLoading: boolean;
 	availableBalance: number;
+	collateralPending: boolean;
 	hasMarket: boolean;
 	hasAssetIndex: boolean;
 	needsAgentApproval: boolean;

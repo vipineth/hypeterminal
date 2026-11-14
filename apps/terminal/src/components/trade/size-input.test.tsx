@@ -76,15 +76,13 @@ vi.mock("@/hooks/trade/use-fee-rates", () => ({
 	useFeeRates: () => ({ takerRate: 0.0007, makerRate: 0.0004 }),
 }));
 
-vi.mock("@/hooks/trade/use-account-balances", () => ({
-	useDefaultDexBalances: () => ({
-		spotBalances: [{ coin: "USDC", token: 0, total: "1000", hold: "0", entryNtl: "0" }],
-		spotAvailableAfterMaintenance: null,
-	}),
-}));
+vi.mock("@/hooks/trade/use-account-balances", async () => {
+	const { standardAccount } = await import("@/test/account-fixture");
+	return { useAccountState: () => standardAccount([{ coin: "USDC", token: 0, total: "1000" }]) };
+});
 
 vi.mock("@/hooks/trade/use-asset-leverage", () => ({
-	useAssetLeverage: () => ({ maxTradeSzs: null, availableToTrade: null }),
+	useAssetLeverage: () => ({ quote: { status: "waiting" } }),
 }));
 
 vi.mock("@/stores/use-order-queue-store", () => ({

@@ -1,4 +1,5 @@
 import { useConnection } from "wagmi";
+import { getTradeCollateral } from "@/domain/trade/account-mode";
 import { deriveOrderEntry, type OrderEntryDerived } from "@/domain/trade/order/derive";
 import { getOrderPrice } from "@/domain/trade/order/price";
 import {
@@ -19,7 +20,7 @@ import {
 	useSizeMode,
 	useTriggerPrice,
 } from "@/stores/use-order-entry-store";
-import { useDefaultDexBalances } from "./use-account-balances";
+import { useAccountState } from "./use-account-balances";
 import { useAssetLeverage } from "./use-asset-leverage";
 
 interface OrderEntryData extends OrderEntryDerived {
@@ -43,7 +44,6 @@ interface OrderEntryData extends OrderEntryDerived {
 	switchModeError: Error | null;
 	isOnlyIsolated: boolean;
 	allowsCrossMargin: boolean;
-	maxTradeSzs: [number, number] | null;
 }
 
 interface UseOrderEntryDataOptions {
@@ -54,7 +54,7 @@ interface UseOrderEntryDataOptions {
 
 export function useOrderEntryData({ market, side, markPx }: UseOrderEntryDataOptions): OrderEntryData {
 	const { isConnected } = useConnection();
-	const { spotBalances, spotAvailableAfterMaintenance } = useDefaultDexBalances();
+	const account = useAccountState();
 	const {
 		displayLeverage: leverage,
 		currentLeverage,
@@ -62,8 +62,7 @@ export function useOrderEntryData({ market, side, markPx }: UseOrderEntryDataOpt
 		maxLeverage,
 		setPendingLeverage,
 		resetPending: resetPendingLeverage,
-		maxTradeSzs,
-		availableToTrade,
+		quote,
 		marginMode,
 		hasPosition,
 		switchMarginMode,
@@ -102,10 +101,7 @@ export function useOrderEntryData({ market, side, markPx }: UseOrderEntryDataOpt
 		sizeMode,
 		size,
 		sizeUnit,
-		spotBalances,
-		spotAvailableAfterMaintenance,
-		maxTradeSzs,
-		availableToTrade,
+		collateral: market ? getTradeCollateral(account, market, side, quote) : { status: "pending", reason: "account" },
 	});
 
 	function getSizeForPercent(pct: number): string {
@@ -157,6 +153,5 @@ export function useOrderEntryData({ market, side, markPx }: UseOrderEntryDataOpt
 		switchModeError,
 		isOnlyIsolated,
 		allowsCrossMargin,
-		maxTradeSzs,
 	};
 }

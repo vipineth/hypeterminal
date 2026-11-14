@@ -1,4 +1,4 @@
-import { noBalanceValidator } from "../definitions/balance";
+import { collateralPendingValidator, noBalanceValidator } from "../definitions/balance";
 import {
 	signerNotReadyValidator,
 	walletLoadingValidator,
@@ -24,6 +24,7 @@ export interface SpotOrderContext extends SpotInputContext, SpotBalanceContext {
 	isReadyToTrade: boolean;
 	needsAgentApproval: boolean;
 	availableBalance: number;
+	collateralPending: boolean;
 	hasMarket: boolean;
 	hasAssetIndex: boolean;
 }
@@ -38,6 +39,7 @@ export interface SpotOrderValidationResult {
 const spotOrderValidators: Validator<SpotOrderContext>[] = [
 	walletNotConnectedValidator,
 	walletLoadingValidator,
+	collateralPendingValidator,
 	noBalanceValidator,
 	noMarketValidator,
 	marketNotReadyValidator,

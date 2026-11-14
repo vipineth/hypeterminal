@@ -12,7 +12,7 @@ interface OrderEntryMaxSizeInput {
 	price: number;
 	spotBalance: SpotBalanceData;
 	szDecimals: number;
-	maxTradeSzs: [number, number] | null;
+	perpMaxSize: number;
 }
 
 interface SizeValueInput {
@@ -92,8 +92,7 @@ export function getMaxSizeForOrderEntry(input: OrderEntryMaxSizeInput): number {
 		return Number.isFinite(floored) ? floored : 0;
 	}
 
-	const maxTradeSize = input.maxTradeSzs?.[isBuy ? 0 : 1] ?? 0;
-	return maxTradeSize > 0 ? maxTradeSize : 0;
+	return input.perpMaxSize > 0 ? input.perpMaxSize : 0;
 }
 
 export function getSizeFromInput(input: SizeValueInput): string {
