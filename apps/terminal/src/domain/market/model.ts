@@ -24,7 +24,7 @@ export interface SpotToken extends SdkToken {
 	isWrapped: boolean;
 }
 
-export type QuoteToken = Pick<SpotToken, "name" | "displayName">;
+export type QuoteToken = Pick<SpotToken, "name" | "displayName"> & { tokenId: SpotToken["tokenId"] | null };
 
 export interface Dex {
 	name: string;
@@ -109,7 +109,7 @@ const BUILDER_PERP_ASSET_ID_BASE = 100_000;
 const BUILDER_PERP_SLOTS_PER_DEX = 10_000;
 const NAMED_SPOT_PAIR_INDEX: ReadonlyMap<string, number> = new Map([["PURR/USDC", 0]]);
 const USDC_TOKEN_INDEX = 0;
-const USDC: QuoteToken = { name: DEFAULT_QUOTE_TOKEN, displayName: DEFAULT_QUOTE_TOKEN };
+const USDC: QuoteToken = { name: DEFAULT_QUOTE_TOKEN, displayName: DEFAULT_QUOTE_TOKEN, tokenId: null };
 
 export function isListed(market: Market): market is ListedMarket {
 	return !market.isDelisted;

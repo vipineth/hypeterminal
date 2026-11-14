@@ -185,6 +185,21 @@ describe("parseMarkets on the committed mainnet snapshot", () => {
 		});
 	});
 
+	it("carries each dex's collateral token id, and none before spot metadata loads", () => {
+		const tokenIds = (payloads: typeof snapshot | Omit<typeof snapshot, "spotMeta">) =>
+			Object.fromEntries(parseMarkets(payloads).dexes.map((dex) => [dex.name || "main", dex.collateralToken.tokenId]));
+
+		expect(tokenIds(snapshot)).toMatchObject({
+			main: "0x6d1e7cde53ba9467b783cb7c530ce054",
+			xyz: "0x6d1e7cde53ba9467b783cb7c530ce054",
+			flx: "0x54e00a5988577cb0b0c9ab0cb6ef7f4b",
+			hyna: "0x2e6d84f2d7ca82e6581e03523e4389f7",
+			cash: "0x25faedc3f054130dbb4e4203aca63567",
+		});
+		const { spotMeta: _, ...perpsOnly } = snapshot;
+		expect(tokenIds(perpsOnly)).toEqual({ main: null, xyz: null, abcd: null, para: null, mkts: null, io: null });
+	});
+
 	it("resolves a builder collateral index past the token gaps by token.index", () => {
 		const moved = copySnapshot();
 		moved.allPerpMetas[dexSlot("xyz")].collateralToken = 479;
@@ -209,7 +224,9 @@ describe("parseMarkets on the committed mainnet snapshot", () => {
 describe("before spotMeta lands", () => {
 	const early = parseMarkets({ perpDexs: snapshot.perpDexs, allPerpMetas: snapshot.allPerpMetas });
 	const usdcDexes = new Set(
-		snapshot.allPerpMetas.flatMap((meta, index) => (meta.collateralToken === 0 ? [snapshot.perpDexs[index]?.name ?? ""] : [])),
+		snapshot.allPerpMetas.flatMap((meta, index) =>
+			meta.collateralToken === 0 ? [snapshot.perpDexs[index]?.name ?? ""] : [],
+		),
 	);
 
 	function orderFields(market: Market | undefined) {

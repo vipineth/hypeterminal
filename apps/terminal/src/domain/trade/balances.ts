@@ -203,7 +203,7 @@ export type AccountSummary =
 
 type SharedMode = Extract<ReadyAccount, { ledger: "spotOnly" }>["mode"];
 
-const MAIN_TOKEN: QuoteToken = { name: DEFAULT_QUOTE_TOKEN, displayName: DEFAULT_QUOTE_TOKEN };
+const MAIN_TOKEN: QuoteToken = { name: DEFAULT_QUOTE_TOKEN, displayName: DEFAULT_QUOTE_TOKEN, tokenId: null };
 
 function getNotice(mode: AccountMode): AccountNotice | null {
 	switch (mode.kind) {
