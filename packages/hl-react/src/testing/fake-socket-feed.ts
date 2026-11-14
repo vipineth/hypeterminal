@@ -46,6 +46,18 @@ export class FakeWebSocket extends EventTarget {
 		this.deliver("activeAssetCtx", { coin: "SOL", ctx: { markPx } });
 	}
 
+	pushCandle(candle: { t: number; c: string }) {
+		if (this.readyState !== FakeWebSocket.OPEN || !this.subscribed) throw new Error("server is not streaming");
+		const { t, c } = candle;
+		this.deliver("candle", { s: "SOL", i: "1m", t, T: t + 59_999, o: c, h: c, l: c, c, v: "1", n: 1 });
+	}
+
+	refuse() {
+		for (const subscription of this.awaitingAck.splice(0)) {
+			this.deliver("error", `Invalid subscription ${JSON.stringify(subscription)}`);
+		}
+	}
+
 	drop() {
 		this.readyState = FakeWebSocket.CLOSED;
 		this.subscribed = false;
