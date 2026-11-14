@@ -440,6 +440,9 @@ describe("labels", () => {
 		expect(spot("@699").pairName).toBe("UANSEM/USDC");
 		expect(spot("@703").pairName).toBe("SPYX/USDC");
 		expect(spot("@189").pairName).toBe("USPYX/USDC");
+		expect(spot("@20").pairName).toBe("PUMP/USDC");
+		expect(spot("@188").pairName).toBe("UPUMP/USDC");
+		expect([spot("@18").base.name, spot("@699").base.name]).toEqual(["ANSEM", "UANSEM"]);
 		expect(spot("@142").pairName).toBe("BTC/USDC");
 		expect(spot("@234").pairName).toBe("BTC/USDH");
 	});
