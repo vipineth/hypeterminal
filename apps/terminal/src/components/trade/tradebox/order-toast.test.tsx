@@ -340,7 +340,7 @@ describe("order toast", () => {
 		view.queued = [{ ...actions.addOrder.mock.calls[0][0], id: "row-hold" }];
 		view.buttons = [];
 		expect(renderToString(<OrderToast />)).toContain(
-			"Known placed: Leg 1 at 90. Unknown: Leg 2 at 95. Dismiss the hold? Sending the same order again may place a leg that was already placed a second time.",
+			"Known placed: Leg 1 at 90. Unknown: Leg 2 at 95. Dismiss the hold? Sending the same order again could place an already placed leg twice.",
 		);
 		expect(buttonsNamed("Dismiss hold")).toHaveLength(0);
 		buttonsNamed("Yes, dismiss hold")[0].onClick?.();

@@ -1285,7 +1285,7 @@ describe("order sender holding a market after a partial result", () => {
 			kind: "missing",
 		});
 		expect(describeHoldDismissal(held.hold)).toBe(
-			"Known placed: none. Unknown: Leg 1 at 90, Leg 2 at 91. Dismiss the hold? Sending the same order again may place a leg that was already placed a second time.",
+			"Known placed: none. Unknown: Leg 1 at 90, Leg 2 at 91. Dismiss the hold? Sending the same order again could place an already placed leg twice.",
 		);
 		expect(await tabB.sender.dismissHold(held.slot, held.hold)).toMatchObject({ kind: "holdDismissed" });
 		expect(storage.items.get(`hypeterminal:dismissed-request:v1:${SLOT}#hold-${held.hold.nonce}`)).toMatchObject({

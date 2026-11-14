@@ -203,7 +203,7 @@ export function describeHoldDismissal(hold: Hold): string {
 	const none = t`none`;
 	const placed = legNamesWith(hold, "placed") || none;
 	const unknownLegs = legNamesWith(hold, "unknown") || none;
-	return t`Known placed: ${placed}. Unknown: ${unknownLegs}. Dismiss the hold? Sending the same order again may place a leg that was already placed a second time.`;
+	return t`Known placed: ${placed}. Unknown: ${unknownLegs}. Dismiss the hold? Sending the same order again could place an already placed leg twice.`;
 }
 
 function legNamesWith(hold: Hold, fate: LegFate): string {
@@ -219,7 +219,7 @@ export function reportHoldOutcome(outcome: HoldOutcome): OrderResult {
 		case "refused":
 			return notSent(describeRefusal(outcome));
 		case "missing":
-			return unknown(t`That hold changed or was released before it was dismissed. Nothing was dismissed.`);
+			return unknown(t`That hold changed or was released before you confirmed. Nothing was dismissed.`);
 		case "holdDismissed":
 			return unknown(
 				t`Hold dismissed. Your next order on this market will be sent, even the same one. Check open orders first.`,
