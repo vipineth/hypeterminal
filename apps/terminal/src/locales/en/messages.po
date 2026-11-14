@@ -1518,8 +1518,12 @@ msgid "Keep it"
 msgstr "Keep it"
 
 #: src/lib/trade/extract-order-status.ts:206
-msgid "Known placed: {placed}. Unknown: {unknownLegs}. Dismiss the hold? Sending the same order again may place a leg that was already placed a second time."
-msgstr "Known placed: {placed}. Unknown: {unknownLegs}. Dismiss the hold? Sending the same order again may place a leg that was already placed a second time."
+msgid "Known placed: {placed}. Unknown: {unknownLegs}. Dismiss the hold? Sending the same order again could place an already placed leg twice."
+msgstr "Known placed: {placed}. Unknown: {unknownLegs}. Dismiss the hold? Sending the same order again could place an already placed leg twice."
+
+#: src/lib/trade/extract-order-status.ts:206
+#~ msgid "Known placed: {placed}. Unknown: {unknownLegs}. Dismiss the hold? Sending the same order again may place a leg that was already placed a second time."
+#~ msgstr "Known placed: {placed}. Unknown: {unknownLegs}. Dismiss the hold? Sending the same order again may place a leg that was already placed a second time."
 
 #: src/components/trade/components/global-settings-dialog.tsx:
 #~ msgid "Language"
@@ -3366,8 +3370,12 @@ msgid "Testnet"
 msgstr "Testnet"
 
 #: src/lib/trade/extract-order-status.ts:222
-msgid "That hold changed or was released before it was dismissed. Nothing was dismissed."
-msgstr "That hold changed or was released before it was dismissed. Nothing was dismissed."
+#~ msgid "That hold changed or was released before it was dismissed. Nothing was dismissed."
+#~ msgstr "That hold changed or was released before it was dismissed. Nothing was dismissed."
+
+#: src/lib/trade/extract-order-status.ts:222
+msgid "That hold changed or was released before you confirmed. Nothing was dismissed."
+msgstr "That hold changed or was released before you confirmed. Nothing was dismissed."
 
 #: src/lib/trade/extract-order-status.ts:305
 msgid "That pending order changed before it was dismissed. Press again to check this market."

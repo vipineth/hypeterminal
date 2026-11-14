@@ -1518,8 +1518,12 @@ msgid "Keep it"
 msgstr ""
 
 #: src/lib/trade/extract-order-status.ts:206
-msgid "Known placed: {placed}. Unknown: {unknownLegs}. Dismiss the hold? Sending the same order again may place a leg that was already placed a second time."
+msgid "Known placed: {placed}. Unknown: {unknownLegs}. Dismiss the hold? Sending the same order again could place an already placed leg twice."
 msgstr ""
+
+#: src/lib/trade/extract-order-status.ts:206
+#~ msgid "Known placed: {placed}. Unknown: {unknownLegs}. Dismiss the hold? Sending the same order again may place a leg that was already placed a second time."
+#~ msgstr ""
 
 #: src/components/trade/footer/footer-bar.tsx:
 #~ msgid "Latency:"
@@ -3362,7 +3366,11 @@ msgid "Testnet"
 msgstr ""
 
 #: src/lib/trade/extract-order-status.ts:222
-msgid "That hold changed or was released before it was dismissed. Nothing was dismissed."
+#~ msgid "That hold changed or was released before it was dismissed. Nothing was dismissed."
+#~ msgstr ""
+
+#: src/lib/trade/extract-order-status.ts:222
+msgid "That hold changed or was released before you confirmed. Nothing was dismissed."
 msgstr ""
 
 #: src/lib/trade/extract-order-status.ts:305
