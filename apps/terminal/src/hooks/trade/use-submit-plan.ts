@@ -10,9 +10,9 @@ import { createExchangeClock } from "@/lib/trade/exchange-clock";
 import {
 	describeInspection,
 	type OrderResult,
-	reportEarlier,
 	reportHoldOutcome,
 	reportRequestOutcome,
+	reportSettlement,
 	reportSubmit,
 	reportUnreadableOutcome,
 } from "@/lib/trade/extract-order-status";
@@ -107,9 +107,9 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 		const signer = getSigner();
 		if (!signer) return { ok: false, status: "notSent", error: t`Wallet is required for exchange actions` };
 		const outcome = await submit(signer);
-		if (outcome.kind === "blocked") {
+		if (outcome.kind === "blocked" && outcome.earlier.kind !== "live") {
 			const { request } = outcome.earlier;
-			upsertByRequestKey(getRequestKey(request), request.label, resultToQueueUpdate(reportEarlier(outcome.earlier)));
+			upsertByRequestKey(getRequestKey(request), request.label, resultToQueueUpdate(reportSettlement(outcome.earlier)));
 		}
 		return reportSubmit(outcome);
 	}

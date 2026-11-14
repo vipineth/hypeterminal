@@ -919,6 +919,32 @@ describe("order legs the ticket reports and retries", () => {
 		expect(net.venue.state.placedLegs).toBe(1);
 	});
 
+	it("leaves no unconfirmed row behind for another tab's order that is still being sent", async () => {
+		marketOrder("11");
+		let releaseReply = () => {};
+		const replyHeld = new Promise<void>((resolve) => {
+			releaseReply = resolve;
+		});
+		net.venue.state.onReply = async () => {
+			net.venue.state.onReply = null;
+			await replyHeld;
+		};
+		const firstTab = renderTicket().buttonContent.action();
+		await vi.waitFor(() => expect(net.venue.exchangeRequests).toHaveLength(1));
+		useTradeTicket = await loadTicket();
+		await pressSubmit();
+		const secondTabRow = lastQueueUpdate();
+		releaseReply();
+		await firstTab;
+		expect(queue.upsertByRequestKey).not.toHaveBeenCalledWith(
+			expect.anything(),
+			expect.anything(),
+			expect.objectContaining({ status: "unsettled" }),
+		);
+		expect(secondTabRow).toMatchObject({ status: "notSent" });
+		expect(net.venue.state.placedLegs).toBe(1);
+	});
+
 	it("gives a press blocked by an unconfirmed order its own not-sent row and keeps the ticket", async () => {
 		vi.useFakeTimers();
 		marketOrder("1");
@@ -935,16 +961,12 @@ describe("order legs the ticket reports and retries", () => {
 		expect(sellRow).toMatchObject({
 			status: "notSent",
 			error: expect.stringMatching(
-				/^Not sent\. An earlier order on this market is not confirmed yet\. It can still execute until .+\. Its Retry sends that earlier order again\. To send this one, cancel it and press again\.$/,
+				/^Not sent\. An earlier order on this market is not confirmed yet\. It can still execute until .+\. Retry on that order's row sends it again\. To send this one, cancel that order and press again\.$/,
 			),
 		});
 		expect(sellRow.requestKey).toBeUndefined();
 		expect(formActions.resetForm).not.toHaveBeenCalled();
-		expect(queue.upsertByRequestKey).toHaveBeenCalledWith(
-			buyRow.requestKey,
-			expect.anything(),
-			expect.objectContaining({ status: "unsettled" }),
-		);
+		expect(queue.upsertByRequestKey).not.toHaveBeenCalled();
 		expect(
 			sentOrders()
 				.flat()
@@ -1071,7 +1093,7 @@ describe("the order a fresh press signs", () => {
 			expect(orderBodies()).toHaveLength(sentBefore);
 			expect(lastQueueUpdate()).toMatchObject({
 				status: "notSent",
-				error: expect.stringContaining("Its Retry sends that earlier order again."),
+				error: expect.stringContaining("Retry on that order's row sends it again."),
 			});
 		},
 	);

@@ -1623,6 +1623,29 @@ describe("order sender listing a request that blocks the market", () => {
 		expect(tabB.sender.list(TEST_USER).map(getRequestKey)).toEqual([keyOf(first)]);
 	});
 
+	it("drops another tab's in-flight request from this tab's list once that tab settles it", async () => {
+		const bus = createMemoryBus();
+		const tabA = openTab(venue, storage, locks, { bus: bus.join() });
+		const tabB = openTab(venue, storage, locks, { bus: bus.join() });
+		const unsubscribe = tabB.sender.subscribe(() => {});
+		await tabB.store.refresh();
+		const [replyHeld, releaseReply] = gate();
+		const [arrived, markArrived] = gate();
+		holdFirstReply(venue, markArrived, replyHeld);
+		const pressA = tabA.sender.submit(signerFor(venue), marketBuy());
+		await arrived;
+		const sentBefore = venue.exchangeRequests.length;
+		const pressB = await tabB.sender.submit(signerFor(venue), marketBuy());
+		expect(pressB).toMatchObject({ kind: "blocked", earlier: { kind: "live" } });
+		expect(venue.exchangeRequests).toHaveLength(sentBefore);
+		expect(tabB.sender.list(TEST_USER)).toHaveLength(1);
+		releaseReply();
+		expect(await pressA).toMatchObject({ kind: "sent", settlement: { kind: "answered" } });
+		await vi.waitFor(() => expect(tabB.sender.list(TEST_USER)).toEqual([]));
+		expect(venue.state.placedLegs).toBe(1);
+		unsubscribe();
+	});
+
 	it("lists another tab's request at once when it blocks a press here", async () => {
 		const tabA = openTab(venue, storage, locks);
 		venue.nextExchangeRequests("lost", "lost", "lost", "lost");

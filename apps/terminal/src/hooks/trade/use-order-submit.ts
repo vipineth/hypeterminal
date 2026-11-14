@@ -97,7 +97,7 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 		const orderId = addOrder({ ...label, orderType: "twap", status: "pending" });
 
 		if (!plan.action) {
-			updateOrder(orderId, { status: "failed", error: plan.errors.join("; ") });
+			updateOrder(orderId, { status: "notSent", error: plan.errors.join("; ") });
 			return false;
 		}
 

@@ -19,7 +19,7 @@ msgid "{0} more wallets"
 msgstr "{0} more wallets"
 
 #. placeholder {0}: result.error
-#: src/lib/trade/extract-order-status.ts:421
+#: src/lib/trade/extract-order-status.ts:416
 msgid "{0}. It will not be sent again. Check open orders."
 msgstr "{0}. It will not be sent again. Check open orders."
 
@@ -142,15 +142,15 @@ msgstr "7 days"
 #~ msgid "A crypto wallet lets you store and manage your digital assets securely."
 #~ msgstr "A crypto wallet lets you store and manage your digital assets securely."
 
-#: src/lib/trade/extract-order-status.ts:455
+#: src/lib/trade/extract-order-status.ts:450
 msgid "A lookup did not find it, which does not prove it never executed."
 msgstr "A lookup did not find it, which does not prove it never executed."
 
-#: src/lib/trade/extract-order-status.ts:458
+#: src/lib/trade/extract-order-status.ts:453
 msgid "A lookup found it: {what}."
 msgstr "A lookup found it: {what}."
 
-#: src/lib/trade/extract-order-status.ts:451
+#: src/lib/trade/extract-order-status.ts:446
 msgid "A matching TWAP is in your history, but it can't be confirmed as this one."
 msgstr "A matching TWAP is in your history, but it can't be confirmed as this one."
 
@@ -509,11 +509,11 @@ msgstr "Cancel TWAP order"
 msgid "canceled"
 msgstr "canceled"
 
-#: src/lib/trade/extract-order-status.ts:366
+#: src/lib/trade/extract-order-status.ts:361
 msgid "Canceled. Nothing was placed."
 msgstr "Canceled. Nothing was placed."
 
-#: src/lib/trade/extract-order-status.ts:366
+#: src/lib/trade/extract-order-status.ts:361
 msgid "Canceled. The TWAP did not start."
 msgstr "Canceled. The TWAP did not start."
 
@@ -528,12 +528,12 @@ msgstr "Canceling..."
 #~ msgid "cancelled"
 #~ msgstr "cancelled"
 
-#: src/lib/trade/extract-order-status.ts:318
+#: src/lib/trade/extract-order-status.ts:313
 msgid "Cannot cancel: another agent key signed this order."
 msgstr "Cannot cancel: another agent key signed this order."
 
 #. placeholder {0}: describeRemaining(outcome.remainingMs)
-#: src/lib/trade/extract-order-status.ts:317
+#: src/lib/trade/extract-order-status.ts:312
 msgid "Cannot cancel: another agent key signed this order. {0}"
 msgstr "Cannot cancel: another agent key signed this order. {0}"
 
@@ -992,15 +992,15 @@ msgstr "Dismiss hold"
 msgid "Dismiss pending order"
 msgstr "Dismiss pending order"
 
-#: src/lib/trade/extract-order-status.ts:388
+#: src/lib/trade/extract-order-status.ts:383
 msgid "Dismissed without confirmation. Check the TWAP tab."
 msgstr "Dismissed without confirmation. Check the TWAP tab."
 
-#: src/lib/trade/extract-order-status.ts:389
+#: src/lib/trade/extract-order-status.ts:384
 msgid "Dismissed without confirmation. It may have executed. Check open orders."
 msgstr "Dismissed without confirmation. It may have executed. Check open orders."
 
-#: src/lib/trade/extract-order-status.ts:341
+#: src/lib/trade/extract-order-status.ts:336
 msgid "Dismissed. The order it could not read may have executed. Check open orders."
 msgstr "Dismissed. The order it could not read may have executed. Check open orders."
 
@@ -1319,7 +1319,7 @@ msgstr "Flip transfer direction"
 #~ msgid "Format for numbers and dates"
 #~ msgstr "Format for numbers and dates"
 
-#: src/lib/trade/extract-order-status.ts:384
+#: src/lib/trade/extract-order-status.ts:379
 msgid "Found by lookup after you dismissed it. The exchange never confirmed the request."
 msgstr "Found by lookup after you dismissed it. The exchange never confirmed the request."
 
@@ -1483,19 +1483,19 @@ msgstr "IOC (Immediate Or Cancel)"
 msgid "Isolated"
 msgstr "Isolated"
 
-#: src/lib/trade/extract-order-status.ts:442
+#: src/lib/trade/extract-order-status.ts:437
 msgid "It can no longer execute."
 msgstr "It can no longer execute."
 
-#: src/lib/trade/extract-order-status.ts:348
+#: src/lib/trade/extract-order-status.ts:343
 msgid "It can still execute until {until}."
 msgstr "It can still execute until {until}."
 
-#: src/lib/trade/extract-order-status.ts:295
+#: src/lib/trade/extract-order-status.ts:290
 msgid "it filled"
 msgstr "it filled"
 
-#: src/lib/trade/extract-order-status.ts:346
+#: src/lib/trade/extract-order-status.ts:341
 msgid "It may still execute."
 msgstr "It may still execute."
 
@@ -1503,19 +1503,19 @@ msgstr "It may still execute."
 msgid "It may still execute. Dismiss it? Your next order on this market will be sent as a new one."
 msgstr "It may still execute. Dismiss it? Your next order on this market will be sent as a new one."
 
-#: src/lib/trade/extract-order-status.ts:297
+#: src/lib/trade/extract-order-status.ts:292
 msgid "it partly filled"
 msgstr "it partly filled"
 
-#: src/lib/trade/extract-order-status.ts:299
+#: src/lib/trade/extract-order-status.ts:294
 msgid "it was placed"
 msgstr "it was placed"
 
-#: src/lib/trade/extract-order-status.ts:301
+#: src/lib/trade/extract-order-status.ts:296
 msgid "it was set"
 msgstr "it was set"
 
-#: src/lib/trade/extract-order-status.ts:454
+#: src/lib/trade/extract-order-status.ts:449
 msgid "Its status could not be read."
 msgstr "Its status could not be read."
 
@@ -2020,7 +2020,7 @@ msgstr "No market"
 msgid "No markets found."
 msgstr "No markets found."
 
-#: src/lib/trade/extract-order-status.ts:449
+#: src/lib/trade/extract-order-status.ts:444
 msgid "No matching TWAP is in your history."
 msgstr "No matching TWAP is in your history."
 
@@ -2087,17 +2087,16 @@ msgid "none"
 msgstr "none"
 
 #. placeholder {0}: settlement.error
-#: src/lib/trade/extract-order-status.ts:359
+#: src/lib/trade/extract-order-status.ts:354
 msgid "Not confirmed: {0}. Retry or cancel it."
 msgstr "Not confirmed: {0}. Retry or cancel it."
 
 #. placeholder {0}: settlement.error
-#: src/lib/trade/extract-order-status.ts:358
+#: src/lib/trade/extract-order-status.ts:353
 msgid "Not confirmed: {0}. Retry, cancel or dismiss it."
 msgstr "Not confirmed: {0}. Retry, cancel or dismiss it."
 
 #: src/components/trade/tradebox/order-toast.tsx:401
-#: src/lib/trade/extract-order-status.ts:268
 msgid "Not confirmed. Retry or cancel it."
 msgstr "Not confirmed. Retry or cancel it."
 
@@ -2106,11 +2105,11 @@ msgid "Not connected"
 msgstr "Not connected"
 
 #. placeholder {0}: describeRemaining(outcome.remainingMs)
-#: src/lib/trade/extract-order-status.ts:324
+#: src/lib/trade/extract-order-status.ts:319
 msgid "Not dismissed. {0} Retry or cancel it."
 msgstr "Not dismissed. {0} Retry or cancel it."
 
-#: src/lib/trade/extract-order-status.ts:377
+#: src/lib/trade/extract-order-status.ts:372
 msgid "Not placed. The request expired before the exchange took it."
 msgstr "Not placed. The request expired before the exchange took it."
 
@@ -2134,23 +2133,28 @@ msgstr "Not sent: {0}"
 
 #. placeholder {0}: describeRemaining(earlier.remainingMs)
 #: src/lib/trade/extract-order-status.ts:275
-msgid "Not sent. An earlier order on this market is not confirmed yet. {0} Its Retry sends that earlier order again. To send this one, cancel it and press again."
-msgstr "Not sent. An earlier order on this market is not confirmed yet. {0} Its Retry sends that earlier order again. To send this one, cancel it and press again."
+#~ msgid "Not sent. An earlier order on this market is not confirmed yet. {0} Its Retry sends that earlier order again. To send this one, cancel it and press again."
+#~ msgstr "Not sent. An earlier order on this market is not confirmed yet. {0} Its Retry sends that earlier order again. To send this one, cancel it and press again."
+
+#. placeholder {0}: describeRemaining(earlier.remainingMs)
+#: src/lib/trade/extract-order-status.ts:270
+msgid "Not sent. An earlier order on this market is not confirmed yet. {0} Retry on that order's row sends it again. To send this one, cancel that order and press again."
+msgstr "Not sent. An earlier order on this market is not confirmed yet. {0} Retry on that order's row sends it again. To send this one, cancel that order and press again."
 
 #. placeholder {0}: describeRemaining(earlier.remainingMs)
 #: src/lib/trade/extract-order-status.ts:277
 #~ msgid "Not sent. An earlier order on this market is not confirmed yet. {0} Retry resends that earlier order, not this one. Cancel it, then press again to send this one."
 #~ msgstr "Not sent. An earlier order on this market is not confirmed yet. {0} Retry resends that earlier order, not this one. Cancel it, then press again to send this one."
 
-#: src/lib/trade/extract-order-status.ts:282
+#: src/lib/trade/extract-order-status.ts:277
 msgid "Not sent. An earlier order on this market is not confirmed yet. Retry or cancel it first."
 msgstr "Not sent. An earlier order on this market is not confirmed yet. Retry or cancel it first."
 
-#: src/lib/trade/extract-order-status.ts:281
+#: src/lib/trade/extract-order-status.ts:276
 msgid "Not sent. An earlier order on this market is not confirmed yet. Retry, cancel or dismiss it first."
 msgstr "Not sent. An earlier order on this market is not confirmed yet. Retry, cancel or dismiss it first."
 
-#: src/lib/trade/extract-order-status.ts:288
+#: src/lib/trade/extract-order-status.ts:283
 msgid "Not sent. An earlier order on this market was still unconfirmed: {what}. Press again to send a new order."
 msgstr "Not sent. An earlier order on this market was still unconfirmed: {what}. Press again to send a new order."
 
@@ -2191,7 +2195,7 @@ msgstr "Not sent. Your last order on this market: {0}. Sending the same order ag
 msgid "Not sent. Your TWAP history could not be read, so this TWAP could not be tracked. Try again."
 msgstr "Not sent. Your TWAP history could not be read, so this TWAP could not be tracked. Try again."
 
-#: src/lib/trade/extract-order-status.ts:376
+#: src/lib/trade/extract-order-status.ts:371
 msgid "Not started. The request expired before the exchange took it."
 msgstr "Not started. The request expired before the exchange took it."
 
@@ -2320,7 +2324,7 @@ msgstr "Order History"
 msgid "Order Queue"
 msgstr "Order Queue"
 
-#: src/lib/trade/extract-order-status.ts:413
+#: src/lib/trade/extract-order-status.ts:408
 msgid "Order sent. Its status could not be read. It will not be sent again. Check open orders."
 msgstr "Order sent. Its status could not be read. It will not be sent again. Check open orders."
 
@@ -2968,7 +2972,7 @@ msgstr "Set to {p}%"
 msgid "Settings"
 msgstr "Settings"
 
-#: src/lib/trade/extract-order-status.ts:452
+#: src/lib/trade/extract-order-status.ts:447
 msgid "Several matching TWAPs are in your history."
 msgstr "Several matching TWAPs are in your history."
 
@@ -3418,7 +3422,7 @@ msgstr "Testnet"
 msgid "That hold changed or was released before you confirmed. Nothing was dismissed."
 msgstr "That hold changed or was released before you confirmed. Nothing was dismissed."
 
-#: src/lib/trade/extract-order-status.ts:339
+#: src/lib/trade/extract-order-status.ts:334
 msgid "That pending order changed before it was dismissed. Press again to check this market."
 msgstr "That pending order changed before it was dismissed. Press again to check this market."
 
@@ -3426,7 +3430,7 @@ msgstr "That pending order changed before it was dismissed. Press again to check
 #~ msgid "The builder at {0}...{1} can now charge up to {maxFeeRate}% fee on orders placed on your behalf."
 #~ msgstr "The builder at {0}...{1} can now charge up to {maxFeeRate}% fee on orders placed on your behalf."
 
-#: src/lib/trade/extract-order-status.ts:443
+#: src/lib/trade/extract-order-status.ts:438
 msgid "The exchange never confirmed this request. {found} {when} Dismiss it? Your next order on this market will be sent as a new one."
 msgstr "The exchange never confirmed this request. {found} {when} Dismiss it? Your next order on this market will be sent as a new one."
 
@@ -3447,7 +3451,7 @@ msgstr "The page you are looking for does not exist."
 msgid "The same order is held on this market. Last result: {0}."
 msgstr "The same order is held on this market. Last result: {0}."
 
-#: src/lib/trade/extract-order-status.ts:303
+#: src/lib/trade/extract-order-status.ts:298
 msgid "the TWAP started"
 msgstr "the TWAP started"
 
@@ -3480,7 +3484,7 @@ msgid "This link was created for a different site."
 msgstr "This link was created for a different site."
 
 #: src/lib/trade/extract-order-status.ts:244
-#: src/lib/trade/extract-order-status.ts:335
+#: src/lib/trade/extract-order-status.ts:330
 msgid "This market is busy. Try again."
 msgstr "This market is busy. Try again."
 
@@ -3491,7 +3495,7 @@ msgid "This mobile link expired."
 msgstr "This mobile link expired."
 
 #: src/lib/trade/extract-order-status.ts:183
-#: src/lib/trade/extract-order-status.ts:310
+#: src/lib/trade/extract-order-status.ts:305
 msgid "This order is already being sent"
 msgstr "This order is already being sent"
 
@@ -3499,7 +3503,7 @@ msgstr "This order is already being sent"
 msgid "This phone link is not approved on Hyperliquid."
 msgstr "This phone link is not approved on Hyperliquid."
 
-#: src/lib/trade/extract-order-status.ts:314
+#: src/lib/trade/extract-order-status.ts:309
 msgid "This request was already settled. Check open orders."
 msgstr "This request was already settled. Check open orders."
 
@@ -3751,7 +3755,7 @@ msgstr "TWAP Orders"
 #~ msgid "TWAP sent but not listed yet. It will not be sent again. Check the TWAP tab."
 #~ msgstr "TWAP sent but not listed yet. It will not be sent again. Check the TWAP tab."
 
-#: src/lib/trade/extract-order-status.ts:426
+#: src/lib/trade/extract-order-status.ts:421
 msgid "TWAP sent. Its status could not be read. It will not be sent again. Check the TWAP tab."
 msgstr "TWAP sent. Its status could not be read. It will not be sent again. Check the TWAP tab."
 
@@ -3759,7 +3763,7 @@ msgstr "TWAP sent. Its status could not be read. It will not be sent again. Chec
 #~ msgid "TWAP status unknown: {message}. Check the TWAP tab before you try again."
 #~ msgstr "TWAP status unknown: {message}. Check the TWAP tab before you try again."
 
-#: src/lib/trade/extract-order-status.ts:429
+#: src/lib/trade/extract-order-status.ts:424
 msgid "TWAP status unknown. A matching TWAP appeared in your history, but it can't be confirmed as this one. It will not be sent again. Check the TWAP tab."
 msgstr "TWAP status unknown. A matching TWAP appeared in your history, but it can't be confirmed as this one. It will not be sent again. Check the TWAP tab."
 
@@ -3767,7 +3771,7 @@ msgstr "TWAP status unknown. A matching TWAP appeared in your history, but it ca
 #~ msgid "TWAP status unknown. Check the TWAP tab before you try again."
 #~ msgstr "TWAP status unknown. Check the TWAP tab before you try again."
 
-#: src/lib/trade/extract-order-status.ts:432
+#: src/lib/trade/extract-order-status.ts:427
 msgid "TWAP status unknown. It will not be sent again. Check the TWAP tab."
 msgstr "TWAP status unknown. It will not be sent again. Check the TWAP tab."
 
@@ -4030,7 +4034,7 @@ msgstr "Your funds were successfully deposited."
 msgid "Your transaction is being processed"
 msgstr "Your transaction is being processed"
 
-#: src/lib/trade/extract-order-status.ts:448
+#: src/lib/trade/extract-order-status.ts:443
 msgid "Your TWAP history could not be read."
 msgstr "Your TWAP history could not be read."
 

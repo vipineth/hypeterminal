@@ -264,15 +264,10 @@ function describeHold(hold: Hold): string {
 		.join(", ");
 }
 
-export function reportEarlier(earlier: Settlement | Live): OrderResult {
-	if (earlier.kind === "live") return unsettled(earlier.request, t`Not confirmed. Retry or cancel it.`, false);
-	return reportSettlement(earlier);
-}
-
 function reportBlocked(earlier: Settlement | Live): OrderResult {
 	if (earlier.kind === "live") {
 		return notSent(
-			t`Not sent. An earlier order on this market is not confirmed yet. ${describeRemaining(earlier.remainingMs)} Its Retry sends that earlier order again. To send this one, cancel it and press again.`,
+			t`Not sent. An earlier order on this market is not confirmed yet. ${describeRemaining(earlier.remainingMs)} Retry on that order's row sends it again. To send this one, cancel that order and press again.`,
 		);
 	}
 	if (earlier.kind === "pending") {
