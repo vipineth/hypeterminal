@@ -74,21 +74,7 @@ const useOrderQueueStore = create<OrderQueueStore>()((set) => ({
 			}));
 		},
 		upsertByRequestKey: (requestKey, base, update) => {
-			set((state) => {
-				if (state.orders.some((order) => order.requestKey === requestKey)) {
-					return {
-						orders: state.orders.map((order) => (order.requestKey === requestKey ? applyUpdate(order, update) : order)),
-					};
-				}
-				const added: OrderQueueItem = {
-					...base,
-					status: "unsettled",
-					requestKey,
-					id: generateOrderId(),
-					createdAt: Date.now(),
-				};
-				return { orders: [...state.orders, applyUpdate(added, update)] };
-			});
+			set((state) => ({ orders: upsertRequestRow(state.orders, requestKey, base, update) }));
 		},
 		removeOrder: (id) => {
 			set((state) => ({
@@ -101,6 +87,25 @@ const useOrderQueueStore = create<OrderQueueStore>()((set) => ({
 function applyUpdate(order: OrderQueueItem, update: Partial<Omit<OrderQueueItem, "id">>): OrderQueueItem {
 	const completed = update.status === "success" || update.status === "failed" || update.status === "unknown";
 	return { ...order, ...update, completedAt: completed ? Date.now() : order.completedAt };
+}
+
+export function upsertRequestRow(
+	orders: OrderQueueItem[],
+	requestKey: string,
+	base: Pick<OrderQueueItem, "market" | "side" | "size">,
+	update: Partial<Omit<OrderQueueItem, "id">>,
+): OrderQueueItem[] {
+	if (orders.some((order) => order.requestKey === requestKey)) {
+		return orders.map((order) => (order.requestKey === requestKey ? applyUpdate(order, update) : order));
+	}
+	const added: OrderQueueItem = {
+		...base,
+		status: "unsettled",
+		requestKey,
+		id: generateOrderId(),
+		createdAt: Date.now(),
+	};
+	return [...orders, applyUpdate(added, update)];
 }
 
 export function resultToQueueUpdate(result: OrderResult): Partial<Omit<OrderQueueItem, "id">> {

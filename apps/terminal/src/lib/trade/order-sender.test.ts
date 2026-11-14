@@ -1135,7 +1135,10 @@ describe("order sender holding a market after a partial result", () => {
 	it("stops holding once the window has passed and every leg's fate is known", async () => {
 		const { sender } = openTab(venue, storage, locks);
 		await sender.submit(signerFor(venue), scale(["90", "95"]));
+		expect(sender.listHolds(TEST_USER)).toHaveLength(1);
+		expect(sender.listHolds("0x0000000000000000000000000000000000000002")).toEqual([]);
 		vi.setSystemTime(Date.now() + PARTIAL_HOLD_MS);
+		expect(sender.listHolds(TEST_USER)).toEqual([]);
 		expect(await sender.submit(signerFor(venue), scale(["90", "96"]))).toMatchObject({ kind: "sent" });
 	});
 
@@ -1253,6 +1256,7 @@ describe("order sender holding a market after a partial result", () => {
 			clockDown = true;
 		};
 		expect(await tabB.sender.submit(signerFor(venue), scale(["90", "96"]))).toMatchObject({ kind: "blocked" });
+		expect(tabB.sender.listHolds(TEST_USER)).toMatchObject([{ hold: { since: null, fates: ["placed", "rejected"] } }]);
 		venue.state.onSend = null;
 		clockDown = false;
 		expect(await tabB.sender.submit(signerFor(venue), scale(["90", "96"]))).toMatchObject({ kind: "held" });
@@ -1277,6 +1281,9 @@ describe("order sender holding a market after a partial result", () => {
 			slot: SLOT,
 			hold: { nonce: sentRequest(first).nonce, fates: ["unknown", "unknown"] },
 		});
+		expect(await tabB.sender.dismissHold(held.slot, { ...held.hold, fates: ["placed", "unknown"] })).toMatchObject({
+			kind: "missing",
+		});
 		expect(describeHoldDismissal(held.hold)).toBe(
 			"Known placed: none. Unknown: Leg 1 at 90, Leg 2 at 91. Dismiss the hold? Sending the same order again may place a leg that was already placed a second time.",
 		);
@@ -1288,6 +1295,47 @@ describe("order sender holding a market after a partial result", () => {
 		expect(tabB.sender.listHolds(TEST_USER)).toEqual([]);
 		expect(await tabB.sender.submit(signerFor(venue), scale(["90", "92"]))).toMatchObject({ kind: "sent" });
 		expect(venue.state.placedLegs).toBe(2);
+	});
+
+	it("restarts the hold window when a later result for the request lands without the exchange clock", async () => {
+		let clockDown = false;
+		const clock: ExchangeClock = {
+			async now() {
+				if (clockDown) throw new Error("Exchange clock unavailable");
+				return Date.now();
+			},
+			estimate: () => Date.now(),
+			warm() {},
+		};
+		const tabA = openTab(venue, storage, locks, { clock });
+		const tabB = openTab(venue, storage, locks);
+		const [replyHeld, releaseReply] = gate();
+		const [arrived, markArrived] = gate();
+		holdFirstReply(venue, markArrived, replyHeld);
+		const pressA = tabA.sender.submit(signerFor(venue), scale(["90", "95"]));
+		await arrived;
+		venue.state.lookupLag = 100;
+		expect(await tabB.sender.submit(signerFor(venue), scale(["90", "96"]))).toMatchObject({ kind: "blocked" });
+		vi.setSystemTime(Date.now() + 4 * 60_000);
+		clockDown = true;
+		releaseReply();
+		await pressA;
+		clockDown = false;
+		venue.state.lookupLag = 0;
+		vi.setSystemTime(Date.now() + 2 * 60_000);
+		expect(await tabB.sender.submit(signerFor(venue), scale(["90", "96"]))).toMatchObject({ kind: "held" });
+		expect(venue.state.placedLegs).toBe(1);
+	});
+
+	it("dismisses only the hold it showed and keeps the others on the market", async () => {
+		const { sender } = openTab(venue, storage, locks);
+		await sender.submit(signerFor(venue), scale(["90", "95"]));
+		await sender.submit(signerFor(venue), scale(["90", "95"], { buy: false }));
+		const buyHold = sender.listHolds(TEST_USER).find(({ hold }) => hold.buy);
+		if (!buyHold) throw new Error("expected a hold on the buy");
+		expect(await sender.dismissHold(buyHold.slot, buyHold.hold)).toMatchObject({ kind: "holdDismissed" });
+		expect(await sender.submit(signerFor(venue), scale(["90", "96"], { buy: false }))).toMatchObject({ kind: "held" });
+		expect(await sender.submit(signerFor(venue), scale(["90", "96"]))).toMatchObject({ kind: "sent" });
 	});
 
 	it("keeps a hold when its dismissal cannot be recorded", async () => {
