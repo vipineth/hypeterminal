@@ -7,10 +7,11 @@ import { labelTypographyClass } from "@/components/ui/field-label";
 import { NumberInput } from "@/components/ui/number-input";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/app";
 import { SWAP_SUCCESS_DURATION_MS } from "@/config/time";
-import { getSpotAvailable, getSpotBalance } from "@/domain/trade/balances";
+import { exceedsBalance } from "@/domain/market";
+import { getSpendLimit } from "@/domain/trade/balances";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
 import { findSpotPair, getAvailablePairTokens, getSwapQuote, getSwapSide } from "@/domain/trade/swap";
-import { useDefaultDexBalances } from "@/hooks/trade/use-account-balances";
+import { useAccountState } from "@/hooks/trade/use-account-balances";
 import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { useAutoCloseSuccess } from "@/hooks/ui/use-auto-close-success";
 import { cn } from "@/lib/cn";
@@ -48,7 +49,7 @@ interface Props {
 
 function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Props) {
 	const { spotMarkets } = useMarketsInfo();
-	const { spotBalances, spotAvailableAfterMaintenance } = useDefaultDexBalances();
+	const account = useAccountState();
 	const { submitPlan, isSubmitting } = useSubmitPlan();
 
 	const defaultToToken = useMemo(() => {
@@ -63,13 +64,10 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 	const [error, setError] = useState<string | null>(null);
 	const { showSuccess, trigger: triggerAutoClose } = useAutoCloseSuccess(onClose, SWAP_SUCCESS_DURATION_MS);
 
-	const getTokenBalance = useCallback(
-		(token: string) => {
-			const balance = getSpotBalance(spotBalances, token);
-			return getSpotAvailable(balance, spotAvailableAfterMaintenance);
-		},
-		[spotBalances, spotAvailableAfterMaintenance],
-	);
+	function getTokenBalance(token: string): string | null {
+		const limit = getSpendLimit(account, "spot", token);
+		return limit.status === "ready" ? limit.amount : null;
+	}
 
 	const fromBalance = getTokenBalance(fromToken);
 	const toBalance = getTokenBalance(toToken);
@@ -138,7 +136,8 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 	}
 
 	function handleMaxClick() {
-		setAmount(String(fromBalance));
+		if (fromBalance === null) return;
+		setAmount(fromBalance);
 	}
 
 	const handleOpenChange = useCallback(
@@ -170,9 +169,15 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 		}
 	}, [spotMarket, orderSize, isSubmitting, isBuying, submitPlan, triggerAutoClose]);
 
-	const insufficientBalance = amountValue > fromBalance;
+	const insufficientBalance = fromBalance !== null && exceedsBalance(amount, fromBalance);
 	const noPairAvailable = fromToken && toToken && !spotMarket;
-	const canSubmit = amountValue > 0 && !insufficientBalance && isPositive(orderSize) && !showSuccess && spotMarket;
+	const canSubmit =
+		fromBalance !== null &&
+		amountValue > 0 &&
+		!insufficientBalance &&
+		isPositive(orderSize) &&
+		!showSuccess &&
+		spotMarket;
 	const isDisabled = isSubmitting || showSuccess;
 
 	return (
@@ -335,7 +340,7 @@ function SpotSwapModalContent({ initialFromToken, initialToToken, onClose }: Pro
 
 interface TokenPanelProps {
 	label: string;
-	balance: number;
+	balance: string | null;
 	balanceToken: string;
 	amount: string;
 	onAmountChange?: (value: string) => void;

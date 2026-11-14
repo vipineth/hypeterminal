@@ -13,8 +13,8 @@ import { ArrowLineDownIcon, ArrowLineUpIcon, ArrowsLeftRightIcon } from "@phosph
 import { Suspense, useState } from "react";
 import { useConnection } from "wagmi";
 import { NETWORKS } from "@/config/networks";
-import { getNormalizedWithdrawable } from "@/domain/trade/balances";
-import { useDefaultDexBalances } from "@/hooks/trade/use-account-balances";
+import { getTransferLimit } from "@/domain/trade/account-mode";
+import { useAccountState } from "@/hooks/trade/use-account-balances";
 import { formatTransferError } from "@/lib/errors/format";
 import { useDeposit, useExchange } from "@/lib/hyperliquid";
 import { createLazyComponent } from "@/lib/lazy";
@@ -57,19 +57,8 @@ export function DepositModal() {
 
 	const { address } = useConnection();
 
-	const {
-		withdrawable: rawWithdrawable,
-		spotBalances,
-		spotAvailableAfterMaintenance,
-		accountAbstraction,
-	} = useDefaultDexBalances();
-	const withdrawable = getNormalizedWithdrawable(
-		rawWithdrawable,
-		spotBalances,
-		spotAvailableAfterMaintenance,
-		accountAbstraction,
-	);
-	const withdrawableNum = toNumberOrZero(withdrawable);
+	const withdrawLimit = getTransferLimit(useAccountState(), "withdraw");
+	const withdrawable = withdrawLimit.status === "ready" ? withdrawLimit.amount : null;
 
 	const {
 		mutate: withdraw,
@@ -80,7 +69,10 @@ export function DepositModal() {
 	} = useExchange("withdraw3");
 
 	const depositValidation = validateDeposit(depositAmount);
-	const withdrawValidation = validateWithdraw(withdrawAmount, withdrawableNum);
+	const withdrawValidation =
+		withdrawable === null
+			? { valid: false, error: null }
+			: validateWithdraw(withdrawAmount, toNumberOrZero(withdrawable));
 
 	function handleClose() {
 		resetDeposit();

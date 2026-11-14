@@ -11,13 +11,13 @@ import {
 } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { PaperPlaneTiltIcon, SpinnerGapIcon, WarningCircleIcon } from "@phosphor-icons/react";
-import { type ChangeEvent, useCallback, useMemo, useState } from "react";
+import { type ChangeEvent, useCallback, useState } from "react";
 import { isAddress } from "viem";
 import { NumberInput } from "@/components/ui/number-input";
-import { DEFAULT_QUOTE_TOKEN } from "@/config/app";
-import { exceedsBalance, getTokenTransferDecimals, isAmountWithinBalance } from "@/domain/market";
-import { type BalanceRow, getPerpAvailable, getSpotAvailable, getSpotAvailableValue } from "@/domain/trade/balances";
-import { useDefaultDexBalances } from "@/hooks/trade/use-account-balances";
+import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER } from "@/config/app";
+import { exceedsBalance, getTokenTransferDecimals } from "@/domain/market";
+import { getSpendableSpotTokens, getSpendLimit, isWithinSpendLimit } from "@/domain/trade/balances";
+import { useAccountState } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { useExchange } from "@/lib/hyperliquid";
 import { useMarkets } from "@/lib/hyperliquid/markets/use-markets";
@@ -69,50 +69,23 @@ function SendModalBody({ onOpenChange, initialAsset, initialAccountType }: BodyP
 	const { getToken } = useMarkets();
 	const { mutateAsync: sendAsset, isPending: isSendAssetPending } = useExchange("sendAsset");
 	const { mutateAsync: spotSend, isPending: isSpotSendPending } = useExchange("spotSend");
-	const { perpSummary, spotBalances, spotAvailableAfterMaintenance } = useDefaultDexBalances();
+	const account = useAccountState();
 
 	const isPending = isSendAssetPending || isSpotSendPending;
 
-	const availableSpotTokens = useMemo((): BalanceRow[] => {
-		if (!spotBalances?.length) return [];
-		return spotBalances
-			.filter((b) => {
-				const available = getSpotAvailable(b, spotAvailableAfterMaintenance);
-				return available > 0;
-			})
-			.map((b) => ({
-				asset: b.coin,
-				type: "spot" as const,
-				available: getSpotAvailableValue(b, spotAvailableAfterMaintenance),
-				inOrder: b.hold,
-				total: b.total,
-				usdValue: b.coin === DEFAULT_QUOTE_TOKEN ? b.total : b.entryNtl,
-				entryNtl: b.entryNtl,
-			}));
-	}, [spotBalances, spotAvailableAfterMaintenance]);
-
-	const tokenOptions = useMemo(() => {
-		if (accountType === "perp") {
-			return [DEFAULT_QUOTE_TOKEN];
-		}
-		return availableSpotTokens.map((b) => b.asset);
-	}, [accountType, availableSpotTokens]);
+	const spendableSpotTokens = account.status === "ready" ? getSpendableSpotTokens(account.spot) : [];
+	const tokenOptions = accountType === "perp" ? [DEFAULT_QUOTE_TOKEN] : spendableSpotTokens;
 
 	const tokenInfo = getToken(selectedToken);
 	const tokenId = tokenInfo ? formatTokenId(tokenInfo) : "";
 
 	const decimals = getTokenTransferDecimals(tokenInfo);
 
-	const availableBalance = useMemo(() => {
-		if (accountType === "perp") {
-			return getPerpAvailable(perpSummary?.accountValue, perpSummary?.totalMarginUsed);
-		}
-		const balance = spotBalances?.find((b) => b.coin === selectedToken);
-		return getSpotAvailable(balance, spotAvailableAfterMaintenance);
-	}, [accountType, perpSummary, spotBalances, selectedToken, spotAvailableAfterMaintenance]);
+	const limit = getSpendLimit(account, accountType, selectedToken);
+	const available = limit.status === "ready" ? limit.amount : null;
 
 	const isValidDestination = isAddress(destination);
-	const isValidAmount = isAmountWithinBalance(amount, availableBalance);
+	const isValidAmount = isWithinSpendLimit(amount, limit);
 	const canSend = isValidDestination && isValidAmount && !!tokenId && !isPending;
 
 	function handleAccountTypeChange(value: string | null) {
@@ -121,8 +94,8 @@ function SendModalBody({ onOpenChange, initialAsset, initialAccountType }: BodyP
 		setAccountType(v);
 		if (v === "perp") {
 			setSelectedToken(DEFAULT_QUOTE_TOKEN);
-		} else if (!availableSpotTokens.some((t) => t.asset === selectedToken)) {
-			setSelectedToken(availableSpotTokens[0]?.asset ?? DEFAULT_QUOTE_TOKEN);
+		} else if (!spendableSpotTokens.includes(selectedToken)) {
+			setSelectedToken(spendableSpotTokens[0] ?? DEFAULT_QUOTE_TOKEN);
 		}
 		setAmount("");
 	}
@@ -138,7 +111,20 @@ function SendModalBody({ onOpenChange, initialAsset, initialAccountType }: BodyP
 	}
 
 	function handleMaxClick() {
-		setAmount(floorToString(availableBalance, decimals));
+		if (available === null) return;
+		setAmount(floorToString(available, decimals));
+	}
+
+	function renderAvailable() {
+		if (limit.status === "unverifiedTransferLimit") return t`Max unavailable. The exchange checks this amount.`;
+		return (
+			<>
+				{t`Available`}:{" "}
+				<span className="underline decoration-dashed underline-offset-2 decoration-fg-muted/50">
+					{available === null ? FALLBACK_VALUE_PLACEHOLDER : `${floorToString(available, decimals)} ${selectedToken}`}
+				</span>
+			</>
+		);
 	}
 
 	const handleSend = useCallback(async () => {
@@ -220,21 +206,16 @@ function SendModalBody({ onOpenChange, initialAsset, initialAccountType }: BodyP
 
 					<NumberInput
 						label={t`Amount`}
-						labelValue={
-							<>
-								Available:{" "}
-								<span className="underline decoration-dashed underline-offset-2 decoration-fg-muted/50">
-									{floorToString(availableBalance, decimals)} {selectedToken}
-								</span>
-							</>
-						}
+						labelValue={renderAvailable()}
 						onLabelValueClick={handleMaxClick}
 						placeholder="0.00"
 						value={amount}
 						onChange={(e: ChangeEvent<HTMLInputElement>) => handleAmountChange(e.target.value)}
 						className={cn(
 							"w-full tabular-nums",
-							exceedsBalance(amount, availableBalance) && "border-stroke-error-strong focus:border-stroke-error-strong",
+							available !== null &&
+								exceedsBalance(amount, available) &&
+								"border-stroke-error-strong focus:border-stroke-error-strong",
 						)}
 					/>
 

@@ -4,10 +4,10 @@ import { ArrowsLeftRightIcon, SpinnerGapIcon, WarningCircleIcon } from "@phospho
 import { useState } from "react";
 import { useConnection } from "wagmi";
 import { NumberInput } from "@/components/ui/number-input";
-import { DEFAULT_QUOTE_TOKEN } from "@/config/app";
+import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER } from "@/config/app";
 import { exceedsBalance, getTokenTransferDecimals, isAmountWithinBalance } from "@/domain/market";
-import { getNormalizedWithdrawable, getSpotAvailable, getSpotBalance } from "@/domain/trade/balances";
-import { useDefaultDexBalances } from "@/hooks/trade/use-account-balances";
+import { getTransferLimit } from "@/domain/trade/account-mode";
+import { useAccountState } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
 import { useExchange } from "@/lib/hyperliquid";
 import { useMarkets } from "@/lib/hyperliquid/markets/use-markets";
@@ -49,20 +49,17 @@ function TransferModalBody({ onOpenChange, initialDirection }: BodyProps) {
 	const { address } = useConnection();
 	const { getToken } = useMarkets();
 	const { mutateAsync: sendAsset, isPending } = useExchange("sendAsset");
-	const { withdrawable, spotBalances, spotAvailableAfterMaintenance, accountAbstraction } = useDefaultDexBalances();
+	const account = useAccountState();
 
 	const usdcTokenInfo = getToken(DEFAULT_QUOTE_TOKEN);
 	const usdcTokenId = usdcTokenInfo ? formatTokenId(usdcTokenInfo) : "";
 
 	const usdcDecimals = getTokenTransferDecimals(usdcTokenInfo);
 
-	const spotUsdcBal = getSpotBalance(spotBalances, DEFAULT_QUOTE_TOKEN);
-	const availableBalanceValue =
-		direction === "toSpot"
-			? Number(getNormalizedWithdrawable(withdrawable, spotBalances, spotAvailableAfterMaintenance, accountAbstraction))
-			: getSpotAvailable(spotUsdcBal, spotAvailableAfterMaintenance);
+	const limit = getTransferLimit(account, direction === "toSpot" ? "perpToSpot" : "spotToPerp");
+	const available = limit.status === "ready" ? limit.amount : null;
 
-	const isValidAmount = isAmountWithinBalance(amount, availableBalanceValue) && !!address && !!usdcTokenId;
+	const isValidAmount = available !== null && isAmountWithinBalance(amount, available) && !!address && !!usdcTokenId;
 
 	const fromLabel = direction === "toSpot" ? t`Perp` : t`Spot`;
 	const toLabel = direction === "toSpot" ? t`Spot` : t`Perp`;
@@ -97,7 +94,19 @@ function TransferModalBody({ onOpenChange, initialDirection }: BodyProps) {
 	}
 
 	function handleMaxClick() {
-		setAmount(floorToString(availableBalanceValue, usdcDecimals));
+		if (available === null) return;
+		setAmount(floorToString(available, usdcDecimals));
+	}
+
+	if (limit.status === "unverifiedTransferLimit") {
+		return (
+			<ModalHeader>
+				<ModalTitle>{t`Transfer USDC`}</ModalTitle>
+				<ModalDescription>
+					{t`Unified accounts share one balance across perps and spot, so there is nothing to move.`}
+				</ModalDescription>
+			</ModalHeader>
+		);
 	}
 
 	return (
@@ -146,7 +155,7 @@ function TransferModalBody({ onOpenChange, initialDirection }: BodyProps) {
 							<>
 								{t`Available`}:{" "}
 								<span className="underline decoration-dashed underline-offset-2 decoration-stroke-weak">
-									{floorToString(availableBalanceValue, usdcDecimals)} USDC
+									{available === null ? FALLBACK_VALUE_PLACEHOLDER : `${floorToString(available, usdcDecimals)} USDC`}
 								</span>
 							</>
 						}
@@ -156,7 +165,8 @@ function TransferModalBody({ onOpenChange, initialDirection }: BodyProps) {
 						onChange={(e) => handleAmountChange(e.target.value)}
 						className={cn(
 							"w-full tabular-nums",
-							exceedsBalance(amount, availableBalanceValue) &&
+							available !== null &&
+								exceedsBalance(amount, available) &&
 								"border-stroke-error-strong focus:border-stroke-error-strong",
 						)}
 					/>

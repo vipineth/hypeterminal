@@ -11,12 +11,12 @@ import {
 } from "@phosphor-icons/react";
 import { InfoRow } from "@/components/ui/info-row";
 import { NumberInput } from "@/components/ui/number-input";
-import { USDC_TRANSFER_DECIMALS } from "@/config/app";
+import { FALLBACK_VALUE_PLACEHOLDER, USDC_TRANSFER_DECIMALS } from "@/config/app";
 import { WITHDRAWAL_FEE_USD } from "@/config/contracts";
 import { NETWORKS } from "@/config/networks";
 import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
-import { floorToString, limitDecimalInput, toNumber, toNumberOrZero } from "@/lib/trade/numbers";
+import { floorToString, limitDecimalInput, toNumber } from "@/lib/trade/numbers";
 import { NetworkSelect } from "./shared-ui";
 
 const ARBITRUM_NETWORK = NETWORKS[0];
@@ -24,14 +24,13 @@ const ARBITRUM_NETWORK = NETWORKS[0];
 interface Props {
 	amount: string;
 	onAmountChange: (value: string) => void;
-	available: string;
+	available: string | null;
 	validation: { valid: boolean; error: string | null };
 	isPending: boolean;
 	onSubmit: () => void;
 }
 
 export function WithdrawForm({ amount, onAmountChange, available, validation, isPending, onSubmit }: Props) {
-	const availableNum = toNumberOrZero(available);
 	const amountNum = toNumber(amount);
 	const netReceived = amountNum !== null && amountNum > 0 ? Math.max(amountNum - WITHDRAWAL_FEE_USD, 0) : null;
 
@@ -46,11 +45,13 @@ export function WithdrawForm({ amount, onAmountChange, available, validation, is
 						<>
 							Available:{" "}
 							<span className="underline decoration-dashed underline-offset-2 decoration-fg-muted/50">
-								{formatNumber(availableNum, 2)} USDC
+								{available === null ? FALLBACK_VALUE_PLACEHOLDER : `${formatNumber(available, 2)} USDC`}
 							</span>
 						</>
 					}
-					onLabelValueClick={() => !isPending && onAmountChange(floorToString(availableNum, USDC_TRANSFER_DECIMALS))}
+					onLabelValueClick={() =>
+						!isPending && available !== null && onAmountChange(floorToString(available, USDC_TRANSFER_DECIMALS))
+					}
 					placeholder="0.00"
 					value={amount}
 					onChange={(e) => onAmountChange(limitDecimalInput(e.target.value, USDC_TRANSFER_DECIMALS))}

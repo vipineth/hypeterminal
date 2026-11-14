@@ -1,10 +1,18 @@
 import Big from "big.js";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/app";
+import { isAmountWithinBalance } from "@/domain/market/calculations";
 import type {
 	AccountAbstraction,
 	SpotAvailableAfterMaintenance,
 	SpotBalance,
 } from "@/hooks/trade/use-account-balances";
+import {
+	type AccountState,
+	getSpotAvailable as getSpotTokenAvailable,
+	getTransferLimit,
+	type SpotState,
+	type TransferLimit,
+} from "@/domain/trade/account-mode";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 import { toBig, toSafeBig } from "@/lib/trade/numbers";
 import type { Side } from "@/lib/trade/types";
@@ -218,4 +226,31 @@ export function getTotalUsdValue(rows: BalanceRow[]): number {
 
 export function filterBalanceRowsByUsdValue(rows: BalanceRow[], minUsd: number): BalanceRow[] {
 	return rows.filter((row) => toSafeBig(row.usdValue).gte(minUsd));
+}
+
+export type SpendPlace = "perp" | "spot";
+
+export function getSpendLimit(account: AccountState, place: SpendPlace, token: string): TransferLimit {
+	if (place === "perp") return getTransferLimit(account, "perpToSpot");
+	if (account.status !== "ready") return { status: "pending" };
+	return { status: "ready", amount: getSpotTokenAvailable(account.spot, token) };
+}
+
+export function getSpendableSpotTokens(spot: SpotState): string[] {
+	return spot.balances
+		.filter((balance) => toSafeBig(getSpotTokenAvailable(spot, balance.coin)).gt(0))
+		.map((balance) => balance.coin);
+}
+
+export function isWithinSpendLimit(amount: string, limit: TransferLimit): boolean {
+	switch (limit.status) {
+		case "ready":
+			return isAmountWithinBalance(amount, limit.amount);
+		case "unverifiedTransferLimit":
+			return toSafeBig(amount).gt(0);
+		case "pending":
+			return false;
+		default:
+			return limit satisfies never;
+	}
 }

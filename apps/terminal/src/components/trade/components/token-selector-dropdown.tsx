@@ -8,7 +8,7 @@ interface Props {
 	tokens: SpotToken[];
 	selectedToken: string;
 	onSelect: (token: string) => void;
-	getBalance: (token: string) => number;
+	getBalance: (token: string) => string | null;
 	disabled?: boolean;
 	className?: string;
 }
