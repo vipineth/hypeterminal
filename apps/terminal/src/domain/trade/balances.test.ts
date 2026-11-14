@@ -47,7 +47,7 @@ function accountOf(name: string, mode: AccountMode, funded: Record<string, strin
 }
 
 function readyBalances(account: ReadyAccount, hideSmall = false) {
-	const balances = getBalances(account, dexes, hideSmall);
+	const balances = getBalances(account, dexes, false, hideSmall);
 	if (balances.status !== "ready") throw new Error("expected ready balances");
 	return balances;
 }
@@ -151,7 +151,7 @@ describe("balance rows", () => {
 	});
 
 	it("shows the main dex row before market data loads", () => {
-		const balances = getBalances(accountOf("mainnet-disabled-main-only", STANDARD), [], false);
+		const balances = getBalances(accountOf("mainnet-disabled-main-only", STANDARD), [], true, false);
 
 		expect(balances).toMatchObject({ status: "ready", isEmpty: false });
 		if (balances.status !== "ready") return;
@@ -168,12 +168,22 @@ describe("balance rows", () => {
 	});
 
 	it("waits for market data before naming a funded builder dex's collateral", () => {
-		expect(getBalances(accountOf("mainnet-disabled-two-dexes", STANDARD), [], false)).toEqual({ status: "loading" });
+		expect(getBalances(accountOf("mainnet-disabled-two-dexes", STANDARD), [], true, false)).toEqual({ status: "loading" });
+	});
+
+	it("still shows a funded dex whose collateral the market model could not resolve", () => {
+		const balances = getBalances(accountOf("mainnet-disabled-two-dexes", STANDARD), [], false, false);
+
+		expect(balances.status === "ready" && balances.perp.map((row) => [row.asset, row.dexLabel])).toEqual([
+			["USDC", null],
+			["io", "io"],
+			["xyz", "xyz"],
+		]);
 	});
 
 	it("passes loading and error through without rows", () => {
-		expect(getBalances({ status: "loading" }, dexes, false)).toEqual({ status: "loading" });
-		expect(getBalances({ status: "error" }, dexes, false)).toEqual({ status: "error" });
+		expect(getBalances({ status: "loading" }, dexes, false, false)).toEqual({ status: "loading" });
+		expect(getBalances({ status: "error" }, dexes, false, false)).toEqual({ status: "error" });
 	});
 });
 

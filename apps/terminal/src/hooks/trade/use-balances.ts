@@ -5,7 +5,7 @@ import { useAccountState } from "./use-account-balances";
 
 export function useBalances(): Balances {
 	const account = useAccountState();
-	const { dexes } = useMarkets();
+	const { dexes, isLoading } = useMarkets();
 	const hideSmall = useHideSmallBalances();
-	return getBalances(account, dexes, hideSmall);
+	return getBalances(account, dexes, isLoading, hideSmall);
 }
