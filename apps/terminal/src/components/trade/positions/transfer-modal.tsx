@@ -128,7 +128,7 @@ function TransferModalBody({ onOpenChange, initialRoute, initialAmount }: BodyPr
 
 	function handleMaxClick() {
 		if (available === null) return;
-		setAmount(floorToString(available, decimals));
+		setAmount(route.from.kind === "perp" ? available : floorToString(available, decimals));
 	}
 
 	if (limit?.status === "unverifiedTransferLimit") {
