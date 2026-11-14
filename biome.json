@@ -54,6 +54,27 @@
 	},
 	"overrides": [
 		{
+			"includes": ["apps/terminal/src/**", "!apps/terminal/src/lib/hyperliquid/use-exchange.ts"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"paths": {
+									"@hypeterminal/hl-react": {
+										"importNames": ["useExchange"],
+										"message": "Import useExchange from @/lib/hyperliquid so a rejected spend invalidates collateral."
+									},
+									"@hypeterminal/hl-react/hooks/useExchange": "Import useExchange from @/lib/hyperliquid so a rejected spend invalidates collateral."
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		{
 			"includes": ["apps/terminal/src/router.tsx"],
 			"linter": {
 				"rules": {
