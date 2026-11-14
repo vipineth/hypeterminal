@@ -103,7 +103,7 @@ export function TradeFormFields({
 	const showTif = orderType === "limit" || orderType === "scale";
 
 	const triggerPriceNum = toNumber(triggerPriceInput);
-	const sizeHasError = (sizeValue > maxSize && maxSize > 0) || (orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD);
+	const sizeHasError = sizeValue > maxSize || (orderValue > 0 && orderValue < ORDER_MIN_NOTIONAL_USD);
 
 	const sliderValue = isDraggingSlider ? dragSliderValue : getSliderValue(sizeValue, maxSize);
 

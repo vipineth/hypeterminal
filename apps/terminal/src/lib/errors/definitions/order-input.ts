@@ -55,5 +55,5 @@ export const exceedsMaxSizeValidator: Validator<OrderInputContext> = createValid
 	category: "input",
 	priority: 104,
 	getMessage: () => t`Exceeds max size`,
-	validate: (ctx) => ctx.maxSize <= 0 || ctx.sizeValue <= ctx.maxSize,
+	validate: (ctx) => ctx.sizeValue <= ctx.maxSize,
 });

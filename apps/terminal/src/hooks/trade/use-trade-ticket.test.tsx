@@ -402,6 +402,16 @@ describe("perp trade ticket", () => {
 		expect(net.venue.orderRequests()).toHaveLength(0);
 	});
 
+	it("sends nothing while the exchange gives no max size for the side", async () => {
+		form.maxTradeSzs = [0, 0];
+		form.tpSlEnabled = false;
+		const ticket = renderTicket();
+		await ticket.buttonContent.action();
+
+		expect(net.venue.orderRequests()).toHaveLength(0);
+		expect(ticket.validation.canSubmit).toBe(false);
+	});
+
 	it("names a builder perp's dex in the order toast", async () => {
 		form.market = { ...SOL_PERP, kind: "builderPerp", name: "io:NVDA", pairName: "NVDA-USDC", dex: { name: "io", index: 3 } };
 		form.tpSlEnabled = false;
