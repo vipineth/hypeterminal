@@ -5,7 +5,8 @@ import { Skeleton } from "boneyard-js/react";
 import { useState } from "react";
 import { useConnection } from "wagmi";
 import { DEFAULT_QUOTE_TOKEN, HL_ALL_DEXS } from "@/config/app";
-import type { BalanceRow, TransferDirection } from "@/domain/trade/balances";
+import type { BalanceRow } from "@/domain/trade/balances";
+import { MAIN_PERP, SPOT, type TransferRoute } from "@/domain/trade/dex-transfer";
 import { useBalances } from "@/hooks/trade/use-balances";
 import { cn } from "@/lib/cn";
 import { formatToken, formatUSD } from "@/lib/format";
@@ -29,9 +30,9 @@ export function MobileBalancesTab({ className }: Props) {
 	const hideSmallBalances = useHideSmallBalances();
 	const { setHideSmallBalances } = useGlobalSettingsActions();
 	const { open: openSwapModal } = useSwapModalActions();
-	const [transferState, setTransferState] = useState<{ open: boolean; direction: TransferDirection }>({
+	const [transferState, setTransferState] = useState<{ open: boolean; route: TransferRoute }>({
 		open: false,
-		direction: "toSpot",
+		route: { from: MAIN_PERP, to: SPOT },
 	});
 	const [sendState, setSendState] = useState<{ open: boolean; asset: string; accountType: "perp" | "spot" }>({
 		open: false,
@@ -59,8 +60,8 @@ export function MobileBalancesTab({ className }: Props) {
 		return { pnl, pnlPercent };
 	}
 
-	function handleTransferClick(direction: TransferDirection) {
-		setTransferState({ open: true, direction });
+	function handleTransferClick(route: TransferRoute) {
+		setTransferState({ open: true, route });
 	}
 
 	function handleSendClick(row: BalanceRow) {
@@ -139,7 +140,7 @@ export function MobileBalancesTab({ className }: Props) {
 								onClick={() => handleTransferClick(transfer)}
 								iconLeft={<ArrowsLeftRightIcon className="size-3.5" />}
 							>
-								{transfer === "toSpot" ? t`To Spot` : t`To Perp`}
+								{transfer.to.kind === "spot" ? t`To Spot` : t`To Perp`}
 							</Button>
 						)}
 						{canSwap && (
@@ -208,7 +209,7 @@ export function MobileBalancesTab({ className }: Props) {
 				<TransferModal
 					open={transferState.open}
 					onOpenChange={(open) => setTransferState((prev) => ({ ...prev, open }))}
-					initialDirection={transferState.direction}
+					initialRoute={transferState.route}
 				/>
 				<SendModal
 					open={sendState.open}

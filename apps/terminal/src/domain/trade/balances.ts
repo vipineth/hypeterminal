@@ -14,6 +14,7 @@ import {
 	type ReadyAccount,
 	type TransferLimit,
 } from "@/domain/trade/account-mode";
+import { dexVenue, MAIN_PERP, SPOT, type TransferRoute } from "@/domain/trade/dex-transfer";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 import { toSafeBig } from "@/lib/trade/numbers";
 
@@ -60,8 +61,6 @@ export function isWithinSpendLimit(amount: string, limit: TransferLimit): boolea
 
 const MAIN_DEX = "";
 
-export type TransferDirection = "toSpot" | "toPerp";
-
 export interface BalanceRow {
 	key: string;
 	type: "perp" | "spot";
@@ -72,7 +71,7 @@ export interface BalanceRow {
 	total: string;
 	usdValue: string;
 	entryNtl: string;
-	transfer: TransferDirection | null;
+	transfer: TransferRoute | null;
 	canSend: boolean;
 }
 
@@ -106,7 +105,9 @@ function getPerpRows(account: ReadyAccount, dexes: readonly Dex[], dexesLoading:
 					total: accountValue,
 					usdValue: accountValue,
 					entryNtl: accountValue,
-					transfer: isMain ? "toSpot" : null,
+					transfer: isMain
+						? { from: MAIN_PERP, to: SPOT }
+						: { from: dexVenue(name), to: collateral === DEFAULT_QUOTE_TOKEN ? MAIN_PERP : SPOT },
 					canSend: isMain,
 				});
 			}
@@ -132,7 +133,7 @@ function getSpotRows(account: ReadyAccount): BalanceRow[] {
 			total: balance.total,
 			usdValue: isQuote ? balance.total : balance.entryNtl,
 			entryNtl: balance.entryNtl,
-			transfer: isQuote && account.ledger === "perDex" ? "toPerp" : null,
+			transfer: isQuote && account.ledger === "perDex" ? { from: SPOT, to: MAIN_PERP } : null,
 			canSend: true,
 		});
 	}

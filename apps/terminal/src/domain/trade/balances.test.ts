@@ -10,6 +10,7 @@ import {
 	getSpendLimit,
 	isWithinSpendLimit,
 } from "@/domain/trade/balances";
+import { toWireDex } from "@/domain/trade/dex-transfer";
 import { type AccountFixture, clearinghouse, TEST_USER } from "@/test/account-fixture";
 
 const meta: MetaPayloads = JSON.parse(
@@ -60,13 +61,13 @@ function rowView(row: ReturnType<typeof readyBalances>["perp"][number]) {
 		dexLabel: row.dexLabel,
 		available: row.available,
 		total: row.total,
-		transfer: row.transfer,
+		transfer: row.transfer && [toWireDex(row.transfer.from), toWireDex(row.transfer.to)],
 		canSend: row.canSend,
 	};
 }
 
 describe("balance rows", () => {
-	it("shows one perp row per funded dex for a standard account, labelled by dex", () => {
+	it("shows one perp row per funded dex for a standard account, labelled by dex, each able to move funds home", () => {
 		const balances = readyBalances(accountOf("mainnet-disabled-two-dexes", STANDARD));
 
 		expect(balances.perp.map(rowView)).toEqual([
@@ -75,7 +76,7 @@ describe("balance rows", () => {
 				dexLabel: null,
 				available: "64116.532932",
 				total: "121166.943682",
-				transfer: "toSpot",
+				transfer: ["", "spot"],
 				canSend: true,
 			},
 			{
@@ -83,7 +84,7 @@ describe("balance rows", () => {
 				dexLabel: "io",
 				available: "12761.264984",
 				total: "12761.264984",
-				transfer: null,
+				transfer: ["io", ""],
 				canSend: false,
 			},
 			{
@@ -91,7 +92,7 @@ describe("balance rows", () => {
 				dexLabel: "xyz",
 				available: "56427.700923",
 				total: "72546.183129",
-				transfer: null,
+				transfer: ["xyz", ""],
 				canSend: false,
 			},
 		]);
@@ -101,7 +102,7 @@ describe("balance rows", () => {
 				dexLabel: null,
 				available: "0.00000009",
 				total: "0.00000009",
-				transfer: "toPerp",
+				transfer: ["spot", ""],
 				canSend: true,
 			},
 		]);
@@ -119,8 +120,15 @@ describe("balance rows", () => {
 		const balances = readyBalances(accountOf("p3-default", STANDARD, { flx: "250.5" }));
 
 		expect(balances.perp.map(rowView)).toEqual([
-			{ asset: "USDC", dexLabel: null, available: "97.617353", total: "97.617353", transfer: "toSpot", canSend: true },
-			{ asset: "USDH", dexLabel: "flx", available: "250.5", total: "250.5", transfer: null, canSend: false },
+			{
+				asset: "USDC",
+				dexLabel: null,
+				available: "97.617353",
+				total: "97.617353",
+				transfer: ["", "spot"],
+				canSend: true,
+			},
+			{ asset: "USDH", dexLabel: "flx", available: "250.5", total: "250.5", transfer: ["flx", "spot"], canSend: false },
 		]);
 	});
 
@@ -163,7 +171,7 @@ describe("balance rows", () => {
 				dexLabel: null,
 				available: "2604750.100751",
 				total: "2949301.7768819998",
-				transfer: "toSpot",
+				transfer: ["", "spot"],
 				canSend: true,
 			},
 		]);
@@ -208,7 +216,7 @@ describe("spot rows by payload", () => {
 		const balances = readyBalances(spotOnly(STANDARD, { balances: [usdc] }));
 
 		expect(balances.spot.map(rowView)).toEqual([
-			{ asset: "USDC", dexLabel: null, available: "75", total: "100.0", transfer: "toPerp", canSend: true },
+			{ asset: "USDC", dexLabel: null, available: "75", total: "100.0", transfer: ["spot", ""], canSend: true },
 		]);
 		expect(getSpendLimit(spotOnly(STANDARD, { balances: [usdc] }), "spot", "USDC")).toEqual({
 			status: "ready",
