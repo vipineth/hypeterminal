@@ -175,7 +175,7 @@ msgstr "الحساب"
 msgid "Account and wallet"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:180
+#: src/components/trade/mobile/mobile-balances-tab.tsx:181
 msgid "Account Balances"
 msgstr "أرصدة الحساب"
 
@@ -187,7 +187,7 @@ msgstr ""
 #~ msgid "Accounts"
 #~ msgstr ""
 
-#: src/components/trade/positions/balances-tab.tsx:241
+#: src/components/trade/positions/balances-tab.tsx:236
 #: src/components/trade/positions/orders-tab.tsx:278
 #: src/components/trade/positions/positions-tab.tsx:215
 #: src/components/trade/positions/twap-tab.tsx:114
@@ -231,7 +231,7 @@ msgstr "إضافة إلى المفضلة"
 msgid "Add TP/SL"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:246
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:248
 msgid "Advanced"
 msgstr ""
 
@@ -273,7 +273,7 @@ msgid "ALO (Add Liquidity Only)"
 msgstr ""
 
 #: src/components/trade/positions/send-modal.tsx:208
-#: src/components/trade/positions/transfer-modal.tsx:153
+#: src/components/trade/positions/transfer-modal.tsx:189
 #: src/components/trade/tradebox/deposit/deposit-form.tsx:72
 #: src/components/trade/tradebox/deposit/withdraw-form.tsx:43
 msgid "Amount"
@@ -303,7 +303,7 @@ msgstr ""
 msgid "Approve in wallet..."
 msgstr ""
 
-#: src/components/trade/positions/balances-tab.tsx:206
+#: src/components/trade/positions/balances-tab.tsx:201
 #: src/components/trade/positions/funding-tab.tsx:77
 #: src/components/trade/positions/history-tab.tsx:79
 #: src/components/trade/positions/orders-history-tab.tsx:77
@@ -317,18 +317,18 @@ msgstr "الأصل"
 #~ msgid "Assets"
 #~ msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:220
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:222
 msgid "Auto close"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:127
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:127
-#: src/components/trade/positions/balances-tab.tsx:213
+#: src/components/trade/mobile/mobile-balances-tab.tsx:128
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:129
+#: src/components/trade/positions/balances-tab.tsx:208
 #: src/components/trade/positions/position-limit-close-modal.tsx:161
 #: src/components/trade/positions/send-modal.tsx:122
-#: src/components/trade/positions/transfer-modal.tsx:156
+#: src/components/trade/positions/transfer-modal.tsx:192
 #: src/components/trade/tradebox/account-panel.tsx:29
-#: src/components/trade/tradebox/trade-form-fields.tsx:131
+#: src/components/trade/tradebox/trade-form-fields.tsx:132
 msgid "Available"
 msgstr "متاح"
 
@@ -364,7 +364,7 @@ msgstr ""
 msgid "Balance"
 msgstr "الرصيد"
 
-#: src/components/trade/tradebox/trade-form-fields.tsx:130
+#: src/components/trade/tradebox/trade-form-fields.tsx:131
 msgid "Balance available to trade"
 msgstr ""
 
@@ -723,8 +723,8 @@ msgstr ""
 #~ msgid "Connect your wallet to start trading on Hyperliquid"
 #~ msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:73
-#: src/components/trade/positions/balances-tab.tsx:172
+#: src/components/trade/mobile/mobile-balances-tab.tsx:74
+#: src/components/trade/positions/balances-tab.tsx:167
 msgid "Connect your wallet to view balances."
 msgstr "اربط محفظتك لعرض الأرصدة."
 
@@ -855,6 +855,10 @@ msgstr ""
 msgid "Could not reset mobile access."
 msgstr ""
 
+#: src/components/trade/tradebox/unified-account-modal.tsx:35
+msgid "Could not switch account mode"
+msgstr ""
+
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:509
 msgid "Create new phone link"
 msgstr ""
@@ -879,7 +883,7 @@ msgstr ""
 msgid "Creating link..."
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:201
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:203
 #: src/components/trade/positions/position-row.tsx:198
 #: src/components/trade/tradebox/margin-mode-modal.tsx:39
 #: src/components/trade/tradebox/trade-header.tsx:68
@@ -939,7 +943,7 @@ msgstr ""
 #: src/components/trade/tradebox/deposit-modal.tsx:155
 #: src/components/trade/tradebox/deposit-modal.tsx:223
 #: src/components/trade/tradebox/deposit/deposit-form.tsx:130
-#: src/components/trade/tradebox/trade-form-fields.tsx:149
+#: src/components/trade/tradebox/trade-form-fields.tsx:150
 #: src/lib/trade/use-button-content.ts:76
 msgid "Deposit"
 msgstr "إيداع"
@@ -1222,7 +1226,7 @@ msgstr ""
 msgid "Failed to copy"
 msgstr ""
 
-#: src/hooks/trade/use-trade-ticket.ts:227
+#: src/hooks/trade/use-trade-ticket.ts:241
 msgid "Failed to enable trading"
 msgstr "فشل تفعيل التداول"
 
@@ -1234,8 +1238,8 @@ msgstr ""
 msgid "Failed to load balances"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:81
-#: src/components/trade/positions/balances-tab.tsx:174
+#: src/components/trade/mobile/mobile-balances-tab.tsx:82
+#: src/components/trade/positions/balances-tab.tsx:169
 msgid "Failed to load balances."
 msgstr "فشل في تحميل الأرصدة."
 
@@ -1335,7 +1339,7 @@ msgstr "منفذ"
 msgid "Filter by {0}"
 msgstr "تصفية حسب {0}"
 
-#: src/components/trade/positions/transfer-modal.tsx:135
+#: src/components/trade/positions/transfer-modal.tsx:169
 msgid "Flip transfer direction"
 msgstr ""
 
@@ -1352,6 +1356,7 @@ msgid "Frequency"
 msgstr ""
 
 #: src/components/trade/components/spot-swap-modal.tsx:203
+#: src/components/trade/positions/transfer-modal.tsx:159
 #: src/components/trade/tradebox/deposit/deposit-form.tsx:68
 msgid "From"
 msgstr ""
@@ -1417,8 +1422,8 @@ msgstr ""
 msgid "H"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:186
-#: src/components/trade/positions/balances-tab.tsx:189
+#: src/components/trade/mobile/mobile-balances-tab.tsx:187
+#: src/components/trade/positions/balances-tab.tsx:184
 msgid "Hide small"
 msgstr ""
 
@@ -1436,6 +1441,18 @@ msgstr ""
 
 #: src/components/trade/tradebox/trade-form-twap.tsx:51
 msgid "Hour(s)"
+msgstr ""
+
+#: src/components/trade/tradebox/unified-account-modal.tsx:67
+msgid "How account modes work"
+msgstr ""
+
+#: src/components/trade/tradebox/unified-account-modal.tsx:43
+msgid "Hyperliquid caps unified accounts at 50,000 actions a day."
+msgstr ""
+
+#: src/components/trade/tradebox/unified-account-modal.tsx:44
+msgid "If this address earns builder fees, they stop accruing while it is unified."
 msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:322
@@ -1500,7 +1517,7 @@ msgstr ""
 msgid "IOC (Immediate Or Cancel)"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:201
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:203
 #: src/components/trade/positions/position-row.tsx:198
 #: src/components/trade/tradebox/margin-mode-modal.tsx:46
 #: src/components/trade/tradebox/trade-header.tsx:68
@@ -1549,6 +1566,10 @@ msgstr ""
 msgid "Keep it"
 msgstr ""
 
+#: src/components/trade/tradebox/unified-account-modal.tsx:78
+msgid "Keep standard"
+msgstr ""
+
 #: src/lib/trade/extract-order-status.ts:232
 msgid "Known placed: {placed}. Unknown: {unknownLegs}. Dismiss the hold? Sending the same order again could place an already placed leg twice."
 msgstr ""
@@ -1578,7 +1599,7 @@ msgstr ""
 msgid "Leg {legNumber} at {0}"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:200
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:202
 #: src/components/trade/tradebox/margin-mode-modal.tsx:175
 msgid "Leverage"
 msgstr ""
@@ -1591,7 +1612,7 @@ msgstr ""
 #~ msgid "limit"
 #~ msgstr "محدد"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:80
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:82
 #: src/components/trade/tradebox/trade-header.tsx:44
 #: src/components/trade/tradebox/trade-header.tsx:49
 msgid "Limit"
@@ -1607,9 +1628,9 @@ msgstr ""
 msgid "Limit close order placed"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:106
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:108
 #: src/components/trade/positions/position-limit-close-modal.tsx:144
-#: src/components/trade/tradebox/trade-form-fields.tsx:192
+#: src/components/trade/tradebox/trade-form-fields.tsx:193
 msgid "Limit Price"
 msgstr "السعر المحدد"
 
@@ -1631,7 +1652,7 @@ msgid "Link mobile device"
 msgstr ""
 
 #: src/components/trade/mobile/mobile-position-card.tsx:167
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:209
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:211
 #: src/components/trade/positions/positions-tab.tsx:191
 msgid "Liq"
 msgstr "التصفية"
@@ -1657,7 +1678,7 @@ msgstr ""
 msgid "Loading balances across all chains..."
 msgstr ""
 
-#: src/components/trade/positions/balances-tab.tsx:173
+#: src/components/trade/positions/balances-tab.tsx:168
 msgid "Loading balances..."
 msgstr "جارٍ تحميل الأرصدة..."
 
@@ -1758,7 +1779,7 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/trade/mobile/mobile-position-card.tsx:163
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:180
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:182
 #: src/components/trade/positions/positions-tab.tsx:182
 msgid "Margin"
 msgstr ""
@@ -1794,7 +1815,7 @@ msgstr "الهامش المطلوب"
 
 #: src/components/trade/mobile/mobile-market-stats.tsx:25
 #: src/components/trade/mobile/mobile-position-card.tsx:159
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:71
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:73
 #: src/components/trade/positions/positions-tab.tsx:188
 msgid "Mark"
 msgstr "السعر المرجعي"
@@ -1818,7 +1839,7 @@ msgstr ""
 #: src/components/trade/chart/token-selector-columns.ts:61
 #: src/components/trade/chart/token-selector-content.tsx:177
 #: src/components/trade/mobile/mobile-orders-tab.tsx:240
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:79
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:81
 #: src/components/trade/positions/orders-tab.tsx:374
 #: src/components/trade/tradebox/trade-header.tsx:43
 #: src/components/trade/tradebox/trade-header.tsx:48
@@ -1855,7 +1876,7 @@ msgstr ""
 #~ msgid "Master"
 #~ msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:172
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:174
 #: src/components/trade/tradebox/bridge/amount-entry-screen.tsx:94
 msgid "Max"
 msgstr "الأقصى"
@@ -1950,9 +1971,19 @@ msgstr ""
 #~ msgid "More pages"
 #~ msgstr "صفحات أخرى"
 
-#: src/components/trade/positions/transfer-modal.tsx:116
-msgid "Move USDC between your Perp and Spot accounts."
+#. placeholder {0}: shortfall.token.displayName
+#. placeholder {1}: shortfall.dex.name
+#: src/components/trade/tradebox/fund-dex-prompt.tsx:41
+msgid "Move {0} to {1}"
 msgstr ""
+
+#: src/components/trade/positions/transfer-modal.tsx:152
+msgid "Move funds between Perps, Spot and builder dexes. Each builder dex holds its own margin."
+msgstr ""
+
+#: src/components/trade/positions/transfer-modal.tsx:116
+#~ msgid "Move USDC between your Perp and Spot accounts."
+#~ msgstr ""
 
 #: src/components/pages/builder-page.tsx:
 #~ msgid "Must be signed by main wallet (not agent/API wallet)"
@@ -2025,8 +2056,8 @@ msgstr ""
 msgid "No balances found"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:89
-#: src/components/trade/positions/balances-tab.tsx:175
+#: src/components/trade/mobile/mobile-balances-tab.tsx:90
+#: src/components/trade/positions/balances-tab.tsx:170
 msgid "No balances found. Deposit funds to start trading."
 msgstr "لم يتم العثور على أرصدة. أودع أموالاً لبدء التداول."
 
@@ -2253,7 +2284,7 @@ msgstr ""
 msgid "Number of Orders"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:248
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:250
 msgid "Off"
 msgstr ""
 
@@ -2271,6 +2302,10 @@ msgstr ""
 
 #: src/components/trade/components/account-notice-line.tsx:31
 msgid "One {tokenName} balance backs perps, builder dexes and spot."
+msgstr ""
+
+#: src/components/trade/tradebox/unified-account-modal.tsx:40
+msgid "One balance in Spot backs perps, spot and every builder dex. You stop moving funds between dexes."
 msgstr ""
 
 #: src/components/trade/components/wallet-dialog.tsx:
@@ -2324,6 +2359,10 @@ msgstr ""
 
 #: src/components/trade/components/wallet-modal.tsx:439
 msgid "Opening camera..."
+msgstr ""
+
+#: src/components/trade/tradebox/fund-dex-prompt.tsx:49
+msgid "Or use one balance for every dex"
 msgstr ""
 
 #: src/components/trade/mobile/mobile-market-stats.tsx:28
@@ -2486,18 +2525,17 @@ msgstr "قيد الانتظار"
 #~ msgstr "دائم"
 
 #: src/components/trade/chart/token-selector-content.tsx:93
-#: src/components/trade/positions/transfer-modal.tsx:64
-#: src/components/trade/positions/transfer-modal.tsx:65
 #: src/config/nav.tsx:43
 msgid "Perp"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:196
-#: src/components/trade/positions/balances-tab.tsx:253
+#: src/components/trade/mobile/mobile-balances-tab.tsx:197
+#: src/components/trade/positions/balances-tab.tsx:248
 msgid "Perpetuals"
 msgstr ""
 
 #: src/components/trade/components/perps-source-label.tsx:14
+#: src/components/trade/positions/transfer-modal.tsx:76
 #: src/components/trade/tradebox/account-panel.tsx:84
 msgid "Perps"
 msgstr "العقود الدائمة"
@@ -2567,7 +2605,7 @@ msgstr ""
 msgid "Please enter an address"
 msgstr ""
 
-#: src/components/trade/positions/balances-tab.tsx:234
+#: src/components/trade/positions/balances-tab.tsx:229
 #: src/components/trade/positions/history-tab.tsx:110
 #: src/components/trade/positions/positions-tab.tsx:201
 msgid "PNL"
@@ -2588,7 +2626,7 @@ msgstr "المحفظة"
 
 #: src/components/trade/mobile/mobile-funding-tab.tsx:100
 #: src/components/trade/positions/funding-tab.tsx:84
-#: src/components/trade/tradebox/trade-form-fields.tsx:157
+#: src/components/trade/tradebox/trade-form-fields.tsx:158
 msgid "Position"
 msgstr "المركز"
 
@@ -2620,6 +2658,10 @@ msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx:150
 msgid "positions"
+msgstr ""
+
+#: src/components/trade/tradebox/unified-account-modal.tsx:42
+msgid "Positions on every dex draw on that one balance, so a loss on one dex can liquidate positions on another."
 msgstr ""
 
 #: src/components/trade/tradebox/bridge/confirmation-screen.tsx:159
@@ -2721,8 +2763,8 @@ msgid "Reduce only"
 msgstr ""
 
 #: src/components/trade/positions/twap-tab.tsx:104
-#: src/components/trade/tradebox/trade-form-fields.tsx:291
-#: src/components/trade/tradebox/trade-form-fields.tsx:295
+#: src/components/trade/tradebox/trade-form-fields.tsx:292
+#: src/components/trade/tradebox/trade-form-fields.tsx:296
 msgid "Reduce Only"
 msgstr "تقليل فقط"
 
@@ -2951,8 +2993,8 @@ msgstr "بيع"
 #~ msgid "Sell Short"
 #~ msgstr "بيع قصير"
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:166
-#: src/components/trade/positions/balances-tab.tsx:162
+#: src/components/trade/mobile/mobile-balances-tab.tsx:167
+#: src/components/trade/positions/balances-tab.tsx:157
 #: src/components/trade/positions/send-modal.tsx:232
 msgid "Send"
 msgstr ""
@@ -3102,7 +3144,7 @@ msgstr "المُوقِّع غير جاهز"
 #: src/components/trade/mobile/mobile-orders-history-tab.tsx:115
 #: src/components/trade/mobile/mobile-orders-tab.tsx:243
 #: src/components/trade/mobile/mobile-position-card.tsx:146
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:124
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:126
 #: src/components/trade/mobile/mobile-twap-tab.tsx:117
 #: src/components/trade/orderbook/orderbook-panel.tsx:124
 #: src/components/trade/orderbook/trades-panel.tsx:78
@@ -3115,7 +3157,7 @@ msgstr "المُوقِّع غير جاهز"
 #: src/components/trade/positions/positions-tab.tsx:175
 #: src/components/trade/positions/twap-tab.tsx:84
 #: src/components/trade/tradebox/order-toast.tsx:154
-#: src/components/trade/tradebox/trade-form-fields.tsx:214
+#: src/components/trade/tradebox/trade-form-fields.tsx:215
 msgid "Size"
 msgstr "الحجم"
 
@@ -3211,10 +3253,9 @@ msgstr ""
 
 #: src/components/trade/chart/token-selector-content.tsx:94
 #: src/components/trade/components/perps-source-label.tsx:18
-#: src/components/trade/mobile/mobile-balances-tab.tsx:202
-#: src/components/trade/positions/balances-tab.tsx:266
-#: src/components/trade/positions/transfer-modal.tsx:64
-#: src/components/trade/positions/transfer-modal.tsx:65
+#: src/components/trade/mobile/mobile-balances-tab.tsx:203
+#: src/components/trade/positions/balances-tab.tsx:261
+#: src/components/trade/positions/transfer-modal.tsx:75
 #: src/components/trade/tradebox/account-panel.tsx:78
 #: src/config/nav.tsx:49
 msgid "Spot"
@@ -3284,7 +3325,7 @@ msgstr ""
 msgid "Stop trigger must be below mark"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:247
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:249
 msgid "Stop, TWAP, Scale, TIF & more"
 msgstr ""
 
@@ -3303,9 +3344,9 @@ msgstr ""
 
 #: src/components/trade/components/spot-swap-modal.tsx:188
 #: src/components/trade/components/spot-swap-modal.tsx:332
-#: src/components/trade/mobile/mobile-balances-tab.tsx:154
-#: src/components/trade/positions/balances-tab.tsx:152
-#: src/components/trade/tradebox/trade-form-fields.tsx:144
+#: src/components/trade/mobile/mobile-balances-tab.tsx:155
+#: src/components/trade/positions/balances-tab.tsx:147
+#: src/components/trade/tradebox/trade-form-fields.tsx:145
 msgid "Swap"
 msgstr ""
 
@@ -3377,6 +3418,10 @@ msgstr ""
 msgid "Switch to {displayName} market, short position"
 msgstr ""
 
+#: src/components/trade/tradebox/unified-account-modal.tsx:52
+msgid "Switch to a unified account?"
+msgstr ""
+
 #: src/components/trade/tradebox/deposit/wrong-network-screen.tsx:44
 #: src/lib/trade/use-button-content.ts:57
 msgid "Switch to Arbitrum"
@@ -3396,6 +3441,10 @@ msgstr "التبديل إلى الوضع الفاتح"
 
 #: src/components/trade/testnet-banner.tsx:30
 msgid "Switch to Mainnet"
+msgstr ""
+
+#: src/components/trade/tradebox/unified-account-modal.tsx:82
+msgid "Switch to unified"
 msgstr ""
 
 #: src/components/trade/tradebox/deposit/wrong-network-screen.tsx:41
@@ -3424,12 +3473,12 @@ msgstr ""
 msgid "Take Profit"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:221
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:223
 msgid "Take profit / stop loss"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:228
-#: src/components/trade/tradebox/trade-form-fields.tsx:300
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:230
+#: src/components/trade/tradebox/trade-form-fields.tsx:301
 msgid "Take Profit / Stop Loss"
 msgstr "جني الأرباح / وقف الخسارة"
 
@@ -3498,12 +3547,20 @@ msgstr ""
 msgid "the TWAP started"
 msgstr ""
 
+#: src/components/trade/positions/transfer-modal.tsx:185
+msgid "These two can't hold the same token. Pick another source or destination."
+msgstr ""
+
 #: src/components/pages/builder-page.tsx:
 #~ msgid "This action must be signed by your main wallet (not an agent/API wallet). The builder must have at least 100 USDC in perps account value."
 #~ msgstr ""
 
 #: src/lib/trade/extract-order-status.ts:206
 msgid "This browser can't keep orders from different tabs apart. Use an up-to-date browser over HTTPS to trade."
+msgstr ""
+
+#: src/components/trade/tradebox/unified-account-modal.tsx:53
+msgid "This changes how your whole account holds margin, not just this market."
 msgstr ""
 
 #: src/components/trade/components/wallet-modal.tsx:651
@@ -3580,17 +3637,18 @@ msgid "Time In Force"
 msgstr ""
 
 #: src/components/trade/components/spot-swap-modal.tsx:238
+#: src/components/trade/positions/transfer-modal.tsx:175
 #: src/components/trade/tradebox/deposit/withdraw-form.tsx:39
 msgid "To"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:142
-#: src/components/trade/positions/balances-tab.tsx:142
+#: src/components/trade/mobile/mobile-balances-tab.tsx:143
+#: src/components/trade/positions/balances-tab.tsx:137
 msgid "To Perp"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:142
-#: src/components/trade/positions/balances-tab.tsx:142
+#: src/components/trade/mobile/mobile-balances-tab.tsx:143
+#: src/components/trade/positions/balances-tab.tsx:137
 msgid "To Spot"
 msgstr ""
 
@@ -3600,11 +3658,11 @@ msgstr ""
 #~ msgid "Toggle Sidebar"
 #~ msgstr "تبديل الشريط الجانبي"
 
-#: src/components/trade/tradebox/trade-form-fields.tsx:243
+#: src/components/trade/tradebox/trade-form-fields.tsx:244
 msgid "Toggle size mode"
 msgstr "تبديل وضع الحجم"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:154
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:156
 msgid "Toggle size unit"
 msgstr ""
 
@@ -3612,9 +3670,9 @@ msgstr ""
 msgid "TOKEN"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-balances-tab.tsx:128
+#: src/components/trade/mobile/mobile-balances-tab.tsx:129
 #: src/components/trade/orderbook/orderbook-panel.tsx:132
-#: src/components/trade/positions/balances-tab.tsx:220
+#: src/components/trade/positions/balances-tab.tsx:215
 #: src/components/trade/tradebox/account-panel.tsx:27
 msgid "Total"
 msgstr "الإجمالي"
@@ -3671,7 +3729,7 @@ msgstr ""
 
 #: src/components/trade/mobile/mobile-position-card.tsx:221
 #: src/components/trade/positions/positions-tab.tsx:208
-#: src/components/trade/tradebox/trade-form-fields.tsx:304
+#: src/components/trade/tradebox/trade-form-fields.tsx:305
 msgid "TP/SL"
 msgstr "TP/SL"
 
@@ -3732,26 +3790,32 @@ msgstr ""
 msgid "Transaction was rejected"
 msgstr ""
 
-#: src/components/trade/positions/transfer-modal.tsx:189
+#: src/components/trade/positions/transfer-modal.tsx:137
+#: src/components/trade/positions/transfer-modal.tsx:151
+#: src/components/trade/positions/transfer-modal.tsx:225
 #: src/components/trade/tradebox/deposit-modal.tsx:212
 #: src/components/trade/tradebox/deposit/wrong-network-screen.tsx:19
 msgid "Transfer"
 msgstr ""
 
-#: src/components/trade/positions/transfer-modal.tsx:87
+#: src/components/trade/positions/transfer-modal.tsx:151
+msgid "Transfer {symbol}"
+msgstr ""
+
+#: src/components/trade/positions/transfer-modal.tsx:125
 msgid "Transfer failed"
 msgstr ""
 
 #: src/components/trade/positions/transfer-modal.tsx:104
 #: src/components/trade/positions/transfer-modal.tsx:115
-msgid "Transfer USDC"
-msgstr ""
+#~ msgid "Transfer USDC"
+#~ msgstr ""
 
 #: src/components/trade/order-entry/deposit-modal.tsx:
 #~ msgid "Transfer USDC to your Hyperliquid account to start trading."
 #~ msgstr "حول USDC إلى حساب Hyperliquid الخاص بك لبدء التداول."
 
-#: src/components/trade/positions/transfer-modal.tsx:189
+#: src/components/trade/positions/transfer-modal.tsx:225
 msgid "Transferring..."
 msgstr ""
 
@@ -3760,8 +3824,8 @@ msgstr ""
 msgid "Trigger"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:87
-#: src/components/trade/tradebox/trade-form-fields.tsx:170
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:89
+#: src/components/trade/tradebox/trade-form-fields.tsx:171
 msgid "Trigger Price"
 msgstr ""
 
@@ -3824,7 +3888,7 @@ msgstr ""
 msgid "TWAP status unknown. It will not be sent again. Check the TWAP tab."
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:247
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:249
 msgid "TWAP, Scale & more"
 msgstr ""
 
@@ -3857,7 +3921,11 @@ msgid "Unified"
 msgstr ""
 
 #: src/components/trade/positions/transfer-modal.tsx:106
-msgid "Unified accounts share one balance across perps and spot, so there is nothing to move."
+#~ msgid "Unified accounts share one balance across perps and spot, so there is nothing to move."
+#~ msgstr ""
+
+#: src/components/trade/positions/transfer-modal.tsx:139
+msgid "Unified accounts share one balance across perps, spot and builder dexes, so there is nothing to move."
 msgstr ""
 
 #: src/lib/errors/format.ts:12
@@ -3900,7 +3968,7 @@ msgstr ""
 msgid "Updated live"
 msgstr "تحديث مباشر"
 
-#: src/components/trade/positions/balances-tab.tsx:227
+#: src/components/trade/positions/balances-tab.tsx:222
 msgid "USD Value"
 msgstr "القيمة بالدولار"
 
@@ -4059,6 +4127,10 @@ msgstr ""
 #~ msgid "You can revoke permissions at any time by registering a new approval with 0% fee rate. Builder codes are processed entirely onchain as part of the fee logic."
 #~ msgstr ""
 
+#: src/components/trade/tradebox/unified-account-modal.tsx:45
+msgid "You can switch back later. Your funds stay in Spot and each dex needs its own transfer again."
+msgstr ""
+
 #. placeholder {0}: holdings.join(" and ")
 #: src/lib/trade/collateral-copy.ts:25
 msgid "You have {0}."
@@ -4092,7 +4164,7 @@ msgstr ""
 msgid "Your bridge is still processing. Funds are safe."
 msgstr ""
 
-#: src/components/trade/tradebox/trade-form-fields.tsx:156
+#: src/components/trade/tradebox/trade-form-fields.tsx:157
 msgid "Your current open position on this market"
 msgstr ""
 
@@ -4106,6 +4178,10 @@ msgstr ""
 
 #: src/lib/trade/extract-order-status.ts:443
 msgid "Your TWAP history could not be read."
+msgstr ""
+
+#: src/components/trade/tradebox/unified-account-modal.tsx:41
+msgid "Your USDC in Perps and on builder dexes moves into Spot when you switch."
 msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:280
