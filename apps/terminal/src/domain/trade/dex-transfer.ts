@@ -1,5 +1,4 @@
 import Big from "big.js";
-import type { OrderType } from "@/config/trade";
 import type { Dex, ListedMarket, QuoteToken } from "@/domain/market/model";
 import {
 	type AccountState,
@@ -9,7 +8,6 @@ import {
 	type TransferLimit,
 } from "@/domain/trade/account-mode";
 import { toSafeBig } from "@/lib/trade/numbers";
-import { isTwapOrderType } from "@/lib/trade/order-types";
 import { formatTokenId } from "@/lib/trade/token-id";
 import type { Side } from "@/lib/trade/types";
 
@@ -150,35 +148,30 @@ export function getTradableDexes(listed: readonly ListedMarket[]): Set<string> {
 	return names;
 }
 
-export interface FundingOrder {
-	orderType: OrderType;
+export interface FundingLeg {
 	side: Side;
-	size: number;
-	price: number;
-	markPx: number;
+	size: string;
+	price: string;
+}
+
+export interface FundingOrder {
+	legs: readonly FundingLeg[];
+	markPx: string;
 	leverage: number;
-	slippageBps: number;
 	feeRate: number;
 }
 
-function getWorstFillPrice({ orderType, side, price, markPx, slippageBps }: FundingOrder): Big {
-	if (orderType !== "market" && !isTwapOrderType(orderType)) return Big(price);
-	const slip = Big(slippageBps).div(10_000);
-	return Big(markPx).times(side === "buy" ? Big(1).plus(slip) : Big(1).minus(slip));
+function getLegNeed({ side, size, price }: FundingLeg, mark: Big, leverage: number, feeRate: number): Big {
+	const sz = toSafeBig(size);
+	const px = toSafeBig(price);
+	const marginPrice = px.gt(mark) ? px : mark;
+	const adverse = side === "buy" ? px.minus(mark) : mark.minus(px);
+	const immediateLoss = adverse.gt(0) ? sz.times(adverse) : Big(0);
+	return sz.times(marginPrice).div(leverage).plus(immediateLoss).plus(sz.times(px).times(feeRate));
 }
 
-export function getFundingNeed(order: FundingOrder): number {
-	if (!(order.size > 0) || !(order.leverage > 0) || !(order.markPx > 0)) return 0;
-	const size = Big(order.size);
-	const mark = Big(order.markPx);
-	const worst = getWorstFillPrice(order);
-	const marginPrice = worst.gt(mark) ? worst : mark;
-	const adverse = order.side === "buy" ? worst.minus(mark) : mark.minus(worst);
-	const immediateLoss = adverse.gt(0) ? size.times(adverse) : Big(0);
-	return size
-		.times(marginPrice)
-		.div(order.leverage)
-		.plus(immediateLoss)
-		.plus(size.times(worst).times(order.feeRate))
-		.toNumber();
+export function getFundingNeed({ legs, markPx, leverage, feeRate }: FundingOrder): number {
+	const mark = toSafeBig(markPx);
+	if (!(leverage > 0) || !mark.gt(0)) return 0;
+	return legs.reduce((need, leg) => need.plus(getLegNeed(leg, mark, leverage, feeRate)), Big(0)).toNumber();
 }

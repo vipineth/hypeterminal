@@ -14,7 +14,7 @@ import { getOrderPrice } from "@/domain/trade/order/price";
 import { useFeeRates } from "@/hooks/trade/use-fee-rates";
 import { useLiveMarkPx } from "@/hooks/trade/use-live-mark-px";
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
-import { useOrderSubmit } from "@/hooks/trade/use-order-submit";
+import { getOpeningLegs, type OrderSubmitInput, useOrderSubmit } from "@/hooks/trade/use-order-submit";
 import {
 	type UnifiedMarketInfo,
 	useAgentRegistration,
@@ -158,16 +158,42 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 
 	const { marginRequired, estimatedFee } = getOrderMetrics({ sizeValue, price, leverage: entry.leverage, feeRate });
 	const { liqPrice, liqWarning } = getLiquidationInfo({ price, sizeValue, leverage: entry.leverage, side });
-	const fundingNeed = getFundingNeed({
-		orderType,
-		side,
-		size: sizeValue,
-		price,
-		markPx,
-		leverage: entry.leverage,
-		slippageBps,
-		feeRate: takerRate + Number(DEFAULT_BUILDER_CONFIG?.f ?? 0) / TENTHS_OF_BPS_PER_UNIT,
-	});
+	const orderInput: OrderSubmitInput | null =
+		market && isListed(market) && baseToken
+			? {
+					market,
+					baseToken,
+					side,
+					orderType,
+					sizeValue: entry.orderSize,
+					markPx: market.markPx ?? "",
+					slippageBps,
+					reduceOnly,
+					tif,
+					limitPriceInput,
+					triggerPriceInput,
+					scaleStartPriceInput,
+					scaleEndPriceInput,
+					scaleLevelsNum,
+					twapMinutesNum,
+					twapRandomize,
+					tpSlEnabled,
+					canUseTpSl,
+					tpPriceInput,
+					slPriceInput,
+					twapOrder,
+					scaleOrder,
+					triggerOrder,
+				}
+			: null;
+	const fundingNeed = orderInput
+		? getFundingNeed({
+				legs: getOpeningLegs(orderInput),
+				markPx: orderInput.markPx,
+				leverage: entry.currentLeverage,
+				feeRate: takerRate + Number(DEFAULT_BUILDER_CONFIG?.f ?? 0) / TENTHS_OF_BPS_PER_UNIT,
+			})
+		: 0;
 
 	const needsAgentApproval = !isAgentReady;
 	const canApprove = !!walletClient && !!address;
@@ -247,33 +273,9 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 
 	async function handleSubmit() {
 		if (!validation.canSubmit || isSubmitting) return;
-		if (!market || !isListed(market) || !baseToken) return;
+		if (!orderInput) return;
 
-		const submitted = await submitOrder({
-			market,
-			baseToken,
-			side,
-			orderType,
-			sizeValue: entry.orderSize,
-			markPx: market.markPx ?? "",
-			slippageBps,
-			reduceOnly,
-			tif,
-			limitPriceInput,
-			triggerPriceInput,
-			scaleStartPriceInput,
-			scaleEndPriceInput,
-			scaleLevelsNum,
-			twapMinutesNum,
-			twapRandomize,
-			tpSlEnabled,
-			canUseTpSl,
-			tpPriceInput,
-			slPriceInput,
-			twapOrder,
-			scaleOrder,
-			triggerOrder,
-		});
+		const submitted = await submitOrder(orderInput);
 		if (submitted) onSubmitted?.();
 	}
 

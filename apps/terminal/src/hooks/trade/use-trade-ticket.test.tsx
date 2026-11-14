@@ -604,6 +604,23 @@ describe("top-up the ticket asks for on an empty builder dex", () => {
 		expect(ticket.fundingNeed).toBeGreaterThanOrEqual(fundsToFill("sell", 100, "100", "99"));
 	});
 
+	it("funds a fill at the tick the market order is sent on, below the raw slippage price", () => {
+		form.market = { ...PARA_TOTAL2, markPx: "380.01" };
+		form.slippagePercent = 3;
+		const ticket = renderTicket();
+
+		expect(fundsToFill("sell", 100, "380.01", "368.60")).toBe(4977.96);
+		expect(ticket.fundingNeed).toBeGreaterThanOrEqual(4977.96);
+	});
+
+	it("funds a twap at the 3% each suborder may slip, not the ticket's market slippage", () => {
+		form.orderType = "twap";
+		form.side = "buy";
+		const ticket = renderTicket();
+
+		expect(ticket.fundingNeed).toBeGreaterThanOrEqual(fundsToFill("buy", 100, "100", "103"));
+	});
+
 	it("funds a limit buy through the book at the taker fee it pays", () => {
 		form.orderType = "limit";
 		form.side = "buy";

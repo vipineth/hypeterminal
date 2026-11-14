@@ -191,13 +191,9 @@ describe("funding need for a market order", () => {
 
 	it("funds enough for the whole size to fill at the slippage price", () => {
 		const need = getFundingNeed({
-			orderType: "market",
-			side: "buy",
-			size: 0.03,
-			price: 380,
-			markPx: 380,
+			legs: [{ side: "buy", size: "0.03", price: "391.4" }],
+			markPx: "380",
 			leverage: 10,
-			slippageBps: 300,
 			feeRate: 0.00055,
 		});
 		const amount = Number(getFundDexPlan(shortfall, need, 2).amount);
@@ -208,30 +204,17 @@ describe("funding need for a market order", () => {
 
 	it("funds a resting limit buy below mark at margin on mark plus fee", () => {
 		const need = getFundingNeed({
-			orderType: "limit",
-			side: "buy",
-			size: 0.03,
-			price: 370,
-			markPx: 380,
+			legs: [{ side: "buy", size: "0.03", price: "370" }],
+			markPx: "380",
 			leverage: 10,
-			slippageBps: 300,
 			feeRate: 0.00055,
 		});
 
 		expect(getFundDexPlan(shortfall, need, 2).amount).toBe("1.15");
 	});
 
-	it("asks for nothing without a size", () => {
-		const need = getFundingNeed({
-			orderType: "market",
-			side: "sell",
-			size: 0,
-			price: 380,
-			markPx: 380,
-			leverage: 10,
-			slippageBps: 300,
-			feeRate: 0.00055,
-		});
+	it("asks for nothing when no order would be sent", () => {
+		const need = getFundingNeed({ legs: [], markPx: "380", leverage: 10, feeRate: 0.00055 });
 
 		expect(getFundDexPlan(shortfall, need, 2).amount).toBe("");
 	});

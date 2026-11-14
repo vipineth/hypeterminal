@@ -1226,7 +1226,7 @@ msgstr "Failed to connect with custom address"
 msgid "Failed to copy"
 msgstr "Failed to copy"
 
-#: src/hooks/trade/use-trade-ticket.ts:241
+#: src/hooks/trade/use-trade-ticket.ts:268
 msgid "Failed to enable trading"
 msgstr "Failed to enable trading"
 

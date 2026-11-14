@@ -1,9 +1,11 @@
-import type { ExchangeOrder, LimitTif, OrderType } from "@/config/trade";
+import { type ExchangeOrder, type LimitTif, type OrderType, TWAP_SUBORDER_MAX_SLIPPAGE_BPS } from "@/config/trade";
 import type { ListedMarket } from "@/domain/market/model";
-import { buildOrderPlan } from "@/domain/trade/order-intent";
+import type { FundingLeg } from "@/domain/trade/dex-transfer";
 import { getAssetLabel } from "@/domain/trade/order/derive";
-import type { TpSl } from "@/domain/trade/orders";
-import { buildTwapPlan } from "@/domain/trade/twap";
+import { getMarketPrice } from "@/domain/trade/order/price";
+import { buildOrderPlan, type EntryOrderIntent } from "@/domain/trade/order-intent";
+import { formatPriceForOrder, OrderBuildError, type TpSl } from "@/domain/trade/orders";
+import { buildTwapPlan, type TwapIntent } from "@/domain/trade/twap";
 import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
 import { isPositive, truncateDecimals } from "@/lib/trade/numbers";
 import type { RequestLabel } from "@/lib/trade/pending-requests";
@@ -71,20 +73,72 @@ function getLabel(input: OrderSubmitInput): RequestLabel {
 	};
 }
 
+function toTwapIntent(input: OrderSubmitInput): TwapIntent {
+	return {
+		market: input.market,
+		side: input.side,
+		sizeValue: input.sizeValue,
+		reduceOnly: input.reduceOnly,
+		minutes: input.twapMinutesNum,
+		randomize: input.twapRandomize,
+	};
+}
+
+function toEntryIntent(input: OrderSubmitInput): EntryOrderIntent {
+	return {
+		kind: "entry",
+		market: input.market,
+		side: input.side,
+		orderType: input.orderType,
+		sizeValue: input.sizeValue,
+		markPx: input.markPx,
+		slippageBps: input.slippageBps,
+		reduceOnly: input.reduceOnly,
+		tif: input.tif,
+		limitPriceInput: input.limitPriceInput,
+		triggerPriceInput: input.triggerPriceInput,
+		scaleStartPriceInput: input.scaleStartPriceInput,
+		scaleEndPriceInput: input.scaleEndPriceInput,
+		scaleLevelsNum: input.scaleLevelsNum,
+		tpSlEnabled: input.tpSlEnabled,
+		canUseTpSl: input.canUseTpSl,
+		tpPriceInput: input.tpPriceInput,
+		slPriceInput: input.slPriceInput,
+	};
+}
+
+function getTwapLegs(input: OrderSubmitInput): FundingLeg[] {
+	const { action } = buildTwapPlan(toTwapIntent(input));
+	if (!action || action.twap.r) return [];
+	const worst = getMarketPrice(input.side, input.markPx, TWAP_SUBORDER_MAX_SLIPPAGE_BPS);
+	try {
+		return [
+			{
+				side: input.side,
+				size: action.twap.s,
+				price: formatPriceForOrder(worst, input.market, input.side, "aggressive"),
+			},
+		];
+	} catch (error) {
+		if (error instanceof OrderBuildError) return [];
+		throw error;
+	}
+}
+
+export function getOpeningLegs(input: OrderSubmitInput): FundingLeg[] {
+	if (input.twapOrder) return getTwapLegs(input);
+	return buildOrderPlan(toEntryIntent(input))
+		.orders.filter((order) => !order.r)
+		.map((order): FundingLeg => ({ side: order.b ? "buy" : "sell", size: order.s, price: order.p }));
+}
+
 export function useOrderSubmit(): UseOrderSubmitResult {
 	const { submitPlan, submitTwap: sendTwap, isSubmitting } = useSubmitPlan();
 	const { addOrder, updateOrder } = useOrderQueueActions();
 	const { resetForm } = useOrderEntryActions();
 
 	async function submitTwap(input: OrderSubmitInput): Promise<boolean> {
-		const plan = buildTwapPlan({
-			market: input.market,
-			side: input.side,
-			sizeValue: input.sizeValue,
-			reduceOnly: input.reduceOnly,
-			minutes: input.twapMinutesNum,
-			randomize: input.twapRandomize,
-		});
+		const plan = buildTwapPlan(toTwapIntent(input));
 
 		const label = getLabel(input);
 		const orderId = addOrder({ ...label, orderType: "twap", status: "pending" });
@@ -101,28 +155,9 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 	}
 
 	async function submitEntry(input: OrderSubmitInput): Promise<boolean> {
-		const { market, tpSlEnabled, canUseTpSl, tpPriceInput, slPriceInput } = input;
+		const { tpSlEnabled, canUseTpSl, tpPriceInput, slPriceInput } = input;
 
-		const plan = buildOrderPlan({
-			kind: "entry",
-			market,
-			side: input.side,
-			orderType: input.orderType,
-			sizeValue: input.sizeValue,
-			markPx: input.markPx,
-			slippageBps: input.slippageBps,
-			reduceOnly: input.reduceOnly,
-			tif: input.tif,
-			limitPriceInput: input.limitPriceInput,
-			triggerPriceInput: input.triggerPriceInput,
-			scaleStartPriceInput: input.scaleStartPriceInput,
-			scaleEndPriceInput: input.scaleEndPriceInput,
-			scaleLevelsNum: input.scaleLevelsNum,
-			tpSlEnabled,
-			canUseTpSl,
-			tpPriceInput,
-			slPriceInput,
-		});
+		const plan = buildOrderPlan(toEntryIntent(input));
 
 		const hasTp = tpSlEnabled && canUseTpSl && isPositive(tpPriceInput);
 		const hasSl = tpSlEnabled && canUseTpSl && isPositive(slPriceInput);

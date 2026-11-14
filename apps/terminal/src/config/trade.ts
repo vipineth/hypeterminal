@@ -27,6 +27,7 @@ export const TWAP_MINUTES_MIN = 5;
 export const TWAP_MINUTES_MAX = 1440;
 export const TWAP_MIN_NOTIONAL_PER_MINUTE_USD = 10;
 export const TWAP_SUBORDER_INTERVAL_SECONDS = 30;
+export const TWAP_SUBORDER_MAX_SLIPPAGE_BPS = 300;
 export const SCALE_LEVELS_MIN = 2;
 export const SCALE_LEVELS_MAX = 20;
 

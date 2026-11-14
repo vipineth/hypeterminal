@@ -1226,7 +1226,7 @@ msgstr ""
 msgid "Failed to copy"
 msgstr ""
 
-#: src/hooks/trade/use-trade-ticket.ts:241
+#: src/hooks/trade/use-trade-ticket.ts:268
 msgid "Failed to enable trading"
 msgstr "Échec de l'activation du trading"
 
