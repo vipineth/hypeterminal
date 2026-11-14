@@ -421,6 +421,26 @@ describe("perp trade ticket", () => {
 		});
 	});
 
+	it("sends nothing for a market order typed on an empty builder dex", async () => {
+		form.market = {
+			...SOL_PERP,
+			kind: "builderPerp",
+			name: "xyz:NVDA",
+			pairName: "NVDA-USDC",
+			dex: { name: "xyz", index: 1, collateralToken: { name: "USDC", displayName: "USDC" } },
+		};
+		form.orderType = "market";
+		form.availableToTrade = ["0.0", "0.0"];
+		form.maxTradeSzs = ["0.0", "0.0"];
+		form.tpSlEnabled = false;
+		const ticket = renderTicket();
+		await ticket.buttonContent.action();
+
+		expect(net.venue.orderRequests()).toHaveLength(0);
+		expect(ticket.buttonContent.disabled).toBe(true);
+		expect(ticket.entry.shortfall?.kind).toBe("dexEmpty");
+	});
+
 	it("offers Deposit only when the collateral token is nowhere in the account", () => {
 		form.availableToTrade = ["0.0", "0.0"];
 		form.mainWithdrawable = "0.0";
@@ -478,7 +498,13 @@ describe("perp trade ticket", () => {
 	});
 
 	it("names a builder perp's dex in the order toast", async () => {
-		form.market = { ...SOL_PERP, kind: "builderPerp", name: "io:NVDA", pairName: "NVDA-USDC", dex: { name: "io", index: 3, collateralToken: { name: "USDC", displayName: "USDC" } } };
+		form.market = {
+			...SOL_PERP,
+			kind: "builderPerp",
+			name: "io:NVDA",
+			pairName: "NVDA-USDC",
+			dex: { name: "io", index: 3, collateralToken: { name: "USDC", displayName: "USDC" } },
+		};
 		form.tpSlEnabled = false;
 		await pressSubmit();
 
