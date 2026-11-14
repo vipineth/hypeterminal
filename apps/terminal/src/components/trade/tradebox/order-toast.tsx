@@ -3,7 +3,13 @@ import { t } from "@lingui/core/macro";
 import { CheckIcon, LightningIcon, MinusIcon, QuestionIcon, SpinnerGapIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect } from "react";
 import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/time";
-import { type DismissPreview, useActiveHolds, usePendingRequests, useSubmitPlan } from "@/hooks/trade/use-submit-plan";
+import {
+	type DismissPreview,
+	useActiveHolds,
+	usePendingRequests,
+	useSettledRequestKeys,
+	useSubmitPlan,
+} from "@/hooks/trade/use-submit-plan";
 import { cn } from "@/lib/cn";
 import {
 	describeHeldMarket,
@@ -433,10 +439,21 @@ function CountdownBar({ order }: { order: OrderQueueItem }) {
 	);
 }
 
+function unconfirmedKeyOf(order: OrderQueueItem): string[] {
+	return order.status === "unsettled" && order.requestKey ? [order.requestKey] : [];
+}
+
 export function OrderToast() {
-	const queued = useOrderQueue();
+	const allQueued = useOrderQueue();
 	const pendingRequests = usePendingRequests();
 	const activeHolds = useActiveHolds();
+	const settledKeys = useSettledRequestKeys(allQueued.flatMap(unconfirmedKeyOf));
+	const activeHoldKeys = new Set(activeHolds.map((held) => toHoldItem(held).id));
+	const queued = allQueued.filter((order) => {
+		if (order.status !== "unsettled") return true;
+		if (order.requestKey && settledKeys.includes(order.requestKey)) return false;
+		return !order.held || activeHoldKeys.has(toHoldItem(order.held).id);
+	});
 	const { addOrder, updateOrder, updateByRequestKey, removeOrder } = useOrderQueueActions();
 	const { retryRequest, cancelRequest, previewDismiss, dismissRequest, dismissUnreadable, dismissHold, canCancel } =
 		useSubmitPlan();

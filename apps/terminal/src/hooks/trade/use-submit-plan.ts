@@ -20,6 +20,7 @@ import {
 	createOrderSender,
 	getRequestKey,
 	type Lookup,
+	type Settlement,
 	type Signer,
 	type SubmitOutcome,
 } from "@/lib/trade/order-sender";
@@ -34,6 +35,7 @@ import { resultToQueueUpdate, useOrderQueueActions } from "@/stores/use-order-qu
 const CLOCK_READ_TIMEOUT_MS = 3000;
 const NO_REQUESTS: PendingRequest[] = [];
 const NO_HOLDS: SlotHold[] = [];
+const NO_KEYS: string[] = [];
 
 const sender = createOrderSender({
 	info: getInfoClient,
@@ -61,6 +63,20 @@ function readActiveHolds(user: string | undefined): SlotHold[] {
 	const key = holds.map(({ slot, hold }) => `${slot}#${hold.nonce}:${hold.fates.join()}`).join("|");
 	if (key !== holdSnapshot.key) holdSnapshot = { key, holds };
 	return holdSnapshot.holds;
+}
+
+let settledSnapshot = { key: "", keys: NO_KEYS };
+
+function readSettledKeys(requestKeys: string[]): string[] {
+	const keys = requestKeys.filter((requestKey) => !sender.isPending(requestKey));
+	const key = keys.join("|");
+	if (key !== settledSnapshot.key) settledSnapshot = { key, keys };
+	return settledSnapshot.keys;
+}
+
+function settledEarlier(outcome: SubmitOutcome): Settlement | null {
+	if (!("earlier" in outcome) || !outcome.earlier || outcome.earlier.kind === "live") return null;
+	return outcome.earlier;
 }
 
 export type SubmitPlanInput = Pick<OrderPlan, "orders" | "grouping"> & { errors?: string[] };
@@ -107,9 +123,10 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 		const signer = getSigner();
 		if (!signer) return { ok: false, status: "notSent", error: t`Wallet is required for exchange actions` };
 		const outcome = await submit(signer);
-		if (outcome.kind === "blocked" && outcome.earlier.kind !== "live") {
-			const { request } = outcome.earlier;
-			upsertByRequestKey(getRequestKey(request), request.label, resultToQueueUpdate(reportSettlement(outcome.earlier)));
+		const earlier = settledEarlier(outcome);
+		if (earlier) {
+			const { request } = earlier;
+			upsertByRequestKey(getRequestKey(request), request.label, resultToQueueUpdate(reportSettlement(earlier)));
 		}
 		return reportSubmit(outcome);
 	}
@@ -191,5 +208,13 @@ export function useActiveHolds(): SlotHold[] {
 		sender.subscribe,
 		() => readActiveHolds(address),
 		() => NO_HOLDS,
+	);
+}
+
+export function useSettledRequestKeys(requestKeys: string[]): string[] {
+	return useSyncExternalStore(
+		sender.subscribe,
+		() => readSettledKeys(requestKeys),
+		() => NO_KEYS,
 	);
 }

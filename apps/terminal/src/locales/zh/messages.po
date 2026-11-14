@@ -472,7 +472,7 @@ msgstr ""
 #: src/components/trade/tradebox/deposit-modal.tsx:150
 #: src/components/trade/tradebox/deposit-modal.tsx:205
 #: src/components/trade/tradebox/margin-mode-modal.tsx:216
-#: src/components/trade/tradebox/order-toast.tsx:274
+#: src/components/trade/tradebox/order-toast.tsx:280
 #: src/routes/mobile-agent-sync.tsx:413
 msgid "Cancel"
 msgstr "取消"
@@ -505,7 +505,7 @@ msgstr "取消选中的订单"
 msgid "Cancel TWAP order"
 msgstr "取消 TWAP 订单"
 
-#: src/components/trade/tradebox/order-toast.tsx:571
+#: src/components/trade/tradebox/order-toast.tsx:588
 msgid "canceled"
 msgstr ""
 
@@ -675,7 +675,7 @@ msgstr "连接钱包"
 msgid "Connect wallet to view account"
 msgstr "连接钱包查看账户"
 
-#: src/components/trade/tradebox/order-toast.tsx:287
+#: src/components/trade/tradebox/order-toast.tsx:293
 msgid "Connect your trading wallet to cancel it."
 msgstr ""
 
@@ -979,16 +979,16 @@ msgid "Disconnected"
 msgstr ""
 
 #: src/components/trade/mobile/offline-banner.tsx:86
-#: src/components/trade/tradebox/order-toast.tsx:196
-#: src/components/trade/tradebox/order-toast.tsx:284
+#: src/components/trade/tradebox/order-toast.tsx:202
+#: src/components/trade/tradebox/order-toast.tsx:290
 msgid "Dismiss"
 msgstr "关闭"
 
-#: src/components/trade/tradebox/order-toast.tsx:357
+#: src/components/trade/tradebox/order-toast.tsx:363
 msgid "Dismiss hold"
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:312
+#: src/components/trade/tradebox/order-toast.tsx:318
 msgid "Dismiss pending order"
 msgstr ""
 
@@ -1181,7 +1181,7 @@ msgstr ""
 msgid "Explorer"
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:576
+#: src/components/trade/tradebox/order-toast.tsx:593
 msgid "failed"
 msgstr "失败"
 
@@ -1302,7 +1302,7 @@ msgstr ""
 msgid "Fill status"
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:62
+#: src/components/trade/tradebox/order-toast.tsx:68
 msgid "Filled"
 msgstr "已成交"
 
@@ -1499,7 +1499,7 @@ msgstr ""
 msgid "It may still execute."
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:320
+#: src/components/trade/tradebox/order-toast.tsx:326
 msgid "It may still execute. Dismiss it? Your next order on this market will be sent as a new one."
 msgstr ""
 
@@ -1519,9 +1519,9 @@ msgstr ""
 msgid "Its status could not be read."
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:247
-#: src/components/trade/tradebox/order-toast.tsx:339
-#: src/components/trade/tradebox/order-toast.tsx:382
+#: src/components/trade/tradebox/order-toast.tsx:253
+#: src/components/trade/tradebox/order-toast.tsx:345
+#: src/components/trade/tradebox/order-toast.tsx:388
 msgid "Keep it"
 msgstr ""
 
@@ -2092,7 +2092,7 @@ msgstr ""
 msgid "Not confirmed: {0}. Retry, cancel or dismiss it."
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:401
+#: src/components/trade/tradebox/order-toast.tsx:407
 msgid "Not confirmed. Retry or cancel it."
 msgstr ""
 
@@ -2109,7 +2109,7 @@ msgstr ""
 msgid "Not placed. The request expired before the exchange took it."
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:566
+#: src/components/trade/tradebox/order-toast.tsx:583
 msgid "not sent"
 msgstr ""
 
@@ -2316,7 +2316,7 @@ msgstr ""
 msgid "Order History"
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:551
+#: src/components/trade/tradebox/order-toast.tsx:568
 msgid "Order Queue"
 msgstr "订单队列"
 
@@ -2408,7 +2408,7 @@ msgstr ""
 msgid "Pairing code does not match this link."
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:64
+#: src/components/trade/tradebox/order-toast.tsx:70
 msgid "Partly filled"
 msgstr ""
 
@@ -2433,7 +2433,7 @@ msgstr ""
 msgid "Payment"
 msgstr "支付"
 
-#: src/components/trade/tradebox/order-toast.tsx:556
+#: src/components/trade/tradebox/order-toast.tsx:573
 msgid "pending"
 msgstr "待处理"
 
@@ -2510,7 +2510,7 @@ msgstr ""
 msgid "Place Limit Close"
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:66
+#: src/components/trade/tradebox/order-toast.tsx:72
 msgid "Placed"
 msgstr ""
 
@@ -2730,7 +2730,7 @@ msgstr ""
 #: src/components/trade/mobile/offline-banner.tsx:80
 #: src/components/trade/tradebox/deposit-modal.tsx:153
 #: src/components/trade/tradebox/deposit-modal.tsx:208
-#: src/components/trade/tradebox/order-toast.tsx:264
+#: src/components/trade/tradebox/order-toast.tsx:270
 msgid "Retry"
 msgstr ""
 
@@ -2765,7 +2765,7 @@ msgstr ""
 msgid "RO"
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:70
+#: src/components/trade/tradebox/order-toast.tsx:76
 msgid "Running"
 msgstr ""
 
@@ -2935,7 +2935,7 @@ msgstr ""
 msgid "sent to Hyperliquid"
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:68
+#: src/components/trade/tradebox/order-toast.tsx:74
 msgid "Set"
 msgstr ""
 
@@ -3068,7 +3068,7 @@ msgstr "签名器未就绪"
 #: src/components/trade/positions/position-tpsl-modal.tsx:116
 #: src/components/trade/positions/positions-tab.tsx:178
 #: src/components/trade/positions/twap-tab.tsx:84
-#: src/components/trade/tradebox/order-toast.tsx:148
+#: src/components/trade/tradebox/order-toast.tsx:154
 #: src/components/trade/tradebox/trade-form-fields.tsx:212
 msgid "Size"
 msgstr "数量"
@@ -3791,11 +3791,11 @@ msgstr "类型"
 #~ msgid "Unable to close position."
 #~ msgstr "无法平仓。"
 
-#: src/components/trade/tradebox/order-toast.tsx:561
+#: src/components/trade/tradebox/order-toast.tsx:578
 msgid "unconfirmed"
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:139
+#: src/components/trade/tradebox/order-toast.tsx:145
 msgid "Unconfirmed order"
 msgstr ""
 
@@ -3908,8 +3908,8 @@ msgstr ""
 #~ msgid "Wallet client not ready"
 #~ msgstr "钱包客户端未就绪"
 
-#: src/hooks/trade/use-submit-plan.ts:108
-#: src/hooks/trade/use-submit-plan.ts:141
+#: src/hooks/trade/use-submit-plan.ts:124
+#: src/hooks/trade/use-submit-plan.ts:158
 msgid "Wallet is required for exchange actions"
 msgstr ""
 
@@ -3977,12 +3977,12 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:373
+#: src/components/trade/tradebox/order-toast.tsx:379
 msgid "Yes, dismiss hold"
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:238
-#: src/components/trade/tradebox/order-toast.tsx:330
+#: src/components/trade/tradebox/order-toast.tsx:244
+#: src/components/trade/tradebox/order-toast.tsx:336
 msgid "Yes, dismiss it"
 msgstr ""
 

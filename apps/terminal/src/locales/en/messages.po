@@ -472,7 +472,7 @@ msgstr "Can't save order state in this browser. Enable site storage to trade."
 #: src/components/trade/tradebox/deposit-modal.tsx:150
 #: src/components/trade/tradebox/deposit-modal.tsx:205
 #: src/components/trade/tradebox/margin-mode-modal.tsx:216
-#: src/components/trade/tradebox/order-toast.tsx:274
+#: src/components/trade/tradebox/order-toast.tsx:280
 #: src/routes/mobile-agent-sync.tsx:413
 msgid "Cancel"
 msgstr "Cancel"
@@ -505,7 +505,7 @@ msgstr "Cancel selected orders"
 msgid "Cancel TWAP order"
 msgstr "Cancel TWAP order"
 
-#: src/components/trade/tradebox/order-toast.tsx:571
+#: src/components/trade/tradebox/order-toast.tsx:588
 msgid "canceled"
 msgstr "canceled"
 
@@ -675,7 +675,7 @@ msgstr "Connect Wallet"
 msgid "Connect wallet to view account"
 msgstr "Connect wallet to view account"
 
-#: src/components/trade/tradebox/order-toast.tsx:287
+#: src/components/trade/tradebox/order-toast.tsx:293
 msgid "Connect your trading wallet to cancel it."
 msgstr "Connect your trading wallet to cancel it."
 
@@ -979,16 +979,16 @@ msgid "Disconnected"
 msgstr "Disconnected"
 
 #: src/components/trade/mobile/offline-banner.tsx:86
-#: src/components/trade/tradebox/order-toast.tsx:196
-#: src/components/trade/tradebox/order-toast.tsx:284
+#: src/components/trade/tradebox/order-toast.tsx:202
+#: src/components/trade/tradebox/order-toast.tsx:290
 msgid "Dismiss"
 msgstr "Dismiss"
 
-#: src/components/trade/tradebox/order-toast.tsx:357
+#: src/components/trade/tradebox/order-toast.tsx:363
 msgid "Dismiss hold"
 msgstr "Dismiss hold"
 
-#: src/components/trade/tradebox/order-toast.tsx:312
+#: src/components/trade/tradebox/order-toast.tsx:318
 msgid "Dismiss pending order"
 msgstr "Dismiss pending order"
 
@@ -1181,7 +1181,7 @@ msgstr "Expires {expiresAtLabel}."
 msgid "Explorer"
 msgstr "Explorer"
 
-#: src/components/trade/tradebox/order-toast.tsx:576
+#: src/components/trade/tradebox/order-toast.tsx:593
 msgid "failed"
 msgstr "failed"
 
@@ -1302,7 +1302,7 @@ msgstr "Fees"
 msgid "Fill status"
 msgstr "Fill status"
 
-#: src/components/trade/tradebox/order-toast.tsx:62
+#: src/components/trade/tradebox/order-toast.tsx:68
 msgid "Filled"
 msgstr "Filled"
 
@@ -1499,7 +1499,7 @@ msgstr "it filled"
 msgid "It may still execute."
 msgstr "It may still execute."
 
-#: src/components/trade/tradebox/order-toast.tsx:320
+#: src/components/trade/tradebox/order-toast.tsx:326
 msgid "It may still execute. Dismiss it? Your next order on this market will be sent as a new one."
 msgstr "It may still execute. Dismiss it? Your next order on this market will be sent as a new one."
 
@@ -1519,9 +1519,9 @@ msgstr "it was set"
 msgid "Its status could not be read."
 msgstr "Its status could not be read."
 
-#: src/components/trade/tradebox/order-toast.tsx:247
-#: src/components/trade/tradebox/order-toast.tsx:339
-#: src/components/trade/tradebox/order-toast.tsx:382
+#: src/components/trade/tradebox/order-toast.tsx:253
+#: src/components/trade/tradebox/order-toast.tsx:345
+#: src/components/trade/tradebox/order-toast.tsx:388
 msgid "Keep it"
 msgstr "Keep it"
 
@@ -2096,7 +2096,7 @@ msgstr "Not confirmed: {0}. Retry or cancel it."
 msgid "Not confirmed: {0}. Retry, cancel or dismiss it."
 msgstr "Not confirmed: {0}. Retry, cancel or dismiss it."
 
-#: src/components/trade/tradebox/order-toast.tsx:401
+#: src/components/trade/tradebox/order-toast.tsx:407
 msgid "Not confirmed. Retry or cancel it."
 msgstr "Not confirmed. Retry or cancel it."
 
@@ -2113,7 +2113,7 @@ msgstr "Not dismissed. {0} Retry or cancel it."
 msgid "Not placed. The request expired before the exchange took it."
 msgstr "Not placed. The request expired before the exchange took it."
 
-#: src/components/trade/tradebox/order-toast.tsx:566
+#: src/components/trade/tradebox/order-toast.tsx:583
 msgid "not sent"
 msgstr "not sent"
 
@@ -2320,7 +2320,7 @@ msgstr "Order filled"
 msgid "Order History"
 msgstr "Order History"
 
-#: src/components/trade/tradebox/order-toast.tsx:551
+#: src/components/trade/tradebox/order-toast.tsx:568
 msgid "Order Queue"
 msgstr "Order Queue"
 
@@ -2412,7 +2412,7 @@ msgstr "Pairing code"
 msgid "Pairing code does not match this link."
 msgstr "Pairing code does not match this link."
 
-#: src/components/trade/tradebox/order-toast.tsx:64
+#: src/components/trade/tradebox/order-toast.tsx:70
 msgid "Partly filled"
 msgstr "Partly filled"
 
@@ -2437,7 +2437,7 @@ msgstr "Paste WalletConnect URI"
 msgid "Payment"
 msgstr "Payment"
 
-#: src/components/trade/tradebox/order-toast.tsx:556
+#: src/components/trade/tradebox/order-toast.tsx:573
 msgid "pending"
 msgstr "pending"
 
@@ -2514,7 +2514,7 @@ msgstr "Place {0} Order"
 msgid "Place Limit Close"
 msgstr "Place Limit Close"
 
-#: src/components/trade/tradebox/order-toast.tsx:66
+#: src/components/trade/tradebox/order-toast.tsx:72
 msgid "Placed"
 msgstr "Placed"
 
@@ -2734,7 +2734,7 @@ msgstr "Resetting..."
 #: src/components/trade/mobile/offline-banner.tsx:80
 #: src/components/trade/tradebox/deposit-modal.tsx:153
 #: src/components/trade/tradebox/deposit-modal.tsx:208
-#: src/components/trade/tradebox/order-toast.tsx:264
+#: src/components/trade/tradebox/order-toast.tsx:270
 msgid "Retry"
 msgstr "Retry"
 
@@ -2769,7 +2769,7 @@ msgstr "Risk/Reward"
 msgid "RO"
 msgstr "RO"
 
-#: src/components/trade/tradebox/order-toast.tsx:70
+#: src/components/trade/tradebox/order-toast.tsx:76
 msgid "Running"
 msgstr "Running"
 
@@ -2939,7 +2939,7 @@ msgstr "Sending..."
 msgid "sent to Hyperliquid"
 msgstr "sent to Hyperliquid"
 
-#: src/components/trade/tradebox/order-toast.tsx:68
+#: src/components/trade/tradebox/order-toast.tsx:74
 msgid "Set"
 msgstr "Set"
 
@@ -3072,7 +3072,7 @@ msgstr "Signer not ready"
 #: src/components/trade/positions/position-tpsl-modal.tsx:116
 #: src/components/trade/positions/positions-tab.tsx:178
 #: src/components/trade/positions/twap-tab.tsx:84
-#: src/components/trade/tradebox/order-toast.tsx:148
+#: src/components/trade/tradebox/order-toast.tsx:154
 #: src/components/trade/tradebox/trade-form-fields.tsx:212
 msgid "Size"
 msgstr "Size"
@@ -3795,11 +3795,11 @@ msgstr "Type"
 #~ msgid "Unable to close position."
 #~ msgstr "Unable to close position."
 
-#: src/components/trade/tradebox/order-toast.tsx:561
+#: src/components/trade/tradebox/order-toast.tsx:578
 msgid "unconfirmed"
 msgstr "unconfirmed"
 
-#: src/components/trade/tradebox/order-toast.tsx:139
+#: src/components/trade/tradebox/order-toast.tsx:145
 msgid "Unconfirmed order"
 msgstr "Unconfirmed order"
 
@@ -3912,8 +3912,8 @@ msgstr "Wallet ({0})"
 #~ msgid "Wallet client not ready"
 #~ msgstr "Wallet client not ready"
 
-#: src/hooks/trade/use-submit-plan.ts:108
-#: src/hooks/trade/use-submit-plan.ts:141
+#: src/hooks/trade/use-submit-plan.ts:124
+#: src/hooks/trade/use-submit-plan.ts:158
 msgid "Wallet is required for exchange actions"
 msgstr "Wallet is required for exchange actions"
 
@@ -3981,12 +3981,12 @@ msgstr "Wrong QR type"
 msgid "Yes"
 msgstr "Yes"
 
-#: src/components/trade/tradebox/order-toast.tsx:373
+#: src/components/trade/tradebox/order-toast.tsx:379
 msgid "Yes, dismiss hold"
 msgstr "Yes, dismiss hold"
 
-#: src/components/trade/tradebox/order-toast.tsx:238
-#: src/components/trade/tradebox/order-toast.tsx:330
+#: src/components/trade/tradebox/order-toast.tsx:244
+#: src/components/trade/tradebox/order-toast.tsx:336
 msgid "Yes, dismiss it"
 msgstr "Yes, dismiss it"
 

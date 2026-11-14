@@ -84,11 +84,10 @@ export type Live = { kind: "live"; request: PendingRequest; remainingMs: number 
 
 export type SubmitOutcome =
 	| Busy
-	| Refused
-	| Held
-	| { kind: "failed"; error: string }
 	| { kind: "blocked"; earlier: Settlement | Live }
-	| { kind: "sent"; settlement: Settlement };
+	| ((Refused | Held | { kind: "failed"; error: string } | { kind: "sent"; settlement: Settlement }) & {
+			earlier?: Settlement;
+	  });
 
 export type RequestOutcome =
 	| Settlement
@@ -147,6 +146,8 @@ export function getRequestKey(request: Pick<PendingRequest, "slot" | "nonce">): 
 }
 
 type SignedBody = { nonce: number } & Record<string, unknown>;
+
+type Signed = { kind: "signed"; request: PendingRequest; earlier?: Settlement };
 
 class HeldBeforeSend extends Error {}
 
@@ -208,7 +209,7 @@ export function createOrderSender(env: SenderEnv) {
 			const claim = await inSlot(() => claimSlot(slot, seen, asset, signer, submission));
 			if (claim.kind !== "signed") return claim;
 			const settlement = await settle(claim.request, true);
-			return { kind: "sent", settlement: await inSlot(() => record(settlement)) };
+			return { kind: "sent", settlement: await inSlot(() => record(settlement)), earlier: claim.earlier };
 		});
 	}
 
@@ -218,24 +219,32 @@ export function createOrderSender(env: SenderEnv) {
 		asset: number,
 		signer: Signer,
 		submission: Submission,
-	): Promise<{ kind: "signed"; request: PendingRequest } | SubmitOutcome> {
+	): Promise<Signed | SubmitOutcome> {
 		const current = await env.store.read(slot);
 		if (stampOf(current) !== seen) {
 			return { kind: "refused", reason: "slotMoved", to: current?.state === "pending" ? "pending" : "settled" };
 		}
 		env.store.remember(slot, current);
-		if (current?.state === "pending") {
-			const remainingMs = await remainingFor(current.request);
-			if (canStillExecute(remainingMs)) {
-				revealed.add(getRequestKey(current.request));
-				return { kind: "blocked", earlier: { kind: "live", request: current.request, remainingMs } };
-			}
-			const earlier = await record(await settle(current.request, false));
-			if (!placedNothing(earlier)) {
-				if (earlier.kind === "pending") revealed.add(getRequestKey(earlier.request));
-				return { kind: "blocked", earlier };
-			}
+		if (current?.state !== "pending") return claimFreeSlot(slot, asset, signer, submission);
+		const remainingMs = await remainingFor(current.request);
+		if (canStillExecute(remainingMs)) {
+			revealed.add(getRequestKey(current.request));
+			return { kind: "blocked", earlier: { kind: "live", request: current.request, remainingMs } };
 		}
+		const earlier = await record(await settle(current.request, false));
+		if (!placedNothing(earlier)) {
+			if (earlier.kind === "pending") revealed.add(getRequestKey(earlier.request));
+			return { kind: "blocked", earlier };
+		}
+		return { ...(await claimFreeSlot(slot, asset, signer, submission)), earlier };
+	}
+
+	async function claimFreeSlot(
+		slot: string,
+		asset: number,
+		signer: Signer,
+		submission: Submission,
+	): Promise<Signed | Exclude<SubmitOutcome, Busy | { kind: "blocked" }>> {
 		const latest = await env.store.read(slot);
 		const holds = await liveHolds(latest?.holds ?? [], submission);
 		const held = holds.find((hold) => overlaps(hold, submission));
@@ -551,6 +560,10 @@ export function createOrderSender(env: SenderEnv) {
 		return history ? history.flatMap(({ twapId }) => (twapId === undefined ? [] : [twapId])) : null;
 	}
 
+	function isPending(requestKey: string): boolean {
+		return env.store.pending().some((request) => getRequestKey(request) === requestKey);
+	}
+
 	function list(user: string): PendingRequest[] {
 		const now = env.clock.estimate();
 		const prefix = getUserSlotPrefix(network(), user);
@@ -591,6 +604,7 @@ export function createOrderSender(env: SenderEnv) {
 		dismiss,
 		dismissUnreadable,
 		dismissHold,
+		isPending,
 		list,
 		listHolds,
 		subscribe(listener: () => void) {
