@@ -20,6 +20,7 @@ const net = vi.hoisted(() => ({
 	market: undefined as unknown,
 	store: null as unknown as HyperliquidStore,
 	updateLeverage: async () => ({}),
+	resetMutation: () => {},
 }));
 
 vi.mock("wagmi", () => ({ useConnection: () => ({ address: net.address, isConnected: true }) }));
@@ -28,7 +29,12 @@ vi.mock("@/lib/hyperliquid", async (importOriginal) => ({
 	...(await importOriginal<typeof import("@/lib/hyperliquid")>()),
 	useSelectedMarketInfo: () => ({ data: net.market }),
 	useUserPositions: () => ({ hasPosition: () => false }),
-	useExchange: () => ({ mutateAsync: () => net.updateLeverage(), isPending: false, error: null, reset: () => {} }),
+	useExchange: () => ({
+		mutateAsync: () => net.updateLeverage(),
+		isPending: false,
+		error: null,
+		reset: net.resetMutation,
+	}),
 	useSubscription: (method: string, params: object) => {
 		const entry = net.store.getState().subscriptions[serializeKey(subscriptionKeys.method(method, params))];
 		return {
@@ -337,5 +343,31 @@ describe("leverage applied from this tab", () => {
 		receivePerps();
 		receiveNvdaQuote("100.0", "20.0", 20);
 		expect(nvdaCollateral(leverage().quote)).toMatchObject({ status: "ready", maxSize: "20.0" });
+	});
+
+	it.each<[string, (hook: () => ReturnType<typeof useAssetLeverage>) => Promise<void>]>([
+		["applying margin and leverage", (hook) => hook().applyMarginAndLeverage("cross", 5)],
+		["switching margin mode", (hook) => hook().switchMarginMode("isolated")],
+		[
+			"confirming a leverage change",
+			(hook) => {
+				hook().setPendingLeverage(5);
+				return hook().confirmLeverage();
+			},
+		],
+	])("holds the old quote after %s when the exchange applied it but the response was lost", async (_, change) => {
+		loadUnified();
+		net.market = NVDA;
+		let exchangeApplied = false;
+		net.updateLeverage = async () => {
+			exchangeApplied = true;
+			throw new Error("Leverage applied, response lost");
+		};
+		const leverage = mountHooks(useAssetLeverage);
+		expect(nvdaCollateral(leverage().quote)).toMatchObject({ status: "ready", maxSize: "10.0" });
+
+		await expect(change(leverage)).rejects.toThrow("response lost");
+		expect(exchangeApplied).toBe(true);
+		expect(nvdaCollateral(leverage().quote)).toEqual({ status: "pending", reason: "quote" });
 	});
 });
