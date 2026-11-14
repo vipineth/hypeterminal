@@ -402,6 +402,14 @@ describe("perp trade ticket", () => {
 		expect(net.venue.orderRequests()).toHaveLength(0);
 	});
 
+	it("names a builder perp's dex in the order toast", async () => {
+		form.market = { ...SOL_PERP, kind: "builderPerp", name: "io:NVDA", pairName: "NVDA-USDC", dex: { name: "io", index: 3 } };
+		form.tpSlEnabled = false;
+		await pressSubmit();
+
+		expect(queue.addOrder).toHaveBeenLastCalledWith(expect.objectContaining({ market: "io:NVDA" }));
+	});
+
 	it("shows the triggers it sends in the order toast", async () => {
 		form.tpPrice = "74.999999999999999";
 		form.slPrice = "84.999999999999999";

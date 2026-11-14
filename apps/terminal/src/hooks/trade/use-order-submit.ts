@@ -1,6 +1,7 @@
 import type { ExchangeOrder, LimitTif, OrderType } from "@/config/trade";
 import type { ListedMarket } from "@/domain/market/model";
 import { buildOrderPlan } from "@/domain/trade/order-intent";
+import { getAssetLabel } from "@/domain/trade/order/derive";
 import type { TpSl } from "@/domain/trade/orders";
 import { buildTwapPlan } from "@/domain/trade/twap";
 import { useSubmitPlan } from "@/hooks/trade/use-submit-plan";
@@ -64,7 +65,7 @@ function findTriggerPrice(orders: ExchangeOrder[], tpsl: TpSl): string | undefin
 
 function getLabel(input: OrderSubmitInput): RequestLabel {
 	return {
-		market: input.baseToken,
+		market: getAssetLabel(input.market, input.baseToken),
 		side: input.side,
 		size: truncateDecimals(input.sizeValue, input.market.szDecimals),
 	};

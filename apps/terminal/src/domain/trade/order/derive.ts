@@ -1,6 +1,7 @@
 import { getSideLabels, getSizeModeLabel, type SideLabels } from "@/config/ui-text";
 import { getBaseQuoteFromPairName } from "@/domain/market";
 import { getMarketCapabilities, type MarketCapabilities } from "@/domain/market/capabilities";
+import type { Market } from "@/domain/market/model";
 import {
 	getAvailableBalanceToken,
 	getSpotBalanceData,
@@ -68,6 +69,10 @@ function getAvailableBalance(
 	return isBuy ? availableLong : availableShort;
 }
 
+export function getAssetLabel(market: Pick<Market, "kind" | "name"> | undefined, baseToken: string): string {
+	return market?.kind === "builderPerp" ? market.name : baseToken;
+}
+
 export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 	const isSpotMarket = inputs.market?.kind === "spot";
 	const isBuy = inputs.side === "buy";
@@ -77,7 +82,7 @@ export function deriveOrderEntry(inputs: OrderEntryInputs): OrderEntryDerived {
 	const { baseToken, quoteToken } = inputs.market
 		? getBaseQuoteFromPairName(inputs.market.pairName, inputs.market.kind)
 		: { baseToken: "", quoteToken: "" };
-	const assetLabel = inputs.market?.kind === "builderPerp" ? inputs.market.name : baseToken;
+	const assetLabel = getAssetLabel(inputs.market, baseToken);
 	const spotBalance = getSpotBalanceData(inputs.spotBalances, inputs.market, inputs.spotAvailableAfterMaintenance);
 	const availableBalanceToken = getAvailableBalanceToken(inputs.market, inputs.side);
 
