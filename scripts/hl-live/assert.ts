@@ -3,7 +3,7 @@ import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
 import type { ExchangeOrder } from "@/config/trade";
 import type Big from "big.js";
 import { type Numeric, toSafeBig } from "@/lib/trade/numbers";
-import { interpretOrderStatuses } from "@/lib/trade/extract-order-status";
+import { toLegState } from "@/lib/trade/leg-state";
 
 export type StatusKind = "resting" | "filled" | "waitingForFill" | "waitingForTrigger" | "error";
 
@@ -27,8 +27,11 @@ export function statusKind(status: OrderStatus): StatusKind {
 }
 
 export function expectStatuses(statuses: OrderStatus[], expected: StatusKind[]): void {
-	const verdict = interpretOrderStatuses(statuses, []);
-	if (!verdict.ok) throw new Error(`the app reads the response as a failure: ${verdict.error}`);
+	const failures = statuses.map(toLegState).filter((state) => state.status !== "placed");
+	if (statuses.length === 0 || failures.length > 0) {
+		const reasons = failures.map((state) => (state.status === "rejected" && state.reason ? state.reason : state.status));
+		throw new Error(`the app reads the response as a failure: ${reasons.join("; ") || "no response from exchange"}`);
+	}
 	const actual = statuses.map(statusKind);
 	if (actual.join() !== expected.join()) {
 		throw new Error(`expected statuses [${expected.join(", ")}], got ${JSON.stringify(statuses)}`);

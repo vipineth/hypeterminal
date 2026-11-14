@@ -95,4 +95,9 @@ describe("restart after a killed run", () => {
 		expect(output).toContain(OTHER_ACCOUNT);
 		expect(code).toBe(2);
 	});
+
+	it("reads an order reply under bun without compiling the app's messages", () => {
+		const { code, output } = restart({}, ["--only", "market"]);
+		expect(code, output).toBe(0);
+	});
 });
