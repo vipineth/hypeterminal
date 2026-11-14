@@ -19,11 +19,11 @@ msgid "{0} more wallets"
 msgstr ""
 
 #. placeholder {0}: result.error
-#: src/lib/trade/extract-order-status.ts:325
+#: src/lib/trade/extract-order-status.ts:385
 msgid "{0}. It will not be sent again. Check open orders."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:79
+#: src/lib/trade/extract-order-status.ts:102
 msgid "{filled} of {total} legs filled, {resting} placed"
 msgstr ""
 
@@ -31,38 +31,43 @@ msgstr ""
 #~ msgid "{formatted} USDC deposited to Hyperliquid"
 #~ msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:103
+#: src/lib/trade/extract-order-status.ts:126
 msgid "{name} canceled"
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:112
+#: src/lib/trade/extract-order-status.ts:135
 msgid "{name} filled"
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:181
+#: src/lib/trade/extract-order-status.ts:236
 msgid "{name} not confirmed"
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:105
+#: src/lib/trade/extract-order-status.ts:128
 msgid "{name} not found on the exchange"
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:111
-#: src/lib/trade/extract-order-status.ts:179
+#. placeholder {0}: state.filledSz
+#: src/lib/trade/extract-order-status.ts:87
+msgid "{name} partially filled: {0} of {size}, {rest} not filled"
+msgstr ""
+
+#: src/lib/trade/extract-order-status.ts:134
+#: src/lib/trade/extract-order-status.ts:234
 msgid "{name} placed"
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:101
-#: src/lib/trade/extract-order-status.ts:180
+#: src/lib/trade/extract-order-status.ts:124
+#: src/lib/trade/extract-order-status.ts:235
 msgid "{name} rejected"
 msgstr ""
 
 #. placeholder {0}: state.reason
-#: src/lib/trade/extract-order-status.ts:101
+#: src/lib/trade/extract-order-status.ts:124
 msgid "{name} rejected: {0}"
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:110
+#: src/lib/trade/extract-order-status.ts:133
 msgid "{name} set"
 msgstr ""
 
@@ -71,7 +76,7 @@ msgid "{p}%"
 msgstr ""
 
 #. placeholder {0}: states.length
-#: src/lib/trade/extract-order-status.ts:91
+#: src/lib/trade/extract-order-status.ts:114
 msgid "{placedScaleLegs} of {0} legs placed"
 msgstr ""
 
@@ -133,15 +138,15 @@ msgstr ""
 #~ msgid "A crypto wallet lets you store and manage your digital assets securely."
 #~ msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:359
+#: src/lib/trade/extract-order-status.ts:419
 msgid "A lookup did not find it, which does not prove it never executed."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:362
+#: src/lib/trade/extract-order-status.ts:422
 msgid "A lookup found it: {what}."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:355
+#: src/lib/trade/extract-order-status.ts:415
 msgid "A matching TWAP is in your history, but it can't be confirmed as this one."
 msgstr ""
 
@@ -449,7 +454,7 @@ msgstr ""
 msgid "Camera permission was denied."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:155
+#: src/lib/trade/extract-order-status.ts:178
 msgid "Can't save order state in this browser. Enable site storage to trade."
 msgstr ""
 
@@ -463,7 +468,7 @@ msgstr ""
 #: src/components/trade/tradebox/deposit-modal.tsx:150
 #: src/components/trade/tradebox/deposit-modal.tsx:205
 #: src/components/trade/tradebox/margin-mode-modal.tsx:216
-#: src/components/trade/tradebox/order-toast.tsx:250
+#: src/components/trade/tradebox/order-toast.tsx:261
 #: src/routes/mobile-agent-sync.tsx:413
 msgid "Cancel"
 msgstr "Annuler"
@@ -496,11 +501,11 @@ msgstr "Annuler les ordres sélectionnés"
 msgid "Cancel TWAP order"
 msgstr "Annuler l'ordre TWAP"
 
-#: src/lib/trade/extract-order-status.ts:276
+#: src/lib/trade/extract-order-status.ts:331
 msgid "Canceled. Nothing was placed."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:276
+#: src/lib/trade/extract-order-status.ts:331
 msgid "Canceled. The TWAP did not start."
 msgstr ""
 
@@ -515,12 +520,12 @@ msgstr "Annulation..."
 #~ msgid "cancelled"
 #~ msgstr "annulé"
 
-#: src/lib/trade/extract-order-status.ts:227
+#: src/lib/trade/extract-order-status.ts:282
 msgid "Cannot cancel: another agent key signed this order."
 msgstr ""
 
 #. placeholder {0}: describeRemaining(outcome.remainingMs)
-#: src/lib/trade/extract-order-status.ts:226
+#: src/lib/trade/extract-order-status.ts:281
 msgid "Cannot cancel: another agent key signed this order. {0}"
 msgstr ""
 
@@ -662,7 +667,7 @@ msgstr "Connecter le portefeuille"
 msgid "Connect wallet to view account"
 msgstr "Connectez le portefeuille pour voir le compte"
 
-#: src/components/trade/tradebox/order-toast.tsx:263
+#: src/components/trade/tradebox/order-toast.tsx:274
 msgid "Connect your trading wallet to cancel it."
 msgstr ""
 
@@ -966,24 +971,28 @@ msgid "Disconnected"
 msgstr ""
 
 #: src/components/trade/mobile/offline-banner.tsx:86
-#: src/components/trade/tradebox/order-toast.tsx:182
-#: src/components/trade/tradebox/order-toast.tsx:260
+#: src/components/trade/tradebox/order-toast.tsx:193
+#: src/components/trade/tradebox/order-toast.tsx:271
 msgid "Dismiss"
 msgstr "Fermer"
 
-#: src/components/trade/tradebox/order-toast.tsx:287
+#: src/components/trade/tradebox/order-toast.tsx:343
+msgid "Dismiss hold"
+msgstr ""
+
+#: src/components/trade/tradebox/order-toast.tsx:298
 msgid "Dismiss pending order"
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:297
+#: src/lib/trade/extract-order-status.ts:352
 msgid "Dismissed without confirmation. Check the TWAP tab."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:298
+#: src/lib/trade/extract-order-status.ts:353
 msgid "Dismissed without confirmation. It may have executed. Check open orders."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:252
+#: src/lib/trade/extract-order-status.ts:307
 msgid "Dismissed. The order it could not read may have executed. Check open orders."
 msgstr ""
 
@@ -1094,7 +1103,7 @@ msgstr ""
 
 #: src/components/trade/mobile/mobile-position-card.tsx:159
 #: src/components/trade/positions/positions-tab.tsx:188
-#: src/lib/trade/extract-order-status.ts:119
+#: src/lib/trade/extract-order-status.ts:142
 msgid "Entry"
 msgstr "Entrée"
 
@@ -1164,7 +1173,7 @@ msgstr ""
 msgid "Explorer"
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:459
+#: src/components/trade/tradebox/order-toast.tsx:544
 msgid "failed"
 msgstr "échoué"
 
@@ -1285,7 +1294,7 @@ msgstr ""
 msgid "Fill status"
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:55
+#: src/components/trade/tradebox/order-toast.tsx:61
 msgid "Filled"
 msgstr "Exécuté"
 
@@ -1302,7 +1311,7 @@ msgstr ""
 #~ msgid "Format for numbers and dates"
 #~ msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:293
+#: src/lib/trade/extract-order-status.ts:348
 msgid "Found by lookup after you dismissed it. The exchange never confirmed the request."
 msgstr ""
 
@@ -1385,6 +1394,10 @@ msgstr ""
 msgid "HIP-3"
 msgstr ""
 
+#: src/lib/trade/extract-order-status.ts:225
+msgid "Hold dismissed. Your next order on this market will be sent, even the same one. Check open orders first."
+msgstr ""
+
 #: src/components/trade/mobile/mobile-bottom-nav.tsx:11
 msgid "Home"
 msgstr ""
@@ -1462,45 +1475,50 @@ msgstr ""
 msgid "Isolated"
 msgstr "Isolé"
 
-#: src/lib/trade/extract-order-status.ts:346
+#: src/lib/trade/extract-order-status.ts:406
 msgid "It can no longer execute."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:259
+#: src/lib/trade/extract-order-status.ts:314
 msgid "It can still execute until {until}."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:204
+#: src/lib/trade/extract-order-status.ts:259
 msgid "it filled"
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:257
+#: src/lib/trade/extract-order-status.ts:312
 msgid "It may still execute."
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:295
+#: src/components/trade/tradebox/order-toast.tsx:306
 msgid "It may still execute. Dismiss it? Your next order on this market will be sent as a new one."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:206
+#: src/lib/trade/extract-order-status.ts:261
 msgid "it partly filled"
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:208
+#: src/lib/trade/extract-order-status.ts:263
 msgid "it was placed"
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:210
+#: src/lib/trade/extract-order-status.ts:265
 msgid "it was set"
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:358
+#: src/lib/trade/extract-order-status.ts:418
 msgid "Its status could not be read."
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:225
-#: src/components/trade/tradebox/order-toast.tsx:314
+#: src/components/trade/tradebox/order-toast.tsx:236
+#: src/components/trade/tradebox/order-toast.tsx:325
+#: src/components/trade/tradebox/order-toast.tsx:368
 msgid "Keep it"
+msgstr ""
+
+#: src/lib/trade/extract-order-status.ts:206
+msgid "Known placed: {placed}. Unknown: {unknownLegs}. Dismiss the hold? Sending the same order again may place a leg that was already placed a second time."
 msgstr ""
 
 #: src/components/trade/footer/footer-bar.tsx:
@@ -1515,12 +1533,12 @@ msgstr "Classement"
 msgid "Learn more"
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:125
+#: src/lib/trade/extract-order-status.ts:148
 msgid "Leg {legNumber}"
 msgstr ""
 
 #. placeholder {0}: leg.price
-#: src/lib/trade/extract-order-status.ts:125
+#: src/lib/trade/extract-order-status.ts:148
 msgid "Leg {legNumber} at {0}"
 msgstr ""
 
@@ -1986,7 +2004,7 @@ msgstr "Pas de marché"
 msgid "No markets found."
 msgstr "Aucun marché trouvé."
 
-#: src/lib/trade/extract-order-status.ts:353
+#: src/lib/trade/extract-order-status.ts:413
 msgid "No matching TWAP is in your history."
 msgstr ""
 
@@ -2048,17 +2066,21 @@ msgstr ""
 msgid "No wallets found"
 msgstr "Aucun portefeuille trouvé"
 
+#: src/lib/trade/extract-order-status.ts:203
+msgid "none"
+msgstr ""
+
 #. placeholder {0}: settlement.error
-#: src/lib/trade/extract-order-status.ts:271
+#: src/lib/trade/extract-order-status.ts:326
 msgid "Not confirmed: {0}. Retry or cancel it."
 msgstr ""
 
 #. placeholder {0}: settlement.error
-#: src/lib/trade/extract-order-status.ts:270
+#: src/lib/trade/extract-order-status.ts:325
 msgid "Not confirmed: {0}. Retry, cancel or dismiss it."
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:333
+#: src/components/trade/tradebox/order-toast.tsx:387
 msgid "Not confirmed. Retry or cancel it."
 msgstr ""
 
@@ -2067,11 +2089,11 @@ msgid "Not connected"
 msgstr "Non connecté"
 
 #. placeholder {0}: describeRemaining(outcome.remainingMs)
-#: src/lib/trade/extract-order-status.ts:234
+#: src/lib/trade/extract-order-status.ts:289
 msgid "Not dismissed. {0} Retry or cancel it."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:286
+#: src/lib/trade/extract-order-status.ts:341
 msgid "Not placed. The request expired before the exchange took it."
 msgstr ""
 
@@ -2085,19 +2107,19 @@ msgstr ""
 #~ msgstr ""
 
 #. placeholder {0}: outcome.error
-#: src/lib/trade/extract-order-status.ts:142
+#: src/lib/trade/extract-order-status.ts:165
 msgid "Not sent: {0}"
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:191
+#: src/lib/trade/extract-order-status.ts:246
 msgid "Not sent. An earlier order on this market is not confirmed yet. Retry or cancel it first."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:190
+#: src/lib/trade/extract-order-status.ts:245
 msgid "Not sent. An earlier order on this market is not confirmed yet. Retry, cancel or dismiss it first."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:197
+#: src/lib/trade/extract-order-status.ts:252
 msgid "Not sent. An earlier order on this market was still unconfirmed: {what}. Press again to send a new order."
 msgstr ""
 
@@ -2105,15 +2127,15 @@ msgstr ""
 #~ msgid "Not sent. Another order on this market just went through. Press again to send a new one."
 #~ msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:162
+#: src/lib/trade/extract-order-status.ts:185
 msgid "Not sent. Another order on this market was just sent from another tab. Press again to send a new one."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:163
+#: src/lib/trade/extract-order-status.ts:186
 msgid "Not sent. Another order on this market was just settled in another tab. Press again to send a new one."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:165
+#: src/lib/trade/extract-order-status.ts:188
 msgid "Not sent. Can't read a pending order for this market. It may come from another version of the app and could still execute."
 msgstr ""
 
@@ -2130,15 +2152,15 @@ msgstr ""
 #~ msgstr ""
 
 #. placeholder {0}: describeHold(hold)
-#: src/lib/trade/extract-order-status.ts:171
+#: src/lib/trade/extract-order-status.ts:194
 msgid "Not sent. Your last order on this market: {0}. Sending the same order again could place those legs twice. Check open orders and send only the missing legs as a new order."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:159
+#: src/lib/trade/extract-order-status.ts:182
 msgid "Not sent. Your TWAP history could not be read, so this TWAP could not be tracked. Try again."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:285
+#: src/lib/trade/extract-order-status.ts:340
 msgid "Not started. The request expired before the exchange took it."
 msgstr ""
 
@@ -2237,7 +2259,7 @@ msgstr ""
 msgid "ORACLE"
 msgstr "ORACLE"
 
-#: src/lib/trade/extract-order-status.ts:127
+#: src/lib/trade/extract-order-status.ts:150
 msgid "Order"
 msgstr ""
 
@@ -2263,11 +2285,11 @@ msgstr ""
 msgid "Order History"
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:444
+#: src/components/trade/tradebox/order-toast.tsx:529
 msgid "Order Queue"
 msgstr "File d'ordres"
 
-#: src/lib/trade/extract-order-status.ts:317
+#: src/lib/trade/extract-order-status.ts:377
 msgid "Order sent. Its status could not be read. It will not be sent again. Check open orders."
 msgstr ""
 
@@ -2355,7 +2377,7 @@ msgstr ""
 msgid "Pairing code does not match this link."
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:57
+#: src/components/trade/tradebox/order-toast.tsx:63
 msgid "Partly filled"
 msgstr ""
 
@@ -2380,7 +2402,7 @@ msgstr ""
 msgid "Payment"
 msgstr "Paiement"
 
-#: src/components/trade/tradebox/order-toast.tsx:449
+#: src/components/trade/tradebox/order-toast.tsx:534
 msgid "pending"
 msgstr "en attente"
 
@@ -2457,7 +2479,7 @@ msgstr ""
 msgid "Place Limit Close"
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:59
+#: src/components/trade/tradebox/order-toast.tsx:65
 msgid "Placed"
 msgstr ""
 
@@ -2677,7 +2699,7 @@ msgstr ""
 #: src/components/trade/mobile/offline-banner.tsx:80
 #: src/components/trade/tradebox/deposit-modal.tsx:153
 #: src/components/trade/tradebox/deposit-modal.tsx:208
-#: src/components/trade/tradebox/order-toast.tsx:240
+#: src/components/trade/tradebox/order-toast.tsx:251
 msgid "Retry"
 msgstr ""
 
@@ -2694,7 +2716,7 @@ msgstr ""
 msgid "RO"
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:63
+#: src/components/trade/tradebox/order-toast.tsx:69
 msgid "Running"
 msgstr ""
 
@@ -2864,7 +2886,7 @@ msgstr ""
 msgid "sent to Hyperliquid"
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:61
+#: src/components/trade/tradebox/order-toast.tsx:67
 msgid "Set"
 msgstr ""
 
@@ -2897,7 +2919,7 @@ msgstr ""
 msgid "Settings"
 msgstr "Paramètres"
 
-#: src/lib/trade/extract-order-status.ts:356
+#: src/lib/trade/extract-order-status.ts:416
 msgid "Several matching TWAPs are in your history."
 msgstr ""
 
@@ -2997,7 +3019,7 @@ msgstr "Signataire non prêt"
 #: src/components/trade/positions/position-tpsl-modal.tsx:116
 #: src/components/trade/positions/positions-tab.tsx:178
 #: src/components/trade/positions/twap-tab.tsx:84
-#: src/components/trade/tradebox/order-toast.tsx:136
+#: src/components/trade/tradebox/order-toast.tsx:144
 #: src/components/trade/tradebox/trade-form-fields.tsx:212
 msgid "Size"
 msgstr "Taille"
@@ -3144,7 +3166,7 @@ msgstr "Statut"
 msgid "Stop Limit"
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:123
+#: src/lib/trade/extract-order-status.ts:146
 msgid "Stop loss"
 msgstr ""
 
@@ -3297,7 +3319,7 @@ msgstr ""
 #~ msgid "Take Market"
 #~ msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:121
+#: src/lib/trade/extract-order-status.ts:144
 msgid "Take profit"
 msgstr ""
 
@@ -3339,7 +3361,11 @@ msgstr ""
 msgid "Testnet"
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:250
+#: src/lib/trade/extract-order-status.ts:222
+msgid "That hold changed or was released before it was dismissed. Nothing was dismissed."
+msgstr ""
+
+#: src/lib/trade/extract-order-status.ts:305
 msgid "That pending order changed before it was dismissed. Press again to check this market."
 msgstr ""
 
@@ -3347,7 +3373,7 @@ msgstr ""
 #~ msgid "The builder at {0}...{1} can now charge up to {maxFeeRate}% fee on orders placed on your behalf."
 #~ msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:347
+#: src/lib/trade/extract-order-status.ts:407
 msgid "The exchange never confirmed this request. {found} {when} Dismiss it? Your next order on this market will be sent as a new one."
 msgstr ""
 
@@ -3363,7 +3389,12 @@ msgstr ""
 msgid "The page you are looking for does not exist."
 msgstr "La page que vous recherchez n'existe pas."
 
-#: src/lib/trade/extract-order-status.ts:212
+#. placeholder {0}: describeHold(hold)
+#: src/lib/trade/extract-order-status.ts:199
+msgid "The same order is held on this market. Last result: {0}."
+msgstr ""
+
+#: src/lib/trade/extract-order-status.ts:267
 msgid "the TWAP started"
 msgstr ""
 
@@ -3371,7 +3402,7 @@ msgstr ""
 #~ msgid "This action must be signed by your main wallet (not an agent/API wallet). The builder must have at least 100 USDC in perps account value."
 #~ msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:157
+#: src/lib/trade/extract-order-status.ts:180
 msgid "This browser can't keep orders from different tabs apart. Use an up-to-date browser over HTTPS to trade."
 msgstr ""
 
@@ -3395,7 +3426,8 @@ msgstr ""
 msgid "This link was created for a different site."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:246
+#: src/lib/trade/extract-order-status.ts:218
+#: src/lib/trade/extract-order-status.ts:301
 msgid "This market is busy. Try again."
 msgstr ""
 
@@ -3405,8 +3437,8 @@ msgstr ""
 msgid "This mobile link expired."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:134
-#: src/lib/trade/extract-order-status.ts:219
+#: src/lib/trade/extract-order-status.ts:157
+#: src/lib/trade/extract-order-status.ts:274
 msgid "This order is already being sent"
 msgstr ""
 
@@ -3414,7 +3446,7 @@ msgstr ""
 msgid "This phone link is not approved on Hyperliquid."
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:223
+#: src/lib/trade/extract-order-status.ts:278
 msgid "This request was already settled. Check open orders."
 msgstr ""
 
@@ -3666,7 +3698,7 @@ msgstr "Ordres TWAP"
 #~ msgid "TWAP sent but not listed yet. It will not be sent again. Check the TWAP tab."
 #~ msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:330
+#: src/lib/trade/extract-order-status.ts:390
 msgid "TWAP sent. Its status could not be read. It will not be sent again. Check the TWAP tab."
 msgstr ""
 
@@ -3674,7 +3706,7 @@ msgstr ""
 #~ msgid "TWAP status unknown: {message}. Check the TWAP tab before you try again."
 #~ msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:333
+#: src/lib/trade/extract-order-status.ts:393
 msgid "TWAP status unknown. A matching TWAP appeared in your history, but it can't be confirmed as this one. It will not be sent again. Check the TWAP tab."
 msgstr ""
 
@@ -3682,7 +3714,7 @@ msgstr ""
 #~ msgid "TWAP status unknown. Check the TWAP tab before you try again."
 #~ msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:336
+#: src/lib/trade/extract-order-status.ts:396
 msgid "TWAP status unknown. It will not be sent again. Check the TWAP tab."
 msgstr ""
 
@@ -3706,11 +3738,11 @@ msgstr "Type"
 #~ msgid "Unable to close position."
 #~ msgstr "Impossible de fermer la position."
 
-#: src/components/trade/tradebox/order-toast.tsx:454
+#: src/components/trade/tradebox/order-toast.tsx:539
 msgid "unconfirmed"
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:127
+#: src/components/trade/tradebox/order-toast.tsx:135
 msgid "Unconfirmed order"
 msgstr ""
 
@@ -3823,8 +3855,8 @@ msgstr ""
 #~ msgid "Wallet client not ready"
 #~ msgstr "Client du portefeuille non prêt"
 
-#: src/hooks/trade/use-submit-plan.ts:91
-#: src/hooks/trade/use-submit-plan.ts:124
+#: src/hooks/trade/use-submit-plan.ts:108
+#: src/hooks/trade/use-submit-plan.ts:141
 msgid "Wallet is required for exchange actions"
 msgstr ""
 
@@ -3892,8 +3924,12 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: src/components/trade/tradebox/order-toast.tsx:216
-#: src/components/trade/tradebox/order-toast.tsx:305
+#: src/components/trade/tradebox/order-toast.tsx:359
+msgid "Yes, dismiss hold"
+msgstr ""
+
+#: src/components/trade/tradebox/order-toast.tsx:227
+#: src/components/trade/tradebox/order-toast.tsx:316
 msgid "Yes, dismiss it"
 msgstr ""
 
@@ -3941,7 +3977,7 @@ msgstr ""
 msgid "Your transaction is being processed"
 msgstr ""
 
-#: src/lib/trade/extract-order-status.ts:352
+#: src/lib/trade/extract-order-status.ts:412
 msgid "Your TWAP history could not be read."
 msgstr ""
 
