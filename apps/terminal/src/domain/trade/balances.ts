@@ -7,9 +7,12 @@ import type {
 	SpotAvailableAfterMaintenance,
 	SpotBalance,
 } from "@/hooks/trade/use-account-balances";
-import type { Dex } from "@/domain/market/model";
+import type { Dex, Market, QuoteToken } from "@/domain/market/model";
 import {
+	type AccountMode,
 	type AccountState,
+	type ClearinghouseState,
+	getCollateralSource,
 	getSpotAvailable as getSpotTokenAvailable,
 	getTransferLimit,
 	type ReadyAccount,
@@ -245,5 +248,172 @@ export function getBalances(account: AccountState, dexes: readonly Dex[], hideSm
 		spot: spot.filter((row) => isVisible(row, hideSmall)),
 		totalUsd,
 		isEmpty: perp.length + spot.length === 0,
+	};
+}
+
+export type OverviewPlace =
+	| { kind: "perps" }
+	| { kind: "dex"; name: string }
+	| { kind: "spot" }
+	| { kind: "unified" }
+	| { kind: "portfolio" }
+	| { kind: "unknown" };
+
+export type AccountNotice = "shared" | "unknown" | "legacy";
+
+export interface LedgerMetrics {
+	equity: string;
+	accountValue: string;
+	balance: string;
+	unrealizedPnl: string;
+	marginRatio: string;
+	crossLeverage: string;
+	maintenanceMargin: string;
+	marginUsed: string;
+	rawUsd: string;
+	available: string;
+}
+
+export type PerpsOverview =
+	| { kind: "ledger"; place: OverviewPlace; token: QuoteToken; notice: AccountNotice | null; metrics: LedgerMetrics }
+	| {
+			kind: "spot";
+			place: OverviewPlace;
+			token: QuoteToken;
+			notice: AccountNotice | null;
+			total: string;
+			available: string;
+	  };
+
+export type AccountSummary =
+	| { status: "pending" }
+	| { status: "ready"; spotEquity: string; perpsEquity: string | null; perps: PerpsOverview };
+
+type SharedMode = Extract<ReadyAccount, { ledger: "spotOnly" }>["mode"];
+
+const MAIN_TOKEN: QuoteToken = { name: DEFAULT_QUOTE_TOKEN, displayName: DEFAULT_QUOTE_TOKEN };
+
+function getNotice(mode: AccountMode): AccountNotice | null {
+	switch (mode.kind) {
+		case "standard":
+			return null;
+		case "legacyDexAbstraction":
+			return "legacy";
+		case "unified":
+		case "portfolio":
+			return "shared";
+		case "unknown":
+			return "unknown";
+		default:
+			return mode satisfies never;
+	}
+}
+
+function getSharedPlace(mode: SharedMode): OverviewPlace {
+	switch (mode.kind) {
+		case "unified":
+			return { kind: "unified" };
+		case "portfolio":
+			return { kind: "portfolio" };
+		case "unknown":
+			return { kind: "unknown" };
+		default:
+			return mode satisfies never;
+	}
+}
+
+function getLedgerMetrics(state: ClearinghouseState | undefined): LedgerMetrics {
+	const accountValue = toSafeBig(state?.crossMarginSummary.accountValue);
+	const maintenanceMargin = toSafeBig(state?.crossMaintenanceMarginUsed);
+	const unrealizedPnl = (state?.assetPositions ?? []).reduce(
+		(sum, entry) => sum.plus(toSafeBig(entry.position.unrealizedPnl)),
+		Big(0),
+	);
+	const hasValue = accountValue.gt(0);
+	return {
+		equity: toSafeBig(state?.marginSummary.accountValue).toFixed(),
+		accountValue: accountValue.toFixed(),
+		balance: accountValue.minus(unrealizedPnl).toFixed(),
+		unrealizedPnl: unrealizedPnl.toFixed(),
+		marginRatio: hasValue ? maintenanceMargin.div(accountValue).toFixed() : "0",
+		crossLeverage: hasValue ? toSafeBig(state?.crossMarginSummary.totalNtlPos).abs().div(accountValue).toFixed() : "0",
+		maintenanceMargin: maintenanceMargin.toFixed(),
+		marginUsed: toSafeBig(state?.marginSummary.totalMarginUsed).toFixed(),
+		rawUsd: toSafeBig(state?.marginSummary.totalRawUsd).toFixed(),
+		available: toSafeBig(state?.withdrawable).toFixed(),
+	};
+}
+
+function getSpotOverview(
+	account: ReadyAccount,
+	place: OverviewPlace,
+	token: QuoteToken,
+	notice: AccountNotice | null,
+): PerpsOverview {
+	const total = account.spot.balances.find((balance) => balance.coin === token.name)?.total ?? "0";
+	return { kind: "spot", place, token, notice, total, available: getSpotTokenAvailable(account.spot, token.name) };
+}
+
+function getPerpsOverview(account: ReadyAccount, market: Market | undefined): PerpsOverview {
+	const notice = getNotice(account.mode);
+	const perpMarket = market?.kind === "spot" ? undefined : market;
+	switch (account.ledger) {
+		case "spotOnly":
+			return getSpotOverview(
+				account,
+				getSharedPlace(account.mode),
+				perpMarket?.dex.collateralToken ?? MAIN_TOKEN,
+				notice,
+			);
+		case "perDex": {
+			const main = account.dexes.get(MAIN_DEX);
+			if (!perpMarket) {
+				return { kind: "ledger", place: { kind: "perps" }, token: MAIN_TOKEN, notice, metrics: getLedgerMetrics(main) };
+			}
+			const source = getCollateralSource(account, perpMarket);
+			const token = perpMarket.dex.collateralToken;
+			switch (source.kind) {
+				case "dex": {
+					const name = source.dex.name;
+					const place: OverviewPlace = name === MAIN_DEX ? { kind: "perps" } : { kind: "dex", name };
+					return { kind: "ledger", place, token, notice, metrics: getLedgerMetrics(account.dexes.get(name)) };
+				}
+				case "mainVia":
+					return { kind: "ledger", place: { kind: "perps" }, token, notice, metrics: getLedgerMetrics(main) };
+				case "spot":
+				case "exchangeOnly":
+					return getSpotOverview(account, { kind: "spot" }, token, notice);
+				default:
+					return source satisfies never;
+			}
+		}
+		default:
+			return account satisfies never;
+	}
+}
+
+function getPerpsEquity(account: ReadyAccount): string | null {
+	switch (account.ledger) {
+		case "spotOnly":
+			return null;
+		case "perDex":
+			return [...account.dexes.values()]
+				.reduce((sum, state) => sum.plus(toSafeBig(state.marginSummary.accountValue)), Big(0))
+				.toFixed();
+		default:
+			return account satisfies never;
+	}
+}
+
+export function getAccountSummary(account: AccountState, market: Market | undefined): AccountSummary {
+	if (account.status !== "ready") return { status: "pending" };
+	const spotEquity = getSpotRows(account)
+		.reduce((sum, row) => sum.plus(toSafeBig(row.usdValue)), Big(0))
+		.toFixed();
+	return {
+		status: "ready",
+		spotEquity,
+		perpsEquity: getPerpsEquity(account),
+		perps: getPerpsOverview(account, market),
 	};
 }

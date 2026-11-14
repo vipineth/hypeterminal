@@ -11,17 +11,59 @@ import {
 import { Skeleton } from "boneyard-js/react";
 import { useState } from "react";
 import { useConnection, useDisconnect } from "wagmi";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/app";
 import { UI_TEXT } from "@/config/ui-text";
-import { useDefaultDexBalances } from "@/hooks/trade/use-account-balances";
+import { getAccountSummary, type PerpsOverview } from "@/domain/trade/balances";
+import { useAccountState } from "@/hooks/trade/use-account-balances";
 import { useCopyToClipboard } from "@/hooks/ui/use-copy-to-clipboard";
 import { cn } from "@/lib/cn";
-import { formatPercent, formatUSD } from "@/lib/format";
+import { formatNumber, formatPercent, formatToken, formatUSD } from "@/lib/format";
+import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { toNumberOrZero } from "@/lib/trade/numbers";
 import { useDepositModalActions } from "@/stores/use-global-modal-store";
+import { AccountNoticeLine } from "../components/account-notice-line";
+import { PerpsSourceLabel } from "../components/perps-source-label";
 import { WalletModal } from "../components/wallet-modal";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
 
 const ACCOUNT_TEXT = UI_TEXT.ACCOUNT_PANEL;
+
+interface Stat {
+	label: string;
+	value: string;
+	valueClass?: string;
+}
+
+function getMarginRatioClass(marginRatio: string): string {
+	const ratio = toNumberOrZero(marginRatio);
+	if (ratio > 0.8) return "text-error";
+	if (ratio > 0.5) return "text-warning";
+	return "";
+}
+
+function getStats(perps: PerpsOverview): Stat[] {
+	if (perps.kind === "spot") {
+		return [
+			{
+				label: ACCOUNT_TEXT.AVAILABLE_LABEL,
+				value: formatToken(perps.available, { decimals: 2, symbol: perps.token.displayName }),
+			},
+		];
+	}
+	const { metrics } = perps;
+	return [
+		{ label: ACCOUNT_TEXT.BALANCE_LABEL, value: formatUSD(metrics.rawUsd) },
+		{ label: ACCOUNT_TEXT.AVAILABLE_LABEL, value: formatUSD(metrics.available) },
+		{ label: ACCOUNT_TEXT.MARGIN_USED_LABEL, value: formatUSD(metrics.marginUsed) },
+		{
+			label: ACCOUNT_TEXT.MARGIN_RATIO_LABEL,
+			value: formatPercent(metrics.marginRatio),
+			valueClass: getMarginRatioClass(metrics.marginRatio),
+		},
+		{ label: t`Maintenance Margin`, value: formatUSD(metrics.maintenanceMargin) },
+		{ label: ACCOUNT_TEXT.CROSS_LEVERAGE_LABEL, value: `${formatNumber(metrics.crossLeverage, 2)}x` },
+	];
+}
 
 interface MobileAccountViewProps {
 	className?: string;
@@ -31,8 +73,11 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 	const { address, isConnected } = useConnection();
 	const disconnect = useDisconnect();
 
-	const { marginSummary, perpSummary, perpPositions, withdrawable, crossMaintenanceMarginUsed, isLoading } =
-		useDefaultDexBalances();
+	const account = useAccountState();
+	const { data: market } = useSelectedMarketInfo();
+	const summary = getAccountSummary(account, market);
+	const perps = summary.status === "ready" ? summary.perps : null;
+	const isLoading = account.status === "loading";
 
 	const [walletModalOpen, setWalletModalOpen] = useState(false);
 	const { copied, copy } = useCopyToClipboard();
@@ -43,20 +88,8 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 		copy(address);
 	}
 
-	const accountValue = toNumberOrZero(marginSummary?.accountValue);
-	const totalMarginUsed = toNumberOrZero(marginSummary?.totalMarginUsed);
-	const totalRawUsd = toNumberOrZero(marginSummary?.totalRawUsd);
-	const crossAccountValue = toNumberOrZero(perpSummary?.accountValue);
-	const crossNtlPos = toNumberOrZero(perpSummary?.totalNtlPos);
-	const maintenanceMargin = toNumberOrZero(crossMaintenanceMarginUsed);
-	const availableBalance = toNumberOrZero(withdrawable);
-	const marginRatio = crossAccountValue > 0 ? maintenanceMargin / crossAccountValue : 0;
-	const crossLeverage = crossAccountValue > 0 ? Math.abs(crossNtlPos) / crossAccountValue : 0;
-
-	let unrealizedPnl = 0;
-	for (const pos of perpPositions) {
-		unrealizedPnl += toNumberOrZero(pos.position.unrealizedPnl);
-	}
+	const unrealizedPnl = perps?.kind === "ledger" ? perps.metrics.unrealizedPnl : null;
+	const isPnlUp = toNumberOrZero(unrealizedPnl) >= 0;
 
 	if (!isConnected) {
 		return (
@@ -127,36 +160,37 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 				<div className="p-2 space-y-4">
 					<div className="p-4 rounded-xs border border-stroke-weak/60 bg-surface">
 						<Skeleton name="account-equity" loading={isLoading}>
-							<div className="text-2xs uppercase font-medium text-fg-muted mb-1.5">{ACCOUNT_TEXT.EQUITY_LABEL}</div>
-							<div className="text-3xl font-bold tabular-nums text-fg">{formatUSD(accountValue)}</div>
-							<div
-								className={cn(
-									"text-sm tabular-nums mt-1.5 font-medium",
-									unrealizedPnl >= 0 ? "text-success" : "text-error",
-								)}
-							>
-								{unrealizedPnl >= 0 ? "+" : ""}
-								{formatUSD(unrealizedPnl)} {ACCOUNT_TEXT.UNREALIZED_LABEL}
+							<div className="flex items-baseline justify-between gap-2 text-2xs uppercase font-medium text-fg-muted mb-1.5">
+								{ACCOUNT_TEXT.EQUITY_LABEL}
+								{perps && <PerpsSourceLabel place={perps.place} token={perps.token} className="normal-case" />}
 							</div>
+							<div className="text-3xl font-bold tabular-nums text-fg">
+								{formatUSD(perps?.kind === "spot" ? perps.total : perps?.metrics.equity)}
+							</div>
+							{unrealizedPnl !== null && (
+								<div className={cn("text-sm tabular-nums mt-1.5 font-medium", isPnlUp ? "text-success" : "text-error")}>
+									{isPnlUp ? "+" : ""}
+									{formatUSD(unrealizedPnl)} {ACCOUNT_TEXT.UNREALIZED_LABEL}
+								</div>
+							)}
+							{perps?.notice && <AccountNoticeLine notice={perps.notice} token={perps.token} className="mt-2" />}
 						</Skeleton>
 					</div>
 
 					<div className="grid grid-cols-2 gap-3">
-						<StatCard label={ACCOUNT_TEXT.BALANCE_LABEL} value={formatUSD(totalRawUsd)} isLoading={isLoading} />
-						<StatCard label={ACCOUNT_TEXT.AVAILABLE_LABEL} value={formatUSD(availableBalance)} isLoading={isLoading} />
-						<StatCard label={ACCOUNT_TEXT.MARGIN_USED_LABEL} value={formatUSD(totalMarginUsed)} isLoading={isLoading} />
-						<StatCard
-							label={ACCOUNT_TEXT.MARGIN_RATIO_LABEL}
-							value={formatPercent(marginRatio)}
-							valueClass={marginRatio > 0.8 ? "text-error" : marginRatio > 0.5 ? "text-warning" : ""}
-							isLoading={isLoading}
-						/>
-						<StatCard label={t`Maintenance Margin`} value={formatUSD(maintenanceMargin)} isLoading={isLoading} />
-						<StatCard
-							label={ACCOUNT_TEXT.CROSS_LEVERAGE_LABEL}
-							value={`${crossLeverage.toFixed(2)}x`}
-							isLoading={isLoading}
-						/>
+						{perps ? (
+							getStats(perps).map((stat) => (
+								<StatCard
+									key={stat.label}
+									label={stat.label}
+									value={stat.value}
+									valueClass={stat.valueClass}
+									isLoading={isLoading}
+								/>
+							))
+						) : (
+							<StatCard label={ACCOUNT_TEXT.AVAILABLE_LABEL} value={FALLBACK_VALUE_PLACEHOLDER} isLoading={isLoading} />
+						)}
 					</div>
 
 					<div className="grid grid-cols-3 gap-2 pt-2">

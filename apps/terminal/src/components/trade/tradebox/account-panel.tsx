@@ -3,112 +3,64 @@ import { t } from "@lingui/core/macro";
 import { ArrowsLeftRightIcon, DownloadSimpleIcon, UploadSimpleIcon } from "@phosphor-icons/react";
 import { useConnection } from "wagmi";
 import { InfoRow, InfoRowGroup } from "@/components/ui/info-row";
-import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER } from "@/config/app";
-import { getSpotAvailableValue } from "@/domain/trade/balances";
-import { useDefaultDexBalances } from "@/hooks/trade/use-account-balances";
+import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/app";
+import { getAccountSummary, type PerpsOverview } from "@/domain/trade/balances";
+import { useAccountState } from "@/hooks/trade/use-account-balances";
 import { cn } from "@/lib/cn";
-import { formatPercent, formatUSD } from "@/lib/format";
-import { toNumberOrZero } from "@/lib/trade/numbers";
+import { formatNumber, formatPercent, formatToken, formatUSD } from "@/lib/format";
+import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { getValueColorClass } from "@/lib/ui/value-color";
 import { useDepositModalActions } from "@/stores/use-global-modal-store";
+import { AccountNoticeLine } from "../components/account-notice-line";
+import { PerpsSourceLabel } from "../components/perps-source-label";
 
-type SummaryRow = {
+interface SummaryRow {
 	label: string;
 	value: string;
 	valueClassName?: string;
-};
+}
+
+function getPerpsRows(perps: PerpsOverview): SummaryRow[] {
+	if (perps.kind === "spot") {
+		const symbol = perps.token.displayName;
+		return [
+			{ label: t`Total`, value: formatToken(perps.total, { decimals: 2, symbol }), valueClassName: "tabular-nums" },
+			{
+				label: t`Available`,
+				value: formatToken(perps.available, { decimals: 2, symbol }),
+				valueClassName: "tabular-nums",
+			},
+		];
+	}
+	const { metrics } = perps;
+	return [
+		{ label: t`Balance`, value: formatUSD(metrics.balance), valueClassName: "tabular-nums" },
+		{
+			label: t`Unrealized PNL`,
+			value: formatUSD(metrics.unrealizedPnl, { signDisplay: "exceptZero" }),
+			valueClassName: cn("tabular-nums", getValueColorClass(metrics.unrealizedPnl)),
+		},
+		{
+			label: t`Cross Margin Ratio`,
+			value: formatPercent(metrics.marginRatio, { maximumFractionDigits: 2 }),
+			valueClassName: "tabular-nums",
+		},
+		{ label: t`Maintenance Margin`, value: formatUSD(metrics.maintenanceMargin), valueClassName: "tabular-nums" },
+		{
+			label: t`Cross Account Leverage`,
+			value: `${formatNumber(metrics.crossLeverage, 2)}x`,
+			valueClassName: "tabular-nums",
+		},
+	];
+}
 
 export function AccountPanel() {
 	const { open: openDepositModal } = useDepositModalActions();
 	const { isConnected } = useConnection();
-	const {
-		marginSummary,
-		perpSummary,
-		perpPositions,
-		spotBalances,
-		spotAvailableAfterMaintenance,
-		crossMaintenanceMarginUsed,
-	} = useDefaultDexBalances();
-
-	let perpMetrics = null;
-	if (marginSummary && perpSummary) {
-		const crossAccountValue = toNumberOrZero(perpSummary.accountValue);
-		const crossTotalNtlPos = toNumberOrZero(perpSummary.totalNtlPos);
-		const maintenanceMargin = toNumberOrZero(crossMaintenanceMarginUsed);
-
-		let unrealizedPnl = 0;
-		for (const pos of perpPositions) {
-			unrealizedPnl += toNumberOrZero(pos.position.unrealizedPnl);
-		}
-
-		const balance = crossAccountValue - unrealizedPnl;
-		const marginRatio = crossAccountValue > 0 ? maintenanceMargin / crossAccountValue : 0;
-		const crossLeverage = crossAccountValue > 0 ? Math.abs(crossTotalNtlPos) / crossAccountValue : 0;
-
-		perpMetrics = {
-			accountValue: crossAccountValue,
-			balance,
-			unrealizedPnl,
-			marginRatio,
-			crossLeverage,
-			maintenanceMargin,
-		};
-	}
-
-	let spotMetrics = null;
-	if (isConnected) {
-		let totalValue = 0;
-		const tokens: Array<{ coin: string; total: number; available: number; usdValue: number }> = [];
-
-		for (const b of spotBalances) {
-			const total = toNumberOrZero(b.total);
-			const entryNtl = toNumberOrZero(b.entryNtl);
-
-			if (total === 0) continue;
-
-			const available = toNumberOrZero(getSpotAvailableValue(b, spotAvailableAfterMaintenance));
-			const usdValue = b.coin === DEFAULT_QUOTE_TOKEN ? total : entryNtl;
-
-			totalValue += usdValue;
-			tokens.push({ coin: b.coin, total, available, usdValue });
-		}
-
-		tokens.sort((a, b) => b.usdValue - a.usdValue);
-		spotMetrics = { totalValue, topTokens: tokens.slice(0, 3) };
-	}
-
-	const hasPerpData = isConnected && perpMetrics !== null;
-	const hasSpotData = isConnected && spotMetrics !== null;
-
-	const perpRows: SummaryRow[] = perpMetrics
-		? [
-				{
-					label: t`Balance`,
-					value: formatUSD(perpMetrics.balance),
-					valueClassName: "tabular-nums",
-				},
-				{
-					label: t`Unrealized PNL`,
-					value: formatUSD(perpMetrics.unrealizedPnl, { signDisplay: "exceptZero" }),
-					valueClassName: cn("tabular-nums", getValueColorClass(perpMetrics.unrealizedPnl)),
-				},
-				{
-					label: t`Cross Margin Ratio`,
-					value: formatPercent(perpMetrics.marginRatio, { maximumFractionDigits: 2 }),
-					valueClassName: "tabular-nums",
-				},
-				{
-					label: t`Maintenance Margin`,
-					value: formatUSD(perpMetrics.maintenanceMargin),
-					valueClassName: "tabular-nums",
-				},
-				{
-					label: t`Cross Account Leverage`,
-					value: `${perpMetrics.crossLeverage.toFixed(2)}x`,
-					valueClassName: "tabular-nums",
-				},
-			]
-		: [];
+	const account = useAccountState();
+	const { data: market } = useSelectedMarketInfo();
+	const summary = getAccountSummary(account, market);
+	const ready = summary.status === "ready" ? summary : null;
 
 	return (
 		<div className="shrink-0 flex flex-col bg-surface border-t border-stroke-weak pb-6 overflow-hidden">
@@ -124,58 +76,64 @@ export function AccountPanel() {
 					<InfoRowGroup className="divide-y-0">
 						<InfoRow
 							label={t`Spot`}
-							value={spotMetrics ? formatUSD(spotMetrics.totalValue) : FALLBACK_VALUE_PLACEHOLDER}
+							value={ready ? formatUSD(ready.spotEquity) : FALLBACK_VALUE_PLACEHOLDER}
 							valueClassName="tabular-nums"
 						/>
-						<InfoRow
-							label={t`Perps`}
-							value={perpMetrics ? formatUSD(perpMetrics.accountValue) : FALLBACK_VALUE_PLACEHOLDER}
-							valueClassName="tabular-nums"
-						/>
+						{ready?.perpsEquity !== null && (
+							<InfoRow
+								label={t`Perps`}
+								value={ready ? formatUSD(ready.perpsEquity) : FALLBACK_VALUE_PLACEHOLDER}
+								valueClassName="tabular-nums"
+							/>
+						)}
 					</InfoRowGroup>
 
-					{hasPerpData && (
+					{ready && (
 						<>
-							<p className="text-xs font-medium text-fg mt-3 mb-1">{t`Perps Overview`}</p>
+							<p className="flex items-baseline justify-between gap-2 text-xs font-medium text-fg mt-3 mb-1">
+								{t`Perps Overview`}
+								<PerpsSourceLabel place={ready.perps.place} token={ready.perps.token} className="text-fg-muted" />
+							</p>
+							{ready.perps.notice && (
+								<AccountNoticeLine notice={ready.perps.notice} token={ready.perps.token} className="mb-1 px-2" />
+							)}
 							<InfoRowGroup className="divide-y-0">
-								{perpRows.map((row) => (
+								{getPerpsRows(ready.perps).map((row) => (
 									<InfoRow key={row.label} label={row.label} value={row.value} valueClassName={row.valueClassName} />
 								))}
 							</InfoRowGroup>
 						</>
 					)}
 
-					{(hasPerpData || hasSpotData) && (
-						<div className="grid grid-cols-3 gap-1 mt-4">
-							<Button
-								variant="outline"
-								intent="neutral"
-								onClick={() => openDepositModal("withdraw")}
-								aria-label={t`Withdraw`}
-								iconLeft={<UploadSimpleIcon className="size-4" />}
-							>
-								{t`Withdraw`}
-							</Button>
-							<Button
-								variant="outline"
-								intent="neutral"
-								onClick={() => openDepositModal("deposit")}
-								aria-label={t`Deposit`}
-								iconLeft={<DownloadSimpleIcon className="size-4" />}
-							>
-								{t`Deposit`}
-							</Button>
-							<Button
-								variant="outline"
-								intent="neutral"
-								onClick={() => openDepositModal("bridge")}
-								aria-label={t`Bridge`}
-								iconLeft={<ArrowsLeftRightIcon className="size-4" />}
-							>
-								{t`Bridge`}
-							</Button>
-						</div>
-					)}
+					<div className="grid grid-cols-3 gap-1 mt-4">
+						<Button
+							variant="outline"
+							intent="neutral"
+							onClick={() => openDepositModal("withdraw")}
+							aria-label={t`Withdraw`}
+							iconLeft={<UploadSimpleIcon className="size-4" />}
+						>
+							{t`Withdraw`}
+						</Button>
+						<Button
+							variant="outline"
+							intent="neutral"
+							onClick={() => openDepositModal("deposit")}
+							aria-label={t`Deposit`}
+							iconLeft={<DownloadSimpleIcon className="size-4" />}
+						>
+							{t`Deposit`}
+						</Button>
+						<Button
+							variant="outline"
+							intent="neutral"
+							onClick={() => openDepositModal("bridge")}
+							aria-label={t`Bridge`}
+							iconLeft={<ArrowsLeftRightIcon className="size-4" />}
+						>
+							{t`Bridge`}
+						</Button>
+					</div>
 				</div>
 			)}
 		</div>

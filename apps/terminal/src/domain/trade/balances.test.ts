@@ -1,18 +1,33 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { type MetaPayloads, parseMarkets } from "@/domain/market/model";
+import { type Market, type MetaPayloads, parseMarkets } from "@/domain/market/model";
 import { type AccountMode, buildAccountState, type ReadyAccount } from "@/domain/trade/account-mode";
-import { getBalances, getSpendableSpotTokens, getSpendLimit, isWithinSpendLimit } from "@/domain/trade/balances";
+import {
+	type AccountSummary,
+	getAccountSummary,
+	getBalances,
+	getSpendableSpotTokens,
+	getSpendLimit,
+	isWithinSpendLimit,
+} from "@/domain/trade/balances";
 import { type AccountFixture, clearinghouse } from "@/test/account-fixture";
 
 const meta: MetaPayloads = JSON.parse(
 	readFileSync(new URL("../../../fixtures/hl-mainnet-meta.json", import.meta.url), "utf8"),
 );
-const { dexes } = parseMarkets(meta);
+const { dexes, byName } = parseMarkets(meta);
+
+function market(name: string): Market {
+	const found = byName.get(name);
+	if (!found) throw new Error(`no market ${name}`);
+	return found;
+}
 
 const STANDARD: AccountMode = { kind: "standard", raw: "disabled" };
 const UNIFIED: AccountMode = { kind: "unified" };
 const PORTFOLIO: AccountMode = { kind: "portfolio" };
+const LEGACY: AccountMode = { kind: "legacyDexAbstraction" };
+const UNKNOWN: AccountMode = { kind: "unknown", raw: "somethingNew" };
 
 function fixture(name: string): AccountFixture {
 	return JSON.parse(readFileSync(new URL(`./__fixtures__/account/${name}.json`, import.meta.url), "utf8"));
@@ -174,5 +189,130 @@ describe("spend limits", () => {
 	it("offers only spot tokens with something available to send", () => {
 		expect(getSpendableSpotTokens(fixture("mainnet-unified-0x8c60").spot)).toEqual(["USDC"]);
 		expect(getSpendableSpotTokens(fixture("mainnet-disabled-main-only").spot)).toEqual([]);
+	});
+});
+
+function overviewView(summary: AccountSummary) {
+	if (summary.status !== "ready") return summary;
+	const { perps } = summary;
+	const base = { place: perps.place, token: perps.token.displayName, notice: perps.notice };
+	if (perps.kind === "spot") return { ...base, total: perps.total, available: perps.available };
+	return { ...base, equity: perps.metrics.equity, available: perps.metrics.available };
+}
+
+describe("account summary", () => {
+	const twoDexes = accountOf("mainnet-disabled-two-dexes", STANDARD);
+	const unified = accountOf("mainnet-unified-0x8c60", UNIFIED);
+
+	it.each([
+		[
+			"standard on a USDC builder dex",
+			twoDexes,
+			"xyz:NVDA",
+			{
+				place: { kind: "dex", name: "xyz" },
+				token: "USDC",
+				notice: null,
+				equity: "72546.183129",
+				available: "56427.700923",
+			},
+		],
+		[
+			"standard on a USDH builder dex",
+			twoDexes,
+			"flx:NVDA",
+			{ place: { kind: "dex", name: "flx" }, token: "USDH", notice: null, equity: "0", available: "0" },
+		],
+		[
+			"standard on the main dex",
+			twoDexes,
+			"BTC",
+			{ place: { kind: "perps" }, token: "USDC", notice: null, equity: "121166.943682", available: "64116.532932" },
+		],
+		[
+			"unified on a USDC builder dex",
+			unified,
+			"xyz:NVDA",
+			{
+				place: { kind: "unified" },
+				token: "USDC",
+				notice: "shared",
+				total: "68423.40402379",
+				available: "66207.01836979",
+			},
+		],
+		[
+			"unified on a USDH builder dex",
+			unified,
+			"flx:NVDA",
+			{ place: { kind: "unified" }, token: "USDH", notice: "shared", total: "0", available: "0" },
+		],
+		[
+			"portfolio on a USDC builder dex",
+			accountOf("mainnet-unified-0x8c60", PORTFOLIO),
+			"xyz:NVDA",
+			{
+				place: { kind: "portfolio" },
+				token: "USDC",
+				notice: "shared",
+				total: "68423.40402379",
+				available: "66207.01836979",
+			},
+		],
+		[
+			"portfolio on a USDH builder dex",
+			accountOf("mainnet-unified-0x8c60", PORTFOLIO),
+			"flx:NVDA",
+			{ place: { kind: "portfolio" }, token: "USDH", notice: "shared", total: "0", available: "0" },
+		],
+		[
+			"legacy on a USDC builder dex draws on the main dex",
+			accountOf("mainnet-disabled-two-dexes", LEGACY),
+			"xyz:NVDA",
+			{ place: { kind: "perps" }, token: "USDC", notice: "legacy", equity: "121166.943682", available: "64116.532932" },
+		],
+		[
+			"legacy on a USDH builder dex draws on spot",
+			accountOf("mainnet-disabled-two-dexes", LEGACY),
+			"flx:NVDA",
+			{ place: { kind: "spot" }, token: "USDH", notice: "legacy", total: "0", available: "0" },
+		],
+		[
+			"unknown mode",
+			accountOf("mainnet-unified-0x8c60", UNKNOWN),
+			"xyz:NVDA",
+			{
+				place: { kind: "unknown" },
+				token: "USDC",
+				notice: "unknown",
+				total: "68423.40402379",
+				available: "66207.01836979",
+			},
+		],
+	])("names the collateral behind the market: %s", (_name, account, marketName, expected) => {
+		expect(overviewView(getAccountSummary(account, market(marketName)))).toEqual(expected);
+	});
+
+	it("never reads a unified account's per-dex balance", () => {
+		const summary = getAccountSummary(unified, market("xyz:NVDA"));
+
+		expect(JSON.stringify(summary)).not.toContain("4433.0458");
+	});
+
+	it("falls back to the main dex when a spot market is selected", () => {
+		expect(overviewView(getAccountSummary(twoDexes, market("@107")))).toMatchObject({ place: { kind: "perps" } });
+		expect(overviewView(getAccountSummary(unified, market("@107")))).toMatchObject({ place: { kind: "unified" } });
+	});
+
+	it("sums perps equity across funded dexes and hides it for a unified account", () => {
+		const standardSummary = getAccountSummary(twoDexes, undefined);
+		const unifiedSummary = getAccountSummary(unified, undefined);
+
+		expect(standardSummary).toMatchObject({ perpsEquity: "206474.391795", spotEquity: "0.00000009" });
+		expect(unifiedSummary).toMatchObject({ perpsEquity: null, spotEquity: "68423.40402379" });
+	});
+
+	it("stays pending while the account loads", () => {
+		expect(getAccountSummary({ status: "loading" }, market("BTC"))).toEqual({ status: "pending" });
 	});
 });
