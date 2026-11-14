@@ -645,6 +645,14 @@ describe("top-up the ticket asks for on an empty builder dex", () => {
 		expect(ticket.fundingNeed).toBeGreaterThanOrEqual(1109.89109);
 		expect(ticket.feeRatePercent).toBe("0.0900%");
 	});
+
+	it("funds at the tier-0 taker rate when the cached user rate is a lower tier", () => {
+		form.takerRate = 0.0004;
+		const ticket = renderTicket();
+
+		expect(ticket.fundingNeed).toBeGreaterThanOrEqual(fundsToFill("sell", 100, "100", "99"));
+		expect(ticket.feeRatePercent).toBe("0.0800%");
+	});
 });
 
 describe("perp ticket tp/sl against the live mark and the sent entry price", () => {

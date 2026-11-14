@@ -4,6 +4,7 @@ import { useConnection, useSwitchChain, useWalletClient } from "wagmi";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/app";
 import { DEFAULT_BUILDER_CONFIG } from "@/config/hyperliquid";
 import { APPROVAL_ERROR_DISMISS_MS } from "@/config/time";
+import { ORDER_FEE_RATE_MAKER, ORDER_FEE_RATE_TAKER } from "@/config/trade";
 import { getPositionDex } from "@/domain/market";
 import { getMarketFeeRates } from "@/domain/market/fees";
 import { isListed } from "@/domain/market/model";
@@ -191,7 +192,9 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 				legs: getOpeningLegs(orderInput),
 				markPx: orderInput.markPx,
 				leverage: entry.currentLeverage,
-				feeRate: takerRate + Number(DEFAULT_BUILDER_CONFIG?.f ?? 0) / TENTHS_OF_BPS_PER_UNIT,
+				feeRate:
+					getMarketFeeRates({ takerRate: ORDER_FEE_RATE_TAKER, makerRate: ORDER_FEE_RATE_MAKER }, market).takerRate +
+					Number(DEFAULT_BUILDER_CONFIG?.f ?? 0) / TENTHS_OF_BPS_PER_UNIT,
 			})
 		: 0;
 
