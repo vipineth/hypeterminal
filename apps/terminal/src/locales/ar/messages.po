@@ -3973,8 +3973,8 @@ msgstr ""
 #~ msgid "Wallet client not ready"
 #~ msgstr "عميل المحفظة غير جاهز"
 
-#: src/hooks/trade/use-submit-plan.ts:125
-#: src/hooks/trade/use-submit-plan.ts:161
+#: src/hooks/trade/use-submit-plan.ts:130
+#: src/hooks/trade/use-submit-plan.ts:164
 msgid "Wallet is required for exchange actions"
 msgstr ""
 

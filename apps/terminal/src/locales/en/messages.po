@@ -3977,8 +3977,8 @@ msgstr "Wallet ({0})"
 #~ msgid "Wallet client not ready"
 #~ msgstr "Wallet client not ready"
 
-#: src/hooks/trade/use-submit-plan.ts:125
-#: src/hooks/trade/use-submit-plan.ts:161
+#: src/hooks/trade/use-submit-plan.ts:130
+#: src/hooks/trade/use-submit-plan.ts:164
 msgid "Wallet is required for exchange actions"
 msgstr "Wallet is required for exchange actions"
 
