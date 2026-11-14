@@ -1,7 +1,16 @@
 import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { AgentNotApproved, agentWallet, loadKeys, openHarness, principalWallet, SigningRefused } from "./harness";
+import {
+	AgentNotApproved,
+	agentWallet,
+	isModeLocked,
+	loadKeys,
+	lockAccountMode,
+	openHarness,
+	principalWallet,
+	SigningRefused,
+} from "./harness";
 
 const keys = { principalKey: generatePrivateKey(), agentKey: generatePrivateKey() };
 const principal = privateKeyToAccount(keys.principalKey);
@@ -107,6 +116,45 @@ describe("testnet transport", () => {
 			message: { source: "a", connectionId: `0x${"00".repeat(32)}` },
 		} as const;
 		expect(await failure(wallet.signTypedData(params as never))).toMatch(/agent refuses Agent with source a/);
+	});
+});
+
+describe("mode-locked principal", () => {
+	const testnet = new HttpTransport({ isTestnet: true });
+	const usdc = "USDC:0xeb62eee3685fc4c43992febcd9e75443";
+
+	it("locks principal 3, the last default-mode account", () => {
+		expect(isModeLocked("0x722cD926F00399fDb28BBa08639F37cFE8002E81")).toBe(true);
+		expect(isModeLocked(principal.address)).toBe(false);
+	});
+
+	it("refuses to sign a mode change or a cross-dex send and sends nothing", async () => {
+		const exchange = new ExchangeClient({ transport: testnet, wallet: principalWallet(principal, testnet, true) });
+		expect(await failure(exchange.userSetAbstraction({ user: principal.address, abstraction: "unifiedAccount" }))).toMatch(
+			/refusing UserSetAbstraction/,
+		);
+		expect(
+			await failure(
+				exchange.sendAsset({ destination: principal.address, sourceDex: "", destinationDex: "xyz", token: usdc, amount: "1" }),
+			),
+		).toMatch(/refusing SendAsset from "" to "xyz"/);
+		expect(requests).toEqual([]);
+	});
+
+	it("still signs a perp to spot transfer for a locked principal", async () => {
+		const exchange = new ExchangeClient({ transport: testnet, wallet: principalWallet(principal, testnet, true) });
+		await exchange.usdClassTransfer({ amount: "1", toPerp: false });
+		expect(requests).toEqual(["https://api.hyperliquid-testnet.xyz/exchange"]);
+	});
+
+	it("refuses agentSetAbstraction above the signer and sends nothing", async () => {
+		const exchange = lockAccountMode(new ExchangeClient({ transport: testnet, wallet: agentWallet(agent, testnet) }));
+		expect(await failure(exchange.agentSetAbstraction({ abstraction: "u" }))).toMatch(/refusing agentSetAbstraction/);
+		expect(await failure(exchange.userSetAbstraction({ user: principal.address, abstraction: "disabled" }))).toMatch(
+			/refusing userSetAbstraction/,
+		);
+		await exchange.order({ orders: [order], grouping: "na" });
+		expect(requests).toEqual(["https://api.hyperliquid-testnet.xyz/exchange"]);
 	});
 });
 

@@ -18,6 +18,12 @@ export const PRINCIPAL_PRIMARY_TYPES = new Set([
 	"HyperliquidTransaction:UserSetAbstraction",
 ]);
 
+export const MODE_LOCKED_PRINCIPALS: ReadonlySet<string> = new Set(["0x722cd926f00399fdb28bba08639f37cfe8002e81"]);
+
+export function isModeLocked(address: string): boolean {
+	return MODE_LOCKED_PRINCIPALS.has(address.toLowerCase());
+}
+
 export interface HarnessKeys {
 	principalKey: Hex;
 	agentKey: Hex;
@@ -172,7 +178,17 @@ function refuseUnlessTestnetUserAction(transport: HttpTransport, typedData: Type
 	}
 }
 
-function principalProvider(account: PrivateKeyAccount, transport: HttpTransport) {
+function refuseModeChange(typedData: TypedDataJson): void {
+	if (typedData.primaryType === "HyperliquidTransaction:UserSetAbstraction") {
+		throw new SigningRefused("refusing UserSetAbstraction: this principal's account mode is locked");
+	}
+	const { sourceDex, destinationDex } = typedData.message ?? {};
+	if (typedData.primaryType === "HyperliquidTransaction:SendAsset" && sourceDex !== destinationDex) {
+		throw new SigningRefused(`refusing SendAsset from ${JSON.stringify(sourceDex)} to ${JSON.stringify(destinationDex)}: this principal's dexes are locked`);
+	}
+}
+
+function principalProvider(account: PrivateKeyAccount, transport: HttpTransport, modeLocked: boolean) {
 	return {
 		async request({ method, params }: { method: string; params?: unknown }) {
 			switch (method) {
@@ -188,6 +204,7 @@ function principalProvider(account: PrivateKeyAccount, transport: HttpTransport)
 					}
 					const typedData = JSON.parse(json) as TypedDataJson;
 					refuseUnlessTestnetUserAction(transport, typedData);
+					if (modeLocked) refuseModeChange(typedData);
 					const { EIP712Domain: _domain, ...types } = typedData.types;
 					return account.signTypedData({
 						domain: typedData.domain,
@@ -203,8 +220,15 @@ function principalProvider(account: PrivateKeyAccount, transport: HttpTransport)
 	};
 }
 
-export function principalWallet(account: PrivateKeyAccount, transport: HttpTransport) {
-	const client = createWalletClient({ account: account.address, transport: custom(principalProvider(account, transport)) });
+export function principalWallet(
+	account: PrivateKeyAccount,
+	transport: HttpTransport,
+	modeLocked = isModeLocked(account.address),
+) {
+	const client = createWalletClient({
+		account: account.address,
+		transport: custom(principalProvider(account, transport, modeLocked)),
+	});
 	const wallet = toHyperliquidWallet(client);
 	if (!wallet) throw new Error("the app wallet adapter returned no wallet");
 	return wallet;
@@ -228,6 +252,17 @@ export function agentWallet(account: PrivateKeyAccount, transport: HttpTransport
 	};
 }
 
+export function lockAccountMode(exchange: ExchangeClient): ExchangeClient {
+	return new Proxy(exchange, {
+		get(target, property, receiver) {
+			if (property === "agentSetAbstraction" || property === "userSetAbstraction") {
+				return () => Promise.reject(new SigningRefused(`refusing ${property}: this principal's account mode is locked`));
+			}
+			return Reflect.get(target, property, receiver);
+		},
+	});
+}
+
 export class AgentNotApproved extends Error {}
 
 export async function openHarness(transport: HttpTransport, keys: HarnessKeys): Promise<Harness> {
@@ -242,11 +277,14 @@ export async function openHarness(transport: HttpTransport, keys: HarnessKeys): 
 			`agent ${agentAccount.address} signs for ${signsFor ?? `no account (role ${role.role})`}, not principal ${principalAccount.address}. Approve the agent for this principal first.`,
 		);
 	}
+	const principal = new ExchangeClient({ transport, wallet: principalWallet(principalAccount, transport) });
+	const agent = new ExchangeClient({ transport, wallet: agentWallet(agentAccount, transport) });
+	const locked = isModeLocked(principalAccount.address);
 	return {
 		transport,
 		info,
-		principal: new ExchangeClient({ transport, wallet: principalWallet(principalAccount, transport) }),
-		agent: new ExchangeClient({ transport, wallet: agentWallet(agentAccount, transport) }),
+		principal: locked ? lockAccountMode(principal) : principal,
+		agent: locked ? lockAccountMode(agent) : agent,
 		user: principalAccount.address,
 		agentAddress: agentAccount.address,
 	};
