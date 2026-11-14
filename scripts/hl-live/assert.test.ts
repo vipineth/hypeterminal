@@ -35,7 +35,7 @@ describe("expectStatuses", () => {
 
 	it("fails on an error leg through the app's own status reading", () => {
 		expect(() => expectStatuses([{ resting: { oid: 1 } }, { error: "Insufficient margin" }] as never, ["resting", "error"])).toThrow(
-			/the app reads the response as a failure: Insufficient margin/,
+			/the app reads the response as a failure: .*Insufficient margin/,
 		);
 	});
 

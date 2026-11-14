@@ -27,7 +27,7 @@ export function statusKind(status: OrderStatus): StatusKind {
 }
 
 export function expectStatuses(statuses: OrderStatus[], expected: StatusKind[]): void {
-	const verdict = interpretOrderStatuses(statuses);
+	const verdict = interpretOrderStatuses(statuses, []);
 	if (!verdict.ok) throw new Error(`the app reads the response as a failure: ${verdict.error}`);
 	const actual = statuses.map(statusKind);
 	if (actual.join() !== expected.join()) {
