@@ -6,6 +6,7 @@ export interface FeeRates {
 }
 
 const MAX_DEPLOYER_FEE_SCALE = 3;
+const MAX_GROWTH_MODE_DEPLOYER_FEE_SCALE = 10;
 const GROWTH_MODE_FEE_SCALE = 0.1;
 
 function getDeployerFeeMultiplier(deployerFeeScale: number): number {
@@ -15,7 +16,8 @@ function getDeployerFeeMultiplier(deployerFeeScale: number): number {
 export function getMarketFeeRates(userRates: FeeRates, market: Market | undefined): FeeRates {
 	if (market?.kind !== "builderPerp") return userRates;
 	const growth = market.growthMode ? GROWTH_MODE_FEE_SCALE : 1;
-	const scale = getDeployerFeeMultiplier(market.deployerFeeScale ?? MAX_DEPLOYER_FEE_SCALE) * growth;
+	const maxScale = market.growthMode ? MAX_GROWTH_MODE_DEPLOYER_FEE_SCALE : MAX_DEPLOYER_FEE_SCALE;
+	const scale = getDeployerFeeMultiplier(market.deployerFeeScale ?? maxScale) * growth;
 	return {
 		takerRate: userRates.takerRate * scale,
 		makerRate: userRates.makerRate > 0 ? userRates.makerRate * scale : userRates.makerRate * growth,

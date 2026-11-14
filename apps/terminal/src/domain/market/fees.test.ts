@@ -29,6 +29,10 @@ describe("fee rates a market charges", () => {
 		expect(getMarketFeeRates(TIER_ZERO, builderPerp(null, false)).takerRate).toBeCloseTo(0.0027, 12);
 	});
 
+	it("charges the growth-mode ceiling, a scale of 10, when a growth builder asset names no scale", () => {
+		expect(getMarketFeeRates(TIER_ZERO, builderPerp(null, true)).takerRate).toBeCloseTo(0.0009, 12);
+	});
+
 	it("scales a maker rebate by growth mode only", () => {
 		const rates = getMarketFeeRates({ takerRate: 0.00045, makerRate: -0.00002 }, builderPerp(1, true));
 		expect(rates.makerRate).toBeCloseTo(-0.000002, 12);

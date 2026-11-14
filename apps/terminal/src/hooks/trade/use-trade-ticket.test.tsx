@@ -557,7 +557,13 @@ describe("top-up the ticket asks for on an empty builder dex", () => {
 	const TIER_ZERO_TAKER = 0.00045;
 	const SCALE_ONE_TAKER_WITH_BUILDER = Big(TIER_ZERO_TAKER).times(2).plus(0.0001);
 
-	function fundsToFill(side: "buy" | "sell", size: number, mark: string, fill: string) {
+	function fundsToFill(
+		side: "buy" | "sell",
+		size: number,
+		mark: string,
+		fill: string,
+		feeRate = SCALE_ONE_TAKER_WITH_BUILDER,
+	) {
 		const adverse = side === "buy" ? Big(fill).minus(mark) : Big(mark).minus(fill);
 		const marginPrice = Big(fill).gt(mark) ? Big(fill) : Big(mark);
 		return Big(size)
@@ -565,7 +571,7 @@ describe("top-up the ticket asks for on an empty builder dex", () => {
 				marginPrice
 					.div(form.leverage)
 					.plus(adverse.gt(0) ? adverse : 0)
-					.plus(Big(fill).times(SCALE_ONE_TAKER_WITH_BUILDER)),
+					.plus(Big(fill).times(feeRate)),
 			)
 			.toNumber();
 	}
@@ -628,6 +634,16 @@ describe("top-up the ticket asks for on an empty builder dex", () => {
 		const ticket = renderTicket();
 
 		expect(ticket.fundingNeed).toBeGreaterThanOrEqual(fundsToFill("buy", 100, "100", "101"));
+	});
+
+	it("funds the growth-mode ceiling when a growth builder asset names no scale", () => {
+		form.market = { ...PARA_TOTAL2, markPx: "100", deployerFeeScale: null, growthMode: true };
+		const scaleJustUnderTen = Big(TIER_ZERO_TAKER).times(9.99).times(2).times(0.1).plus(0.0001);
+		const ticket = renderTicket();
+
+		expect(fundsToFill("sell", 100, "100", "99", scaleJustUnderTen)).toBe(1109.89109);
+		expect(ticket.fundingNeed).toBeGreaterThanOrEqual(1109.89109);
+		expect(ticket.feeRatePercent).toBe("0.0900%");
 	});
 });
 
