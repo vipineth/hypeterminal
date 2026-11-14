@@ -8,6 +8,7 @@ import { NumberInput } from "@/components/ui/number-input";
 import { PriceInput } from "@/components/ui/price-input";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/app";
 import { ORDER_MIN_NOTIONAL_USD, SIZE_PERCENT_OPTIONS } from "@/config/trade";
+import { locksOrderEntry } from "@/domain/trade/account-mode";
 import { getSliderValue } from "@/domain/trade/order/size";
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import { cn } from "@/lib/cn";
@@ -94,7 +95,7 @@ export function TradeFormFields({
 
 	const { setLimitPrice, setTriggerPrice, setReduceOnly, setTpSlEnabled } = useOrderEntryActions();
 
-	const isFormDisabled = !isConnected || shortfall !== null;
+	const isFormDisabled = !isConnected || locksOrderEntry(shortfall);
 
 	const triggerOrder = isTriggerOrderType(orderType);
 	const twapOrder = isTwapOrderType(orderType);

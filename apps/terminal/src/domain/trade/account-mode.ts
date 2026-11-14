@@ -277,3 +277,7 @@ export function getTransferLimit(account: AccountState, route: TransferRoute): T
 	if (!account.perpCurrent) return { status: "pending" };
 	return { status: "ready", amount: account.dexes.get(MAIN_DEX)?.withdrawable ?? "0" };
 }
+
+export function locksOrderEntry(shortfall: Shortfall | null): boolean {
+	return shortfall !== null && shortfall.kind !== "dexEmpty";
+}

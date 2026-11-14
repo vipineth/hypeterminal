@@ -7,6 +7,7 @@ import { PriceInput } from "@/components/ui/price-input";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/app";
 import type { OrderType } from "@/config/trade";
 import { SIZE_PERCENT_OPTIONS } from "@/config/trade";
+import { locksOrderEntry } from "@/domain/trade/account-mode";
 import { useTradeTicket } from "@/hooks/trade/use-trade-ticket";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatToken, formatUSD } from "@/lib/format";
@@ -24,6 +25,7 @@ import {
 import { useLimitPrice, useOrderEntryActions, useTpSlEnabled, useTriggerPrice } from "@/stores/use-order-entry-store";
 import { WalletModal } from "../components/wallet-modal";
 import { CollateralNotice } from "../tradebox/collateral-notice";
+import { FundDexPrompt } from "../tradebox/fund-dex-prompt";
 import { MarginModeModal } from "../tradebox/margin-mode-modal";
 import { TradeFormScale } from "../tradebox/trade-form-scale";
 import { TradeFormTpSl } from "../tradebox/trade-form-tp-sl";
@@ -49,7 +51,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 	const tpSlEnabled = useTpSlEnabled();
 	const { setOrderType, setLimitPrice, setTriggerPrice, setTpSlEnabled } = useOrderEntryActions();
 
-	const isFormDisabled = !ticket.isConnected || entry.shortfall !== null;
+	const isFormDisabled = !ticket.isConnected || locksOrderEntry(entry.shortfall);
 	const isSpot = entry.isSpotMarket;
 	const szDecimals = entry.szDecimals;
 	const priceDecimals = market?.priceDecimals;
@@ -265,6 +267,12 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 
 			<div className="shrink-0 flex flex-col gap-2 border-t border-stroke-weak/60 px-3 pt-2 pb-3">
 				{ticket.isConnected && <CollateralNotice collateral={entry.collateral} className="text-2xs" />}
+				{ticket.isConnected && (
+					<FundDexPrompt
+						collateral={entry.collateral}
+						order={{ margin: ticket.marginRequired, fee: ticket.estimatedFee }}
+					/>
+				)}
 				{validation.errors.length > 0 && ticket.showValidationErrors && (
 					<div className="text-2xs text-error">{validation.errors.join(" • ")}</div>
 				)}
