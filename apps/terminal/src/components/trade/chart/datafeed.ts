@@ -190,7 +190,6 @@ export function createDatafeed(getMarket: (coin: string) => Market | undefined):
 			resolution: ResolutionString,
 			onTick: SubscribeBarsCallback,
 			listenerGuid: string,
-			onResetCacheNeededCallback: () => void,
 		) => {
 			const interval = resolutionToInterval(resolution);
 			if (!interval) return;
@@ -211,7 +210,7 @@ export function createDatafeed(getMarket: (coin: string) => Market | undefined):
 				onTick(bar);
 			};
 
-			store.getState().subscribe(key, coin, interval, listenerGuid, wrappedOnTick, onResetCacheNeededCallback);
+			store.getState().subscribe(key, coin, interval, listenerGuid, wrappedOnTick);
 
 			const cached = store.getState().getLastBar(symbolCacheKey);
 			const streamLastBar = store.getState().streams[key]?.lastBar;

@@ -11,8 +11,7 @@ async function mountChart() {
 	const { createCandleStore } = await import("./store");
 	const chart = createCandleStore();
 	const onTick = vi.fn();
-	const unsubscribeLikeTradingView = () => chart.getState().unsubscribe("SOL:1m", "chart");
-	chart.getState().subscribe("SOL:1m", "SOL", "1m", "chart", onTick, unsubscribeLikeTradingView);
+	chart.getState().subscribe("SOL:1m", "SOL", "1m", "chart", onTick);
 	await drain();
 	server().open();
 	await drain();

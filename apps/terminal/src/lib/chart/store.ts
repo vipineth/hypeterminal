@@ -11,7 +11,6 @@ import type { CandleInterval } from "./resolution";
 type CandleListener = {
 	id: string;
 	onTick: SubscribeBarsCallback;
-	onResetCache: () => void;
 };
 
 type StreamStatus = "idle" | "connecting" | "active" | "error";
@@ -27,7 +26,6 @@ type StreamRuntime = {
 	sharedKey: string;
 	detachSharedStore: () => void;
 	lastData?: unknown;
-	lastStatus?: StreamStatus;
 };
 
 type SharedSubscriptionEntry = HyperliquidStoreState["subscriptions"][string];
@@ -41,7 +39,6 @@ export type CandleStoreState = {
 		interval: CandleInterval,
 		listenerId: string,
 		onTick: SubscribeBarsCallback,
-		onResetCache: () => void,
 	) => void;
 	unsubscribe: (streamKey: string, listenerId: string) => void;
 	setLastBar: (cacheKey: string, bar: Bar) => void;
@@ -127,14 +124,6 @@ export function createCandleStore(): CandleStore {
 			});
 		}
 
-		function notifyResetListeners(key: string) {
-			const stream = get().streams[key];
-			if (!stream) return;
-			for (const listener of stream.listeners.values()) {
-				listener.onResetCache();
-			}
-		}
-
 		function applyBar(key: string, bar: Bar, shouldNotify: boolean) {
 			const current = get().streams[key];
 			if (!current) return;
@@ -168,14 +157,6 @@ export function createCandleStore(): CandleStore {
 		function applySharedEntry(key: string, entry: SharedSubscriptionEntry | undefined) {
 			const runtimeEntry = runtime.get(key);
 			const nextStatus = toStreamStatus(entry?.status);
-			const previousStatus = runtimeEntry?.lastStatus;
-			if (runtimeEntry) {
-				runtimeEntry.lastStatus = nextStatus;
-			}
-
-			if (nextStatus === "error" && previousStatus !== "error") {
-				notifyResetListeners(key);
-			}
 
 			if (nextStatus === "error" || nextStatus === "connecting" || nextStatus === "idle") {
 				setStreamStatus(key, nextStatus, entry?.error);
@@ -232,19 +213,15 @@ export function createCandleStore(): CandleStore {
 			streams: {},
 			lastBarCache: {},
 
-			subscribe: (key, coin, interval, listenerId, onTick, onResetCache) => {
-				const listener: CandleListener = { id: listenerId, onTick, onResetCache };
+			subscribe: (key, coin, interval, listenerId, onTick) => {
+				const listener: CandleListener = { id: listenerId, onTick };
 				let shouldAcquire = false;
 
 				set((state) => {
 					const existing = state.streams[key];
 					if (existing) {
 						const prevListener = existing.listeners.get(listenerId);
-						if (
-							prevListener &&
-							prevListener.onTick === listener.onTick &&
-							prevListener.onResetCache === listener.onResetCache
-						) {
+						if (prevListener?.onTick === listener.onTick) {
 							return state;
 						}
 
