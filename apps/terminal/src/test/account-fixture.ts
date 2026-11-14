@@ -52,7 +52,6 @@ export function liveQuote(
 			maxTradeSzs,
 			markPx: "0",
 		},
-		applied: null,
 	};
 }
 

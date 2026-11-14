@@ -5,7 +5,6 @@ import { type Market, type MetaPayloads, parseMarkets } from "@/domain/market/mo
 import {
 	type AccountMode,
 	type AccountState,
-	type AppliedLeverage,
 	buildAccountState,
 	getCollateralSource,
 	getTradeCollateral,
@@ -46,7 +45,7 @@ function accountOf(name: string, mode?: AccountMode): ReadyAccount {
 }
 
 function liveQuote(name: string, coin: string): QuoteCheck {
-	return { status: "live", quote: fixture(name).activeAssetData[coin], applied: null };
+	return { status: "live", quote: fixture(name).activeAssetData[coin] };
 }
 
 const MODES: Record<string, AccountMode> = {
@@ -305,7 +304,7 @@ describe("trade collateral", () => {
 			...fixture("p3-default").activeAssetData.BTC,
 			availableToTrade: ["0.0", "0.0"] as [string, string],
 		};
-		const collateral = getTradeCollateral(account, market("BTC"), "buy", { status: "live", quote, applied: null });
+		const collateral = getTradeCollateral(account, market("BTC"), "buy", { status: "live", quote });
 		expect(collateral.status === "ready" && collateral.shortfall).toEqual({
 			kind: "inUse",
 			token: expect.objectContaining({ name: "USDC" }),
@@ -321,7 +320,7 @@ describe("trade collateral", () => {
 			dexes: new Map([...account.dexes].map(([dex, state]) => [dex, { ...state, withdrawable: "0.0" }])),
 		};
 		const quote = fixture("p3-default").activeAssetData["xyz:NVDA"];
-		const collateral = getTradeCollateral(empty, market("xyz:NVDA"), "buy", { status: "live", quote, applied: null });
+		const collateral = getTradeCollateral(empty, market("xyz:NVDA"), "buy", { status: "live", quote });
 		expect(collateral.status === "ready" && collateral.shortfall?.kind).toBe("noFunds");
 	});
 
@@ -347,52 +346,18 @@ describe("an activeAssetData quote counts only for this ticket", () => {
 	const nvda = fixture("p3-default").activeAssetData["xyz:NVDA"];
 	const otherWallet = "0x9fed7c631d8d525ce642402c0e36a73cf5c77c1c";
 
-	function appliedHere(leverage: AppliedLeverage["leverage"]): AppliedLeverage {
-		return { user: account.user, coin: "xyz:NVDA", leverage };
-	}
-
 	it.each<[string, AccountState, QuoteCheck]>([
-		["the account has not loaded", { status: "loading" }, { status: "live", quote: nvda, applied: null }],
+		["the account has not loaded", { status: "loading" }, { status: "live", quote: nvda }],
 		["no current quote has arrived", account, { status: "waiting" }],
-		[
-			"the quote is for another dex's NVDA",
-			account,
-			{ status: "live", quote: { ...nvda, coin: "io:NVDA" }, applied: null },
-		],
-		[
-			"the quote is for another wallet",
-			account,
-			{ status: "live", quote: { ...nvda, user: otherWallet }, applied: null },
-		],
-		[
-			"the quote predates the leverage just applied",
-			account,
-			{ status: "live", quote: nvda, applied: appliedHere({ type: "isolated", value: 20, rawUsd: "0" }) },
-		],
-		[
-			"the quote has the old leverage value",
-			account,
-			{ status: "live", quote: nvda, applied: appliedHere({ type: "cross", value: 5 }) },
-		],
+		["the quote is for another dex's NVDA", account, { status: "live", quote: { ...nvda, coin: "io:NVDA" } }],
+		["the quote is for another wallet", account, { status: "live", quote: { ...nvda, user: otherWallet } }],
 	])("is pending when %s", (_label, state, check) => {
 		expect(getTradeCollateral(state, market("xyz:NVDA"), "buy", check).status).toBe("pending");
 	});
 
-	it("matches the wallet case-insensitively and accepts the leverage it was sent", () => {
-		const check: QuoteCheck = { status: "live", quote: nvda, applied: appliedHere({ type: "cross", value: 20 }) };
+	it("matches the wallet case-insensitively", () => {
 		const upper = { ...account, user: account.user.toUpperCase().replace("0X", "0x") };
-		expect(getTradeCollateral(upper, market("xyz:NVDA"), "buy", check).status).toBe("ready");
-	});
-
-	it.each<[string, AppliedLeverage]>([
-		[
-			"another wallet applied on this coin",
-			{ user: otherWallet, coin: "xyz:NVDA", leverage: { type: "cross", value: 5 } },
-		],
-		["this wallet applied on another coin", { user: account.user, coin: "BTC", leverage: { type: "cross", value: 5 } }],
-	])("ignores leverage %s", (_label, applied) => {
-		const check: QuoteCheck = { status: "live", quote: nvda, applied };
-		expect(getTradeCollateral(account, market("xyz:NVDA"), "buy", check).status).toBe("ready");
+		expect(getTradeCollateral(upper, market("xyz:NVDA"), "buy", { status: "live", quote: nvda }).status).toBe("ready");
 	});
 });
 

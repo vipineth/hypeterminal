@@ -63,19 +63,7 @@ export type Shortfall =
 	| { kind: "inUse"; token: QuoteToken }
 	| { kind: "noFunds"; token: QuoteToken };
 
-export interface AppliedLeverage {
-	user: string;
-	coin: string;
-	leverage: ActiveAssetDataResponse["leverage"];
-}
-
-export type QuoteCheck =
-	| {
-			status: "live";
-			quote: ActiveAssetDataResponse;
-			applied: AppliedLeverage | null;
-	  }
-	| { status: "waiting" };
+export type QuoteCheck = { status: "live"; quote: ActiveAssetDataResponse } | { status: "waiting" };
 
 export type Collateral =
 	| { status: "pending"; reason: "account" | "quote" }
@@ -241,21 +229,13 @@ function sameUser(a: string, b: string): boolean {
 	return a.toLowerCase() === b.toLowerCase();
 }
 
-function sameLeverage(a: ActiveAssetDataResponse["leverage"], b: ActiveAssetDataResponse["leverage"]): boolean {
-	return a.type === b.type && a.value === b.value;
-}
-
 function isQuoteFor(
 	check: QuoteCheck,
 	account: ReadyAccount,
 	market: Market,
 ): check is Extract<QuoteCheck, { status: "live" }> {
 	if (check.status !== "live") return false;
-	const { quote, applied } = check;
-	if (!sameUser(quote.user, account.user)) return false;
-	if (quote.coin !== market.name) return false;
-	if (!applied || !sameUser(applied.user, account.user) || applied.coin !== market.name) return true;
-	return sameLeverage(quote.leverage, applied.leverage);
+	return sameUser(check.quote.user, account.user) && check.quote.coin === market.name;
 }
 
 export function getTradeCollateral(account: AccountState, market: Market, side: Side, quote: QuoteCheck): Collateral {

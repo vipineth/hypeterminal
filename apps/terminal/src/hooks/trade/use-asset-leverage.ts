@@ -1,10 +1,9 @@
-import type { ActiveAssetDataResponse } from "@nktkas/hyperliquid";
 import { useEffect, useRef, useState } from "react";
 import { useConnection } from "wagmi";
 import { getPositionDex } from "@/domain/market";
 import { getMarketCapabilities } from "@/domain/market/capabilities";
 import { getDefaultLeverage, getMaxLeverage } from "@/domain/market/model";
-import type { AppliedLeverage, QuoteCheck } from "@/domain/trade/account-mode";
+import type { QuoteCheck } from "@/domain/trade/account-mode";
 import { useExchange, useSelectedMarketInfo, useSubscription, useUserPositions } from "@/lib/hyperliquid";
 import { getMarginModeFromLeverage, type MarginMode } from "@/lib/trade/margin-mode";
 import {
@@ -40,15 +39,6 @@ interface UseAssetLeverageReturn {
 	allowsCrossMargin: boolean;
 }
 
-function isAppliedIn(quote: ActiveAssetDataResponse | undefined, applied: AppliedLeverage): boolean {
-	return (
-		quote?.user.toLowerCase() === applied.user.toLowerCase() &&
-		quote.coin === applied.coin &&
-		quote.leverage.type === applied.leverage.type &&
-		quote.leverage.value === applied.leverage.value
-	);
-}
-
 export function useAssetLeverage(): UseAssetLeverageReturn {
 	const { address, isConnected } = useConnection();
 	const { data: market } = useSelectedMarketInfo();
@@ -78,9 +68,6 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	const userPositions = useUserPositions();
 
 	const { mutateAsync: updateLeverage, isPending, error, reset: resetMutation } = useExchange("updateLeverage");
-
-	const [applied, setApplied] = useState<AppliedLeverage | null>(null);
-	if (applied && (applied.user !== address || isAppliedIn(activeAssetData, applied))) setApplied(null);
 
 	const operationTypeRef = useRef<OperationType>(null);
 	const [pendingLeverage, setPendingLeverageState] = useState<number | null>(null);
@@ -154,7 +141,7 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 			isCross: marginMode === "cross",
 			leverage: pendingLeverage,
 		});
-		markApplied(marginMode, pendingLeverage);
+		bumpCollateralGeneration();
 
 		setPendingLeverageState(null);
 	}
@@ -181,7 +168,7 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 			isCross: mode === "cross",
 			leverage: currentLeverage,
 		});
-		markApplied(mode, currentLeverage);
+		bumpCollateralGeneration();
 
 		setStoredMarginMode(mode);
 	}
@@ -212,24 +199,16 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 			isCross: mode === "cross",
 			leverage: clamped,
 		});
-		markApplied(mode, clamped);
+		bumpCollateralGeneration();
 
 		setStoredMarginMode(mode);
 		setPendingLeverageState(null);
 	}
 
-	function markApplied(mode: MarginMode, value: number) {
-		if (!baseToken || !address) return;
-		const leverage: ActiveAssetDataResponse["leverage"] =
-			mode === "cross" ? { type: "cross", value } : { type: "isolated", value, rawUsd: "0" };
-		setApplied({ user: address, coin: baseToken, leverage });
-		bumpCollateralGeneration();
-	}
-
 	function computeQuote(): QuoteCheck {
 		if (!activeAssetData || subscriptionStatus !== "active" || isQuoteStale) return { status: "waiting" };
 		if (!isCurrentSnapshot(activeAssetData, generation)) return { status: "waiting" };
-		return { status: "live", quote: activeAssetData, applied };
+		return { status: "live", quote: activeAssetData };
 	}
 	const quote = computeQuote();
 

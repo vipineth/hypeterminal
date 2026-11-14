@@ -5,17 +5,21 @@ import { createHyperliquidStore, type HyperliquidStore } from "@hypeterminal/hl-
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { type MetaPayloads, parseMarkets } from "@/domain/market/model";
+import { getTradeCollateral } from "@/domain/trade/account-mode";
 import { getSpendLimit } from "@/domain/trade/balances";
 import { useAccountState } from "@/hooks/trade/use-account-balances";
+import { useAssetLeverage } from "@/hooks/trade/use-asset-leverage";
 import { useOrderEntryData } from "@/hooks/trade/use-order-entry-data";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
 import { bumpCollateralGeneration, trackCollateralReceipts } from "@/stores/use-collateral-generation-store";
 import { clearinghouse } from "@/test/account-fixture";
+import { mountHooks } from "@/test/hook-instance";
 
 const net = vi.hoisted(() => ({
 	address: "0x00000000000000000000000000000000000000a1" as `0x${string}`,
 	market: undefined as unknown,
 	store: null as unknown as HyperliquidStore,
+	updateLeverage: async () => ({}),
 }));
 
 vi.mock("wagmi", () => ({ useConnection: () => ({ address: net.address, isConnected: true }) }));
@@ -24,10 +28,15 @@ vi.mock("@/lib/hyperliquid", async (importOriginal) => ({
 	...(await importOriginal<typeof import("@/lib/hyperliquid")>()),
 	useSelectedMarketInfo: () => ({ data: net.market }),
 	useUserPositions: () => ({ hasPosition: () => false }),
-	useExchange: () => ({ mutateAsync: async () => ({}), isPending: false, error: null, reset: () => {} }),
+	useExchange: () => ({ mutateAsync: () => net.updateLeverage(), isPending: false, error: null, reset: () => {} }),
 	useSubscription: (method: string, params: object) => {
 		const entry = net.store.getState().subscriptions[serializeKey(subscriptionKeys.method(method, params))];
-		return { data: entry?.data, status: entry?.status ?? "idle", error: entry?.error, isStale: entry?.isStale ?? false };
+		return {
+			data: entry?.data,
+			status: entry?.status ?? "idle",
+			error: entry?.error,
+			isStale: entry?.isStale ?? false,
+		};
 	},
 }));
 
@@ -35,6 +44,12 @@ vi.mock("@/stores/use-collateral-generation-store", async (importOriginal) => {
 	const original = await importOriginal<typeof import("@/stores/use-collateral-generation-store")>();
 	return { ...original, useCollateralGeneration: () => original.getCollateralGeneration() };
 });
+
+vi.mock("@/stores/use-global-settings-store", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@/stores/use-global-settings-store")>()),
+	useMarginMode: () => "cross",
+	useGlobalSettingsActions: () => ({ setMarginMode: () => {} }),
+}));
 
 vi.mock("@/stores/use-order-entry-store", () => ({
 	useSizeMode: () => "base",
@@ -93,18 +108,23 @@ function receivePerps(mainWithdrawable = "0.0") {
 	receive(
 		"allDexsClearinghouseState",
 		{ user: net.address },
-		{ clearinghouseStates: [["", clearinghouse(mainWithdrawable)], ["xyz", clearinghouse("0.0")]] },
+		{
+			clearinghouseStates: [
+				["", clearinghouse(mainWithdrawable)],
+				["xyz", clearinghouse("0.0")],
+			],
+		},
 	);
 }
 
-function receiveNvdaQuote(available: string, maxSize: string) {
+function receiveNvdaQuote(available: string, maxSize: string, leverage = 10) {
 	receive(
 		"activeAssetData",
 		{ coin: "xyz:NVDA", user: net.address },
 		{
 			user: net.address,
 			coin: "xyz:NVDA",
-			leverage: { type: "cross", value: 10 },
+			leverage: { type: "cross", value: leverage },
 			availableToTrade: [available, available],
 			maxTradeSzs: [maxSize, maxSize],
 			markPx: "100",
@@ -151,6 +171,7 @@ function perpSendLimit() {
 let untrack: () => void;
 
 beforeEach(() => {
+	net.updateLeverage = async () => ({});
 	net.store = createHyperliquidStore(createHyperliquidConfig());
 	untrack = trackCollateralReceipts(net.store);
 });
@@ -276,5 +297,45 @@ describe("the swap and send limits after a rejection", () => {
 
 		receivePerps("30.0");
 		expect(perpSendLimit()).toEqual({ status: "ready", amount: "30.0" });
+	});
+});
+
+describe("leverage applied from this tab", () => {
+	function nvdaCollateral(quote: ReturnType<typeof useAssetLeverage>["quote"]) {
+		return getTradeCollateral(render(useAccountState), NVDA, "buy", quote);
+	}
+
+	it("sizes from a quote received after the apply settled when another tab changed leverage since", async () => {
+		loadUnified();
+		net.market = NVDA;
+		const leverage = mountHooks(useAssetLeverage);
+
+		await leverage().applyMarginAndLeverage("cross", 20);
+		receiveSpot("100.0", "100.0");
+		receivePerps();
+		receiveNvdaQuote("100.0", "10.0", 5);
+
+		const hook = leverage();
+		expect(hook.currentLeverage).toBe(5);
+		expect(nvdaCollateral(hook.quote)).toMatchObject({ status: "ready", available: "100.0", maxSize: "10.0" });
+	});
+
+	it("does not size from a quote received while the apply was in flight", async () => {
+		loadUnified();
+		net.market = NVDA;
+		let settle = () => {};
+		net.updateLeverage = () => new Promise((resolve) => (settle = () => resolve({})));
+		const leverage = mountHooks(useAssetLeverage);
+
+		const applying = leverage().applyMarginAndLeverage("cross", 20);
+		receiveNvdaQuote("100.0", "10.0", 10);
+		settle();
+		await applying;
+		expect(nvdaCollateral(leverage().quote)).toEqual({ status: "pending", reason: "quote" });
+
+		receiveSpot("100.0", "100.0");
+		receivePerps();
+		receiveNvdaQuote("100.0", "20.0", 20);
+		expect(nvdaCollateral(leverage().quote)).toMatchObject({ status: "ready", maxSize: "20.0" });
 	});
 });
