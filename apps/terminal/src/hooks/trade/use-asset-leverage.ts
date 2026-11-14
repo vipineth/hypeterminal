@@ -110,6 +110,14 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		resetMutation();
 	}, [baseToken, resetMutation]);
 
+	async function sendLeverage(params: Parameters<typeof updateLeverage>[0]) {
+		try {
+			await updateLeverage(params);
+		} finally {
+			bumpCollateralGeneration();
+		}
+	}
+
 	function setPendingLeverage(value: number) {
 		const clamped = Math.max(1, Math.min(value, maxLeverage));
 		if (!isConnected) {
@@ -136,12 +144,11 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		}
 
 		operationTypeRef.current = "leverage";
-		await updateLeverage({
+		await sendLeverage({
 			asset: assetId,
 			isCross: marginMode === "cross",
 			leverage: pendingLeverage,
 		});
-		bumpCollateralGeneration();
 
 		setPendingLeverageState(null);
 	}
@@ -163,12 +170,11 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		}
 
 		operationTypeRef.current = "mode";
-		await updateLeverage({
+		await sendLeverage({
 			asset: assetId,
 			isCross: mode === "cross",
 			leverage: currentLeverage,
 		});
-		bumpCollateralGeneration();
 
 		setStoredMarginMode(mode);
 	}
@@ -194,12 +200,11 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		}
 
 		operationTypeRef.current = "mode";
-		await updateLeverage({
+		await sendLeverage({
 			asset: assetId,
 			isCross: mode === "cross",
 			leverage: clamped,
 		});
-		bumpCollateralGeneration();
 
 		setStoredMarginMode(mode);
 		setPendingLeverageState(null);
