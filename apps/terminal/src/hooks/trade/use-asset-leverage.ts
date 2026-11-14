@@ -4,18 +4,13 @@ import { useConnection } from "wagmi";
 import { getPositionDex } from "@/domain/market";
 import { getMarketCapabilities } from "@/domain/market/capabilities";
 import { getDefaultLeverage, getMaxLeverage } from "@/domain/market/model";
-import { parseAccountMode, type QuoteCheck } from "@/domain/trade/account-mode";
+import { type AppliedLeverage, parseAccountMode, type QuoteCheck } from "@/domain/trade/account-mode";
 import { useExchange, useSelectedMarketInfo, useSubscription, useUserPositions } from "@/lib/hyperliquid";
 import { getMarginModeFromLeverage, type MarginMode } from "@/lib/trade/margin-mode";
 import { bumpCollateralGeneration, firstSeen, useCollateralGeneration } from "@/stores/use-collateral-generation-store";
 import { useGlobalSettingsActions, useMarginMode } from "@/stores/use-global-settings-store";
 
 type OperationType = "leverage" | "mode" | null;
-
-interface AppliedLeverage {
-	coin: string;
-	leverage: ActiveAssetDataResponse["leverage"];
-}
 
 interface UseAssetLeverageReturn {
 	currentLeverage: number;
@@ -41,8 +36,13 @@ interface UseAssetLeverageReturn {
 	allowsCrossMargin: boolean;
 }
 
-function isSameLeverage(a: ActiveAssetDataResponse["leverage"], b: ActiveAssetDataResponse["leverage"]): boolean {
-	return a.type === b.type && a.value === b.value;
+function isAppliedIn(quote: ActiveAssetDataResponse | undefined, applied: AppliedLeverage): boolean {
+	return (
+		quote?.user.toLowerCase() === applied.user.toLowerCase() &&
+		quote.coin === applied.coin &&
+		quote.leverage.type === applied.leverage.type &&
+		quote.leverage.value === applied.leverage.value
+	);
 }
 
 export function useAssetLeverage(): UseAssetLeverageReturn {
@@ -85,9 +85,7 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	const { mutateAsync: updateLeverage, isPending, error, reset: resetMutation } = useExchange("updateLeverage");
 
 	const [applied, setApplied] = useState<AppliedLeverage | null>(null);
-	if (applied && activeAssetData?.coin === applied.coin && isSameLeverage(activeAssetData.leverage, applied.leverage)) {
-		setApplied(null);
-	}
+	if (applied && (applied.user !== address || isAppliedIn(activeAssetData, applied))) setApplied(null);
 
 	const operationTypeRef = useRef<OperationType>(null);
 	const [pendingLeverage, setPendingLeverageState] = useState<number | null>(null);
@@ -226,10 +224,10 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	}
 
 	function markApplied(mode: MarginMode, value: number) {
-		if (!baseToken) return;
+		if (!baseToken || !address) return;
 		const leverage: ActiveAssetDataResponse["leverage"] =
 			mode === "cross" ? { type: "cross", value } : { type: "isolated", value, rawUsd: "0" };
-		setApplied({ coin: baseToken, leverage });
+		setApplied({ user: address, coin: baseToken, leverage });
 		bumpCollateralGeneration();
 	}
 
@@ -238,7 +236,7 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		return {
 			status: "live",
 			quote: activeAssetData,
-			leverage: applied && applied.coin === baseToken ? applied.leverage : null,
+			applied,
 			seen: firstSeen(activeAssetData, generation, accountMode),
 		};
 	}

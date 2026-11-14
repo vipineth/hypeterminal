@@ -54,7 +54,7 @@ export function liveQuote(
 			maxTradeSzs,
 			markPx: "0",
 		},
-		leverage: null,
+		applied: null,
 		seen: SEEN_NOW,
 	};
 }

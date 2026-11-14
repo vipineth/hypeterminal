@@ -62,7 +62,7 @@ describe("builder perp collateral on a standard account", () => {
 			collateral: getTradeCollateral(account, market, "buy", {
 				status: "live",
 				quote: p3.activeAssetData["xyz:NVDA"],
-				leverage: null,
+				applied: null,
 				seen: SEEN_NOW,
 			}),
 		});
