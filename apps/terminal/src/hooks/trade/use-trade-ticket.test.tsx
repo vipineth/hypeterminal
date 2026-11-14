@@ -1114,6 +1114,50 @@ describe("the order a fresh press signs", () => {
 		expect(net.venue.state.placedLegs).toBe(2);
 	});
 
+	it("shows the earlier unconfirmed order as expired once a press past its expiry places the edited ticket", async () => {
+		vi.useFakeTimers();
+		net.venue.nextExchangeRequests("lost", "lost", "lost", "lost");
+		await pressSubmitPastRetries();
+		const unconfirmed = lastQueueUpdate();
+		expect(unconfirmed).toMatchObject({ status: "unsettled", requestKey: expect.stringMatching(/#\d+$/) });
+		await vi.advanceTimersByTimeAsync(EXPIRY_WINDOW_MS + EXPIRY_MARGIN_MS + 1000);
+		form.tpPrice = "";
+		form.slPrice = "70";
+		await pressSubmitPastRetries();
+		expect(lastQueueUpdate()).toMatchObject({ status: "success" });
+		expect(queue.upsertByRequestKey).toHaveBeenCalledWith(
+			unconfirmed.requestKey,
+			expect.anything(),
+			expect.objectContaining({
+				status: "failed",
+				error: "Not placed. The request expired before the exchange took it.",
+			}),
+		);
+		expect(queue.upsertByRequestKey).not.toHaveBeenCalledWith(
+			unconfirmed.requestKey,
+			expect.anything(),
+			expect.objectContaining({ status: "unsettled" }),
+		);
+		expect(net.venue.state.placedLegs).toBe(2);
+	});
+
+	it("shows an unconfirmed order as expired when its Dismiss finds it past expiry", async () => {
+		vi.useFakeTimers();
+		net.venue.nextExchangeRequests("lost", "lost", "lost", "lost");
+		await pressSubmitPastRetries();
+		const { requestKey } = lastQueueUpdate();
+		await vi.advanceTimersByTimeAsync(EXPIRY_WINDOW_MS + EXPIRY_MARGIN_MS + 1000);
+		const previews: unknown[] = [];
+		await pressRowAction(async (hook) => previews.push(await hook.previewDismiss(requestKey)));
+		expect(previews).toEqual([
+			{
+				kind: "result",
+				result: { ok: false, status: "failed", error: "Not placed. The request expired before the exchange took it." },
+			},
+		]);
+		expect(net.venue.state.placedLegs).toBe(0);
+	});
+
 	it("signs the edited ticket once the earlier unconfirmed order is canceled", async () => {
 		vi.useFakeTimers();
 		net.venue.nextExchangeRequests("lost", "lost", "lost", "lost");

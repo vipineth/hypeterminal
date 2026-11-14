@@ -1671,6 +1671,95 @@ describe("order sender listing a request that blocks the market", () => {
 	});
 });
 
+describe("order sender reporting the earlier request a press settled", () => {
+	let venue: FakeExchange;
+	let storage: MemoryKeyValue;
+	let locks: LockManagerLike;
+
+	beforeEach(() => {
+		vi.useFakeTimers({ toFake: ["Date"], now: new Date("2026-11-14T12:00:00Z") });
+		venue = createFakeExchange();
+		storage = createMemoryKeyValue();
+		locks = createMemoryLocks();
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	async function unconfirmedPastExpiry(sender: ReturnType<typeof createOrderSender>) {
+		venue.nextExchangeRequests("lost", "lost", "lost", "lost");
+		const first = await sender.submit(signerFor(venue), marketBuy());
+		vi.setSystemTime(Date.now() + PAST_EXPIRY_MS);
+		return first;
+	}
+
+	it("returns the earlier request's expiry with the new send it made room for", async () => {
+		const { sender } = openTab(venue, storage, locks);
+		const first = await unconfirmedPastExpiry(sender);
+		const press = await sender.submit(signerFor(venue), marketBuy());
+		expect(press).toMatchObject({
+			kind: "sent",
+			settlement: { kind: "answered" },
+			earlier: { kind: "expired", request: { nonce: sentRequest(first).nonce } },
+		});
+		expect(venue.state.placedLegs).toBe(1);
+	});
+
+	it("returns the earlier request's expiry when the new ticket then fails to sign", async () => {
+		const { sender } = openTab(venue, storage, locks);
+		const first = await unconfirmedPastExpiry(sender);
+		const rejecting: Signer = {
+			user: TEST_USER,
+			config: {
+				transport: venue.transport,
+				wallet: {
+					...privateKeyToAccount(TEST_AGENT_KEY),
+					signTypedData: async () => {
+						throw new Error("User rejected the request.");
+					},
+				},
+			},
+		};
+		expect(await sender.submit(rejecting, marketBuy())).toMatchObject({
+			kind: "failed",
+			earlier: { kind: "expired", request: { nonce: sentRequest(first).nonce } },
+		});
+	});
+
+	it("keeps a request pending here until another tab settles it", async () => {
+		const bus = createMemoryBus();
+		const tabA = openTab(venue, storage, locks, { bus: bus.join() });
+		const tabB = openTab(venue, storage, locks, { bus: bus.join() });
+		const unsubscribe = tabA.sender.subscribe(() => {});
+		venue.nextExchangeRequests("lost", "lost", "lost", "lost");
+		const first = await tabA.sender.submit(signerFor(venue), marketBuy());
+		expect(tabA.sender.isPending(keyOf(first))).toBe(true);
+		expect(await tabB.sender.cancel(signerFor(venue), keyOf(first))).toMatchObject({ kind: "canceled" });
+		await vi.waitFor(() => expect(tabA.sender.isPending(keyOf(first))).toBe(false));
+		unsubscribe();
+	});
+
+	it("stops calling the earlier request pending as soon as a press settles it, while the new order is still sending", async () => {
+		const { sender } = openTab(venue, storage, locks);
+		const first = await unconfirmedPastExpiry(sender);
+		const [replyHeld, releaseReply] = gate();
+		const [arrived, markArrived] = gate();
+		venue.state.onReply = async (reply) => {
+			if ((reply as { status?: string }).status !== "ok") return;
+			venue.state.onReply = null;
+			markArrived();
+			await replyHeld;
+		};
+		const press = sender.submit(signerFor(venue), marketBuy());
+		await arrived;
+		expect(sender.isPending(keyOf(first))).toBe(false);
+		releaseReply();
+		await press;
+		expect(sender.isPending(keyOf(first))).toBe(false);
+	});
+});
+
 function holdFirstReply(venue: FakeExchange, onArrive: () => void, until: Promise<void>) {
 	venue.state.onReply = async () => {
 		venue.state.onReply = null;

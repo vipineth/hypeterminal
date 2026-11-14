@@ -19,6 +19,7 @@ const view = vi.hoisted(() => ({
 	queued: [] as OrderQueueItem[],
 	pending: [] as PendingRequest[],
 	holds: [] as SlotHold[],
+	settled: [] as string[],
 	buttons: [] as { label: string; onClick?: () => void; disabled?: boolean }[],
 	canCancel: true,
 }));
@@ -71,6 +72,7 @@ vi.mock("@/stores/use-order-queue-store", async (importOriginal) => ({
 vi.mock("@/hooks/trade/use-submit-plan", () => ({
 	usePendingRequests: () => view.pending,
 	useActiveHolds: () => view.holds,
+	useSettledRequestKeys: () => view.settled,
 	useSubmitPlan: () => ({
 		retryRequest: actions.retryRequest,
 		cancelRequest: actions.cancelRequest,
@@ -135,9 +137,42 @@ describe("order toast", () => {
 		view.queued = [UNCONFIRMED_ROW];
 		view.pending = [LEFT_FROM_BEFORE_RELOAD];
 		view.holds = [];
+		view.settled = [];
 		view.buttons = [];
 		view.canCancel = true;
 		vi.clearAllMocks();
+	});
+
+	it("drops an unconfirmed row and its count once another tab settles its request", () => {
+		view.pending = [];
+		view.queued = [
+			UNCONFIRMED_ROW,
+			{ id: "order-2", market: "ETH", side: "sell", size: "1", status: "success", createdAt: 0 },
+		];
+		view.settled = [UNCONFIRMED_ROW.requestKey ?? ""];
+		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		expect(html).not.toContain("unconfirmed");
+		expect(html).not.toContain("Not confirmed");
+		expect(html).toContain("ETH");
+		expect(buttonsNamed("Retry")).toHaveLength(0);
+		expect(buttonsNamed("Cancel")).toHaveLength(0);
+	});
+
+	it("drops a hold row whose confirm is open once the hold is dismissed elsewhere or released", () => {
+		view.pending = [];
+		view.queued = [
+			{
+				id: "row-hold",
+				...HELD_SCALE.hold.label,
+				status: "unsettled",
+				held: HELD_SCALE,
+				confirmHold: true,
+				createdAt: 0,
+			},
+		];
+		view.holds = [];
+		expect(renderToString(<OrderToast />)).toBe("");
+		expect(buttonsNamed("Yes, dismiss hold")).toHaveLength(0);
 	});
 
 	it("offers Retry and Cancel on an unconfirmed order and on one left from before a reload", () => {
