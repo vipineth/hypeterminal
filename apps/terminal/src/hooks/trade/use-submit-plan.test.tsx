@@ -297,6 +297,24 @@ describe("collateral after the exchange rejects a submit", () => {
 		expect(await countsNow(snapshot)).toBe(false);
 	});
 
+	it("stops counting a balance received before a retried order the exchange rejects", async () => {
+		const hook = await mountSubmitPlan();
+		net.venue.nextExchangeRequests("inTransit", "lost", "lost", "lost");
+		const first = await settle(hook.submitPlan(MARKET_BUY));
+		if (first.ok || first.status !== "unsettled") throw new Error("expected an unconfirmed order");
+		const snapshot = await spotSnapshotReceivedNow();
+		expect(await countsNow(snapshot)).toBe(true);
+
+		net.venue.state.legOutcome = () => ({
+			status: { error: "Insufficient margin to place order. asset=5" },
+			lookup: "unknownOid",
+		});
+		const result = await settle(hook.retryRequest(first.requestKey));
+
+		expect(result).toMatchObject({ ok: false, status: "failed" });
+		expect(await countsNow(snapshot)).toBe(false);
+	});
+
 	it("keeps counting it when a submit never reaches the exchange", async () => {
 		net.tradingReady = false;
 		const hook = await mountSubmitPlan();

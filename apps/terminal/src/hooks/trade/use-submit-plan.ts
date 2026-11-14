@@ -86,6 +86,11 @@ export type DismissPreview =
 	| { kind: "confirm"; text: string; lookup: Lookup }
 	| { kind: "result"; result: OrderResult };
 
+function invalidateCollateralOnFailure(result: OrderResult): OrderResult {
+	if (!result.ok && result.status !== "notSent") bumpCollateralGeneration();
+	return result;
+}
+
 function labelFromLeg(leg: OrderPlan["orders"][number]): RequestLabel {
 	return { market: "", side: leg.b ? "buy" : "sell", size: leg.s };
 }
@@ -129,9 +134,7 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 			const { request } = earlier;
 			upsertByRequestKey(getRequestKey(request), request.label, resultToQueueUpdate(reportSettlement(earlier)));
 		}
-		const result = reportSubmit(outcome);
-		if (!result.ok && result.status !== "notSent") bumpCollateralGeneration();
-		return result;
+		return invalidateCollateralOnFailure(reportSubmit(outcome));
 	}
 
 	function submitPlan(plan: SubmitPlanInput, label?: RequestLabel): Promise<OrderResult> {
@@ -153,7 +156,7 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 	}
 
 	async function retryRequest(requestKey: string): Promise<OrderResult> {
-		return reportRequestOutcome(await sender.retry(requestKey));
+		return invalidateCollateralOnFailure(reportRequestOutcome(await sender.retry(requestKey)));
 	}
 
 	async function cancelRequest(requestKey: string): Promise<OrderResult> {
