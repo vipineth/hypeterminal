@@ -29,7 +29,8 @@ export function standardAccount(balances: TestSpotBalance[], mainWithdrawable = 
 	return buildAccountState({
 		user,
 		mode: { kind: "standard", raw: "default" },
-		current: true,
+		spotCurrent: true,
+		perpCurrent: true,
 		clearinghouseStates: [["", clearinghouse(mainWithdrawable)]],
 		spot: { balances: balances.map((balance) => ({ ...balance, hold: "0", entryNtl: "0" })) },
 	});

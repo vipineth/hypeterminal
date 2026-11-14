@@ -37,7 +37,8 @@ function accountOf(name: string, mode: AccountMode, funded: Record<string, strin
 	const captured = fixture(name);
 	return buildAccountState({
 		user: captured.user,
-		current: true,
+		spotCurrent: true,
+		perpCurrent: true,
 		mode,
 		clearinghouseStates: captured.clearinghouseStates.map(([dex, state]) => [
 			dex,
@@ -195,7 +196,8 @@ describe("spot rows by payload", () => {
 		return buildAccountState({
 			user: TEST_USER,
 			mode,
-			current: true,
+			spotCurrent: true,
+			perpCurrent: true,
 			clearinghouseStates: [],
 			spot,
 		});
@@ -257,12 +259,33 @@ describe("spend limits", () => {
 		["a standard", "mainnet-disabled-two-dexes", STANDARD],
 		["a unified", "mainnet-unified-0x8c60", UNIFIED],
 	])("blocks every spend on %s account whose balances predate the last rejection or mode change", (_, name, mode) => {
-		const account: ReadyAccount = { ...accountOf(name, mode), current: false };
+		const account: ReadyAccount = { ...accountOf(name, mode), spotCurrent: false, perpCurrent: false };
 
 		expect(getSpendLimit(account, "spot", "USDC")).toEqual({ status: "pending" });
 		expect(getSpendLimit(account, "perp", "USDC")).toEqual({ status: "pending" });
 		expect(getTransferLimit(account, "spotToPerp")).toEqual({ status: "pending" });
 		expect(getTransferLimit(account, "withdraw")).toEqual({ status: "pending" });
+	});
+
+	it("holds only the spends that read the stale snapshot on a standard account", () => {
+		const account = accountOf("mainnet-disabled-two-dexes", STANDARD);
+		const staleSpot: ReadyAccount = { ...account, spotCurrent: false };
+		const stalePerp: ReadyAccount = { ...account, perpCurrent: false };
+
+		expect(getSpendLimit(staleSpot, "spot", "USDC")).toEqual({ status: "pending" });
+		expect(getTransferLimit(staleSpot, "spotToPerp")).toEqual({ status: "pending" });
+		expect(getSpendLimit(staleSpot, "perp", "USDC")).toEqual({ status: "ready", amount: "64116.532932" });
+		expect(getSpendLimit(stalePerp, "perp", "USDC")).toEqual({ status: "pending" });
+		expect(getTransferLimit(stalePerp, "withdraw")).toEqual({ status: "pending" });
+		expect(getSpendLimit(stalePerp, "spot", "USDC").status).toBe("ready");
+	});
+
+	it("leaves a unified perp send to the exchange only while both snapshots are current", () => {
+		const account = accountOf("mainnet-unified-0x8c60", UNIFIED);
+
+		expect(getSpendLimit({ ...account, perpCurrent: false }, "perp", "USDC")).toEqual({ status: "pending" });
+		expect(getSpendLimit({ ...account, spotCurrent: false }, "perp", "USDC")).toEqual({ status: "pending" });
+		expect(getTransferLimit({ ...account, perpCurrent: false }, "withdraw").status).toBe("ready");
 	});
 
 	it("offers only spot tokens with something available to send", () => {

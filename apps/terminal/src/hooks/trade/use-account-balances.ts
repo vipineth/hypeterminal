@@ -23,7 +23,8 @@ export function useAccountState(): AccountState {
 	return buildAccountState({
 		user,
 		mode,
-		current: isCurrentSnapshot(spot.data, generation) && isCurrentSnapshot(perp.data, generation),
+		spotCurrent: isCurrentSnapshot(spot.data, generation),
+		perpCurrent: isCurrentSnapshot(perp.data, generation),
 		clearinghouseStates: perp.data.clearinghouseStates,
 		spot: spot.data.spotState,
 	});

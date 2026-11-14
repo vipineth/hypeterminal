@@ -35,7 +35,8 @@ function accountOf(name: string, mode?: AccountMode): ReadyAccount {
 	const captured = fixture(name);
 	return buildAccountState({
 		user: captured.user,
-		current: true,
+		spotCurrent: true,
+		perpCurrent: true,
 		mode:
 			mode ??
 			parseAccountMode(captured.webData3UserState.abstraction, captured.webData3UserState.dexAbstractionEnabled),
@@ -153,7 +154,8 @@ function spotAccount(mode: AccountMode, spot: ReadyAccount["spot"]): ReadyAccoun
 	return buildAccountState({
 		user: TEST_USER,
 		mode,
-		current: true,
+		spotCurrent: true,
+		perpCurrent: true,
 		clearinghouseStates: [["", clearinghouse("0.0")]],
 		spot,
 	});

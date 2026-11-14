@@ -32,7 +32,8 @@ export type AccountState =
 			ledger: "perDex";
 			user: string;
 			mode: PerDexMode;
-			current: boolean;
+			spotCurrent: boolean;
+			perpCurrent: boolean;
 			spot: SpotState;
 			dexes: ReadonlyMap<string, ClearinghouseState>;
 	  }
@@ -41,7 +42,8 @@ export type AccountState =
 			ledger: "spotOnly";
 			user: string;
 			mode: SharedMode;
-			current: boolean;
+			spotCurrent: boolean;
+			perpCurrent: boolean;
 			spot: SpotState;
 			positions: ReadonlyMap<string, readonly PerpPosition[]>;
 	  };
@@ -117,12 +119,20 @@ export function parseAccountMode(abstraction: string | null | undefined, dexAbst
 interface AccountStreams {
 	user: string;
 	mode: AccountMode;
-	current: boolean;
+	spotCurrent: boolean;
+	perpCurrent: boolean;
 	clearinghouseStates: AllDexsClearinghouseStateWsEvent["clearinghouseStates"];
 	spot: SpotState;
 }
 
-export function buildAccountState({ user, mode, current, clearinghouseStates, spot }: AccountStreams): ReadyAccount {
+export function buildAccountState({
+	user,
+	mode,
+	spotCurrent,
+	perpCurrent,
+	clearinghouseStates,
+	spot,
+}: AccountStreams): ReadyAccount {
 	switch (mode.kind) {
 		case "standard":
 		case "legacyDexAbstraction":
@@ -131,7 +141,8 @@ export function buildAccountState({ user, mode, current, clearinghouseStates, sp
 				ledger: "perDex",
 				user,
 				mode,
-				current,
+				spotCurrent,
+				perpCurrent,
 				spot,
 				dexes: new Map(clearinghouseStates),
 			};
@@ -143,7 +154,8 @@ export function buildAccountState({ user, mode, current, clearinghouseStates, sp
 				ledger: "spotOnly",
 				user,
 				mode,
-				current,
+				spotCurrent,
+				perpCurrent,
 				spot,
 				positions: new Map(clearinghouseStates.map(([dex, state]) => [dex, state.assetPositions])),
 			};
@@ -269,17 +281,19 @@ export function getTradeCollateral(account: AccountState, market: Market, side: 
 }
 
 export function getSpotLimit(account: ReadyAccount, tokenName: string): TransferLimit {
-	if (!account.current) return { status: "pending" };
+	if (!account.spotCurrent) return { status: "pending" };
 	const amount = getSpotAvailable(account, tokenName);
 	return amount === null ? { status: "pending" } : { status: "ready", amount };
 }
 
 export function getTransferLimit(account: AccountState, route: TransferRoute): TransferLimit {
-	if (account.status !== "ready" || !account.current) return { status: "pending" };
+	if (account.status !== "ready") return { status: "pending" };
 	if (account.ledger === "spotOnly") {
 		if (route === "withdraw") return getSpotLimit(account, DEFAULT_QUOTE_TOKEN);
+		if (!account.spotCurrent || !account.perpCurrent) return { status: "pending" };
 		return { status: "unverifiedTransferLimit" };
 	}
 	if (route === "spotToPerp") return getSpotLimit(account, DEFAULT_QUOTE_TOKEN);
+	if (!account.perpCurrent) return { status: "pending" };
 	return { status: "ready", amount: account.dexes.get(MAIN_DEX)?.withdrawable ?? "0" };
 }

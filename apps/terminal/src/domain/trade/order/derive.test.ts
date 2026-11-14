@@ -43,7 +43,8 @@ describe("builder perp collateral on a standard account", () => {
 		);
 		const account = buildAccountState({
 			user: p3.user,
-			current: true,
+			spotCurrent: true,
+			perpCurrent: true,
 			mode: parseAccountMode(p3.webData3UserState.abstraction),
 			clearinghouseStates: p3.clearinghouseStates,
 			spot: { balances: [{ coin: "USDC", token: 0, total: "73414", hold: "0", entryNtl: "0" }] },
