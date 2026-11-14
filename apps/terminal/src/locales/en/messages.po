@@ -1065,7 +1065,7 @@ msgstr "Each position uses only its allocated margin. If the margin ratio reache
 msgid "Edit TP/SL"
 msgstr "Edit TP/SL"
 
-#: src/components/trade/components/trading-action-button.tsx:47
+#: src/components/trade/components/trading-action-button.tsx:43
 msgid "Enable"
 msgstr "Enable"
 
@@ -1073,7 +1073,7 @@ msgstr "Enable"
 msgid "Enable Trading"
 msgstr "Enable Trading"
 
-#: src/components/trade/components/trading-action-button.tsx:44
+#: src/components/trade/components/trading-action-button.tsx:40
 msgid "Enabling"
 msgstr "Enabling"
 
