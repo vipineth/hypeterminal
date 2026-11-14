@@ -13,7 +13,7 @@ import {
 	type QuoteCheck,
 	type ReadyAccount,
 } from "@/domain/trade/account-mode";
-import type { AccountFixture } from "@/test/account-fixture";
+import { type AccountFixture, SEEN_NOW } from "@/test/account-fixture";
 
 const meta: MetaPayloads = JSON.parse(
 	readFileSync(new URL("../../../fixtures/hl-mainnet-meta.json", import.meta.url), "utf8"),
@@ -34,6 +34,8 @@ function accountOf(name: string, mode?: AccountMode): ReadyAccount {
 	const captured = fixture(name);
 	return buildAccountState({
 		user: captured.user,
+		generation: 0,
+		spotSeen: SEEN_NOW,
 		mode:
 			mode ??
 			parseAccountMode(captured.webData3UserState.abstraction, captured.webData3UserState.dexAbstractionEnabled),
@@ -43,7 +45,7 @@ function accountOf(name: string, mode?: AccountMode): ReadyAccount {
 }
 
 function liveQuote(name: string, coin: string): QuoteCheck {
-	return { status: "live", quote: fixture(name).activeAssetData[coin], leverage: null };
+	return { status: "live", quote: fixture(name).activeAssetData[coin], leverage: null, seen: SEEN_NOW };
 }
 
 const MODES: Record<string, AccountMode> = {
@@ -226,7 +228,7 @@ describe("trade collateral", () => {
 			...fixture("p3-default").activeAssetData.BTC,
 			availableToTrade: ["0.0", "0.0"] as [string, string],
 		};
-		const collateral = getTradeCollateral(account, market("BTC"), "buy", { status: "live", quote, leverage: null });
+		const collateral = getTradeCollateral(account, market("BTC"), "buy", { status: "live", quote, leverage: null, seen: SEEN_NOW });
 		expect(collateral.status === "ready" && collateral.shortfall).toEqual({
 			kind: "inUse",
 			token: expect.objectContaining({ name: "USDC" }),
@@ -242,7 +244,7 @@ describe("trade collateral", () => {
 			dexes: new Map([...account.dexes].map(([dex, state]) => [dex, { ...state, withdrawable: "0.0" }])),
 		};
 		const quote = fixture("p3-default").activeAssetData["xyz:NVDA"];
-		const collateral = getTradeCollateral(empty, market("xyz:NVDA"), "buy", { status: "live", quote, leverage: null });
+		const collateral = getTradeCollateral(empty, market("xyz:NVDA"), "buy", { status: "live", quote, leverage: null, seen: SEEN_NOW });
 		expect(collateral.status === "ready" && collateral.shortfall?.kind).toBe("noFunds");
 	});
 
@@ -268,34 +270,34 @@ describe("an activeAssetData quote counts only for this ticket", () => {
 	const nvda = fixture("p3-default").activeAssetData["xyz:NVDA"];
 
 	it.each<[string, AccountState, QuoteCheck]>([
-		["the account has not loaded", { status: "loading" }, { status: "live", quote: nvda, leverage: null }],
+		["the account has not loaded", { status: "loading" }, { status: "live", quote: nvda, leverage: null, seen: SEEN_NOW }],
 		["no quote has arrived for this generation", account, { status: "waiting" }],
 		[
 			"the quote is for another dex's NVDA",
 			account,
-			{ status: "live", quote: { ...nvda, coin: "io:NVDA" }, leverage: null },
+			{ status: "live", quote: { ...nvda, coin: "io:NVDA" }, leverage: null, seen: SEEN_NOW },
 		],
 		[
 			"the quote is for another wallet",
 			account,
-			{ status: "live", quote: { ...nvda, user: "0x9fed7c631d8d525ce642402c0e36a73cf5c77c1c" }, leverage: null },
+			{ status: "live", quote: { ...nvda, user: "0x9fed7c631d8d525ce642402c0e36a73cf5c77c1c" }, leverage: null, seen: SEEN_NOW },
 		],
 		[
 			"the quote predates the leverage just applied",
 			account,
-			{ status: "live", quote: nvda, leverage: { type: "isolated", value: 20, rawUsd: "0" } },
+			{ status: "live", quote: nvda, leverage: { type: "isolated", value: 20, rawUsd: "0" }, seen: SEEN_NOW },
 		],
 		[
 			"the quote has the old leverage value",
 			account,
-			{ status: "live", quote: nvda, leverage: { type: "cross", value: 5 } },
+			{ status: "live", quote: nvda, leverage: { type: "cross", value: 5 }, seen: SEEN_NOW },
 		],
 	])("is pending when %s", (_label, state, check) => {
 		expect(getTradeCollateral(state, market("xyz:NVDA"), "buy", check).status).toBe("pending");
 	});
 
 	it("matches the wallet case-insensitively and accepts the leverage it was sent", () => {
-		const check: QuoteCheck = { status: "live", quote: nvda, leverage: { type: "cross", value: 20 } };
+		const check: QuoteCheck = { status: "live", quote: nvda, leverage: { type: "cross", value: 20 }, seen: SEEN_NOW };
 		const upper = { ...account, user: account.user.toUpperCase().replace("0X", "0x") };
 		expect(getTradeCollateral(upper, market("xyz:NVDA"), "buy", check).status).toBe("ready");
 	});

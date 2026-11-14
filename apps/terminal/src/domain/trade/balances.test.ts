@@ -10,7 +10,7 @@ import {
 	getSpendLimit,
 	isWithinSpendLimit,
 } from "@/domain/trade/balances";
-import { type AccountFixture, clearinghouse } from "@/test/account-fixture";
+import { type AccountFixture, clearinghouse, SEEN_NOW } from "@/test/account-fixture";
 
 const meta: MetaPayloads = JSON.parse(
 	readFileSync(new URL("../../../fixtures/hl-mainnet-meta.json", import.meta.url), "utf8"),
@@ -37,6 +37,8 @@ function accountOf(name: string, mode: AccountMode, funded: Record<string, strin
 	const captured = fixture(name);
 	return buildAccountState({
 		user: captured.user,
+		generation: 0,
+		spotSeen: SEEN_NOW,
 		mode,
 		clearinghouseStates: captured.clearinghouseStates.map(([dex, state]) => [
 			dex,

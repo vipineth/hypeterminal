@@ -23,6 +23,11 @@ export type AccountMode =
 type PerDexMode = Extract<AccountMode, { kind: "standard" | "legacyDexAbstraction" }>;
 type SharedMode = Extract<AccountMode, { kind: "unified" | "portfolio" | "unknown" }>;
 
+export interface Seen {
+	generation: number;
+	mode: AccountMode | null;
+}
+
 export type AccountState =
 	| { status: "loading" }
 	| { status: "error" }
@@ -31,7 +36,9 @@ export type AccountState =
 			ledger: "perDex";
 			user: string;
 			mode: PerDexMode;
+			generation: number;
 			spot: SpotState;
+			spotSeen: Seen;
 			dexes: ReadonlyMap<string, ClearinghouseState>;
 	  }
 	| {
@@ -39,7 +46,9 @@ export type AccountState =
 			ledger: "spotOnly";
 			user: string;
 			mode: SharedMode;
+			generation: number;
 			spot: SpotState;
+			spotSeen: Seen;
 			positions: ReadonlyMap<string, readonly PerpPosition[]>;
 	  };
 
@@ -59,7 +68,12 @@ export type Shortfall =
 	| { kind: "noFunds"; token: QuoteToken };
 
 export type QuoteCheck =
-	| { status: "live"; quote: ActiveAssetDataResponse; leverage: ActiveAssetDataResponse["leverage"] | null }
+	| {
+			status: "live";
+			quote: ActiveAssetDataResponse;
+			leverage: ActiveAssetDataResponse["leverage"] | null;
+			seen: Seen;
+	  }
 	| { status: "waiting" };
 
 export type Collateral =
@@ -104,15 +118,33 @@ export function parseAccountMode(abstraction: string | null | undefined, dexAbst
 interface AccountStreams {
 	user: string;
 	mode: AccountMode;
+	generation: number;
 	clearinghouseStates: AllDexsClearinghouseStateWsEvent["clearinghouseStates"];
 	spot: SpotState;
+	spotSeen: Seen;
 }
 
-export function buildAccountState({ user, mode, clearinghouseStates, spot }: AccountStreams): ReadyAccount {
+export function buildAccountState({
+	user,
+	mode,
+	generation,
+	clearinghouseStates,
+	spot,
+	spotSeen,
+}: AccountStreams): ReadyAccount {
 	switch (mode.kind) {
 		case "standard":
 		case "legacyDexAbstraction":
-			return { status: "ready", ledger: "perDex", user, mode, spot, dexes: new Map(clearinghouseStates) };
+			return {
+				status: "ready",
+				ledger: "perDex",
+				user,
+				mode,
+				generation,
+				spot,
+				spotSeen,
+				dexes: new Map(clearinghouseStates),
+			};
 		case "unified":
 		case "portfolio":
 		case "unknown":
@@ -121,7 +153,9 @@ export function buildAccountState({ user, mode, clearinghouseStates, spot }: Acc
 				ledger: "spotOnly",
 				user,
 				mode,
+				generation,
 				spot,
+				spotSeen,
 				positions: new Map(clearinghouseStates.map(([dex, state]) => [dex, state.assetPositions])),
 			};
 		default:
@@ -196,6 +230,14 @@ function getShortfall(account: ReadyAccount, source: CollateralSource, token: Qu
 		: { kind: "noFunds", token };
 }
 
+function sameMode(a: AccountMode, b: AccountMode): boolean {
+	return a.kind === b.kind && ("raw" in a ? a.raw : null) === ("raw" in b ? b.raw : null);
+}
+
+function isCurrent(seen: Seen, account: ReadyAccount): boolean {
+	return seen.generation === account.generation && (seen.mode === null || sameMode(seen.mode, account.mode));
+}
+
 function sameLeverage(a: ActiveAssetDataResponse["leverage"], b: ActiveAssetDataResponse["leverage"]): boolean {
 	return a.type === b.type && a.value === b.value;
 }
@@ -205,7 +247,7 @@ function isQuoteFor(
 	account: ReadyAccount,
 	market: Market,
 ): check is Extract<QuoteCheck, { status: "live" }> {
-	if (check.status !== "live") return false;
+	if (check.status !== "live" || !isCurrent(check.seen, account)) return false;
 	const { quote, leverage } = check;
 	if (quote.user.toLowerCase() !== account.user.toLowerCase()) return false;
 	if (quote.coin !== market.name) return false;
@@ -217,6 +259,7 @@ export function getTradeCollateral(account: AccountState, market: Market, side: 
 	const source = getCollateralSource(account, market);
 
 	if (market.kind === "spot") {
+		if (!isCurrent(account.spotSeen, account)) return { status: "pending", reason: "account" };
 		const token = side === "buy" ? market.quote : market.base;
 		const available = getSpotAvailable(account.spot, token.name);
 		const shortfall = toSafeBig(available).gt(0) ? null : getShortfall(account, { kind: "spot", token }, token);

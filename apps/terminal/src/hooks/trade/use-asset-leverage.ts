@@ -4,10 +4,10 @@ import { useConnection } from "wagmi";
 import { getPositionDex } from "@/domain/market";
 import { getMarketCapabilities } from "@/domain/market/capabilities";
 import { getDefaultLeverage, getMaxLeverage } from "@/domain/market/model";
-import type { QuoteCheck } from "@/domain/trade/account-mode";
+import { parseAccountMode, type QuoteCheck } from "@/domain/trade/account-mode";
 import { useExchange, useSelectedMarketInfo, useSubscription, useUserPositions } from "@/lib/hyperliquid";
 import { getMarginModeFromLeverage, type MarginMode } from "@/lib/trade/margin-mode";
-import { bumpCollateralGeneration, useCollateralGeneration } from "@/stores/use-collateral-generation-store";
+import { bumpCollateralGeneration, firstSeen, useCollateralGeneration } from "@/stores/use-collateral-generation-store";
 import { useGlobalSettingsActions, useMarginMode } from "@/stores/use-global-settings-store";
 
 type OperationType = "leverage" | "mode" | null;
@@ -15,11 +15,6 @@ type OperationType = "leverage" | "mode" | null;
 interface AppliedLeverage {
 	coin: string;
 	leverage: ActiveAssetDataResponse["leverage"];
-}
-
-interface QuoteStamp {
-	data: ActiveAssetDataResponse | undefined;
-	generation: number;
 }
 
 interface UseAssetLeverageReturn {
@@ -75,13 +70,20 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		{ enabled: isConnected && !!address && !!baseToken && isPerpMarket },
 	);
 
+	const { data: accountData } = useSubscription(
+		"webData3",
+		{ user: address ?? "0x0" },
+		{ enabled: isConnected && !!address },
+	);
+	const accountMode = accountData
+		? parseAccountMode(accountData.userState.abstraction, accountData.userState.dexAbstractionEnabled)
+		: null;
+
+	const generation = useCollateralGeneration();
 	const userPositions = useUserPositions();
 
 	const { mutateAsync: updateLeverage, isPending, error, reset: resetMutation } = useExchange("updateLeverage");
 
-	const generation = useCollateralGeneration();
-	const [stamp, setStamp] = useState<QuoteStamp>({ data: activeAssetData, generation });
-	if (stamp.data !== activeAssetData) setStamp({ data: activeAssetData, generation });
 	const [applied, setApplied] = useState<AppliedLeverage | null>(null);
 	if (applied && activeAssetData?.coin === applied.coin && isSameLeverage(activeAssetData.leverage, applied.leverage)) {
 		setApplied(null);
@@ -232,9 +234,13 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	}
 
 	function computeQuote(): QuoteCheck {
-		const isLive = subscriptionStatus === "active" && !isQuoteStale && stamp.generation === generation;
-		if (!activeAssetData || !isLive) return { status: "waiting" };
-		return { status: "live", quote: activeAssetData, leverage: applied && applied.coin === baseToken ? applied.leverage : null };
+		if (!activeAssetData || subscriptionStatus !== "active" || isQuoteStale) return { status: "waiting" };
+		return {
+			status: "live",
+			quote: activeAssetData,
+			leverage: applied && applied.coin === baseToken ? applied.leverage : null,
+			seen: firstSeen(activeAssetData, generation, accountMode),
+		};
 	}
 	const quote = computeQuote();
 

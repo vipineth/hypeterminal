@@ -4,7 +4,7 @@ import type {
 	SpotClearinghouseStateResponse,
 	WebData3WsEvent,
 } from "@nktkas/hyperliquid";
-import { buildAccountState, type QuoteCheck, type ReadyAccount } from "@/domain/trade/account-mode";
+import { buildAccountState, type QuoteCheck, type ReadyAccount, type Seen } from "@/domain/trade/account-mode";
 
 export interface AccountFixture {
 	network: "mainnet" | "testnet";
@@ -19,6 +19,8 @@ export interface AccountFixture {
 
 export const TEST_USER = "0x0000000000000000000000000000000000000001";
 
+export const SEEN_NOW: Seen = { generation: 0, mode: null };
+
 interface TestSpotBalance {
 	coin: string;
 	token: number;
@@ -29,6 +31,8 @@ export function standardAccount(balances: TestSpotBalance[], mainWithdrawable = 
 	return buildAccountState({
 		user,
 		mode: { kind: "standard", raw: "default" },
+		generation: 0,
+		spotSeen: SEEN_NOW,
 		clearinghouseStates: [["", clearinghouse(mainWithdrawable)]],
 		spot: { balances: balances.map((balance) => ({ ...balance, hold: "0", entryNtl: "0" })) },
 	});
@@ -51,6 +55,7 @@ export function liveQuote(
 			markPx: "0",
 		},
 		leverage: null,
+		seen: SEEN_NOW,
 	};
 }
 
