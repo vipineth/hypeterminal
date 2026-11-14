@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { type Market, type MetaPayloads, parseMarkets } from "@/domain/market/model";
-import { type AccountMode, buildAccountState, type ReadyAccount } from "@/domain/trade/account-mode";
+import { type AccountMode, buildAccountState, getTransferLimit, type ReadyAccount } from "@/domain/trade/account-mode";
 import {
 	type AccountSummary,
 	getAccountSummary,
@@ -10,7 +10,7 @@ import {
 	getSpendLimit,
 	isWithinSpendLimit,
 } from "@/domain/trade/balances";
-import { type AccountFixture, clearinghouse, SEEN_NOW, TEST_USER } from "@/test/account-fixture";
+import { type AccountFixture, clearinghouse, TEST_USER } from "@/test/account-fixture";
 
 const meta: MetaPayloads = JSON.parse(
 	readFileSync(new URL("../../../fixtures/hl-mainnet-meta.json", import.meta.url), "utf8"),
@@ -37,8 +37,7 @@ function accountOf(name: string, mode: AccountMode, funded: Record<string, strin
 	const captured = fixture(name);
 	return buildAccountState({
 		user: captured.user,
-		generation: 0,
-		spotSeen: SEEN_NOW,
+		current: true,
 		mode,
 		clearinghouseStates: captured.clearinghouseStates.map(([dex, state]) => [
 			dex,
@@ -170,7 +169,9 @@ describe("balance rows", () => {
 	});
 
 	it("waits for market data before naming a funded builder dex's collateral", () => {
-		expect(getBalances(accountOf("mainnet-disabled-two-dexes", STANDARD), [], true, false)).toEqual({ status: "loading" });
+		expect(getBalances(accountOf("mainnet-disabled-two-dexes", STANDARD), [], true, false)).toEqual({
+			status: "loading",
+		});
 	});
 
 	it("still shows a funded dex whose collateral the market model could not resolve", () => {
@@ -194,10 +195,9 @@ describe("spot rows by payload", () => {
 		return buildAccountState({
 			user: TEST_USER,
 			mode,
-			generation: 0,
+			current: true,
 			clearinghouseStates: [],
 			spot,
-			spotSeen: SEEN_NOW,
 		});
 	}
 	const usdc = { coin: "USDC", token: 0, total: "100.0", hold: "25.0", entryNtl: "0.0" };
@@ -251,6 +251,18 @@ describe("spend limits", () => {
 
 		expect(limit).toEqual({ status: "pending" });
 		expect(isWithinSpendLimit("1", limit)).toBe(false);
+	});
+
+	it.each([
+		["a standard", "mainnet-disabled-two-dexes", STANDARD],
+		["a unified", "mainnet-unified-0x8c60", UNIFIED],
+	])("blocks every spend on %s account whose balances predate the last rejection or mode change", (_, name, mode) => {
+		const account: ReadyAccount = { ...accountOf(name, mode), current: false };
+
+		expect(getSpendLimit(account, "spot", "USDC")).toEqual({ status: "pending" });
+		expect(getSpendLimit(account, "perp", "USDC")).toEqual({ status: "pending" });
+		expect(getTransferLimit(account, "spotToPerp")).toEqual({ status: "pending" });
+		expect(getTransferLimit(account, "withdraw")).toEqual({ status: "pending" });
 	});
 
 	it("offers only spot tokens with something available to send", () => {

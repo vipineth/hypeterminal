@@ -24,11 +24,6 @@ export type AccountMode =
 type PerDexMode = Extract<AccountMode, { kind: "standard" | "legacyDexAbstraction" }>;
 type SharedMode = Extract<AccountMode, { kind: "unified" | "portfolio" | "unknown" }>;
 
-export interface Seen {
-	generation: number;
-	mode: AccountMode | null;
-}
-
 export type AccountState =
 	| { status: "loading" }
 	| { status: "error" }
@@ -37,9 +32,8 @@ export type AccountState =
 			ledger: "perDex";
 			user: string;
 			mode: PerDexMode;
-			generation: number;
+			current: boolean;
 			spot: SpotState;
-			spotSeen: Seen;
 			dexes: ReadonlyMap<string, ClearinghouseState>;
 	  }
 	| {
@@ -47,9 +41,8 @@ export type AccountState =
 			ledger: "spotOnly";
 			user: string;
 			mode: SharedMode;
-			generation: number;
+			current: boolean;
 			spot: SpotState;
-			spotSeen: Seen;
 			positions: ReadonlyMap<string, readonly PerpPosition[]>;
 	  };
 
@@ -79,7 +72,6 @@ export type QuoteCheck =
 			status: "live";
 			quote: ActiveAssetDataResponse;
 			applied: AppliedLeverage | null;
-			seen: Seen;
 	  }
 	| { status: "waiting" };
 
@@ -125,20 +117,12 @@ export function parseAccountMode(abstraction: string | null | undefined, dexAbst
 interface AccountStreams {
 	user: string;
 	mode: AccountMode;
-	generation: number;
+	current: boolean;
 	clearinghouseStates: AllDexsClearinghouseStateWsEvent["clearinghouseStates"];
 	spot: SpotState;
-	spotSeen: Seen;
 }
 
-export function buildAccountState({
-	user,
-	mode,
-	generation,
-	clearinghouseStates,
-	spot,
-	spotSeen,
-}: AccountStreams): ReadyAccount {
+export function buildAccountState({ user, mode, current, clearinghouseStates, spot }: AccountStreams): ReadyAccount {
 	switch (mode.kind) {
 		case "standard":
 		case "legacyDexAbstraction":
@@ -147,9 +131,8 @@ export function buildAccountState({
 				ledger: "perDex",
 				user,
 				mode,
-				generation,
+				current,
 				spot,
-				spotSeen,
 				dexes: new Map(clearinghouseStates),
 			};
 		case "unified":
@@ -160,9 +143,8 @@ export function buildAccountState({
 				ledger: "spotOnly",
 				user,
 				mode,
-				generation,
+				current,
 				spot,
-				spotSeen,
 				positions: new Map(clearinghouseStates.map(([dex, state]) => [dex, state.assetPositions])),
 			};
 		default:
@@ -243,14 +225,6 @@ function getShortfall(account: ReadyAccount, source: CollateralSource, token: Qu
 		: { kind: "noFunds", token };
 }
 
-function sameMode(a: AccountMode, b: AccountMode): boolean {
-	return a.kind === b.kind && ("raw" in a ? a.raw : null) === ("raw" in b ? b.raw : null);
-}
-
-function isCurrent(seen: Seen, account: ReadyAccount): boolean {
-	return seen.generation === account.generation && (seen.mode === null || sameMode(seen.mode, account.mode));
-}
-
 function sameUser(a: string, b: string): boolean {
 	return a.toLowerCase() === b.toLowerCase();
 }
@@ -264,7 +238,7 @@ function isQuoteFor(
 	account: ReadyAccount,
 	market: Market,
 ): check is Extract<QuoteCheck, { status: "live" }> {
-	if (check.status !== "live" || !isCurrent(check.seen, account)) return false;
+	if (check.status !== "live") return false;
 	const { quote, applied } = check;
 	if (!sameUser(quote.user, account.user)) return false;
 	if (quote.coin !== market.name) return false;
@@ -277,10 +251,10 @@ export function getTradeCollateral(account: AccountState, market: Market, side: 
 	const source = getCollateralSource(account, market);
 
 	if (market.kind === "spot") {
-		if (!isCurrent(account.spotSeen, account)) return { status: "pending", reason: "account" };
 		const token = side === "buy" ? market.quote : market.base;
-		const available = getSpotAvailable(account, token.name);
-		if (available === null) return { status: "pending", reason: "account" };
+		const limit = getSpotLimit(account, token.name);
+		if (limit.status !== "ready") return { status: "pending", reason: "account" };
+		const available = limit.amount;
 		const shortfall = toSafeBig(available).gt(0) ? null : getShortfall(account, { kind: "spot", token }, token);
 		return { status: "ready", source: { kind: "spot", token }, token, available, maxSize: null, shortfall };
 	}
@@ -295,12 +269,13 @@ export function getTradeCollateral(account: AccountState, market: Market, side: 
 }
 
 export function getSpotLimit(account: ReadyAccount, tokenName: string): TransferLimit {
+	if (!account.current) return { status: "pending" };
 	const amount = getSpotAvailable(account, tokenName);
 	return amount === null ? { status: "pending" } : { status: "ready", amount };
 }
 
 export function getTransferLimit(account: AccountState, route: TransferRoute): TransferLimit {
-	if (account.status !== "ready") return { status: "pending" };
+	if (account.status !== "ready" || !account.current) return { status: "pending" };
 	if (account.ledger === "spotOnly") {
 		if (route === "withdraw") return getSpotLimit(account, DEFAULT_QUOTE_TOKEN);
 		return { status: "unverifiedTransferLimit" };

@@ -91,7 +91,9 @@ function getPerpRows(account: ReadyAccount, dexes: readonly Dex[], dexesLoading:
 				const accountValue = state.marginSummary.accountValue;
 				if (!toSafeBig(accountValue).gt(0)) continue;
 				const isMain = name === MAIN_DEX;
-				const collateral = isMain ? DEFAULT_QUOTE_TOKEN : dexes.find((entry) => entry.name === name)?.collateralToken.name;
+				const collateral = isMain
+					? DEFAULT_QUOTE_TOKEN
+					: dexes.find((entry) => entry.name === name)?.collateralToken.name;
 				if (!collateral && dexesLoading) return null;
 				const asset = collateral ?? name;
 				rows.push({

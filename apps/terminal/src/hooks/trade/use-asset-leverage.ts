@@ -4,10 +4,14 @@ import { useConnection } from "wagmi";
 import { getPositionDex } from "@/domain/market";
 import { getMarketCapabilities } from "@/domain/market/capabilities";
 import { getDefaultLeverage, getMaxLeverage } from "@/domain/market/model";
-import { type AppliedLeverage, parseAccountMode, type QuoteCheck } from "@/domain/trade/account-mode";
+import type { AppliedLeverage, QuoteCheck } from "@/domain/trade/account-mode";
 import { useExchange, useSelectedMarketInfo, useSubscription, useUserPositions } from "@/lib/hyperliquid";
 import { getMarginModeFromLeverage, type MarginMode } from "@/lib/trade/margin-mode";
-import { bumpCollateralGeneration, firstSeen, useCollateralGeneration } from "@/stores/use-collateral-generation-store";
+import {
+	bumpCollateralGeneration,
+	isCurrentSnapshot,
+	useCollateralGeneration,
+} from "@/stores/use-collateral-generation-store";
 import { useGlobalSettingsActions, useMarginMode } from "@/stores/use-global-settings-store";
 
 type OperationType = "leverage" | "mode" | null;
@@ -69,15 +73,6 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 		{ coin: baseToken ?? "", user: address ?? "" },
 		{ enabled: isConnected && !!address && !!baseToken && isPerpMarket },
 	);
-
-	const { data: accountData } = useSubscription(
-		"webData3",
-		{ user: address ?? "0x0" },
-		{ enabled: isConnected && !!address },
-	);
-	const accountMode = accountData
-		? parseAccountMode(accountData.userState.abstraction, accountData.userState.dexAbstractionEnabled)
-		: null;
 
 	const generation = useCollateralGeneration();
 	const userPositions = useUserPositions();
@@ -233,12 +228,8 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 
 	function computeQuote(): QuoteCheck {
 		if (!activeAssetData || subscriptionStatus !== "active" || isQuoteStale) return { status: "waiting" };
-		return {
-			status: "live",
-			quote: activeAssetData,
-			applied,
-			seen: firstSeen(activeAssetData, generation, accountMode),
-		};
+		if (!isCurrentSnapshot(activeAssetData, generation)) return { status: "waiting" };
+		return { status: "live", quote: activeAssetData, applied };
 	}
 	const quote = computeQuote();
 

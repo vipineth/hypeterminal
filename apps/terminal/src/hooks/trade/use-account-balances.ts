@@ -1,7 +1,7 @@
 import { useConnection } from "wagmi";
 import { type AccountState, buildAccountState, parseAccountMode } from "@/domain/trade/account-mode";
 import { useSubscription } from "@/lib/hyperliquid";
-import { firstSeen, useCollateralGeneration } from "@/stores/use-collateral-generation-store";
+import { isCurrentSnapshot, useCollateralGeneration } from "@/stores/use-collateral-generation-store";
 
 export function useAccountState(): AccountState {
 	const { address, isConnected } = useConnection();
@@ -23,9 +23,8 @@ export function useAccountState(): AccountState {
 	return buildAccountState({
 		user,
 		mode,
-		generation,
+		current: isCurrentSnapshot(spot.data, generation) && isCurrentSnapshot(perp.data, generation),
 		clearinghouseStates: perp.data.clearinghouseStates,
 		spot: spot.data.spotState,
-		spotSeen: firstSeen(spot.data, generation, mode),
 	});
 }

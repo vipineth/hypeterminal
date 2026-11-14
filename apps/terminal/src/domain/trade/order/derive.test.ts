@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { type MetaPayloads, parseMarkets } from "@/domain/market/model";
 import { buildAccountState, getTradeCollateral, parseAccountMode } from "@/domain/trade/account-mode";
 import { deriveOrderEntry, type OrderEntryInputs } from "@/domain/trade/order/derive";
-import { type AccountFixture, SEEN_NOW } from "@/test/account-fixture";
+import type { AccountFixture } from "@/test/account-fixture";
 
 const snapshot: MetaPayloads = JSON.parse(
 	readFileSync(new URL("../../../../fixtures/hl-mainnet-meta.json", import.meta.url), "utf8"),
@@ -43,8 +43,7 @@ describe("builder perp collateral on a standard account", () => {
 		);
 		const account = buildAccountState({
 			user: p3.user,
-			generation: 0,
-			spotSeen: SEEN_NOW,
+			current: true,
 			mode: parseAccountMode(p3.webData3UserState.abstraction),
 			clearinghouseStates: p3.clearinghouseStates,
 			spot: { balances: [{ coin: "USDC", token: 0, total: "73414", hold: "0", entryNtl: "0" }] },
@@ -63,7 +62,6 @@ describe("builder perp collateral on a standard account", () => {
 				status: "live",
 				quote: p3.activeAssetData["xyz:NVDA"],
 				applied: null,
-				seen: SEEN_NOW,
 			}),
 		});
 
