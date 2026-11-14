@@ -46,7 +46,7 @@ interface WireTwap {
 	t: boolean;
 }
 
-const meta = { universe: [{ name: "DOGE", szDecimals: 0 }] };
+const meta = { universe: [{ name: "DOGE", szDecimals: 0 }], collateralToken: 0 };
 let position = 0;
 let history: object[] = [];
 
@@ -57,7 +57,10 @@ const h = {
 		clearinghouseState: async () => ({ assetPositions: position ? [{ position: { coin: "DOGE", szi: String(position) } }] : [] }),
 		perpDexs: async () => [null],
 		allPerpMetas: async () => [meta],
-		spotMeta: async () => ({ tokens: [], universe: [] }),
+		spotMeta: async () => ({
+			tokens: [{ name: "USDC", index: 0, szDecimals: 8, weiDecimals: 8, tokenId: "0x6d1e7cde53ba9467b783cb7c530ce054" }],
+			universe: [],
+		}),
 		twapHistory: async () => history,
 	},
 	agent: {

@@ -4,7 +4,8 @@ import { join } from "node:path";
 import type { InfoClient } from "@nktkas/hyperliquid";
 import { formatPrice, formatSize } from "@nktkas/hyperliquid/utils";
 import { DEFAULT_QUOTE_TOKEN, HL_ALL_DEXS } from "@/config/app";
-import { getBuilderPerpAssetId, getDexFromName, getPerpAssetId, getSpotAssetId } from "@/lib/hyperliquid/markets/helper";
+import { BUILDER_DEX_SEPARATOR } from "@/domain/market/display";
+import { isListed, parseMarkets } from "@/domain/market/model";
 import { toSafeBig } from "@/lib/trade/numbers";
 import { formatTokenId } from "@/lib/trade/token-id";
 import { errorMessage, positionSize } from "./assert";
@@ -32,31 +33,23 @@ const ROUND_DOWN = 0;
 
 export async function loadVenue(info: InfoClient, spec: VenueSpec): Promise<Venue> {
 	if (spec.dex === SPOT_DEX) {
-		const [meta, ctxs] = await info.spotMetaAndAssetCtxs();
-		const pair = meta.universe.find((entry) => entry.name === spec.coin);
-		const base = pair && meta.tokens.find((token) => token.index === pair.tokens[0]);
-		if (!pair || !base) throw new Error(`spot pair ${spec.coin} is not listed`);
-		return {
-			...spec,
-			assetId: getSpotAssetId(pair.index),
-			szDecimals: base.szDecimals,
-			kind: "spot",
-			markPx: ctxs[pair.index].markPx,
-			baseToken: base.name,
-		};
+		const [spotMeta, ctxs] = await info.spotMetaAndAssetCtxs();
+		const market = parseMarkets({ perpDexs: [], allPerpMetas: [], spotMeta }).byName.get(spec.coin);
+		if (market?.kind !== "spot") throw new Error(`spot pair ${spec.coin} is not listed`);
+		const { assetId, szDecimals, kind } = market;
+		return { ...spec, assetId, szDecimals, kind, market, markPx: ctxs[market.ctxIndex].markPx, baseToken: market.base.name };
 	}
-	const [meta, ctxs] = await info.metaAndAssetCtxs({ dex: spec.dex });
-	const assetIndex = meta.universe.findIndex((asset) => asset.name === spec.coin);
-	if (assetIndex < 0) throw new Error(`${spec.coin} is not listed on ${spec.dex || "the main dex"}`);
-	const dexIndex = spec.dex === "" ? 0 : (await info.perpDexs()).findIndex((dex) => dex?.name === spec.dex);
-	return {
-		...spec,
-		assetId: dexIndex === 0 ? getPerpAssetId(assetIndex) : getBuilderPerpAssetId(dexIndex, assetIndex),
-		szDecimals: meta.universe[assetIndex].szDecimals,
-		kind: dexIndex === 0 ? "perp" : "builderPerp",
-		markPx: ctxs[assetIndex].markPx,
-		baseToken: null,
-	};
+	const [perpDexs, allPerpMetas, [, ctxs]] = await Promise.all([
+		info.perpDexs(),
+		info.allPerpMetas(),
+		info.metaAndAssetCtxs({ dex: spec.dex }),
+	]);
+	const market = parseMarkets({ perpDexs, allPerpMetas }).byName.get(spec.coin);
+	if (!market || !isListed(market) || market.kind === "spot") {
+		throw new Error(`${spec.coin} is not listed on ${spec.dex || "the main dex"}`);
+	}
+	const { assetId, szDecimals, kind } = market;
+	return { ...spec, assetId, szDecimals, kind, market, markPx: ctxs[market.ctxIndex].markPx, baseToken: null };
 }
 
 export function spotBase(venue: Venue): string {
@@ -216,8 +209,11 @@ function describeActivity(scan: AccountScan): string[] {
 }
 
 function venueForCoin(coin: string): VenueSpec {
-	const dex = getDexFromName(coin);
-	if (dex) return { label: dex, dex, coin };
+	const separator = coin.indexOf(BUILDER_DEX_SEPARATOR);
+	if (separator > 0) {
+		const dex = coin.slice(0, separator);
+		return { label: dex, dex, coin };
+	}
 	if (coin.startsWith("@") || coin.includes("/")) return { label: SPOT_DEX, dex: SPOT_DEX, coin };
 	return { label: "main", dex: "", coin };
 }

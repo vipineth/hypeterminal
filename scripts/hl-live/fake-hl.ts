@@ -19,6 +19,10 @@ const PERP_DEXES: Record<string, { name: string; szDecimals: number; markPx: str
 	xyz: { name: "xyz:NVDA", szDecimals: 2, markPx: "180" },
 };
 const DEX_NAMES = Object.keys(PERP_DEXES);
+
+function perpMeta(market: { name: string; szDecimals: number }) {
+	return { universe: [{ name: market.name, szDecimals: market.szDecimals, maxLeverage: 10 }], collateralToken: 0 };
+}
 const SPOT_ASSET_BASE = 10_000;
 const BUILDER_ASSET_BASE = 100_000;
 const BUILDER_SLOTS = 10_000;
@@ -96,8 +100,10 @@ function testnetInfo(request: { type: string; dex?: string; user?: string }): un
 			return [{ tokens: [USDC, PURR], universe: [{ name: "PURR/USDC", index: 0, tokens: [1, 0], isCanonical: true }] }, [{ markPx: "0.1" }]];
 		case "metaAndAssetCtxs": {
 			const market = PERP_DEXES[dex];
-			return [{ universe: [{ name: market.name, szDecimals: market.szDecimals, maxLeverage: 10 }] }, [{ markPx: market.markPx }]];
+			return [perpMeta(market), [{ markPx: market.markPx }]];
 		}
+		case "allPerpMetas":
+			return DEX_NAMES.map((name) => perpMeta(PERP_DEXES[name]));
 		case "frontendOpenOrders":
 			return account.orders
 				.filter((order) => dex === "ALL_DEXS" || dexOfCoin(order.coin) === dex)

@@ -1,6 +1,7 @@
 import { formatPrice } from "@nktkas/hyperliquid/utils";
 import type { LimitTif } from "@/config/trade";
 import type { MarketKind } from "@/domain/market/types";
+import { isPerpLike, type ListedMarket, type PerpLikeMarket, type SpotMarket } from "@/domain/market/model";
 import { buildOrderPlan, type EntryOrderIntent, type OrderIntent, type OrderPlan } from "@/domain/trade/order-intent";
 import type { EntryOrderParams } from "@/domain/trade/orders";
 import { buildTwapPlan, type TwapPlan } from "@/domain/trade/twap";
@@ -13,6 +14,7 @@ export interface PlanMarket {
 	szDecimals: number;
 	kind: MarketKind;
 	markPx: string;
+	market: ListedMarket;
 }
 
 export const ORDER_NOTIONAL = 15;
@@ -39,16 +41,24 @@ export function tickPrice(market: PlanMarket, factor: number): string {
 	return formatPrice(priceAt(market, factor), market.szDecimals, market.kind === "spot" ? "spot" : "perp");
 }
 
+function perpLike(market: PlanMarket): PerpLikeMarket & ListedMarket {
+	if (!isPerpLike(market.market)) throw new Error(`${market.market.name} is not a perp market`);
+	return market.market;
+}
+
+function spotOf(market: PlanMarket): SpotMarket {
+	if (market.market.kind !== "spot") throw new Error(`${market.market.name} is not a spot market`);
+	return market.market;
+}
+
 function entry(market: PlanMarket, params: Partial<EntryOrderParams>): EntryOrderIntent {
 	return {
 		kind: "entry",
-		assetId: market.assetId,
+		market: market.market,
 		side: "buy",
 		orderType: "market",
-		sizeValue: Number(lotSize(market)),
-		szDecimals: market.szDecimals,
-		marketKind: market.kind,
-		markPx: Number(market.markPx),
+		sizeValue: lotSize(market),
+		markPx: market.markPx,
 		slippageBps: SLIPPAGE_BPS,
 		reduceOnly: false,
 		tif: "Gtc",
@@ -67,69 +77,64 @@ function entry(market: PlanMarket, params: Partial<EntryOrderParams>): EntryOrde
 
 export const intents = {
 	market: (market: PlanMarket, side: Side, size: string, reduceOnly = false): OrderIntent =>
-		entry(market, { side, sizeValue: Number(size), reduceOnly }),
+		entry(market, { side, sizeValue: size, reduceOnly }),
 	limit: (market: PlanMarket, side: Side, size: string, price: string, tif: LimitTif = "Gtc"): OrderIntent =>
-		entry(market, { side, orderType: "limit", sizeValue: Number(size), limitPriceInput: price, tif }),
+		entry(market, { side, orderType: "limit", sizeValue: size, limitPriceInput: price, tif }),
 	marketWithTpSl: (market: PlanMarket, size: string, tpPrice: string, slPrice: string): OrderIntent =>
-		entry(market, { sizeValue: Number(size), tpSlEnabled: true, tpPriceInput: tpPrice, slPriceInput: slPrice }),
+		entry(market, { sizeValue: size, tpSlEnabled: true, tpPriceInput: tpPrice, slPriceInput: slPrice }),
 	scale: (market: PlanMarket, totalSize: string, startPrice: string, endPrice: string, levels: number): OrderIntent =>
 		entry(market, {
 			orderType: "scale",
-			sizeValue: Number(totalSize),
+			sizeValue: totalSize,
 			scaleStartPriceInput: startPrice,
 			scaleEndPriceInput: endPrice,
 			scaleLevelsNum: levels,
 		}),
 	positionTpSl: (market: PlanMarket, isLong: boolean, tpPrice: string, slPrice: string): OrderIntent => ({
 		kind: "positionTpsl",
-		assetId: market.assetId,
-		szDecimals: market.szDecimals,
+		market: perpLike(market),
 		isLong,
 		tpPriceInput: tpPrice,
 		slPriceInput: slPrice,
 	}),
 	close: (market: PlanMarket, size: string, isLong: boolean): OrderIntent => ({
 		kind: "marketClose",
-		assetId: market.assetId,
-		size: Number(size),
-		szDecimals: market.szDecimals,
+		market: perpLike(market),
+		size,
 		isLong,
-		markPx: Number(market.markPx),
+		markPx: market.markPx,
 		slippageBps: SLIPPAGE_BPS,
 	}),
 	reverse: (market: PlanMarket, size: string, isLong: boolean): OrderIntent => ({
 		kind: "reverse",
-		assetId: market.assetId,
-		size: Number(size),
-		szDecimals: market.szDecimals,
+		market: perpLike(market),
+		size,
 		isLong,
-		markPx: Number(market.markPx),
+		markPx: market.markPx,
 		slippageBps: SLIPPAGE_BPS,
 	}),
 	swap: (market: PlanMarket, isBuy: boolean, size: string): OrderIntent => ({
 		kind: "swap",
-		assetId: market.assetId,
+		market: spotOf(market),
 		isBuy,
-		sizeValue: Number(size),
-		szDecimals: market.szDecimals,
-		markPx: Number(market.markPx),
+		sizeValue: size,
+		markPx: market.markPx,
 		slippageBps: SLIPPAGE_BPS,
 	}),
 };
 
 export function twapPlan(market: PlanMarket, side: Side, size: string): TwapPlan {
 	return buildTwapPlan({
-		assetId: market.assetId,
+		market: market.market,
 		side,
-		sizeValue: Number(size),
-		szDecimals: market.szDecimals,
+		sizeValue: size,
 		reduceOnly: false,
 		minutes: TWAP_MINUTES,
 		randomize: false,
 	});
 }
 
-function marketMark(intent: OrderIntent): number | null {
+function marketMark(intent: OrderIntent): string | null {
 	if (intent.kind === "entry") return intent.orderType === "market" ? intent.markPx : null;
 	if (intent.kind === "marketClose" || intent.kind === "reverse" || intent.kind === "swap") return intent.markPx;
 	return null;
@@ -138,13 +143,13 @@ function marketMark(intent: OrderIntent): number | null {
 export function marketOrderProblems(intent: OrderIntent, built: OrderPlan): string[] {
 	const markPx = marketMark(intent);
 	if (markPx === null) return [];
-	const kind = intent.kind === "swap" || (intent.kind === "entry" && intent.marketKind === "spot") ? "spot" : "perp";
+	const kind = intent.market.kind === "spot" ? "spot" : "perp";
 	return built.orders.flatMap((order) => {
 		if (!("limit" in order.t)) return [];
 		const problems = order.t.limit.tif === "FrontendMarket" ? [] : [`market order sent as ${order.t.limit.tif}, not FrontendMarket`];
 		const band = toSafeBig(SLIPPAGE_BPS).div(10_000);
 		const target = toSafeBig(markPx).times(order.b ? band.plus(1) : toSafeBig(1).minus(band));
-		const step = priceStep(target, intent.szDecimals, kind);
+		const step = priceStep(target, intent.market.szDecimals, kind);
 		if (priceWithin(order.p, target, step, CAP_SLACK_BPS)) return problems;
 		return [...problems, `${order.b ? "buy" : "sell"} cap ${order.p} is not mark ${markPx} ${order.b ? "+" : "-"} ${SLIPPAGE_BPS} bps (${target.toFixed()})`];
 	});
