@@ -22,31 +22,34 @@ export function FundDexPrompt({ collateral, need, className }: Props) {
 	const [unifiedOpen, setUnifiedOpen] = useState(false);
 	const account = useAccountState();
 
-	if (collateral.status !== "ready" || collateral.shortfall?.kind !== "dexEmpty") return null;
-	const shortfall = collateral.shortfall;
+	const shortfall =
+		collateral.status === "ready" && collateral.shortfall?.kind === "dexEmpty" ? collateral.shortfall : null;
 	const canGoUnified = account.status === "ready" && account.mode.kind === "standard";
-	const dex = shortfall.dex.name;
 
 	return (
-		<div className={cn("flex flex-col gap-1.5", className)}>
-			<Button
-				variant="outline"
-				intent="brand"
-				size="xs"
-				className="w-full"
-				iconLeft={<ArrowsLeftRightIcon className="size-3" />}
-				onClick={() => setPlan(getFundDexPlan(shortfall, need, AMOUNT_DECIMALS))}
-			>
-				{t`Move ${shortfall.token.displayName} to ${dex}`}
-			</Button>
-			{canGoUnified && (
-				<button
-					type="button"
-					onClick={() => setUnifiedOpen(true)}
-					className="self-start text-xs text-fg-muted underline-offset-2 hover:text-brand hover:underline"
-				>
-					{t`Or use one balance for every dex`}
-				</button>
+		<>
+			{shortfall && (
+				<div className={cn("flex flex-col gap-1.5", className)}>
+					<Button
+						variant="outline"
+						intent="brand"
+						size="xs"
+						className="w-full"
+						iconLeft={<ArrowsLeftRightIcon className="size-3" />}
+						onClick={() => setPlan(getFundDexPlan(shortfall, need, AMOUNT_DECIMALS))}
+					>
+						{t`Move ${shortfall.token.displayName} to ${shortfall.dex.name}`}
+					</Button>
+					{canGoUnified && (
+						<button
+							type="button"
+							onClick={() => setUnifiedOpen(true)}
+							className="self-start text-xs text-fg-muted underline-offset-2 hover:text-brand hover:underline"
+						>
+							{t`Or use one balance for every dex`}
+						</button>
+					)}
+				</div>
 			)}
 			<TransferModal
 				open={plan !== null}
@@ -55,6 +58,6 @@ export function FundDexPrompt({ collateral, need, className }: Props) {
 				initialAmount={plan?.amount}
 			/>
 			<UnifiedAccountModal open={unifiedOpen} onOpenChange={setUnifiedOpen} />
-		</div>
+		</>
 	);
 }
