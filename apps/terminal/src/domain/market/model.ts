@@ -9,7 +9,7 @@ import {
 import { BUILDER_DEX_SEPARATOR, PERP_MARKET_NAME_SEPARATOR, SPOT_MARKET_NAME_SEPARATOR } from "@/domain/market/display";
 import { getIconUrlFromMarketName, getTokenDisplayNames, getUnderlyingAsset } from "@/domain/market/tokens";
 
-type SdkPerpAsset = MetaResponse["universe"][number];
+type SdkPerpAsset = MetaResponse["universe"][number] & { deployerFeeScale?: string };
 type SdkToken = SpotMetaResponse["tokens"][number];
 
 declare const assetIdBrand: unique symbol;
@@ -50,6 +50,8 @@ interface PerpFields {
 	marginMode: MarginMode | undefined;
 	crossAllowed: boolean;
 	isDelisted: boolean;
+	deployerFeeScale: number | null;
+	growthMode: boolean;
 }
 
 export interface PerpMarket extends MarketBase, PerpFields {
@@ -307,7 +309,14 @@ function toPerpMarket(asset: SdkPerpAsset, position: number, dex: Dex, issues: P
 		marginMode,
 		crossAllowed: marginMode === undefined,
 		isDelisted: asset.isDelisted === true,
+		deployerFeeScale: parseDeployerFeeScale(asset.deployerFeeScale),
+		growthMode: asset.growthMode === "enabled",
 	};
+}
+
+function parseDeployerFeeScale(raw: string | undefined): number | null {
+	const scale = Number(raw);
+	return raw !== undefined && Number.isFinite(scale) && scale >= 0 ? scale : null;
 }
 
 function normalizeMarginMode(asset: SdkPerpAsset, issues: ParseIssue[]): MarginMode | undefined {

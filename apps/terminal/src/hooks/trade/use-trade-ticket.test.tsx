@@ -41,7 +41,9 @@ const SOL_PERP = vi.hoisted(() => ({
 }));
 
 const form = vi.hoisted(() => ({
-	market: POINTS_USDC as typeof POINTS_USDC | (typeof SOL_PERP & { isDelisted?: boolean }),
+	market: POINTS_USDC as
+		| typeof POINTS_USDC
+		| (typeof SOL_PERP & { isDelisted?: boolean; deployerFeeScale?: number | null; growthMode?: boolean }),
 	side: "buy",
 	orderType: "limit",
 	sizeMode: "base",
@@ -63,6 +65,9 @@ const form = vi.hoisted(() => ({
 	availableToTrade: ["10000", "10000"] as [string, string],
 	mainWithdrawable: "10000",
 	quoteCoin: null as string | null,
+	leverage: 10,
+	slippagePercent: 2.5,
+	takerRate: 0.0007,
 }));
 
 const liveFeed = vi.hoisted(() => ({ markPx: null as string | null, status: "active", isStale: false }));
@@ -135,7 +140,13 @@ vi.mock("@/lib/hyperliquid", async (importOriginal) => {
 });
 
 vi.mock("@/hooks/trade/use-fee-rates", () => ({
-	useFeeRates: () => ({ takerRate: 0.0007, makerRate: 0.0004 }),
+	useFeeRates: () => ({ takerRate: form.takerRate, makerRate: 0.0004 }),
+}));
+
+vi.mock("@/stores/use-global-settings-store", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@/stores/use-global-settings-store")>()),
+	useMarketOrderSlippagePercent: () => form.slippagePercent,
+	useMarketOrderSlippageBps: () => form.slippagePercent * 100,
 }));
 
 vi.mock("@/hooks/trade/use-account-balances", async () => {
@@ -157,6 +168,8 @@ vi.mock("@/hooks/trade/use-asset-leverage", async () => {
 	const { liveQuote } = await import("@/test/account-fixture");
 	return {
 		useAssetLeverage: () => ({
+			displayLeverage: form.leverage,
+			currentLeverage: form.leverage,
 			quote: liveQuote(form.quoteCoin ?? form.market.name, form.availableToTrade, form.maxTradeSzs, net.address),
 		}),
 	};
@@ -527,6 +540,77 @@ describe("perp trade ticket", () => {
 		const [[stop]] = sentOrders();
 		expect(stop).toMatchObject({ p: "85", t: { trigger: { triggerPx: "85.001", tpsl: "sl" } } });
 		expect(queue.addOrder).toHaveBeenLastCalledWith(expect.objectContaining({ price: "85.001" }));
+	});
+});
+
+describe("top-up the ticket asks for on an empty builder dex", () => {
+	const PARA_TOTAL2 = {
+		...SOL_PERP,
+		kind: "builderPerp",
+		name: "para:TOTAL2",
+		pairName: "TOTAL2-USDC",
+		szDecimals: 3,
+		dex: { name: "para", index: 7, collateralToken: { name: "USDC", displayName: "USDC" } },
+		deployerFeeScale: 1,
+		growthMode: false,
+	};
+	const TIER_ZERO_TAKER = 0.00045;
+	const SCALE_ONE_TAKER_WITH_BUILDER = Big(TIER_ZERO_TAKER).times(2).plus(0.0001);
+
+	function fundsToFill(side: "buy" | "sell", size: number, mark: string, fill: string) {
+		const adverse = side === "buy" ? Big(fill).minus(mark) : Big(mark).minus(fill);
+		const marginPrice = Big(fill).gt(mark) ? Big(fill) : Big(mark);
+		return Big(size)
+			.times(
+				marginPrice
+					.div(form.leverage)
+					.plus(adverse.gt(0) ? adverse : 0)
+					.plus(Big(fill).times(SCALE_ONE_TAKER_WITH_BUILDER)),
+			)
+			.toNumber();
+	}
+
+	let before = { ...form };
+
+	beforeEach(() => {
+		before = { ...form };
+		form.market = { ...PARA_TOTAL2, markPx: "100" };
+		form.side = "sell";
+		form.orderType = "market";
+		form.sizeMode = "base";
+		form.size = "100";
+		form.sizeUnit = null;
+		form.limitPrice = "";
+		form.tpSlEnabled = false;
+		form.reduceOnly = false;
+		form.twapMinutes = 30;
+		form.availableToTrade = ["0.0", "0.0"];
+		form.maxTradeSzs = ["0.0", "0.0"];
+		form.mainWithdrawable = "100000";
+		form.quoteCoin = null;
+		form.takerRate = TIER_ZERO_TAKER;
+		form.leverage = 10;
+		form.slippagePercent = 1;
+	});
+
+	afterEach(() => {
+		Object.assign(form, before);
+	});
+
+	it("funds the doubled taker fee a deployer fee scale of 1 charges", () => {
+		const ticket = renderTicket();
+
+		expect(ticket.entry.shortfall?.kind).toBe("dexEmpty");
+		expect(ticket.fundingNeed).toBeGreaterThanOrEqual(fundsToFill("sell", 100, "100", "99"));
+	});
+
+	it("funds a limit buy through the book at the taker fee it pays", () => {
+		form.orderType = "limit";
+		form.side = "buy";
+		form.limitPrice = "101";
+		const ticket = renderTicket();
+
+		expect(ticket.fundingNeed).toBeGreaterThanOrEqual(fundsToFill("buy", 100, "100", "101"));
 	});
 });
 

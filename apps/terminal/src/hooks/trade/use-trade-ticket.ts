@@ -5,6 +5,7 @@ import { DEFAULT_QUOTE_TOKEN } from "@/config/app";
 import { DEFAULT_BUILDER_CONFIG } from "@/config/hyperliquid";
 import { APPROVAL_ERROR_DISMISS_MS } from "@/config/time";
 import { getPositionDex } from "@/domain/market";
+import { getMarketFeeRates } from "@/domain/market/fees";
 import { isListed } from "@/domain/market/model";
 import { getMarketQuoteToken } from "@/domain/trade/balances";
 import { getFundingNeed } from "@/domain/trade/dex-transfer";
@@ -86,7 +87,7 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 	const entry = useOrderEntryData({ market, side, markPx });
 	const { isSpotMarket, baseToken, quoteToken, spotBalance, availableBalance, maxSize, sizeValue, orderValue } = entry;
 
-	const { takerRate, makerRate } = useFeeRates(market?.kind);
+	const { takerRate, makerRate } = getMarketFeeRates(useFeeRates(market?.kind), market);
 	const selectedPrice = useSelectedPrice();
 	const orderType = useOrderType();
 	const storedReduceOnly = useReduceOnly();
@@ -165,7 +166,7 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 		markPx,
 		leverage: entry.leverage,
 		slippageBps,
-		feeRate: feeRate + Number(DEFAULT_BUILDER_CONFIG?.f ?? 0) / TENTHS_OF_BPS_PER_UNIT,
+		feeRate: takerRate + Number(DEFAULT_BUILDER_CONFIG?.f ?? 0) / TENTHS_OF_BPS_PER_UNIT,
 	});
 
 	const needsAgentApproval = !isAgentReady;

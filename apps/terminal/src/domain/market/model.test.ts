@@ -269,6 +269,27 @@ describe("before spotMeta lands", () => {
 	});
 });
 
+describe("fee scale", () => {
+	it("reads every builder asset's deployer fee scale and growth mode, and none on the main dex", () => {
+		const perps = model.markets.filter(isPerpLike);
+		const raw = new Map(
+			snapshot.allPerpMetas.flatMap((meta) =>
+				meta.universe.map((asset) => [asset.name, asset as typeof asset & { deployerFeeScale?: string }]),
+			),
+		);
+		const wrong = perps.filter((market) => {
+			const asset = raw.get(market.name);
+			const scale = asset?.deployerFeeScale === undefined ? null : Number(asset.deployerFeeScale);
+			return market.deployerFeeScale !== scale || market.growthMode !== (asset?.growthMode === "enabled");
+		});
+
+		expect(wrong.map((market) => market.name)).toEqual([]);
+		expect(perps.filter((market) => market.kind === "perp" && market.deployerFeeScale !== null)).toEqual([]);
+		expect(perp("para:TOTAL2")).toMatchObject({ deployerFeeScale: 1, growthMode: false });
+		expect(perp("xyz:TSLA")).toMatchObject({ deployerFeeScale: 1, growthMode: true });
+	});
+});
+
 describe("margin policy", () => {
 	it("allows cross only when the normalized margin mode is unset", () => {
 		const perps = model.markets.filter(isPerpLike);

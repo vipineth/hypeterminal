@@ -7,11 +7,7 @@ import {
 	ORDER_FEE_RATE_TAKER,
 } from "@/config/trade";
 import type { MarketKind } from "@/domain/market";
-
-interface FeeRates {
-	takerRate: number;
-	makerRate: number;
-}
+import type { FeeRates } from "@/domain/market/fees";
 
 const USER_FEES_STALE_TIME_MS = 30 * 60 * 1000;
 
