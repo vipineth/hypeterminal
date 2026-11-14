@@ -46,6 +46,10 @@ interface UseAssetLeverageReturn {
 	allowsCrossMargin: boolean;
 }
 
+function isSameLeverage(a: ActiveAssetDataResponse["leverage"], b: ActiveAssetDataResponse["leverage"]): boolean {
+	return a.type === b.type && a.value === b.value;
+}
+
 export function useAssetLeverage(): UseAssetLeverageReturn {
 	const { address, isConnected } = useConnection();
 	const { data: market } = useSelectedMarketInfo();
@@ -79,6 +83,9 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	const [stamp, setStamp] = useState<QuoteStamp>({ data: activeAssetData, generation });
 	if (stamp.data !== activeAssetData) setStamp({ data: activeAssetData, generation });
 	const [applied, setApplied] = useState<AppliedLeverage | null>(null);
+	if (applied && activeAssetData?.coin === applied.coin && isSameLeverage(activeAssetData.leverage, applied.leverage)) {
+		setApplied(null);
+	}
 
 	const operationTypeRef = useRef<OperationType>(null);
 	const [pendingLeverage, setPendingLeverageState] = useState<number | null>(null);
