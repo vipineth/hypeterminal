@@ -47,12 +47,7 @@ export function TradePanel() {
 
 				<div className="flex flex-col gap-3 pt-5 pb-1">
 					{ticket.isConnected && <CollateralNotice collateral={entry.collateral} />}
-					{ticket.isConnected && (
-						<FundDexPrompt
-							collateral={entry.collateral}
-							order={{ margin: ticket.marginRequired, fee: ticket.estimatedFee }}
-						/>
-					)}
+					{ticket.isConnected && <FundDexPrompt collateral={entry.collateral} order={ticket.fundingOrder} />}
 
 					{validation.errors.length > 0 && ticket.showValidationErrors && (
 						<div className="text-xs text-error">{validation.errors.join(" • ")}</div>

@@ -267,12 +267,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 
 			<div className="shrink-0 flex flex-col gap-2 border-t border-stroke-weak/60 px-3 pt-2 pb-3">
 				{ticket.isConnected && <CollateralNotice collateral={entry.collateral} className="text-2xs" />}
-				{ticket.isConnected && (
-					<FundDexPrompt
-						collateral={entry.collateral}
-						order={{ margin: ticket.marginRequired, fee: ticket.estimatedFee }}
-					/>
-				)}
+				{ticket.isConnected && <FundDexPrompt collateral={entry.collateral} order={ticket.fundingOrder} />}
 				{validation.errors.length > 0 && ticket.showValidationErrors && (
 					<div className="text-2xs text-error">{validation.errors.join(" • ")}</div>
 				)}

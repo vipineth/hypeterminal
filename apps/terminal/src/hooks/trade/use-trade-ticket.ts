@@ -6,6 +6,7 @@ import { APPROVAL_ERROR_DISMISS_MS } from "@/config/time";
 import { getPositionDex } from "@/domain/market";
 import { isListed } from "@/domain/market/model";
 import { getMarketQuoteToken } from "@/domain/trade/balances";
+import { getFundingPrice } from "@/domain/trade/dex-transfer";
 import { getLiquidationInfo, getOrderMetrics } from "@/domain/trade/order/metrics";
 import { getOrderPrice } from "@/domain/trade/order/price";
 import { useFeeRates } from "@/hooks/trade/use-fee-rates";
@@ -153,6 +154,12 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 
 	const { marginRequired, estimatedFee } = getOrderMetrics({ sizeValue, price, leverage: entry.leverage, feeRate });
 	const { liqPrice, liqWarning } = getLiquidationInfo({ price, sizeValue, leverage: entry.leverage, side });
+	const funding = getOrderMetrics({
+		sizeValue,
+		price: getFundingPrice(orderType, price, markPx, slippageBps),
+		leverage: entry.leverage,
+		feeRate,
+	});
 
 	const needsAgentApproval = !isAgentReady;
 	const canApprove = !!walletClient && !!address;
@@ -325,6 +332,7 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 		feeRatePercent,
 		marginRequired,
 		estimatedFee,
+		fundingOrder: { margin: funding.marginRequired, fee: funding.estimatedFee },
 		liqPrice,
 		liqWarning,
 		slippagePercent,

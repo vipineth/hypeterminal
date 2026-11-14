@@ -7,11 +7,13 @@ import {
 	dexVenue,
 	getDexWithdrawCap,
 	getFundDexPlan,
+	getFundingPrice,
 	getRouteToken,
 	getVenueLimit,
 	MAIN_PERP,
 	SPOT,
 } from "@/domain/trade/dex-transfer";
+import { getOrderMetrics } from "@/domain/trade/order/metrics";
 import { type AccountFixture, clearinghouse, standardAccount, TEST_USER } from "@/test/account-fixture";
 
 const meta: MetaPayloads = JSON.parse(
@@ -166,5 +168,38 @@ describe("fund a dex from the ticket", () => {
 			route: { from: SPOT, to: dexVenue("xyz") },
 			amount: "",
 		});
+	});
+});
+
+describe("funding need for a market order", () => {
+	it("covers a fill at the slippage price, which the mark price alone did not on testnet", () => {
+		const atMark = getOrderMetrics({ sizeValue: 0.03, price: 378.38, leverage: 10, feeRate: 0.00045 });
+		const atWorst = getOrderMetrics({
+			sizeValue: 0.03,
+			price: getFundingPrice("market", 378.38, 378.38, 250),
+			leverage: 10,
+			feeRate: 0.00045,
+		});
+		const fillAt386 = (0.03 * 386) / 10 + 0.03 * 386 * 0.00045;
+
+		const shortfall = {
+			kind: "dexEmpty" as const,
+			dex: dex("xyz"),
+			token: usdc,
+			elsewhere: [{ place: { kind: "perp" as const }, amount: "51" }],
+		};
+		const markAmount = Number(
+			getFundDexPlan(shortfall, { margin: atMark.marginRequired, fee: atMark.estimatedFee }, 2).amount,
+		);
+		const worstAmount = Number(
+			getFundDexPlan(shortfall, { margin: atWorst.marginRequired, fee: atWorst.estimatedFee }, 2).amount,
+		);
+
+		expect(markAmount).toBeLessThan(fillAt386);
+		expect(worstAmount).toBeGreaterThanOrEqual(fillAt386);
+	});
+
+	it("keeps a limit order at its own price", () => {
+		expect(getFundingPrice("limit", 370, 378.38, 250)).toBe(370);
 	});
 });

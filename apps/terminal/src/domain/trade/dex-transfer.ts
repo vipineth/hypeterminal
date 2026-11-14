@@ -1,4 +1,5 @@
 import Big from "big.js";
+import type { OrderType } from "@/config/trade";
 import type { Dex, ListedMarket, QuoteToken } from "@/domain/market/model";
 import {
 	type AccountState,
@@ -8,6 +9,7 @@ import {
 	type TransferLimit,
 } from "@/domain/trade/account-mode";
 import { toSafeBig } from "@/lib/trade/numbers";
+import { isTwapOrderType } from "@/lib/trade/order-types";
 import { formatTokenId } from "@/lib/trade/token-id";
 
 export type Venue = { kind: "spot" } | { kind: "perp"; dex: string };
@@ -145,4 +147,11 @@ export function getTradableDexes(listed: readonly ListedMarket[]): Set<string> {
 	const names = new Set<string>();
 	for (const market of listed) if (market.kind === "builderPerp") names.add(market.dex.name);
 	return names;
+}
+
+export function getFundingPrice(orderType: OrderType, price: number, markPx: number, slippageBps: number): number {
+	if (orderType !== "market" && !isTwapOrderType(orderType)) return price;
+	return Big(markPx)
+		.times(Big(1).plus(Big(slippageBps).div(10_000)))
+		.toNumber();
 }
