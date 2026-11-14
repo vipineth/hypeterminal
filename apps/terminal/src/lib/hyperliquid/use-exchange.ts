@@ -10,6 +10,7 @@ const COLLATERAL_SPENDS: ReadonlySet<ExchangeMethod> = new Set<ExchangeMethod>([
 	"twapOrder",
 	"spotSend",
 	"sendAsset",
+	"agentSendAsset",
 	"usdSend",
 	"usdClassTransfer",
 	"withdraw3",
