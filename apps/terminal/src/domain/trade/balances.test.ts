@@ -10,7 +10,7 @@ import {
 	getSpendLimit,
 	isWithinSpendLimit,
 } from "@/domain/trade/balances";
-import { type AccountFixture, clearinghouse, SEEN_NOW } from "@/test/account-fixture";
+import { type AccountFixture, clearinghouse, SEEN_NOW, TEST_USER } from "@/test/account-fixture";
 
 const meta: MetaPayloads = JSON.parse(
 	readFileSync(new URL("../../../fixtures/hl-mainnet-meta.json", import.meta.url), "utf8"),
@@ -189,6 +189,40 @@ describe("balance rows", () => {
 	});
 });
 
+describe("spot rows by payload", () => {
+	function spotOnly(mode: AccountMode, spot: ReadyAccount["spot"]): ReadyAccount {
+		return buildAccountState({
+			user: TEST_USER,
+			mode,
+			generation: 0,
+			clearinghouseStates: [],
+			spot,
+			spotSeen: SEEN_NOW,
+		});
+	}
+	const usdc = { coin: "USDC", token: 0, total: "100.0", hold: "25.0", entryNtl: "0.0" };
+
+	it("shows total minus hold for a standard account on the old payload", () => {
+		const balances = readyBalances(spotOnly(STANDARD, { balances: [usdc] }));
+
+		expect(balances.spot.map(rowView)).toEqual([
+			{ asset: "USDC", dexLabel: null, available: "75", total: "100.0", transfer: "toPerp", canSend: true },
+		]);
+		expect(getSpendLimit(spotOnly(STANDARD, { balances: [usdc] }), "spot", "USDC")).toEqual({
+			status: "ready",
+			amount: "75",
+		});
+	});
+
+	it("shows no spendable amount for a unified account whose payload has no maintenance tuple", () => {
+		const account = spotOnly(UNIFIED, { balances: [usdc] });
+
+		expect(readyBalances(account).spot.map((row) => row.available)).toEqual([null]);
+		expect(getSpendLimit(account, "spot", "USDC")).toEqual({ status: "pending" });
+		expect(getSpendableSpotTokens(account)).toEqual([]);
+	});
+});
+
 describe("spend limits", () => {
 	it("limits a perp send to main dex withdrawable for a standard account", () => {
 		const account = accountOf("mainnet-disabled-two-dexes", STANDARD);
@@ -220,8 +254,8 @@ describe("spend limits", () => {
 	});
 
 	it("offers only spot tokens with something available to send", () => {
-		expect(getSpendableSpotTokens(fixture("mainnet-unified-0x8c60").spot)).toEqual(["USDC"]);
-		expect(getSpendableSpotTokens(fixture("mainnet-disabled-main-only").spot)).toEqual([]);
+		expect(getSpendableSpotTokens(accountOf("mainnet-unified-0x8c60", UNIFIED))).toEqual(["USDC"]);
+		expect(getSpendableSpotTokens(accountOf("mainnet-disabled-main-only", STANDARD))).toEqual([]);
 	});
 });
 

@@ -3,6 +3,7 @@ import type {
 	AllDexsClearinghouseStateWsEvent,
 	SpotClearinghouseStateResponse,
 } from "@nktkas/hyperliquid";
+import type Big from "big.js";
 import { DEFAULT_QUOTE_TOKEN } from "@/config/app";
 import type { Dex, Market, QuoteToken } from "@/domain/market/model";
 import { toSafeBig } from "@/lib/trade/numbers";
@@ -163,14 +164,20 @@ export function buildAccountState({
 	}
 }
 
-export function getSpotAvailable(spot: SpotState, tokenName: string): string {
-	const balance = spot.balances.find((entry) => entry.coin === tokenName);
+function positiveOrZero(amount: Big): string {
+	return amount.gt(0) ? amount.toFixed() : "0";
+}
+
+export function getSpotAvailable(account: ReadyAccount, tokenName: string): string | null {
+	const balance = account.spot.balances.find((entry) => entry.coin === tokenName);
 	if (!balance) return "0";
+	const unheld = toSafeBig(balance.total).minus(balance.hold);
+	if (account.ledger === "perDex") return positiveOrZero(unheld);
+	const afterMaintenance = account.spot.tokenToAvailableAfterMaintenance;
+	if (!afterMaintenance) return null;
 	const token = "token" in balance ? balance.token : null;
-	const afterMaintenance = spot.tokenToAvailableAfterMaintenance?.find(([index]) => index === token)?.[1];
-	const available =
-		afterMaintenance != null ? toSafeBig(afterMaintenance) : toSafeBig(balance.total).minus(balance.hold);
-	return available.gt(0) ? available.toFixed() : "0";
+	const listed = afterMaintenance.find(([index]) => index === token)?.[1];
+	return positiveOrZero(listed != null ? toSafeBig(listed) : unheld);
 }
 
 function getSpotTotal(spot: SpotState, tokenName: string): string {
@@ -210,8 +217,8 @@ function getElsewhere(account: ReadyAccount, dex: Dex, token: QuoteToken) {
 		const main = account.dexes.get(MAIN_DEX)?.withdrawable ?? "0";
 		if (toSafeBig(main).gt(0)) elsewhere.push({ place: { kind: "perp" }, amount: main });
 	}
-	const spot = getSpotAvailable(account.spot, token.name);
-	if (toSafeBig(spot).gt(0)) elsewhere.push({ place: { kind: "spot" }, amount: spot });
+	const spot = getSpotAvailable(account, token.name);
+	if (spot !== null && toSafeBig(spot).gt(0)) elsewhere.push({ place: { kind: "spot" }, amount: spot });
 	return elsewhere;
 }
 
@@ -261,7 +268,8 @@ export function getTradeCollateral(account: AccountState, market: Market, side: 
 	if (market.kind === "spot") {
 		if (!isCurrent(account.spotSeen, account)) return { status: "pending", reason: "account" };
 		const token = side === "buy" ? market.quote : market.base;
-		const available = getSpotAvailable(account.spot, token.name);
+		const available = getSpotAvailable(account, token.name);
+		if (available === null) return { status: "pending", reason: "account" };
 		const shortfall = toSafeBig(available).gt(0) ? null : getShortfall(account, { kind: "spot", token }, token);
 		return { status: "ready", source: { kind: "spot", token }, token, available, maxSize: null, shortfall };
 	}
@@ -275,12 +283,17 @@ export function getTradeCollateral(account: AccountState, market: Market, side: 
 	return { status: "ready", source, token, available, maxSize, shortfall };
 }
 
+export function getSpotLimit(account: ReadyAccount, tokenName: string): TransferLimit {
+	const amount = getSpotAvailable(account, tokenName);
+	return amount === null ? { status: "pending" } : { status: "ready", amount };
+}
+
 export function getTransferLimit(account: AccountState, route: TransferRoute): TransferLimit {
 	if (account.status !== "ready") return { status: "pending" };
 	if (account.ledger === "spotOnly") {
-		if (route === "withdraw") return { status: "ready", amount: getSpotAvailable(account.spot, DEFAULT_QUOTE_TOKEN) };
+		if (route === "withdraw") return getSpotLimit(account, DEFAULT_QUOTE_TOKEN);
 		return { status: "unverifiedTransferLimit" };
 	}
-	if (route === "spotToPerp") return { status: "ready", amount: getSpotAvailable(account.spot, DEFAULT_QUOTE_TOKEN) };
+	if (route === "spotToPerp") return getSpotLimit(account, DEFAULT_QUOTE_TOKEN);
 	return { status: "ready", amount: account.dexes.get(MAIN_DEX)?.withdrawable ?? "0" };
 }

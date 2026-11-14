@@ -13,7 +13,7 @@ import {
 	type QuoteCheck,
 	type ReadyAccount,
 } from "@/domain/trade/account-mode";
-import { type AccountFixture, SEEN_NOW } from "@/test/account-fixture";
+import { type AccountFixture, clearinghouse, SEEN_NOW, TEST_USER } from "@/test/account-fixture";
 
 const meta: MetaPayloads = JSON.parse(
 	readFileSync(new URL("../../../fixtures/hl-mainnet-meta.json", import.meta.url), "utf8"),
@@ -146,6 +146,82 @@ describe("collateral source per mode and market", () => {
 			const token = "dex" in source ? source.dex.collateralToken : source.token;
 			expect(token.name).toBe("USDH");
 		}
+	});
+});
+
+function spotAccount(mode: AccountMode, spot: ReadyAccount["spot"]): ReadyAccount {
+	return buildAccountState({
+		user: TEST_USER,
+		mode,
+		generation: 0,
+		clearinghouseStates: [["", clearinghouse("0.0")]],
+		spot,
+		spotSeen: SEEN_NOW,
+	});
+}
+
+function spotBalance(coin: string, token: number, total: string, hold: string) {
+	return { coin, token, total, hold, entryNtl: "0.0" };
+}
+
+describe("spot capacity", () => {
+	const hypeBuy = () => market("@107");
+
+	it("keeps total minus hold for a standard account on the old payload with funds on hold", () => {
+		const account = spotAccount(MODES.standard, { balances: [spotBalance("USDC", 0, "100.0", "30.0")] });
+
+		expect(getTradeCollateral(account, hypeBuy(), "buy", { status: "waiting" })).toMatchObject({
+			status: "ready",
+			available: "70",
+		});
+		expect(getTransferLimit(account, "spotToPerp")).toEqual({ status: "ready", amount: "70" });
+	});
+
+	it.each([
+		["unified", MODES.unified],
+		["portfolio", MODES.portfolio],
+	])("waits for a %s account whose spot payload has no maintenance tuple", (_label, mode) => {
+		const account = spotAccount(mode, { balances: [spotBalance("USDC", 0, "100.0", "0.0")] });
+
+		expect(getTradeCollateral(account, hypeBuy(), "buy", { status: "waiting" })).toEqual({
+			status: "pending",
+			reason: "account",
+		});
+		expect(getTransferLimit(account, "withdraw")).toEqual({ status: "pending" });
+	});
+
+	it("reads a portfolio account's USDC from the tuple when total and hold are negative (mainnet 0x829a)", () => {
+		const account = spotAccount(MODES.portfolio, {
+			balances: [spotBalance("USDC", 0, "-376584.38642166", "-612866.99057765")],
+			tokenToAvailableAfterMaintenance: [[0, "521852.24571199"]],
+		});
+
+		expect(getTradeCollateral(account, hypeBuy(), "buy", { status: "waiting" })).toMatchObject({
+			status: "ready",
+			available: "521852.24571199",
+		});
+	});
+
+	it("sells a unified account's HYPE from total minus hold, since only margin tokens are in the tuple", () => {
+		const account = spotAccount(MODES.unified, {
+			balances: [spotBalance("USDC", 0, "100.0", "0.0"), spotBalance("HYPE", 150, "24.945495", "4.0")],
+			tokenToAvailableAfterMaintenance: [[0, "100.0"]],
+		});
+
+		expect(getTradeCollateral(account, hypeBuy(), "sell", { status: "waiting" })).toMatchObject({
+			status: "ready",
+			available: "20.945495",
+		});
+	});
+
+	it("names no funds for a shared account that holds none of the token, tuple or not", () => {
+		const account = spotAccount(MODES.unified, { balances: [] });
+
+		expect(getTradeCollateral(account, hypeBuy(), "buy", { status: "waiting" })).toMatchObject({
+			status: "ready",
+			available: "0",
+			shortfall: { kind: "noFunds" },
+		});
 	});
 });
 

@@ -9,9 +9,9 @@ import {
 	type ClearinghouseState,
 	getCollateralSource,
 	getSpotAvailable,
+	getSpotLimit,
 	getTransferLimit,
 	type ReadyAccount,
-	type SpotState,
 	type TransferLimit,
 } from "@/domain/trade/account-mode";
 import type { UnifiedMarketInfo } from "@/lib/hyperliquid/hooks/useMarketsInfo";
@@ -33,12 +33,15 @@ export type SpendPlace = "perp" | "spot";
 export function getSpendLimit(account: AccountState, place: SpendPlace, token: string): TransferLimit {
 	if (place === "perp") return getTransferLimit(account, "perpToSpot");
 	if (account.status !== "ready") return { status: "pending" };
-	return { status: "ready", amount: getSpotAvailable(account.spot, token) };
+	return getSpotLimit(account, token);
 }
 
-export function getSpendableSpotTokens(spot: SpotState): string[] {
-	return spot.balances
-		.filter((balance) => toSafeBig(getSpotAvailable(spot, balance.coin)).gt(0))
+export function getSpendableSpotTokens(account: ReadyAccount): string[] {
+	return account.spot.balances
+		.filter((balance) => {
+			const available = getSpotAvailable(account, balance.coin);
+			return available !== null && toSafeBig(available).gt(0);
+		})
 		.map((balance) => balance.coin);
 }
 
@@ -64,7 +67,7 @@ export interface BalanceRow {
 	type: "perp" | "spot";
 	asset: string;
 	dexLabel: string | null;
-	available: string;
+	available: string | null;
 	inOrder: string;
 	total: string;
 	usdValue: string;
@@ -122,7 +125,7 @@ function getSpotRows(account: ReadyAccount): BalanceRow[] {
 			type: "spot",
 			asset: balance.coin,
 			dexLabel: null,
-			available: getSpotAvailable(account.spot, balance.coin),
+			available: getSpotAvailable(account, balance.coin),
 			inOrder: balance.hold,
 			total: balance.total,
 			usdValue: isQuote ? balance.total : balance.entryNtl,
@@ -189,7 +192,7 @@ export type PerpsOverview =
 			token: QuoteToken;
 			notice: AccountNotice | null;
 			total: string;
-			available: string;
+			available: string | null;
 	  };
 
 export type AccountSummary =
@@ -258,7 +261,7 @@ function getSpotOverview(
 	notice: AccountNotice | null,
 ): PerpsOverview {
 	const total = account.spot.balances.find((balance) => balance.coin === token.name)?.total ?? "0";
-	return { kind: "spot", place, token, notice, total, available: getSpotAvailable(account.spot, token.name) };
+	return { kind: "spot", place, token, notice, total, available: getSpotAvailable(account, token.name) };
 }
 
 function getPerpsOverview(account: ReadyAccount, market: Market | undefined): PerpsOverview {

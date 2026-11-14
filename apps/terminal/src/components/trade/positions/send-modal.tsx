@@ -73,7 +73,7 @@ function SendModalBody({ onOpenChange, initialAsset, initialAccountType }: BodyP
 
 	const isPending = isSendAssetPending || isSpotSendPending;
 
-	const spendableSpotTokens = account.status === "ready" ? getSpendableSpotTokens(account.spot) : [];
+	const spendableSpotTokens = account.status === "ready" ? getSpendableSpotTokens(account) : [];
 	const tokenOptions = accountType === "perp" ? [DEFAULT_QUOTE_TOKEN] : spendableSpotTokens;
 
 	const tokenInfo = getToken(selectedToken);

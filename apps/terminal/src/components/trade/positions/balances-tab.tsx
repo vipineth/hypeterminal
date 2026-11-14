@@ -11,7 +11,7 @@ import { cn } from "@/lib/cn";
 import { formatToken, formatUSD } from "@/lib/format";
 import { useSubscription } from "@/lib/hyperliquid";
 import { useMarkets } from "@/lib/hyperliquid/markets/use-markets";
-import { toNumberOrZero } from "@/lib/trade/numbers";
+import { toNumberOrZero, toSafeBig } from "@/lib/trade/numbers";
 import { useSwapModalActions } from "@/stores/use-global-modal-store";
 import { useGlobalSettingsActions, useHideSmallBalances } from "@/stores/use-global-settings-store";
 import { AssetDisplay } from "../components/asset-display";
@@ -94,7 +94,7 @@ export function BalancesTab() {
 	function renderBalanceRow(row: BalanceRow, index: number) {
 		const token = getToken(row.asset);
 		const decimals = row.type === "perp" ? 2 : (token?.szDecimals ?? 2);
-		const hasAvailable = parseFloat(row.available) > 0;
+		const hasAvailable = toSafeBig(row.available).gt(0);
 		const transfer = hasAvailable ? row.transfer : null;
 		const canSwap = row.type === "spot" && hasAvailable;
 		const pnlData = getPnl(row);
