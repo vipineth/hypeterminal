@@ -1,7 +1,7 @@
 import { Button } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
 import { SpinnerGapIcon } from "@phosphor-icons/react";
-import { type ComponentProps, type ReactNode, useCallback } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { useTradingGuard } from "@/lib/hyperliquid";
 
 type ButtonProps = ComponentProps<typeof Button>;
@@ -20,11 +20,7 @@ export function TradingActionButton({
 	intent = "neutral",
 	...buttonProps
 }: Props) {
-	const { isReady, isEnabling, needsTrading, guardAction } = useTradingGuard();
-
-	const runGuardedAction = useCallback(() => {
-		guardAction(onClick);
-	}, [guardAction, onClick]);
+	const { isReady, isEnabling, needsTrading, guardAction } = useTradingGuard(onClick, disabled === true);
 
 	const showEnableTrading = needsTrading && !isEnabling;
 
@@ -34,7 +30,7 @@ export function TradingActionButton({
 				{...buttonProps}
 				variant={variant}
 				intent={intent}
-				onClick={runGuardedAction}
+				onClick={guardAction}
 				disabled={disabled || isEnabling || (!isReady && !needsTrading)}
 				className={className}
 			>

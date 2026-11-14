@@ -9,15 +9,19 @@ interface UseTradingGuardResult {
 	isEnabling: boolean;
 	needsTrading: boolean;
 	enableTrading: () => void;
-	guardAction: (action: PendingAction) => void;
+	guardAction: () => void;
 	error: Error | null;
 	clearError: () => void;
 }
 
-export function useTradingGuard(): UseTradingGuardResult {
+function toError(err: unknown): Error {
+	return err instanceof Error ? err : new Error(String(err));
+}
+
+export function useTradingGuard(action: PendingAction, disabled: boolean): UseTradingGuardResult {
 	const { isReady, isLoading, signaturesRequired } = useAgentStatus();
 	const { register: registerAgent, status: registerStatus, error: agentError } = useAgentRegistration();
-	const pendingActionRef = useRef<PendingAction | null>(null);
+	const isQueuedRef = useRef(false);
 	const prevIsReadyRef = useRef(isReady);
 	const [localError, setLocalError] = useState<Error | null>(null);
 
@@ -27,40 +31,31 @@ export function useTradingGuard(): UseTradingGuardResult {
 
 	useEffect(() => {
 		const wasReady = prevIsReadyRef.current;
-
-		if (!wasReady && isReady && pendingActionRef.current) {
-			const action = pendingActionRef.current;
-			pendingActionRef.current = null;
-			Promise.resolve(action()).catch((err) => {
-				setLocalError(err instanceof Error ? err : new Error(String(err)));
-			});
-		}
-
-		if (wasReady && !isReady) {
-			pendingActionRef.current = null;
-		}
-
 		prevIsReadyRef.current = isReady;
-	}, [isReady]);
+
+		if (wasReady && !isReady) isQueuedRef.current = false;
+		if (wasReady || !isReady || !isQueuedRef.current) return;
+
+		isQueuedRef.current = false;
+		if (disabled) return;
+		Promise.resolve(action()).catch((err) => setLocalError(toError(err)));
+	}, [isReady, disabled, action]);
 
 	function enableTrading() {
 		if (isEnabling) return;
 		setLocalError(null);
 		registerAgent().catch((err) => {
-			pendingActionRef.current = null;
-			const error = err instanceof Error ? err : new Error(String(err));
-			setLocalError(error);
+			isQueuedRef.current = false;
+			setLocalError(toError(err));
 		});
 	}
 
-	function guardAction(action: PendingAction) {
+	function guardAction() {
 		if (isReady) {
-			Promise.resolve(action()).catch((err) => {
-				setLocalError(err instanceof Error ? err : new Error(String(err)));
-			});
+			Promise.resolve(action()).catch((err) => setLocalError(toError(err)));
 			return;
 		}
-		pendingActionRef.current = action;
+		isQueuedRef.current = true;
 		enableTrading();
 	}
 
