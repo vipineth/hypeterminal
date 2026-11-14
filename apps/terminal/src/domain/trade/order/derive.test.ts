@@ -35,3 +35,23 @@ describe("ticket asset label", () => {
 		expect(entryFor("@107").assetLabel).toBe("HYPE");
 	});
 });
+
+describe("builder perp collateral on a standard account", () => {
+	it("never reads spot USDC as xyz margin", () => {
+		const entry = deriveOrderEntry({
+			isConnected: true,
+			market: model.byName.get("xyz:NVDA"),
+			side: "buy",
+			conversionPrice: 171.07,
+			sizeMode: "base",
+			size: "",
+			sizeUnit: null,
+			spotBalances: [{ coin: "USDC", token: 0, total: "73414", hold: "0", entryNtl: "0" }],
+			maxTradeSzs: [0, 0],
+			availableToTrade: [0, 0],
+		});
+
+		expect(entry.availableBalance).toBe(0);
+		expect(entry.spotBalance.quoteAvailable).toBe(0);
+	});
+});

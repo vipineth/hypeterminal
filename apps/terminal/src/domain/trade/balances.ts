@@ -112,16 +112,6 @@ export function getSpotBalanceData(
 		};
 	}
 
-	if (market.kind === "builderPerp") {
-		const quoteBalance = getSpotBalance(spotBalances, quoteName);
-		return {
-			baseAvailable: 0,
-			quoteAvailable: getSpotAvailable(quoteBalance, spotAvailableAfterMaintenance),
-			baseName: "",
-			quoteName,
-		};
-	}
-
 	return { baseAvailable: 0, quoteAvailable: 0, baseName: "", quoteName };
 }
 
