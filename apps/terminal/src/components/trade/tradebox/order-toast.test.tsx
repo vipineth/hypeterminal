@@ -149,6 +149,12 @@ describe("order toast", () => {
 		expect(html).toContain("Not confirmed: Request timed out after 10000 ms. Retry or cancel it.");
 	});
 
+	it("says on a row left from before a reload that Retry resends that order as placed", () => {
+		view.queued = [];
+		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		expect(html).toContain("Retry resends this order as you placed it: Order at 1160.");
+	});
+
 	it("retries an unconfirmed order by its request key", () => {
 		renderToString(<OrderToast />);
 		buttonsNamed("Retry")[1].onClick?.();

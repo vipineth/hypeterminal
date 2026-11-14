@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { PlanLeg } from "@/domain/trade/order-intent";
 import {
 	describeInspection,
+	describeResend,
 	interpretOrderStatuses,
 	NO_EXCHANGE_RESPONSE,
 	reportSettlement,
@@ -152,11 +153,33 @@ describe("reportSettlement", () => {
 			error: "Not confirmed: Failed to fetch. Retry or cancel it.",
 			requestKey: "testnet:0x0000000000000000000000000000000000000001:5#1794596065043",
 			canDismiss: false,
+			resends: "Retry resends this order as you placed it: Order at 80.276.",
 		});
 		expect(reportSettlement({ ...pending, dismissible: true })).toMatchObject({
 			error: "Not confirmed: Failed to fetch. Retry, cancel or dismiss it.",
 			canDismiss: true,
 		});
+	});
+
+	it("names what Retry resends from the signed body, trigger prices included", () => {
+		const entryWithTp: PendingRequest = {
+			...request("order", ENTRY_WITH_TP),
+			body: JSON.stringify({
+				action: {
+					orders: [
+						{ p: "1964", t: { limit: { tif: "FrontendMarket" } } },
+						{ p: "49999", t: { trigger: { isMarket: true, triggerPx: "50000", tpsl: "tp" } } },
+					],
+				},
+			}),
+		};
+		expect(describeResend(entryWithTp)).toBe(
+			"Retry resends this order as you placed it: Entry at 80.276, Take profit at 50000.",
+		);
+		expect(describeResend(request("order", SCALE.slice(0, 2)))).toBe(
+			"Retry resends this order as you placed it: Leg 1 at 80, Leg 2 at 79.5.",
+		);
+		expect(describeResend(request("twap", []))).toBe("Retry resends this TWAP as you placed it.");
 	});
 
 	it("reports the statuses the exchange answered", () => {
@@ -301,7 +324,7 @@ describe("reportSettlement", () => {
 	it("reports a canceled request as placing nothing", () => {
 		expect(reportSettlement({ kind: "canceled", request: request("order") })).toEqual({
 			ok: false,
-			status: "failed",
+			status: "canceled",
 			error: "Canceled. Nothing was placed.",
 		});
 	});

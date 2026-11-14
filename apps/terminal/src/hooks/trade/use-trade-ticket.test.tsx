@@ -1,7 +1,7 @@
 import Big from "big.js";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { LockManagerLike } from "@/lib/trade/order-sender";
+import { EXPIRY_MARGIN_MS, EXPIRY_WINDOW_MS, type LockManagerLike } from "@/lib/trade/order-sender";
 import {
 	comesBackUp,
 	createFakeExchange,
@@ -859,13 +859,14 @@ describe("order legs the ticket reports and retries", () => {
 		expect(net.venue.state.placedLegs).toBe(1);
 	});
 
-	it("shows the earlier unconfirmed order as filled when a later press finds it filled", async () => {
+	it("shows the earlier unconfirmed order as filled when a press after its expiry finds it filled", async () => {
 		vi.useFakeTimers();
 		marketOrder("8");
 		goesDownOnFirstSend(net.venue);
 		await pressSubmitPastRetries();
 		const unconfirmed = lastQueueUpdate();
 		comesBackUp(net.venue);
+		await vi.advanceTimersByTimeAsync(EXPIRY_WINDOW_MS + EXPIRY_MARGIN_MS);
 		await pressSubmitPastRetries();
 		expect(unconfirmed).toMatchObject({ status: "unsettled", requestKey: expect.stringMatching(/#\d+$/) });
 		expect(queue.upsertByRequestKey).toHaveBeenCalledWith(
@@ -932,8 +933,10 @@ describe("order legs the ticket reports and retries", () => {
 		await pressSubmitPastRetries();
 		const sellRow = lastQueueUpdate();
 		expect(sellRow).toMatchObject({
-			status: "failed",
-			error: "Not sent. An earlier order on this market is not confirmed yet. Retry or cancel it first.",
+			status: "notSent",
+			error: expect.stringMatching(
+				/^Not sent\. An earlier order on this market is not confirmed yet\. It can still execute until .+\. Its Retry sends that earlier order again\. To send this one, cancel it and press again\.$/,
+			),
 		});
 		expect(sellRow.requestKey).toBeUndefined();
 		expect(formActions.resetForm).not.toHaveBeenCalled();
@@ -966,7 +969,7 @@ describe("order legs the ticket reports and retries", () => {
 		await pressSubmit();
 		const held = lastQueueUpdate();
 		expect(held).toMatchObject({
-			status: "failed",
+			status: "notSent",
 			error: expect.stringMatching(
 				/^Not sent\. Your last order on this market: Leg 1 at \S+ placed, Leg 2 at \S+ rejected\. /,
 			),
@@ -1068,7 +1071,7 @@ describe("the order a fresh press signs", () => {
 			expect(orderBodies()).toHaveLength(sentBefore);
 			expect(lastQueueUpdate()).toMatchObject({
 				status: "notSent",
-				error: expect.stringContaining("Retry resends that earlier order, not this one."),
+				error: expect.stringContaining("Its Retry sends that earlier order again."),
 			});
 		},
 	);

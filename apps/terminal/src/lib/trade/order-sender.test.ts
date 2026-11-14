@@ -10,6 +10,8 @@ import {
 import {
 	classifyReply,
 	createOrderSender,
+	EXPIRY_MARGIN_MS,
+	EXPIRY_WINDOW_MS,
 	getRequestKey,
 	IN_FLIGHT_GRACE_MS,
 	type LockManagerLike,
@@ -47,6 +49,7 @@ import {
 const SOL = 5;
 const SLOT = getRequestSlot("testnet", TEST_USER, SOL);
 const REVOKED = "User or API Wallet 0x6117f1250ff313fa510bf05b8b2e359411c431d7 does not exist.";
+const PAST_EXPIRY_MS = EXPIRY_WINDOW_MS + EXPIRY_MARGIN_MS + 1000;
 let cloidSeq = 0;
 
 function nextCloid(): `0x${string}` {
@@ -217,12 +220,26 @@ describe("order sender", () => {
 		expect(venue.state.placedLegs).toBe(1);
 	});
 
-	it("resends a request left unconfirmed before a reload instead of signing a new one", async () => {
+	it("sends nothing over a request left unconfirmed before a reload while it can still execute", async () => {
 		goesDownOnFirstSend(venue);
 		const before = openTab(venue, storage, locks);
 		const first = await before.sender.submit(signerFor(venue), marketBuy());
 		expect(first).toMatchObject({ kind: "sent", settlement: { kind: "pending" } });
 		comesBackUp(venue);
+		const sentBefore = venue.exchangeRequests.length;
+		const afterReload = openTab(venue, storage, locks);
+		const second = await afterReload.sender.submit(signerFor(venue), marketBuy());
+		expect(second).toMatchObject({ kind: "blocked", earlier: { kind: "live", request: sentRequest(first) } });
+		expect(venue.exchangeRequests).toHaveLength(sentBefore);
+		expect(afterReload.sender.list(TEST_USER).map((request) => request.nonce)).toEqual([sentRequest(first).nonce]);
+	});
+
+	it("settles a request left unconfirmed before a reload once it can no longer execute, and signs nothing new", async () => {
+		goesDownOnFirstSend(venue);
+		const before = openTab(venue, storage, locks);
+		await before.sender.submit(signerFor(venue), marketBuy());
+		comesBackUp(venue);
+		vi.setSystemTime(Date.now() + PAST_EXPIRY_MS);
 		const afterReload = openTab(venue, storage, locks);
 		const second = await afterReload.sender.submit(signerFor(venue), marketBuy());
 		expect(second).toMatchObject({ kind: "blocked", earlier: { kind: "consumed" } });
@@ -289,7 +306,7 @@ describe("order sender", () => {
 		const { sender } = openTab(venue, storage, locks);
 		const first = await sender.submit(signerFor(venue), marketBuy());
 		expect(first).toMatchObject({ kind: "sent", settlement: { kind: "pending" } });
-		vi.setSystemTime(Date.now() + 31_000);
+		vi.setSystemTime(Date.now() + PAST_EXPIRY_MS);
 		const second = await sender.submit(signerFor(venue), marketBuy());
 		expect(second).toMatchObject({ kind: "sent", settlement: { kind: "answered" } });
 		expect(venue.state.placedLegs).toBe(1);
@@ -778,7 +795,7 @@ describe("order sender settling only on the exchange's reply", () => {
 		const { sender } = openTab(venue, storage, locks);
 		venue.nextExchangeRequests("lost", "lost", "lost", "lost");
 		await sender.submit(signerFor(venue), marketBuy());
-		vi.setSystemTime(Date.now() + 31_000);
+		vi.setSystemTime(Date.now() + PAST_EXPIRY_MS);
 		venue.state.infoDown = true;
 		const blocked = await sender.submit(signerFor(venue), marketBuy());
 		expect(blocked).toMatchObject({ kind: "blocked", earlier: { kind: "expired", lookup: { statuses: null } } });
@@ -811,7 +828,7 @@ describe("order sender settling only on the exchange's reply", () => {
 		venue.nextExchangeRequests("lost");
 		const pressA = tabA.sender.submit(signerFor(venue), marketBuy());
 		await vi.waitFor(() => expect(venue.exchangeRequests).toHaveLength(1));
-		vi.setSystemTime(Date.now() + 31_000);
+		vi.setSystemTime(Date.now() + PAST_EXPIRY_MS);
 		venue.nextExchangeRequests("deliver", "lost", "lost", "lost", "lost");
 		const pressB = await tabB.sender.submit(signerFor(venue), marketBuy());
 		const requestB = sentRequest(pressB);
@@ -830,7 +847,7 @@ describe("order sender settling only on the exchange's reply", () => {
 		venue.nextExchangeRequests("lost", "deliver", "deliver", "lost", "lost", "lost", "lost");
 		const pressA = tabA.sender.submit(signerFor(venue), marketBuy());
 		await vi.waitFor(() => expect(venue.exchangeRequests).toHaveLength(1));
-		vi.setSystemTime(Date.now() + 31_000);
+		vi.setSystemTime(Date.now() + PAST_EXPIRY_MS);
 		const pressB = tabB.sender.submit(signerFor(venue), marketBuy());
 		await vi.waitFor(() => expect(venue.exchangeRequests).toHaveLength(2));
 		releaseASleep();
@@ -847,7 +864,7 @@ describe("order sender settling only on the exchange's reply", () => {
 		const { store, sender } = openTab(venue, storage, locks);
 		venue.nextExchangeRequests("lost", "lost", "lost", "lost");
 		const first = await sender.submit(signerFor(venue), marketBuy());
-		vi.setSystemTime(Date.now() + 31_000);
+		vi.setSystemTime(Date.now() + PAST_EXPIRY_MS);
 		venue.nextExchangeRequests("deliver", "lost", "lost", "lost", "lost");
 		const second = await sender.submit(signerFor(venue), marketBuy());
 		const sentBefore = venue.exchangeRequests.length;
@@ -1054,6 +1071,7 @@ describe("order sender holding a market after a partial result", () => {
 		const pressA = tabA.sender.submit(signerFor(venue), scale(["90", "91"]));
 		await arrived;
 		venue.state.lookupLag = 100;
+		vi.setSystemTime(Date.now() + PAST_EXPIRY_MS);
 		expect(await tabB.sender.submit(signerFor(venue), scale(["90", "92"]))).toMatchObject({ kind: "blocked" });
 		releaseReply();
 		expect(reportSubmit(await pressA)).toEqual({ ok: true, outcome: "filled" });
@@ -1219,6 +1237,7 @@ describe("order sender holding a market after a partial result", () => {
 		};
 		const pressA = tabA.sender.submit(signerFor(venue), scale(["90", "95"]));
 		await arrived;
+		vi.setSystemTime(Date.now() + PAST_EXPIRY_MS);
 		expect(await tabB.sender.submit(signerFor(venue), scale(["90", "96"]))).toMatchObject({ kind: "blocked" });
 		releaseReply();
 		await pressA;

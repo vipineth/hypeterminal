@@ -10,9 +10,9 @@ import { createExchangeClock } from "@/lib/trade/exchange-clock";
 import {
 	describeInspection,
 	type OrderResult,
+	reportEarlier,
 	reportHoldOutcome,
 	reportRequestOutcome,
-	reportSettlement,
 	reportSubmit,
 	reportUnreadableOutcome,
 } from "@/lib/trade/extract-order-status";
@@ -109,7 +109,7 @@ export function useSubmitPlan(): UseSubmitPlanResult {
 		const outcome = await submit(signer);
 		if (outcome.kind === "blocked") {
 			const { request } = outcome.earlier;
-			upsertByRequestKey(getRequestKey(request), request.label, resultToQueueUpdate(reportSettlement(outcome.earlier)));
+			upsertByRequestKey(getRequestKey(request), request.label, resultToQueueUpdate(reportEarlier(outcome.earlier)));
 		}
 		return reportSubmit(outcome);
 	}

@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import type { PlanLeg } from "@/domain/trade/order-intent";
+import type { CloidOrder, PlanLeg } from "@/domain/trade/order-intent";
 import {
 	isRecord,
 	type LegFate,
@@ -16,6 +16,7 @@ import {
 	type Held,
 	type HoldOutcome,
 	type Inspection,
+	type Live,
 	type Lookup,
 	type OrderLookup,
 	type Refused,
@@ -31,9 +32,9 @@ export type OrderOutcome = "filled" | "partiallyFilled" | "resting" | "triggerSe
 
 export type OrderResult =
 	| { ok: true; outcome: OrderOutcome; detail?: string }
-	| { ok: false; status: "failed" | "unknown"; error: string }
+	| { ok: false; status: "failed" | "unknown" | "canceled"; error: string }
 	| { ok: false; status: "notSent"; error: string; unreadable?: UnreadableSlot }
-	| { ok: false; status: "unsettled"; error: string; requestKey: string; canDismiss: boolean };
+	| { ok: false; status: "unsettled"; error: string; requestKey: string; canDismiss: boolean; resends: string };
 
 export type UnreadableSlot = { slot: string; raw: string };
 
@@ -51,6 +52,31 @@ function unknown(error: string): OrderResult {
 
 function notSent(error: string): OrderResult {
 	return { ok: false, status: "notSent", error };
+}
+
+function unsettled(request: PendingRequest, error: string, canDismiss: boolean): OrderResult {
+	return {
+		ok: false,
+		status: "unsettled",
+		error,
+		requestKey: getRequestKey(request),
+		canDismiss,
+		resends: describeResend(request),
+	};
+}
+
+export function describeResend(request: PendingRequest): string {
+	if (request.kind === "twap") return t`Retry resends this TWAP as you placed it.`;
+	const { action } = JSON.parse(request.body) as { action?: { orders?: CloidOrder[] } };
+	const legs = request.legs.map((leg, index) => describeSentLeg(leg, index, action?.orders?.[index]));
+	return t`Retry resends this order as you placed it: ${legs.join(", ")}.`;
+}
+
+function describeSentLeg(leg: PlanLeg, index: number, sent: CloidOrder | undefined): string {
+	const name = getLegName(leg, index);
+	const price = sent && "trigger" in sent.t ? String(sent.t.trigger.triggerPx) : leg.price;
+	if (leg.role === "scaleLeg" || !price) return name;
+	return t`${name} at ${price}`;
 }
 
 export function interpretOrderStatuses(statuses: unknown[], legs: PlanLeg[], sizes: string[] = []): OrderResult {
@@ -238,7 +264,17 @@ function describeHold(hold: Hold): string {
 		.join(", ");
 }
 
-function reportBlocked(earlier: Settlement): OrderResult {
+export function reportEarlier(earlier: Settlement | Live): OrderResult {
+	if (earlier.kind === "live") return unsettled(earlier.request, t`Not confirmed. Retry or cancel it.`, false);
+	return reportSettlement(earlier);
+}
+
+function reportBlocked(earlier: Settlement | Live): OrderResult {
+	if (earlier.kind === "live") {
+		return notSent(
+			t`Not sent. An earlier order on this market is not confirmed yet. ${describeRemaining(earlier.remainingMs)} Its Retry sends that earlier order again. To send this one, cancel it and press again.`,
+		);
+	}
 	if (earlier.kind === "pending") {
 		return notSent(
 			earlier.dismissible
@@ -280,16 +316,14 @@ export function reportRequestOutcome(outcome: RequestOutcome): OrderResult {
 			const error = canStillExecute(outcome.remainingMs)
 				? t`Cannot cancel: another agent key signed this order. ${describeRemaining(outcome.remainingMs)}`
 				: t`Cannot cancel: another agent key signed this order.`;
-			return { ok: false, status: "unsettled", error, requestKey: getRequestKey(outcome.request), canDismiss: true };
+			return unsettled(outcome.request, error, true);
 		}
 		case "live":
-			return {
-				ok: false,
-				status: "unsettled",
-				error: t`Not dismissed. ${describeRemaining(outcome.remainingMs)} Retry or cancel it.`,
-				requestKey: getRequestKey(outcome.request),
-				canDismiss: false,
-			};
+			return unsettled(
+				outcome.request,
+				t`Not dismissed. ${describeRemaining(outcome.remainingMs)} Retry or cancel it.`,
+				false,
+			);
 		default:
 			return reportSettlement(outcome);
 	}
@@ -318,17 +352,19 @@ export function reportSettlement(settlement: Settlement): OrderResult {
 	const { request } = settlement;
 	switch (settlement.kind) {
 		case "pending":
-			return {
-				ok: false,
-				status: "unsettled",
-				error: settlement.dismissible
+			return unsettled(
+				request,
+				settlement.dismissible
 					? t`Not confirmed: ${settlement.error}. Retry, cancel or dismiss it.`
 					: t`Not confirmed: ${settlement.error}. Retry or cancel it.`,
-				requestKey: getRequestKey(request),
-				canDismiss: settlement.dismissible,
-			};
+				settlement.dismissible,
+			);
 		case "canceled":
-			return failed(request.kind === "twap" ? t`Canceled. The TWAP did not start.` : t`Canceled. Nothing was placed.`);
+			return {
+				ok: false,
+				status: "canceled",
+				error: request.kind === "twap" ? t`Canceled. The TWAP did not start.` : t`Canceled. Nothing was placed.`,
+			};
 		case "answered":
 			return request.kind === "twap"
 				? reportTwapReply(settlement.response)

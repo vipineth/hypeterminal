@@ -1,6 +1,6 @@
 import { Button } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
-import { CheckIcon, LightningIcon, QuestionIcon, SpinnerGapIcon, XIcon } from "@phosphor-icons/react";
+import { CheckIcon, LightningIcon, MinusIcon, QuestionIcon, SpinnerGapIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect } from "react";
 import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/time";
 import { type DismissPreview, useActiveHolds, usePendingRequests, useSubmitPlan } from "@/hooks/trade/use-submit-plan";
@@ -8,6 +8,7 @@ import { cn } from "@/lib/cn";
 import {
 	describeHeldMarket,
 	describeHoldDismissal,
+	describeResend,
 	type OrderOutcome,
 	type OrderResult,
 	type UnreadableSlot,
@@ -96,6 +97,7 @@ function OrderItem({ order, onRemove, actions, canCancel }: Props) {
 	const sideBg = order.side === "buy" ? "bg-success-soft" : "bg-error-soft";
 	const orderTypeLabel = getOrderTypeLabel(order.orderType);
 	const hasTpSl = order.tpPrice || order.slPrice;
+	const isNeutral = order.status === "notSent" || order.status === "canceled";
 
 	return (
 		<div
@@ -112,6 +114,7 @@ function OrderItem({ order, onRemove, actions, canCancel }: Props) {
 					order.status === "failed" && "bg-error-soft border border-stroke-error-strong/30",
 					(order.status === "unsettled" || order.status === "unknown") &&
 						"bg-warning-soft border border-stroke-warning-strong/30",
+					isNeutral && "bg-fill-weak border border-stroke-weak",
 				)}
 			>
 				{order.status === "pending" && <SpinnerGapIcon className="size-4 animate-spin text-brand" />}
@@ -120,6 +123,7 @@ function OrderItem({ order, onRemove, actions, canCancel }: Props) {
 				{(order.status === "unsettled" || order.status === "unknown") && (
 					<QuestionIcon className="size-4 text-warning" />
 				)}
+				{isNeutral && <MinusIcon className="size-4 text-fg-muted" />}
 			</div>
 
 			<div className="flex-1 min-w-0 space-y-0.5">
@@ -164,19 +168,18 @@ function OrderItem({ order, onRemove, actions, canCancel }: Props) {
 					</div>
 				)}
 				{order.status === "success" && order.detail && <div className="text-xs text-fg-muted">{order.detail}</div>}
-				{order.error && (
-					<div className={cn("text-xs", order.status === "failed" ? "text-error" : "text-warning")}>{order.error}</div>
-				)}
+				{order.error && <div className={cn("text-xs", getErrorColor(order.status))}>{order.error}</div>}
 				{order.status === "unsettled" && order.requestKey && (
 					<RequestActions
 						requestKey={order.requestKey}
+						resends={order.resends}
 						confirm={order.confirmDismiss}
 						canDismiss={order.canDismiss === true}
 						canCancel={canCancel}
 						actions={actions}
 					/>
 				)}
-				{order.status === "failed" && order.unreadable && (
+				{order.status === "notSent" && order.unreadable && (
 					<UnreadableActions order={order} unreadable={order.unreadable} actions={actions} />
 				)}
 				{order.status === "unsettled" && order.held && (
@@ -184,7 +187,7 @@ function OrderItem({ order, onRemove, actions, canCancel }: Props) {
 				)}
 			</div>
 
-			{(order.status === "failed" || order.status === "unknown") && (
+			{(order.status === "failed" || order.status === "unknown" || isNeutral) && (
 				<Button
 					variant="ghost"
 					intent="neutral"
@@ -199,14 +202,22 @@ function OrderItem({ order, onRemove, actions, canCancel }: Props) {
 	);
 }
 
+function getErrorColor(status: OrderQueueItem["status"]): string {
+	if (status === "failed") return "text-error";
+	if (status === "notSent" || status === "canceled") return "text-fg-muted";
+	return "text-warning";
+}
+
 function RequestActions({
 	requestKey,
+	resends,
 	confirm,
 	canDismiss,
 	canCancel,
 	actions,
 }: {
 	requestKey: string;
+	resends: string | undefined;
 	confirm: OrderQueueItem["confirmDismiss"];
 	canDismiss: boolean;
 	canCancel: boolean;
@@ -240,38 +251,41 @@ function RequestActions({
 		);
 	}
 	return (
-		<div className="flex items-center gap-1.5 pt-1">
-			<Button
-				variant="outline"
-				intent="neutral"
-				size="xxs"
-				className="rounded-xs"
-				onClick={() => actions.retry(requestKey)}
-			>
-				{t`Retry`}
-			</Button>
-			<Button
-				variant="ghost"
-				intent="error"
-				size="xxs"
-				className="rounded-xs"
-				disabled={!canCancel}
-				onClick={() => actions.cancel(requestKey)}
-			>
-				{t`Cancel`}
-			</Button>
-			{canDismiss && (
+		<div className="space-y-1 pt-1">
+			{resends && <div className="text-xs text-fg-muted">{resends}</div>}
+			<div className="flex items-center gap-1.5">
 				<Button
-					variant="ghost"
+					variant="outline"
 					intent="neutral"
 					size="xxs"
 					className="rounded-xs"
-					onClick={() => actions.previewDismiss(requestKey)}
+					onClick={() => actions.retry(requestKey)}
 				>
-					{t`Dismiss`}
+					{t`Retry`}
 				</Button>
-			)}
-			{!canCancel && <span className="text-xs text-fg-muted">{t`Connect your trading wallet to cancel it.`}</span>}
+				<Button
+					variant="ghost"
+					intent="error"
+					size="xxs"
+					className="rounded-xs"
+					disabled={!canCancel}
+					onClick={() => actions.cancel(requestKey)}
+				>
+					{t`Cancel`}
+				</Button>
+				{canDismiss && (
+					<Button
+						variant="ghost"
+						intent="neutral"
+						size="xxs"
+						className="rounded-xs"
+						onClick={() => actions.previewDismiss(requestKey)}
+					>
+						{t`Dismiss`}
+					</Button>
+				)}
+				{!canCancel && <span className="text-xs text-fg-muted">{t`Connect your trading wallet to cancel it.`}</span>}
+			</div>
 		</div>
 	);
 }
@@ -385,6 +399,7 @@ function toQueueItem(request: PendingRequest): OrderQueueItem {
 		orderType: request.kind === "twap" ? "twap" : undefined,
 		status: "unsettled",
 		error: t`Not confirmed. Retry or cancel it.`,
+		resends: describeResend(request),
 		requestKey: getRequestKey(request),
 		createdAt: request.signedAt,
 	};
@@ -430,7 +445,12 @@ export function OrderToast() {
 	const leftOver = pendingRequests.filter((request) => !queuedKeys.has(getRequestKey(request))).map(toQueueItem);
 	const queuedHolds = new Set(queued.map(holdKeyOf));
 	const holdRows = activeHolds.map(toHoldItem).filter((row) => !queuedHolds.has(row.id));
-	const orders = [...leftOver, ...holdRows, ...queued];
+	const orders = [
+		...leftOver,
+		...holdRows,
+		...queued.filter((order) => order.held),
+		...queued.filter((order) => !order.held),
+	];
 	if (orders.length === 0) return null;
 
 	function adopt(requestKey: string, status: OrderQueueItem["status"]) {
@@ -502,6 +522,8 @@ export function OrderToast() {
 	const successCount = orders.filter((o) => o.status === "success").length;
 	const failedCount = orders.filter((o) => o.status === "failed").length;
 	const unsettledCount = orders.filter((o) => o.status === "unsettled" || o.status === "unknown").length;
+	const notSentCount = orders.filter((o) => o.status === "notSent").length;
+	const canceledCount = orders.filter((o) => o.status === "canceled").length;
 
 	return (
 		<div
@@ -537,6 +559,16 @@ export function OrderToast() {
 					{unsettledCount > 0 && (
 						<span className="px-1.5 py-0.5 rounded text-xs font-medium bg-warning-soft text-warning border border-stroke-warning-strong/30">
 							{unsettledCount} {t`unconfirmed`}
+						</span>
+					)}
+					{notSentCount > 0 && (
+						<span className="px-1.5 py-0.5 rounded text-xs font-medium bg-fill-weak text-fg-muted border border-stroke-weak">
+							{notSentCount} {t`not sent`}
+						</span>
+					)}
+					{canceledCount > 0 && (
+						<span className="px-1.5 py-0.5 rounded text-xs font-medium bg-fill-weak text-fg-muted border border-stroke-weak">
+							{canceledCount} {t`canceled`}
 						</span>
 					)}
 					{failedCount > 0 && (

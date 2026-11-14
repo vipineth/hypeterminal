@@ -80,14 +80,14 @@ export type Refused =
 
 export type Held = { kind: "held"; hold: Hold };
 
-type Live = { kind: "live"; request: PendingRequest; remainingMs: number | null };
+export type Live = { kind: "live"; request: PendingRequest; remainingMs: number | null };
 
 export type SubmitOutcome =
 	| Busy
 	| Refused
 	| Held
 	| { kind: "failed"; error: string }
-	| { kind: "blocked"; earlier: Settlement }
+	| { kind: "blocked"; earlier: Settlement | Live }
 	| { kind: "sent"; settlement: Settlement };
 
 export type RequestOutcome =
@@ -225,6 +225,11 @@ export function createOrderSender(env: SenderEnv) {
 		}
 		env.store.remember(slot, current);
 		if (current?.state === "pending") {
+			const remainingMs = await remainingFor(current.request);
+			if (canStillExecute(remainingMs)) {
+				revealed.add(getRequestKey(current.request));
+				return { kind: "blocked", earlier: { kind: "live", request: current.request, remainingMs } };
+			}
 			const earlier = await record(await settle(current.request, false));
 			if (!placedNothing(earlier)) {
 				if (earlier.kind === "pending") revealed.add(getRequestKey(earlier.request));

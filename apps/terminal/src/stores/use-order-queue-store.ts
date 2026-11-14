@@ -12,12 +12,13 @@ export interface OrderQueueItem {
 	orderType?: "market" | "limit" | "trigger" | "scale" | "twap";
 	tpPrice?: string;
 	slPrice?: string;
-	status: "pending" | "success" | "failed" | "unknown" | "unsettled";
+	status: "pending" | "success" | "failed" | "unknown" | "unsettled" | "notSent" | "canceled";
 	outcome?: OrderOutcome;
 	detail?: string;
 	error?: string;
 	requestKey?: string;
 	canDismiss?: boolean;
+	resends?: string;
 	confirmDismiss?: { text: string; lookup: Lookup };
 	unreadable?: UnreadableSlot;
 	confirmUnreadable?: boolean;
@@ -85,7 +86,7 @@ const useOrderQueueStore = create<OrderQueueStore>()((set) => ({
 }));
 
 function applyUpdate(order: OrderQueueItem, update: Partial<Omit<OrderQueueItem, "id">>): OrderQueueItem {
-	const completed = update.status === "success" || update.status === "failed" || update.status === "unknown";
+	const completed = update.status !== undefined && update.status !== "pending" && update.status !== "unsettled";
 	return { ...order, ...update, completedAt: completed ? Date.now() : order.completedAt };
 }
 
@@ -118,6 +119,7 @@ export function resultToQueueUpdate(result: OrderResult): Partial<Omit<OrderQueu
 		outcome: undefined,
 		detail: undefined,
 		error: undefined,
+		resends: undefined,
 	};
 	if (result.ok) return { ...cleared, status: "success", outcome: result.outcome, detail: result.detail };
 	switch (result.status) {
@@ -128,9 +130,10 @@ export function resultToQueueUpdate(result: OrderResult): Partial<Omit<OrderQueu
 				error: result.error,
 				requestKey: result.requestKey,
 				canDismiss: result.canDismiss,
+				resends: result.resends,
 			};
 		case "notSent":
-			return { ...cleared, status: "failed", error: result.error, unreadable: result.unreadable };
+			return { ...cleared, status: "notSent", error: result.error, unreadable: result.unreadable };
 		default:
 			return { ...cleared, status: result.status, error: result.error };
 	}

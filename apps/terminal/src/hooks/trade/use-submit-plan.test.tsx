@@ -121,7 +121,7 @@ describe("retry and cancel on an unconfirmed order", () => {
 		const requestKey = await sendUnconfirmed(hook);
 		const result = await settle(hook.cancelRequest(requestKey));
 		const [lateArrival] = net.venue.deliverInTransit();
-		expect(result).toEqual({ ok: false, status: "failed", error: "Canceled. Nothing was placed." });
+		expect(result).toEqual({ ok: false, status: "canceled", error: "Canceled. Nothing was placed." });
 		expect(lateArrival).toMatchObject({
 			status: "err",
 			response: expect.stringMatching(/^Invalid nonce: duplicate nonce/),
