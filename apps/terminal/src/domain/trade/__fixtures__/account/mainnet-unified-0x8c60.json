@@ -1,0 +1,140 @@
+{
+	"network": "mainnet",
+	"user": "0x8c60f23b6466768b42c31395055d7a8deba5f3e4",
+	"capturedAt": "2026-11-14T04:26:01.545Z",
+	"userAbstraction": "unifiedAccount",
+	"webData3UserState": {
+		"agentAddress": "0x98a2fea933244fb2bf91b963c6e8c0e4a1270f00",
+		"agentValidUntil": 1795708610198,
+		"cumLedger": "69995.25",
+		"serverTime": 1794630360547,
+		"isVault": false,
+		"user": "0x8c60f23b6466768b42c31395055d7a8deba5f3e4",
+		"abstraction": "unifiedAccount"
+	},
+	"spot": {
+		"balances": [
+			{
+				"coin": "USDC",
+				"token": 0,
+				"total": "68423.40402379",
+				"hold": "4432.771308",
+				"entryNtl": "0.0"
+			}
+		],
+		"tokenToAvailableAfterMaintenance": [[0, "66207.01836979"]]
+	},
+	"clearinghouseStates": [
+		[
+			"",
+			{
+				"marginSummary": {
+					"accountValue": "0.0",
+					"totalNtlPos": "0.0",
+					"totalRawUsd": "0.0",
+					"totalMarginUsed": "0.0"
+				},
+				"crossMarginSummary": {
+					"accountValue": "0.0",
+					"totalNtlPos": "0.0",
+					"totalRawUsd": "0.0",
+					"totalMarginUsed": "0.0"
+				},
+				"crossMaintenanceMarginUsed": "0.0",
+				"withdrawable": "0.0",
+				"assetPositions": [],
+				"time": 1794630360627
+			}
+		],
+		[
+			"flx",
+			{
+				"marginSummary": {
+					"accountValue": "0.0",
+					"totalNtlPos": "0.0",
+					"totalRawUsd": "0.0",
+					"totalMarginUsed": "0.0"
+				},
+				"crossMarginSummary": {
+					"accountValue": "0.0",
+					"totalNtlPos": "0.0",
+					"totalRawUsd": "0.0",
+					"totalMarginUsed": "0.0"
+				},
+				"crossMaintenanceMarginUsed": "0.0",
+				"withdrawable": "0.0",
+				"assetPositions": [],
+				"time": 1794630360627
+			}
+		],
+		[
+			"xyz",
+			{
+				"marginSummary": {
+					"accountValue": "4433.0458",
+					"totalNtlPos": "88660.916",
+					"totalRawUsd": "-84227.8702",
+					"totalMarginUsed": "4433.0458"
+				},
+				"crossMarginSummary": {
+					"accountValue": "4433.0458",
+					"totalNtlPos": "88660.916",
+					"totalRawUsd": "-84227.8702",
+					"totalMarginUsed": "4433.0458"
+				},
+				"crossMaintenanceMarginUsed": "2216.5229",
+				"withdrawable": "0.0",
+				"assetPositions": [
+					{
+						"type": "oneWay",
+						"position": {
+							"coin": "xyz:NVDA",
+							"szi": "548.984",
+							"leverage": {
+								"type": "cross",
+								"value": 20
+							},
+							"entryPx": "164.686",
+							"positionValue": "88660.916",
+							"unrealizedPnl": "-1749.34792",
+							"returnOnEquity": "-0.3869799388",
+							"liquidationPx": "37.798536816",
+							"marginUsed": "4433.0458",
+							"maxLeverage": 20,
+							"cumFunding": {
+								"allTime": "30.726074",
+								"sinceOpen": "30.726074",
+								"sinceChange": "0.0"
+							}
+						}
+					}
+				],
+				"time": 1794630360627
+			}
+		]
+	],
+	"activeAssetData": {
+		"BTC": {
+			"user": "0x8c60f23b6466768b42c31395055d7a8deba5f3e4",
+			"coin": "BTC",
+			"leverage": {
+				"type": "cross",
+				"value": 20
+			},
+			"maxTradeSzs": ["19.11794", "19.11794"],
+			"availableToTrade": ["63990.632715", "63990.632715"],
+			"markPx": "66943.0"
+		},
+		"xyz:NVDA": {
+			"user": "0x8c60f23b6466768b42c31395055d7a8deba5f3e4",
+			"coin": "xyz:NVDA",
+			"leverage": {
+				"type": "cross",
+				"value": 20
+			},
+			"maxTradeSzs": ["7925.027", "9022.995"],
+			"availableToTrade": ["63990.630511", "72856.173127"],
+			"markPx": "161.49"
+		}
+	}
+}
