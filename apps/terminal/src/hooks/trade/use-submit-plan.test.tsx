@@ -238,3 +238,63 @@ function storedSlot() {
 		"hypeterminal:pending-request:v2:testnet:0x0000000000000000000000000000000000000001:5",
 	) as { state: string; nonce: number; request: { label: unknown } };
 }
+
+describe("collateral after the exchange rejects a submit", () => {
+	beforeEach(() => {
+		vi.useFakeTimers();
+		net.venue = createFakeExchange();
+		net.storage = createMemoryKeyValue();
+		net.locks = createMemoryLocks();
+		net.tradingReady = true;
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	async function spotSnapshotReceivedNow() {
+		const { createHyperliquidStore } = await import("@hypeterminal/hl-react/store");
+		const { createHyperliquidConfig } = await import("@hypeterminal/hl-react/create-config");
+		const { serializeKey, subscriptionKeys } = await import("@hypeterminal/hl-react");
+		const { trackCollateralReceipts } = await import("@/stores/use-collateral-generation-store");
+		const store = createHyperliquidStore(createHyperliquidConfig());
+		trackCollateralReceipts(store);
+		const key = serializeKey(subscriptionKeys.method("spotState", { user: "0x0000000000000000000000000000000000000001" }));
+		const snapshot = { spotState: { balances: [{ coin: "USDC", token: 0, total: "100.0", hold: "0.0", entryNtl: "0.0" }] } };
+		store.getState().acquireSubscription(key, () => new Promise(() => {}));
+		store.getState().setSubscriptionData(key, snapshot);
+		return snapshot;
+	}
+
+	async function countsNow(snapshot: object) {
+		const { getCollateralGeneration, isCurrentSnapshot } = await import("@/stores/use-collateral-generation-store");
+		return isCurrentSnapshot(snapshot, getCollateralGeneration());
+	}
+
+	it("stops counting a balance received before a failed submit", async () => {
+		const hook = await mountSubmitPlan();
+		const snapshot = await spotSnapshotReceivedNow();
+		expect(await countsNow(snapshot)).toBe(true);
+
+		net.venue.state.legOutcome = () => ({
+			status: { error: "Insufficient margin to place order. asset=5" },
+			lookup: "unknownOid",
+		});
+		const result = await settle(hook.submitPlan(MARKET_BUY));
+
+		expect(result).toMatchObject({ ok: false, status: "failed" });
+		expect(await countsNow(snapshot)).toBe(false);
+	});
+
+	it("keeps counting it when a submit never reaches the exchange", async () => {
+		net.tradingReady = false;
+		const hook = await mountSubmitPlan();
+		const snapshot = await spotSnapshotReceivedNow();
+
+		const result = await hook.submitPlan(MARKET_BUY);
+
+		expect(result).toMatchObject({ ok: false, status: "notSent" });
+		expect(net.venue.exchangeRequests).toHaveLength(0);
+		expect(await countsNow(snapshot)).toBe(true);
+	});
+});
