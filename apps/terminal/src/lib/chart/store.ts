@@ -213,12 +213,16 @@ export function createCandleStore(): CandleStore {
 		function acquireSharedSubscription(runtimeEntry: StreamRuntime, coin: string, interval: CandleInterval) {
 			subscriptionStore.getState().acquireSubscription(
 				runtimeEntry.sharedKey,
-				() =>
-					getSubscriptionClient().candle({ coin, interval }, (event) => {
-						const bar = candleEventToBar(event);
-						if (!bar) return;
-						subscriptionStore.getState().setSubscriptionData(runtimeEntry.sharedKey, bar);
-					}),
+				(onError) =>
+					getSubscriptionClient().candle(
+						{ coin, interval },
+						(event) => {
+							const bar = candleEventToBar(event);
+							if (!bar) return;
+							subscriptionStore.getState().setSubscriptionData(runtimeEntry.sharedKey, bar);
+						},
+						{ onError },
+					),
 				CANDLE_STALENESS_THRESHOLD_MS,
 				true,
 			);
