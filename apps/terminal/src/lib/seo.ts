@@ -95,6 +95,9 @@ export function buildPageHead(options: PageSeoOptions = {}): HeadOutput {
 		{ property: "og:description", content: description },
 		{ property: "og:url", content: canonicalUrl },
 		{ property: "og:image", content: ogImage },
+		{ property: "og:image:width", content: "1200" },
+		{ property: "og:image:height", content: "630" },
+		{ property: "og:image:alt", content: SEO_DEFAULTS.defaultTitle },
 		{ property: "og:locale", content: SEO_DEFAULTS.locale },
 
 		// Twitter Card
@@ -103,6 +106,7 @@ export function buildPageHead(options: PageSeoOptions = {}): HeadOutput {
 		{ name: "twitter:title", content: pageTitle },
 		{ name: "twitter:description", content: description },
 		{ name: "twitter:image", content: ogImage },
+		{ name: "twitter:image:alt", content: SEO_DEFAULTS.defaultTitle },
 	];
 
 	if (noIndex) {
