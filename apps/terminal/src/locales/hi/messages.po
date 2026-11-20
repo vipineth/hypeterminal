@@ -1666,6 +1666,7 @@ msgstr "लिक्विडेशन प्राइस"
 msgid "Liquidated"
 msgstr ""
 
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:310
 #: src/components/ui/spinner.tsx:9
 msgid "Loading"
 msgstr "लोड हो रहा है"

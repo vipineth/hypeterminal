@@ -1670,6 +1670,7 @@ msgstr "Liq. Price"
 msgid "Liquidated"
 msgstr "Liquidated"
 
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:310
 #: src/components/ui/spinner.tsx:9
 msgid "Loading"
 msgstr "Loading"

@@ -125,16 +125,16 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 						<label htmlFor={sizeFieldId} className="text-fg-muted">
 							{t`Size`}
 						</label>
-						<span className="tabular-nums text-fg-muted">
-							{t`Available`}{" "}
-							<span className="text-fg">
-								{ticket.isConnected && entry.collateral.status === "ready"
-									? formatToken(entry.availableBalance, {
-											decimals: isSpot && side === "sell" ? szDecimals : 2,
-											symbol: entry.availableBalanceToken ?? undefined,
-										})
-									: FALLBACK_VALUE_PLACEHOLDER}
-							</span>
+						<span className="flex items-baseline gap-1 tabular-nums text-fg-muted">
+							{t`Available`}
+							<AvailableBalance
+								isConnected={ticket.isConnected}
+								isReady={entry.collateral.status === "ready"}
+								formatted={formatToken(entry.availableBalance, {
+									decimals: isSpot && side === "sell" ? szDecimals : 2,
+									symbol: entry.availableBalanceToken ?? undefined,
+								})}
+							/>
 						</span>
 					</div>
 					<div className="relative">
@@ -291,4 +291,25 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 			<WalletModal {...ticket.walletModalProps} />
 		</div>
 	);
+}
+
+function AvailableBalance({
+	isConnected,
+	isReady,
+	formatted,
+}: {
+	isConnected: boolean;
+	isReady: boolean;
+	formatted: string;
+}) {
+	if (!isConnected) return <span className="text-fg">{FALLBACK_VALUE_PLACEHOLDER}</span>;
+	if (!isReady)
+		return (
+			<span
+				role="status"
+				aria-label={t`Loading`}
+				className="inline-block h-2.5 w-16 self-center rounded-xs bg-fill-weak animate-pulse"
+			/>
+		);
+	return <span className="text-fg">{formatted}</span>;
 }

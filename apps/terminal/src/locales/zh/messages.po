@@ -1666,6 +1666,7 @@ msgstr "清算价"
 msgid "Liquidated"
 msgstr ""
 
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:310
 #: src/components/ui/spinner.tsx:9
 msgid "Loading"
 msgstr "加载中"
