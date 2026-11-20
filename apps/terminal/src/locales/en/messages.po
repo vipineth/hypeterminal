@@ -291,6 +291,10 @@ msgstr "Amount"
 msgid "Any portion that is not immediately filled will be canceled."
 msgstr "Any portion that is not immediately filled will be canceled."
 
+#: src/components/trade/components/phone-link-modal.tsx:115
+msgid "Anyone who scans this QR can trade this account until {expiryLabel}. It cannot withdraw or send funds. Do not share it or take a screenshot. Linking another phone replaces this one."
+msgstr "Anyone who scans this QR can trade this account until {expiryLabel}. It cannot withdraw or send funds. Do not share it or take a screenshot. Linking another phone replaces this one."
+
 #: src/components/trade/header/top-nav.tsx:
 #~ msgid "API"
 #~ msgstr "API"
@@ -303,7 +307,12 @@ msgstr "Any portion that is not immediately filled will be canceled."
 #~ msgid "Approve a builder to charge fees on orders placed on your behalf. Builder codes allow DeFi applications to receive a portion of trading fees."
 #~ msgstr "Approve a builder to charge fees on orders placed on your behalf. Builder codes allow DeFi applications to receive a portion of trading fees."
 
+#: src/components/trade/components/phone-link-modal.tsx:150
+msgid "Approve and show QR"
+msgstr "Approve and show QR"
+
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:338
+#: src/components/trade/components/phone-link-modal.tsx:150
 msgid "Approve in wallet..."
 msgstr "Approve in wallet..."
 
@@ -792,7 +801,7 @@ msgstr "Connecting desktop wallet"
 msgid "Connecting..."
 msgstr "Connecting..."
 
-#: src/lib/wallet-utils.ts:137
+#: src/lib/wallet-utils.ts:138
 msgid "Connection request was rejected in your wallet."
 msgstr "Connection request was rejected in your wallet."
 
@@ -849,6 +858,10 @@ msgstr "Could not import phone access."
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:187
 msgid "Could not link mobile device."
 msgstr "Could not link mobile device."
+
+#: src/components/trade/components/phone-link-modal.tsx:72
+msgid "Could not link your phone."
+msgstr "Could not link your phone."
 
 #: src/components/trade/components/wallet-modal.tsx:361
 #: src/components/trade/components/wallet-modal.tsx:367
@@ -1664,6 +1677,10 @@ msgstr "Link desktop wallet"
 msgid "Link mobile device"
 msgstr "Link mobile device"
 
+#: src/components/trade/components/phone-link-modal.tsx:85
+msgid "Link phone"
+msgstr "Link phone"
+
 #: src/components/trade/mobile/mobile-position-card.tsx:167
 #: src/components/trade/mobile/mobile-trade-ticket-body.tsx:209
 #: src/components/trade/positions/positions-tab.tsx:191
@@ -2074,7 +2091,7 @@ msgstr "No balances found"
 msgid "No balances found. Deposit funds to start trading."
 msgstr "No balances found. Deposit funds to start trading."
 
-#: src/lib/wallet-utils.ts:134
+#: src/lib/wallet-utils.ts:135
 msgid "No browser wallet found. Use WalletConnect or open this page in your wallet app's browser."
 msgstr "No browser wallet found. Use WalletConnect or open this page in your wallet app's browser."
 
@@ -2601,6 +2618,10 @@ msgstr "Phone link loaded"
 msgid "Phone link QR"
 msgstr "Phone link QR"
 
+#: src/components/trade/components/phone-link-modal.tsx:97
+msgid "Phone link QR code"
+msgstr "Phone link QR code"
+
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:380
 msgid "Phone link ready"
 msgstr "Phone link ready"
@@ -2916,6 +2937,10 @@ msgstr "Scan a WalletConnect QR code."
 #: src/components/trade/components/wallet-modal.tsx:
 #~ msgid "Scan desktop wallet QR"
 #~ msgstr "Scan desktop wallet QR"
+
+#: src/components/trade/components/phone-link-modal.tsx:100
+msgid "Scan it with your phone camera, or in HypeTerminal on your phone under Connect Wallet, Link desktop wallet. This QR closes after {qrSeconds} seconds."
+msgstr "Scan it with your phone camera, or in HypeTerminal on your phone under Connect Wallet, Link desktop wallet. This QR closes after {qrSeconds} seconds."
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:417
 msgid "Scan on your phone"
@@ -3770,6 +3795,10 @@ msgstr "Track on LI.FI Explorer"
 msgid "Trade History"
 msgstr "Trade History"
 
+#: src/components/trade/components/phone-link-modal.tsx:89
+msgid "Trade this account from your phone without connecting your wallet there."
+msgstr "Trade this account from your phone without connecting your wallet there."
+
 #. placeholder {0}: spotMarket.pairName
 #: src/components/trade/components/spot-swap-modal.tsx:192
 msgid "Trade via {0} spot market"
@@ -4216,3 +4245,7 @@ msgstr "Your USDC in Perps and on builder dexes moves into Spot when you switch.
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:280
 msgid "Your wallet approves one trading key for this phone. It cannot withdraw funds."
 msgstr "Your wallet approves one trading key for this phone. It cannot withdraw funds."
+
+#: src/components/trade/components/phone-link-modal.tsx:108
+msgid "Your wallet signs once to approve a trading key for your phone, then this window shows a QR."
+msgstr "Your wallet signs once to approve a trading key for your phone, then this window shows a QR."
