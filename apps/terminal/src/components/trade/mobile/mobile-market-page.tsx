@@ -1,6 +1,8 @@
 import { AdaptiveModal, Button } from "@hypeterminal/ui";
+import { t } from "@lingui/core/macro";
 import { ClientOnly } from "@tanstack/react-router";
 import { Suspense, useEffect, useState } from "react";
+import { useConnection } from "wagmi";
 import { getSideLabels } from "@/config/ui-text";
 import { getPositionDex } from "@/domain/market";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
@@ -9,6 +11,7 @@ import type { Side } from "@/lib/trade/types";
 import { useGlobalSettingsActions, useTheme } from "@/stores/use-global-settings-store";
 import { useOrderEntryActions } from "@/stores/use-order-entry-store";
 import { getOrderbookActionsStore, useSelectedPrice } from "@/stores/use-orderbook-actions-store";
+import { WalletModal } from "../components/wallet-modal";
 import { OrderbookPanel } from "../orderbook/orderbook-panel";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
 import { MobileMarketHeader } from "./mobile-market-header";
@@ -24,20 +27,28 @@ export function MobileMarketPage() {
 	const { setMobileMarketOpen } = useGlobalSettingsActions();
 	const { setSide, setOrderType, setLimitPrice } = useOrderEntryActions();
 	const selectedPrice = useSelectedPrice();
+	const { isConnected } = useConnection();
 	const [ticketOpen, setTicketOpen] = useState(false);
+	const [walletModalOpen, setWalletModalOpen] = useState(false);
 	const sideLabels = getSideLabels(market?.kind === "spot");
 
 	useEffect(() => {
 		if (selectedPrice === null) return;
+		getOrderbookActionsStore().actions.clearSelectedPrice();
+		if (!isConnected) return;
 		setOrderType("limit");
 		setLimitPrice(String(selectedPrice));
-		getOrderbookActionsStore().actions.clearSelectedPrice();
 		setTicketOpen(true);
-	}, [selectedPrice, setOrderType, setLimitPrice]);
+	}, [selectedPrice, isConnected, setOrderType, setLimitPrice]);
 
 	function openTicket(side: Side) {
 		setSide(side);
 		setTicketOpen(true);
+	}
+
+	function openWalletModal() {
+		setTicketOpen(false);
+		setWalletModalOpen(true);
 	}
 
 	return (
@@ -70,29 +81,44 @@ export function MobileMarketPage() {
 				</div>
 			</div>
 			<div className="shrink-0 grid grid-cols-2 gap-2 border-t border-stroke-weak/60 bg-surface px-3 py-2">
-				<Button
-					variant="filled"
-					intent="brand"
-					size="md"
-					className="touch-hitbox bg-success text-background hover:opacity-90"
-					onClick={() => openTicket("buy")}
-				>
-					{sideLabels.buy}
-				</Button>
-				<Button
-					variant="filled"
-					intent="error"
-					size="md"
-					className="touch-hitbox text-background"
-					onClick={() => openTicket("sell")}
-				>
-					{sideLabels.sell}
-				</Button>
+				{isConnected ? (
+					<>
+						<Button
+							variant="filled"
+							intent="brand"
+							size="md"
+							className="touch-hitbox bg-success text-background hover:opacity-90"
+							onClick={() => openTicket("buy")}
+						>
+							{sideLabels.buy}
+						</Button>
+						<Button
+							variant="filled"
+							intent="error"
+							size="md"
+							className="touch-hitbox text-background"
+							onClick={() => openTicket("sell")}
+						>
+							{sideLabels.sell}
+						</Button>
+					</>
+				) : (
+					<Button
+						variant="filled"
+						intent="brand"
+						size="md"
+						className="col-span-2 touch-hitbox"
+						onClick={openWalletModal}
+					>
+						{t`Connect Wallet`}
+					</Button>
+				)}
 			</div>
 			<MobileBottomNavSpacer />
-			<AdaptiveModal open={ticketOpen} onOpenChange={setTicketOpen}>
+			<AdaptiveModal open={ticketOpen && isConnected} onOpenChange={setTicketOpen}>
 				<MobileTradeTicketBody onSubmitted={() => setTicketOpen(false)} />
 			</AdaptiveModal>
+			<WalletModal open={walletModalOpen} onOpenChange={setWalletModalOpen} />
 		</div>
 	);
 }

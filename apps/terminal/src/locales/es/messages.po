@@ -690,6 +690,7 @@ msgstr ""
 #: src/components/trade/header/user-menu.tsx:73
 #: src/components/trade/mobile/mobile-account-view.tsx:102
 #: src/components/trade/mobile/mobile-account-view.tsx:108
+#: src/components/trade/mobile/mobile-market-page.tsx:113
 #: src/components/trade/mobile/mobile-nav-drawer.tsx:143
 #: src/lib/trade/use-button-content.ts:49
 msgid "Connect Wallet"
