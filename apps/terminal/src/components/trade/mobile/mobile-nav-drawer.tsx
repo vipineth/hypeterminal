@@ -136,7 +136,10 @@ export function MobileNavDrawer() {
 								variant="outline"
 								intent="neutral"
 								size="sm"
-								onClick={() => setWalletOpen(true)}
+								onClick={() => {
+									setWalletOpen(true);
+									close();
+								}}
 								iconLeft={<WalletIcon className="size-3.5" />}
 								className="w-full"
 							>
