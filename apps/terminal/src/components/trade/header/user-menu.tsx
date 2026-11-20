@@ -11,9 +11,10 @@ import {
 	WalletIcon,
 } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
-import { useConnection, useDisconnect, useEnsName } from "wagmi";
+import { useConnection, useEnsName } from "wagmi";
 import { APP_BAR_BUTTON_HEIGHT_CLASS } from "@/config/layout";
 import { useCopyToClipboard } from "@/hooks/ui/use-copy-to-clipboard";
+import { useDisconnectWallet } from "@/hooks/use-disconnect-wallet";
 import { cn } from "@/lib/cn";
 import { shortenAddress } from "@/lib/format";
 import { useDepositModalActions } from "@/stores/use-global-modal-store";
@@ -25,7 +26,7 @@ const USER_MENU_LABEL_MAX_WIDTH = "max-w-[11rem]";
 
 export function UserMenu() {
 	const { address, isConnected, isConnecting } = useConnection();
-	const disconnect = useDisconnect();
+	const disconnect = useDisconnectWallet();
 	const { data: ensName } = useEnsName({ address });
 	const { open: openDepositModal } = useDepositModalActions();
 	const [isOpen, setIsOpen] = useState(false);

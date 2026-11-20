@@ -10,12 +10,13 @@ import {
 } from "@phosphor-icons/react";
 import { Skeleton } from "boneyard-js/react";
 import { useState } from "react";
-import { useConnection, useDisconnect } from "wagmi";
+import { useConnection } from "wagmi";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/app";
 import { UI_TEXT } from "@/config/ui-text";
 import { getAccountSummary, type PerpsOverview } from "@/domain/trade/balances";
 import { useAccountState } from "@/hooks/trade/use-account-balances";
 import { useCopyToClipboard } from "@/hooks/ui/use-copy-to-clipboard";
+import { useDisconnectWallet } from "@/hooks/use-disconnect-wallet";
 import { cn } from "@/lib/cn";
 import { formatNumber, formatPercent, formatToken, formatUSD } from "@/lib/format";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
@@ -71,7 +72,7 @@ interface MobileAccountViewProps {
 
 export function MobileAccountView({ className }: MobileAccountViewProps) {
 	const { address, isConnected } = useConnection();
-	const disconnect = useDisconnect();
+	const disconnect = useDisconnectWallet();
 
 	const account = useAccountState();
 	const { data: market } = useSelectedMarketInfo();
