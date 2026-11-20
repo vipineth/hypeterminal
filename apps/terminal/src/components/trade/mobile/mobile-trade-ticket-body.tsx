@@ -161,7 +161,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 							{entry.sizeModeLabel}
 						</Button>
 					</div>
-					<div className="grid grid-cols-4 gap-1.5">
+					<div className="mt-1 grid grid-cols-4 gap-1.5">
 						{SIZE_CHIPS.map((pct) => (
 							<Button
 								key={pct}
