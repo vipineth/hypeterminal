@@ -223,7 +223,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 								hint={t`Take profit / stop loss`}
 								trailing={
 									<Toggle
-										size="sm"
+										size="xxs"
 										checked={tpSlEnabled}
 										onCheckedChange={setTpSlEnabled}
 										disabled={isFormDisabled}
