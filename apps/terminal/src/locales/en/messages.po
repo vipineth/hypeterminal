@@ -14,7 +14,7 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. placeholder {0}: otherConnectors.length
-#: src/components/trade/components/wallet-modal.tsx:825
+#: src/components/trade/components/wallet-modal.tsx:829
 msgid "{0} more wallets"
 msgstr "{0} more wallets"
 
@@ -88,7 +88,7 @@ msgstr "{placedScaleLegs} of {0} legs placed"
 msgid "{totalSeconds} seconds"
 msgstr "{totalSeconds} seconds"
 
-#: src/components/trade/tradebox/twap-order-summary.tsx:35
+#: src/components/trade/tradebox/twap-order-summary.tsx:43
 msgid "{TWAP_SUBORDER_INTERVAL_SECONDS} seconds"
 msgstr "{TWAP_SUBORDER_INTERVAL_SECONDS} seconds"
 
@@ -171,7 +171,7 @@ msgstr "A matching TWAP is in your history, but it can't be confirmed as this on
 msgid "Account"
 msgstr "Account"
 
-#: src/components/trade/header/user-menu.tsx:124
+#: src/components/trade/header/user-menu.tsx:127
 msgid "Account and wallet"
 msgstr "Account and wallet"
 
@@ -219,7 +219,7 @@ msgstr "Add"
 msgid "Add {0} to favorites"
 msgstr "Add {0} to favorites"
 
-#: src/components/trade/header/user-menu.tsx:97
+#: src/components/trade/header/user-menu.tsx:100
 msgid "Add funds"
 msgstr "Add funds"
 
@@ -231,7 +231,7 @@ msgstr "Add to favorites"
 msgid "Add TP/SL"
 msgstr "Add TP/SL"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:244
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:248
 msgid "Advanced"
 msgstr "Advanced"
 
@@ -317,7 +317,7 @@ msgstr "Asset"
 #~ msgid "Assets"
 #~ msgstr "Assets"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:218
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:222
 msgid "Auto close"
 msgstr "Auto close"
 
@@ -435,9 +435,9 @@ msgstr "Browse Markets"
 msgid "Builder dexes hold their own funds."
 msgstr "Builder dexes hold their own funds."
 
-#: src/components/trade/tradebox/order-summary.tsx:77
-#: src/components/trade/tradebox/scale-order-summary.tsx:67
-#: src/components/trade/tradebox/twap-order-summary.tsx:62
+#: src/components/trade/tradebox/order-summary.tsx:89
+#: src/components/trade/tradebox/scale-order-summary.tsx:80
+#: src/components/trade/tradebox/twap-order-summary.tsx:68
 msgid "Builder Fee"
 msgstr "Builder Fee"
 
@@ -593,7 +593,7 @@ msgstr "Clipboard paste is not available. Paste from the keyboard menu or type t
 msgid "Clipboard paste was blocked. Paste from the keyboard menu or type the code manually."
 msgstr "Clipboard paste was blocked. Paste from the keyboard menu or type the code manually."
 
-#: src/components/trade/components/wallet-modal.tsx:767
+#: src/components/trade/components/wallet-modal.tsx:771
 #: src/components/trade/mobile/mobile-position-card.tsx:243
 #: src/components/trade/positions/position-actions-dropdown.tsx:28
 #: src/components/trade/tradebox/bridge/executing-screen.tsx:55
@@ -654,7 +654,7 @@ msgstr "Confirm transaction in your wallet"
 #~ msgstr "Confirmation screen coming in next slice"
 
 #: src/components/trade/components/wallet-modal.tsx:458
-#: src/components/trade/components/wallet-modal.tsx:942
+#: src/components/trade/components/wallet-modal.tsx:946
 msgid "Connect"
 msgstr "Connect"
 
@@ -686,12 +686,11 @@ msgstr "Connect to verify"
 msgid "Connect wallet"
 msgstr "Connect wallet"
 
-#: src/components/trade/components/wallet-modal.tsx:761
-#: src/components/trade/header/user-menu.tsx:73
+#: src/components/trade/components/wallet-modal.tsx:765
+#: src/components/trade/header/user-menu.tsx:76
 #: src/components/trade/mobile/mobile-account-view.tsx:102
 #: src/components/trade/mobile/mobile-account-view.tsx:108
-#: src/components/trade/mobile/mobile-market-page.tsx:113
-#: src/components/trade/mobile/mobile-nav-drawer.tsx:143
+#: src/components/trade/mobile/mobile-nav-drawer.tsx:146
 #: src/lib/trade/use-button-content.ts:49
 msgid "Connect Wallet"
 msgstr "Connect Wallet"
@@ -784,11 +783,11 @@ msgstr "Connecting"
 msgid "Connecting desktop wallet"
 msgstr "Connecting desktop wallet"
 
-#: src/components/trade/header/user-menu.tsx:54
+#: src/components/trade/header/user-menu.tsx:55
 msgid "Connecting..."
 msgstr "Connecting..."
 
-#: src/lib/wallet-utils.ts:136
+#: src/lib/wallet-utils.ts:137
 msgid "Connection request was rejected in your wallet."
 msgstr "Connection request was rejected in your wallet."
 
@@ -798,7 +797,7 @@ msgstr "Continue"
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:405
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:452
-#: src/components/trade/components/wallet-modal.tsx:582
+#: src/components/trade/components/wallet-modal.tsx:586
 msgid "Copied"
 msgstr "Copied"
 
@@ -806,7 +805,7 @@ msgstr "Copied"
 msgid "Copied to clipboard"
 msgstr "Copied to clipboard"
 
-#: src/components/trade/header/user-menu.tsx:86
+#: src/components/trade/header/user-menu.tsx:89
 msgid "Copied!"
 msgstr "Copied!"
 
@@ -814,7 +813,7 @@ msgstr "Copied!"
 msgid "Copy address"
 msgstr "Copy address"
 
-#: src/components/trade/header/user-menu.tsx:86
+#: src/components/trade/header/user-menu.tsx:89
 msgid "Copy Address"
 msgstr "Copy Address"
 
@@ -822,7 +821,7 @@ msgstr "Copy Address"
 msgid "Copy code"
 msgstr "Copy code"
 
-#: src/components/trade/components/wallet-modal.tsx:582
+#: src/components/trade/components/wallet-modal.tsx:586
 msgid "Copy link"
 msgstr "Copy link"
 
@@ -888,7 +887,7 @@ msgstr "Created"
 msgid "Creating link..."
 msgstr "Creating link..."
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:199
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:203
 #: src/components/trade/positions/position-row.tsx:198
 #: src/components/trade/tradebox/margin-mode-modal.tsx:39
 #: src/components/trade/tradebox/trade-header.tsx:68
@@ -923,7 +922,7 @@ msgstr "Current"
 #~ msgid "Custom TP percentage"
 #~ msgstr "Custom TP percentage"
 
-#: src/components/trade/components/wallet-modal.tsx:923
+#: src/components/trade/components/wallet-modal.tsx:927
 msgid "Custom wallet address"
 msgstr "Custom wallet address"
 
@@ -999,7 +998,7 @@ msgstr "Destination address"
 #~ msgid "Direct mode: Sign each order with wallet"
 #~ msgstr "Direct mode: Sign each order with wallet"
 
-#: src/components/trade/header/user-menu.tsx:140
+#: src/components/trade/header/user-menu.tsx:143
 msgid "Disconnect"
 msgstr "Disconnect"
 
@@ -1090,7 +1089,7 @@ msgstr "Enabling"
 #~ msgid "Enabling..."
 #~ msgstr "Enabling..."
 
-#: src/components/trade/tradebox/scale-order-summary.tsx:42
+#: src/components/trade/tradebox/scale-order-summary.tsx:50
 #: src/components/trade/tradebox/trade-form-scale.tsx:33
 msgid "End Price"
 msgstr "End Price"
@@ -1161,8 +1160,8 @@ msgstr "Environment"
 #~ msgid "Equity"
 #~ msgstr "Equity"
 
-#: src/components/trade/tradebox/order-summary.tsx:72
-#: src/components/trade/tradebox/scale-order-summary.tsx:62
+#: src/components/trade/tradebox/order-summary.tsx:83
+#: src/components/trade/tradebox/scale-order-summary.tsx:74
 msgid "Est. Fee"
 msgstr "Est. Fee"
 
@@ -1223,7 +1222,7 @@ msgstr "failed"
 msgid "Failed to close position"
 msgstr "Failed to close position"
 
-#: src/components/trade/components/wallet-modal.tsx:725
+#: src/components/trade/components/wallet-modal.tsx:729
 msgid "Failed to connect with custom address"
 msgstr "Failed to connect with custom address"
 
@@ -1235,7 +1234,7 @@ msgstr "Failed to copy"
 msgid "Failed to enable trading"
 msgstr "Failed to enable trading"
 
-#: src/components/trade/components/wallet-modal.tsx:636
+#: src/components/trade/components/wallet-modal.tsx:640
 msgid "Failed to link desktop wallet"
 msgstr "Failed to link desktop wallet"
 
@@ -1318,7 +1317,7 @@ msgstr "Fee"
 #~ msgid "Fee rate must be between 0.001% and 1%"
 #~ msgstr "Fee rate must be between 0.001% and 1%"
 
-#: src/components/trade/tradebox/twap-order-summary.tsx:55
+#: src/components/trade/tradebox/twap-order-summary.tsx:62
 msgid "Fees"
 msgstr "Fees"
 
@@ -1356,7 +1355,7 @@ msgstr "Flip transfer direction"
 msgid "Found by lookup after you dismissed it. The exchange never confirmed the request."
 msgstr "Found by lookup after you dismissed it. The exchange never confirmed the request."
 
-#: src/components/trade/tradebox/twap-order-summary.tsx:35
+#: src/components/trade/tradebox/twap-order-summary.tsx:42
 msgid "Frequency"
 msgstr "Frequency"
 
@@ -1477,7 +1476,7 @@ msgstr "Importing..."
 #~ msgid "In Use"
 #~ msgstr "In Use"
 
-#: src/components/trade/components/wallet-modal.tsx:845
+#: src/components/trade/components/wallet-modal.tsx:849
 msgid "Install a wallet extension to continue"
 msgstr "Install a wallet extension to continue"
 
@@ -1514,7 +1513,7 @@ msgstr "Insufficient funds for gas"
 msgid "Invalid amount"
 msgstr "Invalid amount"
 
-#: src/components/trade/components/wallet-modal.tsx:706
+#: src/components/trade/components/wallet-modal.tsx:710
 msgid "Invalid Ethereum address"
 msgstr "Invalid Ethereum address"
 
@@ -1522,7 +1521,7 @@ msgstr "Invalid Ethereum address"
 msgid "IOC (Immediate Or Cancel)"
 msgstr "IOC (Immediate Or Cancel)"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:199
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:203
 #: src/components/trade/positions/position-row.tsx:198
 #: src/components/trade/tradebox/margin-mode-modal.tsx:46
 #: src/components/trade/tradebox/trade-header.tsx:68
@@ -1595,7 +1594,7 @@ msgstr "Known placed: {placed}. Unknown: {unknownLegs}. Dismiss the hold? Sendin
 msgid "Leaderboard"
 msgstr "Leaderboard"
 
-#: src/components/trade/components/wallet-modal.tsx:967
+#: src/components/trade/components/wallet-modal.tsx:971
 msgid "Learn more"
 msgstr "Learn more"
 
@@ -1608,7 +1607,7 @@ msgstr "Leg {legNumber}"
 msgid "Leg {legNumber} at {0}"
 msgstr "Leg {legNumber} at {0}"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:198
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:202
 #: src/components/trade/tradebox/margin-mode-modal.tsx:175
 msgid "Leverage"
 msgstr "Leverage"
@@ -1656,17 +1655,17 @@ msgid "Link desktop wallet"
 msgstr "Link desktop wallet"
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:236
-#: src/components/trade/header/user-menu.tsx:102
+#: src/components/trade/header/user-menu.tsx:105
 msgid "Link mobile device"
 msgstr "Link mobile device"
 
 #: src/components/trade/mobile/mobile-position-card.tsx:167
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:207
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:211
 #: src/components/trade/positions/positions-tab.tsx:191
 msgid "Liq"
 msgstr "Liq"
 
-#: src/components/trade/tradebox/order-summary.tsx:50
+#: src/components/trade/tradebox/order-summary.tsx:53
 msgid "Liq. Price"
 msgstr "Liq. Price"
 
@@ -1675,7 +1674,6 @@ msgstr "Liq. Price"
 msgid "Liquidated"
 msgstr "Liquidated"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:310
 #: src/components/ui/spinner.tsx:9
 msgid "Loading"
 msgstr "Loading"
@@ -1789,6 +1787,7 @@ msgstr "Manage TP/SL for {0} short position"
 #~ msgstr "Manage your risk on individual positions by restricting the amount of margin allocated to each. If the margin ratio of an isolated position reaches 100%, the position will be liquidated. Margin can be added or removed to individual positions in this mode."
 
 #: src/components/trade/mobile/mobile-position-card.tsx:163
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:182
 #: src/components/trade/positions/positions-tab.tsx:182
 msgid "Margin"
 msgstr "Margin"
@@ -1813,8 +1812,8 @@ msgstr "Margin mode"
 #~ msgid "Margin Ratio"
 #~ msgstr "Margin Ratio"
 
-#: src/components/trade/tradebox/order-summary.tsx:58
-#: src/components/trade/tradebox/scale-order-summary.tsx:56
+#: src/components/trade/tradebox/order-summary.tsx:65
+#: src/components/trade/tradebox/scale-order-summary.tsx:68
 msgid "Margin Req."
 msgstr "Margin Req."
 
@@ -1885,7 +1884,7 @@ msgstr "Markets"
 #~ msgid "Master"
 #~ msgstr "Master"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:175
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:174
 #: src/components/trade/tradebox/bridge/amount-entry-screen.tsx:94
 msgid "Max"
 msgstr "Max"
@@ -1956,7 +1955,7 @@ msgstr "Minimum withdrawal is ${MIN_WITHDRAW_USD}"
 msgid "Minute(s)"
 msgstr "Minute(s)"
 
-#: src/components/trade/components/wallet-modal.tsx:870
+#: src/components/trade/components/wallet-modal.tsx:874
 msgid "Mock Wallet (Testing)"
 msgstr "Mock Wallet (Testing)"
 
@@ -2019,7 +2018,7 @@ msgstr "NEW"
 msgid "New deposit"
 msgstr "New deposit"
 
-#: src/components/trade/components/wallet-modal.tsx:959
+#: src/components/trade/components/wallet-modal.tsx:963
 msgid "New to wallets?"
 msgstr "New to wallets?"
 
@@ -2070,7 +2069,7 @@ msgstr "No balances found"
 msgid "No balances found. Deposit funds to start trading."
 msgstr "No balances found. Deposit funds to start trading."
 
-#: src/lib/wallet-utils.ts:133
+#: src/lib/wallet-utils.ts:134
 msgid "No browser wallet found. Use WalletConnect or open this page in your wallet app's browser."
 msgstr "No browser wallet found. Use WalletConnect or open this page in your wallet app's browser."
 
@@ -2158,7 +2157,7 @@ msgstr "No trading pair available for <0/>/<1/>"
 msgid "No wallet connected"
 msgstr "No wallet connected"
 
-#: src/components/trade/components/wallet-modal.tsx:842
+#: src/components/trade/components/wallet-modal.tsx:846
 msgid "No wallets found"
 msgstr "No wallets found"
 
@@ -2291,13 +2290,13 @@ msgstr "Number format"
 #~ msgid "Number Format"
 #~ msgstr "Number Format"
 
-#: src/components/trade/tradebox/scale-order-summary.tsx:47
+#: src/components/trade/tradebox/scale-order-summary.tsx:57
 #: src/components/trade/tradebox/trade-form-scale.tsx:44
-#: src/components/trade/tradebox/twap-order-summary.tsx:42
+#: src/components/trade/tradebox/twap-order-summary.tsx:50
 msgid "Number of Orders"
 msgstr "Number of Orders"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:246
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:250
 msgid "Off"
 msgstr "Off"
 
@@ -2366,11 +2365,11 @@ msgstr "Open terminal"
 msgid "Open the phone link, then enter the pairing code shown on desktop."
 msgstr "Open the phone link, then enter the pairing code shown on desktop."
 
-#: src/components/trade/components/wallet-modal.tsx:571
+#: src/components/trade/components/wallet-modal.tsx:575
 msgid "Open wallet"
 msgstr "Open wallet"
 
-#: src/components/trade/components/wallet-modal.tsx:552
+#: src/components/trade/components/wallet-modal.tsx:556
 msgid "Open your wallet app to approve the connection."
 msgstr "Open your wallet app to approve the connection."
 
@@ -2440,8 +2439,8 @@ msgstr "Order submitted"
 msgid "Order type"
 msgstr "Order type"
 
-#: src/components/trade/tradebox/order-summary.tsx:55
-#: src/components/trade/tradebox/scale-order-summary.tsx:51
+#: src/components/trade/tradebox/order-summary.tsx:59
+#: src/components/trade/tradebox/scale-order-summary.tsx:62
 msgid "Order Value"
 msgstr "Order Value"
 
@@ -2618,7 +2617,7 @@ msgstr "Placed"
 msgid "Platform"
 msgstr "Platform"
 
-#: src/components/trade/components/wallet-modal.tsx:702
+#: src/components/trade/components/wallet-modal.tsx:706
 msgid "Please enter an address"
 msgstr "Please enter an address"
 
@@ -2879,7 +2878,7 @@ msgstr "Running"
 msgid "Running Time ({TWAP_MINUTES_MIN}m - {0}h)"
 msgstr "Running Time ({TWAP_MINUTES_MIN}m - {0}h)"
 
-#: src/components/trade/tradebox/twap-order-summary.tsx:37
+#: src/components/trade/tradebox/twap-order-summary.tsx:45
 msgid "Runtime"
 msgstr "Runtime"
 
@@ -2904,8 +2903,8 @@ msgstr "Scale levels must be {SCALE_LEVELS_MIN}-{SCALE_LEVELS_MAX}"
 msgid "Scan a QR code from a desktop wallet."
 msgstr "Scan a QR code from a desktop wallet."
 
-#: src/components/trade/components/wallet-modal.tsx:621
-#: src/components/trade/components/wallet-modal.tsx:659
+#: src/components/trade/components/wallet-modal.tsx:625
+#: src/components/trade/components/wallet-modal.tsx:663
 msgid "Scan a WalletConnect QR code."
 msgstr "Scan a WalletConnect QR code."
 
@@ -2921,7 +2920,7 @@ msgstr "Scan on your phone"
 #~ msgid "Scan this QR with your desktop wallet."
 #~ msgstr "Scan this QR with your desktop wallet."
 
-#: src/components/trade/components/wallet-modal.tsx:554
+#: src/components/trade/components/wallet-modal.tsx:558
 msgid "Scan this QR with your mobile wallet."
 msgstr "Scan this QR with your mobile wallet."
 
@@ -3101,7 +3100,7 @@ msgstr "Short position"
 #~ msgid "Show Executions on Chart"
 #~ msgstr "Show Executions on Chart"
 
-#: src/components/trade/components/wallet-modal.tsx:825
+#: src/components/trade/components/wallet-modal.tsx:829
 msgid "Show fewer wallets"
 msgstr "Show fewer wallets"
 
@@ -3182,7 +3181,7 @@ msgstr "Size"
 msgid "Size exceeds position"
 msgstr "Size exceeds position"
 
-#: src/components/trade/tradebox/twap-order-summary.tsx:47
+#: src/components/trade/tradebox/twap-order-summary.tsx:55
 msgid "Size per Suborder"
 msgstr "Size per Suborder"
 
@@ -3224,7 +3223,7 @@ msgstr "SL Price"
 #~ msgid "SL trigger price"
 #~ msgstr "SL trigger price"
 
-#: src/components/trade/tradebox/order-summary.tsx:65
+#: src/components/trade/tradebox/order-summary.tsx:72
 msgid "Slippage"
 msgstr "Slippage"
 
@@ -3298,7 +3297,7 @@ msgstr "Staking"
 msgid "Start and end must differ"
 msgstr "Start and end must differ"
 
-#: src/components/trade/tradebox/scale-order-summary.tsx:37
+#: src/components/trade/tradebox/scale-order-summary.tsx:43
 #: src/components/trade/tradebox/trade-form-scale.tsx:22
 msgid "Start Price"
 msgstr "Start Price"
@@ -3342,7 +3341,7 @@ msgstr "Stop trigger must be above mark"
 msgid "Stop trigger must be below mark"
 msgstr "Stop trigger must be below mark"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:245
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:249
 msgid "Stop, TWAP, Scale, TIF & more"
 msgstr "Stop, TWAP, Scale, TIF & more"
 
@@ -3490,11 +3489,11 @@ msgstr "Take profit"
 msgid "Take Profit"
 msgstr "Take Profit"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:219
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:223
 msgid "Take profit / stop loss"
 msgstr "Take profit / stop loss"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:226
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:230
 #: src/components/trade/tradebox/trade-form-fields.tsx:301
 msgid "Take Profit / Stop Loss"
 msgstr "Take Profit / Stop Loss"
@@ -3580,7 +3579,7 @@ msgstr "This browser can't keep orders from different tabs apart. Use an up-to-d
 msgid "This changes how your whole account holds margin, not just this market."
 msgstr "This changes how your whole account holds margin, not just this market."
 
-#: src/components/trade/components/wallet-modal.tsx:667
+#: src/components/trade/components/wallet-modal.tsx:671
 msgid "This is a phone-access QR. Open it with the phone camera or paste it on the phone access page."
 msgstr "This is a phone-access QR. Open it with the phone camera or paste it on the phone access page."
 
@@ -3588,7 +3587,7 @@ msgstr "This is a phone-access QR. Open it with the phone camera or paste it on 
 msgid "This is not a valid HypeTerminal mobile link."
 msgstr "This is not a valid HypeTerminal mobile link."
 
-#: src/components/trade/components/wallet-modal.tsx:672
+#: src/components/trade/components/wallet-modal.tsx:676
 msgid "This is not a WalletConnect QR code."
 msgstr "This is not a WalletConnect QR code."
 
@@ -3679,7 +3678,7 @@ msgstr "To Spot"
 msgid "Toggle size mode"
 msgstr "Toggle size mode"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:157
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:156
 msgid "Toggle size unit"
 msgstr "Toggle size unit"
 
@@ -3905,7 +3904,7 @@ msgstr "TWAP status unknown. A matching TWAP appeared in your history, but it ca
 msgid "TWAP status unknown. It will not be sent again. Check the TWAP tab."
 msgstr "TWAP status unknown. It will not be sent again. Check the TWAP tab."
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:245
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:249
 msgid "TWAP, Scale & more"
 msgstr "TWAP, Scale & more"
 
@@ -4069,15 +4068,15 @@ msgstr "Wallet is required for exchange actions"
 msgid "Wallet not connected"
 msgstr "Wallet not connected"
 
-#: src/components/trade/components/wallet-modal.tsx:588
+#: src/components/trade/components/wallet-modal.tsx:592
 msgid "Wallet on another device? Scan this QR with it."
 msgstr "Wallet on another device? Scan this QR with it."
 
-#: src/components/trade/components/wallet-modal.tsx:548
+#: src/components/trade/components/wallet-modal.tsx:552
 msgid "WalletConnect pairing ready"
 msgstr "WalletConnect pairing ready"
 
-#: src/components/trade/components/wallet-modal.tsx:526
+#: src/components/trade/components/wallet-modal.tsx:530
 msgid "WalletConnect QR code"
 msgstr "WalletConnect QR code"
 

@@ -39,20 +39,23 @@ export function UserMenu() {
 
 	if (!mounted || isConnecting) {
 		return (
-			<Button
-				variant="outline"
-				intent="neutral"
-				size="sm"
-				className={cn(
-					APP_BAR_BUTTON_HEIGHT_CLASS,
-					USER_MENU_BUTTON_MIN_WIDTH,
-					"shrink-0 px-3 transition-[color,background-color,border-color] duration-150 ease-out",
-				)}
-				disabled
-			>
-				<SpinnerGapIcon className="size-3.5 animate-spin" />
-				<Trans>Connecting...</Trans>
-			</Button>
+			<>
+				<Button
+					variant="outline"
+					intent="neutral"
+					size="sm"
+					className={cn(
+						APP_BAR_BUTTON_HEIGHT_CLASS,
+						USER_MENU_BUTTON_MIN_WIDTH,
+						"shrink-0 px-3 transition-[color,background-color,border-color] duration-150 ease-out",
+					)}
+					disabled
+				>
+					<SpinnerGapIcon className="size-3.5 animate-spin" />
+					<Trans>Connecting...</Trans>
+				</Button>
+				<WalletModal open={isOpen} onOpenChange={setIsOpen} />
+			</>
 		);
 	}
 
