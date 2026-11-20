@@ -235,7 +235,7 @@ msgstr "Add to favorites"
 msgid "Add TP/SL"
 msgstr "Add TP/SL"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:244
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:246
 msgid "Advanced"
 msgstr "Advanced"
 
@@ -321,12 +321,12 @@ msgstr "Asset"
 #~ msgid "Assets"
 #~ msgstr "Assets"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:218
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:220
 msgid "Auto close"
 msgstr "Auto close"
 
 #: src/components/trade/mobile/mobile-balances-tab.tsx:128
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:129
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:131
 #: src/components/trade/positions/balances-tab.tsx:208
 #: src/components/trade/positions/position-limit-close-modal.tsx:161
 #: src/components/trade/positions/send-modal.tsx:122
@@ -892,7 +892,7 @@ msgstr "Created"
 msgid "Creating link..."
 msgstr "Creating link..."
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:199
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:201
 #: src/components/trade/positions/position-row.tsx:198
 #: src/components/trade/tradebox/margin-mode-modal.tsx:39
 #: src/components/trade/tradebox/trade-header.tsx:68
@@ -1526,7 +1526,7 @@ msgstr "Invalid Ethereum address"
 msgid "IOC (Immediate Or Cancel)"
 msgstr "IOC (Immediate Or Cancel)"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:199
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:201
 #: src/components/trade/positions/position-row.tsx:198
 #: src/components/trade/tradebox/margin-mode-modal.tsx:46
 #: src/components/trade/tradebox/trade-header.tsx:68
@@ -1612,7 +1612,7 @@ msgstr "Leg {legNumber}"
 msgid "Leg {legNumber} at {0}"
 msgstr "Leg {legNumber} at {0}"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:198
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:200
 #: src/components/trade/tradebox/margin-mode-modal.tsx:175
 msgid "Leverage"
 msgstr "Leverage"
@@ -1641,7 +1641,7 @@ msgstr "Limit Close"
 msgid "Limit close order placed"
 msgstr "Limit close order placed"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:108
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:109
 #: src/components/trade/positions/position-limit-close-modal.tsx:144
 #: src/components/trade/tradebox/trade-form-fields.tsx:193
 msgid "Limit Price"
@@ -1665,7 +1665,7 @@ msgid "Link mobile device"
 msgstr "Link mobile device"
 
 #: src/components/trade/mobile/mobile-position-card.tsx:167
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:207
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:209
 #: src/components/trade/positions/positions-tab.tsx:191
 msgid "Liq"
 msgstr "Liq"
@@ -1679,7 +1679,7 @@ msgstr "Liq. Price"
 msgid "Liquidated"
 msgstr "Liquidated"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:311
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:313
 #: src/components/ui/spinner.tsx:9
 msgid "Loading"
 msgstr "Loading"
@@ -1889,7 +1889,7 @@ msgstr "Markets"
 #~ msgid "Master"
 #~ msgstr "Master"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:175
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:177
 #: src/components/trade/tradebox/bridge/amount-entry-screen.tsx:94
 msgid "Max"
 msgstr "Max"
@@ -2301,7 +2301,7 @@ msgstr "Number format"
 msgid "Number of Orders"
 msgstr "Number of Orders"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:246
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:248
 msgid "Off"
 msgstr "Off"
 
@@ -3165,7 +3165,7 @@ msgstr "Signer not ready"
 #: src/components/trade/mobile/mobile-orders-history-tab.tsx:115
 #: src/components/trade/mobile/mobile-orders-tab.tsx:243
 #: src/components/trade/mobile/mobile-position-card.tsx:146
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:126
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:128
 #: src/components/trade/mobile/mobile-twap-tab.tsx:117
 #: src/components/trade/orderbook/orderbook-panel.tsx:124
 #: src/components/trade/orderbook/trades-panel.tsx:78
@@ -3346,7 +3346,7 @@ msgstr "Stop trigger must be above mark"
 msgid "Stop trigger must be below mark"
 msgstr "Stop trigger must be below mark"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:245
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:247
 msgid "Stop, TWAP, Scale, TIF & more"
 msgstr "Stop, TWAP, Scale, TIF & more"
 
@@ -3494,11 +3494,11 @@ msgstr "Take profit"
 msgid "Take Profit"
 msgstr "Take Profit"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:219
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:221
 msgid "Take profit / stop loss"
 msgstr "Take profit / stop loss"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:226
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:228
 #: src/components/trade/tradebox/trade-form-fields.tsx:301
 msgid "Take Profit / Stop Loss"
 msgstr "Take Profit / Stop Loss"
@@ -3683,7 +3683,7 @@ msgstr "To Spot"
 msgid "Toggle size mode"
 msgstr "Toggle size mode"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:157
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:159
 msgid "Toggle size unit"
 msgstr "Toggle size unit"
 
@@ -3909,7 +3909,7 @@ msgstr "TWAP status unknown. A matching TWAP appeared in your history, but it ca
 msgid "TWAP status unknown. It will not be sent again. Check the TWAP tab."
 msgstr "TWAP status unknown. It will not be sent again. Check the TWAP tab."
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:245
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:247
 msgid "TWAP, Scale & more"
 msgstr "TWAP, Scale & more"
 
@@ -3929,7 +3929,7 @@ msgstr "Type"
 #~ msgid "Unable to close position."
 #~ msgstr "Unable to close position."
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:306
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:308
 msgid "Unavailable"
 msgstr "Unavailable"
 

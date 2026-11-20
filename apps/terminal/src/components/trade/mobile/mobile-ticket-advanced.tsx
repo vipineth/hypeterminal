@@ -40,7 +40,7 @@ export function MobileTicketAdvanced({ orderType, isSpot, hasReduceOnly, disable
 				<div className="flex items-center gap-3">
 					{hasReduceOnly && (
 						<Toggle
-							size="sm"
+							size="xxs"
 							label={t`Reduce only`}
 							checked={triggerOrder || reduceOnly}
 							onCheckedChange={setReduceOnly}

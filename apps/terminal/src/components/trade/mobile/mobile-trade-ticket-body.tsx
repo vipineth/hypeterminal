@@ -93,8 +93,9 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 						onMidClick={setTriggerPrice}
 						midPrice={ticket.markPx}
 						priceDecimals={priceDecimals}
+						inputSize="lg"
 						className={cn(
-							"w-full text-xs tabular-nums",
+							"w-full tabular-nums",
 							!isPositive(toNumber(triggerPriceInput)) &&
 								hasSize &&
 								"border-stroke-error-strong focus:border-stroke-error-strong",
@@ -112,8 +113,9 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 						onMidClick={setLimitPrice}
 						midPrice={ticket.markPx}
 						priceDecimals={priceDecimals}
+						inputSize="lg"
 						className={cn(
-							"w-full text-xs tabular-nums",
+							"w-full tabular-nums",
 							!ticket.price && hasSize && "border-stroke-error-strong focus:border-stroke-error-strong",
 						)}
 						disabled={isFormDisabled}
