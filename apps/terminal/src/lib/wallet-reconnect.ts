@@ -21,7 +21,7 @@ export async function hydrateAndReconnectRecent(config: Config) {
 
 	const unwatch = watchConnectors(config, {
 		onChange() {
-			if (reconnectConnector(config, recentConnectorId)) unwatch();
+			if (config.state.status !== "disconnected" || reconnectConnector(config, recentConnectorId)) unwatch();
 		},
 	});
 }
