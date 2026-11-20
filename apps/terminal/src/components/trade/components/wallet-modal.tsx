@@ -475,6 +475,7 @@ function DesktopWalletScannerPanel({
 }
 
 function WalletConnectPairingPanel({ uri, isMobile }: { uri: string; isMobile: boolean }) {
+	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [copied, setCopied] = useState(false);
 	const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
 	const [qrError, setQrError] = useState<string | null>(null);
@@ -509,6 +510,10 @@ function WalletConnectPairingPanel({ uri, isMobile }: { uri: string; isMobile: b
 		};
 	}, [uri]);
 
+	useEffect(() => {
+		if (isMobile) panelRef.current?.scrollIntoView({ block: "start" });
+	}, [isMobile]);
+
 	async function handleCopy() {
 		try {
 			await navigator.clipboard.writeText(uri);
@@ -519,8 +524,27 @@ function WalletConnectPairingPanel({ uri, isMobile }: { uri: string; isMobile: b
 		}
 	}
 
+	const qrCode = (
+		<div className="flex justify-center rounded-xs border border-stroke-weak bg-white p-3">
+			{qrDataUrl ? (
+				<img src={qrDataUrl} alt={t`WalletConnect QR code`} className="size-56 max-w-full" />
+			) : qrError ? (
+				<div className="flex h-56 w-56 items-center justify-center text-center text-xs font-semibold text-error">
+					{qrError}
+				</div>
+			) : (
+				<div className="flex h-56 w-56 items-center justify-center">
+					<SpinnerGapIcon className="size-5 animate-spin motion-reduce:animate-none text-brand" aria-hidden="true" />
+				</div>
+			)}
+		</div>
+	);
+
 	return (
-		<div className="mx-4 mb-3 rounded-xs border border-stroke-brand-strong/25 bg-fill-weak p-3 space-y-3">
+		<div
+			ref={panelRef}
+			className="mx-4 mb-3 scroll-mt-2 rounded-xs border border-stroke-brand-strong/25 bg-fill-weak p-3 space-y-3"
+		>
 			<div className="flex items-start gap-2">
 				<LinkIcon className="size-4 text-brand mt-0.5 shrink-0" aria-hidden="true" />
 				<div className="min-w-0 space-y-0.5">
@@ -529,26 +553,14 @@ function WalletConnectPairingPanel({ uri, isMobile }: { uri: string; isMobile: b
 					</p>
 					<p className="text-xs text-fg-muted">
 						{isMobile ? (
-							<Trans>Scan this QR with your desktop wallet.</Trans>
+							<Trans>Open your wallet app to approve the connection.</Trans>
 						) : (
 							<Trans>Scan this QR with your mobile wallet.</Trans>
 						)}
 					</p>
 				</div>
 			</div>
-			<div className="flex justify-center rounded-xs border border-stroke-weak bg-white p-3">
-				{qrDataUrl ? (
-					<img src={qrDataUrl} alt={t`WalletConnect QR code`} className="size-56 max-w-full" />
-				) : qrError ? (
-					<div className="flex h-56 w-56 items-center justify-center text-center text-xs font-semibold text-error">
-						{qrError}
-					</div>
-				) : (
-					<div className="flex h-56 w-56 items-center justify-center">
-						<SpinnerGapIcon className="size-5 animate-spin motion-reduce:animate-none text-brand" aria-hidden="true" />
-					</div>
-				)}
-			</div>
+			{!isMobile && qrCode}
 			<div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
 				{isMobile && (
 					<a
@@ -574,6 +586,14 @@ function WalletConnectPairingPanel({ uri, isMobile }: { uri: string; isMobile: b
 					{copied ? <Trans>Copied</Trans> : <Trans>Copy link</Trans>}
 				</Button>
 			</div>
+			{isMobile && (
+				<div className="space-y-2 border-t border-stroke-weak pt-3">
+					<p className="text-xs text-fg-muted">
+						<Trans>Wallet on another device? Scan this QR with it.</Trans>
+					</p>
+					{qrCode}
+				</div>
+			)}
 		</div>
 	);
 }
