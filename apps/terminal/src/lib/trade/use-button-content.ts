@@ -71,6 +71,9 @@ export function useButtonContent(input: ButtonContentInput): ButtonContent {
 		if (input.collateral.status === "pending") {
 			return { text: t`Checking margin…`, action: () => {}, disabled: true, variant: "cyan" };
 		}
+		if (input.collateral.status === "unavailable") {
+			return { text: t`Account unavailable`, action: () => {}, disabled: true, variant: "cyan" };
+		}
 		if (input.collateral.shortfall?.kind === "noFunds") {
 			return {
 				text: t`Deposit`,

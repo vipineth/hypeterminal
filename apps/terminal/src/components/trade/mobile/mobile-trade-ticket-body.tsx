@@ -7,7 +7,7 @@ import { PriceInput } from "@/components/ui/price-input";
 import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/app";
 import type { OrderType } from "@/config/trade";
 import { SIZE_PERCENT_OPTIONS } from "@/config/trade";
-import { locksOrderEntry } from "@/domain/trade/account-mode";
+import { type Collateral, locksOrderEntry } from "@/domain/trade/account-mode";
 import { useTradeTicket } from "@/hooks/trade/use-trade-ticket";
 import { cn } from "@/lib/cn";
 import { formatPrice, formatToken, formatUSD } from "@/lib/format";
@@ -129,7 +129,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 							{t`Available`}
 							<AvailableBalance
 								isConnected={ticket.isConnected}
-								isReady={entry.collateral.status === "ready"}
+								status={entry.collateral.status}
 								formatted={formatToken(entry.availableBalance, {
 									decimals: isSpot && side === "sell" ? szDecimals : 2,
 									symbol: entry.availableBalanceToken ?? undefined,
@@ -295,15 +295,16 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 
 function AvailableBalance({
 	isConnected,
-	isReady,
+	status,
 	formatted,
 }: {
 	isConnected: boolean;
-	isReady: boolean;
+	status: Collateral["status"];
 	formatted: string;
 }) {
 	if (!isConnected) return <span className="text-fg">{FALLBACK_VALUE_PLACEHOLDER}</span>;
-	if (!isReady)
+	if (status === "unavailable") return <span>{t`Unavailable`}</span>;
+	if (status === "pending")
 		return (
 			<span
 				role="status"

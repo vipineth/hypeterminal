@@ -63,10 +63,14 @@ export type Shortfall =
 	| { kind: "inUse"; token: QuoteToken }
 	| { kind: "noFunds"; token: QuoteToken };
 
-export type QuoteCheck = { status: "live"; quote: ActiveAssetDataResponse } | { status: "waiting" };
+export type QuoteCheck =
+	| { status: "live"; quote: ActiveAssetDataResponse }
+	| { status: "waiting" }
+	| { status: "unavailable" };
 
 export type Collateral =
 	| { status: "pending"; reason: "account" | "quote" }
+	| { status: "unavailable" }
 	| {
 			status: "ready";
 			source: CollateralSource;
@@ -239,6 +243,7 @@ function isQuoteFor(
 }
 
 export function getTradeCollateral(account: AccountState, market: Market, side: Side, quote: QuoteCheck): Collateral {
+	if (account.status === "error") return { status: "unavailable" };
 	if (account.status !== "ready") return { status: "pending", reason: "account" };
 	const source = getCollateralSource(account, market);
 
@@ -251,6 +256,7 @@ export function getTradeCollateral(account: AccountState, market: Market, side: 
 		return { status: "ready", source: { kind: "spot", token }, token, available, maxSize: null, shortfall };
 	}
 
+	if (quote.status === "unavailable") return { status: "unavailable" };
 	if (!isQuoteFor(quote, account, market)) return { status: "pending", reason: "quote" };
 	const sideIndex = side === "buy" ? 0 : 1;
 	const available = quote.quote.availableToTrade[sideIndex];

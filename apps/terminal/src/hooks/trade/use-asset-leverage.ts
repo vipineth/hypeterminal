@@ -211,6 +211,7 @@ export function useAssetLeverage(): UseAssetLeverageReturn {
 	}
 
 	function computeQuote(): QuoteCheck {
+		if (subscriptionStatus === "error") return { status: "unavailable" };
 		if (!activeAssetData || subscriptionStatus !== "active" || isQuoteStale) return { status: "waiting" };
 		if (!isCurrentSnapshot(activeAssetData, generation)) return { status: "waiting" };
 		return { status: "live", quote: activeAssetData };

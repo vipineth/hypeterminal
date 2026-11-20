@@ -341,6 +341,28 @@ describe("trade collateral", () => {
 	});
 });
 
+describe("collateral when account data fails", () => {
+	it("is unavailable when the account streams errored", () => {
+		expect(getTradeCollateral({ status: "error" }, market("BTC"), "buy", { status: "waiting" })).toEqual({
+			status: "unavailable",
+		});
+	});
+
+	it("is unavailable when the perp quote stream errored", () => {
+		const account = accountOf("p3-default");
+		expect(getTradeCollateral(account, market("BTC"), "buy", { status: "unavailable" })).toEqual({
+			status: "unavailable",
+		});
+	});
+
+	it("still waits while the account is loading", () => {
+		expect(getTradeCollateral({ status: "loading" }, market("BTC"), "buy", { status: "waiting" })).toEqual({
+			status: "pending",
+			reason: "account",
+		});
+	});
+});
+
 describe("an activeAssetData quote counts only for this ticket", () => {
 	const account = accountOf("p3-default");
 	const nvda = fixture("p3-default").activeAssetData["xyz:NVDA"];

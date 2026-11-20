@@ -205,7 +205,7 @@ export function useTradeTicket({ onSubmitted }: Options = {}) {
 		isConnected,
 		isWalletLoading,
 		availableBalance,
-		collateralPending: entry.collateral.status === "pending",
+		collateralPending: entry.collateral.status !== "ready",
 		hasMarket: !!market,
 		hasAssetIndex: typeof market?.assetId === "number",
 		needsAgentApproval,
