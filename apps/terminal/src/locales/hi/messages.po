@@ -231,7 +231,7 @@ msgstr "पसंदीदा में जोड़ें"
 msgid "Add TP/SL"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:248
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:244
 msgid "Advanced"
 msgstr ""
 
@@ -317,7 +317,7 @@ msgstr "संपत्ति"
 #~ msgid "Assets"
 #~ msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:222
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:218
 msgid "Auto close"
 msgstr ""
 
@@ -883,7 +883,7 @@ msgstr ""
 msgid "Creating link..."
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:203
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:199
 #: src/components/trade/positions/position-row.tsx:198
 #: src/components/trade/tradebox/margin-mode-modal.tsx:39
 #: src/components/trade/tradebox/trade-header.tsx:68
@@ -1517,7 +1517,7 @@ msgstr ""
 msgid "IOC (Immediate Or Cancel)"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:203
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:199
 #: src/components/trade/positions/position-row.tsx:198
 #: src/components/trade/tradebox/margin-mode-modal.tsx:46
 #: src/components/trade/tradebox/trade-header.tsx:68
@@ -1599,7 +1599,7 @@ msgstr ""
 msgid "Leg {legNumber} at {0}"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:202
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:198
 #: src/components/trade/tradebox/margin-mode-modal.tsx:175
 msgid "Leverage"
 msgstr ""
@@ -1652,7 +1652,7 @@ msgid "Link mobile device"
 msgstr ""
 
 #: src/components/trade/mobile/mobile-position-card.tsx:167
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:211
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:207
 #: src/components/trade/positions/positions-tab.tsx:191
 msgid "Liq"
 msgstr "लिक्विडेशन"
@@ -1779,7 +1779,6 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/trade/mobile/mobile-position-card.tsx:163
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:182
 #: src/components/trade/positions/positions-tab.tsx:182
 msgid "Margin"
 msgstr ""
@@ -1876,7 +1875,7 @@ msgstr ""
 #~ msgid "Master"
 #~ msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:174
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:175
 #: src/components/trade/tradebox/bridge/amount-entry-screen.tsx:94
 msgid "Max"
 msgstr "अधिकतम"
@@ -2284,7 +2283,7 @@ msgstr ""
 msgid "Number of Orders"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:250
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:246
 msgid "Off"
 msgstr ""
 
@@ -3325,7 +3324,7 @@ msgstr ""
 msgid "Stop trigger must be below mark"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:249
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:245
 msgid "Stop, TWAP, Scale, TIF & more"
 msgstr ""
 
@@ -3473,11 +3472,11 @@ msgstr ""
 msgid "Take Profit"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:223
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:219
 msgid "Take profit / stop loss"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:230
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:226
 #: src/components/trade/tradebox/trade-form-fields.tsx:301
 msgid "Take Profit / Stop Loss"
 msgstr "प्रॉफिट लें / स्टॉप लॉस"
@@ -3662,7 +3661,7 @@ msgstr ""
 msgid "Toggle size mode"
 msgstr "साइज मोड टॉगल करें"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:156
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:157
 msgid "Toggle size unit"
 msgstr ""
 
@@ -3888,7 +3887,7 @@ msgstr ""
 msgid "TWAP status unknown. It will not be sent again. Check the TWAP tab."
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:249
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:245
 msgid "TWAP, Scale & more"
 msgstr ""
 

@@ -137,21 +137,22 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 							</span>
 						</span>
 					</div>
-					<div className="flex items-center gap-1">
+					<div className="relative">
 						<NumberInput
 							id={sizeFieldId}
+							inputSize="xl"
 							placeholder="0.00"
 							value={entry.sizeInput}
 							onChange={(e) => entry.setSizeInput(e.target.value)}
 							maxAllowedDecimals={entry.sizeInputDecimals}
-							className="flex-1 text-xs tabular-nums"
+							className="w-full pr-24 font-medium tabular-nums"
 							disabled={isFormDisabled}
 						/>
 						<Button
 							variant="ghost"
 							intent="neutral"
 							size="sm"
-							className="touch-hitbox"
+							className="absolute right-1.5 top-1/2 -translate-y-1/2 touch-hitbox"
 							onClick={ticket.handleSizeModeToggle}
 							aria-label={t`Toggle size unit`}
 							disabled={isFormDisabled}
@@ -164,10 +165,10 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 						{SIZE_CHIPS.map((pct) => (
 							<Button
 								key={pct}
-								variant="outline"
+								variant="ghost"
 								intent="neutral"
-								size="xs"
-								className="touch-hitbox tabular-nums"
+								size="xxs"
+								className="touch-hitbox bg-fill-weak tabular-nums text-fg-muted"
 								onClick={() => ticket.handleSizePercentApply(pct)}
 								disabled={isFormDisabled || entry.maxSize <= 0}
 							>
@@ -177,11 +178,6 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 					</div>
 					{hasSize && (
 						<div className="text-2xs tabular-nums text-fg-muted">
-							{entry.capabilities.isLeveraged && (
-								<>
-									{t`Margin`} {formatUSD(ticket.marginRequired)} ·{" "}
-								</>
-							)}
 							≈{" "}
 							{ticket.sizeMode === "base"
 								? formatUSD(entry.orderValue)
