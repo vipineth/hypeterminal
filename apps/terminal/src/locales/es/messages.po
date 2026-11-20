@@ -88,7 +88,7 @@ msgstr ""
 msgid "{totalSeconds} seconds"
 msgstr ""
 
-#: src/components/trade/tradebox/twap-order-summary.tsx:43
+#: src/components/trade/tradebox/twap-order-summary.tsx:35
 msgid "{TWAP_SUBORDER_INTERVAL_SECONDS} seconds"
 msgstr ""
 
@@ -231,7 +231,7 @@ msgstr "Agregar a favoritos"
 msgid "Add TP/SL"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:248
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:244
 msgid "Advanced"
 msgstr ""
 
@@ -317,7 +317,7 @@ msgstr "Activo"
 #~ msgid "Assets"
 #~ msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:222
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:218
 msgid "Auto close"
 msgstr ""
 
@@ -435,9 +435,9 @@ msgstr ""
 msgid "Builder dexes hold their own funds."
 msgstr ""
 
-#: src/components/trade/tradebox/order-summary.tsx:89
-#: src/components/trade/tradebox/scale-order-summary.tsx:80
-#: src/components/trade/tradebox/twap-order-summary.tsx:68
+#: src/components/trade/tradebox/order-summary.tsx:77
+#: src/components/trade/tradebox/scale-order-summary.tsx:67
+#: src/components/trade/tradebox/twap-order-summary.tsx:62
 msgid "Builder Fee"
 msgstr ""
 
@@ -690,6 +690,7 @@ msgstr ""
 #: src/components/trade/header/user-menu.tsx:76
 #: src/components/trade/mobile/mobile-account-view.tsx:102
 #: src/components/trade/mobile/mobile-account-view.tsx:108
+#: src/components/trade/mobile/mobile-market-page.tsx:113
 #: src/components/trade/mobile/mobile-nav-drawer.tsx:146
 #: src/lib/trade/use-button-content.ts:49
 msgid "Connect Wallet"
@@ -887,7 +888,7 @@ msgstr ""
 msgid "Creating link..."
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:203
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:199
 #: src/components/trade/positions/position-row.tsx:198
 #: src/components/trade/tradebox/margin-mode-modal.tsx:39
 #: src/components/trade/tradebox/trade-header.tsx:68
@@ -1089,7 +1090,7 @@ msgstr ""
 #~ msgid "Enabling..."
 #~ msgstr ""
 
-#: src/components/trade/tradebox/scale-order-summary.tsx:50
+#: src/components/trade/tradebox/scale-order-summary.tsx:42
 #: src/components/trade/tradebox/trade-form-scale.tsx:33
 msgid "End Price"
 msgstr ""
@@ -1160,8 +1161,8 @@ msgstr ""
 #~ msgid "Equity"
 #~ msgstr "Patrimonio"
 
-#: src/components/trade/tradebox/order-summary.tsx:83
-#: src/components/trade/tradebox/scale-order-summary.tsx:74
+#: src/components/trade/tradebox/order-summary.tsx:72
+#: src/components/trade/tradebox/scale-order-summary.tsx:62
 msgid "Est. Fee"
 msgstr "Comisión est."
 
@@ -1317,7 +1318,7 @@ msgstr "Comisión"
 #~ msgid "Fee rate must be between 0.001% and 1%"
 #~ msgstr ""
 
-#: src/components/trade/tradebox/twap-order-summary.tsx:62
+#: src/components/trade/tradebox/twap-order-summary.tsx:55
 msgid "Fees"
 msgstr ""
 
@@ -1355,7 +1356,7 @@ msgstr ""
 msgid "Found by lookup after you dismissed it. The exchange never confirmed the request."
 msgstr ""
 
-#: src/components/trade/tradebox/twap-order-summary.tsx:42
+#: src/components/trade/tradebox/twap-order-summary.tsx:35
 msgid "Frequency"
 msgstr ""
 
@@ -1521,7 +1522,7 @@ msgstr ""
 msgid "IOC (Immediate Or Cancel)"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:203
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:199
 #: src/components/trade/positions/position-row.tsx:198
 #: src/components/trade/tradebox/margin-mode-modal.tsx:46
 #: src/components/trade/tradebox/trade-header.tsx:68
@@ -1603,7 +1604,7 @@ msgstr ""
 msgid "Leg {legNumber} at {0}"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:202
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:198
 #: src/components/trade/tradebox/margin-mode-modal.tsx:175
 msgid "Leverage"
 msgstr ""
@@ -1656,12 +1657,12 @@ msgid "Link mobile device"
 msgstr ""
 
 #: src/components/trade/mobile/mobile-position-card.tsx:167
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:211
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:207
 #: src/components/trade/positions/positions-tab.tsx:191
 msgid "Liq"
 msgstr "Liq"
 
-#: src/components/trade/tradebox/order-summary.tsx:53
+#: src/components/trade/tradebox/order-summary.tsx:50
 msgid "Liq. Price"
 msgstr "Precio liq."
 
@@ -1670,6 +1671,7 @@ msgstr "Precio liq."
 msgid "Liquidated"
 msgstr ""
 
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:310
 #: src/components/ui/spinner.tsx:9
 msgid "Loading"
 msgstr "Cargando"
@@ -1783,7 +1785,6 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/trade/mobile/mobile-position-card.tsx:163
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:182
 #: src/components/trade/positions/positions-tab.tsx:182
 msgid "Margin"
 msgstr ""
@@ -1808,8 +1809,8 @@ msgstr ""
 #~ msgid "Margin Ratio"
 #~ msgstr "Ratio de margen"
 
-#: src/components/trade/tradebox/order-summary.tsx:65
-#: src/components/trade/tradebox/scale-order-summary.tsx:68
+#: src/components/trade/tradebox/order-summary.tsx:58
+#: src/components/trade/tradebox/scale-order-summary.tsx:56
 msgid "Margin Req."
 msgstr "Margen req."
 
@@ -1880,7 +1881,7 @@ msgstr ""
 #~ msgid "Master"
 #~ msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:174
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:175
 #: src/components/trade/tradebox/bridge/amount-entry-screen.tsx:94
 msgid "Max"
 msgstr "Máx"
@@ -2286,13 +2287,13 @@ msgstr ""
 #~ msgid "Number Format"
 #~ msgstr ""
 
-#: src/components/trade/tradebox/scale-order-summary.tsx:57
+#: src/components/trade/tradebox/scale-order-summary.tsx:47
 #: src/components/trade/tradebox/trade-form-scale.tsx:44
-#: src/components/trade/tradebox/twap-order-summary.tsx:50
+#: src/components/trade/tradebox/twap-order-summary.tsx:42
 msgid "Number of Orders"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:250
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:246
 msgid "Off"
 msgstr ""
 
@@ -2435,8 +2436,8 @@ msgstr ""
 msgid "Order type"
 msgstr ""
 
-#: src/components/trade/tradebox/order-summary.tsx:59
-#: src/components/trade/tradebox/scale-order-summary.tsx:62
+#: src/components/trade/tradebox/order-summary.tsx:55
+#: src/components/trade/tradebox/scale-order-summary.tsx:51
 msgid "Order Value"
 msgstr "Valor orden"
 
@@ -2874,7 +2875,7 @@ msgstr ""
 msgid "Running Time ({TWAP_MINUTES_MIN}m - {0}h)"
 msgstr ""
 
-#: src/components/trade/tradebox/twap-order-summary.tsx:45
+#: src/components/trade/tradebox/twap-order-summary.tsx:37
 msgid "Runtime"
 msgstr ""
 
@@ -3177,7 +3178,7 @@ msgstr "Tamaño"
 msgid "Size exceeds position"
 msgstr ""
 
-#: src/components/trade/tradebox/twap-order-summary.tsx:55
+#: src/components/trade/tradebox/twap-order-summary.tsx:47
 msgid "Size per Suborder"
 msgstr ""
 
@@ -3219,7 +3220,7 @@ msgstr ""
 #~ msgid "SL trigger price"
 #~ msgstr ""
 
-#: src/components/trade/tradebox/order-summary.tsx:72
+#: src/components/trade/tradebox/order-summary.tsx:65
 msgid "Slippage"
 msgstr "Deslizamiento"
 
@@ -3293,7 +3294,7 @@ msgstr "Staking"
 msgid "Start and end must differ"
 msgstr ""
 
-#: src/components/trade/tradebox/scale-order-summary.tsx:43
+#: src/components/trade/tradebox/scale-order-summary.tsx:37
 #: src/components/trade/tradebox/trade-form-scale.tsx:22
 msgid "Start Price"
 msgstr ""
@@ -3337,7 +3338,7 @@ msgstr ""
 msgid "Stop trigger must be below mark"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:249
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:245
 msgid "Stop, TWAP, Scale, TIF & more"
 msgstr ""
 
@@ -3485,11 +3486,11 @@ msgstr ""
 msgid "Take Profit"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:223
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:219
 msgid "Take profit / stop loss"
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:230
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:226
 #: src/components/trade/tradebox/trade-form-fields.tsx:301
 msgid "Take Profit / Stop Loss"
 msgstr "Tomar ganancia / Stop Loss"
@@ -3674,7 +3675,7 @@ msgstr ""
 msgid "Toggle size mode"
 msgstr "Cambiar modo de tamaño"
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:156
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:157
 msgid "Toggle size unit"
 msgstr ""
 
@@ -3900,7 +3901,7 @@ msgstr ""
 msgid "TWAP status unknown. It will not be sent again. Check the TWAP tab."
 msgstr ""
 
-#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:249
+#: src/components/trade/mobile/mobile-trade-ticket-body.tsx:245
 msgid "TWAP, Scale & more"
 msgstr ""
 
