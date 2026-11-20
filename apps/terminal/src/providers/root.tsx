@@ -14,6 +14,7 @@ import { config } from "@/config/wagmi";
 import { MarketsProvider } from "@/lib/hyperliquid/markets";
 import { getNetwork } from "@/lib/network";
 import { hydrateAndReconnectRecent } from "@/lib/wallet-reconnect";
+import { PhoneLinkGuard } from "@/providers/phone-link-guard";
 import { trackCollateralReceipts } from "@/stores/use-collateral-generation-store";
 import "@/lib/i18n";
 
@@ -61,6 +62,7 @@ function HyperliquidBridge({ children }: { children: React.ReactNode }) {
 	return (
 		<HyperliquidProvider env={env} userAddress={address} builderConfig={DEFAULT_BUILDER_CONFIG} agentName={APP_NAME}>
 			<CollateralReceipts />
+			<PhoneLinkGuard />
 			<MarketsProvider>{children}</MarketsProvider>
 		</HyperliquidProvider>
 	);

@@ -14,20 +14,18 @@ import {
 	WarningCircleIcon,
 	XIcon,
 } from "@phosphor-icons/react";
-import { type ChangeEvent, type FormEvent, useCallback, useEffect, useId, useRef, useState } from "react";
+import { type ChangeEvent, useCallback, useEffect, useId, useRef, useState } from "react";
 import type { Address } from "viem";
 import { isAddress } from "viem";
 import { type Connector, useConnect, useConnectors } from "wagmi";
 import { mock } from "wagmi/connectors";
+import { PHONE_LINK_ROUTE } from "@/config/phone-link";
 import { MOCK_WALLETS } from "@/config/wagmi";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePrefetchWalletConnect } from "@/hooks/use-prefetch-wallet-connect";
 import { cn } from "@/lib/cn";
-import {
-	classifyQrValue,
-	type QrFeedbackThrottleState,
-	shouldShowQrFeedback,
-} from "@/lib/mobile-sync/qr-classification";
+import { useHyperliquid } from "@/lib/hyperliquid";
+import { readPhoneLink } from "@/lib/phone-link/link-payload";
 import {
 	addRecentWallet,
 	getRecentWallets,
@@ -41,7 +39,6 @@ import {
 
 const WALLET_LIST_MAX_HEIGHT = "max-h-[min(55vh,22rem)]";
 const DRAWER_HANDLE_SIZE_CLASS = "w-8 h-1";
-const WRONG_QR_FEEDBACK_THROTTLE_MS = 1800;
 
 type ScannerDetectionResult = "stop" | "continue";
 
@@ -55,37 +52,6 @@ type WindowWithBarcodeDetector = Window &
 	typeof globalThis & {
 		BarcodeDetector?: BarcodeDetectorConstructor;
 	};
-
-type WalletConnectPairingClient = {
-	core?: {
-		pairing?: {
-			activate?: (parameters: { topic: string }) => Promise<unknown>;
-		};
-	};
-	pair?: (parameters: { activatePairing?: boolean; uri: string }) => Promise<unknown>;
-};
-
-type WalletConnectProviderWithPairing = {
-	client?: WalletConnectPairingClient;
-	signer?: {
-		client?: WalletConnectPairingClient;
-	};
-};
-
-function getWalletConnectPairingTopic(uri: string) {
-	return /^wc:([^@]+)@2(?:\?|$)/.exec(uri)?.[1] ?? null;
-}
-
-async function pairWalletConnectUri(connector: Connector, uri: string) {
-	const provider = (await connector.getProvider?.()) as WalletConnectProviderWithPairing | undefined;
-	const pairingClient = provider?.client ?? provider?.signer?.client;
-	if (typeof pairingClient?.pair !== "function") return;
-	const pairingTopic = getWalletConnectPairingTopic(uri);
-	await pairingClient.pair({ activatePairing: true, uri });
-	if (pairingTopic && typeof pairingClient.core?.pairing?.activate === "function") {
-		await pairingClient.core.pairing.activate({ topic: pairingTopic });
-	}
-}
 
 function ConnectorRow({
 	connector,
@@ -143,20 +109,12 @@ function ConnectorRow({
 	);
 }
 
-function LinkDesktopWalletRow({
-	isPending,
-	isConnecting,
-	onOpenScanner,
-}: {
-	isPending: boolean;
-	isConnecting: boolean;
-	onOpenScanner: () => void;
-}) {
+function LinkDesktopWalletRow({ isPending, onOpenScanner }: { isPending: boolean; onOpenScanner: () => void }) {
 	return (
 		<button
 			type="button"
 			onClick={onOpenScanner}
-			disabled={isPending || isConnecting}
+			disabled={isPending}
 			className={cn(
 				"m-3 w-[calc(100%-1.5rem)] flex items-center gap-3 rounded-xs border border-stroke-brand-strong/30 bg-fill-weak px-3 py-3 cursor-pointer text-left",
 				"hover:bg-fill-hover active:bg-fill-press",
@@ -175,32 +133,23 @@ function LinkDesktopWalletRow({
 					<Trans>Link desktop wallet</Trans>
 				</p>
 				<p className="mt-0.5 text-xs text-fg-muted">
-					<Trans>Scan a QR code from a desktop wallet.</Trans>
+					<Trans>Scan the QR from HypeTerminal on desktop.</Trans>
 				</p>
 			</div>
-			{isConnecting ? (
-				<SpinnerGapIcon
-					className="size-3.5 animate-spin motion-reduce:animate-none text-brand flex-shrink-0"
-					aria-hidden="true"
-				/>
-			) : (
-				<CaretDownIcon
-					className="size-3 -rotate-90 text-icon flex-shrink-0 opacity-30 group-hover:opacity-60 transition-opacity"
-					aria-hidden="true"
-				/>
-			)}
+			<CaretDownIcon
+				className="size-3 -rotate-90 text-icon flex-shrink-0 opacity-30 group-hover:opacity-60 transition-opacity"
+				aria-hidden="true"
+			/>
 		</button>
 	);
 }
 
 function DesktopWalletScannerPanel({
 	errorMessage,
-	isConnecting,
 	onCancel,
 	onQrValue,
 }: {
 	errorMessage: string | null;
-	isConnecting: boolean;
 	onCancel: () => void;
 	onQrValue: (value: string) => ScannerDetectionResult;
 }) {
@@ -209,27 +158,13 @@ function DesktopWalletScannerPanel({
 	const videoRef = useRef<HTMLVideoElement | null>(null);
 	const [cameraReady, setCameraReady] = useState(false);
 	const [cameraError, setCameraError] = useState<string | null>(null);
-	const [manualUri, setManualUri] = useState("");
 	const visibleError = errorMessage ?? cameraError;
-	const hasQrTypeError = !!errorMessage;
-
-	function handleManualSubmit(event: FormEvent<HTMLFormElement>) {
-		event.preventDefault();
-		if (!manualUri.trim()) return;
-		const result = onQrValue(manualUri);
-		if (result === "stop") setManualUri("");
-	}
 
 	useEffect(() => {
 		panelRef.current?.focus();
 	}, []);
 
 	useEffect(() => {
-		if (isConnecting) {
-			setCameraReady(false);
-			return;
-		}
-
 		let animationFrame = 0;
 		let cancelled = false;
 		let decoderUnavailable = false;
@@ -379,7 +314,7 @@ function DesktopWalletScannerPanel({
 			});
 			if (videoRef.current) videoRef.current.srcObject = null;
 		};
-	}, [isConnecting, onQrValue]);
+	}, [onQrValue]);
 
 	return (
 		<section
@@ -392,16 +327,10 @@ function DesktopWalletScannerPanel({
 				<QrCodeIcon className="size-4 text-brand mt-0.5 shrink-0" aria-hidden="true" />
 				<div className="min-w-0 space-y-0.5">
 					<p id={titleId} className="text-sm font-semibold text-fg">
-						{hasQrTypeError ? <Trans>Wrong QR type</Trans> : <Trans>Scan WalletConnect QR</Trans>}
+						<Trans>Scan desktop QR</Trans>
 					</p>
 					<p className="text-xs text-fg-muted">
-						{isConnecting ? (
-							<Trans>Connecting</Trans>
-						) : cameraReady ? (
-							<Trans>Looking for a WalletConnect QR code</Trans>
-						) : (
-							<Trans>Point your camera at the WalletConnect QR code on your desktop wallet.</Trans>
-						)}
+						<Trans>On desktop, open the account menu and choose Link phone.</Trans>
 					</p>
 				</div>
 			</div>
@@ -416,17 +345,6 @@ function DesktopWalletScannerPanel({
 					className="aspect-[4/3] max-h-[min(48dvh,24rem)] w-full bg-neutral-950 object-cover"
 				/>
 				<div className="pointer-events-none absolute inset-[18%] rounded-xs border-2 border-white/80 shadow-[0_0_0_999px_rgba(0,0,0,0.35)]" />
-				{isConnecting && (
-					<div className="absolute inset-0 flex items-center justify-center bg-fill/80 backdrop-blur-sm">
-						<div className="flex items-center gap-2 text-sm font-medium text-fg">
-							<SpinnerGapIcon
-								className="size-4 animate-spin motion-reduce:animate-none text-brand"
-								aria-hidden="true"
-							/>
-							<Trans>Connecting desktop wallet</Trans>
-						</div>
-					</div>
-				)}
 			</div>
 
 			{visibleError ? (
@@ -435,30 +353,9 @@ function DesktopWalletScannerPanel({
 				</p>
 			) : (
 				<p className="text-xs text-fg-muted">
-					{cameraReady ? (
-						<Trans>Camera is on. Looking for a WalletConnect QR code.</Trans>
-					) : (
-						<Trans>Opening camera...</Trans>
-					)}
+					{cameraReady ? <Trans>Camera is on. Looking for the QR.</Trans> : <Trans>Opening camera...</Trans>}
 				</p>
 			)}
-
-			<form className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]" onSubmit={handleManualSubmit}>
-				<TextInput
-					aria-label={t`Paste WalletConnect URI`}
-					value={manualUri}
-					onChange={(event: ChangeEvent<HTMLInputElement>) => setManualUri(event.target.value)}
-					placeholder={t`Paste WalletConnect URI`}
-					autoCapitalize="none"
-					autoCorrect="off"
-					inputMode="url"
-					spellCheck={false}
-					disabled={isConnecting}
-				/>
-				<Button type="submit" variant="outline" intent="neutral" size="md" disabled={isConnecting || !manualUri.trim()}>
-					<Trans>Connect</Trans>
-				</Button>
-			</form>
 
 			<button
 				type="button"
@@ -606,7 +503,7 @@ function WalletContent({ onClose, isMobile }: { onClose: () => void; isMobile: b
 	const [walletConnectUri, setWalletConnectUri] = useState<string | null>(null);
 	const [desktopWalletScannerOpen, setDesktopWalletScannerOpen] = useState(false);
 	const [desktopWalletScannerError, setDesktopWalletScannerError] = useState<string | null>(null);
-	const lastScannerFeedbackRef = useRef<QrFeedbackThrottleState | null>(null);
+	const { env } = useHyperliquid();
 	const [showAll, setShowAll] = useState(false);
 	const [showMock, setShowMock] = useState(false);
 	const [recentWallets] = useState(() => getRecentWallets());
@@ -615,69 +512,21 @@ function WalletContent({ onClose, isMobile }: { onClose: () => void; isMobile: b
 
 	const { mockConnectors, popular, other } = getWalletConnectorGroups(connectors, recentWallets);
 	const walletConnectConnector = connectors.find(isWalletConnectConnector) ?? null;
-	const showDesktopWalletLink = isMobile && walletConnectConnector !== null;
-
-	const handleScannedWalletConnectUri = useCallback(
-		async (uri: string) => {
-			if (!walletConnectConnector) return;
-
-			const pairingTopic = getWalletConnectPairingTopic(uri);
-			if (!pairingTopic) {
-				setDesktopWalletScannerError(t`Scan a WalletConnect QR code.`);
-				return;
-			}
-
-			setDesktopWalletScannerError(null);
-			setConnectingId(walletConnectConnector.uid);
-			try {
-				await pairWalletConnectUri(walletConnectConnector, uri);
-				await connectAsync({ connector: walletConnectConnector, pairingTopic } as Parameters<typeof connectAsync>[0] & {
-					pairingTopic: string;
-				});
-				addRecentWallet(walletConnectConnector.id);
-				onClose();
-			} catch (error) {
-				setDesktopWalletScannerError(
-					error instanceof Error ? getWalletConnectErrorMessage(error) : t`Failed to link desktop wallet`,
-				);
-			} finally {
-				setConnectingId(null);
-			}
-		},
-		[connectAsync, onClose, walletConnectConnector],
-	);
-
-	const showScannerFeedback = useCallback((message: string) => {
-		const nowMs = Date.now();
-		const lastFeedback = lastScannerFeedbackRef.current;
-		if (!shouldShowQrFeedback(lastFeedback, message, nowMs, WRONG_QR_FEEDBACK_THROTTLE_MS)) return;
-
-		lastScannerFeedbackRef.current = { message, atMs: nowMs };
-		setDesktopWalletScannerError(message);
-	}, []);
+	const showDesktopWalletLink = isMobile;
 
 	const handleScannerQrValue = useCallback(
 		(value: string): ScannerDetectionResult => {
-			const classification = classifyQrValue(value);
-			if (classification.type === "walletconnect") {
-				if (!getWalletConnectPairingTopic(classification.uri)) {
-					showScannerFeedback(t`Scan a WalletConnect QR code.`);
-					return "continue";
-				}
-				handleScannedWalletConnectUri(classification.uri);
-				return "stop";
-			}
-			if (classification.type === "phoneAccessLink") {
-				showScannerFeedback(
-					t`This is a phone-access QR. Open it with the phone camera or paste it on the phone access page.`,
-				);
+			const hashIndex = value.indexOf("#");
+			const isPhoneLink =
+				hashIndex !== -1 && readPhoneLink(value, { nowMs: Date.now(), network: env }).status !== "invalid";
+			if (!isPhoneLink) {
+				setDesktopWalletScannerError(t`This is not a HypeTerminal phone link QR.`);
 				return "continue";
 			}
-
-			showScannerFeedback(t`This is not a WalletConnect QR code.`);
-			return "continue";
+			window.location.assign(`${PHONE_LINK_ROUTE}${value.slice(hashIndex)}`);
+			return "stop";
 		},
-		[handleScannedWalletConnectUri, showScannerFeedback],
+		[env],
 	);
 
 	async function handleConnect(connector: Connector) {
@@ -749,7 +598,7 @@ function WalletContent({ onClose, isMobile }: { onClose: () => void; isMobile: b
 		showDesktopWalletLink && walletConnectConnector
 			? other.filter((connector) => connector.uid !== walletConnectConnector.uid)
 			: other;
-	const isScannerMode = desktopWalletScannerOpen && walletConnectConnector !== null;
+	const isScannerMode = desktopWalletScannerOpen;
 
 	return (
 		<div className="flex flex-col">
@@ -782,10 +631,9 @@ function WalletContent({ onClose, isMobile }: { onClose: () => void; isMobile: b
 					isScannerMode ? "max-h-[min(82dvh,42rem)]" : WALLET_LIST_MAX_HEIGHT,
 				)}
 			>
-				{isScannerMode && walletConnectConnector ? (
+				{isScannerMode ? (
 					<DesktopWalletScannerPanel
 						errorMessage={desktopWalletScannerError}
-						isConnecting={connectingId === walletConnectConnector.uid}
 						onCancel={() => {
 							setDesktopWalletScannerOpen(false);
 							setDesktopWalletScannerError(null);
@@ -794,10 +642,9 @@ function WalletContent({ onClose, isMobile }: { onClose: () => void; isMobile: b
 					/>
 				) : hasConnectors ? (
 					<>
-						{showDesktopWalletLink && walletConnectConnector && (
+						{showDesktopWalletLink && (
 							<LinkDesktopWalletRow
 								isPending={isPending}
-								isConnecting={connectingId === walletConnectConnector.uid}
 								onOpenScanner={() => {
 									setWalletConnectUri(null);
 									setDesktopWalletScannerError(null);

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as BuildersPerpRouteImport } from './routes/builders-perp'
+import { Route as LinkRouteImport } from './routes/link'
 import { Route as MobileAgentSyncRouteImport } from './routes/mobile-agent-sync'
 import { Route as PerpRouteImport } from './routes/perp'
 import { Route as SpotRouteImport } from './routes/spot'
@@ -31,6 +32,11 @@ const SplatRoute = SplatRouteImport.update({
 const BuildersPerpRoute = BuildersPerpRouteImport.update({
   id: '/builders-perp',
   path: '/builders-perp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LinkRoute = LinkRouteImport.update({
+  id: '/link',
+  path: '/link',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MobileAgentSyncRoute = MobileAgentSyncRouteImport.update({
@@ -63,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/builders-perp': typeof BuildersPerpRouteWithChildren
+  '/link': typeof LinkRoute
   '/mobile-agent-sync': typeof MobileAgentSyncRoute
   '/perp': typeof PerpRoute
   '/spot': typeof SpotRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/link': typeof LinkRoute
   '/mobile-agent-sync': typeof MobileAgentSyncRoute
   '/perp': typeof PerpRoute
   '/spot': typeof SpotRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/builders-perp': typeof BuildersPerpRouteWithChildren
+  '/link': typeof LinkRoute
   '/mobile-agent-sync': typeof MobileAgentSyncRoute
   '/perp': typeof PerpRoute
   '/spot': typeof SpotRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/builders-perp'
+    | '/link'
     | '/mobile-agent-sync'
     | '/perp'
     | '/spot'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/$'
+    | '/link'
     | '/mobile-agent-sync'
     | '/perp'
     | '/spot'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/builders-perp'
+    | '/link'
     | '/mobile-agent-sync'
     | '/perp'
     | '/spot'
@@ -125,6 +137,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
   BuildersPerpRoute: typeof BuildersPerpRouteWithChildren
+  LinkRoute: typeof LinkRoute
   MobileAgentSyncRoute: typeof MobileAgentSyncRoute
   PerpRoute: typeof PerpRoute
   SpotRoute: typeof SpotRoute
@@ -151,6 +164,13 @@ declare module '@tanstack/react-router' {
       path: '/builders-perp'
       fullPath: '/builders-perp'
       preLoaderRoute: typeof BuildersPerpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/link': {
+      id: '/link'
+      path: '/link'
+      fullPath: '/link'
+      preLoaderRoute: typeof LinkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mobile-agent-sync': {
@@ -209,6 +229,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
   BuildersPerpRoute: BuildersPerpRouteWithChildren,
+  LinkRoute: LinkRoute,
   MobileAgentSyncRoute: MobileAgentSyncRoute,
   PerpRoute: PerpRoute,
   SpotRoute: SpotRoute,
