@@ -25,6 +25,7 @@ import { coinbaseWallet, injected, mock, walletConnect } from "wagmi/connectors"
 import { APP_NAME } from "@/config/app";
 import { getWalletConnectProjectId } from "@/config/env";
 import { getRpcUrl } from "@/config/rpc";
+import { phoneLink } from "@/lib/phone-link/connector";
 import type { MockWalletConfig } from "@/lib/wallet-utils";
 import { registerMockWallet } from "@/lib/wallet-utils";
 
@@ -101,7 +102,9 @@ export function createWagmiConfig(options: WagmiConfigOptions = {}) {
 
 	return createConfig({
 		chains: BRIDGE_CHAINS,
-		connectors: [...mockConnectors, injected(), coinbaseWallet(), walletConnectConnector].filter(isPresent),
+		connectors: [...mockConnectors, injected(), coinbaseWallet(), walletConnectConnector, phoneLink()].filter(
+			isPresent,
+		),
 		transports: BRIDGE_TRANSPORTS,
 		ssr: true,
 	});

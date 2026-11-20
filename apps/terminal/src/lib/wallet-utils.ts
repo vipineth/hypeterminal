@@ -5,6 +5,7 @@ import type {} from "viem/window";
 import type { Connector } from "wagmi";
 import { RECENT_WALLETS_LIMIT, STORAGE_KEYS } from "@/config/app";
 import { WALLET_INFO, type WalletInfo } from "@/config/wallets";
+import { PHONE_LINK_CONNECTOR_ID } from "@/lib/phone-link/connector";
 
 export type { WalletInfo } from "@/config/wallets";
 
@@ -112,7 +113,7 @@ function hasInjectedProvider(): boolean {
 export function getWalletConnectorGroups(connectors: readonly Connector[], recentWallets: readonly string[]) {
 	const { mockConnectors, regularConnectors } = splitWalletConnectors(connectors);
 	const availableConnectors = regularConnectors.filter(
-		(connector) => connector.id !== "injected" || hasInjectedProvider(),
+		(connector) => connector.id !== PHONE_LINK_CONNECTOR_ID && (connector.id !== "injected" || hasInjectedProvider()),
 	);
 	return {
 		mockConnectors,

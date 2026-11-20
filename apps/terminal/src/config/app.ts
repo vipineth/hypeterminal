@@ -24,6 +24,7 @@ export const STORAGE_KEYS = {
 	MARKETS_STATS: "hl-mkt-stats-v1",
 	RECENT_WALLETS: "hypeterminal:recent-wallets",
 	RQ_CACHE: "hl-rq-cache-v1",
+	PHONE_LINK: "hypeterminal:phone-link-v1",
 	LEGACY_METADATA: "hl-markets-meta-v1",
 } as const;
 
