@@ -6,13 +6,14 @@ import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persist
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { useEffect } from "react";
-import { useConnection, WagmiProvider } from "wagmi";
+import { useConnection, WagmiContext } from "wagmi";
 import { APP_NAME, RQ_CACHE_BUSTER, STORAGE_KEYS } from "@/config/app";
 import { DEFAULT_BUILDER_CONFIG } from "@/config/hyperliquid";
 import { RQ_CACHE_MAX_AGE_MS } from "@/config/time";
 import { config } from "@/config/wagmi";
 import { MarketsProvider } from "@/lib/hyperliquid/markets";
 import { getNetwork } from "@/lib/network";
+import { hydrateAndReconnectRecent } from "@/lib/wallet-reconnect";
 import { trackCollateralReceipts } from "@/stores/use-collateral-generation-store";
 import "@/lib/i18n";
 
@@ -46,6 +47,14 @@ function CollateralReceipts() {
 	return null;
 }
 
+function WalletProvider({ children }: { children: React.ReactNode }) {
+	useEffect(() => {
+		void hydrateAndReconnectRecent(config);
+	}, []);
+
+	return <WagmiContext.Provider value={config}>{children}</WagmiContext.Provider>;
+}
+
 function HyperliquidBridge({ children }: { children: React.ReactNode }) {
 	const { address } = useConnection();
 
@@ -60,18 +69,18 @@ function HyperliquidBridge({ children }: { children: React.ReactNode }) {
 export function RootProvider({ children, queryClient }: { children: React.ReactNode; queryClient: QueryClient }) {
 	if (isServer || !persister) {
 		return (
-			<WagmiProvider config={config}>
+			<WalletProvider>
 				<QueryClientProvider client={queryClient}>
 					<I18nProvider i18n={i18n}>
 						<HyperliquidBridge>{children}</HyperliquidBridge>
 					</I18nProvider>
 				</QueryClientProvider>
-			</WagmiProvider>
+			</WalletProvider>
 		);
 	}
 
 	return (
-		<WagmiProvider config={config}>
+		<WalletProvider>
 			<PersistQueryClientProvider
 				client={queryClient}
 				persistOptions={{
@@ -87,6 +96,6 @@ export function RootProvider({ children, queryClient }: { children: React.ReactN
 					<HyperliquidBridge>{children}</HyperliquidBridge>
 				</I18nProvider>
 			</PersistQueryClientProvider>
-		</WagmiProvider>
+		</WalletProvider>
 	);
 }
