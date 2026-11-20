@@ -1,13 +1,15 @@
 import type { TradeTicket } from "@/hooks/trade/use-trade-ticket";
 import { OrderSummary } from "./order-summary";
 import { ScaleOrderSummary } from "./scale-order-summary";
+import type { SummaryLayout } from "./summary-items";
 import { TwapOrderSummary } from "./twap-order-summary";
 
 interface Props {
 	ticket: TradeTicket;
+	layout?: SummaryLayout;
 }
 
-export function TradeTicketSummary({ ticket }: Props) {
+export function TradeTicketSummary({ ticket, layout = "list" }: Props) {
 	const { market, entry } = ticket;
 
 	if (ticket.twapOrder) {
@@ -20,6 +22,7 @@ export function TradeTicketSummary({ ticket }: Props) {
 				feeRatePercent={ticket.feeRatePercent}
 				baseToken={entry.baseToken}
 				szDecimals={market?.szDecimals}
+				layout={layout}
 			/>
 		);
 	}
@@ -36,6 +39,7 @@ export function TradeTicketSummary({ ticket }: Props) {
 				feeRatePercent={ticket.feeRatePercent}
 				priceDecimals={market?.priceDecimals}
 				marketKind={market?.kind}
+				layout={layout}
 			/>
 		);
 	}
@@ -53,6 +57,7 @@ export function TradeTicketSummary({ ticket }: Props) {
 			onSlippageClick={ticket.openSettingsDialog}
 			orderType={ticket.orderType}
 			marketKind={market?.kind}
+			layout={layout}
 		/>
 	);
 }

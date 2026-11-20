@@ -258,7 +258,7 @@ export function MobileTradeTicketBody({ onSubmitted }: Props) {
 					</div>
 				</div>
 
-				<TradeTicketSummary ticket={ticket} />
+				<TradeTicketSummary ticket={ticket} layout="grid" />
 			</div>
 
 			<div className="shrink-0 flex flex-col gap-2 border-t border-stroke-weak/60 px-3 pt-2 pb-3">

@@ -3,6 +3,7 @@ import { FALLBACK_VALUE_PLACEHOLDER } from "@/config/app";
 import { DEFAULT_BUILDER_CONFIG } from "@/config/hyperliquid";
 import { formatPrice, formatUSD } from "@/lib/format";
 import { convertFeeToPercentageString, type MarketKind } from "@/lib/hyperliquid";
+import { type SummaryItem, SummaryItems, type SummaryLayout } from "./summary-items";
 
 interface Props {
 	scaleStart: number | null;
@@ -14,15 +15,7 @@ interface Props {
 	feeRatePercent: string;
 	priceDecimals: number | undefined;
 	marketKind?: MarketKind;
-}
-
-function SummaryRow({ label, children }: { label: string; children: React.ReactNode }) {
-	return (
-		<div className="flex items-center justify-between py-1.5">
-			<span className="text-xs tracking-[0.5px] text-fg-muted">{label}</span>
-			<span className="text-xs tabular-nums text-fg">{children}</span>
-		</div>
-	);
+	layout?: SummaryLayout;
 }
 
 export function ScaleOrderSummary({
@@ -35,52 +28,44 @@ export function ScaleOrderSummary({
 	feeRatePercent,
 	priceDecimals,
 	marketKind = "perp",
+	layout = "list",
 }: Props) {
-	const isLeveraged = marketKind !== "spot";
+	const hasStart = scaleStart !== null && scaleStart > 0;
+	const hasEnd = scaleEnd !== null && scaleEnd > 0;
+	const items: SummaryItem[] = [
+		{
+			label: t`Start Price`,
+			value: hasStart ? formatPrice(scaleStart, { decimals: priceDecimals }) : FALLBACK_VALUE_PLACEHOLDER,
+			tone: hasStart ? "default" : "muted",
+		},
+		{
+			label: t`End Price`,
+			value: hasEnd ? formatPrice(scaleEnd, { decimals: priceDecimals }) : FALLBACK_VALUE_PLACEHOLDER,
+			tone: hasEnd ? "default" : "muted",
+		},
+		{
+			label: t`Number of Orders`,
+			value: scaleLevels > 0 ? scaleLevels : FALLBACK_VALUE_PLACEHOLDER,
+			tone: scaleLevels > 0 ? "default" : "muted",
+		},
+		{ label: t`Order Value`, value: formatUSD(orderValue), tone: orderValue > 0 ? "default" : "muted" },
+	];
 
-	return (
-		<div className="flex flex-col">
-			<SummaryRow label={t`Start Price`}>
-				<span className={scaleStart !== null && scaleStart > 0 ? "text-fg" : "text-fg-muted"}>
-					{scaleStart !== null && scaleStart > 0
-						? formatPrice(scaleStart, { decimals: priceDecimals })
-						: FALLBACK_VALUE_PLACEHOLDER}
-				</span>
-			</SummaryRow>
-			<SummaryRow label={t`End Price`}>
-				<span className={scaleEnd !== null && scaleEnd > 0 ? "text-fg" : "text-fg-muted"}>
-					{scaleEnd !== null && scaleEnd > 0
-						? formatPrice(scaleEnd, { decimals: priceDecimals })
-						: FALLBACK_VALUE_PLACEHOLDER}
-				</span>
-			</SummaryRow>
-			<SummaryRow label={t`Number of Orders`}>
-				<span className={scaleLevels > 0 ? "text-fg" : "text-fg-muted"}>
-					{scaleLevels > 0 ? scaleLevels : FALLBACK_VALUE_PLACEHOLDER}
-				</span>
-			</SummaryRow>
-			<SummaryRow label={t`Order Value`}>
-				<span className={orderValue > 0 ? "text-fg" : "text-fg-muted"}>
-					{orderValue > 0 ? formatUSD(orderValue) : FALLBACK_VALUE_PLACEHOLDER}
-				</span>
-			</SummaryRow>
-			{isLeveraged && (
-				<SummaryRow label={t`Margin Req.`}>
-					<span className={marginRequired > 0 ? "text-fg" : "text-fg-muted"}>
-						{marginRequired > 0 ? formatUSD(marginRequired) : FALLBACK_VALUE_PLACEHOLDER}
-					</span>
-				</SummaryRow>
-			)}
-			<SummaryRow label={t`Est. Fee`}>
-				<span className="text-fg-muted">
-					{orderValue > 0 ? `${feeRatePercent} (${formatUSD(estimatedFee)})` : feeRatePercent}
-				</span>
-			</SummaryRow>
-			{DEFAULT_BUILDER_CONFIG?.f && (
-				<SummaryRow label={t`Builder Fee`}>
-					<span className="text-fg-muted">{convertFeeToPercentageString(DEFAULT_BUILDER_CONFIG.f)}</span>
-				</SummaryRow>
-			)}
-		</div>
-	);
+	if (marketKind !== "spot") {
+		items.push({
+			label: t`Margin Req.`,
+			value: formatUSD(marginRequired),
+			tone: marginRequired > 0 ? "default" : "muted",
+		});
+	}
+	items.push({
+		label: t`Est. Fee`,
+		value: orderValue > 0 ? `${feeRatePercent} (${formatUSD(estimatedFee)})` : feeRatePercent,
+		tone: "muted",
+	});
+	if (DEFAULT_BUILDER_CONFIG?.f) {
+		items.push({ label: t`Builder Fee`, value: convertFeeToPercentageString(DEFAULT_BUILDER_CONFIG.f), tone: "muted" });
+	}
+
+	return <SummaryItems items={items} layout={layout} />;
 }

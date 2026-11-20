@@ -4,6 +4,7 @@ import { DEFAULT_BUILDER_CONFIG } from "@/config/hyperliquid";
 import { TWAP_SUBORDER_INTERVAL_SECONDS } from "@/config/trade";
 import { formatDuration, formatToken, formatUSD } from "@/lib/format";
 import { convertFeeToPercentageString } from "@/lib/hyperliquid";
+import { type SummaryItem, SummaryItems, type SummaryLayout } from "./summary-items";
 
 interface Props {
 	twapMinutesNum: number | null;
@@ -13,15 +14,7 @@ interface Props {
 	feeRatePercent: string;
 	baseToken: string;
 	szDecimals: number | undefined;
-}
-
-function SummaryRow({ label, children }: { label: string; children: React.ReactNode }) {
-	return (
-		<div className="flex items-center justify-between py-1.5">
-			<span className="text-xs tracking-[0.5px] text-fg-muted">{label}</span>
-			<span className="text-xs tabular-nums text-fg">{children}</span>
-		</div>
-	);
+	layout?: SummaryLayout;
 }
 
 export function TwapOrderSummary({
@@ -32,43 +25,42 @@ export function TwapOrderSummary({
 	feeRatePercent,
 	baseToken,
 	szDecimals,
+	layout = "list",
 }: Props) {
 	const minutes = Math.max(0, Math.round(twapMinutesNum ?? 0));
 	const numberOfOrders = minutes > 0 ? Math.floor((minutes * 60) / TWAP_SUBORDER_INTERVAL_SECONDS) + 1 : 0;
 	const sizePerSuborder = numberOfOrders > 0 ? sizeValue / numberOfOrders : 0;
 
-	return (
-		<div className="flex flex-col">
-			<SummaryRow label={t`Frequency`}>
-				<span className="text-fg">{t`${TWAP_SUBORDER_INTERVAL_SECONDS} seconds`}</span>
-			</SummaryRow>
-			<SummaryRow label={t`Runtime`}>
-				<span className={minutes > 0 ? "text-fg" : "text-fg-muted"}>
-					{minutes > 0 ? formatDuration(minutes) : FALLBACK_VALUE_PLACEHOLDER}
-				</span>
-			</SummaryRow>
-			<SummaryRow label={t`Number of Orders`}>
-				<span className={numberOfOrders > 0 ? "text-fg" : "text-fg-muted"}>
-					{numberOfOrders > 0 ? numberOfOrders : FALLBACK_VALUE_PLACEHOLDER}
-				</span>
-			</SummaryRow>
-			<SummaryRow label={t`Size per Suborder`}>
-				<span className={sizePerSuborder > 0 ? "text-fg" : "text-fg-muted"}>
-					{sizePerSuborder > 0
-						? formatToken(sizePerSuborder, { decimals: szDecimals, symbol: baseToken })
-						: FALLBACK_VALUE_PLACEHOLDER}
-				</span>
-			</SummaryRow>
-			<SummaryRow label={t`Fees`}>
-				<span className="text-fg-muted">
-					{orderValue > 0 ? `${feeRatePercent} (${formatUSD(estimatedFee)})` : feeRatePercent}
-				</span>
-			</SummaryRow>
-			{DEFAULT_BUILDER_CONFIG?.f && (
-				<SummaryRow label={t`Builder Fee`}>
-					<span className="text-fg-muted">{convertFeeToPercentageString(DEFAULT_BUILDER_CONFIG.f)}</span>
-				</SummaryRow>
-			)}
-		</div>
-	);
+	const items: SummaryItem[] = [
+		{ label: t`Frequency`, value: t`${TWAP_SUBORDER_INTERVAL_SECONDS} seconds`, tone: "default" },
+		{
+			label: t`Runtime`,
+			value: minutes > 0 ? formatDuration(minutes) : FALLBACK_VALUE_PLACEHOLDER,
+			tone: minutes > 0 ? "default" : "muted",
+		},
+		{
+			label: t`Number of Orders`,
+			value: numberOfOrders > 0 ? numberOfOrders : FALLBACK_VALUE_PLACEHOLDER,
+			tone: numberOfOrders > 0 ? "default" : "muted",
+		},
+		{
+			label: t`Size per Suborder`,
+			value:
+				sizePerSuborder > 0
+					? formatToken(sizePerSuborder, { decimals: szDecimals, symbol: baseToken })
+					: FALLBACK_VALUE_PLACEHOLDER,
+			tone: sizePerSuborder > 0 ? "default" : "muted",
+		},
+		{
+			label: t`Fees`,
+			value: orderValue > 0 ? `${feeRatePercent} (${formatUSD(estimatedFee)})` : feeRatePercent,
+			tone: "muted",
+		},
+	];
+
+	if (DEFAULT_BUILDER_CONFIG?.f) {
+		items.push({ label: t`Builder Fee`, value: convertFeeToPercentageString(DEFAULT_BUILDER_CONFIG.f), tone: "muted" });
+	}
+
+	return <SummaryItems items={items} layout={layout} />;
 }

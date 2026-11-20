@@ -88,7 +88,7 @@ msgstr ""
 msgid "{totalSeconds} seconds"
 msgstr ""
 
-#: src/components/trade/tradebox/twap-order-summary.tsx:43
+#: src/components/trade/tradebox/twap-order-summary.tsx:35
 msgid "{TWAP_SUBORDER_INTERVAL_SECONDS} seconds"
 msgstr ""
 
@@ -435,9 +435,9 @@ msgstr ""
 msgid "Builder dexes hold their own funds."
 msgstr ""
 
-#: src/components/trade/tradebox/order-summary.tsx:89
-#: src/components/trade/tradebox/scale-order-summary.tsx:80
-#: src/components/trade/tradebox/twap-order-summary.tsx:68
+#: src/components/trade/tradebox/order-summary.tsx:77
+#: src/components/trade/tradebox/scale-order-summary.tsx:67
+#: src/components/trade/tradebox/twap-order-summary.tsx:62
 msgid "Builder Fee"
 msgstr ""
 
@@ -1085,7 +1085,7 @@ msgstr ""
 #~ msgid "Enabling..."
 #~ msgstr ""
 
-#: src/components/trade/tradebox/scale-order-summary.tsx:50
+#: src/components/trade/tradebox/scale-order-summary.tsx:42
 #: src/components/trade/tradebox/trade-form-scale.tsx:33
 msgid "End Price"
 msgstr ""
@@ -1156,8 +1156,8 @@ msgstr ""
 #~ msgid "Equity"
 #~ msgstr "Capitaux propres"
 
-#: src/components/trade/tradebox/order-summary.tsx:83
-#: src/components/trade/tradebox/scale-order-summary.tsx:74
+#: src/components/trade/tradebox/order-summary.tsx:72
+#: src/components/trade/tradebox/scale-order-summary.tsx:62
 msgid "Est. Fee"
 msgstr "Frais est."
 
@@ -1313,7 +1313,7 @@ msgstr "Frais"
 #~ msgid "Fee rate must be between 0.001% and 1%"
 #~ msgstr ""
 
-#: src/components/trade/tradebox/twap-order-summary.tsx:62
+#: src/components/trade/tradebox/twap-order-summary.tsx:55
 msgid "Fees"
 msgstr ""
 
@@ -1351,7 +1351,7 @@ msgstr ""
 msgid "Found by lookup after you dismissed it. The exchange never confirmed the request."
 msgstr ""
 
-#: src/components/trade/tradebox/twap-order-summary.tsx:42
+#: src/components/trade/tradebox/twap-order-summary.tsx:35
 msgid "Frequency"
 msgstr ""
 
@@ -1657,7 +1657,7 @@ msgstr ""
 msgid "Liq"
 msgstr "Liq."
 
-#: src/components/trade/tradebox/order-summary.tsx:53
+#: src/components/trade/tradebox/order-summary.tsx:50
 msgid "Liq. Price"
 msgstr "Prix liq."
 
@@ -1804,8 +1804,8 @@ msgstr ""
 #~ msgid "Margin Ratio"
 #~ msgstr "Ratio de marge"
 
-#: src/components/trade/tradebox/order-summary.tsx:65
-#: src/components/trade/tradebox/scale-order-summary.tsx:68
+#: src/components/trade/tradebox/order-summary.tsx:58
+#: src/components/trade/tradebox/scale-order-summary.tsx:56
 msgid "Margin Req."
 msgstr "Marge req."
 
@@ -2278,9 +2278,9 @@ msgstr ""
 #~ msgid "Number Format"
 #~ msgstr ""
 
-#: src/components/trade/tradebox/scale-order-summary.tsx:57
+#: src/components/trade/tradebox/scale-order-summary.tsx:47
 #: src/components/trade/tradebox/trade-form-scale.tsx:44
-#: src/components/trade/tradebox/twap-order-summary.tsx:50
+#: src/components/trade/tradebox/twap-order-summary.tsx:42
 msgid "Number of Orders"
 msgstr ""
 
@@ -2423,8 +2423,8 @@ msgstr ""
 msgid "Order type"
 msgstr ""
 
-#: src/components/trade/tradebox/order-summary.tsx:59
-#: src/components/trade/tradebox/scale-order-summary.tsx:62
+#: src/components/trade/tradebox/order-summary.tsx:55
+#: src/components/trade/tradebox/scale-order-summary.tsx:51
 msgid "Order Value"
 msgstr "Valeur de l'ordre"
 
@@ -2862,7 +2862,7 @@ msgstr ""
 msgid "Running Time ({TWAP_MINUTES_MIN}m - {0}h)"
 msgstr ""
 
-#: src/components/trade/tradebox/twap-order-summary.tsx:45
+#: src/components/trade/tradebox/twap-order-summary.tsx:37
 msgid "Runtime"
 msgstr ""
 
@@ -3165,7 +3165,7 @@ msgstr "Taille"
 msgid "Size exceeds position"
 msgstr ""
 
-#: src/components/trade/tradebox/twap-order-summary.tsx:55
+#: src/components/trade/tradebox/twap-order-summary.tsx:47
 msgid "Size per Suborder"
 msgstr ""
 
@@ -3207,7 +3207,7 @@ msgstr ""
 #~ msgid "SL trigger price"
 #~ msgstr ""
 
-#: src/components/trade/tradebox/order-summary.tsx:72
+#: src/components/trade/tradebox/order-summary.tsx:65
 msgid "Slippage"
 msgstr "Glissement"
 
@@ -3281,7 +3281,7 @@ msgstr "Staking"
 msgid "Start and end must differ"
 msgstr ""
 
-#: src/components/trade/tradebox/scale-order-summary.tsx:43
+#: src/components/trade/tradebox/scale-order-summary.tsx:37
 #: src/components/trade/tradebox/trade-form-scale.tsx:22
 msgid "Start Price"
 msgstr ""
