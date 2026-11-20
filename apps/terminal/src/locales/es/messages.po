@@ -166,7 +166,7 @@ msgstr ""
 #~ msgid "About Builder Codes"
 #~ msgstr ""
 
-#: src/routes/link.tsx:85
+#: src/routes/link.tsx:97
 msgid "Access ends"
 msgstr ""
 
@@ -512,7 +512,7 @@ msgstr ""
 #: src/components/trade/tradebox/deposit-modal.tsx:200
 #: src/components/trade/tradebox/margin-mode-modal.tsx:216
 #: src/components/trade/tradebox/order-toast.tsx:280
-#: src/routes/link.tsx:111
+#: src/routes/link.tsx:123
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -862,7 +862,7 @@ msgstr ""
 #~ msgid "Could not link mobile device."
 #~ msgstr ""
 
-#: src/routes/link.tsx:66
+#: src/routes/link.tsx:78
 msgid "Could not link this phone. Try scanning the QR again."
 msgstr ""
 
@@ -1425,7 +1425,7 @@ msgstr ""
 #~ msgid "Gas:"
 #~ msgstr "Gas:"
 
-#: src/routes/link.tsx:146
+#: src/routes/link.tsx:158
 msgid "Go to HypeTerminal"
 msgstr ""
 
@@ -1674,7 +1674,7 @@ msgstr "Precio límite"
 #~ msgid "limit ro"
 #~ msgstr "límite sr"
 
-#: src/routes/link.tsx:121
+#: src/routes/link.tsx:133
 msgid "Link account"
 msgstr ""
 
@@ -2035,7 +2035,7 @@ msgid "Net received"
 msgstr ""
 
 #: src/components/trade/components/global-settings-modal.tsx:137
-#: src/routes/link.tsx:81
+#: src/routes/link.tsx:93
 msgid "Network"
 msgstr ""
 
@@ -2345,7 +2345,7 @@ msgstr ""
 #~ msgid "on"
 #~ msgstr ""
 
-#: src/routes/link.tsx:142
+#: src/routes/link.tsx:154
 msgid "On desktop, open the account menu and choose Link phone to get a new QR."
 msgstr ""
 
@@ -2361,7 +2361,7 @@ msgstr ""
 msgid "One balance in Spot backs perps, spot and every builder dex. You stop moving funds between dexes."
 msgstr ""
 
-#: src/routes/link.tsx:91
+#: src/routes/link.tsx:103
 msgid "Only continue if this is your own account. This phone can place and cancel orders. Deposits, withdrawals and transfers stay on desktop."
 msgstr ""
 
@@ -3451,7 +3451,7 @@ msgstr ""
 #~ msgid "Switch between mainnet and testnet. Page will reload."
 #~ msgstr ""
 
-#: src/routes/link.tsx:140
+#: src/routes/link.tsx:152
 msgid "Switch the network in Settings on this phone, then scan the QR again."
 msgstr ""
 
@@ -3668,16 +3668,16 @@ msgstr ""
 #~ msgid "This is not a WalletConnect QR code."
 #~ msgstr ""
 
-#: src/routes/link.tsx:134
+#: src/routes/link.tsx:146
 msgid "This link has expired"
 msgstr ""
 
 #. placeholder {0}: result.link.network
-#: src/routes/link.tsx:135
+#: src/routes/link.tsx:147
 msgid "This link is for {0}"
 msgstr ""
 
-#: src/routes/link.tsx:136
+#: src/routes/link.tsx:148
 msgid "This link is not valid"
 msgstr ""
 
@@ -3713,7 +3713,7 @@ msgstr ""
 #~ msgid "This phone link is not approved on Hyperliquid."
 #~ msgstr ""
 
-#: src/routes/link.tsx:99
+#: src/routes/link.tsx:111
 msgid "This replaces the wallet connected on this phone."
 msgstr ""
 
@@ -3851,7 +3851,7 @@ msgstr ""
 #~ msgid "Trade"
 #~ msgstr "Operar"
 
-#: src/routes/link.tsx:74
+#: src/routes/link.tsx:86
 msgid "Trade as this account?"
 msgstr ""
 
