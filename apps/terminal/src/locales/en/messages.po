@@ -2366,8 +2366,12 @@ msgid "One balance in Spot backs perps, spot and every builder dex. You stop mov
 msgstr "One balance in Spot backs perps, spot and every builder dex. You stop moving funds between dexes."
 
 #: src/routes/link.tsx:103
-msgid "Only continue if this is your own account. This phone can place and cancel orders. Deposits, withdrawals and transfers stay on desktop."
-msgstr "Only continue if this is your own account. This phone can place and cancel orders. Deposits, withdrawals and transfers stay on desktop."
+msgid "Only continue if this is your own account. This phone can place and cancel orders. Deposits, withdrawals and sending to other addresses stay on desktop."
+msgstr "Only continue if this is your own account. This phone can place and cancel orders. Deposits, withdrawals and sending to other addresses stay on desktop."
+
+#: src/routes/link.tsx:103
+#~ msgid "Only continue if this is your own account. This phone can place and cancel orders. Deposits, withdrawals and transfers stay on desktop."
+#~ msgstr "Only continue if this is your own account. This phone can place and cancel orders. Deposits, withdrawals and transfers stay on desktop."
 
 #: src/components/trade/components/wallet-dialog.tsx:
 #~ msgid "Only you control your funds. No email or password required."

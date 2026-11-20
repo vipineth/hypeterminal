@@ -102,7 +102,7 @@ function ConfirmLink({ link }: { link: PhoneLink }) {
 			<p className="text-xs text-fg-muted">
 				<Trans>
 					Only continue if this is your own account. This phone can place and cancel orders. Deposits, withdrawals and
-					transfers stay on desktop.
+					sending to other addresses stay on desktop.
 				</Trans>
 			</p>
 
