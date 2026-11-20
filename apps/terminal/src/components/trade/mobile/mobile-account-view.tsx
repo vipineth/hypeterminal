@@ -17,12 +17,14 @@ import { getAccountSummary, type PerpsOverview } from "@/domain/trade/balances";
 import { useAccountState } from "@/hooks/trade/use-account-balances";
 import { useCopyToClipboard } from "@/hooks/ui/use-copy-to-clipboard";
 import { useDisconnectWallet } from "@/hooks/use-disconnect-wallet";
+import { useIsPhoneLinked } from "@/hooks/use-is-phone-linked";
 import { cn } from "@/lib/cn";
 import { formatNumber, formatPercent, formatToken, formatUSD } from "@/lib/format";
 import { useSelectedMarketInfo } from "@/lib/hyperliquid";
 import { toNumberOrZero } from "@/lib/trade/numbers";
 import { useDepositModalActions } from "@/stores/use-global-modal-store";
 import { AccountNoticeLine } from "../components/account-notice-line";
+import { MainWalletOnlyNotice } from "../components/main-wallet-only-notice";
 import { PerpsSourceLabel } from "../components/perps-source-label";
 import { WalletModal } from "../components/wallet-modal";
 import { MobileBottomNavSpacer } from "./mobile-bottom-nav";
@@ -73,6 +75,7 @@ interface MobileAccountViewProps {
 export function MobileAccountView({ className }: MobileAccountViewProps) {
 	const { address, isConnected } = useConnection();
 	const disconnect = useDisconnectWallet();
+	const isPhoneLinked = useIsPhoneLinked();
 
 	const account = useAccountState();
 	const { data: market } = useSelectedMarketInfo();
@@ -200,6 +203,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 							intent="neutral"
 							size="md"
 							onClick={() => openDepositModal("withdraw")}
+							disabled={isPhoneLinked}
 							iconLeft={<UploadSimpleIcon className="size-4" />}
 						>
 							{ACCOUNT_TEXT.WITHDRAW_LABEL}
@@ -209,6 +213,7 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 							intent="neutral"
 							size="md"
 							onClick={() => openDepositModal("deposit")}
+							disabled={isPhoneLinked}
 							iconLeft={<DownloadSimpleIcon className="size-4" />}
 						>
 							{ACCOUNT_TEXT.DEPOSIT_LABEL}
@@ -218,11 +223,13 @@ export function MobileAccountView({ className }: MobileAccountViewProps) {
 							intent="neutral"
 							size="md"
 							onClick={() => openDepositModal("bridge")}
+							disabled={isPhoneLinked}
 							iconLeft={<ArrowsLeftRightIcon className="size-4" />}
 						>
 							{t`Bridge`}
 						</Button>
 					</div>
+					{isPhoneLinked && <MainWalletOnlyNotice className="justify-center" />}
 				</div>
 			</div>
 

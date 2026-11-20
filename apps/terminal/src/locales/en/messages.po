@@ -280,7 +280,7 @@ msgstr "All your {token} for this market is in use as margin."
 msgid "ALO (Add Liquidity Only)"
 msgstr "ALO (Add Liquidity Only)"
 
-#: src/components/trade/positions/send-modal.tsx:208
+#: src/components/trade/positions/send-modal.tsx:211
 #: src/components/trade/positions/transfer-modal.tsx:189
 #: src/components/trade/tradebox/deposit/deposit-form.tsx:72
 #: src/components/trade/tradebox/deposit/withdraw-form.tsx:43
@@ -342,7 +342,7 @@ msgstr "Auto close"
 #: src/components/trade/mobile/mobile-trade-ticket-body.tsx:131
 #: src/components/trade/positions/balances-tab.tsx:208
 #: src/components/trade/positions/position-limit-close-modal.tsx:161
-#: src/components/trade/positions/send-modal.tsx:122
+#: src/components/trade/positions/send-modal.tsx:125
 #: src/components/trade/positions/transfer-modal.tsx:192
 #: src/components/trade/tradebox/account-panel.tsx:29
 #: src/components/trade/tradebox/trade-form-fields.tsx:132
@@ -405,10 +405,10 @@ msgstr "Balance unavailable. Retry"
 #~ msgid "Breadcrumb"
 #~ msgstr "Breadcrumb"
 
-#: src/components/trade/mobile/mobile-account-view.tsx:223
+#: src/components/trade/mobile/mobile-account-view.tsx:229
 #: src/components/trade/tradebox/account-panel.tsx:131
 #: src/components/trade/tradebox/account-panel.tsx:134
-#: src/components/trade/tradebox/deposit-modal.tsx:229
+#: src/components/trade/tradebox/deposit-modal.tsx:232
 msgid "Bridge"
 msgstr "Bridge"
 
@@ -509,8 +509,8 @@ msgstr "Can't save order state in this browser. Enable site storage to trade."
 #: src/components/trade/positions/position-limit-close-modal.tsx:198
 #: src/components/trade/positions/position-tpsl-modal.tsx:170
 #: src/components/trade/positions/twap-tab.tsx:194
-#: src/components/trade/tradebox/deposit-modal.tsx:142
-#: src/components/trade/tradebox/deposit-modal.tsx:197
+#: src/components/trade/tradebox/deposit-modal.tsx:145
+#: src/components/trade/tradebox/deposit-modal.tsx:200
 #: src/components/trade/tradebox/margin-mode-modal.tsx:216
 #: src/components/trade/tradebox/order-toast.tsx:280
 #: src/routes/link.tsx:111
@@ -663,7 +663,7 @@ msgstr "Confirm"
 msgid "Confirm Close"
 msgstr "Confirm Close"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:157
+#: src/components/trade/tradebox/deposit-modal.tsx:160
 msgid "Confirm in wallet"
 msgstr "Confirm in wallet"
 
@@ -709,8 +709,8 @@ msgstr "Connect wallet"
 
 #: src/components/trade/components/wallet-modal.tsx:615
 #: src/components/trade/header/user-menu.tsx:77
-#: src/components/trade/mobile/mobile-account-view.tsx:103
-#: src/components/trade/mobile/mobile-account-view.tsx:109
+#: src/components/trade/mobile/mobile-account-view.tsx:106
+#: src/components/trade/mobile/mobile-account-view.tsx:112
 #: src/components/trade/mobile/mobile-market-page.tsx:113
 #: src/components/trade/mobile/mobile-nav-drawer.tsx:146
 #: src/lib/trade/use-button-content.ts:49
@@ -780,7 +780,7 @@ msgstr "Connect your wallet to view trade history."
 msgid "Connect your wallet to view TWAP orders."
 msgstr "Connect your wallet to view TWAP orders."
 
-#: src/components/trade/mobile/mobile-account-view.tsx:105
+#: src/components/trade/mobile/mobile-account-view.tsx:108
 msgid "Connect your wallet to view your account, positions, and start trading."
 msgstr "Connect your wallet to view your account, positions, and start trading."
 
@@ -830,7 +830,7 @@ msgstr "Copied to clipboard"
 msgid "Copied!"
 msgstr "Copied!"
 
-#: src/components/trade/mobile/mobile-account-view.tsx:137
+#: src/components/trade/mobile/mobile-account-view.tsx:140
 msgid "Copy address"
 msgstr "Copy address"
 
@@ -888,7 +888,7 @@ msgstr "Could not render QR"
 msgid "Could not reset mobile access."
 msgstr "Could not reset mobile access."
 
-#: src/components/trade/tradebox/unified-account-modal.tsx:35
+#: src/components/trade/tradebox/unified-account-modal.tsx:38
 msgid "Could not switch account mode"
 msgstr "Could not switch account mode"
 
@@ -931,7 +931,7 @@ msgstr "Cross Account Leverage"
 #~ msgid "Cross Leverage"
 #~ msgstr "Cross Leverage"
 
-#: src/components/trade/mobile/mobile-account-view.tsx:143
+#: src/components/trade/mobile/mobile-account-view.tsx:146
 msgid "Cross Margin"
 msgstr "Cross Margin"
 
@@ -971,21 +971,21 @@ msgstr "Default"
 #: src/components/trade/mobile/mobile-nav-drawer.tsx:132
 #: src/components/trade/tradebox/account-panel.tsx:122
 #: src/components/trade/tradebox/account-panel.tsx:125
-#: src/components/trade/tradebox/deposit-modal.tsx:112
-#: src/components/trade/tradebox/deposit-modal.tsx:134
-#: src/components/trade/tradebox/deposit-modal.tsx:155
-#: src/components/trade/tradebox/deposit-modal.tsx:223
+#: src/components/trade/tradebox/deposit-modal.tsx:115
+#: src/components/trade/tradebox/deposit-modal.tsx:137
+#: src/components/trade/tradebox/deposit-modal.tsx:158
+#: src/components/trade/tradebox/deposit-modal.tsx:226
 #: src/components/trade/tradebox/deposit/deposit-form.tsx:130
 #: src/components/trade/tradebox/trade-form-fields.tsx:150
 #: src/lib/trade/use-button-content.ts:79
 msgid "Deposit"
 msgstr "Deposit"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:114
+#: src/components/trade/tradebox/deposit-modal.tsx:117
 msgid "Deposit complete"
 msgstr "Deposit complete"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:136
+#: src/components/trade/tradebox/deposit-modal.tsx:139
 msgid "Deposit failed"
 msgstr "Deposit failed"
 
@@ -1015,7 +1015,7 @@ msgstr "Desktop wallet QR scanner"
 msgid "Destination"
 msgstr "Destination"
 
-#: src/components/trade/positions/send-modal.tsx:179
+#: src/components/trade/positions/send-modal.tsx:182
 msgid "Destination address"
 msgstr "Destination address"
 
@@ -1031,7 +1031,7 @@ msgstr "Destination address"
 msgid "Disconnect"
 msgstr "Disconnect"
 
-#: src/components/trade/mobile/mobile-account-view.tsx:153
+#: src/components/trade/mobile/mobile-account-view.tsx:156
 msgid "Disconnect wallet"
 msgstr "Disconnect wallet"
 
@@ -1085,8 +1085,8 @@ msgstr "Display language"
 #~ msgid "Docs"
 #~ msgstr "Docs"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:125
-#: src/components/trade/tradebox/deposit-modal.tsx:180
+#: src/components/trade/tradebox/deposit-modal.tsx:128
+#: src/components/trade/tradebox/deposit-modal.tsx:183
 msgid "Done"
 msgstr "Done"
 
@@ -1480,15 +1480,15 @@ msgstr "Home"
 msgid "Hour(s)"
 msgstr "Hour(s)"
 
-#: src/components/trade/tradebox/unified-account-modal.tsx:67
+#: src/components/trade/tradebox/unified-account-modal.tsx:70
 msgid "How account modes work"
 msgstr "How account modes work"
 
-#: src/components/trade/tradebox/unified-account-modal.tsx:43
+#: src/components/trade/tradebox/unified-account-modal.tsx:46
 msgid "Hyperliquid caps unified accounts at 50,000 actions a day."
 msgstr "Hyperliquid caps unified accounts at 50,000 actions a day."
 
-#: src/components/trade/tradebox/unified-account-modal.tsx:44
+#: src/components/trade/tradebox/unified-account-modal.tsx:47
 msgid "If this address earns builder fees, they stop accruing while it is unified."
 msgstr "If this address earns builder fees, they stop accruing while it is unified."
 
@@ -1603,7 +1603,7 @@ msgstr "Its status could not be read."
 msgid "Keep it"
 msgstr "Keep it"
 
-#: src/components/trade/tradebox/unified-account-modal.tsx:78
+#: src/components/trade/tradebox/unified-account-modal.tsx:82
 msgid "Keep standard"
 msgstr "Keep standard"
 
@@ -1801,7 +1801,7 @@ msgstr "M"
 msgid "Mainnet"
 msgstr "Mainnet"
 
-#: src/components/trade/mobile/mobile-account-view.tsx:64
+#: src/components/trade/mobile/mobile-account-view.tsx:66
 #: src/components/trade/tradebox/account-panel.tsx:48
 msgid "Maintenance Margin"
 msgstr "Maintenance Margin"
@@ -1950,7 +1950,7 @@ msgstr "Max"
 #~ msgid "Max slippage allowed for market orders."
 #~ msgstr "Max slippage allowed for market orders."
 
-#: src/components/trade/positions/send-modal.tsx:119
+#: src/components/trade/positions/send-modal.tsx:122
 msgid "Max unavailable. The exchange checks this amount."
 msgstr "Max unavailable. The exchange checks this amount."
 
@@ -2366,7 +2366,7 @@ msgstr "On desktop, open the account menu and choose Link phone."
 msgid "One {tokenName} balance backs perps, builder dexes and spot."
 msgstr "One {tokenName} balance backs perps, builder dexes and spot."
 
-#: src/components/trade/tradebox/unified-account-modal.tsx:40
+#: src/components/trade/tradebox/unified-account-modal.tsx:43
 msgid "One balance in Spot backs perps, spot and every builder dex. You stop moving funds between dexes."
 msgstr "One balance in Spot backs perps, spot and every builder dex. You stop moving funds between dexes."
 
@@ -2610,7 +2610,7 @@ msgstr "Perpetuals"
 msgid "Perps"
 msgstr "Perps"
 
-#: src/components/trade/positions/send-modal.tsx:160
+#: src/components/trade/positions/send-modal.tsx:163
 msgid "Perps Account"
 msgstr "Perps Account"
 
@@ -2738,7 +2738,7 @@ msgstr "Position reversed — {coin}"
 msgid "positions"
 msgstr "positions"
 
-#: src/components/trade/tradebox/unified-account-modal.tsx:42
+#: src/components/trade/tradebox/unified-account-modal.tsx:45
 msgid "Positions on every dex draw on that one balance, so a loss on one dex can liquidate positions on another."
 msgstr "Positions on every dex draw on that one balance, so a loss on one dex can liquidate positions on another."
 
@@ -2785,7 +2785,7 @@ msgstr "Primary navigation"
 msgid "Processing"
 msgstr "Processing"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:157
+#: src/components/trade/tradebox/deposit-modal.tsx:160
 msgid "Processing deposit"
 msgstr "Processing deposit"
 
@@ -2894,8 +2894,8 @@ msgid "Resetting..."
 msgstr "Resetting..."
 
 #: src/components/trade/mobile/offline-banner.tsx:80
-#: src/components/trade/tradebox/deposit-modal.tsx:145
-#: src/components/trade/tradebox/deposit-modal.tsx:200
+#: src/components/trade/tradebox/deposit-modal.tsx:148
+#: src/components/trade/tradebox/deposit-modal.tsx:203
 #: src/components/trade/tradebox/order-toast.tsx:270
 msgid "Retry"
 msgstr "Retry"
@@ -3085,11 +3085,11 @@ msgstr "Sell"
 
 #: src/components/trade/mobile/mobile-balances-tab.tsx:167
 #: src/components/trade/positions/balances-tab.tsx:157
-#: src/components/trade/positions/send-modal.tsx:232
+#: src/components/trade/positions/send-modal.tsx:243
 msgid "Send"
 msgstr "Send"
 
-#: src/components/trade/positions/send-modal.tsx:154
+#: src/components/trade/positions/send-modal.tsx:157
 msgid "Send failed"
 msgstr "Send failed"
 
@@ -3097,19 +3097,19 @@ msgstr "Send failed"
 #~ msgid "Send only the rejected legs"
 #~ msgstr "Send only the rejected legs"
 
-#: src/components/trade/positions/send-modal.tsx:172
+#: src/components/trade/positions/send-modal.tsx:175
 msgid "Send Tokens"
 msgstr "Send Tokens"
 
-#: src/components/trade/positions/send-modal.tsx:173
+#: src/components/trade/positions/send-modal.tsx:176
 msgid "Send tokens to another account on the Hyperliquid L1."
 msgstr "Send tokens to another account on the Hyperliquid L1."
 
-#: src/components/trade/positions/send-modal.tsx:232
+#: src/components/trade/positions/send-modal.tsx:243
 msgid "Sending..."
 msgstr "Sending..."
 
-#: src/components/trade/tradebox/deposit-modal.tsx:118
+#: src/components/trade/tradebox/deposit-modal.tsx:121
 msgid "sent to Hyperliquid"
 msgstr "sent to Hyperliquid"
 
@@ -3351,7 +3351,7 @@ msgstr "Source"
 msgid "Spot"
 msgstr "Spot"
 
-#: src/components/trade/positions/send-modal.tsx:161
+#: src/components/trade/positions/send-modal.tsx:164
 msgid "Spot Account"
 msgstr "Spot Account"
 
@@ -3512,7 +3512,7 @@ msgstr "Switch to {displayName} market, long position"
 msgid "Switch to {displayName} market, short position"
 msgstr "Switch to {displayName} market, short position"
 
-#: src/components/trade/tradebox/unified-account-modal.tsx:52
+#: src/components/trade/tradebox/unified-account-modal.tsx:55
 msgid "Switch to a unified account?"
 msgstr "Switch to a unified account?"
 
@@ -3529,6 +3529,10 @@ msgstr "Switch to Arbitrum to deposit USDC to Hyperliquid"
 msgid "Switch to dark mode"
 msgstr "Switch to dark mode"
 
+#: src/components/trade/components/main-wallet-only-notice.tsx:13
+msgid "Switch to desktop to use your main wallet"
+msgstr "Switch to desktop to use your main wallet"
+
 #: src/components/trade/header/theme-toggle.tsx:31
 msgid "Switch to light mode"
 msgstr "Switch to light mode"
@@ -3537,7 +3541,7 @@ msgstr "Switch to light mode"
 msgid "Switch to Mainnet"
 msgstr "Switch to Mainnet"
 
-#: src/components/trade/tradebox/unified-account-modal.tsx:82
+#: src/components/trade/tradebox/unified-account-modal.tsx:91
 msgid "Switch to unified"
 msgstr "Switch to unified"
 
@@ -3653,7 +3657,7 @@ msgstr "These two can't hold the same token. Pick another source or destination.
 msgid "This browser can't keep orders from different tabs apart. Use an up-to-date browser over HTTPS to trade."
 msgstr "This browser can't keep orders from different tabs apart. Use an up-to-date browser over HTTPS to trade."
 
-#: src/components/trade/tradebox/unified-account-modal.tsx:53
+#: src/components/trade/tradebox/unified-account-modal.tsx:56
 msgid "This changes how your whole account holds margin, not just this market."
 msgstr "This changes how your whole account holds margin, not just this market."
 
@@ -3916,7 +3920,7 @@ msgstr "Transaction was rejected"
 #: src/components/trade/positions/transfer-modal.tsx:137
 #: src/components/trade/positions/transfer-modal.tsx:151
 #: src/components/trade/positions/transfer-modal.tsx:225
-#: src/components/trade/tradebox/deposit-modal.tsx:212
+#: src/components/trade/tradebox/deposit-modal.tsx:215
 #: src/components/trade/tradebox/deposit/wrong-network-screen.tsx:19
 msgid "Transfer"
 msgstr "Transfer"
@@ -4200,7 +4204,7 @@ msgstr "WalletConnect QR code"
 #~ msgstr "What is a wallet?"
 
 #. placeholder {0}: ARBITRUM_NETWORK.estimatedWithdrawTime
-#: src/components/trade/tradebox/deposit-modal.tsx:174
+#: src/components/trade/tradebox/deposit-modal.tsx:177
 msgid "will arrive in {0}"
 msgstr "will arrive in {0}"
 
@@ -4214,18 +4218,18 @@ msgstr "will arrive in {0}"
 
 #: src/components/trade/tradebox/account-panel.tsx:113
 #: src/components/trade/tradebox/account-panel.tsx:116
-#: src/components/trade/tradebox/deposit-modal.tsx:168
-#: src/components/trade/tradebox/deposit-modal.tsx:189
-#: src/components/trade/tradebox/deposit-modal.tsx:226
+#: src/components/trade/tradebox/deposit-modal.tsx:171
+#: src/components/trade/tradebox/deposit-modal.tsx:192
+#: src/components/trade/tradebox/deposit-modal.tsx:229
 #: src/components/trade/tradebox/deposit/withdraw-form.tsx:122
 msgid "Withdraw"
 msgstr "Withdraw"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:191
+#: src/components/trade/tradebox/deposit-modal.tsx:194
 msgid "Withdrawal failed"
 msgstr "Withdrawal failed"
 
-#: src/components/trade/tradebox/deposit-modal.tsx:170
+#: src/components/trade/tradebox/deposit-modal.tsx:173
 msgid "Withdrawal submitted"
 msgstr "Withdrawal submitted"
 
@@ -4258,7 +4262,7 @@ msgstr "You are on Testnet"
 #~ msgid "You can revoke permissions at any time by registering a new approval with 0% fee rate. Builder codes are processed entirely onchain as part of the fee logic."
 #~ msgstr "You can revoke permissions at any time by registering a new approval with 0% fee rate. Builder codes are processed entirely onchain as part of the fee logic."
 
-#: src/components/trade/tradebox/unified-account-modal.tsx:45
+#: src/components/trade/tradebox/unified-account-modal.tsx:48
 msgid "You can switch back later. Your funds stay in Spot and each dex needs its own transfer again."
 msgstr "You can switch back later. Your funds stay in Spot and each dex needs its own transfer again."
 
@@ -4311,7 +4315,7 @@ msgstr "Your transaction is being processed"
 msgid "Your TWAP history could not be read."
 msgstr "Your TWAP history could not be read."
 
-#: src/components/trade/tradebox/unified-account-modal.tsx:41
+#: src/components/trade/tradebox/unified-account-modal.tsx:44
 msgid "Your USDC in Perps and on builder dexes moves into Spot when you switch."
 msgstr "Your USDC in Perps and on builder dexes moves into Spot when you switch."
 

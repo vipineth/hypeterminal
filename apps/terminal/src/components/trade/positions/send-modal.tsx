@@ -18,11 +18,13 @@ import { DEFAULT_QUOTE_TOKEN, FALLBACK_VALUE_PLACEHOLDER } from "@/config/app";
 import { exceedsBalance, getTokenTransferDecimals } from "@/domain/market";
 import { getSpendableSpotTokens, getSpendLimit, isWithinSpendLimit } from "@/domain/trade/balances";
 import { useAccountState } from "@/hooks/trade/use-account-balances";
+import { useIsPhoneLinked } from "@/hooks/use-is-phone-linked";
 import { cn } from "@/lib/cn";
 import { useExchange } from "@/lib/hyperliquid";
 import { useMarkets } from "@/lib/hyperliquid/markets/use-markets";
 import { floorToString, limitDecimalInput } from "@/lib/trade/numbers";
 import { formatTokenId } from "@/lib/trade/token-id";
+import { MainWalletOnlyNotice } from "../components/main-wallet-only-notice";
 
 type AccountType = "perp" | "spot";
 
@@ -60,6 +62,7 @@ interface BodyProps {
 }
 
 function SendModalBody({ onOpenChange, initialAsset, initialAccountType }: BodyProps) {
+	const isPhoneLinked = useIsPhoneLinked();
 	const [destination, setDestination] = useState("");
 	const [accountType, setAccountType] = useState<AccountType>(initialAccountType);
 	const [selectedToken, setSelectedToken] = useState(initialAsset);
@@ -226,7 +229,15 @@ function SendModalBody({ onOpenChange, initialAsset, initialAccountType }: BodyP
 						</div>
 					)}
 
-					<Button variant="filled" intent="neutral" onClick={handleSend} disabled={!canSend} className="w-full">
+					{isPhoneLinked && <MainWalletOnlyNotice />}
+
+					<Button
+						variant="filled"
+						intent="neutral"
+						onClick={handleSend}
+						disabled={!canSend || isPhoneLinked}
+						className="w-full"
+					>
 						{isPending && <SpinnerGapIcon className="size-3.5 animate-spin mr-2" />}
 						<PaperPlaneTiltIcon className="size-3.5 mr-2" />
 						{isPending ? t`Sending...` : t`Send`}

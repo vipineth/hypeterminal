@@ -12,8 +12,10 @@ import { t } from "@lingui/core/macro";
 import { SpinnerGapIcon, WarningCircleIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import { useConnection } from "wagmi";
+import { useIsPhoneLinked } from "@/hooks/use-is-phone-linked";
 import { useExchange } from "@/lib/hyperliquid";
 import { ACCOUNT_MODES_DOCS_URL } from "@/lib/trade/collateral-copy";
+import { MainWalletOnlyNotice } from "../components/main-wallet-only-notice";
 
 interface Props {
 	open: boolean;
@@ -23,6 +25,7 @@ interface Props {
 export function UnifiedAccountModal({ open, onOpenChange }: Props) {
 	const [error, setError] = useState<string | null>(null);
 	const { address } = useConnection();
+	const isPhoneLinked = useIsPhoneLinked();
 	const { mutateAsync: setAbstraction, isPending } = useExchange("userSetAbstraction");
 
 	async function handleSwitch() {
@@ -66,6 +69,7 @@ export function UnifiedAccountModal({ open, onOpenChange }: Props) {
 					>
 						{t`How account modes work`}
 					</a>
+					{isPhoneLinked && <MainWalletOnlyNotice className="mt-3" />}
 					{error && (
 						<div className="mt-3 flex items-center gap-2 p-2.5 rounded-xs bg-error-soft border border-stroke-error-weak text-xs text-error">
 							<WarningCircleIcon className="size-3.5 shrink-0" />
@@ -77,7 +81,12 @@ export function UnifiedAccountModal({ open, onOpenChange }: Props) {
 					<Button variant="outline" intent="neutral" onClick={() => onOpenChange(false)} disabled={isPending}>
 						{t`Keep standard`}
 					</Button>
-					<Button variant="filled" intent="brand" onClick={handleSwitch} disabled={!address || isPending}>
+					<Button
+						variant="filled"
+						intent="brand"
+						onClick={handleSwitch}
+						disabled={!address || isPending || isPhoneLinked}
+					>
 						{isPending && <SpinnerGapIcon className="size-3.5 animate-spin mr-2" />}
 						{t`Switch to unified`}
 					</Button>

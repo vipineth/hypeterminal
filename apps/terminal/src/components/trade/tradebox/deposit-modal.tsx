@@ -15,12 +15,14 @@ import { useConnection } from "wagmi";
 import { NETWORKS } from "@/config/networks";
 import { getTransferLimit } from "@/domain/trade/account-mode";
 import { useAccountState } from "@/hooks/trade/use-account-balances";
+import { useIsPhoneLinked } from "@/hooks/use-is-phone-linked";
 import { formatTransferError } from "@/lib/errors/format";
 import { useDeposit, useExchange } from "@/lib/hyperliquid";
 import { createLazyComponent } from "@/lib/lazy";
 import { toNumberOrZero } from "@/lib/trade/numbers";
 import { validateWithdraw } from "@/lib/trade/withdraw-validation";
 import { useDepositModalActions, useDepositModalOpen, useDepositModalTab } from "@/stores/use-global-modal-store";
+import { MainWalletOnlyNotice } from "../components/main-wallet-only-notice";
 import { DepositForm } from "./deposit/deposit-form";
 import { StatusScreen, WalletNotConnected } from "./deposit/shared-ui";
 import { WithdrawForm } from "./deposit/withdraw-form";
@@ -56,6 +58,7 @@ export function DepositModal() {
 	} = useDeposit();
 
 	const { address } = useConnection();
+	const isPhoneLinked = useIsPhoneLinked();
 
 	const withdrawLimit = getTransferLimit(useAccountState(), "withdraw");
 	const withdrawable = withdrawLimit.status === "ready" ? withdrawLimit.amount : null;
@@ -94,7 +97,7 @@ export function DepositModal() {
 		}
 	}
 
-	if (!isArbitrum && activeTab === "deposit") {
+	if (!isPhoneLinked && !isArbitrum && activeTab === "deposit") {
 		return (
 			<WrongNetworkScreen
 				open={open}
@@ -231,7 +234,9 @@ export function DepositModal() {
 					</SegmentedControls>
 
 					<div className={`flex flex-col ${DEPOSIT_TAB_MIN_HEIGHT}`}>
-						{activeTab === "deposit" && (
+						{isPhoneLinked && <MainWalletOnlyNotice className="justify-center py-8" />}
+
+						{!isPhoneLinked && activeTab === "deposit" && (
 							<DepositForm
 								amount={depositAmount}
 								onAmountChange={setDepositAmount}
@@ -243,7 +248,8 @@ export function DepositModal() {
 							/>
 						)}
 
-						{activeTab === "withdraw" &&
+						{!isPhoneLinked &&
+							activeTab === "withdraw" &&
 							(!address ? (
 								<WalletNotConnected />
 							) : (
@@ -257,7 +263,7 @@ export function DepositModal() {
 								/>
 							))}
 
-						{activeTab === "bridge" && (
+						{!isPhoneLinked && activeTab === "bridge" && (
 							<Suspense fallback={null}>
 								<LazyBridgeTab />
 							</Suspense>
