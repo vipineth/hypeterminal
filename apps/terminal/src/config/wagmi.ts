@@ -1,5 +1,5 @@
 import type { Chain } from "viem";
-import { createConfig, http } from "wagmi";
+import { createConfig, createConnector, http } from "wagmi";
 import {
 	arbitrum,
 	aurora,
@@ -77,6 +77,11 @@ const WALLET_CONNECT_METADATA = {
 	icons: ["https://app.hypeterminal.com/icon-192.png"],
 };
 
+function lazyWalletConnect(parameters: Parameters<typeof walletConnect>[0]) {
+	const connectorFn = walletConnect(parameters);
+	return createConnector((config) => ({ ...connectorFn(config), setup: undefined }));
+}
+
 function isPresent<T>(value: T | null | undefined): value is T {
 	return value != null;
 }
@@ -87,7 +92,7 @@ export function createWagmiConfig(options: WagmiConfigOptions = {}) {
 	const walletConnectProjectId = getWalletConnectProjectId(env);
 
 	const walletConnectConnector = walletConnectProjectId
-		? walletConnect({
+		? lazyWalletConnect({
 				projectId: walletConnectProjectId,
 				metadata: WALLET_CONNECT_METADATA,
 				showQrModal: false,
