@@ -5,7 +5,7 @@ description: Drive the HypeTerminal trading web app (apps/terminal) in a real br
 
 # Verify HypeTerminal
 
-HypeTerminal is a Hyperliquid trading UI (TanStack Start + Vite, SSR). Users touch one surface, the web app. The desktop layout runs at 1440x900 and the mobile layout at 390x844, on routes `/`, `/perp`, `/spot`, `/builders-perp`, `/builders-perp/$dex`, and `/mobile-agent-sync`. Market data is live from Hyperliquid mainnet, so prices change between runs. Assert structure and labels, not numbers.
+HypeTerminal is a Hyperliquid trading UI (TanStack Start + Vite, SSR). Users touch one surface, the web app. The desktop layout runs at 1440x900 and the mobile layout at 390x844, on routes `/`, `/perp`, `/spot`, `/builders-perp`, `/builders-perp/$dex`, and `/link`. Market data is live from Hyperliquid mainnet, so prices change between runs. Assert structure and labels, not numbers.
 
 The browser driver is `agent-browser` (on `PATH`). Every browser command in this skill takes `--session verify-hypeterminal` so it never touches the user's own browser session. Helpers live in `scripts/` next to this file and resolve the repo root themselves.
 

@@ -15,10 +15,12 @@ import { useConnection, useEnsName } from "wagmi";
 import { APP_BAR_BUTTON_HEIGHT_CLASS } from "@/config/layout";
 import { useCopyToClipboard } from "@/hooks/ui/use-copy-to-clipboard";
 import { useDisconnectWallet } from "@/hooks/use-disconnect-wallet";
+import { useIsPhoneLinked } from "@/hooks/use-is-phone-linked";
 import { cn } from "@/lib/cn";
 import { shortenAddress } from "@/lib/format";
+import { useAgentStatus } from "@/lib/hyperliquid";
 import { useDepositModalActions } from "@/stores/use-global-modal-store";
-import { MobileAgentSyncModal } from "../components/mobile-agent-sync-modal";
+import { PhoneLinkModal } from "../components/phone-link-modal";
 import { WalletModal } from "../components/wallet-modal";
 
 const USER_MENU_BUTTON_MIN_WIDTH = "min-w-[9rem]";
@@ -30,7 +32,9 @@ export function UserMenu() {
 	const { data: ensName } = useEnsName({ address });
 	const { open: openDepositModal } = useDepositModalActions();
 	const [isOpen, setIsOpen] = useState(false);
-	const [mobileSyncOpen, setMobileSyncOpen] = useState(false);
+	const [phoneLinkOpen, setPhoneLinkOpen] = useState(false);
+	const { isReady: isTradingReady } = useAgentStatus();
+	const isPhoneLinked = useIsPhoneLinked();
 	const [mounted, setMounted] = useState(false);
 	const { copied, copy } = useCopyToClipboard();
 
@@ -102,11 +106,15 @@ export function UserMenu() {
 			icon: <PlusCircleIcon className="size-3.5" />,
 			onSelect: () => openDepositModal("deposit"),
 		},
-		{
-			label: t`Link mobile device`,
-			icon: <DeviceMobileIcon className="size-3.5" />,
-			onSelect: () => setMobileSyncOpen(true),
-		},
+		...(isTradingReady && !isPhoneLinked
+			? [
+					{
+						label: t`Link phone`,
+						icon: <DeviceMobileIcon className="size-3.5" />,
+						onSelect: () => setPhoneLinkOpen(true),
+					},
+				]
+			: []),
 	];
 
 	return (
@@ -150,7 +158,7 @@ export function UserMenu() {
 					},
 				]}
 			/>
-			<MobileAgentSyncModal open={mobileSyncOpen} onOpenChange={setMobileSyncOpen} />
+			<PhoneLinkModal open={phoneLinkOpen} onOpenChange={setPhoneLinkOpen} />
 		</>
 	);
 }

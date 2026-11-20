@@ -23,7 +23,6 @@
 		"./registries/*": "./src/registries/*.ts",
 		"./signing/agent-storage": "./src/signing/agent-storage.ts",
 		"./signing/l1-agent-wallet": "./src/signing/l1-agent-wallet.ts",
-		"./signing/mobile-agent": "./src/signing/mobile-agent.ts",
 		"./internal/websocket/batch-updater": "./src/internal/websocket/batch-updater.ts",
 		"./internal/websocket/network-status": "./src/internal/websocket/network-status.ts",
 		"./internal/websocket/payload-guard": "./src/internal/websocket/payload-guard.ts",

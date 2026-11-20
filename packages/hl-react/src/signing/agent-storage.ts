@@ -17,15 +17,7 @@ const publicKeySchema = z
 const agentWalletSchema = z.object({
 	privateKey: privateKeySchema,
 	publicKey: publicKeySchema,
-	source: z.enum(["local-registration", "mobile-sync"]).optional(),
-	agentNameBase: z.string().min(1).optional(),
-	agentName: z.string().min(1).optional(),
-	agentValidUntilMs: z.number().int().positive().optional(),
-	importedAtMs: z.number().int().positive().optional(),
-	syncId: z.string().min(1).optional(),
 });
-
-export type AgentWalletMetadata = Omit<AgentWallet, "privateKey" | "publicKey">;
 
 function getStorageKey(env: HyperliquidEnv, userAddress: string): string {
 	return `hyperliquid_agent_${env}_${userAddress.toLowerCase()}`;
@@ -51,7 +43,6 @@ export function writeAgentToStorage(
 	userAddress: string,
 	privateKey: string,
 	publicKey: string,
-	metadata: AgentWalletMetadata = {},
 ): void {
 	if (typeof window === "undefined") return;
 
@@ -60,7 +51,6 @@ export function writeAgentToStorage(
 		const data: AgentWallet = {
 			privateKey: privateKeySchema.parse(privateKey),
 			publicKey: publicKeySchema.parse(publicKey),
-			...metadata,
 		};
 		localStorage.setItem(key, JSON.stringify(agentWalletSchema.parse(data)));
 		window.dispatchEvent(new StorageEvent("storage", { key }));
@@ -159,14 +149,8 @@ export function useAgentWalletStorage(env: HyperliquidEnv, userAddress: string |
 }
 
 export function useAgentWalletActions() {
-	function setAgent(
-		env: HyperliquidEnv,
-		userAddress: string,
-		privateKey: string,
-		publicKey: string,
-		metadata?: AgentWalletMetadata,
-	) {
-		writeAgentToStorage(env, userAddress, privateKey, publicKey, metadata);
+	function setAgent(env: HyperliquidEnv, userAddress: string, privateKey: string, publicKey: string) {
+		writeAgentToStorage(env, userAddress, privateKey, publicKey);
 	}
 
 	function clearAgent(env: HyperliquidEnv, userAddress: string) {

@@ -175,7 +175,7 @@ msgstr ""
 msgid "Account"
 msgstr "Cuenta"
 
-#: src/components/trade/header/user-menu.tsx:128
+#: src/components/trade/header/user-menu.tsx:136
 msgid "Account and wallet"
 msgstr ""
 
@@ -227,7 +227,7 @@ msgstr ""
 msgid "Add {0} to favorites"
 msgstr ""
 
-#: src/components/trade/header/user-menu.tsx:101
+#: src/components/trade/header/user-menu.tsx:105
 msgid "Add funds"
 msgstr "Agregar fondos"
 
@@ -315,7 +315,6 @@ msgstr ""
 msgid "Approve and show QR"
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:338
 #: src/components/trade/components/phone-link-modal.tsx:150
 msgid "Approve in wallet..."
 msgstr ""
@@ -514,7 +513,6 @@ msgstr ""
 #: src/components/trade/tradebox/margin-mode-modal.tsx:216
 #: src/components/trade/tradebox/order-toast.tsx:280
 #: src/routes/link.tsx:111
-#: src/routes/mobile-agent-sync.tsx:413
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -604,16 +602,16 @@ msgid "Checking margin…"
 msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:285
-msgid "Clipboard does not contain a pairing code."
-msgstr ""
+#~ msgid "Clipboard does not contain a pairing code."
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:277
-msgid "Clipboard paste is not available. Paste from the keyboard menu or type the code manually."
-msgstr ""
+#~ msgid "Clipboard paste is not available. Paste from the keyboard menu or type the code manually."
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:291
-msgid "Clipboard paste was blocked. Paste from the keyboard menu or type the code manually."
-msgstr ""
+#~ msgid "Clipboard paste was blocked. Paste from the keyboard menu or type the code manually."
+#~ msgstr ""
 
 #: src/components/trade/components/wallet-modal.tsx:621
 #: src/components/trade/mobile/mobile-position-card.tsx:243
@@ -688,27 +686,27 @@ msgstr ""
 #~ msgstr "Conecta una billetera para gestionar posiciones."
 
 #: src/routes/mobile-agent-sync.tsx:582
-msgid "Connect the same owner wallet used on desktop before importing phone access."
-msgstr ""
+#~ msgid "Connect the same owner wallet used on desktop before importing phone access."
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:224
-msgid "Connect the same wallet used on desktop before importing phone access."
-msgstr ""
+#~ msgid "Connect the same wallet used on desktop before importing phone access."
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:674
-msgid "Connect the same wallet used on desktop."
-msgstr ""
+#~ msgid "Connect the same wallet used on desktop."
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:532
-msgid "Connect to verify"
-msgstr ""
+#~ msgid "Connect to verify"
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:594
-msgid "Connect wallet"
-msgstr ""
+#~ msgid "Connect wallet"
+#~ msgstr ""
 
 #: src/components/trade/components/wallet-modal.tsx:615
-#: src/components/trade/header/user-menu.tsx:77
+#: src/components/trade/header/user-menu.tsx:81
 #: src/components/trade/mobile/mobile-account-view.tsx:106
 #: src/components/trade/mobile/mobile-account-view.tsx:112
 #: src/components/trade/mobile/mobile-market-page.tsx:113
@@ -726,12 +724,12 @@ msgid "Connect your trading wallet to cancel it."
 msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:150
-msgid "Connect your wallet before linking a mobile device."
-msgstr ""
+#~ msgid "Connect your wallet before linking a mobile device."
+#~ msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:194
-msgid "Connect your wallet before resetting mobile access."
-msgstr ""
+#~ msgid "Connect your wallet before resetting mobile access."
+#~ msgstr ""
 
 #: src/components/trade/tradebox/bridge/shared-ui.tsx:77
 msgid "Connect your wallet to bridge funds"
@@ -804,7 +802,7 @@ msgstr ""
 #~ msgid "Connecting desktop wallet"
 #~ msgstr ""
 
-#: src/components/trade/header/user-menu.tsx:56
+#: src/components/trade/header/user-menu.tsx:60
 msgid "Connecting..."
 msgstr "Conectando..."
 
@@ -816,8 +814,6 @@ msgstr ""
 msgid "Continue"
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:405
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:452
 #: src/components/trade/components/wallet-modal.tsx:484
 msgid "Copied"
 msgstr ""
@@ -826,7 +822,7 @@ msgstr ""
 msgid "Copied to clipboard"
 msgstr ""
 
-#: src/components/trade/header/user-menu.tsx:90
+#: src/components/trade/header/user-menu.tsx:94
 msgid "Copied!"
 msgstr ""
 
@@ -834,21 +830,21 @@ msgstr ""
 msgid "Copy address"
 msgstr ""
 
-#: src/components/trade/header/user-menu.tsx:90
+#: src/components/trade/header/user-menu.tsx:94
 msgid "Copy Address"
 msgstr "Copiar dirección"
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:405
-msgid "Copy code"
-msgstr ""
+#~ msgid "Copy code"
+#~ msgstr ""
 
 #: src/components/trade/components/wallet-modal.tsx:484
 msgid "Copy link"
 msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:452
-msgid "Copy phone link"
-msgstr ""
+#~ msgid "Copy phone link"
+#~ msgstr ""
 
 #: src/hooks/hyperliquid/use-trading-agent.ts:
 #~ msgid "Could not create wallet"
@@ -859,12 +855,12 @@ msgid "Could not fetch your token balances"
 msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:686
-msgid "Could not import phone access."
-msgstr ""
+#~ msgid "Could not import phone access."
+#~ msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:187
-msgid "Could not link mobile device."
-msgstr ""
+#~ msgid "Could not link mobile device."
+#~ msgstr ""
 
 #: src/routes/link.tsx:66
 msgid "Could not link this phone. Try scanning the QR again."
@@ -879,42 +875,41 @@ msgstr ""
 msgid "Could not open the camera."
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:122
 #: src/components/trade/components/wallet-modal.tsx:400
 msgid "Could not render QR"
 msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:220
-msgid "Could not reset mobile access."
-msgstr ""
+#~ msgid "Could not reset mobile access."
+#~ msgstr ""
 
 #: src/components/trade/tradebox/unified-account-modal.tsx:38
 msgid "Could not switch account mode"
 msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:509
-msgid "Create new phone link"
-msgstr ""
+#~ msgid "Create new phone link"
+#~ msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:277
-msgid "Create phone access"
-msgstr ""
+#~ msgid "Create phone access"
+#~ msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:341
-msgid "Create phone link"
-msgstr ""
+#~ msgid "Create phone link"
+#~ msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:240
-msgid "Create secure phone access for trading from this account."
-msgstr ""
+#~ msgid "Create secure phone access for trading from this account."
+#~ msgstr ""
 
 #: src/components/trade/positions/twap-tab.tsx:107
 msgid "Created"
 msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:339
-msgid "Creating link..."
-msgstr ""
+#~ msgid "Creating link..."
+#~ msgstr ""
 
 #: src/components/trade/mobile/mobile-trade-ticket-body.tsx:201
 #: src/components/trade/positions/position-row.tsx:198
@@ -1027,7 +1022,7 @@ msgstr ""
 #~ msgid "Direct mode: Sign each order with wallet"
 #~ msgstr ""
 
-#: src/components/trade/header/user-menu.tsx:144
+#: src/components/trade/header/user-menu.tsx:152
 msgid "Disconnect"
 msgstr "Desconectar"
 
@@ -1154,12 +1149,12 @@ msgid "Enter size"
 msgstr "Ingresa tamaño"
 
 #: src/routes/mobile-agent-sync.tsx:654
-msgid "Enter the 16-character pairing code."
-msgstr ""
+#~ msgid "Enter the 16-character pairing code."
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:537
-msgid "Enter the desktop code"
-msgstr ""
+#~ msgid "Enter the desktop code"
+#~ msgstr ""
 
 #: src/components/trade/positions/position-tpsl-modal.tsx:201
 #: src/lib/errors/definitions/tpsl.ts:77
@@ -1235,8 +1230,8 @@ msgstr "Ejecutado"
 #~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:513
-msgid "Expires {expiresAtLabel}."
-msgstr ""
+#~ msgid "Expires {expiresAtLabel}."
+#~ msgstr ""
 
 #: src/components/trade/mobile/mobile-history-tab.tsx:129
 msgid "Explorer"
@@ -1494,12 +1489,12 @@ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:322
 #: src/routes/mobile-agent-sync.tsx:465
-msgid "Import phone access"
-msgstr ""
+#~ msgid "Import phone access"
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:465
-msgid "Importing..."
-msgstr ""
+#~ msgid "Importing..."
+#~ msgstr ""
 
 #: src/components/trade/tradebox/account-panel.tsx:
 #~ msgid "In Orders"
@@ -1689,10 +1684,11 @@ msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:236
 #: src/components/trade/header/user-menu.tsx:106
-msgid "Link mobile device"
-msgstr ""
+#~ msgid "Link mobile device"
+#~ msgstr ""
 
 #: src/components/trade/components/phone-link-modal.tsx:85
+#: src/components/trade/header/user-menu.tsx:112
 msgid "Link phone"
 msgstr ""
 
@@ -2040,7 +2036,6 @@ msgstr ""
 
 #: src/components/trade/components/global-settings-modal.tsx:137
 #: src/routes/link.tsx:81
-#: src/routes/mobile-agent-sync.tsx:529
 msgid "Network"
 msgstr ""
 
@@ -2142,8 +2137,8 @@ msgid "No matching TWAP is in your history."
 msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:656
-msgid "No mobile link found."
-msgstr ""
+#~ msgid "No mobile link found."
+#~ msgstr ""
 
 #: src/components/trade/mobile/mobile-orders-tab.tsx:145
 #: src/components/trade/positions/orders-tab.tsx:189
@@ -2192,8 +2187,8 @@ msgstr ""
 #~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:342
-msgid "No wallet connected"
-msgstr ""
+#~ msgid "No wallet connected"
+#~ msgstr ""
 
 #: src/components/trade/components/wallet-modal.tsx:694
 msgid "No wallets found"
@@ -2408,12 +2403,12 @@ msgstr "Órdenes abiertas"
 #~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:626
-msgid "Open terminal"
-msgstr ""
+#~ msgid "Open terminal"
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:326
-msgid "Open the phone link, then enter the pairing code shown on desktop."
-msgstr ""
+#~ msgid "Open the phone link, then enter the pairing code shown on desktop."
+#~ msgstr ""
 
 #: src/components/trade/components/wallet-modal.tsx:473
 msgid "Open wallet"
@@ -2524,12 +2519,12 @@ msgstr ""
 #~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:614
-msgid "Owner account"
-msgstr ""
+#~ msgid "Owner account"
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:531
-msgid "Owner wallet"
-msgstr ""
+#~ msgid "Owner wallet"
+#~ msgstr ""
 
 #: src/components/trade/positions/position-tpsl-modal.tsx:
 #~ msgid "P&L"
@@ -2550,28 +2545,28 @@ msgstr ""
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:393
 #: src/routes/mobile-agent-sync.tsx:423
 #: src/routes/mobile-agent-sync.tsx:536
-msgid "Pairing code"
-msgstr ""
+#~ msgid "Pairing code"
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:668
-msgid "Pairing code does not match this link."
-msgstr ""
+#~ msgid "Pairing code does not match this link."
+#~ msgstr ""
 
 #: src/components/trade/tradebox/order-toast.tsx:70
 msgid "Partly filled"
 msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:447
-msgid "Paste code"
-msgstr ""
+#~ msgid "Paste code"
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:385
-msgid "Paste link from desktop"
-msgstr ""
+#~ msgid "Paste link from desktop"
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:683
-msgid "Paste the full phone link from desktop."
-msgstr ""
+#~ msgid "Paste the full phone link from desktop."
+#~ msgstr ""
 
 #: src/components/trade/components/wallet-modal.tsx:448
 #: src/components/trade/components/wallet-modal.tsx:451
@@ -2619,44 +2614,44 @@ msgstr ""
 #~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:607
-msgid "Phone access ready"
-msgstr ""
+#~ msgid "Phone access ready"
+#~ msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:565
-msgid "Phone access reset. The replacement key expires at {expiresAtLabel}."
-msgstr ""
+#~ msgid "Phone access reset. The replacement key expires at {expiresAtLabel}."
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:382
-msgid "Phone link"
-msgstr ""
+#~ msgid "Phone link"
+#~ msgstr ""
 
 #: src/providers/phone-link-guard.tsx:18
 msgid "Phone link ended. Link again from desktop."
 msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:490
-msgid "Phone link expired"
-msgstr ""
+#~ msgid "Phone link expired"
+#~ msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:420
-msgid "Phone link expires {linkExpiresLabel}"
-msgstr ""
+#~ msgid "Phone link expires {linkExpiresLabel}"
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:507
-msgid "Phone link loaded"
-msgstr ""
+#~ msgid "Phone link loaded"
+#~ msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:428
-msgid "Phone link QR"
-msgstr ""
+#~ msgid "Phone link QR"
+#~ msgstr ""
 
 #: src/components/trade/components/phone-link-modal.tsx:97
 msgid "Phone link QR code"
 msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:380
-msgid "Phone link ready"
-msgstr ""
+#~ msgid "Phone link ready"
+#~ msgstr ""
 
 #. placeholder {0}: input.sideLabel
 #: src/lib/trade/use-button-content.ts:86
@@ -2799,8 +2794,8 @@ msgid "QR scanning is not available in this browser."
 msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:463
-msgid "QR visible"
-msgstr ""
+#~ msgid "QR visible"
+#~ msgstr ""
 
 #: src/components/trade/tradebox/trade-form-twap.tsx:80
 msgid "Randomize timing"
@@ -2813,8 +2808,8 @@ msgid "Rate"
 msgstr "Tasa"
 
 #: src/routes/mobile-agent-sync.tsx:537
-msgid "Ready"
-msgstr ""
+#~ msgid "Ready"
+#~ msgstr ""
 
 #: src/components/trade/components/wallet-modal.tsx:94
 msgid "Recent"
@@ -2825,8 +2820,8 @@ msgid "Recent Trades"
 msgstr "Operaciones recientes"
 
 #: src/routes/mobile-agent-sync.tsx:511
-msgid "Recovered after reload. Expires {expiresAtLabel}."
-msgstr ""
+#~ msgid "Recovered after reload. Expires {expiresAtLabel}."
+#~ msgstr ""
 
 #: src/components/trade/positions/orders-tab.tsx:
 #~ msgid "Reduce"
@@ -2865,8 +2860,8 @@ msgid "Remove from favorites"
 msgstr "Quitar de favoritos"
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:540
-msgid "Replaces the current phone key. The old phone must link again."
-msgstr ""
+#~ msgid "Replaces the current phone key. The old phone must link again."
+#~ msgstr ""
 
 #: src/components/pages/builder-page.tsx:
 #~ msgid "Requirements:"
@@ -2874,20 +2869,20 @@ msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:558
 #: src/routes/mobile-agent-sync.tsx:523
-msgid "Reset"
-msgstr ""
+#~ msgid "Reset"
+#~ msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:537
-msgid "Reset phone access"
-msgstr ""
+#~ msgid "Reset phone access"
+#~ msgstr ""
 
 #: src/components/trade/market-overview.tsx:32
 msgid "Resets in"
 msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:558
-msgid "Resetting..."
-msgstr ""
+#~ msgid "Resetting..."
+#~ msgstr ""
 
 #: src/components/trade/mobile/offline-banner.tsx:80
 #: src/components/trade/tradebox/deposit-modal.tsx:148
@@ -2941,8 +2936,8 @@ msgid "Runtime"
 msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:136
-msgid "Saved phone link was invalid. Paste the link again."
-msgstr ""
+#~ msgid "Saved phone link was invalid. Paste the link again."
+#~ msgstr ""
 
 #: src/components/trade/tradebox/trade-header.tsx:65
 #: src/lib/trade/order-types.ts:17
@@ -2979,8 +2974,8 @@ msgid "Scan it with your phone camera, or in HypeTerminal on your phone under Co
 msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:417
-msgid "Scan on your phone"
-msgstr ""
+#~ msgid "Scan on your phone"
+#~ msgstr ""
 
 #: src/components/trade/components/wallet-modal.tsx:136
 msgid "Scan the QR from HypeTerminal on desktop."
@@ -3191,8 +3186,8 @@ msgstr ""
 #~ msgstr "Mostrar posiciones en gráfico"
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:463
-msgid "Show QR"
-msgstr ""
+#~ msgid "Show QR"
+#~ msgstr ""
 
 #: src/components/trade/components/global-settings-dialog.tsx:
 #~ msgid "Show Scanlines"
@@ -3547,8 +3542,8 @@ msgid "Switching..."
 msgstr "Cambiando..."
 
 #: src/routes/mobile-agent-sync.tsx:528
-msgid "Sync ID"
-msgstr ""
+#~ msgid "Sync ID"
+#~ msgstr ""
 
 #: src/lib/trade/order-types.ts:
 #~ msgid "Take Limit"
@@ -3666,8 +3661,8 @@ msgid "This is not a HypeTerminal phone link QR."
 msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:664
-msgid "This is not a valid HypeTerminal mobile link."
-msgstr ""
+#~ msgid "This is not a valid HypeTerminal mobile link."
+#~ msgstr ""
 
 #: src/components/trade/components/wallet-modal.tsx:677
 #~ msgid "This is not a WalletConnect QR code."
@@ -3687,12 +3682,12 @@ msgid "This link is not valid"
 msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:672
-msgid "This link was created for a different network."
-msgstr ""
+#~ msgid "This link was created for a different network."
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:670
-msgid "This link was created for a different site."
-msgstr ""
+#~ msgid "This link was created for a different site."
+#~ msgstr ""
 
 #: src/lib/trade/extract-order-status.ts:244
 #: src/lib/trade/extract-order-status.ts:330
@@ -3706,8 +3701,8 @@ msgstr ""
 #: src/routes/mobile-agent-sync.tsx:84
 #: src/routes/mobile-agent-sync.tsx:132
 #: src/routes/mobile-agent-sync.tsx:666
-msgid "This mobile link expired."
-msgstr ""
+#~ msgid "This mobile link expired."
+#~ msgstr ""
 
 #: src/lib/trade/extract-order-status.ts:183
 #: src/lib/trade/extract-order-status.ts:305
@@ -3715,8 +3710,8 @@ msgid "This order is already being sent"
 msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:679
-msgid "This phone link is not approved on Hyperliquid."
-msgstr ""
+#~ msgid "This phone link is not approved on Hyperliquid."
+#~ msgstr ""
 
 #: src/routes/link.tsx:99
 msgid "This replaces the wallet connected on this phone."
@@ -3894,12 +3889,12 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:383
-msgid "Trading key approved until {agentExpiresLabel}"
-msgstr ""
+#~ msgid "Trading key approved until {agentExpiresLabel}"
+#~ msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:493
-msgid "Trading key still approved until {agentExpiresLabel}. Create a new link to import on your phone."
-msgstr ""
+#~ msgid "Trading key still approved until {agentExpiresLabel}. Create a new link to import on your phone."
+#~ msgstr ""
 
 #: src/components/trade/chart/chart-source-toggle.tsx:60
 msgid "TradingView"
@@ -3957,8 +3952,8 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:340
-msgid "Try again"
-msgstr ""
+#~ msgid "Try again"
+#~ msgstr ""
 
 #: src/components/trade/tradebox/bridge/asset-selection-screen.tsx:81
 #: src/components/trade/tradebox/bridge/bridge-error-screen.tsx:32
@@ -4104,17 +4099,17 @@ msgid "USDC"
 msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:375
-msgid "Use a different phone link"
-msgstr ""
+#~ msgid "Use a different phone link"
+#~ msgstr ""
 
 #: src/routes/mobile-agent-sync.tsx:399
-msgid "Use phone link"
-msgstr ""
+#~ msgid "Use phone link"
+#~ msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:247
 #: src/routes/mobile-agent-sync.tsx:333
-msgid "Using"
-msgstr ""
+#~ msgid "Using"
+#~ msgstr ""
 
 #: src/components/trade/positions/positions-tab.tsx:
 #~ msgid "Value"
@@ -4173,7 +4168,6 @@ msgstr ""
 msgid "Wallet is required for exchange actions"
 msgstr ""
 
-#: src/components/trade/components/mobile-agent-sync-modal.tsx:256
 #: src/components/trade/tradebox/bridge/shared-ui.tsx:74
 #: src/components/trade/tradebox/deposit/shared-ui.tsx:118
 msgid "Wallet not connected"
@@ -4316,8 +4310,8 @@ msgid "Your USDC in Perps and on builder dexes moves into Spot when you switch."
 msgstr ""
 
 #: src/components/trade/components/mobile-agent-sync-modal.tsx:280
-msgid "Your wallet approves one trading key for this phone. It cannot withdraw funds."
-msgstr ""
+#~ msgid "Your wallet approves one trading key for this phone. It cannot withdraw funds."
+#~ msgstr ""
 
 #: src/components/trade/components/phone-link-modal.tsx:108
 msgid "Your wallet signs once to approve a trading key for your phone, then this window shows a QR."
