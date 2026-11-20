@@ -30,6 +30,7 @@ import {
 import {
 	addRecentWallet,
 	getRecentWallets,
+	getWalletConnectErrorMessage,
 	getWalletConnectorGroups,
 	getWalletInfo,
 	isMockConnector,
@@ -618,7 +619,9 @@ function WalletContent({ onClose, isMobile }: { onClose: () => void; isMobile: b
 				addRecentWallet(walletConnectConnector.id);
 				onClose();
 			} catch (error) {
-				setDesktopWalletScannerError(error instanceof Error ? error.message : t`Failed to link desktop wallet`);
+				setDesktopWalletScannerError(
+					error instanceof Error ? getWalletConnectErrorMessage(error) : t`Failed to link desktop wallet`,
+				);
 			} finally {
 				setConnectingId(null);
 			}
@@ -667,15 +670,17 @@ function WalletContent({ onClose, isMobile }: { onClose: () => void; isMobile: b
 		const unsubscribeWalletConnectUri = subscribeWalletConnectUri(connector, setWalletConnectUri);
 		try {
 			await connectAsync({ connector });
-			if (!isMockConnector(connector)) {
-				addRecentWallet(connector.id);
-			}
-			onClose();
+		} catch {
+			return;
 		} finally {
 			unsubscribeWalletConnectUri();
 			if (isWalletConnectConnector(connector)) setWalletConnectUri(null);
 			setConnectingId(null);
 		}
+		if (!isMockConnector(connector)) {
+			addRecentWallet(connector.id);
+		}
+		onClose();
 	}
 
 	async function handleCustomAddressConnect() {
@@ -835,7 +840,7 @@ function WalletContent({ onClose, isMobile }: { onClose: () => void; isMobile: b
 						className="mx-4 mb-3 flex items-start gap-2 p-2.5 rounded-xs bg-error-soft border border-stroke-error-strong/20"
 					>
 						<WarningCircleIcon className="size-3.5 text-error shrink-0 mt-0.5" aria-hidden="true" />
-						<p className="text-xs text-error">{error.message}</p>
+						<p className="text-xs text-error">{getWalletConnectErrorMessage(error)}</p>
 					</div>
 				)}
 			</div>

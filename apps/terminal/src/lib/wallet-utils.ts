@@ -1,5 +1,7 @@
+import { t } from "@lingui/core/macro";
 import { FlaskIcon, WalletIcon } from "@phosphor-icons/react";
 import type { Address } from "viem";
+import type {} from "viem/window";
 import type { Connector } from "wagmi";
 import { RECENT_WALLETS_LIMIT, STORAGE_KEYS } from "@/config/app";
 import { WALLET_INFO, type WalletInfo } from "@/config/wallets";
@@ -103,19 +105,40 @@ export function sortWalletConnectors(connectors: readonly Connector[], recentWal
 	});
 }
 
+function hasInjectedProvider(): boolean {
+	return typeof window !== "undefined" && window.ethereum != null;
+}
+
 export function getWalletConnectorGroups(connectors: readonly Connector[], recentWallets: readonly string[]) {
 	const { mockConnectors, regularConnectors } = splitWalletConnectors(connectors);
+	const availableConnectors = regularConnectors.filter(
+		(connector) => connector.id !== "injected" || hasInjectedProvider(),
+	);
 	return {
 		mockConnectors,
 		popular: sortWalletConnectors(
-			regularConnectors.filter((connector) => getWalletInfo(connector).popular),
+			availableConnectors.filter((connector) => getWalletInfo(connector).popular),
 			recentWallets,
 		),
 		other: sortWalletConnectors(
-			regularConnectors.filter((connector) => !getWalletInfo(connector).popular),
+			availableConnectors.filter((connector) => !getWalletInfo(connector).popular),
 			recentWallets,
 		),
 	};
+}
+
+export function getWalletConnectErrorMessage(error: Error): string {
+	let current: unknown = error;
+	while (current instanceof Error) {
+		if (current.name === "ProviderNotFoundError") {
+			return t`No browser wallet found. Use WalletConnect or open this page in your wallet app's browser.`;
+		}
+		if (current.name === "UserRejectedRequestError" || (current as { code?: unknown }).code === 4001) {
+			return t`Connection request was rejected in your wallet.`;
+		}
+		current = current.cause;
+	}
+	return "shortMessage" in error && typeof error.shortMessage === "string" ? error.shortMessage : error.message;
 }
 
 type ConnectorMessage = { type?: string; data?: unknown };
