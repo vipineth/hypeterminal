@@ -21,6 +21,7 @@ import { type Connector, useConnect, useConnectors } from "wagmi";
 import { mock } from "wagmi/connectors";
 import { MOCK_WALLETS } from "@/config/wagmi";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { usePrefetchWalletConnect } from "@/hooks/use-prefetch-wallet-connect";
 import { cn } from "@/lib/cn";
 import {
 	classifyQrValue,
@@ -984,6 +985,7 @@ interface Props {
 
 export function WalletModal({ open, onOpenChange }: Props) {
 	const isMobile = useIsMobile();
+	usePrefetchWalletConnect(open);
 
 	if (isMobile) {
 		return (
