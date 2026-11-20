@@ -563,19 +563,16 @@ function WalletConnectPairingPanel({ uri, isMobile }: { uri: string; isMobile: b
 						<Trans>Open wallet</Trans>
 					</a>
 				)}
-				<button
-					type="button"
+				<Button
+					variant="outline"
+					intent="neutral"
+					size="md"
 					onClick={handleCopy}
-					className={cn(
-						"inline-flex items-center justify-center gap-2 h-9 px-3 rounded-xs text-sm font-medium",
-						"border border-stroke-weak bg-fill hover:bg-fill-hover active:bg-fill-press transition-colors",
-						"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stroke-focus",
-						!isMobile && "sm:col-span-2",
-					)}
+					className={cn("rounded-xs", !isMobile && "sm:col-span-2")}
 				>
 					<CopyIcon className="size-4" aria-hidden="true" />
 					{copied ? <Trans>Copied</Trans> : <Trans>Copy link</Trans>}
-				</button>
+				</Button>
 			</div>
 		</div>
 	);
