@@ -1,7 +1,8 @@
 import { Button } from "@hypeterminal/ui";
 import { t } from "@lingui/core/macro";
-import { CheckIcon, LightningIcon, MinusIcon, QuestionIcon, SpinnerGapIcon, XIcon } from "@phosphor-icons/react";
-import { useEffect } from "react";
+import { CheckIcon, MinusIcon, QuestionIcon, SpinnerGapIcon, XIcon } from "@phosphor-icons/react";
+import { type ReactElement, useEffect } from "react";
+import { toast } from "sonner";
 import { ORDER_TOAST_SUCCESS_DURATION_MS } from "@/config/time";
 import {
 	type DismissPreview,
@@ -28,9 +29,6 @@ import {
 	useOrderQueue,
 	useOrderQueueActions,
 } from "@/stores/use-order-queue-store";
-
-const ORDER_TOAST_WIDTH = "w-80";
-const ORDER_TOAST_LIST_MAX_HEIGHT = "max-h-72";
 
 function useAutoRemove(order: OrderQueueItem, onRemove: () => void) {
 	useEffect(() => {
@@ -108,8 +106,10 @@ function OrderItem({ order, onRemove, actions, canCancel }: Props) {
 	return (
 		<div
 			className={cn(
-				"flex gap-3 py-2.5 px-3 transition-[opacity,transform] duration-300",
-				order.status === "pending" && "animate-pulse",
+				"relative w-full flex gap-3 py-2.5 px-3 overflow-hidden font-sans",
+				"bg-surface border border-stroke-weak/60 rounded-8",
+				"shadow-overlay shadow-black/20 dark:shadow-black/50 ring-1",
+				getRingColor(order.status),
 			)}
 		>
 			<div
@@ -193,7 +193,7 @@ function OrderItem({ order, onRemove, actions, canCancel }: Props) {
 				)}
 			</div>
 
-			{(order.status === "failed" || order.status === "unknown" || isNeutral) && (
+			{isClosable(order.status) && order.status !== "success" && (
 				<Button
 					variant="ghost"
 					intent="neutral"
@@ -204,8 +204,30 @@ function OrderItem({ order, onRemove, actions, canCancel }: Props) {
 					<XIcon className="size-4" />
 				</Button>
 			)}
+			<CountdownBar order={order} />
 		</div>
 	);
+}
+
+function getRingColor(status: OrderQueueItem["status"]): string {
+	switch (status) {
+		case "pending":
+			return "ring-stroke-brand-strong/30";
+		case "success":
+			return "ring-stroke-success-strong/30";
+		case "failed":
+			return "ring-stroke-error-strong/30";
+		case "unsettled":
+		case "unknown":
+			return "ring-stroke-warning-strong/30";
+		case "notSent":
+		case "canceled":
+			return "ring-stroke-weak";
+	}
+}
+
+function isClosable(status: OrderQueueItem["status"]): boolean {
+	return status !== "pending" && status !== "unsettled";
 }
 
 function getErrorColor(status: OrderQueueItem["status"]): string {
@@ -443,7 +465,13 @@ function unconfirmedKeyOf(order: OrderQueueItem): string[] {
 	return order.status === "unsettled" && order.requestKey ? [order.requestKey] : [];
 }
 
-export function OrderToast() {
+interface OrderToastCard {
+	id: string;
+	dismissible: boolean;
+	card: ReactElement;
+}
+
+export function useOrderToastCards(): OrderToastCard[] {
 	const allQueued = useOrderQueue();
 	const pendingRequests = usePendingRequests();
 	const activeHolds = useActiveHolds();
@@ -468,7 +496,6 @@ export function OrderToast() {
 		...queued.filter((order) => order.held),
 		...queued.filter((order) => !order.held),
 	];
-	if (orders.length === 0) return null;
 
 	function adopt(requestKey: string, status: OrderQueueItem["status"]) {
 		const order = leftOver.find((item) => item.requestKey === requestKey);
@@ -535,75 +562,42 @@ export function OrderToast() {
 		},
 	};
 
-	const pendingCount = orders.filter((o) => o.status === "pending").length;
-	const successCount = orders.filter((o) => o.status === "success").length;
-	const failedCount = orders.filter((o) => o.status === "failed").length;
-	const unsettledCount = orders.filter((o) => o.status === "unsettled" || o.status === "unknown").length;
-	const notSentCount = orders.filter((o) => o.status === "notSent").length;
-	const canceledCount = orders.filter((o) => o.status === "canceled").length;
+	function remove(id: string) {
+		removeOrder(id);
+		toast.dismiss(id);
+	}
 
-	return (
-		<div
-			className={cn(
-				ORDER_TOAST_WIDTH,
-				"fixed bottom-6 right-6 z-50",
-				"bg-surface/95 backdrop-blur-sm",
-				"border border-stroke-weak/60 rounded-8 overflow-hidden",
-				"shadow-overlay shadow-black/20 dark:shadow-black/50",
-				"font-sans",
+	return orders.map((order) => ({
+		id: order.id,
+		dismissible: isClosable(order.status),
+		card: <OrderItem order={order} onRemove={() => remove(order.id)} actions={actions} canCancel={canCancel} />,
+	}));
+}
 
-				pendingCount > 0 && "ring-1 ring-stroke-brand-strong/30",
-				failedCount > 0 && pendingCount === 0 && "ring-1 ring-stroke-error-strong/30",
-				unsettledCount > 0 && pendingCount === 0 && failedCount === 0 && "ring-1 ring-stroke-warning-strong/30",
-				successCount > 0 &&
-					pendingCount === 0 &&
-					failedCount === 0 &&
-					unsettledCount === 0 &&
-					"ring-1 ring-stroke-success-strong/30",
-			)}
-		>
-			<div className="px-3 py-2 border-b border-stroke-weak/40 bg-surface flex items-center justify-between">
-				<div className="flex items-center gap-2">
-					<LightningIcon className="size-4 text-brand" />
-					<span className="text-xs font-semibold uppercase tracking-wider text-fg">{t`Order Queue`}</span>
-				</div>
-				<div className="flex items-center gap-1.5">
-					{pendingCount > 0 && (
-						<span className="px-1.5 py-0.5 rounded text-xs font-medium bg-brand-soft text-brand border border-stroke-brand-strong/30">
-							{pendingCount} {t`pending`}
-						</span>
-					)}
-					{unsettledCount > 0 && (
-						<span className="px-1.5 py-0.5 rounded text-xs font-medium bg-warning-soft text-warning border border-stroke-warning-strong/30">
-							{unsettledCount} {t`unconfirmed`}
-						</span>
-					)}
-					{notSentCount > 0 && (
-						<span className="px-1.5 py-0.5 rounded text-xs font-medium bg-fill-weak text-fg-muted border border-stroke-weak">
-							{notSentCount} {t`not sent`}
-						</span>
-					)}
-					{canceledCount > 0 && (
-						<span className="px-1.5 py-0.5 rounded text-xs font-medium bg-fill-weak text-fg-muted border border-stroke-weak">
-							{canceledCount} {t`canceled`}
-						</span>
-					)}
-					{failedCount > 0 && (
-						<span className="px-1.5 py-0.5 rounded text-xs font-medium bg-error-soft text-error border border-stroke-error-strong/30">
-							{failedCount} {t`failed`}
-						</span>
-					)}
-				</div>
-			</div>
+const shownToastIds = new Set<string>();
 
-			<div className={cn("divide-y divide-stroke-weak/30 overflow-y-auto", ORDER_TOAST_LIST_MAX_HEIGHT)}>
-				{orders.map((order) => (
-					<div key={order.id} className="relative">
-						<OrderItem order={order} onRemove={() => removeOrder(order.id)} actions={actions} canCancel={canCancel} />
-						<CountdownBar order={order} />
-					</div>
-				))}
-			</div>
-		</div>
-	);
+export function OrderToast() {
+	const cards = useOrderToastCards();
+	const { removeOrder } = useOrderQueueActions();
+
+	useEffect(() => {
+		for (const { id, dismissible, card } of cards) {
+			toast.custom(() => card, {
+				id,
+				className: "w-(--width)",
+				duration: Number.POSITIVE_INFINITY,
+				dismissible,
+				onDismiss: () => removeOrder(id),
+			});
+		}
+		const live = new Set(cards.map((card) => card.id));
+		for (const id of shownToastIds) {
+			if (live.has(id)) continue;
+			toast.dismiss(id);
+			shownToastIds.delete(id);
+		}
+		for (const id of live) shownToastIds.add(id);
+	});
+
+	return null;
 }

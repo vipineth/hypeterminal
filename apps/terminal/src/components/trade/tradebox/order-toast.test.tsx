@@ -1,8 +1,8 @@
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { renderToString } from "react-dom/server";
 import { privateKeyToAccount } from "viem/accounts";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { OrderToast } from "@/components/trade/tradebox/order-toast";
+import { useOrderToastCards } from "@/components/trade/tradebox/order-toast";
 import { type OrderResult, reportSettlement, reportSubmit } from "@/lib/trade/extract-order-status";
 import { createOrderSender, type Signer } from "@/lib/trade/order-sender";
 import { createRequestStore, type PendingRequest, type SlotHold } from "@/lib/trade/pending-requests";
@@ -128,6 +128,10 @@ const HELD_SCALE: SlotHold = {
 	},
 };
 
+function OrderToasts() {
+	return useOrderToastCards().map(({ id, card }) => <Fragment key={id}>{card}</Fragment>);
+}
+
 function buttonsNamed(label: string) {
 	return view.buttons.filter((button) => button.label === label);
 }
@@ -143,15 +147,14 @@ describe("order toast", () => {
 		vi.clearAllMocks();
 	});
 
-	it("drops an unconfirmed row and its count once another tab settles its request", () => {
+	it("drops an unconfirmed toast once another tab settles its request", () => {
 		view.pending = [];
 		view.queued = [
 			UNCONFIRMED_ROW,
 			{ id: "order-2", market: "ETH", side: "sell", size: "1", status: "success", createdAt: 0 },
 		];
 		view.settled = [UNCONFIRMED_ROW.requestKey ?? ""];
-		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
-		expect(html).not.toContain("unconfirmed");
+		const html = renderToString(<OrderToasts />).replaceAll("<!-- -->", "");
 		expect(html).not.toContain("Not confirmed");
 		expect(html).toContain("ETH");
 		expect(buttonsNamed("Retry")).toHaveLength(0);
@@ -171,34 +174,34 @@ describe("order toast", () => {
 			},
 		];
 		view.holds = [];
-		expect(renderToString(<OrderToast />)).toBe("");
+		expect(renderToString(<OrderToasts />)).toBe("");
 		expect(buttonsNamed("Yes, dismiss hold")).toHaveLength(0);
 	});
 
 	it("offers Retry and Cancel on an unconfirmed order and on one left from before a reload", () => {
-		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		const html = renderToString(<OrderToasts />).replaceAll("<!-- -->", "");
 		expect(buttonsNamed("Retry")).toHaveLength(2);
 		expect(buttonsNamed("Cancel")).toHaveLength(2);
-		expect(html).toContain("2 unconfirmed");
+		expect(html).toContain("SOL");
 		expect(html).toContain("ETH");
 		expect(html).toContain("Not confirmed: Request timed out after 10000 ms. Retry or cancel it.");
 	});
 
 	it("says on a row left from before a reload that Retry resends that order as placed", () => {
 		view.queued = [];
-		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		const html = renderToString(<OrderToasts />).replaceAll("<!-- -->", "");
 		expect(html).toContain("Retry resends this order as you placed it: Order at 1160.");
 	});
 
 	it("retries an unconfirmed order by its request key", () => {
-		renderToString(<OrderToast />);
+		renderToString(<OrderToasts />);
 		buttonsNamed("Retry")[1].onClick?.();
 		expect(actions.retryRequest).toHaveBeenCalledWith(UNCONFIRMED_ROW.requestKey);
 		expect(actions.addOrder).not.toHaveBeenCalled();
 	});
 
 	it("adds a row for a request left from before a reload before it cancels it", () => {
-		renderToString(<OrderToast />);
+		renderToString(<OrderToasts />);
 		buttonsNamed("Cancel")[0].onClick?.();
 		expect(actions.addOrder).toHaveBeenCalledWith(
 			expect.objectContaining({
@@ -220,13 +223,13 @@ describe("order toast", () => {
 				nonce: 1794596065043,
 			},
 		];
-		renderToString(<OrderToast />);
+		renderToString(<OrderToasts />);
 		expect(buttonsNamed("Retry")).toHaveLength(1);
 	});
 
 	it("asks before it dismisses an unconfirmed order, and shows what the lookup said", async () => {
 		view.queued = [{ ...UNCONFIRMED_ROW, canDismiss: true }];
-		renderToString(<OrderToast />);
+		renderToString(<OrderToasts />);
 		expect(buttonsNamed("Dismiss")).toHaveLength(1);
 		buttonsNamed("Dismiss")[0].onClick?.();
 		await vi.waitFor(() =>
@@ -244,7 +247,7 @@ describe("order toast", () => {
 		];
 		view.pending = [];
 		view.buttons = [];
-		const html = renderToString(<OrderToast />);
+		const html = renderToString(<OrderToasts />);
 		expect(html).toContain("Lookup line.");
 		expect(buttonsNamed("Retry")).toHaveLength(0);
 		buttonsNamed("Yes, dismiss it")[0].onClick?.();
@@ -254,7 +257,7 @@ describe("order toast", () => {
 	it("offers no Retry or Cancel on an order whose outcome is unknown", () => {
 		view.queued = [{ ...UNCONFIRMED_ROW, status: "unknown", requestKey: undefined, error: "TWAP status unknown." }];
 		view.pending = [];
-		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		const html = renderToString(<OrderToasts />).replaceAll("<!-- -->", "");
 		expect(html).toContain("TWAP status unknown.");
 		expect(buttonsNamed("Retry")).toHaveLength(0);
 		expect(buttonsNamed("Cancel")).toHaveLength(0);
@@ -276,7 +279,7 @@ describe("order toast", () => {
 			{ id: "row-2", market: "SOL", side: "sell", size: "5", status: "pending", createdAt: 0, ...blockedSell },
 		];
 		view.pending = [buyLeftOver];
-		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		const html = renderToString(<OrderToasts />).replaceAll("<!-- -->", "");
 		expect(html).toContain(">buy<");
 		expect(html).toContain(">sell<");
 		expect(buttonsNamed("Retry")).toHaveLength(1);
@@ -290,7 +293,7 @@ describe("order toast", () => {
 	it("disables Cancel on a row left from before a reload until the trading wallet is ready, and says why", () => {
 		view.queued = [];
 		view.canCancel = false;
-		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		const html = renderToString(<OrderToasts />).replaceAll("<!-- -->", "");
 		expect(buttonsNamed("Cancel").map((button) => button.disabled)).toEqual([true]);
 		expect(buttonsNamed("Retry").map((button) => button.disabled)).toEqual([undefined]);
 		expect(html).toContain("Connect your trading wallet to cancel it.");
@@ -304,7 +307,7 @@ describe("order toast", () => {
 			error: "Wallet is required for exchange actions",
 		});
 		view.queued = [];
-		renderToString(<OrderToast />);
+		renderToString(<OrderToasts />);
 		buttonsNamed("Cancel")[0].onClick?.();
 		await vi.waitFor(() =>
 			expect(actions.updateByRequestKey).toHaveBeenLastCalledWith(
@@ -316,9 +319,9 @@ describe("order toast", () => {
 		view.pending = [LEFT_FROM_BEFORE_RELOAD];
 		view.holds = [];
 		view.buttons = [];
-		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
-		expect(html).not.toContain("1 pending");
-		expect(html).toContain("1 unconfirmed");
+		const html = renderToString(<OrderToasts />).replaceAll("<!-- -->", "");
+		expect(html).not.toContain("animate-spin");
+		expect(html).toContain("Wallet is required for exchange actions");
 		expect(buttonsNamed("Retry")).toHaveLength(1);
 		expect(buttonsNamed("Cancel")).toHaveLength(1);
 	});
@@ -328,7 +331,7 @@ describe("order toast", () => {
 		const refusal = "Can't save order state in this browser. Enable site storage to trade.";
 		actions.retryRequest.mockResolvedValueOnce({ ok: false, status: "notSent", error: refusal });
 		view.queued = [];
-		renderToString(<OrderToast />);
+		renderToString(<OrderToasts />);
 		buttonsNamed("Retry")[0].onClick?.();
 		await vi.waitFor(() =>
 			expect(actions.updateByRequestKey).toHaveBeenLastCalledWith(
@@ -343,7 +346,7 @@ describe("order toast", () => {
 			UNCONFIRMED_ROW,
 			{ ...UNCONFIRMED_ROW, id: "order-2", requestKey: `${UNCONFIRMED_ROW.requestKey}2`, canDismiss: true },
 		];
-		renderToString(<OrderToast />);
+		renderToString(<OrderToasts />);
 		expect(buttonsNamed("Retry")).toHaveLength(3);
 		expect(buttonsNamed("Dismiss")).toHaveLength(1);
 		buttonsNamed("Dismiss")[0].onClick?.();
@@ -363,7 +366,7 @@ describe("order toast", () => {
 			} as OrderQueueItem,
 		];
 		view.pending = [];
-		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		const html = renderToString(<OrderToasts />).replaceAll("<!-- -->", "");
 		expect(view.buttons.map((button) => button.label)).not.toContain("Send only the rejected legs");
 		expect(html).toContain("Leg 1 at 90 placed, Leg 2 at 95 rejected");
 	});
@@ -372,7 +375,7 @@ describe("order toast", () => {
 		view.queued = [];
 		view.pending = [];
 		view.holds = [HELD_SCALE];
-		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		const html = renderToString(<OrderToasts />).replaceAll("<!-- -->", "");
 		expect(html).toContain(
 			"The same order is held on this market. Last result: Leg 1 at 90 placed, Leg 2 at 95 not confirmed.",
 		);
@@ -380,7 +383,7 @@ describe("order toast", () => {
 		expect(actions.addOrder).toHaveBeenCalledWith(expect.objectContaining({ held: HELD_SCALE, confirmHold: true }));
 		view.queued = [{ ...actions.addOrder.mock.calls[0][0], id: "row-hold" }];
 		view.buttons = [];
-		expect(renderToString(<OrderToast />)).toContain(
+		expect(renderToString(<OrderToasts />)).toContain(
 			"Known placed: Leg 1 at 90. Unknown: Leg 2 at 95. Dismiss the hold? Sending the same order again could place an already placed leg twice.",
 		);
 		expect(buttonsNamed("Dismiss hold")).toHaveLength(0);
@@ -410,7 +413,7 @@ describe("order toast", () => {
 			} as OrderQueueItem,
 		];
 		view.pending = [];
-		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		const html = renderToString(<OrderToasts />).replaceAll("<!-- -->", "");
 		expect(html).not.toContain(">Filled<");
 		expect(html).toContain(">Partly filled<");
 		expect(html).toContain("Order partially filled: 0.2 of 1, 0.8 not filled");
@@ -436,13 +439,13 @@ describe("order toast", () => {
 		view.queued = [refusedRow, { ...refusedRow, id: "row-refused-2" }, confirmingHold];
 		view.pending = [];
 		view.holds = [HELD_SCALE];
-		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
+		const html = renderToString(<OrderToasts />).replaceAll("<!-- -->", "");
 		const confirmAt = html.indexOf("Known placed: Leg 1 at 90.");
 		expect(confirmAt).toBeGreaterThan(-1);
 		expect(confirmAt).toBeLessThan(html.indexOf("Not sent. Your last order on this market"));
 	});
 
-	it("counts a refused press and a canceled order apart from failed ones", async () => {
+	it("shows a refused press and a canceled order apart from a failed one", async () => {
 		const request: PendingRequest = { ...LEFT_FROM_BEFORE_RELOAD, label: { market: "SOL", side: "buy", size: "1" } };
 		const rejected = reportSettlement({
 			kind: "answered",
@@ -454,10 +457,10 @@ describe("order toast", () => {
 		);
 		view.queued = rows as OrderQueueItem[];
 		view.pending = [];
-		const html = renderToString(<OrderToast />).replaceAll("<!-- -->", "");
-		expect(html).toContain("1 failed");
-		expect(html).toContain("1 not sent");
-		expect(html).toContain("1 canceled");
+		const html = renderToString(<OrderToasts />).replaceAll("<!-- -->", "");
+		expect(html).toContain("Insufficient margin to place order. asset=5");
+		expect(html).toContain("Not sent. Your last order on this market");
+		expect(html).toContain("Canceled. Nothing was placed.");
 	});
 
 	it("offers a confirmed Dismiss on a press refused over a pending order it can't read", async () => {
@@ -473,7 +476,7 @@ describe("order toast", () => {
 		} as OrderQueueItem;
 		view.queued = [row];
 		view.pending = [];
-		const html = renderToString(<OrderToast />)
+		const html = renderToString(<OrderToasts />)
 			.replaceAll("<!-- -->", "")
 			.replaceAll("&#x27;", "'");
 		expect(html).toContain("Can't read a pending order for this market.");
@@ -481,7 +484,7 @@ describe("order toast", () => {
 		expect(actions.updateOrder).toHaveBeenCalledWith("row-3", { confirmUnreadable: true });
 		view.queued = [{ ...row, confirmUnreadable: true }];
 		view.buttons = [];
-		expect(renderToString(<OrderToast />)).toContain("It may still execute.");
+		expect(renderToString(<OrderToasts />)).toContain("It may still execute.");
 		buttonsNamed("Yes, dismiss it")[0].onClick?.();
 		await vi.waitFor(() => expect(actions.dismissUnreadable).toHaveBeenCalledWith(unreadable.slot, unreadable.raw));
 		await vi.waitFor(() =>
