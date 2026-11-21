@@ -71,6 +71,7 @@ describe("interpretOrderStatuses", () => {
 		expect(interpretOrderStatuses([FILLED, "waitingForTrigger"], ENTRY_WITH_TP)).toEqual({
 			ok: true,
 			outcome: "filled",
+			avgPx: "80.276",
 		});
 		expect(interpretOrderStatuses([RESTING, "waitingForFill"], ENTRY_WITH_TP)).toEqual({
 			ok: true,
@@ -187,6 +188,7 @@ describe("reportSettlement", () => {
 		expect(reportSettlement({ kind: "answered", request: request("order"), response })).toEqual({
 			ok: true,
 			outcome: "filled",
+			avgPx: "80.276",
 		});
 	});
 
@@ -196,12 +198,14 @@ describe("reportSettlement", () => {
 		expect(reportSettlement({ kind: "answered", request: sized(ORDER, ["1"]), response })).toEqual({
 			ok: true,
 			outcome: "partiallyFilled",
+			avgPx: "80.276",
 			detail: "Order partially filled: 0.2 of 1, 0.8 not filled",
 		});
 		const whole = { type: "order", data: { statuses: [FILLED] } };
 		expect(reportSettlement({ kind: "answered", request: sized(ORDER, ["1"]), response: whole })).toEqual({
 			ok: true,
 			outcome: "filled",
+			avgPx: "80.276",
 		});
 	});
 

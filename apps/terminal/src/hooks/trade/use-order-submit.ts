@@ -163,10 +163,11 @@ export function useOrderSubmit(): UseOrderSubmitResult {
 		const hasSl = tpSlEnabled && canUseTpSl && isPositive(slPriceInput);
 
 		const label = getLabel(input);
+		const orderType = getQueueOrderType(input);
 		const orderId = addOrder({
 			...label,
-			price: plan.orders[0] && getQueuePrice(plan.orders[0]),
-			orderType: getQueueOrderType(input),
+			price: orderType !== "market" && plan.orders[0] ? getQueuePrice(plan.orders[0]) : undefined,
+			orderType,
 			tpPrice: hasTp ? findTriggerPrice(plan.orders, "tp") : undefined,
 			slPrice: hasSl ? findTriggerPrice(plan.orders, "sl") : undefined,
 			status: "pending",

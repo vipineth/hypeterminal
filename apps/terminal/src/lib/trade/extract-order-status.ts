@@ -31,10 +31,12 @@ import type { Hold, PendingRequest } from "@/lib/trade/pending-requests";
 export type OrderOutcome = "filled" | "partiallyFilled" | "resting" | "triggerSet" | "twapStarted";
 
 export type OrderResult =
-	| { ok: true; outcome: OrderOutcome; detail?: string }
+	| PlacedResult
 	| { ok: false; status: "failed" | "unknown" | "canceled"; error: string }
 	| { ok: false; status: "notSent"; error: string; unreadable?: UnreadableSlot }
 	| { ok: false; status: "unsettled"; error: string; requestKey: string; canDismiss: boolean; resends: string };
+
+type PlacedResult = { ok: true; outcome: OrderOutcome; detail?: string; avgPx?: string };
 
 export type UnreadableSlot = { slot: string; raw: string };
 
@@ -93,15 +95,25 @@ function summarizeLegStates(states: LegState[], legs: PlanLeg[], sizes: string[]
 	return failed(describeLegStates(states, legs, sizes));
 }
 
-function summarizePlaced(states: LegState[], legs: PlanLeg[], sizes: string[]): OrderResult {
-	const result = summarizePlacedOutcomes(states, legs);
+function summarizePlaced(states: LegState[], legs: PlanLeg[], sizes: string[]): PlacedResult {
+	const result = { ...summarizePlacedOutcomes(states, legs), avgPx: soleFillPrice(states, legs) };
 	const shortFills = states.flatMap((state, index) => {
 		const short = describeShortFill(getLegName(legs[index] ?? UNNAMED_LEG, index), state, sizes[index]);
 		return short ? [short] : [];
 	});
-	if (!result.ok || shortFills.length === 0) return result;
+	if (shortFills.length === 0) return result;
 	const detail = [result.detail, ...shortFills].filter(Boolean).join(". ");
-	return { ok: true, outcome: "partiallyFilled", detail };
+	return { ...result, outcome: "partiallyFilled", detail };
+}
+
+function soleFillPrice(states: LegState[], legs: PlanLeg[]): string | undefined {
+	const entries = states.filter((_, index) => {
+		const role = (legs[index] ?? UNNAMED_LEG).role;
+		return role !== "takeProfit" && role !== "stopLoss";
+	});
+	const [only] = entries;
+	if (entries.length !== 1 || only.status !== "placed" || only.outcome !== "filled") return undefined;
+	return only.avgPx;
 }
 
 function describeShortFill(name: string, state: LegState, size: string | undefined): string | null {
@@ -113,7 +125,7 @@ function describeShortFill(name: string, state: LegState, size: string | undefin
 	return t`${name} partially filled: ${state.filledSz} of ${size}, ${rest} not filled`;
 }
 
-function summarizePlacedOutcomes(states: LegState[], legs: PlanLeg[]): OrderResult {
+function summarizePlacedOutcomes(states: LegState[], legs: PlanLeg[]): PlacedResult {
 	const outcomes = states.flatMap((state, index) => {
 		const role = (legs[index] ?? UNNAMED_LEG).role;
 		const isChild = role === "takeProfit" || role === "stopLoss";

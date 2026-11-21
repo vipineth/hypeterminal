@@ -121,7 +121,10 @@ export function resultToQueueUpdate(result: OrderResult): Partial<Omit<OrderQueu
 		error: undefined,
 		resends: undefined,
 	};
-	if (result.ok) return { ...cleared, status: "success", outcome: result.outcome, detail: result.detail };
+	if (result.ok) {
+		const fillPrice = result.avgPx ? { price: result.avgPx } : {};
+		return { ...cleared, ...fillPrice, status: "success", outcome: result.outcome, detail: result.detail };
+	}
 	switch (result.status) {
 		case "unsettled":
 			return {

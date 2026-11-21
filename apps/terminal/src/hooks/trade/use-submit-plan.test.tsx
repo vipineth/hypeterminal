@@ -111,7 +111,7 @@ describe("retry and cancel on an unconfirmed order", () => {
 		const requestKey = await sendUnconfirmed(hook);
 		const result = await settle(hook.retryRequest(requestKey));
 		net.venue.deliverInTransit();
-		expect(result).toEqual({ ok: true, outcome: "filled" });
+		expect(result).toEqual({ ok: true, outcome: "filled", avgPx: "90" });
 		expect(new Set(net.venue.exchangeRequests).size).toBe(1);
 		expect(net.venue.state.placedLegs).toBe(1);
 	});
@@ -175,7 +175,7 @@ describe("retry and cancel on an unconfirmed order", () => {
 			lookup: { kind: "order", statuses: [{ status: "unknownOid" }] },
 		});
 		const next = await settle(hook.submitPlan(MARKET_BUY));
-		expect(next).toEqual({ ok: true, outcome: "filled" });
+		expect(next).toEqual({ ok: true, outcome: "filled", avgPx: "90" });
 	});
 
 	it("gives a request that blocks a press in another tab its own row, with Dismiss once it is past expiry", async () => {
@@ -259,8 +259,12 @@ describe("collateral after the exchange rejects a submit", () => {
 		const { trackCollateralReceipts } = await import("@/stores/use-collateral-generation-store");
 		const store = createHyperliquidStore(createHyperliquidConfig());
 		trackCollateralReceipts(store);
-		const key = serializeKey(subscriptionKeys.method("spotState", { user: "0x0000000000000000000000000000000000000001" }));
-		const snapshot = { spotState: { balances: [{ coin: "USDC", token: 0, total: "100.0", hold: "0.0", entryNtl: "0.0" }] } };
+		const key = serializeKey(
+			subscriptionKeys.method("spotState", { user: "0x0000000000000000000000000000000000000001" }),
+		);
+		const snapshot = {
+			spotState: { balances: [{ coin: "USDC", token: 0, total: "100.0", hold: "0.0", entryNtl: "0.0" }] },
+		};
 		store.getState().acquireSubscription(key, () => new Promise(() => {}));
 		store.getState().setSubscriptionData(key, snapshot);
 		return snapshot;

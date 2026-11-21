@@ -1072,7 +1072,7 @@ describe("order legs the ticket reports and retries", () => {
 		marketOrder("6");
 		net.venue.nextExchangeRequests("lost");
 		await pressSubmitPastRetries();
-		expect(lastQueueUpdate()).toEqual({ status: "success", outcome: "filled" });
+		expect(lastQueueUpdate()).toEqual({ status: "success", outcome: "filled", price: "82.283" });
 		expect(net.venue.state.placedLegs).toBe(1);
 		expect(distinctOrderNonces()).toBe(1);
 	});
